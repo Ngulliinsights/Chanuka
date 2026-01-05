@@ -9,6 +9,43 @@ import { colorTokens } from '../tokens/colors';
 import { shadowTokens } from '../tokens/shadows';
 import { spacingTokens } from '../tokens/spacing';
 
+type EmptyStateConfig = {
+  className: string;
+  children: {
+    icon: {
+      className: string;
+      name: string;
+      style: Record<string, string>;
+      'aria-hidden': string;
+    };
+    content: {
+      className: string;
+      children: {
+        title: { className: string; text: string; };
+        description: { className: string; text: string; };
+        suggestion: { className: string; text: string; };
+        actions?: {
+          className: string;
+          children: Array<{
+            key: number;
+            className: string;
+            onClick: () => void;
+            text: string;
+          }>;
+        };
+      };
+    };
+  };
+};
+
+type ContextualEmptyStateContext = {
+  dashboard: () => string;
+  table: () => string;
+  search: () => string;
+  notifications: () => string;
+  favorites: () => string;
+};
+
 export const emptyStates = {
   // Base empty state styles
   base: {
@@ -285,28 +322,47 @@ export const emptyStates = {
 export const emptyStateUtils: {
   getEmptyStateClasses: (
     type?: keyof typeof emptyStates.types,
-    variant?: keyof typeof emptyStates.variants
+    variant?: keyof typeof emptyStates.layouts,
+    context?: keyof typeof emptyStates.context
   ) => string;
-  getEmptyStateContent: (
-    type: keyof typeof emptyStates.types,
-    context?: string
-  ) => {
-    title: string;
-    description: string;
-    icon: string;
-    action?: string;
-  };
   getContextualSuggestions: (context: string, _user_role?: string) => string[];
+  createEmptyState: (config: {
+    type: keyof typeof emptyStates.types;
+    title?: string;
+    description?: string;
+    suggestion?: string;
+    actions?: Array<{
+      label: string;
+      action: () => void;
+      type?: 'primary' | 'secondary';
+    }>;
+    layout?: keyof typeof emptyStates.layouts;
+    context?: keyof typeof emptyStates.context;
+    customIcon?: {
+      name: string;
+      color?: string;
+      size?: string;
+    };
+  }) => EmptyStateConfig;
+  createContextualEmptyState: (context: ContextualEmptyStateContext) => ContextualEmptyStateContext;
+  generateCSS: () => string;
+  validateAccessibility: (emptyState: {
+    hasDescriptiveText: boolean;
+    hasActionableElements: boolean;
+    hasProperHeadingStructure: boolean;
+    hasKeyboardNavigation: boolean;
+    meetsContrastRequirements: boolean;
+  }) => { isValid: boolean; issues: string[] };
 } = {
   /**
    * Get empty state classes
    */
   getEmptyStateClasses: (
     type: keyof typeof emptyStates.types = 'noData',
-    layout: keyof typeof emptyStates.layouts = 'standard',
+    variant: keyof typeof emptyStates.layouts = 'standard',
     context?: keyof typeof emptyStates.context
   ): string => {
-    const classes = [`chanuka-empty-state`, `chanuka-empty-${type}`, `chanuka-empty-${layout}`];
+    const classes = [`chanuka-empty-state`, `chanuka-empty-${type}`, `chanuka-empty-${variant}`];
     if (context) classes.push(`chanuka-empty-${context}`);
     return classes.join(' ');
   },
@@ -333,7 +389,7 @@ export const emptyStateUtils: {
     };
   }) => {
     const typeConfig = emptyStates.types[config.type];
-    
+
     return {
       className: emptyStateUtils.getEmptyStateClasses(config.type, config.layout, config.context),
       children: {
@@ -383,11 +439,11 @@ export const emptyStateUtils: {
    * Create contextual empty states
    */
   createContextualEmptyState: (context: {
-    dashboard: () => ReturnType<typeof emptyStateUtils.createEmptyState>;
-    table: () => ReturnType<typeof emptyStateUtils.createEmptyState>;
-    search: () => ReturnType<typeof emptyStateUtils.createEmptyState>;
-    notifications: () => ReturnType<typeof emptyStateUtils.createEmptyState>;
-    favorites: () => ReturnType<typeof emptyStateUtils.createEmptyState>;
+    dashboard: () => string;
+    table: () => string;
+    search: () => string;
+    notifications: () => string;
+    favorites: () => string;
   }) => context,
 
   /**
@@ -546,27 +602,27 @@ export const emptyStateUtils: {
     meetsContrastRequirements: boolean;
   }): { isValid: boolean; issues: string[] } => {
     const issues: string[] = [];
-    
+
     if (!emptyState.hasDescriptiveText) {
       issues.push('Empty state must have clear, descriptive text');
     }
-    
+
     if (!emptyState.hasActionableElements) {
       issues.push('Empty state should provide actionable elements when appropriate');
     }
-    
+
     if (!emptyState.hasProperHeadingStructure) {
       issues.push('Empty state should use proper heading hierarchy');
     }
-    
+
     if (!emptyState.hasKeyboardNavigation) {
       issues.push('Empty state actions must be keyboard accessible');
     }
-    
+
     if (!emptyState.meetsContrastRequirements) {
       issues.push('Empty state must meet WCAG contrast requirements');
     }
-    
+
     return {
       isValid: issues.length === 0,
       issues,
@@ -600,7 +656,7 @@ export const emptyStateUtils: {
         'Your saved items will appear here',
       ],
     };
-    
+
     return suggestions[context] || ['Try refreshing the page', 'Contact support if the issue persists'];
   },
 } as const;

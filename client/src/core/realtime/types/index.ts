@@ -9,7 +9,7 @@
 import type {
   ConnectionQuality,
   WebSocketMessage
-} from '@shared/schema/websocket';
+} from '../../../../shared/schema/websocket';
 
 import { WebSocketClient } from '../websocket-client';
 
@@ -17,7 +17,7 @@ import { WebSocketClient } from '../websocket-client';
 export type {
   ConnectionQuality,
   WebSocketMessage
-} from '@shared/schema/websocket';
+} from '../../../../shared/schema/websocket';
 
 export { WebSocketClient };
 
@@ -32,6 +32,22 @@ export enum ConnectionState {
   RECONNECTING = 'reconnecting',
   CLOSED = 'closed',
   FAILED = 'failed'
+}
+
+// ============================================================================
+// Polling Fallback Configuration
+// ============================================================================
+
+export interface PollingFallbackConfig {
+  enabled: boolean;
+  intervals: {
+    bills: number;
+    engagement: number;
+    notifications: number;
+    community: number;
+  };
+  max_retries: number;
+  backoff_multiplier: number;
 }
 
 // ============================================================================

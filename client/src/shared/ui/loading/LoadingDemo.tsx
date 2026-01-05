@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
 
-import { 
+import {
   LoadingStateManager,
   PageLoader,
   ComponentLoader,
@@ -16,7 +16,7 @@ import {
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');
   const [selectedDemo, setSelectedDemo] = useState('basic');
-  
+
   // Progressive loading stages configuration
   const progressiveStages = [
     { id: 'init', message: 'Initializing...', duration: 2000 },
@@ -108,7 +108,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <PageLoader isLoading={true} message="Loading page..." />
+                      <PageLoader isLoading={true} />
                     </div>
                   </CardContent>
                 </Card>
@@ -119,7 +119,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <ComponentLoader isLoading={true} message="Loading component..." />
+                      <ComponentLoader isLoading={true} />
                     </div>
                   </CardContent>
                 </Card>
@@ -130,7 +130,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded flex items-center justify-center">
-                      <LoadingStateManager type="component" state="loading" message="Loading..." />
+                      <LoadingStateManager>Loading...</LoadingStateManager>
                     </div>
                   </CardContent>
                 </Card>
@@ -149,16 +149,11 @@ export const LoadingDemo: React.FC = () => {
                       Reset
                     </Button>
                   </div>
-                  
+
                   <div className="h-48 border rounded">
-                    <LoadingStateManager
-                      type="component"
-                      state={demoState}
-                      message="Loading demo content..."
-                      error={demoState === 'error' ? new Error('Demo error occurred') : undefined}
-                      onRetry={simulateBasicLoading}
-                      showDetails={true}
-                    />
+                    <LoadingStateManager>
+                      Loading demo content...
+                    </LoadingStateManager>
                   </div>
                 </CardContent>
               </Card>
@@ -173,10 +168,8 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <ConnectionAwareLoader 
-                        size="md" 
-                        message="Loading with connection awareness..."
-                        showMessage={true}
+                      <ConnectionAwareLoader
+                        isLoading={true}
                       />
                     </div>
                   </CardContent>
@@ -188,7 +181,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <ConnectionAwareLoader />
+                      <ConnectionAwareLoader isLoading={true} />
                     </div>
                   </CardContent>
                 </Card>
@@ -213,14 +206,12 @@ export const LoadingDemo: React.FC = () => {
                       Simulate Timeout
                     </Button>
                   </div>
-                  
+
                   <div className="h-48 border rounded">
                     {timeoutOperation.isLoading ? (
-                      <LoadingStateManager
-                        type="component"
-                        state="loading"
-                        message="Operation in progress..."
-                      />
+                      <LoadingStateManager>
+                        Operation in progress...
+                      </LoadingStateManager>
                     ) : (
                       <div className="flex items-center justify-center h-full text-muted-foreground">
                         Click "Start Timeout Demo" to begin
@@ -239,13 +230,13 @@ export const LoadingDemo: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex space-x-2">
-                    <Button 
+                    <Button
                       onClick={simulateProgressiveLoading}
                       disabled={!progressiveLoading.isComplete}
                     >
                       Start Progressive Loading
                     </Button>
-                    <Button 
+                    <Button
                       onClick={() => progressiveLoading.reset()}
                       disabled={progressiveLoading.isComplete}
                       variant="outline"
@@ -253,15 +244,13 @@ export const LoadingDemo: React.FC = () => {
                       Reset
                     </Button>
                   </div>
-                  
+
                   <div className="h-64 border rounded">
                     {!progressiveLoading.isComplete ? (
                       <div className="p-4">
-                        <LoadingStateManager
-                          type="component"
-                          state="loading"
-                          message={progressiveLoading.currentStage?.message || "Loading..."}
-                        />
+                        <LoadingStateManager>
+                          {progressiveLoading.currentStage?.message || "Loading..."}
+                        </LoadingStateManager>
                         <div className="mt-4 text-sm text-muted-foreground text-center">
                           Stage 1 of {progressiveStages.length}
                         </div>
@@ -288,7 +277,7 @@ export const LoadingDemo: React.FC = () => {
                       Start Multiple Operations
                     </Button>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h4 className="font-medium mb-2">Active Operations</h4>
@@ -299,7 +288,7 @@ export const LoadingDemo: React.FC = () => {
                             <div>Connection: Online</div>
                           </div>
                         </div>
-   
+
                         <div>
                           <h4 className="font-medium mb-2">Adaptive Settings</h4>
                           <div className="text-sm space-y-1">

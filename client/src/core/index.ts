@@ -3,7 +3,7 @@
  *
  * This module focuses on business logic, domain services, and feature-specific
  * functionality. Technical infrastructure has been moved to the shared module
- * following the architectural principle: "shared/ handles UI concerns and 
+ * following the architectural principle: "shared/ handles UI concerns and
  * infrastructure, core/ handles business logic."
  *
  * For technical infrastructure, see the shared/infrastructure module.
@@ -228,6 +228,12 @@ export * from './navigation';
 export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../shared/types';
 export type { UserProfile, UserPreferences as FeatureUserPreferences } from '../features/users/types';
 export type { SearchQuery, SearchResult, SearchFilters, SearchResponse, SearchMetadata } from '../features/search/types';
+
+// ============================================================================
+// Client Architecture Foundation
+// ============================================================================
+
+export * from './architecture';
 
 // ============================================================================
 // Default Export

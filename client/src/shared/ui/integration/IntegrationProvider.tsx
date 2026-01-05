@@ -7,16 +7,17 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { TouchHandler } from '@/core/mobile/touch-handler';
-import { DeviceDetector } from '@client/core/mobile';
-import { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
-import { logger } from '@client/utils/logger';
+import { DeviceDetector } from '@/core/mobile';
+import { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
+import { logger } from '@/utils/logger';
+// TouchHandler is deprecated - using SwipeGestures instead
+// import { useSwipeGesture } from '@/hooks/mobile/useSwipeGesture'; // Unused
 import {
   CSPManager,
   DOMSanitizer,
   InputValidator,
   PasswordValidator,
-} from '@client/utils/security';
+} from '@/utils/security';
 
 import { IntegrationContext } from './context/IntegrationContext';
 import { useIntegration } from './hooks/useIntegration';
@@ -141,7 +142,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         setStatus(prev => ({ ...prev, mobile: 'loading' }));
 
         const deviceDetector = DeviceDetector.getInstance();
-        const touchHandler = TouchHandler.getInstance();
+        // TouchHandler is deprecated - using SwipeGestures instead
 
         // Initialize mobile utilities
         const deviceInfo = deviceDetector.getDeviceInfo();
@@ -167,7 +168,7 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
             passwordValidator,
             privacyAnalytics,
             deviceDetector,
-            touchHandler,
+            // touchHandler removed - use SwipeGestures component instead
           });
 
           logger.info('Tier 1 integration completed successfully', {

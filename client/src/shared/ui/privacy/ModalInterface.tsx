@@ -3,7 +3,7 @@
  * Modal wrapper for dashboard integration
  */
 
-import { PrivacySettings } from '@client/core/auth';
+import { PrivacySettings } from '@/core/auth';
 
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@client/shared/design-system/interactive/Dialog';
+} from '@/shared/design-system/interactive/Dialog';
 
 import { FullInterface } from './FullInterface';
 

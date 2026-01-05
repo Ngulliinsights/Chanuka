@@ -3,17 +3,17 @@ import {
   Clock,
   AlertTriangle,
   Settings,
-  GitBranch,
+  Network as GitBranch, // Using Network as GitBranch replacement
   Shield,
   Database,
-  Layers,
+  LayoutGrid as Layers, // Using LayoutGrid as Layers replacement
   RefreshCw
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
+import { Progress } from '@/shared/design-system';
 
 interface MigrationPhase {
   id: string;

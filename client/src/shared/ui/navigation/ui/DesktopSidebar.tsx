@@ -2,10 +2,10 @@ import { Search, PanelLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
-import { 
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Card, CardContent } from '@/shared/design-system';
+import {
   CommandDialog,
   CommandInput,
   CommandList,
@@ -13,8 +13,8 @@ import {
   CommandGroup,
   CommandItem,
   CommandShortcut
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
+} from '@/shared/design-system';
+import { Input } from '@/shared/design-system';
 
 import { useNav } from '../hooks/useNav';
 
@@ -49,9 +49,9 @@ const navigationUtils = {
    * Returns only items with valid id, label, and href to prevent runtime errors.
    */
   validateNavigationItems(items: NavigationItem[]): NavigationItem[] {
-    return items.filter(item => 
-      item.id && 
-      item.label && 
+    return items.filter(item =>
+      item.id &&
+      item.label &&
       item.href &&
       typeof item.href === 'string'
     );
@@ -62,8 +62,8 @@ const navigationUtils = {
    * This ensures users only see navigation items they have access to.
    */
   filterNavigationByAccess(
-    items: NavigationItem[], 
-    userRole?: string, 
+    items: NavigationItem[],
+    userRole?: string,
     isAuthenticated?: boolean
   ): NavigationItem[] {
     return items.filter(item => {
@@ -85,10 +85,10 @@ const navigationUtils = {
    */
   searchNavigationItems(query: string, items: NavigationItem[]): NavigationItem[] {
     const lowerQuery = query.toLowerCase().trim();
-    
+
     if (!lowerQuery) return items;
-    
-    return items.filter(item => 
+
+    return items.filter(item =>
       item.label.toLowerCase().includes(lowerQuery) ||
       item.href.toLowerCase().includes(lowerQuery) ||
       (item.section && item.section.toLowerCase().includes(lowerQuery))
@@ -111,12 +111,12 @@ export const DesktopSidebar = React.memo(() => {
   const { items, user_role, isAuthenticated } = useNav();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Component state organized by purpose for clarity
   const [searchQuery, setSearchQuery] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
-  
+
   /**
    * Validates and filters navigation items in a single pass.
    * Using useMemo prevents recalculating this on every render when dependencies haven't changed.
@@ -129,7 +129,7 @@ export const DesktopSidebar = React.memo(() => {
       isAuthenticated
     );
   }, [items, user_role, isAuthenticated]);
-  
+
   /**
    * Applies search filter to validated items.
    * Separated from validation logic for better performance and clarity.
@@ -137,7 +137,7 @@ export const DesktopSidebar = React.memo(() => {
   const filteredItems = useMemo(() => {
     return navigationUtils.searchNavigationItems(searchQuery, validatedItems);
   }, [validatedItems, searchQuery]);
-  
+
   /**
    * Handles keyboard shortcut for command palette (Cmd/Ctrl + K).
    * Using useCallback ensures the same function reference across renders.
@@ -201,7 +201,7 @@ export const DesktopSidebar = React.memo(() => {
     navigate(href);
     setShowCommandPalette(false);
   }, [navigate]);
-  
+
   return (
     <>
       {/* Command Palette provides quick keyboard-driven navigation */}
@@ -209,7 +209,7 @@ export const DesktopSidebar = React.memo(() => {
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          
+
           <CommandGroup heading="Navigation">
             {validatedItems.map((item) => (
               <CommandItem
@@ -243,7 +243,7 @@ export const DesktopSidebar = React.memo(() => {
       </CommandDialog>
 
       {/* Main sidebar container with smooth collapse animation */}
-      <aside 
+      <aside
         className={`flex flex-col h-full bg-background border-r border-border transition-all duration-300 ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}
@@ -312,7 +312,7 @@ export const DesktopSidebar = React.memo(() => {
             ) : (
               filteredItems.map((item) => {
                 const isActive = location.pathname === item.href;
-                
+
                 return (
                   <Button
                     key={item.id}

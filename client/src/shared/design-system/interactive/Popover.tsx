@@ -3,7 +3,7 @@ import { AlertCircle } from "lucide-react"
 import * as React from "react"
 
 import { cn } from '../lib/utils'
-import { UIComponentError, attemptUIRecovery, getUIRecoverySuggestions } from '../utils'
+import { UIComponentError, attemptUIRecovery } from '../utils'
 
 const Popover = PopoverPrimitive.Root
 
@@ -37,13 +37,13 @@ interface EnhancedPopoverProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>> = ({ 
-  children, 
-  onError, 
-  fallbackContent, 
-  open, 
-  onOpenChange, 
-  ...props 
+const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>> = ({
+  children,
+  onError,
+  fallbackContent,
+  open,
+  onOpenChange,
+  ...props
 }) => {
   const [error, setError] = React.useState<UIComponentError | null>(null);
 
@@ -53,7 +53,7 @@ const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWitho
 
     try {
       const recoveryResult = await attemptUIRecovery(componentError);
-      
+
       if (recoveryResult.success) {
         setError(null);
       }
@@ -80,8 +80,8 @@ const EnhancedPopover: React.FC<EnhancedPopoverProps & React.ComponentPropsWitho
   }
 
   return (
-    <PopoverPrimitive.Root 
-      open={open} 
+    <PopoverPrimitive.Root
+      open={open}
       onOpenChange={handleOpenChange}
       {...props}
     >
@@ -113,7 +113,7 @@ const EnhancedPopoverContent = React.forwardRef<
         boundaryError instanceof Error ? boundaryError.message : 'Content render error'
       );
       handleError(componentError);
-      
+
       return (
         <div className="p-3 text-sm text-destructive flex items-center gap-2">
           <AlertCircle className="h-4 w-4" />
@@ -144,9 +144,9 @@ const EnhancedPopoverContent = React.forwardRef<
 });
 EnhancedPopoverContent.displayName = "EnhancedPopoverContent";
 
-export { 
-  Popover, 
-  PopoverTrigger, 
+export {
+  Popover,
+  PopoverTrigger,
   PopoverContent,
   EnhancedPopover,
   EnhancedPopoverContent

@@ -1,16 +1,16 @@
 import { formatDistanceToNow } from 'date-fns';
 import { TrendingUp, Star } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { TrackedBill, BillRecommendation } from '@client/shared/types/user-dashboard';
+} from '@/shared/design-system';
+import { TrackedBill, BillRecommendation } from '@/shared/types/user-dashboard';
 
 interface BillsSectionProps {
   trackedBills?: TrackedBill[];

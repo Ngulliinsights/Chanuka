@@ -1,4 +1,4 @@
-import type { NavigationItem, UserRole } from '@client/shared/types';
+import type { NavigationItem, UserRole } from '@/shared/types';
 
 export const canViewItem = (item: NavigationItem, role: UserRole, user: unknown | null): boolean => {
   if (item.adminOnly && role !== 'admin') return false;

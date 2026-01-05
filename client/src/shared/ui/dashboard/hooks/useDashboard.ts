@@ -3,7 +3,7 @@
  * Following navigation component hook patterns
  */
 
-import { useBills } from '@client/features/bills';
+import { useBills } from '@/features/bills';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import {
@@ -11,21 +11,21 @@ import {
   DashboardDataFetchError,
   DashboardActionError,
   DashboardTopicError
-} from '@client/core/error';
-import { getRecoveryStrategy, executeRecovery } from '@client/core/recovery';
+} from '@/core/error';
+import { getRecoveryStrategy, executeRecovery } from '@/core/recovery';
 import {
   validateDashboardData,
   validateActionItem,
   validateTrackedTopic,
   safeValidateDashboardConfig
-} from '@client/core/validation';
+} from '@/core/validation';
 import type {
   DashboardData,
   DashboardConfig,
   UseDashboardResult,
   ActionItem,
   TrackedTopic
-} from '@client/shared/types';
+} from '@/shared/types';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds
@@ -64,7 +64,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
 
   // Transform bills data to dashboard data format
   const dashboardData: DashboardData = useMemo(() => ({
-    summary: billsQuery.data?.summary || {
+    summary: (billsQuery.data as any)?.summary || {
       billsTracked: 0,
       actionsNeeded: 0,
       topicsCount: 0,
@@ -73,8 +73,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       pendingActions: 0,
       lastUpdated: new Date()
     },
-    actionItems: billsQuery.data?.actionItems as ActionItem[] || [],
-    trackedTopics: billsQuery.data?.trackedTopics as TrackedTopic[] || [],
+    actionItems: (billsQuery.data as any)?.actionItems as ActionItem[] || [],
+    trackedTopics: (billsQuery.data as any)?.trackedTopics as TrackedTopic[] || [],
     isLoading: billsQuery.isLoading,
     error: billsQuery.error,
     lastRefresh

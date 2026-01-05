@@ -117,7 +117,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           },
         } : {}
       ),
-      
+
       // Bundle analyzer generates a visual representation of your bundle composition
       // Enable with ANALYZE=true environment variable or analyze mode
       // This helps identify optimization opportunities like large dependencies
@@ -161,7 +161,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       devSourcemap: isDevelopment,
       postcss: path.resolve(rootDir, '.'),
     },
-    
+
     // ============================================================================
     // MODULE RESOLUTION - Configure how imports are resolved
     // ============================================================================
@@ -171,25 +171,24 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         '@': path.resolve(rootDir, './src'),
         '@client': path.resolve(rootDir, './src'),
         '@client/*': path.resolve(rootDir, './src/*'),
-        '@chanuka/shared': path.resolve(rootDir, '../shared'),
         '@shared': path.resolve(rootDir, '../shared'),
         '@shared/*': path.resolve(rootDir, '../shared/*'),
-        
+
         // Client-safe shared module paths
         '@shared/core/utils': path.resolve(rootDir, '../shared/core/src/utils'),
         '@shared/core': path.resolve(rootDir, '../shared/core/src'),
         '@shared/schema': path.resolve(rootDir, '../shared/schema'),
         '@shared/platform': path.resolve(rootDir, '../shared/platform'),
         '@shared/i18n': path.resolve(rootDir, '../shared/i18n'),
-        
+
         // Exclude server-only modules (redirect to stubs)
         '@shared/database': path.resolve(rootDir, './src/stubs/database-stub.ts'),
         '@shared/core/middleware': path.resolve(rootDir, './src/stubs/middleware-stub.ts'),
-        
+
         // Security fixes - redirect to secure implementations
         '@client/utils/authenticated-api': path.resolve(rootDir, './src/utils/secure-authenticated-api.ts'),
         '@client/utils/secure-token-manager': path.resolve(rootDir, './src/utils/secure-token-manager.ts'),
-        
+
         // Logger consolidation - redirect all logger imports to unified implementation
         '@client/utils/logger': path.resolve(rootDir, './src/utils/logger.ts'),
         '@client/utils/logger-simple': path.resolve(rootDir, './src/utils/logger.ts'),
@@ -262,11 +261,11 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // ============================================================================
     build: {
       outDir: 'dist',
-      
+
       // CSS code splitting allows each route to load only its required styles
       // This improves initial load time by deferring non-critical CSS
       cssCodeSplit: true,
-      
+
       // Source maps help debug production issues
       // 'hidden' creates maps but doesn't reference them in bundles for security
       sourcemap: isDevelopment ? true : 'hidden',
@@ -282,28 +281,28 @@ export default defineConfig(({ mode }: ConfigEnv) => {
               if (id.includes('react') || id.includes('react-dom')) {
                 return 'react-core'
               }
-              
+
               // UI libraries are grouped together because they're often used together
               // Keeping related dependencies together reduces the number of requests
-              if (id.includes('@radix-ui') || id.includes('lucide-react') || 
+              if (id.includes('@radix-ui') || id.includes('lucide-react') ||
                   id.includes('clsx') || id.includes('tailwind-merge') ||
                   id.includes('class-variance-authority')) {
                 return 'ui-core'
               }
-              
+
               // Data fetching and form libraries power interactive features
               // Grouping them means they load together when needed
               if (id.includes('@tanstack/react-query') || id.includes('axios') ||
                   id.includes('react-hook-form') || id.includes('zod')) {
                 return 'data-forms'
               }
-              
+
               // Heavy libraries are isolated so they can be lazy loaded
               // This prevents them from blocking initial page render
               if (id.includes('recharts') || id.includes('date-fns')) {
                 return 'heavy-libs'
               }
-              
+
               // Catch-all for remaining vendor code
               return 'vendor'
             }
@@ -311,22 +310,22 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             // Application code splitting by feature improves code organization
             if (id.includes('src/')) {
               // Core infrastructure is needed everywhere, so load it upfront
-              if (id.includes('src/components/layout') || 
+              if (id.includes('src/components/layout') ||
                   id.includes('src/components/navigation') ||
                   id.includes('src/hooks/use-') ||
                   id.includes('src/utils/browser-') ||
                   id.includes('src/store/')) {
                 return 'app-core'
               }
-              
+
               // Feature-specific code gets its own chunk per feature
               // This enables route-based code splitting for optimal loading
-              if (id.includes('src/pages/') || 
+              if (id.includes('src/pages/') ||
                   id.includes('src/features/') ||
                   id.includes('src/components/bills/') ||
                   id.includes('src/components/analysis/')) {
                 const pathParts = id.split('/')
-                const featureIndex = pathParts.findIndex(part => 
+                const featureIndex = pathParts.findIndex(part =>
                   part === 'pages' || part === 'features' || part === 'bills' || part === 'analysis'
                 )
                 if (featureIndex !== -1 && pathParts[featureIndex + 1]) {
@@ -334,12 +333,12 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                 }
                 return 'features'
               }
-              
+
               // Mobile-specific code can be lazy loaded on mobile devices only
               if (id.includes('src/components/mobile/')) {
                 return 'mobile'
               }
-              
+
               return 'app'
             }
           },
@@ -401,11 +400,11 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Chunk size limit enforces discipline around bundle size
       // If exceeded, you need to improve code splitting or remove dependencies
       chunkSizeWarningLimit: 500, // 500KB per chunk
-      
+
       // Terser minification produces smaller bundles than esbuild
       // The tradeoff is slightly slower builds, but worth it for production
       minify: isProduction ? 'terser' : false,
-      
+
       ...(isProduction ? {
         terserOptions: {
           compress: {
@@ -430,20 +429,20 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           },
         } as MinifyOptions,
       } : {}),
-      
+
       // Files smaller than 4KB are inlined as base64 data URLs
       // This reduces HTTP requests at the cost of slightly larger HTML
       // The tradeoff is worth it for small assets like icons
       assetsInlineLimit: 4096,
-      
+
       // Reporting compressed sizes helps track bundle size over time
       // This is the size users actually download, not the raw file size
       reportCompressedSize: isProduction,
-      
+
       // ES2020 target works in all browsers from the last few years
       // Targeting modern browsers allows smaller, faster code
       target: 'es2020',
-      
+
       // CSS minification removes whitespace and optimizes selectors
       cssMinify: isProduction,
     },

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-// import { useWebSocket } from '@client/hooks/useWebSocket';
+// import { useWebSocket } from '@/hooks/useWebSocket';
 import { Bell, AlertCircle, Info, X } from 'lucide-react';
 
-import { cn } from '@client/lib/utils';
-// import { logger } from '@client/utils/logger';
+import { cn } from '@/shared/design-system/utils/cn';
+// import { logger } from '@/utils/logger';
 
 interface Notification {
   id: string;
@@ -21,14 +21,14 @@ interface RealTimeNotificationsProps {
   autoHideDelay?: number;
 }
 
-export function RealTimeNotifications({ 
-  className, 
+export function RealTimeNotifications({
+  className,
   // maxNotifications = 5, // Unused parameter
   // autoHideDelay = 5000 // Unused parameter
 }: RealTimeNotificationsProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  
+
   // Mock WebSocket functionality
   const isConnected = false;
   // const addMessageHandler = () => () => {}; // Unused variable
@@ -40,8 +40,8 @@ export function RealTimeNotifications({
   }, []);
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
+    setNotifications(prev =>
+      prev.map(notif =>
         notif.id === id ? { ...notif, read: true } : notif
       )
     );
@@ -85,13 +85,13 @@ export function RealTimeNotifications({
         title={isConnected ? "Real-time notifications" : "Connecting..."}
       >
         <Bell className="h-6 w-6" />
-        
+
         {/* Connection indicator */}
         <div className={cn(
           "absolute -top-1 -right-1 w-3 h-3 rounded-full",
           isConnected ? "bg-green-500" : "bg-red-500"
         )} />
-        
+
         {/* Unread count badge */}
         {unreadCount > 0 && (
           <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -134,7 +134,7 @@ export function RealTimeNotifications({
                 )}>
                   <div className="flex items-start gap-3">
                     {getNotificationIcon(notification.type)}
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{notification.title}</h4>

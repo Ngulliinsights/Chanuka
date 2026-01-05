@@ -7,7 +7,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { cn } from '@client/shared/design-system';
+import { cn } from '@/shared/design-system';
 
 import { DashboardConfig } from '../types';
 

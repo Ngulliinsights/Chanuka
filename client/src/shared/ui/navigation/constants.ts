@@ -1,4 +1,4 @@
-import type { NavigationItem, NavigationSection } from '@client/shared/types';
+import type { NavigationItem, NavigationSection } from '@/shared/types';
 
 export const SECTION_TITLES: Record<NavigationSection, string> = {
   legislative: 'Legislative Data',

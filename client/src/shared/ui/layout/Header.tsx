@@ -1,8 +1,8 @@
 import { BarChart3, Search, Bell, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
 
 import { cn } from '../../design-system/utils/cn';
 
@@ -19,7 +19,7 @@ interface HeaderProps {
  * Application header component
  * Provides navigation, search, and user actions
  */
-export default function Header({ 
+export default function Header({
   className,
   onMenuToggle,
   showSearch = true,
@@ -44,7 +44,7 @@ export default function Header({
             <BarChart3 className="h-5 w-5" />
           </Button>
         )}
-        
+
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">ST</span>
@@ -81,8 +81,8 @@ export default function Header({
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-5 w-5" />
             {notificationCount > 0 && (
-              <Badge 
-                variant="destructive" 
+              <Badge
+                variant="destructive"
                 className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
               >
                 {notificationCount > 9 ? '9+' : notificationCount}

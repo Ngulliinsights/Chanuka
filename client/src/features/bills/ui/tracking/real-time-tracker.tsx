@@ -6,9 +6,9 @@ import { useWebSocket } from "@client/hooks/use-websocket";
 import type { BillTrackingPreferences } from '@client/core/api/types';
 import { logger } from '@client/utils/logger';
 
-import { Badge } from '@client/shared/ui/Badge';
-import { Button } from '@client/shared/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/ui/Card';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import {
   Select,
   SelectContent,
@@ -48,9 +48,9 @@ export function RealTimeBillTracker({
     subscriptions: billId ? [{ type: 'bill', id: billId }] : [],
     handlers: {
       onBillUpdate: (update) => {
-        logger.debug('Bill update received in tracker', { 
-          billId: update.data?.billId, 
-          type: update.type 
+        logger.debug('Bill update received in tracker', {
+          billId: update.data?.billId,
+          type: update.type
         });
       },
       onNotification: (notification) => {
@@ -82,8 +82,8 @@ export function RealTimeBillTracker({
   useEffect(() => {
     if (!isConnected) {
       connect().catch((error: Error) => {
-        logger.error('Failed to connect to WebSocket:', { 
-          component: 'RealTimeBillTracker' 
+        logger.error('Failed to connect to WebSocket:', {
+          component: 'RealTimeBillTracker'
         }, error);
         toast.error("Failed to connect to real-time updates");
       });

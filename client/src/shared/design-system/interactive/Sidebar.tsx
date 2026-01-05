@@ -3,13 +3,13 @@ import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 import { forwardRef, createContext, useContext, useState, useCallback, useEffect, useMemo, ComponentProps, CSSProperties, ElementRef } from "react"
 
-import { useIsMobile } from '@client/hooks/use-mobile'
-import { cn } from '@client/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/shared/design-system/utils/cn'
 
 import { Button } from './Button'
 import { Input } from './Input'
 import { Separator } from './separator'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './Sheet'
 import { Skeleton } from './skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
 
@@ -381,7 +381,7 @@ SidebarFooter.displayName = "SidebarFooter"
 const SidebarSeparator = forwardRef<
   ElementRef<typeof Separator>,
   ComponentProps<typeof Separator>
->(({ className, ...props }, ref) => {
+>(({ className, ...props }, _ref) => {
   return (
     <Separator
       data-sidebar="separator"
@@ -576,10 +576,8 @@ const SidebarMenuButton = forwardRef<
 
     return (
       <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipTrigger>{button}</TooltipTrigger>
         <TooltipContent
-          side="right"
-          align="center"
           hidden={state !== "collapsed" || isMobile}
         >
           {tooltip.children}

@@ -1,14 +1,14 @@
 /**
  * MobileDataVisualization Component
- * 
+ *
  * Mobile-optimized charts and data visualization.
  * Includes bar charts, pie charts, and metric cards.
- * 
+ *
  * @component
  * @example
  * ```tsx
  * import { MobileDataVisualization } from '@client/shared/ui/mobile/data-display';
- * 
+ *
  * export function Analytics() {
  *   return (
  *     <MobileDataVisualization
@@ -23,7 +23,7 @@
 
 import React from 'react';
 
-import type { ChartData } from '@client/shared/types/mobile';
+import type { ChartData } from '@/shared/types/mobile';
 
 interface MobileDataVisualizationProps {
   data: ChartData;
@@ -34,7 +34,7 @@ interface MobileDataVisualizationProps {
 
 /**
  * MobileDataVisualization Component
- * 
+ *
  * Renders mobile-optimized charts and graphs.
  */
 export const MobileDataVisualization = React.forwardRef<HTMLDivElement, MobileDataVisualizationProps>(
@@ -42,7 +42,7 @@ export const MobileDataVisualization = React.forwardRef<HTMLDivElement, MobileDa
     return (
       <div ref={ref} className={`mobile-data-viz ${type} ${className || ''}`}>
         {title && <h3 className="viz-title">{title}</h3>}
-        
+
         <div className="viz-container">
           {/* Component implementation will be added here */}
           <svg className="chart">

@@ -37,7 +37,7 @@ const ComplexityDots = ({ complexity }: { complexity: 1 | 2 | 3 }) => {
 
   const complexityColors = {
     1: 'bg-green-500',
-    2: 'bg-yellow-500', 
+    2: 'bg-yellow-500',
     3: 'bg-red-500'
   };
 
@@ -47,7 +47,7 @@ const ComplexityDots = ({ complexity }: { complexity: 1 | 2 | 3 }) => {
         <div
           key={i}
           className={`w-2 h-2 rounded-full transition-all duration-200 complexity-dot ${
-            i < complexity 
+            i < complexity
               ? complexityColors[complexity]
               : 'bg-gray-300'
           }`}
@@ -67,10 +67,10 @@ const ReadingTime = ({ minutes }: { minutes: number }) => (
 );
 
 // Mobile tab selector dropdown for complex content navigation
-const MobileTabSelector = ({ 
-  sections, 
-  currentSectionId, 
-  onSectionChange 
+const MobileTabSelector = ({
+  sections,
+  currentSectionId,
+  onSectionChange
 }: {
   sections: SimpleSection[];
   currentSectionId?: string;
@@ -78,9 +78,9 @@ const MobileTabSelector = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const currentSection = sections.find(s => s.id === currentSectionId);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -160,23 +160,23 @@ const MobileTabSelector = ({
 };
 
 // Reading path guidance with step-by-step recommended exploration
-const ReadingPathGuidance = ({ 
-  sections, 
-  currentSectionId, 
-  onSectionChange 
+const ReadingPathGuidance = ({
+  sections,
+  currentSectionId,
+  onSectionChange
 }: {
   sections: SimpleSection[];
   currentSectionId?: string;
   onSectionChange?: (sectionId: string) => void;
 }) => {
   // Find current section index for navigation logic
-  const currentIndex = sections.findIndex(s => s.id === currentSectionId);
+  // const currentIndex = sections.findIndex(s => s.id === currentSectionId);
   const recommendedPath = sections.filter(s => s.isRequired);
   const nextRecommended = recommendedPath.find(s => !s.isCompleted);
 
   // Use currentIndex for navigation if needed
-  const _canGoNext = currentIndex < sections.length - 1;
-  const _canGoPrevious = currentIndex > 0;
+  // const _canGoNext = currentIndex < sections.length - 1;
+  // const _canGoPrevious = currentIndex > 0;
 
   return (
     <div className="reading-path-card mb-6">
@@ -184,7 +184,7 @@ const ReadingPathGuidance = ({
         <BookOpen className="w-5 h-5 text-blue-600" />
         <h3 className="font-semibold text-gray-900">Recommended Reading Path</h3>
       </div>
-      
+
       <div className="space-y-3">
         {recommendedPath.map((section, index) => (
           <div
@@ -194,8 +194,8 @@ const ReadingPathGuidance = ({
           >
             <div className="flex items-center gap-3">
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                section.isCompleted 
-                  ? 'bg-green-100 text-green-700' 
+                section.isCompleted
+                  ? 'bg-green-100 text-green-700'
                   : currentSectionId === section.id
                   ? 'bg-blue-100 text-blue-700'
                   : 'bg-gray-100 text-gray-600'
@@ -206,7 +206,7 @@ const ReadingPathGuidance = ({
                   index + 1
                 )}
               </div>
-              
+
               <div className="flex-1">
                 <div className="font-medium text-gray-900">{section.title}</div>
                 <div className="flex items-center gap-3 mt-1">
@@ -214,7 +214,7 @@ const ReadingPathGuidance = ({
                   <ReadingTime minutes={section.estimatedReadTime} />
                 </div>
               </div>
-              
+
               {currentSectionId === section.id && (
                 <Target className="w-4 h-4 text-blue-600" />
               )}
@@ -238,11 +238,11 @@ const ReadingPathGuidance = ({
 };
 
 // Enhanced collapsible section with progress tracking
-const SimpleSection = ({ 
-  section, 
-  isOpen, 
-  onToggle, 
-  isActive, 
+const SimpleSection = ({
+  section,
+  isOpen,
+  onToggle,
+  isActive,
   onSectionClick,
   onSectionComplete
 }: {
@@ -269,7 +269,7 @@ const SimpleSection = ({
             <ChevronRight className="w-4 h-4 text-gray-500" />
           )}
         </div>
-        
+
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className={`font-medium ${isActive ? 'text-blue-600' : 'text-gray-900'}`}>
@@ -282,11 +282,11 @@ const SimpleSection = ({
               <CheckCircle className="w-4 h-4 text-green-500" />
             )}
           </div>
-          
+
           {/* Reading progress bar for current section */}
           {section.readingProgress !== undefined && section.readingProgress > 0 && (
             <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-              <div 
+              <div
                 className="progress-bar-civic h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${section.readingProgress}%` }}
               />
@@ -294,19 +294,19 @@ const SimpleSection = ({
           )}
         </div>
       </div>
-      
+
       <div className="section-meta">
         <ComplexityDots complexity={section.complexity} />
         <ReadingTime minutes={section.estimatedReadTime} />
       </div>
     </div>
-    
+
     {isOpen && (
       <div className="collapsible-content">
         {section.content && (
           <div className="p-4">
             <p className="text-gray-700 mb-4">{section.content}</p>
-            
+
             {/* Mark as complete button */}
             {!section.isCompleted && (
               <button
@@ -323,7 +323,7 @@ const SimpleSection = ({
             )}
           </div>
         )}
-        
+
         {/* Subsections */}
         {section.subsections && section.subsections.length > 0 && (
           <div className="collapsible-subsection">
@@ -351,9 +351,9 @@ const SimpleSection = ({
 );
 
 // Main enhanced progressive disclosure component
-export const SimpleProgressiveDisclosure = ({ 
-  sections, 
-  currentSectionId, 
+export const SimpleProgressiveDisclosure = ({
+  sections,
+  currentSectionId,
   onSectionChange,
   onSectionComplete,
   showMobileSelector = true,
@@ -394,12 +394,12 @@ export const SimpleProgressiveDisclosure = ({
   const currentIndex = enhancedSections.findIndex(s => s.id === currentSectionId);
   const nextSection = currentIndex < enhancedSections.length - 1 ? enhancedSections[currentIndex + 1] : null;
   const prevSection = currentIndex > 0 ? enhancedSections[currentIndex - 1] : null;
-  
+
   // Calculate overall progress
   const totalSections = enhancedSections.length;
   const completedCount = completedSections.size;
   const overallProgress = totalSections > 0 ? (completedCount / totalSections) * 100 : 0;
-  
+
   // Calculate reading progress for current section
   const currentProgress = currentIndex >= 0 ? ((currentIndex + 1) / totalSections) * 100 : 0;
 
@@ -430,7 +430,7 @@ export const SimpleProgressiveDisclosure = ({
             <MapPin className="w-4 h-4 text-blue-500" />
             <span className="text-sm font-medium text-gray-900">Current Location</span>
           </div>
-          
+
           <div className="context-nav-current-section mb-4">
             <h3 className="font-medium text-gray-900">{currentSection.title}</h3>
             <div className="flex items-center gap-4 mt-2">
@@ -455,11 +455,11 @@ export const SimpleProgressiveDisclosure = ({
             >
               ← {prevSection?.title || 'Previous'}
             </button>
-            
+
             <span className="text-sm text-gray-600 px-3">
               {currentIndex + 1} of {enhancedSections.length}
             </span>
-            
+
             <button
               type="button"
               className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -480,7 +480,7 @@ export const SimpleProgressiveDisclosure = ({
             {completedCount} of {totalSections} completed
           </span>
         </div>
-        
+
         {/* Overall completion progress */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
@@ -488,7 +488,7 @@ export const SimpleProgressiveDisclosure = ({
             <span>{Math.round(overallProgress)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="progress-bar-overall h-2 rounded-full transition-all duration-500"
               style={{ width: `${overallProgress}%` }}
             />
@@ -502,7 +502,7 @@ export const SimpleProgressiveDisclosure = ({
             <span>{Math.round(currentProgress)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="progress-bar-civic h-2 rounded-full transition-all duration-300"
               style={{ width: `${currentProgress}%` }}
             />

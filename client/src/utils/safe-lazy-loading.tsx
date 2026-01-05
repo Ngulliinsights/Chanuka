@@ -67,15 +67,15 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
     // Simple dynamic import based on path
     switch (path) {
       case '@/pages/home':
-        return import('@client/pages/home');
+        return import('@/pages/home');
       case '@/pages/dashboard':
-        return import('@client/pages/dashboard');
+        return import('@/pages/dashboard');
       case '@/pages/bills-dashboard-page':
-        return import('@client/pages/bills/bills-dashboard-page');
+        return import('@/pages/bills/bills-dashboard-page');
       case '@/pages/auth-page':
-        return import('@client/pages/auth/auth-page');
+        return import('@/pages/auth/auth-page');
       case '@/pages/not-found':
-        return import('@client/pages/not-found');
+        return import('@/pages/not-found');
       default:
         return Promise.reject(new Error(`Unknown page path: ${path}`));
     }

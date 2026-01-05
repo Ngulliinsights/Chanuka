@@ -95,6 +95,15 @@ const buttonVariants = cva(
           'min-h-[48px]',
           'min-w-[48px]',
         ].join(' '),
+
+        icon: [
+          'p-2',
+          'text-base',
+          'rounded-md',
+          'min-h-[40px]',
+          'min-w-[40px]',
+          'aspect-square',
+        ].join(' '),
       },
 
       state: {
@@ -126,6 +135,11 @@ export interface ButtonProps
   size?: VariantProps<typeof buttonVariants>['size'];
 
   /**
+   * Render as child element instead of button
+   */
+  asChild?: boolean;
+
+  /**
    * Loading state
    */
   loading?: boolean;
@@ -153,16 +167,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       startIcon,
       endIcon,
       children,
+      asChild = false,
       ...props
     },
     ref
   ) => {
     const computedState = disabled ? 'disabled' : loading ? 'loading' : state;
+    const buttonClasses = cn(buttonVariants({ variant, size, state: computedState }), className);
+
+    if (asChild) {
+      return React.cloneElement(children as React.ReactElement, {
+        className: buttonClasses,
+        ...props,
+      });
+    }
 
     return (
       <button
         ref={ref}
-        className={cn(buttonVariants({ variant, size, state: computedState }), className)}
+        className={buttonClasses}
         disabled={disabled || loading}
         {...props}
       >

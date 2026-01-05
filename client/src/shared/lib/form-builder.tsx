@@ -20,7 +20,7 @@ import {
 } from 'react-hook-form';
 import { ZodSchema, ZodError } from 'zod';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 /**
  * Configuration options for the form builder.

@@ -1,6 +1,6 @@
 /**
  * Notification Center Component
- * 
+ *
  * Main notification management interface with filtering, categorization,
  * and real-time updates.
  */
@@ -9,7 +9,7 @@
 import { Bell, Filter, Settings, Check, X, Trash } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
-import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
+import { useNotifications, useNotificationHistory } from '@/hooks/useNotifications';
 import {
   Badge,
   Button,
@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel
-} from '@client/shared/design-system';
-import { LoadingSpinner } from '@client/shared/ui/loading';
+} from '@/shared/design-system';
+import { LoadingSpinner } from '@/shared/ui/loading';
 
 import { NotificationItem } from './NotificationItem';
 import NotificationPreferences from './NotificationPreferences';
@@ -50,10 +50,10 @@ interface CategoryOption {
 type BulkActionType = 'read' | 'delete' | 'archive';
 type ViewType = 'recent' | 'history';
 
-export function NotificationCenter({ 
-  className = '', 
+export function NotificationCenter({
+  className = '',
   maxHeight = '400px',
-  showPreferences = true 
+  showPreferences = true
 }: NotificationCenterProps) {
   const {
     notifications,
@@ -123,8 +123,8 @@ export function NotificationCenter({
   }, [selectedNotifications, bulkMarkAsRead, bulkDelete, archiveOld]);
 
   const handleSelectNotification = useCallback((notificationId: string, selected: boolean) => {
-    setSelectedNotifications(prev => 
-      selected 
+    setSelectedNotifications(prev =>
+      selected
         ? [...prev, notificationId]
         : prev.filter(id => id !== notificationId)
     );
@@ -184,8 +184,8 @@ export function NotificationCenter({
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <Badge 
-            variant="destructive" 
+          <Badge
+            variant="destructive"
             className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
           >
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -195,7 +195,7 @@ export function NotificationCenter({
 
       {/* Notification Panel */}
       {isOpen && (
-        <div 
+        <div
           className={`absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden`}
           style={{ maxHeight }}
         >
@@ -211,7 +211,7 @@ export function NotificationCenter({
                 </Badge>
               )}
             </div>
-            
+
             <div className="flex items-center gap-1">
               {/* View Toggle */}
               <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
@@ -280,7 +280,7 @@ export function NotificationCenter({
               <Filter className="h-4 w-4 text-gray-500" />
               <span className="text-sm text-gray-600 dark:text-gray-400">Filter by category:</span>
             </div>
-            
+
             <div className="flex flex-wrap gap-1">
               {categoryOptions.map(option => (
                 <Button
@@ -368,8 +368,8 @@ export function NotificationCenter({
               <div className="p-8 text-center">
                 <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {selectedCategory === 'all' 
-                    ? 'No notifications yet' 
+                  {selectedCategory === 'all'
+                    ? 'No notifications yet'
                     : `No ${selectedCategory} notifications`
                   }
                 </p>

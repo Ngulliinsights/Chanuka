@@ -1,19 +1,19 @@
 /**
  * Navigation Performance Dashboard
- * 
+ *
  * Real-time monitoring and analytics dashboard for navigation performance.
  * Implements Phase 2 recommendations for navigation monitoring.
  */
 
 import { useState, useEffect, useMemo } from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Progress } from '@/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 // Remove unused import
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 
 interface PerformanceMetrics {
@@ -91,7 +91,7 @@ export function NavigationPerformanceDashboard({
 
       setMetrics(mockMetrics);
       setLastUpdated(new Date());
-      
+
       logger.info('Navigation performance metrics updated', { metrics: mockMetrics });
     } catch (error) {
       logger.error('Failed to fetch navigation performance metrics', { error });
@@ -103,7 +103,7 @@ export function NavigationPerformanceDashboard({
   // Auto-refresh metrics
   useEffect(() => {
     fetchMetrics();
-    
+
     if (showRealTime) {
       const interval = setInterval(fetchMetrics, refreshInterval);
       return () => clearInterval(interval);
@@ -113,7 +113,7 @@ export function NavigationPerformanceDashboard({
   // Performance status calculation
   const performanceStatus = useMemo(() => {
     const { averageNavigationTime, errorRate, cacheHitRate } = metrics;
-    
+
     if (averageNavigationTime > 1000 || errorRate > 3 || cacheHitRate < 60) {
       return { status: 'poor', color: 'destructive' };
     } else if (averageNavigationTime > 500 || errorRate > 1 || cacheHitRate < 80) {
@@ -154,8 +154,8 @@ export function NavigationPerformanceDashboard({
             <div className="text-2xl font-bold">
               {metrics.averageNavigationTime.toFixed(0)}ms
             </div>
-            <Progress 
-              value={Math.max(0, 100 - (metrics.averageNavigationTime / 10))} 
+            <Progress
+              value={Math.max(0, 100 - (metrics.averageNavigationTime / 10))}
               className="mt-2"
             />
           </CardContent>
@@ -198,8 +198,8 @@ export function NavigationPerformanceDashboard({
             <div className="text-2xl font-bold">
               {metrics.errorRate.toFixed(2)}%
             </div>
-            <Progress 
-              value={Math.max(0, 100 - (metrics.errorRate * 20))} 
+            <Progress
+              value={Math.max(0, 100 - (metrics.errorRate * 20))}
               className="mt-2"
             />
           </CardContent>

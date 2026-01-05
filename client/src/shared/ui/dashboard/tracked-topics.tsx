@@ -1,7 +1,7 @@
-import { AlertCircle, CheckCircle, Edit, RefreshCw, Search, Tag, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, Edit, RefreshCw, Search, Star as Tag, X } from 'lucide-react';
 import React from 'react';
 
-import type { TopicCategory } from '@client/shared/types/dashboard';
+import type { TopicCategory } from '@/shared/types/dashboard';
 
 import { Button, Card, CardContent, CardHeader, Input } from '../../design-system';
 
@@ -9,16 +9,16 @@ import { useDashboard, useDashboardTopics } from './hooks';
 import type { DashboardComponentProps } from './types';
 import { validateTrackedTopic } from './validation';
 
-export const TrackedTopics = React.memo<DashboardComponentProps>(({ 
+export const TrackedTopics = React.memo<DashboardComponentProps>(({
   className = '',
   config,
   onError,
-  onDataChange 
+  onDataChange
 }) => {
   // Fixed: Removed invalid properties 'id' and 'name' from default config to satisfy Partial<DashboardConfig> type
   const { data, loading, error, actions, recovery } = useDashboard(config || {});
   const { operations: topicOps } = useDashboardTopics(data.trackedTopics);
-  
+
   const [isEditing, setIsEditing] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [categoryFilter, setCategoryFilter] = React.useState<TopicCategory | 'all'>('all');
@@ -43,19 +43,19 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
   // Filter and validate topics
   const filteredTopics = React.useMemo(() => {
     if (!data.trackedTopics) return [];
-    
+
     let topics = data.trackedTopics;
-    
+
     // Apply search filter
     if (searchQuery.trim()) {
       topics = topicOps.searchTopics(searchQuery);
     }
-    
+
     // Apply category filter
     if (categoryFilter !== 'all') {
       topics = topics.filter(topic => topic.category === categoryFilter);
     }
-    
+
     // Validate topics
     return topics.map(topic => {
       try {
@@ -69,7 +69,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
 
   const handleAddTopic = async () => {
     if (!newTopicName.trim()) return;
-    
+
     setIsAddingTopic(true);
     try {
       await actions.addTopic({
@@ -79,7 +79,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
         is_active: true,
         description: `Topic: ${newTopicName.trim()}`
       });
-      
+
       setNewTopicName('');
       setNewTopicCategory('healthcare' as TopicCategory);
     } catch (addError) {
@@ -144,9 +144,9 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
             <p className="text-sm text-red-600 mb-3">{error.message}</p>
             {recovery.canRecover && (
               <div className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleRecovery}
                   className="text-red-600 border-red-300 hover:bg-red-50"
                 >
@@ -186,9 +186,9 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
             >
               <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="text-xs font-medium px-2.5 py-1.5"
               onClick={() => setIsEditing(!isEditing)}
             >
@@ -197,7 +197,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
             </Button>
           </div>
         </div>
-        
+
         {/* Search and Filter Controls */}
         {(isEditing || filteredTopics.length > 5) && (
           <div className="flex items-center space-x-2 mt-3">
@@ -210,7 +210,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
                 className="pl-7 text-xs h-7"
               />
             </div>
-            
+
             <select
               aria-label="Filter topics by category"
               value={categoryFilter}
@@ -226,7 +226,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent className="p-5">
         {loading ? (
           <div className="h-12 bg-slate-100 animate-pulse rounded-md"></div>
@@ -267,7 +267,7 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
                 </div>
               </div>
             )}
-            
+
             {/* Topics Display */}
             <div className="flex flex-wrap gap-2">
               {filteredTopics.map((topic) => (
@@ -295,19 +295,19 @@ export const TrackedTopics = React.memo<DashboardComponentProps>(({
                   )}
                 </div>
               ))}
-              
+
               {filteredTopics.length === 0 && (
                 <div className="text-center py-4 text-slate-500 w-full">
                   <p className="text-sm mb-2">
-                    {searchQuery || categoryFilter !== 'all' 
-                      ? 'No topics match your filters' 
+                    {searchQuery || categoryFilter !== 'all'
+                      ? 'No topics match your filters'
                       : 'No topics tracked yet'
                     }
                   </p>
                   {!isEditing && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setIsEditing(true)}
                       className="mt-2"
                     >

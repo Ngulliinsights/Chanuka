@@ -1,17 +1,17 @@
 /**
  * WebSocket Client Module
- * 
+ *
  * Client-side WebSocket connection management.
  * Uses unified WebSocket types from shared schema for consistency.
  */
 
-import { 
-  WebSocketConfig, 
+import {
+  WebSocketConfig,
   ConnectionState,
   WebSocketMessage,
   WebSocketError
-} from '@shared/schema/websocket';
-import { logger } from '@client/utils/logger';
+} from '../../../../shared/schema/websocket';
+import { logger } from '@/utils/logger';
 
 // Define events specific to the client implementation
 export interface WebSocketClientEvents {
@@ -29,7 +29,7 @@ export class WebSocketClient {
   private config: WebSocketConfig; // ✅ Uses shared config type
   private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
   private eventHandlers = new Map<keyof WebSocketClientEvents, Set<EventHandler<keyof WebSocketClientEvents>>>();
-  
+
   // Cross-platform timer handles (browser-compatible)
   private reconnectTimerRef: number | null = null;
   private heartbeatTimer: number | null = null;
@@ -82,7 +82,7 @@ export class WebSocketClient {
 
   // ... (Keep your existing private helper methods: setupEventHandlers, startHeartbeat, etc.)
   // Just ensure they use the ConnectionState enum from the import
-  
+
   private setupEventHandlers() {
     if (!this.ws) return;
 
@@ -97,13 +97,13 @@ export class WebSocketClient {
       this.connectionState = ConnectionState.DISCONNECTED;
       this.stopHeartbeat();
       this.emit('disconnected', event.code, event.reason);
-      
+
       // Auto-reconnect logic based on shared config
       if (this.config.autoConnect !== false) {
         this.attemptReconnect();
       }
     };
-    
+
     this.ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data) as WebSocketMessage;
@@ -138,7 +138,7 @@ export class WebSocketClient {
   }
 
   private emit<K extends keyof WebSocketClientEvents>(
-    event: K, 
+    event: K,
     ...args: Parameters<WebSocketClientEvents[K]>
   ): void {
     const handlers = this.eventHandlers.get(event);
@@ -152,16 +152,16 @@ export class WebSocketClient {
       });
     }
   }
-  
+
   // Implementation for missing methods
-  private stopHeartbeat() { 
+  private stopHeartbeat() {
     if (this.heartbeatTimer) {
       window.clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
   }
 
-  private startHeartbeat() { 
+  private startHeartbeat() {
     if (this.config.heartbeat?.interval) {
       this.heartbeatTimer = window.setInterval(() => {
         if (this.ws?.readyState === WebSocket.OPEN) {
@@ -174,20 +174,20 @@ export class WebSocketClient {
     }
   }
 
-  private clearReconnectTimer() { 
+  private clearReconnectTimer() {
     if (this.reconnectTimerRef) {
       window.clearTimeout(this.reconnectTimerRef);
       this.reconnectTimerRef = null;
     }
   }
 
-  private attemptReconnect() { 
+  private attemptReconnect() {
     if (this.reconnectAttempts < (this.config.reconnect?.maxRetries || 5)) {
       const delay = Math.min(
         (this.config.reconnect?.baseDelay || 1000) * Math.pow(2, this.reconnectAttempts),
         this.config.reconnect?.maxDelay || 30000
       );
-      
+
       this.reconnectTimerRef = window.setTimeout(() => {
         this.reconnectAttempts++;
         this.connect();
@@ -195,10 +195,10 @@ export class WebSocketClient {
     }
   }
 
-  private handleConnectionError(error: unknown) { 
+  private handleConnectionError(error: unknown) {
     this.connectionState = ConnectionState.FAILED;
-    logger.error('WebSocket connection failed', { 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('WebSocket connection failed', {
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 }

@@ -1,17 +1,17 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
-  Search, 
-  Users, 
-  BarChart3, 
-  Shield, 
-  Settings 
+import {
+  Home,
+  FileText,
+  Search,
+  Users,
+  BarChart3,
+  Shield,
+  Settings
 } from 'lucide-react';
 
 import { cn } from '../../design-system/utils/cn';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
 
 interface NavigationItem {
   id: string;
@@ -79,10 +79,10 @@ const defaultItems: NavigationItem[] = [
  * Main navigation component
  * Provides primary navigation for the application
  */
-export default function Navigation({ 
-  className, 
+export default function Navigation({
+  className,
   items = defaultItems,
-  collapsed = false 
+  collapsed = false
 }: NavigationProps) {
   const location = useLocation();
 
@@ -99,8 +99,8 @@ export default function Navigation({
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               "hover:bg-accent hover:text-accent-foreground",
-              isActive 
-                ? "bg-accent text-accent-foreground" 
+              isActive
+                ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground",
               item.disabled && "opacity-50 cursor-not-allowed",
               collapsed && "justify-center"
@@ -108,7 +108,7 @@ export default function Navigation({
             onClick={(e) => item.disabled && e.preventDefault()}
           >
             <Icon className={cn("h-4 w-4", collapsed ? "h-5 w-5" : "")} />
-            
+
             {!collapsed && (
               <>
                 <span className="flex-1">{item.label}</span>

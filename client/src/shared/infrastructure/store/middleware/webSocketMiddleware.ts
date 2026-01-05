@@ -8,19 +8,19 @@
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 
-import { ConnectionState } from '@shared/schema/websocket';
-import { realTimeService } from '@client/core/realtime';
+import { ConnectionState } from '../../../../../../shared/schema/websocket';
+import { realTimeService } from '@/core/realtime';
 import {
   WebSocketSubscription
-} from '@client/core/realtime/types';
+} from '@/core/realtime/types';
 import {
   CivicWebSocketState,
   PollingFallbackConfig,
   RealTimeHandlers,
   BillRealTimeUpdate,
   RealTimeNotification
-} from '@client/core/realtime/types';
-import { logger } from '@client/utils/logger';
+} from '@/core/realtime/types';
+import { logger } from '@/utils/logger';
 
 import {
   updateConnectionState,
@@ -343,7 +343,7 @@ class WebSocketMiddlewareAdapter {
    */
   private async queueSubscriptionOperation(operation: () => Promise<void>) {
     this.subscriptionQueue.push(operation);
-    
+
     if (!this.processingSubscriptions) {
       await this.processSubscriptionQueue();
     }
@@ -354,7 +354,7 @@ class WebSocketMiddlewareAdapter {
    */
   private async processSubscriptionQueue() {
     this.processingSubscriptions = true;
-    
+
     while (this.subscriptionQueue.length > 0) {
       const operation = this.subscriptionQueue.shift();
       if (operation) {
@@ -368,7 +368,7 @@ class WebSocketMiddlewareAdapter {
         }
       }
     }
-    
+
     this.processingSubscriptions = false;
   }
 
@@ -379,7 +379,7 @@ class WebSocketMiddlewareAdapter {
     const currentBills = Array.from(this.subscriptionIds.entries())
       .filter(([k]) => k.startsWith('bill:'))
       .map(([k]) => Number(k.split(':')[1]));
-    
+
     this.pollingFallback.updateSubscriptions({
       bills: currentBills,
       notifications: this.subscriptionIds.has('user_notifications:user')

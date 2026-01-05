@@ -144,9 +144,9 @@ export const expert_profiles = pgTable("expert_profiles", {
   professional_bio: text("professional_bio"),
   
   // Credentials stored as structured JSONB
-  educational_background: jsonb("educational_background").default(sql`'[]'::jsonb`), // [{degree, institution, year}]
+  educational_background: jsonb("educational_background").default(sql`'{}'::jsonb`), // [{degree, institution, year}]
   professional_certifications: varchar("professional_certifications", { length: 255 }).array(),
-  publications: jsonb("publications").default(sql`'[]'::jsonb`), // [{title, journal, year, doi}]
+  publications: jsonb("publications").default(sql`'{}'::jsonb`), // [{title, journal, year, doi}]
   
   // Verification workflow
   verification_status: verificationLevelEnum("verification_status").notNull().default("alleged"),
@@ -156,7 +156,7 @@ export const expert_profiles = pgTable("expert_profiles", {
   
   // Verification evidence - storing references to secure document storage
   credential_documents: varchar("credential_documents", { length: 500 }).array(),
-  reference_contacts: jsonb("reference_contacts").default(sql`'[]'::jsonb`), // [{name, organization, email, verified}]
+  reference_contacts: jsonb("reference_contacts").default(sql`'{}'::jsonb`), // [{name, organization, email, verified}]
   
   // Platform activity preferences
   review_capacity: varchar("review_capacity", { length: 50 }).notNull().default("occasional"), // "occasional", "regular", "frequent", "unavailable"

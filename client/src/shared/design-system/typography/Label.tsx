@@ -1,6 +1,6 @@
 /**
  * Label Component - UNIFIED & TOKEN-BASED
- * 
+ *
  * ✅ Uses design tokens
  * ✅ Accessible form labels
  * ✅ Supports required indicator
@@ -11,7 +11,7 @@ import * as LabelPrimitive from "@radix-ui/react-label"
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 const labelVariants = cva(
   [

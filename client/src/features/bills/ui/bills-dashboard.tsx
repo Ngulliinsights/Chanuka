@@ -1,6 +1,6 @@
 /**
  * Bills Dashboard with Enhanced Filtering and React Query Integration
- * 
+ *
  * This component serves as the main interface for legislative bill tracking,
  * featuring advanced filtering, search capabilities, real-time updates, and
  * personalized user guidance. Built with performance optimization through
@@ -27,7 +27,7 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
@@ -39,14 +39,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/shared/design-system';
-import { copySystem } from '@/content/copy-system';
+import { copySystem } from '@client/content/copy-system';
 import { useBills } from '../hooks';
 import type { Bill, BillsQueryParams } from '../model/types';
 import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { logger } from '@/utils/logger';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/hooks/use-toast';
+import { cn } from '@client/shared/design-system/utils/cn';
+import { logger } from '@client/utils/logger';
 
 import { FilterPanel } from './filter-panel';
 import { StatsOverview } from './stats-overview';
@@ -164,18 +164,18 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
     }
 
     const now = new Date();
-    
+
     // Calculate urgency based on how recently the bill was introduced and its status.
     // Bills are considered urgent if they're active and were introduced within the
     // last 30 days, as these likely need immediate attention and action.
     const urgentCount = bills.filter(bill => {
       if (!bill.introduced_date) return false;
-      
+
       const introducedDate = new Date(bill.introduced_date);
       const daysSinceIntroduction = Math.floor(
         (now.getTime() - introducedDate.getTime()) / (1000 * 60 * 60 * 24)
       );
-      
+
       return bill.status === 'active' && daysSinceIntroduction < URGENT_BILL_DAYS_THRESHOLD;
     }).length;
 
@@ -184,7 +184,7 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
     // ideally be a tagged field in the database for more accurate classification.
     const constitutionalFlags = bills.filter(bill => {
       const titleLower = bill.title?.toLowerCase() || '';
-      return titleLower.includes('constitutional') || 
+      return titleLower.includes('constitutional') ||
              titleLower.includes('amendment') ||
              titleLower.includes('rights');
     }).length;
@@ -248,10 +248,10 @@ function useExportBills(bills: ExtendedBill[]) {
         ...csvData.map((row) =>
           headers.map(header => {
             const value = String(row[header as keyof typeof row]);
-            const needsQuotes = value.includes(',') || 
-                               value.includes('\n') || 
+            const needsQuotes = value.includes(',') ||
+                               value.includes('\n') ||
                                value.includes('"');
-            
+
             if (needsQuotes) {
               return `"${value.replace(/"/g, '""')}"`;
             }
@@ -266,15 +266,15 @@ function useExportBills(bills: ExtendedBill[]) {
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
+
       link.setAttribute('href', url);
       link.setAttribute('download', `bills-export-${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
-      
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       // Clean up the blob URL to prevent memory leaks. This is important because
       // blob URLs consume memory until they're explicitly revoked or the page closes.
       URL.revokeObjectURL(url);
@@ -293,7 +293,7 @@ function useExportBills(bills: ExtendedBill[]) {
         component: 'BillsDashboard',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       toast({
         title: "Export failed",
         description: "Unable to export bills. Please try again.",
@@ -313,11 +313,11 @@ export function BillsDashboard({
 }: BillsDashboardProps) {
   const { isMobile } = useDeviceInfo();
   const { toast } = useToast();
-  
+
   // Fetch user preferences using React Query, which provides automatic caching
   // and background refetching to keep user settings fresh
   const { data: userPreferences } = useUserPreferences();
-  
+
   // Local UI state that doesn't need to be synced with the server
   const [searchInput, setSearchInput] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -361,11 +361,11 @@ export function BillsDashboard({
   // Extract bills array from the response, with a safe fallback to empty array.
   // Using useMemo here prevents unnecessary re-renders when billsResponse object
   // reference changes but the actual bills array hasn't changed.
-  const bills = useMemo(() => 
-    (billsResponse?.bills || []) as ExtendedBill[], 
+  const bills = useMemo(() =>
+    (billsResponse?.bills || []) as ExtendedBill[],
     [billsResponse?.bills]
   );
-  
+
   // Get total count from the API response, using the correct property name
   const totalItems = (billsResponse as PaginatedBillsResponse | undefined)?.total || 0;
 
@@ -422,12 +422,12 @@ export function BillsDashboard({
     try {
       // TODO: Implement with useSaveBill mutation hook
       // await saveBillMutation.mutateAsync(billId);
-      
+
       toast({
         title: "Bill saved",
         description: "This bill has been added to your saved list.",
       });
-      
+
       logger.info('Bill saved', {
         component: 'BillsDashboard',
         billId,
@@ -438,7 +438,7 @@ export function BillsDashboard({
         billId,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       toast({
         title: "Save failed",
         description: "Unable to save bill. Please try again.",
@@ -473,7 +473,7 @@ export function BillsDashboard({
       // Try to use native share API first (better UX on mobile)
       if (navigator.share) {
         await navigator.share(shareData);
-        
+
         toast({
           title: "Bill shared",
           description: "Thank you for sharing this bill!",
@@ -481,7 +481,7 @@ export function BillsDashboard({
       } else {
         // Fallback to clipboard for desktop browsers
         await navigator.clipboard.writeText(shareData.url);
-        
+
         toast({
           title: "Link copied",
           description: "Bill link copied to clipboard!",
@@ -501,7 +501,7 @@ export function BillsDashboard({
           billId,
           error: error.message,
         });
-        
+
         toast({
           title: "Share failed",
           description: "Unable to share bill. Please try again.",
@@ -537,7 +537,7 @@ export function BillsDashboard({
         component: 'BillsDashboard',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       toast({
         title: "Refresh failed",
         description: "Unable to refresh data. Please try again.",
@@ -701,8 +701,8 @@ export function BillsDashboard({
                   Error loading bills
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {error instanceof Error 
-                    ? error.message 
+                  {error instanceof Error
+                    ? error.message
                     : 'An unexpected error occurred while loading bills data'}
                 </p>
               </div>
@@ -720,7 +720,7 @@ export function BillsDashboard({
   // Get user level for personalized content, with a safe default
   const userLevel = (userPreferences as { level?: string })?.level || 'novice';
   const isNoviceUser = userLevel === 'novice';
-  
+
   // Retrieve localized copy based on user level and preferences
   const billTrackingCopy = copySystem.getCopy('billTracking', {
     userLevel: userLevel as 'novice' | 'intermediate' | 'expert',
@@ -745,7 +745,7 @@ export function BillsDashboard({
             <p className="text-muted-foreground">
               {billTrackingCopy.description}
             </p>
-            
+
             {/* Personalized help prompt for novice users */}
             {isNoviceUser && !showPersonalizedHelp && (
               <div className="mt-3">
@@ -764,18 +764,18 @@ export function BillsDashboard({
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleRefresh} 
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
               disabled={isLoading || isFetching}
               aria-label="Refresh bills data"
             >
-              <RefreshCw 
+              <RefreshCw
                 className={cn(
-                  'h-4 w-4 mr-2', 
+                  'h-4 w-4 mr-2',
                   (isLoading || isFetching) && 'animate-spin'
-                )} 
+                )}
               />
               Refresh
             </Button>
@@ -816,18 +816,18 @@ export function BillsDashboard({
             <CardContent>
               <div className="space-y-3 text-blue-700">
                 <p className="text-sm">
-                  Start by searching for topics you care about, like healthcare, 
-                  education, or environmental protection. The search looks through 
+                  Start by searching for topics you care about, like healthcare,
+                  education, or environmental protection. The search looks through
                   bill titles and content to find what matters to you.
                 </p>
                 <p className="text-sm">
-                  Save bills that interest you to get updates when their status 
-                  changes. You&apos;ll be notified about important developments so you 
+                  Save bills that interest you to get updates when their status
+                  changes. You&apos;ll be notified about important developments so you
                   can stay engaged without constant checking.
                 </p>
                 <p className="text-sm">
-                  Use filters to narrow your search by status (like &quot;active&quot; or 
-                  &quot;passed&quot;), urgency level, or policy area. This helps you focus 
+                  Use filters to narrow your search by status (like &quot;active&quot; or
+                  &quot;passed&quot;), urgency level, or policy area. This helps you focus
                   on the bills most relevant to your interests.
                 </p>
                 <div className="pt-2">
@@ -911,7 +911,7 @@ export function BillsDashboard({
 
       {/* Main content area with filter panel and bills grid */}
       <div className={cn(
-        'grid gap-6', 
+        'grid gap-6',
         isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-5'
       )}>
         {/* Desktop filter panel - only shown on larger screens */}
@@ -965,8 +965,8 @@ export function BillsDashboard({
                     )}
 
                     {/* Sort selector */}
-                    <Select 
-                      value={sortBy} 
+                    <Select
+                      value={sortBy}
                       onChange={(e) => handleSortChange(e.target.value)}
                       disabled={isLoading || bills.length === 0}
                     >
@@ -982,10 +982,10 @@ export function BillsDashboard({
                     </Select>
 
                     {/* Sort order toggle */}
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={toggleSortOrder} 
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleSortOrder}
                       className="px-2"
                       disabled={isLoading || bills.length === 0}
                       aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
@@ -1049,7 +1049,7 @@ export function BillsDashboard({
                       ? `No bills match "${searchInput}". Try different search terms or adjust your filters.`
                       : 'Try adjusting your search criteria or filters to see available bills.'}
                   </p>
-                  {(searchInput || Object.keys(filters).some(key => 
+                  {(searchInput || Object.keys(filters).some(key =>
                     key !== 'page' && key !== 'pageSize' && filters[key as keyof ExtendedFilters]
                   )) && (
                     <Button

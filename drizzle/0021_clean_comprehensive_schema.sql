@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 -- Users table
 CREATE TABLE IF NOT EXISTS "users" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "email" varchar(255) UNIQUE NOT NULL,
     "password_hash" varchar(255) NOT NULL,
     "role" varchar(50) DEFAULT 'citizen' NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 -- User profiles table
 CREATE TABLE IF NOT EXISTS "user_profiles" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid UNIQUE NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "first_name" varchar(100),
     "last_name" varchar(100),
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 
 -- Bills table
 CREATE TABLE IF NOT EXISTS "bills" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "bill_number" varchar(50) UNIQUE NOT NULL,
     "title" varchar(500) NOT NULL,
     "summary" text,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS "bills" (
 
 -- Sponsors table
 CREATE TABLE IF NOT EXISTS "sponsors" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "name" varchar(255) NOT NULL,
     "party" varchar(50),
     "state" varchar(2),
@@ -88,12 +88,12 @@ CREATE TABLE IF NOT EXISTS "sponsors" (
 );
 
 -- Add foreign key for bill sponsor
-ALTER TABLE "bills" ADD CONSTRAINT "bills_sponsor_id_fkey" 
+ALTER TABLE "bills" ADD CONSTRAINT "bills_sponsor_id_fkey"
     FOREIGN KEY ("sponsor_id") REFERENCES "sponsors"("id") ON DELETE SET NULL;
 
 -- Bill co-sponsors junction table
 CREATE TABLE IF NOT EXISTS "bill_cosponsors" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "sponsor_id" uuid NOT NULL REFERENCES "sponsors"("id") ON DELETE CASCADE,
     "date_cosponsored" date DEFAULT CURRENT_DATE,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS "bill_cosponsors" (
 
 -- Comments table
 CREATE TABLE IF NOT EXISTS "comments" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "parent_id" uuid REFERENCES "comments"("id") ON DELETE CASCADE,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "comments" (
 
 -- Comment votes table
 CREATE TABLE IF NOT EXISTS "comment_votes" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "comment_id" uuid NOT NULL REFERENCES "comments"("id") ON DELETE CASCADE,
     "vote_type" varchar(10) NOT NULL CHECK (vote_type IN ('up', 'down')),
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS "comment_votes" (
 
 -- Bill engagement table
 CREATE TABLE IF NOT EXISTS "bill_engagement" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "engagement_type" varchar(50) NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS "bill_engagement" (
 
 -- User verification table
 CREATE TABLE IF NOT EXISTS "user_verification" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid UNIQUE NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "verification_type" varchar(50) NOT NULL,
     "verification_status" varchar(20) DEFAULT 'pending',
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS "user_verification" (
 
 -- Notifications table
 CREATE TABLE IF NOT EXISTS "notifications" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "type" varchar(50) NOT NULL,
     "title" varchar(255) NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS "notifications" (
 
 -- Alert preferences table
 CREATE TABLE IF NOT EXISTS "alert_preferences" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid UNIQUE NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "email_notifications" boolean DEFAULT true,
     "push_notifications" boolean DEFAULT true,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS "alert_preferences" (
 
 -- Compliance checks table
 CREATE TABLE IF NOT EXISTS "compliance_checks" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "check_type" varchar(100) NOT NULL,
     "entity_type" varchar(50) NOT NULL,
     "entity_id" varchar(255) NOT NULL,
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS "compliance_checks" (
 
 -- Security monitoring table
 CREATE TABLE IF NOT EXISTS "security_events" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "event_type" varchar(100) NOT NULL,
     "severity" varchar(20) DEFAULT 'info',
     "source_ip" inet,
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS "security_events" (
 
 -- Analytics events table
 CREATE TABLE IF NOT EXISTS "analytics_events" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "event_type" varchar(100) NOT NULL,
     "user_id" uuid REFERENCES "users"("id"),
     "session_id" varchar(255),
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS "analytics_events" (
 
 -- Bill tracking preferences
 CREATE TABLE IF NOT EXISTS "bill_tracking_preferences" (
-    "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "tracking_enabled" boolean DEFAULT true,
@@ -269,49 +269,49 @@ END;
 $$ language 'plpgsql';
 
 -- Apply updated_at triggers to relevant tables
-CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON "users" 
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON "users"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON "user_profiles" 
+CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON "user_profiles"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE ON "sessions" 
+CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE ON "sessions"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bills_updated_at BEFORE UPDATE ON "bills" 
+CREATE TRIGGER update_bills_updated_at BEFORE UPDATE ON "bills"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_sponsors_updated_at BEFORE UPDATE ON "sponsors" 
+CREATE TRIGGER update_sponsors_updated_at BEFORE UPDATE ON "sponsors"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_comments_updated_at BEFORE UPDATE ON "comments" 
+CREATE TRIGGER update_comments_updated_at BEFORE UPDATE ON "comments"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_verification_updated_at BEFORE UPDATE ON "user_verification" 
+CREATE TRIGGER update_user_verification_updated_at BEFORE UPDATE ON "user_verification"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_alert_preferences_updated_at BEFORE UPDATE ON "alert_preferences" 
+CREATE TRIGGER update_alert_preferences_updated_at BEFORE UPDATE ON "alert_preferences"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_compliance_checks_updated_at BEFORE UPDATE ON "compliance_checks" 
+CREATE TRIGGER update_compliance_checks_updated_at BEFORE UPDATE ON "compliance_checks"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bill_tracking_preferences_updated_at BEFORE UPDATE ON "bill_tracking_preferences" 
+CREATE TRIGGER update_bill_tracking_preferences_updated_at BEFORE UPDATE ON "bill_tracking_preferences"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Create search vector update function for bills
 CREATE OR REPLACE FUNCTION update_bill_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.search_vector := to_tsvector('english', 
-        COALESCE(NEW.title, '') || ' ' || 
-        COALESCE(NEW.summary, '') || ' ' || 
+    NEW.search_vector := to_tsvector('english',
+        COALESCE(NEW.title, '') || ' ' ||
+        COALESCE(NEW.summary, '') || ' ' ||
         COALESCE(NEW.bill_number, '')
     );
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_bill_search_vector_trigger 
+CREATE TRIGGER update_bill_search_vector_trigger
     BEFORE INSERT OR UPDATE ON "bills"
     FOR EACH ROW EXECUTE FUNCTION update_bill_search_vector();

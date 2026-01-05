@@ -7,7 +7,7 @@
  */
 
 // Re-export types
-export type { AppError, ErrorDomain, ErrorSeverity, ErrorContext } from '@client/core/error';
+export type { AppError, ErrorDomain, ErrorSeverity, ErrorContext } from '@/core/error';
 export type { UIErrorInfo, UIErrorHandler, UIErrorType, UseUIErrorHandlerResult } from './error-handling-utils';
 
 // Re-export functions and components from core
@@ -16,7 +16,7 @@ export {
   createError,
   useCoreErrorHandler,
   ErrorBoundary as CoreErrorBoundary,
-} from '@client/core/error';
+} from '@/core/error';
 
 // Re-export utilities
 export {

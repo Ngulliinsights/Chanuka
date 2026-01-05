@@ -1,16 +1,16 @@
 /**
  * OfflineStatusBanner - Offline status indicator
- * 
+ *
  * Shows a banner when the device is offline.
  * Uses navigator.onLine to detect connectivity.
- * 
+ *
  * @module components/mobile/feedback/OfflineStatusBanner
  */
 
 import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface OfflineStatusBannerProps {
   /**
@@ -31,10 +31,10 @@ interface OfflineStatusBannerProps {
 
 /**
  * Offline status banner component
- * 
+ *
  * Automatically shows when device loses internet connection.
  * Hides when connection is restored.
- * 
+ *
  * @example
  * ```tsx
  * <OfflineStatusBanner position="top" />
@@ -55,7 +55,7 @@ export function OfflineStatusBanner({
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);

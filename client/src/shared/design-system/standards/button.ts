@@ -185,13 +185,13 @@ export const buttonUtils = {
     loading: boolean = false
   ): string => {
     const classes = ['chanuka-btn'];
-    
+
     classes.push(`chanuka-btn-${variant}`);
     classes.push(`chanuka-btn-${size}`);
-    
+
     if (disabled) classes.push('chanuka-btn-disabled');
     if (loading) classes.push('chanuka-btn-loading');
-    
+
     return classes.join(' ');
   },
 
@@ -206,15 +206,19 @@ export const buttonUtils = {
     const baseStyles = buttonDesignStandards.base;
     const sizeStyles = buttonDesignStandards.sizes[size];
     const variantStyles = buttonDesignStandards.variants[variant];
-    const stateStyles = state === 'disabled' 
-      ? buttonDesignStandards.states.disabled 
+    const baseVariantStyles: any = { ...variantStyles };
+    delete baseVariantStyles.hover;
+    delete baseVariantStyles.active;
+    delete baseVariantStyles.focus;
+    const stateStyles = state === 'disabled'
+      ? buttonDesignStandards.states.disabled
       : variantStyles[state as keyof typeof variantStyles] || {};
 
     return {
       ...baseStyles,
       ...sizeStyles,
-      ...(variantStyles as any),
-      ...(stateStyles as any),
+      ...(baseVariantStyles as Record<string, string | number | undefined>),
+      ...(stateStyles as Record<string, string | number | undefined>),
     };
   },
 
@@ -228,16 +232,16 @@ export const buttonUtils = {
     height: number;
   }): { isValid: boolean; issues: string[] } => {
     const issues: string[] = [];
-    
+
     if (!button.hasText && !button.hasAriaLabel) {
       issues.push('Button must have visible text or aria-label');
     }
-    
+
     const minSize = parseFloat(buttonDesignStandards.accessibility.minTouchTarget);
     if (button.width < minSize || button.height < minSize) {
       issues.push(`Button must be at least ${minSize}px in both dimensions`);
     }
-    
+
     return {
       isValid: issues.length === 0,
       issues,

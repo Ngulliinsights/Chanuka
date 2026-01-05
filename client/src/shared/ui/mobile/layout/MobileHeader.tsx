@@ -27,8 +27,8 @@ import { BarChart3, X, Search } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Badge, Button } from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system';
+import { Badge, Button } from '@/shared/design-system';
+import { cn } from '@/shared/design-system/utils/cn';
 
 // Navigation item interface
 export interface NavigationItem {

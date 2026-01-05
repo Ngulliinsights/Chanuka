@@ -7,7 +7,7 @@ import React from 'react';
  * ✅ Consistent animation
  */
 
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 function Skeleton({
   className,

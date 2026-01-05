@@ -10,7 +10,7 @@ import {
   ErrorContext,
   createError,
   BaseError,
-} from '@client/core/error';
+} from '@/core/error';
 
 // ============================================================================
 // Dashboard Error Types (extending core)
@@ -71,7 +71,7 @@ export class DashboardDataFetchError extends DashboardError {
       errorDetails,
       { operation: 'data_fetch', endpoint }
     );
-    
+
     // Create a new instance with modified properties
     Object.defineProperty(this, 'retryable', {
       value: true,
@@ -92,7 +92,7 @@ export class DashboardValidationError extends DashboardError {
       errorDetails,
       { operation: 'validation', field }
     );
-    
+
     // Override properties using Object.defineProperty
     Object.defineProperty(this, 'type', {
       value: ErrorDomain.VALIDATION,
@@ -100,7 +100,7 @@ export class DashboardValidationError extends DashboardError {
       enumerable: true,
       configurable: false
     });
-    
+
     Object.defineProperty(this, 'severity', {
       value: ErrorSeverity.LOW,
       writable: false,
@@ -119,7 +119,7 @@ export class DashboardConfigurationError extends DashboardError {
       details,
       { operation: 'configuration' }
     );
-    
+
     // Override severity using Object.defineProperty
     Object.defineProperty(this, 'severity', {
       value: ErrorSeverity.HIGH,

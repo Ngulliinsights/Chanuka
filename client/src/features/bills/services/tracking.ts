@@ -1,14 +1,14 @@
 /**
  * Bill Tracking Service - Bills Feature
- * 
+ *
  * Migrated from client/src/services/billTrackingService.ts
  * Business logic service for handling bill tracking operations,
  * real-time updates, and user preferences.
  */
 
-import { Bill } from '@shared/schema/foundation';
+import { Bill } from '../../../../shared/schema/foundation';
 
-import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/core/api/types';
+import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@/core/api/types';
 import { logger } from '@client/utils/logger';
 
 export class BillTrackingService {
@@ -32,7 +32,7 @@ export class BillTrackingService {
   async processBillUpdate(update: BillUpdate): Promise<void> {
     try {
       const billId = update.data.billId;
-      
+
       // Validate update data
       if (!billId || !update.type) {
         logger.warn('Invalid bill update received', {
@@ -173,7 +173,7 @@ export class BillTrackingService {
    */
   getNotificationChannels(): string[] {
     const channels: string[] = [];
-    
+
     if (this.preferences.notificationChannels.inApp) {
       channels.push('in_app');
     }

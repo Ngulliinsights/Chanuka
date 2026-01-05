@@ -1,17 +1,17 @@
 /**
  * MobileTabSelector Component
- * 
+ *
  * Tab navigation component optimized for mobile.
  * Swipeable and touch-friendly tab switching.
- * 
+ *
  * @component
  * @example
  * ```tsx
  * import { MobileTabSelector, useMobileTabs } from '@client/shared/ui/mobile/data-display';
- * 
+ *
  * export function TabbedContent() {
  *   const { activeTab, setActiveTab } = useMobileTabs('overview');
- *   
+ *
  *   return (
  *     <MobileTabSelector
  *       tabs={tabs}
@@ -25,7 +25,7 @@
 
 import React from 'react';
 
-import type { MobileTab } from '@client/shared/types/mobile';
+import type { MobileTab } from '@/shared/types/mobile';
 
 interface MobileTabSelectorProps {
   tabs: MobileTab[];
@@ -36,13 +36,13 @@ interface MobileTabSelectorProps {
 
 /**
  * MobileTabSelector Component
- * 
+ *
  * Touch-friendly tab navigation.
  */
 export const MobileTabSelector = React.forwardRef<HTMLDivElement, MobileTabSelectorProps>(
   ({ tabs, activeTab, onTabChange, className }, ref) => {
     const active = activeTab || tabs[0]?.id;
-    
+
     return (
       <div ref={ref} className={`mobile-tab-selector ${className || ''}`}>
         <div className="tabs-header">
@@ -59,7 +59,7 @@ export const MobileTabSelector = React.forwardRef<HTMLDivElement, MobileTabSelec
             </button>
           ))}
         </div>
-        
+
         <div className="tabs-content">
           {tabs.find(tab => tab.id === active)?.content}
         </div>

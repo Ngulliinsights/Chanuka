@@ -3,7 +3,7 @@
  *
  * Provides a simple way to initialize the consolidated auth system
  * in your application with environment-specific configurations.
- * 
+ *
  * @module init-auth-system
  */
 
@@ -126,7 +126,7 @@ const DEFAULT_INIT_OPTIONS: Record<Environment, Partial<AuthInitOptions>> = {
 
 /**
  * Initialize auth system with environment-specific defaults
- * 
+ *
  * @param apiClient - The unified API client instance
  * @param environment - Current environment (development, test, production)
  * @param customOptions - Optional custom configuration overrides
@@ -206,7 +206,7 @@ export async function initAuthSystem(
 
 /**
  * Quick setup for React applications with sensible defaults
- * 
+ *
  * @param apiClient - The unified API client instance
  * @param callbacks - Optional initialization callbacks
  */
@@ -241,7 +241,7 @@ export async function setupAuthForReact(
 
 /**
  * Setup for testing environments with minimal configuration
- * 
+ *
  * @param mockApiClient - Mock API client for testing
  */
 export async function setupAuthForTesting(mockApiClient: UnifiedApiClient): Promise<void> {
@@ -258,7 +258,7 @@ export async function setupAuthForTesting(mockApiClient: UnifiedApiClient): Prom
 
 /**
  * Validate auth system is properly initialized and configured
- * 
+ *
  * @returns Validation result with initialization status and any errors/warnings
  */
 export async function validateAuthSetup(): Promise<AuthSystemValidation> {
@@ -310,7 +310,7 @@ export async function validateAuthSetup(): Promise<AuthSystemValidation> {
 
 /**
  * Check if auth system is ready for use
- * 
+ *
  * @returns Boolean indicating if system is fully initialized
  */
 export function isAuthSystemReady(): boolean {
@@ -373,7 +373,7 @@ beforeAll(async () => {
   nextjs: `
 // In your _app.tsx
 import { initAuthSystem } from '@/core/auth/scripts/init-auth-system';
-import { apiClient } from '@/lib/api';
+import { apiClient } from '@/core/api';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {

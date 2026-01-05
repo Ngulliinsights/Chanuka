@@ -2,8 +2,8 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle, AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
-import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { cn } from '@/shared/design-system/utils/cn';
+import { logger } from '@/utils/logger';
 
 import { UIComponentError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
@@ -180,7 +180,7 @@ interface EnhancedDropdownMenuProps {
 const EnhancedDropdownMenu = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Root>,
   EnhancedDropdownMenuProps & React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>
->(({ children, onError, fallbackContent, ...props }, ref) => {
+>(({ children, onError, fallbackContent, ...props }, _ref) => {
   const [error, setError] = React.useState<UIComponentError | null>(null);
   const [retryCount, setRetryCount] = React.useState(0);
 

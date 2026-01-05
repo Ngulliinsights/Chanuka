@@ -5,9 +5,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
-import { DashboardConfigurationError } from '@client/core/error';
-import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/core/validation';
-import type { DashboardConfig, DashboardSection } from '@client/shared/types';
+import { DashboardConfigurationError } from '@/core/error';
+import { validateDashboardConfig, safeValidateDashboardConfig } from '@/core/validation';
+import type { DashboardConfig, DashboardSection } from '@/shared/types';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds
@@ -101,7 +101,7 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       await new Promise(resolve => setTimeout(resolve, 200));
 
       setConfig(DEFAULT_CONFIG);
-      
+
       // Clear localStorage
       try {
         localStorage.removeItem(CONFIG_STORAGE_KEY);

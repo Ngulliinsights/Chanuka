@@ -2,12 +2,12 @@ import React from 'react';
 import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system/interactive/DropdownMenu';
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/design-system/interactive/Collapsible';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/design-system/interactive/DropdownMenu';
+import { Progress } from '@/shared/design-system/feedback/Progress';
 
 // Types for progressive disclosure navigation
 export interface NavigationSection {
@@ -37,9 +37,9 @@ interface ProgressiveDisclosureNavigationProps {
 }
 
 // Complexity indicator component
-const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string }> = ({ 
-  complexity, 
-  className 
+const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string }> = ({
+  complexity,
+  className
 }) => (
   <div className={cn("flex items-center gap-1", className)} aria-label={`Complexity level ${complexity} out of 3`}>
     {Array.from({ length: 3 }, (_, i) => (
@@ -47,8 +47,8 @@ const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string 
         key={i}
         className={cn(
           "w-1.5 h-1.5 rounded-full transition-colors",
-          i < complexity 
-            ? "bg-primary" 
+          i < complexity
+            ? "bg-primary"
             : "bg-gray-300"
         )}
       />
@@ -57,9 +57,9 @@ const ComplexityIndicator: React.FC<{ complexity: 1 | 2 | 3; className?: string 
 );
 
 // Reading time indicator component
-const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = ({ 
-  minutes, 
-  className 
+const ReadingTimeIndicator: React.FC<{ minutes: number; className?: string }> = ({
+  minutes,
+  className
 }) => (
   <div className={cn("flex items-center gap-1 text-sm text-gray-600", className)}>
     <Clock className="w-3 h-3" />
@@ -75,7 +75,7 @@ const ContextNavigationHelper: React.FC<{
 }> = ({ sections, currentSectionId, onSectionChange }) => {
   const currentSection = sections.find(s => s.id === currentSectionId);
   const currentIndex = sections.findIndex(s => s.id === currentSectionId);
-  
+
   const nextSection = currentIndex < sections.length - 1 ? sections[currentIndex + 1] : null;
   const prevSection = currentIndex > 0 ? sections[currentIndex - 1] : null;
 
@@ -85,7 +85,7 @@ const ContextNavigationHelper: React.FC<{
         <MapPin className="w-4 h-4 text-primary" />
         <span className="text-sm font-medium text-foreground">You are here</span>
       </div>
-      
+
       {currentSection && (
         <div className="mb-4">
           <h3 className="font-medium text-foreground">{currentSection.title}</h3>
@@ -107,7 +107,7 @@ const ContextNavigationHelper: React.FC<{
           <ArrowRight className="w-3 h-3 rotate-180" />
           Previous
         </Button>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -161,7 +161,7 @@ export const ProgressiveDisclosureNavigation = React.memo<ProgressiveDisclosureN
 
   const handleSectionClick = useCallback((sectionId: string) => {
     onSectionChange?.(sectionId);
-    
+
     // Mark as completed if not already
     if (!completedSections.includes(sectionId)) {
       setCompletedSections(prev => [...prev, sectionId]);
@@ -170,7 +170,7 @@ export const ProgressiveDisclosureNavigation = React.memo<ProgressiveDisclosureN
 
   const handlePathSelect = useCallback((path: ReadingPath) => {
     setSelectedReadingPath(path);
-    
+
     // Navigate to first section in path
     if (path.sections.length > 0) {
       onSectionChange?.(path.sections[0]);
@@ -199,8 +199,8 @@ export const ProgressiveDisclosureNavigation = React.memo<ProgressiveDisclosureN
                 )}
               </Button>
             </CollapsibleTrigger>
-            
-            <div 
+
+            <div
               className="flex-1 flex items-center justify-between cursor-pointer"
               onClick={() => handleSectionClick(section.id)}
             >
@@ -218,7 +218,7 @@ export const ProgressiveDisclosureNavigation = React.memo<ProgressiveDisclosureN
                   </span>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <ComplexityIndicator complexity={section.complexity} />
                 <ReadingTimeIndicator minutes={section.estimatedReadTime} />

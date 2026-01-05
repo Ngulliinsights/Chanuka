@@ -8,7 +8,7 @@
 import { sql, relations } from "drizzle-orm";
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, unique, date, smallint, check
+  index, unique, date, smallint, check, foreignKey
 } from "drizzle-orm/pg-core";
 
 import { bills, users, sponsors } from "./foundation";
@@ -34,10 +34,10 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
   // Legal metadata
   is_fundamental_right: boolean("is_fundamental_right").notNull().default(false),
   // Bill of Rights: Articles 19-59
-  
+
   is_directive_principle: boolean("is_directive_principle").notNull().default(false),
   // National Values and Principles: Article 10
-  
+
   enforcement_mechanism: varchar("enforcement_mechanism", { length: 100 }),
   // Values: 'judicial_review', 'legislative_action', 'administrative_action', 'automatic'
 
@@ -81,20 +81,20 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 // CONSTITUTIONAL ANALYSES - AI + Expert Analysis of Bills
 // ============================================================================
 
-export const constitutional_analyses: any = pgTable("constitutional_analyses", {
+export const constitutional_analyses = pgTable("constitutional_analyses", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Analysis metadata
   analysis_type: varchar("analysis_type", { length: 50 }).notNull(),
   // Values: 'automated', 'expert', 'hybrid', 'crowd_sourced'
-  
+
   confidence_score: numeric("confidence_score", { precision: 3, scale: 2 }),
   // 0.00 to 1.00 scale
 
   // Constitutional implications
   constitutional_provisions_cited: uuid("constitutional_provisions_cited").array(),
-  potential_violations: jsonb("potential_violations").notNull().default(sql`'[]'::jsonb`),
+  potential_violations: jsonb("potential_violations").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "provision": "Article 47",
@@ -103,7 +103,7 @@ export const constitutional_analyses: any = pgTable("constitutional_analyses", {
       "explanation": "Bill lacks fair administrative procedures"
     }
   ] */
-  
+
   constitutional_alignment: varchar("constitutional_alignment", { length: 20 }),
   // Values: 'aligned', 'concerning', 'violates', 'neutral'
 
@@ -121,7 +121,7 @@ export const constitutional_analyses: any = pgTable("constitutional_analyses", {
 
   // Version control and audit trail
   analysis_version: integer("analysis_version").notNull().default(1),
-  superseded_by: uuid("superseded_by").references(() => constitutional_analyses.id, { onDelete: "set null" }),
+  superseded_by: uuid("superseded_by"),
 
   // Publication status
   is_published: boolean("is_published").notNull().default(false),
@@ -130,6 +130,12 @@ export const constitutional_analyses: any = pgTable("constitutional_analyses", {
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
+  // Self-referencing foreign key for version control
+  supersededByFk: foreignKey({
+    columns: [table.superseded_by],
+    foreignColumns: [table.id],
+  }).onDelete("set null"),
+
   // Hot path: Get current analysis for bill
   billCurrentAnalysisIdx: index("idx_constitutional_analyses_bill_current")
     .on(table.bill_id, table.analysis_version.desc())
@@ -168,7 +174,7 @@ export const constitutional_analyses: any = pgTable("constitutional_analyses", {
 // LEGAL PRECEDENTS - Kenyan Case Law and Judicial Decisions
 // ============================================================================
 
-export const legal_precedents: any = pgTable("legal_precedents", {
+export const legal_precedents = pgTable("legal_precedents", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
 
   // Case identification
@@ -198,13 +204,19 @@ export const legal_precedents: any = pgTable("legal_precedents", {
   // Impact assessment
   cited_by_count: integer("cited_by_count").notNull().default(0),
   // How many times this precedent has been cited
-  
-  overruled_by: uuid("overruled_by").references(() => legal_precedents.id, { onDelete: "set null" }),
+
+  overruled_by: uuid("overruled_by"),
   // If this precedent was overruled by a higher court
 
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
+  // Self-referencing foreign key for overruling
+  overruledByFk: foreignKey({
+    columns: [table.overruled_by],
+    foreignColumns: [table.id],
+  }).onDelete("set null"),
+
   // Case name search
   caseNameIdx: index("idx_legal_precedents_case_name").on(table.case_name),
 
@@ -247,15 +259,15 @@ export const expert_review_queue = pgTable("expert_review_queue", {
   // Review priority and reason
   priority_level: varchar("priority_level", { length: 20 }).notNull().default("medium"),
   // Values: 'low', 'medium', 'high', 'urgent'
-  
+
   review_reason: varchar("review_reason", { length: 100 }).notNull(),
-  // Values: 'low_confidence', 'complex_issue', 'public_interest', 
+  // Values: 'low_confidence', 'complex_issue', 'public_interest',
   //         'controversial', 'constitutional_violation', 'precedent_conflict'
 
   // Expert assignment
   assigned_expert_id: uuid("assigned_expert_id").references(() => users.id, { onDelete: "set null" }),
   assigned_at: timestamp("assigned_at", { withTimezone: true }),
-  
+
   // Auto-assignment fields
   required_expertise: varchar("required_expertise", { length: 100 }).array(),
   // Values: ['constitutional_law', 'administrative_law', 'human_rights', etc.]
@@ -268,7 +280,7 @@ export const expert_review_queue = pgTable("expert_review_queue", {
   started_at: timestamp("started_at", { withTimezone: true }),
   completed_at: timestamp("completed_at", { withTimezone: true }),
   review_duration_hours: numeric("review_duration_hours", { precision: 6, scale: 2 }),
-  
+
   review_notes: text("review_notes"),
   review_outcome: varchar("review_outcome", { length: 50 }),
   // Values: 'approved', 'approved_with_changes', 'rejected', 'needs_revision'
@@ -317,7 +329,7 @@ export const analysis_audit_trail = pgTable("analysis_audit_trail", {
   // Action details
   action_type: varchar("action_type", { length: 50 }).notNull(),
   // Values: 'created', 'updated', 'reviewed', 'superseded', 'published', 'unpublished'
-  
+
   actor_id: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
   actor_type: varchar("actor_type", { length: 20 }).notNull(),
   // Values: 'system', 'expert', 'admin', 'ai_model'
@@ -330,7 +342,7 @@ export const analysis_audit_trail = pgTable("analysis_audit_trail", {
     "new_value": "violates",
     "confidence_change": 0.15
   } */
-  
+
   reason: text("reason"),
 
   // Security and tracking
@@ -372,17 +384,17 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
   // Risk assessment
   severity: varchar("severity", { length: 20 }).notNull(),
   // Values: 'critical', 'high', 'medium', 'low'
-  
+
   exploitation_status: varchar("exploitation_status", { length: 30 }).notNull(),
   // Values: 'not_exploited', 'attempted', 'currently_exploited', 'fully_exploited', 'closed'
-  
+
   probability: numeric("probability", { precision: 3, scale: 2 }),
   // 0.00 to 1.00 (likelihood of exploitation)
 
   // Content
   description: text("description").notNull(),
   evidence: text("evidence"),
-  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'[]'::jsonb`),
+  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "date": "2023-05-15",
@@ -394,7 +406,7 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
 
   // Research and analysis
   research_questions: varchar("research_questions", { length: 500 }).array(),
-  
+
   // Prevention and remediation
   prevention_measures: text("prevention_measures"),
   closure_strategy: text("closure_strategy"),
@@ -454,25 +466,25 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
   // Provision identification
   provision_reference: varchar("provision_reference", { length: 50 }).notNull().unique(),
   // Example: "Article 35", "Article 258"
-  
+
   provision_title: varchar("provision_title", { length: 200 }).notNull(),
 
   // Power assessment
   power_granted: text("power_granted").notNull(),
   current_use_rate: varchar("current_use_rate", { length: 20 }),
   // Values: 'never_used', '<5%', '<10%', 'low', 'medium'
-  
+
   potential_impact: varchar("potential_impact", { length: 20 }).notNull(),
   // Values: 'very_high', 'high', 'medium', 'low'
 
   // Usage tracking
   times_invoked: integer("times_invoked").notNull().default(0),
   last_invoked_date: date("last_invoked_date"),
-  invocation_examples: jsonb("invocation_examples").notNull().default(sql`'[]'::jsonb`),
+  invocation_examples: jsonb("invocation_examples").notNull().default(sql`'{}'::jsonb`),
 
   // Activation strategy
   activation_strategy: text("activation_strategy"),
-  barriers_to_use: jsonb("barriers_to_use").notNull().default(sql`'[]'::jsonb`),
+  barriers_to_use: jsonb("barriers_to_use").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "barrier": "Lack of awareness",
@@ -531,16 +543,16 @@ export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
   question_category: varchar("question_category", { length: 50 }).notNull(),
   // Values: 'constitutional_knowledge', 'institutional_powers', 'legislative_procedure',
   //         'public_finance', 'rights_jurisprudence'
-  
+
   difficulty_level: varchar("difficulty_level", { length: 20 }).notNull().default('basic'),
   // Values: 'basic', 'intermediate', 'advanced', 'expert'
 
   // Question content
   question: text("question").notNull(),
   correct_answer: text("correct_answer").notNull(),
-  
+
   // Multiple choice options (if applicable)
-  answer_options: jsonb("answer_options").notNull().default(sql`'[]'::jsonb`),
+  answer_options: jsonb("answer_options").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"option": "A", "text": "Senate has equal power to US Senate"},
     {"option": "B", "text": "Senate limited to county matters (Article 96)"}
@@ -612,24 +624,24 @@ export const constitutional_loopholes = pgTable("constitutional_loopholes", {
   // Risk assessment
   exploitation_risk: varchar("exploitation_risk", { length: 20 }).notNull(),
   // Values: 'critical', 'high', 'medium', 'low'
-  
+
   priority: varchar("priority", { length: 20 }).notNull(),
   // Values: 'urgent', 'high', 'medium', 'low'
 
   // Content
   description: text("description").notNull(),
   exploitation_scenario: text("exploitation_scenario"),
-  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'[]'::jsonb`),
+  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
 
   // Prevention and closure
   prevention_strategy: text("prevention_strategy"),
   proposed_amendment: text("proposed_amendment"),
-  alternative_interpretations: jsonb("alternative_interpretations").notNull().default(sql`'[]'::jsonb`),
+  alternative_interpretations: jsonb("alternative_interpretations").notNull().default(sql`'{}'::jsonb`),
 
   // Status tracking
   status: varchar("status", { length: 20 }).notNull().default('open'),
   // Values: 'open', 'partially_closed', 'closed', 'worsening'
-  
+
   times_exploited: integer("times_exploited").notNull().default(0),
   last_exploitation_date: date("last_exploitation_date"),
 
@@ -702,7 +714,7 @@ export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
   rights_jurisprudence: numeric("rights_jurisprudence", { precision: 5, scale: 2 }),
 
   // Critical errors - YOUR SENATOR EXAMPLE DOCUMENTED HERE
-  critical_errors: jsonb("critical_errors").notNull().default(sql`'[]'::jsonb`),
+  critical_errors: jsonb("critical_errors").notNull().default(sql`'{}'::jsonb`),
   /* Example structure:
   [
     {
@@ -723,7 +735,7 @@ export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
   training_recommended: boolean("training_recommended").notNull().default(false),
   training_priority: varchar("training_priority", { length: 20 }),
   // Values: 'low', 'medium', 'high', 'urgent'
-  
+
   recommended_topics: varchar("recommended_topics", { length: 100 }).array(),
 
   // Audit trail

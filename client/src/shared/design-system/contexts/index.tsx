@@ -10,7 +10,7 @@
  * - MultilingualProvider: Localization and language support
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { BrandVoiceProvider } from './BrandVoiceProvider';
 import { LowBandwidthProvider } from './LowBandwidthProvider';

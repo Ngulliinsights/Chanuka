@@ -1,10 +1,10 @@
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { Skeleton } from '@client/shared/ui/loading/ui/Skeleton.tsx';
+import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Skeleton } from '@/shared/ui/loading/ui/Skeleton';
 
 
 
@@ -152,7 +152,7 @@ export default function DatabaseStatus({ stats, schemaCheck, isLoading }: Databa
                   {getSeverityIcon(issue.severity)}
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900">
-                      {issue.type.split('_').map(word => 
+                      {issue.type.split('_').map(word =>
                         word.charAt(0).toUpperCase() + word.slice(1)
                       ).join(' ')}
                     </h4>

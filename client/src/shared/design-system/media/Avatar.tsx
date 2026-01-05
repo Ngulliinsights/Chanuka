@@ -1,6 +1,6 @@
 /**
  * Avatar Component - UNIFIED & TOKEN-BASED
- * 
+ *
  * ✅ Uses design tokens
  * ✅ Supports multiple sizes (sm, md, lg, xl)
  * ✅ Proper border and background colors
@@ -9,7 +9,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 const avatarVariants = cva(
   [

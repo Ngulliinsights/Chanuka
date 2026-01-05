@@ -1,15 +1,15 @@
 /**
  * Mock Data Hook
- * 
+ *
  * React hook for accessing mock data with loading states, error handling,
  * and real-time updates integration.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { mockDataService, RealTimeEvent } from '@client/shared/testing/mock-data';
-import { dataLoaders } from '@client/data/mock/loaders';
-import { logger } from '@client/utils/logger';
+import { mockDataService, RealTimeEvent } from '@/shared/testing/mock-data';
+import { dataLoaders } from '@/data/mock/loaders';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook state interface
@@ -120,7 +120,7 @@ export function useMockData<T>(
         eventType: event.type,
         eventId: event.id
       });
-      
+
       // Refresh data after a short delay to batch updates
       setTimeout(() => {
         refresh();

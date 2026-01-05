@@ -84,6 +84,8 @@ interface SearchConfig {
   searchSettings: SearchSettings;
 }
 
+export type { SearchConfig };
+
 interface SearchSettings {
   enableFuzzy: boolean;
   combineResults: boolean;

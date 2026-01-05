@@ -1,17 +1,19 @@
 
-import { InvalidNavigationPathError } from '@client/core/error';
-import { validateNavigationPath } from '@client/validation';
+import { InvalidNavigationPathError } from '@/core/error';
+import { validateNavigationPath } from '@/validation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import type { NavigationItem as SharedNavigationItem, UserRole as SharedUserRole } from '../types';
-import type { NavigationItem, UserRole } from '@client/shared/types/navigation';
+import type { NavigationItem, UserRole } from '@/shared/types/navigation';
 
 // Type conversion helpers
 function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
   return {
     ...item,
     icon: typeof item.icon === 'string' ? (() => null) as any : item.icon as any,
-    section: item.section || 'tools', // Provide default section if undefined
+    section: (item.section === 'system' ? 'tools' : item.section) || 'tools', // Map system to tools, provide default
+    badge: typeof item.badge === 'string' ? parseInt(item.badge, 10) || undefined : item.badge,
+    allowedRoles: item.allowedRoles as any, // Type assertion to resolve conflict
   };
 }
 

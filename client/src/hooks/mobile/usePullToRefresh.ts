@@ -34,7 +34,7 @@
 import { useCallback, useRef, useState } from 'react';
 
 import { GESTURE_CONFIG } from '@/config/gestures';
-import type { PullToRefreshConfig } from '@/types/mobile';
+import type { PullToRefreshConfig } from '@/shared/types/mobile';
 
 interface UsePullToRefreshReturn {
   isRefreshing: boolean;

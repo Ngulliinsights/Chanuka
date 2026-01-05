@@ -1,6 +1,6 @@
 /**
  * Render Tracking Integration Utilities
- * 
+ *
  * Simple utilities to integrate render tracking into existing components
  * without requiring JSX compilation for the examples.
  */
@@ -15,7 +15,7 @@ export class RenderTrackingIntegration {
    * Add render tracking to an existing component's useEffect
    */
   static trackComponentRender(
-    componentName: string, 
+    componentName: string,
     trigger: string = 'component-render',
     additionalData?: any
   ): void {
@@ -60,12 +60,12 @@ export class RenderTrackingIntegration {
     operation: () => T
   ): T {
     const start = performance.now();
-    
+
     try {
       const result = operation();
       const end = performance.now();
       const duration = end - start;
-      
+
       logger.trackPerformanceImpact({
         component: `${componentName}.${operationName}`,
         renderDuration: duration,
@@ -77,7 +77,7 @@ export class RenderTrackingIntegration {
     } catch (error) {
       const end = performance.now();
       const duration = end - start;
-      
+
       logger.trackPerformanceImpact({
         component: `${componentName}.${operationName}`,
         renderDuration: duration,
@@ -98,12 +98,12 @@ export class RenderTrackingIntegration {
     operation: () => Promise<T>
   ): Promise<T> {
     const start = performance.now();
-    
+
     try {
       const result = await operation();
       const end = performance.now();
       const duration = end - start;
-      
+
       logger.trackPerformanceImpact({
         component: `${componentName}.${operationName}`,
         renderDuration: duration,
@@ -115,7 +115,7 @@ export class RenderTrackingIntegration {
     } catch (error) {
       const end = performance.now();
       const duration = end - start;
-      
+
       logger.trackPerformanceImpact({
         component: `${componentName}.${operationName}`,
         renderDuration: duration,
@@ -157,11 +157,11 @@ export class RenderTrackingIntegration {
     // Monitor for infinite renders every 5 seconds
     const monitoringInterval = setInterval(() => {
       const stats = logger.getRenderStats();
-      
+
       if (stats.infiniteRenderAlerts > 0) {
         console.warn('🚨 Infinite render alerts detected:', stats);
       }
-      
+
       // Log components with high render counts
       if (stats.totalRenders > 100) {
         console.info('📊 High render activity:', stats);
@@ -189,7 +189,7 @@ export class RenderTrackingIntegration {
    */
   static generateReport(): string {
     const stats = logger.getRenderStats();
-    
+
     const report = `
 # Render Tracking Report
 Generated: ${new Date().toISOString()}
@@ -230,7 +230,7 @@ export const INTEGRATION_EXAMPLES = {
   // AppLayout component integration
   appLayout: `
 // Add to AppLayout component
-import { trackRender, trackLifecycle } from '@client/utils/render-tracking-integration';
+import { trackRender, trackLifecycle } from '@/utils/render-tracking-integration';
 
 function AppLayout() {
   useEffect(() => {
@@ -252,7 +252,7 @@ function AppLayout() {
   // WebSocket component integration
   webSocket: `
 // Add to WebSocket components
-import { trackRender, trackLifecycle, measurePerformance } from '@client/utils/render-tracking-integration';
+import { trackRender, trackLifecycle, measurePerformance } from '@/utils/render-tracking-integration';
 
 function WebSocketClient() {
   useEffect(() => {
@@ -278,12 +278,12 @@ function WebSocketClient() {
   // Performance monitoring setup
   monitoring: `
 // Add to main App component or index.tsx
-import { setupMonitoring } from '@client/utils/render-tracking-integration';
+import { setupMonitoring } from '@/utils/render-tracking-integration';
 
 // In development mode
 if (process.env.NODE_ENV === 'development') {
   const cleanup = setupMonitoring();
-  
+
   // Optional: cleanup on app unmount
   // cleanup();
 }`

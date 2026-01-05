@@ -1,17 +1,17 @@
 /**
  * ScrollToTopButton - Floating button to scroll to top
- * 
+ *
  * Appears after scrolling down a certain distance.
  * Provides quick navigation back to top of page.
- * 
+ *
  * @module components/mobile/interaction/ScrollToTopButton
  */
 
 import { ChevronUp } from 'lucide-react';
 import { type ReactNode } from 'react';
 
-import { useScrollManager } from '@client/hooks/mobile';
-import { cn } from '@client/lib/utils';
+import { useScrollManager } from '@/hooks/mobile';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface ScrollToTopButtonProps {
   /**
@@ -40,10 +40,10 @@ interface ScrollToTopButtonProps {
 
 /**
  * Scroll to top button component
- * 
+ *
  * Shows a floating button that appears after scrolling.
  * Automatically scrolls page to top with smooth animation.
- * 
+ *
  * @example
  * ```tsx
  * <ScrollToTopButton threshold={400} />

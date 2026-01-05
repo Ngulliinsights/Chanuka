@@ -7,10 +7,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   actualTheme: 'light' | 'dark';
+  isDark: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -55,13 +56,13 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
   // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // Remove existing theme classes
     root.classList.remove('light', 'dark');
-    
+
     // Add current theme class
     root.classList.add(actualTheme);
-    
+
     // Store theme preference
     localStorage.setItem('theme', theme);
   }, [theme, actualTheme]);
@@ -74,6 +75,7 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
     theme,
     setTheme: handleSetTheme,
     actualTheme,
+    isDark: actualTheme === 'dark',
   };
 
   return (
@@ -85,11 +87,11 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  
+
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
-  
+
   return context;
 }
 

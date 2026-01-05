@@ -1,6 +1,6 @@
 /**
  * Monitoring Initialization Utility
- * 
+ *
  * Initializes all monitoring services for production deployment:
  * - Error monitoring (Sentry)
  * - Performance monitoring (RUM)
@@ -8,8 +8,8 @@
  * - Custom metrics collection
  */
 
-import ErrorMonitoring from '@client/monitoring/error-monitoring';
-// import { getPerformanceMonitor } from '@client/core/performance';
+import ErrorMonitoring from '@/monitoring/error-monitoring';
+// import { getPerformanceMonitor } from '@/core/performance';
 
 interface MonitoringConfig {
   environment: string;
@@ -253,7 +253,7 @@ class MonitoringInitializer {
         const navigationObserver = new PerformanceObserver((list) => {
           for (const _entry of list.getEntries()) {
             // const navEntry = entry as PerformanceNavigationTiming; // Unused variable
-            
+
             // performanceMonitoring.recordCustomMetric({
             //   name: 'navigation_timing',
             //   value: navEntry.loadEventEnd - (navEntry as any).navigationStart,
@@ -308,7 +308,7 @@ class MonitoringInitializer {
       const formId = form.id || form.name || 'unnamed-form';
 
       // performanceMonitoring.trackInteraction('form-submit', formId);
-      
+
       this.errorMonitoring.addBreadcrumb(
         `Form submitted: ${formId}`,
         'user',
@@ -320,7 +320,7 @@ class MonitoringInitializer {
     // Page visibility changes
     document.addEventListener('visibilitychange', () => {
       const state = document.visibilityState;
-      
+
       // performanceMonitoring.recordCustomMetric({
       //   name: 'page_visibility_change',
       //   value: state === 'visible' ? 1 : 0,

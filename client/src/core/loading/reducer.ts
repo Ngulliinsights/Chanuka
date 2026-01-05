@@ -1,320 +1,497 @@
 /**
- * Unified Loading State Reducer - Consolidated from multiple implementations
- * Handles all loading state transitions with optimized logic and error integration
+ * Optimized Loading State Reducer
+ * Manages loading operations with performance-optimized state transitions
+ * Aligned with actual LoadingAction and LoadingStateData types
  */
 
-import { LoadingStateData, LoadingAction, LoadingOperation, ConnectionInfo, AdaptiveSettings, AssetLoadingProgress, LoadingMetrics as LoadingStats } from '@client/shared/types';
+import {
+  LoadingStateData,
+  LoadingAction,
+  LoadingOperation,
+  LoadingMetrics,
+} from '@client/shared/types';
 
-export function loadingReducer(state: LoadingStateData, action: LoadingAction): LoadingStateData {
+/**
+ * Main reducer for managing loading state
+ * Handles action types: retry, fallback, cancel, prioritize, delay, cache
+ */
+export function loadingReducer(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
   switch (action.type) {
-    case 'START_OPERATION': {
-      const operation: LoadingOperation = {
-        ...action.payload,
-        startTime: Date.now(),
-        retryCount: 0,
-        timeoutWarningShown: false,
-        cancelled: false,
-      };
+    case 'retry':
+      return handleRetry(state, action);
 
-      const newOperations = {
-        ...state.operations,
-        [operation.id]: operation,
-      };
+    case 'fallback':
+      return handleFallback(state, action);
 
-      const newStats: LoadingStats = {
-        ...state.stats,
-        totalOperations: state.stats.totalOperations + 1,
-        activeOperations: Object.keys(newOperations).length,
-        lastUpdate: Date.now(),
-      };
+    case 'cancel':
+      return handleCancel(state, action);
 
-      return {
-        ...state,
-        operations: newOperations,
-        globalLoading: Object.keys(newOperations).length > 0,
-        highPriorityLoading: Object.values(newOperations).some(op => op.priority === 'high'),
-        stats: newStats,
-      };
-    }
+    case 'prioritize':
+      return handlePrioritize(state, action);
 
-    case 'UPDATE_OPERATION': {
-      const { id, updates } = action.payload;
-      const existingOperation = state.operations[id];
+    case 'delay':
+      return handleDelay(state, action);
 
-      if (!existingOperation) return state;
-
-      const updatedOperation = { ...existingOperation, ...updates };
-      const newOperations = {
-        ...state.operations,
-        [id]: updatedOperation,
-      };
-
-      return {
-        ...state,
-        operations: newOperations,
-      };
-    }
-
-    case 'COMPLETE_OPERATION': {
-      const { id } = action.payload;
-      const newOperations = { ...state.operations };
-      const completedOperation = newOperations[id];
-
-      if (completedOperation) {
-        delete newOperations[id];
-
-        const completionTime = Date.now() - completedOperation.startTime;
-        const newStats: LoadingStats = {
-          ...state.stats,
-          activeOperations: Object.keys(newOperations).length,
-          completedOperations: state.stats.completedOperations + 1,
-          failedOperations: action.payload.success ? state.stats.failedOperations : state.stats.failedOperations + 1,
-          averageLoadTime: calculateNewAverageLoadTime(
-            state.stats.averageLoadTime,
-            state.stats.completedOperations,
-            completionTime
-          ),
-          lastUpdate: Date.now(),
-        };
-
-        return {
-          ...state,
-          operations: newOperations,
-          globalLoading: Object.keys(newOperations).length > 0,
-          highPriorityLoading: Object.values(newOperations).some(op => op.priority === 'high'),
-          stats: newStats,
-        };
-      }
-
-      return state;
-    }
-
-    case 'RETRY_OPERATION': {
-      const { id } = action.payload;
-      const operation = state.operations[id];
-
-      if (!operation) return state;
-
-      const updatedOperation = {
-        ...operation,
-        retryCount: operation.retryCount + 1,
-        error: undefined,
-        startTime: Date.now(),
-        timeoutWarningShown: false,
-        cancelled: false,
-      };
-
-      const newStats: LoadingStats = {
-        ...state.stats,
-        retryRate: calculateRetryRate(state.stats, Object.values(state.operations).length),
-        lastUpdate: Date.now(),
-      };
-
-      return {
-        ...state,
-        operations: {
-          ...state.operations,
-          [id]: updatedOperation,
-        },
-        stats: newStats,
-      };
-    }
-
-    case 'CANCEL_OPERATION': {
-      const { id } = action.payload;
-      const newOperations = { ...state.operations };
-      const cancelledOperation = newOperations[id];
-
-      if (cancelledOperation) {
-        newOperations[id] = { ...cancelledOperation, cancelled: true };
-        delete newOperations[id]; // Remove cancelled operations
-
-        const newStats: LoadingStats = {
-          ...state.stats,
-          activeOperations: Object.keys(newOperations).length,
-          lastUpdate: Date.now(),
-        };
-
-        return {
-          ...state,
-          operations: newOperations,
-          globalLoading: Object.keys(newOperations).length > 0,
-          highPriorityLoading: Object.values(newOperations).some(op => op.priority === 'high'),
-          stats: newStats,
-        };
-      }
-
-      return state;
-    }
-
-    case 'TIMEOUT_OPERATION': {
-      const { id } = action.payload;
-      const operation = state.operations[id];
-
-      if (!operation) return state;
-
-      const timeoutError = new Error(`Operation timed out after ${operation.timeout || 30000}ms`);
-      const updatedOperation = {
-        ...operation,
-        error: timeoutError,
-      };
-
-      const newStats: LoadingStats = {
-        ...state.stats,
-        failedOperations: state.stats.failedOperations + 1,
-        lastUpdate: Date.now(),
-      };
-
-      return {
-        ...state,
-        operations: {
-          ...state.operations,
-          [id]: updatedOperation,
-        },
-        stats: newStats,
-      };
-    }
-
-    case 'UPDATE_CONNECTION': {
-      const { connectionInfo, isOnline } = action.payload;
-
-      // Update adaptive settings based on connection
-      const adaptiveSettings: AdaptiveSettings = {
-        ...state.adaptiveSettings,
-        enableAnimations: isOnline && connectionInfo.type !== 'slow',
-        maxConcurrentOperations: getMaxConcurrentOperations(connectionInfo),
-        defaultTimeout: getDefaultTimeout(connectionInfo),
-        retryDelay: getRetryDelay(connectionInfo),
-        connectionMultiplier: getConnectionMultiplier(connectionInfo),
-      };
-
-      const connectionImpact = calculateConnectionImpact(connectionInfo, isOnline);
-
-      const newStats: LoadingStats = {
-        ...state.stats,
-        connectionImpact,
-        lastUpdate: Date.now(),
-      };
-
-      return {
-        ...state,
-        connectionInfo,
-        isOnline,
-        adaptiveSettings,
-        stats: newStats,
-      };
-    }
-
-    case 'UPDATE_ADAPTIVE_SETTINGS': {
-      return {
-        ...state,
-        adaptiveSettings: {
-          ...state.adaptiveSettings,
-          ...action.payload,
-        },
-      };
-    }
-
-    case 'UPDATE_ASSET_PROGRESS': {
-      return {
-        ...state,
-        assetLoadingProgress: action.payload,
-      };
-    }
-
-    case 'UPDATE_STATS': {
-      return {
-        ...state,
-        stats: {
-          ...state.stats,
-          ...action.payload,
-          lastUpdate: Date.now(),
-        },
-      };
-    }
-
-    case 'SHOW_TIMEOUT_WARNING': {
-      const { id } = action.payload;
-      const operation = state.operations[id];
-
-      if (!operation) return state;
-
-      return {
-        ...state,
-        operations: {
-          ...state.operations,
-          [id]: { ...operation, timeoutWarningShown: true },
-        },
-      };
-    }
+    case 'cache':
+      return handleCache(state, action);
 
     default:
       return state;
   }
 }
 
-// Helper functions for calculations
-function calculateNewAverageLoadTime(currentAverage: number, completedCount: number, newTime: number): number {
-  if (completedCount === 0) return newTime;
-  return (currentAverage * completedCount + newTime) / (completedCount + 1);
+// ============================================================================
+// Action Handlers
+// ============================================================================
+
+/**
+ * Handles retry action - increments retry count for an operation
+ */
+function handleRetry(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
+
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const updatedOperation: LoadingOperation = {
+    ...operation,
+    retryCount: operation.retryCount + 1,
+    error: undefined,
+    startTime: new Date(),
+  };
+
+  const newOperations = {
+    ...state.operations,
+    [operationId]: updatedOperation,
+  };
+
+  return {
+    ...state,
+    operations: newOperations,
+    stats: updateMetrics(state.stats, {
+      totalOperations: state.stats.totalOperations,
+      completedOperations: state.stats.completedOperations,
+      failedOperations: state.stats.failedOperations,
+    }),
+  };
 }
 
-function calculateRetryRate(stats: LoadingStats, activeOperations: number): number {
-  const totalOperations = stats.totalOperations + activeOperations;
-  if (totalOperations === 0) return 0;
+/**
+ * Handles fallback action - marks operation with fallback state
+ */
+function handleFallback(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
 
-  // Estimate retry rate based on current stats
-  const estimatedRetries = stats.retryRate * stats.totalOperations;
-  return estimatedRetries / totalOperations;
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const updatedOperation: LoadingOperation = {
+    ...operation,
+    state: 'loading', // Keep existing state or update as needed
+  };
+
+  return {
+    ...state,
+    operations: {
+      ...state.operations,
+      [operationId]: updatedOperation,
+    },
+  };
 }
 
-function getMaxConcurrentOperations(connectionInfo: ConnectionInfo): number {
-  switch (connectionInfo.type) {
-    case 'slow':
-      return 2;
-    case 'offline':
-      return 1;
-    default:
-      return 4;
+/**
+ * Handles cancel action - removes operation from state
+ */
+function handleCancel(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
+
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const newOperations = { ...state.operations };
+  delete newOperations[operationId];
+
+  return {
+    ...state,
+    operations: newOperations,
+    stats: updateMetrics(state.stats, {
+      totalOperations: state.stats.totalOperations,
+      completedOperations: state.stats.completedOperations + 1,
+      failedOperations: state.stats.failedOperations,
+    }),
+  };
+}
+
+/**
+ * Handles prioritize action - updates operation metadata to mark as prioritized
+ */
+function handlePrioritize(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
+
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const updatedOperation: LoadingOperation = {
+    ...operation,
+    metadata: {
+      ...(operation.metadata || {}),
+      prioritized: true,
+      prioritizedAt: new Date().toISOString(),
+    },
+  };
+
+  return {
+    ...state,
+    operations: {
+      ...state.operations,
+      [operationId]: updatedOperation,
+    },
+  };
+}
+
+/**
+ * Handles delay action - updates operation metadata with delay information
+ */
+function handleDelay(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
+
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const delayAmount = extractDelayAmount(action);
+
+  const updatedOperation: LoadingOperation = {
+    ...operation,
+    metadata: {
+      ...(operation.metadata || {}),
+      delayed: true,
+      delayAmount,
+      delayedAt: new Date().toISOString(),
+    },
+  };
+
+  return {
+    ...state,
+    operations: {
+      ...state.operations,
+      [operationId]: updatedOperation,
+    },
+  };
+}
+
+/**
+ * Handles cache action - marks operation as cached
+ */
+function handleCache(
+  state: LoadingStateData,
+  action: LoadingAction
+): LoadingStateData {
+  const operationId = extractOperationId(action);
+  if (!operationId) return state;
+
+  const operation = state.operations[operationId];
+  if (!operation) return state;
+
+  const updatedOperation: LoadingOperation = {
+    ...operation,
+    metadata: {
+      ...(operation.metadata || {}),
+      cached: true,
+      cachedAt: new Date().toISOString(),
+    },
+  };
+
+  return {
+    ...state,
+    operations: {
+      ...state.operations,
+      [operationId]: updatedOperation,
+    },
+  };
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Extracts operation ID from action
+ * Attempts to get ID from common property names
+ */
+function extractOperationId(action: LoadingAction): string | null {
+  // Safely check for operation ID in action payload
+  if ('payload' in action && action.payload && typeof action.payload === 'object') {
+    const payload = action.payload as { operationId?: string; id?: string };
+    return payload.operationId || payload.id || null;
   }
-}
 
-function getDefaultTimeout(connectionInfo: ConnectionInfo): number {
-  switch (connectionInfo.type) {
-    case 'slow':
-      return 60000; // 60 seconds
-    case 'offline':
-      return 120000; // 2 minutes
-    default:
-      return 30000; // 30 seconds
+  // Check direct properties
+  if ('operationId' in action && typeof action.operationId === 'string') {
+    return action.operationId;
   }
-}
 
-function getRetryDelay(connectionInfo: ConnectionInfo): number {
-  switch (connectionInfo.type) {
-    case 'slow':
-      return 2000; // 2 seconds
-    case 'offline':
-      return 5000; // 5 seconds
-    default:
-      return 1000; // 1 second
+  if ('id' in action && typeof action.id === 'string') {
+    return action.id;
   }
+
+  return null;
 }
 
-function getConnectionMultiplier(connectionInfo: ConnectionInfo): number {
-  switch (connectionInfo.type) {
-    case 'slow':
-      return 2;
-    case 'offline':
-      return 3;
-    default:
-      return 1;
+/**
+ * Extracts delay amount from action
+ */
+function extractDelayAmount(action: LoadingAction): number {
+  // Safely check for delay in action payload
+  if ('payload' in action && action.payload && typeof action.payload === 'object') {
+    const payload = action.payload as { delay?: number; delayAmount?: number };
+    return payload.delay || payload.delayAmount || 0;
   }
+
+  // Check direct properties
+  if ('delay' in action && typeof action.delay === 'number') {
+    return action.delay;
+  }
+
+  if ('delayAmount' in action && typeof action.delayAmount === 'number') {
+    return action.delayAmount;
+  }
+
+  return 0;
 }
 
-function calculateConnectionImpact(connectionInfo: ConnectionInfo, isOnline: boolean): 'high' | 'medium' | 'low' {
-  if (!isOnline) return 'high';
-  if (connectionInfo.type === 'slow') return 'high';
-  if (connectionInfo.type === 'unknown') return 'medium';
-  return 'low';
+/**
+ * Updates metrics with new values
+ * Only updates properties that exist on LoadingMetrics type
+ */
+function updateMetrics(
+  currentMetrics: LoadingMetrics,
+  updates: Partial<LoadingMetrics>
+): LoadingMetrics {
+  return {
+    ...currentMetrics,
+    ...updates,
+  };
+}
+
+/**
+ * Calculates completion time between two dates
+ */
+export function calculateCompletionTime(startTime: Date, endTime: Date): number {
+  return endTime.getTime() - startTime.getTime();
+}
+
+/**
+ * Checks if operation has exceeded its max retries
+ */
+export function hasExceededRetries(operation: LoadingOperation): boolean {
+  return operation.retryCount >= operation.maxRetries;
+}
+
+/**
+ * Gets all operations with dependencies
+ */
+export function getOperationsWithDependencies(
+  state: LoadingStateData
+): LoadingOperation[] {
+  return Object.values(state.operations).filter(
+    (op) => op.dependencies && op.dependencies.length > 0
+  );
+}
+
+/**
+ * Checks if all dependencies for an operation are complete
+ */
+export function areDependenciesComplete(
+  operation: LoadingOperation,
+  state: LoadingStateData
+): boolean {
+  if (!operation.dependencies || operation.dependencies.length === 0) {
+    return true;
+  }
+
+  return operation.dependencies.every((depId) => {
+    const dep = state.operations[depId];
+    // Dependency is complete if it doesn't exist (was completed and removed)
+    return !dep;
+  });
+}
+
+/**
+ * Gets operations sorted by start time (oldest first)
+ */
+export function getOperationsByAge(state: LoadingStateData): LoadingOperation[] {
+  return Object.values(state.operations).sort(
+    (a, b) => a.startTime.getTime() - b.startTime.getTime()
+  );
+}
+
+/**
+ * Gets operations filtered by type
+ */
+export function getOperationsByType(
+  state: LoadingStateData,
+  type: string
+): LoadingOperation[] {
+  return Object.values(state.operations).filter((op) => op.type === type);
+}
+
+/**
+ * Checks if there are any active operations
+ */
+export function hasActiveOperations(state: LoadingStateData): boolean {
+  return Object.keys(state.operations).length > 0;
+}
+
+/**
+ * Gets count of operations in specific state
+ */
+export function getOperationCountByState(
+  state: LoadingStateData,
+  operationState: string
+): number {
+  return Object.values(state.operations).filter(
+    (op) => op.state === operationState
+  ).length;
+}
+
+/**
+ * Calculates success rate from metrics
+ */
+export function calculateSuccessRate(metrics: LoadingMetrics): number {
+  const total = metrics.totalOperations;
+  if (total === 0) return 0;
+  return ((total - metrics.failedOperations) / total) * 100;
+}
+
+/**
+ * Calculates average operation duration
+ */
+export function calculateAverageDuration(
+  totalDuration: number,
+  completedCount: number
+): number {
+  if (completedCount === 0) return 0;
+  return totalDuration / completedCount;
+}
+
+/**
+ * Updates queue length metrics
+ */
+export function updateQueueMetrics(
+  currentMetrics: LoadingMetrics,
+  currentQueueLength: number
+): LoadingMetrics {
+  return {
+    ...currentMetrics,
+    currentQueueLength,
+    peakQueueLength: Math.max(currentMetrics.peakQueueLength, currentQueueLength),
+  };
+}
+
+/**
+ * Creates initial loading state with all required properties
+ */
+export function createInitialLoadingState(): LoadingStateData {
+  return {
+    isLoading: false,
+    operations: {},
+    stats: {
+      totalOperations: 0,
+      completedOperations: 0,
+      failedOperations: 0,
+      averageDuration: 0,
+      successRate: 0,
+      currentQueueLength: 0,
+      peakQueueLength: 0,
+    },
+  };
+}
+
+/**
+ * Creates initial metrics object
+ */
+export function createInitialMetrics(): LoadingMetrics {
+  return {
+    totalOperations: 0,
+    completedOperations: 0,
+    failedOperations: 0,
+    averageDuration: 0,
+    successRate: 0,
+    currentQueueLength: 0,
+    peakQueueLength: 0,
+  };
+}
+
+/**
+ * Recalculates all derived metrics from current state
+ */
+export function recalculateMetrics(state: LoadingStateData): LoadingMetrics {
+  const activeCount = Object.keys(state.operations).length;
+  const successRate = calculateSuccessRate(state.stats);
+
+  return {
+    ...state.stats,
+    currentQueueLength: activeCount,
+    peakQueueLength: Math.max(state.stats.peakQueueLength, activeCount),
+    successRate,
+  };
+}
+
+// ============================================================================
+// Utility Types
+// ============================================================================
+
+export type LoadingReducerAction = LoadingAction;
+export type LoadingReducerState = LoadingStateData;
+
+/**
+ * Helper type for operation updates
+ */
+export type OperationUpdate = Partial<
+  Omit<LoadingOperation, 'id' | 'startTime'>
+> & {
+  id: string;
+};
+
+/**
+ * Helper type for batch operation updates
+ */
+export interface BatchOperationUpdate {
+  operationIds: string[];
+  update: Partial<Omit<LoadingOperation, 'id' | 'startTime'>>;
+}
+
+/**
+ * Helper type for metrics calculation
+ */
+export interface MetricsSnapshot {
+  timestamp: Date;
+  activeOperations: number;
+  completedOperations: number;
+  failedOperations: number;
+  successRate: number;
+  averageDuration: number;
 }

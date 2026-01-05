@@ -1,8 +1,8 @@
 import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
 import { useState } from 'react';
 
-import { logger } from '@client/utils/logger';
-import { useApiConnection } from '@client/core/api/hooks/useApiConnection';
+import { logger } from '@/utils/logger';
+import { useApiConnection } from '@/core/api/hooks/useApiConnection';
 
 interface ConnectionStatusProps {
   showDetails?: boolean;
@@ -43,19 +43,19 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
     if (isLoading) {
       return <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />;
     }
-    
+
     if (!navigator.onLine) {
       return <Network className="w-4 h-4 text-red-500" />;
     }
-    
+
     if (isConnected && isHealthy) {
       return <CheckCircle className="w-4 h-4 text-green-500" />;
     }
-    
+
     if (isConnected) {
       return <Network className="w-4 h-4 text-yellow-500" />;
     }
-    
+
     return <AlertCircle className="w-4 h-4 text-red-500" />;
   };
 
@@ -182,7 +182,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Response Time</span>
             <span className={`text-sm ${
-              healthStatus.latency < 1000 ? 'text-green-600' : 
+              healthStatus.latency < 1000 ? 'text-green-600' :
               healthStatus.latency < 3000 ? 'text-yellow-600' : 'text-red-600'
             }`}>
               {healthStatus.latency}ms
@@ -239,7 +239,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
                 {diagnostics.status.toUpperCase()}
               </span>
             </div>
-            
+
             {diagnostics.issues.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-1">Issues:</p>
@@ -253,7 +253,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
                 </ul>
               </div>
             )}
-            
+
             {diagnostics.recommendations.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-1">Recommendations:</p>

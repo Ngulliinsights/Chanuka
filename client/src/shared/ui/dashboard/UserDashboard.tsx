@@ -12,24 +12,24 @@ import {
   Star,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+} from '@/shared/design-system';
+import { Progress } from '@/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 import type {
   EngagementHistoryItem as ImportedEngagementHistoryItem,
   UserDashboardData,
   PrivacyControls as ImportedPrivacyControls,
   DashboardPreferences,
-} from '@client/shared/types/user-dashboard';
+} from '@/shared/types/user-dashboard';
 
 import { ActivitySection } from './sections/ActivitySection';
 import { BillsSection } from './sections/BillsSection';

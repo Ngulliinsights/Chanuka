@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { ProgressiveLoaderProps } from '../types';
-import { cn } from '@client/shared/design-system/lib/utils';
+import { cn } from '@/shared/design-system/lib/utils';
 import { LoadingIndicator } from './LoadingIndicator';
 
 export const ProgressiveLoader = React.memo<ProgressiveLoaderProps>(({

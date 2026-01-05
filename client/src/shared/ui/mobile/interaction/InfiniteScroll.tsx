@@ -1,17 +1,17 @@
 /**
  * InfiniteScroll Component
- * 
+ *
  * Automatically loads more content when user scrolls near the bottom.
  * Perfect for feeds, lists, and paginated content.
- * 
+ *
  * @component
  * @example
  * ```tsx
  * import { InfiniteScroll, useInfiniteScroll } from '@client/shared/ui/mobile/interaction';
- * 
+ *
  * export function MyFeed() {
  *   const { isLoading, hasMore, onLoadMore } = useInfiniteScroll();
- *   
+ *
  *   return (
  *     <InfiniteScroll onLoadMore={onLoadMore} hasMore={hasMore} isLoading={isLoading}>
  *       {items.map(item => <Item key={item.id} item={item} />)}
@@ -23,7 +23,7 @@
 
 import React from 'react';
 
-import type { InfiniteScrollConfig } from '@client/shared/types/mobile';
+import type { InfiniteScrollConfig } from '@/shared/types/mobile';
 
 interface InfiniteScrollProps extends InfiniteScrollConfig {
   children: React.ReactNode;
@@ -31,7 +31,7 @@ interface InfiniteScrollProps extends InfiniteScrollConfig {
 
 /**
  * InfiniteScroll Component
- * 
+ *
  * Wraps scrollable content with infinite scroll pagination.
  */
 export const InfiniteScroll = React.forwardRef<HTMLDivElement, InfiniteScrollProps>(

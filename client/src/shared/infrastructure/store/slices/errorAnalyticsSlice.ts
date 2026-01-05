@@ -10,15 +10,15 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 // Import unified types from services
 import {
   DashboardFilters,
-  OverviewMetrics as ErrorOverviewMetrics,
-  TrendDataPoint,
+  ErrorOverviewMetrics,
+  TimeSeriesDataPoint as TrendDataPoint,
   ErrorPattern,
   RecoveryAnalytics,
   RealTimeMetrics,
-  errorAnalyticsRepository,
   Alert,
-  ErrorEntry
-} from '@client/services';
+  CoreError as ErrorEntry,
+  errorAnalyticsBridge
+} from '@/services/errorAnalyticsBridge';
 
 interface ErrorAnalyticsState {
   // Data states
@@ -68,40 +68,37 @@ const initialState: ErrorAnalyticsState = {
 // Async thunks for data fetching
 export const fetchOverviewMetrics = createAsyncThunk(
   'errorAnalytics/fetchOverviewMetrics',
-  async (_filters: DashboardFilters) => {
-    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
-    return await errorAnalyticsRepository.getOverviewMetrics(_filters);
+  async (filters: DashboardFilters) => {
+    return await errorAnalyticsBridge.getOverviewMetrics(filters);
   }
 );
 
 export const fetchTrendData = createAsyncThunk(
   'errorAnalytics/fetchTrendData',
-  async ({ period: _period, filters: _filters }: { period: string; filters: DashboardFilters }) => {
-    // Note: Repository doesn't use period/filters yet, but we keep the interface for future enhancement
-    return await errorAnalyticsRepository.getTrendData({ period: _period, filters: _filters });
+  async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
+    const trendData = await errorAnalyticsBridge.getTrendData(period, filters);
+    return trendData.timeSeries;
   }
 );
 
 export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
-  async (_filters: DashboardFilters) => {
-    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
-    return await errorAnalyticsRepository.getPatterns(_filters);
+  async (filters: DashboardFilters) => {
+    return await errorAnalyticsBridge.getPatterns(filters);
   }
 );
 
 export const fetchRecoveryAnalytics = createAsyncThunk(
   'errorAnalytics/fetchRecoveryAnalytics',
-  async (_filters: DashboardFilters) => {
-    // Note: Repository doesn't use filters yet, but we keep the interface for future enhancement
-    return await errorAnalyticsRepository.getRecoveryAnalytics(_filters);
+  async (filters: DashboardFilters) => {
+    return await errorAnalyticsBridge.getRecoveryAnalytics(filters);
   }
 );
 
 export const fetchRealTimeMetrics = createAsyncThunk(
   'errorAnalytics/fetchRealTimeMetrics',
   async () => {
-    return await errorAnalyticsRepository.getRealTimeMetrics();
+    return await errorAnalyticsBridge.getRealTimeMetrics();
   }
 );
 

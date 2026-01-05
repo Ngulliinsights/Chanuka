@@ -2,10 +2,11 @@
  * Integration Types
  */
 
-import type { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/utils/security';
-import type { DeviceDetector } from '@client/core/mobile';
-import type { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
-import type { TouchHandler } from '@/core/mobile/touch-handler';
+import type { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@/utils/security';
+import type { DeviceDetector } from '@/core/mobile';
+import type { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
+// TouchHandler is deprecated - using SwipeGestures instead
+// import type { SwipeGestureConfig } from '@/hooks/mobile/useSwipeGesture'; // Module not found
 
 export interface IntegrationStatus {
   security: 'pending' | 'loading' | 'success' | 'error';
@@ -21,7 +22,7 @@ export interface IntegrationServices {
   passwordValidator?: PasswordValidator;
   privacyAnalytics?: PrivacyAnalyticsService;
   deviceDetector?: DeviceDetector;
-  touchHandler?: TouchHandler;
+  // touchHandler removed - use SwipeGestures component instead
 }
 
 export interface IntegrationContextValue {

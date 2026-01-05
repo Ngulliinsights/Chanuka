@@ -3,9 +3,9 @@
  * * Displays ML-powered bill recommendations with relevance scoring and reasoning.
  */
 
-import { 
-  X, 
-  ExternalLink, 
+import {
+  X,
+  ExternalLink,
   Target,
   TrendingUp,
   Users,
@@ -15,14 +15,14 @@ import {
   CheckCircle,
   Sparkles,
   Zap,
-  Cpu
+  Settings as Cpu // Using Settings as Cpu replacement
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { BillRecommendation } from '@client/shared/types/user-dashboard';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Progress } from '@/shared/design-system/feedback/Progress';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { BillRecommendation } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 
@@ -32,20 +32,20 @@ interface RecommendationsSectionProps {
   compact?: boolean;
 }
 
-export function RecommendationsSection({ 
-  recommendations, 
-  loading = false, 
-  compact = false 
+export function RecommendationsSection({
+  recommendations,
+  loading = false,
+  compact = false
 }: RecommendationsSectionProps) {
   // Mock store functions since userDashboardSlice doesn't exist yet
   const acceptRecommendation = (id: string) => {
     console.log('Accept recommendation:', id);
   };
-  
+
   const dismissRecommendation = (id: string) => {
     console.log('Dismiss recommendation:', id);
   };
-  
+
   const refreshRecommendations = () => {
     console.log('Refresh recommendations');
   };
@@ -147,8 +147,8 @@ export function RecommendationsSection({
             <p className="text-sm text-muted-foreground mb-4">
               Engage with more bills to get personalized recommendations.
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={handleRefreshRecommendations}
             >
@@ -171,8 +171,8 @@ export function RecommendationsSection({
             <Badge variant="secondary">{recommendations.length}</Badge>
           </CardTitle>
           <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={handleRefreshRecommendations}
             >
@@ -201,7 +201,7 @@ export function RecommendationsSection({
                     <Badge variant="outline">
                       {recommendation.bill.billNumber}
                     </Badge>
-                    <Badge 
+                    <Badge
                       variant="outline"
                       className={getConfidenceClass(recommendation.confidence)}
                     >
@@ -234,8 +234,8 @@ export function RecommendationsSection({
                     {Math.round(recommendation.relevanceScore * 100)}%
                   </span>
                 </div>
-                <Progress 
-                  value={recommendation.relevanceScore * 100} 
+                <Progress
+                  value={recommendation.relevanceScore * 100}
                   className="h-2"
                 />
               </div>
@@ -285,7 +285,7 @@ export function RecommendationsSection({
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Track Bill
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -293,7 +293,7 @@ export function RecommendationsSection({
                 >
                   <X className="h-4 w-4" />
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -313,8 +313,8 @@ export function RecommendationsSection({
               <div className="text-xs text-muted-foreground">
                 <p className="font-medium mb-1">How recommendations work:</p>
                 <p>
-                  Our AI analyzes your engagement patterns, interests, and similar users&apos; 
-                  behavior to suggest relevant legislation. Confidence scores reflect 
+                  Our AI analyzes your engagement patterns, interests, and similar users&apos;
+                  behavior to suggest relevant legislation. Confidence scores reflect
                   the algorithm&apos;s certainty in the match.
                 </p>
               </div>

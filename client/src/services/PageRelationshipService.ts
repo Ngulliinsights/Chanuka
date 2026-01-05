@@ -1,5 +1,5 @@
 import { RelatedPage, PageRelationship, UserRole } from '@client/shared/types/navigation';
-import { logger } from '@client/utils/logger';
+// import { logger } from '@client/utils/logger'; // Unused
 
 /**
  * Configuration for page relationships
@@ -35,20 +35,20 @@ interface RelationshipStats {
  */
 export class PageRelationshipService {
   private static instance: PageRelationshipService;
-  
+
   // Core data structures optimized for lookup performance
   private relationships: Map<string, PageRelationship>;
   private pageMetadata: Map<string, PageMetadata>;
-  
+
   // User behavior tracking with decay mechanism
   private userBehaviorWeights: Map<string, number>;
   private behaviorWeightDecay = 0.95; // Decay factor for older patterns
   private maxBehaviorWeight = 1.0; // Cap on behavior weight contribution
-  
+
   // Cache for frequently accessed computations
   private breadcrumbCache: Map<string, BreadcrumbItem[]>;
   private parentChainCache: Map<string, string[]>;
-  
+
   // Configuration constants
   private readonly DEFAULT_MAX_SUGGESTIONS = 5;
   private readonly DEFAULT_MAX_PATH_DEPTH = 3;
@@ -63,7 +63,7 @@ export class PageRelationshipService {
     this.userBehaviorWeights = new Map();
     this.breadcrumbCache = new Map();
     this.parentChainCache = new Map();
-    
+
     this.initializeFromConfig(this.getDefaultConfig());
   }
 
@@ -206,7 +206,7 @@ export class PageRelationshipService {
     }
 
     const relatedPages: RelatedPage[] = [];
-    
+
     // Pre-filter and map in a single pass
     for (const [relatedPageId, relation] of Object.entries(relationship.relatedPages)) {
       // Skip inaccessible pages early
@@ -232,7 +232,7 @@ export class PageRelationshipService {
 
     // Sort by weight descending
     relatedPages.sort((a, b) => b.weight - a.weight);
-    
+
     return relatedPages;
   }
 
@@ -257,7 +257,7 @@ export class PageRelationshipService {
    */
   public updateRelationship(pageId: string, relationship: PageRelationship): void {
     this.relationships.set(pageId, relationship);
-    
+
     // Invalidate caches that depend on this relationship
     this.invalidateCachesForPage(pageId);
   }
@@ -268,7 +268,7 @@ export class PageRelationshipService {
    */
   public updatePageMetadata(pageId: string, metadata: PageMetadata): void {
     this.pageMetadata.set(pageId, metadata);
-    
+
     // Invalidate breadcrumb cache as titles may have changed
     this.breadcrumbCache.clear();
   }
@@ -279,7 +279,7 @@ export class PageRelationshipService {
   private invalidateCachesForPage(pageId: string): void {
     this.breadcrumbCache.delete(pageId);
     this.parentChainCache.delete(pageId);
-    
+
     // Also invalidate caches for pages that might reference this page
     for (const cachedPageId of this.parentChainCache.keys()) {
       const chain = this.parentChainCache.get(cachedPageId);
@@ -300,10 +300,10 @@ export class PageRelationshipService {
     maxSuggestions: number = this.DEFAULT_MAX_SUGGESTIONS
   ): RelatedPage[] {
     const relatedPages = this.getRelatedPages(currentPage, user_role);
-    
+
     // Convert visit history to Set for O(1) lookup
     const visitSet = new Set(visitHistory);
-    
+
     // Apply boosts in a single pass
     const boostedPages = relatedPages.map(page => ({
       ...page,
@@ -325,22 +325,22 @@ export class PageRelationshipService {
   public calculateRelationshipStrength(pageA: string, pageB: string): number {
     const relationshipA = this.relationships.get(pageA);
     const relationshipB = this.relationships.get(pageB);
-    
+
     const weightAtoB = relationshipA?.relatedPages[pageB]?.weight ?? 0;
     const weightBtoA = relationshipB?.relatedPages[pageA]?.weight ?? 0;
-    
+
     // Early return if no relationship exists
     if (weightAtoB === 0 && weightBtoA === 0) {
       return 0;
     }
-    
+
     let strength = weightAtoB + weightBtoA;
-    
+
     // Apply bidirectional bonus only if both directions exist
     if (weightAtoB > 0 && weightBtoA > 0) {
       strength *= this.BIDIRECTIONAL_BONUS;
     }
-    
+
     return Math.min(strength, this.MAX_RELATIONSHIP_STRENGTH);
   }
 
@@ -356,32 +356,32 @@ export class PageRelationshipService {
     if (startPage === targetPage) {
       return [startPage];
     }
-    
+
     const visited = new Set<string>([startPage]);
     const queue: Array<{ page: string; path: string[] }> = [
       { page: startPage, path: [startPage] }
     ];
-    
+
     while (queue.length > 0) {
       const current = queue.shift()!;
-      
+
       // Depth limit check
       if (current.path.length > maxDepth) {
         continue;
       }
-      
+
       const relationship = this.relationships.get(current.page);
       if (!relationship) {
         continue;
       }
-      
+
       // Check all related pages
       for (const relatedPageId of Object.keys(relationship.relatedPages)) {
         // Found target - return immediately
         if (relatedPageId === targetPage) {
           return [...current.path, relatedPageId];
         }
-        
+
         // Add unvisited pages to queue
         if (!visited.has(relatedPageId)) {
           visited.add(relatedPageId);
@@ -392,7 +392,7 @@ export class PageRelationshipService {
         }
       }
     }
-    
+
     return []; // No path found within depth limit
   }
 
@@ -404,7 +404,7 @@ export class PageRelationshipService {
     user_role?: UserRole
   ): RelatedPage[] {
     const pages: RelatedPage[] = [];
-    
+
     for (const [pageId, metadata] of this.pageMetadata.entries()) {
       if (metadata.category === category && this.isPageAccessible(pageId, user_role)) {
         pages.push({
@@ -420,10 +420,10 @@ export class PageRelationshipService {
         });
       }
     }
-    
+
     // Sort alphabetically by title
     pages.sort((a, b) => a.title.localeCompare(b.title));
-    
+
     return pages;
   }
 
@@ -434,18 +434,18 @@ export class PageRelationshipService {
   public updateUserBehaviorWeights(navigationPath: string[]): void {
     // Apply decay to existing weights
     this.applyBehaviorWeightDecay();
-    
+
     // Update weights for new navigation pattern
     for (let i = 0; i < navigationPath.length - 1; i++) {
       const key = `${navigationPath[i]}->${navigationPath[i + 1]}`;
       const currentWeight = this.userBehaviorWeights.get(key) ?? 0;
-      
+
       // Cap the weight to prevent infinite growth
       const newWeight = Math.min(
         currentWeight + 0.1,
         this.maxBehaviorWeight
       );
-      
+
       this.userBehaviorWeights.set(key, newWeight);
     }
   }
@@ -456,7 +456,7 @@ export class PageRelationshipService {
   private applyBehaviorWeightDecay(): void {
     for (const [key, weight] of this.userBehaviorWeights.entries()) {
       const decayedWeight = weight * this.behaviorWeightDecay;
-      
+
       // Remove weights that have decayed below threshold
       if (decayedWeight < 0.01) {
         this.userBehaviorWeights.delete(key);
@@ -478,7 +478,7 @@ export class PageRelationshipService {
   ): RelatedPage[] {
     const basePages = this.getRelatedPages(currentPage, user_role);
     const recentSet = new Set(recentPages);
-    
+
     // Calculate final weights in single pass
     const scoredPages = basePages.map(page => {
       const behaviorKey = `${currentPage}->${page.pageId}`;
@@ -490,7 +490,7 @@ export class PageRelationshipService {
         weight: (page.weight + behaviorWeight) * recentBoost,
       };
     });
-    
+
     // Sort and limit results
     return scoredPages
       .sort((a, b) => b.weight - a.weight)
@@ -506,11 +506,11 @@ export class PageRelationshipService {
     if (cached) {
       return cached;
     }
-    
+
     // Generate breadcrumbs
     const breadcrumbs: BreadcrumbItem[] = [];
     const parentChain = this.findParentChain(pageId);
-    
+
     // Build breadcrumb items
     parentChain.forEach((parentPageId, index) => {
       const metadata = this.pageMetadata.get(parentPageId);
@@ -522,10 +522,10 @@ export class PageRelationshipService {
         });
       }
     });
-    
+
     // Cache the result
     this.breadcrumbCache.set(pageId, breadcrumbs);
-    
+
     return breadcrumbs;
   }
 
@@ -538,31 +538,31 @@ export class PageRelationshipService {
     if (cached) {
       return cached;
     }
-    
+
     const chain: string[] = [];
     const visited = new Set<string>();
     let currentPage = pageId;
-    
+
     // Traverse up the parent chain
     while (currentPage && !visited.has(currentPage)) {
       visited.add(currentPage);
       chain.unshift(currentPage);
-      
+
       const relationship = this.relationships.get(currentPage);
       if (!relationship) {
         break;
       }
-      
+
       // Find parent relationship
       const parentEntry = Object.entries(relationship.relatedPages)
         .find(([, relation]) => relation.type === 'parent');
-      
+
       currentPage = parentEntry ? parentEntry[0] : '';
     }
-    
+
     // Cache the result
     this.parentChainCache.set(pageId, chain);
-    
+
     return chain;
   }
 
@@ -571,15 +571,15 @@ export class PageRelationshipService {
    */
   public getChildPages(parentPageId: string, user_role?: UserRole): RelatedPage[] {
     const childPages: RelatedPage[] = [];
-    
+
     // Iterate through all relationships to find children
     for (const [pageId, relationship] of this.relationships.entries()) {
       // Check if this page has the target as a parent
       const parentRelation = relationship.relatedPages[parentPageId];
-      
+
       if (parentRelation?.type === 'parent') {
         const metadata = this.pageMetadata.get(pageId);
-        
+
         if (metadata && this.isPageAccessible(pageId, user_role)) {
           childPages.push({
             pageId,
@@ -595,10 +595,10 @@ export class PageRelationshipService {
         }
       }
     }
-    
+
     // Sort by weight descending
     childPages.sort((a, b) => b.weight - a.weight);
-    
+
     return childPages;
   }
 
@@ -633,17 +633,17 @@ export class PageRelationshipService {
     const totalPages = this.pageMetadata.size;
     let totalRelationships = 0;
     const categoryCounts: Record<string, number> = {};
-    
+
     // Count relationships
     for (const relationship of this.relationships.values()) {
       totalRelationships += Object.keys(relationship.relatedPages).length;
     }
-    
+
     // Count categories
     for (const metadata of this.pageMetadata.values()) {
       categoryCounts[metadata.category] = (categoryCounts[metadata.category] ?? 0) + 1;
     }
-    
+
     return {
       totalPages,
       totalRelationships,
@@ -673,15 +673,15 @@ export class PageRelationshipService {
   public exportConfig(): PageConfig {
     const relationships: Record<string, PageRelationship> = {};
     const metadata: Record<string, PageMetadata> = {};
-    
+
     this.relationships.forEach((rel, key) => {
       relationships[key] = rel;
     });
-    
+
     this.pageMetadata.forEach((meta, key) => {
       metadata[key] = meta;
     });
-    
+
     return { relationships, metadata };
   }
 

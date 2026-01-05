@@ -1,10 +1,10 @@
-import type { RelatedPage, UserRole } from '@client/shared/types';
+import type { RelatedPage, UserRole } from '@/shared/types';
 
-import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
-import { useAuth } from '@client/core/auth';
-import { NavigationValidationError } from '@client/core/error';
-import { getRecoverySuggestions } from '@client/recovery';
-import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@client/validation';
+import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
+import { useAuth } from '@/core/auth';
+import { NavigationValidationError } from '@/core/error';
+import { getRecoverySuggestions } from '@/recovery';
+import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@/validation';
 
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
 

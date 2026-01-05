@@ -111,10 +111,10 @@ export const search_analytics = pgTable("search_analytics", {
   avgSessionDurationSeconds: integer("avg_session_duration_seconds"),
 
   // Geographic breakdown (top counties by search volume)
-  topSearchCounties: jsonb("top_search_counties").notNull().default(sql`'[]'::jsonb`),
+  topSearchCounties: jsonb("top_search_counties").notNull().default(sql`'{}'::jsonb`),
 
   // Popular search terms
-  popularTerms: jsonb("popular_terms").notNull().default(sql`'[]'::jsonb`),
+  popularTerms: jsonb("popular_terms").notNull().default(sql`'{}'::jsonb`),
 
   // Content type distribution
   contentTypeDistribution: jsonb("content_type_distribution").notNull().default(sql`'{}'::jsonb`),

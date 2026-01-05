@@ -1,22 +1,22 @@
 /**
  * Dashboard Stats Component
- * 
+ *
  * Displays key statistics and metrics overview for the user dashboard.
  */
 
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  BookOpen, 
-  MessageSquare, 
+import {
+  BookOpen,
+  MessageSquare,
   TrendingUp,
   Calendar,
   Award,
   Target
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Card, CardContent } from '@client/shared/design-system/typography/Card.tsx';
-import { UserDashboardData, CivicImpactMetrics } from '@client/shared/types/user-dashboard';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Card, CardContent } from '@/shared/design-system/typography/Card';
+import { UserDashboardData, CivicImpactMetrics } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardStats.module.css';
 
@@ -34,11 +34,11 @@ interface DashboardStatsProps {
   loading?: boolean;
 }
 
-export function DashboardStats({ 
-  stats, 
-  engagementStats, 
-  civicMetrics, 
-  loading = false 
+export function DashboardStats({
+  stats,
+  engagementStats,
+  civicMetrics,
+  loading = false
 }: DashboardStatsProps) {
 
   if (loading) {
@@ -102,14 +102,14 @@ export function DashboardStats({
                     {stat.title}
                   </p>
                   <div className="flex items-center gap-2">
-                    <p 
+                    <p
                       className={`text-2xl font-bold ${styles.statValue}`}
                       data-color={stat.color}
                     >
                       {stat.value}
                     </p>
                     {stat.title === 'Civic Score' && civicMetrics && (
-                      <Badge 
+                      <Badge
                         variant="outline"
                         className={`text-xs ${styles.badge}`}
                         data-border-color={stat.color}
@@ -122,7 +122,7 @@ export function DashboardStats({
                     {stat.description}
                   </p>
                 </div>
-                <div 
+                <div
                   className={`flex items-center justify-center w-12 h-12 rounded-full ${styles.iconContainer}`}
                   data-bg-color={stat.color}
                 >
@@ -148,7 +148,7 @@ export function DashboardStats({
               </div>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-lg font-semibold text-civic-transparency">
@@ -156,21 +156,21 @@ export function DashboardStats({
               </div>
               <div className="text-xs text-muted-foreground">Views</div>
             </div>
-            
+
             <div className="text-center">
               <div className="text-lg font-semibold text-civic-community">
                 {engagementStats.commentCount}
               </div>
               <div className="text-xs text-muted-foreground">Comments</div>
             </div>
-            
+
             <div className="text-center">
               <div className="text-lg font-semibold text-civic-community">
                 {engagementStats.shareCount}
               </div>
               <div className="text-xs text-muted-foreground">Shares</div>
             </div>
-            
+
             <div className="text-center">
               <div className="text-lg font-semibold text-civic-urgent">
                 {engagementStats.saveCount}
@@ -191,7 +191,7 @@ export function DashboardStats({
                   Top {100 - civicMetrics.comparisons.percentile}%
                 </Badge>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
                 {Object.entries(civicMetrics.scoreBreakdown).map(([category, score]) => (
                   <div key={category} className="text-center">

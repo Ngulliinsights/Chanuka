@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 
 
 export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
@@ -74,11 +74,11 @@ export const OptimizedImage = React.memo<OptimizedImageProps>(({
     // In a real implementation, you might use a service like Cloudinary, ImageKit, or Next.js Image Optimization
     // For now, we'll return the original src with query parameters for potential server-side optimization
     const url = new URL(originalSrc, window.location.origin);
-    
+
     if (width) url.searchParams.set('w', width.toString());
     if (height) url.searchParams.set('h', height.toString());
     if (quality) url.searchParams.set('q', quality.toString());
-    
+
     return url.toString();
   };
 
@@ -109,7 +109,7 @@ export const OptimizedImage = React.memo<OptimizedImageProps>(({
   // Placeholder component
   const renderPlaceholder = () => {
     if (placeholder === 'empty') return null;
-    
+
     if (typeof placeholder === 'string' && placeholder !== 'blur') {
       return (
         <img

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { LoadingStateProps } from '../types';
-import { cn } from '@client/shared/design-system/lib/utils';
+import { cn } from '@/shared/design-system/lib/utils';
 import { DEFAULT_LOADING_SIZE, LOADING_SIZES } from '../constants';
 
 export interface LoadingIndicatorProps extends LoadingStateProps {
@@ -22,7 +22,7 @@ export const LoadingIndicator = React.memo<LoadingIndicatorProps>(({
   color = 'primary',
 }) => {
   const sizeClass = LOADING_SIZES[size as keyof typeof LOADING_SIZES] || LOADING_SIZES[DEFAULT_LOADING_SIZE];
-  
+
   const colorClasses = {
     primary: 'text-blue-600',
     secondary: 'text-gray-600',

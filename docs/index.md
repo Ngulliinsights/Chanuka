@@ -1,6 +1,7 @@
 # Chanuka Platform Documentation Index
 
 ## Document Control
+
 **Version:** 3.1
 **Date:** December 9, 2025
 **Phase:** Documentation Restructuring
@@ -38,6 +39,50 @@ The active/ directory contains current, actively maintained documentation for on
 - [setup.md](active/setup.md) - Development environment setup
 - [TESTING_QUICK_START.md](active/TESTING_QUICK_START.md) - Testing quick start guide
 - [UNIFIED_TESTING_REFERENCE.md](active/UNIFIED_TESTING_REFERENCE.md) - Unified testing reference
+
+### Guides
+
+The guides/ directory contains implementation tutorials, step-by-step guides, and quick references to help developers get started and perform tasks.
+
+- [functional-validator-guide.md](guides/functional-validator-guide.md) - Functional validator usage guide and documentation
+- [IMPORT_MAPPING_GUIDE.md](guides/IMPORT_MAPPING_GUIDE.md) - Guide for import mapping
+- [MVP-DATABASE-INTEGRATION-GUIDE.md](guides/MVP-DATABASE-INTEGRATION-GUIDE.md) - Guide for MVP database integration
+- [phase1-quick-reference.md](guides/phase1-quick-reference.md) - Quick reference for phase 1
+- [project-structure.md](guides/project-structure.md) - Guide to project structure
+- [quick-reference-guide.md](guides/quick-reference-guide.md) - General quick reference guide
+- [research-implementation-guide.md](guides/research-implementation-guide.md) - Guide for implementing research
+
+### Architecture
+
+The architecture/ directory focuses on technical design documents, system architecture, and integration designs that describe how the system is structured.
+
+- [application-flow.md](architecture/application-flow.md) - Application flow documentation
+- [architecture.md](architecture/architecture.md) - System architecture overview
+- [chanuka_architecture.txt](architecture/chanuka_architecture.txt) - Chanuka platform architecture
+- [CORE_INTEGRATION_STATUS.md](architecture/CORE_INTEGRATION_STATUS.md) - Core integration status
+- [docs-module.md](architecture/docs-module.md) - Documentation module design
+- [FEATURES_INTEGRATION_STATUS.md](architecture/FEATURES_INTEGRATION_STATUS.md) - Features integration status
+- [FINAL-SCHEMA-INTEGRATION-ZERO-REDUNDANCY.md](architecture/FINAL-SCHEMA-INTEGRATION-ZERO-REDUNDANCY.md) - Final schema integration design
+- [INHERITANCE_COMPOSITION_ANALYSIS.md](architecture/INHERITANCE_COMPOSITION_ANALYSIS.md) - Analysis of inheritance and composition
+- [REVISED-SCHEMA-INTEGRATION-FOCUSED.md](architecture/REVISED-SCHEMA-INTEGRATION-FOCUSED.md) - Revised schema integration design
+- [schema-domain-relationships.md](architecture/schema-domain-relationships.md) - Schema domain relationships
+- [SHARED_INTEGRATION_STATUS.md](architecture/SHARED_INTEGRATION_STATUS.md) - Shared integration status
+
+### Reports
+
+The reports/ directory aggregates status updates, completion summaries, analysis reports, and progress documents for tracking project status and outcomes.
+
+- [CLIENT_FIXES_FINAL_SUMMARY.md](reports/CLIENT_FIXES_FINAL_SUMMARY.md) - Summary of client fixes
+- [CLIENT_VALIDATION_COMPLETE.md](reports/CLIENT_VALIDATION_COMPLETE.md) - Completion report for client validation
+- [CRITICAL_FIXES_SUMMARY.md](reports/CRITICAL_FIXES_SUMMARY.md) - Summary of critical fixes
+- [DESIGN_SYSTEM_COMPLETE.md](reports/DESIGN_SYSTEM_COMPLETE.md) - Completion report for design system
+- [DOCUMENTATION_ORGANIZATION_COMPLETE.md](reports/DOCUMENTATION_ORGANIZATION_COMPLETE.md) - Completion report for documentation organization
+- [ERROR_HANDLING_INTEGRATION_SUMMARY.md](reports/ERROR_HANDLING_INTEGRATION_SUMMARY.md) - Summary of error handling integration
+- [export-analysis-updated.md](reports/export-analysis-updated.md) - Updated export analysis
+- [fix-implementation-phase1.md](reports/fix-implementation-phase1.md) - Phase 1 fix implementation
+- [MASTER-SUMMARY.md](reports/MASTER-SUMMARY.md) - Master summary of project
+- [RESOLUTION_STATUS_REPORT.md](reports/RESOLUTION_STATUS_REPORT.md) - Report on resolution status
+- [TYPE_SYSTEM_COMPLETION_SUMMARY.md](reports/TYPE_SYSTEM_COMPLETION_SUMMARY.md) - Summary of type system completion
 
 ### Testing & Validation
 
@@ -104,101 +149,101 @@ The archive/ directory contains historical documentation and completed project p
 
 ### System Architecture & Design
 
-| Document | Description | Version | Last Updated |
-|----------|-------------|---------|--------------|
-| [README.md](../README.md) | Main project documentation with system overview | 3.0 | 2025-12-03 |
-| [detailed-architecture.md](active/detailed-architecture.md) | High-level system architecture and domain designs | 3.0 | 2025-12-03 |
-| [infrastructure-guide.md](active/infrastructure-guide.md) | Database schemas, infrastructure setup, and operations | 3.0 | 2025-12-03 |
-| [documentation-standards.md](reference/documentation-standards.md) | Standards for documentation creation and maintenance | 3.0 | 2025-12-03 |
+| Document                                                           | Description                                            | Version | Last Updated |
+| ------------------------------------------------------------------ | ------------------------------------------------------ | ------- | ------------ |
+| [README.md](../README.md)                                          | Main project documentation with system overview        | 3.0     | 2025-12-03   |
+| [detailed-architecture.md](active/detailed-architecture.md)        | High-level system architecture and domain designs      | 3.0     | 2025-12-03   |
+| [infrastructure-guide.md](active/infrastructure-guide.md)          | Database schemas, infrastructure setup, and operations | 3.0     | 2025-12-03   |
+| [documentation-standards.md](reference/documentation-standards.md) | Standards for documentation creation and maintenance   | 3.0     | 2025-12-03   |
 
 ### Chanuka-Specific Documentation
 
 #### Design & Specifications
 
-| Document | Description | Version | Last Updated |
-|----------|-------------|---------|--------------|
-| [chanuka/chanuka_design_specifications.md](chanuka/chanuka_design_specifications.md) | Complete UI design specifications and component architecture | 3.0 | 2025-12-03 |
-| [chanuka/chanuka_implementation_guide.md](chanuka/chanuka_implementation_guide.md) | Comprehensive implementation guide with code examples | 3.0 | 2025-12-03 |
-| [chanuka/chanuka_design.txt](chanuka/chanuka_design.txt) | Original design specifications (legacy) | - | - |
+| Document                                                                             | Description                                                  | Version | Last Updated |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------ | ------- | ------------ |
+| [chanuka/chanuka_design_specifications.md](chanuka/chanuka_design_specifications.md) | Complete UI design specifications and component architecture | 3.0     | 2025-12-03   |
+| [chanuka/chanuka_implementation_guide.md](chanuka/chanuka_implementation_guide.md)   | Comprehensive implementation guide with code examples        | 3.0     | 2025-12-03   |
+| [chanuka/chanuka_design.txt](chanuka/chanuka_design.txt)                             | Original design specifications (legacy)                      | -       | -            |
 
 #### Strategic & Analysis Documents
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [chanuka idea validation.md](chanuka%20idea%20validation.md) | Strategic evaluation and conceptual validation | Current |
-| [chanuka/sustainable_uprising.md](chanuka/sustainable_uprising.md) | Long-term sustainability analysis | Current |
-| [chanuka/global_implications.md](chanuka/global_implications.md) | International impact assessment | Current |
-| [chanuka/strategic-ui-features-analysis.md](chanuka/strategic-ui-features-analysis.md) | Analysis of missing strategic features | Current |
-| [chanuka/missing-strategic-features-analysis.md](chanuka/missing-strategic-features-analysis.md) | Gap analysis and implementation priorities | Current |
-| [chanuka/chanuka_platform_client_improvement_recommendations.md](chanuka/chanuka_platform_client_improvement_recommendations.md) | Client-side enhancement recommendations | Current |
+| Document                                                                                                                         | Description                                    | Status  |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------- |
+| [chanuka idea validation.md](chanuka%20idea%20validation.md)                                                                     | Strategic evaluation and conceptual validation | Current |
+| [chanuka/sustainable_uprising.md](chanuka/sustainable_uprising.md)                                                               | Long-term sustainability analysis              | Current |
+| [chanuka/global_implications.md](chanuka/global_implications.md)                                                                 | International impact assessment                | Current |
+| [chanuka/strategic-ui-features-analysis.md](chanuka/strategic-ui-features-analysis.md)                                           | Analysis of missing strategic features         | Current |
+| [chanuka/missing-strategic-features-analysis.md](chanuka/missing-strategic-features-analysis.md)                                 | Gap analysis and implementation priorities     | Current |
+| [chanuka/chanuka_platform_client_improvement_recommendations.md](chanuka/chanuka_platform_client_improvement_recommendations.md) | Client-side enhancement recommendations        | Current |
 
 #### Content & Communication
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [chanuka/chanuka_complete_slogans.md](chanuka/chanuka_complete_slogans.md) | Platform slogans and messaging | Current |
-| [chanuka/philosophical_connections_analysis.md](chanuka/philosophical_connections_analysis.md) | Philosophical foundation analysis | Current |
+| Document                                                                                         | Description                                     | Status  |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ------- |
+| [chanuka/chanuka_complete_slogans.md](chanuka/chanuka_complete_slogans.md)                       | Platform slogans and messaging                  | Current |
+| [chanuka/philosophical_connections_analysis.md](chanuka/philosophical_connections_analysis.md)   | Philosophical foundation analysis               | Current |
 | [chanuka/Scriptural Distributed Leadership.md](chanuka/Scriptural%20Distributed%20Leadership.md) | Biblical foundations for distributed leadership | Current |
-| [chanuka/strategic_additions_poems.md](chanuka/strategic_additions_poems.md) | Creative content for platform | Current |
+| [chanuka/strategic_additions_poems.md](chanuka/strategic_additions_poems.md)                     | Creative content for platform                   | Current |
 
 #### Implementation & Technical
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [chanuka/# Chanuka Platform Consolidation Impleme.md](chanuka/%23%20Chanuka%20Platform%20Consolidation%20Impleme.md) | Detailed consolidation implementation tasks | Current |
-| [chanuka/api_strategy_doc.md](chanuka/api_strategy_doc.md) | Multi-API strategy and implementation guidance | Current |
-| [chanuka/chanuka_automation_strategy.md](chanuka/chanuka_automation_strategy.md) | Platform automation approach | Current |
-| [chanuka/chanuka_implementation_unified.txt](chanuka/chanuka_implementation_unified.txt) | Unified implementation specifications (legacy) | Legacy |
+| Document                                                                                                             | Description                                    | Status  |
+| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------- |
+| [chanuka/# Chanuka Platform Consolidation Impleme.md](chanuka/%23%20Chanuka%20Platform%20Consolidation%20Impleme.md) | Detailed consolidation implementation tasks    | Current |
+| [chanuka/api_strategy_doc.md](chanuka/api_strategy_doc.md)                                                           | Multi-API strategy and implementation guidance | Current |
+| [chanuka/chanuka_automation_strategy.md](chanuka/chanuka_automation_strategy.md)                                     | Platform automation approach                   | Current |
+| [chanuka/chanuka_implementation_unified.txt](chanuka/chanuka_implementation_unified.txt)                             | Unified implementation specifications (legacy) | Legacy  |
 
 #### Prototypes & Mockups
 
-| Document | Description | Type |
-|----------|-------------|------|
-| [chanuka/community-input_1751743369833.html](chanuka/community-input_1751743369833.html) | Community engagement interface prototype | HTML |
-| [chanuka/dashboard_1751743369900.html](chanuka/dashboard_1751743369900.html) | Main dashboard interface prototype | HTML |
-| [chanuka/expert-verification_1751743369833.html](chanuka/expert-verification_1751743369833.html) | Expert verification system prototype | HTML |
-| [chanuka/merged_bill_sponsorship.html](chanuka/merged_bill_sponsorship.html) | Sponsorship analysis interface | HTML |
-| [chanuka/sponsorbyreal.html](chanuka/sponsorbyreal.html) | Real sponsor analysis tool | HTML |
+| Document                                                                                         | Description                              | Type |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------- | ---- |
+| [chanuka/community-input_1751743369833.html](chanuka/community-input_1751743369833.html)         | Community engagement interface prototype | HTML |
+| [chanuka/dashboard_1751743369900.html](chanuka/dashboard_1751743369900.html)                     | Main dashboard interface prototype       | HTML |
+| [chanuka/expert-verification_1751743369833.html](chanuka/expert-verification_1751743369833.html) | Expert verification system prototype     | HTML |
+| [chanuka/merged_bill_sponsorship.html](chanuka/merged_bill_sponsorship.html)                     | Sponsorship analysis interface           | HTML |
+| [chanuka/sponsorbyreal.html](chanuka/sponsorbyreal.html)                                         | Real sponsor analysis tool               | HTML |
 
 ## Supporting Documentation
 
 ### Project Management
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [project-timeline.md](consolidated/project-timeline.md) | Critical fixes and roadmap | Current |
-| [testing-reference.md](consolidated/testing-reference.md) | Testing status and summaries | Current |
-| [functional-validator-guide.md](functional-validator-guide.md) | Functional validator usage and configuration | Current |
-| [client-optimization-guide.md](consolidated/client-optimization-guide.md) | Race condition fixes documentation | Current |
+| Document                                                                  | Description                                  | Status  |
+| ------------------------------------------------------------------------- | -------------------------------------------- | ------- |
+| [project-timeline.md](consolidated/project-timeline.md)                   | Critical fixes and roadmap                   | Current |
+| [testing-reference.md](consolidated/testing-reference.md)                 | Testing status and summaries                 | Current |
+| [functional-validator-guide.md](functional-validator-guide.md)            | Functional validator usage and configuration | Current |
+| [client-optimization-guide.md](consolidated/client-optimization-guide.md) | Race condition fixes documentation           | Current |
 
 ### Technical Infrastructure
 
-| Document | Description | Status |
-|----------|-------------|--------|
+| Document                                                                                     | Description                      | Status  |
+| -------------------------------------------------------------------------------------------- | -------------------------------- | ------- |
 | [CLIENT_SHARED_MODULE_INTEGRATION_STRATEGY.md](CLIENT_SHARED_MODULE_INTEGRATION_STRATEGY.md) | Client shared module integration | Current |
-| [core-error-handling-architecture.md](core-error-handling-architecture.md) | Error handling architecture | Current |
-| [database-cohesion-implementation-summary.md](database-cohesion-implementation-summary.md) | Database cohesion implementation | Current |
-| [database-cohesion-migration-guide.md](database-cohesion-migration-guide.md) | Database migration guidance | Current |
-| [deployment-module.md](deployment-module.md) | Deployment infrastructure | Current |
-| [domain-integration-completion-summary.md](domain-integration-completion-summary.md) | Domain integration summary | Current |
-| [drizzle-module.md](drizzle-module.md) | Drizzle ORM documentation | Current |
-| [environment-config-assessment.md](environment-config-assessment.md) | Environment configuration | Current |
-| [project/brand-roadmap.md](reference/brand-roadmap.md) | Brand development roadmap | Current |
-| [project/manifesto.md](reference/manifesto.md) | Project manifesto | Current |
-| [project/problem-statement.md](reference/problem-statement.md) | Problem statement | Current |
-| [schema-domain-relationships.md](schema-domain-relationships.md) | Schema relationships | Current |
-| [scripts-module.md](scripts-module.md) | Scripts and utilities | Current |
-| [secure-environment-setup.md](secure-environment-setup.md) | Security setup | Current |
-| [server-module.md](server-module.md) | Server architecture | Current |
-| [setup.md](setup.md) | Setup instructions | Current |
-| [shared-module.md](shared-module.md) | Shared code documentation | Current |
-| [structure_tools_guide.md](structure_tools_guide.md) | Structure tools | Current |
-| [tests-module.md](tests-module.md) | Testing documentation | Current |
-| [ui-design-plan.md](ui-design-plan.md) | UI design planning | Current |
-| [unified-api-client-architecture.md](unified-api-client-architecture.md) | API client architecture | Current |
-| [unified-components-documentation.md](unified-components-documentation.md) | Component documentation | Current |
-| [user-component-consolidation-architecture.md](user-component-consolidation-architecture.md) | User component consolidation | Current |
-| [validation-services.md](validation-services.md) | Validation services | Current |
+| [core-error-handling-architecture.md](core-error-handling-architecture.md)                   | Error handling architecture      | Current |
+| [database-cohesion-implementation-summary.md](database-cohesion-implementation-summary.md)   | Database cohesion implementation | Current |
+| [database-cohesion-migration-guide.md](database-cohesion-migration-guide.md)                 | Database migration guidance      | Current |
+| [deployment-module.md](deployment-module.md)                                                 | Deployment infrastructure        | Current |
+| [domain-integration-completion-summary.md](domain-integration-completion-summary.md)         | Domain integration summary       | Current |
+| [drizzle-module.md](drizzle-module.md)                                                       | Drizzle ORM documentation        | Current |
+| [environment-config-assessment.md](environment-config-assessment.md)                         | Environment configuration        | Current |
+| [project/brand-roadmap.md](reference/brand-roadmap.md)                                       | Brand development roadmap        | Current |
+| [project/manifesto.md](reference/manifesto.md)                                               | Project manifesto                | Current |
+| [project/problem-statement.md](reference/problem-statement.md)                               | Problem statement                | Current |
+| [schema-domain-relationships.md](schema-domain-relationships.md)                             | Schema relationships             | Current |
+| [scripts-module.md](scripts-module.md)                                                       | Scripts and utilities            | Current |
+| [secure-environment-setup.md](secure-environment-setup.md)                                   | Security setup                   | Current |
+| [server-module.md](server-module.md)                                                         | Server architecture              | Current |
+| [setup.md](setup.md)                                                                         | Setup instructions               | Current |
+| [shared-module.md](shared-module.md)                                                         | Shared code documentation        | Current |
+| [structure_tools_guide.md](structure_tools_guide.md)                                         | Structure tools                  | Current |
+| [tests-module.md](tests-module.md)                                                           | Testing documentation            | Current |
+| [ui-design-plan.md](ui-design-plan.md)                                                       | UI design planning               | Current |
+| [unified-api-client-architecture.md](unified-api-client-architecture.md)                     | API client architecture          | Current |
+| [unified-components-documentation.md](unified-components-documentation.md)                   | Component documentation          | Current |
+| [user-component-consolidation-architecture.md](user-component-consolidation-architecture.md) | User component consolidation     | Current |
+| [validation-services.md](validation-services.md)                                             | Validation services              | Current |
 
 ## Version Control & Quality Assurance
 
@@ -220,20 +265,24 @@ The archive/ directory contains historical documentation and completed project p
 ### By Role
 
 **Developers:**
+
 - [chanuka_implementation_guide.md](chanuka/chanuka_implementation_guide.md)
 - [detailed-architecture.md](active/detailed-architecture.md)
 - [infrastructure-guide.md](active/infrastructure-guide.md)
 
 **Designers:**
+
 - [chanuka_design_specifications.md](chanuka/chanuka_design_specifications.md)
 - [ui-design-plan.md](ui-design-plan.md)
 
 **Project Managers:**
+
 - [README.md](../README.md)
 - [project-timeline.md](consolidated/project-timeline.md)
 - [testing-reference.md](consolidated/testing-reference.md)
 
 **Stakeholders:**
+
 - [README.md](../README.md)
 - [chanuka idea validation.md](chanuka%20idea%20validation.md)
 - [sustainable_uprising.md](reference/sustainable_uprising.md)
@@ -259,10 +308,11 @@ This index is automatically maintained. To add new documentation:
 ## Contact
 
 For questions about documentation or to suggest improvements:
+
 - Review [documentation-standards.md](reference/documentation-standards.md) for contribution guidelines
 - Check [CHANGELOG.md](../CHANGELOG.md) for recent updates
 - Refer to individual document headers for authors and reviewers
 
 ---
 
-*This index was last updated on December 9, 2025. For the most current information, check the repository directly.*
+_This index was last updated on December 9, 2025. For the most current information, check the repository directly._

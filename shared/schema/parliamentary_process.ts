@@ -384,8 +384,8 @@ export const public_hearings = pgTable("public_hearings", {
   chairperson_id: uuid("chairperson_id").references(() => sponsors.id, { onDelete: "set null" }),
 
   // Hearing participants
-  invited_speakers: jsonb("invited_speakers").notNull().default(sql`'[]'::jsonb`),
-  public_speakers: jsonb("public_speakers").notNull().default(sql`'[]'::jsonb`),
+  invited_speakers: jsonb("invited_speakers").notNull().default(sql`'{}'::jsonb`),
+  public_speakers: jsonb("public_speakers").notNull().default(sql`'{}'::jsonb`),
 
   // Hearing outcomes
   hearing_status: varchar("hearing_status", { length: 30 }).notNull().default("scheduled"), // "scheduled", "in_progress", "completed", "cancelled"

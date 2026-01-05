@@ -1,6 +1,6 @@
 /**
  * Alert Component - UNIFIED & TOKEN-BASED
- * 
+ *
  * ✅ Uses design tokens
  * ✅ Multiple variants (default, destructive, success, warning)
  * ✅ Proper icon spacing and accessibility
@@ -9,7 +9,7 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
-import { cn } from "@client/utils/cn"
+import { cn } from "@/shared/design-system/utils/cn"
 
 const alertVariants = cva(
   [

@@ -5,9 +5,9 @@
 
 import { useState, useCallback } from 'react';
 
-import { DashboardTopicError } from '@client/core/error';
-import { validateTrackedTopic } from '@client/core/validation';
-import type { TrackedTopic, TopicCategory } from '@client/shared/types';
+import { DashboardTopicError } from '@/core/error';
+import { validateTrackedTopic } from '@/core/validation';
+import type { TrackedTopic, TopicCategory } from '@/shared/types';
 
 export interface UseDashboardTopicsResult {
   topics: TrackedTopic[];
@@ -50,10 +50,10 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
       validateTrackedTopic(newTopic);
 
       // Check for duplicate topic names
-      const existingTopic = topics.find(topic => 
+      const existingTopic = topics.find(topic =>
         topic.name.toLowerCase() === newTopic.name.toLowerCase()
       );
-      
+
       if (existingTopic) {
         throw new Error(`Topic "${newTopic.name}" already exists`);
       }
@@ -86,7 +86,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
       if (!existingTopic) {
         throw new Error(`Topic with ID ${topicId} not found`);
       }
-      
+
       const updatedTopic: TrackedTopic = {
         id: existingTopic.id,
         name: updates.name ?? existingTopic.name,
@@ -102,10 +102,10 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
       // Check for duplicate names if name is being updated
       if (updates.name && updates.name !== topics[topicIndex]?.name) {
-        const existingTopic = topics.find(topic => 
+        const existingTopic = topics.find(topic =>
           topic.id !== topicId && topic.name.toLowerCase() === updates.name!.toLowerCase()
         );
-        
+
         if (existingTopic) {
           throw new Error(`Topic "${updates.name}" already exists`);
         }
@@ -114,7 +114,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
       // TODO: Replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      setTopics(prev => prev.map(topic => 
+      setTopics(prev => prev.map(topic =>
         topic.id === topicId ? updatedTopic : topic
       ));
     } catch (topicError) {
@@ -177,9 +177,9 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
   const searchTopics = useCallback((query: string): TrackedTopic[] => {
     if (!query.trim()) return topics;
-    
+
     const lowercaseQuery = query.toLowerCase();
-    return topics.filter(topic => 
+    return topics.filter(topic =>
       topic.name.toLowerCase().includes(lowercaseQuery) ||
       topic.description?.toLowerCase().includes(lowercaseQuery) ||
       topic.keywords?.some((keyword: string) => keyword.toLowerCase().includes(lowercaseQuery))

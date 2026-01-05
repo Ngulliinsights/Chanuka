@@ -3,8 +3,8 @@
  * Comprehensive permission management system
  */
 
-import { User } from '@client/core/auth';
-// import { authService } from '@client/services/AuthService';
+import { User } from '@/core/auth';
+// import { authService } from '@/services/AuthService';
 
 export interface RBACContext {
   user: User;
@@ -185,13 +185,13 @@ class RBACManager {
       return result;
 
     } catch (error) {
-      logger.error('Permission check failed:', { 
+      logger.error('Permission check failed:', {
         component: 'RBACManager',
         user: user?.id,
         resource,
         action
       }, error);
-      
+
       // Fail securely - deny access on error
       return false;
     }
@@ -260,7 +260,7 @@ class RBACManager {
       const allPermissions = this.getAllPermissions(userRole);
 
       // Check for exact match
-      const exactMatch = allPermissions.find(p => 
+      const exactMatch = allPermissions.find(p =>
         (p.resource === resource || p.resource === '*') &&
         (p.action === action || p.action === '*')
       );
@@ -286,7 +286,7 @@ class RBACManager {
    */
   private checkGuestPermission(resource: string, action: string): boolean {
     const guestRole = ROLES.GUEST;
-    return guestRole.permissions.some(p => 
+    return guestRole.permissions.some(p =>
       p.resource === resource && p.action === action
     );
   }
@@ -349,11 +349,11 @@ class RBACManager {
    */
   private hasExpertiseInArea(user: User, area: string): boolean {
     if (!user.expertise) return false;
-    
-    const expertiseAreas = Array.isArray(user.expertise) 
-      ? user.expertise 
+
+    const expertiseAreas = Array.isArray(user.expertise)
+      ? user.expertise
       : user.expertise.split(',').map((s: string) => s.trim());
-      
+
     return expertiseAreas.includes(area);
   }
 
@@ -373,12 +373,12 @@ class RBACManager {
    */
   hasMinimumRole(user: User | null, minimumRole: string): boolean {
     if (!user) return false;
-    
+
     const userRole = this.getUserRole(user);
     const minRole = ROLES[minimumRole.toUpperCase()];
-    
+
     if (!userRole || !minRole) return false;
-    
+
     return userRole.level >= minRole.level;
   }
 
@@ -400,7 +400,7 @@ class RBACManager {
       return permissions;
     } catch (error) {
       logger.error('Failed to get available actions:', { component: 'RBACManager' }, error);
-      
+
       // Fallback to local check
       const userRole = this.getUserRole(user);
       if (userRole) {
@@ -409,7 +409,7 @@ class RBACManager {
           .filter(p => p.resource === resource || p.resource === '*')
           .map(p => p.action);
       }
-      
+
       return [];
     }
   }
@@ -430,14 +430,14 @@ class RBACManager {
 
   private getFromCache(key: string): boolean | null {
     this.cleanExpiredCache();
-    
+
     const cached = this.permissionCache.get(key);
     return cached !== undefined ? cached : null;
   }
 
   private setCache(key: string, value: boolean): void {
     this.permissionCache.set(key, value);
-    
+
     // Auto-expire cache entries
     setTimeout(() => {
       this.permissionCache.delete(key);
@@ -496,7 +496,7 @@ export const rbacManager = new RBACManager();
 
 import { useState, useEffect } from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@/core/auth';
 
 /**
  * Hook to check if user has permission

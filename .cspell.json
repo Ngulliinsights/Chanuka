@@ -57,6 +57,9 @@
     "Deoptimization",
     "onwarn",
     "nosniff",
-    "untracking"
+    "untracking",
+    "Customizer",
+    "cmdk",
+    "nums"
   ]
 }

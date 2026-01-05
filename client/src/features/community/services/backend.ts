@@ -1,6 +1,6 @@
 /**
  * Community Backend Service - Community Feature
- * 
+ *
  * Migrated from client/src/services/community-backend-service.ts
  * Real API integration for community features with WebSocket support
  * for discussion threads, expert verification, and community analytics.
@@ -27,7 +27,7 @@ interface WebSocketBillUpdate {
 }
 
 interface WebSocketNotification {
-  type: 'community_activity' | 'expert_verification' | 'moderation_action' | 
+  type: 'community_activity' | 'expert_verification' | 'moderation_action' |
         'comment_reply' | 'expert_insight' | 'campaign_update' | 'petition_milestone';
   userId?: string;
   verificationType?: string;
@@ -76,14 +76,14 @@ class CommunityBackendService {
     try {
       await this.testBackendConnection();
       this.setupWebSocketListeners();
-      
+
       this.isInitialized = true;
-      logger.info('Community backend service initialized successfully', { 
-        component: 'CommunityBackendService' 
+      logger.info('Community backend service initialized successfully', {
+        component: 'CommunityBackendService'
       });
     } catch (error) {
-      logger.error('Failed to initialize community backend service', { 
-        component: 'CommunityBackendService' 
+      logger.error('Failed to initialize community backend service', {
+        component: 'CommunityBackendService'
       }, error);
       throw error;
     }
@@ -100,15 +100,15 @@ class CommunityBackendService {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`Backend health check failed: ${response.statusText}`);
       }
-      
+
       logger.info('Backend connection verified', { component: 'CommunityBackendService' });
     } catch (error) {
-      logger.warn('Backend connection test failed, will use fallback mode', { 
-        component: 'CommunityBackendService' 
+      logger.warn('Backend connection test failed, will use fallback mode', {
+        component: 'CommunityBackendService'
       });
     }
   }
@@ -153,8 +153,8 @@ class CommunityBackendService {
    */
   private isValidNotificationType(type: string): boolean {
     return [
-      'community_activity', 
-      'expert_verification', 
+      'community_activity',
+      'expert_verification',
       'moderation_action',
       'comment_reply',
       'expert_insight',
@@ -167,7 +167,7 @@ class CommunityBackendService {
    * Handle real-time community updates
    */
   private handleCommunityUpdate(data: WebSocketBillUpdate): void {
-    window.dispatchEvent(new CustomEvent('communityUpdate', { 
+    window.dispatchEvent(new CustomEvent('communityUpdate', {
       detail: {
         type: data.update.type,
         billId: data.bill_id,
@@ -181,8 +181,8 @@ class CommunityBackendService {
    * Handle community notifications
    */
   private handleCommunityNotification(data: WebSocketNotification): void {
-    window.dispatchEvent(new CustomEvent('communityNotification', { 
-      detail: data 
+    window.dispatchEvent(new CustomEvent('communityNotification', {
+      detail: data
     }));
 
     switch (data.type) {
@@ -205,21 +205,21 @@ class CommunityBackendService {
   }
 
   private onWebSocketConnected(): void {
-    logger.info('WebSocket connected, setting up community subscriptions', { 
-      component: 'CommunityBackendService' 
+    logger.info('WebSocket connected, setting up community subscriptions', {
+      component: 'CommunityBackendService'
     });
     this.subscribeToCommunityUpdates();
   }
 
   private onWebSocketDisconnected(): void {
-    logger.info('WebSocket disconnected, community real-time features disabled', { 
-      component: 'CommunityBackendService' 
+    logger.info('WebSocket disconnected, community real-time features disabled', {
+      component: 'CommunityBackendService'
     });
   }
 
   private handleExpertVerificationNotification(data: WebSocketNotification): void {
     if (!data.userId) return;
-    
+
     window.dispatchEvent(new CustomEvent('expertVerificationUpdate', {
       detail: {
         userId: data.userId,
@@ -232,7 +232,7 @@ class CommunityBackendService {
 
   private handleCommentReplyNotification(data: WebSocketNotification): void {
     if (!data.commentId) return;
-    
+
     window.dispatchEvent(new CustomEvent('commentReply', {
       detail: {
         commentId: data.commentId,
@@ -246,7 +246,7 @@ class CommunityBackendService {
 
   private handleExpertInsightNotification(data: WebSocketNotification): void {
     if (!data.billId) return;
-    
+
     window.dispatchEvent(new CustomEvent('expertInsightAdded', {
       detail: {
         billId: data.billId,
@@ -259,7 +259,7 @@ class CommunityBackendService {
 
   private handleCampaignUpdateNotification(data: WebSocketNotification): void {
     if (!data.campaignId) return;
-    
+
     window.dispatchEvent(new CustomEvent('campaignUpdate', {
       detail: {
         campaignId: data.campaignId,
@@ -273,7 +273,7 @@ class CommunityBackendService {
 
   private handlePetitionMilestoneNotification(data: WebSocketNotification): void {
     if (!data.petitionId) return;
-    
+
     window.dispatchEvent(new CustomEvent('petitionMilestone', {
       detail: {
         petitionId: data.petitionId,
@@ -296,7 +296,7 @@ class CommunityBackendService {
     try {
       return await communityApiService.getDiscussionThread(billId);
     } catch (error) {
-      logger.error('Failed to fetch discussion thread', { 
+      logger.error('Failed to fetch discussion thread', {
         component: 'CommunityBackendService',
         billId
       }, error as Error);
@@ -314,7 +314,7 @@ class CommunityBackendService {
     try {
       return await communityApiService.getBillComments(billId, options);
     } catch (error) {
-      logger.error('Failed to fetch bill comments', { 
+      logger.error('Failed to fetch bill comments', {
         component: 'CommunityBackendService',
         billId
       }, error as Error);
@@ -336,7 +336,7 @@ class CommunityBackendService {
       this.subscribeToDiscussion(Number(data.billId));
       return result;
     } catch (error) {
-      logger.error('Failed to add comment', { 
+      logger.error('Failed to add comment', {
         component: 'CommunityBackendService',
         billId: data.billId
       }, error as Error);
@@ -390,8 +390,8 @@ class CommunityBackendService {
    */
   cleanup(): void {
     this.isInitialized = false;
-    logger.info('Community backend service cleaned up', { 
-      component: 'CommunityBackendService' 
+    logger.info('Community backend service cleaned up', {
+      component: 'CommunityBackendService'
     });
   }
 }

@@ -127,8 +127,8 @@ export const communities = pgTable("communities", {
   engagement_preferences: jsonb("engagement_preferences").notNull().default(sql`'{}'::jsonb`),
 
   // Community leadership
-  traditional_leaders: jsonb("traditional_leaders").notNull().default(sql`'[]'::jsonb`),
-  community_groups: jsonb("community_groups").notNull().default(sql`'[]'::jsonb`),
+  traditional_leaders: jsonb("traditional_leaders").notNull().default(sql`'{}'::jsonb`),
+  community_groups: jsonb("community_groups").notNull().default(sql`'{}'::jsonb`),
 
   // Assigned ambassadors
   primary_ambassador_id: uuid("primary_ambassador_id").references(() => ambassadors.id, { onDelete: "set null" }),
@@ -536,7 +536,7 @@ export type NewLocalizedContent = typeof localized_content.$inferInsert;
  * Assistive Technology Compatibility tracking
  */
 export const assistive_technology_compatibility = pgTable('assistive_technology_compatibility', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   technology_name: varchar('technology_name', { length: 255 }).notNull(),
   technology_type: varchar('technology_type', { length: 100 }).notNull(),
   platform: varchar('platform', { length: 100 }).notNull(),
@@ -553,7 +553,7 @@ export const assistive_technology_compatibility = pgTable('assistive_technology_
  * Accessibility Features tracking
  */
 export const accessibility_features = pgTable('accessibility_features', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   feature_name: varchar('feature_name', { length: 255 }).notNull(),
   feature_category: varchar('feature_category', { length: 100 }).notNull(),
   user_impact_score: integer('user_impact_score').notNull(),
@@ -567,7 +567,7 @@ export const accessibility_features = pgTable('accessibility_features', {
  * Accessibility Audits
  */
 export const accessibility_audits = pgTable('accessibility_audits', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   audit_type: varchar('audit_type', { length: 100 }).notNull(),
   scope: varchar('scope', { length: 100 }).notNull(),
   audited_components: jsonb('audited_components').notNull(),
@@ -589,7 +589,7 @@ export const accessibility_audits = pgTable('accessibility_audits', {
  * Accessibility Feedback
  */
 export const accessibility_feedback = pgTable('accessibility_feedback', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid('user_id').notNull(),
   feedback_type: varchar('feedback_type', { length: 100 }).notNull(),
   page_url: varchar('page_url', { length: 500 }).notNull(),
@@ -616,7 +616,7 @@ export const accessibility_feedback = pgTable('accessibility_feedback', {
  * Inclusive Design Metrics
  */
 export const inclusive_design_metrics = pgTable('inclusive_design_metrics', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   measurement_date: timestamp('measurement_date').notNull(),
   reporting_period: varchar('reporting_period', { length: 50 }).notNull(),
   user_diversity_metrics: jsonb('user_diversity_metrics').notNull(),
@@ -634,7 +634,7 @@ export const inclusive_design_metrics = pgTable('inclusive_design_metrics', {
  * User Accessibility Preferences
  */
 export const user_accessibility_preferences = pgTable('user_accessibility_preferences', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid('user_id').notNull(),
   visual_preferences: jsonb('visual_preferences').notNull(),
   auditory_preferences: jsonb('auditory_preferences').notNull(),
@@ -650,7 +650,7 @@ export const user_accessibility_preferences = pgTable('user_accessibility_prefer
  * Alternative Formats
  */
 export const alternative_formats = pgTable('alternative_formats', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   content_type: varchar('content_type', { length: 100 }).notNull(),
   content_id: varchar('content_id', { length: 255 }).notNull(),
   format_type: varchar('format_type', { length: 100 }).notNull(),
@@ -668,7 +668,7 @@ export const alternative_formats = pgTable('alternative_formats', {
  * Offline Content Cache
  */
 export const offline_content_cache = pgTable('offline_content_cache', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid('user_id').notNull(),
   content_type: varchar('content_type', { length: 100 }).notNull(),
   content_id: varchar('content_id', { length: 255 }).notNull(),
@@ -687,7 +687,7 @@ export const offline_content_cache = pgTable('offline_content_cache', {
  * Offline Sync Queue
  */
 export const offline_sync_queue = pgTable('offline_sync_queue', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid('user_id').notNull(),
   operation_type: varchar('operation_type', { length: 100 }).notNull(),
   entity_type: varchar('entity_type', { length: 100 }).notNull(),

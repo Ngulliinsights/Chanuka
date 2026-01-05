@@ -1,12 +1,12 @@
 /**
  * Data Retention Service - Shared Services
- * 
+ *
  * Migrated from client/src/services/dataRetentionService.ts
  * Handles data lifecycle management, cleanup, and retention policies
  * across the civic engagement platform.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 interface RetentionPolicy {
   id: string;
@@ -108,7 +108,7 @@ class DataRetentionService {
    * Update an existing retention policy
    */
   async updateRetentionPolicy(
-    policyId: string, 
+    policyId: string,
     updates: Partial<Omit<RetentionPolicy, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<void> {
     try {
@@ -221,7 +221,7 @@ class DataRetentionService {
       });
 
       const activePolicies = Array.from(this.policies.values()).filter(p => p.enabled);
-      
+
       for (const policy of activePolicies) {
         await this.executeCleanupForPolicy(policy);
       }
@@ -288,14 +288,14 @@ class DataRetentionService {
     const activePolicies = policies.filter(p => p.enabled);
     const completedJobs = this.jobs.filter(j => j.status === 'completed');
     const failedJobs = this.jobs.filter(j => j.status === 'failed');
-    
+
     const dataTypesManaged = [...new Set(policies.flatMap(p => p.dataTypes))];
     const storageFreed = completedJobs.reduce((total, job) => {
       // Estimate storage freed (this would be calculated based on actual data)
       return total + (job.recordsDeleted || 0) * 1024; // Rough estimate
     }, 0);
 
-    const lastCleanup = completedJobs.length > 0 
+    const lastCleanup = completedJobs.length > 0
       ? completedJobs[completedJobs.length - 1].executedAt || ''
       : '';
 
@@ -327,14 +327,14 @@ class DataRetentionService {
     }
 
     // Use the most restrictive policy (shortest retention period)
-    const policy = applicablePolicies.reduce((shortest, current) => 
+    const policy = applicablePolicies.reduce((shortest, current) =>
       current.retentionPeriod < shortest.retentionPeriod ? current : shortest
     );
 
     const dataAge = Date.now() - new Date(createdAt).getTime();
     const daysSinceCreation = Math.floor(dataAge / (1000 * 60 * 60 * 24));
 
-    const shouldArchive = policy.archiveAfter 
+    const shouldArchive = policy.archiveAfter
       ? daysSinceCreation >= policy.archiveAfter && daysSinceCreation < policy.deleteAfter
       : false;
 
@@ -418,7 +418,7 @@ class DataRetentionService {
 
         // Simulate cleanup process (in real implementation, this would interact with database)
         const result = await this.performDataCleanup(dataType, policy);
-        
+
         job.status = 'completed';
         job.recordsProcessed = result.processed;
         job.recordsDeleted = result.deleted;
@@ -507,7 +507,7 @@ export const retentionUtils = {
       const years = Math.floor(days / 365);
       const remainingDays = days % 365;
       const months = Math.floor(remainingDays / 30);
-      
+
       let result = `${years} year${years > 1 ? 's' : ''}`;
       if (months > 0) {
         result += ` ${months} month${months > 1 ? 's' : ''}`;

@@ -4,16 +4,16 @@
  */
 
 import { Network } from 'lucide-react';
-import React, { 
-  createContext, 
-  useContext, 
-  useState, 
-  useEffect, 
-  useCallback, 
-  useRef 
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef
 } from 'react';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 interface OfflineData {
   bills: Array<{
@@ -72,7 +72,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     try {
       const transaction = dbRef.current.transaction(['data'], 'readonly');
       const store = transaction.objectStore('data');
-      
+
       const dataRequest = store.get('offlineData');
       dataRequest.onsuccess = () => {
         if (dataRequest.result) {
@@ -84,7 +84,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       const actionsTransaction = dbRef.current.transaction(['actions'], 'readonly');
       const actionsStore = actionsTransaction.objectStore('actions');
       const actionsRequest = actionsStore.getAll();
-      
+
       actionsRequest.onsuccess = () => {
         setPendingActions(actionsRequest.result || []);
       };
@@ -109,7 +109,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
             body: JSON.stringify(action.data)
           });
           break;
-        
+
         case 'untrack-bill':
           await fetch('/api/bills/untrack', {
             method: 'POST',
@@ -117,7 +117,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
             body: JSON.stringify(action.data)
           });
           break;
-        
+
         case 'update-preferences':
           await fetch('/api/user/preferences', {
             method: 'PUT',
@@ -125,7 +125,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
             body: JSON.stringify(action.data)
           });
           break;
-        
+
         default:
           logger.warn('Unknown action type:', { component: 'Chanuka', type: action.type });
       }
@@ -134,16 +134,16 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     for (const action of pendingActions) {
       try {
         await processAction(action);
-        
+
         // Remove successful action
         const transaction = dbRef.current.transaction(['actions'], 'readwrite');
         const store = transaction.objectStore('actions');
         await store.delete(action.id);
-        
+
         setPendingActions(prev => prev.filter(a => a.id !== action.id));
       } catch (error) {
         logger.error('Failed to sync action:', { component: 'Chanuka', action: action.type, error });
-        
+
         // Increment retry count
         const updatedAction = {
           ...action,
@@ -154,8 +154,8 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
           const transaction = dbRef.current.transaction(['actions'], 'readwrite');
           const store = transaction.objectStore('actions');
           await store.put(updatedAction);
-          
-          setPendingActions(prev => 
+
+          setPendingActions(prev =>
             prev.map(a => a.id === action.id ? updatedAction : a)
           );
         } else {
@@ -163,7 +163,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
           const transaction = dbRef.current.transaction(['actions'], 'readwrite');
           const store = transaction.objectStore('actions');
           await store.delete(action.id);
-          
+
           setPendingActions(prev => prev.filter(a => a.id !== action.id));
         }
       }
@@ -175,24 +175,24 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     const initDB = async () => {
       try {
         const request = indexedDB.open('chanuka-offline', 1);
-        
+
         request.onerror = () => {
           logger.error('Failed to open IndexedDB', { component: 'Chanuka' });
         };
-        
+
         request.onsuccess = () => {
           dbRef.current = request.result;
           loadOfflineData();
         };
-        
+
         request.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-          
+
           // Create object stores
           if (!db.objectStoreNames.contains('data')) {
             db.createObjectStore('data', { keyPath: 'key' });
           }
-          
+
           if (!db.objectStoreNames.contains('actions')) {
             db.createObjectStore('actions', { keyPath: 'id' });
           }
@@ -212,7 +212,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         .then((registration) => {
           logger.info('Service Worker registered:', { component: 'Chanuka', registration: registration.scope });
           setIsServiceWorkerReady(true);
-          
+
           // Listen for updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
@@ -238,7 +238,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       setIsOnline(true);
       syncPendingActions();
     };
-    
+
     const handleOffline = () => {
       setIsOnline(false);
     };
@@ -257,13 +257,13 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     if (!dbRef.current) return;
 
     try {
-      const currentData = offlineData || { 
-        bills: [], 
-        user: null, 
-        preferences: {}, 
-        lastSync: 0 
+      const currentData = offlineData || {
+        bills: [],
+        user: null,
+        preferences: {},
+        lastSync: 0
       };
-      
+
       const newOfflineData: OfflineData = {
         ...currentData,
         [key]: data,
@@ -272,7 +272,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
 
       const transaction = dbRef.current.transaction(['data'], 'readwrite');
       const store = transaction.objectStore('data');
-      
+
       await store.put({
         key: 'offlineData',
         value: newOfflineData
@@ -304,7 +304,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     try {
       const transaction = dbRef.current.transaction(['actions'], 'readwrite');
       const store = transaction.objectStore('actions');
-      
+
       await store.put(action);
       setPendingActions(prev => [...prev, action]);
     } catch (error) {
@@ -320,10 +320,10 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       const transaction = dbRef.current.transaction(['data', 'actions'], 'readwrite');
       const dataStore = transaction.objectStore('data');
       const actionsStore = transaction.objectStore('actions');
-      
+
       await dataStore.clear();
       await actionsStore.clear();
-      
+
       setOfflineData(null);
       setPendingActions([]);
     } catch (error) {
@@ -378,7 +378,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
       const timer = setTimeout(() => setIsVisible(false), 3000);
       return () => clearTimeout(timer);
     }
-    
+
     return undefined;
   }, [isOnline]);
 
@@ -425,7 +425,7 @@ export function OfflineStatus({ className = '', showDetails = false }: OfflineSt
 /**
  * Offline-First Data Hook
  * Provides data with offline fallback
- * 
+ *
  * Note: This hook is exported from a component file for convenience.
  * For optimal Fast Refresh support, consider moving to a separate utilities file.
  */
@@ -460,7 +460,7 @@ export function useOfflineData<T>(
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      
+
       // Try cached data as fallback
       const cachedData = getCachedData(key as keyof OfflineData);
       if (cachedData) {

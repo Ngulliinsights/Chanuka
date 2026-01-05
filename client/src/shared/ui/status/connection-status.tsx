@@ -1,12 +1,12 @@
 /**
  * Connection Status Component
- * 
+ *
  * Simple component to display connection status information
  */
 
 import { useState, useEffect } from 'react';
 import { Wifi, WifiOff, AlertCircle } from 'lucide-react';
-import { Badge } from '@client/shared/design-system';
+import { Badge } from '@/shared/design-system';
 
 interface ConnectionStatusProps {
   className?: string;

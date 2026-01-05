@@ -153,7 +153,7 @@ export const bill_implementation = pgTable("bill_implementation", {
 
   // Implementation progress
   implementation_percentage: numeric("implementation_percentage", { precision: 5, scale: 2 }), // 0-100
-  key_milestones: jsonb("key_milestones").notNull().default(sql`'[]'::jsonb`),
+  key_milestones: jsonb("key_milestones").notNull().default(sql`'{}'::jsonb`),
 
   // Challenges and issues
   implementation_challenges: text("implementation_challenges"),
@@ -252,14 +252,14 @@ export const success_stories = pgTable("success_stories", {
   // Story content
   story_summary: text("story_summary").notNull(),
   detailed_narrative: text("detailed_narrative"),
-  key_actors: jsonb("key_actors").notNull().default(sql`'[]'::jsonb`),
+  key_actors: jsonb("key_actors").notNull().default(sql`'{}'::jsonb`),
 
   // Impact metrics
   quantified_impact: jsonb("quantified_impact").notNull().default(sql`'{}'::jsonb`),
   people_affected: integer("people_affected"),
 
   // Evidence and verification
-  evidence_sources: jsonb("evidence_sources").notNull().default(sql`'[]'::jsonb`),
+  evidence_sources: jsonb("evidence_sources").notNull().default(sql`'{}'::jsonb`),
   verification_status: varchar("verification_status", { length: 30 }).notNull().default("unverified"), // "unverified", "verified", "disputed"
 
   // Story lifecycle
@@ -374,8 +374,8 @@ export const demographic_equity_metrics = pgTable("demographic_equity_metrics", 
   preferred_engagement_types: varchar("preferred_engagement_types", { length: 50 }).array(),
 
   // Barriers and challenges
-  reported_barriers: jsonb("reported_barriers").notNull().default(sql`'[]'::jsonb`),
-  support_needs: jsonb("support_needs").notNull().default(sql`'[]'::jsonb`),
+  reported_barriers: jsonb("reported_barriers").notNull().default(sql`'{}'::jsonb`),
+  support_needs: jsonb("support_needs").notNull().default(sql`'{}'::jsonb`),
 
   // Equity indicators
   participation_rate: real("participation_rate"),

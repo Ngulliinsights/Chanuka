@@ -1,14 +1,14 @@
 /**
  * Bills Cache Service - Feature-Specific Caching
- * 
+ *
  * Migrated from client/src/services/bills-data-cache.ts
  * Advanced caching service for bills data with offline support,
  * intelligent cache invalidation, and background synchronization.
  */
 
-import { Bill } from '@shared/schema/foundation';
-import { BillsStats } from '@client/core/api/bills';
-import { logger } from '@client/utils/logger';
+import { Bill } from '../../../../shared/schema/foundation';
+import { BillsStats } from '@/core/api/bills';
+import { logger } from '@/utils/logger';
 
 // ============================================================================
 // Type Definitions
@@ -66,7 +66,7 @@ class BillsCacheService {
   private db: IDBDatabase | null = null;
   private cleanupTimer: NodeJS.Timeout | null = null;
   private offlineQueue: OfflineQueueItem[] = [];
-  
+
   // Cache statistics
   private stats = {
     hits: 0,
@@ -138,7 +138,7 @@ class BillsCacheService {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         if (!db.objectStoreNames.contains('cache')) {
           const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
           cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
@@ -299,7 +299,7 @@ class BillsCacheService {
   getCacheStats(): CacheStats {
     const entries = Array.from(this.memoryCache.values());
     const now = Date.now();
-    
+
     let totalCompressedSize = 0;
     let totalUncompressedSize = 0;
     let oldestEntry = now;
@@ -314,7 +314,7 @@ class BillsCacheService {
           totalUncompressedSize += entry.metadata.size;
         }
       }
-      
+
       if (entry.timestamp < oldestEntry) oldestEntry = entry.timestamp;
       if (entry.timestamp > newestEntry) newestEntry = entry.timestamp;
     });
@@ -336,7 +336,7 @@ class BillsCacheService {
 
   private generateBillsKey(searchParams?: any): string {
     if (!searchParams) return 'bills:all';
-    
+
     const normalized = {
       ...searchParams,
       status: searchParams.status?.sort(),
@@ -358,7 +358,7 @@ class BillsCacheService {
   }
 
   private shouldCompress(data: any): boolean {
-    return this.config.enableCompression && 
+    return this.config.enableCompression &&
            this.calculateSize(data) > this.config.compressionThreshold;
   }
 
@@ -433,7 +433,7 @@ class BillsCacheService {
 
     for (const key of expiredKeys) {
       this.memoryCache.delete(key);
-      
+
       if (this.config.enablePersistence && this.db) {
         await this.deleteFromIndexedDB(key);
       }

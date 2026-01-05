@@ -1,10 +1,10 @@
-import { 
-  BookOpen, 
-  ChevronDown, 
-  ChevronRight, 
-  Zap, 
-  Users, 
-  DollarSign, 
+import {
+  BookOpen,
+  ChevronDown,
+  ChevronRight,
+  Zap,
+  Users,
+  DollarSign,
   Calendar,
   AlertCircle,
   CheckCircle,
@@ -12,10 +12,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/design-system/interactive/Collapsible';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 
 interface PlainLanguageSection {
   id: string;
@@ -44,7 +44,7 @@ interface PlainLanguageSummaryProps {
  * PlainLanguageSummary - Converts complex legal content into accessible language
  * Features: Section-by-section breakdown, impact analysis, complexity indicators
  */
-export function PlainLanguageSummary({ 
+export function PlainLanguageSummary({
   sections,
   className = ""
 }: PlainLanguageSummaryProps) {
@@ -130,7 +130,7 @@ export function PlainLanguageSummary({
       {/* Section Summaries */}
       <div className="space-y-4">
         {sections.map((section) => (
-          <Collapsible 
+          <Collapsible
             key={section.id}
             open={expandedSections.has(section.id)}
             onOpenChange={() => toggleSection(section.id)}
@@ -145,14 +145,14 @@ export function PlainLanguageSummary({
                         <div>
                           <CardTitle className="text-base">{section.title}</CardTitle>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge 
-                              variant="outline" 
+                            <Badge
+                              variant="outline"
                               className={`text-xs ${getComplexityColor(section.complexity)}`}
                             >
                               {section.complexity} complexity
                             </Badge>
-                            <Badge 
-                              variant={section.importance === 'critical' ? 'destructive' : 'secondary'} 
+                            <Badge
+                              variant={section.importance === 'critical' ? 'destructive' : 'secondary'}
                               className="text-xs"
                             >
                               {section.importance} priority
@@ -161,8 +161,8 @@ export function PlainLanguageSummary({
                         </div>
                       </div>
                     </div>
-                    {expandedSections.has(section.id) ? 
-                      <ChevronDown className="h-4 w-4" /> : 
+                    {expandedSections.has(section.id) ?
+                      <ChevronDown className="h-4 w-4" /> :
                       <ChevronRight className="h-4 w-4" />
                     }
                   </div>

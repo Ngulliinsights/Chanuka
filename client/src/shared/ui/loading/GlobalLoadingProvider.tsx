@@ -1,6 +1,6 @@
 /**
  * Global Loading Provider
- * 
+ *
  * Provides global loading state management and context for the application.
  * This component should be placed at the root of your app to enable
  * global loading indicators throughout the component tree.
@@ -9,8 +9,8 @@
 import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { 
-  startLoadingOperation, 
+import {
+  startLoadingOperation,
   completeLoadingOperation,
   selectLoadingOperation,
   selectOperationsByPriority,
@@ -18,8 +18,8 @@ import {
   selectShouldShowGlobalLoader,
   type LoadingStateData,
   type ExtendedLoadingOperation
-} from '@client/shared/infrastructure/store/slices/loadingSlice';
-import { LoadingOperation, LoadingPriority } from '@client/shared/ui/loading/types';
+} from '@/shared/infrastructure/store/slices/loadingSlice';
+import { LoadingOperation, LoadingPriority } from '@/shared/ui/loading/types';
 
 // ============================================================================
 // Utility Functions
@@ -64,11 +64,11 @@ interface GlobalLoadingContextValue {
   isOnline: boolean;
   shouldShowGlobalLoader: boolean;
   activeOperationsCount: number;
-  
+
   // Actions
   startOperation: (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>) => Promise<string>;
   completeOperation: (id: string, success?: boolean, error?: string) => Promise<void>;
-  
+
   // Selectors
   getOperation: (id: string) => LoadingOperation | undefined;
   getOperationsByPriority: (priority: LoadingPriority) => LoadingOperation[];
@@ -86,16 +86,16 @@ const GlobalLoadingContext = createContext<GlobalLoadingContextValue | null>(nul
 
 /**
  * Hook to access global loading state and actions
- * 
+ *
  * @throws Error if used outside of GlobalLoadingProvider
  */
 export const useGlobalLoading = (): GlobalLoadingContextValue => {
   const context = useContext(GlobalLoadingContext);
-  
+
   if (!context) {
     throw new Error('useGlobalLoading must be used within a GlobalLoadingProvider');
   }
-  
+
   return context;
 };
 
@@ -109,10 +109,10 @@ interface GlobalLoadingProviderProps {
 
 /**
  * Global Loading Provider Component
- * 
+ *
  * Wraps the application to provide global loading state management.
  * Connect this to your Redux store at the root of your app.
- * 
+ *
  * @example
  * ```tsx
  * function App() {
@@ -128,20 +128,20 @@ interface GlobalLoadingProviderProps {
  */
 export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
-  
+
   // Select loading state from Redux store
   const extendedOperations = useSelector((state: { loading: LoadingStateData }) => state.loading.operations);
   const isOnline = useSelector((state: { loading: LoadingStateData }) => state.loading.isOnline);
   const shouldShowGlobalLoader = useSelector(selectShouldShowGlobalLoader);
   const activeOperationsCount = useSelector(selectActiveOperationsCount);
-  
+
   // Convert extended operations to standard operations for component compatibility
   const operations = useMemo(() => convertOperationsRecord(extendedOperations), [extendedOperations]);
-  
+
   // Action creators
   const startOperation = useCallback(
     async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>): Promise<string> => {
-      const result = await dispatch(startLoadingOperation(operation));
+      const result = await dispatch(startLoadingOperation(operation) as any);
       if (startLoadingOperation.fulfilled.match(result)) {
         return result.payload.id;
       }
@@ -149,14 +149,14 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
     },
     [dispatch]
   );
-  
+
   const completeOperation = useCallback(
     async (id: string, success: boolean = true, error?: string): Promise<void> => {
-      await dispatch(completeLoadingOperation({ id, success, error }));
+      await dispatch(completeLoadingOperation({ id, success, error }) as any);
     },
     [dispatch]
   );
-  
+
   // Selectors
   const getOperation = useCallback(
     (id: string): LoadingOperation | undefined => {
@@ -165,7 +165,7 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
     },
     [extendedOperations, isOnline]
   );
-  
+
   const getOperationsByPriority = useCallback(
     (priority: LoadingPriority): LoadingOperation[] => {
       const extended = selectOperationsByPriority({ loading: { operations: extendedOperations, isOnline } as LoadingStateData }, priority);
@@ -173,7 +173,7 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
     },
     [extendedOperations, isOnline]
   );
-  
+
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     (): GlobalLoadingContextValue => ({
@@ -197,7 +197,7 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
       getOperationsByPriority,
     ]
   );
-  
+
   return (
     <GlobalLoadingContext.Provider value={contextValue}>
       {children}

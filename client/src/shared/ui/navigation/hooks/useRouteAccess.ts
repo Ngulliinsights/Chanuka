@@ -1,11 +1,11 @@
-import type { UserRole } from '@client/shared/types';
+import type { UserRole } from '@/shared/types';
 import type { AccessDenialReason } from '../types';
 
-import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
-import { useAuth } from '@client/core/auth';
-import { NavigationValidationError, NavigationAccessDeniedError } from '@client/core/error';
-import { getRecoverySuggestions } from '@client/recovery';
-import { validateNavigationPath, validateUserRole } from '@client/validation';
+import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
+import { useAuth } from '@/core/auth';
+import { NavigationValidationError, NavigationAccessDeniedError } from '@/core/error';
+import { getRecoverySuggestions } from '@/recovery';
+import { validateNavigationPath, validateUserRole } from '@/validation';
 
 import { checkRouteAccess } from '../utils/route-access';
 
@@ -35,7 +35,7 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : contextRole as UserRole;
 
-    return checkRouteAccess(path, navUserRole, user);
+    return checkRouteAccess(path, navUserRole, user as any);
   } catch (error) {
     // Handle validation errors
     if (error instanceof NavigationValidationError || error instanceof NavigationAccessDeniedError) {

@@ -1,12 +1,12 @@
 /**
  * Loading Spinner Component
- * 
+ *
  * A simple loading spinner component
  */
 
 import * as React from "react"
 import { Loader2 } from "lucide-react"
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg"
@@ -16,7 +16,7 @@ const LoadingSpinner = React.forwardRef<HTMLDivElement, LoadingSpinnerProps>(
   ({ className, size = "md", ...props }, ref) => {
     const sizeClasses = {
       sm: "h-4 w-4",
-      md: "h-6 w-6", 
+      md: "h-6 w-6",
       lg: "h-8 w-8"
     }
 

@@ -20,11 +20,15 @@ export interface BasicDialogProps {
 }
 
 export interface DateValidationProps {
-  // Generated interface
-  [key: string]: any;
+  minDate?: Date;
+  maxDate?: Date;
+  disabledDates?: Date[];
+  required?: boolean;
+  format?: string;
 }
 
-export type ValidationState = {
-  // Generated type
-  [key: string]: any;
+export interface ValidationState {
+  isValid: boolean;
+  touched: boolean;
+  error?: string;
 };

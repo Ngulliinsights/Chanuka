@@ -6,7 +6,14 @@ export * from './types';
 // Components
 export { UserDashboard } from './UserDashboard';
 export { SmartDashboard } from './SmartDashboard';
+export { AdaptiveDashboard } from './AdaptiveDashboard';
 export { useDashboardData } from './useDashboardData';
+
+// Layouts
+export * from './layouts';
+
+// Widgets
+export * from './widgets';
 
 // Migration Dashboard
 export { MigrationDashboard } from './sections/MigrationDashboard';

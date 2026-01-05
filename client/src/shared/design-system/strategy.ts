@@ -198,9 +198,9 @@ export const EXTENSIBILITY_FRAMEWORK = {
    */
   customComponentTemplate: `
     // Import design tokens and utilities
-    import { cn } from '@client/shared/design-system/utils/cn.ts';
+    import { cn } from '@/shared/design-system/utils/cn';
     import { colorTokens, spacingTokens } from '../tokens';
-    import { A11Y_STANDARDS } from '@client/shared/infrastructure/quality-optimizer.ts';
+    import { A11Y_STANDARDS } from '@/shared/infrastructure/quality-optimizer';
 
     // Component with:
     // - Design tokens for all styling

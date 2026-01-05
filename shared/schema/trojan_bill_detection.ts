@@ -40,7 +40,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
   stated_purpose: text("stated_purpose"),
   
   // What it ACTUALLY does (hidden provisions)
-  hidden_provisions: jsonb("hidden_provisions").notNull().default(sql`'[]'::jsonb`),
+  hidden_provisions: jsonb("hidden_provisions").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "section": "Section 47(3)(b)",
@@ -214,10 +214,10 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   //         'broad_discretion', 'schedule_hiding', 'cross_reference_confusion'
 
   // Constitutional implications
-  affected_rights: jsonb("affected_rights").notNull().default(sql`'[]'::jsonb`),
+  affected_rights: jsonb("affected_rights").notNull().default(sql`'{}'::jsonb`),
   // Constitutional articles affected: ["Article 31 (Privacy)", "Article 33 (Expression)"]
   
-  affected_institutions: jsonb("affected_institutions").notNull().default(sql`'[]'::jsonb`),
+  affected_institutions: jsonb("affected_institutions").notNull().default(sql`'{}'::jsonb`),
   // Which institutions get new powers/lose oversight
 
   constitutional_articles_violated: varchar("constitutional_articles_violated", { length: 20 }).array(),

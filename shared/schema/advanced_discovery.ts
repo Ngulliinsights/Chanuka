@@ -3,7 +3,7 @@
 // ============================================================================
 // Search intelligence, discovery patterns, and bill relationship mapping
 
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
 
 import { users, bills } from './foundation';
@@ -13,7 +13,7 @@ import { users, bills } from './foundation';
 // ============================================================================
 
 export const searchQueries = pgTable('search_queries', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id),
   queryText: text('query_text').notNull(),
   queryIntent: varchar('query_intent', { length: 50 }), // 'exploratory', 'specific', 'comparative', 'monitoring'
@@ -39,7 +39,7 @@ export const searchQueries = pgTable('search_queries', {
 // ============================================================================
 
 export const discoveryPatterns = pgTable('discovery_patterns', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   patternType: varchar('pattern_type', { length: 50 }), // 'trending', 'controversial', 'related_cluster', 'impact_prediction'
   entityIds: uuid('entity_ids').array().notNull(), // Bills or topics involved in pattern
   patternStrength: decimal('pattern_strength', { precision: 5, scale: 2 }), // How strong the pattern is
@@ -64,7 +64,7 @@ export const discoveryPatterns = pgTable('discovery_patterns', {
 // ============================================================================
 
 export const billRelationships = pgTable('bill_relationships', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   billAId: uuid('bill_a_id').references(() => bills.id).notNull(),
   billBId: uuid('bill_b_id').references(() => bills.id).notNull(),
   relationshipType: varchar('relationship_type', { length: 50 }), // 'similar', 'conflicting', 'dependent', 'superseding'
@@ -92,7 +92,7 @@ export const billRelationships = pgTable('bill_relationships', {
 // ============================================================================
 
 export const searchAnalytics = pgTable('search_analytics', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   queryId: uuid('query_id').references(() => searchQueries.id),
   analyticsType: varchar('analytics_type', { length: 50 }), // 'click_through', 'dwell_time', 'refinement', 'abandonment'
   entityType: varchar('entity_type', { length: 50 }), // 'bill', 'sponsor', 'topic'
@@ -112,7 +112,7 @@ export const searchAnalytics = pgTable('search_analytics', {
 // ============================================================================
 
 export const trendingTopics = pgTable('trending_topics', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   topicName: varchar('topic_name', { length: 255 }).notNull(),
   topicCategory: varchar('topic_category', { length: 100 }), // 'policy_area', 'keyword', 'entity'
   trendScore: decimal('trend_score', { precision: 8, scale: 2 }).notNull(),
@@ -138,7 +138,7 @@ export const trendingTopics = pgTable('trending_topics', {
 // ============================================================================
 
 export const userRecommendations = pgTable('user_recommendations', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   recommendationType: varchar('recommendation_type', { length: 50 }), // 'bill', 'topic', 'expert', 'discussion'
   entityType: varchar('entity_type', { length: 50 }),

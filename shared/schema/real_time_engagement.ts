@@ -3,7 +3,7 @@
 // ============================================================================
 // Live engagement tracking, gamification, and real-time analytics
 
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
   index, decimal, unique } from 'drizzle-orm/pg-core';
 
@@ -14,7 +14,7 @@ import { users } from './foundation';
 // ============================================================================
 
 export const engagementEvents = pgTable('engagement_events', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   eventType: varchar('event_type', { length: 50 }).notNull(), // 'view', 'comment', 'vote', 'share', 'save'
   entityType: varchar('entity_type', { length: 50 }).notNull(), // 'bill', 'comment', 'analysis'
   entityId: uuid('entity_id').notNull(),
@@ -43,7 +43,7 @@ export const engagementEvents = pgTable('engagement_events', {
 // ============================================================================
 
 export const liveMetricsCache = pgTable('live_metrics_cache', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   metricType: varchar('metric_type', { length: 50 }).notNull(), // 'bill_views', 'comment_count', 'sentiment_score'
   entityType: varchar('entity_type', { length: 50 }).notNull(),
   entityId: uuid('entity_id').notNull(),
@@ -65,7 +65,7 @@ export const liveMetricsCache = pgTable('live_metrics_cache', {
 // ============================================================================
 
 export const civicAchievements = pgTable('civic_achievements', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   achievementName: varchar('achievement_name', { length: 100 }).notNull(),
   achievementCategory: varchar('achievement_category', { length: 50 }), // 'participation', 'quality', 'impact', 'expertise'
   achievementTier: varchar('achievement_tier', { length: 20 }), // 'bronze', 'silver', 'gold', 'platinum'
@@ -91,7 +91,7 @@ export const civicAchievements = pgTable('civic_achievements', {
 // ============================================================================
 
 export const userAchievements = pgTable('user_achievements', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   achievementId: uuid('achievement_id').references(() => civicAchievements.id).notNull(),
   earnedAt: timestamp('earned_at').defaultNow(),
@@ -111,7 +111,7 @@ export const userAchievements = pgTable('user_achievements', {
 // ============================================================================
 
 export const civicScores = pgTable('civic_scores', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   totalScore: integer('total_score').default(0),
   participationScore: integer('participation_score').default(0),
@@ -136,7 +136,7 @@ export const civicScores = pgTable('civic_scores', {
 // ============================================================================
 
 export const engagementLeaderboards = pgTable('engagement_leaderboards', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   leaderboardType: varchar('leaderboard_type', { length: 50 }).notNull(), // 'daily', 'weekly', 'monthly', 'all_time'
   category: varchar('category', { length: 50 }), // 'overall', 'comments', 'analysis', 'expertise'
   userId: uuid('user_id').references(() => users.id).notNull(),
@@ -162,7 +162,7 @@ export const engagementLeaderboards = pgTable('engagement_leaderboards', {
 // ============================================================================
 
 export const realTimeNotifications = pgTable('real_time_notifications', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   notificationType: varchar('notification_type', { length: 50 }), // 'achievement', 'mention', 'reply', 'trending'
   title: varchar('title', { length: 255 }).notNull(),
@@ -193,7 +193,7 @@ export const realTimeNotifications = pgTable('real_time_notifications', {
 // ============================================================================
 
 export const engagementAnalytics = pgTable('engagement_analytics', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   analyticsType: varchar('analytics_type', { length: 50 }), // 'session', 'user_journey', 'conversion', 'retention'
   entityType: varchar('entity_type', { length: 50 }),
   entityId: uuid('entity_id'),

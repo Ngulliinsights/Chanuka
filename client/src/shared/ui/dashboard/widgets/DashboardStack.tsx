@@ -5,7 +5,9 @@
  */
 
 import React from 'react';
-import { cn } from '@client/shared/design-system';
+
+import { cn } from '@/shared/design-system/utils/cn';
+
 import { DashboardStackProps, DashboardSectionConfig } from '../types';
 
 interface SectionRendererProps {
@@ -16,7 +18,7 @@ interface SectionRendererProps {
 /**
  * Section Renderer Component
  */
-const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, _onUpdate }) => {
+const SectionRenderer: React.FC<SectionRendererProps> = React.memo(({ section, onUpdate: _onUpdate }) => {
   // Handle different content types
   const renderContent = () => {
     switch (section.contentType) {

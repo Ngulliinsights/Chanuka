@@ -1,6 +1,6 @@
 /**
  * Navigation Breadcrumbs Module
- * 
+ *
  * Handles breadcrumb generation and related page discovery
  */
 
@@ -25,8 +25,10 @@ export function generateBreadcrumbs(
 
   // Build breadcrumbs from path segments
   let currentPath = '';
-  for (const segment of pathSegments) {
+  for (let i = 0; i < pathSegments.length; i++) {
+    const segment = pathSegments[i];
     currentPath += `/${segment}`;
+    const isLast = i === pathSegments.length - 1;
 
     // Find matching navigation item
     const navItem = navigationItems.find(item => item.href === currentPath);
@@ -35,14 +37,75 @@ export function generateBreadcrumbs(
       breadcrumbs.push({
         label: navItem.label,
         path: navItem.href,
-        is_active: currentPath === path
+        is_active: isLast
       });
     } else {
-      // Generate breadcrumb from segment
+      // Generate human-readable labels from path segments
+      let label = segment;
+
+      // Handle special cases and improve readability
+      switch (segment) {
+        case 'bills':
+          label = 'Bills';
+          break;
+        case 'community':
+          label = 'Community';
+          break;
+        case 'search':
+          label = 'Search';
+          break;
+        case 'results':
+          label = 'Search Results';
+          break;
+        case 'dashboard':
+          label = 'Dashboard';
+          break;
+        case 'account':
+          label = 'Account';
+          break;
+        case 'settings':
+          label = 'Settings';
+          break;
+        case 'admin':
+          label = 'Administration';
+          break;
+        case 'analysis':
+          label = 'Analysis';
+          break;
+        case 'auth':
+          label = 'Authentication';
+          break;
+        case 'onboarding':
+          label = 'Getting Started';
+          break;
+        case 'terms':
+          label = 'Terms of Service';
+          break;
+        case 'privacy':
+          label = 'Privacy Policy';
+          break;
+        default:
+          // For dynamic segments (like bill IDs), try to make them more readable
+          if (/^\d+$/.test(segment)) {
+            // If it's a number, it's likely an ID
+            const parentSegment = pathSegments[i - 1];
+            if (parentSegment === 'bills') {
+              label = `Bill ${segment}`;
+            } else {
+              label = `Item ${segment}`;
+            }
+          } else {
+            // Convert kebab-case or snake_case to Title Case
+            label = segment
+              .replace(/[-_]/g, ' ')
+              .replace(/\b\w/g, l => l.toUpperCase());
+          }
+      }
+
       breadcrumbs.push({
-        label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
+        label,
         path: currentPath,
-        is_active: currentPath === path
+        is_active: isLast
       });
     }
   }

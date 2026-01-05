@@ -11,14 +11,14 @@ import {
   Info
 } from 'lucide-react';
 
-import { useAuth } from '@client/core/auth';
-import { PrivacySettings } from '@client/core/auth';
+import { useAuth } from '@/core/auth';
+import { PrivacySettings } from '@/core/auth';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { Label } from '@client/shared/design-system/typography/Label.tsx';
-import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
+import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Label } from '@/shared/design-system/typography/Label';
+import { Switch } from '@/shared/design-system/interactive/Switch';
 
 
 // import { ConsentControls } from './controls/ConsentControls';

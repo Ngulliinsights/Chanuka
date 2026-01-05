@@ -36,7 +36,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { BottomSheetConfig } from '@client/shared/types/mobile';
+import type { BottomSheetConfig } from '@/shared/types/mobile';
 
 interface MobileBottomSheetProps extends BottomSheetConfig {
   children: React.ReactNode;

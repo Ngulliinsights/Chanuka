@@ -1,9 +1,9 @@
 /**
  * Optimized Navigation Hook
- * 
+ *
  * Performance-optimized navigation hook with memoization,
  * lazy loading, and efficient state management.
- * 
+ *
  * Implements Phase 2 recommendations for navigation performance.
  * All TypeScript errors resolved and code structure optimized.
  */
@@ -11,10 +11,10 @@
 import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useAppSelector } from '@client/shared/hooks/store';
-import { selectNavigationUIState } from '@client/shared/infrastructure/store/slices/navigationSlice';
-import { navigationUtils } from '@client/shared/services/navigation';
-import { logger } from '@client/utils/logger';
+import { useAppSelector } from '@/shared/hooks/store';
+import { selectNavigationUIState } from '@/shared/infrastructure/store/slices/navigationSlice';
+import { navigationUtils } from '@/shared/services/navigation';
+import { logger } from '@/utils/logger';
 
 interface OptimizedNavigationOptions {
   enableAnalytics?: boolean;
@@ -77,7 +77,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       if (now - lastTracked > 1000) {
         analyticsRef.current.set(eventKey, now);
         logger.info('Navigation event', { eventType, ...data });
-        
+
         // Clean up old analytics entries periodically
         if (analyticsRef.current.size > 100) {
           const entries = Array.from(analyticsRef.current.entries());
@@ -101,7 +101,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       // Check cache first to avoid redundant fetches
       const cached = cacheRef.current[path];
       const cacheMaxAge = 300000; // 5 minutes in milliseconds
-      
+
       if (cached && Date.now() - cached.timestamp < cacheMaxAge) {
         logger.debug('Route data served from cache', { path });
         return cached.data;
@@ -130,15 +130,15 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
         // Implement LRU cache cleanup to maintain memory efficiency
         const cacheKeys = Object.keys(cacheRef.current);
         if (cacheKeys.length > cacheSize) {
-          const sortedKeys = cacheKeys.sort((a, b) => 
+          const sortedKeys = cacheKeys.sort((a, b) =>
             cacheRef.current[a].timestamp - cacheRef.current[b].timestamp
           );
           const keysToRemove = sortedKeys.slice(0, cacheKeys.length - cacheSize);
           keysToRemove.forEach(key => delete cacheRef.current[key]);
-          
-          logger.debug('Cache cleaned up', { 
-            removed: keysToRemove.length, 
-            remaining: Object.keys(cacheRef.current).length 
+
+          logger.debug('Cache cleaned up', {
+            removed: keysToRemove.length,
+            remaining: Object.keys(cacheRef.current).length
           });
         }
       }
@@ -155,7 +155,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
    * Handles navigation with performance tracking and optional route preloading
    */
   const navigateOptimized = useCallback((
-    path: string, 
+    path: string,
     options?: { replace?: boolean; preload?: boolean; state?: unknown }
   ) => {
     const startTime = performance.now();
@@ -177,9 +177,9 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       }
 
       // Perform navigation with optional replace or state
-      navigate(path, { 
+      navigate(path, {
         replace: options?.replace || false,
-        state: options?.state 
+        state: options?.state
       });
 
       // Log performance metrics for monitoring
@@ -255,7 +255,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
    */
   const searchRef = useRef<NodeJS.Timeout>();
   const searchNavigation = useCallback((
-    query: string, 
+    query: string,
     callback?: (results: Array<{ path: string; title: string; score: number }>) => void
   ) => {
     // Clear previous search timeout to implement debouncing
@@ -267,7 +267,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
     searchRef.current = setTimeout(() => {
       try {
         const lowerQuery = query.toLowerCase();
-        
+
         // Search through cached routes and breadcrumbs
         const results = [
           ...breadcrumbs.map(crumb => ({
@@ -341,12 +341,12 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
   const getCacheStats = useCallback(() => {
     const now = Date.now();
     const cacheEntries = Object.entries(cacheRef.current);
-    
+
     return {
       totalEntries: cacheEntries.length,
       preloadedCount: preloadedRef.current.size,
-      oldestEntry: cacheEntries.length > 0 
-        ? Math.floor((now - Math.min(...cacheEntries.map(([, v]) => v.timestamp))) / 1000) 
+      oldestEntry: cacheEntries.length > 0
+        ? Math.floor((now - Math.min(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)
         : 0,
       newestEntry: cacheEntries.length > 0
         ? Math.floor((now - Math.max(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)

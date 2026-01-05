@@ -1,14 +1,14 @@
 /**
  * Error Message Component
- * 
+ *
  * A component for displaying error messages with retry functionality
  */
 
 import * as React from "react"
 
-import { AlertCircle, RefreshCw } from "lucide-react"
+import { AlertCircle } from "lucide-react"
 
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 // Note: Button and Card components not available in current design system structure
 // This component is disabled and needs to be refactored to use available components

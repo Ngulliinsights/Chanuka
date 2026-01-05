@@ -8,7 +8,7 @@
 import { sql, relations } from "drizzle-orm";
 import {
     pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-    index, unique, date, smallint, check
+    index, unique, date, smallint, check, foreignKey
 } from "drizzle-orm/pg-core";
 
 import {
@@ -20,7 +20,7 @@ import { bills, users } from "./foundation";
 // MARKET SECTORS - Economic sector classification and tracking
 // ============================================================================
 
-export const market_sectors: any = pgTable("market_sectors", {
+export const market_sectors = pgTable("market_sectors", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
 
     // Sector identification
@@ -28,7 +28,7 @@ export const market_sectors: any = pgTable("market_sectors", {
     sector_code: varchar("sector_code", { length: 20 }).notNull().unique(),
     // Example: "AGRI", "TECH", "FINA", "ENER", "HEAL"
 
-    parent_sector_id: uuid("parent_sector_id").references(() => market_sectors.id, { onDelete: "set null" }),
+    parent_sector_id: uuid("parent_sector_id"),
     // Hierarchical sector organization
 
     // Economic metrics
@@ -65,7 +65,7 @@ export const market_sectors: any = pgTable("market_sectors", {
 
     // Sector metadata
     description: text("description"),
-    key_players: jsonb("key_players").notNull().default(sql`'[]'::jsonb`),
+    key_players: jsonb("key_players").notNull().default(sql`'{}'::jsonb`),
     /* Structure: [
       {
         "name": "Safaricom PLC",
@@ -78,6 +78,12 @@ export const market_sectors: any = pgTable("market_sectors", {
     created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
+    // Self-referencing foreign key for hierarchical sectors
+    parentSectorFk: foreignKey({
+        columns: [table.parent_sector_id],
+        foreignColumns: [table.id],
+    }).onDelete("set null"),
+
     // Sector hierarchy queries
     parentSectorIdx: index("idx_market_sectors_parent")
         .on(table.parent_sector_id)
@@ -211,7 +217,7 @@ export const market_stakeholders = pgTable("market_stakeholders", {
     // Stakeholder identification
     stakeholder_name: varchar("stakeholder_name", { length: 300 }).notNull(),
     stakeholder_type: varchar("stakeholder_type", { length: 50 }).notNull(),
-    // Values: 'corporation', 'industry_association', 'trade_union', 'cooperative', 
+    // Values: 'corporation', 'industry_association', 'trade_union', 'cooperative',
     //         'professional_body', 'lobby_group', 'think_tank'
 
     // Economic profile
@@ -234,7 +240,7 @@ export const market_stakeholders = pgTable("market_stakeholders", {
     foreign_ownership_percentage: numeric("foreign_ownership_percentage", { precision: 5, scale: 2 }),
 
     // Political connections
-    political_affiliations: jsonb("political_affiliations").notNull().default(sql`'[]'::jsonb`),
+    political_affiliations: jsonb("political_affiliations").notNull().default(sql`'{}'::jsonb`),
     /* Structure: [
       {
         "type": "board_member",
@@ -340,7 +346,7 @@ export const stakeholder_positions = pgTable("stakeholder_positions", {
     // How the bill affects their economic interests
 
     // Advocacy activities
-    lobbying_activities: jsonb("lobbying_activities").notNull().default(sql`'[]'::jsonb`),
+    lobbying_activities: jsonb("lobbying_activities").notNull().default(sql`'{}'::jsonb`),
     /* Structure: [
       {
         "date": "2024-03-15",
@@ -350,7 +356,7 @@ export const stakeholder_positions = pgTable("stakeholder_positions", {
       }
     ] */
 
-    public_statements: jsonb("public_statements").notNull().default(sql`'[]'::jsonb`),
+    public_statements: jsonb("public_statements").notNull().default(sql`'{}'::jsonb`),
     /* Structure: [
       {
         "date": "2024-03-20",

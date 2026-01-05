@@ -1,7 +1,7 @@
-import { 
-  BookOpen, 
-  Scale, 
-  Clock, 
+import {
+  BookOpen,
+  Scale,
+  Clock,
   Zap,
   Users,
   HelpCircle,
@@ -9,10 +9,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import type { Bill } from '@client/shared/types';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import type { Bill } from '@/shared/types';
 
 import { ConstitutionalContext } from './ConstitutionalContext';
 import { EducationalTooltip } from './EducationalTooltip';

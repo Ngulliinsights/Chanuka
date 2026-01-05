@@ -1,9 +1,9 @@
 /**
  * Smart Dashboard Component
- * 
+ *
  * Provides personalized, progressive disclosure-based dashboard
  * that adapts to user skill level and engagement patterns.
- * 
+ *
  * This component uses React Query for efficient server state management,
  * automatically handling caching, refetching, and loading states for
  * user data, saved bills, and activity history.
@@ -26,9 +26,9 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
+import { Progress } from '@/shared/design-system';
 
 // Type Definitions
 interface SmartDashboardProps {
@@ -81,7 +81,7 @@ const getWelcomeMessage = (
 ): string => {
   const messages = {
     novice: {
-      morning: hasRecentActivity 
+      morning: hasRecentActivity
         ? "Good morning! Ready to continue exploring how legislation affects your community?"
         : "Good morning! Let's start by finding bills that matter to you.",
       afternoon: hasRecentActivity
@@ -116,12 +116,12 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
     queryKey: ['savedBills'],
     queryFn: fetchSavedBills,
   });
-  
+
   const { data: recentActivity = [] } = useQuery({
     queryKey: ['recentActivity'],
     queryFn: fetchRecentActivity,
   });
-  
+
   // Calculate engagement metrics from the fetched data
   const metrics = {
     billsTracked: savedBills.length,
@@ -139,7 +139,7 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
       description: "Every action you take makes democracy more transparent"
     },
     intermediate: {
-      title: "Civic Engagement Impact", 
+      title: "Civic Engagement Impact",
       description: "Your active participation strengthens democratic discourse"
     },
     expert: {
@@ -170,7 +170,7 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
             <div className="text-xs text-muted-foreground">Civic Score</div>
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Civic Engagement Level</span>
@@ -266,7 +266,7 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
           <div className="text-center py-6">
             <Zap className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground mb-4">
-              {userLevel === 'novice' 
+              {userLevel === 'novice'
                 ? "Start your civic journey by exploring bills that affect your community"
                 : "Begin engaging with legislation and community discussions"
               }
@@ -310,7 +310,7 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 24) {
       return 'Today';
     } else if (diffInHours < 48) {
@@ -356,15 +356,15 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
 export function SmartDashboard({ className }: SmartDashboardProps) {
   // Default user level for now
   const userLevel = 'novice';
-  
+
   // Determine time of day for contextual greeting
   const hour = new Date().getHours();
-  const timeOfDay: 'morning' | 'afternoon' | 'evening' = 
+  const timeOfDay: 'morning' | 'afternoon' | 'evening' =
     hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
 
-  // Mock recent activity  
+  // Mock recent activity
   const recentActivity: Activity[] = [];
-  
+
   const welcomeMessage = getWelcomeMessage(userLevel, timeOfDay, recentActivity.length > 0);
 
   return (
@@ -393,7 +393,7 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
         {/* Left Column - Primary engagement metrics and contextual content */}
         <div className="lg:col-span-2 space-y-6">
           <ImpactMetrics userLevel={userLevel} />
-          
+
           {/* Progressive disclosure: Show different content based on user level */}
           {userLevel === 'novice' && (
             <Card className="border-green-200 bg-green-50">

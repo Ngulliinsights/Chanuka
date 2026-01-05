@@ -1,15 +1,15 @@
-import type { UserRole, RelatedPage } from '@client/shared/types';
+import type { UserRole, RelatedPage } from '@/shared/types';
 import type { UserRole as SharedUserRole } from '../types';
 
 // Remove unused import
-import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/validation';
+import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';
 
 // Type conversion helper
 function convertUserRoleArray(roles: SharedUserRole[] | undefined): UserRole[] | undefined {
   if (!roles) return undefined;
-  
+
   const roleMap: Record<SharedUserRole, UserRole> = {
     'public': 'public',
     'citizen': 'citizen',
@@ -20,7 +20,7 @@ function convertUserRoleArray(roles: SharedUserRole[] | undefined): UserRole[] |
     'official': 'citizen', // Map official to citizen for compatibility
     'moderator': 'admin', // Map moderator to admin for compatibility
   };
-  
+
   return roles.map(role => roleMap[role] || 'public');
 }
 
@@ -202,7 +202,7 @@ export const generateBreadcrumbRelationships = (
     for (let i = 0; i < pathSegments.length; i++) {
       const segment = pathSegments[i];
       if (!segment) continue;
-      
+
       currentPathBuilder += `/${segment}`;
 
       // Skip if this is a parameter

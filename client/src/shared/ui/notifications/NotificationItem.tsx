@@ -1,16 +1,16 @@
 /**
  * Notification Item Component
- * 
+ *
  * Individual notification display with actions and metadata
  */
 
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  MessageCircle, 
-  User, 
-  AlertTriangle, 
-  Shield, 
-  FileText, 
+import {
+  MessageCircle,
+  User,
+  AlertTriangle,
+  Shield,
+  FileText,
   Settings,
   ExternalLink,
   Trash,
@@ -19,10 +19,10 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Notification, NotificationType } from '@client/services/notification-service';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
+import { Notification, NotificationType } from '@/services/notification-service';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -164,7 +164,7 @@ export function NotificationItem({
                     <ExternalLink className="h-3 w-3" />
                   </Button>
                 )}
-                
+
                 {!notification.read && (
                   <Button
                     variant="ghost"
@@ -198,7 +198,7 @@ export function NotificationItem({
             <Badge variant="secondary" className={`text-xs ${getCategoryColor(notification.category)}`}>
               {String(notification.category || 'General')}
             </Badge>
-            
+
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {formatDistanceToNow(new Date((notification.createdAt || notification.timestamp) as string), { addSuffix: true })}
             </span>

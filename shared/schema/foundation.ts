@@ -48,7 +48,7 @@ export const users = pgTable("users", {
   // Two-factor authentication
   two_factor_enabled: boolean("two_factor_enabled").notNull().default(false),
   two_factor_secret: varchar("two_factor_secret", { length: 32 }),
-  backup_codes: jsonb("backup_codes").notNull().default(sql`'[]'::jsonb`),
+  backup_codes: jsonb("backup_codes").notNull().default(sql`'{}'::jsonb`),
 
   // Account lifecycle
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -130,18 +130,7 @@ export const user_profiles = pgTable("user_profiles", {
   avatar_url: varchar("avatar_url", { length: 500 }),
   website: varchar("website", { length: 255 }),
   preferences: jsonb("preferences").notNull().default(sql`'{}'::jsonb`),
-  privacy_settings: jsonb("privacy_settings").notNull().default(sql`'{
-    "show_real_name": true,
-    "show_location": true,
-    "show_contact_info": false,
-    "show_voting_history": false,
-    "show_engagement_stats": true,
-    "allow_direct_messages": true,
-    "public_profile": true,
-    "data_retention_preference": "standard",
-    "analytics_participation": true,
-    "research_participation": false
-  }'::jsonb`),
+  privacy_settings: jsonb("privacy_settings").notNull().default(sql`'{}'::jsonb`),
 
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -240,7 +229,7 @@ export const sponsors = pgTable("sponsors", {
   ethnicityActiveIdx: index("idx_sponsors_ethnicity_active")
     .on(table.ethnicity, table.is_active)
     .where(sql`${table.ethnicity} IS NOT NULL AND ${table.is_active} = true`),
-  
+
   ethnicityGenderIdx: index("idx_sponsors_ethnicity_gender")
     .on(table.ethnicity, table.gender)
     .where(sql`${table.ethnicity} IS NOT NULL AND ${table.is_active} = true`),
@@ -386,9 +375,9 @@ export const parliamentary_sittings = pgTable("parliamentary_sittings", {
   sitting_date: date("sitting_date").notNull(),
   sitting_number: smallint("sitting_number"),
 
-  agenda: jsonb("agenda").notNull().default(sql`'[]'::jsonb`),
+  agenda: jsonb("agenda").notNull().default(sql`'{}'::jsonb`),
   attendance_count: smallint("attendance_count").notNull().default(0),
-  bills_discussed: jsonb("bills_discussed").notNull().default(sql`'[]'::jsonb`),
+  bills_discussed: jsonb("bills_discussed").notNull().default(sql`'{}'::jsonb`),
 
   // Official records (Hansard)
   minutes_url: varchar("minutes_url", { length: 500 }),
@@ -468,7 +457,7 @@ export const bills = pgTable("bills", {
   share_count: integer("share_count").notNull().default(0),
   vote_count_for: integer("vote_count_for").notNull().default(0),
   vote_count_against: integer("vote_count_against").notNull().default(0),
-  
+
   // Computed engagement score
   engagement_score: numeric("engagement_score", { precision: 10, scale: 2 }).notNull().default(sql`0`),
   // Formula: (votes * 10) + (comments * 5) + (shares * 3) + (views * 0.1)
@@ -478,7 +467,7 @@ export const bills = pgTable("bills", {
   tags: varchar("tags", { length: 100 }).array(),
 
   // External references
-  external_urls: jsonb("external_urls").notNull().default(sql`'[]'::jsonb`),
+  external_urls: jsonb("external_urls").notNull().default(sql`'{}'::jsonb`),
   metadata: jsonb("metadata").notNull().default(sql`'{}'::jsonb`),
 
   // AI/ML processing status
@@ -535,11 +524,11 @@ export const bills = pgTable("bills", {
 
   // Data validation
   engagementCountsCheck: check("bills_engagement_counts_check",
-    sql`${table.view_count} >= 0 AND ${table.comment_count} >= 0 AND 
+    sql`${table.view_count} >= 0 AND ${table.comment_count} >= 0 AND
         ${table.share_count} >= 0 AND ${table.vote_count_for} >= 0 AND ${table.vote_count_against} >= 0`),
 
   dateLogicCheck: check("bills_date_logic_check",
-    sql`${table.last_action_date} IS NULL OR ${table.introduced_date} IS NULL OR 
+    sql`${table.last_action_date} IS NULL OR ${table.introduced_date} IS NULL OR
         ${table.last_action_date} >= ${table.introduced_date}`),
 
   engagementScoreCheck: check("bills_engagement_score_check",
@@ -590,32 +579,32 @@ export const user_sessions = pgTable("user_sessions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   session_token: varchar("session_token", { length: 255 }).notNull().unique(),
-  
+
   // Session metadata
   device_info: jsonb("device_info").notNull().default(sql`'{}'::jsonb`),
   ip_address: varchar("ip_address", { length: 45 }),
   user_agent: text("user_agent"),
   location: jsonb("location"),
-  
+
   // Session lifecycle
   is_active: boolean("is_active").notNull().default(true),
   last_activity: timestamp("last_activity", { withTimezone: true }).notNull().defaultNow(),
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
-  
+
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
   // Hot path: User's active sessions
   userActiveIdx: index("idx_user_sessions_user_active")
     .on(table.user_id, table.is_active)
     .where(sql`${table.is_active} = true`),
-  
+
   // Session token lookup
   sessionTokenIdx: index("idx_user_sessions_token").on(table.session_token),
-  
+
   // Cleanup expired sessions
   expiresIdx: index("idx_user_sessions_expires").on(table.expires_at)
     .where(sql`${table.expires_at} < NOW()`),
-  
+
   // Security auditing
   lastActivityIdx: index("idx_user_sessions_last_activity").on(table.last_activity.desc()),
 }));

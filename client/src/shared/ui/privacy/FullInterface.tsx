@@ -9,19 +9,19 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback, Suspense } from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@/core/auth';
 import {
   PrivacySettings,
   ConsentRecord
-} from '@client/core/auth';
-import { logger } from '@client/utils/logger';
+} from '@/core/auth';
+import { logger } from '@/utils/logger';
 
 
 // import { ConsentModal } from '../../auth/ConsentModal';
-import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert.tsx';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs.tsx';
+import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
 const VisibilityControls = React.lazy(() => import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls })));
 const DataUsageControls = React.lazy(() => import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls })));
 const ConsentControls = React.lazy(() => import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls })));

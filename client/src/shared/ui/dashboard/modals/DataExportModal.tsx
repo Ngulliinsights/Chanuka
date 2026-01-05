@@ -1,6 +1,6 @@
 /**
  * Data Export Modal Component
- * 
+ *
  * Allows users to export their personal data for GDPR compliance.
  */
 
@@ -15,25 +15,25 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@client/shared/design-system/interactive/Dialog.tsx';
-import { Input } from '@client/shared/design-system/interactive/Input.tsx';
+} from '@/shared/design-system/interactive/Dialog';
+import { Input } from '@/shared/design-system/interactive/Input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system/interactive/Select.tsx';
-import { Label } from '@client/shared/design-system/typography/Label.tsx';
-import { DataExportRequest } from '@client/shared/types/user-dashboard';
+} from '@/shared/design-system/interactive/Select';
+import { Label } from '@/shared/design-system/typography/Label';
+import { DataExportRequest } from '@/shared/types/user-dashboard';
 
 
 interface DataExportModalProps {
@@ -150,13 +150,13 @@ export function DataExportModal({
       // Update date range if needed
       const finalRequest = {
         ...exportRequest,
-        dateRange: useDateRange && startDate && endDate 
+        dateRange: useDateRange && startDate && endDate
           ? { start: startDate, end: endDate }
           : undefined
       };
 
       const exportId = await onExport(finalRequest);
-      
+
       setExportResult({
         success: true,
         message: 'Export completed successfully! Your download will begin shortly.',
@@ -181,7 +181,7 @@ export function DataExportModal({
     }
   };
 
-  const canExport = Object.values(exportRequest).some(value => 
+  const canExport = Object.values(exportRequest).some(value =>
     typeof value === 'boolean' ? value : false
   );
 
@@ -189,9 +189,11 @@ export function DataExportModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5" />
-            Export Your Data
+          <DialogTitle>
+            <div className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              Export Your Data
+            </div>
           </DialogTitle>
           <DialogDescription>
             Download a copy of your personal data in compliance with GDPR and privacy regulations.
@@ -202,8 +204,8 @@ export function DataExportModal({
           {/* Export Result */}
           {exportResult && (
             <div className={`p-4 rounded-lg flex items-start gap-3 ${
-              exportResult.success 
-                ? 'bg-green-50 border border-green-200' 
+              exportResult.success
+                ? 'bg-green-50 border border-green-200'
                 : 'bg-red-50 border border-red-200'
             }`}>
               {exportResult.success ? (
@@ -361,14 +363,14 @@ export function DataExportModal({
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isExporting}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleExport}
               disabled={!canExport || isExporting}
             >

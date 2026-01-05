@@ -1,7 +1,7 @@
 /**
  * DESIGN SYSTEM DIRECTORY VALIDATION FRAMEWORK
  * ════════════════════════════════════════════════════════════════════════════
- * 
+ *
  * Comprehensive validation of all design-system directories to ensure:
  * 1. Index files exist and export properly
  * 2. Components/utilities are functional
@@ -10,8 +10,8 @@
  * 5. Documentation is present
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+// import { readFileSync, existsSync } from 'fs'; // Unused
+// import { join } from 'path'; // Unused
 
 // ════════════════════════════════════════════════════════════════════════════
 // VALIDATION CATEGORIES

@@ -66,13 +66,13 @@ export const political_appointments = pgTable("political_appointments", {
   // Values: 'phd', 'masters', 'bachelors', 'diploma', 'certificate', 'secondary', 'other'
   
   relevant_experience_years: smallint("relevant_experience_years"),
-  previous_positions: jsonb("previous_positions").notNull().default(sql`'[]'::jsonb`),
+  previous_positions: jsonb("previous_positions").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"position": "CEO", "organization": "Kenya Power", "years": 5},
     {"position": "Director", "organization": "Treasury", "years": 3}
   ] */
   
-  professional_qualifications: jsonb("professional_qualifications").notNull().default(sql`'[]'::jsonb`),
+  professional_qualifications: jsonb("professional_qualifications").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"type": "CPA", "body": "ICPAK", "year": 2015},
     {"type": "Lawyer", "body": "LSK", "year": 2010}
@@ -99,15 +99,15 @@ export const political_appointments = pgTable("political_appointments", {
   performance_rating: numeric("performance_rating", { precision: 3, scale: 2 }),
   // 0.00-1.00 scale
   
-  achievements: jsonb("achievements").notNull().default(sql`'[]'::jsonb`),
-  failures: jsonb("failures").notNull().default(sql`'[]'::jsonb`),
+  achievements: jsonb("achievements").notNull().default(sql`'{}'::jsonb`),
+  failures: jsonb("failures").notNull().default(sql`'{}'::jsonb`),
 
   // Accountability
   removed_for_non_performance: boolean("removed_for_non_performance").notNull().default(false),
   corruption_allegations: boolean("corruption_allegations").notNull().default(false),
   corruption_allegations_details: text("corruption_allegations_details"),
   
-  court_cases: jsonb("court_cases").notNull().default(sql`'[]'::jsonb`),
+  court_cases: jsonb("court_cases").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"case": "ACC v. John Doe", "year": 2023, "status": "ongoing", "outcome": null}
   ] */
@@ -202,7 +202,7 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
   winning_company: varchar("winning_company", { length: 255 }).notNull(),
   company_registration_number: varchar("company_registration_number", { length: 100 }),
   
-  company_owners: jsonb("company_owners").notNull().default(sql`'[]'::jsonb`),
+  company_owners: jsonb("company_owners").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "name": "John Doe",

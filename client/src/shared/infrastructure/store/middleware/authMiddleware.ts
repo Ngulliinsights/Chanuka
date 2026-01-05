@@ -5,12 +5,12 @@
 
 import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
-import { authApiService as authService } from '@client/core/api';
-import { logout, tokenManager, clearError } from '@client/core/auth';
-import { logger } from '@client/utils/logger';
-import { rbacManager } from '@client/utils/rbac';
-import { tokenRefreshDeduplicator } from '@client/utils/request-deduplicator';
-import { securityMonitor } from '@client/utils/security';
+import { authApiService as authService } from '@/core/api';
+import { logout, tokenManager, clearError } from '@/core/auth';
+import { logger } from '@/utils/logger';
+import { rbacManager } from '@/utils/rbac';
+import { tokenRefreshDeduplicator } from '@/utils/request-deduplicator';
+import { securityMonitor } from '@/utils/security';
 
 import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
 

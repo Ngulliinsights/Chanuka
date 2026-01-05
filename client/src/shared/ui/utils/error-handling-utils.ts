@@ -6,9 +6,9 @@
  * React components to support Fast Refresh.
  */
 
-import { createError, coreErrorHandler, handleError as coreHandleError } from '@client/core/error';
-import type { AppError, ErrorDomain, ErrorSeverity } from '@client/core/error';
-import { logger } from '@client/utils/logger';
+import { createError, coreErrorHandler, handleError as coreHandleError } from '@/core/error';
+import type { AppError, ErrorDomain, ErrorSeverity } from '@/core/error';
+import { logger } from '@/utils/logger';
 
 // ============================================================================
 // UI-Specific Error Types (extending core)

@@ -1,22 +1,22 @@
 /**
  * Seamless Integration Example Component
- * 
+ *
  * Demonstrates how to use the seamless integration system
  * with progressive enhancement and graceful fallbacks.
  */
 
 import { useState } from 'react';
 
-import { 
-  useValidation, 
-  useFormatting, 
-  useStrings, 
-  useArrays, 
-  useCivic, 
+import {
+  useValidation,
+  useFormatting,
+  useStrings,
+  useArrays,
+  useCivic,
   useAnonymity,
   useProgressiveEnhancement,
   useIntegrationStatus
-} from '@client/hooks/useSeamlessIntegration';
+} from '@/hooks/useSeamlessIntegration';
 
 interface ExampleFormData {
   email: string;

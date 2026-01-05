@@ -1,7 +1,7 @@
 import { AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 import React from 'react';
 
-import { handleError, measureAsync, recordMetric } from '@client/core';
+import { handleError, measureAsync, recordMetric } from '@/core';
 
 import { Button, Card, CardContent, CardHeader } from '../../design-system';
 
@@ -9,11 +9,11 @@ import { useDashboard } from './hooks';
 import type { DashboardComponentProps, DashboardConfig } from './types';
 import { validateActivitySummary } from './validation';
 
-export const ActivitySummary = React.memo<DashboardComponentProps>(({ 
+export const ActivitySummary = React.memo<DashboardComponentProps>(({
   className = '',
   config,
   onError,
-  onDataChange 
+  onDataChange
 }) => {
   // Fix: Type config properly as Partial<DashboardConfig>
   const { data, loading, error, actions, recovery } = useDashboard(config as Partial<DashboardConfig>);
@@ -42,7 +42,7 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
   // Validate summary data
   const validatedSummary = React.useMemo(() => {
     if (!data.summary) return null;
-    
+
     try {
       return validateActivitySummary(data.summary);
     } catch (validationError) {
@@ -110,9 +110,9 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
             <p className="text-sm text-red-600 mb-3">{error.message}</p>
             {recovery.canRecover && (
               <div className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleRecovery}
                   className="text-red-600 border-red-300 hover:bg-red-50"
                 >
@@ -189,9 +189,9 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(({
         ) : (
           <div className="text-center py-4 text-slate-500">
             <p className="text-sm">No activity data available</p>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleRefresh}
               className="mt-2"
             >

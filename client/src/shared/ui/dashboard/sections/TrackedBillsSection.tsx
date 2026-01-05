@@ -16,15 +16,15 @@ import {
   Trash,
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/typography/Card.tsx';
-import { TrackedBill } from '@client/shared/types/user-dashboard';
+} from '@/shared/design-system/typography/Card';
+import { TrackedBill } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

@@ -6,10 +6,10 @@
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@/lib/utils';
-import { usePasswordVisibility } from '@client/hooks/usePasswordUtils';
+import { cn } from '@/shared/design-system/utils/cn';
+import { usePasswordVisibility } from '@/features/users/hooks/usePasswordUtils';
 
-import { Input } from '@client/../../Input';
+import { Input } from '@/shared/design-system/interactive/Input';
 import { Label } from '@client/../../Label';
 
 export interface AuthInputProps {

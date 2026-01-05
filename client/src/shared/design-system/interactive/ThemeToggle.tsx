@@ -3,10 +3,10 @@
  * Accessible theme switcher with light/dark/system options
  */
 
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Settings as Moon, Settings as Sun, Settings as Monitor } from 'lucide-react';
 import React from 'react';
 
-import { useTheme, type ThemeContextType } from '@client/shared/design-system';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 import { Button } from './Button';
 import {
@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from './DropdownMenu';
 
-type Theme = 'light' | 'dark' | 'high-contrast';
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeToggleProps {
   variant?: 'button' | 'dropdown';
@@ -43,8 +43,8 @@ export function ThemeToggle({
       icon: <Moon className="h-4 w-4" />,
     },
     {
-      value: 'high-contrast',
-      label: 'High Contrast',
+      value: 'system',
+      label: 'System',
       icon: <Monitor className="h-4 w-4" />,
     },
   ];

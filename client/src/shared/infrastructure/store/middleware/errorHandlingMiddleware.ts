@@ -1,6 +1,6 @@
 /**
  * Error Handling Middleware for Client
- * 
+ *
  * Integrates with core error system to capture and handle errors from actions and API calls.
  */
 
@@ -11,17 +11,17 @@ import {
   ErrorSeverity,
   coreErrorHandler,
   createError,
-} from '@client/core/error';
-import { logger } from '@client/utils/logger';
+} from '@/core/error';
+import { logger } from '@/utils/logger';
 
 export const errorHandlingMiddleware: Middleware = (store) => (next) => (action: unknown) => {
   const reduxAction = action as Action & { type: string };
-  
+
   try {
     return next(action);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     // Create error through core system
     const appError = createError(
       ErrorDomain.SYSTEM,
@@ -45,7 +45,7 @@ export const errorHandlingMiddleware: Middleware = (store) => (next) => (action:
 
     // Handle through core system
     coreErrorHandler.handleError(appError);
-    
+
     // Additional Redux-specific logging
     logger.error('Action error caught by middleware', {
       component: 'ErrorHandlingMiddleware',
@@ -53,7 +53,7 @@ export const errorHandlingMiddleware: Middleware = (store) => (next) => (action:
       error: errorMessage,
       errorId: appError.id,
     });
-    
+
     // Dispatch Redux-specific error action for UI state management
     store.dispatch({
       type: 'error/actionError',
@@ -66,7 +66,7 @@ export const errorHandlingMiddleware: Middleware = (store) => (next) => (action:
         severity: appError.severity,
       }
     });
-    
+
     throw error;
   }
 };

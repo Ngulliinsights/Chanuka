@@ -5,7 +5,8 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { cn } from '@client/shared/design-system';
+
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface DashboardGridProps {
   /** Number of columns */
@@ -52,7 +53,6 @@ export const DashboardGrid = React.memo<DashboardGridProps>(({
 }) => {
   const [currentColumns, setCurrentColumns] = useState(columns);
   const [isDragging, setIsDragging] = useState(false);
-  const [_isResizing, setIsResizing] = useState(false);
 
   // Responsive column calculation
   useEffect(() => {
@@ -146,7 +146,6 @@ export const DashboardGrid = React.memo<DashboardGridProps>(({
 
         // Drag states
         isDragging && 'opacity-50',
-        isResizing && 'select-none',
 
         className
       )}
@@ -178,7 +177,6 @@ export const DashboardGrid = React.memo<DashboardGridProps>(({
 
             // Drag states
             isDragging && 'z-50 scale-105 shadow-lg',
-            isResizing && 'pointer-events-none',
           )}
           draggable={editable}
           onDragStart={handleDragStart}

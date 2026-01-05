@@ -8,7 +8,7 @@
 
 import { Component, ReactNode, ErrorInfo } from 'react';
 
-import { getBrowserInfo } from '@/core/browser';
+import { browserDetector } from '@/core/browser/browser-detector';
 import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
 import { getPerformanceMonitor } from '@/core/performance';
 import { logger } from '@/utils/logger';
@@ -156,7 +156,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             context: {
               component: 'ErrorBoundary',
               timestamp: Date.now(),
-              browserInfo: getBrowserInfo(),
+              browserInfo: browserDetector.getBrowserInfo(),
               performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
             },
           });
@@ -254,7 +254,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoveryAttempts: this.recoveryAttempts,
       recoverySuccessful: false,
       userFeedbackProvided: false,
-      browserInfo: getBrowserInfo(),
+      browserInfo: browserDetector.getBrowserInfo(),
       performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
       context: this.props.context,
     };
@@ -267,7 +267,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       errorId,
       componentStack: errorInfo.componentStack,
       context: this.props.context,
-      browserInfo: getBrowserInfo(),
+      browserInfo: browserDetector.getBrowserInfo(),
       performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
       recoveryAttempts: this.recoveryAttempts,
       hasRecoveryOptions: true,

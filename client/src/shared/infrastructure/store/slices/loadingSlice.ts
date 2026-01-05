@@ -7,8 +7,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@client/shared/ui/loading';
-import { logger } from '@client/utils/logger';
+import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@/shared/ui/loading';
+import { logger } from '@/utils/logger';
 
 // Extended type definitions
 interface ConnectionInfo {
@@ -176,7 +176,7 @@ export const timeoutLoadingOperation = createAsyncThunk(
 
       const timeout = operation.timeout || loadingState.loading.adaptiveSettings.defaultTimeout;
       const timeoutError = `Operation timed out after ${timeout}ms`;
-      
+
       return { id, error: timeoutError };
     } catch (error) {
       return rejectWithValue(
@@ -187,7 +187,7 @@ export const timeoutLoadingOperation = createAsyncThunk(
 );
 
 // Stats update type
-type StatsUpdateType = 
+type StatsUpdateType =
   | 'increment_completed'
   | 'increment_failed'
   | 'update_average_time'

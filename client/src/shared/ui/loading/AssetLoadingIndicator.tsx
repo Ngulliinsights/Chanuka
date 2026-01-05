@@ -1,8 +1,8 @@
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { useMemo, useState, useEffect, memo } from 'react';
 
-import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { cn } from '@/shared/design-system/utils/cn';
+import { logger } from '@/utils/logger';
 
 import { useAssetLoading } from './hooks/useAssetLoading';
 import { useLoadingRecovery } from './hooks/useLoadingRecovery';

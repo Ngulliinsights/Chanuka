@@ -266,19 +266,19 @@ export const participation_quality_audits = pgTable("participation_quality_audit
   // =========================================================================
   // EVIDENCE AND DOCUMENTATION
   // =========================================================================
-  evidence_documents: jsonb("evidence_documents").notNull().default(sql`'[]'::jsonb`),
+  evidence_documents: jsonb("evidence_documents").notNull().default(sql`'{}'::jsonb`),
   // Array of references: [{"type": "report", "url": "...", "title": "..."}, ...]
   
   statistical_evidence: jsonb("statistical_evidence").notNull().default(sql`'{}'::jsonb`),
   // Quantitative data supporting findings
   
-  witness_statements: jsonb("witness_statements").default(sql`'[]'::jsonb`),
+  witness_statements: jsonb("witness_statements").default(sql`'{}'::jsonb`),
   // Testimonies from participants or observers
   
-  media_coverage: jsonb("media_coverage").default(sql`'[]'::jsonb`),
+  media_coverage: jsonb("media_coverage").default(sql`'{}'::jsonb`),
   // News articles documenting the process
   
-  official_documents: jsonb("official_documents").default(sql`'[]'::jsonb`),
+  official_documents: jsonb("official_documents").default(sql`'{}'::jsonb`),
   // Parliamentary records, committee reports, hansard
 
   // =========================================================================

@@ -14,8 +14,7 @@ import {
   ApiResponse,
   RequestOptions,
   ClientConfig,
-  UnifiedApiClient,
-  ApiRequest
+  UnifiedApiClient
 } from './types';
 import type { RequestInterceptor, ResponseInterceptor } from './types/common';
 

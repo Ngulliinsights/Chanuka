@@ -1,9 +1,9 @@
 import React from "react";
 
-import { useNavigationPreferences } from "@client/core/navigation/hooks";
-import { Button } from "@client/shared/design-system/interactive/Button.tsx";
-import { Switch } from "@client/shared/design-system/interactive/Switch.tsx";
-import { Label } from "@client/shared/design-system/typography/Label.tsx";
+import { useNavigationPreferences } from "@/core/navigation/hooks";
+import { Button } from "@/shared/design-system/interactive/Button";
+import { Switch } from "@/shared/design-system/interactive/Switch";
+import { Label } from "@/shared/design-system/typography/Label";
 
 import {
   Dialog,

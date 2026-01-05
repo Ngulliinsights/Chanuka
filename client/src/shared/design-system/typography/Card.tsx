@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const cardVariants = cva(

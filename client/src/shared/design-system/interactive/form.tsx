@@ -11,13 +11,11 @@ import { FormProvider, useFormContext } from "react-hook-form"
 import { Slot } from "@radix-ui/react-slot"
 import { Root } from "@radix-ui/react-label"
 
-import { cn } from "@client/lib/utils"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/shared/design-system/utils/cn"
 
 const Form = FormProvider
 
 type FormFieldContextValue<
-  TFieldValues extends Record<string, any> = Record<string, any>,
   TName extends string = string
 > = {
   name: TName
@@ -28,7 +26,6 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 )
 
 const FormField = <
-  TFieldValues extends Record<string, any> = Record<string, any>,
   TName extends string = string
 >({
   ...props

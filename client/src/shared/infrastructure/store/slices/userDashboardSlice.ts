@@ -1,7 +1,7 @@
 
 /**
  * User Dashboard State Management with Redux Toolkit
- * 
+ *
  * Manages personalized dashboard data, engagement history,
  * civic metrics, and ML-powered recommendations.
  */
@@ -9,7 +9,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { useAppSelector, useAppDispatch } from '@client/hooks/store';
+import { useAppSelector, useAppDispatch } from '@/hooks/store';
 import type {
   UserDashboardData,
   TrackedBill,
@@ -20,23 +20,23 @@ import type {
   DataExportRequest,
   TemporalFilter,
   DashboardPreferences
-} from '@client/shared/types/user-dashboard';
+} from '@/shared/types/user-dashboard';
 
 import type { RootState } from '../index';
 
 interface UserDashboardState {
   // Core data
   dashboardData: UserDashboardData | null;
-  
+
   // UI state
   loading: boolean;
   error: string | null;
-  
+
   // Filters and preferences
   timeFilter: TemporalFilter;
   preferences: DashboardPreferences;
   privacyControls: PrivacyControls;
-  
+
   // Real-time updates
   lastUpdateTime: string | null;
   pendingUpdates: number;
@@ -50,7 +50,7 @@ export const refreshRecommendations = createAsyncThunk(
       // In a real implementation, this would call the ML recommendation API
       // For now, we'll simulate with mock data
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       const mockRecommendations: BillRecommendation[] = [
         {
           bill: {
@@ -78,7 +78,7 @@ export const refreshRecommendations = createAsyncThunk(
           confidence: 0.78
         }
       ];
-      
+
       return mockRecommendations;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh recommendations');
@@ -92,7 +92,7 @@ export const requestDataExport = createAsyncThunk(
     try {
       // In a real implementation, this would call the data export API
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const exportId = `export_${Date.now()}`;
       return exportId;
     } catch (error) {
@@ -107,7 +107,7 @@ export const refreshDashboard = createAsyncThunk(
     try {
       // In a real implementation, this would fetch fresh data from the API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       return { timestamp: new Date().toISOString() };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh dashboard');
@@ -161,7 +161,7 @@ const userDashboardSlice = createSlice({
     updateTrackedBill: (state, action: PayloadAction<{ billId: number; updates: Partial<TrackedBill> }>) => {
       const { billId, updates } = action.payload;
       if (!state.dashboardData) return;
-      
+
       const billIndex = state.dashboardData.trackedBills.findIndex(b => b.id === billId);
       if (billIndex !== -1) {
         state.dashboardData.trackedBills[billIndex] = {
@@ -174,7 +174,7 @@ const userDashboardSlice = createSlice({
     addEngagementItem: (state, action: PayloadAction<EngagementHistoryItem>) => {
       const item = action.payload;
       if (!state.dashboardData) return;
-      
+
       state.dashboardData.recentActivity.unshift(item);
       // Keep only the most recent 100 items
       if (state.dashboardData.recentActivity.length > 100) {
@@ -185,7 +185,7 @@ const userDashboardSlice = createSlice({
     updateCivicMetrics: (state, action: PayloadAction<Partial<CivicImpactMetrics>>) => {
       const metrics = action.payload;
       if (!state.dashboardData) return;
-      
+
       state.dashboardData.civicMetrics = {
         ...state.dashboardData.civicMetrics,
         ...metrics
@@ -196,7 +196,7 @@ const userDashboardSlice = createSlice({
     trackBill: (state, action: PayloadAction<{ billId: number; notifications?: TrackedBill['notifications'] }>) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
-      
+
       // Check if bill is already tracked
       const existingIndex = state.dashboardData.trackedBills.findIndex(b => b.id === billId);
       if (existingIndex === -1) {
@@ -221,7 +221,7 @@ const userDashboardSlice = createSlice({
             expertAnalysis: true
           }
         };
-        
+
         state.dashboardData.trackedBills.unshift(newTrackedBill);
         state.dashboardData.stats.totalBillsTracked += 1;
       }
@@ -230,7 +230,7 @@ const userDashboardSlice = createSlice({
     untrackBill: (state, action: PayloadAction<number>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
-      
+
       const index = state.dashboardData.trackedBills.findIndex(b => b.id === billId);
       if (index !== -1) {
         state.dashboardData.trackedBills.splice(index, 1);
@@ -241,7 +241,7 @@ const userDashboardSlice = createSlice({
     updateBillNotifications: (state, action: PayloadAction<{ billId: number; notifications: TrackedBill['notifications'] }>) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
-      
+
       const billIndex = state.dashboardData.trackedBills.findIndex(b => b.id === billId);
       if (billIndex !== -1) {
         state.dashboardData.trackedBills[billIndex].notifications = notifications;
@@ -252,7 +252,7 @@ const userDashboardSlice = createSlice({
     dismissRecommendation: (state, action: PayloadAction<number>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
-      
+
       state.dashboardData.recommendations = state.dashboardData.recommendations.filter(
         r => r.bill.id !== billId
       );
@@ -261,17 +261,17 @@ const userDashboardSlice = createSlice({
     acceptRecommendation: (state, action: PayloadAction<number>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
-      
+
       // Track the bill
-      userDashboardSlice.caseReducers.trackBill(state, { 
-        payload: { billId }, 
-        type: 'userDashboard/trackBill' 
+      userDashboardSlice.caseReducers.trackBill(state, {
+        payload: { billId },
+        type: 'userDashboard/trackBill'
       });
-      
+
       // Dismiss the recommendation
-      userDashboardSlice.caseReducers.dismissRecommendation(state, { 
-        payload: billId, 
-        type: 'userDashboard/dismissRecommendation' 
+      userDashboardSlice.caseReducers.dismissRecommendation(state, {
+        payload: billId,
+        type: 'userDashboard/dismissRecommendation'
       });
     },
 
@@ -300,7 +300,7 @@ const userDashboardSlice = createSlice({
     // Real-time updates
     handleRealTimeUpdate: (state, action: PayloadAction<{ type: string; data: Record<string, unknown> }>) => {
       const { type, data } = action.payload;
-      
+
       switch (type) {
         case 'bill_status_change':
           if (state.dashboardData) {
@@ -318,7 +318,7 @@ const userDashboardSlice = createSlice({
           break;
 
         case 'civic_metrics_update':
-          if (state.dashboardData && data.userId === state.dashboardData.stats && 
+          if (state.dashboardData && data.userId === state.dashboardData.stats &&
               data.metrics && typeof data.metrics === 'object') {
             state.dashboardData.civicMetrics = {
               ...state.dashboardData.civicMetrics,
@@ -328,8 +328,8 @@ const userDashboardSlice = createSlice({
           break;
 
         case 'new_recommendation':
-          if (state.dashboardData && data.recommendation && 
-              typeof data.recommendation === 'object' && 
+          if (state.dashboardData && data.recommendation &&
+              typeof data.recommendation === 'object' &&
               'bill' in data.recommendation) {
             state.dashboardData.recommendations.unshift(data.recommendation as BillRecommendation);
             // Keep only top 10 recommendations
@@ -431,12 +431,12 @@ export const selectFilteredEngagementHistory = createSelector(
   [selectUserDashboardState],
   (userDashboard): EngagementHistoryItem[] => {
     if (!userDashboard.dashboardData) return [];
-    
+
     return userDashboard.dashboardData.recentActivity.filter((item: EngagementHistoryItem) => {
       if (!userDashboard.timeFilter.startDate && !userDashboard.timeFilter.endDate) {
         const now = new Date();
         const itemDate = new Date(item.timestamp);
-        
+
         switch (userDashboard.timeFilter.period) {
           case 'day':
             return itemDate >= new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -452,14 +452,14 @@ export const selectFilteredEngagementHistory = createSelector(
             return true;
         }
       }
-      
+
       const itemDate = new Date(item.timestamp);
       const start = userDashboard.timeFilter.startDate ? new Date(userDashboard.timeFilter.startDate) : null;
       const end = userDashboard.timeFilter.endDate ? new Date(userDashboard.timeFilter.endDate) : null;
-      
+
       if (start && itemDate < start) return false;
       if (end && itemDate > end) return false;
-      
+
       return true;
     });
   }
@@ -480,8 +480,8 @@ export const selectDashboardMeta = createSelector(
   [selectUserDashboardState],
   (userDashboard) => ({
     hasData: !!userDashboard.dashboardData,
-    isDataStale: userDashboard.lastUpdateTime ? 
-      (Date.now() - new Date(userDashboard.lastUpdateTime).getTime()) > (userDashboard.preferences.refreshInterval * 60 * 1000) : 
+    isDataStale: userDashboard.lastUpdateTime ?
+      (Date.now() - new Date(userDashboard.lastUpdateTime).getTime()) > (userDashboard.preferences.refreshInterval * 60 * 1000) :
       true
   })
 );

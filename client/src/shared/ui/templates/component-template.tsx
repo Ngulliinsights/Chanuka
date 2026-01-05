@@ -1,6 +1,6 @@
 /**
  * Standard Component Template
- * 
+ *
  * Use this template for creating new shared UI components.
  * Follow this pattern for consistency across the shared UI system.
  */
@@ -35,9 +35,9 @@ export const ComponentName = React.memo<ComponentNameProps>(({
 }) => {
   // Error handling
   const { error, errorMessage, clearError } = useUIErrorHandler('ComponentName');
-  
+
   // Component logic here
-  
+
   // Error state
   if (error) {
     return (
@@ -53,7 +53,7 @@ export const ComponentName = React.memo<ComponentNameProps>(({
       </div>
     );
   }
-  
+
   // Main render
   return (
     <div className={className} data-testid={testId}>
@@ -74,7 +74,7 @@ export default ComponentName;
 // ============================================================================
 
 /*
-import { ComponentName } from '@client/shared/ui/components';
+import { ComponentName } from '@/shared/ui/components';
 
 function MyPage() {
   return (

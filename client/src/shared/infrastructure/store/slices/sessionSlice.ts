@@ -8,7 +8,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 // ============================================================================
 // Types and Interfaces
@@ -129,7 +129,7 @@ const generateCsrfToken = (): string => {
  */
 const setSecureCookie = (name: string, value: string, maxAge: number): void => {
   if (typeof document === 'undefined') return;
-  
+
   const cookieString = [
     `${name}=${encodeURIComponent(value)}`,
     'Path=/',
@@ -137,7 +137,7 @@ const setSecureCookie = (name: string, value: string, maxAge: number): void => {
     'SameSite=Strict', // Added for CSRF protection
     `Max-Age=${maxAge}`
   ].join('; ');
-  
+
   document.cookie = cookieString;
 };
 
@@ -154,10 +154,10 @@ const clearCookie = (name: string): void => {
  */
 const setCsrfToken = (token: string): void => {
   if (typeof document === 'undefined') return;
-  
+
   // Set cookie
   setSecureCookie(CSRF_COOKIE_NAME, token, SESSION_MAX_AGE_MS / 1000);
-  
+
   // Set meta tag for easier access by JavaScript
   let metaTag = document.querySelector(`meta[name="${CSRF_META_NAME}"]`) as HTMLMetaElement;
   if (!metaTag) {
@@ -173,7 +173,7 @@ const setCsrfToken = (token: string): void => {
  */
 const getStoredSessionData = (): SessionData | null => {
   if (typeof window === 'undefined' || !window.sessionStorage) return null;
-  
+
   try {
     const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
     return stored ? JSON.parse(stored) : null;
@@ -188,7 +188,7 @@ const getStoredSessionData = (): SessionData | null => {
  */
 const storeSessionData = (data: SessionData): void => {
   if (typeof window === 'undefined' || !window.sessionStorage) return;
-  
+
   try {
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
@@ -282,12 +282,12 @@ export const createSession = createAsyncThunk(
 
       // Update Redux state
       dispatch(setSessionData(sessionData));
-      dispatch(recordActivity({ 
-        type: 'api', 
-        details: { 
-          action: 'session_start', 
-          userId: sessionData.userId 
-        } 
+      dispatch(recordActivity({
+        type: 'api',
+        details: {
+          action: 'session_start',
+          userId: sessionData.userId
+        }
       }));
 
       logger.info('Session created successfully', {
@@ -342,7 +342,7 @@ export const validateSession = createAsyncThunk(
         ...sessionData,
         lastActivity: now.toISOString()
       };
-      
+
       storeSessionData(updatedSessionData);
       dispatch(updateLastActivity());
 
@@ -413,7 +413,7 @@ export const checkConcurrentSessions = createAsyncThunk(
 
       // Mock implementation - replace with actual API call when available
       const sessions: SessionInfo[] = [];
-      
+
       // Check again after async operation
       if (signal.aborted) {
         throw new Error('Request cancelled');
@@ -438,7 +438,7 @@ export const checkConcurrentSessions = createAsyncThunk(
       if (signal.aborted || (error instanceof Error && error.message === 'Request cancelled')) {
         return rejectWithValue('Request cancelled');
       }
-      
+
       const message = error instanceof Error ? error.message : 'Failed to check concurrent sessions';
       logger.error('Failed to check concurrent sessions', { error });
       return rejectWithValue(message);
@@ -529,9 +529,9 @@ const sessionSlice = createSlice({
     /**
      * Records user activity with timestamp and details
      */
-    recordActivity: (state, action: PayloadAction<{ 
-      type: ActivityType; 
-      details?: Record<string, unknown> 
+    recordActivity: (state, action: PayloadAction<{
+      type: ActivityType;
+      details?: Record<string, unknown>
     }>) => {
       const now = Date.now();
       state.lastActivity = now;
@@ -574,7 +574,7 @@ const sessionSlice = createSlice({
      */
     addWarning: (state, action: PayloadAction<SessionWarning>) => {
       state.warnings.push(action.payload);
-      
+
       // Limit warnings to prevent memory issues
       if (state.warnings.length > MAX_WARNINGS) {
         state.warnings = state.warnings.slice(-MAX_WARNINGS);

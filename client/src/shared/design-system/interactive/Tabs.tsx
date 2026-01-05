@@ -1,6 +1,6 @@
 /**
  * Tabs Component - UNIFIED & TOKEN-BASED
- * 
+ *
  * ✅ Uses design tokens
  * ✅ Animated tab switching
  * ✅ Proper accessibility support
@@ -8,7 +8,7 @@
 
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-import { cn } from "@client/lib/utils"
+import { cn } from "@/shared/design-system/utils/cn"
 
 const Tabs = TabsPrimitive.Root
 

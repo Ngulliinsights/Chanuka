@@ -1,8 +1,8 @@
-import { 
-  Scale, 
-  ChevronDown, 
-  ChevronRight, 
-  BookOpen, 
+import {
+  Scale,
+  ChevronDown,
+  ChevronRight,
+  BookOpen,
   ExternalLink,
   AlertTriangle,
   CheckCircle,
@@ -12,10 +12,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system/interactive/Collapsible.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/design-system/interactive/Collapsible';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 
 interface ConstitutionalProvision {
   id: string;
@@ -49,7 +49,7 @@ interface ConstitutionalContextProps {
  * ConstitutionalContext - Integrates constitutional context with bill provisions
  * Features: Article-by-article analysis, constitutional basis, conflict identification
  */
-export function ConstitutionalContext({ 
+export function ConstitutionalContext({
   provisions,
   className = ""
 }: ConstitutionalContextProps) {
@@ -98,7 +98,7 @@ export function ConstitutionalContext({
   // Extract all constitutional articles referenced
   const allConstitutionalArticles = Array.from(
     new Set(
-      provisions.flatMap(p => 
+      provisions.flatMap(p =>
         p.constitutionalBasis.map(cb => cb.article)
       )
     )
@@ -181,18 +181,18 @@ export function ConstitutionalContext({
       {/* Bill Provisions with Constitutional Context */}
       <div className="space-y-4">
         {provisions
-          .filter(provision => 
-            selectedConstitutionalArticle === null || 
+          .filter(provision =>
+            selectedConstitutionalArticle === null ||
             provision.constitutionalBasis.some(cb => cb.article === selectedConstitutionalArticle)
           )
           .map((provision) => (
-          <Collapsible 
+          <Collapsible
             key={provision.id}
             open={expandedProvisions.has(provision.id)}
             onOpenChange={() => toggleProvision(provision.id)}
           >
-            <Card className={selectedConstitutionalArticle && 
-              provision.constitutionalBasis.some(cb => cb.article === selectedConstitutionalArticle) 
+            <Card className={selectedConstitutionalArticle &&
+              provision.constitutionalBasis.some(cb => cb.article === selectedConstitutionalArticle)
               ? "ring-2 ring-purple-200" : ""}>
               <CollapsibleTrigger asChild>
                 <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
@@ -209,9 +209,9 @@ export function ConstitutionalContext({
                           </CardDescription>
                           <div className="flex items-center gap-2 mt-2">
                             {provision.constitutionalBasis.map((cb, index) => (
-                              <Badge 
+                              <Badge
                                 key={index}
-                                variant="outline" 
+                                variant="outline"
                                 className={`text-xs ${getImpactColor(cb.impact)}`}
                               >
                                 <span className="inline-flex items-center gap-1">
@@ -224,8 +224,8 @@ export function ConstitutionalContext({
                         </div>
                       </div>
                     </div>
-                    {expandedProvisions.has(provision.id) ? 
-                      <ChevronDown className="h-4 w-4" /> : 
+                    {expandedProvisions.has(provision.id) ?
+                      <ChevronDown className="h-4 w-4" /> :
                       <ChevronRight className="h-4 w-4" />
                     }
                   </div>

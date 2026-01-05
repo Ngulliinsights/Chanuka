@@ -1,8 +1,8 @@
-import React from 'react';
-import { useToast } from '@client/hooks/use-toast'
-import { logger } from '@client/utils/logger';
+// import React from 'react'; // Unused
+import { useToast } from '@/hooks/use-toast'
+// import { logger } from '@/utils/logger'; // Unused
 
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from './toast'
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from './Toast'
 
 export function Toaster() {
   const { toasts } = useToast()

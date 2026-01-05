@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface NavLinkProps extends LinkProps {
   is_active?: boolean;

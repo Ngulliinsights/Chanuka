@@ -1,27 +1,47 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
 
-import { en } from '@client/utils/i18n';
+import { languages, detectLanguage, saveLanguagePreference, getKenyanContext, type SupportedLanguage } from '../../utils/i18n';
 
-type Translations = typeof en;
+type Translations = typeof languages.en;
 
 interface I18nContextType {
   t: (key: string, values?: Record<string, unknown>) => string;
-  changeLanguage: (lang: string) => void;
-  language: string;
+  changeLanguage: (lang: SupportedLanguage) => void;
+  language: SupportedLanguage;
+  availableLanguages: readonly SupportedLanguage[];
+  kenyanContext: ReturnType<typeof getKenyanContext>;
+  isRTL: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState('en');
-  const [translations, setTranslations] = useState<Translations>(en);
+  const [language, setLanguage] = useState<SupportedLanguage>(() => detectLanguage());
+  const [translations, setTranslations] = useState<Translations>(() => languages[detectLanguage()]);
 
-  // Could load other languages dynamically here in a real implementation
+  // Load translations when language changes
   useEffect(() => {
-    if (language === 'en') {
-      setTranslations(en);
-    }
+    const loadTranslations = async () => {
+      try {
+        const newTranslations = languages[language];
+        setTranslations(newTranslations);
+
+        // Update document language and direction
+        document.documentElement.lang = language;
+        // Future Arabic support - currently no RTL languages supported
+        document.documentElement.dir = 'ltr';
+
+        // Save preference
+        saveLanguagePreference(language);
+      } catch (error) {
+        console.error(`Failed to load translations for ${language}:`, error);
+        // Fallback to English
+        setTranslations(languages.en);
+      }
+    };
+
+    loadTranslations();
   }, [language]);
 
   const t = useCallback((key: string, values?: Record<string, unknown>): string => {
@@ -32,7 +52,17 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
       if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
         value = (value as Record<string, unknown>)[k];
       } else {
-        return key;
+        // Fallback to English if key not found
+        let fallbackValue: unknown = languages.en as unknown;
+        for (const fallbackKey of keys) {
+          if (fallbackValue && typeof fallbackValue === 'object' && Object.prototype.hasOwnProperty.call(fallbackValue, fallbackKey)) {
+            fallbackValue = (fallbackValue as Record<string, unknown>)[fallbackKey];
+          } else {
+            return key; // Return key if not found in fallback either
+          }
+        }
+        value = fallbackValue;
+        break;
       }
     }
 
@@ -40,6 +70,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
       return key;
     }
 
+    // Replace parameters in translation
     if (values) {
       return Object.entries(values).reduce((acc, [k, v]) => {
         return acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
@@ -49,15 +80,29 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     return value as string;
   }, [translations]);
 
-  const changeLanguage = useCallback((lang: string) => {
-    setLanguage(lang);
+  const changeLanguage = useCallback((lang: SupportedLanguage) => {
+    if (lang in languages) {
+      setLanguage(lang);
+    }
   }, []);
+
+  const kenyanContext = useMemo(() => getKenyanContext(), []);
+
+  const availableLanguages = useMemo(() => Object.keys(languages) as SupportedLanguage[], []);
+
+  const isRTL = useMemo(() => {
+    // Future support for RTL languages
+    return false;
+  }, [language]);
 
   const contextValue = useMemo(() => ({
     t,
     changeLanguage,
-    language
-  }), [t, changeLanguage, language]);
+    language,
+    availableLanguages,
+    kenyanContext,
+    isRTL,
+  }), [t, changeLanguage, language, availableLanguages, kenyanContext, isRTL]);
 
   return (
     <I18nContext.Provider value={contextValue}>

@@ -1,12 +1,12 @@
 /**
  * Data Retention Service - Shared Infrastructure
- * 
+ *
  * Migrated from client/src/services/dataRetentionService.ts
  * Handles data lifecycle management, cleanup policies, and compliance
  * with data protection regulations for the civic engagement platform.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 interface RetentionPolicy {
   id: string;
@@ -64,15 +64,15 @@ class DataRetentionService {
     try {
       // Load default policies
       await this.loadDefaultPolicies();
-      
+
       // Load existing records
       await this.loadExistingRecords();
-      
+
       // Schedule cleanup tasks
       this.scheduleCleanupTasks();
-      
+
       this.isInitialized = true;
-      
+
       logger.info('Data retention service initialized', {
         component: 'DataRetentionService',
         policiesCount: this.policies.size,
@@ -93,7 +93,7 @@ class DataRetentionService {
   registerDataRecord(record: Omit<DataRecord, 'id' | 'createdAt' | 'archived'>): string {
     const recordId = crypto.randomUUID();
     const now = new Date().toISOString();
-    
+
     const fullRecord: DataRecord = {
       id: recordId,
       createdAt: now,
@@ -110,7 +110,7 @@ class DataRetentionService {
     }
 
     this.records.set(recordId, fullRecord);
-    
+
     logger.debug('Data record registered', {
       component: 'DataRetentionService',
       recordId,
@@ -139,7 +139,7 @@ class DataRetentionService {
   createRetentionPolicy(policy: Omit<RetentionPolicy, 'id' | 'createdAt' | 'updatedAt'>): string {
     const policyId = crypto.randomUUID();
     const now = new Date().toISOString();
-    
+
     const fullPolicy: RetentionPolicy = {
       id: policyId,
       createdAt: now,
@@ -148,7 +148,7 @@ class DataRetentionService {
     };
 
     this.policies.set(policyId, fullPolicy);
-    
+
     logger.info('Retention policy created', {
       component: 'DataRetentionService',
       policyId,
@@ -180,10 +180,10 @@ class DataRetentionService {
     };
 
     this.policies.set(policyId, updatedPolicy);
-    
+
     // Update affected records
     this.updateRecordsForPolicy(policyId, updatedPolicy);
-    
+
     logger.info('Retention policy updated', {
       component: 'DataRetentionService',
       policyId,
@@ -261,7 +261,7 @@ class DataRetentionService {
   generateComplianceReport(): RetentionReport {
     const records = Array.from(this.records.values());
     const now = new Date();
-    
+
     const recordsByType: Record<string, number> = {};
     const recordsByPolicy: Record<string, number> = {};
     let scheduledDeletions = 0;
@@ -271,27 +271,27 @@ class DataRetentionService {
     records.forEach(record => {
       // Count by type
       recordsByType[record.type] = (recordsByType[record.type] || 0) + 1;
-      
+
       // Count by policy
       recordsByPolicy[record.retentionPolicyId] = (recordsByPolicy[record.retentionPolicyId] || 0) + 1;
-      
+
       // Count scheduled deletions
       if (record.scheduledDeletion && new Date(record.scheduledDeletion) <= now) {
         scheduledDeletions++;
       }
-      
+
       // Count archived records
       if (record.archived) {
         archivedRecords++;
       }
-      
+
       // Check for violations (records past retention without deletion)
       const policy = this.policies.get(record.retentionPolicyId);
       if (policy && record.scheduledDeletion) {
         const deletionDate = new Date(record.scheduledDeletion);
         const gracePeriod = new Date(deletionDate);
         gracePeriod.setDate(gracePeriod.getDate() + 7); // 7-day grace period
-        
+
         if (now > gracePeriod && !record.archived) {
           violationCount++;
         }
@@ -457,12 +457,12 @@ class DataRetentionService {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(2, 0, 0, 0);
-    
+
     const timeUntilCleanup = tomorrow.getTime() - now.getTime();
-    
+
     this.cleanupTimer = setTimeout(() => {
       this.performCleanup();
-      
+
       // Schedule recurring cleanup every 24 hours
       this.cleanupTimer = setInterval(() => {
         this.performCleanup();
@@ -493,7 +493,7 @@ class DataRetentionService {
     record.archived = true;
     record.metadata.archivedAt = new Date().toISOString();
     this.records.set(record.id, record);
-    
+
     logger.debug('Record archived', {
       component: 'DataRetentionService',
       recordId: record.id,
@@ -509,7 +509,7 @@ class DataRetentionService {
 
     // In a real implementation, this would delete from database
     this.records.delete(recordId);
-    
+
     logger.debug('Record deleted', {
       component: 'DataRetentionService',
       recordId,

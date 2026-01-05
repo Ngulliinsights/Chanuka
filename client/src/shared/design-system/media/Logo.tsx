@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface LogoProps {
   className?: string;
@@ -13,7 +12,7 @@ interface LogoProps {
 
 const sizeClasses = {
   sm: 'h-6 w-6',
-  md: 'h-8 w-8', 
+  md: 'h-8 w-8',
   lg: 'h-12 w-12',
   xl: 'h-16 w-16'
 };
@@ -21,13 +20,13 @@ const sizeClasses = {
 const textSizeClasses = {
   sm: 'text-sm',
   md: 'text-lg',
-  lg: 'text-xl', 
+  lg: 'text-xl',
   xl: 'text-2xl'
 };
 
-export const Logo = React.memo<LogoProps>(({ 
-  className = '', 
-  size = 'md', 
+export const Logo = React.memo<LogoProps>(({
+  className = '',
+  size = 'md',
   showText = true,
   textClassName = '',
   variant = 'default'
@@ -50,9 +49,9 @@ export const Logo = React.memo<LogoProps>(({
 
   return (
     <div className="flex items-center space-x-2">
-      <img 
-        src="/Chanuka_logo.svg" 
-        alt="Chanuka Logo" 
+      <img
+        src="/Chanuka_logo.svg"
+        alt="Chanuka Logo"
         className={logoClasses}
       />
       {showText && (

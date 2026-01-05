@@ -1,14 +1,14 @@
 /**
  * MobileChartCarousel Component
- * 
+ *
  * Carousel of charts that can be swiped through on mobile.
  * Perfect for displaying multiple related visualizations.
- * 
+ *
  * @component
  * @example
  * ```tsx
  * import { MobileChartCarousel } from '@client/shared/ui/mobile/data-display';
- * 
+ *
  * export function ChartsPage() {
  *   return (
  *     <MobileChartCarousel
@@ -22,7 +22,7 @@
 
 import React from 'react';
 
-import type { ChartData } from '@client/shared/types/mobile';
+import type { ChartData } from '@/shared/types/mobile';
 
 interface MobileChartCarouselProps {
   charts: ChartData[];
@@ -31,13 +31,13 @@ interface MobileChartCarouselProps {
 
 /**
  * MobileChartCarousel Component
- * 
+ *
  * Swipeable carousel of charts.
  */
 export const MobileChartCarousel = React.forwardRef<HTMLDivElement, MobileChartCarouselProps>(
   ({ charts, className }, ref) => {
     const [activeIndex, setActiveIndex] = React.useState(0);
-    
+
     return (
       <div ref={ref} className={`mobile-chart-carousel ${className || ''}`}>
         {/* Component implementation will be added here */}
@@ -54,7 +54,7 @@ export const MobileChartCarousel = React.forwardRef<HTMLDivElement, MobileChartC
             </div>
           ))}
         </div>
-        
+
         <div className="carousel-indicators">
           {charts.map((_, index) => (
             <button

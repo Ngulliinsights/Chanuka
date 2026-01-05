@@ -1,6 +1,6 @@
 /**
  * Enhanced UX Integration Component
- * 
+ *
  * This component integrates all the UX enhancements:
  * - Unified state management
  * - Progressive disclosure
@@ -12,9 +12,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
-import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { logger } from '@client/utils/logger';
+import { useUserProfile } from '@/features/users/hooks/useUserAPI';
+import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
+import { logger } from '@/utils/logger';
 
 interface EnhancedUXIntegrationProps {
   children: React.ReactNode;
@@ -68,7 +68,7 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
             announceToScreenReader('Skipped to main content');
           }
         }
-        
+
         // Open search (Alt + S)
         if (event.altKey && event.key === 's') {
           event.preventDefault();
@@ -78,7 +78,7 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
             announceToScreenReader('Search focused');
           }
         }
-        
+
         // Open navigation (Alt + N)
         if (event.altKey && event.key === 'n') {
           event.preventDefault();
@@ -97,7 +97,7 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
         // This would integrate with the existing web vitals monitoring
         logger.info('Performance monitoring active');
       }
-      
+
       // Monitor component render times
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -110,7 +110,7 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
           }
         }
       });
-      
+
       observer.observe({ entryTypes: ['measure'] });
     };
 
@@ -141,20 +141,20 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
     try {
       // Initialize accessibility announcements
       setupAccessibilityAnnouncements();
-      
+
       // Initialize keyboard navigation
       setupKeyboardNavigation();
-      
+
       // Initialize performance monitoring
       if (process.env.NODE_ENV === 'development') {
         setupPerformanceMonitoring();
       }
-      
+
       // Initialize error recovery
       setupErrorRecovery();
-      
+
       setIsInitialized(true);
-      
+
       logger.info('Enhanced UX integration initialized', {
         component: 'EnhancedUXIntegration',
         userId: user?.id,
@@ -189,17 +189,17 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
   // Apply accessibility preferences
   useEffect(() => {
     const accessibilityPrefs = (preferences as Record<string, unknown>).accessibility as Record<string, unknown>;
-    
+
     if (accessibilityPrefs?.reducedMotion) {
       document.documentElement.style.setProperty('--animation-duration', '0.01ms');
     }
-    
+
     if (accessibilityPrefs?.highContrast) {
       document.documentElement.classList.add('high-contrast');
     } else {
       document.documentElement.classList.remove('high-contrast');
     }
-    
+
     // Set font size
     const fontSizeMap = {
       small: '14px',
@@ -216,10 +216,10 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
   // Apply theme preferences
   useEffect(() => {
     const prefsTheme = (preferences as Record<string, unknown>).theme;
-    const theme = prefsTheme === 'system' 
+    const theme = prefsTheme === 'system'
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : prefsTheme;
-      
+
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [preferences]);
 
@@ -238,17 +238,17 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
   return (
     <>
       {children}
-      
+
       {/* Accessibility Skip Links */}
       <div className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50">
-        <a 
-          href="#main-content" 
+        <a
+          href="#main-content"
           className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
         >
           Skip to main content
         </a>
       </div>
-      
+
       {/* Keyboard Shortcuts Help */}
       <div className="sr-only">
         <p>Keyboard shortcuts: Alt+M for main content, Alt+S for search, Alt+N for navigation</p>

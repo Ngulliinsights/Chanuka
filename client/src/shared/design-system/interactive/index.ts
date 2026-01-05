@@ -3,7 +3,7 @@
  *
  * Interactive UI components for user interactions, form controls, selection,
  * navigation interaction, and state management.
- * 
+ *
  * STRATEGIC PLACEMENT:
  * - Basic Form Controls: Button, Input, Textarea, Select, Checkbox, Switch
  * - Composite Selectors: Tabs, Dialog, Popover
@@ -31,16 +31,11 @@ export { Switch, type SwitchProps } from './Switch';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
   DialogTrigger,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
-  DialogDescription,
-  EnhancedDialog
+  DialogDescription
 } from './Dialog';
 
 export {

@@ -58,9 +58,9 @@ CREATE TABLE IF NOT EXISTS "bills" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "bills_bill_number_unique" UNIQUE("bill_number"),
-	CONSTRAINT "bills_engagement_counts_check" CHECK ("bills"."view_count" >= 0 AND "bills"."comment_count" >= 0 AND 
+	CONSTRAINT "bills_engagement_counts_check" CHECK ("bills"."view_count" >= 0 AND "bills"."comment_count" >= 0 AND
         "bills"."vote_count_for" >= 0 AND "bills"."vote_count_against" >= 0),
-	CONSTRAINT "bills_date_logic_check" CHECK ("bills"."last_action_date" IS NULL OR "bills"."introduced_date" IS NULL OR 
+	CONSTRAINT "bills_date_logic_check" CHECK ("bills"."last_action_date" IS NULL OR "bills"."introduced_date" IS NULL OR
         "bills"."last_action_date" >= "bills"."introduced_date"),
 	CONSTRAINT "bills_engagement_score_check" CHECK ("bills"."engagement_score" >= 0)
 );
@@ -1596,7 +1596,7 @@ CREATE TABLE IF NOT EXISTS "user_verification" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "analytics_events" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"event_name" varchar(100) NOT NULL,
 	"event_category" varchar(50) NOT NULL,
 	"event_action" varchar(50),
@@ -1636,7 +1636,7 @@ CREATE TABLE IF NOT EXISTS "analytics_events" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "bill_impact_metrics" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"bill_id" uuid NOT NULL,
 	"metric_type" varchar(100) NOT NULL,
 	"metric_category" varchar(50) NOT NULL,
@@ -1661,7 +1661,7 @@ CREATE TABLE IF NOT EXISTS "bill_impact_metrics" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "content_performance" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"content_type" varchar(50) NOT NULL,
 	"content_id" uuid NOT NULL,
 	"measurement_date" date NOT NULL,
@@ -1689,7 +1689,7 @@ CREATE TABLE IF NOT EXISTS "content_performance" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "county_engagement_stats" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"county" "kenyan_county" NOT NULL,
 	"active_users" integer DEFAULT 0 NOT NULL,
 	"new_users" integer DEFAULT 0 NOT NULL,
@@ -1723,7 +1723,7 @@ CREATE TABLE IF NOT EXISTS "county_engagement_stats" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "data_sources" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"source_name" varchar(255) NOT NULL,
 	"source_type" varchar(100) NOT NULL,
 	"source_url" varchar(1000),
@@ -1745,7 +1745,7 @@ CREATE TABLE IF NOT EXISTS "data_sources" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "external_bill_references" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"bill_id" uuid NOT NULL,
 	"external_id" varchar(255) NOT NULL,
 	"external_source" varchar(100) NOT NULL,
@@ -1763,7 +1763,7 @@ CREATE TABLE IF NOT EXISTS "external_bill_references" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "platform_health_metrics" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"measurement_timestamp" timestamp NOT NULL,
 	"measurement_period_minutes" integer DEFAULT 5 NOT NULL,
 	"avg_response_time_ms" integer,
@@ -1797,7 +1797,7 @@ CREATE TABLE IF NOT EXISTS "platform_health_metrics" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "sync_jobs" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"data_source_id" uuid NOT NULL,
 	"job_name" varchar(255) NOT NULL,
 	"job_type" varchar(100) NOT NULL,
@@ -1829,7 +1829,7 @@ CREATE TABLE IF NOT EXISTS "sync_jobs" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "trending_analysis" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"analysis_date" date NOT NULL,
 	"time_window_hours" integer NOT NULL,
 	"analysis_start" timestamp NOT NULL,
@@ -1856,7 +1856,7 @@ CREATE TABLE IF NOT EXISTS "trending_analysis" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_engagement_summary" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"measurement_date" date NOT NULL,
 	"time_period" varchar(20) DEFAULT 'monthly' NOT NULL,

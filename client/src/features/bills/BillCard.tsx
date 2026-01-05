@@ -8,6 +8,7 @@ import {
   Bookmark,
   BookmarkCheck,
   AlertCircle,
+  Check,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -15,7 +16,8 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { cn } from '@client/lib/utils';
+import { Checkbox } from '@client/shared/design-system';
+import { cn } from '@client/shared/design-system/utils/cn';
 import type { Bill } from '@client/shared/types';
 
 interface BillCardProps {
@@ -23,8 +25,12 @@ interface BillCardProps {
   onSave?: (billId: string) => void;
   onShare?: (billId: string) => void;
   onComment?: (billId: string) => void;
+  onClick?: (billId: string) => void;
+  onSelect?: (billId: string) => void;
   isSaved?: boolean;
+  isSelected?: boolean;
   showQuickActions?: boolean;
+  showCheckbox?: boolean;
   viewMode?: 'grid' | 'list';
 }
 
@@ -67,8 +73,12 @@ export function BillCard({
   onSave,
   onShare,
   onComment,
+  onClick,
+  onSelect,
   isSaved = false,
+  isSelected = false,
   showQuickActions = true,
+  showCheckbox = false,
   viewMode = 'grid',
 }: BillCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -87,6 +97,27 @@ export function BillCard({
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       action();
+    }
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger card click if clicking on interactive elements
+    if (
+      (e.target as HTMLElement).closest('button') ||
+      (e.target as HTMLElement).closest('a') ||
+      (e.target as HTMLElement).closest('input')
+    ) {
+      return;
+    }
+
+    if (onClick) {
+      onClick(bill.id);
+    }
+  };
+
+  const handleSelectChange = (checked: boolean) => {
+    if (onSelect) {
+      onSelect(bill.id);
     }
   };
 
@@ -110,11 +141,25 @@ export function BillCard({
       className={cn(
         'chanuka-card group relative transition-all duration-200 hover:shadow-lg hover:shadow-primary/10',
         'border border-border hover:border-primary/20',
+        isSelected && 'ring-2 ring-primary border-primary',
+        onClick && 'cursor-pointer',
         viewMode === 'list' && 'flex flex-row'
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleCardClick}
     >
+      {/* Selection Checkbox */}
+      {showCheckbox && (
+        <div className="absolute top-3 left-3 z-10">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={handleSelectChange}
+            aria-label={`Select ${bill.title}`}
+            className="bg-white shadow-sm"
+          />
+        </div>
+      )}
       {/* Quick Actions Overlay */}
       {showQuickActions && (
         <div
@@ -169,7 +214,11 @@ export function BillCard({
       )}
 
       <CardHeader className="pb-3">
-        <div className={cn('flex items-start justify-between gap-2', showQuickActions && 'pr-20')}>
+        <div className={cn(
+          'flex items-start justify-between gap-2',
+          showQuickActions && 'pr-20',
+          showCheckbox && 'pl-10'
+        )}>
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-mono">{bill.id}</span>
@@ -185,13 +234,19 @@ export function BillCard({
             </div>
 
             <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
-              <Link
-                to={`/bills/${bill.id}`}
-                className="hover:underline focus:underline focus:outline-none"
-                tabIndex={0}
-              >
-                {bill.title}
-              </Link>
+              {onClick ? (
+                <span className="hover:underline focus:underline focus:outline-none cursor-pointer">
+                  {bill.title}
+                </span>
+              ) : (
+                <Link
+                  to={`/bills/${bill.id}`}
+                  className="hover:underline focus:underline focus:outline-none"
+                  tabIndex={0}
+                >
+                  {bill.title}
+                </Link>
+              )}
             </CardTitle>
           </div>
 
@@ -259,6 +314,12 @@ export function BillCard({
             to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors text-sm"
             tabIndex={0}
+            onClick={(e) => {
+              if (onClick) {
+                e.preventDefault();
+                onClick(bill.id);
+              }
+            }}
           >
             <TrendingUp className="h-4 w-4" />
             View Details

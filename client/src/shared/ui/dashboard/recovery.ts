@@ -3,7 +3,7 @@
  * Following navigation component recovery patterns
  */
 
-import type { DashboardData, DashboardConfig } from '@client/shared/types/dashboard';
+import type { DashboardData, DashboardConfig } from '@/shared/types/dashboard';
 
 import { DashboardError, DashboardErrorType } from './errors';
 
@@ -31,19 +31,19 @@ export function getRecoveryStrategy(context: RecoveryContext): RecoveryStrategy 
   switch (error.type) {
     case DashboardErrorType.DASHBOARD_DATA_FETCH_ERROR:
       return getDataFetchRecoveryStrategy(context);
-    
+
     case DashboardErrorType.DASHBOARD_VALIDATION_ERROR:
       return getValidationRecoveryStrategy(context);
-    
+
     case DashboardErrorType.DASHBOARD_CONFIGURATION_ERROR:
       return getConfigurationRecoveryStrategy(context);
-    
+
     case DashboardErrorType.DASHBOARD_ACTION_ERROR:
       return getActionRecoveryStrategy(context);
-    
+
     case DashboardErrorType.DASHBOARD_TOPIC_ERROR:
       return getTopicRecoveryStrategy(context);
-    
+
     default:
       return getGenericRecoveryStrategy(context);
   }
@@ -51,7 +51,7 @@ export function getRecoveryStrategy(context: RecoveryContext): RecoveryStrategy 
 
 function getDataFetchRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
   const { retryCount = 0, lastSuccessfulFetch } = context;
-  
+
   if (retryCount < 3) {
     return {
       canRecover: true,
@@ -69,12 +69,12 @@ function getDataFetchRecoveryStrategy(context: RecoveryContext): RecoveryStrateg
     };
   }
 
-  const hasRecentData = Boolean(lastSuccessfulFetch && 
+  const hasRecentData = Boolean(lastSuccessfulFetch &&
     (Date.now() - lastSuccessfulFetch.getTime()) < 300000); // 5 minutes
 
   return {
     canRecover: hasRecentData,
-    suggestions: hasRecentData 
+    suggestions: hasRecentData
       ? [
           'Using cached data from recent fetch',
           'Try refreshing the page',

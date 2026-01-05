@@ -1,17 +1,17 @@
 import { Bell, Mail, MessageSquare, Smartphone, Filter, Settings, TestTube, Save, CheckCircle, X, RefreshCw, AlertCircle } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { useToast } from '@client/hooks/use-toast';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Switch } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
+import { Input } from '@/shared/design-system';
+import { Label } from '@/shared/design-system';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/design-system';
+import { Separator } from '@/shared/design-system';
+import { Switch } from '@/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 
 // --- TYPES ---
 
@@ -123,7 +123,7 @@ export default function NotificationPreferences() {
   const [testingEmail, setTestingEmail] = useState(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
   const [activeTab, setActiveTab] = useState('channels');
-  
+
   // Input states
   const [newInterest, setNewInterest] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
@@ -138,7 +138,7 @@ export default function NotificationPreferences() {
     return JSON.stringify(preferences) !== JSON.stringify(originalPreferences);
   }, [preferences, originalPreferences]);
 
-  const pushSupported = useMemo(() => 
+  const pushSupported = useMemo(() =>
     'Notification' in window && 'serviceWorker' in navigator,
     []
   );
@@ -151,12 +151,12 @@ export default function NotificationPreferences() {
       const response = await fetch('/api/notifications/preferences', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch preferences');
-      
+
       const data = await response.json();
       const preferences = data.data;
-      
+
       setPreferences(preferences);
       setOriginalPreferences(JSON.parse(JSON.stringify(preferences)));
     } catch (error) {
@@ -172,7 +172,7 @@ export default function NotificationPreferences() {
 
   const savePreferences = useCallback(async () => {
     if (!preferences) return;
-    
+
     setSaving(true);
     try {
       const response = await fetch('/api/notifications/preferences', {
@@ -183,11 +183,11 @@ export default function NotificationPreferences() {
         },
         body: JSON.stringify(preferences)
       });
-      
+
       if (!response.ok) throw new Error('Failed to save preferences');
-      
+
       setOriginalPreferences(JSON.parse(JSON.stringify(preferences)));
-      
+
       toast({
         title: 'Settings Saved',
         description: 'Your notification preferences have been updated successfully.'
@@ -209,9 +209,9 @@ export default function NotificationPreferences() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       if (!response.ok) throw new Error('Failed to send test');
-      
+
       toast({
         title: 'Test Notification Sent',
         description: 'Check your enabled notification channels.'
@@ -232,9 +232,9 @@ export default function NotificationPreferences() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       if (!response.ok) throw new Error('Failed to send test email');
-      
+
       toast({
         title: 'Test Email Sent',
         description: 'Check your inbox for the test email.'
@@ -304,12 +304,12 @@ export default function NotificationPreferences() {
     resetFn: React.Dispatch<React.SetStateAction<string>>
   ) => {
     if (!preferences || !value.trim()) return;
-    
+
     const normalizedValue = value.trim().toLowerCase();
-    const currentArray = field === 'interests' 
-      ? preferences.interests 
+    const currentArray = field === 'interests'
+      ? preferences.interests
       : preferences.smartFiltering[field];
-    
+
     if (currentArray.includes(normalizedValue)) {
       toast({
         title: 'Already Added',
@@ -318,13 +318,13 @@ export default function NotificationPreferences() {
       });
       return;
     }
-    
+
     if (field === 'interests') {
       updatePreference({ interests: [...preferences.interests, normalizedValue] });
     } else {
       updateSmartFiltering(field, [...currentArray, normalizedValue]);
     }
-    
+
     resetFn('');
   }, [preferences, toast, updatePreference, updateSmartFiltering]);
 
@@ -333,7 +333,7 @@ export default function NotificationPreferences() {
     value: string
   ) => {
     if (!preferences) return;
-    
+
     if (field === 'interests') {
       updatePreference({ interests: preferences.interests.filter(i => i !== value) });
     } else {
@@ -346,11 +346,11 @@ export default function NotificationPreferences() {
 
   const requestPushPermission = useCallback(async () => {
     if (!pushSupported) return false;
-    
+
     try {
       const permission = await Notification.requestPermission();
       setPushPermission(permission);
-      
+
       if (permission === 'granted') {
         toast({
           title: 'Permission Granted',
@@ -435,15 +435,15 @@ export default function NotificationPreferences() {
           <h1 className="text-3xl font-bold text-gray-900">Notification Preferences</h1>
           <p className="text-gray-600 mt-1">Customize how and when you receive notifications</p>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2">
           {hasChanges && (
             <Badge variant="outline" className="border-orange-300 text-orange-700 bg-orange-50">
               Unsaved changes
             </Badge>
           )}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             onClick={sendTestNotification}
             className="flex items-center gap-2"
@@ -451,18 +451,18 @@ export default function NotificationPreferences() {
             <TestTube className="h-4 w-4" />
             Test
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={resetPreferences} 
+            onClick={resetPreferences}
             disabled={!hasChanges}
             className="flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             Reset
           </Button>
-          <Button 
-            onClick={savePreferences} 
+          <Button
+            onClick={savePreferences}
             disabled={saving || !hasChanges}
             className="flex items-center gap-2"
           >
@@ -509,7 +509,7 @@ export default function NotificationPreferences() {
                   const Icon = config.icon;
                   const isPush = channelKey === 'push';
                   const showPermissionWarning = isPush && channel.enabled && pushPermission !== 'granted';
-                  
+
                   return (
                     <div key={channelKey} className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -520,8 +520,8 @@ export default function NotificationPreferences() {
                           <div>
                             <Label className="text-base font-medium">{config.label}</Label>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className={`text-xs ${channel.enabled ? 'border-green-300 text-green-700 bg-green-50' : 'border-gray-300 text-gray-600'}`}
                               >
                                 {channel.enabled ? 'Active' : 'Disabled'}
@@ -536,7 +536,7 @@ export default function NotificationPreferences() {
                         </div>
                         <Switch
                           checked={channel.enabled}
-                          onCheckedChange={(enabled: boolean) => 
+                          onCheckedChange={(enabled: boolean) =>
                             isPush ? handlePushToggle(enabled) : updateChannel(channelKey, 'enabled', enabled)
                           }
                         />
@@ -611,11 +611,11 @@ export default function NotificationPreferences() {
                               </div>
                             )}
                           </div>
-                          
+
                           {config.testable && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={sendTestEmail}
                               disabled={testingEmail}
                               className="w-full sm:w-auto"
@@ -635,7 +635,7 @@ export default function NotificationPreferences() {
                           )}
                         </div>
                       )}
-                      
+
                       {channelKey !== 'push' && <Separator />}
                     </div>
                   );
@@ -686,7 +686,7 @@ export default function NotificationPreferences() {
             <CardHeader>
               <CardTitle>Your Interests</CardTitle>
               <CardDescription>
-                Add topics you care about to personalize your notification experience. 
+                Add topics you care about to personalize your notification experience.
                 Enable &ldquo;Interest-Based Filtering&rdquo; in Advanced settings to only receive relevant notifications.
               </CardDescription>
             </CardHeader>
@@ -701,8 +701,8 @@ export default function NotificationPreferences() {
                   }
                   className="flex-1"
                 />
-                <Button 
-                  onClick={() => addTag('interests', newInterest, setNewInterest)} 
+                <Button
+                  onClick={() => addTag('interests', newInterest, setNewInterest)}
                   size="sm"
                   disabled={!newInterest.trim()}
                 >
@@ -713,8 +713,8 @@ export default function NotificationPreferences() {
               {preferences.interests.length > 0 ? (
                 <div className="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
                   {preferences.interests.map((interest) => (
-                    <TagBadge 
-                      key={interest} 
+                    <TagBadge
+                      key={interest}
                       label={interest}
                       onRemove={() => removeTag('interests', interest)}
                     />
@@ -819,7 +819,7 @@ export default function NotificationPreferences() {
                       onCheckedChange={(checked: boolean) => updateSmartFiltering('interestBasedFiltering', checked)}
                     />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label className="text-base font-medium">Filter Priority Threshold</Label>
                     <p className="text-sm text-gray-600">
@@ -827,7 +827,7 @@ export default function NotificationPreferences() {
                     </p>
                     <Select
                       value={preferences.smartFiltering.priorityThreshold}
-                      onValueChange={(value: 'low' | 'medium' | 'high') => 
+                      onValueChange={(value: 'low' | 'medium' | 'high') =>
                         updateSmartFiltering('priorityThreshold', value)
                       }
                     >
@@ -899,8 +899,8 @@ interface TagBadgeProps {
 
 function TagBadge({ label, onRemove }: TagBadgeProps) {
   return (
-    <Badge 
-      variant="secondary" 
+    <Badge
+      variant="secondary"
       className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 text-sm hover:bg-gray-200 transition-colors"
     >
       {label}
@@ -927,15 +927,15 @@ interface FilterSectionProps {
   onRemove: (item: string) => void;
 }
 
-function FilterSection({ 
-  title, 
-  description, 
-  placeholder, 
-  items, 
-  value, 
-  onChange, 
-  onAdd, 
-  onRemove 
+function FilterSection({
+  title,
+  description,
+  placeholder,
+  items,
+  value,
+  onChange,
+  onAdd,
+  onRemove
 }: FilterSectionProps) {
   return (
     <div className="space-y-3">
@@ -943,7 +943,7 @@ function FilterSection({
         <Label className="text-base font-medium">{title}</Label>
         <p className="text-sm text-gray-600 mt-1">{description}</p>
       </div>
-      
+
       <div className="flex gap-2">
         <Input
           placeholder={placeholder}

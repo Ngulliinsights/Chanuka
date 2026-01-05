@@ -1,6 +1,6 @@
 /**
  * Integration Test Component
- * 
+ *
  * This component tests all the enhanced UX features working together
  * and provides a comprehensive validation of the implementation
  */
@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Loader2,
   Smartphone,
-  Monitor,
+  Eye as Monitor, // Using Eye as Monitor replacement
   Users,
   Zap,
   Earth,
@@ -78,7 +78,7 @@ export function IntegrationTest() {
             emotionalTone: 'empowering',
             contentComplexity: 'simple'
           });
-          
+
           if (copy.headline && copy.description && copy.cta) {
             return {
               success: true,
@@ -109,18 +109,18 @@ export function IntegrationTest() {
             height: window.innerHeight,
             isMobile: isMobile
           };
-          
+
           // Test touch targets (should be at least 44px)
           const buttons = document.querySelectorAll('button');
           let smallButtons = 0;
-          
+
           buttons.forEach(button => {
             const rect = button.getBoundingClientRect();
             if (rect.width < 44 || rect.height < 44) {
               smallButtons++;
             }
           });
-          
+
           if (smallButtons === 0) {
             return {
               success: true,
@@ -149,13 +149,13 @@ export function IntegrationTest() {
         try {
           // Test accessibility announcements element
           const announcements = document.getElementById('accessibility-announcements');
-          
+
           // Test skip links
           const skipLinks = document.querySelectorAll('a[href="#main-content"]');
-          
+
           // Test ARIA labels
           const ariaElements = document.querySelectorAll('[aria-label], [aria-labelledby], [role]');
-          
+
           if (announcements && skipLinks.length > 0 && ariaElements.length > 0) {
             return {
               success: true,
@@ -185,7 +185,7 @@ export function IntegrationTest() {
           // Test preferences structure
           const requiredPreferences = ['theme', 'language', 'notifications', 'dashboard', 'accessibility'];
           const missingPreferences = requiredPreferences.filter(pref => !(pref in preferences));
-          
+
           if (missingPreferences.length === 0) {
             return {
               success: true,
@@ -213,7 +213,7 @@ export function IntegrationTest() {
         try {
           // Test offline state detection
           const offlineCapable = 'serviceWorker' in navigator && 'caches' in window;
-          
+
           // TODO: Test pending actions queue with React Query
           const pendingActions = []; // Mock for now
 
@@ -242,14 +242,14 @@ export function IntegrationTest() {
 
     for (let i = 0; i < tests.length; i++) {
       const test = tests[i];
-      
+
       // Add pending result
       const pendingResult: TestResult = {
         name: test.name,
         status: 'pending',
         message: 'Running test...'
       };
-      
+
       results.push(pendingResult);
       setTestResults([...results]);
       setProgress(((i + 0.5) / tests.length) * 100);
@@ -257,7 +257,7 @@ export function IntegrationTest() {
       try {
         // Run the test
         const result = await test.test();
-        
+
         // Update result
         results[i] = {
           name: test.name,
@@ -265,13 +265,13 @@ export function IntegrationTest() {
           message: result.message,
           details: result.details
         };
-        
+
         setTestResults([...results]);
         setProgress(((i + 1) / tests.length) * 100);
-        
+
         // Small delay for visual feedback
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
       } catch (error) {
         results[i] = {
           name: test.name,
@@ -284,7 +284,7 @@ export function IntegrationTest() {
     }
 
     setIsRunning(false);
-    
+
     // Log test results
     const successCount = results.filter(r => r.status === 'success').length;
     logger.info('Integration tests completed', {
@@ -350,9 +350,9 @@ export function IntegrationTest() {
                 A11y Ready
               </Badge>
             </div>
-            
-            <Button 
-              onClick={runTests} 
+
+            <Button
+              onClick={runTests}
               disabled={isRunning}
               className="flex items-center gap-2"
             >

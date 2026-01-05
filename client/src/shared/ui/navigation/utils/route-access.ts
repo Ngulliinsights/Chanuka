@@ -1,6 +1,6 @@
-import { InvalidNavigationPathError } from '@client/core/error';
-import type { NavigationItem, UserRole } from '@client/shared/types';
-import { validateNavigationPath, validateUserRole } from '@client/validation';
+import { InvalidNavigationPathError } from '@/core/error';
+import type { NavigationItem, UserRole } from '@/shared/types';
+import { validateNavigationPath, validateUserRole } from '@/validation';
 
 
 import { findNavigationItemByPath } from './navigation-utils';
@@ -8,10 +8,10 @@ import { findNavigationItemByPath } from './navigation-utils';
 /**
  * Reason why access to a route was denied
  */
-export type AccessDenialReason = 
-  | 'unauthenticated' 
-  | 'admin_required' 
-  | 'insufficient_role' 
+export type AccessDenialReason =
+  | 'unauthenticated'
+  | 'admin_required'
+  | 'insufficient_role'
   | 'custom_condition';
 
 /**

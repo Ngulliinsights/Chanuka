@@ -1,27 +1,27 @@
 /**
  * Real-time Dashboard Component
- * 
+ *
  * Displays live bill updates, community engagement metrics, and notifications
  * using the integrated WebSocket client with polling fallback.
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Bell, 
-  Activity, 
-  Users, 
-  MessageSquare, 
+import {
+  Bell,
+  Activity,
+  Users,
+  MessageSquare,
   TrendingUp,
   AlertCircle,
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
 
-// import { useWebSocket } from '@client/hooks/use-websocket';
-import { cn } from '@client/lib/utils';
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card.tsx';
+// import { useWebSocket } from '@/hooks/use-websocket';
+import { cn } from '@/shared/design-system/utils/cn';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 
 interface RealTimeDashboardProps {
   className?: string;
@@ -91,7 +91,7 @@ export function RealTimeDashboard({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
@@ -235,7 +235,7 @@ export function RealTimeDashboard({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">
-                        {'bill_id' in activity 
+                        {'bill_id' in activity
                           ? `Bill ${activity.bill_id} updated`
                           : 'Community discussion'
                         }

@@ -1,5 +1,4 @@
 import { Suspense, useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
 
 // Architecture Imports
 import { AppProviders } from '@client/app/providers/AppProviders';
@@ -17,17 +16,15 @@ function App() {
 
   return (
     <AppProviders>
-      <BrowserRouter>
-        <ErrorBoundary>
-          {/* AppShell handles Layout, Nav, and Offline states */}
-          <AppShell enableNavigation={true} enableThemeProvider={true}>
-            <Suspense fallback={<LoadingStates.PageLoading />}>
-              <AppRouter />
-            </Suspense>
-          </AppShell>
-          <Toaster />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary>
+        {/* AppShell handles Layout, Nav, Router, and Offline states */}
+        <AppShell enableNavigation={true} enableThemeProvider={true}>
+          <Suspense fallback={<LoadingStates.PageLoading />}>
+            <AppRouter />
+          </Suspense>
+        </AppShell>
+        <Toaster />
+      </ErrorBoundary>
     </AppProviders>
   );
 }

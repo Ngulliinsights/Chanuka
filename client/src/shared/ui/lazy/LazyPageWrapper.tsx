@@ -1,6 +1,6 @@
 import { Suspense, ReactElement } from 'react';
 
-import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
+import { LoadingStates } from '@/shared/ui/loading/LoadingStates';
 
 interface LazyPageWrapperProps {
   children: React.ComponentType;
@@ -10,7 +10,7 @@ interface LazyPageWrapperProps {
 /**
  * Wrapper component that properly handles lazy-loaded React components
  * by wrapping them in a Suspense boundary with a fallback UI.
- * 
+ *
  * This solves the TypeScript error where LazyExoticComponent cannot be
  * directly assigned to ReactNode in React Router's Route element prop.
  */

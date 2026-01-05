@@ -15,19 +15,19 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
-import { Checkbox } from '@client/shared/design-system/interactive/Checkbox.tsx';
-import { Input } from '@client/shared/design-system/interactive/Input.tsx';
-import { Switch } from '@client/shared/design-system/interactive/Switch.tsx';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
+import { Input } from '@/shared/design-system/interactive/Input';
+import { Switch } from '@/shared/design-system/interactive/Switch';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/typography/Card.tsx';
-import { Label } from '@client/shared/design-system/typography/Label.tsx';
-import { DashboardPreferences } from '@client/shared/types/user-dashboard';
+} from '@/shared/design-system/typography/Card';
+import { Label } from '@/shared/design-system/typography/Label';
+import { DashboardPreferences } from '@/shared/types/user-dashboard';
 
 interface DashboardPreferencesModalProps {
   open: boolean;

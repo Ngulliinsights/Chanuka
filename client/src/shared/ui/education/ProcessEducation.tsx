@@ -9,15 +9,15 @@ import {
   Scale,
 } from 'lucide-react';
 
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Progress } from '@/shared/design-system/feedback/Progress';
+import { Button } from '@/shared/design-system/interactive/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/typography/Card.tsx';
+} from '@/shared/design-system/typography/Card';
 
 interface LegislativeStep {
   id: string;

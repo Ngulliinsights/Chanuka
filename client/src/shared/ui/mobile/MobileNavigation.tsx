@@ -10,14 +10,14 @@ import { BarChart3, Search, User, Settings, ArrowLeft, Bell } from 'lucide-react
 import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import type { NavigationItem } from '@client/config';
-import { useAuth } from '@client/hooks';
-import { useMobileNavigation } from '@client/hooks/mobile/useMobileNavigation';
-import { cn } from '@client/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@client/shared/design-system';
+import type { NavigationItem } from '@/config';
+import { useAuth } from '@/hooks';
+import { useMobileNavigation } from '@/hooks/mobile/useMobileNavigation';
+import { cn } from '@/shared/design-system/utils/cn';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
+import { Badge } from '@/shared/design-system';
+import { Button } from '@/shared/design-system';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/design-system';
 
 // Navigation modes
 export type NavigationMode = 'drawer' | 'bottom' | 'both';

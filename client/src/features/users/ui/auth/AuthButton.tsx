@@ -6,8 +6,8 @@
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@client/shared/design-system/interactive/Button';
+import { cn } from '@/shared/design-system/utils/cn';
+import { Button } from '@/shared/design-system/interactive/Button';
 
 export interface AuthButtonProps {
   type?: 'button' | 'submit' | 'reset';

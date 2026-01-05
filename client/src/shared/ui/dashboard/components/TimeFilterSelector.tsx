@@ -1,19 +1,19 @@
 /**
  * Time Filter Selector Component
- * 
+ *
  * Allows users to filter dashboard data by time periods.
  */
 
 import { Clock } from 'lucide-react';
 
-import { TemporalFilter } from '@client/shared/types/user-dashboard';
-import { 
+import { TemporalFilter } from '@/shared/types/user-dashboard';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system/interactive/Select.tsx';
+} from '@/shared/design-system/interactive/Select';
 
 interface TimeFilterSelectorProps {
   value: TemporalFilter;
@@ -21,12 +21,12 @@ interface TimeFilterSelectorProps {
   className?: string;
 }
 
-export function TimeFilterSelector({ 
-  value, 
-  onChange, 
-  className = '' 
+export function TimeFilterSelector({
+  value,
+  onChange,
+  className = ''
 }: TimeFilterSelectorProps) {
-  
+
   const timeOptions = [
     { value: 'day', label: 'Last 24 Hours' },
     { value: 'week', label: 'Last Week' },

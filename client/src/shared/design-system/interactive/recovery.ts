@@ -11,12 +11,12 @@ export interface RecoveryResult {
 }
 
 export async function attemptUIRecovery(
-  componentName: string,
+  _componentName: string,
   error: UIDialogError,
   retryCount: number
 ): Promise<RecoveryResult> {
   console.warn('Attempting UI recovery for dialog error:', error);
-  
+
   // Simple recovery logic
   if (retryCount < 3) {
     return {
@@ -25,7 +25,7 @@ export async function attemptUIRecovery(
       message: 'Retrying operation'
     };
   }
-  
+
   return {
     success: false,
     shouldRetry: false,
@@ -33,7 +33,7 @@ export async function attemptUIRecovery(
   };
 }
 
-export function getUIRecoverySuggestions(error: UIDialogError): string[] {
+export function getUIRecoverySuggestions(_error: UIDialogError): string[] {
   return [
     'Check dialog is properly mounted in DOM',
     'Verify dialog trigger element is accessible',

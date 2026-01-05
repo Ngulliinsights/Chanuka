@@ -1,12 +1,12 @@
 /**
  * INTEGRATION VALIDATOR & COHESION CHECKER
- * 
+ *
  * The 4 Personas Framework:
  * 1. ARCHITECT: System design, patterns, structure
  * 2. AUDITOR: Naming, standards, compliance
  * 3. INTEGRATOR: Cross-module cohesion (THIS FILE)
  * 4. OPTIMIZER: Performance, quality, refinement
- * 
+ *
  * This validator ensures:
  * - Proper module boundaries
  * - Dependency flow correctness (features -> core -> shared)
@@ -212,7 +212,7 @@ export class IntegrationValidator {
 
   private consolidateRecommendations(checks: Record<string, ValidationCheck>): string[] {
     const allSuggestions = new Set<string>();
-    
+
     Object.values(checks).forEach(check => {
       check.suggestions.forEach(suggestion => allSuggestions.add(suggestion));
     });
@@ -266,7 +266,7 @@ export class IntegrationValidator {
     Object.entries(this.results.checks).forEach(([key, check]) => {
       const name = checkNames[key as keyof typeof checkNames];
       lines.push(`  ${name}: ${check.passed ? '✓ PASS' : '✗ FAIL'}`);
-      
+
       if (check.issues.length > 0) {
         check.issues.forEach(issue => {
           lines.push(`    - [${issue.severity.toUpperCase()}] ${issue.message}`);

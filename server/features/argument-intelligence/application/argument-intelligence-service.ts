@@ -4,17 +4,16 @@ import {
   type Argument,
   argument_relationships,
   type ArgumentRelationship,
-  argumentTable as arguments,
+  argumentTable,
   type Claim,
   claims,
   type Evidence,
   evidence,
   legislative_briefs,
   type LegislativeBrief,
-  synthesis_jobs,
-  type SynthesisJob
+  synthesis_jobs
 } from '@shared/schema';
-import { and, asc, count, desc, eq, inArray, isNotNull,like, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -78,8 +77,7 @@ export interface StoredBrief {
 
 /**
  * ArgumentIntelligenceService - Consolidated service for argument intelligence operations
- * 
- * This service replaces the repository pattern with direct Drizzle ORM usage,
+ * * This service replaces the repository pattern with direct Drizzle ORM usage,
  * providing comprehensive argument processing, clustering, evidence validation,
  * and brief generation capabilities.
  */
@@ -95,6 +93,7 @@ export class ArgumentIntelligenceService {
   /**
    * Store a processed argument in the database
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async storeArgument(argumentData: any): Promise<Argument> {
     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };
     logger.debug('Storing processed argument', logContext);
@@ -102,7 +101,7 @@ export class ArgumentIntelligenceService {
     try {
       const now = new Date();
       const [newArgument] = await this.database
-        .insert(arguments)
+        .insert(argumentTable)
         .values({
           ...argumentData,
           created_at: now,
@@ -110,9 +109,9 @@ export class ArgumentIntelligenceService {
         })
         .returning();
 
-      logger.info('✅ Argument stored successfully', { 
-        ...logContext, 
-        argument_id: newArgument.id 
+      logger.info('✅ Argument stored successfully', {
+        ...logContext,
+        argument_id: newArgument.id
       });
 
       return newArgument;
@@ -126,19 +125,19 @@ export class ArgumentIntelligenceService {
    * Get arguments for a specific bill
    */
   async getArgumentsForBill(bill_id: string): Promise<Argument[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getArgumentsForBill', 
-      bill_id 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getArgumentsForBill',
+      bill_id
     };
     logger.debug('Fetching arguments for bill', logContext);
 
     try {
       const results = await this.database
         .select()
-        .from(arguments)
-        .where(eq(arguments.bill_id, bill_id))
-        .orderBy(desc(arguments.created_at));
+        .from(argumentTable)
+        .where(eq(argumentTable.bill_id, bill_id))
+        .orderBy(desc(argumentTable.created_at));
 
       logger.debug('✅ Arguments retrieved', { ...logContext, count: results.length });
       return results;
@@ -152,11 +151,11 @@ export class ArgumentIntelligenceService {
    * Search arguments by text content
    */
   async searchArguments(searchText: string, limit: number = 50): Promise<Argument[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'searchArguments', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'searchArguments',
       searchText,
-      limit 
+      limit
     };
     logger.debug('Searching arguments', logContext);
 
@@ -164,15 +163,15 @@ export class ArgumentIntelligenceService {
       const searchPattern = `%${searchText}%`;
       const results = await this.database
         .select()
-        .from(arguments)
+        .from(argumentTable)
         .where(
           or(
-            like(arguments.content, searchPattern),
-            like(arguments.summary, searchPattern)
+            like(argumentTable.content, searchPattern),
+            like(argumentTable.summary, searchPattern)
           )
         )
         .limit(limit)
-        .orderBy(desc(arguments.created_at));
+        .orderBy(desc(argumentTable.created_at));
 
       logger.debug('✅ Argument search completed', { ...logContext, count: results.length });
       return results;
@@ -189,11 +188,12 @@ export class ArgumentIntelligenceService {
   /**
    * Store extracted claims
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async storeClaims(claimsData: any[]): Promise<Claim[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'storeClaims',
-      count: claimsData.length 
+      count: claimsData.length
     };
     logger.debug('Storing extracted claims', logContext);
 
@@ -210,9 +210,9 @@ export class ArgumentIntelligenceService {
         .values(claimsWithTimestamps)
         .returning();
 
-      logger.info('✅ Claims stored successfully', { 
-        ...logContext, 
-        stored_count: newClaims.length 
+      logger.info('✅ Claims stored successfully', {
+        ...logContext,
+        stored_count: newClaims.length
       });
 
       return newClaims;
@@ -226,10 +226,10 @@ export class ArgumentIntelligenceService {
    * Get claims for a specific argument
    */
   async getClaimsForArgument(argumentId: string): Promise<Claim[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getClaimsForArgument', 
-      argumentId 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getClaimsForArgument',
+      argumentId
     };
     logger.debug('Fetching claims for argument', logContext);
 
@@ -255,11 +255,12 @@ export class ArgumentIntelligenceService {
   /**
    * Store evidence records
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async storeEvidence(evidenceData: any[]): Promise<Evidence[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'storeEvidence',
-      count: evidenceData.length 
+      count: evidenceData.length
     };
     logger.debug('Storing evidence records', logContext);
 
@@ -276,9 +277,9 @@ export class ArgumentIntelligenceService {
         .values(evidenceWithTimestamps)
         .returning();
 
-      logger.info('✅ Evidence stored successfully', { 
-        ...logContext, 
-        stored_count: newEvidence.length 
+      logger.info('✅ Evidence stored successfully', {
+        ...logContext,
+        stored_count: newEvidence.length
       });
 
       return newEvidence;
@@ -292,10 +293,10 @@ export class ArgumentIntelligenceService {
    * Get evidence for a specific claim
    */
   async getEvidenceForClaim(claimId: string): Promise<Evidence[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getEvidenceForClaim', 
-      claimId 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getEvidenceForClaim',
+      claimId
     };
     logger.debug('Fetching evidence for claim', logContext);
 
@@ -321,11 +322,12 @@ export class ArgumentIntelligenceService {
   /**
    * Store a generated legislative brief
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async storeBrief(briefData: any): Promise<LegislativeBrief> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'storeBrief',
-      briefType: briefData.brief_type 
+      briefType: briefData.brief_type
     };
     logger.debug('Storing legislative brief', logContext);
 
@@ -340,9 +342,9 @@ export class ArgumentIntelligenceService {
         })
         .returning();
 
-      logger.info('✅ Legislative brief stored successfully', { 
-        ...logContext, 
-        brief_id: newBrief.id 
+      logger.info('✅ Legislative brief stored successfully', {
+        ...logContext,
+        brief_id: newBrief.id
       });
 
       return newBrief;
@@ -356,10 +358,10 @@ export class ArgumentIntelligenceService {
    * Get briefs for a specific bill
    */
   async getBriefsForBill(bill_id: string): Promise<LegislativeBrief[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getBriefsForBill', 
-      bill_id 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getBriefsForBill',
+      bill_id
     };
     logger.debug('Fetching briefs for bill', logContext);
 
@@ -382,10 +384,10 @@ export class ArgumentIntelligenceService {
    * Get a specific brief by ID
    */
   async getBriefById(briefId: string): Promise<LegislativeBrief | null> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getBriefById', 
-      briefId 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getBriefById',
+      briefId
     };
     logger.debug('Fetching brief by ID', logContext);
 
@@ -415,10 +417,10 @@ export class ArgumentIntelligenceService {
    * Store bill argument synthesis
    */
   async storeBillSynthesis(synthesis: BillArgumentSynthesis): Promise<void> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'storeBillSynthesis',
-      bill_id: synthesis.bill_id 
+      bill_id: synthesis.bill_id
     };
     logger.debug('Storing bill synthesis', logContext);
 
@@ -455,10 +457,10 @@ export class ArgumentIntelligenceService {
    * Get bill argument synthesis
    */
   async getBillSynthesis(bill_id: string): Promise<BillArgumentSynthesis | null> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'getBillSynthesis',
-      bill_id 
+      bill_id
     };
     logger.debug('Fetching bill synthesis', logContext);
 
@@ -482,7 +484,7 @@ export class ArgumentIntelligenceService {
       }
 
       const inputData = this.parseJson(synthesis.input_data, {});
-      
+
       return {
         bill_id: synthesis.bill_id,
         majorClaims: inputData.majorClaims || [],
@@ -506,11 +508,12 @@ export class ArgumentIntelligenceService {
   /**
    * Store argument relationships (clustering, similarity, etc.)
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async storeArgumentRelationships(relationships: any[]): Promise<ArgumentRelationship[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'storeArgumentRelationships',
-      count: relationships.length 
+      count: relationships.length
     };
     logger.debug('Storing argument relationships', logContext);
 
@@ -527,9 +530,9 @@ export class ArgumentIntelligenceService {
         .values(relationshipsWithTimestamps)
         .returning();
 
-      logger.info('✅ Argument relationships stored successfully', { 
-        ...logContext, 
-        stored_count: newRelationships.length 
+      logger.info('✅ Argument relationships stored successfully', {
+        ...logContext,
+        stored_count: newRelationships.length
       });
 
       return newRelationships;
@@ -543,11 +546,11 @@ export class ArgumentIntelligenceService {
    * Get related arguments for clustering and similarity analysis
    */
   async getRelatedArguments(argumentId: string, relationshipType?: string): Promise<ArgumentRelationship[]> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
-      operation: 'getRelatedArguments', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'getRelatedArguments',
       argumentId,
-      relationshipType 
+      relationshipType
     };
     logger.debug('Fetching related arguments', logContext);
 
@@ -583,11 +586,12 @@ export class ArgumentIntelligenceService {
   /**
    * Get argument statistics for a bill
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getArgumentStatistics(bill_id: string): Promise<any> {
-    const logContext = { 
-      component: 'ArgumentIntelligenceService', 
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
       operation: 'getArgumentStatistics',
-      bill_id 
+      bill_id
     };
     logger.debug('Calculating argument statistics', logContext);
 
@@ -595,19 +599,19 @@ export class ArgumentIntelligenceService {
       const [stats] = await this.database
         .select({
           totalArguments: count(),
-          avgConfidenceScore: sql<number>`AVG(${arguments.confidence_score})`,
-          avgSentimentScore: sql<number>`AVG(${arguments.sentiment_score})`
+          avgConfidenceScore: sql<number>`AVG(${argumentTable.confidence_score})`,
+          avgSentimentScore: sql<number>`AVG(${argumentTable.sentiment_score})`
         })
-        .from(arguments)
-        .where(eq(arguments.bill_id, bill_id));
+        .from(argumentTable)
+        .where(eq(argumentTable.bill_id, bill_id));
 
       const [claimStats] = await this.database
         .select({
           totalClaims: count()
         })
         .from(claims)
-        .innerJoin(arguments, eq(claims.argument_id, arguments.id))
-        .where(eq(arguments.bill_id, bill_id));
+        .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
+        .where(eq(argumentTable.bill_id, bill_id));
 
       const [evidenceStats] = await this.database
         .select({
@@ -616,8 +620,8 @@ export class ArgumentIntelligenceService {
         })
         .from(evidence)
         .innerJoin(claims, eq(evidence.claim_id, claims.id))
-        .innerJoin(arguments, eq(claims.argument_id, arguments.id))
-        .where(eq(arguments.bill_id, bill_id));
+        .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
+        .where(eq(argumentTable.bill_id, bill_id));
 
       const statistics = {
         arguments: {
@@ -649,16 +653,17 @@ export class ArgumentIntelligenceService {
   /**
    * Safely parse JSON with fallback
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parseJson(jsonString: string | null, fallback: any = null): any {
     if (!jsonString) return fallback;
-    
+
     try {
       return JSON.parse(jsonString);
     } catch (error) {
-      logger.warn('Failed to parse JSON, using fallback', { 
+      logger.warn('Failed to parse JSON, using fallback', {
         component: 'ArgumentIntelligenceService',
         jsonString: jsonString?.substring(0, 100),
-        error 
+        error
       });
       return fallback;
     }
@@ -670,18 +675,18 @@ export class ArgumentIntelligenceService {
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
       // Simple query to test database connectivity
-      await this.database.select({ count: count() }).from(arguments).limit(1);
-      
+      await this.database.select({ count: count() }).from(argumentTable).limit(1);
+
       return {
         status: 'healthy',
         timestamp: new Date()
       };
     } catch (error) {
-      logger.error('Health check failed', { 
+      logger.error('Health check failed', {
         component: 'ArgumentIntelligenceService',
-        error 
+        error
       });
-      
+
       return {
         status: 'unhealthy',
         timestamp: new Date()
@@ -698,5 +703,3 @@ export class ArgumentIntelligenceService {
  * Singleton instance of ArgumentIntelligenceService for application-wide use.
  */
 export const argumentIntelligenceService = new ArgumentIntelligenceService();
-
-

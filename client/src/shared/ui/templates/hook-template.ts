@@ -1,6 +1,6 @@
 /**
  * Standard Hook Template
- * 
+ *
  * Use this template for creating new shared UI hooks.
  * Follow this pattern for consistency across the shared UI system.
  */
@@ -24,7 +24,7 @@ export interface UseHookNameResult {
   loading: boolean;
   error: Error | null;
   /** Add your specific return values here */
-  
+
   // Actions
   actions: {
     refresh: () => Promise<void>;
@@ -38,40 +38,40 @@ export interface UseHookNameResult {
 
 export const useHookName = (options: UseHookNameOptions = {}): UseHookNameResult => {
   const { enabled = true } = options;
-  
+
   // State
   const [data, setData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Error handling
   const { error, handleError, clearError } = useUIErrorHandler('useHookName');
-  
+
   // Actions
   const refresh = useCallback(async () => {
     if (!enabled) return;
-    
+
     try {
       setLoading(true);
       clearError();
-      
+
       // Your async logic here
       const result = await fetchData();
       setData(result);
-      
+
     } catch (err) {
       handleError(err as Error, 'refresh');
     } finally {
       setLoading(false);
     }
   }, [enabled, handleError, clearError]);
-  
+
   // Effects
   useEffect(() => {
     if (enabled) {
       refresh();
     }
   }, [enabled, refresh]);
-  
+
   // Return
   return {
     data,
@@ -97,16 +97,16 @@ async function fetchData(): Promise<any> {
 // ============================================================================
 
 /*
-import { useHookName } from '@client/shared/ui/hooks';
+import { useHookName } from '@/shared/ui/hooks';
 
 function MyComponent() {
   const { data, loading, error, actions } = useHookName({
     enabled: true,
   });
-  
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-  
+
   return (
     <div>
       <pre>{JSON.stringify(data, null, 2)}</pre>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface SafeAreaWrapperProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface SafeAreaWrapperProps {
 
 export function SafeAreaWrapper({ children, className, edges = ['top', 'right', 'bottom', 'left'] }: SafeAreaWrapperProps): JSX.Element {
   const safeAreaClasses = edges.map(edge => `safe-area-inset-${edge}`).join(' ');
-  
+
   return (
     <div className={cn('safe-area-wrapper', safeAreaClasses, className)}>
       {children}

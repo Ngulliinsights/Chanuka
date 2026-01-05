@@ -3,7 +3,7 @@
 // ============================================================================
 // Expert credentials, verification, and credibility scoring system
 
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { pgTable, uuid, varchar, integer, decimal, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
 
 import { users } from './foundation';
@@ -13,7 +13,7 @@ import { users } from './foundation';
 // ============================================================================
 
 export const expertCredentials = pgTable('expert_credentials', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   credentialType: varchar('credential_type', { length: 50 }).notNull(), // 'academic', 'professional', 'institutional'
   institution: varchar('institution', { length: 255 }),
@@ -37,7 +37,7 @@ export const expertCredentials = pgTable('expert_credentials', {
 // ============================================================================
 
 export const expertDomains = pgTable('expert_domains', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   domainCategory: varchar('domain_category', { length: 100 }).notNull(), // 'constitutional_law', 'healthcare', 'finance', etc.
   expertiseLevel: varchar('expertise_level', { length: 20 }), // 'expert', 'specialist', 'practitioner'
@@ -59,7 +59,7 @@ export const expertDomains = pgTable('expert_domains', {
 // ============================================================================
 
 export const credibilityScores = pgTable('credibility_scores', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id').references(() => users.id).notNull(),
   domainCategory: varchar('domain_category', { length: 100 }),
   baseScore: decimal('base_score', { precision: 5, scale: 2 }).default('50.0'), // Starting credibility
@@ -84,7 +84,7 @@ export const credibilityScores = pgTable('credibility_scores', {
 // ============================================================================
 
 export const expertReviews = pgTable('expert_reviews', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   expertId: uuid('expert_id').references(() => users.id).notNull(),
   entityType: varchar('entity_type', { length: 50 }).notNull(), // 'bill', 'analysis', 'comment'
   entityId: uuid('entity_id').notNull(),
@@ -107,7 +107,7 @@ export const expertReviews = pgTable('expert_reviews', {
 // ============================================================================
 
 export const peerValidations = pgTable('peer_validations', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   validatorId: uuid('validator_id').references(() => users.id).notNull(),
   targetExpertId: uuid('target_expert_id').references(() => users.id).notNull(),
   domainCategory: varchar('domain_category', { length: 100 }),
@@ -129,7 +129,7 @@ export const peerValidations = pgTable('peer_validations', {
 // ============================================================================
 
 export const expertActivity = pgTable('expert_activity', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   expertId: uuid('expert_id').references(() => users.id).notNull(),
   activityType: varchar('activity_type', { length: 50 }), // 'review', 'analysis', 'comment', 'verification'
   entityType: varchar('entity_type', { length: 50 }),

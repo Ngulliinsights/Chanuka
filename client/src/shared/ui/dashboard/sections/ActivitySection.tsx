@@ -3,13 +3,13 @@ import {
   Activity,
   Eye,
   MessageSquare,
-  Vote,
+  ThumbsUp as Vote, // Using ThumbsUp as Vote replacement
   Star
 } from 'lucide-react';
 
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { EngagementHistoryItem } from '@client/shared/types/user-dashboard';
+import { Button } from '@/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
+import { EngagementHistoryItem } from '@/shared/types/user-dashboard';
 
 interface ActivitySectionProps {
   activities: EngagementHistoryItem[];

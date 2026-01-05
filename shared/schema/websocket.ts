@@ -1,9 +1,9 @@
 /**
  * Unified WebSocket Type System
- * 
+ *
  * Single source of truth for WebSocket communication between client and server.
  * Provides type-safe message definitions, configuration, and runtime validation.
- * 
+ *
  * @module websocket-types
  * @version 2.0.0
  */
@@ -47,6 +47,26 @@ export enum Priority {
   CRITICAL = 3
 }
 
+/**
+ * Priority levels specifically for subscriptions
+ */
+export enum SubscriptionPriority {
+  LOW = 0,
+  NORMAL = 1,
+  HIGH = 2,
+  CRITICAL = 3
+}
+
+/**
+ * Priority levels specifically for notifications
+ */
+export enum NotificationPriority {
+  LOW = 0,
+  NORMAL = 1,
+  HIGH = 2,
+  CRITICAL = 3
+}
+
 // ============================================================================
 // Base Message Types
 // ============================================================================
@@ -54,7 +74,7 @@ export enum Priority {
 /**
  * Base interface for all WebSocket messages.
  * Provides consistent structure for bidirectional communication.
- * 
+ *
  * @template T - Type of the message payload data
  */
 export interface WebSocketMessage<T = unknown> {
@@ -425,6 +445,16 @@ export interface SubscriptionHandler {
   lastMessageAt?: number;
 }
 
+/**
+ * Alias for Subscription interface for WebSocket context
+ */
+export type WebSocketSubscription = Subscription;
+
+/**
+ * Alias for NotificationData interface for WebSocket context
+ */
+export type WebSocketNotification = NotificationData;
+
 // ============================================================================
 // Statistics & Monitoring
 // ============================================================================
@@ -510,6 +540,29 @@ export interface WebSocketEventHandlers {
   onQualityChange?: (quality: ConnectionQuality) => void;
 }
 
+/**
+ * Real-time event handlers for WebSocket connections
+ */
+export interface RealTimeHandlers {
+  onBillUpdate?: MessageHandler<BillUpdate>;
+  onCommunityUpdate?: MessageHandler<CommunityUpdate>;
+  onNotification?: MessageHandler<NotificationData>;
+  onConnectionChange?: ConnectionHandler;
+  onError?: ErrorHandler;
+  onSystemMessage?: MessageHandler<SystemMessage>;
+}
+
+/**
+ * Union type for all WebSocket-related events
+ */
+export type WebSocketEvents =
+  | BillUpdateMessage
+  | CommunityUpdateMessage
+  | NotificationMessage
+  | ConnectionMessage
+  | SystemMessage
+  | ErrorMessage;
+
 // ============================================================================
 // Type Guards
 // ============================================================================
@@ -563,7 +616,7 @@ export function isValidWebSocketMessage(value: unknown): value is WebSocketMessa
   if (typeof value !== 'object' || value === null) {
     return false;
   }
-  
+
   const msg = value as WebSocketMessage;
   return typeof msg.type === 'string' && msg.type.length > 0;
 }
@@ -582,13 +635,13 @@ export function hasMessageData<T>(message: WebSocketMessage<T>): message is WebS
 /**
  * Extract message data type from a message type
  */
-export type ExtractMessageData<T extends WebSocketMessage> = 
+export type ExtractMessageData<T extends WebSocketMessage> =
   T extends WebSocketMessage<infer D> ? D : never;
 
 /**
  * Create a handler type for a specific message type
  */
-export type HandlerForMessage<T extends WebSocketMessage> = 
+export type HandlerForMessage<T extends WebSocketMessage> =
   MessageHandler<ExtractMessageData<T>>;
 
 /**
@@ -612,19 +665,19 @@ export const DEFAULT_CONFIG = {
     maxDelay: 30000,
     multiplier: 2
   } as ReconnectConfig,
-  
+
   heartbeat: {
     interval: 30000,
     timeout: 5000,
     includeSequence: false
   } as HeartbeatConfig,
-  
+
   message: {
     maxQueueSize: 100,
     maxMessageSize: 1024 * 1024, // 1MB
     compression: false
   } as MessageConfig,
-  
+
   server: {
     port: 8080,
     path: '/',

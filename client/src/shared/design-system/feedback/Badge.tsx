@@ -1,6 +1,6 @@
 /**
  * Badge Component - UNIFIED & TOKEN-BASED
- * 
+ *
  * ✅ Uses design tokens
  * ✅ Multiple variants (default, secondary, destructive, outline, success, warning)
  * ✅ Size support (sm, md, lg)
@@ -10,7 +10,7 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import { HTMLAttributes } from "react"
 
-import { cn } from '@client/lib/utils'
+import { cn } from '@/shared/design-system/utils/cn'
 
 const badgeVariants = cva(
   [

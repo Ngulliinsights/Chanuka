@@ -18,16 +18,16 @@ import {
   Calendar,
 } from 'lucide-react';
 
-import { Badge } from '@client/shared/design-system/feedback/Badge.tsx';
-import { Progress } from '@client/shared/design-system/feedback/Progress.tsx';
-import { Button } from '@client/shared/design-system/interactive/Button.tsx';
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Progress } from '@/shared/design-system/feedback/Progress';
+import { Button } from '@/shared/design-system/interactive/Button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system/typography/Card.tsx';
-import { CivicImpactMetrics } from '@client/shared/types/user-dashboard';
+} from '@/shared/design-system/typography/Card';
+import { CivicImpactMetrics } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

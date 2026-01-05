@@ -60,14 +60,14 @@ export class AnalyticsService {
    */
   private getCached<T>(key: string): T | null {
     const cached = this.cache.get(key);
-    
+
     if (!cached) {
       return null;
     }
 
     // Check if cache entry has expired
     const isExpired = Date.now() - cached.timestamp >= cached.ttl;
-    
+
     if (isExpired) {
       this.cache.delete(key);
       return null;
@@ -89,10 +89,10 @@ export class AnalyticsService {
       }
     }
 
-    this.cache.set(key, { 
-      data, 
-      timestamp: Date.now(), 
-      ttl 
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl
     });
   }
 
@@ -104,7 +104,7 @@ export class AnalyticsService {
     if (!filters) {
       return prefix;
     }
-    
+
     // Sort keys for consistent cache key generation regardless of property order
     const sortedFilters = Object.keys(filters)
       .sort()
@@ -112,7 +112,7 @@ export class AnalyticsService {
         acc[key] = filters[key as keyof AnalyticsFilters];
         return acc;
       }, {} as AnalyticsFilters);
-    
+
     return `${prefix}-${JSON.stringify(sortedFilters)}`;
   }
 
@@ -130,7 +130,7 @@ export class AnalyticsService {
   public clearCacheByPrefix(prefix: string): void {
     const keysToDelete = Array.from(this.cache.keys())
       .filter(key => key.startsWith(prefix));
-    
+
     keysToDelete.forEach(key => this.cache.delete(key));
   }
 
@@ -145,7 +145,7 @@ export class AnalyticsService {
   async getDashboard(filters?: AnalyticsFilters): Promise<DashboardData> {
     const cacheKey = this.generateCacheKey('dashboard', filters);
     const cached = this.getCached<DashboardData>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -170,13 +170,13 @@ export class AnalyticsService {
       engagementGrowthRate: number;
       riskScore: number;
     }>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
 
     const rawData = await analyticsApiService.getSummary(filters);
-    
+
     // Apply business logic calculations
     const enhancedData: AnalyticsSummary & {
       engagementGrowthRate: number;
@@ -200,18 +200,18 @@ export class AnalyticsService {
    * Combines engagement metrics with risk assessment for comprehensive insights.
    */
   async getBillAnalytics(
-    billId: string, 
+    billId: string,
     filters?: AnalyticsFilters
-  ): Promise<BillAnalytics & { 
-    conflicts: unknown[]; 
+  ): Promise<BillAnalytics & {
+    conflicts: unknown[];
     riskLevel: 'low' | 'medium' | 'high';
   }> {
     const cacheKey = this.generateCacheKey(`bill-${billId}`, filters);
-    const cached = this.getCached<BillAnalytics & { 
-      conflicts: unknown[]; 
+    const cached = this.getCached<BillAnalytics & {
+      conflicts: unknown[];
       riskLevel: 'low' | 'medium' | 'high';
     }>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -223,8 +223,8 @@ export class AnalyticsService {
     ]);
 
     // Merge conflict data with analytics and calculate risk
-    const enhancedData: BillAnalytics & { 
-      conflicts: unknown[]; 
+    const enhancedData: BillAnalytics & {
+      conflicts: unknown[];
       riskLevel: 'low' | 'medium' | 'high';
     } = {
       ...analytics,
@@ -241,11 +241,11 @@ export class AnalyticsService {
    * Provides insights into engagement patterns and scoring.
    */
   async getEngagementReport(
-    billId: string, 
+    billId: string,
     filters?: AnalyticsFilters
   ): Promise<EngagementReport & {
-    trendAnalysis: { 
-      direction: 'up' | 'down' | 'stable'; 
+    trendAnalysis: {
+      direction: 'up' | 'down' | 'stable';
       changePercent: number;
       momentum: number;
     };
@@ -253,14 +253,14 @@ export class AnalyticsService {
   }> {
     const cacheKey = this.generateCacheKey(`engagement-${billId}`, filters);
     const cached = this.getCached<EngagementReport & {
-      trendAnalysis: { 
-        direction: 'up' | 'down' | 'stable'; 
+      trendAnalysis: {
+        direction: 'up' | 'down' | 'stable';
         changePercent: number;
         momentum: number;
       };
       engagementScore: number;
     }>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -269,8 +269,8 @@ export class AnalyticsService {
 
     // Calculate trend analysis and engagement scoring
     const enhancedData: EngagementReport & {
-      trendAnalysis: { 
-        direction: 'up' | 'down' | 'stable'; 
+      trendAnalysis: {
+        direction: 'up' | 'down' | 'stable';
         changePercent: number;
         momentum: number;
       };
@@ -298,7 +298,7 @@ export class AnalyticsService {
       recommendations: string[];
       priorityScore: number;
     }>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -328,7 +328,7 @@ export class AnalyticsService {
    * User activities are not cached as they represent real-time behavior.
    */
   async getUserActivity(
-    userId?: string, 
+    userId?: string,
     filters?: AnalyticsFilters
   ): Promise<AnalyticsResponse<(UserActivity & {
     engagementScore: number;
@@ -354,12 +354,12 @@ export class AnalyticsService {
    * Bills are ranked based on engagement, conflicts, and business importance.
    */
   async getTopBills(
-    limit = 10, 
+    limit = 10,
     filters?: AnalyticsFilters
   ): Promise<BillAnalytics[]> {
     const cacheKey = this.generateCacheKey(`top-bills-${limit}`, filters);
     const cached = this.getCached<BillAnalytics[]>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -426,7 +426,7 @@ export class AnalyticsService {
 
     // Ensure we're working with an array and enhance with impact scores
     const stakeholders = Array.isArray(rawData) ? rawData : [];
-    
+
     return stakeholders.map(stakeholder => ({
       ...stakeholder,
       impactScore: this.calculateStakeholderImpact(stakeholder)
@@ -442,7 +442,7 @@ export class AnalyticsService {
    * Handles data transformation and formatting for external consumption.
    */
   async exportAnalytics(
-    filters?: AnalyticsFilters, 
+    filters?: AnalyticsFilters,
     format: 'csv' | 'json' = 'json'
   ): Promise<unknown> {
     const rawData = await analyticsApiService.exportAnalytics(filters, format);
@@ -510,9 +510,9 @@ export class AnalyticsService {
     const baselineThreshold = 0.5;
     const positiveGrowth = 0.15;
     const negativeGrowth = -0.05;
-    
-    return summary.averageEngagementRate > baselineThreshold 
-      ? positiveGrowth 
+
+    return summary.averageEngagementRate > baselineThreshold
+      ? positiveGrowth
       : negativeGrowth;
   }
 
@@ -525,13 +525,13 @@ export class AnalyticsService {
     const conflictRisk = summary.totalBills > 0
       ? summary.conflictsDetected / summary.totalBills
       : 0;
-    
+
     // Add risk penalty for low engagement (below 30% threshold)
     const lowEngagementThreshold = 0.3;
-    const engagementRisk = summary.averageEngagementRate < lowEngagementThreshold 
-      ? 0.3 
+    const engagementRisk = summary.averageEngagementRate < lowEngagementThreshold
+      ? 0.3
       : 0;
-    
+
     // Combine risks and cap at 1.0
     return Math.min(conflictRisk + engagementRisk, 1);
   }
@@ -544,7 +544,7 @@ export class AnalyticsService {
     const highSeverityConflicts = conflicts.filter(
       c => c.conflict_level === 'high'
     ).length;
-    
+
     const mediumSeverityConflicts = conflicts.filter(
       c => c.conflict_level === 'medium'
     ).length;
@@ -552,7 +552,7 @@ export class AnalyticsService {
     // Risk thresholds based on conflict severity counts
     if (highSeverityConflicts > 2) return 'high';
     if (highSeverityConflicts > 0 || mediumSeverityConflicts > 3) return 'medium';
-    
+
     return 'low';
   }
 
@@ -570,8 +570,8 @@ export class AnalyticsService {
     momentum: number;
   } {
     if (dailyData.length < 2) {
-      return { 
-        direction: 'stable', 
+      return {
+        direction: 'stable',
         changePercent: 0,
         momentum: 0
       };
@@ -596,13 +596,13 @@ export class AnalyticsService {
 
     // Calculate percentage change
     const changePercent = ((recentAvg - previousAvg) / previousAvg) * 100;
-    
+
     // Determine direction based on threshold (5% change)
     const changeThreshold = 5;
-    const direction = changePercent > changeThreshold 
-      ? 'up' 
-      : changePercent < -changeThreshold 
-        ? 'down' 
+    const direction = changePercent > changeThreshold
+      ? 'up'
+      : changePercent < -changeThreshold
+        ? 'down'
         : 'stable';
 
     // Calculate momentum as rate of acceleration
@@ -675,7 +675,7 @@ export class AnalyticsService {
 
     if (totalEngagement > highThreshold) return 'high';
     if (totalEngagement > mediumThreshold) return 'medium';
-    
+
     return 'low';
   }
 
@@ -698,7 +698,7 @@ export class AnalyticsService {
     const highSeverityConflicts = conflicts.filter(
       c => c.conflict_level === 'high'
     );
-    
+
     if (highSeverityConflicts.length > 0) {
       recommendations.push(
         'Immediate review required for high-priority conflicts. Consider escalation to senior stakeholders.'
@@ -717,7 +717,7 @@ export class AnalyticsService {
     const mediumSeverityConflicts = conflicts.filter(
       c => c.conflict_level === 'medium'
     );
-    
+
     if (mediumSeverityConflicts.length > 3) {
       recommendations.push(
         'Pattern of medium-severity conflicts suggests need for policy clarification or amendment review.'
@@ -767,7 +767,7 @@ export class AnalyticsService {
       // Calculate importance score for each bill using weighted factors
       const scoreA = this.calculateBillImportanceScore(a);
       const scoreB = this.calculateBillImportanceScore(b);
-      
+
       return scoreB - scoreA; // Descending order
     });
   }
@@ -902,7 +902,7 @@ export class AnalyticsService {
     if (format === 'csv') {
       return this.convertToCSV(data);
     }
-    
+
     // JSON format returns data as-is (already serializable)
     return data;
   }
@@ -918,16 +918,16 @@ export class AnalyticsService {
 
     // Extract headers from first object
     const headers = Object.keys(data[0]);
-    
+
     // Escape CSV values to handle commas and quotes
     const escapeCSVValue = (value: unknown): string => {
       const stringValue = String(value ?? '');
-      
+
       // Wrap in quotes if contains comma, quote, or newline
       if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
         return `"${stringValue.replace(/"/g, '""')}"`;
       }
-      
+
       return stringValue;
     };
 
@@ -951,7 +951,7 @@ export class AnalyticsService {
     // Normalize active users (assuming 100 is target healthy level)
     const targetActiveUsers = 100;
     const userScore = Math.min(
-      (metrics.activeUsers || 0) / targetActiveUsers, 
+      (metrics.activeUsers || 0) / targetActiveUsers,
       1
     );
 
@@ -971,7 +971,7 @@ export class AnalyticsService {
       warning: 0.7,
       error: 0.3
     };
-    
+
     const healthMultiplier = healthMultipliers[metrics.systemHealth] || 0.5;
 
     // Calculate composite health score

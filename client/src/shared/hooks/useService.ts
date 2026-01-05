@@ -1,15 +1,15 @@
 /**
  * Service Hook for Dependency Injection
- * 
+ *
  * Provides a React hook interface to the service registry
  * for clean dependency injection in components.
  */
 
 import { useEffect, useState } from 'react';
 
-import { globalServiceLocator } from '@client/core/api/registry';
-import type { ApiService } from '@client/core/api/types/service';
-import { logger } from '@client/utils/logger';
+import { globalServiceLocator } from '@/core/api/registry';
+import type { ApiService } from '@/core/api/types/service';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook to get a service from the registry
@@ -24,14 +24,14 @@ export function useService<T extends ApiService>(serviceName: string): T | null 
     const loadService = async () => {
       try {
         const serviceInstance = await globalServiceLocator.getService<T>(serviceName);
-        
+
         if (mounted) {
           setService(serviceInstance);
           setError(null);
         }
       } catch (err) {
         const error = err instanceof Error ? err : new Error('Failed to load service');
-        
+
         if (mounted) {
           setError(error);
           setService(null);
@@ -89,7 +89,7 @@ export function useServices<T extends Record<string, ApiService>>(
         }
       } catch (err) {
         const error = err instanceof Error ? err : new Error('Failed to load services');
-        
+
         if (mounted) {
           setError(error);
           setServices(null);

@@ -1,12 +1,12 @@
 /**
  * Navigation Service - Shared Services
- * 
+ *
  * Migrated from client/src/services/navigation.ts
  * Handles programmatic navigation, route management, and navigation state
  * for the civic engagement platform.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@/utils/logger';
 
 interface NavigationState {
   currentPath: string;

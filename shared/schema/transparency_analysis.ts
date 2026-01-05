@@ -47,7 +47,7 @@ export const corporate_entities = pgTable("corporate_entities", {
   // Ownership and structure
   parent_company_id: uuid("parent_company_id"),
   ownership_structure: jsonb("ownership_structure").notNull().default(sql`'{}'::jsonb`),
-  key_executives: jsonb("key_executives").notNull().default(sql`'[]'::jsonb`),
+  key_executives: jsonb("key_executives").notNull().default(sql`'{}'::jsonb`),
   
   // Public profile
   is_publicly_traded: boolean("is_publicly_traded").notNull().default(false),
@@ -242,7 +242,7 @@ export const bill_financial_conflicts = pgTable("bill_financial_conflicts", {
   
   // Public awareness
   is_public: boolean("is_public").notNull().default(false),
-  media_coverage: jsonb("media_coverage").notNull().default(sql`'[]'::jsonb`),
+  media_coverage: jsonb("media_coverage").notNull().default(sql`'{}'::jsonb`),
   
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

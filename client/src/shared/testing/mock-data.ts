@@ -1,13 +1,13 @@
 /**
  * Mock Data Service - Testing Infrastructure
- * 
+ *
  * Migrated from client/src/services/mockDataService.ts
  * Central service for managing mock data integration, loading strategies,
  * and real-time simulation throughout the application.
  */
 
-import type { DiscussionThread } from '@client/features/community/types';
-import { logger } from '@client/utils/logger';
+import type { DiscussionThread } from '@/features/community/types';
+import { logger } from '@/utils/logger';
 
 // Note: These imports would need to be updated based on actual mock data structure
 // import {
@@ -67,7 +67,7 @@ class MockDataService {
 
   constructor(config: Partial<MockDataServiceConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
-    
+
     logger.info('Mock Data Service initialized', {
       component: 'MockDataService',
       config: this.config
@@ -119,7 +119,7 @@ class MockDataService {
       }
 
       this.initialized = true;
-      
+
       logger.info('Mock Data Service initialization completed', {
         component: 'MockDataService',
         cacheStats: this.getCacheStats()
@@ -315,11 +315,11 @@ class MockDataService {
     if (this.config.enableRealTimeSimulation) {
       this.stopRealTimeSimulation();
     }
-    
+
     this.clearCache();
     this.realTimeListeners = [];
     this.initialized = false;
-    
+
     logger.info('Mock Data Service shutdown completed', {
       component: 'MockDataService'
     });

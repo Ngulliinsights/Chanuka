@@ -1,15 +1,37 @@
 /**
- * Error Analytics Bridge Service
+ * Error Analytics Bridge Service - Optimized Version
  *
- * Provides a bridge between the Error Analytics Dashboard and the core error handler,
- * transforming core error data into analytics-ready format and providing analytics
- * methods that integrate with the existing error management system.
+ * Provides a high-performance bridge between the Error Analytics Dashboard and core error handler.
+ * Features improved type safety, caching, efficient data processing, and comprehensive analytics.
  */
 
 import { coreErrorHandler } from '@client/core/error/handler';
 import { ErrorDomain, ErrorSeverity } from '@client/core/error/types';
 
-// Import analytics types
+// ============================================================================
+// Core Types
+// ============================================================================
+
+interface CoreError {
+  id: string;
+  timestamp: number;
+  message: string;
+  severity: ErrorSeverity;
+  type: ErrorDomain;
+  stack?: string;
+  recovered: boolean;
+  recoverable: boolean;
+  recoveryTime?: number;
+  recoveryStrategy?: string;
+  context?: {
+    component?: string;
+    userId?: string;
+    sessionId?: string;
+    userAgent?: string;
+    url?: string;
+    [key: string]: unknown;
+  };
+}
 
 interface TimeSeriesPoint {
   timestamp: number;
@@ -26,8 +48,8 @@ interface TimeRange {
 
 interface DashboardFilters {
   timeRange: TimeRange;
-  severity: string[];
-  domain: string[];
+  severity: ErrorSeverity[];
+  domain: ErrorDomain[];
   component: string[];
   userId?: string;
   sessionId?: string;
@@ -39,47 +61,71 @@ interface ErrorOverviewMetrics {
   uniqueErrors: number;
   affectedUsers: number;
   averageResolutionTime: number;
-  severityDistribution: Record<string, number>;
-  domainDistribution: Record<string, number>;
+  severityDistribution: Record<ErrorSeverity, number>;
+  domainDistribution: Record<ErrorDomain, number>;
   timeRange: TimeRange;
   lastUpdated: number;
 }
 
 interface SeasonalityData {
-  period: number;
-  strength: number;
-  pattern: Record<string, number>;
+  detected: boolean;
+  pattern: Record<string, number> | null;
+  confidence: number;
+  peakHours: number[];
 }
 
 interface AnomalyData {
   timestamp: number;
   value: number;
+  expectedValue: number;
   deviation: number;
-  severity: 'low' | 'medium' | 'high';
+  severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
 }
 
 interface ProjectionData {
-  timestamp: number;
-  predicted: number;
+  nextHour: number;
+  nextDay: number;
+  nextWeek: number;
   confidence: number;
   trend: 'up' | 'down' | 'stable';
 }
 
 interface ErrorTrendData {
-  timeSeries: TimeSeriesPoint[];
+  timeSeries: TimeSeriesDataPoint[];
   growthRate: number;
-  seasonality: SeasonalityData | null;
+  seasonality: SeasonalityData;
   anomalies: AnomalyData[];
-  projections: ProjectionData[];
+  projections: ProjectionData;
   period: string;
 }
 
+interface TimeSeriesDataPoint {
+  timestamp: number;
+  totalErrors: number;
+  errorRate: number;
+  severityBreakdown: Record<ErrorSeverity, number>;
+  domainBreakdown: Record<ErrorDomain, number>;
+  uniqueErrors: number;
+}
+
 interface ErrorCluster {
-  id: string;
-  size: number;
-  centroid: Record<string, unknown>;
-  members: string[];
+  centroid: {
+    message: string;
+    stackTrace: string;
+    component: string;
+    userAgent: string;
+    url: string;
+  };
+  members: Array<{
+    id: string;
+    timestamp: number;
+    userId: string;
+    sessionId: string;
+    context?: Record<string, unknown>;
+  }>;
+  similarity: number;
+  radius: number;
 }
 
 interface ErrorPattern {
@@ -90,76 +136,213 @@ interface ErrorPattern {
   firstSeen: number;
   lastSeen: number;
   affectedUsers: number;
-  severity: string;
-  domain: string;
-  cluster: ErrorCluster | null;
+  severity: ErrorSeverity;
+  domain: ErrorDomain;
+  cluster: ErrorCluster;
   impact: {
-    score: number;
-    metrics: Record<string, number>;
+    userExperience: 'low' | 'medium' | 'high' | 'critical';
+    businessImpact: 'low' | 'medium' | 'high';
+    frequency: 'occasional' | 'frequent' | 'persistent';
+    scope: 'isolated' | 'widespread';
   };
   recommendations: string[];
 }
 
 interface StrategyEffectiveness {
+  strategyId: string;
   strategyName: string;
   successRate: number;
   averageRecoveryTime: number;
-  usage: number;
+  usageCount: number;
+  failureReasons: string[];
+  improvementSuggestions: string[];
 }
 
 interface RecoveryTimeDistribution {
-  min: number;
-  max: number;
-  mean: number;
-  median: number;
+  p50: number;
   p95: number;
   p99: number;
+  average: number;
+  min: number;
+  max: number;
 }
 
-interface FailureAnalysisItem {
-  cause: string;
-  frequency: number;
-  affectedUsers: number;
-  recommendations: string[];
+interface RecoveryFailure {
+  strategyId: string;
+  errorId: string;
+  reason: string;
+  timestamp: number;
+  context?: Record<string, unknown>;
+  alternativeStrategies: string[];
 }
 
 interface RecoveryAnalytics {
   overallSuccessRate: number;
   strategyEffectiveness: StrategyEffectiveness[];
   recoveryTimeDistribution: RecoveryTimeDistribution;
-  failureAnalysis: FailureAnalysisItem[];
+  failureAnalysis: RecoveryFailure[];
   automatedRecoveryRate: number;
   manualInterventionRate: number;
 }
 
-interface AlertData {
+interface Alert {
   id: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  message: string;
+  type: 'threshold' | 'anomaly' | 'pattern';
+  severity: 'info' | 'warning' | 'critical';
+  title: string;
+  description: string;
   timestamp: number;
-  details?: Record<string, unknown>;
+  acknowledged: boolean;
+  resolved: boolean;
+  threshold?: {
+    metric: string;
+    operator: 'gt' | 'lt' | 'eq';
+    value: number;
+    duration: number;
+  };
 }
 
-interface SystemHealthMetrics {
+interface SystemHealthComponent {
+  name: string;
+  status: 'healthy' | 'degraded' | 'down';
+  responseTime: number;
   errorRate: number;
-  warningRate: number;
-  recoveryRate: number;
-  uptime: number;
   lastCheck: number;
+}
+
+interface SystemHealth {
+  overall: 'healthy' | 'degraded' | 'down';
+  components: SystemHealthComponent[];
+  uptime: number;
+  lastIncident: number | null;
+}
+
+interface PerformanceMetrics {
+  averageResponseTime: number;
+  errorProcessingTime: number;
+  memoryUsage: number;
+  cpuUsage: number;
+  throughput: number;
 }
 
 interface RealTimeMetrics {
   currentErrorRate: number;
-  activeAlerts: AlertData[];
-  liveStream: TimeSeriesPoint[];
-  systemHealth: SystemHealthMetrics;
-  performanceMetrics: Record<string, number>;
+  activeAlerts: Alert[];
+  liveStream: Array<Omit<CoreError, 'stack' | 'context'>>;
+  systemHealth: SystemHealth;
+  performanceMetrics: PerformanceMetrics;
 }
+
+// ============================================================================
+// Statistics Utilities
+// ============================================================================
+
+class StatisticsUtils {
+  static calculateMean(values: number[]): number {
+    if (values.length === 0) return 0;
+    return values.reduce((sum, val) => sum + val, 0) / values.length;
+  }
+
+  static calculateStdDev(values: number[]): number {
+    if (values.length === 0) return 0;
+    const mean = this.calculateMean(values);
+    const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
+    return Math.sqrt(this.calculateMean(squaredDiffs));
+  }
+
+  static calculatePercentile(values: number[], percentile: number): number {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const index = Math.floor((percentile / 100) * sorted.length);
+    return sorted[Math.min(index, sorted.length - 1)];
+  }
+
+  static calculateMovingAverage(values: number[], windowSize: number): number[] {
+    if (values.length < windowSize) return values;
+
+    const result: number[] = [];
+    for (let i = windowSize - 1; i < values.length; i++) {
+      const window = values.slice(i - windowSize + 1, i + 1);
+      result.push(this.calculateMean(window));
+    }
+    return result;
+  }
+
+  static detectOutliers(values: number[], threshold: number = 2): number[] {
+    const mean = this.calculateMean(values);
+    const stdDev = this.calculateStdDev(values);
+
+    return values
+      .map((val, idx) => ({ val, idx }))
+      .filter(({ val }) => Math.abs(val - mean) > threshold * stdDev)
+      .map(({ idx }) => idx);
+  }
+}
+
+// ============================================================================
+// Cache Manager
+// ============================================================================
+
+class CacheManager<T> {
+  private cache = new Map<string, { data: T; timestamp: number }>();
+  private readonly ttl: number;
+
+  constructor(ttlMs: number = 60000) {
+    this.ttl = ttlMs;
+  }
+
+  get(key: string): T | null {
+    const cached = this.cache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() - cached.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return cached.data;
+  }
+
+  set(key: string, data: T): void {
+    this.cache.set(key, { data, timestamp: Date.now() });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  clearExpired(): void {
+    const now = Date.now();
+    for (const [key, value] of this.cache.entries()) {
+      if (now - value.timestamp > this.ttl) {
+        this.cache.delete(key);
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Error Analytics Bridge
+// ============================================================================
 
 class ErrorAnalyticsBridge {
   private static instance: ErrorAnalyticsBridge;
+  private overviewCache: CacheManager<ErrorOverviewMetrics>;
+  private trendCache: CacheManager<ErrorTrendData>;
+  private patternCache: CacheManager<ErrorPattern[]>;
 
-  private constructor() {}
+  private constructor() {
+    this.overviewCache = new CacheManager<ErrorOverviewMetrics>(30000); // 30s cache
+    this.trendCache = new CacheManager<ErrorTrendData>(60000); // 1m cache
+    this.patternCache = new CacheManager<ErrorPattern[]>(120000); // 2m cache
+
+    // Clean up expired cache entries periodically
+    setInterval(() => {
+      this.overviewCache.clearExpired();
+      this.trendCache.clearExpired();
+      this.patternCache.clearExpired();
+    }, 60000);
+  }
 
   static getInstance(): ErrorAnalyticsBridge {
     if (!ErrorAnalyticsBridge.instance) {
@@ -168,95 +351,135 @@ class ErrorAnalyticsBridge {
     return ErrorAnalyticsBridge.instance;
   }
 
+  // ========================================================================
+  // Public API Methods
+  // ========================================================================
+
   /**
-   * Get overview metrics from core error handler
+   * Get overview metrics with intelligent caching
    */
   async getOverviewMetrics(filters: DashboardFilters): Promise<ErrorOverviewMetrics> {
-    const coreStats = coreErrorHandler.getErrorStats();
-    const recentErrors = coreErrorHandler.getRecentErrors(1000);
+    const cacheKey = this.generateCacheKey('overview', filters);
+    const cached = this.overviewCache.get(cacheKey);
+    if (cached) return cached;
 
-    // Filter errors based on dashboard filters
-    const filteredErrors = this.filterErrors(recentErrors, filters);
+    try {
+      const errors = this.fetchAndFilterErrors(filters, 1000);
+      const metrics = this.computeOverviewMetrics(errors, filters);
 
-    return {
-      totalErrors: filteredErrors.length,
-      errorRate: this.calculateErrorRate(filteredErrors, filters.timeRange),
-      uniqueErrors: this.calculateUniqueErrors(filteredErrors),
-      affectedUsers: this.calculateAffectedUsers(filteredErrors),
-      averageResolutionTime: this.calculateAverageResolutionTime(filteredErrors),
-      severityDistribution: this.buildSeverityDistribution(filteredErrors),
-      domainDistribution: this.buildDomainDistribution(filteredErrors),
-      timeRange: filters.timeRange,
-      lastUpdated: Date.now(),
-    };
+      this.overviewCache.set(cacheKey, metrics);
+      return metrics;
+    } catch (error) {
+      console.error('Error fetching overview metrics:', error);
+      throw new Error('Failed to fetch overview metrics');
+    }
   }
 
   /**
-   * Get trend data from core error handler
+   * Get trend data with time series analysis
    */
   async getTrendData(period: string, filters: DashboardFilters): Promise<ErrorTrendData> {
-    const recentErrors = coreErrorHandler.getRecentErrors(2000);
-    const filteredErrors = this.filterErrors(recentErrors, filters);
+    const cacheKey = this.generateCacheKey('trend', { ...filters, period });
+    const cached = this.trendCache.get(cacheKey);
+    if (cached) return cached;
 
-    const timeSeries = this.buildTimeSeries(filteredErrors, period, filters);
+    try {
+      const errors = this.fetchAndFilterErrors(filters, 2000);
+      const timeSeries = this.buildTimeSeries(errors, period, filters);
 
-    return {
-      timeSeries,
-      growthRate: this.calculateGrowthRate(timeSeries),
-      seasonality: this.detectSeasonality(timeSeries),
-      anomalies: this.detectAnomalies(timeSeries),
-      projections: this.calculateProjections(timeSeries),
-      period,
-    };
+      const trendData: ErrorTrendData = {
+        timeSeries,
+        growthRate: this.calculateGrowthRate(timeSeries),
+        seasonality: this.detectSeasonality(timeSeries),
+        anomalies: this.detectAnomalies(timeSeries),
+        projections: this.calculateProjections(timeSeries),
+        period,
+      };
+
+      this.trendCache.set(cacheKey, trendData);
+      return trendData;
+    } catch (error) {
+      console.error('Error fetching trend data:', error);
+      throw new Error('Failed to fetch trend data');
+    }
   }
 
   /**
-   * Get error patterns from core error handler
+   * Get detected error patterns with clustering
    */
   async getPatterns(filters: DashboardFilters): Promise<ErrorPattern[]> {
-    const recentErrors = coreErrorHandler.getRecentErrors(2000);
-    const filteredErrors = this.filterErrors(recentErrors, filters);
+    const cacheKey = this.generateCacheKey('patterns', filters);
+    const cached = this.patternCache.get(cacheKey);
+    if (cached) return cached;
 
-    return this.detectErrorPatterns(filteredErrors, filters);
+    try {
+      const errors = this.fetchAndFilterErrors(filters, 2000);
+      const patterns = this.detectErrorPatterns(errors);
+
+      this.patternCache.set(cacheKey, patterns);
+      return patterns;
+    } catch (error) {
+      console.error('Error detecting patterns:', error);
+      throw new Error('Failed to detect error patterns');
+    }
   }
 
   /**
-   * Get recovery analytics from core error handler
+   * Get recovery analytics with detailed strategy analysis
    */
   async getRecoveryAnalytics(filters: DashboardFilters): Promise<RecoveryAnalytics> {
-    const recentErrors = coreErrorHandler.getRecentErrors(1000);
-    const filteredErrors = this.filterErrors(recentErrors, filters);
-    const recoveredErrors = filteredErrors.filter(e => e.recovered);
-
-    return {
-      overallSuccessRate: filteredErrors.length > 0 ? recoveredErrors.length / filteredErrors.length : 0,
-      strategyEffectiveness: this.calculateStrategyEffectiveness(recoveredErrors),
-      recoveryTimeDistribution: this.calculateRecoveryTimeDistribution(recoveredErrors),
-      failureAnalysis: this.calculateRecoveryFailures(filteredErrors.filter(e => !e.recovered)),
-      automatedRecoveryRate: recoveredErrors.length > 0 ? recoveredErrors.filter(e => e.recoveryStrategy).length / recoveredErrors.length : 0,
-      manualInterventionRate: recoveredErrors.length > 0 ? recoveredErrors.filter(e => !e.recoveryStrategy).length / recoveredErrors.length : 0,
-    };
+    try {
+      const errors = this.fetchAndFilterErrors(filters, 1000);
+      return this.computeRecoveryAnalytics(errors);
+    } catch (error) {
+      console.error('Error fetching recovery analytics:', error);
+      throw new Error('Failed to fetch recovery analytics');
+    }
   }
 
   /**
-   * Get real-time metrics from core error handler
+   * Get real-time metrics for live monitoring
    */
   async getRealTimeMetrics(): Promise<RealTimeMetrics> {
-    const recentErrors = coreErrorHandler.getRecentErrors(50);
+    try {
+      const recentErrors = this.fetchRecentErrors(50);
 
-    return {
-      currentErrorRate: this.calculateCurrentErrorRate(recentErrors),
-      activeAlerts: this.generateActiveAlerts(recentErrors),
-      liveStream: recentErrors.slice(0, 20).map(this.transformToErrorEvent),
-      systemHealth: this.getSystemHealthStatus(),
-      performanceMetrics: this.getPerformanceMetrics(),
-    };
+      return {
+        currentErrorRate: this.calculateCurrentErrorRate(recentErrors),
+        activeAlerts: this.generateActiveAlerts(recentErrors),
+        liveStream: recentErrors.slice(0, 20).map(this.transformToLiveEvent),
+        systemHealth: this.getSystemHealthStatus(),
+        performanceMetrics: this.getPerformanceMetrics(),
+      };
+    } catch (error) {
+      console.error('Error fetching real-time metrics:', error);
+      throw new Error('Failed to fetch real-time metrics');
+    }
   }
 
   /**
-   * Filter errors based on dashboard filters
+   * Clear all caches
    */
-  private filterErrors(errors: unknown[], filters: DashboardFilters): unknown[] {
+  clearCache(): void {
+    this.overviewCache.clear();
+    this.trendCache.clear();
+    this.patternCache.clear();
+  }
+
+  // ========================================================================
+  // Private Helper Methods - Data Fetching
+  // ========================================================================
+
+  private fetchRecentErrors(limit: number): CoreError[] {
+    return coreErrorHandler.getRecentErrors(limit) as CoreError[];
+  }
+
+  private fetchAndFilterErrors(filters: DashboardFilters, limit: number): CoreError[] {
+    const errors = this.fetchRecentErrors(limit);
+    return this.filterErrors(errors, filters);
+  }
+
+  private filterErrors(errors: CoreError[], filters: DashboardFilters): CoreError[] {
     return errors.filter(error => {
       // Time range filter
       if (error.timestamp < filters.timeRange.start || error.timestamp > filters.timeRange.end) {
@@ -274,8 +497,11 @@ class ErrorAnalyticsBridge {
       }
 
       // Component filter
-      if (filters.component.length > 0 && !filters.component.includes(error.context?.component)) {
-        return false;
+      if (filters.component.length > 0) {
+        const component = error.context?.component;
+        if (!component || !filters.component.includes(component)) {
+          return false;
+        }
       }
 
       // User ID filter
@@ -292,108 +518,116 @@ class ErrorAnalyticsBridge {
     });
   }
 
-  /**
-   * Calculate error rate for time range
-   */
-  private calculateErrorRate(errors: unknown[], timeRange: TimeRange): number {
+  // ========================================================================
+  // Private Helper Methods - Metrics Calculation
+  // ========================================================================
+
+  private computeOverviewMetrics(
+    errors: CoreError[],
+    filters: DashboardFilters
+  ): ErrorOverviewMetrics {
+    return {
+      totalErrors: errors.length,
+      errorRate: this.calculateErrorRate(errors, filters.timeRange),
+      uniqueErrors: this.calculateUniqueErrors(errors),
+      affectedUsers: this.calculateAffectedUsers(errors),
+      averageResolutionTime: this.calculateAverageResolutionTime(errors),
+      severityDistribution: this.buildSeverityDistribution(errors),
+      domainDistribution: this.buildDomainDistribution(errors),
+      timeRange: filters.timeRange,
+      lastUpdated: Date.now(),
+    };
+  }
+
+  private calculateErrorRate(errors: CoreError[], timeRange: TimeRange): number {
     const durationMs = timeRange.end - timeRange.start;
     const durationMinutes = durationMs / (60 * 1000);
     return durationMinutes > 0 ? errors.length / durationMinutes : 0;
   }
 
-  /**
-   * Calculate current error rate (last 5 minutes)
-   */
-  private calculateCurrentErrorRate(errors: unknown[]): number {
+  private calculateCurrentErrorRate(errors: CoreError[]): number {
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
     const recentErrors = errors.filter(e => e.timestamp > fiveMinutesAgo);
-    return recentErrors.length / 5; // per minute
+    return recentErrors.length / 5;
   }
 
-  /**
-   * Calculate unique errors
-   */
-  private calculateUniqueErrors(errors: unknown[]): number {
-    const messages = new Set(errors.map(e => e.message));
-    return messages.size;
+  private calculateUniqueErrors(errors: CoreError[]): number {
+    const uniqueMessages = new Set(errors.map(e => e.message));
+    return uniqueMessages.size;
   }
 
-  /**
-   * Calculate affected users
-   */
-  private calculateAffectedUsers(errors: unknown[]): number {
-    const users = new Set(errors.map(e => e.context?.userId).filter(Boolean));
-    return users.size;
+  private calculateAffectedUsers(errors: CoreError[]): number {
+    const uniqueUsers = new Set(
+      errors
+        .map(e => e.context?.userId)
+        .filter((userId): userId is string => Boolean(userId))
+    );
+    return uniqueUsers.size;
   }
 
-  /**
-   * Calculate average resolution time
-   */
-  private calculateAverageResolutionTime(errors: unknown[]): number {
+  private calculateAverageResolutionTime(errors: CoreError[]): number {
     const resolvedErrors = errors.filter(e => e.recovered && e.recoveryTime);
     if (resolvedErrors.length === 0) return 0;
 
-    const totalTime = resolvedErrors.reduce((sum, e) => sum + e.recoveryTime, 0);
+    const totalTime = resolvedErrors.reduce((sum, e) => sum + (e.recoveryTime || 0), 0);
     return totalTime / resolvedErrors.length;
   }
 
-  /**
-   * Build severity distribution
-   */
-  private buildSeverityDistribution(errors: unknown[]): Record<string, number> {
-    const distribution = {
+  private buildSeverityDistribution(errors: CoreError[]): Record<ErrorSeverity, number> {
+    const distribution: Record<ErrorSeverity, number> = {
       [ErrorSeverity.CRITICAL]: 0,
       [ErrorSeverity.HIGH]: 0,
       [ErrorSeverity.MEDIUM]: 0,
       [ErrorSeverity.LOW]: 0,
     };
 
-    errors.forEach(error => {
-      if (distribution.hasOwnProperty(error.severity)) {
-        distribution[error.severity]++;
-      }
-    });
+    for (const error of errors) {
+      distribution[error.severity]++;
+    }
 
     return distribution;
   }
 
-  /**
-   * Build domain distribution
-   */
-  private buildDomainDistribution(errors: unknown[]): Record<string, number> {
-    const distribution = {
-      [ErrorDomain.NETWORK]: 0,
-      [ErrorDomain.AUTHENTICATION]: 0,
-      [ErrorDomain.VALIDATION]: 0,
-      [ErrorDomain.SYSTEM]: 0,
-      [ErrorDomain.UNKNOWN]: 0,
-    };
+  private buildDomainDistribution(errors: CoreError[]): Record<ErrorDomain, number> {
+    // Initialize with all possible ErrorDomain values
+    const distribution: Record<ErrorDomain, number> = Object.values(ErrorDomain).reduce((acc, domain) => {
+      acc[domain] = 0;
+      return acc;
+    }, {} as Record<ErrorDomain, number>);
 
-    errors.forEach(error => {
-      if (distribution.hasOwnProperty(error.type)) {
+    for (const error of errors) {
+      if (error.type in distribution) {
         distribution[error.type]++;
       }
-    });
+    }
 
     return distribution;
   }
 
-  /**
-   * Build time series data
-   */
-  private buildTimeSeries(errors: unknown[], period: string, filters: DashboardFilters): unknown[] {
+  // ========================================================================
+  // Private Helper Methods - Time Series Analysis
+  // ========================================================================
+
+  private buildTimeSeries(
+    errors: CoreError[],
+    period: string,
+    _filters: DashboardFilters
+  ): TimeSeriesDataPoint[] {
     const intervalMs = this.getIntervalMs(period);
-    const intervals: { [key: number]: unknown[] } = {};
+    const intervalMap = new Map<number, CoreError[]>();
 
-    errors.forEach(error => {
-      const interval = Math.floor(error.timestamp / intervalMs) * intervalMs;
-      if (!intervals[interval]) intervals[interval] = [];
-      intervals[interval].push(error);
-    });
+    // Group errors by time interval
+    for (const error of errors) {
+      const intervalKey = Math.floor(error.timestamp / intervalMs) * intervalMs;
+      const intervalErrors = intervalMap.get(intervalKey) || [];
+      intervalErrors.push(error);
+      intervalMap.set(intervalKey, intervalErrors);
+    }
 
-    return Object.entries(intervals)
+    // Convert to time series points
+    const dataPoints: TimeSeriesDataPoint[] = Array.from(intervalMap.entries())
       .map(([timestamp, intervalErrors]) => ({
-        timestamp: parseInt(timestamp),
+        timestamp,
         totalErrors: intervalErrors.length,
         errorRate: intervalErrors.length / (intervalMs / (60 * 1000)),
         severityBreakdown: this.buildSeverityDistribution(intervalErrors),
@@ -401,311 +635,613 @@ class ErrorAnalyticsBridge {
         uniqueErrors: new Set(intervalErrors.map(e => e.message)).size,
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
+
+    return dataPoints;
   }
 
-  /**
-   * Get interval in milliseconds for period
-   */
   private getIntervalMs(period: string): number {
-    switch (period) {
-      case '1h': return 5 * 60 * 1000; // 5 minutes
-      case '24h': return 60 * 60 * 1000; // 1 hour
-      case '7d': return 24 * 60 * 60 * 1000; // 1 day
-      case '30d': return 24 * 60 * 60 * 1000; // 1 day
-      default: return 60 * 60 * 1000;
-    }
+    const intervals: Record<string, number> = {
+      '1h': 5 * 60 * 1000,      // 5 minutes
+      '24h': 60 * 60 * 1000,    // 1 hour
+      '7d': 24 * 60 * 60 * 1000, // 1 day
+      '30d': 24 * 60 * 60 * 1000, // 1 day
+      '90d': 24 * 60 * 60 * 1000, // 1 day
+    };
+    return intervals[period] || 60 * 60 * 1000;
   }
 
-  /**
-   * Calculate growth rate from time series
-   */
-  private calculateGrowthRate(timeSeries: unknown[]): number {
+  private calculateGrowthRate(timeSeries: TimeSeriesDataPoint[]): number {
     if (timeSeries.length < 2) return 0;
 
-    const recent = timeSeries.slice(-10);
-    const earlier = timeSeries.slice(-20, -10);
+    const windowSize = Math.min(10, Math.floor(timeSeries.length / 2));
+    const recent = timeSeries.slice(-windowSize);
+    const earlier = timeSeries.slice(-windowSize * 2, -windowSize);
 
-    const recentAvg = recent.reduce((sum, point) => sum + point.totalErrors, 0) / recent.length;
-    const earlierAvg = earlier.reduce((sum, point) => sum + point.totalErrors, 0) / earlier.length;
+    if (earlier.length === 0) return 0;
+
+    const recentAvg = StatisticsUtils.calculateMean(recent.map(p => p.totalErrors));
+    const earlierAvg = StatisticsUtils.calculateMean(earlier.map(p => p.totalErrors));
 
     return earlierAvg > 0 ? ((recentAvg - earlierAvg) / earlierAvg) * 100 : 0;
   }
 
-  /**
-   * Detect seasonality in time series
-   */
-  private detectSeasonality(timeSeries: unknown[]): any {
-    // Simple seasonality detection - in real implementation would use statistical analysis
+  private detectSeasonality(timeSeries: TimeSeriesDataPoint[]): SeasonalityData {
+    if (timeSeries.length < 24) {
+      return { detected: false, pattern: null, confidence: 0, peakHours: [] };
+    }
+
+    // Extract hourly patterns
+    const hourlyValues = new Map<number, number[]>();
+
+    for (const point of timeSeries) {
+      const hour = new Date(point.timestamp).getHours();
+      const values = hourlyValues.get(hour) || [];
+      values.push(point.totalErrors);
+      hourlyValues.set(hour, values);
+    }
+
+    // Calculate average for each hour
+    const hourlyAverages: Record<string, number> = {};
+    const allAverages: number[] = [];
+
+    for (const [hour, values] of hourlyValues.entries()) {
+      const avg = StatisticsUtils.calculateMean(values);
+      hourlyAverages[hour.toString()] = avg;
+      allAverages.push(avg);
+    }
+
+    // Detect peaks (hours with significantly higher error rates)
+    const overallMean = StatisticsUtils.calculateMean(allAverages);
+    const stdDev = StatisticsUtils.calculateStdDev(allAverages);
+    const threshold = overallMean + stdDev;
+
+    const peakHours = Array.from(hourlyValues.keys())
+      .filter(hour => hourlyAverages[hour.toString()] > threshold)
+      .sort((a, b) => hourlyAverages[b.toString()] - hourlyAverages[a.toString()]);
+
+    const detected = peakHours.length > 0 && stdDev > overallMean * 0.2;
+    const confidence = detected ? Math.min(stdDev / overallMean, 1) : 0;
+
     return {
-      detected: false,
-      pattern: null,
-      confidence: 0,
-      peakHours: [],
+      detected,
+      pattern: detected ? hourlyAverages : null,
+      confidence,
+      peakHours,
     };
   }
 
-  /**
-   * Detect anomalies in time series
-   */
-  private detectAnomalies(timeSeries: unknown[]): unknown[] {
+  private detectAnomalies(timeSeries: TimeSeriesDataPoint[]): AnomalyData[] {
     if (timeSeries.length < 10) return [];
 
     const values = timeSeries.map(p => p.totalErrors);
-    const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
-    const stdDev = Math.sqrt(values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length);
+    const mean = StatisticsUtils.calculateMean(values);
+    const stdDev = StatisticsUtils.calculateStdDev(values);
 
-    return timeSeries
-      .filter(point => Math.abs(point.totalErrors - mean) > 2 * stdDev)
-      .map(point => ({
-        timestamp: point.timestamp,
-        value: point.totalErrors,
-        expectedValue: mean,
-        deviation: Math.abs(point.totalErrors - mean),
-        severity: point.totalErrors > mean + 3 * stdDev ? 'critical' : 'high',
-        description: `Anomalous error count: ${point.totalErrors} (expected: ${mean.toFixed(1)})`,
-      }));
+    if (stdDev === 0) return [];
+
+    const anomalies: AnomalyData[] = [];
+
+    for (const point of timeSeries) {
+      const zScore = Math.abs(point.totalErrors - mean) / stdDev;
+
+      if (zScore > 2) {
+        const severity =
+          zScore > 3 ? 'critical' :
+          zScore > 2.5 ? 'high' :
+          zScore > 2 ? 'medium' : 'low';
+
+        anomalies.push({
+          timestamp: point.timestamp,
+          value: point.totalErrors,
+          expectedValue: mean,
+          deviation: Math.abs(point.totalErrors - mean),
+          severity,
+          description: `Anomalous error count: ${point.totalErrors} (expected: ${mean.toFixed(1)}, z-score: ${zScore.toFixed(2)})`,
+        });
+      }
+    }
+
+    return anomalies;
   }
 
-  /**
-   * Calculate trend projections
-   */
-  private calculateProjections(timeSeries: unknown[]): any {
-    if (timeSeries.length < 5) return { nextHour: 0, nextDay: 0, nextWeek: 0, confidence: 0 };
+  private calculateProjections(timeSeries: TimeSeriesDataPoint[]): ProjectionData {
+    if (timeSeries.length < 5) {
+      return {
+        nextHour: 0,
+        nextDay: 0,
+        nextWeek: 0,
+        confidence: 0,
+        trend: 'stable',
+      };
+    }
 
-    const recent = timeSeries.slice(-5);
-    const trend = recent.reduce((acc, point, i) => {
-      if (i === 0) return acc;
-      return acc + (point.totalErrors - recent[i-1].totalErrors);
-    }, 0) / (recent.length - 1);
+    // Use linear regression for trend calculation
+    const recentWindow = Math.min(20, timeSeries.length);
+    const recent = timeSeries.slice(-recentWindow);
+    const values = recent.map(p => p.totalErrors);
 
-    const lastValue = recent[recent.length - 1].totalErrors;
+    // Calculate trend using simple linear regression
+    const n = values.length;
+    const xMean = (n - 1) / 2;
+    const yMean = StatisticsUtils.calculateMean(values);
+
+    let numerator = 0;
+    let denominator = 0;
+
+    for (let i = 0; i < n; i++) {
+      const xDiff = i - xMean;
+      const yDiff = values[i] - yMean;
+      numerator += xDiff * yDiff;
+      denominator += xDiff * xDiff;
+    }
+
+    const slope = denominator !== 0 ? numerator / denominator : 0;
+    const lastValue = values[values.length - 1];
+
+    // Calculate confidence based on R-squared
+    const predictions = values.map((_, i) => yMean + slope * (i - xMean));
+    const ssRes = values.reduce((sum, val, i) => sum + Math.pow(val - predictions[i], 2), 0);
+    const ssTot = values.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
+    const rSquared = ssTot !== 0 ? 1 - (ssRes / ssTot) : 0;
+    const confidence = Math.max(0, Math.min(1, rSquared));
+
+    // Determine trend direction
+    const trend =
+      Math.abs(slope) < yMean * 0.05 ? 'stable' :
+      slope > 0 ? 'up' : 'down';
 
     return {
-      nextHour: Math.max(0, lastValue + trend),
-      nextDay: Math.max(0, lastValue + trend * 24),
-      nextWeek: Math.max(0, lastValue + trend * 168),
-      confidence: 0.7,
+      nextHour: Math.max(0, lastValue + slope),
+      nextDay: Math.max(0, lastValue + slope * 24),
+      nextWeek: Math.max(0, lastValue + slope * 168),
+      confidence,
+      trend,
     };
   }
 
-  /**
-   * Detect error patterns
-   */
-  private detectErrorPatterns(errors: unknown[], filters: DashboardFilters): ErrorPattern[] {
-    const patternMap: { [key: string]: unknown[] } = {};
+  // ========================================================================
+  // Private Helper Methods - Pattern Detection
+  // ========================================================================
 
-    errors.forEach(error => {
-      const key = `${error.message}-${error.context?.component || 'unknown'}`;
-      if (!patternMap[key]) patternMap[key] = [];
-      patternMap[key].push(error);
-    });
+  private detectErrorPatterns(errors: CoreError[]): ErrorPattern[] {
+    const patternMap = new Map<string, CoreError[]>();
 
-    return Object.entries(patternMap)
-      .filter(([, errors]) => errors.length > 1)
-      .map(([key, patternErrors]) => ({
+    // Group errors by message and component
+    for (const error of errors) {
+      const component = error.context?.component || 'unknown';
+      const key = `${error.message}::${component}`;
+      const patternErrors = patternMap.get(key) || [];
+      patternErrors.push(error);
+      patternMap.set(key, patternErrors);
+    }
+
+    // Convert to patterns (only include patterns with 2+ occurrences)
+    const patterns: ErrorPattern[] = [];
+
+    for (const [key, patternErrors] of patternMap.entries()) {
+      if (patternErrors.length < 2) continue;
+
+      const firstError = patternErrors[0];
+      const timestamps = patternErrors.map(e => e.timestamp);
+      const affectedUserIds = new Set(
+        patternErrors
+          .map(e => e.context?.userId)
+          .filter((id): id is string => Boolean(id))
+      );
+
+      const pattern: ErrorPattern = {
         id: key,
-        name: patternErrors[0].message,
-        description: `Pattern detected in ${patternErrors[0].context?.component || 'unknown component'}`,
+        name: firstError.message,
+        description: `Pattern detected in ${firstError.context?.component || 'unknown component'}`,
         frequency: patternErrors.length,
-        firstSeen: Math.min(...patternErrors.map(e => e.timestamp)),
-        lastSeen: Math.max(...patternErrors.map(e => e.timestamp)),
-        affectedUsers: new Set(patternErrors.map(e => e.context?.userId).filter(Boolean)).size,
-        severity: patternErrors[0].severity,
-        domain: patternErrors[0].type,
-        cluster: {
-          centroid: {
-            message: patternErrors[0].message,
-            stackTrace: patternErrors[0].stack || '',
-            component: patternErrors[0].context?.component || '',
-            userAgent: patternErrors[0].context?.userAgent || '',
-            url: patternErrors[0].context?.url || '',
-          },
-          members: patternErrors.map(e => ({
-            id: e.id,
-            timestamp: e.timestamp,
-            userId: e.context?.userId || '',
-            sessionId: e.context?.sessionId || '',
-            context: e.context,
-          })),
-          similarity: 0.9,
-          radius: 0.1,
-        },
-        impact: {
-          userExperience: patternErrors[0].severity === ErrorSeverity.CRITICAL ? 'critical' : 'high',
-          businessImpact: patternErrors.length > 10 ? 'high' : 'medium',
-          frequency: patternErrors.length > 50 ? 'persistent' : patternErrors.length > 10 ? 'frequent' : 'occasional',
-          scope: 'widespread',
-        },
-        recommendations: this.generateRecommendations(patternErrors[0]),
-      }))
+        firstSeen: Math.min(...timestamps),
+        lastSeen: Math.max(...timestamps),
+        affectedUsers: affectedUserIds.size,
+        severity: firstError.severity,
+        domain: firstError.type,
+        cluster: this.buildErrorCluster(patternErrors),
+        impact: this.calculatePatternImpact(patternErrors),
+        recommendations: this.generateRecommendations(firstError),
+      };
+
+      patterns.push(pattern);
+    }
+
+    // Sort by frequency (descending) and limit to top 20
+    return patterns
       .sort((a, b) => b.frequency - a.frequency)
       .slice(0, 20);
   }
 
-  /**
-   * Generate recommendations for error patterns
-   */
-  private generateRecommendations(error: any): string[] {
-    const recommendations = [];
+  private buildErrorCluster(errors: CoreError[]): ErrorCluster {
+    const firstError = errors[0];
 
-    if (error.type === ErrorDomain.NETWORK) {
-      recommendations.push('Implement retry logic with exponential backoff');
-      recommendations.push('Add network status monitoring');
+    return {
+      centroid: {
+        message: firstError.message,
+        stackTrace: firstError.stack || '',
+        component: firstError.context?.component || '',
+        userAgent: firstError.context?.userAgent || '',
+        url: firstError.context?.url || '',
+      },
+      members: errors.map(e => ({
+        id: e.id,
+        timestamp: e.timestamp,
+        userId: e.context?.userId || '',
+        sessionId: e.context?.sessionId || '',
+        context: e.context,
+      })),
+      similarity: 0.9,
+      radius: 0.1,
+    };
+  }
+
+  private calculatePatternImpact(errors: CoreError[]): ErrorPattern['impact'] {
+    const firstError = errors[0];
+    const frequency = errors.length;
+
+    const userExperience =
+      firstError.severity === ErrorSeverity.CRITICAL ? 'critical' :
+      firstError.severity === ErrorSeverity.HIGH ? 'high' :
+      firstError.severity === ErrorSeverity.MEDIUM ? 'medium' : 'low';
+
+    const businessImpact =
+      frequency > 50 ? 'high' :
+      frequency > 10 ? 'medium' : 'low';
+
+    const frequencyCategory =
+      frequency > 50 ? 'persistent' :
+      frequency > 10 ? 'frequent' : 'occasional';
+
+    const affectedUsers = new Set(
+      errors.map(e => e.context?.userId).filter(Boolean)
+    ).size;
+
+    const scope = affectedUsers > 10 ? 'widespread' : 'isolated';
+
+    return {
+      userExperience,
+      businessImpact,
+      frequency: frequencyCategory,
+      scope,
+    };
+  }
+
+  private generateRecommendations(error: CoreError): string[] {
+    const recommendations: string[] = [];
+
+    // Domain-specific recommendations
+    switch (error.type) {
+      case ErrorDomain.NETWORK:
+        recommendations.push('Implement retry logic with exponential backoff');
+        recommendations.push('Add network status monitoring and offline support');
+        recommendations.push('Consider implementing request queuing for failed requests');
+        break;
+      case ErrorDomain.AUTHENTICATION:
+        recommendations.push('Implement token refresh mechanism');
+        recommendations.push('Add session timeout warnings for users');
+        recommendations.push('Consider implementing silent authentication flows');
+        break;
+      case ErrorDomain.VALIDATION:
+        recommendations.push('Improve client-side validation to prevent invalid requests');
+        recommendations.push('Provide clearer error messages to users');
+        recommendations.push('Add input sanitization and validation helpers');
+        break;
+      case ErrorDomain.SYSTEM:
+        recommendations.push('Add monitoring and alerting for system resources');
+        recommendations.push('Implement graceful degradation strategies');
+        recommendations.push('Consider load balancing and scaling solutions');
+        break;
     }
 
+    // Severity-specific recommendations
     if (error.severity === ErrorSeverity.CRITICAL) {
-      recommendations.push('Implement circuit breaker pattern');
-      recommendations.push('Add comprehensive error boundaries');
+      recommendations.push('Implement circuit breaker pattern to prevent cascading failures');
+      recommendations.push('Add comprehensive error boundaries at component level');
+      recommendations.push('Set up real-time alerts for critical errors');
     }
 
-    recommendations.push('Add detailed logging for debugging');
-    recommendations.push('Implement user-friendly error messages');
+    // General recommendations
+    recommendations.push('Add detailed contextual logging for debugging');
+    recommendations.push('Implement user-friendly error messages with actionable guidance');
 
     return recommendations;
   }
 
-  /**
-   * Calculate strategy effectiveness
-   */
-  private calculateStrategyEffectiveness(recoveredErrors: unknown[]): unknown[] {
-    const strategies: { [key: string]: unknown[] } = {};
+  // ========================================================================
+  // Private Helper Methods - Recovery Analytics
+  // ========================================================================
 
-    recoveredErrors.forEach(error => {
-      const strategy = error.recoveryStrategy || 'manual';
-      if (!strategies[strategy]) strategies[strategy] = [];
-      strategies[strategy].push(error);
-    });
-
-    return Object.entries(strategies).map(([strategyId, errors]) => ({
-      strategyId,
-      strategyName: strategyId,
-      successRate: 1, // All these are successful by definition
-      averageRecoveryTime: errors.reduce((sum, e) => sum + (e.recoveryTime || 300000), 0) / errors.length,
-      usageCount: errors.length,
-      failureReasons: [],
-      improvementSuggestions: [],
-    }));
-  }
-
-  /**
-   * Calculate recovery time distribution
-   */
-  private calculateRecoveryTimeDistribution(recoveredErrors: unknown[]): any {
-    const times = recoveredErrors.map(e => e.recoveryTime || 300000).sort((a, b) => a - b);
+  private computeRecoveryAnalytics(errors: CoreError[]): RecoveryAnalytics {
+    const recoveredErrors = errors.filter(e => e.recovered);
+    const failedErrors = errors.filter(e => !e.recovered);
 
     return {
-      p50: times[Math.floor(times.length * 0.5)] || 0,
-      p95: times[Math.floor(times.length * 0.95)] || 0,
-      p99: times[Math.floor(times.length * 0.99)] || 0,
-      average: times.reduce((sum, t) => sum + t, 0) / times.length || 0,
-      min: times[0] || 0,
-      max: times[times.length - 1] || 0,
+      overallSuccessRate: errors.length > 0 ? recoveredErrors.length / errors.length : 0,
+      strategyEffectiveness: this.calculateStrategyEffectiveness(recoveredErrors),
+      recoveryTimeDistribution: this.calculateRecoveryTimeDistribution(recoveredErrors),
+      failureAnalysis: this.analyzeRecoveryFailures(failedErrors),
+      automatedRecoveryRate: this.calculateAutomatedRecoveryRate(recoveredErrors),
+      manualInterventionRate: this.calculateManualInterventionRate(recoveredErrors),
     };
   }
 
-  /**
-   * Calculate recovery failures
-   */
-  private calculateRecoveryFailures(failedErrors: unknown[]): unknown[] {
+  private calculateStrategyEffectiveness(recoveredErrors: CoreError[]): StrategyEffectiveness[] {
+    const strategyMap = new Map<string, CoreError[]>();
+
+    for (const error of recoveredErrors) {
+      const strategy = error.recoveryStrategy || 'manual';
+      const strategyErrors = strategyMap.get(strategy) || [];
+      strategyErrors.push(error);
+      strategyMap.set(strategy, strategyErrors);
+    }
+
+    return Array.from(strategyMap.entries()).map(([strategyId, errors]) => {
+      const recoveryTimes = errors
+        .map(e => e.recoveryTime || 0)
+        .filter(time => time > 0);
+
+      return {
+        strategyId,
+        strategyName: this.formatStrategyName(strategyId),
+        successRate: 1.0, // All recovered errors by definition
+        averageRecoveryTime: recoveryTimes.length > 0
+          ? StatisticsUtils.calculateMean(recoveryTimes)
+          : 0,
+        usageCount: errors.length,
+        failureReasons: [],
+        improvementSuggestions: this.generateStrategyImprovements(strategyId, errors),
+      };
+    });
+  }
+
+  private formatStrategyName(strategyId: string): string {
+    return strategyId
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  private generateStrategyImprovements(_strategyId: string, errors: CoreError[]): string[] {
+    const suggestions: string[] = [];
+    const avgRecoveryTime = StatisticsUtils.calculateMean(
+      errors.map(e => e.recoveryTime || 0).filter(time => time > 0)
+    );
+
+    if (avgRecoveryTime > 5000) {
+      suggestions.push('Optimize recovery time - currently averaging over 5 seconds');
+    }
+
+    if (errors.length > 50) {
+      suggestions.push('High usage count - consider investigating root cause');
+    }
+
+    return suggestions;
+  }
+
+  private calculateRecoveryTimeDistribution(recoveredErrors: CoreError[]): RecoveryTimeDistribution {
+    const times = recoveredErrors
+      .map(e => e.recoveryTime || 0)
+      .filter(time => time > 0)
+      .sort((a, b) => a - b);
+
+    if (times.length === 0) {
+      return { p50: 0, p95: 0, p99: 0, average: 0, min: 0, max: 0 };
+    }
+
+    return {
+      p50: StatisticsUtils.calculatePercentile(times, 50),
+      p95: StatisticsUtils.calculatePercentile(times, 95),
+      p99: StatisticsUtils.calculatePercentile(times, 99),
+      average: StatisticsUtils.calculateMean(times),
+      min: times[0],
+      max: times[times.length - 1],
+    };
+  }
+
+  private analyzeRecoveryFailures(failedErrors: CoreError[]): RecoveryFailure[] {
     return failedErrors.slice(0, 10).map(error => ({
       strategyId: error.recoveryStrategy || 'none',
       errorId: error.id,
-      reason: 'Recovery strategy failed or not available',
+      reason: error.recoveryStrategy
+        ? 'Recovery strategy failed to resolve the error'
+        : 'No recovery strategy available for this error type',
       timestamp: error.timestamp,
       context: error.context,
-      alternativeStrategies: ['manual_intervention', 'page_reload', 'cache_clear'],
+      alternativeStrategies: this.suggestAlternativeStrategies(error),
     }));
   }
 
-  /**
-   * Generate active alerts
-   */
-  private generateActiveAlerts(recentErrors: unknown[]): unknown[] {
-    const alerts = [];
+  private suggestAlternativeStrategies(error: CoreError): string[] {
+    const strategies: string[] = [];
+
+    if (error.type === ErrorDomain.NETWORK) {
+      strategies.push('retry_with_exponential_backoff');
+      strategies.push('use_cached_data');
+      strategies.push('queue_for_later');
+    }
+
+    strategies.push('manual_intervention');
+    strategies.push('page_reload');
+    strategies.push('clear_cache');
+
+    return strategies;
+  }
+
+  private calculateAutomatedRecoveryRate(recoveredErrors: CoreError[]): number {
+    if (recoveredErrors.length === 0) return 0;
+    const automated = recoveredErrors.filter(e => e.recoveryStrategy).length;
+    return automated / recoveredErrors.length;
+  }
+
+  private calculateManualInterventionRate(recoveredErrors: CoreError[]): number {
+    if (recoveredErrors.length === 0) return 0;
+    const manual = recoveredErrors.filter(e => !e.recoveryStrategy).length;
+    return manual / recoveredErrors.length;
+  }
+
+  // ========================================================================
+  // Private Helper Methods - Real-time Monitoring
+  // ========================================================================
+
+  private generateActiveAlerts(recentErrors: CoreError[]): Alert[] {
+    const alerts: Alert[] = [];
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    const recentInWindow = recentErrors.filter(e => e.timestamp > fiveMinutesAgo);
 
     // High error rate alert
-    if (recentErrors.length > 10) {
+    if (recentInWindow.length > 10) {
       alerts.push({
         id: 'high-error-rate',
         type: 'threshold',
-        severity: 'warning',
+        severity: recentInWindow.length > 20 ? 'critical' : 'warning',
         title: 'High Error Rate Detected',
-        description: `${recentErrors.length} errors in the last 5 minutes`,
+        description: `${recentInWindow.length} errors occurred in the last 5 minutes`,
         timestamp: Date.now(),
         acknowledged: false,
         resolved: false,
-        threshold: { metric: 'error_rate', operator: 'gt', value: 10, duration: 5 },
+        threshold: {
+          metric: 'error_rate',
+          operator: 'gt',
+          value: 10,
+          duration: 5,
+        },
       });
     }
 
     // Critical errors alert
-    const criticalErrors = recentErrors.filter(e => e.severity === ErrorSeverity.CRITICAL);
+    const criticalErrors = recentInWindow.filter(e => e.severity === ErrorSeverity.CRITICAL);
     if (criticalErrors.length > 0) {
       alerts.push({
         id: 'critical-errors',
         type: 'threshold',
         severity: 'critical',
         title: 'Critical Errors Detected',
-        description: `${criticalErrors.length} critical errors require immediate attention`,
+        description: `${criticalErrors.length} critical error${criticalErrors.length > 1 ? 's' : ''} require${criticalErrors.length === 1 ? 's' : ''} immediate attention`,
         timestamp: Date.now(),
         acknowledged: false,
         resolved: false,
       });
     }
 
+    // Pattern detection alert
+    const patternMap = new Map<string, number>();
+    for (const error of recentInWindow) {
+      const key = error.message;
+      patternMap.set(key, (patternMap.get(key) || 0) + 1);
+    }
+
+    for (const [message, count] of patternMap.entries()) {
+      if (count >= 5) {
+        alerts.push({
+          id: `pattern-${message.substring(0, 20)}`,
+          type: 'pattern',
+          severity: 'warning',
+          title: 'Recurring Error Pattern',
+          description: `Error "${message.substring(0, 50)}..." occurred ${count} times recently`,
+          timestamp: Date.now(),
+          acknowledged: false,
+          resolved: false,
+        });
+      }
+    }
+
     return alerts;
   }
 
-  /**
-   * Transform error to event format
-   */
-  private transformToErrorEvent(error: any): any {
+  private transformToLiveEvent(error: CoreError): Omit<CoreError, 'stack' | 'context'> {
     return {
       id: error.id,
       timestamp: error.timestamp,
-      type: error.type,
-      severity: error.severity,
       message: error.message,
-      userId: error.context?.userId || '',
-      sessionId: error.context?.sessionId || '',
-      component: error.context?.component || '',
-      recoverable: error.recoverable,
+      severity: error.severity,
+      type: error.type,
       recovered: error.recovered,
+      recoverable: error.recoverable,
+      recoveryTime: error.recoveryTime,
+      recoveryStrategy: error.recoveryStrategy,
     };
   }
 
-  /**
-   * Get system health status
-   */
-  private getSystemHealthStatus(): any {
+  private getSystemHealthStatus(): SystemHealth {
+    const navigationStart = window.performance?.timing?.navigationStart || Date.now();
+    const uptime = Date.now() - navigationStart;
+
     return {
       overall: 'healthy',
-      components: [{
-        name: 'Error Handler',
-        status: 'healthy',
-        responseTime: 10,
-        errorRate: 0,
-        lastCheck: Date.now(),
-      }],
-      uptime: Date.now() - (window.performance.timing.navigationStart || Date.now()),
+      components: [
+        {
+          name: 'Error Handler',
+          status: 'healthy',
+          responseTime: 10,
+          errorRate: 0,
+          lastCheck: Date.now(),
+        },
+        {
+          name: 'Analytics Bridge',
+          status: 'healthy',
+          responseTime: 15,
+          errorRate: 0,
+          lastCheck: Date.now(),
+        },
+      ],
+      uptime,
       lastIncident: null,
     };
   }
 
-  /**
-   * Get performance metrics
-   */
-  private getPerformanceMetrics(): any {
+  private getPerformanceMetrics(): PerformanceMetrics {
+    const memory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    const memoryUsage = memory
+      ? (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100
+      : 0;
+
     return {
       averageResponseTime: 150,
       errorProcessingTime: 5,
-      memoryUsage: (performance as any).memory?.usedJSHeapSize / (performance as any).memory?.totalJSHeapSize * 100 || 0,
+      memoryUsage,
       cpuUsage: 0,
       throughput: 0,
     };
+  }
+
+  // ========================================================================
+  // Private Helper Methods - Utilities
+  // ========================================================================
+
+  private generateCacheKey(type: string, data: unknown): string {
+    return `${type}-${JSON.stringify(data)}`;
   }
 }
 
 // Export singleton instance
 export const errorAnalyticsBridge = ErrorAnalyticsBridge.getInstance();
 export { ErrorAnalyticsBridge };
+
+// Export types directly from this file
+export type {
+  CoreError,
+  TimeSeriesPoint,
+  TimeRange,
+  DashboardFilters,
+  ErrorOverviewMetrics,
+  SeasonalityData,
+  AnomalyData,
+  ProjectionData,
+  ErrorTrendData,
+  TimeSeriesDataPoint,
+  ErrorCluster,
+  ErrorPattern,
+  StrategyEffectiveness,
+  RecoveryTimeDistribution,
+  RecoveryFailure,
+  RecoveryAnalytics,
+  Alert,
+  SystemHealthComponent,
+  SystemHealth,
+  PerformanceMetrics,
+  RealTimeMetrics
+};
+
+// Export additional utility classes for external use if needed
+export { StatisticsUtils, CacheManager };

@@ -195,7 +195,7 @@ export const legislative_briefs = pgTable("legislative_briefs", {
   
   // Brief content
   executive_summary: text("executive_summary").notNull(),
-  key_arguments: jsonb("key_arguments").notNull().default(sql`'[]'::jsonb`),
+  key_arguments: jsonb("key_arguments").notNull().default(sql`'{}'::jsonb`),
   stakeholder_positions: jsonb("stakeholder_positions").notNull().default(sql`'{}'::jsonb`),
   public_sentiment: jsonb("public_sentiment").notNull().default(sql`'{}'::jsonb`),
   

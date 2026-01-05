@@ -13,8 +13,8 @@ import {
   ErrorContext,
   coreErrorHandler,
   createError,
-} from '@client/core/error';
-import { logger } from '@client/utils/logger';
+} from '@/core/error';
+import { logger } from '@/utils/logger';
 
 // ============================================================================
 // Redux-specific types (extending core types)
@@ -383,7 +383,7 @@ const errorHandlingSlice = createSlice({
     // Sync with core error system
     syncWithCoreSystem: (state) => {
       const coreStats = coreErrorHandler.getErrorStats();
-      
+
       // Update stats from core system
       state.errorStats.recoveryRate = coreStats.recovered / Math.max(coreStats.total, 1);
       state.errorStats.lastUpdated = Date.now();
