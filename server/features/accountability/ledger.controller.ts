@@ -1,6 +1,7 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPost } from 'inversify-express-utils';
+
 import { LedgerService } from './ledger.service';
 
 @controller('/api/ledger')
@@ -18,10 +19,15 @@ export class LedgerController {
         return;
       }
 
-      const id = await this.ledgerService.recordAction(action, actor, resource || 'Manual Entry', details || {});
+      const id = await this.ledgerService.recordAction(
+        action,
+        actor,
+        resource || 'Manual Entry',
+        details || {}
+      );
       res.status(201).json({ id, message: 'Violation recorded in Shadow Ledger' });
     } catch (error) {
-      console.error(error);
+      // In production, send this to your observability stack (e.g. Sentry)
       res.status(500).json({ error: 'Failed to record violation' });
     }
   }
@@ -43,7 +49,7 @@ export class LedgerController {
   }
 
   @httpGet('/summary')
-  async getSummary(req: Request, res: Response): Promise<void> {
+  async getSummary(_req: Request, res: Response): Promise<void> {
     try {
       const summary = await this.ledgerService.getSummary();
       res.json(summary);
