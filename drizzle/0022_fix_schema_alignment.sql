@@ -81,7 +81,7 @@ CREATE TABLE "user" (
     "name" text NOT NULL,
     "role" user_role NOT NULL DEFAULT 'citizen',
     "verificationStatus" verification_status NOT NULL DEFAULT 'pending',
-    "preferences" jsonb DEFAULT '{}',
+    "preferences" jsonb DEFAULT '{}'::jsonb,
     "isActive" boolean NOT NULL DEFAULT true,
     "lastLoginAt" timestamp with time zone,
     "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
@@ -96,7 +96,7 @@ CREATE TABLE "user_profile" (
     "expertise" text[] DEFAULT '{}',
     "location" text,
     "organization" text,
-    "verificationDocuments" jsonb DEFAULT '[]',
+    "verificationDocuments" jsonb DEFAULT '[]'::jsonb,
     "reputationScore" integer NOT NULL DEFAULT 0,
     "isPublic" boolean NOT NULL DEFAULT true,
     "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
@@ -211,8 +211,8 @@ CREATE TABLE "bill" (
     "commentCountCached" integer NOT NULL DEFAULT 0,
     "engagementScore" numeric(10, 2) NOT NULL DEFAULT 0,
     "complexityScore" integer,
-    "constitutionalConcerns" jsonb DEFAULT '[]',
-    "stakeholderAnalysis" jsonb DEFAULT '{}',
+    "constitutionalConcerns" jsonb DEFAULT '[]'::jsonb,
+    "stakeholderAnalysis" jsonb DEFAULT '{}'::jsonb,
     "introducedDate" timestamp with time zone,
     "lastActionDate" timestamp with time zone,
     "searchVector" text,
@@ -295,7 +295,7 @@ CREATE TABLE "social_share" (
     "billId" integer NOT NULL REFERENCES "bill"("id") ON DELETE CASCADE,
     "platform" text NOT NULL,
     "userId" uuid NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
-    "metadata" jsonb DEFAULT '{}',
+    "metadata" jsonb DEFAULT '{}'::jsonb,
     "sharedAt" timestamp with time zone NOT NULL DEFAULT now(),
     "likes" integer NOT NULL DEFAULT 0,
     "shares" integer NOT NULL DEFAULT 0,
@@ -312,10 +312,10 @@ CREATE TABLE "analysis" (
     "id" serial PRIMARY KEY,
     "billId" integer NOT NULL REFERENCES "bill"("id") ON DELETE CASCADE,
     "analysisType" analysis_type NOT NULL,
-    "results" jsonb DEFAULT '{}',
+    "results" jsonb DEFAULT '{}'::jsonb,
     "confidence" numeric(5, 4) DEFAULT 0,
     "modelVersion" text,
-    "metadata" jsonb DEFAULT '{}',
+    "metadata" jsonb DEFAULT '{}'::jsonb,
     "isApproved" boolean NOT NULL DEFAULT false,
     "approvedBy" uuid REFERENCES "user"("id") ON DELETE SET NULL,
     "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
@@ -368,8 +368,8 @@ CREATE TABLE "verification" (
     "verificationType" verification_type NOT NULL,
     "verificationStatus" verification_status NOT NULL DEFAULT 'pending',
     "confidence" numeric(5, 4) NOT NULL DEFAULT 0,
-    "evidence" jsonb DEFAULT '[]',
-    "expertise" jsonb DEFAULT '{}',
+    "evidence" jsonb DEFAULT '[]'::jsonb,
+    "expertise" jsonb DEFAULT '{}'::jsonb,
     "reasoning" text,
     "feedback" text,
     "endorsements" integer NOT NULL DEFAULT 0,
@@ -415,7 +415,7 @@ CREATE TABLE "sponsor_transparency" (
     "id" serial PRIMARY KEY,
     "sponsorId" integer NOT NULL REFERENCES "sponsor"("id") ON DELETE CASCADE,
     "disclosureType" disclosure_type NOT NULL,
-    "disclosureData" jsonb NOT NULL DEFAULT '{}',
+    "disclosureData" jsonb NOT NULL DEFAULT '{}'::jsonb,
     "reportingPeriod" text,
     "isVerified" boolean NOT NULL DEFAULT false,
     "verifiedBy" uuid REFERENCES "user"("id") ON DELETE SET NULL,
@@ -434,7 +434,7 @@ CREATE TABLE "notification" (
     "type" notification_type NOT NULL,
     "title" text NOT NULL,
     "message" text NOT NULL,
-    "data" jsonb DEFAULT '{}',
+    "data" jsonb DEFAULT '{}'::jsonb,
     "isRead" boolean NOT NULL DEFAULT false,
     "createdAt" timestamp with time zone NOT NULL DEFAULT now(),
     "readAt" timestamp with time zone
@@ -535,49 +535,49 @@ END;
 $$ language 'plpgsql';
 
 -- Apply updated_at triggers to relevant tables
-CREATE TRIGGER update_user_updated_at BEFORE UPDATE ON "user" 
+CREATE TRIGGER update_user_updated_at BEFORE UPDATE ON "user"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_profile_updated_at BEFORE UPDATE ON "user_profile" 
+CREATE TRIGGER update_user_profile_updated_at BEFORE UPDATE ON "user_profile"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_session_updated_at BEFORE UPDATE ON "session" 
+CREATE TRIGGER update_session_updated_at BEFORE UPDATE ON "session"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bill_updated_at BEFORE UPDATE ON "bill" 
+CREATE TRIGGER update_bill_updated_at BEFORE UPDATE ON "bill"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_sponsor_updated_at BEFORE UPDATE ON "sponsor" 
+CREATE TRIGGER update_sponsor_updated_at BEFORE UPDATE ON "sponsor"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bill_comment_updated_at BEFORE UPDATE ON "bill_comment" 
+CREATE TRIGGER update_bill_comment_updated_at BEFORE UPDATE ON "bill_comment"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_progress_updated_at BEFORE UPDATE ON "user_progress" 
+CREATE TRIGGER update_user_progress_updated_at BEFORE UPDATE ON "user_progress"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_bill_tracking_preference_updated_at BEFORE UPDATE ON "user_bill_tracking_preference" 
+CREATE TRIGGER update_user_bill_tracking_preference_updated_at BEFORE UPDATE ON "user_bill_tracking_preference"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_analysis_updated_at BEFORE UPDATE ON "analysis" 
+CREATE TRIGGER update_analysis_updated_at BEFORE UPDATE ON "analysis"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_content_analysis_updated_at BEFORE UPDATE ON "content_analysis" 
+CREATE TRIGGER update_content_analysis_updated_at BEFORE UPDATE ON "content_analysis"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_bill_section_conflict_updated_at BEFORE UPDATE ON "bill_section_conflict" 
+CREATE TRIGGER update_bill_section_conflict_updated_at BEFORE UPDATE ON "bill_section_conflict"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_verification_updated_at BEFORE UPDATE ON "verification" 
+CREATE TRIGGER update_verification_updated_at BEFORE UPDATE ON "verification"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_stakeholder_updated_at BEFORE UPDATE ON "stakeholder" 
+CREATE TRIGGER update_stakeholder_updated_at BEFORE UPDATE ON "stakeholder"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_sponsor_affiliation_updated_at BEFORE UPDATE ON "sponsor_affiliation" 
+CREATE TRIGGER update_sponsor_affiliation_updated_at BEFORE UPDATE ON "sponsor_affiliation"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_sponsor_transparency_updated_at BEFORE UPDATE ON "sponsor_transparency" 
+CREATE TRIGGER update_sponsor_transparency_updated_at BEFORE UPDATE ON "sponsor_transparency"
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================================================
@@ -587,16 +587,16 @@ CREATE TRIGGER update_sponsor_transparency_updated_at BEFORE UPDATE ON "sponsor_
 CREATE OR REPLACE FUNCTION update_bill_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW."searchVector" := to_tsvector('english', 
-        COALESCE(NEW."title", '') || ' ' || 
-        COALESCE(NEW."summary", '') || ' ' || 
+    NEW."searchVector" := to_tsvector('english',
+        COALESCE(NEW."title", '') || ' ' ||
+        COALESCE(NEW."summary", '') || ' ' ||
         COALESCE(NEW."billNumber", '')
     );
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_bill_search_vector_trigger 
+CREATE TRIGGER update_bill_search_vector_trigger
     BEFORE INSERT OR UPDATE ON "bill"
     FOR EACH ROW EXECUTE FUNCTION update_bill_search_vector();
 
@@ -605,11 +605,11 @@ CREATE TRIGGER update_bill_search_vector_trigger
 -- ============================================================================
 
 -- Insert a test user for validation
-INSERT INTO "user" ("email", "passwordHash", "name", "role") VALUES 
+INSERT INTO "user" ("email", "passwordHash", "name", "role") VALUES
 ('admin@example.com', '$2b$10$example_hash', 'System Admin', 'admin')
 ON CONFLICT ("email") DO NOTHING;
 
 -- Insert a test sponsor
-INSERT INTO "sponsor" ("name", "role", "party") VALUES 
+INSERT INTO "sponsor" ("name", "role", "party") VALUES
 ('Test Sponsor', 'Senator', 'Independent')
 ON CONFLICT DO NOTHING;

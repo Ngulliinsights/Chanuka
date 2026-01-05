@@ -15,23 +15,23 @@ interface ImportFix {
 }
 
 const IMPORT_FIXES: ImportFix[] = [
-  // Fix @chanuka/shared imports to @shared
+  // Fix @shared imports to @shared
   {
     pattern: /from ['"]@chanuka\/shared(['"])/g,
     replacement: "from '@shared$1",
-    description: 'Replace @chanuka/shared with @shared'
+    description: 'Replace @shared with @shared'
   },
   {
     pattern: /from ['"]@chanuka\/shared\/([^'"]+)(['"])/g,
     replacement: "from '@shared/$1$2",
-    description: 'Replace @chanuka/shared/* with @shared/*'
+    description: 'Replace @shared/* with @shared/*'
   },
   {
     pattern: /import\s*\(\s*['"]@chanuka\/shared([^'"]*)['"]\s*\)/g,
     replacement: "import('@shared$1')",
-    description: 'Replace dynamic @chanuka/shared imports with @shared'
+    description: 'Replace dynamic @shared imports with @shared'
   },
-  
+
   // Fix inconsistent @shared/core/src paths
   {
     pattern: /from ['"]@shared\/core\/src\/([^'"]+)(['"])/g,
@@ -43,7 +43,7 @@ const IMPORT_FIXES: ImportFix[] = [
     replacement: "import('@shared/core/$1')",
     description: 'Simplify dynamic @shared/core/src/* imports'
   },
-  
+
   // Fix relative imports that should use aliases (from shared to other modules)
   {
     pattern: /from ['"]\.\.\/\.\.\/server\/([^'"]+)(['"])/g,
@@ -60,7 +60,7 @@ const IMPORT_FIXES: ImportFix[] = [
     replacement: "from '@shared/$1$2",
     description: 'Replace ../../shared/* with @shared/*'
   },
-  
+
   // Fix relative imports within shared module
   {
     pattern: /from ['"]\.\.\/([^'"]+)(['"])/g,
@@ -77,11 +77,11 @@ const IMPORT_FIXES: ImportFix[] = [
 
 function findTypeScriptFiles(dir: string, files: string[] = []): string[] {
   const entries = readdirSync(dir);
-  
+
   for (const entry of entries) {
     const fullPath = join(dir, entry);
     const stat = statSync(fullPath);
-    
+
     if (stat.isDirectory()) {
       // Skip node_modules, dist, and other build directories
       if (!['node_modules', 'dist', 'build', 'coverage', '.git'].includes(entry)) {
@@ -94,7 +94,7 @@ function findTypeScriptFiles(dir: string, files: string[] = []): string[] {
       }
     }
   }
-  
+
   return files;
 }
 
@@ -103,27 +103,27 @@ function fixImportsInFile(filePath: string): boolean {
     const content = readFileSync(filePath, 'utf-8');
     let modifiedContent = content;
     let hasChanges = false;
-    
+
     for (const fix of IMPORT_FIXES) {
       const originalContent = modifiedContent;
-      
+
       if (typeof fix.replacement === 'string') {
         modifiedContent = modifiedContent.replace(fix.pattern, fix.replacement);
       } else {
         modifiedContent = modifiedContent.replace(fix.pattern, fix.replacement as any);
       }
-      
+
       if (modifiedContent !== originalContent) {
         hasChanges = true;
         console.log(`  ✓ ${fix.description}`);
       }
     }
-    
+
     if (hasChanges) {
       writeFileSync(filePath, modifiedContent, 'utf-8');
       return true;
     }
-    
+
     return false;
   } catch (error) {
     console.error(`Error processing ${filePath}:`, error);
@@ -133,23 +133,23 @@ function fixImportsInFile(filePath: string): boolean {
 
 function main() {
   console.log('🔧 Standardizing import paths across the codebase...\n');
-  
+
   const rootDir = process.cwd();
   const tsFiles = findTypeScriptFiles(rootDir);
-  
+
   console.log(`Found ${tsFiles.length} TypeScript files to process\n`);
-  
+
   let processedFiles = 0;
   let modifiedFiles = 0;
-  
+
   for (const filePath of tsFiles) {
     const relativePath = relative(rootDir, filePath);
-    
+
     console.log(`Processing: ${relativePath}`);
-    
+
     const wasModified = fixImportsInFile(filePath);
     processedFiles++;
-    
+
     if (wasModified) {
       modifiedFiles++;
       console.log(`  ✅ Modified\n`);
@@ -157,12 +157,12 @@ function main() {
       console.log(`  ⏭️  No changes needed\n`);
     }
   }
-  
+
   console.log('📊 Summary:');
   console.log(`  • Files processed: ${processedFiles}`);
   console.log(`  • Files modified: ${modifiedFiles}`);
   console.log(`  • Files unchanged: ${processedFiles - modifiedFiles}`);
-  
+
   if (modifiedFiles > 0) {
     console.log('\n✅ Import path standardization completed successfully!');
     console.log('\n💡 Next steps:');

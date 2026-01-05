@@ -1,4 +1,4 @@
-CREATE TYPE "public"."action_status" AS ENUM('active', 'paused', 'completed', 'cancelled', 'archived');--> statement-breakpoint
+ CREATE TYPE "public"."action_status" AS ENUM('active', 'paused', 'completed', 'cancelled', 'archived');--> statement-breakpoint
 CREATE TYPE "public"."action_type" AS ENUM('call_mp', 'submit_testimony', 'share_social', 'attend_hearing', 'organize_event', 'petition', 'email_campaign', 'community_meeting');--> statement-breakpoint
 CREATE TYPE "public"."ambassador_status" AS ENUM('pending', 'active', 'inactive', 'suspended', 'certified');--> statement-breakpoint
 CREATE TYPE "public"."bill_status" AS ENUM('drafted', 'introduced', 'first_reading', 'second_reading', 'committee_stage', 'report_stage', 'third_reading', 'presidential_assent', 'act_of_parliament', 'withdrawn', 'lapsed');--> statement-breakpoint

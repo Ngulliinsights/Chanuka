@@ -394,7 +394,7 @@ importers:
 
   client:
     dependencies:
-      '@chanuka/shared':
+      '@shared':
         specifier: workspace:*
         version: link:../shared
       '@datadog/browser-rum':
@@ -698,7 +698,7 @@ importers:
 
   server:
     dependencies:
-      '@chanuka/shared':
+      '@shared':
         specifier: workspace:*
         version: link:../shared
       qrcode:

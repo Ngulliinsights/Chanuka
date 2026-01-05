@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS "user_profiles" (
     "location" varchar(255),
     "website" varchar(255),
     "avatar_url" varchar(500),
-    "preferences" jsonb DEFAULT '{}',
-    "privacy_settings" jsonb DEFAULT '{}',
+    "preferences" jsonb DEFAULT '{}'::jsonb,
+    "privacy_settings" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
     "id" varchar(255) PRIMARY KEY,
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "expires_at" timestamp NOT NULL,
-    "data" jsonb DEFAULT '{}',
+    "data" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "bills" (
     "sponsor_id" uuid,
     "committee" varchar(255),
     "tags" text[],
-    "metadata" jsonb DEFAULT '{}',
+    "metadata" jsonb DEFAULT '{}'::jsonb,
     "search_vector" tsvector,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
@@ -80,9 +80,9 @@ CREATE TABLE IF NOT EXISTS "sponsors" (
     "chamber" varchar(20),
     "bio" text,
     "website" varchar(255),
-    "social_media" jsonb DEFAULT '{}',
-    "financial_disclosures" jsonb DEFAULT '{}',
-    "voting_record" jsonb DEFAULT '{}',
+    "social_media" jsonb DEFAULT '{}'::jsonb,
+    "financial_disclosures" jsonb DEFAULT '{}'::jsonb,
+    "voting_record" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS "bill_engagement" (
     "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "engagement_type" varchar(50) NOT NULL,
-    "engagement_data" jsonb DEFAULT '{}',
+    "engagement_data" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     UNIQUE("user_id", "bill_id", "engagement_type")
 );
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS "user_verification" (
     "user_id" uuid UNIQUE NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "verification_type" varchar(50) NOT NULL,
     "verification_status" varchar(20) DEFAULT 'pending',
-    "verification_data" jsonb DEFAULT '{}',
+    "verification_data" jsonb DEFAULT '{}'::jsonb,
     "verified_by" uuid REFERENCES "users"("id"),
     "verified_at" timestamp,
     "expires_at" timestamp,
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS "notifications" (
     "type" varchar(50) NOT NULL,
     "title" varchar(255) NOT NULL,
     "message" text NOT NULL,
-    "data" jsonb DEFAULT '{}',
+    "data" jsonb DEFAULT '{}'::jsonb,
     "is_read" boolean DEFAULT false,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "read_at" timestamp
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS "alert_preferences" (
     "bill_updates" boolean DEFAULT true,
     "comment_replies" boolean DEFAULT true,
     "weekly_digest" boolean DEFAULT true,
-    "preferences" jsonb DEFAULT '{}',
+    "preferences" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS "compliance_checks" (
     "entity_type" varchar(50) NOT NULL,
     "entity_id" varchar(255) NOT NULL,
     "status" varchar(20) DEFAULT 'pending',
-    "result" jsonb DEFAULT '{}',
+    "result" jsonb DEFAULT '{}'::jsonb,
     "last_checked" timestamp DEFAULT now(),
     "next_check" timestamp,
     "created_at" timestamp DEFAULT now() NOT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS "security_events" (
     "severity" varchar(20) DEFAULT 'info',
     "source_ip" inet,
     "user_id" uuid REFERENCES "users"("id"),
-    "event_data" jsonb DEFAULT '{}',
+    "event_data" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL
 );
 
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS "analytics_events" (
     "event_type" varchar(100) NOT NULL,
     "user_id" uuid REFERENCES "users"("id"),
     "session_id" varchar(255),
-    "event_data" jsonb DEFAULT '{}',
+    "event_data" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL
 );
 
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS "bill_tracking_preferences" (
     "bill_id" uuid NOT NULL REFERENCES "bills"("id") ON DELETE CASCADE,
     "tracking_enabled" boolean DEFAULT true,
     "notification_frequency" varchar(20) DEFAULT 'immediate',
-    "preferences" jsonb DEFAULT '{}',
+    "preferences" jsonb DEFAULT '{}'::jsonb,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL,
     UNIQUE("user_id", "bill_id")

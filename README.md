@@ -36,7 +36,7 @@ Visit:
 chanuka-platform/
 ├── client/          # React frontend (@chanuka/client)
 ├── server/          # Express backend (@chanuka/server)  
-├── shared/          # Shared utilities (@chanuka/shared)
+├── shared/          # Shared utilities (@shared)
 ├── docs/           # Documentation
 └── package.json    # Monorepo configuration
 ```

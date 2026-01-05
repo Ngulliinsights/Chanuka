@@ -7,17 +7,17 @@ const __dirname = resolve(fileURLToPath(import.meta.url), '..')
 
 /**
  * UNIFIED VITEST WORKSPACE CONFIGURATION
- * 
+ *
  * This is the SINGLE SOURCE OF TRUTH for all test configuration across the monorepo.
  * All projects use consistent setup, environments, and conventions.
- * 
+ *
  * Key Principles:
  * - One workspace, multiple projects (7 projects)
  * - Global utilities auto-injected via vitest.setup.ts
  * - Standardized naming conventions (.test.ts, .integration.test.ts, .e2e.test.ts)
  * - Phase 1 test infrastructure in /tests directory
  * - Eliminated duplicate and redundant configurations
- * 
+ *
  * Entry Point Flow:
  * vitest.workspace.ts (this file)
  *   → Each project references vitest.setup.ts
@@ -40,7 +40,7 @@ export default defineWorkspace([
       css: true,
       testTimeout: 10000,
       hookTimeout: 5000,
-      
+
       // Only includes standard unit tests
       include: [
         'client/src/**/*.test.{ts,tsx}',
@@ -55,14 +55,14 @@ export default defineWorkspace([
         '**/*.performance.test.{ts,tsx}',
         '**/*.a11y.test.{ts,tsx}',
       ],
-      
+
       environmentOptions: {
         jsdom: {
           resources: 'usable',
           url: 'http://localhost:3000',
         },
       },
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html', 'lcov'],
@@ -79,7 +79,7 @@ export default defineWorkspace([
         all: true,
         skipFull: false,
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 2 : 0,
       pool: 'threads',
@@ -94,7 +94,7 @@ export default defineWorkspace([
       alias: {
         '@': resolve(__dirname, './client/src'),
         '@client': resolve(__dirname, './client/src'),
-        '@chanuka/shared': resolve(__dirname, './shared'),
+        '@shared': resolve(__dirname, './shared'),
       },
     },
   },
@@ -112,7 +112,7 @@ export default defineWorkspace([
       css: true,
       testTimeout: 30000, // Longer for integration tests
       hookTimeout: 10000,
-      
+
       // Integration tests in __tests__ directories and .integration files
       include: [
         'client/src/**/__tests__/**/*.test.{ts,tsx}',
@@ -120,14 +120,14 @@ export default defineWorkspace([
         'client/src/**/*.integration.test.{ts,tsx}',
       ],
       exclude: ['**/node_modules/**', '**/dist/**'],
-      
+
       environmentOptions: {
         jsdom: {
           resources: 'usable',
           url: 'http://localhost:3000',
         },
       },
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html'],
@@ -140,7 +140,7 @@ export default defineWorkspace([
           'client/src/test-utils/**',
         ],
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 2 : 0,
       pool: 'threads',
@@ -155,7 +155,7 @@ export default defineWorkspace([
       alias: {
         '@': resolve(__dirname, './client/src'),
         '@client': resolve(__dirname, './client/src'),
-        '@chanuka/shared': resolve(__dirname, './shared'),
+        '@shared': resolve(__dirname, './shared'),
       },
     },
   },
@@ -173,24 +173,24 @@ export default defineWorkspace([
       css: true,
       testTimeout: 15000,
       hookTimeout: 5000,
-      
+
       // Only a11y tests
       include: ['client/src/**/*.a11y.test.{ts,tsx}'],
       exclude: ['**/node_modules/**', '**/dist/**'],
-      
+
       environmentOptions: {
         jsdom: {
           resources: 'usable',
           url: 'http://localhost:3000',
         },
       },
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html'],
         reportsDirectory: './coverage/client/a11y',
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 1 : 0,
     },
@@ -198,7 +198,7 @@ export default defineWorkspace([
       alias: {
         '@': resolve(__dirname, './client/src'),
         '@client': resolve(__dirname, './client/src'),
-        '@chanuka/shared': resolve(__dirname, './shared'),
+        '@shared': resolve(__dirname, './shared'),
       },
     },
   },
@@ -215,7 +215,7 @@ export default defineWorkspace([
       setupFiles: ['./vitest.setup.ts', './tests/setup/modules/server.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
-      
+
       // Standard unit tests only
       include: [
         'server/**/*.test.{ts,tsx}',
@@ -228,7 +228,7 @@ export default defineWorkspace([
         'server/**/*.integration.test.{ts,tsx}',
         'server/**/*.e2e.test.{ts,tsx}',
       ],
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html', 'lcov'],
@@ -244,7 +244,7 @@ export default defineWorkspace([
         all: true,
         skipFull: false,
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 2 : 0,
       pool: 'threads',
@@ -275,7 +275,7 @@ export default defineWorkspace([
       setupFiles: ['./vitest.setup.ts', './tests/setup/modules/server.ts'],
       testTimeout: 30000, // Longer for DB operations
       hookTimeout: 10000,
-      
+
       // Integration tests in __tests__ and .integration files
       include: [
         'server/**/__tests__/**/*.test.{ts,tsx}',
@@ -283,13 +283,13 @@ export default defineWorkspace([
         'server/**/*.integration.test.{ts,tsx}',
       ],
       exclude: ['server/node_modules/**', 'server/dist/**'],
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html'],
         reportsDirectory: './coverage/server/integration',
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 2 : 0,
     },
@@ -313,7 +313,7 @@ export default defineWorkspace([
       setupFiles: ['./vitest.setup.ts', './tests/setup/modules/shared.ts'],
       testTimeout: 10000,
       hookTimeout: 5000,
-      
+
       include: [
         'shared/**/*.test.{ts,tsx}',
         'shared/**/*.spec.{ts,tsx}',
@@ -323,7 +323,7 @@ export default defineWorkspace([
         'shared/dist/**',
         'shared/**/__tests__/**',
       ],
-      
+
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html', 'lcov'],
@@ -336,7 +336,7 @@ export default defineWorkspace([
         ],
         all: true,
       },
-      
+
       reporters: ['verbose'],
       retry: process.env.CI ? 2 : 0,
       pool: 'threads',
@@ -359,10 +359,10 @@ export default defineWorkspace([
       setupFiles: ['./vitest.setup.ts', './tests/setup/index.ts'],
       testTimeout: 60000, // E2E can take longer
       hookTimeout: 30000,
-      
+
       include: ['tests/e2e/**/*.spec.{ts,tsx}'],
       exclude: ['**/node_modules/**'],
-      
+
       reporters: ['verbose'],
       // E2E tests don't run in parallel by default
       pool: 'threads',

@@ -20,7 +20,7 @@ const ROOT_DIR = process.cwd();
 function validateESLintConfig(workspace: string): { issues: string[], warnings: string[] } {
   const issues: string[] = [];
   const warnings: string[] = [];
-  
+
   const eslintPath = join(ROOT_DIR, workspace, '.eslintrc.js');
   if (!existsSync(eslintPath)) {
     issues.push('Missing .eslintrc.js file');
@@ -28,7 +28,7 @@ function validateESLintConfig(workspace: string): { issues: string[], warnings: 
   }
 
   const eslintContent = readFileSync(eslintPath, 'utf-8');
-  
+
   // Check for root config extension
   if (!eslintContent.includes('../.eslintrc.js')) {
     issues.push('ESLint config should extend root configuration');
@@ -53,7 +53,7 @@ function validateESLintConfig(workspace: string): { issues: string[], warnings: 
 function validateTypeScriptConfig(workspace: string): { issues: string[], warnings: string[] } {
   const issues: string[] = [];
   const warnings: string[] = [];
-  
+
   const tsconfigPath = join(ROOT_DIR, workspace, 'tsconfig.json');
   if (!existsSync(tsconfigPath)) {
     issues.push('Missing tsconfig.json file');
@@ -77,8 +77,8 @@ function validateTypeScriptConfig(workspace: string): { issues: string[], warnin
     // Check for shared workspace reference
     if (workspace !== 'shared') {
       const paths = tsconfig.compilerOptions?.paths || {};
-      if (!paths['@chanuka/shared']) {
-        warnings.push('Consider adding @chanuka/shared path mapping');
+      if (!paths['@shared']) {
+        warnings.push('Consider adding @shared path mapping');
       }
     }
 
@@ -92,7 +92,7 @@ function validateTypeScriptConfig(workspace: string): { issues: string[], warnin
 function validatePackageJson(workspace: string): { issues: string[], warnings: string[] } {
   const issues: string[] = [];
   const warnings: string[] = [];
-  
+
   const packagePath = join(ROOT_DIR, workspace, 'package.json');
   if (!existsSync(packagePath)) {
     issues.push('Missing package.json file');
@@ -116,15 +116,15 @@ function validatePackageJson(workspace: string): { issues: string[], warnings: s
     // Check for shared dependency (except in shared itself)
     if (workspace !== 'shared') {
       const deps = packageJson.dependencies || {};
-      if (!deps['@chanuka/shared']) {
-        warnings.push('Consider adding @chanuka/shared dependency');
+      if (!deps['@shared']) {
+        warnings.push('Consider adding @shared dependency');
       }
     }
 
     // Check for essential scripts
     const scripts = packageJson.scripts || {};
     const essentialScripts = ['build', 'type-check'];
-    
+
     for (const script of essentialScripts) {
       if (!scripts[script]) {
         warnings.push(`Missing essential script: ${script}`);
@@ -191,12 +191,12 @@ function validateRootConfiguration(): ValidationResult {
   // Validate root package.json
   try {
     const packageJson = JSON.parse(readFileSync(join(ROOT_DIR, 'package.json'), 'utf-8'));
-    
+
     // Check for duplicate scripts
     const scripts = packageJson.scripts || {};
     const scriptNames = Object.keys(scripts);
     const duplicates = scriptNames.filter((name, index) => scriptNames.indexOf(name) !== index);
-    
+
     if (duplicates.length > 0) {
       result.issues.push(`Duplicate scripts found: ${duplicates.join(', ')}`);
     }
@@ -211,7 +211,7 @@ function validateRootConfiguration(): ValidationResult {
 
 function printResults(results: ValidationResult[]) {
   console.log('🔍 Configuration Consistency Validation\\n');
-  
+
   let totalIssues = 0;
   let totalWarnings = 0;
   let passedWorkspaces = 0;
@@ -219,7 +219,7 @@ function printResults(results: ValidationResult[]) {
   for (const result of results) {
     const status = result.passed ? '✅' : '❌';
     console.log(`${status} ${result.workspace.toUpperCase()}`);
-    
+
     if (result.issues.length === 0 && result.warnings.length === 0) {
       console.log('  ✨ All configurations valid');
     } else {
@@ -228,14 +228,14 @@ function printResults(results: ValidationResult[]) {
         result.issues.forEach(issue => console.log(`    - ${issue}`));
         totalIssues += result.issues.length;
       }
-      
+
       if (result.warnings.length > 0) {
         console.log('  ⚠️  Warnings:');
         result.warnings.forEach(warning => console.log(`    - ${warning}`));
         totalWarnings += result.warnings.length;
       }
     }
-    
+
     if (result.passed) passedWorkspaces++;
     console.log('');
   }
@@ -243,7 +243,7 @@ function printResults(results: ValidationResult[]) {
   console.log(`📊 Summary: ${passedWorkspaces}/${results.length} workspaces passed`);
   console.log(`🚨 Total Issues: ${totalIssues}`);
   console.log(`⚠️  Total Warnings: ${totalWarnings}`);
-  
+
   if (totalIssues > 0) {
     console.log('\\n❌ Configuration validation failed');
     process.exit(1);
