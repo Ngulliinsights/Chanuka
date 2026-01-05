@@ -107,7 +107,7 @@ export const analysis = pgTable("analysis", {
   id: uuid("id").primaryKey().default(sql\`gen_random_uuid()\`),
   bill_id: uuid("bill_id").references(() => bills.id),
   analysis_type: varchar("analysis_type", { length: 50 }),
-  results: jsonb("results").default({}),
+  results: jsonb("results").default(sql`'{}'::jsonb`),
   created_at: timestamp("created_at").notNull().defaultNow(),
 });
 

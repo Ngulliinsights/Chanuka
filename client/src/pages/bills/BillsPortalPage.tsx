@@ -435,7 +435,7 @@ export default function BillsPortalPage() {
 
           <div className="flex border rounded-md">
             <Button
-              variant={currentFilters.viewMode === 'grid' ? 'default' : 'ghost'}
+              variant={currentFilters.viewMode === 'grid' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => handleViewModeChange('grid')}
               className="rounded-r-none"
@@ -443,7 +443,7 @@ export default function BillsPortalPage() {
               <Grid className="h-4 w-4" />
             </Button>
             <Button
-              variant={currentFilters.viewMode === 'list' ? 'default' : 'ghost'}
+              variant={currentFilters.viewMode === 'list' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => handleViewModeChange('list')}
               className="rounded-l-none"

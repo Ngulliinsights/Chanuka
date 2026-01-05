@@ -2,7 +2,7 @@
 
 ## Understanding the Testing Pyramid
 
-Testing your application requires a layered approach where different types of tests serve different purposes. Think of this as a pyramid with three main layers.
+Testing your an requires a layered approach where different types of tests serve different purposes. Think of this as a pyramid with three main layers.
 
 At the base of the pyramid, you have **unit tests** that validate individual functions and components in isolation. These tests run quickly and make up the majority of your test suite, typically accounting for 70% of your tests. They catch bugs early and are cheap to maintain, but they don't verify how different parts of your application work together.
 
@@ -88,3 +88,4 @@ Next, implement integration tests for key user flows that involve multiple compo
 Set up continuous integration to run unit and integration tests on every commit, and configure nightly end-to-end test runs against staging environments. Finally, integrate the functional validator into your deployment pipeline to catch broken routes before they reach production.
 
 The goal is not perfect test coverage but confidence that your application works correctly. Start small, focus on high-value tests, and grow your test suite iteratively as you learn what types of tests provide the most value for your specific application.
+pplica
