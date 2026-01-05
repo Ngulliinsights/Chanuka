@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../.././use-toast';
 
 import { analyticsService } from '../services/analytics';
 import type {

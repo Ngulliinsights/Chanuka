@@ -8,6 +8,8 @@
  */
 
 import {
+import React from 'react';
+
   ArrowLeft,
   Share2,
   Bell,

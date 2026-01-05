@@ -1,4 +1,6 @@
 import {
+import React from 'react';
+
   TrendingUp,
   MessageSquare,
   Award

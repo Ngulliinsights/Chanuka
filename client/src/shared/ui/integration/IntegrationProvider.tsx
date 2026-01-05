@@ -9,7 +9,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 
 import { DeviceDetector } from '@/core/mobile';
 import { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 // TouchHandler is deprecated - using SwipeGestures instead
 // import { useSwipeGesture } from '@/hooks/mobile/useSwipeGesture'; // Unused
 import {

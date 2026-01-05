@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/core/auth';
 import type { DataExportRequest } from '@/shared/types/user-dashboard';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';
 

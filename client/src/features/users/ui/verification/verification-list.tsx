@@ -7,6 +7,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { LoadingSpinner } from '@client/shared/design-system';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@client/shared/design-system';
+import React from 'react';
 
 interface VerificationItem { id: number;
   bill_id: number;

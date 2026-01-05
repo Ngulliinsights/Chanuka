@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from '@client/lib/utils';
 
 import { BillCard } from './BillCard';
+import React from 'react';
 
 interface BillListProps {
   bills: Bill[];

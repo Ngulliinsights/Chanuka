@@ -10,6 +10,7 @@
 
 // Remove unused React import
 import { NavigationPerformanceDashboard } from '@/shared/ui/navigation/performance/NavigationPerformanceDashboard';
+import React from 'react';
 
 export function PerformanceDashboard() {
   return <NavigationPerformanceDashboard />;

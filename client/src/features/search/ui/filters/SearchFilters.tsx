@@ -7,6 +7,8 @@
 
 import { format } from 'date-fns';
 import {
+import React from 'react';
+
   Filter,
   X,
   Calendar as CalendarIcon,

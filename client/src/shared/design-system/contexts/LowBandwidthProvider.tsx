@@ -19,6 +19,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 import { LowBandwidthConfig, defaultLowBandwidthConfig } from '../standards/low-bandwidth';
+import React from 'react';
 
 interface LowBandwidthContextType {
   /**

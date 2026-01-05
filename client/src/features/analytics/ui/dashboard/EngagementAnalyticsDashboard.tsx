@@ -7,6 +7,8 @@
  */
 
 import {
+import React from 'react';
+
   Activity,
   Users,
   MessageSquare,

@@ -6,6 +6,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
+import React from 'react';
 
 interface Bill {
   id: number;

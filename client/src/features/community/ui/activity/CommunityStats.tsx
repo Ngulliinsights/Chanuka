@@ -10,6 +10,8 @@
  */
 
 import {
+import React from 'react';
+
   Users,
   MessageSquare,
   Award,

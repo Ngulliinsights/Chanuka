@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/shared/hooks/store';
 import { selectNavigationUIState } from '@/shared/infrastructure/store/slices/navigationSlice';
 import { navigationUtils } from '@/shared/services/navigation';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 
 interface OptimizedNavigationOptions {
   enableAnalytics?: boolean;

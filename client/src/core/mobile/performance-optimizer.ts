@@ -7,7 +7,7 @@
  * @module core/mobile/performance-optimizer
  */
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 import { DeviceDetector } from './device-detector';
 
 /**

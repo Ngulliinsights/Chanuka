@@ -8,6 +8,7 @@ import { PrivacySettings } from '@/core/auth';
 import { CompactInterface } from './CompactInterface';
 import { FullInterface } from './FullInterface';
 import { ModalInterface } from './ModalInterface';
+import React from 'react';
 
 export type PrivacyMode = 'full' | 'modal' | 'compact';
 

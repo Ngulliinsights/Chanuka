@@ -11,8 +11,9 @@ import { Component, ReactNode, ErrorInfo } from 'react';
 import { browserDetector } from '@/core/browser/browser-detector';
 import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
 import { getPerformanceMonitor } from '@/core/performance';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 import { startTrace, finishTrace } from '@/utils/tracing';
+import React from 'react';
 
 /**
  * Represents a recovery option for error handling

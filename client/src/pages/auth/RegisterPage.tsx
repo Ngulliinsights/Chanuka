@@ -11,6 +11,7 @@ import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 export default function RegisterPage() {
   const navigate = useNavigate();

@@ -11,6 +11,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useState, useRef } from 'react';
 import {
+import React from 'react';
+
   useForm,
   UseFormProps,
   UseFormReturn,
@@ -20,7 +22,7 @@ import {
 } from 'react-hook-form';
 import { ZodSchema, ZodError } from 'zod';
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 /**
  * Configuration options for the form builder.

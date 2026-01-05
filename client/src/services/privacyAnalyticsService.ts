@@ -16,7 +16,7 @@
  */
 
 import { privacyAnalyticsApiService } from '@/core/api/privacy';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 import { privacyUtils, privacyCompliance } from '@/utils/privacy-compliance';
 
 // ============================================================================

@@ -2,6 +2,8 @@ import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
 import ConnectionStatus from '@client/shared/ui/status/connection-status';
 import DatabaseStatus from '@client/shared/ui/status/database-status';
 import { 
+import React from 'react';
+
   Users, 
   FileText, 
   AlertTriangle, 

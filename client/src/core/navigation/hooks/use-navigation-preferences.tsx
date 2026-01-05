@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 const PREFERENCES_STORAGE_KEY = 'navigation-preferences';
 

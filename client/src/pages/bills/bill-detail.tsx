@@ -12,6 +12,7 @@ import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
 import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();

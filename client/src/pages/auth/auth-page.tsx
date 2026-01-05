@@ -14,6 +14,8 @@ import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import {
+import React from 'react';
+
   Card,
   CardContent,
   CardDescription,

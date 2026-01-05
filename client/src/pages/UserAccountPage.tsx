@@ -11,6 +11,7 @@ import { useAuth } from '@client/core/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Alert, AlertDescription } from '@client/shared/design-system';
+import React from 'react';
 
 export default function UserAccountPage() {
   const { user, isAuthenticated } = useAuth();

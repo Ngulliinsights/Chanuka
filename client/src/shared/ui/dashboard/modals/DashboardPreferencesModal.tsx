@@ -5,6 +5,8 @@
  */
 
 import {
+import React from 'react';
+
   Settings,
   Clock,
   RefreshCw,

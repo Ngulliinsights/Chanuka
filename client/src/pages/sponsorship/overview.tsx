@@ -1,5 +1,7 @@
 
 import {
+import React from 'react';
+
   ArrowLeft,
   ChevronRight, 
   AlertTriangle, 

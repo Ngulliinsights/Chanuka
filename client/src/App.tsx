@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@client/core/error/components';
 import { Toaster } from '@client/shared/design-system';
 import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 function App() {
   useEffect(() => {

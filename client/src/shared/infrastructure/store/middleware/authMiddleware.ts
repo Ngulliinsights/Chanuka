@@ -7,7 +7,7 @@ import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
 import { authApiService as authService } from '@/core/api';
 import { logout, tokenManager, clearError } from '@/core/auth';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import { rbacManager } from '@/utils/rbac';
 import { tokenRefreshDeduplicator } from '@/utils/request-deduplicator';
 import { securityMonitor } from '@/utils/security';

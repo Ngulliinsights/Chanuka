@@ -11,6 +11,8 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { 
+import React from 'react';
+
   ThumbsUp, 
   ThumbsDown, 
   MessageSquare, 

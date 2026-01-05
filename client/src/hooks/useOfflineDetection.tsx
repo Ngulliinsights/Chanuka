@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 export interface ConnectionQuality {
   type: 'offline' | 'slow' | 'fast' | 'unknown';

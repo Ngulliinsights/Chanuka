@@ -4,6 +4,8 @@
  */
 
 import {
+import React from 'react';
+
   Database,
   BarChart3,
   Shield,

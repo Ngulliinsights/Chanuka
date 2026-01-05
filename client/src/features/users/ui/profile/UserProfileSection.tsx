@@ -11,6 +11,7 @@ import { useAuth } from '@client/core/auth';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
+import React from 'react';
 
 // Session Display Component
 function SessionDisplay() {

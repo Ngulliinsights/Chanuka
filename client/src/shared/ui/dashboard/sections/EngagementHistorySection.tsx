@@ -6,6 +6,8 @@
 
 import { formatDistanceToNow, format } from 'date-fns';
 import {
+import React from 'react';
+
   Activity,
   Eye,
   MessageSquare,

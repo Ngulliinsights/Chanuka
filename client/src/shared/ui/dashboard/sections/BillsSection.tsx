@@ -4,6 +4,8 @@ import { TrendingUp, Star } from 'lucide-react';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
 import {
+import React from 'react';
+
   Card,
   CardContent,
   CardDescription,

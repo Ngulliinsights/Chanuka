@@ -6,6 +6,7 @@ import { globalApiClient } from '@client/core/api/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { MonitoringDashboard } from '@client/shared/ui/dashboard/MonitoringDashboard';
 import { logger } from '@client/utils/logger';
+import React from 'react';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {

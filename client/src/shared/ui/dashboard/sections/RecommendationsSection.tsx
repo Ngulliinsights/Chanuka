@@ -4,6 +4,8 @@
  */
 
 import {
+import React from 'react';
+
   X,
   ExternalLink,
   Target,

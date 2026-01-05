@@ -66,7 +66,7 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
   const importFn = () => {
     // Simple dynamic import based on path
     switch (path) {
-      case '@/pages/home':
+      case '../pages/home':
         return import('@/pages/home');
       case '@/pages/dashboard':
         return import('@/pages/dashboard');

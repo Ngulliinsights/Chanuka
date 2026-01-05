@@ -74,8 +74,8 @@ vi.mock('../../features/search/ui/interface/IntelligentAutocomplete', () => ({
   default: ({ query, onSelect, onSearch }: any) => (
     <div data-testid="autocomplete">
       <div>Query: {query}</div>
-      <button onClick={() => onSelect('suggestion 1')}>Suggestion 1</button>
-      <button onClick={() => onSearch('test search')}>Search</button>
+      <button type="button" onClick={() => onSelect('suggestion 1')}>Suggestion 1</button>
+      <button type="button" onClick={() => onSearch('test search')}>Search</button>
     </div>
   )
 }));

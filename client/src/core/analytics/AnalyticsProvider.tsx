@@ -215,7 +215,7 @@ export const AnalyticsStatus: React.FC = () => {
     return (
       <div className="analytics-status error">
         <p>Analytics Error: {error}</p>
-        <button onClick={reinitialize}>Retry</button>
+        <button type="button" onClick={reinitialize}>Retry</button>
       </div>
     );
   }

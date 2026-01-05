@@ -3,7 +3,7 @@ import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 import { forwardRef, createContext, useContext, useState, useCallback, useEffect, useMemo, ComponentProps, CSSProperties, ElementRef } from "react"
 
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useIsMobile } from '../../../hooks/use-mobile'
 import { cn } from '@/shared/design-system/utils/cn'
 
 import { Button } from './Button'
@@ -12,6 +12,7 @@ import { Separator } from './separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './Sheet'
 import { Skeleton } from './skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
+import React from 'react';
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

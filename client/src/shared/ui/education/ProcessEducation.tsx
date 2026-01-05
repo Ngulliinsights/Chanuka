@@ -1,4 +1,6 @@
 import {
+import React from 'react';
+
   Clock,
   Users,
   BookOpen,

@@ -6,7 +6,7 @@
 
 import { Middleware, Action } from '@reduxjs/toolkit';
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 
 export const apiMiddleware: Middleware = (_store) => (next) => (action: unknown) => {
   const reduxAction = action as Action & { type: string };

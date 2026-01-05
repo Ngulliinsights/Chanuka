@@ -2,6 +2,7 @@
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
 
 import { languages, detectLanguage, saveLanguagePreference, getKenyanContext, type SupportedLanguage } from '../../utils/i18n';
+import React from 'react';
 
 type Translations = typeof languages.en;
 

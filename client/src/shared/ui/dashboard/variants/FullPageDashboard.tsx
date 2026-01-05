@@ -1,4 +1,6 @@
 import {
+import React from 'react';
+
   Settings,
   Download,
   RefreshCw,

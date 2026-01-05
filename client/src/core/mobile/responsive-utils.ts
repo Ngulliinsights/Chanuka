@@ -7,7 +7,7 @@
  * @module core/mobile/responsive-utils
  */
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 import { MOBILE_BREAKPOINTS } from '../../config';
 

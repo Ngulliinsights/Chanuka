@@ -6,7 +6,7 @@
  * with data protection regulations for the civic engagement platform.
  */
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 interface RetentionPolicy {
   id: string;

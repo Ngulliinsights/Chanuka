@@ -8,7 +8,7 @@
 
 import { createError, coreErrorHandler, handleError as coreHandleError } from '@/core/error';
 import type { AppError, ErrorDomain, ErrorSeverity } from '@/core/error';
-import { logger } from '@/utils/logger';
+import { logger } from '../.././logger';
 
 // ============================================================================
 // UI-Specific Error Types (extending core)

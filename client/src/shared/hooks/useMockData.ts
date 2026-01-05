@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { mockDataService, RealTimeEvent } from '@/shared/testing/mock-data';
 import { dataLoaders } from '@/data/mock/loaders';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 /**
  * Hook state interface

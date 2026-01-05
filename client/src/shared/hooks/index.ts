@@ -6,12 +6,12 @@
  */
 
 // UI/Utility Hooks - general purpose
-export { useToast } from '../../hooks/use-toast';
-export { useIsMobile as useMobile } from '../../hooks/use-mobile';
-export { useKeyboardFocus } from '../../hooks/use-keyboard-focus';
-export { useDebounce } from '../../hooks/useDebounce';
-export { useMediaQuery } from '../../hooks/useMediaQuery';
-export { useCleanup } from '../../hooks/useCleanup';
+export { useToast } from '.././use-toast';
+export { useIsMobile as useMobile } from '.././use-mobile';
+export { useKeyboardFocus } from '.././use-keyboard-focus';
+export { useDebounce } from '.././useDebounce';
+export { useMediaQuery } from '.././useMediaQuery';
+export { useCleanup } from '.././useCleanup';
 
 // Internationalization
 export { useI18n } from './use-i18n';
@@ -32,9 +32,9 @@ export {
   useSystemActivity,
   useSystemSchema,
   useSystemEnvironment
-} from '../../hooks/use-system';
+} from '.././use-system';
 
 // Progressive disclosure and UX
-export { useProgressiveDisclosure } from '../../hooks/useProgressiveDisclosure';
+export { useProgressiveDisclosure } from '.././useProgressiveDisclosure';
 
 

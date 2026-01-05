@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 
 import { useUserProfile } from '@/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 interface EnhancedUXIntegrationProps {
   children: React.ReactNode;

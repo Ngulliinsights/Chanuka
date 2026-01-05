@@ -14,7 +14,7 @@ import {
   coreErrorHandler,
   createError,
 } from '@/core/error';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 
 // ============================================================================
 // Redux-specific types (extending core types)

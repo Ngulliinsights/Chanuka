@@ -1,4 +1,5 @@
 import { lazy, LazyExoticComponent, ComponentType, useRef, useEffect } from 'react';
+import React from 'react';
 
 /**
  * Safe lazy loading utilities with error handling and retry logic

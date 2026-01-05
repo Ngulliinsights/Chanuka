@@ -5,6 +5,7 @@ import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Skeleton } from '@/shared/ui/loading/ui/Skeleton';
+import React from 'react';
 
 
 

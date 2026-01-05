@@ -13,6 +13,7 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
+import React from 'react';
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();

@@ -5,6 +5,8 @@ import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@client/core/auth';
 import { personaDetector } from '@client/core/personalization';
 import type {
+import React from 'react';
+
   PersonaType,
   PersonaClassification,
   PersonaPreferences

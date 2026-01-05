@@ -10,6 +10,8 @@ import { useState, useEffect, useCallback } from "react";
 import { logger } from "@client/utils/logger";
 
 import {
+import React from 'react';
+
   useRenderTracker,
   withRenderTracking,
   usePerformanceMeasurement,

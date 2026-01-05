@@ -5,6 +5,7 @@ import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 
 import { cn } from '../../design-system/utils/cn';
+import React from 'react';
 
 interface HeaderProps {
   className?: string;

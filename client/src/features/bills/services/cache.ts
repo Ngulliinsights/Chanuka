@@ -8,7 +8,7 @@
 
 import { Bill } from '../../../../shared/schema/foundation';
 import { BillsStats } from '@/core/api/bills';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 // ============================================================================
 // Type Definitions

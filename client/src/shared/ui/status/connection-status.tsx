@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import { Badge } from '@/shared/design-system';
+import React from 'react';
 
 interface ConnectionStatusProps {
   className?: string;

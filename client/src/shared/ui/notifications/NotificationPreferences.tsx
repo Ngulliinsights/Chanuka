@@ -1,7 +1,7 @@
 import { Bell, Mail, MessageSquare, Smartphone, Filter, Settings, TestTube, Save, CheckCircle, X, RefreshCw, AlertCircle } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../../hooks/use-toast';
 import { Alert, AlertDescription } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';

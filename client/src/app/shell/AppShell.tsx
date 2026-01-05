@@ -16,7 +16,7 @@ import { LoadingStateManager } from '@/shared/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@/shared/ui/navigation/BreadcrumbNavigation';
 import { useBreadcrumbNavigation } from '@/shared/ui/navigation/hooks/useBreadcrumbNavigation';
 import { OfflineProvider } from '@/shared/ui/offline';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { AnalyticsIntegration } from '../../core/analytics/AnalyticsIntegration';

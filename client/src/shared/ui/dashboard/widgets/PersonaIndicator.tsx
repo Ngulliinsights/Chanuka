@@ -7,6 +7,8 @@
 
 import { useState } from 'react';
 import {
+import React from 'react';
+
   User,
   TrendingUp,
   Award,

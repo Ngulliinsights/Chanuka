@@ -12,6 +12,8 @@
 
 import { ThumbsUp } from 'lucide-react';
 import {
+import React from 'react';
+
   Activity,
   TrendingUp,
   Users,

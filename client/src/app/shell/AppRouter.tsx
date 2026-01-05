@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { ErrorBoundary } from '@/core/error/components';
 import { LoadingStateManager } from '@/shared/ui/loading/LoadingStates';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 

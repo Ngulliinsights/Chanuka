@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@clie
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
 import { validatePassword } from '@client/utils/security';
+import React from 'react';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

@@ -7,6 +7,8 @@ import { intelligentSearch } from '@client/features/search/services/intelligent-
 import type { SavedSearch } from '@client/features/search/types';
 import { useToast } from '@client/hooks/use-toast';
 import {
+import React from 'react';
+
   Dialog,
   DialogContent,
   DialogHeader,

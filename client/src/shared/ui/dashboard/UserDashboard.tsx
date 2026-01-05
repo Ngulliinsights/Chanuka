@@ -1,5 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import {
+import React from 'react';
+
   Settings,
   Download,
   RefreshCw,

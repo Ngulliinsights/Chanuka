@@ -4,6 +4,8 @@
  */
 
 import { 
+import React from 'react';
+
   Shield, 
   Lock, 
   Eye, 

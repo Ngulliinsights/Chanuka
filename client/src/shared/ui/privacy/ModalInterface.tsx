@@ -6,6 +6,8 @@
 import { PrivacySettings } from '@/core/auth';
 
 import {
+import React from 'react';
+
   Dialog,
   DialogContent,
   DialogDescription,

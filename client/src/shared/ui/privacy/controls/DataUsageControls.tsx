@@ -11,6 +11,7 @@ import { Button } from '@/shared/design-system/interactive/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Label } from '@/shared/design-system/typography/Label';
 import { Switch } from '@/shared/design-system/interactive/Switch';
+import React from 'react';
 
 
 interface DataUsageControlsProps {

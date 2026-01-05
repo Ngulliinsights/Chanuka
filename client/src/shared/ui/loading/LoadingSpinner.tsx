@@ -1,5 +1,6 @@
 
 import { cn } from '../../design-system/utils/cn';
+import React from 'react';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';

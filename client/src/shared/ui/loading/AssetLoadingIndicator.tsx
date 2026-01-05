@@ -2,12 +2,13 @@ import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-re
 import { useMemo, useState, useEffect, memo } from 'react';
 
 import { cn } from '@/shared/design-system/utils/cn';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 import { useAssetLoading } from './hooks/useAssetLoading';
 import { useLoadingRecovery } from './hooks/useLoadingRecovery';
 import type { AssetLoadingIndicatorProps } from './types';
 import { LoadingError, getErrorDisplayMessage, safeValidateLoadingProgress } from './utils/loadingUtils';
+import React from 'react';
 
 // ===== MAIN COMPONENT =====
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import React from 'react';
 
 /**
  * Network Information API interface for connection monitoring

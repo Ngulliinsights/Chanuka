@@ -13,6 +13,9 @@
 
 // Import error types from our local error system to avoid circular dependencies
 import { ErrorSeverity, ErrorDomain, BaseError } from '../core/error';
+import { PerformanceMonitor } from '../core/performance/monitor';
+import { PerformanceAlertsManager } from '../core/performance/alerts';
+import { PerformanceMetric } from '../core/performance/types';
 
 // Re-export error types for backward compatibility
 export { ErrorSeverity, ErrorDomain, BaseError };
@@ -110,27 +113,19 @@ class SimpleRenderTracker {
 
   trackPerformanceImpact(data: PerformanceImpactData): void {
     const { component, renderDuration } = data;
+    const performanceMonitor = PerformanceMonitor.getInstance();
+    const alertsManager = PerformanceAlertsManager.getInstance();
 
-    if (!this.performanceData.has(component)) {
-      this.performanceData.set(component, []);
-    }
+    const metric: PerformanceMetric = {
+      name: 'component-render-duration',
+      value: renderDuration,
+      timestamp: new Date(data.timestamp),
+      category: 'custom',
+      metadata: { component },
+    };
 
-    const durations = this.performanceData.get(component)!;
-    durations.push(renderDuration);
-
-    // Keep only last 10 measurements to prevent memory bloat
-    if (durations.length > 10) {
-      durations.shift();
-    }
-
-    // Log slow renders
-    if (renderDuration > 16) { // 1 frame at 60fps
-      console.warn('Slow render detected', {
-        component: 'performance-tracker',
-        renderComponent: component,
-        duration: renderDuration
-      });
-    }
+    performanceMonitor.recordCustomMetric(metric);
+    alertsManager.checkMetric(metric);
   }
 
   detectInfiniteRender(component: string, threshold = 50): boolean {

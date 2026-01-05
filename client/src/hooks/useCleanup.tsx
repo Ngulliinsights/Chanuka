@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
+import React from 'react';
 
 type CleanupFunction = () => void;
 

@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import { Bell, AlertCircle, Info, X } from 'lucide-react';
 
 import { cn } from '@/shared/design-system/utils/cn';
-// import { logger } from '@/utils/logger';
+import React from 'react';
+
+// import { logger } from '../../../utils/logger';
 
 interface Notification {
   id: string;

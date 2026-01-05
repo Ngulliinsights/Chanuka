@@ -20,7 +20,7 @@ import {
   BillRealTimeUpdate,
   RealTimeNotification
 } from '@/core/realtime/types';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 
 import {
   updateConnectionState,

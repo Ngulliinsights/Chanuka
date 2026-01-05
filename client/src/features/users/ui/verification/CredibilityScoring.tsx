@@ -12,6 +12,7 @@ import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';
+import React from 'react';
 
 interface CredibilityIndicatorProps {
   score: number;

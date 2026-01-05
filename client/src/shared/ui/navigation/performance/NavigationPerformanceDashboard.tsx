@@ -13,8 +13,9 @@ import { Button } from '@/shared/design-system';
 import { Progress } from '@/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 // Remove unused import
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
 interface PerformanceMetrics {
   averageNavigationTime: number;

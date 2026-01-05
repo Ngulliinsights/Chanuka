@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
 import { useDeviceInfo } from './mobile/useDeviceInfo'
+import React from 'react';
 
 export function useIsMobile() {
   const { isMobile } = useDeviceInfo()

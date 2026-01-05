@@ -14,7 +14,7 @@ import {
   PrivacySettings,
   ConsentRecord
 } from '@/core/auth';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 
 // import { ConsentModal } from '../../auth/ConsentModal';

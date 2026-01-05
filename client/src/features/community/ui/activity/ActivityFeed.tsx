@@ -12,6 +12,8 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import {
+import React from 'react';
+
   MessageSquare,
   Heart,
   Share2,

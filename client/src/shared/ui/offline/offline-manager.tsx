@@ -13,7 +13,7 @@ import React, {
   useRef
 } from 'react';
 
-import { logger } from '@/utils/logger';
+import { logger } from '../../../utils/logger';
 
 interface OfflineData {
   bills: Array<{
