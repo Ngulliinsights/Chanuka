@@ -4,9 +4,8 @@
  * Allows users to export their personal data for GDPR compliance.
  */
 
-import {
 import React from 'react';
-
+import {
   Download,
   FileText,
   Database,

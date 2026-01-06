@@ -12,12 +12,11 @@ import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } 
 import { useAppDispatch, useAppSelector } from '@client/shared/hooks/store';
 import { logger } from '@client/utils/logger';
 
+import React from 'react';
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
 import * as authActions from '../store/auth-slice';
 import type {
-import React from 'react';
-
   User,
   RegisterData,
   AuthResponse,

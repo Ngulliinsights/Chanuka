@@ -1,20 +1,19 @@
 import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
 import ConnectionStatus from '@client/shared/ui/status/connection-status';
 import DatabaseStatus from '@client/shared/ui/status/database-status';
-import { 
 import React from 'react';
-
-  Users, 
-  FileText, 
-  AlertTriangle, 
-  Shield, 
-  Settings, 
+import {
+  Users,
+  FileText,
+  AlertTriangle,
+  Shield,
+  Settings,
   Database,
   Activity,
   TrendingUp,
   Eye,
   CheckCircle,
-  XCircle,
+  Circle,
   Clock,
   BarChart3,
   Search,
@@ -74,7 +73,7 @@ export default function AdminPage() {
     switch (status) {
       case 'success': return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'warning': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
-      case 'error': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'error': return <Circle className="w-4 h-4 text-red-500" />;
       default: return <Clock className="w-4 h-4 text-blue-500" />;
     }
   };
@@ -102,16 +101,16 @@ export default function AdminPage() {
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800 px-3 py-1">
               <Activity className="w-4 h-4 mr-2" />
               System Healthy
             </Badge>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
               className="hover:bg-blue-50"
@@ -119,7 +118,7 @@ export default function AdminPage() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            
+
             <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <Bell className="w-4 h-4 mr-2" />
               Alerts
@@ -258,7 +257,7 @@ export default function AdminPage() {
                 System
               </TabsTrigger>
             </TabsList>
-            
+
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
                 <Search className="w-4 h-4 mr-2" />
@@ -403,7 +402,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
                     <Link to="/admin/roles">
                       <Shield className="w-5 h-5 mr-3" />
@@ -413,7 +412,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-purple-50">
                     <Link to="/admin/user-settings">
                       <Settings className="w-5 h-5 mr-3" />
@@ -424,7 +423,7 @@ export default function AdminPage() {
                     </Link>
                   </Button>
                 </div>
-                
+
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
                   <h4 className="font-semibold text-gray-900 mb-2">Quick Stats</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -480,7 +479,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-orange-50">
                     <Link to="/admin/workarounds">
                       <AlertTriangle className="w-5 h-5 mr-3" />
@@ -490,7 +489,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
                     <Link to="/admin/analytics">
                       <BarChart3 className="w-5 h-5 mr-3" />
@@ -501,7 +500,7 @@ export default function AdminPage() {
                     </Link>
                   </Button>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-xl">
                     <h4 className="font-semibold text-gray-900 mb-4">Content Overview</h4>
@@ -520,7 +519,7 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl">
                     <h4 className="font-semibold text-gray-900 mb-4">Recent Alerts</h4>
                     <div className="space-y-3">
@@ -529,7 +528,7 @@ export default function AdminPage() {
                         <span className="text-sm">Workaround detected in Bill #2847</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4 text-red-500" />
+                        <Circle className="w-4 h-4 text-red-500" />
                         <span className="text-sm">Content flagged for review</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -573,7 +572,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-green-50">
                     <Link to="/admin/pending-reviews">
                       <CheckCircle className="w-5 h-5 mr-3" />
@@ -583,7 +582,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
                     <Link to="/admin/verification-history">
                       <Eye className="w-5 h-5 mr-3" />
@@ -594,7 +593,7 @@ export default function AdminPage() {
                     </Link>
                   </Button>
                 </div>
-                
+
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl">
                   <h4 className="font-semibold text-gray-900 mb-4">Verification Queue</h4>
                   <div className="space-y-3">
@@ -662,7 +661,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
                     <Link to="/admin/database">
                       <Database className="w-5 h-5 mr-3" />
@@ -672,7 +671,7 @@ export default function AdminPage() {
                       </div>
                     </Link>
                   </Button>
-                  
+
                   <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-green-50">
                     <Link to="/admin/performance">
                       <BarChart3 className="w-5 h-5 mr-3" />
@@ -683,7 +682,7 @@ export default function AdminPage() {
                     </Link>
                   </Button>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl">
                     <h4 className="font-semibold text-gray-900 mb-4">System Health</h4>
@@ -702,7 +701,7 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
                     <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
                     <div className="space-y-2">

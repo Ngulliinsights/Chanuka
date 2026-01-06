@@ -3,9 +3,8 @@
  * Allows users to configure security preferences
  */
 
-import { 
 import React from 'react';
-
+import {
   Shield, 
   Lock, 
   Eye, 

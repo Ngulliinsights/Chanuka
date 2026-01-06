@@ -1,7 +1,6 @@
 
-import {
 import React from 'react';
-
+import {
   ArrowLeft,
   ChevronRight, 
   AlertTriangle, 

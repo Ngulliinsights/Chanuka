@@ -1,24 +1,49 @@
 /**
- * Services Index - Legacy Services (Pending Integration)
- * 
+ * Services Index - Legacy Services & FSD Migration Exports
+ *
  * ⚠️  MIGRATION IN PROGRESS ⚠️
- * 
+ *
  * This directory contains legacy services that are being migrated to FSD structure.
  * Most services have been successfully integrated into their appropriate locations:
- * 
+ *
+ * - Analytics services → features/analytics/model/
+ * - Monitoring services → features/monitoring/model/ & shared/infrastructure/monitoring/
  * - Core services → core/
  * - Feature services → features/[feature]/services/
  * - Shared services → shared/services/
- * 
- * See SERVICES_INTEGRATION_COMPLETE.md for full migration status.
+ *
+ * COMPLETED MIGRATIONS:
+ * ✅ errorAnalyticsBridge → features/analytics/model/error-analytics-bridge.ts
+ * ✅ privacyAnalyticsService → features/analytics/model/privacy-analytics.ts
+ * ✅ performance-benchmarking → features/monitoring/model/performance-benchmarking.ts
+ * ✅ render-tracker → features/monitoring/model/render-tracker.ts
+ * ✅ enhanced-error-monitoring → shared/infrastructure/monitoring/error-monitor.ts
+ * ✅ enhanced-performance-monitoring → shared/infrastructure/monitoring/performance-monitor.ts
+ * ✅ enhanced-monitoring-integration → shared/infrastructure/monitoring/monitoring-integration.ts
+ * ✅ dataRetentionService → shared/infrastructure/data/data-retention-service.ts
+ * ✅ navigation → core/navigation/navigation-service.ts
+ * ✅ userService → features/users/model/user-service.ts
+ * ✅ PageRelationshipService → features/navigation/model/page-relationship-service.ts
  */
 
 // ============================================================================
-// REMAINING LEGACY SERVICES (Pending Integration)
+// FSD MIGRATION EXPORTS (Backward Compatibility)
 // ============================================================================
 
-// Legacy user service (to be integrated into features/users/services/)
-export { userService } from './userService';
+// Re-export migrated services from their new FSD locations
+export { dataRetentionService, retentionUtils } from '@client/core/analytics/data-retention-service';
+export { navigationService, BrowserNavigationService, type NavigationService } from '@client/core/navigation/navigation-service';
+export { userService } from '@client/features/users/model/user-service';
+export { PageRelationshipService } from '@/core/navigation/page-relationship-service';
+
+// ============================================================================
+// REMAINING LEGACY SERVICES (Kept for compatibility)
+// ============================================================================
+
+// Services that remain in this directory for legacy/compatibility reasons
+export * from './auth-service-init';
+export * from './mockUserData';
+export * from './realistic-demo-data';
 
 // Export types that were in repositories
 export interface DashboardFilters {

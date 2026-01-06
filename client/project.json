@@ -39,6 +39,7 @@
       "executor": "@nx/vite:test",
       "outputs": ["{options.reportsDirectory}"],
       "options": {
+        "configFile": "vitest.config.ts",
         "passWithNoTests": true,
         "reportsDirectory": "../coverage/client"
       }

@@ -5,11 +5,10 @@
  * and guided learning experiences.
  */
 
+import React from 'react';
 import { BookOpen, Target, Users, ArrowRight, HelpCircle } from 'lucide-react';
 
 import type {
-import React from 'react';
-
   PersonaType,
   PersonaClassification,
   PersonaPreferences,

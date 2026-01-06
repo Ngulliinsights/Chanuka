@@ -6,9 +6,8 @@ import { useSavedSearches } from '@client/features/search/hooks/useSearch';
 import { intelligentSearch } from '@client/features/search/services/intelligent-search';
 import type { SavedSearch } from '@client/features/search/types';
 import { useToast } from '@client/hooks/use-toast';
-import {
 import React from 'react';
-
+import {
   Dialog,
   DialogContent,
   DialogHeader,

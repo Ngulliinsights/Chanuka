@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
 import React from 'react';
-
+import {
   Star,
   Bell,
   Eye,

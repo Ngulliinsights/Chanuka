@@ -1,6 +1,7 @@
 /**
  * Extended Lucide React type declarations
- * Provides fallback types for missing icons
+ * Consolidated from global and client type definitions
+ * Provides fallback types for missing icons and ensures type safety
  */
 
 declare module 'lucide-react' {
@@ -9,6 +10,11 @@ declare module 'lucide-react' {
   export interface LucideProps extends SVGProps<SVGSVGElement> {
     size?: string | number;
     absoluteStrokeWidth?: boolean;
+    className?: string;
+    color?: string;
+    strokeWidth?: number | string;
+    onClick?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
+    style?: React.CSSProperties;
   }
 
   export type LucideIcon = ComponentType<LucideProps>;
@@ -83,10 +89,45 @@ declare module 'lucide-react' {
   export const Circle: LucideIcon;
   export const BookOpen: LucideIcon;
   export const Target: LucideIcon;
-  export const Mail: LucideIcon;
   export const MessageSquare: LucideIcon;
+
+  // Additional icons from global declarations
+  export const Earth: LucideIcon;
+  export const Activity: LucideIcon;
+  export const Award: LucideIcon;
+  export const Flame: LucideIcon;
+  export const Grid3X3: LucideIcon;
+  export const LayoutGrid: LucideIcon;
+  export const List: LucideIcon;
+  export const Maximize2: LucideIcon;
+  export const Megaphone: LucideIcon;
+  export const Network: LucideIcon;
+  export const Sparkles: LucideIcon;
+  export const Send: LucideIcon;
+  export const ThumbsUp: LucideIcon;
+  export const TrendingUp: LucideIcon;
+  export const Trophy: LucideIcon;
+  export const Wifi: LucideIcon;
+  export const WifiOff: LucideIcon;
+  export const Zap: LucideIcon;
+
+  // Aliases for compatibility
+  export const Grid: LucideIcon; // Alias for Grid3X3
 
   // Fallback for any other missing icons
   const _default: Record<string, LucideIcon>;
   export default _default;
+}
+
+// Specific module declarations for commonly used icons
+declare module 'lucide-react/Sparkles' {
+  import type { LucideIcon } from 'lucide-react';
+  const Sparkles: LucideIcon;
+  export default Sparkles;
+}
+
+declare module 'lucide-react/BookOpen' {
+  import type { LucideIcon } from 'lucide-react';
+  const BookOpen: LucideIcon;
+  export default BookOpen;
 }

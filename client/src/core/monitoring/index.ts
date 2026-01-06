@@ -3,86 +3,90 @@
  *
  * Comprehensive monitoring and performance tracking system for development
  * Provides route profiling, regression testing, and continuous monitoring
- *
- * Requirements: 11.4, 11.5
  */
 
-// Route Performance Profiler
-export { RouteProfiler, useRouteProfiler } from './RouteProfiler';
+/**
+ * Core Monitoring Module
+ *
+ * Comprehensive monitoring and performance tracking system for development
+ * Provides route profiling, regression testing, and continuous monitoring
+ */
 
-// Performance Regression Testing
+// Development tools (moved to features/monitoring)
+export { routeProfiler } from '@client/features/monitoring';
+export { performanceRegressionTester } from '@client/features/monitoring';
+export { continuousPerformanceMonitor } from '@client/features/monitoring';
+
+// Development Dashboard (moved to shared infrastructure)
+export { DevelopmentMonitoringDashboard } from '@client/shared/infrastructure/monitoring';
+
+// Enhanced Error Monitoring (moved to shared infrastructure)
+export { ErrorMonitor as ErrorMonitoring } from '@client/shared/infrastructure/monitoring';
+
+// Enhanced Performance Monitoring (moved to shared infrastructure)
+export { PerformanceMonitor as PerformanceMonitoring } from '@client/shared/infrastructure/monitoring';
+
+// Enhanced Monitoring Integration (moved to shared infrastructure)
+export { MonitoringIntegration as MonitoringService } from '@client/shared/infrastructure/monitoring';
+export type { MonitoringConfig } from '@client/shared/infrastructure/monitoring';
+
+// Monitoring Initialization
 export {
-  PerformanceRegressionTester,
-  performanceRegressionTester
-} from './PerformanceRegressionTester';
-
-// Continuous Performance Monitoring
-export {
-  ContinuousPerformanceMonitor,
-  continuousPerformanceMonitor
-} from './ContinuousPerformanceMonitor';
-
-// Development Monitoring Dashboard
-export { DevelopmentMonitoringDashboard } from './DevelopmentMonitoringDashboard';
-
-// Types
-export type {
-  RoutePerformanceMetrics,
-  ComponentMetrics
-} from './RouteProfiler';
-
-export type {
-  PerformanceBaseline,
-  PerformanceTestResult,
-  PerformanceRegression,
-  RegressionTestConfig
-} from './PerformanceRegressionTester';
-
-export type {
-  MonitoringConfig,
-  PerformanceAlert,
-  WebVitalsMetrics,
-  PerformanceSnapshot
-} from './ContinuousPerformanceMonitor';
+  initializeMonitoring,
+  getMonitoringInstance,
+  default as MonitoringInitializer
+} from './monitoring-init';
 
 /**
  * Initialize all monitoring systems
  */
-export const initializeMonitoring = (config?: {
+export const initializeCoreMonitoring = async (config?: {
   enableProfiler?: boolean;
   enableRegressionTesting?: boolean;
   enableContinuousMonitoring?: boolean;
+  enableEnhancedMonitoring?: boolean;
 }) => {
   const {
     enableProfiler = process.env.NODE_ENV === 'development',
     enableRegressionTesting = process.env.NODE_ENV === 'development',
-    enableContinuousMonitoring = process.env.NODE_ENV === 'development'
+    enableContinuousMonitoring = process.env.NODE_ENV === 'development',
+    enableEnhancedMonitoring = process.env.NODE_ENV === 'development'
   } = config || {};
 
   if (enableRegressionTesting) {
+    const { performanceRegressionTester } = await import('@client/features/monitoring');
     performanceRegressionTester.startAutomatedTesting();
   }
 
   if (enableContinuousMonitoring) {
+    const { continuousPerformanceMonitor } = await import('@client/features/monitoring');
     continuousPerformanceMonitor.start();
+  }
+
+  if (enableEnhancedMonitoring) {
+    // Enhanced monitoring auto-initializes
+    console.log('Enhanced monitoring enabled');
   }
 
   return {
     profiler: enableProfiler,
     regressionTesting: enableRegressionTesting,
-    continuousMonitoring: enableContinuousMonitoring
+    continuousMonitoring: enableContinuousMonitoring,
+    enhancedMonitoring: enableEnhancedMonitoring
   };
 };
 
 /**
  * Cleanup all monitoring systems
  */
-export const cleanupMonitoring = () => {
+export const cleanupMonitoring = async () => {
+  const { performanceRegressionTester, continuousPerformanceMonitor } = await import('@client/features/monitoring');
+
   performanceRegressionTester.stopAutomatedTesting();
   continuousPerformanceMonitor.stop();
 };
 
 // Auto-initialize in development mode
 if (process.env.NODE_ENV === 'development') {
-  initializeMonitoring();
+  initializeCoreMonitoring().catch(console.error);
 }

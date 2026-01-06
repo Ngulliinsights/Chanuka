@@ -3,9 +3,8 @@
  * Displays expert verification system and analysis
  */
 
-import {
 import React from 'react';
-
+import {
   Shield,
   Users,
   CheckCircle,

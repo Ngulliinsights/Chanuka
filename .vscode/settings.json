@@ -16,5 +16,11 @@
     "files.exclude": {
         "**/node_modules/**": true
     },
-    "typescript.autoClosingTags": false
+    "typescript.autoClosingTags": false,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true
+    },
+    "chat.mcp.gallery.enabled": true,
+    "chat.renderRelatedFiles": true,
+    "chat.restoreLastPanelSession": true
 }

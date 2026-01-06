@@ -4,9 +4,8 @@
  * Optimized for accessibility, performance, and user experience
  */
 
-import { 
 import React from 'react';
-
+import {
   Settings, 
   Shield, 
   BarChart3,

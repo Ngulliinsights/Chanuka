@@ -1,6 +1,6 @@
 /**
  * Navigation core module - Modular navigation system
- * 
+ *
  * This module provides comprehensive navigation functionality including:
  * - Validation and access control
  * - Breadcrumb generation and related pages
@@ -8,6 +8,8 @@
  * - Analytics and event tracking
  * - User preferences and settings
  * - Path lookup and utilities
+ * - Route preloading and validation
+ * - Navigation wrapper utilities
  */
 
 // Core types and interfaces
@@ -15,6 +17,7 @@ export * from './types';
 
 // Validation functionality
 export * from './validation';
+export * from './route-validation';
 
 // Access control and permissions
 export * from './access-control';
@@ -27,6 +30,12 @@ export * from './search';
 
 // Analytics and tracking
 export * from './analytics';
+
+// Route preloading and performance
+export * from './route-preloading';
+
+// Navigation utilities and backward compatibility
+export * from './navigation-wrapper';
 
 // User preferences
 export {

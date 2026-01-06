@@ -4,9 +4,8 @@
  */
 
 // Remove unused React import
-import {
 import React from 'react';
-
+import {
   Bell,
   Download,
   Trash,

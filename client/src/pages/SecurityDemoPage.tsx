@@ -3,9 +3,8 @@
  * Demonstrates the security system features
  */
 
-import { 
 import React from 'react';
-
+import {
   Shield, 
   AlertTriangle, 
   CheckCircle, 

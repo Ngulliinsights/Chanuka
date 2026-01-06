@@ -5,9 +5,8 @@
  */
 
 import { format } from 'date-fns';
-import {
 import React from 'react';
-
+import {
   TrendingUp,
   Award,
   Users,

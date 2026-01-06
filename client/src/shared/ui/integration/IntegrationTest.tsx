@@ -5,9 +5,8 @@
  * and provides a comprehensive validation of the implementation
  */
 
-import {
 import React from 'react';
-
+import {
   CheckCircle,
   AlertCircle,
   Loader2,

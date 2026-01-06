@@ -3,9 +3,8 @@
  * * Displays ML-powered bill recommendations with relevance scoring and reasoning.
  */
 
-import {
 import React from 'react';
-
+import {
   X,
   ExternalLink,
   Target,

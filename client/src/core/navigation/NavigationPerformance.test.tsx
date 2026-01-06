@@ -11,51 +11,58 @@ import { MemoryRouter } from 'react-router-dom';
 import { NavigationPerformance } from './NavigationPerformance';
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
 // Mock dynamic imports
-jest.mock('../../pages/StrategicHomePage', () => ({
+vi.mock('../../pages/StrategicHomePage', () => ({
   default: () => <div>Home Page</div>
 }));
 
-jest.mock('../../pages/bills/bills-dashboard-page', () => ({
+vi.mock('../../pages/bills/bills-dashboard-page', () => ({
   default: () => <div>Bills Dashboard</div>
 }));
 
-jest.mock('../../pages/UniversalSearchPage', () => ({
+vi.mock('../../pages/UniversalSearchPage', () => ({
   default: () => <div>Search Page</div>
 }));
 
-// Mock IntersectionObserver
-const mockIntersectionObserver = jest.fn();
-mockIntersectionObserver.mockReturnValue({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn()
-});
-window.IntersectionObserver = mockIntersectionObserver;
+// Mock browser APIs
+const mockIntersectionObserver = vi.fn(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn()
+}));
 
-// Mock PerformanceObserver
-const mockPerformanceObserver = jest.fn();
-mockPerformanceObserver.mockReturnValue({
-  observe: jest.fn(),
-  disconnect: jest.fn()
-});
-window.PerformanceObserver = mockPerformanceObserver;
+const mockPerformanceObserver = vi.fn(() => ({
+  observe: vi.fn(),
+  disconnect: vi.fn()
+}));
 
-// Mock MutationObserver
-const mockMutationObserver = jest.fn();
-mockMutationObserver.mockReturnValue({
-  observe: jest.fn(),
-  disconnect: jest.fn()
+const mockMutationObserver = vi.fn(() => ({
+  observe: vi.fn(),
+  disconnect: vi.fn()
+}));
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  value: mockIntersectionObserver
 });
-window.MutationObserver = mockMutationObserver;
+
+Object.defineProperty(window, 'PerformanceObserver', {
+  writable: true,
+  value: mockPerformanceObserver
+});
+
+Object.defineProperty(window, 'MutationObserver', {
+  writable: true,
+  value: mockMutationObserver
+});
 
 const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
   children,
@@ -72,12 +79,12 @@ const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
 
 describe('NavigationPerformance', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Initialization', () => {
@@ -101,7 +108,7 @@ describe('NavigationPerformance', () => {
       );
 
       // Fast-forward timers to trigger preloading
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
 
       // Verify that preloading was initiated
       // (Implementation details would be tested through integration)
@@ -117,7 +124,7 @@ describe('NavigationPerformance', () => {
       );
 
       // Fast-forward to trigger preloading
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
 
       // Verify preloading behavior
       await waitFor(() => {
@@ -133,7 +140,7 @@ describe('NavigationPerformance', () => {
         </TestWrapper>
       );
 
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
 
       // Change route
       rerender(
@@ -142,7 +149,7 @@ describe('NavigationPerformance', () => {
         </TestWrapper>
       );
 
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
 
       // Verify different preloading behavior for different routes
       expect(true).toBe(true); // Placeholder
@@ -185,7 +192,7 @@ describe('NavigationPerformance', () => {
       mutationCallback([]);
 
       // Fast-forward timer for re-observation
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
 
       expect(true).toBe(true); // Placeholder for actual link re-observation test
     });
@@ -264,10 +271,10 @@ describe('NavigationPerformance', () => {
 
   describe('Cleanup', () => {
     it('should cleanup observers on unmount', () => {
-      const mockDisconnect = jest.fn();
-      mockIntersectionObserver.mockReturnValue({
-        observe: jest.fn(),
-        unobserve: jest.fn(),
+      const mockDisconnect = vi.fn();
+      mockIntersectionObserver.mockReturnValueOnce({
+        observe: vi.fn(),
+        unobserve: vi.fn(),
         disconnect: mockDisconnect
       });
 

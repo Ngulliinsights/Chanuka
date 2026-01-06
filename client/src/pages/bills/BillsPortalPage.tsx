@@ -5,22 +5,20 @@ import {
   Filter,
   Grid,
   List,
-  SortAsc,
-  SortDesc,
-  BookmarkPlus,
-  Share2,
+  ArrowUp,
+  ArrowDown,
+  Bookmark,
   Download,
   RefreshCw,
   AlertCircle,
   TrendingUp,
   Clock,
-  Users,
   FileText
 } from 'lucide-react';
 
 import { Button } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import {
@@ -30,25 +28,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '@client/shared/design-system';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@client/shared/design-system';
 
 import { useBills } from '@client/features/bills/hooks';
 import { BillCard } from '@client/features/bills';
 import { FilterPanel } from '@client/features/bills/ui/filter-panel';
-import { StatsOverview } from '@client/features/bills/ui/stats-overview';
 import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
 import { useToast } from '@client/hooks/use-toast';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { logger } from '@client/utils/logger';
 import { cn } from '@client/shared/design-system/utils/cn';
 
-import type { Bill, BillsQueryParams } from '@client/features/bills/types';
+import type { BillsQueryParams } from '@client/features/bills/types';
 
 // Types for the portal
 interface BillsPortalFilters extends BillsQueryParams {
@@ -368,7 +358,7 @@ export default function BillsPortalPage() {
         <Card className="cursor-pointer hover:bg-accent/50 transition-colors"
               onClick={() => handleCategoryChange('saved')}>
           <CardContent className="p-4 text-center">
-            <BookmarkPlus className="h-6 w-6 mx-auto mb-2 text-purple-600" />
+            <Bookmark className="h-6 w-6 mx-auto mb-2 text-purple-600" />
             <div className="text-2xl font-bold">{stats.saved}</div>
             <div className="text-sm text-muted-foreground">Saved</div>
           </CardContent>
@@ -427,9 +417,9 @@ export default function BillsPortalPage() {
             onClick={handleSortOrderToggle}
           >
             {currentFilters.sortOrder === 'asc' ? (
-              <SortAsc className="h-4 w-4" />
+              <ArrowUp className="h-4 w-4" />
             ) : (
-              <SortDesc className="h-4 w-4" />
+              <ArrowDown className="h-4 w-4" />
             )}
           </Button>
 

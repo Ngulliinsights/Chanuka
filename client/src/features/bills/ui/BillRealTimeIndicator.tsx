@@ -5,9 +5,8 @@
  * for individual bills using WebSocket integration.
  */
 
-import { 
 import React from 'react';
-
+import {
   Activity, 
   MessageSquare, 
   Users, 

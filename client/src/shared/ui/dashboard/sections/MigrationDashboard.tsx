@@ -1,6 +1,5 @@
-import {
 import React from 'react';
-
+import {
   CheckCircle,
   Clock,
   AlertTriangle,

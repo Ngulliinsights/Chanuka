@@ -1,6 +1,6 @@
 /**
  * Comprehensive Validation Schemas
- * 
+ *
  * Type-safe validation using Zod with React Hook Form integration
  * Covers bills, users, comments, search, and form validation
  */
@@ -318,7 +318,7 @@ export const formValidationSchemas = {
   // Payment form
   paymentForm: z.object({
     cardNumber: z.string()
-      .regex(/^\d{13,19}$/, 'Invalid card number')
+      .regex(/^\d{4}(?:\s?\d{4}){3}$|^\d{13,19}$/, 'Invalid card number')
       .transform((val) => val.replace(/\s/g, '')),
 
     expiryDate: z.string()

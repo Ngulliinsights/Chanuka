@@ -9,9 +9,8 @@ import { logger } from '@client/utils/logger';
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import {
 import React from 'react';
-
+import {
   Select,
   SelectContent,
   SelectItem,

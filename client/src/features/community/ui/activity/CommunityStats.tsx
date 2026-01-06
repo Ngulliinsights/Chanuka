@@ -9,9 +9,8 @@
  * - Performance-optimized with memoization and efficient rendering
  */
 
-import {
 import React from 'react';
-
+import {
   Users,
   MessageSquare,
   Award,

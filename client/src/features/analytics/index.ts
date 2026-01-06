@@ -1,13 +1,7 @@
 /**
  * Analytics Feature
- * User journey tracking, error analytics, performance monitoring, and bill analysis
+ *
+ * Centralized exports for analytics feature
  */
 
-// Business logic services
-export * from './services';
-
-// Analytics hooks
-export * from './hooks';
-
-// UI components
-export * from './ui';
+export * from './model';

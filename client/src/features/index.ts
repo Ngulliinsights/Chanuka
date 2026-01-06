@@ -1,6 +1,6 @@
 /**
  * Features Module Index
- * 
+ *
  * Central export point for all feature modules
  * Follows Feature-Sliced Design (FSD) architecture
  */
@@ -28,3 +28,12 @@ export * from './users';
 
 // Admin Features
 export * from './admin';
+
+// Monitoring Features
+export * from './monitoring';
+
+// Notifications Features
+export * from './notifications';
+
+// Realtime Features
+export * from './realtime';

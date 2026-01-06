@@ -4,9 +4,8 @@
  * Allows users to customize their dashboard layout and preferences.
  */
 
-import {
 import React from 'react';
-
+import {
   Settings,
   Clock,
   RefreshCw,

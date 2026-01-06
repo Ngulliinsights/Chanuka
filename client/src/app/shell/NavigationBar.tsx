@@ -10,9 +10,8 @@ import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../core/search/
 import { UnifiedSearchInterface } from '../../core/search/UnifiedSearchInterface';
 import { useDeviceInfo } from '../../hooks/mobile/useDeviceInfo';
 import { cn } from '../../lib/utils';
-import {
 import React from 'react';
-
+import {
   Avatar,
   AvatarFallback,
   AvatarImage,

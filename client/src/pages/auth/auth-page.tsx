@@ -13,9 +13,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import {
 import React from 'react';
-
+import {
   Card,
   CardContent,
   CardDescription,

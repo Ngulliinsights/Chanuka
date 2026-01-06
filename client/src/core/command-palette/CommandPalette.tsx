@@ -239,8 +239,24 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       groupedCommands[section.id]?.length > 0
     );
 
-    // Add custom commands section if any
-    if (customCommands.length > 0 && groupedCommands.other?.length > 0) {
+    // Add custom sections from grouped commands
+    Object.keys(groupedCommands).forEach(sectionId => {
+      if (sectionId !== 'other' && !sections.some(s => s.id === sectionId)) {
+        const commands = groupedCommands[sectionId];
+        if (commands.length > 0) {
+          // Create a section for custom groups
+          sections.push({
+            id: sectionId,
+            title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1) + ' Commands',
+            commands,
+            priority: 0
+          });
+        }
+      }
+    });
+
+    // Add other/custom commands section if any
+    if (groupedCommands.other?.length > 0) {
       sections.push({
         id: 'other',
         title: 'Custom Commands',

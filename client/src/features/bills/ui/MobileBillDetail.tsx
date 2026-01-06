@@ -7,9 +7,8 @@
  * accessibility support, and performance optimization.
  */
 
-import {
 import React from 'react';
-
+import {
   ArrowLeft,
   Share2,
   Bell,

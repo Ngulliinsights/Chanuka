@@ -1,22 +1,22 @@
 /**
  * Performance Monitoring API Service
- * 
+ *
  * This service manages communication with backend performance monitoring endpoints.
  * It tracks Core Web Vitals, custom metrics, resource timings, and provides
  * actionable insights through performance analytics and recommendations.
- * 
+ *
  * Core Web Vitals tracked:
  * - LCP (Largest Contentful Paint): Loading performance
  * - FID (First Input Delay): Interactivity
  * - CLS (Cumulative Layout Shift): Visual stability
  * - TTFB (Time to First Byte): Server response time
  * - FCP (First Contentful Paint): Perceived load speed
- * 
+ *
  * @module PerformanceApiService
  */
+import { logger } from '@client/utils/logger';
 
 import { ErrorFactory } from '../error';
-import { logger } from '@client/utils/logger';
 
 import { globalApiClient } from './client';
 
@@ -105,7 +105,7 @@ export interface ResourceTiming {
 /**
  * Performance issue types that can be detected and reported
  */
-export type PerformanceIssueType = 
+export type PerformanceIssueType =
   | 'slow_page'
   | 'high_memory'
   | 'network_issue'
@@ -205,17 +205,17 @@ export class PerformanceApiService {
 
   /**
    * Reports comprehensive performance metrics to the backend.
-   * 
+   *
    * This method sends a complete snapshot of the current page's performance,
    * including Core Web Vitals, custom business metrics, and resource timings.
    * This data powers performance dashboards and automated alerting systems.
-   * 
+   *
    * The backend aggregates this data to identify performance trends, detect
    * regressions, and generate recommendations for optimization.
-   * 
+   *
    * @param payload - Complete metrics payload including all performance data
    * @throws {UnifiedError} When the network request fails or validation errors occur
-   * 
+   *
    * @example
    * ```typescript
    * await service.reportMetrics({
@@ -261,7 +261,7 @@ export class PerformanceApiService {
 
       throw ErrorFactory.createNetworkError(
         'Failed to send performance metrics to the server',
-        { 
+        {
           sessionId: payload.sessionId,
           metricsCount: payload.metrics.length,
           originalError: error,
@@ -278,28 +278,28 @@ export class PerformanceApiService {
 
   /**
    * Retrieves performance analytics for a specific user.
-   * 
+   *
    * This method returns historical performance data, trends over time, and
    * aggregated metrics for a user. It helps identify patterns like:
    * - Performance degradation over time
    * - Correlation between device/network and performance
    * - User-specific performance bottlenecks
-   * 
+   *
    * The date range parameter allows you to focus on specific time periods
    * for more detailed analysis.
-   * 
+   *
    * @param userId - The unique identifier of the user
    * @param dateRange - Optional date range to filter results
    * @returns Promise resolving to comprehensive analytics data
    * @throws {UnifiedError} When retrieval fails or user is not found
-   * 
+   *
    * @example
    * ```typescript
    * const analytics = await service.getUserAnalytics('user_123', {
    *   start: '2024-01-01',
    *   end: '2024-01-31'
    * });
-   * 
+   *
    * console.log(`Average LCP: ${analytics.averageMetrics.LCP}ms`);
    * ```
    */
@@ -353,17 +353,17 @@ export class PerformanceApiService {
 
   /**
    * Retrieves performance benchmarks for comparison.
-   * 
+   *
    * Benchmarks define what constitutes "good" vs "poor" performance based on
    * industry standards (like Google's Core Web Vitals thresholds) and your
    * application's specific requirements. Use these to:
    * - Color-code metrics in dashboards (green/yellow/red)
    * - Trigger alerts when performance degrades
    * - Set team goals and track improvements
-   * 
+   *
    * @returns Promise resolving to benchmark thresholds
    * @throws {UnifiedError} When retrieval fails
-   * 
+   *
    * @example
    * ```typescript
    * const benchmarks = await service.getBenchmarks();
@@ -397,17 +397,17 @@ export class PerformanceApiService {
 
   /**
    * Reports a detected performance issue.
-   * 
+   *
    * Use this method when automated monitoring detects performance problems
    * like slow page loads, memory leaks, or network failures. The backend
    * can aggregate these reports to:
    * - Identify widespread issues affecting multiple users
    * - Correlate issues with deployments or infrastructure changes
    * - Prioritize performance improvements based on impact
-   * 
+   *
    * @param issue - Complete issue report with context
    * @throws {UnifiedError} When reporting fails
-   * 
+   *
    * @example
    * ```typescript
    * await service.reportIssue({
@@ -466,25 +466,25 @@ export class PerformanceApiService {
 
   /**
    * Retrieves personalized performance recommendations.
-   * 
+   *
    * Based on a session's performance data, this endpoint returns actionable
    * recommendations for improvement. The backend analyzes metrics to identify:
    * - Resource optimization opportunities (images, scripts, fonts)
    * - Code splitting opportunities
    * - Caching strategy improvements
    * - Critical rendering path optimizations
-   * 
+   *
    * Each recommendation includes an estimated impact score to help you
    * prioritize improvements that will provide the most benefit.
-   * 
+   *
    * @param sessionId - The session to analyze
    * @returns Promise resolving to an array of prioritized recommendations
    * @throws {UnifiedError} When retrieval fails or session is not found
-   * 
+   *
    * @example
    * ```typescript
    * const recommendations = await service.getRecommendations('sess_abc123');
-   * 
+   *
    * for (const rec of recommendations) {
    *   console.log(`${rec.priority}: ${rec.description}`);
    *   console.log(`Expected improvement: ${rec.impact}%`);
@@ -528,11 +528,11 @@ export class PerformanceApiService {
  * Global singleton instance of the Performance API Service.
  * Use this instance throughout your application for consistent behavior
  * and proper resource management.
- * 
+ *
  * @example
  * ```typescript
  * import { performanceApiService } from './api/performance';
- * 
+ *
  * await performanceApiService.reportMetrics(metricsPayload);
  * ```
  */

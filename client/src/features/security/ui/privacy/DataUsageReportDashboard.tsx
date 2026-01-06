@@ -3,9 +3,8 @@
  * Transparent reporting of how user data is collected, used, and shared
  */
 
-import {
 import React from 'react';
-
+import {
   Database,
   BarChart3,
   Shield,

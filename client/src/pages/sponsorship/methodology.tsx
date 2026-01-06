@@ -1,16 +1,15 @@
 
-import {
 import React from 'react';
-
+import {
   ArrowLeft,
-  Search, 
+  Search,
   CheckCircle,
   ChevronLeft,
   Shield,
   Database,
   FileText,
   Users,
-  BarChart,
+  BarChart3,
   Scale,
   Eye,
   Cpu,
@@ -107,7 +106,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                         stage: 2,
                         title: "Financial Influence Mapping",
                         description: "Advanced tracking of campaign contributions and financial relationships across multiple election cycles.",
-                        icon: <BarChart className="h-6 w-6" />
+                        icon: <BarChart3 className="h-6 w-6" />
                       },
                       {
                         stage: 3,
@@ -164,7 +163,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Systematically monitors financial disclosures, property records, business registrations, 
+                          Systematically monitors financial disclosures, property records, business registrations,
                           and other official government databases across federal, state, and local levels.
                         </p>
                         <div className="text-xs text-blue-600">
@@ -179,7 +178,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Maps complex corporate ownership structures, subsidiary relationships, 
+                          Maps complex corporate ownership structures, subsidiary relationships,
                           and business partnerships to identify indirect financial connections.
                         </p>
                         <div className="text-xs text-blue-600">
@@ -194,7 +193,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Natural language processing analysis of 300+ news outlets, trade publications, 
+                          Natural language processing analysis of 300+ news outlets, trade publications,
                           and investigative reports to identify emerging conflicts.
                         </p>
                         <div className="text-xs text-blue-600">
@@ -226,7 +225,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                         <div key={item.source} className="flex items-center gap-4">
                           <span className="min-w-[200px] text-sm font-medium">{item.source}</span>
                           <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                               className={`h-2 rounded-full ${item.color}`}
                               style={{ width: `${item.weight}%` }}
                             ></div>
@@ -286,7 +285,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                           </div>
                           <div className="flex items-center gap-2 mb-2">
                             <div className="flex-1 bg-gray-200 rounded-full h-2">
-                              <div 
+                              <div
                                 className={`h-2 rounded-full ${dimension.color}`}
                                 style={{ width: `${dimension.level}%` }}
                               ></div>
@@ -334,8 +333,8 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                     <CardContent className="p-4">
                       <h5 className="font-semibold mb-2">Our Verification Commitment</h5>
                       <p className="text-sm text-blue-800">
-                        Every public submission receives response within 72 hours. Verified information is credited 
-                        to contributors in our public database. Our expert verification network ensures accuracy 
+                        Every public submission receives response within 72 hours. Verified information is credited
+                        to contributors in our public database. Our expert verification network ensures accuracy
                         while protecting legitimate whistleblowers and concerned citizens.
                       </p>
                     </CardContent>
@@ -361,7 +360,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Healthcare Reform Bill Section 12 demonstrates <strong>72% textual similarity</strong> with 
+                          Healthcare Reform Bill Section 12 demonstrates <strong>72% textual similarity</strong> with
                           pharmaceutical industry white paper published in 2023.
                         </p>
                         <div className="text-xs text-blue-600">
@@ -379,7 +378,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Digital learning provisions show <strong>68% precision alignment</strong> with vendor specifications. 
+                          Digital learning provisions show <strong>68% precision alignment</strong> with vendor specifications.
                           Concurrent analysis reveals timing correlation with campaign contributions.
                         </p>
                         <div className="text-xs text-green-600">
@@ -397,7 +396,7 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
-                          Donation volumes increased by <strong>340%</strong> in 30-day period preceding policy position reversal. 
+                          Donation volumes increased by <strong>340%</strong> in 30-day period preceding policy position reversal.
                           Pattern repeats across three separate legislative initiatives.
                         </p>
                         <div className="text-xs text-red-600">
@@ -424,19 +423,19 @@ export default function MethodologyPage({ bill_id  }: MethodologyProps) {
         <CardContent>
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>
-              <strong>Data Completeness:</strong> Our analysis is based on publicly available information. 
+              <strong>Data Completeness:</strong> Our analysis is based on publicly available information.
               Some financial relationships or conflicts may not be captured if not publicly disclosed.
             </p>
             <p>
-              <strong>Temporal Accuracy:</strong> Financial interests and affiliations change over time. 
+              <strong>Temporal Accuracy:</strong> Financial interests and affiliations change over time.
               We strive to maintain current data but there may be delays in updates.
             </p>
             <p>
-              <strong>Interpretation:</strong> Conflict scores represent potential risks based on available data. 
+              <strong>Interpretation:</strong> Conflict scores represent potential risks based on available data.
               They do not constitute accusations of wrongdoing or improper behavior.
             </p>
             <p>
-              <strong>Legal Compliance:</strong> Our analysis aims to highlight transparency issues, 
+              <strong>Legal Compliance:</strong> Our analysis aims to highlight transparency issues,
               not determine legal compliance. Legal determinations require official investigation.
             </p>
           </div>

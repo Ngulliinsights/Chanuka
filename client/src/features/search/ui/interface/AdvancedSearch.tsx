@@ -5,9 +5,8 @@
  * capabilities for power users and detailed search requirements.
  */
 
-import {
 import React from 'react';
-
+import {
   Search,
   Plus,
   Minus,

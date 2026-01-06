@@ -5,9 +5,8 @@
  * Focuses on activity tracking, bill management, and community participation.
  */
 
-import {
 import React from 'react';
-
+import {
   Activity,
   Bookmark,
   MessageSquare,

@@ -15,25 +15,26 @@ import { createNavigationProvider } from './context';
 import navigationSlice from '../../shared/infrastructure/store/slices/navigationSlice';
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
 // Mock navigation hooks
-const mockNavigate = jest.fn();
-const mockLocation = { pathname: '/' };
+const mockNavigate = vi.fn();
 const mockAuth = { user: null, isAuthenticated: false };
 const mockDeviceInfo = { isMobile: false, isTablet: false, isDesktop: true };
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-  useLocation: () => mockLocation
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate
+  };
+});
 
 // Create test store
 const createTestStore = () => {
@@ -68,7 +69,7 @@ const createTestStore = () => {
 
 // Create test navigation provider
 const TestNavigationProvider = createNavigationProvider(
-  () => mockLocation,
+  () => ({ pathname: window.location.pathname || '/' }),
   () => mockNavigate,
   () => mockAuth,
   () => mockDeviceInfo
@@ -95,7 +96,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
 
 describe('NavigationConsistency', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset document title
     document.title = '';
     // Clear meta tags
@@ -261,7 +262,7 @@ describe('NavigationConsistency', () => {
 
   describe('Analytics Integration', () => {
     it('should track page views when gtag is available', () => {
-      const mockGtag = jest.fn();
+      const mockGtag = vi.fn();
       (window as any).gtag = mockGtag;
 
       render(

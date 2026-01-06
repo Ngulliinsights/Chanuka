@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -5,8 +6,6 @@ import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@client/core/auth';
 import { personaDetector } from '@client/core/personalization';
 import type {
-import React from 'react';
-
   PersonaType,
   PersonaClassification,
   PersonaPreferences

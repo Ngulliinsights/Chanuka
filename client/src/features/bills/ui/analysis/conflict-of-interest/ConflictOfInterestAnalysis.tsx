@@ -5,9 +5,8 @@
  * historical patterns, and implementation workarounds into a comprehensive analysis.
  */
 
-import {
 import React from 'react';
-
+import {
   Network,
   DollarSign,
   Eye,

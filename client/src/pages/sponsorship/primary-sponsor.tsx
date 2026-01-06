@@ -1,6 +1,5 @@
-import {
 import React from 'react';
-
+import {
   ArrowLeft,
   ChevronLeft, 
   ChevronRight, 

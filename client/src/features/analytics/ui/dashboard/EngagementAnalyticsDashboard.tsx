@@ -6,9 +6,8 @@
  * and gamification elements.
  */
 
-import {
 import React from 'react';
-
+import {
   Activity,
   Users,
   MessageSquare,

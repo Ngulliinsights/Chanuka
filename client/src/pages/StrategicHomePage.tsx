@@ -46,7 +46,7 @@ import { personaDetector } from '@client/core/personalization';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
-import { usePerformanceMonitoring } from '@client/utils/performance-monitor';
+
 
 // Lazy load non-critical components for performance
 const PlatformStats = lazy(() => import('../components/home/PlatformStats'));
@@ -362,9 +362,6 @@ const AuthenticatedHero: React.FC<{
  * Main component implementing progressive disclosure based on authentication status
  */
 export default function StrategicHomePage() {
-  // Performance monitoring
-  usePerformanceMonitoring('home');
-
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const { data: userProfile } = useUserProfile() as { data: ExtendedUserProfile | undefined };

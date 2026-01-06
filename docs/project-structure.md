@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 1/5/2026, 2:03:53 PM
+**Generated:** 1/6/2026, 10:19:56 AM
 **Max Depth:** 7 levels
 
 ```
@@ -158,12 +158,6 @@
 │   │   │   │   ├── system.ts
 │   │   │   │   ├── user.ts
 │   │   │   │   └── WEBSOCKET_API_README.md
-│   │   │   ├── architecture/
-│   │   │   │   ├── component-reuse-matrix.ts
-│   │   │   │   ├── foundation-demo.tsx
-│   │   │   │   ├── foundation-test.ts
-│   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
-│   │   │   │   └── index.ts
 │   │   │   ├── auth/
 │   │   │   │   ├── config/
 │   │   │   │   │   ├── auth-config.ts
@@ -196,6 +190,7 @@
 │   │   │   │   │   └── validation.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── initialization.ts
+│   │   │   │   ├── rbac.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── service.ts
 │   │   │   │   └── types.ts
@@ -312,10 +307,9 @@
 │   │   │   │   ├── touch-handler.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── monitoring/
-│   │   │   │   ├── ContinuousPerformanceMonitor.ts
-│   │   │   │   ├── DevelopmentMonitoringDashboard.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── PerformanceRegressionTester.ts
+│   │   │   │   ├── monitoring-init.ts
+│   │   │   │   └── sentry-config.ts
 │   │   │   ├── navigation/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -330,6 +324,7 @@
 │   │   │   │   ├── hooks.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── lookup.ts
+│   │   │   │   ├── navigation-wrapper.ts
 │   │   │   │   ├── NavigationConsistency.test.tsx
 │   │   │   │   ├── NavigationConsistency.tsx
 │   │   │   │   ├── NavigationPerformance.test.tsx
@@ -384,6 +379,9 @@
 │   │   │   │   ├── types.ts
 │   │   │   │   ├── UnifiedSearchInterface.test.tsx
 │   │   │   │   └── UnifiedSearchInterface.tsx
+│   │   │   ├── security/
+│   │   │   │   ├── index.ts
+│   │   │   │   └── security-utils.ts
 │   │   │   ├── storage/
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
@@ -451,6 +449,12 @@
 │   │   │   │   │   ├── use-web-vitals.ts
 │   │   │   │   │   ├── useAnalytics.ts
 │   │   │   │   │   └── useErrorAnalytics.ts
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── error-analytics-bridge.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── offline-analytics.ts
+│   │   │   │   │   ├── privacy-analytics.ts
+│   │   │   │   │   └── user-journey-tracker.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── analysis.ts
 │   │   │   │   │   ├── analytics.ts
@@ -558,6 +562,20 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── market/
 │   │   │   │   └── SokoHaki.tsx
+│   │   │   ├── monitoring/
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── continuous-performance-monitor.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── performance-benchmarking.ts
+│   │   │   │   │   ├── performance-regression-tester.ts
+│   │   │   │   │   ├── render-tracker.ts
+│   │   │   │   │   ├── render-tracking-integration.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── notifications/
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── notification-service.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── pretext-detection/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   └── usePretextAnalysis.ts
@@ -571,6 +589,11 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
+│   │   │   ├── realtime/
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── realtime-optimizer.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── search/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── useIntelligentSearch.ts
@@ -692,11 +715,6 @@
 │   │   │   ├── utils.ts
 │   │   │   ├── validation-schemas.test.ts
 │   │   │   └── validation-schemas.ts
-│   │   ├── monitoring/
-│   │   │   ├── error-monitoring.ts
-│   │   │   ├── index.ts
-│   │   │   ├── performance-monitoring.ts
-│   │   │   └── sentry-config.ts
 │   │   ├── pages/
 │   │   │   ├── admin/
 │   │   │   │   ├── admin.tsx
@@ -781,16 +799,12 @@
 │   │   ├── services/
 │   │   │   ├── auth-service-init.ts
 │   │   │   ├── dataRetentionService.ts
-│   │   │   ├── errorAnalyticsBridge.ts
 │   │   │   ├── index.ts
 │   │   │   ├── mockUserData.ts
 │   │   │   ├── navigation.ts
-│   │   │   ├── notification-service.ts
 │   │   │   ├── notification-system-integration-summary.md
 │   │   │   ├── PageRelationshipService.ts
-│   │   │   ├── privacyAnalyticsService.ts
 │   │   │   ├── realistic-demo-data.ts
-│   │   │   ├── UserJourneyTracker.ts
 │   │   │   └── userService.ts
 │   │   ├── shared/
 │   │   │   ├── context/
@@ -959,8 +973,26 @@
 │   │   │   │   ├── asset-loading/
 │   │   │   │   │   ├── AssetLoadingProvider.tsx
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── cache/
+│   │   │   │   │   ├── cache-invalidation.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── compatibility/
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── events/
+│   │   │   │   │   ├── event-bus.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── http/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── request-deduplicator.ts
+│   │   │   │   ├── monitoring/
+│   │   │   │   │   ├── development-dashboard.tsx
+│   │   │   │   │   ├── error-monitor.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── monitoring-integration.ts
+│   │   │   │   │   └── performance-monitor.ts
+│   │   │   │   ├── storage/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── offline-data-manager.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   ├── middleware/
 │   │   │   │   │   │   ├── apiMiddleware.ts
@@ -980,9 +1012,15 @@
 │   │   │   │   │   │   └── userDashboardSlice.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── store-types.ts
+│   │   │   │   ├── sync/
+│   │   │   │   │   ├── background-sync-manager.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── system/
 │   │   │   │   │   ├── HealthCheck.tsx
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── workers/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── service-worker.ts
 │   │   │   │   ├── data-retention.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── integration-validator.ts
@@ -1296,40 +1334,24 @@
 │   │   │   └── lucide-react.d.ts
 │   │   ├── utils/
 │   │   │   ├── assets.ts
-│   │   │   ├── backgroundSyncManager.ts
 │   │   │   ├── browser-compatibility-tests.ts
 │   │   │   ├── browser.ts
 │   │   │   ├── bundle-analyzer.ts
-│   │   │   ├── cacheInvalidation.ts
 │   │   │   ├── cn.ts
 │   │   │   ├── comprehensiveLoading.ts
 │   │   │   ├── contrast.ts
 │   │   │   ├── demo-data-service.ts
 │   │   │   ├── emergency-triage.ts
 │   │   │   ├── env-config.ts
-│   │   │   ├── EventBus.ts
 │   │   │   ├── i18n.ts
 │   │   │   ├── input-validation.ts
 │   │   │   ├── investor-demo-enhancements.ts
 │   │   │   ├── logger.ts
-│   │   │   ├── monitoring-init.ts
-│   │   │   ├── navigation-wrapper.ts
-│   │   │   ├── offlineAnalytics.ts
-│   │   │   ├── offlineDataManager.ts
-│   │   │   ├── performance-benchmarking.ts
-│   │   │   ├── performance-monitor.ts
 │   │   │   ├── preload-optimizer.ts
 │   │   │   ├── privacy-compliance.ts
-│   │   │   ├── rbac.ts
 │   │   │   ├── react-helpers.ts
-│   │   │   ├── realtime-optimizer.ts
-│   │   │   ├── render-tracker.ts
-│   │   │   ├── render-tracking-integration.ts
-│   │   │   ├── request-deduplicator.ts
 │   │   │   ├── safe-lazy-loading.tsx
-│   │   │   ├── security.ts
 │   │   │   ├── service-recovery.ts
-│   │   │   ├── serviceWorker.ts
 │   │   │   └── tracing.ts
 │   │   ├── validation/
 │   │   │   └── index.ts
@@ -1341,6 +1363,7 @@
 │   │   ├── test-styles.html
 │   │   └── vite-env.d.ts
 │   ├── BUG_FIXES_SUMMARY.md
+│   ├── fix-import-syntax.mjs
 │   ├── index.html
 │   ├── migration-helper.js
 │   ├── package-scripts.json
@@ -1395,6 +1418,10 @@
 │   │   └── SHARED_INTEGRATION_STATUS.md
 │   ├── archive/
 │   │   ├── CHANGE_LOG.md
+│   │   ├── CONSOLIDATION_PLAN.md
+│   │   ├── CONSOLIDATION_SUMMARY.md
+│   │   ├── DESIGN_SYSTEM_DELIVERY.md
+│   │   ├── DESIGN_SYSTEM_INDEX.md
 │   │   ├── DOCUMENTATION_AUDIT_REPORT.md
 │   │   ├── IMPLEMENTATION_MERGE_SUMMARY.md
 │   │   ├── import-export-report.md
@@ -1402,6 +1429,7 @@
 │   │   ├── README_ERRORS.md
 │   │   ├── README_USSD_FIXES.md
 │   │   ├── REALTIME_INTEGRATION_SUMMARY.md
+│   │   ├── START_HERE.md
 │   │   ├── STORE_MIGRATION_ASSESSMENT.md
 │   │   ├── SYSTEMATIC_FIX_GUIDE.md
 │   │   ├── TASK_10_3_IMPLEMENTATION_SUMMARY.md
@@ -1456,9 +1484,9 @@
 │   │   ├── IMPORT_MAPPING_GUIDE.md
 │   │   ├── MVP-DATABASE-INTEGRATION-GUIDE.md
 │   │   ├── phase1-quick-reference.md
-│   │   ├── project-structure.md
 │   │   ├── quick-reference-guide.md
-│   │   └── research-implementation-guide.md
+│   │   ├── research-implementation-guide.md
+│   │   └── testing-strategy.md
 │   ├── reference/
 │   │   ├── api-consumer-guide.md
 │   │   ├── API.md
@@ -1550,7 +1578,20 @@
 │   │   ├── TYPE_SYSTEM_REMEDIATION_COMPLETE.md
 │   │   ├── TYPESCRIPT_ERROR_ANALYSIS.md
 │   │   └── TYPESCRIPT_FIXES_APPLIED.md
-│   └── index.md
+│   ├── Adversarial Validation of 'Chanuka' as Democratic Infrastructure in Kenya.md
+│   ├── Chanuka Validation_ A Rigorous Plan.md
+│   ├── chanuka_funder_table (1).md
+│   ├── chanuka_timeline_gantt.md
+│   ├── Data Strategy for Chanuka Launch.md
+│   ├── index.md
+│   ├── kba_pitch_deck.md
+│   ├── leg_intel_scraper.js
+│   ├── project-structure-comparison.md
+│   ├── project-structure.md
+│   ├── schema_analysis.md
+│   ├── Strategic Funding and Networking Plan.md
+│   ├── Validating Legislative Intelligence Market.md
+│   └── Validating Parliamentary Compliance Infrastructure.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -1577,8 +1618,6 @@
 │   ├── COMPREHENSIVE_MIGRATION_SUMMARY.md
 │   ├── LEGACY_MIGRATION_ARCHIVE.md
 │   └── legacy_migration_validation.sql
-├── plans/
-│   └── docs_reorganization_plan.md
 ├── playwright-report/
 │   └── index.html
 ├── scripts/
@@ -1653,11 +1692,13 @@
 │   │   ├── package-lock.json
 │   │   ├── package.json
 │   │   └── tsconfig.json
+│   ├── add-react-imports.js
 │   ├── align-imports.ts
 │   ├── align-schema.ts
 │   ├── analyze-bundle.cjs
 │   ├── analyze-codebase-errors.ts
 │   ├── analyze-phase2.sh
+│   ├── analyzer.js
 │   ├── architecture_fixer.ts
 │   ├── audit-codebase-utilities.ts
 │   ├── audit-error-handling-sprawl.ts
@@ -1667,6 +1708,7 @@
 │   ├── bundle-analyzer.js
 │   ├── check-table-structure.ts
 │   ├── check-tables.ts
+│   ├── check-thresholds.js
 │   ├── clean-shared-core-imports.ts
 │   ├── cleanup-deprecated-folders.ts
 │   ├── cleanup-legacy-adapters.js
@@ -1725,6 +1767,7 @@
 │   ├── fix-shared-ui.sh
 │   ├── fix-typescript-syntax-errors.ts
 │   ├── flatten-codebase.sh
+│   ├── functional_validator.js
 │   ├── generate-bundle-report.js
 │   ├── generate-comprehensive-migrations.ts
 │   ├── identify-any-usage.ts
@@ -1753,8 +1796,11 @@
 │   ├── phase2-analyze.js
 │   ├── phase2-migration-generator.sh
 │   ├── prepare-module-deletion.ts
+│   ├── race-condition-analyzer.js
 │   ├── rollback-cleanup.ts
 │   ├── run-adapter-cleanup.js
+│   ├── runtime_diagnostics.js
+│   ├── runtime-dependency-check.js
 │   ├── scan-migration-artifacts.sh
 │   ├── scan-remaining-imports.js
 │   ├── setup-playwright.js
@@ -1880,6 +1926,9 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy-factory.ts
 │   │   │   └── index.ts
+│   │   ├── ai-evaluation/
+│   │   │   └── application/
+│   │   │       └── evaluation-orchestrator.ts
 │   │   ├── alert-preferences/
 │   │   │   ├── application/
 │   │   │   │   ├── commands/
@@ -2015,8 +2064,10 @@
 │   │   │   │       ├── entity-extractor.ts
 │   │   │   │       ├── sentence-classifier.ts
 │   │   │   │       └── similarity-calculator.ts
+│   │   │   ├── types/
+│   │   │   │   └── argument.types.ts
 │   │   │   ├── IMPLEMENTATION_STATUS.md
-│   │   │   └── index.ts
+│   │   │   ├── index.ts
 │   │   ├── bills/
 │   │   │   ├── application/
 │   │   │   │   ├── bill-service-adapter.ts
@@ -2068,15 +2119,19 @@
 │   │   │   │   ├── constitutional-analysis-service-complete.ts
 │   │   │   │   ├── constitutional-analyzer.ts
 │   │   │   │   ├── expert-flagging-service.ts
+│   │   │   │   ├── grounding-service.ts
 │   │   │   │   ├── precedent-finder.ts
-│   │   │   │   └── provision-matcher.ts
+│   │   │   │   ├── provision-matcher.ts
+│   │   │   │   └── uncertainty-assessor.ts
 │   │   │   ├── config/
 │   │   │   │   └── analysis-config.ts
 │   │   │   ├── demo/
 │   │   │   │   └── constitutional-analysis-demo.ts
 │   │   │   ├── infrastructure/
-│   │   │   │   └── external/
-│   │   │   │       └── legal-database-client.ts
+│   │   │   │   ├── external/
+│   │   │   │   │   └── legal-database-client.ts
+│   │   │   │   └── knowledge-base/
+│   │   │   │       └── precedents-db.ts
 │   │   │   ├── scripts/
 │   │   │   │   └── populate-sample-data.ts
 │   │   │   ├── services/
@@ -2096,6 +2151,9 @@
 │   │   │   ├── services/
 │   │   │   │   └── government-data-integration.service.ts
 │   │   │   ├── index.ts
+│   │   ├── institutional-api/
+│   │   │   └── application/
+│   │   │       └── api-gateway-service.ts
 │   │   ├── market/
 │   │   │   ├── market.controller.ts
 │   │   │   ├── market.service.ts
@@ -3000,22 +3058,17 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
-├── analyzer.js
+├── ARGUMENT_INTELLIGENCE_SETUP_COMPLETE.md
 ├── CHANGELOG.md
 ├── chanuka_error_extractor.py
-├── check-thresholds.js
 ├── circular-dependency-resolver.mjs
 ├── clear-sw.html
 ├── client-fix-report-20251220-180156.md
 ├── codebase_errors.json
 ├── combined_analysis.json
-├── CONSOLIDATION_PLAN.md
-├── CONSOLIDATION_SUMMARY.md
 ├── count-websocket-fields.mjs
 ├── cspell.config.yaml
 ├── database-consolidation-analysis.md
-├── DESIGN_SYSTEM_DELIVERY.md
-├── DESIGN_SYSTEM_INDEX.md
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
@@ -3034,10 +3087,10 @@
 ├── final-issue-resolver.mjs
 ├── fix-imports.js
 ├── FSD_TYPE_MIGRATION_SUMMARY.md
-├── functional_validator.js
 ├── generate-structure.mjs
 ├── import-resolver.mjs
 ├── knip.config.ts
+├── monitoring-fsd-restructure-plan.md
 ├── nginx.conf
 ├── nx.json
 ├── package.json
@@ -3048,24 +3101,24 @@
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
+├── PROJECT_STATUS.md
 ├── quality-config-dev.json
 ├── quality-config-pr.json
 ├── quality-config-production.json
 ├── quality-config-staging.json
 ├── quality-gate-report.json
-├── race-condition-analyzer.js
 ├── race-condition-tests.spec.js
 ├── README.md
 ├── remaining-export-fixer.mjs
 ├── remaining-fixes-report-20251220-184518.md
+├── REORGANIZATION_SUMMARY.md
 ├── run_codebase_stats.bat
-├── runtime_diagnostics.js
-├── runtime-dependency-check.js
-├── START_HERE.md
+├── setup_argument_intelligence.js
 ├── start-dev.js
 ├── tailwind.config.js
+├── test_api_integration.js
+├── test_argument_intelligence.js
 ├── test-race-condition-fixes.js
-├── testing_strategy.md
 ├── tsconfig.json
 ├── tsconfig.server.json
 ├── TYPE_CONSOLIDATION_SUMMARY.md

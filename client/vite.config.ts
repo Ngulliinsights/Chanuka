@@ -478,5 +478,15 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // Info level in development helps with debugging
     // Warn level in production keeps CI logs clean
     logLevel: isDevelopment ? 'info' : 'warn',
+
+    // ============================================================================
+    // TESTING - Vitest configuration
+    // ============================================================================
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.ts'],
+      css: true,
+    },
   }
 })

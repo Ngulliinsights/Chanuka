@@ -1,7 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
-import {
 import React from 'react';
-
+import {
   BarChart3,
   Target,
   Award,
