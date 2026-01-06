@@ -1,6 +1,6 @@
 /**
  * Authentication Types
- * 
+ *
  * Type definitions for authentication and user management
  */
 
@@ -13,7 +13,7 @@ export enum ExpertStatus {
   VERIFIED = 'verified',
   CONTRIBUTOR = 'contributor',
   MODERATOR = 'moderator',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 export interface Badge {

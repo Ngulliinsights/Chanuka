@@ -8,12 +8,14 @@
  * - Security validation
  */
 
-import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
+
+import { Request, Response, NextFunction } from 'express';
+
 import { getDefaultCache } from '../cache';
 // import { RateLimitMiddleware } from '../rate-limiting/middleware'; // Unused import
-import { RateLimitStore } from '../rate-limiting/types';
 import { logger } from '../observability/logging';
+import { RateLimitStore } from '../rate-limiting/types';
 
 export interface AIRequest extends Request { aiContext?: {
     service: string;
@@ -232,7 +234,7 @@ async function validateAIRequest(req: Request): Promise<{
   // Validate content type for POST/PUT requests
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
     const content_type = req.get('Content-Type');
-    if (!content_type || !content_type.includes('application/json')) {
+    if (!content_type?.includes('application/json')) {
       errors.push('Content-Type must be application/json');
     }
   }

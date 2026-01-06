@@ -1,6 +1,6 @@
 /**
  * Mock Data Loaders and Caching
- * 
+ *
  * Provides data loading strategies, caching mechanisms, and error handling
  * for mock data integration throughout the application.
  */
@@ -17,24 +17,24 @@ import {
   mockTemporalAnalyticsData,
   mockUserEngagementProfile,
   mockCivicEngagementGoals,
-  mockEngagementNotifications
+  mockEngagementNotifications,
 } from './analytics';
 import { mockBills, mockBillsStats } from './bills';
-import { 
-  mockActivityItems, 
-  mockTrendingTopics, 
-  mockExpertInsights, 
-  mockCampaigns, 
-  mockPetitions, 
+import {
+  mockActivityItems,
+  mockTrendingTopics,
+  mockExpertInsights,
+  mockCampaigns,
+  mockPetitions,
   mockCommunityStats,
-  mockLocalImpactMetrics 
+  mockLocalImpactMetrics,
 } from './community';
-import { 
-  mockDiscussionThreads, 
-  mockComments, 
-  mockCommentReports, 
+import {
+  mockDiscussionThreads,
+  mockComments,
+  mockCommentReports,
   mockModerationActions,
-  mockTypingIndicators 
+  mockTypingIndicators,
 } from './discussions';
 import { mockExperts, mockOfficialExperts, mockExpertCredibilityMetrics } from './experts';
 import { mockRealTimeEvents, mockConnectionStatus } from './realtime';
@@ -75,7 +75,7 @@ class MockDataCache {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: ttl || this.defaultTTL
+      ttl: ttl || this.defaultTTL,
     });
   }
 
@@ -128,9 +128,9 @@ const setLoadingState = (key: string, state: Partial<LoadingState>): void => {
   const currentState = loadingStates.get(key) || {
     isLoading: false,
     error: null,
-    lastLoaded: null
+    lastLoaded: null,
   };
-  
+
   loadingStates.set(key, { ...currentState, ...state });
 };
 
@@ -138,11 +138,13 @@ const setLoadingState = (key: string, state: Partial<LoadingState>): void => {
  * Get loading state
  */
 const getLoadingState = (key: string): LoadingState => {
-  return loadingStates.get(key) || {
-    isLoading: false,
-    error: null,
-    lastLoaded: null
-  };
+  return (
+    loadingStates.get(key) || {
+      isLoading: false,
+      error: null,
+      lastLoaded: null,
+    }
+  );
 };
 
 /**
@@ -177,7 +179,7 @@ const createDataLoader = <T>(
 ) => {
   return async (): Promise<T> => {
     const cacheKey = `loader_${key}`;
-    
+
     // Check cache first
     const cachedData = cache.get<T>(cacheKey);
     if (cachedData) {
@@ -191,41 +193,41 @@ const createDataLoader = <T>(
     try {
       // Simulate network delay
       await simulateNetworkDelay(options.minDelay, options.maxDelay);
-      
+
       // Simulate potential network errors
       simulateNetworkError(options.errorRate);
-      
+
       // Get data
       const data = dataProvider();
-      
+
       // Cache the data
       cache.set(cacheKey, data, options.cacheTTL);
-      
+
       // Update loading state
       setLoadingState(key, {
         isLoading: false,
         error: null,
-        lastLoaded: new Date().toISOString()
+        lastLoaded: new Date().toISOString(),
       });
 
-      logger.info(`Data loaded successfully for ${key}`, { 
+      logger.info(`Data loaded successfully for ${key}`, {
         component: 'MockDataLoader',
-        dataSize: Array.isArray(data) ? data.length : 1
+        dataSize: Array.isArray(data) ? data.length : 1,
       });
 
       return data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       setLoadingState(key, {
         isLoading: false,
         error: errorMessage,
-        lastLoaded: null
+        lastLoaded: null,
       });
 
       logger.error(`Failed to load data for ${key}`, {
         component: 'MockDataLoader',
-        error: errorMessage
+        error: errorMessage,
       });
 
       throw error;
@@ -240,62 +242,97 @@ export const dataLoaders = {
   // Bills data
   bills: createDataLoader('bills', () => mockBills, { cacheTTL: 2 * 60 * 1000 }),
   billsStats: createDataLoader('billsStats', () => mockBillsStats, { cacheTTL: 1 * 60 * 1000 }),
-  
+
   // User data
   users: createDataLoader('users', () => mockUsers),
   expertUsers: createDataLoader('expertUsers', () => mockExpertUsers),
   moderatorUsers: createDataLoader('moderatorUsers', () => mockModeratorUsers),
   currentUser: createDataLoader('currentUser', () => mockCurrentUser),
-  
+
   // Expert data
   experts: createDataLoader('experts', () => mockExperts),
   officialExperts: createDataLoader('officialExperts', () => mockOfficialExperts),
-  expertCredibilityMetrics: createDataLoader('expertCredibilityMetrics', () => mockExpertCredibilityMetrics),
-  
+  expertCredibilityMetrics: createDataLoader(
+    'expertCredibilityMetrics',
+    () => mockExpertCredibilityMetrics
+  ),
+
   // Community data
-  activityItems: createDataLoader('activityItems', () => mockActivityItems, { cacheTTL: 30 * 1000 }),
-  trendingTopics: createDataLoader('trendingTopics', () => mockTrendingTopics, { cacheTTL: 1 * 60 * 1000 }),
+  activityItems: createDataLoader('activityItems', () => mockActivityItems, {
+    cacheTTL: 30 * 1000,
+  }),
+  trendingTopics: createDataLoader('trendingTopics', () => mockTrendingTopics, {
+    cacheTTL: 1 * 60 * 1000,
+  }),
   expertInsights: createDataLoader('expertInsights', () => mockExpertInsights),
   campaigns: createDataLoader('campaigns', () => mockCampaigns),
   petitions: createDataLoader('petitions', () => mockPetitions),
-  communityStats: createDataLoader('communityStats', () => mockCommunityStats, { cacheTTL: 30 * 1000 }),
+  communityStats: createDataLoader('communityStats', () => mockCommunityStats, {
+    cacheTTL: 30 * 1000,
+  }),
   localImpactMetrics: createDataLoader('localImpactMetrics', () => mockLocalImpactMetrics),
-  
+
   // Discussion data
   discussionThreads: createDataLoader('discussionThreads', () => mockDiscussionThreads),
   comments: createDataLoader('comments', () => mockComments),
   commentReports: createDataLoader('commentReports', () => mockCommentReports),
   moderationActions: createDataLoader('moderationActions', () => mockModerationActions),
-  typingIndicators: createDataLoader('typingIndicators', () => mockTypingIndicators, { cacheTTL: 10 * 1000 }),
-  
+  typingIndicators: createDataLoader('typingIndicators', () => mockTypingIndicators, {
+    cacheTTL: 10 * 1000,
+  }),
+
   // Analytics data
-  liveEngagementMetrics: createDataLoader('liveEngagementMetrics', () => mockLiveEngagementMetrics, { cacheTTL: 30 * 1000 }),
-  personalEngagementScore: createDataLoader('personalEngagementScore', () => mockPersonalEngagementScore),
-  communitysentimentAnalysis: createDataLoader('communitysentimentAnalysis', () => mockCommunitysentimentAnalysis, { cacheTTL: 1 * 60 * 1000 }),
-  expertVerificationMetrics: createDataLoader('expertVerificationMetrics', () => mockExpertVerificationMetrics),
+  liveEngagementMetrics: createDataLoader(
+    'liveEngagementMetrics',
+    () => mockLiveEngagementMetrics,
+    { cacheTTL: 30 * 1000 }
+  ),
+  personalEngagementScore: createDataLoader(
+    'personalEngagementScore',
+    () => mockPersonalEngagementScore
+  ),
+  communitysentimentAnalysis: createDataLoader(
+    'communitysentimentAnalysis',
+    () => mockCommunitysentimentAnalysis,
+    { cacheTTL: 1 * 60 * 1000 }
+  ),
+  expertVerificationMetrics: createDataLoader(
+    'expertVerificationMetrics',
+    () => mockExpertVerificationMetrics
+  ),
   engagementStatistics: createDataLoader('engagementStatistics', () => mockEngagementStatistics),
   temporalAnalyticsData: createDataLoader('temporalAnalyticsData', () => mockTemporalAnalyticsData),
   userEngagementProfile: createDataLoader('userEngagementProfile', () => mockUserEngagementProfile),
   civicEngagementGoals: createDataLoader('civicEngagementGoals', () => mockCivicEngagementGoals),
-  engagementNotifications: createDataLoader('engagementNotifications', () => mockEngagementNotifications, { cacheTTL: 30 * 1000 }),
-  
+  engagementNotifications: createDataLoader(
+    'engagementNotifications',
+    () => mockEngagementNotifications,
+    { cacheTTL: 30 * 1000 }
+  ),
+
   // Real-time data
-  realTimeEvents: createDataLoader('realTimeEvents', () => mockRealTimeEvents, { cacheTTL: 10 * 1000 }),
-  connectionStatus: createDataLoader('connectionStatus', () => mockConnectionStatus, { cacheTTL: 5 * 1000 })
+  realTimeEvents: createDataLoader('realTimeEvents', () => mockRealTimeEvents, {
+    cacheTTL: 10 * 1000,
+  }),
+  connectionStatus: createDataLoader('connectionStatus', () => mockConnectionStatus, {
+    cacheTTL: 5 * 1000,
+  }),
 };
 
 /**
  * Batch data loader for loading multiple data types
  */
-export const loadBatchData = async (keys: (keyof typeof dataLoaders)[]): Promise<Record<string, any>> => {
+export const loadBatchData = async (
+  keys: (keyof typeof dataLoaders)[]
+): Promise<Record<string, any>> => {
   const results: Record<string, any> = {};
-  const promises = keys.map(async (key) => {
+  const promises = keys.map(async key => {
     try {
       results[key] = await dataLoaders[key]();
     } catch (error) {
-      logger.error(`Failed to load ${key} in batch`, { 
+      logger.error(`Failed to load ${key} in batch`, {
         component: 'MockDataLoader',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       results[key] = null;
     }
@@ -314,23 +351,23 @@ export const initializeEssentialData = async (): Promise<void> => {
     'billsStats',
     'currentUser',
     'communityStats',
-    'liveEngagementMetrics'
+    'liveEngagementMetrics',
   ];
 
-  logger.info('Initializing essential mock data', { 
+  logger.info('Initializing essential mock data', {
     component: 'MockDataLoader',
-    keys: essentialKeys
+    keys: essentialKeys,
   });
 
   try {
     await loadBatchData(essentialKeys);
-    logger.info('Essential mock data initialized successfully', { 
-      component: 'MockDataLoader'
+    logger.info('Essential mock data initialized successfully', {
+      component: 'MockDataLoader',
     });
   } catch (error) {
     logger.error('Failed to initialize essential mock data', {
       component: 'MockDataLoader',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw error;
   }
@@ -340,9 +377,9 @@ export const initializeEssentialData = async (): Promise<void> => {
  * Preload data for better performance
  */
 export const preloadData = async (keys: (keyof typeof dataLoaders)[]): Promise<void> => {
-  logger.info('Preloading mock data', { 
+  logger.info('Preloading mock data', {
     component: 'MockDataLoader',
-    keys
+    keys,
   });
 
   // Load data in background without waiting
@@ -350,7 +387,7 @@ export const preloadData = async (keys: (keyof typeof dataLoaders)[]): Promise<v
     dataLoaders[key]().catch(error => {
       logger.warn(`Failed to preload ${key}`, {
         component: 'MockDataLoader',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     });
   });
@@ -373,8 +410,8 @@ export const getCacheStats = () => {
     size: cache.size(),
     loadingStates: Array.from(loadingStates.entries()).map(([key, state]) => ({
       key,
-      ...state
-    }))
+      ...state,
+    })),
   };
 };
 
@@ -413,20 +450,20 @@ export const validateDataIntegrity = (): { valid: boolean; errors: string[] } =>
     logger.info('Data integrity validation completed', {
       component: 'MockDataLoader',
       valid: errors.length === 0,
-      errorCount: errors.length
+      errorCount: errors.length,
     });
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     errors.push(`Validation error: ${errorMessage}`);
-    
+
     return {
       valid: false,
-      errors
+      errors,
     };
   }
 };
@@ -436,5 +473,5 @@ export const validateDataIntegrity = (): { valid: boolean; errors: string[] } =>
  */
 export const loadingStateUtils = {
   getLoadingState,
-  setLoadingState
+  setLoadingState,
 };

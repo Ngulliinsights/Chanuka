@@ -1,14 +1,12 @@
-import type { UserRole } from '@/shared/types';
-import type { AccessDenialReason } from '../types';
-
-import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
 import { useAuth } from '@/core/auth';
 import { NavigationValidationError, NavigationAccessDeniedError } from '@/core/error';
+import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
 import { getRecoverySuggestions } from '@/recovery';
+import type { UserRole } from '@/shared/types';
 import { validateNavigationPath, validateUserRole } from '@/validation';
 
+import type { AccessDenialReason } from '../types';
 import { checkRouteAccess } from '../utils/route-access';
-
 
 export interface UseRouteAccessResult {
   canAccess: boolean;
@@ -33,12 +31,15 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
     // Validate and convert the context UserRole to our navigation UserRole
     const contextRole = user_role as string;
     validateUserRole(contextRole);
-    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : contextRole as UserRole;
+    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
 
     return checkRouteAccess(path, navUserRole, user as any);
   } catch (error) {
     // Handle validation errors
-    if (error instanceof NavigationValidationError || error instanceof NavigationAccessDeniedError) {
+    if (
+      error instanceof NavigationValidationError ||
+      error instanceof NavigationAccessDeniedError
+    ) {
       // Get recovery suggestions
       const suggestions = getRecoverySuggestions(error);
 
@@ -47,7 +48,7 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
         denialReason: 'custom_condition',
         error,
         recoveryAttempted: false,
-        recoverySuggestions: suggestions
+        recoverySuggestions: suggestions,
       };
     }
 
@@ -56,8 +57,7 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
     return {
       canAccess: false,
       denialReason: 'custom_condition',
-      error: error instanceof NavigationAccessDeniedError ? error : undefined
+      error: error instanceof NavigationAccessDeniedError ? error : undefined,
     };
   }
 };
-

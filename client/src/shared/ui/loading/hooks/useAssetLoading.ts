@@ -5,7 +5,6 @@
 import { useCallback, useState } from 'react';
 
 import { logger } from '../../../../utils/logger';
-
 import type { LoadingProgress, LoadingStats } from '../types';
 
 // Mock implementation of useAssetLoading

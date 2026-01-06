@@ -1,6 +1,6 @@
 /**
  * Authentication Initialization
- * 
+ *
  * Centralized initialization for the entire authentication system
  */
 
@@ -63,7 +63,7 @@ export async function initializeAuth(options: AuthInitOptions): Promise<void> {
   }
 
   authSystemState.initializationPromise = performInitialization(options);
-  
+
   try {
     await authSystemState.initializationPromise;
   } finally {
@@ -79,13 +79,13 @@ async function performInitialization(options: AuthInitOptions): Promise<void> {
     logger.info('Initializing authentication system', {
       component: 'AuthInit',
       environment: options.environment,
-      enableAutoInit: options.enableAutoInit
+      enableAutoInit: options.enableAutoInit,
     });
 
     // Step 1: Create and validate configuration
     const settings = createAuthConfig(options.environment, options.settings);
     const validation = validateAuthConfig(settings);
-    
+
     if (!validation.isValid) {
       throw createError(
         ErrorDomain.SYSTEM,
@@ -120,18 +120,19 @@ async function performInitialization(options: AuthInitOptions): Promise<void> {
 
     logger.info('Authentication system initialized successfully', {
       component: 'AuthInit',
-      features: Object.keys(settings.features).filter(key => settings.features[key as keyof typeof settings.features])
+      features: Object.keys(settings.features).filter(
+        key => settings.features[key as keyof typeof settings.features]
+      ),
     });
 
     // Notify success
     if (options.onInitialized) {
       options.onInitialized(true);
     }
-
   } catch (error) {
     logger.error('Authentication system initialization failed', {
       component: 'AuthInit',
-      error
+      error,
     });
 
     // Notify error
@@ -154,17 +155,16 @@ async function initializeStorageManagers(settings: AuthSettings): Promise<void> 
   try {
     // Token manager is already initialized as singleton
     // Session manager is already initialized as singleton
-    
+
     logger.debug('Storage managers initialized', {
       component: 'AuthInit',
       tokenNamespace: settings.tokens.storageNamespace,
-      sessionNamespace: settings.session.storageNamespace
+      sessionNamespace: settings.session.storageNamespace,
     });
-
   } catch (error) {
     logger.error('Failed to initialize storage managers', {
       component: 'AuthInit',
-      error
+      error,
     });
     throw error;
   }
@@ -176,24 +176,23 @@ async function initializeStorageManagers(settings: AuthSettings): Promise<void> 
 async function restoreSession(_options: AuthInitOptions): Promise<void> {
   try {
     const currentSession = sessionManager.getCurrentSession();
-    
+
     if (currentSession) {
       logger.info('Session restored from storage', {
         component: 'AuthInit',
         userId: currentSession.userId,
         sessionId: currentSession.sessionId,
-        expiresAt: currentSession.expiresAt
+        expiresAt: currentSession.expiresAt,
       });
     } else {
       logger.debug('No valid session found in storage', {
-        component: 'AuthInit'
+        component: 'AuthInit',
       });
     }
-
   } catch (error) {
     logger.warn('Failed to restore session', {
       component: 'AuthInit',
-      error
+      error,
     });
     // Don't throw - session restoration failure shouldn't block initialization
   }
@@ -205,30 +204,29 @@ async function restoreSession(_options: AuthInitOptions): Promise<void> {
 async function validateStoredTokens(_options: AuthInitOptions): Promise<void> {
   try {
     const hasTokens = await tokenManager.isTokenValid();
-    
+
     if (hasTokens && authSystemState.apiService) {
       const isValid = await authSystemState.apiService.validateStoredTokens();
-      
+
       if (isValid) {
         logger.info('Stored tokens validated successfully', {
-          component: 'AuthInit'
+          component: 'AuthInit',
         });
       } else {
         logger.warn('Stored tokens are invalid, clearing', {
-          component: 'AuthInit'
+          component: 'AuthInit',
         });
         await tokenManager.clearTokens();
       }
     } else {
       logger.debug('No tokens to validate', {
-        component: 'AuthInit'
+        component: 'AuthInit',
       });
     }
-
   } catch (error) {
     logger.warn('Token validation failed', {
       component: 'AuthInit',
-      error
+      error,
     });
     // Clear potentially corrupted tokens
     await tokenManager.clearTokens();
@@ -248,11 +246,7 @@ export async function configureAuth(newSettings: Partial<AuthSettings>): Promise
   }
 
   if (!authSystemState.settings) {
-    throw createError(
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      'No current settings to update'
-    );
+    throw createError(ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, 'No current settings to update');
   }
 
   try {
@@ -303,13 +297,12 @@ export async function configureAuth(newSettings: Partial<AuthSettings>): Promise
 
     logger.info('Authentication configuration updated', {
       component: 'AuthInit',
-      updatedFields: Object.keys(newSettings)
+      updatedFields: Object.keys(newSettings),
     });
-
   } catch (error) {
     logger.error('Failed to update authentication configuration', {
       component: 'AuthInit',
-      error
+      error,
     });
     throw error;
   }
@@ -345,7 +338,7 @@ export function getAuthSystemStatus(): {
 export async function cleanupAuth(): Promise<void> {
   try {
     logger.info('Cleaning up authentication system', {
-      component: 'AuthInit'
+      component: 'AuthInit',
     });
 
     // Stop session monitoring
@@ -358,13 +351,12 @@ export async function cleanupAuth(): Promise<void> {
     authSystemState.initializationPromise = null;
 
     logger.info('Authentication system cleanup completed', {
-      component: 'AuthInit'
+      component: 'AuthInit',
     });
-
   } catch (error) {
     logger.error('Authentication system cleanup failed', {
       component: 'AuthInit',
-      error
+      error,
     });
     throw error;
   }

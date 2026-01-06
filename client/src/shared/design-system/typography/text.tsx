@@ -6,50 +6,48 @@
  * ✅ Semantic text elements
  */
 
-import * as React from 'react';
-import { cn } from '@/shared/design-system/utils/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
-const textVariants = cva(
-  'text-[hsl(var(--color-foreground))]',
-  {
-    variants: {
-      variant: {
-        default: '',
-        muted: 'text-[hsl(var(--color-muted-foreground))]',
-        accent: 'text-[hsl(var(--color-accent-foreground))]',
-        destructive: 'text-[hsl(var(--color-destructive))]',
-      },
-      size: {
-        xs: 'text-xs',
-        sm: 'text-sm',
-        base: 'text-base',
-        lg: 'text-lg',
-        xl: 'text-xl',
-        '2xl': 'text-2xl',
-        '3xl': 'text-3xl',
-        '4xl': 'text-4xl',
-      },
-      weight: {
-        normal: 'font-normal',
-        medium: 'font-medium',
-        semibold: 'font-semibold',
-        bold: 'font-bold',
-      },
-      align: {
-        left: 'text-left',
-        center: 'text-center',
-        right: 'text-right',
-      },
+import { cn } from '@/shared/design-system/utils/cn';
+
+const textVariants = cva('text-[hsl(var(--color-foreground))]', {
+  variants: {
+    variant: {
+      default: '',
+      muted: 'text-[hsl(var(--color-muted-foreground))]',
+      accent: 'text-[hsl(var(--color-accent-foreground))]',
+      destructive: 'text-[hsl(var(--color-destructive))]',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'base',
-      weight: 'normal',
-      align: 'left',
+    size: {
+      xs: 'text-xs',
+      sm: 'text-sm',
+      base: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
+      '2xl': 'text-2xl',
+      '3xl': 'text-3xl',
+      '4xl': 'text-4xl',
     },
-  }
-);
+    weight: {
+      normal: 'font-normal',
+      medium: 'font-medium',
+      semibold: 'font-semibold',
+      bold: 'font-bold',
+    },
+    align: {
+      left: 'text-left',
+      center: 'text-center',
+      right: 'text-right',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'base',
+    weight: 'normal',
+    align: 'left',
+  },
+});
 
 export interface TextProps
   extends React.HTMLAttributes<HTMLParagraphElement>,

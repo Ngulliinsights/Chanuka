@@ -6,8 +6,9 @@
  * intelligent cache invalidation, and background synchronization.
  */
 
-import { Bill } from '../../../../shared/schema/foundation';
 import { BillsStats } from '@/core/api/bills';
+
+import { Bill } from '../../../../shared/schema/foundation';
 import { logger } from '../../../utils/logger';
 
 // ============================================================================
@@ -72,7 +73,7 @@ class BillsCacheService {
     hits: 0,
     misses: 0,
     totalRequests: 0,
-    totalSize: 0
+    totalSize: 0,
   };
 
   constructor(config: Partial<CacheConfig> = {}) {
@@ -83,7 +84,7 @@ class BillsCacheService {
       enablePersistence: true,
       enableCompression: true,
       cleanupInterval: 5 * 60 * 1000, // 5 minutes
-      ...config
+      ...config,
     };
 
     this.initialize();
@@ -104,12 +105,12 @@ class BillsCacheService {
       logger.info('Bills Cache Service initialized', {
         component: 'BillsCacheService',
         config: this.config,
-        persistenceEnabled: this.config.enablePersistence
+        persistenceEnabled: this.config.enablePersistence,
       });
     } catch (error) {
       logger.error('Failed to initialize Bills Cache Service', {
         component: 'BillsCacheService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -123,7 +124,7 @@ class BillsCacheService {
 
       request.onerror = () => {
         logger.error('Failed to open IndexedDB', {
-          component: 'BillsCacheService'
+          component: 'BillsCacheService',
         });
         reject(new Error('Failed to open IndexedDB'));
       };
@@ -131,12 +132,12 @@ class BillsCacheService {
       request.onsuccess = () => {
         this.db = request.result;
         logger.debug('IndexedDB initialized successfully', {
-          component: 'BillsCacheService'
+          component: 'BillsCacheService',
         });
         resolve();
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result;
 
         if (!db.objectStoreNames.contains('cache')) {
@@ -152,7 +153,7 @@ class BillsCacheService {
         }
 
         logger.debug('IndexedDB schema created', {
-          component: 'BillsCacheService'
+          component: 'BillsCacheService',
         });
       };
     });
@@ -219,7 +220,7 @@ class BillsCacheService {
         logger.debug('Cache hit (memory)', {
           component: 'BillsCacheService',
           key: key.substring(0, 50) + '...',
-          age: Date.now() - memoryEntry.timestamp
+          age: Date.now() - memoryEntry.timestamp,
         });
         return this.decompressData(memoryEntry.data);
       }
@@ -232,7 +233,7 @@ class BillsCacheService {
           logger.debug('Cache hit (persistent)', {
             component: 'BillsCacheService',
             key: key.substring(0, 50) + '...',
-            age: Date.now() - persistentEntry.timestamp
+            age: Date.now() - persistentEntry.timestamp,
           });
           return this.decompressData(persistentEntry.data);
         }
@@ -244,7 +245,7 @@ class BillsCacheService {
       logger.error('Failed to get from cache', {
         component: 'BillsCacheService',
         key,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       this.stats.misses++;
       return null;
@@ -264,8 +265,8 @@ class BillsCacheService {
         metadata: {
           source: 'api',
           size: this.calculateSize(data),
-          compressed: this.shouldCompress(data)
-        }
+          compressed: this.shouldCompress(data),
+        },
       };
 
       this.memoryCache.set(key, entry);
@@ -282,13 +283,13 @@ class BillsCacheService {
         key: key.substring(0, 50) + '...',
         size: entry.metadata!.size,
         compressed: entry.metadata!.compressed,
-        ttl: entry.ttl
+        ttl: entry.ttl,
       });
     } catch (error) {
       logger.error('Failed to set cache', {
         component: 'BillsCacheService',
         key,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -326,7 +327,7 @@ class BillsCacheService {
       missRate: this.stats.totalRequests > 0 ? this.stats.misses / this.stats.totalRequests : 0,
       oldestEntry: oldestEntry === now ? 0 : oldestEntry,
       newestEntry,
-      compressionRatio: totalUncompressedSize > 0 ? totalCompressedSize / totalUncompressedSize : 1
+      compressionRatio: totalUncompressedSize > 0 ? totalCompressedSize / totalUncompressedSize : 1,
     };
   }
 
@@ -343,7 +344,7 @@ class BillsCacheService {
       urgency: searchParams.urgency?.sort(),
       policyAreas: searchParams.policyAreas?.sort(),
       sponsors: searchParams.sponsors?.sort(),
-      controversyLevels: searchParams.controversyLevels?.sort()
+      controversyLevels: searchParams.controversyLevels?.sort(),
     };
 
     return `bills:search:${btoa(JSON.stringify(normalized))}`;
@@ -358,8 +359,9 @@ class BillsCacheService {
   }
 
   private shouldCompress(data: any): boolean {
-    return this.config.enableCompression &&
-           this.calculateSize(data) > this.config.compressionThreshold;
+    return (
+      this.config.enableCompression && this.calculateSize(data) > this.config.compressionThreshold
+    );
   }
 
   private compressData(data: any): any {
@@ -383,8 +385,9 @@ class BillsCacheService {
   private async enforceCacheLimits(): Promise<void> {
     if (this.stats.totalSize <= this.config.maxSize) return;
 
-    const entries = Array.from(this.memoryCache.entries())
-      .sort(([, a], [, b]) => a.timestamp - b.timestamp);
+    const entries = Array.from(this.memoryCache.entries()).sort(
+      ([, a], [, b]) => a.timestamp - b.timestamp
+    );
 
     let removedSize = 0;
     let removedCount = 0;
@@ -409,7 +412,7 @@ class BillsCacheService {
         removedEntries: removedCount,
         removedSize,
         currentSize: this.stats.totalSize,
-        maxSize: this.config.maxSize
+        maxSize: this.config.maxSize,
       });
     }
   }
@@ -446,7 +449,7 @@ class BillsCacheService {
         component: 'BillsCacheService',
         expiredCount: expiredKeys.length,
         reclaimedSize,
-        remainingEntries: this.memoryCache.size
+        remainingEntries: this.memoryCache.size,
       });
     }
   }
@@ -490,7 +493,7 @@ class BillsCacheService {
     this.offlineQueue = [];
 
     logger.info('Bills Cache Service cleaned up', {
-      component: 'BillsCacheService'
+      component: 'BillsCacheService',
     });
   }
 }

@@ -10,15 +10,15 @@
  * Requirements: 9.1, 9.2
  */
 
-import { logger } from '@client/utils/logger';
 import { PerformanceMonitor } from '@client/core/performance/monitor';
+import { logger } from '@client/utils/logger';
 
 export interface PerformanceThresholds {
-  home: number;           // < 2000ms
-  search: number;         // < 500ms
-  dashboard: number;      // < 3000ms
-  navigation: number;     // < 200ms
-  interaction: number;    // < 100ms
+  home: number; // < 2000ms
+  search: number; // < 500ms
+  dashboard: number; // < 3000ms
+  navigation: number; // < 200ms
+  interaction: number; // < 100ms
 }
 
 export interface PerformanceBenchmark {
@@ -29,9 +29,9 @@ export interface PerformanceBenchmark {
   memoryUsage: number;
   bundleSize: number;
   coreWebVitals: {
-    lcp: number;  // Largest Contentful Paint
-    fid: number;  // First Input Delay
-    cls: number;  // Cumulative Layout Shift
+    lcp: number; // Largest Contentful Paint
+    fid: number; // First Input Delay
+    cls: number; // Cumulative Layout Shift
   };
   timestamp: string;
   passed: boolean;
@@ -51,11 +51,11 @@ export interface OptimizationReport {
 class PerformanceBenchmarking {
   private static instance: PerformanceBenchmarking;
   private thresholds: PerformanceThresholds = {
-    home: 2000,        // 2 seconds
-    search: 500,       // 500ms for search results
-    dashboard: 3000,   // 3 seconds with full data
-    navigation: 200,   // 200ms for navigation
-    interaction: 100   // 100ms for interactions
+    home: 2000, // 2 seconds
+    search: 500, // 500ms for search results
+    dashboard: 3000, // 3 seconds with full data
+    navigation: 200, // 200ms for navigation
+    interaction: 100, // 100ms for interactions
   };
 
   private benchmarks: Map<string, PerformanceBenchmark[]> = new Map();
@@ -100,7 +100,7 @@ class PerformanceBenchmarking {
       coreWebVitals: webVitals,
       timestamp: new Date().toISOString(),
       passed: loadTime <= threshold,
-      issues: this.identifyIssues(pageName, loadTime, webVitals, memoryUsage)
+      issues: this.identifyIssues(pageName, loadTime, webVitals, memoryUsage),
     };
 
     // Store benchmark
@@ -113,7 +113,7 @@ class PerformanceBenchmarking {
     logger.info(`Performance benchmark completed for ${pageName}`, {
       benchmark,
       threshold,
-      passed: benchmark.passed
+      passed: benchmark.passed,
     });
 
     return benchmark;
@@ -161,7 +161,7 @@ class PerformanceBenchmarking {
 
     logger.info(`Starting optimization for ${pageName}`, {
       currentLoadTime: latestBenchmark.loadTime,
-      threshold: this.getThreshold(pageName)
+      threshold: this.getThreshold(pageName),
     });
 
     // Apply optimizations based on issues
@@ -175,7 +175,7 @@ class PerformanceBenchmarking {
     logger.info(`Optimization completed for ${pageName}`, {
       before: latestBenchmark.loadTime,
       after: optimizedBenchmark.loadTime,
-      improvement: latestBenchmark.loadTime - optimizedBenchmark.loadTime
+      improvement: latestBenchmark.loadTime - optimizedBenchmark.loadTime,
     });
   }
 
@@ -299,7 +299,8 @@ class PerformanceBenchmarking {
       issues.push('high-cls');
     }
 
-    if (memoryUsage > 100 * 1024 * 1024) { // 100MB
+    if (memoryUsage > 100 * 1024 * 1024) {
+      // 100MB
       issues.push('high-memory');
     }
 
@@ -310,7 +311,7 @@ class PerformanceBenchmarking {
    * Wait for page to be fully loaded
    */
   private async waitForPageLoad(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (document.readyState === 'complete') {
         resolve();
       } else {
@@ -323,7 +324,7 @@ class PerformanceBenchmarking {
    * Collect Web Vitals metrics
    */
   private async collectWebVitals(): Promise<{ lcp: number; fid: number; cls: number }> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const vitals = { lcp: 0, fid: 0, cls: 0 };
 
       // Simplified - would use actual web-vitals library
@@ -381,7 +382,9 @@ class PerformanceBenchmarking {
 
     benchmarks.forEach(benchmark => {
       if (!benchmark.passed) {
-        criticalIssues.push(`${benchmark.pageName}: ${benchmark.loadTime}ms (threshold: ${this.getThreshold(benchmark.pageName)}ms)`);
+        criticalIssues.push(
+          `${benchmark.pageName}: ${benchmark.loadTime}ms (threshold: ${this.getThreshold(benchmark.pageName)}ms)`
+        );
 
         if (benchmark.loadTime > this.getThreshold(benchmark.pageName) * 1.5) {
           recommendations.push(`Critical: ${benchmark.pageName} needs immediate optimization`);
@@ -401,7 +404,7 @@ class PerformanceBenchmarking {
       averageLoadTime: Math.round(averageLoadTime),
       criticalIssues,
       recommendations,
-      benchmarks
+      benchmarks,
     };
 
     logger.info('Performance optimization report generated', { report });
@@ -441,7 +444,7 @@ class PerformanceBenchmarking {
     const data = {
       thresholds: this.thresholds,
       benchmarks: Object.fromEntries(this.benchmarks),
-      exportedAt: new Date().toISOString()
+      exportedAt: new Date().toISOString(),
     };
 
     return JSON.stringify(data, null, 2);

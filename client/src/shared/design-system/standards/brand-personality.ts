@@ -33,7 +33,7 @@ export const ToneMatrix = {
     language: 'Affirming, positive',
     examples: {
       title: 'You found the bill!',
-      body: 'Here\'s what\'s being proposed—and how it might affect you.',
+      body: "Here's what's being proposed—and how it might affect you.",
       cta: 'Explore the details',
       tone: 'Warm, celebratory, forward-looking',
     },
@@ -47,8 +47,8 @@ export const ToneMatrix = {
     emotion: 'Empathetic',
     language: 'Clear, actionable, reassuring',
     examples: {
-      title: 'We couldn\'t find that bill',
-      body: 'This might happen if the bill number changed or it\'s from a previous session. Try searching for related bills or the sponsor\'s name.',
+      title: "We couldn't find that bill",
+      body: "This might happen if the bill number changed or it's from a previous session. Try searching for related bills or the sponsor's name.",
       cta: 'Try a different search',
       tone: 'Problem-solving, helpful, not blaming',
     },
@@ -93,7 +93,7 @@ export const ToneMatrix = {
     language: 'Constructive, re-directing',
     examples: {
       title: 'No bills match your search',
-      body: 'This doesn\'t mean there\'s nothing relevant. Try broader terms, or browse bills by topic.',
+      body: "This doesn't mean there's nothing relevant. Try broader terms, or browse bills by topic.",
       cta: 'Browse all bills',
       tone: 'Helpful, solution-focused',
     },
@@ -107,7 +107,7 @@ export const ToneMatrix = {
     emotion: 'Confident',
     language: 'Breaking into digestible pieces, visual hierarchy',
     examples: {
-      title: 'Here\'s what this bill changes',
+      title: "Here's what this bill changes",
       body: 'First: What it affects | Second: How it affects it | Third: Who benefits',
       cta: 'Read the full text',
       tone: 'Guide-like, "I\'ve got this—let me explain"',
@@ -150,7 +150,7 @@ export const VoiceConsistency = {
     preference: 'Short, punchy sentences',
     rhythm: 'Mix short + medium sentences, avoid long strings',
     examples: {
-      good: 'Bills take time. That\'s by design. Today we\'ll show you why.',
+      good: "Bills take time. That's by design. Today we'll show you why.",
       bad: 'Bills undergo a multifaceted process which, by design of the legislative system, takes time, and we are now prepared to demonstrate the rationale.',
     },
   },
@@ -180,7 +180,7 @@ export const VoiceConsistency = {
    * Use them! Makes voice warmer, more conversational
    */
   contractions: {
-    recommended: ['it\'s', 'we\'ve', 'they\'re', 'here\'s', 'what\'s'],
+    recommended: ["it's", "we've", "they're", "here's", "what's"],
     avoid: ['cannot', 'do not'], // Use "can't", "don't" instead
     principle: 'Contractions make voice friendlier',
   },
@@ -219,7 +219,7 @@ export const MicrocopyLibrary = {
       label: 'Bill number',
       placeholder: 'e.g., HB 1234 or SB 567',
       help: 'Find bills by their official reference number',
-      error: 'That doesn\'t look like a valid bill number. Try HB 1234 or SB 567.',
+      error: "That doesn't look like a valid bill number. Try HB 1234 or SB 567.",
     },
 
     dateRange: {
@@ -271,7 +271,7 @@ export const MicrocopyLibrary = {
    */
   helpText: {
     sponsor: 'The legislator who introduced this bill',
-    coSponsors: 'Other legislators who support the bill\'s direction',
+    coSponsors: "Other legislators who support the bill's direction",
     status: 'Where the bill is in the process right now',
     impacts: 'Who this bill would affect and how',
     support: 'Reasons legislators and groups give for supporting',
@@ -289,14 +289,14 @@ export const MicrocopyLibrary = {
     },
 
     noSavedBills: {
-      title: 'You haven\'t saved any bills yet',
+      title: "You haven't saved any bills yet",
       subtitle: 'Bills you save will appear here for quick reference',
       action: 'Start exploring',
     },
 
     noUpdates: {
       title: 'No new updates on tracked bills',
-      subtitle: 'We\'ll notify you as bills you\'re watching progress',
+      subtitle: "We'll notify you as bills you're watching progress",
       action: 'Track more bills',
     },
   },
@@ -308,24 +308,24 @@ export const MicrocopyLibrary = {
   errors: {
     networkError: {
       title: 'Connection lost',
-      reason: 'We couldn\'t reach our servers',
+      reason: "We couldn't reach our servers",
       solution: 'Check your connection and try again',
     },
 
     notFound: {
       title: 'Bill not found',
-      reason: 'This bill number doesn\'t exist or may be from a different session',
+      reason: "This bill number doesn't exist or may be from a different session",
       solution: 'Search for related bills or try a different number',
     },
 
     loadingFailed: {
-      title: 'Couldn\'t load this bill',
+      title: "Couldn't load this bill",
       reason: 'Our database is having trouble',
       solution: 'Refresh the page or try again in a few moments',
     },
 
     permissionError: {
-      title: 'You don\'t have access to this',
+      title: "You don't have access to this",
       reason: 'This content requires authentication',
       solution: 'Sign in with your account',
     },
@@ -338,7 +338,7 @@ export const MicrocopyLibrary = {
     saved: 'Bill saved to your library',
     contacted: 'Your message was sent to your representative',
     shared: 'Link copied to clipboard',
-    tracked: 'You\'ll get updates on this bill',
+    tracked: "You'll get updates on this bill",
   },
 
   /**
@@ -361,7 +361,7 @@ export const AudienceAdaptation = {
     description: 'New to legislative process',
     approach: 'Define terms, provide context, be encouraging',
     example: {
-      novice: 'This bill passed committee! That means it\'s one step closer to becoming law.',
+      novice: "This bill passed committee! That means it's one step closer to becoming law.",
       expert: 'Bill advanced out of committee to the floor',
     },
     dontDo: 'Assume prior knowledge, use unexplained jargon',
@@ -396,13 +396,13 @@ export const EmotionalIntelligence = {
   frustrated: {
     signal: 'User repeating search, trying different terms',
     tone: 'Empathetic, validating',
-    response: 'Bills can be hard to find. Let\'s break this down together.',
+    response: "Bills can be hard to find. Let's break this down together.",
   },
 
   overwhelmed: {
     signal: 'User abandoning mid-flow',
     tone: 'Reassuring, chunking',
-    response: 'Too much information? We\'ve divided this into smaller sections.',
+    response: "Too much information? We've divided this into smaller sections.",
   },
 
   curious: {
@@ -414,13 +414,13 @@ export const EmotionalIntelligence = {
   skeptical: {
     signal: 'First-time visitor, unfamiliar with source',
     tone: 'Transparent, factual',
-    response: 'We source from official government records. Here\'s where this data comes from.',
+    response: "We source from official government records. Here's where this data comes from.",
   },
 
   urgency: {
     signal: 'Bill voting soon, repeated visits',
     tone: 'Clear, action-focused',
-    response: 'Vote is tomorrow. Here\'s how to contact your representative today.',
+    response: "Vote is tomorrow. Here's how to contact your representative today.",
   },
 };
 
@@ -455,7 +455,7 @@ export const FormatSpecificVoice = {
    * Help Documentation
    */
   documentation: {
-    structure: 'Start with question in user\'s words, then explain',
+    structure: "Start with question in user's words, then explain",
     examples: [
       'Why is the same bill numbered differently? → Explanation',
       'How do I know if my rep supports this? → Explanation',
@@ -494,12 +494,12 @@ export const FormatSpecificVoice = {
 export const VoiceAntiPatterns = {
   tooCorporate: {
     bad: 'We are pleased to announce the continued advancement of legislative initiatives',
-    good: 'Here\'s the latest on the bills we\'re tracking',
+    good: "Here's the latest on the bills we're tracking",
     issue: 'Sounds disconnected, distant',
   },
 
   tooCasual: {
-    bad: 'Yo this bill slaps 🔥 It\'s gonna change everything fr fr',
+    bad: "Yo this bill slaps 🔥 It's gonna change everything fr fr",
     good: 'This bill could significantly change how education funding works',
     issue: 'Loses credibility, alienates some users',
   },
@@ -507,7 +507,7 @@ export const VoiceAntiPatterns = {
   condescending: {
     bad: 'A bill is a proposal for a law. A law is a rule. Rules are things you follow.',
     good: 'A bill is a formal proposal for a new law',
-    issue: 'Talks down, doesn\'t respect user intelligence',
+    issue: "Talks down, doesn't respect user intelligence",
   },
 
   vague: {

@@ -1,8 +1,9 @@
 // Remove unused React import
+import React from 'react';
+
 import type { NavigationSection, ReadingPath } from '@/hooks/useProgressiveDisclosure';
 
 import { ProgressiveDisclosureNavigation } from './ProgressiveDisclosureNavigation';
-import React from 'react';
 
 // Demo component to test Progressive Disclosure Navigation
 export const ProgressiveDisclosureDemo = () => {

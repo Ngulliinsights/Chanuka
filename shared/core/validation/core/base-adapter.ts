@@ -5,6 +5,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import { 
   ValidationAdapter, 
   ValidationAdapterConfig, 
@@ -382,7 +383,7 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
 
   protected extractValidationErrors(error: any): ValidationError[] {
     // Default implementation - concrete adapters should override
-    if (error && error.errors && Array.isArray(error.errors)) {
+    if (error?.errors && Array.isArray(error.errors)) {
       return error.errors;
     }
     

@@ -62,35 +62,38 @@ export function PullToRefresh({
     setAnnouncement(message);
   }, [state]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (disabled || !isAtTop()) return;
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (disabled || !isAtTop()) return;
 
-    startY.current = e.touches[0].clientY;
-    isDragging.current = true;
-    setState('idle');
-  }, [disabled, isAtTop]);
+      startY.current = e.touches[0].clientY;
+      isDragging.current = true;
+      setState('idle');
+    },
+    [disabled, isAtTop]
+  );
 
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging.current || disabled || state === 'refreshing') return;
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!isDragging.current || disabled || state === 'refreshing') return;
 
-    if (!isAtTop()) {
-      isDragging.current = false;
-      return;
-    }
+      if (!isAtTop()) {
+        isDragging.current = false;
+        return;
+      }
 
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - startY.current;
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY.current;
 
-    if (deltaY > 0) {
-      const resistedDistance = Math.min(
-        deltaY * config.resistance,
-        config.maxPullDistance
-      );
+      if (deltaY > 0) {
+        const resistedDistance = Math.min(deltaY * config.resistance, config.maxPullDistance);
 
-      setPullDistance(resistedDistance);
-      setState(resistedDistance >= config.threshold ? 'ready' : 'pulling');
-    }
-  }, [disabled, state, isAtTop, config]);
+        setPullDistance(resistedDistance);
+        setState(resistedDistance >= config.threshold ? 'ready' : 'pulling');
+      }
+    },
+    [disabled, state, isAtTop, config]
+  );
 
   const handleTouchEnd = useCallback(async () => {
     if (!isDragging.current || disabled) return;
@@ -140,12 +143,7 @@ export function PullToRefresh({
       style={pullStyle as any}
     >
       {/* Hidden live region for screen reader announcements */}
-      <div
-        ref={liveRegionRef}
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div ref={liveRegionRef} aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
 
@@ -164,13 +162,9 @@ export function PullToRefresh({
       >
         <div className="flex items-center gap-2">
           {(state === 'pulling' || state === 'ready') && (
-            <span className={cn('transition-transform', state === 'ready' && 'rotate-180')}>
-              ↓
-            </span>
+            <span className={cn('transition-transform', state === 'ready' && 'rotate-180')}>↓</span>
           )}
-          {state === 'refreshing' && (
-            <span className="animate-spin">⟳</span>
-          )}
+          {state === 'refreshing' && <span className="animate-spin">⟳</span>}
           <span>
             {state === 'pulling' && 'Pull down to refresh'}
             {state === 'ready' && 'Release to refresh'}

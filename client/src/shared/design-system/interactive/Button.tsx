@@ -72,29 +72,11 @@ const buttonVariants = cva(
       },
 
       size: {
-        sm: [
-          'px-3 py-1.5',
-          'text-sm',
-          'rounded-md',
-          'min-h-[32px]',
-          'min-w-[32px]',
-        ].join(' '),
+        sm: ['px-3 py-1.5', 'text-sm', 'rounded-md', 'min-h-[32px]', 'min-w-[32px]'].join(' '),
 
-        md: [
-          'px-4 py-2',
-          'text-base',
-          'rounded-md',
-          'min-h-[40px]',
-          'min-w-[40px]',
-        ].join(' '),
+        md: ['px-4 py-2', 'text-base', 'rounded-md', 'min-h-[40px]', 'min-w-[40px]'].join(' '),
 
-        lg: [
-          'px-6 py-3',
-          'text-lg',
-          'rounded-lg',
-          'min-h-[48px]',
-          'min-w-[48px]',
-        ].join(' '),
+        lg: ['px-6 py-3', 'text-lg', 'rounded-lg', 'min-h-[48px]', 'min-w-[48px]'].join(' '),
 
         icon: [
           'p-2',
@@ -183,12 +165,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <button
-        ref={ref}
-        className={buttonClasses}
-        disabled={disabled || loading}
-        {...props}
-      >
+      <button ref={ref} className={buttonClasses} disabled={disabled || loading} {...props}>
         {startIcon && !loading && startIcon}
         {loading && (
           <svg

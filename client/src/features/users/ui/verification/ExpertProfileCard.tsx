@@ -1,27 +1,32 @@
-import { 
-  User, 
-  MapPin, 
-  Calendar, 
-  Mail, 
+import {
+  User,
+  MapPin,
+  Calendar,
+  Mail,
   ChevronDown,
   ChevronUp,
   CheckCircle,
   Building,
   Award,
-  Clock
+  Clock,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { cn } from '@client/lib/utils';
 import { Expert, ExpertCredential, ExpertAffiliation } from '@client/features/users/types';
-
-import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
+import { cn } from '@client/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
 
+import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
 
 import { CredibilityIndicator } from './CredibilityScoring';
 import { ExpertBadge } from './ExpertBadge';
@@ -37,7 +42,7 @@ interface ExpertProfileCardProps {
 
 /**
  * ExpertProfileCard - Comprehensive expert profile display with credentials and affiliations
- * 
+ *
  * Features:
  * - Expert verification badges and credibility scoring
  * - Expandable credentials and affiliations
@@ -51,7 +56,7 @@ export function ExpertProfileCard({
   compact = false,
   className,
   onViewProfile,
-  onContact
+  onContact,
 }: ExpertProfileCardProps) {
   const [showCredentials, setShowCredentials] = useState(showFullProfile);
   const [showAffiliations, setShowAffiliations] = useState(showFullProfile);
@@ -68,7 +73,7 @@ export function ExpertProfileCard({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short'
+      month: 'short',
     });
   };
 
@@ -102,35 +107,28 @@ export function ExpertProfileCard({
 
   if (compact) {
     return (
-      <Card className={cn("transition-all duration-200 hover:shadow-md", className)}>
+      <Card className={cn('transition-all duration-200 hover:shadow-md', className)}>
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={expert.avatar} alt={expert.name} />
               <AvatarFallback>{getInitials(expert.name)}</AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-sm truncate">{expert.name}</h3>
-                <ExpertBadge 
-                  verificationType={expert.verificationType}
-                  size="sm"
-                />
+                <ExpertBadge verificationType={expert.verificationType} size="sm" />
               </div>
-              
-              <CredibilityIndicator 
-                score={expert.credibilityScore}
-                size="sm"
-                className="mb-2"
-              />
-              
+
+              <CredibilityIndicator score={expert.credibilityScore} size="sm" className="mb-2" />
+
               {expert.affiliations.length > 0 && (
                 <p className="text-xs text-muted-foreground truncate">
                   {expert.affiliations[0].role} at {expert.affiliations[0].organization}
                 </p>
               )}
-              
+
               <div className="flex flex-wrap gap-1 mt-2">
                 {expert.specializations.slice(0, 2).map((spec, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
@@ -144,7 +142,7 @@ export function ExpertProfileCard({
                 )}
               </div>
             </div>
-            
+
             {onViewProfile && (
               <Button
                 variant="outline"
@@ -162,32 +160,30 @@ export function ExpertProfileCard({
   }
 
   return (
-    <Card className={cn("transition-all duration-200 hover:shadow-md", className)}>
+    <Card className={cn('transition-all duration-200 hover:shadow-md', className)}>
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src={expert.avatar} alt={expert.name} />
-            <AvatarFallback className="text-lg">
-              {getInitials(expert.name)}
-            </AvatarFallback>
+            <AvatarFallback className="text-lg">{getInitials(expert.name)}</AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <CardTitle className="text-xl">{expert.name}</CardTitle>
-              <ExpertBadge 
+              <ExpertBadge
                 verificationType={expert.verificationType}
                 credibilityScore={expert.credibilityScore}
                 showScore={true}
               />
             </div>
-            
+
             {expert.bio && (
               <CardDescription className="text-sm leading-relaxed mb-3">
                 {expert.bio}
               </CardDescription>
             )}
-            
+
             <div className="flex flex-wrap gap-2 mb-3">
               {expert.specializations.map((spec, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
@@ -195,7 +191,7 @@ export function ExpertProfileCard({
                 </Badge>
               ))}
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <User className="h-4 w-4" />
@@ -207,7 +203,7 @@ export function ExpertProfileCard({
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-2">
             {onViewProfile && (
               <Button
@@ -219,7 +215,7 @@ export function ExpertProfileCard({
                 View Profile
               </Button>
             )}
-            
+
             {onContact && expert.contactInfo?.email && (
               <Button
                 variant="ghost"
@@ -271,9 +267,7 @@ export function ExpertProfileCard({
         {expert.credentials.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium">
-                Credentials ({expert.credentials.length})
-              </h4>
+              <h4 className="text-sm font-medium">Credentials ({expert.credentials.length})</h4>
               <Button
                 variant="ghost"
                 size="sm"
@@ -296,24 +290,25 @@ export function ExpertProfileCard({
 
             {showCredentials ? (
               <div className="space-y-3">
-                {expert.credentials.map((credential) => {
+                {expert.credentials.map(credential => {
                   const IconComponent = getCredentialIcon(credential.type);
                   return (
-                    <div key={credential.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                    <div
+                      key={credential.id}
+                      className="flex items-start gap-3 p-3 bg-muted/50 rounded-md"
+                    >
                       <div className="flex items-center gap-2">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />
-                        {credential.verified && (
-                          <CheckCircle className="h-3 w-3 text-green-600" />
-                        )}
+                        {credential.verified && <CheckCircle className="h-3 w-3 text-green-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h5 className="font-medium text-sm">{credential.title}</h5>
-                          <Badge 
-                            variant={credential.verified ? "default" : "outline"} 
+                          <Badge
+                            variant={credential.verified ? 'default' : 'outline'}
                             className="text-xs"
                           >
-                            {credential.verified ? "Verified" : "Pending"}
+                            {credential.verified ? 'Verified' : 'Pending'}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -333,15 +328,13 @@ export function ExpertProfileCard({
               </div>
             ) : (
               <div className="space-y-2">
-                {expert.credentials.slice(0, 2).map((credential) => {
+                {expert.credentials.slice(0, 2).map(credential => {
                   const IconComponent = getCredentialIcon(credential.type);
                   return (
                     <div key={credential.id} className="flex items-center gap-2">
                       <IconComponent className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{credential.title}</span>
-                      {credential.verified && (
-                        <CheckCircle className="h-3 w-3 text-green-600" />
-                      )}
+                      {credential.verified && <CheckCircle className="h-3 w-3 text-green-600" />}
                     </div>
                   );
                 })}
@@ -359,9 +352,7 @@ export function ExpertProfileCard({
         {expert.affiliations.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium">
-                Affiliations ({expert.affiliations.length})
-              </h4>
+              <h4 className="text-sm font-medium">Affiliations ({expert.affiliations.length})</h4>
               <Button
                 variant="ghost"
                 size="sm"
@@ -384,24 +375,25 @@ export function ExpertProfileCard({
 
             {showAffiliations ? (
               <div className="space-y-3">
-                {expert.affiliations.map((affiliation) => {
+                {expert.affiliations.map(affiliation => {
                   const IconComponent = getAffiliationIcon(affiliation.type);
                   return (
-                    <div key={affiliation.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                    <div
+                      key={affiliation.id}
+                      className="flex items-start gap-3 p-3 bg-muted/50 rounded-md"
+                    >
                       <div className="flex items-center gap-2">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />
-                        {affiliation.verified && (
-                          <CheckCircle className="h-3 w-3 text-green-600" />
-                        )}
+                        {affiliation.verified && <CheckCircle className="h-3 w-3 text-green-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h5 className="font-medium text-sm">{affiliation.role}</h5>
-                          <Badge 
-                            variant={affiliation.current ? "default" : "outline"} 
+                          <Badge
+                            variant={affiliation.current ? 'default' : 'outline'}
                             className="text-xs"
                           >
-                            {affiliation.current ? "Current" : "Former"}
+                            {affiliation.current ? 'Current' : 'Former'}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-1">
@@ -426,7 +418,7 @@ export function ExpertProfileCard({
               </div>
             ) : (
               <div className="space-y-2">
-                {expert.affiliations.slice(0, 2).map((affiliation) => {
+                {expert.affiliations.slice(0, 2).map(affiliation => {
                   const IconComponent = getAffiliationIcon(affiliation.type);
                   return (
                     <div key={affiliation.id} className="flex items-center gap-2">
@@ -434,11 +426,11 @@ export function ExpertProfileCard({
                       <span className="text-sm">
                         {affiliation.role} at {affiliation.organization}
                       </span>
-                      {affiliation.verified && (
-                        <CheckCircle className="h-3 w-3 text-green-600" />
-                      )}
+                      {affiliation.verified && <CheckCircle className="h-3 w-3 text-green-600" />}
                       {affiliation.current && (
-                        <Badge variant="secondary" className="text-xs">Current</Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          Current
+                        </Badge>
                       )}
                     </div>
                   );

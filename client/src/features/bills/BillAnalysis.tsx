@@ -1,9 +1,15 @@
 import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { Bill } from '@client/shared/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 interface BillAnalysisProps {
   bill: Bill;
@@ -32,7 +38,7 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
             title: 'PhD in Constitutional Law',
             institution: 'Harvard Law School',
             year: 2010,
-            verified: true
+            verified: true,
           },
           {
             id: 'cred-2',
@@ -40,8 +46,8 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
             title: 'Former Supreme Court Clerk',
             institution: 'Supreme Court of Kenya',
             year: 2015,
-            verified: true
-          }
+            verified: true,
+          },
         ],
         affiliations: [
           {
@@ -50,8 +56,8 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
             role: 'Professor of Constitutional Law',
             type: 'academic' as const,
             current: true,
-            verified: true
-          }
+            verified: true,
+          },
         ],
         specializations: ['Constitutional Law', 'Healthcare Policy', 'Human Rights'],
         credibilityScore: 0.92,
@@ -59,34 +65,37 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
         avgCommunityRating: 4.8,
         verified: true,
         verificationDate: '2024-01-01T00:00:00Z',
-        bio: 'Leading constitutional law expert with 15+ years of experience in healthcare policy analysis.'
+        bio: 'Leading constitutional law expert with 15+ years of experience in healthcare policy analysis.',
       },
-      analysis: 'The Healthcare Access Reform Act presents a complex constitutional landscape. While the fundamental right to healthcare (Article 43) provides strong constitutional support, the federal-state authority balance raises legitimate concerns under our devolved system. The income-based eligibility criteria require careful scrutiny for equal protection compliance, particularly regarding potential discrimination against vulnerable populations.',
+      analysis:
+        'The Healthcare Access Reform Act presents a complex constitutional landscape. While the fundamental right to healthcare (Article 43) provides strong constitutional support, the federal-state authority balance raises legitimate concerns under our devolved system. The income-based eligibility criteria require careful scrutiny for equal protection compliance, particularly regarding potential discrimination against vulnerable populations.',
       confidence: 0.85,
-      methodology: 'Comprehensive constitutional analysis using precedent review, comparative law analysis, and constitutional interpretation principles.',
+      methodology:
+        'Comprehensive constitutional analysis using precedent review, comparative law analysis, and constitutional interpretation principles.',
       sources: [
         'Constitution of Kenya 2010, Article 43',
         'Okwanda v. Minister of Health [2014] eKLR',
-        'Healthcare policy constitutional precedents'
+        'Healthcare policy constitutional precedents',
       ],
       lastUpdated: '2024-01-15T10:30:00Z',
       communityValidation: {
         upvotes: 23,
         downvotes: 2,
         comments: 8,
-        userVote: null
+        userVote: null,
       },
-      tags: ['constitutional-law', 'healthcare', 'equal-protection', 'devolution']
-    }
+      tags: ['constitutional-law', 'healthcare', 'equal-protection', 'devolution'],
+    },
   ];
 
   // Extract constitutional concerns for civic action guidance
-  const constitutionalConcerns = bill.constitutionalFlags?.map(flag => flag.type || 'General') || [];
+  const constitutionalConcerns =
+    bill.constitutionalFlags?.map(flag => flag.type || 'General') || [];
   const recommendations = [
     'Review income-based eligibility criteria for equal protection compliance',
     'Clarify federal-state authority boundaries in healthcare regulation',
     'Consider adding explicit constitutional basis citations',
-    'Strengthen due process protections in eligibility determinations'
+    'Strengthen due process protections in eligibility determinations',
   ];
 
   return (
@@ -124,9 +133,7 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
                 <Scale className="h-5 w-5 text-blue-600" />
                 Constitutional Analysis Overview
               </CardTitle>
-              <CardDescription>
-                Comprehensive constitutional review and analysis
-              </CardDescription>
+              <CardDescription>Comprehensive constitutional review and analysis</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -175,10 +182,15 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
                 <Card key={flag.id || index}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                      <AlertTriangle className={`h-5 w-5 ${
-                        flag.severity === 'high' ? 'text-red-500' :
-                        flag.severity === 'medium' ? 'text-yellow-500' : 'text-green-500'
-                      }`} />
+                      <AlertTriangle
+                        className={`h-5 w-5 ${
+                          flag.severity === 'high'
+                            ? 'text-red-500'
+                            : flag.severity === 'medium'
+                              ? 'text-yellow-500'
+                              : 'text-green-500'
+                        }`}
+                      />
                       {flag.type || 'Constitutional Concern'}
                     </CardTitle>
                   </CardHeader>
@@ -216,13 +228,11 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
           </Card>
 
           <div className="space-y-4">
-            {mockExpertAnalyses.map((analysis) => (
+            {mockExpertAnalyses.map(analysis => (
               <Card key={analysis.id}>
                 <CardHeader>
                   <CardTitle>{analysis.expert.name}</CardTitle>
-                  <CardDescription>
-                    {analysis.expert.specializations.join(', ')}
-                  </CardDescription>
+                  <CardDescription>{analysis.expert.specializations.join(', ')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed mb-4">{analysis.analysis}</p>
@@ -308,7 +318,7 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="mt-6">
                   <h4 className="font-semibold mb-3">Key Recommendations</h4>
                   <ul className="space-y-2">

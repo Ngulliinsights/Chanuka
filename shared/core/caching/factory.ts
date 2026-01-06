@@ -4,10 +4,9 @@
  * Factory functions for creating and managing cache services
  */
 
-import type { CacheService, CacheConfig } from './core/interfaces';
 import { MemoryAdapter } from './adapters/memory-adapter';
-import { RedisAdapter } from './adapters/redis-adapter';
 import { MultiTierAdapter } from './adapters/multi-tier-adapter';
+import type { CacheService, CacheConfig } from './core/interfaces';
 
 // Cache manager for cache operations
 export class CacheManager {

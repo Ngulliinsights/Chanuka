@@ -5,15 +5,21 @@
 
 import { Shield, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import React from 'react';
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();
@@ -29,7 +35,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const result = await requestPasswordReset(email);
-      
+
       if (result.success) {
         setSuccess(true);
       } else {
@@ -48,9 +54,7 @@ export default function ForgotPasswordPage() {
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              Check your email
-            </h2>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Check your email</h2>
             <p className="mt-2 text-sm text-gray-600">
               We&apos;ve sent a password reset link to {email}
             </p>
@@ -61,8 +65,8 @@ export default function ForgotPasswordPage() {
               <div className="text-center space-y-4">
                 <Mail className="mx-auto h-8 w-8 text-blue-600" />
                 <p className="text-sm text-gray-600">
-                  If an account with that email exists, you&apos;ll receive a password reset link shortly.
-                  The link will expire in 1 hour for security reasons.
+                  If an account with that email exists, you&apos;ll receive a password reset link
+                  shortly. The link will expire in 1 hour for security reasons.
                 </p>
                 <div className="space-y-2">
                   <Link to="/auth/login">
@@ -71,8 +75,8 @@ export default function ForgotPasswordPage() {
                       Back to Sign In
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       setSuccess(false);
                       setEmail('');
@@ -95,9 +99,7 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Reset your password
-          </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Reset your password</h2>
           <p className="mt-2 text-sm text-gray-600">
             Enter your email address and we&apos;ll send you a link to reset your password
           </p>
@@ -125,7 +127,7 @@ export default function ForgotPasswordPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   required
                   autoComplete="email"
                   placeholder="Enter your email address"
@@ -133,11 +135,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading || !email}
-              >
+              <Button type="submit" className="w-full" disabled={loading || !email}>
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

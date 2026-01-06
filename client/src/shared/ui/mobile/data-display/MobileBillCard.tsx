@@ -1,14 +1,14 @@
 /**
  * MobileBillCard Component
- * 
+ *
  * Responsive bill card component optimized for mobile display.
  * Single component that works on all viewport sizes via responsive CSS.
- * 
+ *
  * @component
  * @example
  * ```tsx
  * import { MobileBillCard } from '@client/shared/ui/mobile/data-display';
- * 
+ *
  * export function BillsList() {
  *   return (
  *     <div className="grid grid-cols-1 md:grid-cols-2">
@@ -40,7 +40,7 @@ interface MobileBillCardProps {
 
 /**
  * MobileBillCard Component
- * 
+ *
  * Responsive bill card - same component for all screen sizes.
  */
 export const MobileBillCard = React.forwardRef<HTMLDivElement, MobileBillCardProps>(
@@ -57,16 +57,14 @@ export const MobileBillCard = React.forwardRef<HTMLDivElement, MobileBillCardPro
           <h3 className="bill-title">{bill.title}</h3>
           {bill.number && <span className="bill-number">{bill.number}</span>}
         </div>
-        
+
         {(variant === 'default' || variant === 'detailed') && bill.status && (
           <div className="card-status">
             <span className={`status-badge ${bill.status}`}>{bill.status}</span>
           </div>
         )}
-        
-        <div className="card-content">
-          {/* Additional bill details will be rendered here */}
-        </div>
+
+        <div className="card-content">{/* Additional bill details will be rendered here */}</div>
       </div>
     );
   }

@@ -5,8 +5,8 @@
  * Ensures proper dependency flow and cross-module compatibility
  */
 
-import type { PerformanceMetric } from '@/core/performance';
 import type { ErrorContext } from '@/core/error';
+import type { PerformanceMetric } from '@/core/performance';
 
 /**
  * Integration points between design system and core modules

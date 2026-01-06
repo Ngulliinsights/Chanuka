@@ -28,7 +28,6 @@ export { useOfflineDetection } from './useOfflineDetection';
 export { useOfflineCapabilities } from './useOfflineCapabilities';
 export { useOnlineStatus } from '../core/loading/hooks';
 
-
 // Error Recovery (in core/hooks)
 export { useErrorRecovery } from './useErrorRecovery';
 
@@ -66,7 +65,7 @@ export {
   useSystemStats,
   useSystemActivity,
   useSystemSchema,
-  useSystemEnvironment
+  useSystemEnvironment,
 } from './use-system';
 
 // Other feature hooks

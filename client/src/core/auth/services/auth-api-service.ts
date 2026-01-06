@@ -1,6 +1,6 @@
 /**
  * Consolidated Authentication API Service
- * 
+ *
  * Unified implementation that consolidates:
  * - AuthApiService from core/api/auth.ts
  * - authService from services/auth-service-init.ts
@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@client/utils/logger';
- 
+
 import type { UnifiedApiClient } from '../../api/types';
 import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';
@@ -62,7 +62,7 @@ export class AuthApiService {
       logger.info('User login successful', {
         email: credentials.email,
         rememberMe: credentials.rememberMe,
-        hasTwoFactor: !!credentials.twoFactorToken
+        hasTwoFactor: !!credentials.twoFactorToken,
       });
 
       return response.data;
@@ -79,12 +79,9 @@ export class AuthApiService {
     try {
       // Validate password confirmation matches before sending to server
       if (data.password !== data.confirmPassword) {
-        throw createError(
-          ErrorDomain.VALIDATION,
-          ErrorSeverity.MEDIUM,
-          'Passwords do not match',
-          { context: { field: 'confirmPassword' } }
-        );
+        throw createError(ErrorDomain.VALIDATION, ErrorSeverity.MEDIUM, 'Passwords do not match', {
+          context: { field: 'confirmPassword' },
+        });
       }
 
       if (!data.acceptTerms) {
@@ -104,7 +101,7 @@ export class AuthApiService {
 
       logger.info('User registration successful', {
         email: data.email,
-        name: data.name
+        name: data.name,
       });
 
       return response.data;
@@ -119,11 +116,7 @@ export class AuthApiService {
    */
   async logout(): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/logout`,
-        {},
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/logout`, {}, { skipCache: true });
 
       logger.info('User logout successful');
     } catch (error) {
@@ -150,14 +143,12 @@ export class AuthApiService {
    */
   async updateUserProfile(updates: Partial<User>): Promise<User> {
     try {
-      const response = await this.apiClient.patch<User>(
-        `${this.authEndpoint}/profile`,
-        updates,
-        { skipCache: true }
-      );
+      const response = await this.apiClient.patch<User>(`${this.authEndpoint}/profile`, updates, {
+        skipCache: true,
+      });
 
       logger.info('Profile updated successfully', {
-        updatedFields: Object.keys(updates)
+        updatedFields: Object.keys(updates),
       });
 
       return response.data;
@@ -193,7 +184,8 @@ export class AuthApiService {
     try {
       // In development mode, if no server is running, just return false gracefully
       if (process.env.NODE_ENV === 'development') {
-        const hasLocalTokens = localStorage.getItem('token') || localStorage.getItem('refresh_token');
+        const hasLocalTokens =
+          localStorage.getItem('token') || localStorage.getItem('refresh_token');
         if (!hasLocalTokens) {
           return false;
         }
@@ -209,10 +201,12 @@ export class AuthApiService {
     } catch (error) {
       // In development, connection errors are expected when no server is running
       if (process.env.NODE_ENV === 'development') {
-        logger.debug('Token validation skipped - no server available (development mode)', { error });
+        logger.debug('Token validation skipped - no server available (development mode)', {
+          error,
+        });
         return false;
       }
-      
+
       logger.warn('Token validation failed', { error });
       return false;
     }
@@ -265,11 +259,7 @@ export class AuthApiService {
    */
   async disableTwoFactor(token: string): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/2fa/disable`,
-        { token },
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/2fa/disable`, { token }, { skipCache: true });
 
       logger.info('2FA disabled successfully');
     } catch (error) {
@@ -342,11 +332,9 @@ export class AuthApiService {
    */
   async requestPasswordReset(request: PasswordResetRequest): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/password/reset-request`,
-        request,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/password/reset-request`, request, {
+        skipCache: true,
+      });
 
       logger.info('Password reset requested', { email: request.email });
     } catch (error) {
@@ -361,19 +349,12 @@ export class AuthApiService {
   async resetPassword(reset: PasswordReset): Promise<void> {
     try {
       if (reset.password !== reset.confirmPassword) {
-        throw createError(
-          ErrorDomain.VALIDATION,
-          ErrorSeverity.MEDIUM,
-          'Passwords do not match',
-          { context: { field: 'confirmPassword' } }
-        );
+        throw createError(ErrorDomain.VALIDATION, ErrorSeverity.MEDIUM, 'Passwords do not match', {
+          context: { field: 'confirmPassword' },
+        });
       }
 
-      await this.apiClient.post(
-        `${this.authEndpoint}/password/reset`,
-        reset,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/password/reset`, reset, { skipCache: true });
 
       logger.info('Password reset completed successfully');
     } catch (error) {
@@ -391,11 +372,7 @@ export class AuthApiService {
    */
   async extendSession(): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/session/extend`,
-        {},
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/session/extend`, {}, { skipCache: true });
 
       logger.debug('Session extended successfully');
     } catch (error) {
@@ -409,9 +386,7 @@ export class AuthApiService {
    */
   async getActiveSessions(): Promise<SessionInfo[]> {
     try {
-      const response = await this.apiClient.get<SessionInfo[]>(
-        `${this.authEndpoint}/sessions`
-      );
+      const response = await this.apiClient.get<SessionInfo[]>(`${this.authEndpoint}/sessions`);
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch active sessions', { error });
@@ -424,10 +399,9 @@ export class AuthApiService {
    */
   async terminateSession(sessionId: string): Promise<void> {
     try {
-      await this.apiClient.delete(
-        `${this.authEndpoint}/sessions/${sessionId}`,
-        { skipCache: true }
-      );
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/${sessionId}`, {
+        skipCache: true,
+      });
 
       logger.info('Session revoked successfully', { sessionId });
     } catch (error) {
@@ -441,10 +415,7 @@ export class AuthApiService {
    */
   async terminateAllOtherSessions(): Promise<void> {
     try {
-      await this.apiClient.delete(
-        `${this.authEndpoint}/sessions/others`,
-        { skipCache: true }
-      );
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/others`, { skipCache: true });
 
       logger.info('All other sessions revoked successfully');
     } catch (error) {
@@ -483,9 +454,9 @@ export class AuthApiService {
     // This would typically be constructed based on provider configuration
     const params = new URLSearchParams({
       provider,
-      ...(state && { state })
+      ...(state && { state }),
     });
-    
+
     return `${this.authEndpoint}/oauth/authorize?${params.toString()}`;
   }
 
@@ -498,11 +469,9 @@ export class AuthApiService {
    */
   async updatePrivacySettings(settings: Partial<PrivacySettings>): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/privacy-settings`,
-        settings,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/privacy-settings`, settings, {
+        skipCache: true,
+      });
 
       logger.info('Privacy settings updated successfully');
     } catch (error) {
@@ -514,7 +483,10 @@ export class AuthApiService {
   /**
    * Request data export for the current user.
    */
-  async requestDataExport(format: 'json' | 'csv' | 'xml' = 'json', includes: string[] = []): Promise<DataExportRequest> {
+  async requestDataExport(
+    format: 'json' | 'csv' | 'xml' = 'json',
+    includes: string[] = []
+  ): Promise<DataExportRequest> {
     try {
       const response = await this.apiClient.post<DataExportRequest>(
         `${this.authEndpoint}/data-export`,
@@ -533,7 +505,10 @@ export class AuthApiService {
   /**
    * Request data deletion for the current user.
    */
-  async requestDataDeletion(retentionPeriod: string = '30days', includes: string[] = []): Promise<DataDeletionRequest> {
+  async requestDataDeletion(
+    retentionPeriod: string = '30days',
+    includes: string[] = []
+  ): Promise<DataDeletionRequest> {
     try {
       const response = await this.apiClient.post<DataDeletionRequest>(
         `${this.authEndpoint}/data-deletion`,
@@ -588,20 +563,14 @@ export class AuthApiService {
    */
   private async handleAuthError(error: unknown, defaultMessage: string): Promise<Error> {
     if (error instanceof Error) {
-      return createError(
-        ErrorDomain.AUTHENTICATION,
-        ErrorSeverity.HIGH,
-        error.message,
-        { details: { originalError: error } }
-      );
+      return createError(ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, error.message, {
+        details: { originalError: error },
+      });
     }
 
-    return createError(
-      ErrorDomain.AUTHENTICATION,
-      ErrorSeverity.HIGH,
-      defaultMessage,
-      { details: { originalError: error } }
-    );
+    return createError(ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, defaultMessage, {
+      details: { originalError: error },
+    });
   }
 }
 
@@ -612,7 +581,10 @@ export class AuthApiService {
 /**
  * Creates a new AuthApiService instance with the provided API client
  */
-export function createAuthApiService(apiClient: UnifiedApiClient, baseUrl?: string): AuthApiService {
+export function createAuthApiService(
+  apiClient: UnifiedApiClient,
+  baseUrl?: string
+): AuthApiService {
   return new AuthApiService(apiClient, baseUrl);
 }
 
@@ -636,5 +608,5 @@ export function setAuthApiService(service: AuthApiService): void {
 export const authApiService = {
   get instance() {
     return getAuthApiService();
-  }
+  },
 };

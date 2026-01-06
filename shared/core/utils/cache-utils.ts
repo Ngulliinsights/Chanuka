@@ -5,9 +5,9 @@
  * into the shared core system.
  */
 
+import { MemoryAdapter } from '../caching/adapters/memory-adapter';
 import { logger } from '../observability/logging';
 // import { CacheAdapter } from '../caching/core/interfaces'; // Unused import
-import { MemoryAdapter } from '../caching/adapters/memory-adapter';
 
 // Cache metrics for monitoring
 export interface CacheMetrics {

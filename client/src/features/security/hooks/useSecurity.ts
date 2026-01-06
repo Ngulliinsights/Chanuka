@@ -5,18 +5,10 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
-import { 
-  securityService, 
-  SecurityStatus
-} from '@client/security/security-service';
+import { securityService, SecurityStatus } from '@client/security/security-service';
 
-import { 
-  clientRateLimiter, 
-  RateLimitConfigs 
-} from '../../../security/rate-limiter';
-import { 
-  SecurityThreat
-} from '../../../security/vulnerability-scanner';
+import { clientRateLimiter, RateLimitConfigs } from '../../../security/rate-limiter';
+import { SecurityThreat } from '../../../security/vulnerability-scanner';
 
 // Constants extracted to module level for better performance
 const DEFAULT_SCAN_INTERVAL = 300000; // 5 minutes
@@ -43,12 +35,23 @@ export interface SecurityHookResult {
   isSecure: boolean;
   threats: SecurityThreat[];
   latestThreat: SecurityThreat | null;
-  validateInput: <T>(schema: unknown, input: unknown) => Promise<{ success: true; data: T } | { success: false; errors: string[] }>;
+  validateInput: <T>(
+    schema: unknown,
+    input: unknown
+  ) => Promise<{ success: true; data: T } | { success: false; errors: string[] }>;
   sanitizeText: (input: string, maxLength?: number) => string;
   sanitizeHtml: (html: string, options?: Record<string, unknown>) => string;
-  performSecurityCheck: (input: string) => { isSafe: boolean; threats: string[]; sanitized: string };
+  performSecurityCheck: (input: string) => {
+    isSafe: boolean;
+    threats: string[];
+    sanitized: string;
+  };
   checkRateLimit: (key: string, configName: keyof typeof RateLimitConfigs) => RateLimitStatus;
-  attemptRateLimitedAction: <T>(key: string, configName: keyof typeof RateLimitConfigs, action: () => Promise<T>) => Promise<T>;
+  attemptRateLimitedAction: <T>(
+    key: string,
+    configName: keyof typeof RateLimitConfigs,
+    action: () => Promise<T>
+  ) => Promise<T>;
   performScan: () => Promise<void>;
   scanInProgress: boolean;
   refreshSecurity: () => void;
@@ -59,13 +62,11 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
   const {
     enableThreatMonitoring = true,
     enablePeriodicScanning = false,
-    scanInterval = DEFAULT_SCAN_INTERVAL
+    scanInterval = DEFAULT_SCAN_INTERVAL,
   } = _options;
 
   // State management
-  const [status, setStatus] = useState<SecurityStatus>(() => 
-    securityService.getSecurityStatus()
-  );
+  const [status, setStatus] = useState<SecurityStatus>(() => securityService.getSecurityStatus());
   const [threats, setThreats] = useState<SecurityThreat[]>([]);
   const [latestThreat, setLatestThreat] = useState<SecurityThreat | null>(null);
   const [scanInProgress, setScanInProgress] = useState(false);
@@ -88,9 +89,9 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
       return await securityService.validateInput<T>(schema as Record<string, unknown>, input);
     } catch (error) {
       console.error('Input validation failed:', error);
-      return { 
-        success: false as const, 
-        errors: ['Validation service unavailable'] 
+      return {
+        success: false as const,
+        errors: ['Validation service unavailable'],
       };
     }
   }, []);
@@ -116,75 +117,79 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
     }
   }, []);
 
-  const performSecurityCheck = useCallback((input: string): { isSafe: boolean; threats: string[]; sanitized: string } => {
-    try {
-      const result = securityService.performSecurityCheck(input);
-      // Ensure we always return the expected object shape
-      if (typeof result === 'boolean') {
+  const performSecurityCheck = useCallback(
+    (input: string): { isSafe: boolean; threats: string[]; sanitized: string } => {
+      try {
+        const result = securityService.performSecurityCheck(input);
+        // Ensure we always return the expected object shape
+        if (typeof result === 'boolean') {
+          return {
+            isSafe: result,
+            threats: result ? [] : ['Input validation failed'],
+            sanitized: result ? input : '',
+          };
+        }
+        return result;
+      } catch (error) {
+        console.error('Security check failed:', error);
         return {
-          isSafe: result,
-          threats: result ? [] : ['Input validation failed'],
-          sanitized: result ? input : ''
+          isSafe: false,
+          threats: ['Security check unavailable'],
+          sanitized: '',
         };
       }
-      return result;
-    } catch (error) {
-      console.error('Security check failed:', error);
-      return { 
-        isSafe: false, 
-        threats: ['Security check unavailable'], 
-        sanitized: '' 
-      };
-    }
-  }, []);
+    },
+    []
+  );
 
-  const checkRateLimit = useCallback((
-    key: string, 
-    configName: keyof typeof RateLimitConfigs
-  ): RateLimitStatus => {
-    try {
+  const checkRateLimit = useCallback(
+    (key: string, configName: keyof typeof RateLimitConfigs): RateLimitStatus => {
+      try {
+        const config = RateLimitConfigs[configName];
+        const result = clientRateLimiter.checkLimit(key, config);
+        return result;
+      } catch (error) {
+        console.error('Rate limit check failed:', error);
+        return { allowed: true, remaining: Infinity, resetTime: 0 };
+      }
+    },
+    []
+  );
+
+  const attemptRateLimitedAction = useCallback(
+    async <T>(
+      key: string,
+      configName: keyof typeof RateLimitConfigs,
+      action: () => Promise<T>
+    ): Promise<T> => {
       const config = RateLimitConfigs[configName];
-      const result = clientRateLimiter.checkLimit(key, config);
-      return result;
-    } catch (error) {
-      console.error('Rate limit check failed:', error);
-      return { allowed: true, remaining: Infinity, resetTime: 0 };
-    }
-  }, []);
+      const limitCheck = clientRateLimiter.checkLimit(key, config);
 
-  const attemptRateLimitedAction = useCallback(async <T>(
-    key: string, 
-    configName: keyof typeof RateLimitConfigs, 
-    action: () => Promise<T>
-  ): Promise<T> => {
-    const config = RateLimitConfigs[configName];
-    const limitCheck = clientRateLimiter.checkLimit(key, config);
-    
-    if (!limitCheck.allowed) {
-      throw new Error(`Rate limit exceeded. Retry after ${limitCheck.resetTime}ms`);
-    }
-    
-    // Execute the action
-    return await action();
-  }, []);
+      if (!limitCheck.allowed) {
+        throw new Error(`Rate limit exceeded. Retry after ${limitCheck.resetTime}ms`);
+      }
+
+      // Execute the action
+      return await action();
+    },
+    []
+  );
 
   // Security scan with proper async handling and error management
   const performScan = useCallback(async () => {
     if (scanInProgress || !isMountedRef.current) return;
-    
+
     setScanInProgress(true);
-    
+
     try {
       // Await the async scan operation
       const result = await securityService.performSecurityScan();
-      
+
       if (!isMountedRef.current) return;
-      
+
       // Check if we have threats in the result
       if (result.threats && result.threats.length > 0) {
-        setThreats(prev => 
-          [...result.threats, ...prev].slice(0, MAX_THREATS_HISTORY)
-        );
+        setThreats(prev => [...result.threats, ...prev].slice(0, MAX_THREATS_HISTORY));
         setLatestThreat(result.threats[0]);
       }
     } catch (error) {
@@ -207,9 +212,9 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
   useEffect(() => {
     if (!enableThreatMonitoring) return;
 
-    threatUnsubscribeRef.current = securityService.onThreatDetected((threat) => {
+    threatUnsubscribeRef.current = securityService.onThreatDetected(threat => {
       if (!isMountedRef.current) return;
-      
+
       setThreats(prev => [threat, ...prev].slice(0, MAX_THREATS_HISTORY));
       setLatestThreat(threat);
     });
@@ -241,10 +246,7 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
 
   // Status update interval with proper cleanup
   useEffect(() => {
-    statusIntervalRef.current = setInterval(
-      refreshSecurity, 
-      STATUS_UPDATE_INTERVAL
-    );
+    statusIntervalRef.current = setInterval(refreshSecurity, STATUS_UPDATE_INTERVAL);
 
     return () => {
       if (statusIntervalRef.current) {
@@ -265,11 +267,9 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
   // This prevents recalculation on every render
   const isSecure = useMemo(() => {
     return (
-      status.csrf.hasValidToken && 
+      status.csrf.hasValidToken &&
       status.vulnerabilityScanning.lastScanScore > SECURITY_SCORE_THRESHOLD &&
-      threats.filter(t => 
-        t.severity === 'critical' || t.severity === 'high'
-      ).length === 0
+      threats.filter(t => t.severity === 'critical' || t.severity === 'high').length === 0
     );
   }, [status.csrf.hasValidToken, status.vulnerabilityScanning.lastScanScore, threats]);
 
@@ -287,7 +287,7 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
     performScan,
     scanInProgress,
     refreshSecurity,
-    clearThreats
+    clearThreats,
   };
 }
 
@@ -308,53 +308,54 @@ export function useSecureForm<T extends Record<string, unknown>>(
 
   // Optimized setValue - removed errors from dependency array
   // to prevent unnecessary callback recreation
-  const setValue = useCallback((field: keyof T, value: unknown) => {
-    const sanitizedValue = typeof value === 'string' 
-      ? sanitizeText(value) 
-      : value;
-    
-    setValues(prev => ({
-      ...prev,
-      [field]: sanitizedValue
-    }));
+  const setValue = useCallback(
+    (field: keyof T, value: unknown) => {
+      const sanitizedValue = typeof value === 'string' ? sanitizeText(value) : value;
 
-    // Clear field-specific errors
-    setErrors(prev => {
-      if (!prev[field as string]) return prev;
-      
-      const newErrors = { ...prev };
-      delete newErrors[field as string];
-      return newErrors;
-    });
-  }, [sanitizeText]);
+      setValues(prev => ({
+        ...prev,
+        [field]: sanitizedValue,
+      }));
+
+      // Clear field-specific errors
+      setErrors(prev => {
+        if (!prev[field as string]) return prev;
+
+        const newErrors = { ...prev };
+        delete newErrors[field as string];
+        return newErrors;
+      });
+    },
+    [sanitizeText]
+  );
 
   // Enhanced validation with better error parsing
   const validate = useCallback(async (): Promise<boolean> => {
     setIsValidating(true);
-    
+
     try {
       const result = await validateInput(schema, values);
-      
+
       if (result.success) {
         setErrors({});
         return true;
       }
-      
+
       // Improved error parsing with fallback
       const fieldErrors: Record<string, string[]> = {};
-      
+
       result.errors.forEach(error => {
         // Handle both "field: message" and plain message formats
         const colonIndex = error.indexOf(': ');
         const field = colonIndex > 0 ? error.substring(0, colonIndex) : 'form';
         const message = colonIndex > 0 ? error.substring(colonIndex + 2) : error;
-        
+
         if (!fieldErrors[field]) {
           fieldErrors[field] = [];
         }
         fieldErrors[field].push(message);
       });
-      
+
       setErrors(fieldErrors);
       return false;
     } catch (error) {
@@ -372,10 +373,7 @@ export function useSecureForm<T extends Record<string, unknown>>(
   }, []);
 
   // Computed property for error state
-  const hasErrors = useMemo(() => 
-    Object.keys(errors).length > 0, 
-    [errors]
-  );
+  const hasErrors = useMemo(() => Object.keys(errors).length > 0, [errors]);
 
   return {
     values,
@@ -384,17 +382,14 @@ export function useSecureForm<T extends Record<string, unknown>>(
     setValue,
     validate,
     reset,
-    hasErrors
+    hasErrors,
   };
 }
 
 /**
  * Optimized hook for rate-limited actions with automatic status updates
  */
-export function useRateLimit(
-  key: string, 
-  configName: keyof typeof RateLimitConfigs
-) {
+export function useRateLimit(key: string, configName: keyof typeof RateLimitConfigs) {
   const { checkRateLimit, attemptRateLimitedAction } = useSecurity();
   const [status, setStatus] = useState<RateLimitStatus | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -403,7 +398,7 @@ export function useRateLimit(
   // Stable update function
   const updateStatus = useCallback(() => {
     if (!isMountedRef.current) return;
-    
+
     try {
       const result = checkRateLimit(key, configName);
       setStatus(result);
@@ -412,22 +407,20 @@ export function useRateLimit(
     }
   }, [key, configName, checkRateLimit]);
 
-  const attemptAction = useCallback(async <T>(
-    action: () => Promise<T>
-  ): Promise<T> => {
-    const result = await attemptRateLimitedAction(key, configName, action);
-    updateStatus();
-    return result;
-  }, [key, configName, attemptRateLimitedAction, updateStatus]);
+  const attemptAction = useCallback(
+    async <T>(action: () => Promise<T>): Promise<T> => {
+      const result = await attemptRateLimitedAction(key, configName, action);
+      updateStatus();
+      return result;
+    },
+    [key, configName, attemptRateLimitedAction, updateStatus]
+  );
 
   // Setup status polling with cleanup
   useEffect(() => {
     updateStatus();
-    
-    intervalRef.current = setInterval(
-      updateStatus, 
-      RATE_LIMIT_CHECK_INTERVAL
-    );
+
+    intervalRef.current = setInterval(updateStatus, RATE_LIMIT_CHECK_INTERVAL);
 
     return () => {
       if (intervalRef.current) {
@@ -449,6 +442,6 @@ export function useRateLimit(
     attemptAction,
     isAllowed: status?.allowed ?? true,
     remaining: status?.remaining ?? Infinity,
-    retryAfter: status?.resetTime ?? 0
+    retryAfter: status?.resetTime ?? 0,
   };
 }

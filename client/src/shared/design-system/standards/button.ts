@@ -210,9 +210,10 @@ export const buttonUtils = {
     delete baseVariantStyles.hover;
     delete baseVariantStyles.active;
     delete baseVariantStyles.focus;
-    const stateStyles = state === 'disabled'
-      ? buttonDesignStandards.states.disabled
-      : variantStyles[state as keyof typeof variantStyles] || {};
+    const stateStyles =
+      state === 'disabled'
+        ? buttonDesignStandards.states.disabled
+        : variantStyles[state as keyof typeof variantStyles] || {};
 
     return {
       ...baseStyles,
@@ -248,4 +249,3 @@ export const buttonUtils = {
     };
   },
 } as const;
-

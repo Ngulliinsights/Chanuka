@@ -1,9 +1,9 @@
 /**
  * Intelligent Search Service - Dual-Engine Search Implementation
- * 
+ *
  * Implements PostgreSQL full-text search with Fuse.js fuzzy matching fallback
  * for comprehensive search capabilities with typo tolerance and relevance scoring.
- * 
+ *
  * Key optimizations:
  * - Enhanced type safety with strict null checks
  * - Improved caching with TTL support
@@ -16,6 +16,7 @@ import Fuse, { type IFuseOptions } from 'fuse.js';
 
 import { searchApiClient } from '@client/core/api/search';
 import { logger } from '@client/utils/logger';
+
 import type { SearchResult, SearchMetadata } from '../types';
 
 interface SearchSuggestion {
@@ -123,8 +124,8 @@ const FUSE_CONFIGS: Record<string, IFuseOptions<any>> = {
       { name: 'title', weight: 0.7 },
       { name: 'summary', weight: 0.3 },
       { name: 'billNumber', weight: 0.5 },
-      { name: 'policyAreas', weight: 0.2 }
-    ]
+      { name: 'policyAreas', weight: 0.2 },
+    ],
   },
   sponsors: {
     threshold: 0.3,
@@ -133,24 +134,22 @@ const FUSE_CONFIGS: Record<string, IFuseOptions<any>> = {
     includeMatches: true,
     keys: [
       { name: 'name', weight: 0.9 },
-      { name: 'party', weight: 0.1 }
-    ]
+      { name: 'party', weight: 0.1 },
+    ],
   },
   comments: {
     threshold: 0.5,
     distance: 200,
     includeScore: true,
     includeMatches: true,
-    keys: [
-      { name: 'content', weight: 1.0 }
-    ]
-  }
+    keys: [{ name: 'content', weight: 1.0 }],
+  },
 };
 
 const CACHE_CONFIG = {
   MAX_SIZE: 100,
   TTL_MS: 5 * 60 * 1000, // 5 minutes
-  CLEANUP_INTERVAL_MS: 60 * 1000 // 1 minute
+  CLEANUP_INTERVAL_MS: 60 * 1000, // 1 minute
 } as const;
 
 const SEARCH_CONFIG = {
@@ -158,7 +157,7 @@ const SEARCH_CONFIG = {
   MAX_LIMIT: 500,
   MIN_QUERY_LENGTH: 2,
   AUTOCOMPLETE_LIMIT: 10,
-  SUGGESTION_LIMIT: 5
+  SUGGESTION_LIMIT: 5,
 } as const;
 
 // ============================================================================
@@ -204,7 +203,7 @@ class IntelligentSearchService {
     if (cached) {
       logger.info('Search cache hit', {
         query: request.q,
-        cacheAge: Date.now() - cached.timestamp
+        cacheAge: Date.now() - cached.timestamp,
       });
       return cached.data;
     }
@@ -213,7 +212,7 @@ class IntelligentSearchService {
       // Execute both search engines in parallel for optimal performance
       const [postgresqlResult, fuseResult] = await Promise.allSettled([
         this.performPostgreSQLSearch(request),
-        request.enableFuzzy !== false ? this.performFuseSearch(request) : null
+        request.enableFuzzy !== false ? this.performFuseSearch(request) : null,
       ]);
 
       const engines: SearchEngineResult[] = [];
@@ -232,7 +231,7 @@ class IntelligentSearchService {
       // Generate intelligent suggestions and facets
       const [suggestions, facets] = await Promise.all([
         this.generateSuggestions(request.q, limitedResults),
-        Promise.resolve(this.generateFacets(limitedResults))
+        Promise.resolve(this.generateFacets(limitedResults)),
       ]);
 
       const result: CombinedSearchResult = {
@@ -241,7 +240,7 @@ class IntelligentSearchService {
         totalCount: limitedResults.length,
         searchTime: Date.now() - startTime,
         suggestions,
-        facets
+        facets,
       };
 
       // Cache the result with metadata
@@ -254,17 +253,16 @@ class IntelligentSearchService {
         engines: engines.map(e => ({
           engine: e.engine,
           resultCount: e.results.length,
-          quality: e.quality.toFixed(2)
-        }))
+          quality: e.quality.toFixed(2),
+        })),
       });
 
       return result;
-
     } catch (error) {
       logger.error('Intelligent search failed', {
         query: request.q,
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
 
       // Return empty result rather than throwing to maintain UX
@@ -310,9 +308,7 @@ class IntelligentSearchService {
   /**
    * Perform PostgreSQL full-text search with robust parameter handling
    */
-  private async performPostgreSQLSearch(
-    request: DualSearchRequest
-  ): Promise<SearchEngineResult> {
+  private async performPostgreSQLSearch(request: DualSearchRequest): Promise<SearchEngineResult> {
     const startTime = Date.now();
 
     try {
@@ -321,7 +317,8 @@ class IntelligentSearchService {
 
       if (request.type !== undefined) params.type = request.type;
       if (request.sort !== undefined) params.sort = request.sort;
-      if (request.limit !== undefined) params.limit = Math.min(request.limit, SEARCH_CONFIG.MAX_LIMIT);
+      if (request.limit !== undefined)
+        params.limit = Math.min(request.limit, SEARCH_CONFIG.MAX_LIMIT);
       if (request.offset !== undefined) params.offset = request.offset;
       if (request.filters !== undefined) params.filters = JSON.stringify(request.filters);
 
@@ -340,16 +337,15 @@ class IntelligentSearchService {
         results,
         searchTime,
         totalCount: response.data.total || results.length,
-        quality
+        quality,
       };
-
     } catch (error) {
       const searchTime = Date.now() - startTime;
 
       logger.warn('PostgreSQL search failed, results will rely on Fuse.js fallback', {
         query: request.q,
         searchTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       return {
@@ -357,7 +353,7 @@ class IntelligentSearchService {
         results: [],
         searchTime,
         totalCount: 0,
-        quality: 0
+        quality: 0,
       };
     }
   }
@@ -365,9 +361,7 @@ class IntelligentSearchService {
   /**
    * Perform Fuse.js fuzzy search with efficient instance caching
    */
-  private async performFuseSearch(
-    request: DualSearchRequest
-  ): Promise<SearchEngineResult> {
+  private async performFuseSearch(request: DualSearchRequest): Promise<SearchEngineResult> {
     const startTime = Date.now();
 
     try {
@@ -384,7 +378,7 @@ class IntelligentSearchService {
 
       // Perform fuzzy search with configurable limit
       const fuseResults = fuse.search(request.q, {
-        limit: request.limit || SEARCH_CONFIG.DEFAULT_LIMIT
+        limit: request.limit || SEARCH_CONFIG.DEFAULT_LIMIT,
       });
 
       // Transform Fuse results to standardized format
@@ -398,11 +392,10 @@ class IntelligentSearchService {
         metadata: {
           ...result.item,
           fuseScore: result.score,
-          matches: result.matches
+          matches: result.matches,
         },
-        highlights: request.highlightMatches !== false
-          ? this.generateHighlights(result.matches)
-          : []
+        highlights:
+          request.highlightMatches !== false ? this.generateHighlights(result.matches) : [],
       }));
 
       const searchTime = Date.now() - startTime;
@@ -413,14 +406,13 @@ class IntelligentSearchService {
         results,
         searchTime,
         totalCount: results.length,
-        quality
+        quality,
       };
-
     } catch (error) {
       logger.error('Fuse.js search failed', {
         query: request.q,
         type: request.type,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       return this.createEmptyEngineResult('fuse', startTime);
@@ -453,8 +445,9 @@ class IntelligentSearchService {
 
     // Cleanup old instances if we have too many
     if (this.fuseInstances.size >= 10) {
-      const oldestKey = Array.from(this.fuseInstances.entries())
-        .sort((a, b) => a[1].timestamp - b[1].timestamp)[0][0];
+      const oldestKey = Array.from(this.fuseInstances.entries()).sort(
+        (a, b) => a[1].timestamp - b[1].timestamp
+      )[0][0];
       this.fuseInstances.delete(oldestKey);
     }
 
@@ -479,7 +472,7 @@ class IntelligentSearchService {
     } catch (error) {
       logger.warn('Failed to fetch Fuse search data', {
         type,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return [];
     }
@@ -501,7 +494,7 @@ class IntelligentSearchService {
       limit = SEARCH_CONFIG.AUTOCOMPLETE_LIMIT,
       includeRecent = true,
       includePopular = true,
-      includeBillTitles = true
+      includeBillTitles = true,
     } = options;
 
     // Validate query length
@@ -514,7 +507,7 @@ class IntelligentSearchService {
       const [suggestionsResponse, recentResponse, popularResponse] = await Promise.allSettled([
         searchApiClient.getSuggestions(query, limit),
         includeRecent ? searchApiClient.getRecentSearches(5) : null,
-        includePopular ? searchApiClient.getPopularSearches(5) : null
+        includePopular ? searchApiClient.getPopularSearches(5) : null,
       ]);
 
       const suggestions: SearchSuggestion[] = [];
@@ -546,16 +539,15 @@ class IntelligentSearchService {
           categories: [],
           sponsors: [],
           tags: [],
-          statuses: []
+          statuses: [],
         },
         query,
-        totalSuggestions: uniqueSuggestions.length
+        totalSuggestions: uniqueSuggestions.length,
       };
-
     } catch (error) {
       logger.error('Autocomplete failed', {
         query,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       return this.createEmptyAutocompleteResult(query);
@@ -593,7 +585,7 @@ class IntelligentSearchService {
             term: item.query,
             type: 'recent',
             frequency: item.frequency || 1,
-            score: 0.8
+            score: 0.8,
           });
         }
       });
@@ -616,7 +608,7 @@ class IntelligentSearchService {
             term: item.query,
             type: 'popular',
             frequency: item.count || 1,
-            score: 0.9
+            score: 0.9,
           });
         }
       });
@@ -645,8 +637,8 @@ class IntelligentSearchService {
             id: result.item.id?.toString(),
             metadata: {
               bill_id: result.item.id,
-              description: result.item.summary
-            }
+              description: result.item.summary,
+            },
           });
         });
       }
@@ -663,10 +655,9 @@ class IntelligentSearchService {
     limit: number
   ): SearchSuggestion[] {
     return suggestions
-      .filter((suggestion, index, self) =>
-        index === self.findIndex(s =>
-          s.term.toLowerCase() === suggestion.term.toLowerCase()
-        )
+      .filter(
+        (suggestion, index, self) =>
+          index === self.findIndex(s => s.term.toLowerCase() === suggestion.term.toLowerCase())
       )
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, limit);
@@ -689,7 +680,7 @@ class IntelligentSearchService {
       const response = await searchApiClient.saveSearch({
         name: request.name,
         query: request.query,
-        is_public: request.isPublic || false
+        is_public: request.isPublic || false,
       });
 
       if (response.status !== 200 || !response.data) {
@@ -701,14 +692,14 @@ class IntelligentSearchService {
 
       logger.info('Search saved successfully', {
         name: request.name,
-        hasAlerts: !!request.emailAlerts?.enabled
+        hasAlerts: !!request.emailAlerts?.enabled,
       });
 
       return response.data;
     } catch (error) {
       logger.error('Failed to save search with alerts', {
         name: request.name,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -717,16 +708,18 @@ class IntelligentSearchService {
   /**
    * Get comprehensive search analytics and performance metrics
    */
-  async getSearchAnalytics(): Promise<SearchAnalytics & {
-    enginePerformance: {
-      postgresql: { avgTime: number; successRate: number };
-      fuse: { avgTime: number; successRate: number };
-    };
-    qualityMetrics: {
-      avgRelevanceScore: number;
-      userSatisfactionRate: number;
-    };
-  }> {
+  async getSearchAnalytics(): Promise<
+    SearchAnalytics & {
+      enginePerformance: {
+        postgresql: { avgTime: number; successRate: number };
+        fuse: { avgTime: number; successRate: number };
+      };
+      qualityMetrics: {
+        avgRelevanceScore: number;
+        userSatisfactionRate: number;
+      };
+    }
+  > {
     try {
       const response = await searchApiClient.getSearchAnalytics();
 
@@ -737,7 +730,7 @@ class IntelligentSearchService {
       return response.data;
     } catch (error) {
       logger.error('Failed to get search analytics', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -757,7 +750,7 @@ class IntelligentSearchService {
       filters: request.filters,
       sort: request.sort,
       enableFuzzy: request.enableFuzzy,
-      limit: request.limit
+      limit: request.limit,
     };
     return `search:${JSON.stringify(keyObject)}`;
   }
@@ -796,7 +789,7 @@ class IntelligentSearchService {
     this.searchCache.set(key, {
       data: result,
       timestamp: Date.now(),
-      hits: 0
+      hits: 0,
     });
   }
 
@@ -810,8 +803,10 @@ class IntelligentSearchService {
 
     // Find entry with oldest timestamp and fewest hits
     for (const [key, entry] of this.searchCache.entries()) {
-      if (entry.timestamp < oldestTime ||
-        (entry.timestamp === oldestTime && entry.hits < leastHits)) {
+      if (
+        entry.timestamp < oldestTime ||
+        (entry.timestamp === oldestTime && entry.hits < leastHits)
+      ) {
         oldestKey = key;
         oldestTime = entry.timestamp;
         leastHits = entry.hits;
@@ -872,12 +867,12 @@ class IntelligentSearchService {
     return {
       searchCache: {
         size: this.searchCache.size,
-        maxSize: CACHE_CONFIG.MAX_SIZE
+        maxSize: CACHE_CONFIG.MAX_SIZE,
       },
       fuseInstances: {
-        size: this.fuseInstances.size
+        size: this.fuseInstances.size,
       },
-      hitRate: totalEntries > 0 ? totalHits / totalEntries : 0
+      hitRate: totalEntries > 0 ? totalHits / totalEntries : 0,
     };
   }
 
@@ -895,15 +890,13 @@ class IntelligentSearchService {
     const hasHighRelevance = results.some(r => r.relevanceScore > 80);
     const queryLower = query.toLowerCase();
 
-    const queryTermsFound = results.some(r =>
-      r.title.toLowerCase().includes(queryLower) ||
-      r.content.toLowerCase().includes(queryLower)
+    const queryTermsFound = results.some(
+      r =>
+        r.title.toLowerCase().includes(queryLower) || r.content.toLowerCase().includes(queryLower)
     );
 
     // Weighted quality calculation
-    return (avgRelevance / 100) * 0.6 +
-      (hasHighRelevance ? 0.3 : 0) +
-      (queryTermsFound ? 0.1 : 0);
+    return (avgRelevance / 100) * 0.6 + (hasHighRelevance ? 0.3 : 0) + (queryTermsFound ? 0.1 : 0);
   }
 
   /**
@@ -911,9 +904,12 @@ class IntelligentSearchService {
    */
   private getResultType(type?: string): 'bill' | 'sponsor' | 'comment' {
     switch (type) {
-      case 'sponsors': return 'sponsor';
-      case 'comments': return 'comment';
-      default: return 'bill';
+      case 'sponsors':
+        return 'sponsor';
+      case 'comments':
+        return 'comment';
+      default:
+        return 'bill';
     }
   }
 
@@ -933,8 +929,7 @@ class IntelligentSearchService {
 
     // If query not found, return beginning of content
     if (index === -1) {
-      return content.substring(0, maxLength) +
-        (content.length > maxLength ? '...' : '');
+      return content.substring(0, maxLength) + (content.length > maxLength ? '...' : '');
     }
 
     // Extract excerpt around the query match
@@ -954,38 +949,40 @@ class IntelligentSearchService {
   private generateHighlights(matches: readonly any[] | undefined): SearchHighlight[] {
     if (!matches || matches.length === 0) return [];
 
-    return matches.map(match => {
-      if (!match.value || !match.indices) return null;
+    return matches
+      .map(match => {
+        if (!match.value || !match.indices) return null;
 
-      const { value, indices } = match;
-      let highlighted = value;
+        const { value, indices } = match;
+        let highlighted = value;
 
-      // Apply highlighting in reverse order to maintain correct positions
-      indices.slice().reverse().forEach(([start, end]: readonly [number, number]) => {
-        const before = highlighted.substring(0, start);
-        const matchText = highlighted.substring(start, end + 1);
-        const after = highlighted.substring(end + 1);
-        highlighted = `${before}<mark>${matchText}</mark>${after}`;
-      });
+        // Apply highlighting in reverse order to maintain correct positions
+        indices
+          .slice()
+          .reverse()
+          .forEach(([start, end]: readonly [number, number]) => {
+            const before = highlighted.substring(0, start);
+            const matchText = highlighted.substring(start, end + 1);
+            const after = highlighted.substring(end + 1);
+            highlighted = `${before}<mark>${matchText}</mark>${after}`;
+          });
 
-      return {
-        field: match.key || 'content',
-        snippet: highlighted,
-        positions: indices.map(([start, end]: readonly [number, number]) => ({
-          start,
-          end
-        }))
-      };
-    }).filter((h): h is SearchHighlight => h !== null);
+        return {
+          field: match.key || 'content',
+          snippet: highlighted,
+          positions: indices.map(([start, end]: readonly [number, number]) => ({
+            start,
+            end,
+          })),
+        };
+      })
+      .filter((h): h is SearchHighlight => h !== null);
   }
 
   /**
    * Generate intelligent search suggestions from results
    */
-  private async generateSuggestions(
-    query: string,
-    results: SearchResult[]
-  ): Promise<string[]> {
+  private async generateSuggestions(query: string, results: SearchResult[]): Promise<string[]> {
     const suggestions = new Set<string>();
     const queryLower = query.toLowerCase();
     const queryWords = new Set(queryLower.split(/\s+/));
@@ -999,9 +996,7 @@ class IntelligentSearchService {
         // - Longer than 3 characters
         // - Not already in the query
         // - Likely to be meaningful (simple heuristic)
-        if (word.length > 3 &&
-          !queryWords.has(word) &&
-          !this.isCommonStopWord(word)) {
+        if (word.length > 3 && !queryWords.has(word) && !this.isCommonStopWord(word)) {
           suggestions.add(word);
         }
       });
@@ -1015,9 +1010,27 @@ class IntelligentSearchService {
    */
   private isCommonStopWord(word: string): boolean {
     const stopWords = new Set([
-      'the', 'and', 'for', 'that', 'this', 'with', 'from', 'have',
-      'been', 'will', 'would', 'could', 'should', 'about', 'their',
-      'there', 'which', 'when', 'where', 'while', 'what'
+      'the',
+      'and',
+      'for',
+      'that',
+      'this',
+      'with',
+      'from',
+      'have',
+      'been',
+      'will',
+      'would',
+      'could',
+      'should',
+      'about',
+      'their',
+      'there',
+      'which',
+      'when',
+      'where',
+      'while',
+      'what',
     ]);
     return stopWords.has(word.toLowerCase());
   }
@@ -1029,7 +1042,7 @@ class IntelligentSearchService {
     const facets: SearchFacets = {
       types: {},
       categories: {},
-      statuses: {}
+      statuses: {},
     };
 
     results.forEach(result => {
@@ -1065,8 +1078,8 @@ class IntelligentSearchService {
       facets: {
         types: {},
         categories: {},
-        statuses: {}
-      }
+        statuses: {},
+      },
     };
   }
 
@@ -1082,7 +1095,7 @@ class IntelligentSearchService {
       results: [],
       searchTime: Date.now() - startTime,
       totalCount: 0,
-      quality: 0
+      quality: 0,
     };
   }
 
@@ -1096,10 +1109,10 @@ class IntelligentSearchService {
         categories: [],
         sponsors: [],
         tags: [],
-        statuses: []
+        statuses: [],
       },
       query,
-      totalSuggestions: 0
+      totalSuggestions: 0,
     };
   }
 

@@ -22,6 +22,7 @@
     "noImplicitThis": true,
     "skipLibCheck": true,
     "allowJs": true,
+    "ignoreDeprecations": "6.0",
 
     // Emit
     "noEmit": true,

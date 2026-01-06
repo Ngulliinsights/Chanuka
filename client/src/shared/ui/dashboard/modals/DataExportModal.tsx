@@ -4,7 +4,6 @@
  * Allows users to export their personal data for GDPR compliance.
  */
 
-import React from 'react';
 import {
   Download,
   FileText,
@@ -12,8 +11,9 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Info
+  Info,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Button } from '@/shared/design-system/interactive/Button';
@@ -36,25 +36,20 @@ import {
 import { Label } from '@/shared/design-system/typography/Label';
 import { DataExportRequest } from '@/shared/types/user-dashboard';
 
-
 interface DataExportModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onExport: (request: DataExportRequest) => Promise<string>;
 }
 
-export function DataExportModal({
-  open,
-  onOpenChange,
-  onExport
-}: DataExportModalProps) {
+export function DataExportModal({ open, onOpenChange, onExport }: DataExportModalProps) {
   const [exportRequest, setExportRequest] = useState<DataExportRequest>({
     format: 'json',
     includePersonalData: true,
     includeActivityHistory: true,
     includeMetrics: true,
     includeComments: true,
-    dateRange: undefined
+    dateRange: undefined,
   });
 
   const [isExporting, setIsExporting] = useState(false);
@@ -73,50 +68,50 @@ export function DataExportModal({
       value: 'json' as const,
       label: 'JSON',
       description: 'Machine-readable format, good for developers',
-      icon: <Database className="h-4 w-4" />
+      icon: <Database className="h-4 w-4" />,
     },
     {
       value: 'csv' as const,
       label: 'CSV',
       description: 'Spreadsheet format, good for analysis',
-      icon: <FileText className="h-4 w-4" />
+      icon: <FileText className="h-4 w-4" />,
     },
     {
       value: 'pdf' as const,
       label: 'PDF',
       description: 'Human-readable format, good for records',
-      icon: <FileText className="h-4 w-4" />
-    }
+      icon: <FileText className="h-4 w-4" />,
+    },
   ];
 
   const dataCategories = [
     {
       key: 'includePersonalData' as const,
       title: 'Personal Information',
-      description: 'Name, email, profile data, preferences'
+      description: 'Name, email, profile data, preferences',
     },
     {
       key: 'includeActivityHistory' as const,
       title: 'Activity History',
-      description: 'Views, comments, shares, votes, and engagement timeline'
+      description: 'Views, comments, shares, votes, and engagement timeline',
     },
     {
       key: 'includeMetrics' as const,
       title: 'Civic Metrics',
-      description: 'Engagement scores, achievements, and impact measurements'
+      description: 'Engagement scores, achievements, and impact measurements',
     },
     {
       key: 'includeComments' as const,
       title: 'Comments & Contributions',
-      description: 'All comments, expert contributions, and discussion posts'
-    }
+      description: 'All comments, expert contributions, and discussion posts',
+    },
   ];
 
   const handleCategoryToggle = (key: keyof DataExportRequest) => {
     if (typeof exportRequest[key] === 'boolean') {
       setExportRequest(prev => ({
         ...prev,
-        [key]: !prev[key]
+        [key]: !prev[key],
       }));
     }
   };
@@ -138,7 +133,7 @@ export function DataExportModal({
     if (useDateRange && startDate && endDate) {
       setExportRequest(prev => ({
         ...prev,
-        dateRange: { start: startDate, end: endDate }
+        dateRange: { start: startDate, end: endDate },
       }));
     }
   };
@@ -151,9 +146,8 @@ export function DataExportModal({
       // Update date range if needed
       const finalRequest = {
         ...exportRequest,
-        dateRange: useDateRange && startDate && endDate
-          ? { start: startDate, end: endDate }
-          : undefined
+        dateRange:
+          useDateRange && startDate && endDate ? { start: startDate, end: endDate } : undefined,
       };
 
       const exportId = await onExport(finalRequest);
@@ -161,21 +155,24 @@ export function DataExportModal({
       setExportResult({
         success: true,
         message: 'Export completed successfully! Your download will begin shortly.',
-        downloadId: exportId
+        downloadId: exportId,
       });
 
       // In a real implementation, this would trigger a download
       setTimeout(() => {
-        setExportResult(prev => prev ? {
-          ...prev,
-          message: 'Download ready. Check your downloads folder.'
-        } : null);
+        setExportResult(prev =>
+          prev
+            ? {
+                ...prev,
+                message: 'Download ready. Check your downloads folder.',
+              }
+            : null
+        );
       }, 2000);
-
     } catch (error) {
       setExportResult({
         success: false,
-        message: error instanceof Error ? error.message : 'Export failed. Please try again.'
+        message: error instanceof Error ? error.message : 'Export failed. Please try again.',
       });
     } finally {
       setIsExporting(false);
@@ -204,25 +201,29 @@ export function DataExportModal({
         <div className="space-y-6">
           {/* Export Result */}
           {exportResult && (
-            <div className={`p-4 rounded-lg flex items-start gap-3 ${
-              exportResult.success
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-red-50 border border-red-200'
-            }`}>
+            <div
+              className={`p-4 rounded-lg flex items-start gap-3 ${
+                exportResult.success
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-red-50 border border-red-200'
+              }`}
+            >
               {exportResult.success ? (
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
               ) : (
                 <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
               )}
               <div>
-                <p className={`font-medium ${
-                  exportResult.success ? 'text-green-800' : 'text-red-800'
-                }`}>
+                <p
+                  className={`font-medium ${
+                    exportResult.success ? 'text-green-800' : 'text-red-800'
+                  }`}
+                >
                   {exportResult.success ? 'Export Successful' : 'Export Failed'}
                 </p>
-                <p className={`text-sm ${
-                  exportResult.success ? 'text-green-700' : 'text-red-700'
-                }`}>
+                <p
+                  className={`text-sm ${exportResult.success ? 'text-green-700' : 'text-red-700'}`}
+                >
                   {exportResult.message}
                 </p>
               </div>
@@ -238,23 +239,18 @@ export function DataExportModal({
               </p>
             </div>
 
-            <Select
-              value={exportRequest.format}
-              onValueChange={handleFormatChange}
-            >
+            <Select value={exportRequest.format} onValueChange={handleFormatChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {formatOptions.map((option) => (
+                {formatOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex items-center gap-2">
                       {option.icon}
                       <div>
                         <div className="font-medium">{option.label}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {option.description}
-                        </div>
+                        <div className="text-xs text-muted-foreground">{option.description}</div>
                       </div>
                     </div>
                   </SelectItem>
@@ -273,7 +269,7 @@ export function DataExportModal({
             </div>
 
             <div className="space-y-3">
-              {dataCategories.map((category) => (
+              {dataCategories.map(category => (
                 <div
                   key={category.key}
                   className="flex items-start space-x-3 p-3 border rounded-lg"
@@ -287,9 +283,7 @@ export function DataExportModal({
                     <Label htmlFor={category.key} className="font-medium">
                       {category.title}
                     </Label>
-                    <p className="text-sm text-muted-foreground">
-                      {category.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{category.description}</p>
                   </div>
                 </div>
               ))}
@@ -318,24 +312,28 @@ export function DataExportModal({
               <div className="ml-6 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="start-date" className="text-sm">Start Date</Label>
+                    <Label htmlFor="start-date" className="text-sm">
+                      Start Date
+                    </Label>
                     <Input
                       id="start-date"
                       type="date"
                       value={startDate}
-                      onChange={(e) => {
+                      onChange={e => {
                         setStartDate(e.target.value);
                         handleDateChange();
                       }}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="end-date" className="text-sm">End Date</Label>
+                    <Label htmlFor="end-date" className="text-sm">
+                      End Date
+                    </Label>
                     <Input
                       id="end-date"
                       type="date"
                       value={endDate}
-                      onChange={(e) => {
+                      onChange={e => {
                         setEndDate(e.target.value);
                         handleDateChange();
                       }}
@@ -364,17 +362,10 @@ export function DataExportModal({
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isExporting}
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
               Cancel
             </Button>
-            <Button
-              onClick={handleExport}
-              disabled={!canExport || isExporting}
-            >
+            <Button onClick={handleExport} disabled={!canExport || isExporting}>
               {isExporting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -1,6 +1,6 @@
 /**
  * Realtime Hook
- * 
+ *
  * Dedicated hook for real-time WebSocket functionality,
  * can be used independently or as part of unified community hooks.
  */
@@ -23,7 +23,7 @@ interface UseRealtimeReturn {
   leaveRoom: (room: string) => void;
   emit: <K extends keyof WebSocketEvents>(event: K, data: WebSocketEvents[K]) => void;
   on: <K extends keyof WebSocketEvents>(
-    event: K, 
+    event: K,
     handler: (data: WebSocketEvents[K]) => void
   ) => () => void;
 }
@@ -38,17 +38,20 @@ export function useRealtime({
   // Connect on mount if autoConnect is enabled
   useEffect(() => {
     if (autoConnect) {
-      wsManager.connect().then(() => {
-        setIsConnected(true);
-        
-        // Join initial rooms
-        rooms.forEach(room => {
-          wsManager.joinRoom(room);
+      wsManager
+        .connect()
+        .then(() => {
+          setIsConnected(true);
+
+          // Join initial rooms
+          rooms.forEach(room => {
+            wsManager.joinRoom(room);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to connect to WebSocket:', error);
+          setIsConnected(false);
         });
-      }).catch(error => {
-        console.error('Failed to connect to WebSocket:', error);
-        setIsConnected(false);
-      });
     }
 
     // Set up connection status monitoring
@@ -82,27 +85,33 @@ export function useRealtime({
     setIsConnected(false);
   }, [wsManager]);
 
-  const joinRoom = useCallback((room: string) => {
-    wsManager.joinRoom(room);
-  }, [wsManager]);
+  const joinRoom = useCallback(
+    (room: string) => {
+      wsManager.joinRoom(room);
+    },
+    [wsManager]
+  );
 
-  const leaveRoom = useCallback((room: string) => {
-    wsManager.leaveRoom(room);
-  }, [wsManager]);
+  const leaveRoom = useCallback(
+    (room: string) => {
+      wsManager.leaveRoom(room);
+    },
+    [wsManager]
+  );
 
-  const emit = useCallback(<K extends keyof WebSocketEvents>(
-    event: K, 
-    data: WebSocketEvents[K]
-  ) => {
-    wsManager.emit(event, data);
-  }, [wsManager]);
+  const emit = useCallback(
+    <K extends keyof WebSocketEvents>(event: K, data: WebSocketEvents[K]) => {
+      wsManager.emit(event, data);
+    },
+    [wsManager]
+  );
 
-  const on = useCallback(<K extends keyof WebSocketEvents>(
-    event: K, 
-    handler: (data: WebSocketEvents[K]) => void
-  ) => {
-    return wsManager.on(event, handler);
-  }, [wsManager]);
+  const on = useCallback(
+    <K extends keyof WebSocketEvents>(event: K, handler: (data: WebSocketEvents[K]) => void) => {
+      return wsManager.on(event, handler);
+    },
+    [wsManager]
+  );
 
   return {
     isConnected,

@@ -150,7 +150,11 @@ export interface IDataAccessLayer {
 // ============================================================================
 
 class MockDataAccessLayer implements IDataAccessLayer {
-  async queryExpiredRecords(category: DataCategory, expiryDate: Date, limit: number): Promise<string[]> {
+  async queryExpiredRecords(
+    category: DataCategory,
+    expiryDate: Date,
+    limit: number
+  ): Promise<string[]> {
     // Simulate database query
     const count = Math.floor(Math.random() * limit);
     return Array.from({ length: count }, () => crypto.randomUUID());
@@ -162,7 +166,11 @@ class MockDataAccessLayer implements IDataAccessLayer {
     return recordIds.length;
   }
 
-  async createBackup(category: DataCategory, recordIds: string[], encrypted: boolean): Promise<string> {
+  async createBackup(
+    category: DataCategory,
+    recordIds: string[],
+    encrypted: boolean
+  ): Promise<string> {
     // Simulate backup creation
     await this.delay(200);
     return `backup_${category}_${Date.now()}`;
@@ -180,7 +188,8 @@ class MockDataAccessLayer implements IDataAccessLayer {
       canDelete: Math.random() > 0.5,
       retentionExpiry: new Date(oldestDate.getTime() + 365 * 24 * 60 * 60 * 1000),
       hasExceptions: Math.random() > 0.8,
-      lastCleanup: Math.random() > 0.5 ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) : undefined
+      lastCleanup:
+        Math.random() > 0.5 ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) : undefined,
     };
   }
 
@@ -208,10 +217,7 @@ export class DataRetentionService {
   private readonly dataAccess: IDataAccessLayer;
   private jobExecutionLock = false;
 
-  constructor(
-    dataAccess?: IDataAccessLayer,
-    customPolicies?: RetentionPolicy[]
-  ) {
+  constructor(dataAccess?: IDataAccessLayer, customPolicies?: RetentionPolicy[]) {
     this.dataAccess = dataAccess ?? new MockDataAccessLayer();
     this.initializeDefaultPolicies();
 
@@ -242,7 +248,7 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR', 'CCPA', 'KDPA'],
         notifyBeforeDeletion: true,
-        notificationPeriod: 30
+        notificationPeriod: 30,
       },
       {
         id: 'activity-data',
@@ -260,7 +266,7 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR'],
         notifyBeforeDeletion: false,
-        notificationPeriod: 0
+        notificationPeriod: 0,
       },
       {
         id: 'analytics-data',
@@ -278,7 +284,7 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR', 'CCPA'],
         notifyBeforeDeletion: false,
-        notificationPeriod: 0
+        notificationPeriod: 0,
       },
       {
         id: 'security-logs',
@@ -296,7 +302,7 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR', 'CCPA', 'PIPEDA'],
         notifyBeforeDeletion: false,
-        notificationPeriod: 0
+        notificationPeriod: 0,
       },
       {
         id: 'communications',
@@ -314,7 +320,7 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR', 'CCPA'],
         notifyBeforeDeletion: true,
-        notificationPeriod: 7
+        notificationPeriod: 7,
       },
       {
         id: 'temporary-data',
@@ -332,8 +338,8 @@ export class DataRetentionService {
         enabled: true,
         complianceFrameworks: ['GDPR'],
         notifyBeforeDeletion: false,
-        notificationPeriod: 0
-      }
+        notificationPeriod: 0,
+      },
     ];
 
     defaultPolicies.forEach(policy => this.policies.set(policy.id, policy));
@@ -359,7 +365,7 @@ export class DataRetentionService {
     logger.info('Policy updated', {
       component: 'DataRetentionService',
       policyId,
-      changes: updates
+      changes: updates,
     });
   }
 
@@ -380,9 +386,9 @@ export class DataRetentionService {
   }
 
   getPolicyForCategory(category: DataCategory): RetentionPolicy | null {
-    return Array.from(this.policies.values()).find(
-      policy => policy.dataCategory === category
-    ) ?? null;
+    return (
+      Array.from(this.policies.values()).find(policy => policy.dataCategory === category) ?? null
+    );
   }
 
   // ============================================================================
@@ -435,7 +441,8 @@ export class DataRetentionService {
     dryRun?: boolean;
     delay?: number; // hours
   }): Promise<DataCleanupJob[]> {
-    const categories = options?.categories ??
+    const categories =
+      options?.categories ??
       Array.from(this.policies.values())
         .filter(p => p.autoDelete && p.enabled)
         .map(p => p.dataCategory);
@@ -457,7 +464,7 @@ export class DataRetentionService {
         recordsProcessed: 0,
         dryRun: options?.dryRun ?? false,
         retryCount: 0,
-        maxRetries: 3
+        maxRetries: 3,
       };
 
       this.jobs.set(job.id, job);
@@ -468,7 +475,7 @@ export class DataRetentionService {
         category,
         recordCount: 0,
         success: true,
-        metadata: { jobId: job.id, scheduledFor }
+        metadata: { jobId: job.id, scheduledFor },
       });
 
       logger.info('Data cleanup job scheduled', {
@@ -477,7 +484,7 @@ export class DataRetentionService {
         policyId: policy.id,
         category,
         scheduledFor,
-        dryRun: job.dryRun
+        dryRun: job.dryRun,
       });
     }
 
@@ -513,7 +520,7 @@ export class DataRetentionService {
         component: 'DataRetentionService',
         category,
         dryRun: options?.dryRun ?? false,
-        policyId: policy.id
+        policyId: policy.id,
       });
 
       const result: CleanupResult = {
@@ -524,7 +531,7 @@ export class DataRetentionService {
         warnings: [],
         backupCreated: false,
         executionTime: 0,
-        batchesProcessed: 0
+        batchesProcessed: 0,
       };
 
       // Calculate expiry date
@@ -591,14 +598,14 @@ export class DataRetentionService {
           recordsFound: result.recordsFound,
           batchesProcessed: result.batchesProcessed,
           executionTime: result.executionTime,
-          backupId: result.backupId
-        }
+          backupId: result.backupId,
+        },
       });
 
       logger.info('Data cleanup completed', {
         component: 'DataRetentionService',
         category,
-        ...result
+        ...result,
       });
 
       return result;
@@ -609,7 +616,7 @@ export class DataRetentionService {
         component: 'DataRetentionService',
         category,
         error,
-        executionTime
+        executionTime,
       });
 
       return {
@@ -620,7 +627,7 @@ export class DataRetentionService {
         warnings: [],
         backupCreated: false,
         executionTime,
-        batchesProcessed: 0
+        batchesProcessed: 0,
       };
     } finally {
       this.jobExecutionLock = false;
@@ -652,7 +659,7 @@ export class DataRetentionService {
 
     try {
       const result = await this.executeDataCleanup(policy.dataCategory, {
-        dryRun: job.dryRun
+        dryRun: job.dryRun,
       });
 
       job.status = result.success ? 'completed' : 'failed';
@@ -709,7 +716,7 @@ export class DataRetentionService {
       retentionStatus,
       complianceScore: complianceResult.score,
       lastValidated: new Date(),
-      pendingDeletions
+      pendingDeletions,
     };
   }
 
@@ -740,11 +747,16 @@ export class DataRetentionService {
     const recommendations: string[] = [];
     const now = new Date();
 
-    for (const [category, data] of Object.entries(summary.categories) as [DataCategory, CategoryData][]) {
+    for (const [category, data] of Object.entries(summary.categories) as [
+      DataCategory,
+      CategoryData,
+    ][]) {
       const policy = this.getPolicyForCategory(category);
       if (!policy) continue;
 
-      const daysOverdue = Math.floor((now.getTime() - data.retentionExpiry.getTime()) / (24 * 60 * 60 * 1000));
+      const daysOverdue = Math.floor(
+        (now.getTime() - data.retentionExpiry.getTime()) / (24 * 60 * 60 * 1000)
+      );
 
       if (daysOverdue > 0) {
         const severity = daysOverdue > 90 ? 'critical' : daysOverdue > 30 ? 'high' : 'medium';
@@ -756,7 +768,7 @@ export class DataRetentionService {
           remediation: policy.autoDelete
             ? `Schedule automatic cleanup for ${category}`
             : `Manually review and delete ${category} data`,
-          deadline: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+          deadline: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
         });
 
         if (policy.autoDelete) {
@@ -766,7 +778,9 @@ export class DataRetentionService {
 
       // Large dataset warning
       if (data.sizeBytes > 50 * 1024 * 1024) {
-        recommendations.push(`Consider archiving large ${policy.name} dataset (${this.formatFileSize(data.sizeBytes)})`);
+        recommendations.push(
+          `Consider archiving large ${policy.name} dataset (${this.formatFileSize(data.sizeBytes)})`
+        );
       }
     }
 
@@ -779,7 +793,7 @@ export class DataRetentionService {
       issues,
       recommendations,
       lastAudit: now,
-      nextAudit
+      nextAudit,
     };
   }
 
@@ -790,7 +804,7 @@ export class DataRetentionService {
       low: 5,
       medium: 15,
       high: 30,
-      critical: 50
+      critical: 50,
     };
 
     const totalDeductions = issues.reduce((sum, issue) => {
@@ -827,15 +841,19 @@ export class DataRetentionService {
     const enabledPolicies = policies.filter(p => p.enabled);
     const autoDeletePolicies = enabledPolicies.filter(p => p.autoDelete);
 
-    const averageRetentionDays = policies.reduce((sum, p) => sum + p.retentionPeriod, 0) / policies.length;
+    const averageRetentionDays =
+      policies.reduce((sum, p) => sum + p.retentionPeriod, 0) / policies.length;
 
     const frameworks = new Set<ComplianceFramework>();
     policies.forEach(p => p.complianceFrameworks.forEach(f => frameworks.add(f)));
 
-    const jobStats = Array.from(this.jobs.values()).reduce((acc, job) => {
-      acc[job.status]++;
-      return acc;
-    }, { pending: 0, running: 0, completed: 0, failed: 0, cancelled: 0 } as Record<JobStatus, number>);
+    const jobStats = Array.from(this.jobs.values()).reduce(
+      (acc, job) => {
+        acc[job.status]++;
+        return acc;
+      },
+      { pending: 0, running: 0, completed: 0, failed: 0, cancelled: 0 } as Record<JobStatus, number>
+    );
 
     return {
       policies,
@@ -845,13 +863,13 @@ export class DataRetentionService {
         autoDeletePolicies: autoDeletePolicies.length,
         averageRetentionDays: Math.round(averageRetentionDays),
         complianceFrameworks: Array.from(frameworks),
-        totalCategories: new Set(policies.map(p => p.dataCategory)).size
+        totalCategories: new Set(policies.map(p => p.dataCategory)).size,
       },
       jobs: {
         total: this.jobs.size,
-        ...jobStats
+        ...jobStats,
       },
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
   }
 
@@ -903,7 +921,7 @@ export const retentionUtils = {
       compliant: 'text-green-600',
       overdue: 'text-red-600',
       pending_deletion: 'text-yellow-600',
-      archived: 'text-blue-600'
+      archived: 'text-blue-600',
     };
     return colors[status] ?? 'text-gray-600';
   },
@@ -913,7 +931,7 @@ export const retentionUtils = {
       low: 'text-blue-600',
       medium: 'text-yellow-600',
       high: 'text-orange-600',
-      critical: 'text-red-600'
+      critical: 'text-red-600',
     };
     return colors[severity];
   },
@@ -938,5 +956,5 @@ export const retentionUtils = {
     if (estimatedMinutes < 1) return 'Less than 1 minute';
     if (estimatedMinutes < 60) return `~${Math.round(estimatedMinutes)} minutes`;
     return `~${Math.round(estimatedMinutes / 60)} hours`;
-  }
+  },
 };

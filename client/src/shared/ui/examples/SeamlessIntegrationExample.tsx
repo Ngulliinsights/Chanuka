@@ -6,8 +6,8 @@
  */
 
 import { useState } from 'react';
-
 import React from 'react';
+
 import {
   useValidation,
   useFormatting,
@@ -16,7 +16,7 @@ import {
   useCivic,
   useAnonymity,
   useProgressiveEnhancement,
-  useIntegrationStatus
+  useIntegrationStatus,
 } from '@/hooks/useSeamlessIntegration';
 
 interface ExampleFormData {
@@ -33,7 +33,7 @@ export function SeamlessIntegrationExample() {
     phone: '',
     billNumber: '',
     amount: 0,
-    title: ''
+    title: '',
   });
 
   // Use seamless integration hooks
@@ -81,9 +81,7 @@ export function SeamlessIntegrationExample() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          Seamless Integration Example
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Seamless Integration Example</h1>
 
         {/* Integration Status */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -91,23 +89,31 @@ export function SeamlessIntegrationExample() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <span className="font-medium">Enhancement Level:</span>
-              <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                enhancementLevel === 'enhanced' ? 'bg-green-100 text-green-800' :
-                enhancementLevel === 'basic' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
+              <span
+                className={`ml-2 px-2 py-1 rounded text-xs ${
+                  enhancementLevel === 'enhanced'
+                    ? 'bg-green-100 text-green-800'
+                    : enhancementLevel === 'basic'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}
+              >
                 {enhancementLevel}
               </span>
             </div>
             <div>
               <span className="font-medium">Shared Modules:</span>
-              <span className={`ml-2 ${diagnostics.canUseSharedModules ? 'text-green-600' : 'text-yellow-600'}`}>
+              <span
+                className={`ml-2 ${diagnostics.canUseSharedModules ? 'text-green-600' : 'text-yellow-600'}`}
+              >
                 {diagnostics.canUseSharedModules ? 'Available' : 'Fallback Mode'}
               </span>
             </div>
             <div>
               <span className="font-medium">Health:</span>
-              <span className={`ml-2 ${diagnostics.integrationHealth === 'healthy' ? 'text-green-600' : 'text-red-600'}`}>
+              <span
+                className={`ml-2 ${diagnostics.integrationHealth === 'healthy' ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {diagnostics.integrationHealth}
               </span>
             </div>
@@ -120,13 +126,11 @@ export function SeamlessIntegrationExample() {
             <h2 className="text-lg font-semibold mb-4">Form with Validation</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={e => handleInputChange('email', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-md ${
                     formData.email && !isEmailValid ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -144,7 +148,7 @@ export function SeamlessIntegrationExample() {
                 <input
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={e => handleInputChange('phone', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-md ${
                     formData.phone && !isPhoneValid ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -156,13 +160,11 @@ export function SeamlessIntegrationExample() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Bill Number
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bill Number</label>
                 <input
                   type="text"
                   value={formData.billNumber}
-                  onChange={(e) => handleInputChange('billNumber', e.target.value)}
+                  onChange={e => handleInputChange('billNumber', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-md ${
                     formData.billNumber && !isBillNumberValid ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -174,29 +176,23 @@ export function SeamlessIntegrationExample() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount (KES)
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (KES)</label>
                 <input
                   type="number"
                   value={formData.amount}
-                  onChange={(e) => handleInputChange('amount', parseFloat(e.target.value) || 0)}
+                  onChange={e => handleInputChange('amount', parseFloat(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   placeholder="0"
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  Formatted: {formattedAmount}
-                </p>
+                <p className="text-sm text-gray-500 mt-1">Formatted: {formattedAmount}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={e => handleInputChange('title', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   placeholder="Enter a title"
                 />

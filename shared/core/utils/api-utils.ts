@@ -4,6 +4,7 @@
  */
 
 import { Response } from 'express';
+
 import { logger } from '../observability/logging';
 
 export interface ApiResponse<T = unknown> {

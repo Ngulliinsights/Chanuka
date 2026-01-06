@@ -1,8 +1,8 @@
 import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lucide-react';
 import React from 'react';
 
-import type { Bill } from '@client/shared/types';
 import { Badge } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 interface BillHeaderProps {
   bill: Bill;

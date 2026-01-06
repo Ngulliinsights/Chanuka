@@ -1,6 +1,6 @@
 /**
  * Engagement Types
- * 
+ *
  * Type definitions for user engagement and interaction metrics
  */
 
@@ -13,7 +13,7 @@ export enum EngagementType {
   SAVE = 'save',
   SHARE = 'share',
   COMMENT = 'comment',
-  VOTE = 'vote'
+  VOTE = 'vote',
 }
 
 export interface EngagementMetrics {

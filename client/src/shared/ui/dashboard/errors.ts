@@ -22,7 +22,7 @@ export enum DashboardErrorType {
   DASHBOARD_VALIDATION_ERROR = 'DASHBOARD_VALIDATION_ERROR',
   DASHBOARD_CONFIGURATION_ERROR = 'DASHBOARD_CONFIGURATION_ERROR',
   DASHBOARD_ACTION_ERROR = 'DASHBOARD_ACTION_ERROR',
-  DASHBOARD_TOPIC_ERROR = 'DASHBOARD_TOPIC_ERROR'
+  DASHBOARD_TOPIC_ERROR = 'DASHBOARD_TOPIC_ERROR',
 }
 
 // ============================================================================
@@ -77,7 +77,7 @@ export class DashboardDataFetchError extends DashboardError {
       value: true,
       writable: false,
       enumerable: true,
-      configurable: false
+      configurable: false,
     });
   }
 }
@@ -85,47 +85,40 @@ export class DashboardDataFetchError extends DashboardError {
 export class DashboardValidationError extends DashboardError {
   constructor(message: string, field: string, value: unknown, details?: Record<string, unknown>) {
     const errorDetails = { field, value, ...details };
-    super(
-      message,
-      DashboardErrorType.DASHBOARD_VALIDATION_ERROR,
-      422,
-      errorDetails,
-      { operation: 'validation', field }
-    );
+    super(message, DashboardErrorType.DASHBOARD_VALIDATION_ERROR, 422, errorDetails, {
+      operation: 'validation',
+      field,
+    });
 
     // Override properties using Object.defineProperty
     Object.defineProperty(this, 'type', {
       value: ErrorDomain.VALIDATION,
       writable: false,
       enumerable: true,
-      configurable: false
+      configurable: false,
     });
 
     Object.defineProperty(this, 'severity', {
       value: ErrorSeverity.LOW,
       writable: false,
       enumerable: true,
-      configurable: false
+      configurable: false,
     });
   }
 }
 
 export class DashboardConfigurationError extends DashboardError {
   constructor(message: string, details?: Record<string, unknown>) {
-    super(
-      message,
-      DashboardErrorType.DASHBOARD_CONFIGURATION_ERROR,
-      500,
-      details,
-      { operation: 'configuration' }
-    );
+    super(message, DashboardErrorType.DASHBOARD_CONFIGURATION_ERROR, 500, details, {
+      operation: 'configuration',
+    });
 
     // Override severity using Object.defineProperty
     Object.defineProperty(this, 'severity', {
       value: ErrorSeverity.HIGH,
       writable: false,
       enumerable: true,
-      configurable: false
+      configurable: false,
     });
   }
 }
@@ -143,7 +136,12 @@ export class DashboardActionError extends DashboardError {
 }
 
 export class DashboardTopicError extends DashboardError {
-  constructor(operation: string, topicId?: string, reason?: string, details?: Record<string, unknown>) {
+  constructor(
+    operation: string,
+    topicId?: string,
+    reason?: string,
+    details?: Record<string, unknown>
+  ) {
     super(
       `Topic ${operation} failed${topicId ? ` for topic ${topicId}` : ''}${reason ? `: ${reason}` : ''}`,
       DashboardErrorType.DASHBOARD_TOPIC_ERROR,
@@ -164,23 +162,18 @@ export const createDashboardError = (
   details?: Record<string, unknown>,
   context?: ErrorContext
 ): AppError => {
-  return createError(
-    ErrorDomain.BUSINESS_LOGIC,
-    ErrorSeverity.MEDIUM,
-    message,
-    {
-      details: {
-        dashboardErrorType: type,
-        ...details,
-      },
-      context: {
-        component: 'Dashboard',
-        ...context,
-      },
-      recoverable: true,
-      retryable: type === DashboardErrorType.DASHBOARD_DATA_FETCH_ERROR,
-    }
-  );
+  return createError(ErrorDomain.BUSINESS_LOGIC, ErrorSeverity.MEDIUM, message, {
+    details: {
+      dashboardErrorType: type,
+      ...details,
+    },
+    context: {
+      component: 'Dashboard',
+      ...context,
+    },
+    recoverable: true,
+    retryable: type === DashboardErrorType.DASHBOARD_DATA_FETCH_ERROR,
+  });
 };
 
 export const createDashboardDataFetchError = (
@@ -216,25 +209,19 @@ export const createDashboardValidationError = (
   value: unknown,
   details?: Record<string, unknown>
 ): AppError => {
-  return createError(
-    ErrorDomain.VALIDATION,
-    ErrorSeverity.LOW,
-    message,
-    {
-      details: {
-        field,
-        value,
-        dashboardErrorType: DashboardErrorType.DASHBOARD_VALIDATION_ERROR,
-        ...details,
-      },
-      context: {
-        component: 'Dashboard',
-        operation: 'validation',
-        field,
-      },
-      recoverable: false,
-      retryable: false,
-    }
-  );
+  return createError(ErrorDomain.VALIDATION, ErrorSeverity.LOW, message, {
+    details: {
+      field,
+      value,
+      dashboardErrorType: DashboardErrorType.DASHBOARD_VALIDATION_ERROR,
+      ...details,
+    },
+    context: {
+      component: 'Dashboard',
+      operation: 'validation',
+      field,
+    },
+    recoverable: false,
+    retryable: false,
+  });
 };
-

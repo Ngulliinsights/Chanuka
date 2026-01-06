@@ -10,7 +10,12 @@ This directory contains practical examples of using the unified loading states m
 import { useLoadingOperation } from '@core/loading';
 
 function UserProfile({ userId }: { userId: string }) {
-  const { data: user, isLoading, error, execute } = useLoadingOperation('fetch-user', {
+  const {
+    data: user,
+    isLoading,
+    error,
+    execute,
+  } = useLoadingOperation('fetch-user', {
     timeout: 10000,
     retryLimit: 2,
   });
@@ -40,17 +45,12 @@ function UserProfile({ userId }: { userId: string }) {
 import { useProgressiveLoading } from '@core/loading';
 
 function FileUploadComponent() {
-  const {
-    currentStage,
-    progress,
-    start,
-    completeCurrentStage,
-    failCurrentStage
-  } = useProgressiveLoading([
-    { id: 'validate', message: 'Validating file...', duration: 2000 },
-    { id: 'upload', message: 'Uploading...', duration: 30000 },
-    { id: 'process', message: 'Processing...', duration: 10000 },
-  ]);
+  const { currentStage, progress, start, completeCurrentStage, failCurrentStage } =
+    useProgressiveLoading([
+      { id: 'validate', message: 'Validating file...', duration: 2000 },
+      { id: 'upload', message: 'Uploading...', duration: 30000 },
+      { id: 'process', message: 'Processing...', duration: 10000 },
+    ]);
 
   const handleUpload = async (file: File) => {
     start();
@@ -61,7 +61,7 @@ function FileUploadComponent() {
       completeCurrentStage();
 
       // Upload stage with progress
-      const result = await uploadFile(file, (progress) => {
+      const result = await uploadFile(file, progress => {
         // Update progress if needed
       });
       completeCurrentStage();
@@ -69,7 +69,6 @@ function FileUploadComponent() {
       // Processing stage
       await processFile(result.id);
       completeCurrentStage();
-
     } catch (error) {
       failCurrentStage(error);
     }
@@ -77,7 +76,7 @@ function FileUploadComponent() {
 
   return (
     <div>
-      <input type="file" onChange={(e) => handleUpload(e.target.files[0])} />
+      <input type="file" onChange={e => handleUpload(e.target.files[0])} />
       {currentStage && (
         <div>
           <p>{currentStage.message}</p>
@@ -132,9 +131,7 @@ function App() {
     <div>
       <GlobalLoadingIndicator />
       {isLoading && (
-        <div className="loading-banner">
-          {operationCount} operations in progress...
-        </div>
+        <div className="loading-banner">{operationCount} operations in progress...</div>
       )}
       {/* App content */}
     </div>
@@ -174,17 +171,11 @@ function AdaptiveComponent() {
 import { useTimeoutAwareLoading } from '@core/loading';
 
 function TimeoutExample() {
-  const {
-    isLoading,
-    isTimeout,
-    elapsedTime,
-    remainingTime,
-    start,
-    extendTimeout
-  } = useTimeoutAwareLoading({
-    timeout: 10000,
-    onTimeout: () => console.log('Operation timed out'),
-  });
+  const { isLoading, isTimeout, elapsedTime, remainingTime, start, extendTimeout } =
+    useTimeoutAwareLoading({
+      timeout: 10000,
+      onTimeout: () => console.log('Operation timed out'),
+    });
 
   const handleLongOperation = () => {
     start(async () => {
@@ -205,9 +196,7 @@ function TimeoutExample() {
           <p>Elapsed: {elapsedTime}ms</p>
           <p>Remaining: {remainingTime}ms</p>
           {remainingTime < 2000 && (
-            <button onClick={() => extendTimeout(5000)}>
-              Extend Timeout
-            </button>
+            <button onClick={() => extendTimeout(5000)}>Extend Timeout</button>
           )}
         </div>
       )}
@@ -235,9 +224,7 @@ function ResilientComponent() {
         <p>Error: {error.message}</p>
         <div>
           <button onClick={retry}>Retry</button>
-          {recovery.canRecover && (
-            <button onClick={recover}>Auto Recover</button>
-          )}
+          {recovery.canRecover && <button onClick={recover}>Auto Recover</button>}
         </div>
         {recovery.suggestions.length > 0 && (
           <ul>
@@ -272,9 +259,7 @@ function LoadingStates() {
         </div>
       )}
 
-      {loadingState === 'loaded' && (
-        <div>Actual content here</div>
-      )}
+      {loadingState === 'loaded' && <div>Actual content here</div>}
     </div>
   );
 }
@@ -382,9 +367,7 @@ function DataExportComponent() {
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { LoadingProvider } from '@core/loading';
 
-const wrapper = ({ children }) => (
-  <LoadingProvider>{children}</LoadingProvider>
-);
+const wrapper = ({ children }) => <LoadingProvider>{children}</LoadingProvider>;
 
 test('handles loading states', async () => {
   const { result } = renderHook(() => useLoadingOperation('test'), { wrapper });
@@ -462,9 +445,7 @@ function BatchOperations() {
 
   const handleBatchUpdate = async (operations: any[]) => {
     return await executeBatch(async () => {
-      const results = await Promise.allSettled(
-        operations.map(op => performOperation(op))
-      );
+      const results = await Promise.allSettled(operations.map(op => performOperation(op)));
       return results;
     });
   };

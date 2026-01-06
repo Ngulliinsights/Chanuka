@@ -3,19 +3,20 @@
  * Tests for error boundary components and error recovery
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import { ErrorBoundary } from '../../../core/error/components/ErrorBoundary';
-import { UnifiedErrorBoundary } from '../../../core/error/components/UnifiedErrorBoundary';
 import { RecoveryUI } from '../../../core/error/components/RecoveryUI';
 import { ServiceUnavailable } from '../../../core/error/components/ServiceUnavailable';
+import { UnifiedErrorBoundary } from '../../../core/error/components/UnifiedErrorBoundary';
 
 // Mock the error handler
 vi.mock('../../../core/error/handler', () => ({
   coreErrorHandler: {
     handleError: vi.fn(),
-    addReporter: vi.fn()
-  }
+    addReporter: vi.fn(),
+  },
 }));
 
 // Mock the error recovery manager
@@ -24,14 +25,14 @@ vi.mock('../../../core/error/recovery', () => ({
     getInstance: vi.fn(() => ({
       handleRecovery: vi.fn(),
       getRecoveryOptions: vi.fn(() => []),
-      isRecovering: vi.fn(() => false)
-    }))
-  }
+      isRecovering: vi.fn(() => false),
+    })),
+  },
 }));
 
 // Mock the error reporting
 vi.mock('../../../core/error/reporting', () => ({
-  ErrorReporter: vi.fn()
+  ErrorReporter: vi.fn(),
 }));
 
 describe('ErrorBoundary', () => {
@@ -68,7 +69,9 @@ describe('ErrorBoundary', () => {
 
   it('should call error handler when error occurs', () => {
     const mockErrorHandler = vi.fn();
-    vi.mocked(require('../../../core/error/handler').coreErrorHandler.handleError).mockImplementation(mockErrorHandler);
+    vi.mocked(
+      require('../../../core/error/handler').coreErrorHandler.handleError
+    ).mockImplementation(mockErrorHandler);
 
     render(
       <ErrorBoundary>
@@ -169,9 +172,7 @@ describe('RecoveryUI', () => {
   it('should handle retry action', async () => {
     const mockRetry = vi.fn();
 
-    render(
-      <RecoveryUI onRetry={mockRetry} />
-    );
+    render(<RecoveryUI onRetry={mockRetry} />);
 
     const retryButton = screen.getByText(/Try Again/);
     fireEvent.click(retryButton);
@@ -184,9 +185,7 @@ describe('RecoveryUI', () => {
   it('should handle refresh action', async () => {
     const mockRefresh = vi.fn();
 
-    render(
-      <RecoveryUI onRefresh={mockRefresh} />
-    );
+    render(<RecoveryUI onRefresh={mockRefresh} />);
 
     const refreshButton = screen.getByText(/Refresh Page/);
     fireEvent.click(refreshButton);
@@ -199,9 +198,7 @@ describe('RecoveryUI', () => {
   it('should handle contact support action', async () => {
     const mockContact = vi.fn();
 
-    render(
-      <RecoveryUI onContactSupport={mockContact} />
-    );
+    render(<RecoveryUI onContactSupport={mockContact} />);
 
     const contactButton = screen.getByText(/Contact Support/);
     fireEvent.click(contactButton);
@@ -215,7 +212,7 @@ describe('RecoveryUI', () => {
     const errorDetails = {
       message: 'Test error',
       stack: 'Error stack trace',
-      componentStack: 'Component stack'
+      componentStack: 'Component stack',
     };
 
     render(<RecoveryUI error={errorDetails} />);
@@ -274,7 +271,7 @@ describe('ServiceUnavailable', () => {
         maintenanceInfo={{
           startTime: '2023-01-01T10:00:00Z',
           endTime: '2023-01-01T12:00:00Z',
-          description: 'Scheduled maintenance'
+          description: 'Scheduled maintenance',
         }}
       />
     );
@@ -289,9 +286,7 @@ describe('Error Boundary Integration', () => {
   };
 
   const FallbackComponent = ({ error }: { error: Error }) => (
-    <div data-testid="custom-fallback">
-      Custom fallback: {error.message}
-    </div>
+    <div data-testid="custom-fallback">Custom fallback: {error.message}</div>
   );
 
   beforeEach(() => {
@@ -323,7 +318,9 @@ describe('Error Boundary Integration', () => {
 
   it('should preserve error context', () => {
     const mockErrorHandler = vi.fn();
-    vi.mocked(require('../../../core/error/handler').coreErrorHandler.handleError).mockImplementation(mockErrorHandler);
+    vi.mocked(
+      require('../../../core/error/handler').coreErrorHandler.handleError
+    ).mockImplementation(mockErrorHandler);
 
     render(
       <ErrorBoundary>
@@ -334,7 +331,7 @@ describe('Error Boundary Integration', () => {
     expect(mockErrorHandler).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'Integration test error',
-        name: 'Error'
+        name: 'Error',
       })
     );
   });
@@ -374,12 +371,7 @@ describe('Error Recovery Workflows', () => {
   });
 
   it('should provide context-specific recovery options', () => {
-    render(
-      <RecoveryUI
-        context="network"
-        error={{ message: 'Network error' }}
-      />
-    );
+    render(<RecoveryUI context="network" error={{ message: 'Network error' }} />);
 
     expect(screen.getByText(/Network error/)).toBeInTheDocument();
   });

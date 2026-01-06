@@ -54,28 +54,28 @@ export interface UnifiedThread {
   billId: string;
   title: string;
   description?: string;
-  
+
   // Metadata
   createdAt: string;
   updatedAt: string;
   createdBy: string;
-  
+
   // Engagement metrics (rich metadata from discussion.ts)
   commentCount: number;
   participantCount: number;
   lastActivityAt: string;
   isActive: boolean;
-  
+
   // Quality and moderation
   qualityScore: number;
   isModerated: boolean;
   isPinned: boolean;
   isLocked: boolean;
-  
+
   // Tags and categorization
   tags: string[];
   category: 'general' | 'analysis' | 'question' | 'proposal';
-  
+
   // Real-time state
   activeUsers: string[];
   typingUsers: string[];
@@ -85,10 +85,10 @@ export interface UnifiedThread {
 // UNIFIED MODERATION TYPES (resolves inconsistent violation types)
 // ============================================================================
 
-export type ViolationType = 
+export type ViolationType =
   | 'spam'
   | 'harassment'
-  | 'inappropriate_language'    // Standardized naming
+  | 'inappropriate_language' // Standardized naming
   | 'misinformation'
   | 'off_topic'
   | 'personal_attack'
@@ -151,7 +151,7 @@ export interface DiscussionState {
 // ============================================================================
 
 export interface CreateCommentRequest {
-  billId: string;           // Consistent camelCase
+  billId: string; // Consistent camelCase
   content: string;
   parentId?: string;
   threadId?: string;
@@ -186,28 +186,28 @@ export interface UseDiscussionReturn {
   comments: UnifiedComment[];
   threads: UnifiedThread[];
   currentThread?: UnifiedThread;
-  
+
   // Loading states
   isLoading: boolean;
   isLoadingComments: boolean;
   isLoadingThreads: boolean;
-  
+
   // Error states
   error?: string;
-  
+
   // Actions
   createComment: (data: CreateCommentRequest) => Promise<UnifiedComment>;
   updateComment: (data: UpdateCommentRequest) => Promise<UnifiedComment>;
   deleteComment: (commentId: string) => Promise<void>;
   voteComment: (commentId: string, vote: 'up' | 'down') => Promise<void>;
-  
+
   // Thread actions
   createThread: (data: CreateThreadRequest) => Promise<UnifiedThread>;
   selectThread: (threadId: string) => void;
-  
+
   // Moderation
   reportContent: (data: ModerationRequest) => Promise<void>;
-  
+
   // Real-time
   typingUsers: string[];
   activeUsers: string[];
@@ -218,7 +218,7 @@ export interface UseDiscussionReturn {
 export interface UseCommunityReturn {
   // All discussion functionality plus community-specific features
   discussion: UseDiscussionReturn;
-  
+
   // Community stats
   stats: {
     totalComments: number;
@@ -226,12 +226,12 @@ export interface UseCommunityReturn {
     activeUsers: number;
     expertComments: number;
   };
-  
+
   // Social features
   shareThread: (threadId: string, platform: string) => Promise<void>;
   bookmarkComment: (commentId: string) => Promise<void>;
   followThread: (threadId: string) => Promise<void>;
-  
+
   // Expert insights
   expertInsights: UnifiedComment[];
   trendingTopics: string[];
@@ -247,17 +247,17 @@ export interface WebSocketEvents {
   'comment:updated': { comment: UnifiedComment };
   'comment:deleted': { commentId: string };
   'comment:voted': { commentId: string; score: number };
-  
+
   // Thread events
   'thread:created': { thread: UnifiedThread };
   'thread:updated': { thread: UnifiedThread };
-  
+
   // Real-time presence
   'user:typing': { threadId: string; userId: string; userName: string };
   'user:stopped_typing': { threadId: string; userId: string };
   'user:joined': { threadId: string; userId: string; userName: string };
   'user:left': { threadId: string; userId: string };
-  
+
   // Moderation events
   'content:moderated': { contentId: string; action: string };
 }

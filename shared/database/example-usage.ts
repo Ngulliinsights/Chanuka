@@ -6,9 +6,11 @@
  * with all safety mechanisms in place.
  */
 
-import { executeQuery } from './pool';
 import { logger } from '@shared/core';
+
 import { users } from '../schema/foundation';
+
+import { executeQuery } from './pool';
 
 /**
  * Example: Safe database initialization

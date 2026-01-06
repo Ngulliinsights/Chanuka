@@ -16,7 +16,7 @@ import {
   AnalyticsEventType,
   AnalyticsDashboardData,
   PagePerformanceMetrics,
-  UserEngagementMetrics
+  UserEngagementMetrics,
 } from '@client/core/analytics/comprehensive-tracker';
 import { useNavigation } from '@client/core/navigation/context';
 import { logger } from '@client/utils/logger';
@@ -40,8 +40,16 @@ export interface ComprehensiveAnalyticsHook {
   // Tracking methods
   trackEvent: (eventType: AnalyticsEventType, data?: Record<string, unknown>) => Promise<void>;
   trackPageView: (page?: string, additionalData?: Record<string, unknown>) => Promise<void>;
-  trackUserInteraction: (element: string, action: string, data?: Record<string, unknown>) => Promise<void>;
-  trackConversion: (conversionType: string, value?: number, data?: Record<string, unknown>) => Promise<void>;
+  trackUserInteraction: (
+    element: string,
+    action: string,
+    data?: Record<string, unknown>
+  ) => Promise<void>;
+  trackConversion: (
+    conversionType: string,
+    value?: number,
+    data?: Record<string, unknown>
+  ) => Promise<void>;
   trackError: (error: Error, context?: Record<string, unknown>) => Promise<void>;
   trackPerformance: (metrics: Partial<PagePerformanceMetrics>) => Promise<void>;
 
@@ -70,7 +78,7 @@ const DEFAULT_OPTIONS: Required<UseComprehensiveAnalyticsOptions> = {
   autoTrackPerformance: true,
   autoTrackErrors: true,
   flushInterval: 30000, // 30 seconds
-  sessionTimeout: 30 * 60 * 1000 // 30 minutes
+  sessionTimeout: 30 * 60 * 1000, // 30 minutes
 };
 
 /**
@@ -126,8 +134,8 @@ export function useComprehensiveAnalytics(
             search: location.search,
             hash: location.hash,
             referrer: document.referrer,
-            timeOnPreviousPage: Date.now() - pageStartTimeRef.current.getTime()
-          }
+            timeOnPreviousPage: Date.now() - pageStartTimeRef.current.getTime(),
+          },
         });
 
         pageStartTimeRef.current = new Date();
@@ -140,7 +148,13 @@ export function useComprehensiveAnalytics(
     };
 
     trackPageView();
-  }, [location.pathname, location.search, location.hash, mergedOptions.autoTrackPageViews, isEnabled]);
+  }, [
+    location.pathname,
+    location.search,
+    location.hash,
+    mergedOptions.autoTrackPageViews,
+    isEnabled,
+  ]);
 
   /**
    * Auto-track performance metrics
@@ -156,18 +170,20 @@ export function useComprehensiveAnalytics(
       }
 
       try {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const navigation = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming;
         if (navigation) {
           const metrics: Partial<PagePerformanceMetrics> = {
             pageId: location.pathname,
             loadTime: navigation.loadEventEnd - navigation.fetchStart,
             timeToInteractive: navigation.domInteractive - navigation.fetchStart,
-            timestamp: new Date()
+            timestamp: new Date(),
           };
 
           trackerRef.current!.trackEvent({
             type: 'performance_issue',
-            data: { performanceMetrics: metrics }
+            data: { performanceMetrics: metrics },
           });
         }
       } catch (err) {
@@ -202,8 +218,8 @@ export function useComprehensiveAnalytics(
           colno: event.colno,
           stack: event.error?.stack,
           userAgent: navigator.userAgent,
-          url: window.location.href
-        }
+          url: window.location.href,
+        },
       });
     };
 
@@ -214,8 +230,8 @@ export function useComprehensiveAnalytics(
           message: 'Unhandled Promise Rejection',
           reason: event.reason,
           userAgent: navigator.userAgent,
-          url: window.location.href
-        }
+          url: window.location.href,
+        },
       });
     };
 
@@ -247,8 +263,8 @@ export function useComprehensiveAnalytics(
           data: {
             action: 'session_timeout',
             sessionDuration: now.getTime() - sessionStartRef.current.getTime(),
-            lastActivity: lastActivityRef.current.toISOString()
-          }
+            lastActivity: lastActivityRef.current.toISOString(),
+          },
         });
 
         // Reset session
@@ -264,122 +280,125 @@ export function useComprehensiveAnalytics(
   /**
    * Track a custom analytics event
    */
-  const trackEvent = useCallback(async (
-    eventType: AnalyticsEventType,
-    data?: Record<string, unknown>
-  ): Promise<void> => {
-    if (!trackerRef.current || !isEnabled) {
-      return;
-    }
+  const trackEvent = useCallback(
+    async (eventType: AnalyticsEventType, data?: Record<string, unknown>): Promise<void> => {
+      if (!trackerRef.current || !isEnabled) {
+        return;
+      }
 
-    try {
-      setIsLoading(true);
+      try {
+        setIsLoading(true);
 
-      await trackerRef.current.trackEvent({
-        type: eventType,
-        data: {
-          ...data,
-          sessionDuration: Date.now() - sessionStartRef.current.getTime(),
-          timeOnPage: Date.now() - pageStartTimeRef.current.getTime()
-        }
-      });
+        await trackerRef.current.trackEvent({
+          type: eventType,
+          data: {
+            ...data,
+            sessionDuration: Date.now() - sessionStartRef.current.getTime(),
+            timeOnPage: Date.now() - pageStartTimeRef.current.getTime(),
+          },
+        });
 
-      lastActivityRef.current = new Date();
-      setLastEventTime(new Date());
-      setError(null);
-    } catch (err) {
-      logger.error('Failed to track event', { error: err, eventType, data });
-      setError(`Failed to track ${eventType} event`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isEnabled]);
+        lastActivityRef.current = new Date();
+        setLastEventTime(new Date());
+        setError(null);
+      } catch (err) {
+        logger.error('Failed to track event', { error: err, eventType, data });
+        setError(`Failed to track ${eventType} event`);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isEnabled]
+  );
 
   /**
    * Track a page view event
    */
-  const trackPageView = useCallback(async (
-    page?: string,
-    additionalData?: Record<string, unknown>
-  ): Promise<void> => {
-    const pageToTrack = page || location.pathname;
+  const trackPageView = useCallback(
+    async (page?: string, additionalData?: Record<string, unknown>): Promise<void> => {
+      const pageToTrack = page || location.pathname;
 
-    await trackEvent('page_view', {
-      page: pageToTrack,
-      referrer: document.referrer,
-      userAgent: navigator.userAgent,
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      },
-      ...additionalData
-    });
-  }, [trackEvent, location.pathname]);
+      await trackEvent('page_view', {
+        page: pageToTrack,
+        referrer: document.referrer,
+        userAgent: navigator.userAgent,
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+        ...additionalData,
+      });
+    },
+    [trackEvent, location.pathname]
+  );
 
   /**
    * Track a user interaction event
    */
-  const trackUserInteraction = useCallback(async (
-    element: string,
-    action: string,
-    data?: Record<string, unknown>
-  ): Promise<void> => {
-    await trackEvent('user_interaction', {
-      element,
-      action,
-      timestamp: new Date().toISOString(),
-      ...data
-    });
-  }, [trackEvent]);
+  const trackUserInteraction = useCallback(
+    async (element: string, action: string, data?: Record<string, unknown>): Promise<void> => {
+      await trackEvent('user_interaction', {
+        element,
+        action,
+        timestamp: new Date().toISOString(),
+        ...data,
+      });
+    },
+    [trackEvent]
+  );
 
   /**
    * Track a conversion event
    */
-  const trackConversion = useCallback(async (
-    conversionType: string,
-    value?: number,
-    data?: Record<string, unknown>
-  ): Promise<void> => {
-    await trackEvent('conversion_event', {
-      conversionType,
-      value,
-      timestamp: new Date().toISOString(),
-      ...data
-    });
-  }, [trackEvent]);
+  const trackConversion = useCallback(
+    async (
+      conversionType: string,
+      value?: number,
+      data?: Record<string, unknown>
+    ): Promise<void> => {
+      await trackEvent('conversion_event', {
+        conversionType,
+        value,
+        timestamp: new Date().toISOString(),
+        ...data,
+      });
+    },
+    [trackEvent]
+  );
 
   /**
    * Track an error event
    */
-  const trackError = useCallback(async (
-    error: Error,
-    context?: Record<string, unknown>
-  ): Promise<void> => {
-    await trackEvent('error_occurred', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      context,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      timestamp: new Date().toISOString()
-    });
-  }, [trackEvent]);
+  const trackError = useCallback(
+    async (error: Error, context?: Record<string, unknown>): Promise<void> => {
+      await trackEvent('error_occurred', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        context,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [trackEvent]
+  );
 
   /**
    * Track performance metrics
    */
-  const trackPerformance = useCallback(async (
-    metrics: Partial<PagePerformanceMetrics>
-  ): Promise<void> => {
-    await trackEvent('performance_issue', {
-      performanceMetrics: {
-        pageId: location.pathname,
-        timestamp: new Date(),
-        ...metrics
-      }
-    });
-  }, [trackEvent, location.pathname]);
+  const trackPerformance = useCallback(
+    async (metrics: Partial<PagePerformanceMetrics>): Promise<void> => {
+      await trackEvent('performance_issue', {
+        performanceMetrics: {
+          pageId: location.pathname,
+          timestamp: new Date(),
+          ...metrics,
+        },
+      });
+    },
+    [trackEvent, location.pathname]
+  );
 
   /**
    * Get dashboard data
@@ -412,7 +431,7 @@ export function useComprehensiveAnalytics(
         eventCount: 0,
         userEngagementCount: 0,
         pageMetricsCount: 0,
-        isEnabled: false
+        isEnabled: false,
       };
     }
 
@@ -428,7 +447,7 @@ export function useComprehensiveAnalytics(
         events: [],
         engagement: [],
         pageMetrics: [],
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     }
 
@@ -480,7 +499,7 @@ export function useComprehensiveAnalytics(
     isEnabled,
     isLoading,
     error,
-    lastEventTime
+    lastEventTime,
   };
 }
 
@@ -490,27 +509,39 @@ export function useComprehensiveAnalytics(
 export function useInteractionTracking(elementId?: string) {
   const { trackUserInteraction } = useComprehensiveAnalytics();
 
-  const trackClick = useCallback((element?: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(element || elementId || 'unknown', 'click', data);
-  }, [trackUserInteraction, elementId]);
+  const trackClick = useCallback(
+    (element?: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(element || elementId || 'unknown', 'click', data);
+    },
+    [trackUserInteraction, elementId]
+  );
 
-  const trackHover = useCallback((element?: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(element || elementId || 'unknown', 'hover', data);
-  }, [trackUserInteraction, elementId]);
+  const trackHover = useCallback(
+    (element?: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(element || elementId || 'unknown', 'hover', data);
+    },
+    [trackUserInteraction, elementId]
+  );
 
-  const trackFocus = useCallback((element?: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(element || elementId || 'unknown', 'focus', data);
-  }, [trackUserInteraction, elementId]);
+  const trackFocus = useCallback(
+    (element?: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(element || elementId || 'unknown', 'focus', data);
+    },
+    [trackUserInteraction, elementId]
+  );
 
-  const trackScroll = useCallback((element?: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(element || elementId || 'unknown', 'scroll', data);
-  }, [trackUserInteraction, elementId]);
+  const trackScroll = useCallback(
+    (element?: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(element || elementId || 'unknown', 'scroll', data);
+    },
+    [trackUserInteraction, elementId]
+  );
 
   return {
     trackClick,
     trackHover,
     trackFocus,
-    trackScroll
+    trackScroll,
   };
 }
 
@@ -520,27 +551,39 @@ export function useInteractionTracking(elementId?: string) {
 export function useFormTracking(formId: string) {
   const { trackUserInteraction, trackConversion } = useComprehensiveAnalytics();
 
-  const trackFormStart = useCallback((data?: Record<string, unknown>) => {
-    trackUserInteraction(formId, 'form_start', data);
-  }, [trackUserInteraction, formId]);
+  const trackFormStart = useCallback(
+    (data?: Record<string, unknown>) => {
+      trackUserInteraction(formId, 'form_start', data);
+    },
+    [trackUserInteraction, formId]
+  );
 
-  const trackFormSubmit = useCallback((data?: Record<string, unknown>) => {
-    trackConversion('form_submission', 1, { formId, ...data });
-  }, [trackConversion, formId]);
+  const trackFormSubmit = useCallback(
+    (data?: Record<string, unknown>) => {
+      trackConversion('form_submission', 1, { formId, ...data });
+    },
+    [trackConversion, formId]
+  );
 
-  const trackFormError = useCallback((error: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(formId, 'form_error', { error, ...data });
-  }, [trackUserInteraction, formId]);
+  const trackFormError = useCallback(
+    (error: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(formId, 'form_error', { error, ...data });
+    },
+    [trackUserInteraction, formId]
+  );
 
-  const trackFieldInteraction = useCallback((fieldName: string, action: string, data?: Record<string, unknown>) => {
-    trackUserInteraction(`${formId}.${fieldName}`, action, data);
-  }, [trackUserInteraction, formId]);
+  const trackFieldInteraction = useCallback(
+    (fieldName: string, action: string, data?: Record<string, unknown>) => {
+      trackUserInteraction(`${formId}.${fieldName}`, action, data);
+    },
+    [trackUserInteraction, formId]
+  );
 
   return {
     trackFormStart,
     trackFormSubmit,
     trackFormError,
-    trackFieldInteraction
+    trackFieldInteraction,
   };
 }
 
@@ -550,30 +593,39 @@ export function useFormTracking(formId: string) {
 export function useSearchTracking() {
   const { trackUserInteraction, trackConversion } = useComprehensiveAnalytics();
 
-  const trackSearchQuery = useCallback((query: string, filters?: Record<string, unknown>) => {
-    trackUserInteraction('search', 'query', { query, filters });
-  }, [trackUserInteraction]);
+  const trackSearchQuery = useCallback(
+    (query: string, filters?: Record<string, unknown>) => {
+      trackUserInteraction('search', 'query', { query, filters });
+    },
+    [trackUserInteraction]
+  );
 
-  const trackSearchResult = useCallback((query: string, resultCount: number, clickedResult?: string) => {
-    trackUserInteraction('search', 'results', {
-      query,
-      resultCount,
-      clickedResult
-    });
+  const trackSearchResult = useCallback(
+    (query: string, resultCount: number, clickedResult?: string) => {
+      trackUserInteraction('search', 'results', {
+        query,
+        resultCount,
+        clickedResult,
+      });
 
-    if (clickedResult) {
-      trackConversion('search_click', 1, { query, clickedResult });
-    }
-  }, [trackUserInteraction, trackConversion]);
+      if (clickedResult) {
+        trackConversion('search_click', 1, { query, clickedResult });
+      }
+    },
+    [trackUserInteraction, trackConversion]
+  );
 
-  const trackSearchFilter = useCallback((filterType: string, filterValue: string) => {
-    trackUserInteraction('search', 'filter', { filterType, filterValue });
-  }, [trackUserInteraction]);
+  const trackSearchFilter = useCallback(
+    (filterType: string, filterValue: string) => {
+      trackUserInteraction('search', 'filter', { filterType, filterValue });
+    },
+    [trackUserInteraction]
+  );
 
   return {
     trackSearchQuery,
     trackSearchResult,
-    trackSearchFilter
+    trackSearchFilter,
   };
 }
 

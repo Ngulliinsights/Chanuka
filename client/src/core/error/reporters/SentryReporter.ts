@@ -173,7 +173,10 @@ export class SentryReporter implements ErrorReporter {
           });
         } else {
           // Capture as message if no cause error
-          this.sentry?.captureMessage(error.message, level as import('@sentry/browser').SeverityLevel);
+          this.sentry?.captureMessage(
+            error.message,
+            level as import('@sentry/browser').SeverityLevel
+          );
         }
       });
     } catch (reportError) {
@@ -260,7 +263,7 @@ export class SentryReporter implements ErrorReporter {
         message: breadcrumb.message,
         category: breadcrumb.category,
         level: breadcrumb.level as import('@sentry/browser').SeverityLevel,
-        data: breadcrumb.data
+        data: breadcrumb.data,
       });
     }
   }

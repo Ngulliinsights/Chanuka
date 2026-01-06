@@ -3,14 +3,15 @@
 // ============================================================================
 // Main orchestration service for processing citizen comments into structured arguments
 
+import { logger } from '@shared/core';
+
+import { ArgumentIntelligenceService } from './argument-intelligence-service';
 import { BriefGeneratorService, GeneratedBrief } from './brief-generator';
 import { ArgumentCluster, ClusteringService } from './clustering-service';
 import { CoalitionFinderService } from './coalition-finder';
 import { EvidenceValidatorService } from './evidence-validator';
 import { PowerBalancerService } from './power-balancer';
 import { ExtractedArgument as ServiceExtractedArgument, StructureExtractorService } from './structure-extractor';
-import { ArgumentIntelligenceService } from './argument-intelligence-service';
-import { logger } from '@shared/core';
 
 export interface CommentProcessingRequest {
   comment_id: string;

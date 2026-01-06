@@ -1,6 +1,6 @@
 /**
  * React Hook for Seamless Shared Integration
- * 
+ *
  * Provides React hooks for seamless integration with shared modules,
  * including loading states, error handling, and automatic fallbacks.
  */
@@ -14,20 +14,30 @@ import { logger } from '../utils/logger';
 
 // Fallback seamless integration object for when the module is not available
 const seamlessIntegration = {
-  initialize: async () => { /* stub */ },
+  initialize: async () => {
+    /* stub */
+  },
   getStatus: () => ({
     initialized: true,
     sharedModulesAvailable: false,
-    integrationMode: 'client-only' as const
+    integrationMode: 'client-only' as const,
   }),
   validation: {
     email: (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
     phone: (phone: string) => /^(\+254|0)[17]\d{8}$/.test(phone.replace(/\s/g, '')),
     billNumber: (billNumber: string) => /^[A-Z]{1,3}\s?\d{1,4}\/\d{4}$/.test(billNumber),
-    url: (url: string) => { try { new URL(url); return true; } catch { return false; } }
+    url: (url: string) => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    },
   },
   formatting: {
-    currency: (amount: number, currency = 'KES') => new Intl.NumberFormat('en-KE', { style: 'currency', currency }).format(amount),
+    currency: (amount: number, currency = 'KES') =>
+      new Intl.NumberFormat('en-KE', { style: 'currency', currency }).format(amount),
     date: (date: Date | string) => new Date(date).toLocaleDateString('en-KE'),
     relativeTime: (date: Date | string) => {
       const diffDays = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
@@ -35,25 +45,45 @@ const seamlessIntegration = {
       if (diffDays === 1) return 'Yesterday';
       return `${diffDays} days ago`;
     },
-    number: (num: number, options?: Intl.NumberFormatOptions) => new Intl.NumberFormat('en-KE', options).format(num),
-    percentage: (value: number, total: number) => `${((value / total) * 100).toFixed(1)}%`
+    number: (num: number, options?: Intl.NumberFormatOptions) =>
+      new Intl.NumberFormat('en-KE', options).format(num),
+    percentage: (value: number, total: number) => `${((value / total) * 100).toFixed(1)}%`,
   },
   strings: {
-    slugify: (text: string) => text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-'),
-    truncate: (text: string, length: number) => text.length > length ? text.slice(0, length) + '...' : text,
+    slugify: (text: string) =>
+      text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-'),
+    truncate: (text: string, length: number) =>
+      text.length > length ? text.slice(0, length) + '...' : text,
     capitalize: (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
-    titleCase: (text: string) => text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()),
-    camelCase: (text: string) => text.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => index === 0 ? word.toLowerCase() : word.toUpperCase()).replace(/\s+/g, ''),
-    kebabCase: (text: string) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase()
+    titleCase: (text: string) =>
+      text.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()),
+    camelCase: (text: string) =>
+      text
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
+          index === 0 ? word.toLowerCase() : word.toUpperCase()
+        )
+        .replace(/\s+/g, ''),
+    kebabCase: (text: string) =>
+      text
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .replace(/[\s_]+/g, '-')
+        .toLowerCase(),
   },
   arrays: {
     unique: <T>(array: T[]) => [...new Set(array)],
-    groupBy: <T, K extends keyof T>(array: T[], key: K) => array.reduce((groups, item) => {
-      const groupKey = String(item[key]);
-      if (!groups[groupKey]) groups[groupKey] = [];
-      groups[groupKey].push(item);
-      return groups;
-    }, {} as Record<string, T[]>),
+    groupBy: <T, K extends keyof T>(array: T[], key: K) =>
+      array.reduce(
+        (groups, item) => {
+          const groupKey = String(item[key]);
+          if (!groups[groupKey]) groups[groupKey] = [];
+          groups[groupKey].push(item);
+          return groups;
+        },
+        {} as Record<string, T[]>
+      ),
     chunk: <T>(array: T[], size: number) => {
       const chunks: T[][] = [];
       for (let i = 0; i < array.length; i += size) {
@@ -68,17 +98,20 @@ const seamlessIntegration = {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
       return shuffled;
-    }
+    },
   },
   civic: {
     calculateUrgencyScore: () => 50,
-    generateEngagementSummary: () => 'Loading engagement data...'
+    generateEngagementSummary: () => 'Loading engagement data...',
   },
   anonymity: {
     generateId: () => 'anon_' + Math.random().toString(36).substring(2, 11),
     getDisplayIdentity: () => ({ name: 'Anonymous', avatar: null, identifier: 'loading' }),
-    generatePseudonymSuggestions: (count = 3) => Array(count).fill(0).map((_, i) => `Anonymous${i + 1}`)
-  }
+    generatePseudonymSuggestions: (count = 3) =>
+      Array(count)
+        .fill(0)
+        .map((_, i) => `Anonymous${i + 1}`),
+  },
 };
 
 interface IntegrationState {
@@ -98,24 +131,24 @@ export function useSeamlessIntegration() {
     loading: true,
     error: null,
     sharedAvailable: false,
-    integrationMode: 'loading'
+    integrationMode: 'loading',
   });
 
   const initialize = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
-      
+
       await seamlessIntegration.initialize();
       const status = seamlessIntegration.getStatus();
-      
+
       setState({
         initialized: status.initialized,
         loading: false,
         error: null,
         sharedAvailable: status.sharedModulesAvailable,
-        integrationMode: status.integrationMode as 'hybrid' | 'client-only'
+        integrationMode: status.integrationMode as 'hybrid' | 'client-only',
       });
-      
+
       logger.info('Seamless integration hook initialized', status);
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Integration failed');
@@ -123,9 +156,9 @@ export function useSeamlessIntegration() {
         ...prev,
         loading: false,
         error: err,
-        integrationMode: 'client-only'
+        integrationMode: 'client-only',
       }));
-      
+
       logger.error('Seamless integration initialization failed', { error: err });
     }
   }, []);
@@ -141,7 +174,7 @@ export function useSeamlessIntegration() {
   return {
     ...state,
     retry,
-    utils: seamlessIntegration
+    utils: seamlessIntegration,
   };
 }
 
@@ -150,7 +183,7 @@ export function useSeamlessIntegration() {
  */
 export function useValidation() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic validation while loading
@@ -159,11 +192,16 @@ export function useValidation() {
         phone: (phone: string) => /^(\+254|0)[17]\d{8}$/.test(phone.replace(/\s/g, '')),
         billNumber: (billNumber: string) => /^[A-Z]{1,3}\s?\d{1,4}\/\d{4}$/.test(billNumber),
         url: (url: string) => {
-          try { new URL(url); return true; } catch { return false; }
-        }
+          try {
+            new URL(url);
+            return true;
+          } catch {
+            return false;
+          }
+        },
       };
     }
-    
+
     return seamlessIntegration.validation;
   }, [initialized]);
 }
@@ -173,26 +211,28 @@ export function useValidation() {
  */
 export function useFormatting() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic formatting while loading
       return {
-        currency: (amount: number, currency = 'KES') => 
+        currency: (amount: number, currency = 'KES') =>
           new Intl.NumberFormat('en-KE', { style: 'currency', currency }).format(amount),
         date: (date: Date | string) => new Date(date).toLocaleDateString('en-KE'),
         relativeTime: (date: Date | string) => {
-          const diffDays = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+          const diffDays = Math.floor(
+            (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
+          );
           if (diffDays === 0) return 'Today';
           if (diffDays === 1) return 'Yesterday';
           return `${diffDays} days ago`;
         },
-        number: (num: number, options?: Intl.NumberFormatOptions) => 
+        number: (num: number, options?: Intl.NumberFormatOptions) =>
           new Intl.NumberFormat('en-KE', options).format(num),
-        percentage: (value: number, total: number) => `${((value / total) * 100).toFixed(1)}%`
+        percentage: (value: number, total: number) => `${((value / total) * 100).toFixed(1)}%`,
       };
     }
-    
+
     return seamlessIntegration.formatting;
   }, [initialized]);
 }
@@ -202,20 +242,38 @@ export function useFormatting() {
  */
 export function useStrings() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic string utilities while loading
       return {
-        slugify: (text: string) => text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-'),
-        truncate: (text: string, length: number) => text.length > length ? text.slice(0, length) + '...' : text,
+        slugify: (text: string) =>
+          text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-'),
+        truncate: (text: string, length: number) =>
+          text.length > length ? text.slice(0, length) + '...' : text,
         capitalize: (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
-        titleCase: (text: string) => text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()),
-        camelCase: (text: string) => text.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => index === 0 ? word.toLowerCase() : word.toUpperCase()).replace(/\s+/g, ''),
-        kebabCase: (text: string) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase()
+        titleCase: (text: string) =>
+          text.replace(
+            /\w\S*/g,
+            txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+          ),
+        camelCase: (text: string) =>
+          text
+            .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
+              index === 0 ? word.toLowerCase() : word.toUpperCase()
+            )
+            .replace(/\s+/g, ''),
+        kebabCase: (text: string) =>
+          text
+            .replace(/([a-z])([A-Z])/g, '$1-$2')
+            .replace(/[\s_]+/g, '-')
+            .toLowerCase(),
       };
     }
-    
+
     return seamlessIntegration.strings;
   }, [initialized]);
 }
@@ -225,19 +283,22 @@ export function useStrings() {
  */
 export function useArrays() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic array utilities while loading
       return {
         unique: <T>(array: T[]) => [...new Set(array)],
-        groupBy: <T, K extends keyof T>(array: T[], key: K) => 
-          array.reduce((groups, item) => {
-            const groupKey = String(item[key]);
-            if (!groups[groupKey]) groups[groupKey] = [];
-            groups[groupKey].push(item);
-            return groups;
-          }, {} as Record<string, T[]>),
+        groupBy: <T, K extends keyof T>(array: T[], key: K) =>
+          array.reduce(
+            (groups, item) => {
+              const groupKey = String(item[key]);
+              if (!groups[groupKey]) groups[groupKey] = [];
+              groups[groupKey].push(item);
+              return groups;
+            },
+            {} as Record<string, T[]>
+          ),
         chunk: <T>(array: T[], size: number) => {
           const chunks: T[][] = [];
           for (let i = 0; i < array.length; i += size) {
@@ -252,10 +313,10 @@ export function useArrays() {
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
           }
           return shuffled;
-        }
+        },
       };
     }
-    
+
     return seamlessIntegration.arrays;
   }, [initialized]);
 }
@@ -265,16 +326,16 @@ export function useArrays() {
  */
 export function useCivic() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic civic utilities while loading
       return {
         calculateUrgencyScore: () => 50, // Default medium urgency
-        generateEngagementSummary: () => 'Loading engagement data...'
+        generateEngagementSummary: () => 'Loading engagement data...',
       };
     }
-    
+
     return seamlessIntegration.civic;
   }, [initialized]);
 }
@@ -284,7 +345,7 @@ export function useCivic() {
  */
 export function useAnonymity() {
   const { initialized } = useSeamlessIntegration();
-  
+
   return useMemo(() => {
     if (!initialized) {
       // Return basic anonymity utilities while loading
@@ -293,13 +354,15 @@ export function useAnonymity() {
         getDisplayIdentity: () => ({
           name: 'Anonymous',
           avatar: null,
-          identifier: 'loading'
+          identifier: 'loading',
         }),
-        generatePseudonymSuggestions: (count = 3) => 
-          Array(count).fill(0).map((_, i) => `Anonymous${i + 1}`)
+        generatePseudonymSuggestions: (count = 3) =>
+          Array(count)
+            .fill(0)
+            .map((_, i) => `Anonymous${i + 1}`),
       };
     }
-    
+
     return seamlessIntegration.anonymity;
   }, [initialized]);
 }
@@ -309,21 +372,26 @@ export function useAnonymity() {
  */
 export function useIntegrationStatus() {
   const integration = useSeamlessIntegration();
-  
-  const diagnostics = useMemo(() => ({
-    canUseSharedModules: integration.sharedAvailable,
-    integrationHealth: integration.error ? 'unhealthy' : 'healthy',
-    fallbackMode: !integration.sharedAvailable,
-    recommendations: [
-      ...(integration.error ? ['Check shared module configuration'] : []),
-      ...(integration.integrationMode === 'client-only' ? ['Consider enabling shared modules for enhanced features'] : []),
-      ...(integration.loading ? ['Integration still initializing'] : [])
-    ]
-  }), [integration]);
+
+  const diagnostics = useMemo(
+    () => ({
+      canUseSharedModules: integration.sharedAvailable,
+      integrationHealth: integration.error ? 'unhealthy' : 'healthy',
+      fallbackMode: !integration.sharedAvailable,
+      recommendations: [
+        ...(integration.error ? ['Check shared module configuration'] : []),
+        ...(integration.integrationMode === 'client-only'
+          ? ['Consider enabling shared modules for enhanced features']
+          : []),
+        ...(integration.loading ? ['Integration still initializing'] : []),
+      ],
+    }),
+    [integration]
+  );
 
   return {
     ...integration,
-    diagnostics
+    diagnostics,
   };
 }
 
@@ -332,37 +400,40 @@ export function useIntegrationStatus() {
  */
 export function useProgressiveEnhancement() {
   const { sharedAvailable, initialized } = useSeamlessIntegration();
-  
+
   const enhancementLevel = useMemo(() => {
     if (!initialized) return 'loading';
     if (sharedAvailable) return 'enhanced';
     return 'basic';
   }, [initialized, sharedAvailable]);
-  
-  const shouldEnableFeature = useCallback((feature: string) => {
-    const featureRequirements: Record<string, 'basic' | 'enhanced'> = {
-      'advanced-validation': 'enhanced',
-      'civic-scoring': 'enhanced',
-      'anonymity-management': 'enhanced',
-      'basic-formatting': 'basic',
-      'basic-validation': 'basic'
-    };
-    
-    const required = featureRequirements[feature] || 'basic';
-    
-    if (required === 'enhanced') {
-      return enhancementLevel === 'enhanced';
-    }
-    
-    return enhancementLevel !== 'loading';
-  }, [enhancementLevel]);
-  
+
+  const shouldEnableFeature = useCallback(
+    (feature: string) => {
+      const featureRequirements: Record<string, 'basic' | 'enhanced'> = {
+        'advanced-validation': 'enhanced',
+        'civic-scoring': 'enhanced',
+        'anonymity-management': 'enhanced',
+        'basic-formatting': 'basic',
+        'basic-validation': 'basic',
+      };
+
+      const required = featureRequirements[feature] || 'basic';
+
+      if (required === 'enhanced') {
+        return enhancementLevel === 'enhanced';
+      }
+
+      return enhancementLevel !== 'loading';
+    },
+    [enhancementLevel]
+  );
+
   return {
     enhancementLevel,
     shouldEnableFeature,
     isEnhanced: enhancementLevel === 'enhanced',
     isBasic: enhancementLevel === 'basic',
-    isLoading: enhancementLevel === 'loading'
+    isLoading: enhancementLevel === 'loading',
   };
 }
 
@@ -373,13 +444,13 @@ export function useIntegrationRetry() {
   const [retryCount, setRetryCount] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
   const { error, retry } = useSeamlessIntegration();
-  
+
   const retryWithBackoff = useCallback(async () => {
     if (isRetrying) return;
-    
+
     setIsRetrying(true);
     const delay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Max 10 seconds
-    
+
     setTimeout(async () => {
       try {
         await retry();
@@ -392,14 +463,14 @@ export function useIntegrationRetry() {
       }
     }, delay);
   }, [retry, retryCount, isRetrying]);
-  
+
   const shouldShowRetry = error && !isRetrying && retryCount < 5;
-  
+
   return {
     retryCount,
     isRetrying,
     shouldShowRetry,
     retryWithBackoff,
-    maxRetriesReached: retryCount >= 5
+    maxRetriesReached: retryCount >= 5,
   };
 }

@@ -1,22 +1,47 @@
-import { Bell, Mail, MessageSquare, Smartphone, Filter, Settings, TestTube, Save, CheckCircle, X, RefreshCw, AlertCircle } from 'lucide-react';
+import {
+  Bell,
+  Mail,
+  MessageSquare,
+  Smartphone,
+  Filter,
+  Settings,
+  TestTube,
+  Save,
+  CheckCircle,
+  X,
+  RefreshCw,
+  AlertCircle,
+} from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { useToast } from '../../../hooks/use-toast';
 import { Alert, AlertDescription } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
 import { Input } from '@/shared/design-system';
 import { Label } from '@/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/design-system';
 import { Separator } from '@/shared/design-system';
 import { Switch } from '@/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 
+import { useToast } from '../../../hooks/use-toast';
+
 // --- TYPES ---
 
 type ChannelKey = 'inApp' | 'email' | 'sms' | 'push';
-type CategoryKey = 'billUpdates' | 'commentReplies' | 'expertVerifications' | 'systemAlerts' | 'weeklyDigest';
+type CategoryKey =
+  | 'billUpdates'
+  | 'commentReplies'
+  | 'expertVerifications'
+  | 'systemAlerts'
+  | 'weeklyDigest';
 type Frequency = 'immediate' | 'hourly' | 'daily' | 'weekly';
 type Priority = 'low' | 'medium' | 'high' | 'urgent';
 type FilterField = 'keywordFilters' | 'categoryFilters' | 'sponsorFilters';
@@ -73,51 +98,53 @@ const CHANNEL_CONFIG: Record<ChannelKey, ChannelConfig> = {
   inApp: { icon: Bell, label: 'In-App Notifications', testable: false },
   email: { icon: Mail, label: 'Email Notifications', testable: true },
   sms: { icon: MessageSquare, label: 'SMS Notifications', testable: false },
-  push: { icon: Smartphone, label: 'Push Notifications', testable: false }
+  push: { icon: Smartphone, label: 'Push Notifications', testable: false },
 } as const;
 
 const FREQUENCY_OPTIONS: readonly { value: Frequency; label: string }[] = [
   { value: 'immediate', label: 'Immediate' },
   { value: 'hourly', label: 'Hourly Digest' },
   { value: 'daily', label: 'Daily Digest' },
-  { value: 'weekly', label: 'Weekly Digest' }
+  { value: 'weekly', label: 'Weekly Digest' },
 ] as const;
 
 const PRIORITY_CONFIG: Record<Priority, PriorityConfig> = {
   low: { label: 'Low', color: 'bg-gray-100 text-gray-800 border-gray-300' },
   medium: { label: 'Medium', color: 'bg-blue-100 text-blue-800 border-blue-300' },
   high: { label: 'High', color: 'bg-orange-100 text-orange-800 border-orange-300' },
-  urgent: { label: 'Urgent', color: 'bg-red-100 text-red-800 border-red-300' }
+  urgent: { label: 'Urgent', color: 'bg-red-100 text-red-800 border-red-300' },
 } as const;
 
 const CATEGORY_CONFIG: Record<CategoryKey, CategoryConfig> = {
   billUpdates: {
     label: 'Bill Updates',
-    description: 'Status changes, new amendments, and voting updates'
+    description: 'Status changes, new amendments, and voting updates',
   },
   commentReplies: {
     label: 'Comment Replies',
-    description: 'Replies to your comments and mentions'
+    description: 'Replies to your comments and mentions',
   },
   expertVerifications: {
     label: 'Expert Verifications',
-    description: 'Expert analysis and verification updates'
+    description: 'Expert analysis and verification updates',
   },
   systemAlerts: {
     label: 'System Alerts',
-    description: 'Important system announcements and maintenance'
+    description: 'Important system announcements and maintenance',
   },
   weeklyDigest: {
     label: 'Weekly Digest',
-    description: 'Weekly summary of activity and updates'
-  }
+    description: 'Weekly summary of activity and updates',
+  },
 } as const;
 
 // --- MAIN COMPONENT ---
 
 export default function NotificationPreferences() {
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
-  const [originalPreferences, setOriginalPreferences] = useState<NotificationPreferences | null>(null);
+  const [originalPreferences, setOriginalPreferences] = useState<NotificationPreferences | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingEmail, setTestingEmail] = useState(false);
@@ -138,10 +165,7 @@ export default function NotificationPreferences() {
     return JSON.stringify(preferences) !== JSON.stringify(originalPreferences);
   }, [preferences, originalPreferences]);
 
-  const pushSupported = useMemo(() =>
-    'Notification' in window && 'serviceWorker' in navigator,
-    []
-  );
+  const pushSupported = useMemo(() => 'Notification' in window && 'serviceWorker' in navigator, []);
 
   // --- API CALLS ---
 
@@ -149,7 +173,7 @@ export default function NotificationPreferences() {
     setLoading(true);
     try {
       const response = await fetch('/api/notifications/preferences', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       if (!response.ok) throw new Error('Failed to fetch preferences');
@@ -163,7 +187,7 @@ export default function NotificationPreferences() {
       toast({
         title: 'Error Loading Preferences',
         description: 'Unable to load your notification settings. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -179,9 +203,9 @@ export default function NotificationPreferences() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(preferences)
+        body: JSON.stringify(preferences),
       });
 
       if (!response.ok) throw new Error('Failed to save preferences');
@@ -190,13 +214,13 @@ export default function NotificationPreferences() {
 
       toast({
         title: 'Settings Saved',
-        description: 'Your notification preferences have been updated successfully.'
+        description: 'Your notification preferences have been updated successfully.',
       });
     } catch (error) {
       toast({
         title: 'Save Failed',
         description: 'Unable to save your preferences. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -207,20 +231,20 @@ export default function NotificationPreferences() {
     try {
       const response = await fetch('/api/notifications/test', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       if (!response.ok) throw new Error('Failed to send test');
 
       toast({
         title: 'Test Notification Sent',
-        description: 'Check your enabled notification channels.'
+        description: 'Check your enabled notification channels.',
       });
     } catch (error) {
       toast({
         title: 'Test Failed',
         description: 'Unable to send test notification.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   }, [toast]);
@@ -230,20 +254,20 @@ export default function NotificationPreferences() {
     try {
       const response = await fetch('/api/notifications/test-email', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       if (!response.ok) throw new Error('Failed to send test email');
 
       toast({
         title: 'Test Email Sent',
-        description: 'Check your inbox for the test email.'
+        description: 'Check your inbox for the test email.',
       });
     } catch (error) {
       toast({
         title: 'Email Test Failed',
         description: 'Unable to send test email.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setTestingEmail(false);
@@ -252,95 +276,103 @@ export default function NotificationPreferences() {
 
   // --- PREFERENCE HANDLERS ---
 
-  const updateChannel = useCallback((
-    channel: ChannelKey,
-    field: keyof NotificationChannel,
-    value: boolean | Frequency | QuietHours
-  ) => {
-    setPreferences(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        channels: {
-          ...prev.channels,
-          [channel]: { ...prev.channels[channel], [field]: value }
-        }
-      };
-    });
-  }, []);
+  const updateChannel = useCallback(
+    (
+      channel: ChannelKey,
+      field: keyof NotificationChannel,
+      value: boolean | Frequency | QuietHours
+    ) => {
+      setPreferences(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          channels: {
+            ...prev.channels,
+            [channel]: { ...prev.channels[channel], [field]: value },
+          },
+        };
+      });
+    },
+    []
+  );
 
   const updateCategory = useCallback((category: CategoryKey, enabled: boolean) => {
     setPreferences(prev => {
       if (!prev) return prev;
       return {
         ...prev,
-        categories: { ...prev.categories, [category]: enabled }
+        categories: { ...prev.categories, [category]: enabled },
       };
     });
   }, []);
 
-  const updateSmartFiltering = useCallback(<K extends keyof SmartFiltering>(
-    field: K,
-    value: SmartFiltering[K]
-  ) => {
-    setPreferences(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        smartFiltering: { ...prev.smartFiltering, [field]: value }
-      };
-    });
-  }, []);
+  const updateSmartFiltering = useCallback(
+    <K extends keyof SmartFiltering>(field: K, value: SmartFiltering[K]) => {
+      setPreferences(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          smartFiltering: { ...prev.smartFiltering, [field]: value },
+        };
+      });
+    },
+    []
+  );
 
   const updatePreference = useCallback((updates: Partial<NotificationPreferences>) => {
-    setPreferences(prev => prev ? { ...prev, ...updates } : prev);
+    setPreferences(prev => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
   // --- TAG HANDLERS ---
 
-  const addTag = useCallback((
-    field: 'interests' | FilterField,
-    value: string,
-    resetFn: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    if (!preferences || !value.trim()) return;
+  const addTag = useCallback(
+    (
+      field: 'interests' | FilterField,
+      value: string,
+      resetFn: React.Dispatch<React.SetStateAction<string>>
+    ) => {
+      if (!preferences || !value.trim()) return;
 
-    const normalizedValue = value.trim().toLowerCase();
-    const currentArray = field === 'interests'
-      ? preferences.interests
-      : preferences.smartFiltering[field];
+      const normalizedValue = value.trim().toLowerCase();
+      const currentArray =
+        field === 'interests' ? preferences.interests : preferences.smartFiltering[field];
 
-    if (currentArray.includes(normalizedValue)) {
-      toast({
-        title: 'Already Added',
-        description: `"${normalizedValue}" is already in your list.`,
-        variant: 'destructive'
-      });
-      return;
-    }
+      if (currentArray.includes(normalizedValue)) {
+        toast({
+          title: 'Already Added',
+          description: `"${normalizedValue}" is already in your list.`,
+          variant: 'destructive',
+        });
+        return;
+      }
 
-    if (field === 'interests') {
-      updatePreference({ interests: [...preferences.interests, normalizedValue] });
-    } else {
-      updateSmartFiltering(field, [...currentArray, normalizedValue]);
-    }
+      if (field === 'interests') {
+        updatePreference({ interests: [...preferences.interests, normalizedValue] });
+      } else {
+        updateSmartFiltering(field, [...currentArray, normalizedValue]);
+      }
 
-    resetFn('');
-  }, [preferences, toast, updatePreference, updateSmartFiltering]);
+      resetFn('');
+    },
+    [preferences, toast, updatePreference, updateSmartFiltering]
+  );
 
-  const removeTag = useCallback((
-    field: 'interests' | FilterField,
-    value: string
-  ) => {
-    if (!preferences) return;
+  const removeTag = useCallback(
+    (field: 'interests' | FilterField, value: string) => {
+      if (!preferences) return;
 
-    if (field === 'interests') {
-      updatePreference({ interests: preferences.interests.filter(i => i !== value) });
-    } else {
-      const currentArray = preferences.smartFiltering[field];
-      updateSmartFiltering(field, currentArray.filter(item => item !== value));
-    }
-  }, [preferences, updatePreference, updateSmartFiltering]);
+      if (field === 'interests') {
+        updatePreference({ interests: preferences.interests.filter(i => i !== value) });
+      } else {
+        const currentArray = preferences.smartFiltering[field];
+        updateSmartFiltering(
+          field,
+          currentArray.filter(item => item !== value)
+        );
+      }
+    },
+    [preferences, updatePreference, updateSmartFiltering]
+  );
 
   // --- PUSH NOTIFICATION HANDLERS ---
 
@@ -354,14 +386,14 @@ export default function NotificationPreferences() {
       if (permission === 'granted') {
         toast({
           title: 'Permission Granted',
-          description: 'Push notifications are now enabled.'
+          description: 'Push notifications are now enabled.',
         });
         return true;
       } else if (permission === 'denied') {
         toast({
           title: 'Permission Denied',
           description: 'Enable push notifications in your browser settings to use this feature.',
-          variant: 'destructive'
+          variant: 'destructive',
         });
         return false;
       }
@@ -369,27 +401,30 @@ export default function NotificationPreferences() {
       toast({
         title: 'Permission Error',
         description: 'Unable to request notification permission.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
       return false;
     }
     return false;
   }, [pushSupported, toast]);
 
-  const handlePushToggle = useCallback(async (enabled: boolean) => {
-    if (enabled && pushPermission !== 'granted') {
-      const granted = await requestPushPermission();
-      if (!granted) return;
-    }
-    updateChannel('push', 'enabled', enabled);
-  }, [pushPermission, requestPushPermission, updateChannel]);
+  const handlePushToggle = useCallback(
+    async (enabled: boolean) => {
+      if (enabled && pushPermission !== 'granted') {
+        const granted = await requestPushPermission();
+        if (!granted) return;
+      }
+      updateChannel('push', 'enabled', enabled);
+    },
+    [pushPermission, requestPushPermission, updateChannel]
+  );
 
   const resetPreferences = useCallback(() => {
     if (originalPreferences) {
       setPreferences(JSON.parse(JSON.stringify(originalPreferences)));
       toast({
         title: 'Changes Reset',
-        description: 'All changes have been reverted.'
+        description: 'All changes have been reverted.',
       });
     }
   }, [originalPreferences, toast]);
@@ -508,14 +543,19 @@ export default function NotificationPreferences() {
                   const channel = preferences.channels[channelKey];
                   const Icon = config.icon;
                   const isPush = channelKey === 'push';
-                  const showPermissionWarning = isPush && channel.enabled && pushPermission !== 'granted';
+                  const showPermissionWarning =
+                    isPush && channel.enabled && pushPermission !== 'granted';
 
                   return (
                     <div key={channelKey} className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${channel.enabled ? 'bg-blue-50' : 'bg-gray-50'}`}>
-                            <Icon className={`h-5 w-5 ${channel.enabled ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <div
+                            className={`p-2 rounded-lg ${channel.enabled ? 'bg-blue-50' : 'bg-gray-50'}`}
+                          >
+                            <Icon
+                              className={`h-5 w-5 ${channel.enabled ? 'text-blue-600' : 'text-gray-400'}`}
+                            />
                           </div>
                           <div>
                             <Label className="text-base font-medium">{config.label}</Label>
@@ -537,7 +577,9 @@ export default function NotificationPreferences() {
                         <Switch
                           checked={channel.enabled}
                           onCheckedChange={(enabled: boolean) =>
-                            isPush ? handlePushToggle(enabled) : updateChannel(channelKey, 'enabled', enabled)
+                            isPush
+                              ? handlePushToggle(enabled)
+                              : updateChannel(channelKey, 'enabled', enabled)
                           }
                         />
                       </div>
@@ -546,7 +588,8 @@ export default function NotificationPreferences() {
                         <Alert className="ml-14">
                           <AlertCircle className="h-4 w-4" />
                           <AlertDescription>
-                            Browser permission required. Click the switch to enable push notifications.
+                            Browser permission required. Click the switch to enable push
+                            notifications.
                           </AlertDescription>
                         </Alert>
                       )}
@@ -566,7 +609,7 @@ export default function NotificationPreferences() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {FREQUENCY_OPTIONS.map((option) => (
+                                  {FREQUENCY_OPTIONS.map(option => (
                                     <SelectItem key={option.value} value={option.value}>
                                       {option.label}
                                     </SelectItem>
@@ -586,7 +629,9 @@ export default function NotificationPreferences() {
                                       updateChannel(channelKey, 'quietHours', {
                                         start: e.target.value,
                                         end: channel.quietHours?.end || '08:00',
-                                        timezone: channel.quietHours?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+                                        timezone:
+                                          channel.quietHours?.timezone ||
+                                          Intl.DateTimeFormat().resolvedOptions().timeZone,
                                       })
                                     }
                                     className="flex-1"
@@ -599,7 +644,9 @@ export default function NotificationPreferences() {
                                       updateChannel(channelKey, 'quietHours', {
                                         start: channel.quietHours?.start || '22:00',
                                         end: e.target.value,
-                                        timezone: channel.quietHours?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+                                        timezone:
+                                          channel.quietHours?.timezone ||
+                                          Intl.DateTimeFormat().resolvedOptions().timeZone,
                                       })
                                     }
                                     className="flex-1"
@@ -660,14 +707,13 @@ export default function NotificationPreferences() {
             <CardContent className="space-y-4">
               {(Object.entries(CATEGORY_CONFIG) as [CategoryKey, CategoryConfig][]).map(
                 ([categoryKey, config]) => (
-                  <div key={categoryKey} className="flex items-start justify-between p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                  <div
+                    key={categoryKey}
+                    className="flex items-start justify-between p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                  >
                     <div className="flex-1">
-                      <Label className="text-base font-medium cursor-pointer">
-                        {config.label}
-                      </Label>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {config.description}
-                      </p>
+                      <Label className="text-base font-medium cursor-pointer">{config.label}</Label>
+                      <p className="text-sm text-gray-600 mt-1">{config.description}</p>
                     </div>
                     <Switch
                       checked={preferences.categories[categoryKey]}
@@ -686,8 +732,9 @@ export default function NotificationPreferences() {
             <CardHeader>
               <CardTitle>Your Interests</CardTitle>
               <CardDescription>
-                Add topics you care about to personalize your notification experience.
-                Enable &ldquo;Interest-Based Filtering&rdquo; in Advanced settings to only receive relevant notifications.
+                Add topics you care about to personalize your notification experience. Enable
+                &ldquo;Interest-Based Filtering&rdquo; in Advanced settings to only receive relevant
+                notifications.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -695,7 +742,9 @@ export default function NotificationPreferences() {
                 <Input
                   placeholder="e.g., healthcare, education, climate"
                   value={newInterest}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewInterest(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setNewInterest(e.target.value)
+                  }
                   onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
                     e.key === 'Enter' && addTag('interests', newInterest, setNewInterest)
                   }
@@ -712,7 +761,7 @@ export default function NotificationPreferences() {
 
               {preferences.interests.length > 0 ? (
                 <div className="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  {preferences.interests.map((interest) => (
+                  {preferences.interests.map(interest => (
                     <TagBadge
                       key={interest}
                       label={interest}
@@ -737,9 +786,7 @@ export default function NotificationPreferences() {
           <Card>
             <CardHeader>
               <CardTitle>General Settings</CardTitle>
-              <CardDescription>
-                Fine-tune your notification experience
-              </CardDescription>
+              <CardDescription>Fine-tune your notification experience</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-start justify-between p-4 rounded-lg border border-gray-200">
@@ -751,7 +798,9 @@ export default function NotificationPreferences() {
                 </div>
                 <Switch
                   checked={preferences.batchingEnabled}
-                  onCheckedChange={(checked: boolean) => updatePreference({ batchingEnabled: checked })}
+                  onCheckedChange={(checked: boolean) =>
+                    updatePreference({ batchingEnabled: checked })
+                  }
                 />
               </div>
 
@@ -771,9 +820,7 @@ export default function NotificationPreferences() {
                     {(Object.entries(PRIORITY_CONFIG) as [Priority, PriorityConfig][]).map(
                       ([value, config]) => (
                         <SelectItem key={value} value={value}>
-                          <Badge className={`${config.color} border`}>
-                            {config.label}
-                          </Badge>
+                          <Badge className={`${config.color} border`}>{config.label}</Badge>
                         </SelectItem>
                       )
                     )}
@@ -816,7 +863,9 @@ export default function NotificationPreferences() {
                     </div>
                     <Switch
                       checked={preferences.smartFiltering.interestBasedFiltering}
-                      onCheckedChange={(checked: boolean) => updateSmartFiltering('interestBasedFiltering', checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        updateSmartFiltering('interestBasedFiltering', checked)
+                      }
                     />
                   </div>
 
@@ -835,7 +884,7 @@ export default function NotificationPreferences() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(['low', 'medium', 'high'] as const).map((value) => (
+                        {(['low', 'medium', 'high'] as const).map(value => (
                           <SelectItem key={value} value={value}>
                             <Badge className={`${PRIORITY_CONFIG[value].color} border`}>
                               {PRIORITY_CONFIG[value].label}
@@ -856,7 +905,7 @@ export default function NotificationPreferences() {
                     value={newKeyword}
                     onChange={setNewKeyword}
                     onAdd={() => addTag('keywordFilters', newKeyword, setNewKeyword)}
-                    onRemove={(item) => removeTag('keywordFilters', item)}
+                    onRemove={item => removeTag('keywordFilters', item)}
                   />
 
                   <FilterSection
@@ -867,7 +916,7 @@ export default function NotificationPreferences() {
                     value={newCategoryFilter}
                     onChange={setNewCategoryFilter}
                     onAdd={() => addTag('categoryFilters', newCategoryFilter, setNewCategoryFilter)}
-                    onRemove={(item) => removeTag('categoryFilters', item)}
+                    onRemove={item => removeTag('categoryFilters', item)}
                   />
 
                   <FilterSection
@@ -878,7 +927,7 @@ export default function NotificationPreferences() {
                     value={newSponsorFilter}
                     onChange={setNewSponsorFilter}
                     onAdd={() => addTag('sponsorFilters', newSponsorFilter, setNewSponsorFilter)}
-                    onRemove={(item) => removeTag('sponsorFilters', item)}
+                    onRemove={item => removeTag('sponsorFilters', item)}
                   />
                 </div>
               )}
@@ -935,7 +984,7 @@ function FilterSection({
   value,
   onChange,
   onAdd,
-  onRemove
+  onRemove,
 }: FilterSectionProps) {
   return (
     <div className="space-y-3">
@@ -949,9 +998,7 @@ function FilterSection({
           placeholder={placeholder}
           value={value}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-          onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
-            e.key === 'Enter' && onAdd()
-          }
+          onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && onAdd()}
           className="flex-1"
         />
         <Button onClick={onAdd} size="sm" disabled={!value.trim()}>
@@ -961,7 +1008,7 @@ function FilterSection({
 
       {items.length > 0 ? (
         <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-          {items.map((item) => (
+          {items.map(item => (
             <TagBadge key={item} label={item} onRemove={() => onRemove(item)} />
           ))}
         </div>

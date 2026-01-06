@@ -1,10 +1,10 @@
-import { 
-  PretextScore, 
-  BillAnalysis, 
-  AnalysisConfig, 
-  TimelineEvent, 
+import {
+  PretextScore,
+  BillAnalysis,
+  AnalysisConfig,
+  TimelineEvent,
   Stakeholder,
-  Source 
+  Source,
 } from '../types';
 
 export class PretextAnalysisService {
@@ -21,12 +21,12 @@ export class PretextAnalysisService {
     const billData = await this.fetchBillData(billId);
     const timeline = await this.buildTimeline(billId);
     const stakeholders = await this.analyzeStakeholders(billId);
-    
+
     const indicators = {
       timing: this.analyzeTimingIndicators(timeline),
       beneficiaryMismatch: this.analyzeBeneficiaryMismatch(stakeholders, billData),
       scopeCreep: this.analyzeScopeCreep(billData),
-      networkCentrality: this.analyzeNetworkCentrality(stakeholders)
+      networkCentrality: this.analyzeNetworkCentrality(stakeholders),
     };
 
     const score = this.calculateCompositeScore(indicators);
@@ -42,7 +42,7 @@ export class PretextAnalysisService {
       indicators,
       rationale,
       sources,
-      reviewStatus: score > this.config.thresholds.reviewRequired ? 'pending' : 'verified'
+      reviewStatus: score > this.config.thresholds.reviewRequired ? 'pending' : 'verified',
     };
   }
 
@@ -64,23 +64,25 @@ export class PretextAnalysisService {
         const daysDiff = Math.abs(
           (bill.date.getTime() - crisis.date.getTime()) / (1000 * 60 * 60 * 24)
         );
-        
+
         if (daysDiff <= this.config.timeWindows.crisisToBill) {
-          const proximityScore = Math.max(0, 100 - (daysDiff / this.config.timeWindows.crisisToBill) * 100);
-          maxScore = Math.max(maxScore, proximityScore);
-          evidence.push(
-            `Bill introduced ${Math.round(daysDiff)} days after ${crisis.title}`
+          const proximityScore = Math.max(
+            0,
+            100 - (daysDiff / this.config.timeWindows.crisisToBill) * 100
           );
+          maxScore = Math.max(maxScore, proximityScore);
+          evidence.push(`Bill introduced ${Math.round(daysDiff)} days after ${crisis.title}`);
         }
       }
     }
 
     return {
       score: maxScore,
-      description: maxScore > 50 
-        ? 'Bill introduced shortly after crisis event' 
-        : 'Normal timing pattern observed',
-      evidence
+      description:
+        maxScore > 50
+          ? 'Bill introduced shortly after crisis event'
+          : 'Normal timing pattern observed',
+      evidence,
     };
   }
 
@@ -88,7 +90,7 @@ export class PretextAnalysisService {
    * Analyze beneficiary patterns vs stated rationale
    */
   private analyzeBeneficiaryMismatch(
-    stakeholders: Stakeholder[], 
+    stakeholders: Stakeholder[],
     billData: any
   ): {
     score: number;
@@ -115,10 +117,9 @@ export class PretextAnalysisService {
     }
 
     // Check for rapid procurement awards
-    const procurementEvents = billData.timeline?.filter(
-      (e: TimelineEvent) => e.type === 'procurement'
-    ) || [];
-    
+    const procurementEvents =
+      billData.timeline?.filter((e: TimelineEvent) => e.type === 'procurement') || [];
+
     if (procurementEvents.length > 0) {
       score += 20;
       evidence.push(`${procurementEvents.length} procurement events linked to bill`);
@@ -126,10 +127,11 @@ export class PretextAnalysisService {
 
     return {
       score: Math.min(score, 100),
-      description: score > 50 
-        ? 'Significant beneficiary-sponsor connections detected' 
-        : 'Limited beneficiary concerns identified',
-      evidence
+      description:
+        score > 50
+          ? 'Significant beneficiary-sponsor connections detected'
+          : 'Limited beneficiary concerns identified',
+      evidence,
     };
   }
 
@@ -149,7 +151,7 @@ export class PretextAnalysisService {
     // Check for broad powers or vague language
     const broadTerms = ['emergency', 'necessary', 'appropriate', 'reasonable'];
     const billText = billData.text || '';
-    
+
     broadTerms.forEach(term => {
       const matches = (billText.match(new RegExp(term, 'gi')) || []).length;
       if (matches > 3) {
@@ -160,10 +162,9 @@ export class PretextAnalysisService {
 
     return {
       score: Math.min(score, 100),
-      description: score > 40 
-        ? 'Bill contains broad or vague language' 
-        : 'Bill scope appears focused',
-      evidence
+      description:
+        score > 40 ? 'Bill contains broad or vague language' : 'Bill scope appears focused',
+      evidence,
     };
   }
 
@@ -179,9 +180,7 @@ export class PretextAnalysisService {
     let score = 0;
 
     // Calculate connection density
-    const totalConnections = stakeholders.reduce(
-      (sum, s) => sum + s.connections.length, 0
-    );
+    const totalConnections = stakeholders.reduce((sum, s) => sum + s.connections.length, 0);
     const avgConnections = totalConnections / stakeholders.length;
 
     if (avgConnections > 3) {
@@ -200,10 +199,11 @@ export class PretextAnalysisService {
 
     return {
       score: Math.min(score, 100),
-      description: score > 50 
-        ? 'Dense network of connected actors identified' 
-        : 'Normal stakeholder network pattern',
-      evidence
+      description:
+        score > 50
+          ? 'Dense network of connected actors identified'
+          : 'Normal stakeholder network pattern',
+      evidence,
     };
   }
 
@@ -212,12 +212,12 @@ export class PretextAnalysisService {
    */
   private calculateCompositeScore(indicators: any): number {
     const { weights } = this.config;
-    
+
     return Math.round(
       indicators.timing.score * weights.timing +
-      indicators.beneficiaryMismatch.score * weights.beneficiaryMismatch +
-      indicators.scopeCreep.score * weights.scopeCreep +
-      indicators.networkCentrality.score * weights.networkCentrality
+        indicators.beneficiaryMismatch.score * weights.beneficiaryMismatch +
+        indicators.scopeCreep.score * weights.scopeCreep +
+        indicators.networkCentrality.score * weights.networkCentrality
     );
   }
 
@@ -226,16 +226,17 @@ export class PretextAnalysisService {
    */
   private calculateConfidence(indicators: any, timelineLength: number): number {
     let confidence = 0.5; // baseline
-    
+
     // More timeline events = higher confidence
     confidence += Math.min(timelineLength * 0.05, 0.3);
-    
+
     // Evidence count affects confidence
     const totalEvidence = Object.values(indicators).reduce(
-      (sum: number, indicator: any) => sum + indicator.evidence.length, 0
+      (sum: number, indicator: any) => sum + indicator.evidence.length,
+      0
     );
     confidence += Math.min(totalEvidence * 0.02, 0.2);
-    
+
     return Math.min(confidence, 1.0);
   }
 
@@ -244,7 +245,7 @@ export class PretextAnalysisService {
    */
   private generateRationale(indicators: any): string[] {
     const rationale: string[] = [];
-    
+
     Object.entries(indicators).forEach(([key, indicator]: [string, any]) => {
       if (indicator.score > 30) {
         rationale.push(`${key}: ${indicator.description}`);
@@ -259,11 +260,11 @@ export class PretextAnalysisService {
    */
   private aggregateSources(timeline: TimelineEvent[], stakeholders: Stakeholder[]): Source[] {
     const sources: Source[] = [];
-    
+
     timeline.forEach(event => {
       sources.push(...event.sources);
     });
-    
+
     stakeholders.forEach(stakeholder => {
       stakeholder.connections.forEach(connection => {
         sources.push(...connection.sources);
@@ -271,8 +272,8 @@ export class PretextAnalysisService {
     });
 
     // Deduplicate by URL
-    const uniqueSources = sources.filter((source, index, self) => 
-      index === self.findIndex(s => s.url === source.url)
+    const uniqueSources = sources.filter(
+      (source, index, self) => index === self.findIndex(s => s.url === source.url)
     );
 
     return uniqueSources;

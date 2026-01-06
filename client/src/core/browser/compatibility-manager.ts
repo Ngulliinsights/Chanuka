@@ -1,6 +1,6 @@
 /**
  * Browser Compatibility Manager Module
- * 
+ *
  * High-level orchestrator for browser detection, feature testing,
  * polyfill loading, and compatibility scoring.
  */
@@ -55,7 +55,7 @@ export class BrowserCompatibilityManager {
         recommendations: [],
         compatibilityScore: 0,
         shouldBlock: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       // Load polyfills for missing features
@@ -68,9 +68,12 @@ export class BrowserCompatibilityManager {
 
       this.initialized = true;
       return this.status;
-
     } catch (error) {
-      logger.error('Failed to initialize browser compatibility manager', { component: 'BrowserCompatibilityManager' }, error);
+      logger.error(
+        'Failed to initialize browser compatibility manager',
+        { component: 'BrowserCompatibilityManager' },
+        error
+      );
       throw error;
     }
   }
@@ -150,10 +153,11 @@ export class BrowserCompatibilityManager {
     // Critical: Internet Explorer is completely unsupported
     if (browserInfo.name === 'ie') {
       recommendations.push({
-        message: 'Internet Explorer is no longer supported. Switch to Chrome, Firefox, Safari, or Edge immediately.',
+        message:
+          'Internet Explorer is no longer supported. Switch to Chrome, Firefox, Safari, or Edge immediately.',
         severity: 'critical',
         category: 'browser-version',
-        actionable: true
+        actionable: true,
       });
     }
 
@@ -163,7 +167,7 @@ export class BrowserCompatibilityManager {
         message: `Your browser version is outdated. Update to the latest version for optimal compatibility.`,
         severity: 'high',
         category: 'browser-version',
-        actionable: true
+        actionable: true,
       });
     }
 
@@ -173,27 +177,29 @@ export class BrowserCompatibilityManager {
         message: `Browser compatibility score is ${compatibilityScore}%. Update your browser for better performance.`,
         severity: 'medium',
         category: 'browser-version',
-        actionable: true
+        actionable: true,
       });
     }
 
     // High: Missing ES6 without polyfills
     if (!browserInfo.features.es6 && !polyfillsLoaded) {
       recommendations.push({
-        message: 'Modern JavaScript features are not supported. The application may not function correctly.',
+        message:
+          'Modern JavaScript features are not supported. The application may not function correctly.',
         severity: 'high',
         category: 'feature-missing',
-        actionable: false
+        actionable: false,
       });
     }
 
     // Low: Missing optional features
     if (!browserInfo.features.serviceWorkers) {
       recommendations.push({
-        message: 'Offline functionality is not available. Update your browser to enable working without internet.',
+        message:
+          'Offline functionality is not available. Update your browser to enable working without internet.',
         severity: 'low',
         category: 'feature-missing',
-        actionable: true
+        actionable: true,
       });
     }
 

@@ -1,6 +1,6 @@
 /**
  * API Authentication Module
- * 
+ *
  * Handles authentication-related API functionality including token management,
  * automatic token refresh, and authentication interceptors.
  */
@@ -32,8 +32,8 @@ export class AuthenticationInterceptor {
         ...request,
         headers: {
           ...request.headers,
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       };
     }
     return request;
@@ -85,31 +85,31 @@ export class TokenRefreshInterceptor {
    */
   public async refreshAuthToken(refreshToken: string): Promise<void> {
     this.isRefreshing = true;
-    
+
     try {
       const response = await fetch(`${this.config.tokenRefreshEndpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({ refreshToken }),
       });
 
       if (!response.ok) {
         throw new Error('Token refresh failed');
       }
 
-      const data = await response.json() as {
+      const data = (await response.json()) as {
         accessToken: string;
         refreshToken: string;
         expiresAt: string;
       };
-      
+
       await tokenManager.storeTokens({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
         expiresAt: new Date(data.expiresAt),
-        tokenType: 'Bearer'
+        tokenType: 'Bearer',
       });
 
       logger.info('Authentication token refreshed successfully');
@@ -124,15 +124,15 @@ export class TokenRefreshInterceptor {
    */
   private handleAuthenticationFailure(): void {
     logger.warn('Authentication failed, user needs to login');
-    
+
     if (this.config.onAuthFailure) {
       this.config.onAuthFailure();
     }
-    
+
     const event = new CustomEvent('auth:failure', {
-      detail: { reason: 'token_expired' }
+      detail: { reason: 'token_expired' },
     });
-    
+
     if (typeof window !== 'undefined') {
       window.dispatchEvent(event);
     }
@@ -150,8 +150,8 @@ export async function shouldRefreshToken(thresholdMinutes: number = 5): Promise<
   if (!expiresAt) return false;
 
   const now = new Date();
-  const threshold = new Date(now.getTime() + (thresholdMinutes * 60 * 1000));
-  
+  const threshold = new Date(now.getTime() + thresholdMinutes * 60 * 1000);
+
   return expiresAt <= threshold;
 }
 
@@ -178,7 +178,7 @@ export async function proactiveTokenRefresh(config: AuthConfig): Promise<void> {
 export function createAuthInterceptors(config: AuthConfig) {
   return {
     request: new AuthenticationInterceptor(),
-    error: new TokenRefreshInterceptor(config)
+    error: new TokenRefreshInterceptor(config),
   };
 }
 
@@ -188,5 +188,5 @@ export function createAuthInterceptors(config: AuthConfig) {
 export const DEFAULT_AUTH_CONFIG: AuthConfig = {
   tokenRefreshEndpoint: '/api/auth/refresh',
   tokenRefreshThreshold: 5, // 5 minutes
-  maxRefreshAttempts: 3
+  maxRefreshAttempts: 3,
 };

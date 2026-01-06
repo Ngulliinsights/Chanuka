@@ -27,7 +27,7 @@ const isValidNavigationPath = () => true;
 export const validateNavigation = {
   validateNavigationItem,
   validateNavigationItems,
-  isValidNavigationPath
+  isValidNavigationPath,
 };
 
 // Navigation section determination (from utils.ts)
@@ -54,5 +54,5 @@ export const navigationUtils = {
   determineNavigationSection,
   validateNavigationItem,
   validateNavigationItems,
-  isValidNavigationPath
+  isValidNavigationPath,
 };

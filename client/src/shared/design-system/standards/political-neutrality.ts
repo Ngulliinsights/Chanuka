@@ -300,7 +300,7 @@ export const PoliticalNeutralityPrinciples = {
       '☐ No default expansion favoring one view',
       '☐ Tab order alternates or random between perspectives',
       '☐ Keyboard navigation works equally for all',
-      '☐ Search/filter doesn\'t bias toward one perspective',
+      "☐ Search/filter doesn't bias toward one perspective",
     ],
 
     userResearch: [
@@ -373,7 +373,16 @@ export function validatePoliticalNeutrality(config: {
   const suggestions: string[] = [];
 
   // Check for biased language
-  const biasedTerms = ['pro', 'con', 'support', 'oppose', 'radical', 'extreme', 'traditional', 'progressive'];
+  const biasedTerms = [
+    'pro',
+    'con',
+    'support',
+    'oppose',
+    'radical',
+    'extreme',
+    'traditional',
+    'progressive',
+  ];
   if (config.languageContent) {
     biasedTerms.forEach(term => {
       if (config.languageContent?.toLowerCase().includes(term)) {

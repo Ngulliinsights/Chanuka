@@ -3,7 +3,7 @@
  *
  * Centralized export for shared UI components, design system primitives,
  * reusable interface elements, and technical infrastructure.
- * 
+ *
  * This module now consolidates both UI concerns and infrastructure
  * following the architectural principle from SHARED_VS_CORE_ANALYSIS.md:
  * "shared/ handles UI concerns and infrastructure, core/ handles business logic"
@@ -21,28 +21,28 @@ export {
   // Navigation components
   Navigation,
   DesktopSidebar,
-  
+
   // Loading components
   LoadingIndicator,
-  
+
   // Dashboard components
   UserDashboard,
-  
+
   // Notification components
   NotificationCenter,
   NotificationItem,
-  
+
   // Mobile components
   InfiniteScroll,
   AutoHideHeader,
-  
+
   // Privacy components
   PrivacyManager,
-  
+
   // Realtime components
   RealTimeDashboard,
   RealTimeNotifications,
-  
+
   // Education components
   EducationalFramework,
   ConstitutionalContext,
@@ -56,9 +56,7 @@ export {
 export * from './infrastructure';
 
 // Shared Hooks - Export only existing hooks
-export {
-  useProgressiveDisclosure,
-} from './hooks';
+export { useProgressiveDisclosure } from './hooks';
 
 // Shared Libraries - Export only non-conflicting items
 export {
@@ -85,7 +83,7 @@ export * from './testing';
 // Validation utilities - Export specific items to avoid conflicts
 export type { ValidationResult as SharedValidationResult } from './validation';
 
-// Interface definitions - Export specific items to avoid conflicts  
+// Interface definitions - Export specific items to avoid conflicts
 export type { UnifiedInterfaces } from './interfaces';
 
 // Component templates

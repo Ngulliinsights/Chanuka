@@ -1,13 +1,10 @@
 import React from 'react';
-import { SkeletonProps } from '../types';
+
 import { cn } from '@/shared/design-system/lib/utils';
 
-export const Skeleton = React.memo<SkeletonProps>(({
-  className,
-  width,
-  height,
-  ...props
-}) => {
+import { SkeletonProps } from '../types';
+
+export const Skeleton = React.memo<SkeletonProps>(({ className, width, height, ...props }) => {
   const style: React.CSSProperties = {
     ...(width && { width }),
     ...(height && { height }),
@@ -25,4 +22,3 @@ export const Skeleton = React.memo<SkeletonProps>(({
 });
 
 export default Skeleton;
-

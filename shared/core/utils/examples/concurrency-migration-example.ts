@@ -5,10 +5,10 @@
  * to gradually migrate from legacy to new implementations.
  */
 
+import { MockFeatureFlagsService } from '../../types/feature-flags';
 import { ConcurrencyAdapter } from '../concurrency-adapter';
 import { getConcurrencyRouter } from '../concurrency-migration-router';
 import { globalMutex, apiSemaphore } from '../race-condition-prevention';
-import { MockFeatureFlagsService } from '../../types/feature-flags';
 
 // Example 1: Direct usage of new concurrency utilities
 export async function directUsageExample() {

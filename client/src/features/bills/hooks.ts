@@ -29,10 +29,14 @@ export const billsKeys = {
   sponsors: (billId: string | number) => [...billsKeys.detail(billId), 'sponsors'] as const,
   polls: (billId: string | number) => [...billsKeys.detail(billId), 'polls'] as const,
   analysis: (billId: string | number) => [...billsKeys.detail(billId), 'analysis'] as const,
-  sponsorshipAnalysis: (billId: string | number) => [...billsKeys.detail(billId), 'sponsorship-analysis'] as const,
-  primarySponsorAnalysis: (billId: string | number) => [...billsKeys.detail(billId), 'primary-sponsor-analysis'] as const,
-  coSponsorsAnalysis: (billId: string | number) => [...billsKeys.detail(billId), 'co-sponsors-analysis'] as const,
-  financialAnalysis: (billId: string | number) => [...billsKeys.detail(billId), 'financial-analysis'] as const,
+  sponsorshipAnalysis: (billId: string | number) =>
+    [...billsKeys.detail(billId), 'sponsorship-analysis'] as const,
+  primarySponsorAnalysis: (billId: string | number) =>
+    [...billsKeys.detail(billId), 'primary-sponsor-analysis'] as const,
+  coSponsorsAnalysis: (billId: string | number) =>
+    [...billsKeys.detail(billId), 'co-sponsors-analysis'] as const,
+  financialAnalysis: (billId: string | number) =>
+    [...billsKeys.detail(billId), 'financial-analysis'] as const,
   metadata: () => [...billsKeys.all, 'metadata'] as const,
   categories: () => [...billsKeys.metadata(), 'categories'] as const,
   statuses: () => [...billsKeys.metadata(), 'statuses'] as const,
@@ -248,8 +252,7 @@ export function useTrackBill(billId: string | number) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (tracking: boolean) => 
-      billsApiService.trackBill(billId, tracking),
+    mutationFn: (tracking: boolean) => billsApiService.trackBill(billId, tracking),
 
     onSuccess: (_, tracking) => {
       queryClient.invalidateQueries({ queryKey: billsKeys.detail(billId) });
@@ -257,7 +260,7 @@ export function useTrackBill(billId: string | number) {
 
       toast({
         title: tracking ? 'Bill tracked' : 'Bill untracked',
-        description: tracking 
+        description: tracking
           ? 'You will receive updates about this bill'
           : 'You will no longer receive updates about this bill',
       });
@@ -314,8 +317,7 @@ export function useAddBillComment(billId: string | number) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (payload: CommentPayload) =>
-      billsApiService.addBillComment(billId, payload),
+    mutationFn: (payload: CommentPayload) => billsApiService.addBillComment(billId, payload),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: billsKeys.comments(billId) });
@@ -346,11 +348,11 @@ export function useVoteOnComment() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ 
-      commentId, 
-      voteType 
-    }: { 
-      commentId: string | number; 
+    mutationFn: ({
+      commentId,
+      voteType,
+    }: {
+      commentId: string | number;
       voteType: 'up' | 'down';
     }) => billsApiService.voteOnComment(commentId, voteType),
 
@@ -378,8 +380,7 @@ export function useEndorseComment() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (commentId: string | number) => 
-      billsApiService.endorseComment(commentId),
+    mutationFn: (commentId: string | number) => billsApiService.endorseComment(commentId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: billsKeys.all });
@@ -414,8 +415,7 @@ export function useCreateBillPoll(billId: string | number) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (payload: CreatePollPayload) =>
-      billsApiService.createBillPoll(billId, payload),
+    mutationFn: (payload: CreatePollPayload) => billsApiService.createBillPoll(billId, payload),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: billsKeys.polls(billId) });

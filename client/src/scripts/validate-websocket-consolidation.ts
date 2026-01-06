@@ -1,6 +1,6 @@
 /**
  * WebSocket Consolidation Validation Script
- * 
+ *
  * Validates that the WebSocket consolidation migration was successful
  * and all components are properly integrated.
  */
@@ -48,7 +48,7 @@ class WebSocketConsolidationValidator {
       'client/src/core/realtime/websocket',
       'client/src/core/realtime/services',
       'client/src/core/realtime/hooks',
-      'client/src/core/realtime/utils'
+      'client/src/core/realtime/utils',
     ];
 
     for (const dir of requiredDirectories) {
@@ -76,7 +76,7 @@ class WebSocketConsolidationValidator {
       'client/src/core/realtime/hooks/use-bill-tracking.ts',
       'client/src/core/realtime/hooks/use-community-realtime.ts',
       'client/src/core/realtime/utils/event-emitter.ts',
-      'client/src/core/realtime/README.md'
+      'client/src/core/realtime/README.md',
     ];
 
     for (const file of requiredFiles) {
@@ -94,13 +94,13 @@ class WebSocketConsolidationValidator {
     const filesToCheck = [
       'client/src/core/realtime/index.ts',
       'client/src/core/realtime/services/realtime-service.ts',
-      'client/src/core/realtime/hooks/use-websocket.ts'
+      'client/src/core/realtime/hooks/use-websocket.ts',
     ];
 
     for (const file of filesToCheck) {
       if (fs.existsSync(file)) {
         const content = fs.readFileSync(file, 'utf-8');
-        
+
         // Check for proper imports
         if (file.includes('realtime-service.ts')) {
           if (!content.includes("from '../websocket/manager'")) {
@@ -116,7 +116,7 @@ class WebSocketConsolidationValidator {
           '@client/services/webSocketService',
           '@client/services/CommunityWebSocketManager',
           '@client/hooks/use-websocket',
-          '@client/utils/realtime-optimizer'
+          '@client/utils/realtime-optimizer',
         ];
 
         for (const legacyImport of legacyImports) {
@@ -134,10 +134,10 @@ class WebSocketConsolidationValidator {
     console.log('\n📤 Validating exports...');
 
     const indexFile = 'client/src/core/realtime/index.ts';
-    
+
     if (fs.existsSync(indexFile)) {
       const content = fs.readFileSync(indexFile, 'utf-8');
-      
+
       const requiredExports = [
         'UnifiedWebSocketManager',
         'RealTimeService',
@@ -147,7 +147,7 @@ class WebSocketConsolidationValidator {
         'NotificationService',
         'useWebSocket',
         'useBillTracking',
-        'useCommunityRealTime'
+        'useCommunityRealTime',
       ];
 
       for (const exportName of requiredExports) {
@@ -166,10 +166,10 @@ class WebSocketConsolidationValidator {
     console.log('\n🏷️  Validating types...');
 
     const typesFile = 'client/src/core/realtime/types.ts';
-    
+
     if (fs.existsSync(typesFile)) {
       const content = fs.readFileSync(typesFile, 'utf-8');
-      
+
       const requiredTypes = [
         'ConnectionState',
         'WebSocketConfig',
@@ -180,7 +180,7 @@ class WebSocketConsolidationValidator {
         'RealTimeHandlers',
         'WebSocketHookReturn',
         'BillTrackingHookReturn',
-        'CommunityRealTimeHookReturn'
+        'CommunityRealTimeHookReturn',
       ];
 
       for (const typeName of requiredTypes) {
@@ -247,7 +247,7 @@ class WebSocketConsolidationValidator {
 // CLI interface
 async function main() {
   const validator = new WebSocketConsolidationValidator();
-  
+
   try {
     await validator.validate();
   } catch (error) {

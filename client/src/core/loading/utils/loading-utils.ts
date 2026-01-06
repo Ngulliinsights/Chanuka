@@ -106,9 +106,13 @@ export function createOperationFromScenario(
 
   return {
     id: `${scenario.id}-${instanceId}`,
-    type: scenario.id.includes('page') ? 'page' :
-          scenario.id.includes('component') ? 'component' :
-          scenario.id.includes('api') ? 'api' : 'asset',
+    type: scenario.id.includes('page')
+      ? 'page'
+      : scenario.id.includes('component')
+        ? 'component'
+        : scenario.id.includes('api')
+          ? 'api'
+          : 'asset',
     startTime: new Date(),
     state: 'idle',
     retryCount: 0,
@@ -231,7 +235,11 @@ export class LoadingScenarioBuilder {
 }
 
 // Check if operation has timed out
-export function hasOperationTimedOut(operation: LoadingOperation, timeoutMs: number = 30000, currentTime?: Date): boolean {
+export function hasOperationTimedOut(
+  operation: LoadingOperation,
+  timeoutMs: number = 30000,
+  currentTime?: Date
+): boolean {
   const now = currentTime || new Date();
   const startTime = operation.startTime;
   const elapsed = now.getTime() - startTime.getTime();
@@ -244,7 +252,10 @@ export function calculateRetryDelay(retryCount: number, baseDelay: number = 1000
 }
 
 // Get adjusted timeout based on priority
-export function getAdjustedTimeout(baseTimeout: number, priority: 'low' | 'normal' | 'high' | 'critical'): number {
+export function getAdjustedTimeout(
+  baseTimeout: number,
+  priority: 'low' | 'normal' | 'high' | 'critical'
+): number {
   switch (priority) {
     case 'critical':
       return baseTimeout;

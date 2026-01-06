@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { useUIErrorHandler } from '../utils/error-handling';
 
 // ============================================================================
@@ -57,7 +58,6 @@ export const useHookName = (options: UseHookNameOptions = {}): UseHookNameResult
       // Your async logic here
       const result = await fetchData();
       setData(result);
-
     } catch (err) {
       handleError(err as Error, 'refresh');
     } finally {

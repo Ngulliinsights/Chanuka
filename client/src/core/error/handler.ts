@@ -241,27 +241,19 @@ class CoreErrorHandler {
       id: 'network-retry',
       name: 'Network Retry',
       description: 'Retry network requests with exponential backoff',
-      canRecover: (error) =>
-        error.type === ErrorDomain.NETWORK &&
-        error.retryable &&
-        (error.retryCount || 0) < 3,
-      recover: async (error) => {
+      canRecover: error =>
+        error.type === ErrorDomain.NETWORK && error.retryable && (error.retryCount || 0) < 3,
+      recover: async error => {
         const retryCount = (error.retryCount || 0) + 1;
         const delayMs = Math.min(1000 * Math.pow(2, retryCount), 10000);
 
         await new Promise(resolve => setTimeout(resolve, delayMs));
-        
+
         // Create a new error instance with incremented retry count
-        const retriedError = new AppError(
-          error.message,
-          error.code,
-          error.type,
-          error.severity,
-          {
-            ...error,
-            retryCount,
-          }
-        );
+        const retriedError = new AppError(error.message, error.code, error.type, error.severity, {
+          ...error,
+          retryCount,
+        });
 
         // Update the stored error
         this.errors.set(error.id, retriedError);
@@ -278,10 +270,8 @@ class CoreErrorHandler {
       id: 'cache-clear',
       name: 'Cache Clear and Reload',
       description: 'Clear application cache and reload the page',
-      canRecover: (error) =>
-        error.severity === ErrorSeverity.CRITICAL &&
-        error.recoverable,
-      recover: async (_error) => {
+      canRecover: error => error.severity === ErrorSeverity.CRITICAL && error.recoverable,
+      recover: async _error => {
         try {
           // Clear caches
           if ('caches' in window) {
@@ -314,10 +304,8 @@ class CoreErrorHandler {
       id: 'page-reload',
       name: 'Page Reload',
       description: 'Reload the current page to recover from error',
-      canRecover: (error) =>
-        error.severity >= ErrorSeverity.HIGH &&
-        error.recoverable,
-      recover: async (_error) => {
+      canRecover: error => error.severity >= ErrorSeverity.HIGH && error.recoverable,
+      recover: async _error => {
         setTimeout(() => window.location.reload(), 1000);
         return true;
       },
@@ -332,7 +320,7 @@ class CoreErrorHandler {
     if (!this.config.enableGlobalHandlers) return;
 
     // Handle uncaught errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       event.preventDefault();
 
       this.handleError({
@@ -355,7 +343,7 @@ class CoreErrorHandler {
     });
 
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       event.preventDefault();
 
       this.handleError({
@@ -484,9 +472,11 @@ class CoreErrorHandler {
    */
   private emitErrorEvents(): void {
     if (typeof window !== 'undefined' && this.pendingNotifications.length > 0) {
-      window.dispatchEvent(new CustomEvent('coreErrors', {
-        detail: this.pendingNotifications
-      }));
+      window.dispatchEvent(
+        new CustomEvent('coreErrors', {
+          detail: this.pendingNotifications,
+        })
+      );
     }
   }
 

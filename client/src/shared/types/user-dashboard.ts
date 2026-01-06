@@ -1,6 +1,6 @@
 /**
  * User Dashboard Types
- * 
+ *
  * Defines interfaces for personalized user dashboard functionality
  * including tracked bills, engagement history, and civic impact metrics.
  * Migrated from client/src/types/user-dashboard.ts

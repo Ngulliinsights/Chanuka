@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
+
 import { architecturePerformanceMonitor } from '../core/performance/architecture-performance-monitor';
 
 interface UseArchitecturePerformanceOptions {
@@ -20,8 +21,18 @@ interface UseArchitecturePerformanceReturn {
   startJourney: (journeyId: string, userPersona?: 'novice' | 'intermediate' | 'expert') => void;
   addJourneyStep: (stepName: string, success?: boolean) => void;
   completeJourney: () => void;
-  recordSearchPerformance: (query: string, responseTime: number, resultCount: number, searchType?: 'unified' | 'intelligent' | 'legacy') => void;
-  recordDashboardPerformance: (dashboardType: 'adaptive' | 'legacy', loadTime: number, widgetCount: number, personaDetected?: 'novice' | 'intermediate' | 'expert') => void;
+  recordSearchPerformance: (
+    query: string,
+    responseTime: number,
+    resultCount: number,
+    searchType?: 'unified' | 'intelligent' | 'legacy'
+  ) => void;
+  recordDashboardPerformance: (
+    dashboardType: 'adaptive' | 'legacy',
+    loadTime: number,
+    widgetCount: number,
+    personaDetected?: 'novice' | 'intermediate' | 'expert'
+  ) => void;
 }
 
 /**
@@ -34,7 +45,7 @@ export function useArchitecturePerformance(
     componentName = 'UnknownComponent',
     trackLoad = true,
     trackRender = false,
-    enableJourneyTracking = false
+    enableJourneyTracking = false,
   } = options;
 
   const mountTimeRef = useRef<number>(0);
@@ -58,12 +69,12 @@ export function useArchitecturePerformance(
   /**
    * Start user journey tracking
    */
-  const startJourney = useCallback((
-    journeyId: string,
-    userPersona?: 'novice' | 'intermediate' | 'expert'
-  ) => {
-    architecturePerformanceMonitor.startUserJourney(journeyId, userPersona);
-  }, []);
+  const startJourney = useCallback(
+    (journeyId: string, userPersona?: 'novice' | 'intermediate' | 'expert') => {
+      architecturePerformanceMonitor.startUserJourney(journeyId, userPersona);
+    },
+    []
+  );
 
   /**
    * Add step to current journey
@@ -82,36 +93,42 @@ export function useArchitecturePerformance(
   /**
    * Record search performance
    */
-  const recordSearchPerformance = useCallback((
-    query: string,
-    responseTime: number,
-    resultCount: number,
-    searchType: 'unified' | 'intelligent' | 'legacy' = 'unified'
-  ) => {
-    architecturePerformanceMonitor.recordSearchPerformance(
-      query,
-      responseTime,
-      resultCount,
-      searchType
-    );
-  }, []);
+  const recordSearchPerformance = useCallback(
+    (
+      query: string,
+      responseTime: number,
+      resultCount: number,
+      searchType: 'unified' | 'intelligent' | 'legacy' = 'unified'
+    ) => {
+      architecturePerformanceMonitor.recordSearchPerformance(
+        query,
+        responseTime,
+        resultCount,
+        searchType
+      );
+    },
+    []
+  );
 
   /**
    * Record dashboard performance
    */
-  const recordDashboardPerformance = useCallback((
-    dashboardType: 'adaptive' | 'legacy',
-    loadTime: number,
-    widgetCount: number,
-    personaDetected?: 'novice' | 'intermediate' | 'expert'
-  ) => {
-    architecturePerformanceMonitor.recordDashboardPerformance(
-      dashboardType,
-      loadTime,
-      widgetCount,
-      personaDetected
-    );
-  }, []);
+  const recordDashboardPerformance = useCallback(
+    (
+      dashboardType: 'adaptive' | 'legacy',
+      loadTime: number,
+      widgetCount: number,
+      personaDetected?: 'novice' | 'intermediate' | 'expert'
+    ) => {
+      architecturePerformanceMonitor.recordDashboardPerformance(
+        dashboardType,
+        loadTime,
+        widgetCount,
+        personaDetected
+      );
+    },
+    []
+  );
 
   // Auto-track component lifecycle
   useEffect(() => {
@@ -151,7 +168,7 @@ export function useArchitecturePerformance(
     addJourneyStep,
     completeJourney,
     recordSearchPerformance,
-    recordDashboardPerformance
+    recordDashboardPerformance,
   };
 }
 
@@ -181,7 +198,7 @@ export function useRoutePerformance(routeName: string) {
   }, [routeName]);
 
   return {
-    routeStartTime: routeStartTime.current
+    routeStartTime: routeStartTime.current,
   };
 }
 
@@ -196,37 +213,38 @@ export function useSearchPerformance() {
     performance.mark(`search-${query}-start`);
   }, []);
 
-  const endSearch = useCallback((
-    query: string,
-    resultCount: number,
-    searchType: 'unified' | 'intelligent' | 'legacy' = 'unified'
-  ) => {
-    const responseTime = performance.now() - searchStartTime.current;
-    performance.mark(`search-${query}-end`);
-    performance.measure(`search-${query}`, `search-${query}-start`, `search-${query}-end`);
+  const endSearch = useCallback(
+    (
+      query: string,
+      resultCount: number,
+      searchType: 'unified' | 'intelligent' | 'legacy' = 'unified'
+    ) => {
+      const responseTime = performance.now() - searchStartTime.current;
+      performance.mark(`search-${query}-end`);
+      performance.measure(`search-${query}`, `search-${query}-start`, `search-${query}-end`);
 
-    architecturePerformanceMonitor.recordSearchPerformance(
-      query,
-      responseTime,
-      resultCount,
-      searchType
-    );
+      architecturePerformanceMonitor.recordSearchPerformance(
+        query,
+        responseTime,
+        resultCount,
+        searchType
+      );
 
-    return responseTime;
-  }, []);
+      return responseTime;
+    },
+    []
+  );
 
   return {
     startSearch,
-    endSearch
+    endSearch,
   };
 }
 
 /**
  * Hook for dashboard performance monitoring
  */
-export function useDashboardPerformance(
-  dashboardType: 'adaptive' | 'legacy' = 'adaptive'
-) {
+export function useDashboardPerformance(dashboardType: 'adaptive' | 'legacy' = 'adaptive') {
   const loadStartTime = useRef<number>(0);
   const widgetCount = useRef<number>(0);
 
@@ -235,28 +253,28 @@ export function useDashboardPerformance(
     performance.mark(`dashboard-${dashboardType}-start`);
   }, [dashboardType]);
 
-  const endDashboardLoad = useCallback((
-    personaDetected?: 'novice' | 'intermediate' | 'expert',
-    customizationLevel: number = 0
-  ) => {
-    const loadTime = performance.now() - loadStartTime.current;
-    performance.mark(`dashboard-${dashboardType}-end`);
-    performance.measure(
-      `dashboard-${dashboardType}`,
-      `dashboard-${dashboardType}-start`,
-      `dashboard-${dashboardType}-end`
-    );
+  const endDashboardLoad = useCallback(
+    (personaDetected?: 'novice' | 'intermediate' | 'expert', customizationLevel: number = 0) => {
+      const loadTime = performance.now() - loadStartTime.current;
+      performance.mark(`dashboard-${dashboardType}-end`);
+      performance.measure(
+        `dashboard-${dashboardType}`,
+        `dashboard-${dashboardType}-start`,
+        `dashboard-${dashboardType}-end`
+      );
 
-    architecturePerformanceMonitor.recordDashboardPerformance(
-      dashboardType,
-      loadTime,
-      widgetCount.current,
-      personaDetected,
-      customizationLevel
-    );
+      architecturePerformanceMonitor.recordDashboardPerformance(
+        dashboardType,
+        loadTime,
+        widgetCount.current,
+        personaDetected,
+        customizationLevel
+      );
 
-    return loadTime;
-  }, [dashboardType]);
+      return loadTime;
+    },
+    [dashboardType]
+  );
 
   const setWidgetCount = useCallback((count: number) => {
     widgetCount.current = count;
@@ -270,7 +288,7 @@ export function useDashboardPerformance(
   return {
     startDashboardLoad,
     endDashboardLoad,
-    setWidgetCount
+    setWidgetCount,
   };
 }
 
@@ -318,7 +336,7 @@ export function useUserJourney(
   return {
     addStep,
     completeJourney,
-    isActive: journeyStarted.current
+    isActive: journeyStarted.current,
   };
 }
 
@@ -328,31 +346,37 @@ export function useUserJourney(
 export function useNavigationPerformance() {
   const navigationStartTime = useRef<number>(0);
 
-  const startNavigation = useCallback((navigationType: 'breadcrumb' | 'menu' | 'command-palette' | 'direct') => {
-    navigationStartTime.current = performance.now();
-  }, []);
+  const startNavigation = useCallback(
+    (navigationType: 'breadcrumb' | 'menu' | 'command-palette' | 'direct') => {
+      navigationStartTime.current = performance.now();
+    },
+    []
+  );
 
-  const endNavigation = useCallback((
-    navigationType: 'breadcrumb' | 'menu' | 'command-palette' | 'direct',
-    clicksToDestination: number,
-    destinationReached: boolean = true
-  ) => {
-    const timeToDestination = performance.now() - navigationStartTime.current;
+  const endNavigation = useCallback(
+    (
+      navigationType: 'breadcrumb' | 'menu' | 'command-palette' | 'direct',
+      clicksToDestination: number,
+      destinationReached: boolean = true
+    ) => {
+      const timeToDestination = performance.now() - navigationStartTime.current;
 
-    // This would be recorded by the main monitor
-    // For now, just log the navigation performance
-    console.debug('Navigation completed', {
-      navigationType,
-      clicksToDestination,
-      timeToDestination,
-      destinationReached
-    });
+      // This would be recorded by the main monitor
+      // For now, just log the navigation performance
+      console.debug('Navigation completed', {
+        navigationType,
+        clicksToDestination,
+        timeToDestination,
+        destinationReached,
+      });
 
-    return timeToDestination;
-  }, []);
+      return timeToDestination;
+    },
+    []
+  );
 
   return {
     startNavigation,
-    endNavigation
+    endNavigation,
   };
 }

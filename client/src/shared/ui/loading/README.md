@@ -27,7 +27,7 @@ function App() {
     <Provider store={store}>
       <GlobalLoadingProvider>
         <YourApp />
-        
+
         {/* Global loading indicator - shows automatically */}
         <GlobalLoadingIndicator
           position="top-right"
@@ -53,7 +53,7 @@ function MyComponent() {
   const handleAsyncAction = async () => {
     const operationId = await show({
       message: 'Saving data...',
-      priority: 'high'
+      priority: 'high',
     });
 
     try {
@@ -78,6 +78,7 @@ function MyComponent() {
 The main visual component that displays loading states.
 
 **Props:**
+
 - `position`: Where to show the indicator (`'top-right'`, `'center'`, etc.)
 - `showOperationDetails`: Whether to show detailed operation info
 - `maxVisibleOperations`: Maximum operations to display
@@ -90,6 +91,7 @@ The main visual component that displays loading states.
 A compact version showing just a spinner.
 
 **Props:**
+
 - `className`: Additional CSS classes
 
 ## Hooks
@@ -99,6 +101,7 @@ A compact version showing just a spinner.
 Main hook for controlling loading states.
 
 **Returns:**
+
 - `show(options)`: Start a loading operation
 - `hide(operationId)`: Complete a loading operation
 - `isLoading`: Whether any operations are active
@@ -106,6 +109,7 @@ Main hook for controlling loading states.
 - `shouldShow`: Whether the global loader should be visible
 
 **Show Options:**
+
 - `message`: Loading message to display
 - `priority`: Operation priority (`'high'`, `'medium'`, `'low'`)
 - `type`: Loading type (`'progressive'`, `'data'`, etc.)
@@ -117,6 +121,7 @@ Main hook for controlling loading states.
 Lower-level hook for direct access to the loading context.
 
 **Returns:**
+
 - `operations`: All active operations
 - `isOnline`: Network status
 - `shouldShowGlobalLoader`: Whether to show the global loader
@@ -216,12 +221,14 @@ The components use Tailwind CSS classes and can be customized:
 If you were using the old `useGlobalLoadingIndicator` hook, here's how to migrate:
 
 **Old way:**
+
 ```tsx
 const { show, hide, config, isEnabled } = useGlobalLoadingIndicator();
 show({ position: 'center', customMessage: 'Loading...' });
 ```
 
 **New way:**
+
 ```tsx
 const { show, hide, isLoading } = useGlobalLoadingIndicator();
 const opId = await show({ message: 'Loading...' });
@@ -238,16 +245,19 @@ const opId = await show({ message: 'Loading...' });
 ## Troubleshooting
 
 **Loading indicator not showing:**
+
 - Ensure `GlobalLoadingProvider` wraps your app
 - Check that `GlobalLoadingIndicator` is rendered
 - Verify Redux store includes the `loadingSlice`
 
 **Operations not completing:**
+
 - Always call `hide()` in a `finally` block
 - Check for unhandled promise rejections
 - Verify operation IDs match between `show()` and `hide()`
 
 **Performance issues:**
+
 - Limit `maxVisibleOperations` for better performance
 - Use appropriate priorities to avoid showing too many operations
 - Consider using `MinimalGlobalLoadingIndicator` for simple cases

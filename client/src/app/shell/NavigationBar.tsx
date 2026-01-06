@@ -1,5 +1,6 @@
 import * as LucideIcons from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../core/auth';
@@ -10,7 +11,6 @@ import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../core/search/
 import { UnifiedSearchInterface } from '../../core/search/UnifiedSearchInterface';
 import { useDeviceInfo } from '../../hooks/mobile/useDeviceInfo';
 import { cn } from '../../lib/utils';
-import React from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -108,9 +108,7 @@ const NotificationMenu = memo(
           notifications.map(notification => (
             <DropdownMenuItem key={notification.id} className="flex items-start space-x-2 p-3">
               <div className="flex-1 min-w-0">
-                <div
-                  className={cn('text-sm', notification.unread ? 'font-medium' : 'font-normal')}
-                >
+                <div className={cn('text-sm', notification.unread ? 'font-medium' : 'font-normal')}>
                   {notification.title}
                 </div>
               </div>
@@ -298,7 +296,7 @@ export const NavigationBar = memo<NavigationBarProps>(
                   size="sm"
                   onClick={handleMobileMenuToggle}
                   className="mr-2 p-2"
-                  aria-label={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
+                  aria-label={mobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
                 >
                   {mobileMenuOpen ? (
                     <LucideIcons.X className="h-5 w-5" />

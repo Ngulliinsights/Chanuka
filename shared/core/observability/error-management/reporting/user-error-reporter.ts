@@ -7,6 +7,7 @@
 
 import { BaseError, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+
 import {
   UserErrorReport,
   UserFeedback,

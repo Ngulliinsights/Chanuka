@@ -1,6 +1,6 @@
 /**
  * ConflictNetworkVisualization - Interactive D3.js network visualization
- * 
+ *
  * Displays organizational connections, financial interests, and voting patterns
  * as an interactive network graph with accessibility fallbacks.
  */
@@ -9,20 +9,23 @@ import * as d3 from 'd3';
 import { Network, Table, Eye, EyeOff, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-import { 
-  NetworkData, 
-  NetworkNode, 
-  NetworkLink, 
+import {
+  NetworkData,
+  NetworkNode,
+  NetworkLink,
   ConflictVisualizationProps,
-  AccessibilityFallbackData 
+  AccessibilityFallbackData,
 } from '@client/features/analysis/types';
-
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
-
 
 interface ConflictNetworkVisualizationProps extends ConflictVisualizationProps {
   showAccessibilityFallback?: boolean;
@@ -35,7 +38,7 @@ export function ConflictNetworkVisualization({
   width = 800,
   height = 600,
   interactive = true,
-  showAccessibilityFallback = false
+  showAccessibilityFallback = false,
 }: ConflictNetworkVisualizationProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [activeView, setActiveView] = useState<'network' | 'table'>('network');
@@ -54,7 +57,7 @@ export function ConflictNetworkVisualization({
       name: conflictAnalysis.sponsorName,
       type: 'sponsor',
       size: 20,
-      color: 'hsl(var(--civic-constitutional))'
+      color: 'hsl(var(--civic-constitutional))',
     });
 
     // Add organization nodes and links
@@ -64,8 +67,8 @@ export function ConflictNetworkVisualization({
         id: orgId,
         name: connection.organizationName,
         type: 'organization',
-        size: 10 + (connection.strength * 10),
-        color: getOrganizationColor(connection.organizationType)
+        size: 10 + connection.strength * 10,
+        color: getOrganizationColor(connection.organizationType),
       });
 
       links.push({
@@ -73,7 +76,7 @@ export function ConflictNetworkVisualization({
         target: orgId,
         strength: connection.strength,
         type: 'organizational',
-        description: `${connection.connectionType} - ${connection.description}`
+        description: `${connection.connectionType} - ${connection.description}`,
       });
     });
 
@@ -95,7 +98,7 @@ export function ConflictNetworkVisualization({
         name: industry,
         type: 'industry',
         size: Math.min(5 + Math.log10(totalAmount + 1) * 2, 15),
-        color: 'hsl(var(--civic-transparency))'
+        color: 'hsl(var(--civic-transparency))',
       });
 
       links.push({
@@ -104,7 +107,7 @@ export function ConflictNetworkVisualization({
         strength: Math.min(totalAmount / 100000, 1), // Normalize to 0-1
         type: 'financial',
         amount: totalAmount,
-        description: `Financial interests totaling $${totalAmount.toLocaleString()}`
+        description: `Financial interests totaling $${totalAmount.toLocaleString()}`,
       });
     });
 
@@ -118,7 +121,7 @@ export function ConflictNetworkVisualization({
       nonprofit: 'hsl(var(--civic-expert))',
       lobbyist: 'hsl(var(--status-critical))',
       trade_association: 'hsl(var(--status-moderate))',
-      government: 'hsl(var(--civic-constitutional))'
+      government: 'hsl(var(--civic-constitutional))',
     };
     return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
   };
@@ -136,9 +139,10 @@ export function ConflictNetworkVisualization({
     const container = svg.append('g').attr('class', 'network-container');
 
     // Set up zoom behavior
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 4])
-      .on('zoom', (event) => {
+      .on('zoom', event => {
         container.attr('transform', event.transform);
         setZoomLevel(event.transform.k);
       });
@@ -146,33 +150,44 @@ export function ConflictNetworkVisualization({
     svg.call(zoom);
 
     // Create force simulation
-    const simulation = d3.forceSimulation<NetworkNode>(data.nodes)
-      .force('link', d3.forceLink<NetworkNode, NetworkLink>(data.links)
-        .id(d => d.id)
-        .distance(d => 50 + (1 - d.strength) * 100)
-        .strength(d => d.strength * 0.5)
+    const simulation = d3
+      .forceSimulation<NetworkNode>(data.nodes)
+      .force(
+        'link',
+        d3
+          .forceLink<NetworkNode, NetworkLink>(data.links)
+          .id(d => d.id)
+          .distance(d => 50 + (1 - d.strength) * 100)
+          .strength(d => d.strength * 0.5)
       )
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => d.size + 5));
+      .force(
+        'collision',
+        d3.forceCollide().radius(d => d.size + 5)
+      );
 
     // Create links
-    const link = container.append('g')
+    const link = container
+      .append('g')
       .attr('class', 'links')
       .selectAll('line')
       .data(data.links)
-      .enter().append('line')
+      .enter()
+      .append('line')
       .attr('stroke', d => getLinkColor(d.type))
       .attr('stroke-width', d => Math.max(1, d.strength * 4))
       .attr('stroke-opacity', 0.6)
       .style('cursor', interactive ? 'pointer' : 'default');
 
     // Create nodes
-    const node = container.append('g')
+    const node = container
+      .append('g')
       .attr('class', 'nodes')
       .selectAll('circle')
       .data(data.nodes)
-      .enter().append('circle')
+      .enter()
+      .append('circle')
       .attr('r', d => d.size)
       .attr('fill', d => d.color)
       .attr('stroke', '#fff')
@@ -180,11 +195,13 @@ export function ConflictNetworkVisualization({
       .style('cursor', interactive ? 'pointer' : 'default');
 
     // Add labels
-    const labels = container.append('g')
+    const labels = container
+      .append('g')
       .attr('class', 'labels')
       .selectAll('text')
       .data(data.nodes)
-      .enter().append('text')
+      .enter()
+      .append('text')
       .text(d => d.name)
       .attr('font-size', '12px')
       .attr('font-family', 'system-ui, sans-serif')
@@ -201,10 +218,12 @@ export function ConflictNetworkVisualization({
           setSelectedNode(d);
           onNodeClick?.(d);
         })
-        .on('mouseover', function(event, d) {
+        .on('mouseover', function (event, d) {
           d3.select(this).attr('stroke-width', 4);
           // Show tooltip
-          const tooltip = d3.select('body').append('div')
+          const tooltip = d3
+            .select('body')
+            .append('div')
             .attr('class', 'network-tooltip')
             .style('position', 'absolute')
             .style('background', 'hsl(var(--popover))')
@@ -216,11 +235,9 @@ export function ConflictNetworkVisualization({
             .style('z-index', '1000')
             .html(`<strong>${d.name}</strong><br/>Type: ${d.type}<br/>Size: ${d.size}`);
 
-          tooltip
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px');
+          tooltip.style('left', event.pageX + 10 + 'px').style('top', event.pageY - 10 + 'px');
         })
-        .on('mouseout', function() {
+        .on('mouseout', function () {
           d3.select(this).attr('stroke-width', 2);
           d3.selectAll('.network-tooltip').remove();
         });
@@ -230,10 +247,12 @@ export function ConflictNetworkVisualization({
           event.stopPropagation();
           onLinkClick?.(d);
         })
-        .on('mouseover', function(event, d) {
+        .on('mouseover', function (event, d) {
           d3.select(this).attr('stroke-opacity', 1);
           // Show link tooltip
-          const tooltip = d3.select('body').append('div')
+          const tooltip = d3
+            .select('body')
+            .append('div')
             .attr('class', 'network-tooltip')
             .style('position', 'absolute')
             .style('background', 'hsl(var(--popover))')
@@ -243,19 +262,20 @@ export function ConflictNetworkVisualization({
             .style('font-size', '12px')
             .style('pointer-events', 'none')
             .style('z-index', '1000')
-            .html(`<strong>${d.type}</strong><br/>${d.description}<br/>Strength: ${(d.strength * 100).toFixed(1)}%`);
+            .html(
+              `<strong>${d.type}</strong><br/>${d.description}<br/>Strength: ${(d.strength * 100).toFixed(1)}%`
+            );
 
-          tooltip
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px');
+          tooltip.style('left', event.pageX + 10 + 'px').style('top', event.pageY - 10 + 'px');
         })
-        .on('mouseout', function() {
+        .on('mouseout', function () {
           d3.select(this).attr('stroke-opacity', 0.6);
           d3.selectAll('.network-tooltip').remove();
         });
 
       // Add drag behavior
-      const drag = d3.drag<SVGCircleElement, NetworkNode>()
+      const drag = d3
+        .drag<SVGCircleElement, NetworkNode>()
         .on('start', (event, d) => {
           if (!event.active) simulation.alphaTarget(0.3).restart();
           d.fx = d.x;
@@ -282,13 +302,9 @@ export function ConflictNetworkVisualization({
         .attr('x2', d => (d.target as NetworkNode).x!)
         .attr('y2', d => (d.target as NetworkNode).y!);
 
-      node
-        .attr('cx', d => d.x!)
-        .attr('cy', d => d.y!);
+      node.attr('cx', d => d.x!).attr('cy', d => d.y!);
 
-      labels
-        .attr('x', d => d.x!)
-        .attr('y', d => d.y!);
+      labels.attr('x', d => d.x!).attr('y', d => d.y!);
     });
 
     // Cleanup
@@ -296,7 +312,16 @@ export function ConflictNetworkVisualization({
       simulation.stop();
       d3.selectAll('.network-tooltip').remove();
     };
-  }, [conflictAnalysis, activeView, width, height, interactive, generateNetworkData, onNodeClick, onLinkClick]);
+  }, [
+    conflictAnalysis,
+    activeView,
+    width,
+    height,
+    interactive,
+    generateNetworkData,
+    onNodeClick,
+    onLinkClick,
+  ]);
 
   // Get link color based on type
   const getLinkColor = (type: string): string => {
@@ -304,7 +329,7 @@ export function ConflictNetworkVisualization({
       financial: 'hsl(var(--civic-transparency))',
       organizational: 'hsl(var(--civic-community))',
       voting: 'hsl(var(--civic-constitutional))',
-      industry: 'hsl(var(--status-moderate))'
+      industry: 'hsl(var(--status-moderate))',
     };
     return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
   };
@@ -312,60 +337,60 @@ export function ConflictNetworkVisualization({
   // Zoom controls
   const handleZoomIn = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(
-      d3.zoom<SVGSVGElement, unknown>().scaleBy as any,
-      1.5
-    );
+    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1.5);
   };
 
   const handleZoomOut = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(
-      d3.zoom<SVGSVGElement, unknown>().scaleBy as any,
-      1 / 1.5
-    );
+    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1 / 1.5);
   };
 
   const handleResetZoom = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(
-      d3.zoom<SVGSVGElement, unknown>().transform as any,
-      d3.zoomIdentity
-    );
+    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().transform as any, d3.zoomIdentity);
   };
 
   // Generate accessibility fallback data
   const generateFallbackData = (): AccessibilityFallbackData => {
     return {
-      sponsors: [{
-        name: conflictAnalysis.sponsorName,
-        riskLevel: conflictAnalysis.riskLevel,
-        financialInterests: conflictAnalysis.financialInterests.length,
-        organizationalConnections: conflictAnalysis.organizationalConnections.length,
-        transparencyScore: conflictAnalysis.transparencyScore.overall
-      }],
+      sponsors: [
+        {
+          name: conflictAnalysis.sponsorName,
+          riskLevel: conflictAnalysis.riskLevel,
+          financialInterests: conflictAnalysis.financialInterests.length,
+          organizationalConnections: conflictAnalysis.organizationalConnections.length,
+          transparencyScore: conflictAnalysis.transparencyScore.overall,
+        },
+      ],
       connections: [
         ...conflictAnalysis.organizationalConnections.map(conn => ({
           from: conflictAnalysis.sponsorName,
           to: conn.organizationName,
           type: conn.connectionType,
           strength: conn.strength,
-          description: conn.description
+          description: conn.description,
         })),
         ...conflictAnalysis.financialInterests.map(interest => ({
           from: conflictAnalysis.sponsorName,
           to: interest.industry,
           type: interest.category,
           strength: Math.min(interest.amount / 100000, 1),
-          description: `$${interest.amount.toLocaleString()} - ${interest.description}`
-        }))
+          description: `$${interest.amount.toLocaleString()} - ${interest.description}`,
+        })),
       ],
       summary: {
-        totalConnections: conflictAnalysis.organizationalConnections.length + conflictAnalysis.financialInterests.length,
-        highRiskConnections: conflictAnalysis.organizationalConnections.filter(c => c.strength > 0.7).length,
+        totalConnections:
+          conflictAnalysis.organizationalConnections.length +
+          conflictAnalysis.financialInterests.length,
+        highRiskConnections: conflictAnalysis.organizationalConnections.filter(
+          c => c.strength > 0.7
+        ).length,
         averageTransparencyScore: conflictAnalysis.transparencyScore.overall,
-        topIndustries: [...new Set(conflictAnalysis.financialInterests.map(f => f.industry))].slice(0, 3)
-      }
+        topIndustries: [...new Set(conflictAnalysis.financialInterests.map(f => f.industry))].slice(
+          0,
+          3
+        ),
+      },
     };
   };
 
@@ -390,14 +415,21 @@ export function ConflictNetworkVisualization({
               size="sm"
               onClick={() => setActiveView(activeView === 'network' ? 'table' : 'network')}
             >
-              {activeView === 'network' ? <Table className="h-4 w-4" /> : <Network className="h-4 w-4" />}
+              {activeView === 'network' ? (
+                <Table className="h-4 w-4" />
+              ) : (
+                <Network className="h-4 w-4" />
+              )}
               {activeView === 'network' ? 'Table View' : 'Network View'}
             </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeView} onValueChange={(value) => setActiveView(value as 'network' | 'table')}>
+        <Tabs
+          value={activeView}
+          onValueChange={value => setActiveView(value as 'network' | 'table')}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="network">Network Visualization</TabsTrigger>
             <TabsTrigger value="table">Accessibility Table</TabsTrigger>
@@ -407,14 +439,8 @@ export function ConflictNetworkVisualization({
             {/* Network Controls */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Badge variant="outline">
-                  Zoom: {(zoomLevel * 100).toFixed(0)}%
-                </Badge>
-                {selectedNode && (
-                  <Badge variant="secondary">
-                    Selected: {selectedNode.name}
-                  </Badge>
-                )}
+                <Badge variant="outline">Zoom: {(zoomLevel * 100).toFixed(0)}%</Badge>
+                {selectedNode && <Badge variant="secondary">Selected: {selectedNode.name}</Badge>}
               </div>
               <div className="flex items-center gap-1">
                 <Button variant="outline" size="sm" onClick={handleZoomIn}>
@@ -439,26 +465,41 @@ export function ConflictNetworkVisualization({
                 role="img"
                 aria-label="Conflict of interest network visualization"
               >
-                <title>Network showing connections between {conflictAnalysis.sponsorName} and organizations/industries</title>
+                <title>
+                  Network showing connections between {conflictAnalysis.sponsorName} and
+                  organizations/industries
+                </title>
               </svg>
             </div>
 
             {/* Legend */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'hsl(var(--civic-constitutional))' }}></div>
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: 'hsl(var(--civic-constitutional))' }}
+                ></div>
                 <span>Sponsor</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'hsl(var(--status-high))' }}></div>
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: 'hsl(var(--status-high))' }}
+                ></div>
                 <span>Corporation</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'hsl(var(--civic-expert))' }}></div>
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: 'hsl(var(--civic-expert))' }}
+                ></div>
                 <span>Nonprofit</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'hsl(var(--civic-transparency))' }}></div>
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: 'hsl(var(--civic-transparency))' }}
+                ></div>
                 <span>Industry</span>
               </div>
             </div>
@@ -474,15 +515,21 @@ export function ConflictNetworkVisualization({
                   <div className="text-sm text-muted-foreground">Total Connections</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{fallbackData.summary.highRiskConnections}</div>
+                  <div className="text-2xl font-bold">
+                    {fallbackData.summary.highRiskConnections}
+                  </div>
                   <div className="text-sm text-muted-foreground">High Risk</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{fallbackData.summary.averageTransparencyScore}%</div>
+                  <div className="text-2xl font-bold">
+                    {fallbackData.summary.averageTransparencyScore}%
+                  </div>
                   <div className="text-sm text-muted-foreground">Transparency</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{fallbackData.summary.topIndustries.length}</div>
+                  <div className="text-2xl font-bold">
+                    {fallbackData.summary.topIndustries.length}
+                  </div>
                   <div className="text-sm text-muted-foreground">Industries</div>
                 </div>
               </div>
@@ -510,15 +557,19 @@ export function ConflictNetworkVisualization({
                         <td className="border border-border p-2">
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                              <div 
+                              <div
                                 className="h-full bg-primary rounded-full"
                                 style={{ width: `${connection.strength * 100}%` }}
                               ></div>
                             </div>
-                            <span className="text-sm">{(connection.strength * 100).toFixed(1)}%</span>
+                            <span className="text-sm">
+                              {(connection.strength * 100).toFixed(1)}%
+                            </span>
                           </div>
                         </td>
-                        <td className="border border-border p-2 text-sm">{connection.description}</td>
+                        <td className="border border-border p-2 text-sm">
+                          {connection.description}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

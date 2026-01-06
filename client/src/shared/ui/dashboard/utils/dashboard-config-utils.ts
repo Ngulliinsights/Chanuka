@@ -12,9 +12,7 @@ import { dashboardConstants } from './dashboard-constants';
 /**
  * Create a validated dashboard configuration
  */
-export function createDashboardConfig(
-  overrides: Partial<DashboardConfig> = {}
-): DashboardConfig {
+export function createDashboardConfig(overrides: Partial<DashboardConfig> = {}): DashboardConfig {
   // Create a complete config with required fields
   const config: DashboardConfig = {
     id: overrides.id || 'default-dashboard',
@@ -26,12 +24,12 @@ export function createDashboardConfig(
       name: 'Default Layout',
       widgets: [],
       columns: 3,
-      responsive: true
+      responsive: true,
     },
     permissions: overrides.permissions || {
       view: ['user'],
       edit: ['user'],
-      admin: ['admin']
+      admin: ['admin'],
     },
     settings: overrides.settings || {
       autoRefresh: true,
@@ -39,11 +37,11 @@ export function createDashboardConfig(
       theme: 'auto',
       compactMode: false,
       showTitles: true,
-      enableAnimations: true
+      enableAnimations: true,
     },
     // Apply defaults and overrides
     ...dashboardConstants.DEFAULT_CONFIG,
-    ...overrides
+    ...overrides,
   };
 
   try {
@@ -66,7 +64,7 @@ export function mergeDashboardConfigs(
 ): DashboardConfig {
   const merged = {
     ...baseConfig,
-    ...overrides
+    ...overrides,
   };
 
   try {
@@ -92,23 +90,23 @@ export function getRefreshIntervalOptions(): Array<{
     {
       value: dashboardConstants.REFRESH_INTERVALS.FAST,
       label: '10 seconds',
-      description: 'Fast refresh - high data usage'
+      description: 'Fast refresh - high data usage',
     },
     {
       value: dashboardConstants.REFRESH_INTERVALS.NORMAL,
       label: '30 seconds',
-      description: 'Normal refresh - recommended'
+      description: 'Normal refresh - recommended',
     },
     {
       value: dashboardConstants.REFRESH_INTERVALS.SLOW,
       label: '1 minute',
-      description: 'Slow refresh - low data usage'
+      description: 'Slow refresh - low data usage',
     },
     {
       value: dashboardConstants.REFRESH_INTERVALS.VERY_SLOW,
       label: '5 minutes',
-      description: 'Very slow refresh - minimal data usage'
-    }
+      description: 'Very slow refresh - minimal data usage',
+    },
   ];
 }
 
@@ -126,26 +124,26 @@ export function getDashboardSectionOptions(): Array<{
       value: dashboardConstants.SECTIONS.ACTIVITY.value,
       label: dashboardConstants.SECTIONS.ACTIVITY.label,
       icon: dashboardConstants.SECTIONS.ACTIVITY.icon,
-      description: 'Overview of your legislative activity'
+      description: 'Overview of your legislative activity',
     },
     {
       value: dashboardConstants.SECTIONS.ACTIONS.value,
       label: dashboardConstants.SECTIONS.ACTIONS.label,
       icon: dashboardConstants.SECTIONS.ACTIONS.icon,
-      description: 'Your pending and completed action items'
+      description: 'Your pending and completed action items',
     },
     {
       value: dashboardConstants.SECTIONS.TOPICS.value,
       label: dashboardConstants.SECTIONS.TOPICS.label,
       icon: dashboardConstants.SECTIONS.TOPICS.icon,
-      description: 'Topics you are tracking'
+      description: 'Topics you are tracking',
     },
     {
       value: dashboardConstants.SECTIONS.ANALYTICS.value,
       label: dashboardConstants.SECTIONS.ANALYTICS.label,
       icon: dashboardConstants.SECTIONS.ANALYTICS.icon,
-      description: 'Analytics and insights'
-    }
+      description: 'Analytics and insights',
+    },
   ];
 }
 
@@ -162,12 +160,18 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
 
   // Check refresh interval
   const refreshInterval = config.refreshInterval;
-  if (refreshInterval !== undefined && refreshInterval !== null && typeof refreshInterval === 'number') {
+  if (
+    refreshInterval !== undefined &&
+    refreshInterval !== null &&
+    typeof refreshInterval === 'number'
+  ) {
     if (refreshInterval < dashboardConstants.LIMITS.MIN_REFRESH_INTERVAL) {
       errors.push('Refresh interval too short');
     }
     if (refreshInterval > dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL) {
-      errors.push(`Refresh interval too long (maximum: ${dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL}ms)`);
+      errors.push(
+        `Refresh interval too long (maximum: ${dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL}ms)`
+      );
     }
     if (refreshInterval < dashboardConstants.REFRESH_INTERVALS.NORMAL) {
       warnings.push('Fast refresh intervals may increase data usage');
@@ -176,9 +180,15 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
 
   // Check max items limits
   const maxActionItems = config.maxActionItems;
-  if (maxActionItems !== undefined && maxActionItems !== null && typeof maxActionItems === 'number') {
+  if (
+    maxActionItems !== undefined &&
+    maxActionItems !== null &&
+    typeof maxActionItems === 'number'
+  ) {
     if (maxActionItems > dashboardConstants.LIMITS.MAX_ACTION_ITEMS_DISPLAY) {
-      warnings.push(`High action item limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxActionItems})`);
+      warnings.push(
+        `High action item limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxActionItems})`
+      );
     }
     if (maxActionItems < 1) {
       errors.push('Must display at least 1 action item');
@@ -187,9 +197,15 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
 
   // Check max tracked topics limits
   const maxTrackedTopics = config.maxTrackedTopics;
-  if (maxTrackedTopics !== undefined && maxTrackedTopics !== null && typeof maxTrackedTopics === 'number') {
+  if (
+    maxTrackedTopics !== undefined &&
+    maxTrackedTopics !== null &&
+    typeof maxTrackedTopics === 'number'
+  ) {
     if (maxTrackedTopics > dashboardConstants.LIMITS.MAX_TRACKED_TOPICS_DISPLAY) {
-      warnings.push(`High topic limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxTrackedTopics})`);
+      warnings.push(
+        `High topic limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxTrackedTopics})`
+      );
     }
     if (maxTrackedTopics < 1) {
       errors.push('Must display at least 1 tracked topic');
@@ -199,7 +215,7 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
   return {
     isValid: errors.length === 0,
     errors,
-    warnings
+    warnings,
   };
 }
 
@@ -234,7 +250,8 @@ export function getConfigurationRecommendations(usage: {
   }
 
   // Session-based recommendations
-  if (usage.averageSessionDuration && usage.averageSessionDuration < 300000) { // Less than 5 minutes
+  if (usage.averageSessionDuration && usage.averageSessionDuration < 300000) {
+    // Less than 5 minutes
     recommendations.enableAutoRefresh = false;
     recommendations.showCompletedActions = false;
   }
@@ -249,7 +266,7 @@ export function exportDashboardConfig(config: DashboardConfig): string {
   const exportData = {
     config,
     exportedAt: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
   };
 
   return JSON.stringify(exportData, null, 2);

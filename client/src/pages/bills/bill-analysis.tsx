@@ -1,23 +1,29 @@
-import React from 'react';
 import {
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle, 
+  TrendingUp,
+  Users,
+  DollarSign,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
   X,
   ArrowLeft,
   FileText,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
@@ -60,50 +66,65 @@ export default function BillAnalysis() {
     // Simulate API call with realistic data
     const loadAnalysis = async () => {
       setLoading(true);
-      
+
       // Mock analysis data
       const mockAnalysis: AnalysisData = {
         id: id || '1',
         title: 'Digital Privacy Protection and Data Rights Act',
-        summary: 'This comprehensive legislation establishes robust data protection frameworks, enhances individual privacy rights, and creates regulatory oversight for digital platforms. The bill addresses growing concerns about data misuse while balancing innovation needs.',
+        summary:
+          'This comprehensive legislation establishes robust data protection frameworks, enhances individual privacy rights, and creates regulatory oversight for digital platforms. The bill addresses growing concerns about data misuse while balancing innovation needs.',
         impactScore: 85,
         complexityLevel: 'High',
-        stakeholders: ['Technology Companies', 'Privacy Advocates', 'Small Businesses', 'Consumers', 'Regulatory Bodies'],
+        stakeholders: [
+          'Technology Companies',
+          'Privacy Advocates',
+          'Small Businesses',
+          'Consumers',
+          'Regulatory Bodies',
+        ],
         economicImpact: {
           estimatedCost: 'KSh 2.5 Billion',
           beneficiaries: 45000000,
-          timeframe: '3-5 years'
+          timeframe: '3-5 years',
         },
         constitutionalAnalysis: {
           compliance: 'Compliant',
-          articles: ['Article 31 (Privacy)', 'Article 35 (Access to Information)', 'Article 46 (Consumer Rights)'],
-          notes: 'The bill strengthens constitutional privacy protections and aligns with international best practices.'
+          articles: [
+            'Article 31 (Privacy)',
+            'Article 35 (Access to Information)',
+            'Article 46 (Consumer Rights)',
+          ],
+          notes:
+            'The bill strengthens constitutional privacy protections and aligns with international best practices.',
         },
         publicSentiment: {
           support: 68,
           opposition: 18,
-          neutral: 14
+          neutral: 14,
         },
         expertOpinions: [
           {
             expert: 'Dr. Sarah Kimani',
             organization: 'Kenya ICT Authority',
             stance: 'Support',
-            summary: 'Essential legislation that will position Kenya as a leader in digital rights protection while maintaining innovation incentives.'
+            summary:
+              'Essential legislation that will position Kenya as a leader in digital rights protection while maintaining innovation incentives.',
           },
           {
             expert: 'Prof. Michael Otieno',
             organization: 'University of Nairobi Law School',
             stance: 'Support',
-            summary: 'Constitutionally sound approach that balances individual rights with economic development needs.'
+            summary:
+              'Constitutionally sound approach that balances individual rights with economic development needs.',
           },
           {
             expert: 'Jane Wanjiku',
             organization: 'Kenya Association of Manufacturers',
             stance: 'Neutral',
-            summary: 'Supports privacy protection but recommends phased implementation to allow business adaptation.'
-          }
-        ]
+            summary:
+              'Supports privacy protection but recommends phased implementation to allow business adaptation.',
+          },
+        ],
       };
 
       // Simulate network delay
@@ -148,10 +169,14 @@ export default function BillAnalysis() {
 
   const getComplianceIcon = (compliance: string) => {
     switch (compliance) {
-      case 'Compliant': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'Concerns': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'Violations': return <X className="h-5 w-5 text-red-600" />;
-      default: return <AlertTriangle className="h-5 w-5 text-gray-600" />;
+      case 'Compliant':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'Concerns':
+        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      case 'Violations':
+        return <X className="h-5 w-5 text-red-600" />;
+      default:
+        return <AlertTriangle className="h-5 w-5 text-gray-600" />;
     }
   };
 
@@ -159,7 +184,10 @@ export default function BillAnalysis() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Link to={`/bills/${id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link
+          to={`/bills/${id}`}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Bill Details
         </Link>
@@ -187,7 +215,15 @@ export default function BillAnalysis() {
               <BarChart3 className="h-5 w-5 text-orange-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Complexity</p>
-                <Badge variant={analysis.complexityLevel === 'High' ? 'destructive' : analysis.complexityLevel === 'Medium' ? 'default' : 'secondary'}>
+                <Badge
+                  variant={
+                    analysis.complexityLevel === 'High'
+                      ? 'destructive'
+                      : analysis.complexityLevel === 'Medium'
+                        ? 'default'
+                        : 'secondary'
+                  }
+                >
                   {analysis.complexityLevel}
                 </Badge>
               </div>
@@ -201,7 +237,9 @@ export default function BillAnalysis() {
               <Users className="h-5 w-5 text-blue-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Beneficiaries</p>
-                <p className="text-2xl font-bold">{(analysis.economicImpact.beneficiaries / 1000000).toFixed(1)}M</p>
+                <p className="text-2xl font-bold">
+                  {(analysis.economicImpact.beneficiaries / 1000000).toFixed(1)}M
+                </p>
               </div>
             </div>
           </CardContent>
@@ -238,13 +276,15 @@ export default function BillAnalysis() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700 leading-relaxed mb-6">{analysis.summary}</p>
-              
+
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Key Stakeholders</h4>
                   <div className="flex flex-wrap gap-2">
                     {analysis.stakeholders.map((stakeholder, index) => (
-                      <Badge key={index} variant="outline">{stakeholder}</Badge>
+                      <Badge key={index} variant="outline">
+                        {stakeholder}
+                      </Badge>
                     ))}
                   </div>
                 </div>
@@ -260,14 +300,20 @@ export default function BillAnalysis() {
                 {getComplianceIcon(analysis.constitutionalAnalysis.compliance)}
                 <span>Constitutional Analysis</span>
               </CardTitle>
-              <CardDescription>Assessment of constitutional compliance and implications</CardDescription>
+              <CardDescription>
+                Assessment of constitutional compliance and implications
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Alert className={`mb-4 ${
-                analysis.constitutionalAnalysis.compliance === 'Compliant' ? 'border-green-200 bg-green-50' :
-                analysis.constitutionalAnalysis.compliance === 'Concerns' ? 'border-yellow-200 bg-yellow-50' :
-                'border-red-200 bg-red-50'
-              }`}>
+              <Alert
+                className={`mb-4 ${
+                  analysis.constitutionalAnalysis.compliance === 'Compliant'
+                    ? 'border-green-200 bg-green-50'
+                    : analysis.constitutionalAnalysis.compliance === 'Concerns'
+                      ? 'border-yellow-200 bg-yellow-50'
+                      : 'border-red-200 bg-red-50'
+                }`}
+              >
                 <AlertDescription>
                   <strong>Status:</strong> {analysis.constitutionalAnalysis.compliance}
                 </AlertDescription>
@@ -306,19 +352,25 @@ export default function BillAnalysis() {
                 <div className="text-center p-4 border rounded-lg">
                   <DollarSign className="h-8 w-8 mx-auto text-green-600 mb-2" />
                   <h4 className="font-semibold">Estimated Cost</h4>
-                  <p className="text-2xl font-bold text-green-600">{analysis.economicImpact.estimatedCost}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {analysis.economicImpact.estimatedCost}
+                  </p>
                 </div>
 
                 <div className="text-center p-4 border rounded-lg">
                   <Users className="h-8 w-8 mx-auto text-blue-600 mb-2" />
                   <h4 className="font-semibold">Beneficiaries</h4>
-                  <p className="text-2xl font-bold text-blue-600">{analysis.economicImpact.beneficiaries.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {analysis.economicImpact.beneficiaries.toLocaleString()}
+                  </p>
                 </div>
 
                 <div className="text-center p-4 border rounded-lg">
                   <Clock className="h-8 w-8 mx-auto text-orange-600 mb-2" />
                   <h4 className="font-semibold">Implementation</h4>
-                  <p className="text-2xl font-bold text-orange-600">{analysis.economicImpact.timeframe}</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {analysis.economicImpact.timeframe}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -336,7 +388,9 @@ export default function BillAnalysis() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">Support</span>
-                    <span className="text-sm text-green-600">{analysis.publicSentiment.support}%</span>
+                    <span className="text-sm text-green-600">
+                      {analysis.publicSentiment.support}%
+                    </span>
                   </div>
                   <Progress value={analysis.publicSentiment.support} className="h-2" />
                 </div>
@@ -344,7 +398,9 @@ export default function BillAnalysis() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">Opposition</span>
-                    <span className="text-sm text-red-600">{analysis.publicSentiment.opposition}%</span>
+                    <span className="text-sm text-red-600">
+                      {analysis.publicSentiment.opposition}%
+                    </span>
                   </div>
                   <Progress value={analysis.publicSentiment.opposition} className="h-2" />
                 </div>
@@ -352,7 +408,9 @@ export default function BillAnalysis() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">Neutral</span>
-                    <span className="text-sm text-gray-600">{analysis.publicSentiment.neutral}%</span>
+                    <span className="text-sm text-gray-600">
+                      {analysis.publicSentiment.neutral}%
+                    </span>
                   </div>
                   <Progress value={analysis.publicSentiment.neutral} className="h-2" />
                 </div>
@@ -371,10 +429,15 @@ export default function BillAnalysis() {
                       <h4 className="font-semibold">{opinion.expert}</h4>
                       <p className="text-sm text-muted-foreground">{opinion.organization}</p>
                     </div>
-                    <Badge variant={
-                      opinion.stance === 'Support' ? 'default' :
-                      opinion.stance === 'Oppose' ? 'destructive' : 'secondary'
-                    }>
+                    <Badge
+                      variant={
+                        opinion.stance === 'Support'
+                          ? 'default'
+                          : opinion.stance === 'Oppose'
+                            ? 'destructive'
+                            : 'secondary'
+                      }
+                    >
                       {opinion.stance}
                     </Badge>
                   </div>
@@ -388,4 +451,3 @@ export default function BillAnalysis() {
     </div>
   );
 }
-

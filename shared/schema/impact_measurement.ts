@@ -10,9 +10,9 @@ import {
   index, date, smallint, real
 } from "drizzle-orm/pg-core";
 
+import { campaigns } from "./advocacy_coordination";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
-import { campaigns } from "./advocacy_coordination";
 
 // ============================================================================
 // PARTICIPATION COHORTS - Track user groups for equity analysis

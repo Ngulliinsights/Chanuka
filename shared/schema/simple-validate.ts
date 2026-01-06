@@ -3,19 +3,20 @@
 // ============================================================================
 // Quick validation to ensure all schemas compile correctly without dependencies
 
-import * as foundation from "./foundation";
-import * as citizenParticipation from "./citizen_participation";
-import * as parliamentaryProcess from "./parliamentary_process";
-import * as constitutionalIntelligence from "./constitutional_intelligence";
-import * as argumentIntelligence from "./argument_intelligence";
-import * as advocacyCoordination from "./advocacy_coordination";
-import * as universalAccess from "./universal_access";
-import * as transparencyAnalysis from "./transparency_analysis";
-import * as impactMeasurement from "./impact_measurement";
-import * as transparencyIntelligence from "./transparency_intelligence";
-import * as expertVerification from "./expert_verification";
 import * as advancedDiscovery from "./advanced_discovery";
+import * as advocacyCoordination from "./advocacy_coordination";
+import * as argumentIntelligence from "./argument_intelligence";
+import * as citizenParticipation from "./citizen_participation";
+import * as constitutionalIntelligence from "./constitutional_intelligence";
+import * as expertVerification from "./expert_verification";
+import * as foundation from "./foundation";
+import * as impactMeasurement from "./impact_measurement";
+import * as parliamentaryProcess from "./parliamentary_process";
 import * as realTimeEngagement from "./real_time_engagement";
+import * as transparencyAnalysis from "./transparency_analysis";
+import * as transparencyIntelligence from "./transparency_intelligence";
+import * as universalAccess from "./universal_access";
+
 import * as mainSchema from "./index";
 
 // ============================================================================

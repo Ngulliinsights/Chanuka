@@ -4,7 +4,14 @@
  */
 
 export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin' | 'system';
-export type UserRole = 'public' | 'citizen' | 'user' | 'expert' | 'admin' | 'journalist' | 'advocate';
+export type UserRole =
+  | 'public'
+  | 'citizen'
+  | 'user'
+  | 'expert'
+  | 'admin'
+  | 'journalist'
+  | 'advocate';
 
 /**
  * Navigation item interface
@@ -66,14 +73,14 @@ export interface NavigationState {
   breadcrumbs: BreadcrumbItem[];
   relatedPages: RelatedPage[];
   currentSection: NavigationSection;
-  
+
   // UI state (merged from ResponsiveNavigationContext)
   sidebarOpen: boolean;
   mobileMenuOpen: boolean;
   isMobile: boolean;
   sidebarCollapsed: boolean;
   mounted: boolean;
-  
+
   // User state
   user_role: UserRole;
   preferences: NavigationPreferences;
@@ -90,7 +97,7 @@ export interface NavigationContextValue extends NavigationState {
   updateUserRole: (role: UserRole) => void;
   updatePreferences: (preferences: Partial<NavigationPreferences>) => void;
   addToRecentPages: (page: { path: string; title: string }) => void;
-  
+
   // UI actions (merged from ResponsiveNavigationContext)
   toggleSidebar: () => void;
   toggleMobileMenu: () => void;
@@ -110,4 +117,3 @@ export interface NavigationAnalyticsEvent {
   userAgent?: string;
   referrer?: string;
 }
-

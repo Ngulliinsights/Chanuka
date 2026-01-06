@@ -1,9 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
+import App from './App';
 import { logger } from './utils/logger';
 
-import App from './App';
 import './index.css';
 
 // ============================================================================
@@ -25,7 +25,7 @@ function setupProcessEnvironment(): void {
 
     if (typeof globalWindow.process === 'undefined') {
       globalWindow.process = {
-        env: { NODE_ENV: import.meta.env.MODE || 'development' }
+        env: { NODE_ENV: import.meta.env.MODE || 'development' },
       };
     }
   } catch (error) {
@@ -44,7 +44,7 @@ function suppressExtensionErrors(): void {
   const extensionErrorPatterns = [
     'chrome-extension://',
     'message channel closed before a response was received',
-    'Extension context invalidated'
+    'Extension context invalidated',
   ];
 
   window.addEventListener('error', (event: ErrorEvent) => {
@@ -74,7 +74,7 @@ function getRootElement(): HTMLElement {
   if (!element) {
     throw new Error(
       `Root element with id "${ROOT_ELEMENT_ID}" not found in DOM. ` +
-      'Ensure your index.html contains <div id="root"></div>'
+        'Ensure your index.html contains <div id="root"></div>'
     );
   }
 
@@ -95,7 +95,7 @@ function mountReactApp(rootElement: HTMLElement): void {
 
     logger.info('✅ React application mounted successfully', {
       component: 'Bootstrap',
-      mode: process.env.NODE_ENV
+      mode: process.env.NODE_ENV,
     });
   } catch (error) {
     logger.error('Failed to mount React application', { component: 'Bootstrap' }, error);
@@ -122,13 +122,16 @@ async function initializeApplication(): Promise<void> {
 
     logger.info('✅ Chanuka Platform initialized successfully', {
       component: 'Bootstrap',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    logger.error('❌ Application initialization failed', {
-      component: 'Bootstrap'
-    }, error);
+    logger.error(
+      '❌ Application initialization failed',
+      {
+        component: 'Bootstrap',
+      },
+      error
+    );
 
     // Simple error fallback
     document.body.innerHTML = `

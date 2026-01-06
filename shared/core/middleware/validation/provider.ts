@@ -1,10 +1,10 @@
-import { MiddlewareProvider } from '../types';
-import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
 import { Request, Response, NextFunction } from 'express';
 
 import { MiddlewareProvider } from '../../types';
 import { ValidationSchema } from '../../validation/core/interfaces';
 import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
+import { CoreValidationService as ValidationService } from '../../validation/core/validation-service';
+import { MiddlewareProvider } from '../types';
 
 interface ValidationMiddlewareOptions {
   schema: ValidationSchema;

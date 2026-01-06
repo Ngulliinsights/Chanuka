@@ -15,13 +15,12 @@ import type {
   UserActivity,
   AnalyticsAlert,
   StakeholderAnalysis,
-  AnalyticsExport
+  AnalyticsExport,
 } from '@client/shared/types/analytics';
 import { logger } from '@client/utils/logger';
 
 import { globalErrorHandler } from './errors';
 import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
-
 
 /**
  * Centralized service for all analytics-related API operations.
@@ -115,7 +114,10 @@ export class AnalyticsApiService {
   /**
    * Get engagement report for a bill
    */
-  async getEngagementReport(bill_id: string, filters?: AnalyticsFilters): Promise<EngagementReport> {
+  async getEngagementReport(
+    bill_id: string,
+    filters?: AnalyticsFilters
+  ): Promise<EngagementReport> {
     try {
       const params = new URLSearchParams();
 
@@ -154,7 +156,10 @@ export class AnalyticsApiService {
   /**
    * Get user activity analytics
    */
-  async getUserActivity(user_id?: string, filters?: AnalyticsFilters): Promise<AnalyticsResponse<UserActivity[]>> {
+  async getUserActivity(
+    user_id?: string,
+    filters?: AnalyticsFilters
+  ): Promise<AnalyticsResponse<UserActivity[]>> {
     try {
       const params = new URLSearchParams();
 
@@ -243,11 +248,13 @@ export class AnalyticsApiService {
   /**
    * Get trending topics
    */
-  async getTrendingTopics(limit = 20): Promise<{ topic: string; count: number; trend: 'up' | 'down' | 'stable' }[]> {
+  async getTrendingTopics(
+    limit = 20
+  ): Promise<{ topic: string; count: number; trend: 'up' | 'down' | 'stable' }[]> {
     try {
-      const response = await this.apiClient.get<{ topic: string; count: number; trend: 'up' | 'down' | 'stable' }[]>(
-        `${this.analyticsEndpoint}/trends/topics?limit=${limit}`
-      );
+      const response = await this.apiClient.get<
+        { topic: string; count: number; trend: 'up' | 'down' | 'stable' }[]
+      >(`${this.analyticsEndpoint}/trends/topics?limit=${limit}`);
 
       return response.data;
     } catch (error) {
@@ -261,7 +268,9 @@ export class AnalyticsApiService {
    */
   async getStakeholderAnalysis(bill_id?: string): Promise<StakeholderAnalysis[]> {
     try {
-      const endpoint = bill_id ? `${this.analyticsEndpoint}/stakeholders/${bill_id}` : `${this.analyticsEndpoint}/stakeholders`;
+      const endpoint = bill_id
+        ? `${this.analyticsEndpoint}/stakeholders/${bill_id}`
+        : `${this.analyticsEndpoint}/stakeholders`;
 
       const response = await this.apiClient.get<StakeholderAnalysis[]>(endpoint);
 
@@ -275,7 +284,10 @@ export class AnalyticsApiService {
   /**
    * Export analytics data
    */
-  async exportAnalytics(filters?: AnalyticsFilters, format: 'csv' | 'json' = 'json'): Promise<AnalyticsExport> {
+  async exportAnalytics(
+    filters?: AnalyticsFilters,
+    format: 'csv' | 'json' = 'json'
+  ): Promise<AnalyticsExport> {
     try {
       const params = new URLSearchParams();
       params.append('format', format);
@@ -325,7 +337,7 @@ export class AnalyticsApiService {
    */
   private async handleAnalyticsError(error: unknown, defaultMessage: string): Promise<Error> {
     const errorResponse = error as UnknownError;
-    
+
     const errorMessage =
       (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
       (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
@@ -338,7 +350,7 @@ export class AnalyticsApiService {
       component: 'AnalyticsApiService',
       operation: 'analytics',
       status: (errorResponse as AxiosErrorResponse)?.response?.status,
-      endpoint: (errorResponse as AxiosErrorResponse)?.config?.url
+      endpoint: (errorResponse as AxiosErrorResponse)?.config?.url,
     });
 
     return analyticsError;

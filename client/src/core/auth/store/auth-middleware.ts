@@ -1,6 +1,6 @@
 /**
  * Consolidated Authentication Middleware
- * 
+ *
  * Unified implementation that consolidates:
  * - Auth middleware from store/middleware/authMiddleware.ts
  * - Token refresh logic
@@ -70,7 +70,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
   let refreshPromise: Promise<void> | null = null;
 
-  return (store: StoreApi) => (next) => (action: unknown) => {
+  return (store: StoreApi) => next => (action: unknown) => {
     const result = next(action);
     const state = store.getState();
 
@@ -99,7 +99,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
             logger.warn('Unauthenticated action attempted:', {
               component: 'AuthMiddleware',
               action: action.type,
-              user: state.auth.user?.id
+              user: state.auth.user?.id,
             });
 
             // Dispatch logout to clear any stale state
@@ -111,7 +111,7 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
 
     // Check for token refresh needs
     if (finalConfig.enableAutoRefresh && state.auth.isAuthenticated) {
-      checkTokenRefresh(store, finalConfig, refreshPromise, (promise) => {
+      checkTokenRefresh(store, finalConfig, refreshPromise, promise => {
         refreshPromise = promise;
       });
     }
@@ -124,7 +124,12 @@ export const createAuthMiddleware = (config: Partial<AuthMiddlewareConfig> = {})
  * Type guard to check if action is an auth-related action
  */
 function isAuthAction(action: unknown): action is AuthAction {
-  return typeof action === 'object' && action !== null && 'type' in action && typeof (action as { type: unknown }).type === 'string';
+  return (
+    typeof action === 'object' &&
+    action !== null &&
+    'type' in action &&
+    typeof (action as { type: unknown }).type === 'string'
+  );
 }
 
 /**
@@ -135,7 +140,7 @@ function handleLoginSuccess(payload: LoginFulfilledPayload, config: AuthMiddlewa
     logger.info('Login successful', {
       component: 'AuthMiddleware',
       userId: payload.user?.id,
-      method: payload.method || 'password'
+      method: payload.method || 'password',
     });
 
     // Record security event if monitoring is enabled
@@ -143,13 +148,12 @@ function handleLoginSuccess(payload: LoginFulfilledPayload, config: AuthMiddlewa
       recordSecurityEvent(payload.user.id, 'login', {
         method: payload.method || 'password',
         timestamp: new Date().toISOString(),
-        sessionId: payload.sessionId
+        sessionId: payload.sessionId,
       });
     }
 
     // Clear any cached data for fresh start
     clearSensitiveData();
-
   } catch (error) {
     logger.error('Error handling login success:', { component: 'AuthMiddleware' }, error);
   }
@@ -162,7 +166,7 @@ function handleLoginFailure(error: LoginRejectedPayload, config: AuthMiddlewareC
   try {
     logger.warn('Login failed', {
       component: 'AuthMiddleware',
-      error: error?.message || 'Unknown error'
+      error: error?.message || 'Unknown error',
     });
 
     // Record failed login attempt for security monitoring
@@ -170,13 +174,12 @@ function handleLoginFailure(error: LoginRejectedPayload, config: AuthMiddlewareC
       recordFailedLoginAttempt({
         timestamp: new Date().toISOString(),
         error: error?.message || 'Unknown error',
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
       });
     }
 
     // Clear any stale tokens
     tokenManager.clearTokens();
-
   } catch (err) {
     logger.error('Error handling login failure:', { component: 'AuthMiddleware' }, err);
   }
@@ -198,10 +201,9 @@ function handleLogoutSuccess(config: AuthMiddlewareConfig): void {
     // Record security event if monitoring is enabled
     if (config.enableSecurityMonitoring) {
       recordSecurityEvent('unknown', 'logout', {
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-
   } catch (error) {
     logger.error('Error handling logout:', { component: 'AuthMiddleware' }, error);
   }
@@ -214,16 +216,15 @@ function handleUserUpdate(user: UserUpdatePayload, config: AuthMiddlewareConfig)
   try {
     logger.debug('User data updated', {
       component: 'AuthMiddleware',
-      userId: user?.id
+      userId: user?.id,
     });
 
     // Record security event for profile updates if monitoring is enabled
     if (config.enableSecurityMonitoring && user?.id) {
       recordSecurityEvent(user.id, 'profile_update', {
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-
   } catch (error) {
     logger.error('Error handling user update:', { component: 'AuthMiddleware' }, error);
   }
@@ -242,17 +243,19 @@ function checkTokenRefresh(
   if (refreshPromise) return;
 
   // Check if tokens need refresh
-  tokenManager.isTokenExpiringSoon(config.refreshThreshold).then(needsRefresh => {
-    if (needsRefresh) {
-      const promise = performTokenRefresh(store)
-        .finally(() => {
+  tokenManager
+    .isTokenExpiringSoon(config.refreshThreshold)
+    .then(needsRefresh => {
+      if (needsRefresh) {
+        const promise = performTokenRefresh(store).finally(() => {
           setRefreshPromise(null);
         });
-      setRefreshPromise(promise);
-    }
-  }).catch(error => {
-    logger.error('Token refresh check failed:', { component: 'AuthMiddleware' }, error);
-  });
+        setRefreshPromise(promise);
+      }
+    })
+    .catch(error => {
+      logger.error('Token refresh check failed:', { component: 'AuthMiddleware' }, error);
+    });
 }
 
 /**
@@ -273,18 +276,16 @@ async function performTokenRefresh(store: StoreApi): Promise<void> {
       store.dispatch(clearError());
 
       logger.info('Token refreshed successfully', {
-        component: 'AuthMiddleware'
+        component: 'AuthMiddleware',
       });
-
     } else {
       logger.warn('Token refresh failed, logging out user', {
-        component: 'AuthMiddleware'
+        component: 'AuthMiddleware',
       });
 
       // Token refresh failed, logout user
       store.dispatch(logout() as unknown as UnknownAction);
     }
-
   } catch (error) {
     logger.error('Token refresh error:', { component: 'AuthMiddleware' }, error);
 
@@ -314,9 +315,10 @@ function requiresAuthentication(action: unknown): boolean {
     // Any action with 'authenticated' in the type
   ];
 
-  return protectedActions.some(pattern =>
-    isAuthAction(action) &&
-    (action.type.includes(pattern) || action.type.includes('authenticated'))
+  return protectedActions.some(
+    pattern =>
+      isAuthAction(action) &&
+      (action.type.includes(pattern) || action.type.includes('authenticated'))
   );
 }
 
@@ -326,18 +328,12 @@ function requiresAuthentication(action: unknown): boolean {
 function clearSensitiveData(): void {
   try {
     // Clear specific sensitive keys
-    const sensitiveKeys = [
-      'user_preferences',
-      'saved_bills',
-      'draft_comments',
-      'search_history'
-    ];
+    const sensitiveKeys = ['user_preferences', 'saved_bills', 'draft_comments', 'search_history'];
 
     sensitiveKeys.forEach(key => {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
-
   } catch (error) {
     logger.error('Error clearing sensitive data:', { component: 'AuthMiddleware' }, error);
   }
@@ -346,14 +342,18 @@ function clearSensitiveData(): void {
 /**
  * Record security event for monitoring
  */
-function recordSecurityEvent(userId: string, eventType: string, metadata: Record<string, unknown>): void {
+function recordSecurityEvent(
+  userId: string,
+  eventType: string,
+  metadata: Record<string, unknown>
+): void {
   try {
     // This would typically integrate with a security monitoring service
     logger.info('Security event recorded', {
       component: 'AuthMiddleware',
       userId,
       eventType,
-      metadata
+      metadata,
     });
 
     // In a real implementation, this might send to an analytics service
@@ -370,7 +370,7 @@ function recordFailedLoginAttempt(metadata: Record<string, unknown>): void {
   try {
     logger.warn('Failed login attempt recorded', {
       component: 'AuthMiddleware',
-      metadata
+      metadata,
     });
 
     // In a real implementation, this might trigger rate limiting

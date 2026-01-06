@@ -35,7 +35,7 @@ export {
   defaultWebSocketConfig,
   defaultRealTimeConfig,
   getWebSocketConfig,
-  getRealTimeConfig
+  getRealTimeConfig,
 } from './config';
 
 // Utilities

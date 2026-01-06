@@ -1,13 +1,17 @@
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
+import React from 'react';
 
 import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/design-system/typography/Card';
 import { Skeleton } from '@/shared/ui/loading/ui/Skeleton';
-import React from 'react';
-
-
 
 interface HealthStatus {
   status: string;
@@ -98,9 +102,7 @@ export default function DatabaseStatus({ stats, schemaCheck, isLoading }: Databa
             <Search className="h-5 w-5 mr-2 text-primary" />
             Database Overview
           </CardTitle>
-          <CardDescription>
-            Current database status and key metrics
-          </CardDescription>
+          <CardDescription>Current database status and key metrics</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -146,16 +148,14 @@ export default function DatabaseStatus({ stats, schemaCheck, isLoading }: Databa
               </Alert>
             ) : (
               schemaCheck?.issues.map((issue, index) => (
-                <div
-                  key={index}
-                  className="flex items-start space-x-3 p-4 rounded-lg border"
-                >
+                <div key={index} className="flex items-start space-x-3 p-4 rounded-lg border">
                   {getSeverityIcon(issue.severity)}
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900">
-                      {issue.type.split('_').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                      ).join(' ')}
+                      {issue.type
+                        .split('_')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
                     </h4>
                     <p className="text-sm text-gray-600 mt-1">{issue.message}</p>
                     <div className="mt-2 flex items-center space-x-2">

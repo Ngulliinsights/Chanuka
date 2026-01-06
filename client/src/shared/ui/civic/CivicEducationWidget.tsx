@@ -16,12 +16,18 @@ import {
   MessageSquare,
   ExternalLink,
   ChevronRight,
-  Info
+  Info,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { useKenyanContext } from '@client/shared/context/KenyanContextProvider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
@@ -42,7 +48,7 @@ interface CivicEducationWidgetProps {
 export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
   variant = 'full',
   showTitle = true,
-  className = ''
+  className = '',
 }) => {
   const { t, language } = useI18n();
   const { government, legalProcesses, cultural } = useKenyanContext();
@@ -139,8 +145,7 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
           <CardDescription>
             {language === 'sw'
               ? 'Jifunze kuhusu mfumo wa serikali ya Kenya na jinsi ya kushiriki'
-              : 'Learn about Kenya\'s government system and how to participate'
-            }
+              : "Learn about Kenya's government system and how to participate"}
           </CardDescription>
         </CardHeader>
       )}
@@ -182,8 +187,7 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                   <p className="text-sm text-gray-600">
                     {language === 'sw'
                       ? 'Haki za msingi za raia wa Kenya'
-                      : 'Fundamental rights of Kenyan citizens'
-                    }
+                      : 'Fundamental rights of Kenyan citizens'}
                   </p>
                 </div>
 
@@ -194,8 +198,7 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                   <p className="text-sm text-gray-600">
                     {language === 'sw'
                       ? 'Ugatuzi wa madaraka kwa kaunti'
-                      : 'Devolution of power to counties'
-                    }
+                      : 'Devolution of power to counties'}
                   </p>
                 </div>
               </div>
@@ -252,9 +255,7 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                     {government.legislature.senate.members} members
                   </Badge>
                 </div>
-                <p className="text-sm text-purple-700">
-                  {government.legislature.senate.role}
-                </p>
+                <p className="text-sm text-purple-700">{government.legislature.senate.role}</p>
               </div>
 
               <div className="p-3 bg-orange-50 rounded-lg">
@@ -284,12 +285,17 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                   {legalProcesses.publicParticipation.timeline}
                 </p>
                 <div className="space-y-1">
-                  {legalProcesses.publicParticipation.requirements.slice(0, 3).map((requirement, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-xs text-yellow-700">
-                      <div className="w-1 h-1 bg-yellow-600 rounded-full" />
-                      <span>{requirement}</span>
-                    </div>
-                  ))}
+                  {legalProcesses.publicParticipation.requirements
+                    .slice(0, 3)
+                    .map((requirement, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center space-x-2 text-xs text-yellow-700"
+                      >
+                        <div className="w-1 h-1 bg-yellow-600 rounded-full" />
+                        <span>{requirement}</span>
+                      </div>
+                    ))}
                 </div>
               </div>
 
@@ -301,7 +307,10 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                   </h5>
                   <div className="space-y-1">
                     {legalProcesses.publicParticipation.methods.slice(0, 4).map((method, index) => (
-                      <div key={index} className="text-sm text-gray-600 flex items-center space-x-2">
+                      <div
+                        key={index}
+                        className="text-sm text-gray-600 flex items-center space-x-2"
+                      >
                         <ChevronRight className="h-3 w-3" />
                         <span>{method}</span>
                       </div>
@@ -312,15 +321,22 @@ export const CivicEducationWidget: React.FC<CivicEducationWidgetProps> = ({
                 <div className="p-3 border border-gray-200 rounded-lg">
                   <h5 className="font-medium text-gray-900 mb-2 flex items-center space-x-2">
                     <Users className="h-4 w-4" />
-                    <span>{language === 'sw' ? 'Fursa za Ushiriki' : 'Participation Opportunities'}</span>
+                    <span>
+                      {language === 'sw' ? 'Fursa za Ushiriki' : 'Participation Opportunities'}
+                    </span>
                   </h5>
                   <div className="space-y-1">
-                    {cultural.civicEngagement.opportunities.slice(0, 4).map((opportunity, index) => (
-                      <div key={index} className="text-sm text-gray-600 flex items-center space-x-2">
-                        <ChevronRight className="h-3 w-3" />
-                        <span>{opportunity}</span>
-                      </div>
-                    ))}
+                    {cultural.civicEngagement.opportunities
+                      .slice(0, 4)
+                      .map((opportunity, index) => (
+                        <div
+                          key={index}
+                          className="text-sm text-gray-600 flex items-center space-x-2"
+                        >
+                          <ChevronRight className="h-3 w-3" />
+                          <span>{opportunity}</span>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>

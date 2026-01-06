@@ -49,10 +49,9 @@ export function LoadingSpinner({
     variantClasses[variant],
   ].join(' ');
 
-  const containerClasses = [
-    'flex flex-col items-center justify-center gap-2',
-    className,
-  ].filter(Boolean).join(' ');
+  const containerClasses = ['flex flex-col items-center justify-center gap-2', className]
+    .filter(Boolean)
+    .join(' ');
 
   // Don't render anything if not loading
   if (!isLoading) {
@@ -67,9 +66,7 @@ export function LoadingSpinner({
     >
       <div className={spinnerClasses} aria-hidden="true" />
       {showMessage && message && (
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {message}
-        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
       )}
       <span className="sr-only">{ariaLabel || message || 'Loading...'}</span>
     </div>

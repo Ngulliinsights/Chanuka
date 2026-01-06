@@ -558,9 +558,7 @@ class ErrorAnalyticsBridge {
 
   private calculateAffectedUsers(errors: CoreError[]): number {
     const uniqueUsers = new Set(
-      errors
-        .map(e => e.context?.userId)
-        .filter((userId): userId is string => Boolean(userId))
+      errors.map(e => e.context?.userId).filter((userId): userId is string => Boolean(userId))
     );
     return uniqueUsers.size;
   }
@@ -590,10 +588,13 @@ class ErrorAnalyticsBridge {
 
   private buildDomainDistribution(errors: CoreError[]): Record<ErrorDomain, number> {
     // Initialize with all possible ErrorDomain values
-    const distribution: Record<ErrorDomain, number> = Object.values(ErrorDomain).reduce((acc, domain) => {
-      acc[domain] = 0;
-      return acc;
-    }, {} as Record<ErrorDomain, number>);
+    const distribution: Record<ErrorDomain, number> = Object.values(ErrorDomain).reduce(
+      (acc, domain) => {
+        acc[domain] = 0;
+        return acc;
+      },
+      {} as Record<ErrorDomain, number>
+    );
 
     for (const error of errors) {
       if (error.type in distribution) {
@@ -641,8 +642,8 @@ class ErrorAnalyticsBridge {
 
   private getIntervalMs(period: string): number {
     const intervals: Record<string, number> = {
-      '1h': 5 * 60 * 1000,      // 5 minutes
-      '24h': 60 * 60 * 1000,    // 1 hour
+      '1h': 5 * 60 * 1000, // 5 minutes
+      '24h': 60 * 60 * 1000, // 1 hour
       '7d': 24 * 60 * 60 * 1000, // 1 day
       '30d': 24 * 60 * 60 * 1000, // 1 day
       '90d': 24 * 60 * 60 * 1000, // 1 day
@@ -726,9 +727,7 @@ class ErrorAnalyticsBridge {
 
       if (zScore > 2) {
         const severity =
-          zScore > 3 ? 'critical' :
-          zScore > 2.5 ? 'high' :
-          zScore > 2 ? 'medium' : 'low';
+          zScore > 3 ? 'critical' : zScore > 2.5 ? 'high' : zScore > 2 ? 'medium' : 'low';
 
         anomalies.push({
           timestamp: point.timestamp,
@@ -782,13 +781,11 @@ class ErrorAnalyticsBridge {
     const predictions = values.map((_, i) => yMean + slope * (i - xMean));
     const ssRes = values.reduce((sum, val, i) => sum + Math.pow(val - predictions[i], 2), 0);
     const ssTot = values.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
-    const rSquared = ssTot !== 0 ? 1 - (ssRes / ssTot) : 0;
+    const rSquared = ssTot !== 0 ? 1 - ssRes / ssTot : 0;
     const confidence = Math.max(0, Math.min(1, rSquared));
 
     // Determine trend direction
-    const trend =
-      Math.abs(slope) < yMean * 0.05 ? 'stable' :
-      slope > 0 ? 'up' : 'down';
+    const trend = Math.abs(slope) < yMean * 0.05 ? 'stable' : slope > 0 ? 'up' : 'down';
 
     return {
       nextHour: Math.max(0, lastValue + slope),
@@ -824,9 +821,7 @@ class ErrorAnalyticsBridge {
       const firstError = patternErrors[0];
       const timestamps = patternErrors.map(e => e.timestamp);
       const affectedUserIds = new Set(
-        patternErrors
-          .map(e => e.context?.userId)
-          .filter((id): id is string => Boolean(id))
+        patternErrors.map(e => e.context?.userId).filter((id): id is string => Boolean(id))
       );
 
       const pattern: ErrorPattern = {
@@ -848,9 +843,7 @@ class ErrorAnalyticsBridge {
     }
 
     // Sort by frequency (descending) and limit to top 20
-    return patterns
-      .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 20);
+    return patterns.sort((a, b) => b.frequency - a.frequency).slice(0, 20);
   }
 
   private buildErrorCluster(errors: CoreError[]): ErrorCluster {
@@ -881,21 +874,20 @@ class ErrorAnalyticsBridge {
     const frequency = errors.length;
 
     const userExperience =
-      firstError.severity === ErrorSeverity.CRITICAL ? 'critical' :
-      firstError.severity === ErrorSeverity.HIGH ? 'high' :
-      firstError.severity === ErrorSeverity.MEDIUM ? 'medium' : 'low';
+      firstError.severity === ErrorSeverity.CRITICAL
+        ? 'critical'
+        : firstError.severity === ErrorSeverity.HIGH
+          ? 'high'
+          : firstError.severity === ErrorSeverity.MEDIUM
+            ? 'medium'
+            : 'low';
 
-    const businessImpact =
-      frequency > 50 ? 'high' :
-      frequency > 10 ? 'medium' : 'low';
+    const businessImpact = frequency > 50 ? 'high' : frequency > 10 ? 'medium' : 'low';
 
     const frequencyCategory =
-      frequency > 50 ? 'persistent' :
-      frequency > 10 ? 'frequent' : 'occasional';
+      frequency > 50 ? 'persistent' : frequency > 10 ? 'frequent' : 'occasional';
 
-    const affectedUsers = new Set(
-      errors.map(e => e.context?.userId).filter(Boolean)
-    ).size;
+    const affectedUsers = new Set(errors.map(e => e.context?.userId).filter(Boolean)).size;
 
     const scope = affectedUsers > 10 ? 'widespread' : 'isolated';
 
@@ -981,19 +973,17 @@ class ErrorAnalyticsBridge {
       strategyId,
       strategyName: strategyId,
       successRate: 1.0, // All errors in this group were recovered
-      averageRecoveryTime: StatisticsUtils.calculateMean(
-        errors.map(e => e.recoveryTime || 0)
-      ),
+      averageRecoveryTime: StatisticsUtils.calculateMean(errors.map(e => e.recoveryTime || 0)),
       usageCount: errors.length,
       failureReasons: [],
       improvementSuggestions: [],
     }));
   }
 
-  private calculateRecoveryTimeDistribution(recoveredErrors: CoreError[]): RecoveryTimeDistribution {
-    const recoveryTimes = recoveredErrors
-      .map(e => e.recoveryTime || 0)
-      .filter(time => time > 0);
+  private calculateRecoveryTimeDistribution(
+    recoveredErrors: CoreError[]
+  ): RecoveryTimeDistribution {
+    const recoveryTimes = recoveredErrors.map(e => e.recoveryTime || 0).filter(time => time > 0);
 
     if (recoveryTimes.length === 0) {
       return {
@@ -1037,9 +1027,7 @@ class ErrorAnalyticsBridge {
 
   private calculateManualInterventionRate(recoveredErrors: CoreError[]): number {
     // Assume manual if recovery time is slow (> 30 seconds)
-    const manualRecoveries = recoveredErrors.filter(
-      e => e.recoveryTime && e.recoveryTime > 30000
-    );
+    const manualRecoveries = recoveredErrors.filter(e => e.recoveryTime && e.recoveryTime > 30000);
     return recoveredErrors.length > 0 ? manualRecoveries.length / recoveredErrors.length : 0;
   }
 

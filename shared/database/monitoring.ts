@@ -1,5 +1,6 @@
-import { monitorPoolHealth } from './pool';
 import { logger } from '../core/src/observability/logging';
+
+import { monitorPoolHealth } from './pool';
 
 // Performance monitoring is optional and loaded dynamically
 const getPerformanceMonitoring = async (): Promise<any> => {

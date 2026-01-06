@@ -3,9 +3,9 @@
  * Comprehensive XSS prevention and input validation
  */
 
-import { SecurityEvent } from '@client/shared/types';
 import DOMPurify from 'dompurify';
 
+import { SecurityEvent } from '@client/shared/types';
 import { logger } from '@client/utils/logger';
 
 // Type definitions for DOMPurify hook data
@@ -43,7 +43,7 @@ export interface ThreatDetection {
   location?: string;
 }
 
-export type ThreatType = 
+export type ThreatType =
   | 'script_injection'
   | 'html_injection'
   | 'attribute_injection'
@@ -62,12 +62,12 @@ export class InputSanitizer {
       allowedSchemes: ['http', 'https', 'mailto', 'tel'],
       maxLength: 10000,
       stripUnknownTags: true,
-      ...config
+      ...config,
     };
 
     // Initialize DOMPurify
     this.setupDOMPurify();
-    
+
     // Initialize threat detection patterns
     this.threatPatterns = this.initializeThreatPatterns();
   }
@@ -75,77 +75,88 @@ export class InputSanitizer {
   private setupDOMPurify(): void {
     // Configure DOMPurify with our settings
     DOMPurify.setConfig({
-      ALLOWED_TAGS: this.config.allowedTags.length > 0 ? this.config.allowedTags : ['p', 'b', 'i', 'em', 'strong', 'br'],
+      ALLOWED_TAGS:
+        this.config.allowedTags.length > 0
+          ? this.config.allowedTags
+          : ['p', 'b', 'i', 'em', 'strong', 'br'],
       ALLOWED_ATTR: Object.values(this.config.allowedAttributes).flat(),
       ALLOWED_URI_REGEXP: new RegExp(
-        `^(?:(?:${(this.config.allowedSchemes || []).join('|')}):|\\/|#)`, 'i'
+        `^(?:(?:${(this.config.allowedSchemes || []).join('|')}):|\\/|#)`,
+        'i'
       ),
       KEEP_CONTENT: !this.config.stripUnknownTags,
       RETURN_DOM: false,
       RETURN_DOM_FRAGMENT: false,
       SANITIZE_DOM: true,
       WHOLE_DOCUMENT: false,
-      FORCE_BODY: false
+      FORCE_BODY: false,
     });
 
     // Add hooks for threat detection with properly typed parameters
-    DOMPurify.addHook('beforeSanitizeElements' as any, ((node: Element, data: DOMPurifyHookData) => {
-      this.detectElementThreats(node, data);
-    }) as any);
+    DOMPurify.addHook(
+      'beforeSanitizeElements' as any,
+      ((node: Element, data: DOMPurifyHookData) => {
+        this.detectElementThreats(node, data);
+      }) as any
+    );
 
-    DOMPurify.addHook('beforeSanitizeAttributes' as any, ((node: Element, data: DOMPurifyHookData) => {
-      this.detectAttributeThreats(node, data);
-    }) as any);
+    DOMPurify.addHook(
+      'beforeSanitizeAttributes' as any,
+      ((node: Element, data: DOMPurifyHookData) => {
+        this.detectAttributeThreats(node, data);
+      }) as any
+    );
   }
 
   private initializeThreatPatterns(): Map<ThreatType, RegExp[]> {
     return new Map([
-      ['script_injection', [
-        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-        /javascript:/gi,
-        /on\w+\s*=/gi,
-        /eval\s*\(/gi,
-        /setTimeout\s*\(/gi,
-        /setInterval\s*\(/gi
-      ]],
-      ['html_injection', [
-        /<iframe\b[^>]*>/gi,
-        /<object\b[^>]*>/gi,
-        /<embed\b[^>]*>/gi,
-        /<form\b[^>]*>/gi,
-        /<input\b[^>]*>/gi,
-        /<meta\b[^>]*>/gi
-      ]],
-      ['attribute_injection', [
-        /style\s*=.*expression\s*\(/gi,
-        /style\s*=.*javascript:/gi,
-        /href\s*=.*javascript:/gi,
-        /src\s*=.*javascript:/gi
-      ]],
-      ['url_injection', [
-        /data:text\/html/gi,
-        /data:application\/javascript/gi,
-        /vbscript:/gi,
-        /file:/gi,
-        /ftp:/gi
-      ]],
-      ['css_injection', [
-        /expression\s*\(/gi,
-        /@import/gi,
-        /behavior\s*:/gi,
-        /-moz-binding/gi
-      ]],
-      ['data_uri_abuse', [
-        /data:image\/svg\+xml.*<script/gi,
-        /data:text\/html.*<script/gi
-      ]],
-      ['suspicious_pattern', [
-        /\x00/g, // Null bytes
-        /\uFEFF/g, // BOM
-        /[\u0000-\u001F\u007F-\u009F]/g, // Control characters
-        /&#x0*[0-9a-f]{2,}/gi, // Hex entities
-        /&#0*[0-9]{2,}/gi // Decimal entities
-      ]]
+      [
+        'script_injection',
+        [
+          /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+          /javascript:/gi,
+          /on\w+\s*=/gi,
+          /eval\s*\(/gi,
+          /setTimeout\s*\(/gi,
+          /setInterval\s*\(/gi,
+        ],
+      ],
+      [
+        'html_injection',
+        [
+          /<iframe\b[^>]*>/gi,
+          /<object\b[^>]*>/gi,
+          /<embed\b[^>]*>/gi,
+          /<form\b[^>]*>/gi,
+          /<input\b[^>]*>/gi,
+          /<meta\b[^>]*>/gi,
+        ],
+      ],
+      [
+        'attribute_injection',
+        [
+          /style\s*=.*expression\s*\(/gi,
+          /style\s*=.*javascript:/gi,
+          /href\s*=.*javascript:/gi,
+          /src\s*=.*javascript:/gi,
+        ],
+      ],
+      [
+        'url_injection',
+        [/data:text\/html/gi, /data:application\/javascript/gi, /vbscript:/gi, /file:/gi, /ftp:/gi],
+      ],
+      ['css_injection', [/expression\s*\(/gi, /@import/gi, /behavior\s*:/gi, /-moz-binding/gi]],
+      ['data_uri_abuse', [/data:image\/svg\+xml.*<script/gi, /data:text\/html.*<script/gi]],
+      [
+        'suspicious_pattern',
+        [
+          /\x00/g, // Null bytes
+          /\uFEFF/g, // BOM
+          /[\u0000-\u001F\u007F-\u009F]/g, // Control characters
+          /&#x0*[0-9a-f]{2,}/gi, // Hex entities
+          /&#0*[0-9]{2,}/gi, // Decimal entities
+        ],
+      ],
     ]);
   }
 
@@ -159,7 +170,7 @@ export class InputSanitizer {
         wasModified: false,
         removedElements: [],
         removedAttributes: [],
-        threats: []
+        threats: [],
       };
     }
 
@@ -180,7 +191,7 @@ export class InputSanitizer {
           type: 'suspicious_pattern',
           severity: 'medium',
           description: `Input truncated from ${original.length} to ${this.config.maxLength} characters`,
-          originalContent: original.substring(this.config.maxLength)
+          originalContent: original.substring(this.config.maxLength),
         });
       }
 
@@ -195,7 +206,7 @@ export class InputSanitizer {
           component: 'InputSanitizer',
           originalLength: original.length,
           sanitizedLength: sanitized.length,
-          threatsDetected: threats.length
+          threatsDetected: threats.length,
         });
       }
 
@@ -209,29 +220,30 @@ export class InputSanitizer {
         wasModified,
         removedElements,
         removedAttributes,
-        threats
+        threats,
       };
-
     } catch (error) {
       // Cast error to Error type for proper logging
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error('Error during HTML sanitization', {
         error: errorMessage,
-        component: 'InputSanitizer'
+        component: 'InputSanitizer',
       });
-      
+
       // Return empty string on error for security
       return {
         sanitized: '',
         wasModified: true,
         removedElements: ['*'],
         removedAttributes: ['*'],
-        threats: [{
-          type: 'suspicious_pattern',
-          severity: 'critical',
-          description: 'Sanitization failed, content blocked',
-          originalContent: original
-        }]
+        threats: [
+          {
+            type: 'suspicious_pattern',
+            severity: 'critical',
+            description: 'Sanitization failed, content blocked',
+            originalContent: original,
+          },
+        ],
       };
     }
   }
@@ -246,7 +258,7 @@ export class InputSanitizer {
         wasModified: false,
         removedElements: [],
         removedAttributes: [],
-        threats: []
+        threats: [],
       };
     }
 
@@ -275,7 +287,7 @@ export class InputSanitizer {
           type: 'suspicious_pattern',
           severity: 'low',
           description: `Text truncated from ${original.length} to ${this.config.maxLength} characters`,
-          originalContent: original.substring(this.config.maxLength)
+          originalContent: original.substring(this.config.maxLength),
         });
       }
 
@@ -290,27 +302,28 @@ export class InputSanitizer {
         wasModified,
         removedElements: [],
         removedAttributes: [],
-        threats
+        threats,
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error('Error during text sanitization', {
         error: errorMessage,
-        component: 'InputSanitizer'
+        component: 'InputSanitizer',
       });
-      
+
       return {
         sanitized: '',
         wasModified: true,
         removedElements: [],
         removedAttributes: [],
-        threats: [{
-          type: 'suspicious_pattern',
-          severity: 'critical',
-          description: 'Text sanitization failed, content blocked',
-          originalContent: original
-        }]
+        threats: [
+          {
+            type: 'suspicious_pattern',
+            severity: 'critical',
+            description: 'Text sanitization failed, content blocked',
+            originalContent: original,
+          },
+        ],
       };
     }
   }
@@ -326,15 +339,17 @@ export class InputSanitizer {
     try {
       // Basic URL validation
       const urlObj = new URL(sanitized, window.location.origin);
-      
+
       // Check allowed schemes
-      if (this.config.allowedSchemes && 
-          !this.config.allowedSchemes.includes(urlObj.protocol.slice(0, -1))) {
+      if (
+        this.config.allowedSchemes &&
+        !this.config.allowedSchemes.includes(urlObj.protocol.slice(0, -1))
+      ) {
         threats.push({
           type: 'protocol_violation',
           severity: 'high',
           description: `Disallowed protocol: ${urlObj.protocol}`,
-          originalContent: original
+          originalContent: original,
         });
         sanitized = '#';
       }
@@ -345,19 +360,21 @@ export class InputSanitizer {
           type: 'script_injection',
           severity: 'critical',
           description: 'JavaScript URL detected',
-          originalContent: original
+          originalContent: original,
         });
         sanitized = '#';
       }
 
       // Check for data URIs with scripts
-      if (sanitized.toLowerCase().startsWith('data:') && 
-          (sanitized.includes('<script') || sanitized.includes('javascript'))) {
+      if (
+        sanitized.toLowerCase().startsWith('data:') &&
+        (sanitized.includes('<script') || sanitized.includes('javascript'))
+      ) {
         threats.push({
           type: 'data_uri_abuse',
           severity: 'critical',
           description: 'Malicious data URI detected',
-          originalContent: original
+          originalContent: original,
         });
         sanitized = '#';
       }
@@ -373,16 +390,15 @@ export class InputSanitizer {
         wasModified,
         removedElements: [],
         removedAttributes: [],
-        threats
+        threats,
       };
-
     } catch (error) {
       // Invalid URL
       threats.push({
         type: 'url_injection',
         severity: 'medium',
         description: 'Invalid URL format',
-        originalContent: original
+        originalContent: original,
       });
 
       return {
@@ -390,7 +406,7 @@ export class InputSanitizer {
         wasModified: true,
         removedElements: [],
         removedAttributes: [],
-        threats
+        threats,
       };
     }
   }
@@ -407,7 +423,7 @@ export class InputSanitizer {
               type: threatType,
               severity: this.assessThreatSeverity(threatType, match),
               description: `${threatType.replace('_', ' ')} detected: ${match.substring(0, 50)}...`,
-              originalContent: match
+              originalContent: match,
             });
           });
         }
@@ -417,7 +433,10 @@ export class InputSanitizer {
     return threats;
   }
 
-  private assessThreatSeverity(threatType: ThreatType, content: string): 'low' | 'medium' | 'high' | 'critical' {
+  private assessThreatSeverity(
+    threatType: ThreatType,
+    content: string
+  ): 'low' | 'medium' | 'high' | 'critical' {
     switch (threatType) {
       case 'script_injection':
         return 'critical';
@@ -447,7 +466,7 @@ export class InputSanitizer {
       logger.debug('Potentially dangerous element detected', {
         component: 'InputSanitizer',
         tagName: node.tagName,
-        innerHTML: node.innerHTML.substring(0, 100)
+        innerHTML: node.innerHTML.substring(0, 100),
       });
     }
   }
@@ -461,15 +480,15 @@ export class InputSanitizer {
         logger.debug('Dangerous attribute detected', {
           component: 'InputSanitizer',
           attribute: data.attrName,
-          value: data.attrValue.substring(0, 100)
+          value: data.attrValue.substring(0, 100),
         });
       }
     }
   }
 
   private reportThreats(threats: ThreatDetection[], originalContent: string): void {
-    const highSeverityThreats = threats.filter(t => 
-      t.severity === 'high' || t.severity === 'critical'
+    const highSeverityThreats = threats.filter(
+      t => t.severity === 'high' || t.severity === 'critical'
     );
 
     if (highSeverityThreats.length > 0) {
@@ -480,8 +499,8 @@ export class InputSanitizer {
         threats: threats.map(t => ({
           type: t.type,
           severity: t.severity,
-          description: t.description
-        }))
+          description: t.description,
+        })),
       });
 
       // Create security event for high-severity threats
@@ -493,13 +512,13 @@ export class InputSanitizer {
           threatCount: threats.length,
           threats: threats,
           originalContentLength: originalContent.length,
-          userAgent: navigator.userAgent
-        }
+          userAgent: navigator.userAgent,
+        },
       };
 
       // Report security event
       const customEvent = new CustomEvent('security-event', {
-        detail: securityEvent
+        detail: securityEvent,
       });
       document.dispatchEvent(customEvent);
     }
@@ -508,7 +527,10 @@ export class InputSanitizer {
   /**
    * Batch sanitize multiple inputs
    */
-  sanitizeBatch(inputs: { [key: string]: string }, type: 'html' | 'text' | 'url' = 'text'): { [key: string]: SanitizationResult } {
+  sanitizeBatch(
+    inputs: { [key: string]: string },
+    type: 'html' | 'text' | 'url' = 'text'
+  ): { [key: string]: SanitizationResult } {
     const results: { [key: string]: SanitizationResult } = {};
 
     for (const [key, value] of Object.entries(inputs)) {
@@ -532,7 +554,7 @@ export class InputSanitizer {
    */
   isSafe(input: string, type: 'html' | 'text' | 'url' = 'text'): boolean {
     let result: SanitizationResult;
-    
+
     switch (type) {
       case 'html':
         result = this.sanitizeHTML(input);
@@ -559,7 +581,7 @@ export class InputSanitizer {
     return {
       threatsDetected: 0,
       criticalThreats: 0,
-      sanitizationsPerformed: 0
+      sanitizationsPerformed: 0,
     };
   }
 
@@ -574,7 +596,10 @@ export class InputSanitizer {
   /**
    * Validate and sanitize input
    */
-  async validateAndSanitize(_schema: unknown, input: unknown): Promise<{ success: true; data: unknown } | { success: false; errors: string[] }> {
+  async validateAndSanitize(
+    _schema: unknown,
+    input: unknown
+  ): Promise<{ success: true; data: unknown } | { success: false; errors: string[] }> {
     // Simple validation - in real implementation, use a validation library
     // Prefix unused parameter with underscore to satisfy linter
     return { success: true, data: input };
@@ -586,7 +611,7 @@ export const inputSanitizer = new InputSanitizer({
   enabled: true,
   allowedTags: ['p', 'b', 'i', 'em', 'strong', 'br', 'a', 'img'],
   allowedAttributes: {
-    'a': ['href', 'target'],
-    'img': ['src', 'alt']
-  }
+    a: ['href', 'target'],
+    img: ['src', 'alt'],
+  },
 });

@@ -16,7 +16,10 @@ export const usernameSchema = z
   .string()
   .min(3, 'Username must be at least 3 characters')
   .max(50, 'Username must be less than 50 characters')
-  .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens');
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Username can only contain letters, numbers, underscores, and hyphens'
+  );
 
 // Route validation
 export const routeSchema = z.object({
@@ -70,7 +73,10 @@ export function validateUsername(username: string) {
 }
 
 export function validateNavigationPath(path: string) {
-  const pathSchema = z.string().min(1, 'Path cannot be empty').startsWith('/', 'Path must start with /');
+  const pathSchema = z
+    .string()
+    .min(1, 'Path cannot be empty')
+    .startsWith('/', 'Path must start with /');
   return pathSchema.safeParse(path);
 }
 
@@ -101,15 +107,18 @@ export function validateUseRelatedPagesOptions(options: unknown) {
 }
 
 // Generic validation function
-export function validate<T>(schema: z.ZodSchema<T>, data: unknown): { success: boolean; data?: T; error?: string } {
+export function validate<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown
+): { success: boolean; data?: T; error?: string } {
   const result = schema.safeParse(data);
-  
+
   if (result.success) {
     return { success: true, data: result.data };
   } else {
-    return { 
-      success: false, 
-      error: result.error.errors.map(e => e.message).join(', ')
+    return {
+      success: false,
+      error: result.error.errors.map(e => e.message).join(', '),
     };
   }
 }

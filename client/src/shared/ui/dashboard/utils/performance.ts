@@ -53,7 +53,7 @@ export class DashboardPerformanceMonitor {
   private logPerformanceMetrics() {
     logger.info('Dashboard performance metrics', {
       ...this.metrics,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -64,12 +64,12 @@ export class DashboardPerformanceMonitor {
       logger.warn('Dashboard load time exceeded 3 second requirement', {
         loadTimeMs: Math.round(loadTime),
         requirement: '3000ms',
-        exceedsBy: Math.round(loadTime - 3000)
+        exceedsBy: Math.round(loadTime - 3000),
       });
     } else if (loadTime) {
       logger.info('Dashboard load time within requirements', {
         loadTimeMs: Math.round(loadTime),
-        requirement: '3000ms'
+        requirement: '3000ms',
       });
     }
   }
@@ -79,7 +79,7 @@ export class DashboardPerformanceMonitor {
       loadTime: this.metrics.loadTime || 0,
       renderTime: this.metrics.renderTime || 0,
       dataFetchTime: this.metrics.dataFetchTime || 0,
-      personaDetectionTime: this.metrics.personaDetectionTime || 0
+      personaDetectionTime: this.metrics.personaDetectionTime || 0,
     };
   }
 }
@@ -105,12 +105,13 @@ export function useDashboardPerformance() {
     markDataFetchEnd: () => monitor.current?.markDataFetchEnd(),
     markPersonaDetectionStart: () => monitor.current?.markPersonaDetectionStart(),
     markPersonaDetectionEnd: () => monitor.current?.markPersonaDetectionEnd(),
-    getMetrics: () => monitor.current?.getMetrics() || {
-      loadTime: 0,
-      renderTime: 0,
-      dataFetchTime: 0,
-      personaDetectionTime: 0
-    }
+    getMetrics: () =>
+      monitor.current?.getMetrics() || {
+        loadTime: 0,
+        renderTime: 0,
+        dataFetchTime: 0,
+        personaDetectionTime: 0,
+      },
   };
 }
 
@@ -130,7 +131,7 @@ export function createLazyDashboardWidget<T extends React.ComponentType<any>>(
 
       logger.debug('Dashboard widget loaded', {
         loadTimeMs: Math.round(loadTime),
-        componentName: module.default.name || 'Unknown'
+        componentName: module.default.name || 'Unknown',
       });
 
       return module;

@@ -29,7 +29,7 @@ class RouteProfiler {
       path,
       loadTime,
       renderTime,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.metrics.push(metric);

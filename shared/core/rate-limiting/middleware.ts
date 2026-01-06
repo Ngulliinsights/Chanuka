@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+
 import { RateLimitStore, RateLimitOptions, RateLimitHeaders } from './types';
 
 export class RateLimitMiddleware {

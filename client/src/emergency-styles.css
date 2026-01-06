@@ -264,8 +264,12 @@ p {
 
 /* Loading spinner */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin {
@@ -277,11 +281,11 @@ p {
   .container {
     padding: 0 0.5rem;
   }
-  
+
   h1 {
     font-size: 1.875rem;
   }
-  
+
   .p-8 {
     padding: 1.5rem;
   }

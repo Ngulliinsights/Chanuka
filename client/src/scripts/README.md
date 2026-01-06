@@ -5,6 +5,7 @@ This directory contains automated tools for migrating and maintaining the unifie
 ## 📋 Available Scripts
 
 ### 🔄 Component Migration
+
 ```bash
 # Migrate components automatically (dry run first)
 npm run migrate:components:dry-run
@@ -17,12 +18,14 @@ npm run migrate:components:verbose
 ```
 
 **What it does:**
+
 - Converts legacy Button/Card/Badge imports to unified components
 - Updates hardcoded colors to design tokens
 - Adds accessibility improvements (button types, touch targets)
 - Fixes common styling issues
 
 ### 📊 Bundle Analysis
+
 ```bash
 # Analyze current CSS bundle
 npm run analyze:bundle
@@ -32,12 +35,14 @@ npm run analyze:bundle:compare
 ```
 
 **What it does:**
+
 - Measures CSS bundle size and compression
 - Identifies duplicate rules and optimization opportunities
 - Provides actionable recommendations
 - Tracks performance improvements over time
 
 ### ⚡ Performance Audit
+
 ```bash
 # Run performance audit
 npm run audit:performance
@@ -50,12 +55,14 @@ npm run audit:performance:report performance-report.json
 ```
 
 **What it does:**
+
 - Measures bundle sizes (raw and gzipped)
 - Analyzes code complexity and duplicates
 - Estimates loading performance metrics
 - Provides performance grades and recommendations
 
 ### ✅ Migration Validation
+
 ```bash
 # Validate migration completeness
 npm run validate:migration
@@ -68,12 +75,14 @@ npm run migration:complete
 ```
 
 **What it does:**
+
 - Verifies unified components are properly set up
 - Checks design tokens are correctly configured
 - Scans for legacy patterns that need migration
 - Provides detailed validation report
 
 ### 🧪 Testing
+
 ```bash
 # Run visual regression tests
 npm run test:visual
@@ -85,6 +94,7 @@ npm run test:components
 ## 🎯 Usage Examples
 
 ### Migrating a New Component
+
 ```bash
 # 1. First, run a dry run to see what would change
 npm run migrate:components:dry-run
@@ -100,6 +110,7 @@ npm run test:components
 ```
 
 ### Performance Monitoring
+
 ```bash
 # 1. Create a baseline before changes
 npm run audit:performance:compare baseline.json
@@ -114,6 +125,7 @@ npm run audit:performance:report report.json
 ```
 
 ### Bundle Optimization
+
 ```bash
 # 1. Analyze current bundle
 npm run analyze:bundle
@@ -129,8 +141,9 @@ npm run analyze:bundle
 ## 📁 Script Details
 
 ### migrate-components.ts
+
 - **Purpose**: Automated component migration
-- **Features**: 
+- **Features**:
   - Import statement updates
   - Component usage replacements
   - Style token migrations
@@ -138,6 +151,7 @@ npm run analyze:bundle
 - **Safety**: Includes dry-run mode and backup recommendations
 
 ### analyze-bundle.ts
+
 - **Purpose**: CSS bundle analysis and optimization
 - **Features**:
   - File size measurement
@@ -146,6 +160,7 @@ npm run analyze:bundle
   - Before/after comparisons
 
 ### performance-audit.ts
+
 - **Purpose**: Comprehensive performance monitoring
 - **Features**:
   - Bundle size tracking
@@ -154,6 +169,7 @@ npm run analyze:bundle
   - Performance grading system
 
 ### validate-migration.ts
+
 - **Purpose**: Migration completeness validation
 - **Features**:
   - Component setup verification
@@ -164,6 +180,7 @@ npm run analyze:bundle
 ## 🔧 Configuration
 
 ### Migration Rules
+
 Edit `migrate-components.ts` to add new migration patterns:
 
 ```typescript
@@ -171,30 +188,33 @@ const COMPONENT_MIGRATIONS: MigrationRule[] = [
   {
     pattern: /old-pattern/g,
     replacement: 'new-pattern',
-    description: 'Description of what this fixes'
-  }
+    description: 'Description of what this fixes',
+  },
 ];
 ```
 
 ### Performance Thresholds
+
 Adjust performance thresholds in `performance-audit.ts`:
 
 ```typescript
 // Bundle size warnings
-if (bundleSize.css.total > 100000) { // 100KB threshold
+if (bundleSize.css.total > 100000) {
+  // 100KB threshold
   recommendations.push('Bundle size warning...');
 }
 ```
 
 ### Validation Rules
+
 Add new validation checks in `validate-migration.ts`:
 
 ```typescript
 const legacyPatterns = [
-  { 
-    pattern: /legacy-pattern/g, 
-    message: 'Description of the issue' 
-  }
+  {
+    pattern: /legacy-pattern/g,
+    message: 'Description of the issue',
+  },
 ];
 ```
 
@@ -203,31 +223,38 @@ const legacyPatterns = [
 ### Common Issues
 
 **"Module not found" errors:**
+
 ```bash
 # Install missing dependencies
 npm install tsx glob zlib
 ```
 
 **Permission errors:**
+
 ```bash
 # Make scripts executable (Unix/Mac)
 chmod +x src/scripts/*.ts
 ```
 
 **TypeScript compilation errors:**
+
 ```bash
 # Check TypeScript configuration
 npx tsc --noEmit src/scripts/migrate-components.ts
 ```
 
 ### Debug Mode
+
 Add `--verbose` flag to any script for detailed output:
+
 ```bash
 npm run migrate:components -- --verbose
 ```
 
 ### Dry Run Mode
+
 Always test migrations first:
+
 ```bash
 npm run migrate:components:dry-run
 ```
@@ -235,13 +262,16 @@ npm run migrate:components:dry-run
 ## 📊 Performance Benchmarks
 
 ### Expected Results After Migration
+
 - **Bundle Size**: 15-20% reduction
 - **Duplicate Rules**: 50-80% reduction
 - **Performance Score**: 80+ (out of 100)
 - **Loading Time**: 10-15% improvement
 
 ### Monitoring
+
 Set up automated monitoring in CI/CD:
+
 ```bash
 # In your CI pipeline
 npm run audit:performance:compare baseline.json
@@ -254,6 +284,7 @@ fi
 ## 🤝 Contributing
 
 ### Adding New Migration Rules
+
 1. Identify the pattern to migrate
 2. Add the rule to the appropriate script
 3. Test with dry-run mode
@@ -261,6 +292,7 @@ fi
 5. Add validation checks
 
 ### Improving Performance Analysis
+
 1. Add new metrics to track
 2. Update threshold recommendations
 3. Enhance reporting format

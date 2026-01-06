@@ -3,7 +3,7 @@
  * Transparent reporting of how user data is collected, used, and shared
  */
 
-import React from 'react';
+import { privacyAnalyticsService } from '@client/services/privacyAnalyticsService';
 import {
   Database,
   BarChart3,
@@ -14,23 +14,28 @@ import {
   CheckCircle,
   Info,
   Trash,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { useAuth } from '@client/core/auth';
 import { dataRetentionService, retentionUtils } from '@client/services/dataRetentionService';
-import { privacyAnalyticsService } from '@client/services/privacyAnalyticsService';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 import { privacyCompliance } from '@client/utils/privacy-compliance';
 
 import { Globe } from '../icons/SimpleIcons';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
 
 interface DataUsageStats {
   totalDataPoints: number;
@@ -77,30 +82,33 @@ export function DataUsageReportDashboard() {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       // Load data retention summary with error handling
       const retentionSummary = await dataRetentionService.getUserDataSummary(auth.user.id);
-      
+
       // Load analytics metrics with fallback to empty metrics
       const analyticsMetrics = privacyAnalyticsService.getAnalyticsMetrics() || {
         totalEvents: 0,
         anonymizedEvents: 0,
-        consentedEvents: 0
+        consentedEvents: 0,
       };
-      
+
       // Load privacy compliance data
       privacyCompliance.generatePrivacyPolicySummary();
 
       // Transform data for display with safe fallbacks
-      const transformedCategories: DataCategory[] = Object.entries(retentionSummary.categories || {}).map(([id, data]) => ({
+      const transformedCategories: DataCategory[] = Object.entries(
+        retentionSummary.categories || {}
+      ).map(([id, data]) => ({
         id,
         name: id.charAt(0).toUpperCase() + id.slice(1).replace('_', ' '),
         description: getDataCategoryDescription(id),
         dataPoints: data.recordCount || 0,
         sizeBytes: data.sizeBytes || 0,
         lastAccessed: new Date().toISOString(),
-        retentionExpiry: data.retentionExpiry || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        retentionExpiry:
+          data.retentionExpiry || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         purposes: getDataCategoryPurposes(id),
         legalBasis: getDataCategoryLegalBasis(id),
         thirdPartySharing: getThirdPartySharing(id),
@@ -110,22 +118,25 @@ export function DataUsageReportDashboard() {
 
       // Calculate statistics with safe math operations
       const totalDataPoints = transformedCategories.reduce((sum, cat) => sum + cat.dataPoints, 0);
-      const retentionCompliant = transformedCategories.filter(cat => 
-        new Date(cat.retentionExpiry) > new Date()
+      const retentionCompliant = transformedCategories.filter(
+        cat => new Date(cat.retentionExpiry) > new Date()
       ).length;
 
       const usageStats: DataUsageStats = {
         totalDataPoints,
         categoriesTracked: transformedCategories.length,
-        retentionCompliance: transformedCategories.length > 0 
-          ? Math.round((retentionCompliant / transformedCategories.length) * 100) 
-          : 100,
-        anonymizedPercentage: analyticsMetrics.totalEvents > 0
-          ? Math.round((analyticsMetrics.anonymizedEvents / analyticsMetrics.totalEvents) * 100)
-          : 0,
-        consentedPercentage: analyticsMetrics.totalEvents > 0
-          ? Math.round((analyticsMetrics.consentedEvents / analyticsMetrics.totalEvents) * 100)
-          : 0,
+        retentionCompliance:
+          transformedCategories.length > 0
+            ? Math.round((retentionCompliant / transformedCategories.length) * 100)
+            : 100,
+        anonymizedPercentage:
+          analyticsMetrics.totalEvents > 0
+            ? Math.round((analyticsMetrics.anonymizedEvents / analyticsMetrics.totalEvents) * 100)
+            : 0,
+        consentedPercentage:
+          analyticsMetrics.totalEvents > 0
+            ? Math.round((analyticsMetrics.consentedEvents / analyticsMetrics.totalEvents) * 100)
+            : 0,
         lastUpdated: new Date().toISOString(),
       };
 
@@ -153,12 +164,12 @@ export function DataUsageReportDashboard() {
     if (!auth.user) return;
 
     try {
-      const categories = categoryId 
-        ? [categoryId] 
+      const categories = categoryId
+        ? [categoryId]
         : ['profile', 'activity', 'analytics', 'communications'];
-      
+
       await auth.requestDataExport('json', categories);
-      
+
       logger.info('Data export requested', {
         component: 'DataUsageReportDashboard',
         categories,
@@ -184,7 +195,7 @@ export function DataUsageReportDashboard() {
 
     try {
       await auth.requestDataDeletion('30days', [categoryId]);
-      
+
       logger.info('Data deletion requested', {
         component: 'DataUsageReportDashboard',
         category: categoryId,
@@ -277,12 +288,7 @@ export function DataUsageReportDashboard() {
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
           Failed to load data usage report: {error}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh}
-            className="ml-4"
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh} className="ml-4">
             Retry
           </Button>
         </AlertDescription>
@@ -295,9 +301,7 @@ export function DataUsageReportDashboard() {
     return (
       <Alert>
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Please log in to view your data usage report.
-        </AlertDescription>
+        <AlertDescription>Please log in to view your data usage report.</AlertDescription>
       </Alert>
     );
   }
@@ -322,7 +326,7 @@ export function DataUsageReportDashboard() {
           <select
             id="period-select"
             value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value as typeof selectedPeriod)}
+            onChange={e => setSelectedPeriod(e.target.value as typeof selectedPeriod)}
             className="border rounded-md px-3 py-2 text-sm"
             aria-label="Select reporting period"
           >
@@ -406,7 +410,7 @@ export function DataUsageReportDashboard() {
         {/* Data Categories Tab - Shows what data we have about the user */}
         <TabsContent value="categories">
           <div className="space-y-4">
-            {categories.map((category) => (
+            {categories.map(category => (
               <Card key={category.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -431,11 +435,15 @@ export function DataUsageReportDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                       <p className="text-sm text-gray-600">Data Points</p>
-                      <p className="text-lg font-semibold">{category.dataPoints.toLocaleString()}</p>
+                      <p className="text-lg font-semibold">
+                        {category.dataPoints.toLocaleString()}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Storage Size</p>
-                      <p className="text-lg font-semibold">{retentionUtils.formatFileSize(category.sizeBytes)}</p>
+                      <p className="text-lg font-semibold">
+                        {retentionUtils.formatFileSize(category.sizeBytes)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Retention Expires</p>
@@ -448,7 +456,7 @@ export function DataUsageReportDashboard() {
                   <div className="mb-4">
                     <p className="text-sm text-gray-600 mb-2">Purposes</p>
                     <div className="flex flex-wrap gap-1">
-                      {category.purposes.map((purpose) => (
+                      {category.purposes.map(purpose => (
                         <Badge key={purpose} variant="outline" className="text-xs">
                           {purpose}
                         </Badge>
@@ -502,21 +510,27 @@ export function DataUsageReportDashboard() {
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium">Platform Functionality</p>
-                        <p className="text-sm text-gray-600">Essential features and user experience</p>
+                        <p className="text-sm text-gray-600">
+                          Essential features and user experience
+                        </p>
                       </div>
                       <Badge>Contract</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium">Civic Transparency</p>
-                        <p className="text-sm text-gray-600">Public engagement and democratic participation</p>
+                        <p className="text-sm text-gray-600">
+                          Public engagement and democratic participation
+                        </p>
                       </div>
                       <Badge>Public Interest</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium">Analytics & Improvement</p>
-                        <p className="text-sm text-gray-600">Platform optimization and feature development</p>
+                        <p className="text-sm text-gray-600">
+                          Platform optimization and feature development
+                        </p>
                       </div>
                       <Badge>Consent</Badge>
                     </div>
@@ -570,13 +584,11 @@ export function DataUsageReportDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Data Retention Policies</CardTitle>
-              <CardDescription>
-                How long we keep different types of data and why
-              </CardDescription>
+              <CardDescription>How long we keep different types of data and why</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {dataRetentionService.getRetentionPolicies().map((policy) => (
+                {dataRetentionService.getRetentionPolicies().map(policy => (
                   <div key={policy.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{policy.name}</h4>
@@ -585,7 +597,7 @@ export function DataUsageReportDashboard() {
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">{policy.description}</p>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="font-medium mb-1">Legal Basis</p>
@@ -601,7 +613,7 @@ export function DataUsageReportDashboard() {
                       <div className="mt-3">
                         <p className="font-medium text-sm mb-1">Exceptions</p>
                         <div className="flex flex-wrap gap-1">
-                          {policy.exceptions.map((exception) => (
+                          {policy.exceptions.map(exception => (
                             <Badge key={exception} variant="outline" className="text-xs">
                               {exception}
                             </Badge>
@@ -630,8 +642,9 @@ export function DataUsageReportDashboard() {
                 <Alert>
                   <Shield className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Privacy Commitment:</strong> We never sell your personal data to advertisers or data brokers. 
-                    All third-party sharing is limited to essential services and research purposes.
+                    <strong>Privacy Commitment:</strong> We never sell your personal data to
+                    advertisers or data brokers. All third-party sharing is limited to essential
+                    services and research purposes.
                   </AlertDescription>
                 </Alert>
 
@@ -642,11 +655,14 @@ export function DataUsageReportDashboard() {
                       <Badge>Consent Required</Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      Anonymized usage data shared with analytics providers to improve platform performance
+                      Anonymized usage data shared with analytics providers to improve platform
+                      performance
                     </p>
                     <div className="text-sm">
                       <p className="font-medium mb-1">Data Shared</p>
-                      <p className="text-gray-600">Page views, feature usage, performance metrics (anonymized)</p>
+                      <p className="text-gray-600">
+                        Page views, feature usage, performance metrics (anonymized)
+                      </p>
                     </div>
                   </div>
 
@@ -656,11 +672,14 @@ export function DataUsageReportDashboard() {
                       <Badge>Consent Required</Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      Aggregated civic engagement data shared with academic researchers studying democracy
+                      Aggregated civic engagement data shared with academic researchers studying
+                      democracy
                     </p>
                     <div className="text-sm">
                       <p className="font-medium mb-1">Data Shared</p>
-                      <p className="text-gray-600">Aggregated participation patterns, demographic trends (anonymized)</p>
+                      <p className="text-gray-600">
+                        Aggregated participation patterns, demographic trends (anonymized)
+                      </p>
                     </div>
                   </div>
 
@@ -674,7 +693,9 @@ export function DataUsageReportDashboard() {
                     </p>
                     <div className="text-sm">
                       <p className="font-medium mb-1">Services</p>
-                      <p className="text-gray-600">Email delivery, cloud hosting, security monitoring</p>
+                      <p className="text-gray-600">
+                        Email delivery, cloud hosting, security monitoring
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -699,9 +720,7 @@ export function DataUsageReportDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Data Management Actions</CardTitle>
-          <CardDescription>
-            Exercise your data rights and manage your information
-          </CardDescription>
+          <CardDescription>Exercise your data rights and manage your information</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">

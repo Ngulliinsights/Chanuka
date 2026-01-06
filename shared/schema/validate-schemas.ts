@@ -5,8 +5,8 @@
 
 // Import all schemas to check for TypeScript errors (sorted)
 import * as advancedDiscovery from "./advanced_discovery";
-import * as argumentIntelligence from "./argument_intelligence";
 import * as advocacyCoordination from "./advocacy_coordination";
+import * as argumentIntelligence from "./argument_intelligence";
 import * as citizenParticipation from "./citizen_participation";
 import * as constitutionalIntelligence from "./constitutional_intelligence";
 import * as expertVerification from "./expert_verification";

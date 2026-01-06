@@ -1,6 +1,6 @@
 /**
  * Shared Interfaces Module
- * 
+ *
  * Common interface definitions and contracts
  */
 

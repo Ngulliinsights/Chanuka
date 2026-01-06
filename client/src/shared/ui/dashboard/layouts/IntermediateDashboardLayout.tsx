@@ -5,7 +5,6 @@
  * Focuses on activity tracking, bill management, and community participation.
  */
 
-import React from 'react';
 import {
   Activity,
   Bookmark,
@@ -17,10 +16,15 @@ import {
   Users,
   ArrowRight,
   Eye,
-  Calendar
+  Calendar,
 } from 'lucide-react';
+import React from 'react';
 
-import type { PersonaType, PersonaClassification, PersonaPreferences } from '@client/core/personalization/types';
+import type {
+  PersonaType,
+  PersonaClassification,
+  PersonaPreferences,
+} from '@client/core/personalization/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
@@ -43,9 +47,8 @@ export function IntermediateDashboardLayout({
   expandedSections,
   hiddenWidgets,
   classification,
-  onSectionToggle
+  onSectionToggle,
 }: IntermediateDashboardLayoutProps) {
-
   const isExpanded = (sectionId: string) => expandedSections.has(sectionId);
   const isHidden = (widgetId: string) => hiddenWidgets.has(widgetId);
 
@@ -56,10 +59,8 @@ export function IntermediateDashboardLayout({
     <div className="intermediate-dashboard-layout">
       {/* Two-column grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* Activity Summary */}
           {!isHidden('activity-summary') && (
             <Card>
@@ -91,9 +92,7 @@ export function IntermediateDashboardLayout({
 
                 {classification?.nextLevelRequirements && (
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-blue-800 mb-2">
-                      Path to Expert Level:
-                    </h4>
+                    <h4 className="font-semibold text-blue-800 mb-2">Path to Expert Level:</h4>
                     <div className="space-y-2">
                       {classification.nextLevelRequirements.map((requirement, index) => (
                         <div key={index} className="flex items-center gap-2 text-sm text-blue-700">
@@ -118,9 +117,7 @@ export function IntermediateDashboardLayout({
                     Tracked Bills
                   </span>
                   <Button variant="outline" size="sm" asChild>
-                    <a href="/bills/manage">
-                      Manage All
-                    </a>
+                    <a href="/bills/manage">Manage All</a>
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -133,8 +130,11 @@ export function IntermediateDashboardLayout({
                   </TabsList>
 
                   <TabsContent value="active" className="space-y-3 mt-4">
-                    {[1, 2, 3].map((bill) => (
-                      <div key={bill} className="p-3 border rounded-lg hover:bg-accent transition-colors">
+                    {[1, 2, 3].map(bill => (
+                      <div
+                        key={bill}
+                        className="p-3 border rounded-lg hover:bg-accent transition-colors"
+                      >
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="font-medium text-sm">
                             Bill #{bill}: Healthcare Reform Act 2024
@@ -144,7 +144,8 @@ export function IntermediateDashboardLayout({
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-3">
-                          Comprehensive healthcare reform focusing on accessibility and cost reduction.
+                          Comprehensive healthcare reform focusing on accessibility and cost
+                          reduction.
                         </p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -191,7 +192,7 @@ export function IntermediateDashboardLayout({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[1, 2, 3].map((discussion) => (
+                  {[1, 2, 3].map(discussion => (
                     <div key={discussion} className="p-3 border rounded-lg">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-medium text-sm">
@@ -202,7 +203,8 @@ export function IntermediateDashboardLayout({
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">
-                        Community members are discussing the potential effects of the proposed healthcare changes...
+                        Community members are discussing the potential effects of the proposed
+                        healthcare changes...
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -226,7 +228,6 @@ export function IntermediateDashboardLayout({
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
-
           {/* Quick Actions */}
           {!isHidden('quick-actions') && (
             <Card>
@@ -323,41 +324,27 @@ export function IntermediateDashboardLayout({
               <CardContent>
                 <div className="space-y-3">
                   <div className="p-2 bg-blue-50 rounded-lg">
-                    <p className="text-sm font-medium text-blue-800">
-                      Healthcare Reform Bill
-                    </p>
-                    <p className="text-xs text-blue-600">
-                      Moved to committee review
-                    </p>
+                    <p className="text-sm font-medium text-blue-800">Healthcare Reform Bill</p>
+                    <p className="text-xs text-blue-600">Moved to committee review</p>
                     <p className="text-xs text-muted-foreground">2 hours ago</p>
                   </div>
 
                   <div className="p-2 bg-green-50 rounded-lg">
-                    <p className="text-sm font-medium text-green-800">
-                      New Discussion Reply
-                    </p>
-                    <p className="text-xs text-green-600">
-                      Someone replied to your comment
-                    </p>
+                    <p className="text-sm font-medium text-green-800">New Discussion Reply</p>
+                    <p className="text-xs text-green-600">Someone replied to your comment</p>
                     <p className="text-xs text-muted-foreground">4 hours ago</p>
                   </div>
 
                   <div className="p-2 bg-purple-50 rounded-lg">
-                    <p className="text-sm font-medium text-purple-800">
-                      Weekly Digest Ready
-                    </p>
-                    <p className="text-xs text-purple-600">
-                      Your personalized bill summary
-                    </p>
+                    <p className="text-sm font-medium text-purple-800">Weekly Digest Ready</p>
+                    <p className="text-xs text-purple-600">Your personalized bill summary</p>
                     <p className="text-xs text-muted-foreground">1 day ago</p>
                   </div>
                 </div>
 
                 <div className="pt-3 border-t mt-3">
                   <Button variant="ghost" size="sm" className="w-full" asChild>
-                    <a href="/notifications">
-                      View All Notifications
-                    </a>
+                    <a href="/notifications">View All Notifications</a>
                   </Button>
                 </div>
               </CardContent>
@@ -372,9 +359,7 @@ export function IntermediateDashboardLayout({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="p-3 border rounded-lg">
-                  <h4 className="font-medium text-sm mb-1">
-                    Education Funding Bill
-                  </h4>
+                  <h4 className="font-medium text-sm mb-1">Education Funding Bill</h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     Based on your interest in community development
                   </p>
@@ -387,12 +372,8 @@ export function IntermediateDashboardLayout({
                 </div>
 
                 <div className="p-3 border rounded-lg">
-                  <h4 className="font-medium text-sm mb-1">
-                    Transportation Infrastructure
-                  </h4>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Popular in your area
-                  </p>
+                  <h4 className="font-medium text-sm mb-1">Transportation Infrastructure</h4>
+                  <p className="text-xs text-muted-foreground mb-2">Popular in your area</p>
                   <Button variant="ghost" size="sm" asChild>
                     <a href="/bills/transportation">
                       Learn More

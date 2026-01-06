@@ -1,6 +1,6 @@
 /**
  * Consolidated Authentication Redux Slice
- * 
+ *
  * Unified implementation that consolidates:
  * - Auth slice from store/slices/authSlice.ts
  * - All authentication state management
@@ -39,7 +39,7 @@ export const login = createAsyncThunk(
       return {
         user: result.userId, // AuthSession has userId, not user
         sessionExpiry: result.expiresAt.toISOString(), // Convert Date to string
-        requires2FA: false // AuthSession doesn't have this field
+        requires2FA: false, // AuthSession doesn't have this field
       };
     } catch (error) {
       logger.error('Login failed', { error });
@@ -57,7 +57,7 @@ export const register = createAsyncThunk(
       const result = await authService.register(data);
       return {
         user: result.userId, // AuthSession has userId, not user
-        sessionExpiry: result.expiresAt.toISOString() // Convert Date to string
+        sessionExpiry: result.expiresAt.toISOString(), // Convert Date to string
       };
     } catch (error) {
       logger.error('Registration failed', { error });
@@ -67,18 +67,15 @@ export const register = createAsyncThunk(
 );
 
 // Logout thunk
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async () => {
-    try {
-      const authService = getAuthApiService();
-      await authService.logout();
-    } catch (error) {
-      logger.warn('Logout request failed (continuing with local cleanup)', { error });
-      // Don't reject, always clear local state
-    }
+export const logout = createAsyncThunk('auth/logout', async () => {
+  try {
+    const authService = getAuthApiService();
+    await authService.logout();
+  } catch (error) {
+    logger.warn('Logout request failed (continuing with local cleanup)', { error });
+    // Don't reject, always clear local state
   }
-);
+});
 
 // Token refresh thunk
 export const refreshTokens = createAsyncThunk(
@@ -117,7 +114,9 @@ export const requestPasswordReset = createAsyncThunk(
       await authService.requestPasswordReset({ email });
     } catch (error) {
       logger.error('Password reset request failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Password reset request failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Password reset request failed'
+      );
     }
   }
 );
@@ -125,7 +124,14 @@ export const requestPasswordReset = createAsyncThunk(
 // Password reset completion thunk
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
-  async ({ token, password, confirmPassword }: { token: string; password: string; confirmPassword: string }, { rejectWithValue }) => {
+  async (
+    {
+      token,
+      password,
+      confirmPassword,
+    }: { token: string; password: string; confirmPassword: string },
+    { rejectWithValue }
+  ) => {
     try {
       const authService = getAuthApiService();
       await authService.resetPassword({ token, password, confirmPassword });
@@ -139,7 +145,10 @@ export const resetPassword = createAsyncThunk(
 // Password change thunk
 export const changePassword = createAsyncThunk(
   'auth/changePassword',
-  async ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }, { rejectWithValue }) => {
+  async (
+    { currentPassword, newPassword }: { currentPassword: string; newPassword: string },
+    { rejectWithValue }
+  ) => {
     try {
       const authService = getAuthApiService();
       await authService.changePassword(currentPassword, newPassword);
@@ -201,7 +210,9 @@ export const verifyTwoFactor = createAsyncThunk(
       return await authService.verifyTwoFactor(token);
     } catch (error) {
       logger.error('Two-factor verification failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Two-factor verification failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Two-factor verification failed'
+      );
     }
   }
 );
@@ -285,7 +296,9 @@ export const terminateAllSessions = createAsyncThunk(
       await authService.terminateAllOtherSessions();
     } catch (error) {
       logger.error('Terminate all sessions failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Terminate all sessions failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Terminate all sessions failed'
+      );
     }
   }
 );
@@ -299,7 +312,9 @@ export const updatePrivacySettings = createAsyncThunk(
       await authService.updatePrivacySettings(settings);
     } catch (error) {
       logger.error('Update privacy settings failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Update privacy settings failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Update privacy settings failed'
+      );
     }
   }
 );
@@ -307,7 +322,10 @@ export const updatePrivacySettings = createAsyncThunk(
 // Request data export thunk
 export const requestDataExport = createAsyncThunk(
   'auth/requestDataExport',
-  async ({ format, includes }: { format: 'json' | 'csv' | 'xml'; includes: string[] }, { rejectWithValue }) => {
+  async (
+    { format, includes }: { format: 'json' | 'csv' | 'xml'; includes: string[] },
+    { rejectWithValue }
+  ) => {
     try {
       const authService = getAuthApiService();
       return await authService.requestDataExport(format, includes);
@@ -321,13 +339,18 @@ export const requestDataExport = createAsyncThunk(
 // Request data deletion thunk
 export const requestDataDeletion = createAsyncThunk(
   'auth/requestDataDeletion',
-  async ({ retentionPeriod, includes }: { retentionPeriod: string; includes: string[] }, { rejectWithValue }) => {
+  async (
+    { retentionPeriod, includes }: { retentionPeriod: string; includes: string[] },
+    { rejectWithValue }
+  ) => {
     try {
       const authService = getAuthApiService();
       return await authService.requestDataDeletion(retentionPeriod, includes);
     } catch (error) {
       logger.error('Request data deletion failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Request data deletion failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Request data deletion failed'
+      );
     }
   }
 );
@@ -355,7 +378,9 @@ export const getSuspiciousActivity = createAsyncThunk(
       return await authService.getSuspiciousActivity();
     } catch (error) {
       logger.error('Get suspicious activity failed', { error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Get suspicious activity failed');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Get suspicious activity failed'
+      );
     }
   }
 );
@@ -412,7 +437,7 @@ const authSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
       }
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     setInitialized: (state, action: PayloadAction<boolean>) => {
@@ -421,7 +446,7 @@ const authSlice = createSlice({
     setTwoFactorRequired: (state, action: PayloadAction<boolean>) => {
       state.twoFactorRequired = action.payload;
     },
-    resetAuthState: (state) => {
+    resetAuthState: state => {
       state.user = null;
       state.isAuthenticated = false;
       state.sessionExpiry = null;
@@ -430,10 +455,10 @@ const authSlice = createSlice({
       state.isInitialized = false;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Login
-      .addCase(login.pending, (state) => {
+      .addCase(login.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -456,7 +481,7 @@ const authSlice = createSlice({
       })
 
       // Registration
-      .addCase(register.pending, (state) => {
+      .addCase(register.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -477,10 +502,10 @@ const authSlice = createSlice({
       })
 
       // Logout
-      .addCase(logout.pending, (state) => {
+      .addCase(logout.pending, state => {
         state.isLoading = true;
       })
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(logout.fulfilled, state => {
         state.user = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
@@ -488,7 +513,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.twoFactorRequired = false;
       })
-      .addCase(logout.rejected, (state) => {
+      .addCase(logout.rejected, state => {
         // Even if logout fails on server, clear local state
         state.user = null;
         state.isAuthenticated = false;
@@ -499,11 +524,11 @@ const authSlice = createSlice({
       })
 
       // Token refresh
-      .addCase(refreshTokens.fulfilled, (state) => {
+      .addCase(refreshTokens.fulfilled, state => {
         // Token refresh doesn't return user data, just tokens
         state.error = null;
       })
-      .addCase(refreshTokens.rejected, (state) => {
+      .addCase(refreshTokens.rejected, state => {
         state.user = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
@@ -511,7 +536,7 @@ const authSlice = createSlice({
       })
 
       // Email verification
-      .addCase(verifyEmail.fulfilled, (state) => {
+      .addCase(verifyEmail.fulfilled, state => {
         state.error = null;
       })
       .addCase(verifyEmail.rejected, (state, action) => {
@@ -534,11 +559,11 @@ const authSlice = createSlice({
       })
 
       // Two-factor setup
-      .addCase(setupTwoFactor.pending, (state) => {
+      .addCase(setupTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(setupTwoFactor.fulfilled, (state) => {
+      .addCase(setupTwoFactor.fulfilled, state => {
         state.isLoading = false;
         state.error = null;
       })
@@ -548,11 +573,11 @@ const authSlice = createSlice({
       })
 
       // Two-factor enable
-      .addCase(enableTwoFactor.pending, (state) => {
+      .addCase(enableTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(enableTwoFactor.fulfilled, (state) => {
+      .addCase(enableTwoFactor.fulfilled, state => {
         if (state.user) {
           state.user.twoFactorEnabled = true;
         }
@@ -565,11 +590,11 @@ const authSlice = createSlice({
       })
 
       // Two-factor disable
-      .addCase(disableTwoFactor.pending, (state) => {
+      .addCase(disableTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(disableTwoFactor.fulfilled, (state) => {
+      .addCase(disableTwoFactor.fulfilled, state => {
         if (state.user) {
           state.user.twoFactorEnabled = false;
         }
@@ -582,7 +607,7 @@ const authSlice = createSlice({
       })
 
       // Two-factor verification
-      .addCase(verifyTwoFactor.pending, (state) => {
+      .addCase(verifyTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -602,7 +627,7 @@ const authSlice = createSlice({
       })
 
       // Profile update
-      .addCase(updateUserProfile.pending, (state) => {
+      .addCase(updateUserProfile.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -617,7 +642,7 @@ const authSlice = createSlice({
       })
 
       // OAuth login
-      .addCase(loginWithOAuth.pending, (state) => {
+      .addCase(loginWithOAuth.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -637,7 +662,7 @@ const authSlice = createSlice({
       })
 
       // Validate stored tokens
-      .addCase(validateStoredTokens.pending, (state) => {
+      .addCase(validateStoredTokens.pending, state => {
         state.isLoading = true;
       })
       .addCase(validateStoredTokens.fulfilled, (state, _action) => {
@@ -650,7 +675,7 @@ const authSlice = createSlice({
         state.isInitialized = true;
         state.error = null;
       })
-      .addCase(validateStoredTokens.rejected, (state) => {
+      .addCase(validateStoredTokens.rejected, state => {
         state.user = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
@@ -672,46 +697,31 @@ export const {
   clearError,
   setInitialized,
   setTwoFactorRequired,
-  resetAuthState
+  resetAuthState,
 } = authSlice.actions;
 
 // Base selectors
 const selectAuthState = (state: { auth: AuthState }) => state.auth;
 
 // Memoized selectors
-export const selectUser = createSelector(
-  [selectAuthState],
-  (auth) => auth.user
-);
+export const selectUser = createSelector([selectAuthState], auth => auth.user);
 
 export const selectIsAuthenticated = createSelector(
   [selectAuthState],
-  (auth) => auth.isAuthenticated
+  auth => auth.isAuthenticated
 );
 
-export const selectIsLoading = createSelector(
-  [selectAuthState],
-  (auth) => auth.isLoading
-);
+export const selectIsLoading = createSelector([selectAuthState], auth => auth.isLoading);
 
-export const selectAuthError = createSelector(
-  [selectAuthState],
-  (auth) => auth.error
-);
+export const selectAuthError = createSelector([selectAuthState], auth => auth.error);
 
-export const selectSessionExpiry = createSelector(
-  [selectAuthState],
-  (auth) => auth.sessionExpiry
-);
+export const selectSessionExpiry = createSelector([selectAuthState], auth => auth.sessionExpiry);
 
-export const selectIsInitialized = createSelector(
-  [selectAuthState],
-  (auth) => auth.isInitialized
-);
+export const selectIsInitialized = createSelector([selectAuthState], auth => auth.isInitialized);
 
 export const selectTwoFactorRequired = createSelector(
   [selectAuthState],
-  (auth) => auth.twoFactorRequired
+  auth => auth.twoFactorRequired
 );
 
 // Composite selectors
@@ -721,19 +731,20 @@ export const selectAuthStatus = createSelector(
     isAuthenticated,
     isLoading,
     twoFactorRequired,
-    needsTwoFactor: isAuthenticated && twoFactorRequired
+    needsTwoFactor: isAuthenticated && twoFactorRequired,
   })
 );
 
-export const selectUserProfile = createSelector(
-  [selectUser],
-  (user) => user ? {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    twoFactorEnabled: user.twoFactorEnabled
-  } : null
+export const selectUserProfile = createSelector([selectUser], user =>
+  user
+    ? {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        twoFactorEnabled: user.twoFactorEnabled,
+      }
+    : null
 );
 
 // Export reducer

@@ -6,10 +6,10 @@
  * real-time updates, and user preferences.
  */
 
-import { Bill } from '../../../../shared/schema/foundation';
-
 import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@/core/api/types';
 import { logger } from '@client/utils/logger';
+
+import { Bill } from '../../../../shared/schema/foundation';
 
 export class BillTrackingService {
   private preferences: BillTrackingPreferences = {
@@ -37,7 +37,7 @@ export class BillTrackingService {
       if (!billId || !update.type) {
         logger.warn('Invalid bill update received', {
           component: 'BillTrackingService',
-          update
+          update,
         });
         return;
       }
@@ -49,13 +49,13 @@ export class BillTrackingService {
         component: 'BillTrackingService',
         billId,
         type: update.type,
-        processedUpdates: Object.keys(processedUpdates)
+        processedUpdates: Object.keys(processedUpdates),
       });
     } catch (error) {
       logger.error('Failed to process bill update', {
         component: 'BillTrackingService',
         update,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -71,7 +71,18 @@ export class BillTrackingService {
     switch (update.type) {
       case 'status_change':
         if (data.oldStatus && data.newStatus) {
-          updates.status = data.newStatus as 'drafted' | 'introduced' | 'first_reading' | 'second_reading' | 'committee_stage' | 'report_stage' | 'third_reading' | 'presidential_assent' | 'act_of_parliament' | 'withdrawn' | 'lapsed';
+          updates.status = data.newStatus as
+            | 'drafted'
+            | 'introduced'
+            | 'first_reading'
+            | 'second_reading'
+            | 'committee_stage'
+            | 'report_stage'
+            | 'third_reading'
+            | 'presidential_assent'
+            | 'act_of_parliament'
+            | 'withdrawn'
+            | 'lapsed';
         }
         break;
 
@@ -116,13 +127,13 @@ export class BillTrackingService {
       logger.debug('Engagement metrics processed (React Query handles updates)', {
         component: 'BillTrackingService',
         billId: metrics.billId,
-        metrics
+        metrics,
       });
     } catch (error) {
       logger.error('Failed to process engagement update', {
         component: 'BillTrackingService',
         metrics,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -134,12 +145,12 @@ export class BillTrackingService {
   updatePreferences(newPreferences: Partial<BillTrackingPreferences>): void {
     this.preferences = {
       ...this.preferences,
-      ...newPreferences
+      ...newPreferences,
     };
 
     logger.info('Bill tracking preferences updated', {
       component: 'BillTrackingService',
-      preferences: this.preferences
+      preferences: this.preferences,
     });
   }
 
@@ -196,13 +207,13 @@ export class BillTrackingService {
     preferences: BillTrackingPreferences;
   } {
     logger.warn('getTrackingStats is deprecated - use React Query hooks for tracking data', {
-      component: 'BillTrackingService'
+      component: 'BillTrackingService',
     });
 
     return {
       trackedBills: 0,
       totalUpdates: 0,
-      preferences: this.preferences
+      preferences: this.preferences,
     };
   }
 }

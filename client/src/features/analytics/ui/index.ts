@@ -1,6 +1,6 @@
 /**
  * Analytics Feature UI Components
- * 
+ *
  * All UI components specific to the analytics feature organized by FSD principles.
  * These components handle engagement analytics, metrics visualization, and reporting.
  */

@@ -6,8 +6,9 @@
  * client and server modules to consume.
  */
 
-import { Result, err } from '../primitives/types/result';
 import { ZodSchema } from 'zod';
+
+import { Result, err } from '../primitives/types/result';
 
 /**
  * Validation result type

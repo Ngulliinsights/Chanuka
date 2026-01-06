@@ -4,6 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
+
 // import { Result, ok, err } from '../../primitives/types/result'; // Unused import
 import { logger } from '../../observability/logging/logger';
 import { getMetricsCollector } from '../metrics';
@@ -72,7 +73,7 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
 
       let data = getResult.value;
       let tokens = 0;
-      let resetAt = new Date(now + config.windowMs);
+      const resetAt = new Date(now + config.windowMs);
 
       if (!data) {
         // First request in window

@@ -4,10 +4,16 @@
  */
 
 import { Shield, Lock, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import React from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 
 export default function SecurityPage() {
   return (
@@ -16,9 +22,7 @@ export default function SecurityPage() {
         {/* Header */}
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-blue-600" />
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">
-            Security Settings
-          </h1>
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">Security Settings</h1>
           <p className="mt-2 text-gray-600">
             Manage your account security and authentication preferences
           </p>
@@ -28,8 +32,8 @@ export default function SecurityPage() {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Security Settings Coming Soon:</strong> Advanced security features including 
-            two-factor authentication, password management, and security monitoring will be 
+            <strong>Security Settings Coming Soon:</strong> Advanced security features including
+            two-factor authentication, password management, and security monitoring will be
             available in the next update.
           </AlertDescription>
         </Alert>
@@ -42,9 +46,7 @@ export default function SecurityPage() {
                 <Lock className="h-5 w-5" />
                 Password Security
               </CardTitle>
-              <CardDescription>
-                Change your password and view security requirements
-              </CardDescription>
+              <CardDescription>Change your password and view security requirements</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
@@ -59,9 +61,7 @@ export default function SecurityPage() {
                 <Shield className="h-5 w-5" />
                 Two-Factor Authentication
               </CardTitle>
-              <CardDescription>
-                Add an extra layer of security to your account
-              </CardDescription>
+              <CardDescription>Add an extra layer of security to your account</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">

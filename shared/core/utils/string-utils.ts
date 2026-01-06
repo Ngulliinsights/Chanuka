@@ -123,7 +123,7 @@ export class StringUtils {
   static extractBeforePattern(value: string, pattern: RegExp): string | null {
     if (!value || !pattern) return null;
     const match = value.match(pattern);
-    return match && match.index !== undefined ? value.slice(0, match.index) : null;
+    return match?.index !== undefined ? value.slice(0, match.index) : null;
   }
 
   /**

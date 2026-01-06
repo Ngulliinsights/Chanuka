@@ -19,7 +19,12 @@ import { logger } from '@client/utils/logger';
 
 interface WebSocketBillUpdate {
   update: {
-    type: 'new_comment' | 'comment_update' | 'expert_contribution' | 'comment_voted' | 'comment_reported';
+    type:
+      | 'new_comment'
+      | 'comment_update'
+      | 'expert_contribution'
+      | 'comment_voted'
+      | 'comment_reported';
     data: Record<string, unknown>;
   };
   bill_id: number;
@@ -27,8 +32,14 @@ interface WebSocketBillUpdate {
 }
 
 interface WebSocketNotification {
-  type: 'community_activity' | 'expert_verification' | 'moderation_action' |
-        'comment_reply' | 'expert_insight' | 'campaign_update' | 'petition_milestone';
+  type:
+    | 'community_activity'
+    | 'expert_verification'
+    | 'moderation_action'
+    | 'comment_reply'
+    | 'expert_insight'
+    | 'campaign_update'
+    | 'petition_milestone';
   userId?: string;
   verificationType?: string;
   credibilityScore?: number;
@@ -79,12 +90,16 @@ class CommunityBackendService {
 
       this.isInitialized = true;
       logger.info('Community backend service initialized successfully', {
-        component: 'CommunityBackendService'
+        component: 'CommunityBackendService',
       });
     } catch (error) {
-      logger.error('Failed to initialize community backend service', {
-        component: 'CommunityBackendService'
-      }, error);
+      logger.error(
+        'Failed to initialize community backend service',
+        {
+          component: 'CommunityBackendService',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -97,8 +112,8 @@ class CommunityBackendService {
       const response = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -108,7 +123,7 @@ class CommunityBackendService {
       logger.info('Backend connection verified', { component: 'CommunityBackendService' });
     } catch (error) {
       logger.warn('Backend connection test failed, will use fallback mode', {
-        component: 'CommunityBackendService'
+        component: 'CommunityBackendService',
       });
     }
   }
@@ -145,7 +160,13 @@ class CommunityBackendService {
    * Type guard for community update types
    */
   private isValidCommunityUpdateType(type: string): boolean {
-    return ['new_comment', 'comment_update', 'expert_contribution', 'comment_voted', 'comment_reported'].includes(type);
+    return [
+      'new_comment',
+      'comment_update',
+      'expert_contribution',
+      'comment_voted',
+      'comment_reported',
+    ].includes(type);
   }
 
   /**
@@ -159,7 +180,7 @@ class CommunityBackendService {
       'comment_reply',
       'expert_insight',
       'campaign_update',
-      'petition_milestone'
+      'petition_milestone',
     ].includes(type);
   }
 
@@ -167,23 +188,27 @@ class CommunityBackendService {
    * Handle real-time community updates
    */
   private handleCommunityUpdate(data: WebSocketBillUpdate): void {
-    window.dispatchEvent(new CustomEvent('communityUpdate', {
-      detail: {
-        type: data.update.type,
-        billId: data.bill_id,
-        data: data.update.data,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('communityUpdate', {
+        detail: {
+          type: data.update.type,
+          billId: data.bill_id,
+          data: data.update.data,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   /**
    * Handle community notifications
    */
   private handleCommunityNotification(data: WebSocketNotification): void {
-    window.dispatchEvent(new CustomEvent('communityNotification', {
-      detail: data
-    }));
+    window.dispatchEvent(
+      new CustomEvent('communityNotification', {
+        detail: data,
+      })
+    );
 
     switch (data.type) {
       case 'expert_verification':
@@ -206,83 +231,93 @@ class CommunityBackendService {
 
   private onWebSocketConnected(): void {
     logger.info('WebSocket connected, setting up community subscriptions', {
-      component: 'CommunityBackendService'
+      component: 'CommunityBackendService',
     });
     this.subscribeToCommunityUpdates();
   }
 
   private onWebSocketDisconnected(): void {
     logger.info('WebSocket disconnected, community real-time features disabled', {
-      component: 'CommunityBackendService'
+      component: 'CommunityBackendService',
     });
   }
 
   private handleExpertVerificationNotification(data: WebSocketNotification): void {
     if (!data.userId) return;
 
-    window.dispatchEvent(new CustomEvent('expertVerificationUpdate', {
-      detail: {
-        userId: data.userId,
-        verificationType: data.verificationType,
-        credibilityScore: data.credibilityScore,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('expertVerificationUpdate', {
+        detail: {
+          userId: data.userId,
+          verificationType: data.verificationType,
+          credibilityScore: data.credibilityScore,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   private handleCommentReplyNotification(data: WebSocketNotification): void {
     if (!data.commentId) return;
 
-    window.dispatchEvent(new CustomEvent('commentReply', {
-      detail: {
-        commentId: data.commentId,
-        parentId: data.parentId,
-        billId: data.billId,
-        authorName: data.authorName,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('commentReply', {
+        detail: {
+          commentId: data.commentId,
+          parentId: data.parentId,
+          billId: data.billId,
+          authorName: data.authorName,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   private handleExpertInsightNotification(data: WebSocketNotification): void {
     if (!data.billId) return;
 
-    window.dispatchEvent(new CustomEvent('expertInsightAdded', {
-      detail: {
-        billId: data.billId,
-        insight: data.insight,
-        expertName: data.expertName,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('expertInsightAdded', {
+        detail: {
+          billId: data.billId,
+          insight: data.insight,
+          expertName: data.expertName,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   private handleCampaignUpdateNotification(data: WebSocketNotification): void {
     if (!data.campaignId) return;
 
-    window.dispatchEvent(new CustomEvent('campaignUpdate', {
-      detail: {
-        campaignId: data.campaignId,
-        updateType: data.updateType,
-        newCount: data.newCount,
-        milestone: data.milestone,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('campaignUpdate', {
+        detail: {
+          campaignId: data.campaignId,
+          updateType: data.updateType,
+          newCount: data.newCount,
+          milestone: data.milestone,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   private handlePetitionMilestoneNotification(data: WebSocketNotification): void {
     if (!data.petitionId) return;
 
-    window.dispatchEvent(new CustomEvent('petitionMilestone', {
-      detail: {
-        petitionId: data.petitionId,
-        milestone: data.milestone,
-        currentSignatures: data.currentSignatures,
-        goal: data.goal,
-        timestamp: data.timestamp
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('petitionMilestone', {
+        detail: {
+          petitionId: data.petitionId,
+          milestone: data.milestone,
+          currentSignatures: data.currentSignatures,
+          goal: data.goal,
+          timestamp: data.timestamp,
+        },
+      })
+    );
   }
 
   // ============================================================================
@@ -296,10 +331,14 @@ class CommunityBackendService {
     try {
       return await communityApiService.getDiscussionThread(billId);
     } catch (error) {
-      logger.error('Failed to fetch discussion thread', {
-        component: 'CommunityBackendService',
-        billId
-      }, error as Error);
+      logger.error(
+        'Failed to fetch discussion thread',
+        {
+          component: 'CommunityBackendService',
+          billId,
+        },
+        error as Error
+      );
       throw error;
     }
   }
@@ -307,17 +346,18 @@ class CommunityBackendService {
   /**
    * Get comments for a bill with filtering and sorting
    */
-  async getBillComments(
-    billId: number,
-    options: CommentQueryOptions = {}
-  ): Promise<Comment[]> {
+  async getBillComments(billId: number, options: CommentQueryOptions = {}): Promise<Comment[]> {
     try {
       return await communityApiService.getBillComments(billId, options);
     } catch (error) {
-      logger.error('Failed to fetch bill comments', {
-        component: 'CommunityBackendService',
-        billId
-      }, error as Error);
+      logger.error(
+        'Failed to fetch bill comments',
+        {
+          component: 'CommunityBackendService',
+          billId,
+        },
+        error as Error
+      );
       throw error;
     }
   }
@@ -330,16 +370,20 @@ class CommunityBackendService {
       const result = await communityApiService.addComment({
         billId: Number(data.billId),
         content: data.content,
-        parentId: data.parentId?.toString()
+        parentId: data.parentId?.toString(),
       });
 
       this.subscribeToDiscussion(Number(data.billId));
       return result;
     } catch (error) {
-      logger.error('Failed to add comment', {
-        component: 'CommunityBackendService',
-        billId: data.billId
-      }, error as Error);
+      logger.error(
+        'Failed to add comment',
+        {
+          component: 'CommunityBackendService',
+          billId: data.billId,
+        },
+        error as Error
+      );
       throw error;
     }
   }
@@ -350,7 +394,7 @@ class CommunityBackendService {
   subscribeToDiscussion(billId: number | string): void {
     if (!realTimeService.isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to discussion updates.', {
-        component: 'CommunityBackendService'
+        component: 'CommunityBackendService',
       });
       return;
     }
@@ -361,7 +405,7 @@ class CommunityBackendService {
 
     logger.info('Subscribed to discussion updates', {
       component: 'CommunityBackendService',
-      billId: normalizedBillId
+      billId: normalizedBillId,
     });
   }
 
@@ -371,7 +415,7 @@ class CommunityBackendService {
   subscribeToCommunityUpdates(): void {
     if (!realTimeService.isConnected()) {
       logger.warn('WebSocket not connected. Cannot subscribe to community updates.', {
-        component: 'CommunityBackendService'
+        component: 'CommunityBackendService',
       });
       return;
     }
@@ -381,7 +425,7 @@ class CommunityBackendService {
     communityService.subscribeToModerationEvents();
 
     logger.info('Subscribed to community updates', {
-      component: 'CommunityBackendService'
+      component: 'CommunityBackendService',
     });
   }
 
@@ -391,7 +435,7 @@ class CommunityBackendService {
   cleanup(): void {
     this.isInitialized = false;
     logger.info('Community backend service cleaned up', {
-      component: 'CommunityBackendService'
+      component: 'CommunityBackendService',
     });
   }
 }

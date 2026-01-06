@@ -28,18 +28,21 @@ api/
 ## Features
 
 ### Connection Management
+
 - **Authentication**: Token-based WebSocket authentication
 - **Rate Limiting**: Per-user rate limiting for WebSocket connections
 - **Heartbeats**: Automatic connection health monitoring
 - **Cleanup**: Automatic cleanup of stale connections
 
 ### Message Handling
+
 - **Topic-based Subscriptions**: Clients can subscribe to specific topics
 - **Message Broadcasting**: Broadcast messages to all subscribers of a topic
 - **User-specific Messages**: Send messages to specific users
 - **Custom Handlers**: Register custom message handlers for different message types
 
 ### Security
+
 - **Origin Validation**: Validate WebSocket connection origins
 - **Message Validation**: Validate incoming message formats
 - **Rate Limiting**: Prevent abuse with rate limiting
@@ -79,17 +82,19 @@ Register custom message handlers for different message types:
 // Register a message handler
 wsServer.registerMessageHandler('bill_subscribe', async (connection, message) => {
   const { billIds } = message.data;
-  
+
   // Subscribe to bills
   for (const billId of billIds) {
     wsServer.subscribeToTopic(connection.id, `bill:${billId}`);
   }
-  
+
   // Send confirmation
-  connection.ws.send(JSON.stringify({
-    type: 'bill_subscribed',
-    data: { billIds }
-  }));
+  connection.ws.send(
+    JSON.stringify({
+      type: 'bill_subscribed',
+      data: { billIds },
+    })
+  );
 });
 
 // Unregister a message handler
@@ -105,8 +110,8 @@ wsServer.broadcastToTopic('bill:123', {
   data: {
     billId: 123,
     status: 'passed',
-    timestamp: new Date().toISOString()
-  }
+    timestamp: new Date().toISOString(),
+  },
 });
 
 // Broadcast to a specific user
@@ -115,8 +120,8 @@ wsServer.broadcastToUser('user123', {
   data: {
     id: 'notif1',
     title: 'Bill Update',
-    message: 'A bill you follow has been updated'
-  }
+    message: 'A bill you follow has been updated',
+  },
 });
 
 // Broadcast to all users except one
@@ -124,7 +129,7 @@ wsServer.broadcastToTopic(
   'discussion:123',
   {
     type: 'typing_indicator',
-    data: { userId: 'user123', isTyping: true }
+    data: { userId: 'user123', isTyping: true },
   },
   'user123' // Exclude this user
 );
@@ -144,6 +149,7 @@ Object.entries(defaultMessageHandlers).forEach(([type, handler]) => {
 ```
 
 Default handlers include:
+
 - `subscribe` - Handle topic subscriptions
 - `unsubscribe` - Handle topic unsubscriptions
 - `ping`/`pong` - Handle heartbeat messages
@@ -166,7 +172,7 @@ if (connection) {
   console.log('Connection details:', {
     userId: connection.userId,
     subscriptions: Array.from(connection.subscriptions),
-    connectionTime: connection.connectionTime
+    connectionTime: connection.connectionTime,
   });
 }
 ```
@@ -176,6 +182,7 @@ if (connection) {
 ### Client to Server Messages
 
 #### Authentication
+
 ```json
 {
   "type": "auth",
@@ -186,6 +193,7 @@ if (connection) {
 ```
 
 #### Subscription
+
 ```json
 {
   "type": "subscribe",
@@ -196,6 +204,7 @@ if (connection) {
 ```
 
 #### Custom Messages
+
 ```json
 {
   "type": "bill_subscribe",
@@ -209,6 +218,7 @@ if (connection) {
 ### Server to Client Messages
 
 #### Connection
+
 ```json
 {
   "type": "connected",
@@ -221,6 +231,7 @@ if (connection) {
 ```
 
 #### Bill Update
+
 ```json
 {
   "type": "bill_update",
@@ -236,6 +247,7 @@ if (connection) {
 ```
 
 #### Error
+
 ```json
 {
   "type": "error",
@@ -253,19 +265,19 @@ The WebSocket server can be configured with various options:
 
 ```typescript
 const config = {
-  path: '/api/ws',                    // WebSocket endpoint path
-  maxConnections: 1000,              // Maximum total connections
-  maxConnectionsPerUser: 5,          // Maximum connections per user
+  path: '/api/ws', // WebSocket endpoint path
+  maxConnections: 1000, // Maximum total connections
+  maxConnectionsPerUser: 5, // Maximum connections per user
   maxSubscriptionsPerConnection: 20, // Maximum subscriptions per connection
-  maxMessageSize: 1024 * 1024,       // Maximum message size (1MB)
-  heartbeatInterval: 10000,          // Heartbeat interval (10s)
-  connectionTimeout: 30000,          // Connection timeout (30s)
-  cleanupInterval: 60000,            // Cleanup interval (1m)
-  maxAge: 86400000,                  // Maximum connection age (24h)
+  maxMessageSize: 1024 * 1024, // Maximum message size (1MB)
+  heartbeatInterval: 10000, // Heartbeat interval (10s)
+  connectionTimeout: 30000, // Connection timeout (30s)
+  cleanupInterval: 60000, // Cleanup interval (1m)
+  maxAge: 86400000, // Maximum connection age (24h)
   rateLimit: {
-    windowMs: 60000,                 // Rate limit window (1m)
-    maxRequests: 100                 // Max requests per window
-  }
+    windowMs: 60000, // Rate limit window (1m)
+    maxRequests: 100, // Max requests per window
+  },
 };
 ```
 
@@ -286,20 +298,22 @@ const ws = new WebSocket('ws://localhost:3001/api/ws');
 
 ws.on('open', () => {
   console.log('Connected to WebSocket API');
-  
+
   // Subscribe to topics
-  ws.send(JSON.stringify({
-    type: 'subscribe',
-    data: { topics: ['bill:123'] }
-  }));
+  ws.send(
+    JSON.stringify({
+      type: 'subscribe',
+      data: { topics: ['bill:123'] },
+    })
+  );
 });
 
-ws.on('message', (data) => {
+ws.on('message', data => {
   const message = JSON.parse(data.toString());
   console.log('Received message:', message);
 });
 
-ws.on('error', (error) => {
+ws.on('error', error => {
   console.error('WebSocket error:', error);
 });
 ```
@@ -315,12 +329,14 @@ ws.on('error', (error) => {
 ## Deployment
 
 ### Development
+
 ```bash
 npm run dev
 # WebSocket API will be available at ws://localhost:3001/api/ws
 ```
 
 ### Production
+
 ```bash
 npm run build
 npm start
@@ -350,6 +366,7 @@ Monitor these metrics for production deployments:
 ### Debug Mode
 
 Enable debug logging:
+
 ```typescript
 // Set logger to debug level
 logger.setLevel('debug');
@@ -358,6 +375,7 @@ logger.setLevel('debug');
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section
 2. Review the type definitions in `api/types/websocket.ts`
 3. Consult the development team

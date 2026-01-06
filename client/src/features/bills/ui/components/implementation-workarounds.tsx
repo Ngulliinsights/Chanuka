@@ -1,7 +1,13 @@
 import { AlertTriangle, Shield, FileText } from 'lucide-react';
 import React from 'react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 
 export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_id }) => {
   return (
@@ -24,8 +30,9 @@ export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_
                 <div>
                   <h4 className="font-medium text-yellow-800">Analysis In Progress</h4>
                   <p className="text-sm text-yellow-700 mt-1">
-                    Implementation workaround detection for Bill #{bill_id} is currently under development.
-                    This feature will analyze potential constitutional bypass mechanisms and implementation strategies.
+                    Implementation workaround detection for Bill #{bill_id} is currently under
+                    development. This feature will analyze potential constitutional bypass
+                    mechanisms and implementation strategies.
                   </p>
                 </div>
               </div>
@@ -38,7 +45,8 @@ export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_
                   <span className="font-medium text-blue-800">Constitutional Analysis</span>
                 </div>
                 <p className="text-sm text-blue-700">
-                  Examining bill provisions for potential constitutional conflicts or bypass mechanisms.
+                  Examining bill provisions for potential constitutional conflicts or bypass
+                  mechanisms.
                 </p>
               </div>
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ArrowLeft,
   Network,
@@ -9,6 +8,7 @@ import {
   BarChart3,
   Share2,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -19,8 +19,9 @@ import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
-interface FinancialNetworkProps { bill_id?: string;
- }
+interface FinancialNetworkProps {
+  bill_id?: string;
+}
 
 interface NetworkData {
   totalEntities: number;
@@ -35,7 +36,8 @@ interface NetworkData {
   }>;
 }
 
-export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkProps) { const [networkData, setNetworkData] = useState<NetworkData | null>(null);
+export default function FinancialNetworkAnalysis({ bill_id }: FinancialNetworkProps) {
+  const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,14 +48,17 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
       try {
         if (!isMounted) return;
         setLoading(true);
-        
-        const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis/financial-network`, {
-          signal: abortController.signal,
-        });
+
+        const response = await fetch(
+          `/api/bills/${bill_id}/sponsorship-analysis/financial-network`,
+          {
+            signal: abortController.signal,
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
-          
+
           // Only update state if component is still mounted
           if (isMounted && !abortController.signal.aborted) {
             setNetworkData({
@@ -61,8 +66,12 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
               interconnectionRate: data.metrics?.interconnectionRate || 0,
               totalAffiliations: data.metrics?.totalConnections || 0,
               primarySponsorExposure: data.industryAnalysis?.breakdown?.[0]?.amount || 0,
-              totalFinancialExposure: data.industryAnalysis?.breakdown?.reduce((sum: number, item: { amount: number }) => sum + item.amount, 0) || 0,
-              industryBreakdown: data.industryAnalysis?.breakdown || []
+              totalFinancialExposure:
+                data.industryAnalysis?.breakdown?.reduce(
+                  (sum: number, item: { amount: number }) => sum + item.amount,
+                  0
+                ) || 0,
+              industryBreakdown: data.industryAnalysis?.breakdown || [],
             });
           }
         } else {
@@ -76,9 +85,9 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
               primarySponsorExposure: 28700000,
               totalFinancialExposure: 142800000,
               industryBreakdown: [
-                { sector: "Healthcare Services", percentage: 60, amount: 85680000 },
-                { sector: "Pharmaceutical", percentage: 40, amount: 57120000 }
-              ]
+                { sector: 'Healthcare Services', percentage: 60, amount: 85680000 },
+                { sector: 'Pharmaceutical', percentage: 40, amount: 57120000 },
+              ],
             });
           }
         }
@@ -97,9 +106,9 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
             primarySponsorExposure: 28700000,
             totalFinancialExposure: 142800000,
             industryBreakdown: [
-              { sector: "Healthcare Services", percentage: 60, amount: 85680000 },
-              { sector: "Pharmaceutical", percentage: 40, amount: 57120000 }
-            ]
+              { sector: 'Healthcare Services', percentage: 60, amount: 85680000 },
+              { sector: 'Pharmaceutical', percentage: 40, amount: 57120000 },
+            ],
           });
         }
       } finally {
@@ -142,24 +151,37 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary">Home</Link>
+        <Link to="/" className="hover:text-primary">
+          Home
+        </Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
+        <Link to={`/bills/${bill_id}`} className="hover:text-primary">
+          Bills
+        </Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={`/bills/${bill_id}/sponsorship-analysis`} className="hover:text-primary">
+          Sponsorship Analysis
+        </Link>
         <span>›</span>
         <span className="text-foreground">Financial Network</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link
+          to={`/bills/${bill_id}/sponsorship-analysis`}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4"
+        >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
 
-        <h1 className="text-3xl font-bold text-foreground mb-2">Financial Network & Influence Mapping</h1>
-        <p className="text-muted-foreground">Comprehensive analysis of financial relationships and industry influence</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Financial Network & Influence Mapping
+        </h1>
+        <p className="text-muted-foreground">
+          Comprehensive analysis of financial relationships and industry influence
+        </p>
       </div>
 
       {/* Network Overview */}
@@ -171,19 +193,25 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-primary mb-2">{networkData.totalEntities}</div>
+                <div className="text-2xl font-bold text-primary mb-2">
+                  {networkData.totalEntities}
+                </div>
                 <div className="text-sm text-muted-foreground">Connected Entities</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-primary mb-2">{networkData.interconnectionRate}%</div>
+                <div className="text-2xl font-bold text-primary mb-2">
+                  {networkData.interconnectionRate}%
+                </div>
                 <div className="text-sm text-muted-foreground">Interconnection Rate</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-primary mb-2">{networkData.totalAffiliations}</div>
+                <div className="text-2xl font-bold text-primary mb-2">
+                  {networkData.totalAffiliations}
+                </div>
                 <div className="text-sm text-muted-foreground">Total Affiliations</div>
               </CardContent>
             </Card>
@@ -195,7 +223,9 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Financial Network & Influence Mapping</CardTitle>
-          <p className="text-muted-foreground">Comprehensive analysis of financial relationships and influence pathways</p>
+          <p className="text-muted-foreground">
+            Comprehensive analysis of financial relationships and influence pathways
+          </p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="overview" className="w-full">
@@ -229,19 +259,40 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                     <div className="p-4 bg-muted rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium">Primary Sponsor</span>
-                        <span className="font-bold">KSh {(networkData.primarySponsorExposure / 1000000).toFixed(1)}M</span>
+                        <span className="font-bold">
+                          KSh {(networkData.primarySponsorExposure / 1000000).toFixed(1)}M
+                        </span>
                       </div>
-                      <Progress value={(networkData.primarySponsorExposure / networkData.totalFinancialExposure) * 100} />
+                      <Progress
+                        value={
+                          (networkData.primarySponsorExposure /
+                            networkData.totalFinancialExposure) *
+                          100
+                        }
+                      />
                     </div>
 
                     <div className="p-4 bg-muted rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium">Co-Sponsors Combined</span>
                         <span className="font-bold">
-                          KSh {((networkData.totalFinancialExposure - networkData.primarySponsorExposure) / 1000000).toFixed(1)}M
+                          KSh{' '}
+                          {(
+                            (networkData.totalFinancialExposure -
+                              networkData.primarySponsorExposure) /
+                            1000000
+                          ).toFixed(1)}
+                          M
                         </span>
                       </div>
-                      <Progress value={((networkData.totalFinancialExposure - networkData.primarySponsorExposure) / networkData.totalFinancialExposure) * 100} />
+                      <Progress
+                        value={
+                          ((networkData.totalFinancialExposure -
+                            networkData.primarySponsorExposure) /
+                            networkData.totalFinancialExposure) *
+                          100
+                        }
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -250,23 +301,31 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600 mb-2">KSh {(networkData.totalFinancialExposure / 1000000).toFixed(1)}M</div>
+                    <div className="text-2xl font-bold text-blue-600 mb-2">
+                      KSh {(networkData.totalFinancialExposure / 1000000).toFixed(1)}M
+                    </div>
                     <div className="text-sm text-muted-foreground">Total Financial Support</div>
-                    <p className="text-xs text-muted-foreground mt-1">Combined contributions from all identified sources</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Combined contributions from all identified sources
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-green-600 mb-2">68%</div>
                     <div className="text-sm text-muted-foreground">Primary Industry Sources</div>
-                    <p className="text-xs text-muted-foreground mt-1">Healthcare and pharmaceutical sector contributions</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Healthcare and pharmaceutical sector contributions
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-yellow-600 mb-2">Medium</div>
                     <div className="text-sm text-muted-foreground">Transparency Rating</div>
-                    <p className="text-xs text-muted-foreground mt-1">Based on disclosure completeness and verification</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Based on disclosure completeness and verification
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -277,7 +336,10 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
               <Card>
                 <CardHeader>
                   <CardTitle>Key Corporate Backers</CardTitle>
-                  <p className="text-muted-foreground">Analysis of major corporate entities providing financial support to bill sponsors</p>
+                  <p className="text-muted-foreground">
+                    Analysis of major corporate entities providing financial support to bill
+                    sponsors
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -290,7 +352,10 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                       </CardHeader>
                       <CardContent>
                         <div className="text-3xl font-bold text-red-600 mb-2">KSh 42.3M</div>
-                        <p className="text-sm text-muted-foreground mb-3">Primary manufacturer of medications affected by pricing provisions in Sections 4-7</p>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Primary manufacturer of medications affected by pricing provisions in
+                          Sections 4-7
+                        </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                           <div>
                             <span className="font-medium">Lobbying Expenditure:</span>
@@ -317,7 +382,10 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                       </CardHeader>
                       <CardContent>
                         <div className="text-3xl font-bold text-yellow-600 mb-2">KSh 28.5M</div>
-                        <p className="text-sm text-muted-foreground mb-3">Industry association representing 24 healthcare providers affected by Sections 12-14</p>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Industry association representing 24 healthcare providers affected by
+                          Sections 12-14
+                        </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                           <div>
                             <span className="font-medium">Policy Papers:</span>
@@ -359,7 +427,9 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                           <div className="text-2xl font-bold text-blue-600 mb-2">
                             KSh {(sector.amount / 1000000).toFixed(1)}M
                           </div>
-                          <div className="text-sm text-muted-foreground">{sector.percentage}% of total exposure</div>
+                          <div className="text-sm text-muted-foreground">
+                            {sector.percentage}% of total exposure
+                          </div>
                           <Progress value={sector.percentage} className="mt-2" />
                         </CardContent>
                       </Card>
@@ -381,7 +451,10 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-32 bg-gray-200 rounded-full h-2">
-                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '42%' }}></div>
+                          <div
+                            className="bg-blue-600 h-2 rounded-full"
+                            style={{ width: '42%' }}
+                          ></div>
                         </div>
                         <span className="text-sm font-medium">42%</span>
                       </div>
@@ -393,7 +466,10 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-32 bg-gray-200 rounded-full h-2">
-                          <div className="bg-green-600 h-2 rounded-full" style={{ width: '26%' }}></div>
+                          <div
+                            className="bg-green-600 h-2 rounded-full"
+                            style={{ width: '26%' }}
+                          ></div>
                         </div>
                         <span className="text-sm font-medium">26%</span>
                       </div>
@@ -412,11 +488,14 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                 <CardContent>
                   <div className="bg-muted rounded-lg p-8 text-center">
                     <Network className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Interactive Network Visualization</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Interactive Network Visualization
+                    </h3>
                     <p className="text-muted-foreground mb-4">
-                      Visual representation of connections between sponsors, organizations, and financial interests
+                      Visual representation of connections between sponsors, organizations, and
+                      financial interests
                     </p>
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={() => {
                         // Launch interactive network diagram in modal or new window
@@ -428,8 +507,9 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground text-center mt-4">
-                    This network shows connections between financial backers, bill sponsors, and affected industries. 
-                    Node size represents financial contribution amount, while connection thickness indicates relationship strength.
+                    This network shows connections between financial backers, bill sponsors, and
+                    affected industries. Node size represents financial contribution amount, while
+                    connection thickness indicates relationship strength.
                   </p>
                 </CardContent>
               </Card>
@@ -479,21 +559,30 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <h5 className="font-semibold text-blue-800 mb-2">High Interconnectivity</h5>
               <p className="text-sm text-blue-700">
-                {networkData.interconnectionRate}% of sponsors have overlapping organizational ties, indicating potential coordinated influence.
+                {networkData.interconnectionRate}% of sponsors have overlapping organizational ties,
+                indicating potential coordinated influence.
               </p>
             </div>
 
             <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-              <h5 className="font-semibold text-yellow-800 mb-2">Concentrated Financial Interest</h5>
+              <h5 className="font-semibold text-yellow-800 mb-2">
+                Concentrated Financial Interest
+              </h5>
               <p className="text-sm text-yellow-700">
-                Primary sponsor controls {((networkData.primarySponsorExposure / networkData.totalFinancialExposure) * 100).toFixed(0)}% of total financial exposure, creating significant influence concentration.
+                Primary sponsor controls{' '}
+                {(
+                  (networkData.primarySponsorExposure / networkData.totalFinancialExposure) *
+                  100
+                ).toFixed(0)}
+                % of total financial exposure, creating significant influence concentration.
               </p>
             </div>
 
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <h5 className="font-semibold text-green-800 mb-2">Industry Sector Dominance</h5>
               <p className="text-sm text-green-700">
-                Healthcare services sector represents the largest financial stake at {networkData.industryBreakdown[0].percentage}% of total exposure.
+                Healthcare services sector represents the largest financial stake at{' '}
+                {networkData.industryBreakdown[0].percentage}% of total exposure.
               </p>
             </div>
           </div>
@@ -502,13 +591,13 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
+        <Link to={`/bills/${bill_id}/sponsorship-analysis/co-sponsors`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Co-Sponsors
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/methodology`}>
+        <Link to={`/bills/${bill_id}/sponsorship-analysis/methodology`}>
           <Button>
             Next: Methodology
             <ChevronRight className="h-4 w-4 ml-2" />
@@ -518,4 +607,3 @@ export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkP
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Scale,
   AlertTriangle,
@@ -11,16 +10,23 @@ import {
   ChevronDown,
   ChevronUp,
   Shield,
-  Gavel
+  Gavel,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
-import type { Bill } from '@client/shared/types';
 import { Badge } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 type SeverityLevel = 'low' | 'moderate' | 'high' | 'critical';
 
@@ -86,18 +92,20 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
         'Strong constitutional basis under Commerce Clause',
         'Potential federal overreach concerns in state jurisdiction',
         'Equal protection considerations require careful implementation',
-        'Implementation timeline aligns with constitutional requirements'
-      ]
+        'Implementation timeline aligns with constitutional requirements',
+      ],
     },
     flags: [
       {
         id: 'flag-1',
         severity: 'moderate',
         title: 'Federal-State Authority Balance',
-        description: 'This provision may exceed federal authority under the current constitutional framework',
+        description:
+          'This provision may exceed federal authority under the current constitutional framework',
         article: 'Article I, Section 8',
         precedents: ['United States v. Lopez (1995)', 'NFIB v. Sebelius (2012)'],
-        recommendation: 'Consider state implementation partnerships to address jurisdictional concerns'
+        recommendation:
+          'Consider state implementation partnerships to address jurisdictional concerns',
       },
       {
         id: 'flag-2',
@@ -106,8 +114,8 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
         description: 'Income-based eligibility criteria may require equal protection analysis',
         article: '14th Amendment',
         precedents: ['San Antonio v. Rodriguez (1973)', 'Plyler v. Doe (1982)'],
-        recommendation: 'Ensure clear, objective criteria for eligibility determinations'
-      }
+        recommendation: 'Ensure clear, objective criteria for eligibility determinations',
+      },
     ],
     precedentAnalysis: {
       supportingCases: [
@@ -115,29 +123,29 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
           name: 'Wickard v. Filburn',
           year: 1942,
           relevance: 85,
-          summary: 'Established broad interpretation of Commerce Clause authority'
+          summary: 'Established broad interpretation of Commerce Clause authority',
         },
         {
           name: 'Heart of Atlanta Motel v. United States',
           year: 1964,
           relevance: 78,
-          summary: 'Upheld federal regulation of local activities affecting interstate commerce'
-        }
+          summary: 'Upheld federal regulation of local activities affecting interstate commerce',
+        },
       ],
       challengingCases: [
         {
           name: 'United States v. Lopez',
           year: 1995,
           relevance: 72,
-          summary: 'Limited federal authority under Commerce Clause for non-economic activities'
-        }
-      ]
+          summary: 'Limited federal authority under Commerce Clause for non-economic activities',
+        },
+      ],
     },
     expertConsensus: {
       supportPercentage: 68,
       totalExperts: 25,
-      confidence: 82
-    }
+      confidence: 82,
+    },
   };
 
   const toggleSection = (sectionId: string) => {
@@ -154,21 +162,31 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
   const getSeverityColor = (severity: SeverityLevel) => {
     switch (severity) {
-      case 'critical': return 'text-red-700 bg-red-50 border-red-200';
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      case 'moderate': return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      case 'low': return 'text-green-700 bg-green-50 border-green-200';
-      default: return 'text-gray-700 bg-gray-50 border-gray-200';
+      case 'critical':
+        return 'text-red-700 bg-red-50 border-red-200';
+      case 'high':
+        return 'text-red-600 bg-red-50 border-red-200';
+      case 'moderate':
+        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
+      case 'low':
+        return 'text-green-700 bg-green-50 border-green-200';
+      default:
+        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
   };
 
   const getSeverityIcon = (severity: SeverityLevel) => {
     switch (severity) {
-      case 'critical': return <XCircle className="h-5 w-5 text-red-600" />;
-      case 'high': return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      case 'moderate': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'low': return <Info className="h-5 w-5 text-green-600" />;
-      default: return <Info className="h-5 w-5 text-gray-600" />;
+      case 'critical':
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'high':
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
+      case 'moderate':
+        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      case 'low':
+        return <Info className="h-5 w-5 text-green-600" />;
+      default:
+        return <Info className="h-5 w-5 text-gray-600" />;
     }
   };
 
@@ -196,19 +214,21 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
             {/* Score and Risk Level */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className={`text-3xl font-bold ${getScoreColor(analysisData.overallAssessment.constitutionalityScore)}`}>
+                <div
+                  className={`text-3xl font-bold ${getScoreColor(analysisData.overallAssessment.constitutionalityScore)}`}
+                >
                   {Math.round(analysisData.overallAssessment.constitutionalityScore * 100)}%
                 </div>
                 <div className="text-sm text-blue-800">Constitutionality Score</div>
               </div>
-              
+
               <div className="text-center p-4 bg-purple-50 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600">
                   {analysisData.expertConsensus.supportPercentage}%
                 </div>
                 <div className="text-sm text-purple-800">Expert Support</div>
               </div>
-              
+
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {analysisData.expertConsensus.confidence}%
@@ -243,23 +263,24 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
       {/* Constitutional Flags */}
       <Card>
-        <CardHeader 
-          className="cursor-pointer"
-          onClick={() => toggleSection('flags')}
-        >
+        <CardHeader className="cursor-pointer" onClick={() => toggleSection('flags')}>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-500" />
               Constitutional Concerns ({analysisData.flags.length})
             </div>
-            {expandedSections.has('flags') ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            {expandedSections.has('flags') ? (
+              <ChevronUp className="h-5 w-5" />
+            ) : (
+              <ChevronDown className="h-5 w-5" />
+            )}
           </CardTitle>
         </CardHeader>
-        
+
         {expandedSections.has('flags') && (
           <CardContent>
             <div className="space-y-4">
-              {analysisData.flags.map((flag) => (
+              {analysisData.flags.map(flag => (
                 <Card key={flag.id} className={`border ${getSeverityColor(flag.severity)}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
@@ -271,16 +292,15 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                             {flag.severity}
                           </Badge>
                         </div>
-                        
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {flag.description}
-                        </p>
-                        
+
+                        <p className="text-sm text-muted-foreground mb-3">{flag.description}</p>
+
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-medium">Constitutional Basis:</span> {flag.article}
+                            <span className="font-medium">Constitutional Basis:</span>{' '}
+                            {flag.article}
                           </div>
-                          
+
                           <div>
                             <span className="font-medium">Relevant Precedents:</span>
                             <div className="flex flex-wrap gap-1 mt-1">
@@ -291,7 +311,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                               ))}
                             </div>
                           </div>
-                          
+
                           <div className="p-3 bg-blue-50 rounded border border-blue-200">
                             <span className="font-medium text-blue-800">Recommendation:</span>
                             <p className="text-blue-700 text-sm mt-1">{flag.recommendation}</p>
@@ -309,19 +329,20 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
       {/* Precedent Analysis */}
       <Card>
-        <CardHeader 
-          className="cursor-pointer"
-          onClick={() => toggleSection('precedents')}
-        >
+        <CardHeader className="cursor-pointer" onClick={() => toggleSection('precedents')}>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Gavel className="h-5 w-5 text-purple-500" />
               Legal Precedent Analysis
             </div>
-            {expandedSections.has('precedents') ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            {expandedSections.has('precedents') ? (
+              <ChevronUp className="h-5 w-5" />
+            ) : (
+              <ChevronDown className="h-5 w-5" />
+            )}
           </CardTitle>
         </CardHeader>
-        
+
         {expandedSections.has('precedents') && (
           <CardContent>
             <div className="space-y-6">
@@ -335,7 +356,9 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                   {analysisData.precedentAnalysis.supportingCases.map((case_, index) => (
                     <div key={index} className="p-3 bg-green-50 rounded border border-green-200">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-green-800">{case_.name} ({case_.year})</span>
+                        <span className="font-medium text-green-800">
+                          {case_.name} ({case_.year})
+                        </span>
                         <Badge variant="outline" className="text-green-700">
                           {case_.relevance}% relevant
                         </Badge>
@@ -358,7 +381,9 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                   {analysisData.precedentAnalysis.challengingCases.map((case_, index) => (
                     <div key={index} className="p-3 bg-orange-50 rounded border border-orange-200">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-orange-800">{case_.name} ({case_.year})</span>
+                        <span className="font-medium text-orange-800">
+                          {case_.name} ({case_.year})
+                        </span>
                         <Badge variant="outline" className="text-orange-700">
                           {case_.relevance}% relevant
                         </Badge>
@@ -396,7 +421,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                 </div>
                 <Progress value={analysisData.expertConsensus.supportPercentage} className="h-2" />
               </div>
-              
+
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Analysis Confidence</span>
@@ -407,9 +432,10 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
                 <Progress value={analysisData.expertConsensus.confidence} className="h-2" />
               </div>
             </div>
-            
+
             <div className="text-sm text-muted-foreground">
-              Based on analysis from {analysisData.expertConsensus.totalExperts} constitutional law experts
+              Based on analysis from {analysisData.expertConsensus.totalExperts} constitutional law
+              experts
             </div>
           </div>
         </CardContent>

@@ -149,8 +149,8 @@ class DataRetentionService {
    * Checks if data is eligible for deletion
    */
   isEligibleForDeletion(
-    createdAt: string, 
-    category: string, 
+    createdAt: string,
+    category: string,
     userConsent?: boolean,
     hasExceptions?: boolean
   ): boolean {
@@ -168,7 +168,7 @@ class DataRetentionService {
     // Check if retention period has expired
     const expiryDate = new Date(this.calculateRetentionExpiry(createdAt, category));
     const now = new Date();
-    
+
     return now > expiryDate;
   }
 
@@ -207,7 +207,7 @@ class DataRetentionService {
    * Executes data cleanup for a specific category
    */
   async executeDataCleanup(
-    category: string, 
+    category: string,
     dryRun: boolean = false
   ): Promise<{
     recordsFound: number;
@@ -303,7 +303,9 @@ class DataRetentionService {
       // In production, this would query actual user data
       const mockData = {
         recordCount: Math.floor(Math.random() * 100),
-        oldestRecord: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+        oldestRecord: new Date(
+          Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
+        ).toISOString(),
         newestRecord: new Date().toISOString(),
         sizeBytes: Math.floor(Math.random() * 1024 * 1024), // Random size up to 1MB
         canDelete: policy.autoDelete,
@@ -317,11 +319,11 @@ class DataRetentionService {
     }
 
     const totalSize = Object.values(categories).reduce((sum, cat) => sum + cat.sizeBytes, 0);
-    
+
     // Determine retention status
     let retentionStatus: UserDataSummary['retentionStatus'] = 'compliant';
     const now = new Date();
-    
+
     for (const [category, data] of Object.entries(categories)) {
       const expiryDate = new Date(data.retentionExpiry);
       if (now > expiryDate && data.canDelete) {
@@ -357,7 +359,7 @@ class DataRetentionService {
       if (!policy) continue;
 
       const expiryDate = new Date(data.retentionExpiry);
-      
+
       if (now > expiryDate) {
         if (policy.autoDelete) {
           issues.push(`${policy.name} data is overdue for automatic deletion`);
@@ -368,7 +370,8 @@ class DataRetentionService {
       }
 
       // Check for large data sizes
-      if (data.sizeBytes > 10 * 1024 * 1024) { // 10MB threshold
+      if (data.sizeBytes > 10 * 1024 * 1024) {
+        // 10MB threshold
         recommendations.push(`Consider archiving large ${policy.name} dataset`);
       }
     }
@@ -394,9 +397,9 @@ class DataRetentionService {
     lastUpdated: string;
   } {
     const autoDeletePolicies = this.RETENTION_POLICIES.filter(p => p.autoDelete).length;
-    const averageRetentionDays = this.RETENTION_POLICIES.reduce(
-      (sum, p) => sum + p.retentionPeriod, 0
-    ) / this.RETENTION_POLICIES.length;
+    const averageRetentionDays =
+      this.RETENTION_POLICIES.reduce((sum, p) => sum + p.retentionPeriod, 0) /
+      this.RETENTION_POLICIES.length;
 
     return {
       policies: this.getRetentionPolicies(),

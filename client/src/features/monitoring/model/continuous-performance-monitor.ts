@@ -34,7 +34,13 @@ interface MonitoringConfig {
  */
 interface PerformanceAlert {
   id: string;
-  type: 'load_time' | 'render_time' | 'memory_usage' | 'error_rate' | 'resource_count' | 'web_vitals';
+  type:
+    | 'load_time'
+    | 'render_time'
+    | 'memory_usage'
+    | 'error_rate'
+    | 'resource_count'
+    | 'web_vitals';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   value: number;
@@ -68,13 +74,13 @@ class ContinuousPerformanceMonitor {
         renderTime: 100, // 100ms
         memoryUsage: 100 * 1024 * 1024, // 100MB
         errorRate: 0.05, // 5%
-        resourceCount: 100
+        resourceCount: 100,
       },
       alertCooldown: 300000, // 5 minutes
       enableWebVitalsTracking: true,
       enableResourceTracking: true,
       enableErrorTracking: true,
-      enableMemoryTracking: true
+      enableMemoryTracking: true,
     };
   }
 
@@ -145,7 +151,7 @@ class ContinuousPerformanceMonitor {
           message: `High memory usage: ${Math.round(usedMemory / 1024 / 1024)}MB`,
           value: usedMemory,
           threshold: this.config.alertThresholds.memoryUsage,
-          route: window.location.pathname
+          route: window.location.pathname,
         });
       }
     }
@@ -165,7 +171,7 @@ class ContinuousPerformanceMonitor {
         message: `High resource count: ${resourceCount}`,
         value: resourceCount,
         threshold: this.config.alertThresholds.resourceCount,
-        route: window.location.pathname
+        route: window.location.pathname,
       });
     }
   }
@@ -181,7 +187,9 @@ class ContinuousPerformanceMonitor {
   /**
    * Create performance alert
    */
-  private createAlert(alertData: Omit<PerformanceAlert, 'id' | 'timestamp' | 'acknowledged'>): void {
+  private createAlert(
+    alertData: Omit<PerformanceAlert, 'id' | 'timestamp' | 'acknowledged'>
+  ): void {
     const alertKey = `${alertData.type}-${alertData.route}`;
     const now = Date.now();
     const lastAlertTime = this.lastAlertTimes.get(alertKey) || 0;
@@ -195,7 +203,7 @@ class ContinuousPerformanceMonitor {
       ...alertData,
       id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
-      acknowledged: false
+      acknowledged: false,
     };
 
     this.alerts.push(alert);
@@ -260,7 +268,4 @@ class ContinuousPerformanceMonitor {
 export const continuousPerformanceMonitor = ContinuousPerformanceMonitor.getInstance();
 
 // Export types
-export type {
-  MonitoringConfig,
-  PerformanceAlert
-};
+export type { MonitoringConfig, PerformanceAlert };

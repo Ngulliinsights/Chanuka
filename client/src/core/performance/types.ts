@@ -1,6 +1,6 @@
 /**
  * Performance System Types
- * 
+ *
  * Comprehensive type definitions for the performance monitoring system including
  * metrics, budgets, Web Vitals, alerts, and optimization suggestions.
  */
@@ -179,7 +179,14 @@ export interface NetworkInfo {
  * Performance observer configuration
  */
 export interface ObserverConfig {
-  type: 'navigation' | 'resource' | 'paint' | 'largest-contentful-paint' | 'first-input' | 'layout-shift' | 'longtask';
+  type:
+    | 'navigation'
+    | 'resource'
+    | 'paint'
+    | 'largest-contentful-paint'
+    | 'first-input'
+    | 'layout-shift'
+    | 'longtask';
   buffered?: boolean;
   entryTypes?: string[];
 }
@@ -214,7 +221,7 @@ export interface PerformanceEvents {
 /**
  * Performance error types
  */
-export type PerformanceErrorCode = 
+export type PerformanceErrorCode =
   | 'OBSERVER_NOT_SUPPORTED'
   | 'METRIC_COLLECTION_FAILED'
   | 'BUDGET_VALIDATION_FAILED'
@@ -316,21 +323,21 @@ export const DEFAULT_PERFORMANCE_CONFIG: PerformanceConfig = {
   webVitals: {
     enabled: true,
     reportingThreshold: 0.1, // Report 10% of sessions
-    sampleRate: 1.0 // Sample 100% of eligible sessions
+    sampleRate: 1.0, // Sample 100% of eligible sessions
   },
   budgets: {
     enabled: true,
-    checkInterval: 5000 // Check every 5 seconds
+    checkInterval: 5000, // Check every 5 seconds
   },
   alerts: {
     enabled: true,
     maxAlerts: 100,
     retentionMs: 60 * 60 * 1000, // 1 hour
-    externalReporting: false
+    externalReporting: false,
   },
   optimization: {
     enabled: true,
     autoAnalysis: true,
-    analysisInterval: 30000 // Analyze every 30 seconds
-  }
+    analysisInterval: 30000, // Analyze every 30 seconds
+  },
 };

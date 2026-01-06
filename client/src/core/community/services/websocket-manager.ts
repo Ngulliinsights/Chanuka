@@ -1,6 +1,6 @@
 /**
  * WebSocket Manager
- * 
+ *
  * Unified WebSocket management for real-time community features.
  * Consolidates WebSocket logic from CommunityWebSocketManager and EventBus.
  */
@@ -64,18 +64,18 @@ export class WebSocketManager {
           console.log('WebSocket connected');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
-          
+
           // Rejoin rooms after reconnection
           this.joinedRooms.forEach(room => {
             if (this.ws?.readyState === WebSocket.OPEN) {
               this.ws.send(JSON.stringify({ event: 'join_room', data: { room } }));
             }
           });
-          
+
           resolve();
         };
 
-        this.ws.onmessage = (event) => {
+        this.ws.onmessage = event => {
           try {
             const message = JSON.parse(event.data);
             this.handleMessage(message);
@@ -91,7 +91,7 @@ export class WebSocketManager {
           this.attemptReconnect();
         };
 
-        this.ws.onerror = (error) => {
+        this.ws.onerror = error => {
           console.error('WebSocket error:', error);
           this.isConnecting = false;
           reject(error);
@@ -137,13 +137,13 @@ export class WebSocketManager {
    * Subscribe to WebSocket events
    */
   on<K extends keyof WebSocketEvents>(
-    event: K, 
+    event: K,
     handler: EventHandler<WebSocketEvents[K]>
   ): () => void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, []);
     }
-    
+
     const handlers = this.eventHandlers.get(event)!;
     handlers.push(handler);
 
@@ -159,10 +159,7 @@ export class WebSocketManager {
   /**
    * Unsubscribe from WebSocket events
    */
-  off<K extends keyof WebSocketEvents>(
-    event: K, 
-    handler?: EventHandler<WebSocketEvents[K]>
-  ): void {
+  off<K extends keyof WebSocketEvents>(event: K, handler?: EventHandler<WebSocketEvents[K]>): void {
     if (!handler) {
       // Remove all handlers for this event
       this.eventHandlers.delete(event);
@@ -208,10 +205,13 @@ export class WebSocketManager {
   /**
    * Handle incoming WebSocket messages
    */
-  private handleMessage(message: { event: keyof WebSocketEvents; data: Record<string, unknown> }): void {
+  private handleMessage(message: {
+    event: keyof WebSocketEvents;
+    data: Record<string, unknown>;
+  }): void {
     const { event, data } = message;
     const handlers = this.eventHandlers.get(event);
-    
+
     if (handlers) {
       handlers.forEach(handler => {
         try {
@@ -234,9 +234,9 @@ export class WebSocketManager {
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
+
     console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
-    
+
     setTimeout(() => {
       this.connect().catch(error => {
         console.error('Reconnection failed:', error);

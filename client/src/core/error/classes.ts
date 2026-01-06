@@ -44,13 +44,13 @@ export class BaseError extends Error {
     } = {}
   ) {
     super(message);
-    
+
     // Set error name to constructor name for better stack traces
     this.name = this.constructor.name;
-    
+
     // Generate unique error identifier
     this.errorId = `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    
+
     // Initialize error properties with sensible defaults
     this.statusCode = options.statusCode ?? 500;
     this.code = options.code ?? 'INTERNAL_ERROR';
@@ -96,7 +96,7 @@ export class BaseError extends Error {
       severity: this.severity,
       retryable: this.retryable,
       recoverable: this.recoverable,
-      context: this.context
+      context: this.context,
     };
 
     // Route to appropriate log level based on severity
@@ -130,7 +130,7 @@ export class BaseError extends Error {
       retryable: this.retryable,
       recoverable: this.recoverable,
       context: this.context,
-      stack: this.stack
+      stack: this.stack,
     };
   }
 
@@ -142,7 +142,7 @@ export class BaseError extends Error {
     const newContext = { ...this.context, ...additionalContext };
     return new (this.constructor as new (...args: unknown[]) => this)(this.message, {
       ...this,
-      context: newContext
+      context: newContext,
     });
   }
 }
@@ -163,7 +163,7 @@ export class ValidationError extends BaseError {
       severity: ErrorSeverity.MEDIUM,
       retryable: false,
       recoverable: false,
-      context
+      context,
     });
   }
 }
@@ -180,7 +180,7 @@ export class NetworkError extends BaseError {
       severity: ErrorSeverity.MEDIUM,
       retryable: true,
       recoverable: true,
-      context
+      context,
     });
   }
 }
@@ -197,7 +197,7 @@ export class UnauthorizedError extends BaseError {
       severity: ErrorSeverity.HIGH,
       retryable: false,
       recoverable: true,
-      context
+      context,
     });
   }
 }
@@ -214,7 +214,7 @@ export class NotFoundError extends BaseError {
       severity: ErrorSeverity.LOW,
       retryable: false,
       recoverable: false,
-      context
+      context,
     });
   }
 }
@@ -231,7 +231,7 @@ export class CacheError extends BaseError {
       severity: ErrorSeverity.LOW,
       retryable: true,
       recoverable: true,
-      context
+      context,
     });
   }
 }
@@ -283,7 +283,12 @@ export class NavigationItemNotFoundError extends NavigationError {
 }
 
 export class InvalidNavigationPathError extends NavigationError {
-  constructor(path: string, reason?: string, details?: Record<string, unknown>, context?: ErrorContext) {
+  constructor(
+    path: string,
+    reason?: string,
+    details?: Record<string, unknown>,
+    context?: ErrorContext
+  ) {
     super(
       reason ?? `Invalid navigation path: ${path}`,
       NavigationErrorType.INVALID_NAVIGATION_PATH,
@@ -313,7 +318,13 @@ export class NavigationAccessDeniedError extends NavigationError {
 }
 
 export class NavigationValidationError extends NavigationError {
-  constructor(message: string, field: string, value: unknown, details?: Record<string, unknown>, context?: ErrorContext) {
+  constructor(
+    message: string,
+    field: string,
+    value: unknown,
+    details?: Record<string, unknown>,
+    context?: ErrorContext
+  ) {
     super(
       message,
       NavigationErrorType.NAVIGATION_VALIDATION_ERROR,
@@ -326,12 +337,6 @@ export class NavigationValidationError extends NavigationError {
 
 export class NavigationConfigurationError extends NavigationError {
   constructor(message: string, details?: Record<string, unknown>, context?: ErrorContext) {
-    super(
-      message,
-      NavigationErrorType.NAVIGATION_CONFIGURATION_ERROR,
-      500,
-      details,
-      context
-    );
+    super(message, NavigationErrorType.NAVIGATION_CONFIGURATION_ERROR, 500, details, context);
   }
 }

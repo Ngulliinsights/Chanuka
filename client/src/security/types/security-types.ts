@@ -1,6 +1,6 @@
 /**
  * Security Types
- * 
+ *
  * Type definitions for security infrastructure components
  */
 
@@ -98,7 +98,12 @@ export interface VulnerabilityReport {
 
 export interface SecurityEvent {
   id: string;
-  type: 'csp-violation' | 'csrf-attempt' | 'rate-limit-exceeded' | 'xss-attempt' | 'vulnerability-detected';
+  type:
+    | 'csp-violation'
+    | 'csrf-attempt'
+    | 'rate-limit-exceeded'
+    | 'xss-attempt'
+    | 'vulnerability-detected';
   severity: 'info' | 'warning' | 'error' | 'critical';
   message: string;
   source: string;

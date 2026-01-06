@@ -15,14 +15,15 @@ import {
   ExternalLink,
   Trash,
   Check,
-  Award
+  Award,
 } from 'lucide-react';
 import React from 'react';
 
-import { Notification, NotificationType } from '@/services/notification-service';
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
+
+import { Notification, NotificationType } from '@/services/notification-service';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -39,7 +40,7 @@ export function NotificationItem({
   onSelect,
   onClick,
   onDelete,
-  showActions = true
+  showActions = true,
 }: NotificationItemProps) {
   const getNotificationIcon = (type: NotificationType) => {
     const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -59,7 +60,7 @@ export function NotificationItem({
       bill_status: FileText,
       comment: MessageCircle,
       expert_analysis: User,
-      achievement: Award
+      achievement: Award,
     };
 
     const IconComponent = iconMap[type] || Settings;
@@ -71,7 +72,7 @@ export function NotificationItem({
       urgent: 'bg-red-500',
       high: 'bg-orange-500',
       medium: 'bg-blue-500',
-      low: 'bg-gray-500'
+      low: 'bg-gray-500',
     };
     return colorMap[(priority || 'medium') as keyof typeof colorMap] || colorMap.medium;
   };
@@ -83,7 +84,7 @@ export function NotificationItem({
       expert: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
       moderation: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
       system: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-      security: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      security: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     };
     return colorMap[(category || 'system') as keyof typeof colorMap] || colorMap.system;
   };
@@ -131,7 +132,9 @@ export function NotificationItem({
         )}
 
         {/* Priority Indicator */}
-        <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getPriorityColor(notification.priority)}`} />
+        <div
+          className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getPriorityColor(notification.priority)}`}
+        />
 
         {/* Icon */}
         <div className="flex-shrink-0 mt-1 text-gray-500 dark:text-gray-400">
@@ -142,7 +145,9 @@ export function NotificationItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h4 className={`text-sm font-medium ${!notification.read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
+              <h4
+                className={`text-sm font-medium ${!notification.read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}
+              >
                 {String(notification.title)}
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
@@ -158,7 +163,9 @@ export function NotificationItem({
                     variant="ghost"
                     size="sm"
                     className="p-1 h-6 w-6"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleActionClick('open', e)}
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                      handleActionClick('open', e)
+                    }
                     title="Open link"
                   >
                     <ExternalLink className="h-3 w-3" />
@@ -184,7 +191,9 @@ export function NotificationItem({
                   variant="ghost"
                   size="sm"
                   className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleActionClick('delete', e)}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleActionClick('delete', e)
+                  }
                   title="Delete notification"
                 >
                   <Trash className="h-3 w-3" />
@@ -195,12 +204,18 @@ export function NotificationItem({
 
           {/* Metadata */}
           <div className="flex items-center gap-2 mt-2">
-            <Badge variant="secondary" className={`text-xs ${getCategoryColor(notification.category)}`}>
+            <Badge
+              variant="secondary"
+              className={`text-xs ${getCategoryColor(notification.category)}`}
+            >
               {String(notification.category || 'General')}
             </Badge>
 
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {formatDistanceToNow(new Date((notification.createdAt || notification.timestamp) as string), { addSuffix: true })}
+              {formatDistanceToNow(
+                new Date((notification.createdAt || notification.timestamp) as string),
+                { addSuffix: true }
+              )}
             </span>
 
             {notification.priority === 'urgent' && (
@@ -232,20 +247,22 @@ export function NotificationItem({
           )}
 
           {/* Community Context */}
-          {Boolean(communityContext) && typeof communityContext === 'object' && communityContext !== null && (
-            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {typeof communityContext === 'object' && communityContext !== null && (
-                <>
-                  {'billId' in communityContext && (
-                    <span>Bill #{String(communityContext.billId)}</span>
-                  )}
-                  {'expertId' in communityContext && (
-                    <span className="ml-2">Expert: {String(communityContext.expertId)}</span>
-                  )}
-                </>
-              )}
-            </div>
-          )}
+          {Boolean(communityContext) &&
+            typeof communityContext === 'object' &&
+            communityContext !== null && (
+              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {typeof communityContext === 'object' && communityContext !== null && (
+                  <>
+                    {'billId' in communityContext && (
+                      <span>Bill #{String(communityContext.billId)}</span>
+                    )}
+                    {'expertId' in communityContext && (
+                      <span className="ml-2">Expert: {String(communityContext.expertId)}</span>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
         </div>
       </div>
     </div>

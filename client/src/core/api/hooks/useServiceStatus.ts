@@ -23,11 +23,11 @@ const DEFAULT_STATUS: ServiceStatus = {
 
 /**
  * Custom hook for monitoring and managing service health status
- * 
+ *
  * This hook provides real-time tracking of a service's health by polling
  * the service recovery utility every 5 seconds. It gives you both the current
  * status and functions to manually check health or reset tracking.
- * 
+ *
  * @param serviceName - The unique identifier for the service to monitor
  * @returns Status information and control functions for the service
  */
@@ -48,7 +48,7 @@ export function useServiceStatus(serviceName: string) {
     }
     return DEFAULT_STATUS;
   });
-  
+
   const [isChecking, setIsChecking] = useState(false);
 
   // Set up periodic polling to keep the UI in sync with service recovery state
@@ -76,7 +76,7 @@ export function useServiceStatus(serviceName: string) {
 
   /**
    * Manually trigger a health check for this service
-   * 
+   *
    * This function calls your backend health endpoint to verify the service
    * is operational. If healthy, it refreshes the status from the recovery utility.
    * The checking state is managed automatically to provide loading feedback.
@@ -88,7 +88,7 @@ export function useServiceStatus(serviceName: string) {
       // Adjust this URL to match your actual API structure
       const response = await fetch(`/api/health/${serviceName}`);
       const isHealthy = response.ok;
-      
+
       if (isHealthy) {
         // Service is healthy, refresh our local state from the recovery utility
         const updatedStatus = serviceRecovery.getServiceStatus(serviceName);
@@ -104,7 +104,7 @@ export function useServiceStatus(serviceName: string) {
           setStatus(mappedStatus);
         }
       }
-      
+
       return isHealthy;
     } catch (error) {
       console.error(`Health check failed for ${serviceName}:`, error);
@@ -116,7 +116,7 @@ export function useServiceStatus(serviceName: string) {
 
   /**
    * Reset the status tracking for this service
-   * 
+   *
    * This refreshes the local state with the current status from the
    * service recovery utility. Useful after resolving issues or when
    * you want to force a state synchronization.
@@ -144,6 +144,6 @@ export function useServiceStatus(serviceName: string) {
     checkHealth,
     resetStatus,
     // Convenience property for quick online/offline checks in your components
-    isOnline: status.isAvailable
+    isOnline: status.isAvailable,
   };
 }

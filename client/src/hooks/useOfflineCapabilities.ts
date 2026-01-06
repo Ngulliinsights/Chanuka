@@ -1,12 +1,12 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect, useCallback, useRef } from 'react';
-
 import { backgroundSyncManager } from '@client/utils/backgroundSyncManager';
 import { cacheInvalidation } from '@client/utils/cacheInvalidation';
-import { logger } from '@client/utils/logger';
 import { offlineAnalytics } from '@client/utils/offlineAnalytics';
 import { offlineDataManager } from '@client/utils/offlineDataManager';
 import { addNetworkStatusListener, isOnline } from '@client/utils/serviceWorker';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { logger } from '@client/utils/logger';
 
 export interface OfflineState {
   isOnline: boolean;
@@ -43,10 +43,10 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
   // Update online status
   useEffect(() => {
-    const cleanup = addNetworkStatusListener((online) => {
+    const cleanup = addNetworkStatusListener(online => {
       if (mountedRef.current) {
         setState(prev => ({ ...prev, isOnline: online }));
-        
+
         if (online) {
           // Trigger sync when coming back online
           syncNow();
@@ -84,7 +84,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
         // Check if service worker is registered and critical data is cached
         const registration = await navigator.serviceWorker.getRegistration();
         const hasCriticalData = localStorage.getItem('offline_bills') !== null;
-        
+
         setState(prev => ({
           ...prev,
           isOfflineReady: !!registration && hasCriticalData,
@@ -121,7 +121,10 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
       logger.info('Sync completed successfully', { component: 'useOfflineCapabilities' });
     } catch (error) {
-      await offlineAnalytics.trackUserAction('manual_sync', { success: false, error: String(error) });
+      await offlineAnalytics.trackUserAction('manual_sync', {
+        success: false,
+        error: String(error),
+      });
       logger.error('Sync failed:', { component: 'useOfflineCapabilities', error });
       throw error;
     }
@@ -160,11 +163,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
   const enableOfflineMode = useCallback(async () => {
     try {
       // Preload critical data for offline use
-      const criticalEndpoints = [
-        '/api/bills',
-        '/api/sponsors',
-        '/api/community/recent',
-      ];
+      const criticalEndpoints = ['/api/bills', '/api/sponsors', '/api/community/recent'];
 
       for (const endpoint of criticalEndpoints) {
         try {
@@ -174,7 +173,10 @@ export function useOfflineCapabilities(): OfflineCapabilities {
             await offlineDataManager.setOfflineData(endpoint, data);
           }
         } catch (error) {
-          logger.warn(`Failed to cache ${endpoint}`, { component: 'useOfflineCapabilities', error });
+          logger.warn(`Failed to cache ${endpoint}`, {
+            component: 'useOfflineCapabilities',
+            error,
+          });
         }
       }
 
@@ -185,7 +187,10 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
       logger.info('Offline mode enabled', { component: 'useOfflineCapabilities' });
     } catch (error) {
-      logger.error('Failed to enable offline mode:', { component: 'useOfflineCapabilities', error });
+      logger.error('Failed to enable offline mode:', {
+        component: 'useOfflineCapabilities',
+        error,
+      });
       throw error;
     }
   }, []);
@@ -201,7 +206,11 @@ export function useOfflineCapabilities(): OfflineCapabilities {
       const data = await offlineDataManager.getOfflineData(key);
       return data !== null;
     } catch (error) {
-      logger.error('Failed to check if data is cached', { component: 'useOfflineCapabilities', key, error });
+      logger.error('Failed to check if data is cached', {
+        component: 'useOfflineCapabilities',
+        key,
+        error,
+      });
       return false;
     }
   }, []);
@@ -217,11 +226,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 }
 
 // Hook for offline-first data fetching
-export function useOfflineQuery<T>(
-  key: string,
-  fetchFn: () => Promise<T>,
-  fallbackData?: T
-) {
+export function useOfflineQuery<T>(key: string, fetchFn: () => Promise<T>, fallbackData?: T) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -278,12 +283,15 @@ export function useOfflineQuery<T>(
       const result = await fetchFn();
       setData(result);
       setIsFromCache(false);
-      
+
       // Update cache
-      localStorage.setItem(`offline_${key}`, JSON.stringify({
-        data: result,
-        timestamp: Date.now(),
-      }));
+      localStorage.setItem(
+        `offline_${key}`,
+        JSON.stringify({
+          data: result,
+          timestamp: Date.now(),
+        })
+      );
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -302,17 +310,16 @@ export function useOfflineQuery<T>(
 
 // Hook for managing offline notifications
 export function useOfflineNotifications() {
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: 'info' | 'warning' | 'error';
-    message: string;
-    timestamp: number;
-  }>>([]);
+  const [notifications, setNotifications] = useState<
+    Array<{
+      id: string;
+      type: 'info' | 'warning' | 'error';
+      message: string;
+      timestamp: number;
+    }>
+  >([]);
 
-  const addNotification = useCallback((
-    type: 'info' | 'warning' | 'error',
-    message: string
-  ) => {
+  const addNotification = useCallback((type: 'info' | 'warning' | 'error', message: string) => {
     const notification = {
       id: Math.random().toString(36).substr(2, 9),
       type,
@@ -338,7 +345,7 @@ export function useOfflineNotifications() {
 
   // Listen for network status changes
   useEffect(() => {
-    const cleanup = addNetworkStatusListener((online) => {
+    const cleanup = addNetworkStatusListener(online => {
       if (online) {
         addNotification('info', 'Connection restored. Syncing data...');
       } else {
@@ -356,47 +363,3 @@ export function useOfflineNotifications() {
     clearNotifications,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

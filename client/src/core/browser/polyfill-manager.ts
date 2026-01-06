@@ -1,6 +1,6 @@
 /**
  * Polyfill Manager Module
- * 
+ *
  * Manages the loading and tracking of polyfills for missing browser features.
  * Polyfills provide JavaScript implementations of features that browsers don't support natively.
  */
@@ -8,12 +8,19 @@
 import { logger } from '@client/utils/logger';
 
 import { FeatureDetector } from './feature-detector';
-import type { FetchOptions, FetchResponse, IntersectionObserverEntry, IntersectionObserverOptions, PolyfillStatus, StoragePolyfill } from './types';
+import type {
+  FetchOptions,
+  FetchResponse,
+  IntersectionObserverEntry,
+  IntersectionObserverOptions,
+  PolyfillStatus,
+  StoragePolyfill,
+} from './types';
 
 /**
  * Manages the loading and tracking of polyfills for missing browser features.
  * Polyfills provide JavaScript implementations of features that browsers don't support natively.
- * 
+ *
  * This manager ensures that polyfills are only loaded when needed and only loaded once,
  * preventing duplicate work and potential conflicts.
  */
@@ -57,10 +64,10 @@ export class PolyfillManager {
 
     // If the feature is natively supported, skip the polyfill
     if (checkFunction()) {
-      this.loadedPolyfills.set(feature, { 
-        loaded: true, 
+      this.loadedPolyfills.set(feature, {
+        loaded: true,
         feature,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
       return;
     }
@@ -68,7 +75,7 @@ export class PolyfillManager {
     // Load the polyfill and track the promise to prevent duplicate loads
     const promise = this.loadPolyfill(feature, polyfillFunction);
     this.loadingPromises.set(feature, promise);
-    
+
     try {
       await promise;
     } finally {
@@ -86,24 +93,28 @@ export class PolyfillManager {
   ): Promise<void> {
     try {
       await polyfillFunction();
-      
-      this.loadedPolyfills.set(feature, { 
-        loaded: true, 
+
+      this.loadedPolyfills.set(feature, {
+        loaded: true,
         feature,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       logger.info(`Polyfill loaded: ${feature}`, { component: 'PolyfillManager' });
     } catch (error) {
       const polyfillError = error as Error;
-      this.loadedPolyfills.set(feature, { 
-        loaded: false, 
-        error: polyfillError, 
+      this.loadedPolyfills.set(feature, {
+        loaded: false,
+        error: polyfillError,
         feature,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
-      logger.error(`Failed to load polyfill: ${feature}`, { component: 'PolyfillManager' }, polyfillError);
+
+      logger.error(
+        `Failed to load polyfill: ${feature}`,
+        { component: 'PolyfillManager' },
+        polyfillError
+      );
       throw polyfillError;
     }
   }
@@ -121,20 +132,23 @@ export class PolyfillManager {
         if (typeof fetch !== 'undefined') return;
 
         // Create a basic fetch implementation using XMLHttpRequest
-        (window as unknown as Record<string, unknown>).fetch = function(url: string, options: FetchOptions = {}): Promise<FetchResponse> {
+        (window as unknown as Record<string, unknown>).fetch = function (
+          url: string,
+          options: FetchOptions = {}
+        ): Promise<FetchResponse> {
           return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             const method = options.method || 'GET';
-            
+
             xhr.open(method, url);
-            
+
             // Apply any custom headers from the options
             if (options.headers) {
               Object.keys(options.headers).forEach(key => {
                 xhr.setRequestHeader(key, options.headers![key]);
               });
             }
-            
+
             // When the request completes, build a Response-like object
             xhr.onload = () => {
               const response = {
@@ -147,21 +161,22 @@ export class PolyfillManager {
                 json: () => Promise.resolve(JSON.parse(xhr.responseText)),
                 blob: () => Promise.resolve(new Blob([xhr.response])),
                 arrayBuffer: () => Promise.resolve(xhr.response),
-                clone: function() {
+                clone: function () {
                   return Object.assign({}, this);
                 },
-                formData: () => Promise.reject(new Error('formData() method not implemented in fetch polyfill'))
+                formData: () =>
+                  Promise.reject(new Error('formData() method not implemented in fetch polyfill')),
               };
               resolve(response);
             };
-            
+
             xhr.onerror = () => reject(new Error('Network request failed'));
             xhr.ontimeout = () => reject(new Error('Network request timed out'));
-            
+
             if (options.timeout) {
               xhr.timeout = options.timeout;
             }
-            
+
             xhr.send(options.body || null);
           });
         };
@@ -193,11 +208,13 @@ export class PolyfillManager {
             reject: (reason: unknown) => void;
           }> = [];
 
-          constructor(executor: (resolve: (value: unknown) => void, reject: (reason: unknown) => void) => void) {
+          constructor(
+            executor: (resolve: (value: unknown) => void, reject: (reason: unknown) => void) => void
+          ) {
             try {
               executor(
-                (value) => this.resolve(value as T),
-                (reason) => this.reject(reason)
+                value => this.resolve(value as T),
+                reason => this.reject(reason)
               );
             } catch (error) {
               this.reject(error);
@@ -261,13 +278,16 @@ export class PolyfillManager {
             }, 0);
           }
 
-          then<U>(onFulfilled?: (value: T) => U, onRejected?: (reason: unknown) => U): SimplePromise<U> {
+          then<U>(
+            onFulfilled?: (value: T) => U,
+            onRejected?: (reason: unknown) => U
+          ): SimplePromise<U> {
             return new SimplePromise<U>((resolve, reject) => {
               this.handle({
                 onFulfilled,
                 onRejected,
                 resolve,
-                reject
+                reject,
               });
             });
           }
@@ -295,16 +315,13 @@ export class PolyfillManager {
               let completed = 0;
 
               promises.forEach((promise, index) => {
-                promise.then(
-                  (value) => {
-                    results[index] = value;
-                    completed++;
-                    if (completed === promises.length) {
-                      resolve(results);
-                    }
-                  },
-                  reject
-                );
+                promise.then(value => {
+                  results[index] = value;
+                  completed++;
+                  if (completed === promises.length) {
+                    resolve(results);
+                  }
+                }, reject);
               });
             });
           }
@@ -329,7 +346,10 @@ export class PolyfillManager {
           private callback: (entries: IntersectionObserverEntry[]) => void;
           private elements: Set<Element> = new Set();
 
-          constructor(callback: (entries: IntersectionObserverEntry[]) => void, _options: IntersectionObserverOptions = {}) {
+          constructor(
+            callback: (entries: IntersectionObserverEntry[]) => void,
+            _options: IntersectionObserverOptions = {}
+          ) {
             this.callback = callback;
           }
 
@@ -367,28 +387,48 @@ export class PolyfillManager {
                 height: intersectionHeight,
                 x: elementLeft,
                 y: elementTop,
-                toJSON: () => ({ left: elementLeft, top: elementTop, right: elementRight, bottom: elementBottom, width: intersectionWidth, height: intersectionHeight, x: elementLeft, y: elementTop })
+                toJSON: () => ({
+                  left: elementLeft,
+                  top: elementTop,
+                  right: elementRight,
+                  bottom: elementBottom,
+                  width: intersectionWidth,
+                  height: intersectionHeight,
+                  x: elementLeft,
+                  y: elementTop,
+                }),
               };
 
-              this.callback([{
-                target: element,
-                isIntersecting,
-                intersectionRatio,
-                boundingClientRect: rect,
-                rootBounds: {
-                  left: 0,
-                  top: 0,
-                  right: viewportWidth,
-                  bottom: viewportHeight,
-                  width: viewportWidth,
-                  height: viewportHeight,
-                  x: 0,
-                  y: 0,
-                  toJSON: () => ({ left: 0, top: 0, right: viewportWidth, bottom: viewportHeight, width: viewportWidth, height: viewportHeight, x: 0, y: 0 })
+              this.callback([
+                {
+                  target: element,
+                  isIntersecting,
+                  intersectionRatio,
+                  boundingClientRect: rect,
+                  rootBounds: {
+                    left: 0,
+                    top: 0,
+                    right: viewportWidth,
+                    bottom: viewportHeight,
+                    width: viewportWidth,
+                    height: viewportHeight,
+                    x: 0,
+                    y: 0,
+                    toJSON: () => ({
+                      left: 0,
+                      top: 0,
+                      right: viewportWidth,
+                      bottom: viewportHeight,
+                      width: viewportWidth,
+                      height: viewportHeight,
+                      x: 0,
+                      y: 0,
+                    }),
+                  },
+                  intersectionRect,
+                  time: Date.now(),
                 },
-                intersectionRect,
-                time: Date.now()
-              }]);
+              ]);
             }, 0);
           }
 
@@ -409,7 +449,7 @@ export class PolyfillManager {
    */
   async loadStoragePolyfills(): Promise<void> {
     const featureDetector = FeatureDetector.getInstance();
-    
+
     await this.loadPolyfillIfNeeded(
       'localStorage',
       () => featureDetector.detectLocalStorageSupport(),
@@ -419,11 +459,19 @@ export class PolyfillManager {
         const storage: { [key: string]: string } = {};
         const localStoragePolyfill: StoragePolyfill = {
           getItem: (key: string) => storage[key] || null,
-          setItem: (key: string, value: string) => { storage[key] = String(value); },
-          removeItem: (key: string) => { delete storage[key]; },
-          clear: () => { Object.keys(storage).forEach(key => delete storage[key]); },
+          setItem: (key: string, value: string) => {
+            storage[key] = String(value);
+          },
+          removeItem: (key: string) => {
+            delete storage[key];
+          },
+          clear: () => {
+            Object.keys(storage).forEach(key => delete storage[key]);
+          },
           key: (index: number) => Object.keys(storage)[index] || null,
-          get length() { return Object.keys(storage).length; }
+          get length() {
+            return Object.keys(storage).length;
+          },
         };
         (window as unknown as Record<string, unknown>).localStorage = localStoragePolyfill;
       }
@@ -438,11 +486,19 @@ export class PolyfillManager {
         const storage: { [key: string]: string } = {};
         const sessionStoragePolyfill: StoragePolyfill = {
           getItem: (key: string) => storage[key] || null,
-          setItem: (key: string, value: string) => { storage[key] = String(value); },
-          removeItem: (key: string) => { delete storage[key]; },
-          clear: () => { Object.keys(storage).forEach(key => delete storage[key]); },
+          setItem: (key: string, value: string) => {
+            storage[key] = String(value);
+          },
+          removeItem: (key: string) => {
+            delete storage[key];
+          },
+          clear: () => {
+            Object.keys(storage).forEach(key => delete storage[key]);
+          },
           key: (index: number) => Object.keys(storage)[index] || null,
-          get length() { return Object.keys(storage).length; }
+          get length() {
+            return Object.keys(storage).length;
+          },
         };
         (window as unknown as Record<string, unknown>).sessionStorage = sessionStoragePolyfill;
       }
@@ -482,9 +538,7 @@ export class PolyfillManager {
               const lastSize = this.lastSizes.get(element);
 
               // Check if size actually changed
-              if (!lastSize || 
-                  lastSize.width !== rect.width || 
-                  lastSize.height !== rect.height) {
+              if (!lastSize || lastSize.width !== rect.width || lastSize.height !== rect.height) {
                 hasChanges = true;
                 this.lastSizes.set(element, rect);
 
@@ -493,7 +547,7 @@ export class PolyfillManager {
                   contentRect: rect,
                   borderBoxSize: [{ blockSize: rect.height, inlineSize: rect.width }],
                   contentBoxSize: [{ blockSize: rect.height, inlineSize: rect.width }],
-                  devicePixelContentBoxSize: [{ blockSize: rect.height, inlineSize: rect.width }]
+                  devicePixelContentBoxSize: [{ blockSize: rect.height, inlineSize: rect.width }],
                 } as ResizeObserverEntry);
               }
             });
@@ -566,19 +620,18 @@ export class PolyfillManager {
 
         // Normalize requestFullscreen on Element prototype
         if (!docElement.requestFullscreen) {
-          Element.prototype.requestFullscreen = function(this: Element) {
+          Element.prototype.requestFullscreen = function (this: Element) {
             const element = this as HTMLElement & {
               requestFullscreen?: () => Promise<void>;
               webkitRequestFullscreen?: () => Promise<void>;
               mozRequestFullScreen?: () => Promise<void>;
               msRequestFullscreen?: () => Promise<void>;
             };
-            const request = (
+            const request =
               element.requestFullscreen ||
               element.webkitRequestFullscreen ||
               element.mozRequestFullScreen ||
-              element.msRequestFullscreen
-            );
+              element.msRequestFullscreen;
 
             if (request) {
               return request.call(element);
@@ -589,7 +642,7 @@ export class PolyfillManager {
 
         // Normalize fullscreenElement getter
         Object.defineProperty(document, 'fullscreenElement', {
-          get: function() {
+          get: function () {
             const docWithVendor = document as Document & {
               webkitFullscreenElement?: Element | null;
               mozFullScreenElement?: Element | null;
@@ -603,7 +656,7 @@ export class PolyfillManager {
               null
             );
           },
-          configurable: true
+          configurable: true,
         });
 
         // Normalize fullscreenchange event
@@ -665,7 +718,7 @@ export class PolyfillManager {
 
           readText: (): Promise<string> => {
             return Promise.reject(new Error('Reading clipboard not supported in this browser'));
-          }
+          },
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -686,7 +739,7 @@ export class PolyfillManager {
         this.loadResizeObserverPolyfill(),
         this.loadStoragePolyfills(),
         this.loadFullscreenPolyfill(),
-        this.loadClipboardPolyfill()
+        this.loadClipboardPolyfill(),
       ]);
 
       logger.info('All polyfills loaded successfully', { component: 'PolyfillManager' });

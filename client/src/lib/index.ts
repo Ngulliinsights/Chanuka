@@ -1,21 +1,21 @@
 /**
  * DEPRECATED - This directory has been migrated
- * 
+ *
  * All files have been moved to: client/src/shared/lib/
- * 
+ *
  * Update your imports:
  * OLD: import { cn } from '@client/lib/utils';
  * NEW: import { cn } from '@client/shared/lib/utils';
  *  OR:  import { cn } from '@client/shared/lib';
- * 
+ *
  * This file provides backward compatibility during migration.
  * Remove this after all imports have been updated.
- * 
+ *
  * Timeline:
  * - Phase 1 (NOW): Both old and new locations work
  * - Phase 2 (1 week): Emit warnings on old imports
  * - Phase 3 (2 weeks): Remove deprecated exports
- * 
+ *
  * @deprecated Use @client/shared/lib instead
  */
 
@@ -37,29 +37,22 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // For backwards compatibility during migration
-export { 
-  useFormBuilder, 
-  withFormBuilder, 
-  createFormBuilder 
-} from '../lib/form-builder';
+export { useFormBuilder, withFormBuilder, createFormBuilder } from '../lib/form-builder';
 
 export { default as ProtectedRoute } from '../lib/protected-route';
 
-export { 
-  queryClient, 
-  queryKeys, 
+export {
+  queryClient,
+  queryKeys,
   invalidateQueries,
   prefetchQueries,
   cacheUtils,
   configureOfflineSupport,
   setupGlobalErrorHandler,
-  devUtils
+  devUtils,
 } from '../shared/lib/react-query-config';
 
-export { 
-  apiRequest, 
-  getQueryFn 
-} from '../lib/queryClient';
+export { apiRequest, getQueryFn } from '../lib/queryClient';
 
 export {
   validationPatterns,

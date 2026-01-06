@@ -1,5 +1,5 @@
-import type { ObservabilityMetrics, TelemetryData, BaseObservabilityConfig } from './common-types';
 import type { BaseObservabilityInterface, BaseTelemetryInterface, BaseMetricsInterface } from './base-interfaces';
+import type { ObservabilityMetrics, TelemetryData, BaseObservabilityConfig } from './common-types';
 
 // Forward declarations to resolve circular dependencies
 declare module './types' {
@@ -18,6 +18,7 @@ declare module './types' {
  */
 
 import { Result } from '../primitives/types';
+
 import { BaseError } from './error-management';
 
 // ==================== Core Observability Types ====================

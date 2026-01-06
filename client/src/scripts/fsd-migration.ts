@@ -1,6 +1,6 @@
 /**
  * Feature-Sliced Design (FSD) Migration Script
- * 
+ *
  * Automates the reorganization of components according to FSD principles.
  * This script analyzes component usage and moves them to appropriate locations.
  */
@@ -24,31 +24,31 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     source: 'components/ui/button.tsx',
     destination: 'shared/design-system/primitives/Button.tsx',
     category: 'design-system',
-    reason: 'Primitive UI component used across all features'
+    reason: 'Primitive UI component used across all features',
   },
   {
     source: 'components/ui/input.tsx',
     destination: 'shared/design-system/primitives/Input.tsx',
     category: 'design-system',
-    reason: 'Primitive UI component used across all features'
+    reason: 'Primitive UI component used across all features',
   },
   {
     source: 'components/ui/card.tsx',
     destination: 'shared/design-system/primitives/Card.tsx',
     category: 'design-system',
-    reason: 'Primitive UI component used across all features'
+    reason: 'Primitive UI component used across all features',
   },
   {
     source: 'components/ui/badge.tsx',
     destination: 'shared/design-system/primitives/Badge.tsx',
     category: 'design-system',
-    reason: 'Primitive UI component used across all features'
+    reason: 'Primitive UI component used across all features',
   },
   {
     source: 'components/ui/alert.tsx',
     destination: 'shared/design-system/feedback/Alert.tsx',
     category: 'design-system',
-    reason: 'Primitive feedback component used across all features'
+    reason: 'Primitive feedback component used across all features',
   },
 
   // Shared UI Components (Cross-Feature)
@@ -56,31 +56,31 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     source: 'components/layout/app-layout.tsx',
     destination: 'shared/ui/layout/Layout.tsx',
     category: 'shared-ui',
-    reason: 'Layout component used across multiple features'
+    reason: 'Layout component used across multiple features',
   },
   {
     source: 'components/navigation/ProgressiveDisclosureNavigation.tsx',
     destination: 'shared/ui/navigation/Navigation.tsx',
     category: 'shared-ui',
-    reason: 'Navigation component used across multiple features'
+    reason: 'Navigation component used across multiple features',
   },
   {
     source: 'components/loading/LoadingStates.tsx',
     destination: 'shared/ui/loading/LoadingSpinner.tsx',
     category: 'shared-ui',
-    reason: 'Loading component used across multiple features'
+    reason: 'Loading component used across multiple features',
   },
   {
     source: 'components/error-handling/ErrorBoundary.tsx',
     destination: 'shared/ui/error/ErrorBoundary.tsx',
     category: 'shared-ui',
-    reason: 'Error boundary used across multiple features'
+    reason: 'Error boundary used across multiple features',
   },
   {
     source: 'components/mobile/MobileNavigation.tsx',
     destination: 'shared/ui/mobile/MobileDrawer.tsx',
     category: 'shared-ui',
-    reason: 'Mobile navigation used across multiple features'
+    reason: 'Mobile navigation used across multiple features',
   },
 
   // Bills Feature Components
@@ -89,35 +89,35 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     destination: 'features/bills/ui/detail/BillHeader.tsx',
     category: 'feature-specific',
     feature: 'bills',
-    reason: 'Bill-specific component used only in bills feature'
+    reason: 'Bill-specific component used only in bills feature',
   },
   {
     source: 'components/bill-detail/BillOverviewTab.tsx',
     destination: 'features/bills/ui/detail/BillOverview.tsx',
     category: 'feature-specific',
     feature: 'bills',
-    reason: 'Bill-specific component used only in bills feature'
+    reason: 'Bill-specific component used only in bills feature',
   },
   {
     source: 'components/bill-detail/BillAnalysisTab.tsx',
     destination: 'features/bills/ui/analysis/BillAnalysis.tsx',
     category: 'feature-specific',
     feature: 'bills',
-    reason: 'Bill-specific component used only in bills feature'
+    reason: 'Bill-specific component used only in bills feature',
   },
   {
     source: 'components/bill-detail/ConstitutionalAnalysisPanel.tsx',
     destination: 'features/bills/ui/analysis/ConstitutionalAnalysis.tsx',
     category: 'feature-specific',
     feature: 'bills',
-    reason: 'Bill-specific component used only in bills feature'
+    reason: 'Bill-specific component used only in bills feature',
   },
   {
     source: 'components/bill-tracking/real-time-tracker.tsx',
     destination: 'features/bills/ui/tracking/BillTracking.tsx',
     category: 'feature-specific',
     feature: 'bills',
-    reason: 'Bill-specific component used only in bills feature'
+    reason: 'Bill-specific component used only in bills feature',
   },
 
   // Community Feature Components
@@ -126,21 +126,21 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     destination: 'features/community/ui/hub/CommunityHub.tsx',
     category: 'feature-specific',
     feature: 'community',
-    reason: 'Community-specific component used only in community feature'
+    reason: 'Community-specific component used only in community feature',
   },
   {
     source: 'components/discussion/DiscussionThread.tsx',
     destination: 'features/community/ui/discussion/DiscussionThread.tsx',
     category: 'feature-specific',
     feature: 'community',
-    reason: 'Community-specific component used only in community feature'
+    reason: 'Community-specific component used only in community feature',
   },
   {
     source: 'components/discussion/CommentForm.tsx',
     destination: 'features/community/ui/discussion/CommentForm.tsx',
     category: 'feature-specific',
     feature: 'community',
-    reason: 'Community-specific component used only in community feature'
+    reason: 'Community-specific component used only in community feature',
   },
 
   // Search Feature Components
@@ -149,7 +149,7 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     destination: 'features/search/ui/interface/AdvancedSearch.tsx',
     category: 'feature-specific',
     feature: 'search',
-    reason: 'Search-specific component used only in search feature'
+    reason: 'Search-specific component used only in search feature',
   },
 
   // Auth/Users Feature Components
@@ -158,21 +158,21 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     destination: 'features/users/ui/auth/AuthGuard.tsx',
     category: 'feature-specific',
     feature: 'users',
-    reason: 'Auth-specific component used only in users feature'
+    reason: 'Auth-specific component used only in users feature',
   },
   {
     source: 'components/auth/TwoFactorSetup.tsx',
     destination: 'features/users/ui/auth/TwoFactorSetup.tsx',
     category: 'feature-specific',
     feature: 'users',
-    reason: 'Auth-specific component used only in users feature'
+    reason: 'Auth-specific component used only in users feature',
   },
   {
     source: 'components/user/UserProfileSection.tsx',
     destination: 'features/users/ui/profile/UserProfile.tsx',
     category: 'feature-specific',
     feature: 'users',
-    reason: 'User-specific component used only in users feature'
+    reason: 'User-specific component used only in users feature',
   },
 
   // Analytics Feature Components
@@ -181,7 +181,7 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
     destination: 'features/analytics/ui/dashboard/EngagementDashboard.tsx',
     category: 'feature-specific',
     feature: 'analytics',
-    reason: 'Analytics-specific component used only in analytics feature'
+    reason: 'Analytics-specific component used only in analytics feature',
   },
 ];
 
@@ -240,13 +240,7 @@ const FSD_ESLINT_RULES = {
   'import/order': [
     'error',
     {
-      groups: [
-        'builtin',
-        'external',
-        'internal',
-        ['parent', 'sibling'],
-        'index',
-      ],
+      groups: ['builtin', 'external', 'internal', ['parent', 'sibling'], 'index'],
       pathGroups: [
         {
           pattern: '@client/shared/**',
@@ -282,7 +276,7 @@ export function generateMigrationReport(): {
   const summary = COMPONENT_MAPPINGS.reduce(
     (acc, mapping) => {
       acc.totalComponents++;
-      
+
       switch (mapping.category) {
         case 'design-system':
           acc.designSystemComponents++;
@@ -297,7 +291,7 @@ export function generateMigrationReport(): {
           }
           break;
       }
-      
+
       return acc;
     },
     {
@@ -389,10 +383,10 @@ client/src/
   `;
 
   const guidelines = [
-    'Components used by a single feature should live in that feature\'s ui/ directory',
+    "Components used by a single feature should live in that feature's ui/ directory",
     'Components used by multiple features should be promoted to shared/ui/',
     'Primitive UI components (buttons, inputs) belong in shared/design-system/',
-    'Features cannot import from other features\' ui/ directories',
+    "Features cannot import from other features' ui/ directories",
     'All imports should go through feature index files for clean APIs',
     'Use ESLint rules to enforce FSD boundaries automatically',
   ];
@@ -434,14 +428,14 @@ import { userService } from '@client/features/users/api';
 export async function executeFSDMigration(): Promise<void> {
   logger.info('Starting Feature-Sliced Design migration', {
     component: 'FSDMigration',
-    totalMappings: COMPONENT_MAPPINGS.length
+    totalMappings: COMPONENT_MAPPINGS.length,
   });
 
   const report = generateMigrationReport();
-  
+
   logger.info('Migration report generated', {
     component: 'FSDMigration',
-    summary: report.summary
+    summary: report.summary,
   });
 
   // Log migration plan
@@ -452,7 +446,7 @@ export async function executeFSDMigration(): Promise<void> {
       destination: mapping.destination,
       category: mapping.category,
       feature: mapping.feature,
-      reason: mapping.reason
+      reason: mapping.reason,
     });
   });
 
@@ -462,7 +456,7 @@ export async function executeFSDMigration(): Promise<void> {
     component: 'FSDMigration',
     isCompliant: compliance.isCompliant,
     score: compliance.score,
-    violations: compliance.violations.length
+    violations: compliance.violations.length,
   });
 
   // Generate documentation
@@ -470,7 +464,7 @@ export async function executeFSDMigration(): Promise<void> {
   logger.info('FSD documentation generated', {
     component: 'FSDMigration',
     guidelines: docs.guidelines.length,
-    examples: Object.keys(docs.examples).length
+    examples: Object.keys(docs.examples).length,
   });
 
   logger.info('FSD migration analysis complete', {
@@ -480,8 +474,8 @@ export async function executeFSDMigration(): Promise<void> {
       'Execute component moves',
       'Update import statements',
       'Add ESLint rules',
-      'Test all features'
-    ]
+      'Test all features',
+    ],
   });
 }
 

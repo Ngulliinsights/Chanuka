@@ -1,21 +1,20 @@
 /**
  * Navigation Utilities - Consolidated Helper Functions
- * 
+ *
  * Enhanced with functionality from utils/navigation.ts for comprehensive
  * navigation management with validation, access control, and search capabilities.
  */
 
-import { NavigationItem, BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from './types';
 import { logger } from '../../utils/logger';
+
+import { NavigationItem, BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from './types';
 
 /**
  * Generate breadcrumbs from a path
  */
 export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
   const segments = path.split('/').filter(Boolean);
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', path: '/', is_active: path === '/' }
-  ];
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: path === '/' }];
 
   let currentPath = '';
   segments.forEach((segment, index) => {
@@ -24,7 +23,7 @@ export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
     breadcrumbs.push({
       label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
       path: currentPath,
-      is_active: isLast
+      is_active: isLast,
     });
   });
 
@@ -47,7 +46,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'legislative',
         type: 'parent',
         weight: 1.0,
-        relevanceScore: 0.9
+        relevanceScore: 0.9,
       },
       {
         pageId: 'bills-analysis',
@@ -57,7 +56,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'legislative',
         type: 'child',
         weight: 0.8,
-        relevanceScore: 0.8
+        relevanceScore: 0.8,
       }
     );
   }
@@ -72,7 +71,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'community',
         type: 'related',
         weight: 0.9,
-        relevanceScore: 0.85
+        relevanceScore: 0.85,
       },
       {
         pageId: 'expert-verification',
@@ -82,39 +81,35 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'community',
         type: 'related',
         weight: 0.7,
-        relevanceScore: 0.75
+        relevanceScore: 0.75,
       }
     );
   }
 
   if (user_role !== 'public') {
-    relatedPages.push(
-      {
-        pageId: 'dashboard',
-        title: 'Dashboard',
-        path: '/dashboard',
-        description: 'Your personal dashboard',
-        category: 'user',
-        type: 'related',
-        weight: 0.95,
-        relevanceScore: 0.9
-      }
-    );
+    relatedPages.push({
+      pageId: 'dashboard',
+      title: 'Dashboard',
+      path: '/dashboard',
+      description: 'Your personal dashboard',
+      category: 'user',
+      type: 'related',
+      weight: 0.95,
+      relevanceScore: 0.9,
+    });
   }
 
   if (user_role === 'admin') {
-    relatedPages.push(
-      {
-        pageId: 'admin-panel',
-        title: 'Admin Panel',
-        path: '/admin',
-        description: 'System administration',
-        category: 'admin',
-        type: 'related',
-        weight: 1.0,
-        relevanceScore: 0.95
-      }
-    );
+    relatedPages.push({
+      pageId: 'admin-panel',
+      title: 'Admin Panel',
+      path: '/admin',
+      description: 'System administration',
+      category: 'admin',
+      type: 'related',
+      weight: 1.0,
+      relevanceScore: 0.95,
+    });
   }
 
   return relatedPages;
@@ -144,18 +139,18 @@ export function determineNavigationSection(path: string): NavigationSection {
  */
 export function isNavigationPathActive(path: string, currentPath: string): boolean {
   if (path === currentPath) return true;
-  
+
   // Handle exact matches first
   if (path === '/' && currentPath === '/') return true;
   if (path === '/' && currentPath !== '/') return false;
-  
+
   // Handle nested paths
   if (currentPath.startsWith(path + '/')) return true;
-  
+
   // Handle query parameters and fragments
   const currentPathBase = currentPath.split('?')[0]?.split('#')[0] || currentPath;
   const pathBase = path.split('?')[0]?.split('#')[0] || path;
-  
+
   return currentPathBase === pathBase || currentPathBase.startsWith(pathBase + '/');
 }
 
@@ -167,7 +162,7 @@ export function normalizePath(path: string): string {
   if (path !== '/' && path.endsWith('/')) {
     path = path.slice(0, -1);
   }
-  
+
   // Remove query parameters and fragments for comparison
   return path.split('?')[0].split('#')[0];
 }
@@ -178,10 +173,10 @@ export function normalizePath(path: string): string {
 export function extractPageTitle(path: string): string {
   const segments = path.split('/').filter(Boolean);
   if (segments.length === 0) return 'Home';
-  
+
   const lastSegment = segments[segments.length - 1];
   if (!lastSegment) return 'Home';
-  
+
   return lastSegment
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -204,13 +199,13 @@ export function requiresRole(path: string, requiredRole: UserRole): boolean {
     '/admin': ['admin'],
     '/expert-verification': ['expert', 'admin'],
   };
-  
+
   for (const [pathPrefix, roles] of Object.entries(roleBasedPaths)) {
     if (path.startsWith(pathPrefix)) {
       return roles.includes(requiredRole);
     }
   }
-  
+
   return true; // Allow access by default
 }
 
@@ -223,20 +218,20 @@ export function getNavigationMenuItems(user_role: UserRole) {
     { label: 'Bills', path: '/bills', icon: 'document' },
     { label: 'Community', path: '/community', icon: 'users' },
   ];
-  
+
   if (user_role !== 'public') {
     baseItems.push({ label: 'Dashboard', path: '/dashboard', icon: 'dashboard' });
     baseItems.push({ label: 'Profile', path: '/profile', icon: 'user' });
   }
-  
+
   if (user_role === 'expert' || user_role === 'admin') {
     baseItems.push({ label: 'Expert Verification', path: '/expert-verification', icon: 'shield' });
   }
-  
+
   if (user_role === 'admin') {
     baseItems.push({ label: 'Admin', path: '/admin', icon: 'settings' });
   }
-  
+
   return baseItems;
 }
 
@@ -330,7 +325,7 @@ export function hasRouteAccess(
       } catch (error) {
         logger.warn('Error evaluating navigation item condition', {
           itemId: item.id,
-          error
+          error,
         });
         return false;
       }
@@ -520,7 +515,7 @@ export function trackNavigationEvent(
     logger.info('Navigation event', {
       event,
       ...data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Here you could integrate with analytics services
@@ -551,7 +546,7 @@ export function getNavigationPreferences(): {
   return {
     sidebarCollapsed: false,
     recentPages: [],
-    favoritePages: []
+    favoritePages: [],
   };
 }
 
@@ -571,4 +566,3 @@ export function saveNavigationPreferences(preferences: {
     logger.error('Failed to save navigation preferences', { error, preferences });
   }
 }
-

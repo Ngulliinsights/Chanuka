@@ -1,6 +1,6 @@
 /**
  * Community Data Integration Demo Script
- * 
+ *
  * Demonstrates the community data integration functionality without
  * requiring a full build. This script shows how the various components
  * work together to provide real-time community features.
@@ -55,7 +55,6 @@ class CommunityIntegrationDemo {
 
       // Step 5: Run demo scenarios
       await this.runDemoScenarios();
-
     } catch (error) {
       console.error('❌ Failed to initialize community data integration:', error);
       throw error;
@@ -185,7 +184,6 @@ class CommunityIntegrationDemo {
         },
         timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       console.error('   ❌ Discussion participation demo failed:', error);
     }
@@ -219,7 +217,8 @@ class CommunityIntegrationDemo {
           billId: this.demoData.billId,
           expertId: 'expert-user-123',
           title: 'Constitutional Analysis of Healthcare Reform',
-          content: 'This bill raises important constitutional questions regarding federal vs state authority...',
+          content:
+            'This bill raises important constitutional questions regarding federal vs state authority...',
           category: 'constitutional',
           severity: 'high',
           tags: ['constitutional', 'healthcare', 'federalism'],
@@ -230,7 +229,6 @@ class CommunityIntegrationDemo {
       });
 
       console.log('   ✓ Simulated expert verification and insight');
-
     } catch (error) {
       console.error('   ❌ Expert insights demo failed:', error);
     }
@@ -250,19 +248,21 @@ class CommunityIntegrationDemo {
       console.log(`   ✓ Initial unread notifications: ${initialCount}`);
 
       // Simulate community notification
-      window.dispatchEvent(new CustomEvent('communityNotification', {
-        detail: {
-          type: 'expert_response',
-          title: 'Expert Response to Your Comment',
-          message: 'Dr. Smith has responded to your comment on Healthcare Reform',
-          data: {
-            billId: this.demoData.billId,
-            commentId: 'demo-comment-123',
-            expertId: 'expert-user-123',
+      window.dispatchEvent(
+        new CustomEvent('communityNotification', {
+          detail: {
+            type: 'expert_response',
+            title: 'Expert Response to Your Comment',
+            message: 'Dr. Smith has responded to your comment on Healthcare Reform',
+            data: {
+              billId: this.demoData.billId,
+              commentId: 'demo-comment-123',
+              expertId: 'expert-user-123',
+            },
+            timestamp: new Date().toISOString(),
           },
-          timestamp: new Date().toISOString(),
-        },
-      }));
+        })
+      );
 
       console.log('   ✓ Simulated community notification');
 
@@ -272,7 +272,6 @@ class CommunityIntegrationDemo {
       // Check updated notification count
       const updatedCount = notificationService.getUnreadCount();
       console.log(`   ✓ Updated unread notifications: ${updatedCount}`);
-
     } catch (error) {
       console.error('   ❌ Notifications demo failed:', error);
     }
@@ -313,7 +312,6 @@ class CommunityIntegrationDemo {
       });
 
       console.log('   ✓ Simulated community analytics updates');
-
     } catch (error) {
       console.error('   ❌ Community analytics demo failed:', error);
     }
@@ -332,7 +330,9 @@ class CommunityIntegrationDemo {
    * Simulate expert verification update
    */
   private simulateExpertVerificationUpdate(data: any): void {
-    window.dispatchEvent(new CustomEvent('community:expert_verification_updated', { detail: data }));
+    window.dispatchEvent(
+      new CustomEvent('community:expert_verification_updated', { detail: data })
+    );
   }
 
   /**
@@ -390,10 +390,10 @@ export { CommunityIntegrationDemo };
 // Auto-run demo if this file is executed directly
 if (typeof window !== 'undefined') {
   const demo = new CommunityIntegrationDemo();
-  
+
   // Add to global scope for manual testing
   (window as any).communityDemo = demo;
-  
+
   console.log('🎯 Community Integration Demo loaded!');
   console.log('💡 Run "communityDemo.initialize()" to start the demo');
   console.log('📊 Run "communityDemo.getStatus()" to check status');

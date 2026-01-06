@@ -1,6 +1,6 @@
 /**
  * Search Feature - Public API
- * 
+ *
  * Provides access to search functionality including:
  * - Intelligent dual-engine search service
  * - Core API client for direct endpoint access
@@ -27,40 +27,3 @@ export * from './hooks/useIntelligentSearch';
 
 // For backward compatibility
 export { searchApiClient as searchApi } from '@client/core/api/search';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

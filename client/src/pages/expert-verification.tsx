@@ -3,16 +3,8 @@
  * Displays expert verification system and analysis
  */
 
+import { Shield, Users, CheckCircle, Clock, Star, Award, FileText } from 'lucide-react';
 import React from 'react';
-import {
-  Shield,
-  Users,
-  CheckCircle,
-  Clock,
-  Star,
-  Award,
-  FileText
-} from 'lucide-react';
 import { useState } from 'react';
 
 import { ExpertBadge } from '@client/features/users/ui/verification/ExpertBadge';
@@ -21,7 +13,13 @@ import { ExpertProfileCard } from '@client/features/users/ui/verification/Expert
 import { ExpertVerificationDemo } from '@client/features/users/ui/verification/ExpertVerificationDemo';
 import { VerificationWorkflow } from '@client/features/users/ui/verification/VerificationWorkflow';
 import { Badge } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 export default function ExpertVerification() {
@@ -32,7 +30,7 @@ export default function ExpertVerification() {
     totalExperts: 127,
     pendingApplications: 23,
     verifiedAnalyses: 1847,
-    averageCredibilityScore: 87.3
+    averageCredibilityScore: 87.3,
   };
 
   const featuredExperts = [
@@ -45,7 +43,7 @@ export default function ExpertVerification() {
       specializations: ['Constitutional Law', 'Human Rights'],
       verificationType: 'official' as const,
       affiliationType: 'academic' as const,
-      recentAnalyses: 12
+      recentAnalyses: 12,
     },
     {
       id: 2,
@@ -56,7 +54,7 @@ export default function ExpertVerification() {
       specializations: ['Public Policy', 'Economic Analysis'],
       verificationType: 'domain' as const,
       affiliationType: 'government' as const,
-      recentAnalyses: 8
+      recentAnalyses: 8,
     },
     {
       id: 3,
@@ -67,8 +65,8 @@ export default function ExpertVerification() {
       specializations: ['Judicial Review', 'Constitutional Interpretation'],
       verificationType: 'official' as const,
       affiliationType: 'judicial' as const,
-      recentAnalyses: 15
-    }
+      recentAnalyses: 15,
+    },
   ];
 
   return (
@@ -110,7 +108,9 @@ export default function ExpertVerification() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending Applications</p>
-                <p className="text-2xl font-bold text-gray-900">{verificationStats.pendingApplications}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {verificationStats.pendingApplications}
+                </p>
               </div>
               <Clock className="w-8 h-8 text-orange-500" />
             </div>
@@ -122,7 +122,9 @@ export default function ExpertVerification() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Verified Analyses</p>
-                <p className="text-2xl font-bold text-gray-900">{verificationStats.verifiedAnalyses.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {verificationStats.verifiedAnalyses.toLocaleString()}
+                </p>
               </div>
               <FileText className="w-8 h-8 text-green-500" />
             </div>
@@ -134,7 +136,9 @@ export default function ExpertVerification() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Avg. Credibility</p>
-                <p className="text-2xl font-bold text-gray-900">{verificationStats.averageCredibilityScore}%</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {verificationStats.averageCredibilityScore}%
+                </p>
               </div>
               <Star className="w-8 h-8 text-purple-500" />
             </div>
@@ -166,7 +170,9 @@ export default function ExpertVerification() {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
                   <div>
                     <h4 className="font-medium">Academic Credentials</h4>
-                    <p className="text-sm text-gray-600">Advanced degrees from recognized institutions</p>
+                    <p className="text-sm text-gray-600">
+                      Advanced degrees from recognized institutions
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -239,7 +245,7 @@ export default function ExpertVerification() {
 
         <TabsContent value="experts" className="space-y-6">
           <div className="grid gap-6">
-            {featuredExperts.map((expert) => (
+            {featuredExperts.map(expert => (
               <ExpertProfileCard
                 key={expert.id}
                 expert={{
@@ -254,8 +260,8 @@ export default function ExpertVerification() {
                       title: 'PhD in Constitutional Law',
                       institution: expert.institution,
                       year: 2010,
-                      verified: true
-                    }
+                      verified: true,
+                    },
                   ],
                   affiliations: [
                     {
@@ -264,8 +270,8 @@ export default function ExpertVerification() {
                       organization: expert.institution,
                       role: expert.title,
                       startDate: '2015-01-01',
-                      verified: true
-                    }
+                      verified: true,
+                    },
                   ],
                   specializations: expert.specializations,
                   verificationType: expert.verificationType,
@@ -274,10 +280,10 @@ export default function ExpertVerification() {
                   bio: `Experienced ${expert.title.toLowerCase()} with extensive background in ${expert.specializations.join(' and ')}.`,
                   contactInfo: {
                     email: `${expert.name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-                    website: `https://example.com/experts/${expert.id}`
+                    website: `https://example.com/experts/${expert.id}`,
                   },
                   verificationDate: new Date().toISOString(),
-                  lastActive: new Date().toISOString()
+                  lastActive: new Date().toISOString(),
                 }}
                 showFullProfile={false}
                 onViewProfile={() => window.open(`/experts/${expert.id}`, '_blank')}
@@ -293,9 +299,7 @@ export default function ExpertVerification() {
                 <Users className="w-5 h-5" />
                 Expert Consensus Analysis
               </CardTitle>
-              <CardDescription>
-                How experts reach consensus on legislative analysis
-              </CardDescription>
+              <CardDescription>How experts reach consensus on legislative analysis</CardDescription>
             </CardHeader>
             <CardContent>
               <ExpertConsensus
@@ -311,21 +315,21 @@ export default function ExpertVerification() {
                       stance: 'support',
                       count: 7,
                       percentage: 78,
-                      reasoning: 'Aligns with constitutional healthcare provisions'
+                      reasoning: 'Aligns with constitutional healthcare provisions',
                     },
                     {
                       stance: 'oppose',
                       count: 2,
                       percentage: 22,
-                      reasoning: 'Potential conflicts with existing legislation'
-                    }
+                      reasoning: 'Potential conflicts with existing legislation',
+                    },
                   ],
                   keyPoints: [
                     'Constitutional compliance verified',
                     'Budget allocation concerns raised',
-                    'Implementation timeline feasible'
+                    'Implementation timeline feasible',
                   ],
-                  lastUpdated: new Date().toISOString()
+                  lastUpdated: new Date().toISOString(),
                 }}
                 showDetails={true}
                 onViewDetails={() => console.log('View consensus details')}
@@ -352,11 +356,11 @@ export default function ExpertVerification() {
                       userId: 'user-123',
                       feedback: 'Dr. Smith has excellent credentials and published work',
                       vote: 'approve' as const,
-                      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-                    }
+                      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                    },
                   ],
                   createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-                  updatedAt: new Date().toISOString()
+                  updatedAt: new Date().toISOString(),
                 }}
                 onReview={async (workflowId, status, notes) => {
                   console.log('Review action:', workflowId, status, notes);
@@ -375,7 +379,9 @@ export default function ExpertVerification() {
           <Card>
             <CardHeader>
               <CardTitle>Live Expert Verification Demo</CardTitle>
-              <CardDescription>Interactive demonstration of the expert verification system</CardDescription>
+              <CardDescription>
+                Interactive demonstration of the expert verification system
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ExpertVerificationDemo />
@@ -386,4 +392,3 @@ export default function ExpertVerification() {
     </div>
   );
 }
-

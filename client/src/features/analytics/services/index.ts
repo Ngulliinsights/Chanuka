@@ -1,6 +1,6 @@
 /**
  * Analytics Feature Services
- * 
+ *
  * Business logic services for analytics-related operations.
  * Integrated from client/src/services/ following FSD principles.
  */
@@ -9,7 +9,4 @@
 export { analysisService } from './analysis';
 
 // Export types
-export type {
-  BillAnalysis,
-  ConflictAnalysisResult
-} from './analysis';
+export type { BillAnalysis, ConflictAnalysisResult } from './analysis';

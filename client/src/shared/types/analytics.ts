@@ -1,6 +1,6 @@
 /**
  * Shared Analytics Types
- * 
+ *
  * These types are used across both core and features to avoid circular dependencies.
  * Moved from features/analytics/types to enable core API integration.
  */

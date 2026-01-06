@@ -3,12 +3,13 @@
  * Accepts a mode prop to render different interfaces
  */
 
+import React from 'react';
+
 import { PrivacySettings } from '@/core/auth';
 
 import { CompactInterface } from './CompactInterface';
 import { FullInterface } from './FullInterface';
 import { ModalInterface } from './ModalInterface';
-import React from 'react';
 
 export type PrivacyMode = 'full' | 'modal' | 'compact';
 
@@ -31,7 +32,7 @@ export function PrivacyManager({
   open = false,
   onOpenChange,
   onOpenFullSettings,
-  className = ''
+  className = '',
 }: PrivacyManagerProps) {
   switch (mode) {
     case 'full':

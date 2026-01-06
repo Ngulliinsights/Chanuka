@@ -1,24 +1,30 @@
-import React from 'react';
 import {
-  Database, 
-  Activity, 
-  HardDrive, 
-  Users, 
-  FileText, 
-  RefreshCw, 
-  Download, 
+  Database,
+  Activity,
+  HardDrive,
+  Users,
+  FileText,
+  RefreshCw,
+  Download,
   AlertTriangle,
   CheckCircle,
   Clock,
   Trash,
-  Settings
+  Settings,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
@@ -55,7 +61,7 @@ export default function DatabaseManager() {
 
   const loadDashboardData = async () => {
     setLoading(true);
-    
+
     // Mock data - in real app, this would come from API
     const mockStats: DatabaseStats = {
       totalRecords: 1247893,
@@ -66,7 +72,7 @@ export default function DatabaseManager() {
       storageUsed: 2.4,
       storageTotal: 10,
       lastBackup: '2024-01-20T02:00:00Z',
-      uptime: '15 days, 8 hours'
+      uptime: '15 days, 8 hours',
     };
 
     const mockHealth: SystemHealth = {
@@ -75,12 +81,12 @@ export default function DatabaseManager() {
       memory: 67,
       disk: 24,
       connections: 45,
-      maxConnections: 100
+      maxConnections: 100,
     };
 
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     setStats(mockStats);
     setHealth(mockHealth);
     setLoading(false);
@@ -94,19 +100,27 @@ export default function DatabaseManager() {
 
   const getHealthColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600';
-      case 'warning': return 'text-yellow-600';
-      case 'critical': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'healthy':
+        return 'text-green-600';
+      case 'warning':
+        return 'text-yellow-600';
+      case 'critical':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const getHealthIcon = (status: string) => {
     switch (status) {
-      case 'healthy': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'critical': return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      default: return <Clock className="h-5 w-5 text-gray-600" />;
+      case 'healthy':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      case 'critical':
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
+      default:
+        return <Clock className="h-5 w-5 text-gray-600" />;
     }
   };
 
@@ -139,9 +153,13 @@ export default function DatabaseManager() {
 
       {/* System Health Alert */}
       {health && health.status !== 'healthy' && (
-        <Alert className={`mb-6 ${
-          health.status === 'warning' ? 'border-yellow-200 bg-yellow-50' : 'border-red-200 bg-red-50'
-        }`}>
+        <Alert
+          className={`mb-6 ${
+            health.status === 'warning'
+              ? 'border-yellow-200 bg-yellow-50'
+              : 'border-red-200 bg-red-50'
+          }`}
+        >
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             Database system is showing {health.status} status. Please review system metrics below.
@@ -182,7 +200,9 @@ export default function DatabaseManager() {
               {health && getHealthIcon(health.status)}
               <div>
                 <p className="text-sm font-medium text-muted-foreground">System Status</p>
-                <p className={`text-lg font-bold capitalize ${health && getHealthColor(health.status)}`}>
+                <p
+                  className={`text-lg font-bold capitalize ${health && getHealthColor(health.status)}`}
+                >
                   {health?.status}
                 </p>
               </div>
@@ -230,7 +250,7 @@ export default function DatabaseManager() {
                     </div>
                     <span className="font-medium">{stats?.bills.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Users className="h-4 w-4 text-green-600" />
@@ -238,7 +258,7 @@ export default function DatabaseManager() {
                     </div>
                     <span className="font-medium">{stats?.users.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Database className="h-4 w-4 text-purple-600" />
@@ -246,7 +266,7 @@ export default function DatabaseManager() {
                     </div>
                     <span className="font-medium">{stats?.comments.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Activity className="h-4 w-4 text-orange-600" />
@@ -273,12 +293,12 @@ export default function DatabaseManager() {
                         {stats?.storageUsed}GB / {stats?.storageTotal}GB
                       </span>
                     </div>
-                    <Progress 
-                      value={stats ? (stats.storageUsed / stats.storageTotal) * 100 : 0} 
+                    <Progress
+                      value={stats ? (stats.storageUsed / stats.storageTotal) * 100 : 0}
                       className="h-2"
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-muted-foreground">Available</p>
@@ -348,12 +368,12 @@ export default function DatabaseManager() {
                     </div>
                     <p className="text-sm text-muted-foreground">Active Connections</p>
                   </div>
-                  
-                  <Progress 
-                    value={health ? (health.connections / health.maxConnections) * 100 : 0} 
+
+                  <Progress
+                    value={health ? (health.connections / health.maxConnections) * 100 : 0}
                     className="h-2"
                   />
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-center text-sm">
                     <div>
                       <p className="text-muted-foreground">Available</p>
@@ -364,7 +384,10 @@ export default function DatabaseManager() {
                     <div>
                       <p className="text-muted-foreground">Utilization</p>
                       <p className="font-bold">
-                        {health ? ((health.connections / health.maxConnections) * 100).toFixed(1) : 0}%
+                        {health
+                          ? ((health.connections / health.maxConnections) * 100).toFixed(1)
+                          : 0}
+                        %
                       </p>
                     </div>
                   </div>
@@ -401,7 +424,7 @@ export default function DatabaseManager() {
                     <Download className="h-4 w-4 mr-2" />
                     Create Manual Backup
                   </Button>
-                  
+
                   <Button variant="outline" className="w-full">
                     <Download className="h-4 w-4 mr-2" />
                     Restore from Backup
@@ -422,17 +445,17 @@ export default function DatabaseManager() {
                     <span className="text-sm">Daily Backup</span>
                     <Badge variant="default">Enabled</Badge>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Weekly Full Backup</span>
                     <Badge variant="default">Enabled</Badge>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Retention Period</span>
                     <span className="text-sm text-muted-foreground">30 days</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Storage Location</span>
                     <span className="text-sm text-muted-foreground">Cloud Storage</span>
@@ -457,17 +480,17 @@ export default function DatabaseManager() {
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Optimize Tables
                   </Button>
-                  
+
                   <Button variant="outline" className="w-full justify-start">
                     <Database className="h-4 w-4 mr-2" />
                     Rebuild Indexes
                   </Button>
-                  
+
                   <Button variant="outline" className="w-full justify-start">
                     <Trash className="h-4 w-4 mr-2" />
                     Clean Temporary Data
                   </Button>
-                  
+
                   <Button variant="outline" className="w-full justify-start">
                     <Activity className="h-4 w-4 mr-2" />
                     Update Statistics
@@ -488,17 +511,17 @@ export default function DatabaseManager() {
                     <CheckCircle className="h-4 w-4 text-green-600" />
                     <span>Backup completed successfully</span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 p-2 bg-blue-50 rounded">
                     <Database className="h-4 w-4 text-blue-600" />
                     <span>Index optimization completed</span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 p-2 bg-yellow-50 rounded">
                     <AlertTriangle className="h-4 w-4 text-yellow-600" />
                     <span>High connection usage detected</span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
                     <Clock className="h-4 w-4 text-gray-600" />
                     <span>Scheduled maintenance in 2 days</span>
@@ -520,10 +543,11 @@ export default function DatabaseManager() {
                 <Alert>
                   <Settings className="h-4 w-4" />
                   <AlertDescription>
-                    Database configuration changes require administrator privileges and may require system restart.
+                    Database configuration changes require administrator privileges and may require
+                    system restart.
                   </AlertDescription>
                 </Alert>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold">Connection Settings</h4>
@@ -542,7 +566,7 @@ export default function DatabaseManager() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h4 className="font-semibold">Performance Settings</h4>
                     <div className="space-y-2 text-sm">
@@ -569,4 +593,3 @@ export default function DatabaseManager() {
     </div>
   );
 }
-

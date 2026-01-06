@@ -6,8 +6,8 @@
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
 import { Button } from '@/shared/design-system/interactive/Button';
+import { cn } from '@/shared/design-system/utils/cn';
 
 export interface AuthButtonProps {
   type?: 'button' | 'submit' | 'reset';
@@ -20,70 +20,71 @@ export interface AuthButtonProps {
   onClick?: () => void;
 }
 
-export const AuthButton = React.memo<AuthButtonProps>(({
-  type = 'button',
-  variant = 'primary',
-  size = 'md',
-  loading = false,
-  disabled = false,
-  className,
-  children,
-  onClick,
-}) => {
-  const variantClasses = {
-    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-    outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-  };
+export const AuthButton = React.memo<AuthButtonProps>(
+  ({
+    type = 'button',
+    variant = 'primary',
+    size = 'md',
+    loading = false,
+    disabled = false,
+    className,
+    children,
+    onClick,
+  }) => {
+    const variantClasses = {
+      primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+      outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+    };
 
-  const sizeClasses = {
-    sm: 'h-8 px-3 text-xs',
-    md: 'h-10 px-4 py-2',
-    lg: 'h-11 px-8',
-  };
+    const sizeClasses = {
+      sm: 'h-8 px-3 text-xs',
+      md: 'h-10 px-4 py-2',
+      lg: 'h-11 px-8',
+    };
 
-  return (
-    <Button
-      type={type}
-      className={cn(
-        'inline-flex items-center justify-center rounded-md font-medium transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
-      disabled={disabled || loading}
-      onClick={onClick}
-    >
-      {loading && (
-        <Loader2 className={cn(
-          'animate-spin',
-          size === 'sm' ? 'mr-1 h-3 w-3' : 'mr-2 h-4 w-4'
-        )} />
-      )}
-      {children}
-    </Button>
-  );
-});
+    return (
+      <Button
+        type={type}
+        className={cn(
+          'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:pointer-events-none disabled:opacity-50',
+          variantClasses[variant],
+          sizeClasses[size],
+          className
+        )}
+        disabled={disabled || loading}
+        onClick={onClick}
+      >
+        {loading && (
+          <Loader2
+            className={cn('animate-spin', size === 'sm' ? 'mr-1 h-3 w-3' : 'mr-2 h-4 w-4')}
+          />
+        )}
+        {children}
+      </Button>
+    );
+  }
+);
 
 AuthButton.displayName = 'AuthButton';
 
 // Specialized button components
-export const SubmitButton = React.memo<Omit<AuthButtonProps, 'type'> & {
-  mode: 'login' | 'register';
-}>(({ mode, loading, children, ...props }) => (
-  <AuthButton
-    {...props}
-    type="submit"
-    variant="primary"
-    loading={loading}
-    className="w-full"
-  >
-    {children || (loading
-      ? (mode === 'login' ? 'Signing in...' : 'Creating account...')
-      : (mode === 'login' ? 'Sign In' : 'Create Account')
-    )}
+export const SubmitButton = React.memo<
+  Omit<AuthButtonProps, 'type'> & {
+    mode: 'login' | 'register';
+  }
+>(({ mode, loading, children, ...props }) => (
+  <AuthButton {...props} type="submit" variant="primary" loading={loading} className="w-full">
+    {children ||
+      (loading
+        ? mode === 'login'
+          ? 'Signing in...'
+          : 'Creating account...'
+        : mode === 'login'
+          ? 'Sign In'
+          : 'Create Account')}
   </AuthButton>
 ));
 
@@ -133,4 +134,3 @@ export const RetryButton = React.memo<{
 ));
 
 RetryButton.displayName = 'RetryButton';
-

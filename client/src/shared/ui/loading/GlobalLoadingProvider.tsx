@@ -17,7 +17,7 @@ import {
   selectActiveOperationsCount,
   selectShouldShowGlobalLoader,
   type LoadingStateData,
-  type ExtendedLoadingOperation
+  type ExtendedLoadingOperation,
 } from '@/shared/infrastructure/store/slices/loadingSlice';
 import { LoadingOperation, LoadingPriority } from '@/shared/ui/loading/types';
 
@@ -66,7 +66,9 @@ interface GlobalLoadingContextValue {
   activeOperationsCount: number;
 
   // Actions
-  startOperation: (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>) => Promise<string>;
+  startOperation: (
+    operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>
+  ) => Promise<string>;
   completeOperation: (id: string, success?: boolean, error?: string) => Promise<void>;
 
   // Selectors
@@ -130,13 +132,18 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   const dispatch = useDispatch();
 
   // Select loading state from Redux store
-  const extendedOperations = useSelector((state: { loading: LoadingStateData }) => state.loading.operations);
+  const extendedOperations = useSelector(
+    (state: { loading: LoadingStateData }) => state.loading.operations
+  );
   const isOnline = useSelector((state: { loading: LoadingStateData }) => state.loading.isOnline);
   const shouldShowGlobalLoader = useSelector(selectShouldShowGlobalLoader);
   const activeOperationsCount = useSelector(selectActiveOperationsCount);
 
   // Convert extended operations to standard operations for component compatibility
-  const operations = useMemo(() => convertOperationsRecord(extendedOperations), [extendedOperations]);
+  const operations = useMemo(
+    () => convertOperationsRecord(extendedOperations),
+    [extendedOperations]
+  );
 
   // Action creators
   const startOperation = useCallback(
@@ -160,7 +167,10 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   // Selectors
   const getOperation = useCallback(
     (id: string): LoadingOperation | undefined => {
-      const extended = selectLoadingOperation({ loading: { operations: extendedOperations, isOnline } as LoadingStateData }, id);
+      const extended = selectLoadingOperation(
+        { loading: { operations: extendedOperations, isOnline } as LoadingStateData },
+        id
+      );
       return extended ? convertToLoadingOperation(extended) : undefined;
     },
     [extendedOperations, isOnline]
@@ -168,7 +178,10 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
 
   const getOperationsByPriority = useCallback(
     (priority: LoadingPriority): LoadingOperation[] => {
-      const extended = selectOperationsByPriority({ loading: { operations: extendedOperations, isOnline } as LoadingStateData }, priority);
+      const extended = selectOperationsByPriority(
+        { loading: { operations: extendedOperations, isOnline } as LoadingStateData },
+        priority
+      );
       return extended.map(convertToLoadingOperation);
     },
     [extendedOperations, isOnline]
@@ -199,9 +212,7 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   );
 
   return (
-    <GlobalLoadingContext.Provider value={contextValue}>
-      {children}
-    </GlobalLoadingContext.Provider>
+    <GlobalLoadingContext.Provider value={contextValue}>{children}</GlobalLoadingContext.Provider>
   );
 };
 

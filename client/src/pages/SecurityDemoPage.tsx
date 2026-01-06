@@ -3,15 +3,8 @@
  * Demonstrates the security system features
  */
 
+import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Activity } from 'lucide-react';
 import React from 'react';
-import {
-  Shield, 
-  AlertTriangle, 
-  CheckCircle, 
-  Lock,
-  Eye,
-  Activity
-} from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { SecurityDashboard } from '@client/features/security/ui/dashboard/SecurityDashboard';
@@ -20,18 +13,37 @@ import { getSecuritySystem } from '@client/security';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
 export default function SecurityDemoPage() {
   const [testInput, setTestInput] = useState('');
-  const [sanitizedResult, setSanitizedResult] = useState<{ sanitized?: string; error?: string; wasModified?: boolean; threats?: Array<{ severity: string; type: string; description: string }> } | null>(null);
+  const [sanitizedResult, setSanitizedResult] = useState<{
+    sanitized?: string;
+    error?: string;
+    wasModified?: boolean;
+    threats?: Array<{ severity: string; type: string; description: string }>;
+  } | null>(null);
   const [csrfToken, setCsrfToken] = useState<string>('');
   const [cspNonce, setCspNonce] = useState<string>('');
-  const [rateLimitStatus, setRateLimitStatus] = useState<{ currentRequests?: number; maxRequests?: number; windowMs?: number; blocked?: boolean; testResults?: { totalRequests: number; rateLimitedRequests: number } } | null>(null);
-  const [vulnerabilities, setVulnerabilities] = useState<Array<{ severity?: string; type?: string; description?: string }>>([]);
+  const [rateLimitStatus, setRateLimitStatus] = useState<{
+    currentRequests?: number;
+    maxRequests?: number;
+    windowMs?: number;
+    blocked?: boolean;
+    testResults?: { totalRequests: number; rateLimitedRequests: number };
+  } | null>(null);
+  const [vulnerabilities, setVulnerabilities] = useState<
+    Array<{ severity?: string; type?: string; description?: string }>
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -61,7 +73,6 @@ export default function SecurityDemoPage() {
       // Get vulnerabilities
       const vulnerabilityReports = securitySystem.vulnerabilityScanner.getVulnerabilities();
       setVulnerabilities(vulnerabilityReports);
-
     } catch (error) {
       logger.error('Failed to load security info', { component: 'SecurityDemoPage' }, error);
     }
@@ -77,7 +88,6 @@ export default function SecurityDemoPage() {
 
       const result = securitySystem.sanitizer.sanitizeHTML(testInput);
       setSanitizedResult(result);
-
     } catch (error) {
       logger.error('Failed to sanitize input', { component: 'SecurityDemoPage' }, error);
       setSanitizedResult({ error: 'Sanitization failed' });
@@ -88,17 +98,19 @@ export default function SecurityDemoPage() {
     setIsLoading(true);
     try {
       // Make multiple requests to test rate limiting
-      const requests = Array(5).fill(null).map((_, i) => 
-        fetch('/api/test-endpoint', { 
-          method: 'POST',
-          body: JSON.stringify({ test: `request-${i}` }),
-          headers: { 'Content-Type': 'application/json' }
-        }).catch(() => ({ status: 429, statusText: 'Rate Limited' }))
-      );
+      const requests = Array(5)
+        .fill(null)
+        .map((_, i) =>
+          fetch('/api/test-endpoint', {
+            method: 'POST',
+            body: JSON.stringify({ test: `request-${i}` }),
+            headers: { 'Content-Type': 'application/json' },
+          }).catch(() => ({ status: 429, statusText: 'Rate Limited' }))
+        );
 
       const responses = await Promise.all(requests);
       const rateLimitedCount = responses.filter(r => r.status === 429).length;
-      
+
       // Update rate limit status
       const securitySystem = getSecuritySystem();
       if (securitySystem) {
@@ -107,11 +119,10 @@ export default function SecurityDemoPage() {
           ...rateLimitInfo,
           testResults: {
             totalRequests: responses.length,
-            rateLimitedRequests: rateLimitedCount
-          }
+            rateLimitedRequests: rateLimitedCount,
+          },
         });
       }
-
     } catch (error) {
       logger.error('Rate limit test failed', { component: 'SecurityDemoPage' }, error);
     } finally {
@@ -143,20 +154,25 @@ export default function SecurityDemoPage() {
         source: 'SecurityDemoPage',
         details: {
           action: 'manual_test',
-          timestamp: new Date().toISOString()
-        }
-      }
+          timestamp: new Date().toISOString(),
+        },
+      },
     });
     document.dispatchEvent(event);
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low': return 'bg-blue-100 text-blue-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'low':
+        return 'bg-blue-100 text-blue-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'high':
+        return 'bg-orange-100 text-orange-800';
+      case 'critical':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -191,9 +207,7 @@ export default function SecurityDemoPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">Active</div>
-                <p className="text-xs text-muted-foreground">
-                  Content Security Policy enabled
-                </p>
+                <p className="text-xs text-muted-foreground">Content Security Policy enabled</p>
               </CardContent>
             </Card>
 
@@ -204,9 +218,7 @@ export default function SecurityDemoPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">Active</div>
-                <p className="text-xs text-muted-foreground">
-                  Token-based protection
-                </p>
+                <p className="text-xs text-muted-foreground">Token-based protection</p>
               </CardContent>
             </Card>
 
@@ -217,9 +229,7 @@ export default function SecurityDemoPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">Active</div>
-                <p className="text-xs text-muted-foreground">
-                  Request throttling enabled
-                </p>
+                <p className="text-xs text-muted-foreground">Request throttling enabled</p>
               </CardContent>
             </Card>
 
@@ -229,12 +239,8 @@ export default function SecurityDemoPage() {
                 <Eye className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600">
-                  {vulnerabilities.length}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Issues detected
-                </p>
+                <div className="text-2xl font-bold text-orange-600">{vulnerabilities.length}</div>
+                <p className="text-xs text-muted-foreground">Issues detected</p>
               </CardContent>
             </Card>
           </div>
@@ -242,9 +248,7 @@ export default function SecurityDemoPage() {
           <Card>
             <CardHeader>
               <CardTitle>Security Status</CardTitle>
-              <CardDescription>
-                Current security tokens and configuration
-              </CardDescription>
+              <CardDescription>Current security tokens and configuration</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -261,7 +265,7 @@ export default function SecurityDemoPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex space-x-2">
                 <Button onClick={loadSecurityInfo} variant="outline" size="sm">
                   <Activity className="h-4 w-4 mr-2" />
@@ -290,11 +294,11 @@ export default function SecurityDemoPage() {
                 <Textarea
                   placeholder="Enter HTML content to test (e.g., <script>alert('xss')</script><p>Safe content</p>)"
                   value={testInput}
-                  onChange={(e) => setTestInput(e.target.value)}
+                  onChange={e => setTestInput(e.target.value)}
                   className="mt-1"
                 />
               </div>
-              
+
               <Button onClick={testInputSanitization} disabled={!testInput}>
                 <Shield className="h-4 w-4 mr-2" />
                 Sanitize Input
@@ -326,9 +330,7 @@ export default function SecurityDemoPage() {
                                   </Badge>
                                   <span className="font-medium">{threat.type}</span>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {threat.description}
-                                </p>
+                                <p className="text-sm text-gray-600 mt-1">{threat.description}</p>
                               </div>
                             </AlertDescription>
                           </Alert>
@@ -352,9 +354,7 @@ export default function SecurityDemoPage() {
             <Card>
               <CardHeader>
                 <CardTitle>CSRF Protection</CardTitle>
-                <CardDescription>
-                  Cross-Site Request Forgery protection status
-                </CardDescription>
+                <CardDescription>Cross-Site Request Forgery protection status</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -366,7 +366,8 @@ export default function SecurityDemoPage() {
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
-                    CSRF protection is active. All forms and API requests are automatically protected.
+                    CSRF protection is active. All forms and API requests are automatically
+                    protected.
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -389,7 +390,8 @@ export default function SecurityDemoPage() {
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
-                    CSP is active with nonce-based script execution. Inline scripts are blocked unless they have the correct nonce.
+                    CSP is active with nonce-based script execution. Inline scripts are blocked
+                    unless they have the correct nonce.
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -399,9 +401,7 @@ export default function SecurityDemoPage() {
           <Card>
             <CardHeader>
               <CardTitle>Rate Limiting Test</CardTitle>
-              <CardDescription>
-                Test the request rate limiting system
-              </CardDescription>
+              <CardDescription>Test the request rate limiting system</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {rateLimitStatus && (
@@ -416,11 +416,15 @@ export default function SecurityDemoPage() {
                   </div>
                   <div>
                     <label className="font-medium">Window</label>
-                    <div className="text-lg font-bold">{Math.round((rateLimitStatus.windowMs || 0) / 1000)}s</div>
+                    <div className="text-lg font-bold">
+                      {Math.round((rateLimitStatus.windowMs || 0) / 1000)}s
+                    </div>
                   </div>
                   <div>
                     <label className="font-medium">Status</label>
-                    <div className={`text-lg font-bold ${rateLimitStatus.blocked ? 'text-red-600' : 'text-green-600'}`}>
+                    <div
+                      className={`text-lg font-bold ${rateLimitStatus.blocked ? 'text-red-600' : 'text-green-600'}`}
+                    >
                       {rateLimitStatus.blocked ? 'Blocked' : 'OK'}
                     </div>
                   </div>
@@ -436,7 +440,8 @@ export default function SecurityDemoPage() {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    Test completed: {rateLimitStatus.testResults.rateLimitedRequests} out of {rateLimitStatus.testResults.totalRequests} requests were rate limited.
+                    Test completed: {rateLimitStatus.testResults.rateLimitedRequests} out of{' '}
+                    {rateLimitStatus.testResults.totalRequests} requests were rate limited.
                   </AlertDescription>
                 </Alert>
               )}

@@ -9,10 +9,10 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 // Import individual fix modules
-const { removeUnusedImports } = require('./fix-unused-imports');
-const { fixLucideIcons } = require('./fix-lucide-icons');
 const { fixButtonVariants } = require('./fix-button-variants');
 const { fixComponentProps } = require('./fix-component-props');
+const { fixLucideIcons } = require('./fix-lucide-icons');
+const { removeUnusedImports } = require('./fix-unused-imports');
 
 /**
  * Run a command and handle errors

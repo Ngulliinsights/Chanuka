@@ -116,13 +116,25 @@ export const MobileMetricCard = ({
   </div>
 );
 
-export const MobileBarChart = ({ _data, ...props }: { _data?: unknown; [key: string]: unknown }) => (
+export const MobileBarChart = ({
+  _data,
+  ...props
+}: {
+  _data?: unknown;
+  [key: string]: unknown;
+}) => (
   <div className="mobile-bar-chart" {...props}>
     Bar Chart Placeholder
   </div>
 );
 
-export const MobilePieChart = ({ _data, ...props }: { _data?: unknown; [key: string]: unknown }) => (
+export const MobilePieChart = ({
+  _data,
+  ...props
+}: {
+  _data?: unknown;
+  [key: string]: unknown;
+}) => (
   <div className="mobile-pie-chart" {...props}>
     Pie Chart Placeholder
   </div>

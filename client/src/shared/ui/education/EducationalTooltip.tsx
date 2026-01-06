@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   HelpCircle,
   Info,
@@ -9,6 +8,7 @@ import {
   CheckCircle,
   ExternalLink,
 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import {
@@ -87,70 +87,70 @@ export function EducationalTooltip({
         <TooltipContent side={side}>
           <div className="max-w-sm p-0">
             <div className="p-4 space-y-3">
-            {/* Header */}
-            <div className="flex items-center gap-2">
-              {getContextIcon(context)}
-              <div>
-                <h4 className="font-semibold text-sm">{term}</h4>
-                <Badge variant="outline" className={`text-xs ${getContextColor(context)}`}>
-                  {context}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Definition */}
-            <p className="text-sm leading-relaxed">{definition}</p>
-
-            {/* Examples */}
-            {examples.length > 0 && (
-              <div>
-                <h5 className="font-medium text-xs mb-1 flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-green-600" />
-                  Examples
-                </h5>
-                <ul className="space-y-1">
-                  {examples.map((example, index) => (
-                    <li
-                      key={index}
-                      className="text-xs text-muted-foreground flex items-start gap-1"
-                    >
-                      <span className="w-1 h-1 rounded-full bg-muted-foreground mt-1.5 flex-shrink-0"></span>
-                      {example}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Related Terms */}
-            {relatedTerms.length > 0 && (
-              <div>
-                <h5 className="font-medium text-xs mb-1">Related Terms</h5>
-                <div className="flex flex-wrap gap-1">
-                  {relatedTerms.map((relatedTerm, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {relatedTerm}
-                    </Badge>
-                  ))}
+              {/* Header */}
+              <div className="flex items-center gap-2">
+                {getContextIcon(context)}
+                <div>
+                  <h4 className="font-semibold text-sm">{term}</h4>
+                  <Badge variant="outline" className={`text-xs ${getContextColor(context)}`}>
+                    {context}
+                  </Badge>
                 </div>
               </div>
-            )}
 
-            {/* Learn More */}
-            {learnMoreUrl && (
-              <div className="pt-2 border-t">
-                <a
-                  href={learnMoreUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                  Learn more
-                </a>
-              </div>
-            )}
-          </div>
+              {/* Definition */}
+              <p className="text-sm leading-relaxed">{definition}</p>
+
+              {/* Examples */}
+              {examples.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-xs mb-1 flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    Examples
+                  </h5>
+                  <ul className="space-y-1">
+                    {examples.map((example, index) => (
+                      <li
+                        key={index}
+                        className="text-xs text-muted-foreground flex items-start gap-1"
+                      >
+                        <span className="w-1 h-1 rounded-full bg-muted-foreground mt-1.5 flex-shrink-0"></span>
+                        {example}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Related Terms */}
+              {relatedTerms.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-xs mb-1">Related Terms</h5>
+                  <div className="flex flex-wrap gap-1">
+                    {relatedTerms.map((relatedTerm, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {relatedTerm}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Learn More */}
+              {learnMoreUrl && (
+                <div className="pt-2 border-t">
+                  <a
+                    href={learnMoreUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Learn more
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>

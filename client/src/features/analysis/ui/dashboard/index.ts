@@ -1,2 +1,2 @@
 export { AnalysisDashboard } from './AnalysisDashboard';
-export type { } from './AnalysisDashboard';
+export type {} from './AnalysisDashboard';

@@ -2,8 +2,8 @@
  * Kenya-specific Anonymity Helper
  * Implementation of the AnonymityService defined in shared/core
  */
-import type { UserProfile } from '../../../schema/foundation';
 import { AnonymityService, AnonymityLevel, DisplayIdentity, DataRetentionPolicy } from '../../../core/src/utils/anonymity-interface';
+import type { UserProfile } from '../../../schema/foundation';
 
 export function generateAnonymousId(): string {
   const prefix = 'Citizen_';

@@ -546,7 +546,7 @@ export const LowBandwidthComponents = {
  * Loading State & Skeleton Screens
  */
 export const LoadingStates = {
-  philosophy: 'Show content faster, don\'t wait for images',
+  philosophy: "Show content faster, don't wait for images",
 
   skeleton: {
     approach: 'Show text placeholders while loading',
@@ -567,7 +567,7 @@ export const LoadingStates = {
   timing: {
     show: '200ms after request starts',
     hide: 'When content renders',
-    note: 'Don\'t show for fast loads (< 200ms)',
+    note: "Don't show for fast loads (< 200ms)",
   },
 };
 
@@ -598,7 +598,7 @@ export const LowBandwidthTestingChecklist = {
 
   progressiveEnhancement: [
     '☐ JavaScript loads async, not blocking render',
-    '☐ JS errors don\'t break core functionality',
+    "☐ JS errors don't break core functionality",
     '☐ Page usable before JS loads',
     '☐ Enhanced features progressive, not required',
   ],

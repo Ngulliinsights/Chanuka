@@ -15,7 +15,7 @@ const DEFAULT_CONFIG: DashboardConfig = {
   maxTrackedTopics: 20,
   enableAutoRefresh: true,
   showCompletedActions: false,
-  defaultView: 'activity'
+  defaultView: 'activity',
 };
 
 const CONFIG_STORAGE_KEY = 'dashboard-config';
@@ -37,14 +37,20 @@ export interface UseDashboardConfigResult {
   };
 }
 
-export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): UseDashboardConfigResult {
+export function useDashboardConfig(
+  initialConfig?: Partial<DashboardConfig>
+): UseDashboardConfigResult {
   const [config, setConfig] = useState<DashboardConfig>(() => {
     // Try to load from localStorage first
     try {
       const savedConfig = localStorage.getItem(CONFIG_STORAGE_KEY);
       if (savedConfig) {
         const parsedConfig = JSON.parse(savedConfig);
-        const validation = safeValidateDashboardConfig({ ...DEFAULT_CONFIG, ...parsedConfig, ...initialConfig });
+        const validation = safeValidateDashboardConfig({
+          ...DEFAULT_CONFIG,
+          ...parsedConfig,
+          ...initialConfig,
+        });
         return validation.success ? validation.data : DEFAULT_CONFIG;
       }
     } catch (error) {
@@ -68,29 +74,32 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
     }
   }, [config]);
 
-  const updateConfig = useCallback(async (updates: Partial<DashboardConfig>) => {
-    setLoading(true);
-    setError(null);
+  const updateConfig = useCallback(
+    async (updates: Partial<DashboardConfig>) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const newConfig = { ...config, ...updates };
-      validateDashboardConfig(newConfig);
+      try {
+        const newConfig = { ...config, ...updates };
+        validateDashboardConfig(newConfig);
 
-      // TODO: Replace with actual API call to save config
-      await new Promise(resolve => setTimeout(resolve, 200));
+        // TODO: Replace with actual API call to save config
+        await new Promise(resolve => setTimeout(resolve, 200));
 
-      setConfig(newConfig);
-    } catch (configError: unknown) {
-      const error = new DashboardConfigurationError(
-        `Failed to update configuration: ${configError instanceof Error ? configError.message : 'Update failed'}`,
-        { updates, originalConfig: config }
-      );
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [config]);
+        setConfig(newConfig);
+      } catch (configError: unknown) {
+        const error = new DashboardConfigurationError(
+          `Failed to update configuration: ${configError instanceof Error ? configError.message : 'Update failed'}`,
+          { updates, originalConfig: config }
+        );
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [config]
+  );
 
   const resetConfig = useCallback(async () => {
     setLoading(true);
@@ -119,13 +128,19 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
     }
   }, []);
 
-  const setRefreshInterval = useCallback(async (interval: number) => {
-    await updateConfig({ refreshInterval: interval });
-  }, [updateConfig]);
+  const setRefreshInterval = useCallback(
+    async (interval: number) => {
+      await updateConfig({ refreshInterval: interval });
+    },
+    [updateConfig]
+  );
 
-  const setMaxItems = useCallback(async (maxActionItems: number, maxTrackedTopics: number) => {
-    await updateConfig({ maxActionItems, maxTrackedTopics });
-  }, [updateConfig]);
+  const setMaxItems = useCallback(
+    async (maxActionItems: number, maxTrackedTopics: number) => {
+      await updateConfig({ maxActionItems, maxTrackedTopics });
+    },
+    [updateConfig]
+  );
 
   const toggleAutoRefresh = useCallback(async () => {
     await updateConfig({ enableAutoRefresh: !config.enableAutoRefresh });
@@ -135,9 +150,12 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
     await updateConfig({ showCompletedActions: !config.showCompletedActions });
   }, [config.showCompletedActions, updateConfig]);
 
-  const setDefaultView = useCallback(async (view: DashboardSection) => {
-    await updateConfig({ defaultView: view });
-  }, [updateConfig]);
+  const setDefaultView = useCallback(
+    async (view: DashboardSection) => {
+      await updateConfig({ defaultView: view });
+    },
+    [updateConfig]
+  );
 
   const exportConfig = useCallback((): string => {
     return JSON.stringify(config, null, 2);
@@ -180,8 +198,7 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       toggleCompletedActions,
       setDefaultView,
       exportConfig,
-      importConfig
-    }
+      importConfig,
+    },
   };
 }
-

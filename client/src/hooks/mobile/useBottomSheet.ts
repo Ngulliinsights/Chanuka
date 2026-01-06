@@ -80,11 +80,14 @@ export function useBottomSheet(options: UseBottomSheetOptions = {}): UseBottomSh
     }
   }, [isOpen, onClose, onOpen]);
 
-  const snapTo = useCallback((index: number) => {
-    if (index >= 0 && index < snapPoints.length) {
-      setCurrentSnap(index);
-    }
-  }, [snapPoints.length]);
+  const snapTo = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < snapPoints.length) {
+        setCurrentSnap(index);
+      }
+    },
+    [snapPoints.length]
+  );
 
   return {
     isOpen,

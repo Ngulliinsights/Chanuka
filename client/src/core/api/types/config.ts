@@ -1,6 +1,6 @@
 /**
  * Configuration Types
- * 
+ *
  * Type definitions for service configuration and settings
  */
 
@@ -139,8 +139,6 @@ export interface ClientInterceptors {
 
 export type RequestInterceptor = (
   config: RequestInit & { url: string }
-) => RequestInit & { url: string } | Promise<RequestInit & { url: string }>;
+) => (RequestInit & { url: string }) | Promise<RequestInit & { url: string }>;
 
-export type ResponseInterceptor = (
-  response: Response
-) => Response | Promise<Response>;
+export type ResponseInterceptor = (response: Response) => Response | Promise<Response>;

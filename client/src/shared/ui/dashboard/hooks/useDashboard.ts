@@ -3,28 +3,28 @@
  * Following navigation component hook patterns
  */
 
-import { useBills } from '@/features/bills';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import {
   DashboardError,
   DashboardDataFetchError,
   DashboardActionError,
-  DashboardTopicError
+  DashboardTopicError,
 } from '@/core/error';
 import { getRecoveryStrategy, executeRecovery } from '@/core/recovery';
 import {
   validateDashboardData,
   validateActionItem,
   validateTrackedTopic,
-  safeValidateDashboardConfig
+  safeValidateDashboardConfig,
 } from '@/core/validation';
+import { useBills } from '@/features/bills';
 import type {
   DashboardData,
   DashboardConfig,
   UseDashboardResult,
   ActionItem,
-  TrackedTopic
+  TrackedTopic,
 } from '@/shared/types';
 
 const DEFAULT_CONFIG: DashboardConfig = {
@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: DashboardConfig = {
   maxTrackedTopics: 20,
   enableAutoRefresh: true,
   showCompletedActions: false,
-  defaultView: 'activity'
+  defaultView: 'activity',
 };
 
 export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardResult {
@@ -56,46 +56,66 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       setLastRefresh(new Date());
       setRetryCount(0);
     } catch (refreshError: unknown) {
-      const dashboardError = new DashboardDataFetchError('refresh', refreshError instanceof Error ? refreshError.message : 'Refresh failed');
+      const dashboardError = new DashboardDataFetchError(
+        'refresh',
+        refreshError instanceof Error ? refreshError.message : 'Refresh failed'
+      );
       setError(dashboardError);
       setRetryCount(prev => prev + 1);
     }
   }, [billsQuery]);
 
   // Transform bills data to dashboard data format
-  const dashboardData: DashboardData = useMemo(() => ({
-    summary: (billsQuery.data as any)?.summary || {
-      billsTracked: 0,
-      actionsNeeded: 0,
-      topicsCount: 0,
-      recentActivity: 0,
-      completedActions: 0,
-      pendingActions: 0,
-      lastUpdated: new Date()
-    },
-    actionItems: (billsQuery.data as any)?.actionItems as ActionItem[] || [],
-    trackedTopics: (billsQuery.data as any)?.trackedTopics as TrackedTopic[] || [],
-    isLoading: billsQuery.isLoading,
-    error: billsQuery.error,
-    lastRefresh
-  }), [billsQuery.data, billsQuery.isLoading, billsQuery.error, lastRefresh]);
+  const dashboardData: DashboardData = useMemo(
+    () => ({
+      summary: (billsQuery.data as any)?.summary || {
+        billsTracked: 0,
+        actionsNeeded: 0,
+        topicsCount: 0,
+        recentActivity: 0,
+        completedActions: 0,
+        pendingActions: 0,
+        lastUpdated: new Date(),
+      },
+      actionItems: ((billsQuery.data as any)?.actionItems as ActionItem[]) || [],
+      trackedTopics: ((billsQuery.data as any)?.trackedTopics as TrackedTopic[]) || [],
+      isLoading: billsQuery.isLoading,
+      error: billsQuery.error,
+      lastRefresh,
+    }),
+    [billsQuery.data, billsQuery.isLoading, billsQuery.error, lastRefresh]
+  );
 
   // Validate dashboard data
   useEffect(() => {
-    if (!billsQuery.isLoading && (dashboardData.summary || dashboardData.actionItems || dashboardData.trackedTopics)) {
+    if (
+      !billsQuery.isLoading &&
+      (dashboardData.summary || dashboardData.actionItems || dashboardData.trackedTopics)
+    ) {
       try {
         validateDashboardData(dashboardData);
         setError(null);
         setRetryCount(0);
         setLastRefresh(new Date());
       } catch (validationError: unknown) {
-        const dashboardError = validationError instanceof DashboardError
-          ? validationError
-          : new DashboardDataFetchError('validation', validationError instanceof Error ? validationError.message : 'Validation failed');
+        const dashboardError =
+          validationError instanceof DashboardError
+            ? validationError
+            : new DashboardDataFetchError(
+                'validation',
+                validationError instanceof Error ? validationError.message : 'Validation failed'
+              );
         setError(dashboardError);
       }
     }
-  }, [billsQuery.data, billsQuery.isLoading, dashboardData.summary, dashboardData.actionItems, dashboardData.trackedTopics, dashboardData]);
+  }, [
+    billsQuery.data,
+    billsQuery.isLoading,
+    dashboardData.summary,
+    dashboardData.actionItems,
+    dashboardData.trackedTopics,
+    dashboardData,
+  ]);
 
   // Handle bills error
   useEffect(() => {
@@ -128,92 +148,122 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
     setLastRefresh(null);
   }, []);
 
-  const addTopic = useCallback(async (topic: Omit<TrackedTopic, 'id' | 'created_at'>) => {
-    try {
-      const newTopic: TrackedTopic = {
-        ...topic,
-        id: `topic-${Date.now()}`,
-        created_at: new Date()
-      };
+  const addTopic = useCallback(
+    async (topic: Omit<TrackedTopic, 'id' | 'created_at'>) => {
+      try {
+        const newTopic: TrackedTopic = {
+          ...topic,
+          id: `topic-${Date.now()}`,
+          created_at: new Date(),
+        };
 
-      validateTrackedTopic(newTopic);
+        validateTrackedTopic(newTopic);
 
-      // TODO: Implement actual API call to add topic
-      console.log('Adding topic:', newTopic);
+        // TODO: Implement actual API call to add topic
+        console.log('Adding topic:', newTopic);
 
-      await refresh();
-    } catch (topicError: unknown) {
-      const dashboardError = new DashboardTopicError('add', undefined, topicError instanceof Error ? topicError.message : 'Add topic failed');
-      setError(dashboardError);
-      throw dashboardError;
-    }
-  }, [refresh]);
+        await refresh();
+      } catch (topicError: unknown) {
+        const dashboardError = new DashboardTopicError(
+          'add',
+          undefined,
+          topicError instanceof Error ? topicError.message : 'Add topic failed'
+        );
+        setError(dashboardError);
+        throw dashboardError;
+      }
+    },
+    [refresh]
+  );
 
-  const removeTopic = useCallback(async (topicId: string) => {
-    try {
-      // TODO: Implement actual API call to remove topic
-      console.log('Removing topic:', topicId);
+  const removeTopic = useCallback(
+    async (topicId: string) => {
+      try {
+        // TODO: Implement actual API call to remove topic
+        console.log('Removing topic:', topicId);
 
-      await refresh();
-    } catch (topicError: unknown) {
-      const dashboardError = new DashboardTopicError('remove', topicId, topicError instanceof Error ? topicError.message : 'Remove topic failed');
-      setError(dashboardError);
-      throw dashboardError;
-    }
-  }, [refresh]);
+        await refresh();
+      } catch (topicError: unknown) {
+        const dashboardError = new DashboardTopicError(
+          'remove',
+          topicId,
+          topicError instanceof Error ? topicError.message : 'Remove topic failed'
+        );
+        setError(dashboardError);
+        throw dashboardError;
+      }
+    },
+    [refresh]
+  );
 
-  const completeAction = useCallback(async (actionId: string) => {
-    try {
-      // TODO: Implement actual API call to complete action
-      console.log('Completing action:', actionId);
+  const completeAction = useCallback(
+    async (actionId: string) => {
+      try {
+        // TODO: Implement actual API call to complete action
+        console.log('Completing action:', actionId);
 
-      await refresh();
-    } catch (actionError: unknown) {
-      const dashboardError = new DashboardActionError('complete', actionError instanceof Error ? actionError.message : 'Complete action failed');
-      setError(dashboardError);
-      throw dashboardError;
-    }
-  }, [refresh]);
+        await refresh();
+      } catch (actionError: unknown) {
+        const dashboardError = new DashboardActionError(
+          'complete',
+          actionError instanceof Error ? actionError.message : 'Complete action failed'
+        );
+        setError(dashboardError);
+        throw dashboardError;
+      }
+    },
+    [refresh]
+  );
 
-  const addAction = useCallback(async (action: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      const newAction: ActionItem = {
-        ...action,
-        id: `action-${Date.now()}`,
-        created_at: new Date(),
-        updated_at: new Date()
-      };
+  const addAction = useCallback(
+    async (action: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
+      try {
+        const newAction: ActionItem = {
+          ...action,
+          id: `action-${Date.now()}`,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
 
-      validateActionItem(newAction);
+        validateActionItem(newAction);
 
-      // TODO: Implement actual API call to add action
-      console.log('Adding action:', newAction);
+        // TODO: Implement actual API call to add action
+        console.log('Adding action:', newAction);
 
-      await refresh();
-    } catch (actionError: unknown) {
-      const dashboardError = new DashboardActionError('add', actionError instanceof Error ? actionError.message : 'Add action failed');
-      setError(dashboardError);
-      throw dashboardError;
-    }
-  }, [refresh]);
+        await refresh();
+      } catch (actionError: unknown) {
+        const dashboardError = new DashboardActionError(
+          'add',
+          actionError instanceof Error ? actionError.message : 'Add action failed'
+        );
+        setError(dashboardError);
+        throw dashboardError;
+      }
+    },
+    [refresh]
+  );
 
   // Recovery functionality
   const recovery = {
-    canRecover: error ? getRecoveryStrategy({
-      error,
-      data: dashboardData,
-      config: dashboardConfig,
-      retryCount,
-      lastSuccessfulFetch: lastRefresh || undefined
-    }).canRecover : false,
+    canRecover: error
+      ? getRecoveryStrategy({
+          error,
+          data: dashboardData,
+          config: dashboardConfig,
+          retryCount,
+          lastSuccessfulFetch: lastRefresh || undefined,
+        }).canRecover
+      : false,
 
-    suggestions: error ? getRecoveryStrategy({
-      error,
-      data: dashboardData,
-      config: dashboardConfig,
-      retryCount,
-      lastSuccessfulFetch: lastRefresh || undefined
-    }).suggestions : [],
+    suggestions: error
+      ? getRecoveryStrategy({
+          error,
+          data: dashboardData,
+          config: dashboardConfig,
+          retryCount,
+          lastSuccessfulFetch: lastRefresh || undefined,
+        }).suggestions
+      : [],
 
     recover: async (): Promise<boolean> => {
       if (!error) return true;
@@ -223,7 +273,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
         data: dashboardData,
         config: dashboardConfig,
         retryCount,
-        lastSuccessfulFetch: lastRefresh || undefined
+        lastSuccessfulFetch: lastRefresh || undefined,
       });
 
       const recovered = await executeRecovery(strategy, {
@@ -231,7 +281,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
         data: dashboardData,
         config: dashboardConfig,
         retryCount,
-        lastSuccessfulFetch: lastRefresh || undefined
+        lastSuccessfulFetch: lastRefresh || undefined,
       });
 
       if (recovered) {
@@ -240,7 +290,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       }
 
       return false;
-    }
+    },
   };
 
   return {
@@ -253,9 +303,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       addTopic,
       removeTopic,
       completeAction,
-      addAction
+      addAction,
     },
-    recovery
+    recovery,
   };
 }
-

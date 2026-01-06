@@ -1,5 +1,4 @@
 import { lazy, LazyExoticComponent, ComponentType, useRef, useEffect } from 'react';
-import React from 'react';
 
 /**
  * Safe lazy loading utilities with error handling and retry logic
@@ -23,7 +22,7 @@ export function createSafeLazy<P extends Record<string, never> = Record<string, 
 
   return lazy(async () => {
     let lastError: Error | null = null;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await importFn();
@@ -35,7 +34,7 @@ export function createSafeLazy<P extends Record<string, never> = Record<string, 
         }
       }
     }
-    
+
     throw lastError;
   });
 }
@@ -57,11 +56,11 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
   return Object.entries(componentPaths).reduce(
     (batch, [componentName, importPath]) => {
       const importFn = () => import(/* @vite-ignore */ importPath);
-      
+
       batch[componentName as keyof T] = enableRetry
         ? createSafeLazy(importFn, retryOptions)
         : lazy(importFn);
-      
+
       return batch;
     },
     {} as Record<keyof T, LazyExoticComponent<ComponentType<Record<string, never>>>>
@@ -84,7 +83,7 @@ export function preloadLazyComponent<P extends object>(
 
     // Fallback: try to access internal payload
     const payload = (lazyComponent as { _payload?: unknown })._payload;
-    
+
     if (payload && typeof (payload as { _result?: unknown })._result === 'undefined') {
       return (payload as { _init: (p: unknown) => Promise<unknown> })._init(payload) as Promise<{
         default: ComponentType<P>;
@@ -116,7 +115,7 @@ export function usePreloadComponents(
 
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     return () => {
       isMountedRef.current = false;
     };
@@ -132,7 +131,7 @@ export function usePreloadComponents(
     const currentIds = components
       .map(c => (c as unknown as { $$typeof?: symbol }).$$typeof?.toString() || Math.random())
       .join(',');
-    
+
     if (currentIds !== componentIds) {
       return;
     }
@@ -150,7 +149,7 @@ export function usePreloadComponents(
 
       components.forEach(component => {
         if (signal.aborted || !isMountedRef.current) return;
-        
+
         preloadLazyComponent(component).catch(error => {
           if (process.env.NODE_ENV === 'development' && !signal.aborted) {
             console.warn('Failed to preload component:', error);
@@ -174,7 +173,7 @@ export function usePreloadComponents(
  */
 export function clearLazyLoadingCache(): void {
   componentLoadingState.clear();
-  
+
   // Clear any global caches if available
   if (process.env.NODE_ENV === 'development') {
     console.log('All lazy loading caches cleared');

@@ -1,9 +1,9 @@
 /**
  * Web Vitals Monitoring Module
- * 
+ *
  * Monitors Core Web Vitals and other performance metrics using browser APIs.
  * Automatically tracks LCP, FID, INP, CLS, FCP, and TTFB with proper attribution.
- * 
+ *
  * @module WebVitalsMonitor
  * @version 2.0.0
  */
@@ -35,7 +35,7 @@ interface PerformanceEntryWithInteraction extends PerformanceEventTiming {
 const DEFAULT_CONFIG: PerformanceConfig['webVitals'] = {
   enabled: true,
   reportingThreshold: 0.1,
-  sampleRate: 1.0
+  sampleRate: 1.0,
 };
 
 /**
@@ -48,7 +48,7 @@ const THRESHOLDS = {
   INP: { good: 200, poor: 500 },
   CLS: { good: 0.1, poor: 0.25 },
   FCP: { good: 1800, poor: 3000 },
-  TTFB: { good: 800, poor: 1800 }
+  TTFB: { good: 800, poor: 1800 },
 } as const;
 
 /**
@@ -56,16 +56,16 @@ const THRESHOLDS = {
  * Core Web Vitals (LCP, INP, CLS) receive equal weight
  */
 const METRIC_WEIGHTS = {
-  lcp: 0.30,
-  inp: 0.30,
-  cls: 0.30,
+  lcp: 0.3,
+  inp: 0.3,
+  cls: 0.3,
   fcp: 0.05,
-  ttfb: 0.05
+  ttfb: 0.05,
 } as const;
 
 /**
  * Web Vitals Monitor class for tracking Core Web Vitals
- * 
+ *
  * This singleton class provides comprehensive monitoring of web performance metrics
  * with automatic observer setup, metric collection, and configurable reporting.
  */
@@ -103,9 +103,9 @@ export class WebVitalsMonitor {
    * Checks if code is running in a browser environment with PerformanceObserver support
    */
   private isBrowserEnvironment(): boolean {
-    return typeof window !== 'undefined' && 
-           'PerformanceObserver' in window &&
-           'performance' in window;
+    return (
+      typeof window !== 'undefined' && 'PerformanceObserver' in window && 'performance' in window
+    );
   }
 
   /**
@@ -131,11 +131,15 @@ export class WebVitalsMonitor {
   private setupVisibilityHandler(): void {
     if (typeof document === 'undefined') return;
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        this.finalizeMetrics();
-      }
-    }, { once: true, capture: true });
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.visibilityState === 'hidden') {
+          this.finalizeMetrics();
+        }
+      },
+      { once: true, capture: true }
+    );
   }
 
   /**
@@ -153,9 +157,9 @@ export class WebVitalsMonitor {
         url: window.location.href,
         metadata: {
           attribution: {
-            finalValue: true
-          }
-        }
+            finalValue: true,
+          },
+        },
       });
     }
 
@@ -169,9 +173,9 @@ export class WebVitalsMonitor {
         url: window.location.href,
         metadata: {
           attribution: {
-            finalValue: true
-          }
-        }
+            finalValue: true,
+          },
+        },
       });
     }
   }
@@ -202,7 +206,7 @@ export class WebVitalsMonitor {
       { name: 'INP', setup: () => this.observeINP() },
       { name: 'CLS', setup: () => this.observeCLS() },
       { name: 'FCP', setup: () => this.observeFCP() },
-      { name: 'TTFB', setup: () => this.observeTTFB() }
+      { name: 'TTFB', setup: () => this.observeTTFB() },
     ];
 
     // Set up each observer independently to prevent one failure from affecting others
@@ -220,15 +224,15 @@ export class WebVitalsMonitor {
    * Measures loading performance by tracking the render time of the largest content element
    */
   private observeLCP(): void {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1] as PerformanceEntryWithRender;
-      
+
       if (!lastEntry) return;
 
       // LCP uses renderTime if available (for images), otherwise loadTime, otherwise startTime
       const lcpValue = lastEntry.renderTime || lastEntry.loadTime || lastEntry.startTime;
-      
+
       this.recordMetric({
         name: 'LCP',
         value: lcpValue,
@@ -241,12 +245,15 @@ export class WebVitalsMonitor {
             renderTime: lastEntry.renderTime,
             loadTime: lastEntry.loadTime,
             startTime: lastEntry.startTime,
-            url: lastEntry.element?.getAttribute('src') || lastEntry.element?.getAttribute('href') || undefined
-          }
-        }
+            url:
+              lastEntry.element?.getAttribute('src') ||
+              lastEntry.element?.getAttribute('href') ||
+              undefined,
+          },
+        },
       });
     });
-    
+
     observer.observe({ type: 'largest-contentful-paint', buffered: true });
     this.observers.set('LCP', observer);
   }
@@ -257,7 +264,7 @@ export class WebVitalsMonitor {
    * Note: FID only measures the first interaction on the page
    */
   private observeFID(): void {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
       if (this.fidRecorded || entries.length === 0) return;
 
@@ -277,9 +284,9 @@ export class WebVitalsMonitor {
             eventType: entry.name,
             processingStart: entry.processingStart,
             startTime: entry.startTime,
-            duration: entry.duration
-          }
-        }
+            duration: entry.duration,
+          },
+        },
       });
 
       this.fidRecorded = true;
@@ -298,24 +305,24 @@ export class WebVitalsMonitor {
   private observeINP(): void {
     const interactionMap = new Map<number, number>();
 
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries() as PerformanceEntryWithInteraction[];
-      
-      entries.forEach((entry) => {
+
+      entries.forEach(entry => {
         // Skip entries without an interaction ID (these aren't user interactions)
         if (!entry.interactionId) return;
 
         const duration = entry.duration;
         const existingDuration = interactionMap.get(entry.interactionId) || 0;
-        
+
         // Track the maximum duration for this interaction ID
         if (duration > existingDuration) {
           interactionMap.set(entry.interactionId, duration);
-          
+
           // INP is the worst interaction, so we update if this is worse than current
           if (duration > this.inpValue) {
             this.inpValue = duration;
-            
+
             this.recordMetric({
               name: 'INP',
               value: duration,
@@ -328,9 +335,9 @@ export class WebVitalsMonitor {
                   processingStart: entry.processingStart,
                   startTime: entry.startTime,
                   duration: entry.duration,
-                  interactionId: entry.interactionId
-                }
-              }
+                  interactionId: entry.interactionId,
+                },
+              },
             });
           }
         }
@@ -352,7 +359,7 @@ export class WebVitalsMonitor {
     const SESSION_GAP_MS = 1000;
     const MAX_SESSION_DURATION_MS = 5000;
 
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       list.getEntries().forEach((entry: PerformanceEntryWithInput) => {
         // Only count layout shifts that weren't caused by user input
         if (entry.hadRecentInput || !entry.value) return;
@@ -361,7 +368,8 @@ export class WebVitalsMonitor {
         const lastSessionEntry = sessionEntries[sessionEntries.length - 1];
 
         // Determine if this entry belongs to the current session
-        const isPartOfCurrentSession = sessionValue > 0 &&
+        const isPartOfCurrentSession =
+          sessionValue > 0 &&
           entry.startTime - lastSessionEntry.startTime < SESSION_GAP_MS &&
           entry.startTime - firstSessionEntry.startTime < MAX_SESSION_DURATION_MS;
 
@@ -388,12 +396,13 @@ export class WebVitalsMonitor {
               attribution: {
                 sessionValue,
                 shiftValue: entry.value,
-                sources: entry.sources?.map(source => ({
-                  element: source.node?.tagName || 'unknown',
-                  selector: this.getElementSelector(source.node)
-                })) || []
-              }
-            }
+                sources:
+                  entry.sources?.map(source => ({
+                    element: source.node?.tagName || 'unknown',
+                    selector: this.getElementSelector(source.node),
+                  })) || [],
+              },
+            },
           });
         }
       });
@@ -408,8 +417,8 @@ export class WebVitalsMonitor {
    * Measures when the first text or image is painted to the screen
    */
   private observeFCP(): void {
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    const observer = new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         if (entry.name === 'first-contentful-paint') {
           this.recordMetric({
             name: 'FCP',
@@ -420,16 +429,16 @@ export class WebVitalsMonitor {
             metadata: {
               attribution: {
                 startTime: entry.startTime,
-                entryType: entry.entryType
-              }
-            }
+                entryType: entry.entryType,
+              },
+            },
           });
           // Disconnect after recording FCP since it only happens once
           observer.disconnect();
         }
       });
     });
-    
+
     observer.observe({ type: 'paint', buffered: true });
     this.observers.set('FCP', observer);
   }
@@ -439,10 +448,10 @@ export class WebVitalsMonitor {
    * Measures the time from navigation start to when the first byte is received
    */
   private observeTTFB(): void {
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    const observer = new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         const navEntry = entry as PerformanceNavigationTiming;
-        
+
         // Ensure we have valid timing data
         if (navEntry.responseStart <= 0) return;
 
@@ -461,16 +470,16 @@ export class WebVitalsMonitor {
               dnsTime: navEntry.domainLookupEnd - navEntry.domainLookupStart,
               connectionTime: navEntry.connectEnd - navEntry.connectStart,
               requestStart: navEntry.requestStart,
-              responseStart: navEntry.responseStart
-            }
-          }
+              responseStart: navEntry.responseStart,
+            },
+          },
         });
-        
+
         // Disconnect after recording TTFB since it only happens once per page load
         observer.disconnect();
       });
     });
-    
+
     observer.observe({ type: 'navigation', buffered: true });
     this.observers.set('TTFB', observer);
   }
@@ -480,7 +489,7 @@ export class WebVitalsMonitor {
    */
   private getElementSelector(element?: Element): string {
     if (!element) return 'unknown';
-    
+
     try {
       if (element.id) return `#${element.id}`;
       if (element.className && typeof element.className === 'string') {
@@ -515,7 +524,7 @@ export class WebVitalsMonitor {
     if (Math.random() > this.config.sampleRate) return;
 
     this.metrics.push(metric);
-    
+
     // Maintain a reasonable history size to prevent memory issues
     if (this.metrics.length > this.MAX_METRICS) {
       this.metrics = this.metrics.slice(-this.MAX_METRICS);
@@ -544,17 +553,17 @@ export class WebVitalsMonitor {
   getLatestMetric(name: WebVitalsMetric['name']): WebVitalsMetric | undefined {
     return this.metrics
       .filter(m => m.name === name)
-      .reduce<WebVitalsMetric | undefined>(
-        (latest, current) => 
-          !latest || current.timestamp > latest.timestamp ? current : latest,
-        undefined
-      );
+      .reduce<
+        WebVitalsMetric | undefined
+      >((latest, current) => (!latest || current.timestamp > latest.timestamp ? current : latest), undefined);
   }
 
   /**
    * Returns metrics filtered by rating
    */
-  getMetricsByRating(rating: 'good' | 'needs-improvement' | 'poor'): ReadonlyArray<WebVitalsMetric> {
+  getMetricsByRating(
+    rating: 'good' | 'needs-improvement' | 'poor'
+  ): ReadonlyArray<WebVitalsMetric> {
     return this.metrics.filter(m => m.rating === rating);
   }
 
@@ -563,14 +572,17 @@ export class WebVitalsMonitor {
    */
   getWebVitalsScores(): Record<string, { value: number; rating: string }> {
     const metricNames: Array<WebVitalsMetric['name']> = ['LCP', 'FID', 'INP', 'CLS', 'FCP', 'TTFB'];
-    
-    return metricNames.reduce((acc, name) => {
-      const metric = this.getLatestMetric(name);
-      acc[name.toLowerCase()] = metric 
-        ? { value: metric.value, rating: metric.rating }
-        : { value: 0, rating: 'good' };
-      return acc;
-    }, {} as Record<string, { value: number; rating: string }>);
+
+    return metricNames.reduce(
+      (acc, name) => {
+        const metric = this.getLatestMetric(name);
+        acc[name.toLowerCase()] = metric
+          ? { value: metric.value, rating: metric.rating }
+          : { value: 0, rating: 'good' };
+        return acc;
+      },
+      {} as Record<string, { value: number; rating: string }>
+    );
   }
 
   /**
@@ -599,7 +611,7 @@ export class WebVitalsMonitor {
           score = 0;
           break;
       }
-      
+
       totalScore += score * weight;
       totalWeight += weight;
     });
@@ -613,7 +625,7 @@ export class WebVitalsMonitor {
   updateConfig(config: Partial<PerformanceConfig['webVitals']>): void {
     const wasEnabled = this.config.enabled;
     this.config = { ...this.config, ...config };
-    
+
     if (!this.config.enabled && wasEnabled) {
       this.disconnect();
     } else if (this.config.enabled && !wasEnabled && this.isBrowserEnvironment()) {
@@ -656,7 +668,7 @@ export class WebVitalsMonitor {
       url: this.isBrowserEnvironment() ? window.location.href : '',
       metrics: this.getMetrics(),
       summary: this.getWebVitalsScores(),
-      overallScore: this.getOverallScore()
+      overallScore: this.getOverallScore(),
     };
   }
 }

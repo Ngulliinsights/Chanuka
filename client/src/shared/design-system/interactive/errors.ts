@@ -34,7 +34,7 @@ export class UIComponentError extends Error {
       operation: this.operation,
       timestamp: this.timestamp.toISOString(),
       recoverable: this.recoverable,
-      stack: this.stack
+      stack: this.stack,
     };
   }
 }
@@ -42,11 +42,7 @@ export class UIComponentError extends Error {
 export class UIDateError extends UIComponentError {
   public readonly date?: Date;
 
-  constructor(
-    componentName: string,
-    message: string,
-    date?: Date
-  ) {
+  constructor(componentName: string, message: string, date?: Date) {
     super(componentName, 'date', message, true);
     this.name = 'UIDateError';
     this.date = date;

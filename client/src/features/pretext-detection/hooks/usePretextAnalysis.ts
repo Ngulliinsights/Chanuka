@@ -22,7 +22,7 @@ export interface PretextAnalysisOptions {
 
 export function usePretextAnalysis(options: PretextAnalysisOptions = {}) {
   const { billId, content, enabled = true } = options;
-  
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<PretextAnalysisResult | null>(null);
 
@@ -48,16 +48,16 @@ export function usePretextAnalysis(options: PretextAnalysisOptions = {}) {
         indicators: [
           'Vague language detected',
           'Broad authority granted',
-          'Limited oversight mechanisms'
+          'Limited oversight mechanisms',
         ],
         confidence: 0.75,
         recommendations: [
           'Request more specific language',
           'Add sunset clauses',
-          'Include regular review requirements'
-        ]
+          'Include regular review requirements',
+        ],
       };
-      
+
       setAnalysisResult(mockResult);
       return mockResult;
     } catch (error) {

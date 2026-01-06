@@ -41,7 +41,7 @@ interface LegislativeProcessGuideProps {
 }
 
 export const LegislativeProcessGuide: React.FC<LegislativeProcessGuideProps> = ({
-  className = ''
+  className = '',
 }) => {
   const [selectedStep, setSelectedStep] = useState<number>(0);
   const [language, setLanguage] = useState<'en' | 'sw'>('en');
@@ -140,7 +140,7 @@ export const LegislativeProcessGuide: React.FC<LegislativeProcessGuideProps> = (
                   onClick={() => setSelectedStep(index)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => {
+                  onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       setSelectedStep(index);
                     }

@@ -1,6 +1,6 @@
 /**
  * Community Types
- * 
+ *
  * Type definitions for community features, discussions, and comments
  */
 
@@ -35,7 +35,12 @@ export interface CommunityUpdate {
 // Query Parameters
 // ============================================================================
 
-export type CommentSortField = 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
+export type CommentSortField =
+  | 'newest'
+  | 'oldest'
+  | 'most_voted'
+  | 'controversial'
+  | 'expert_first';
 
 export interface CommentsQueryParams extends PaginationParams {
   readonly sort?: CommentSortField;

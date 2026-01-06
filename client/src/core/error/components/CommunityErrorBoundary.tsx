@@ -60,23 +60,24 @@ export class CommunityErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error): Partial<CommunityErrorBoundaryState> {
     // Convert to BaseError with community-specific context
-    const baseError = error instanceof BaseError
-      ? error
-      : new BaseError(error.message, {
-          statusCode: 500,
-          code: 'COMMUNITY_ERROR_BOUNDARY',
-          domain: ErrorDomain.SYSTEM,
-          severity: ErrorSeverity.HIGH,
-          retryable: true,
-          recoverable: true,
-          cause: error,
-          context: {
-            component: 'CommunityErrorBoundary',
-            timestamp: Date.now(),
-            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-            url: typeof window !== 'undefined' ? window.location.href : undefined,
-          },
-        });
+    const baseError =
+      error instanceof BaseError
+        ? error
+        : new BaseError(error.message, {
+            statusCode: 500,
+            code: 'COMMUNITY_ERROR_BOUNDARY',
+            domain: ErrorDomain.SYSTEM,
+            severity: ErrorSeverity.HIGH,
+            retryable: true,
+            recoverable: true,
+            cause: error,
+            context: {
+              component: 'CommunityErrorBoundary',
+              timestamp: Date.now(),
+              userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+              url: typeof window !== 'undefined' ? window.location.href : undefined,
+            },
+          });
 
     return {
       hasError: true,
@@ -88,25 +89,26 @@ export class CommunityErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Create BaseError with enhanced context
-    const baseError = error instanceof BaseError
-      ? error
-      : new BaseError(error.message, {
-          statusCode: 500,
-          code: 'COMMUNITY_ERROR_BOUNDARY',
-          domain: ErrorDomain.SYSTEM,
-          severity: ErrorSeverity.HIGH,
-          retryable: true,
-          recoverable: true,
-          cause: error,
-          context: {
-            component: 'CommunityErrorBoundary',
-            operation: 'community_feature',
-            timestamp: Date.now(),
-            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-            url: typeof window !== 'undefined' ? window.location.href : undefined,
-            componentStack: errorInfo.componentStack,
-          },
-        });
+    const baseError =
+      error instanceof BaseError
+        ? error
+        : new BaseError(error.message, {
+            statusCode: 500,
+            code: 'COMMUNITY_ERROR_BOUNDARY',
+            domain: ErrorDomain.SYSTEM,
+            severity: ErrorSeverity.HIGH,
+            retryable: true,
+            recoverable: true,
+            cause: error,
+            context: {
+              component: 'CommunityErrorBoundary',
+              operation: 'community_feature',
+              timestamp: Date.now(),
+              userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+              url: typeof window !== 'undefined' ? window.location.href : undefined,
+              componentStack: errorInfo.componentStack,
+            },
+          });
 
     console.error('Community Error Boundary caught an error:', {
       error: baseError,
@@ -185,9 +187,14 @@ export class CommunityErrorBoundary extends Component<
       // Use SharedErrorDisplay for consistent UI
       const displayConfig: ErrorDisplayConfig = {
         variant: 'inline',
-        severity: error.metadata?.severity === ErrorSeverity.CRITICAL ? 'critical' :
-                 error.metadata?.severity === ErrorSeverity.HIGH ? 'high' :
-                 error.metadata?.severity === ErrorSeverity.MEDIUM ? 'medium' : 'low',
+        severity:
+          error.metadata?.severity === ErrorSeverity.CRITICAL
+            ? 'critical'
+            : error.metadata?.severity === ErrorSeverity.HIGH
+              ? 'high'
+              : error.metadata?.severity === ErrorSeverity.MEDIUM
+                ? 'medium'
+                : 'low',
         showIcon: true,
         showRetry: showRetry && error.metadata?.retryable,
         showReport: false,
@@ -198,16 +205,17 @@ export class CommunityErrorBoundary extends Component<
       const customActions = (
         <div className="mt-4 space-y-2">
           {recoveryAttempted && (
-            <div className={cn(
-              "p-3 rounded-md text-sm",
-              recoverySuccessful
-                ? "bg-green-50 border border-green-200 text-green-800"
-                : "bg-yellow-50 border border-yellow-200 text-yellow-800"
-            )}>
+            <div
+              className={cn(
+                'p-3 rounded-md text-sm',
+                recoverySuccessful
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : 'bg-yellow-50 border border-yellow-200 text-yellow-800'
+              )}
+            >
               {recoverySuccessful
-                ? "✓ Recovery successful! The community feature has been restored."
-                : `✗ Recovery attempt failed. (Attempt ${retryCount + 1})`
-              }
+                ? '✓ Recovery successful! The community feature has been restored.'
+                : `✗ Recovery attempt failed. (Attempt ${retryCount + 1})`}
             </div>
           )}
 
@@ -259,9 +267,12 @@ export const useIncrementalErrorBoundary = () => {
     });
   }, []);
 
-  const isSectionFailed = React.useCallback((sectionId: string) => {
-    return failedSections.has(sectionId);
-  }, [failedSections]);
+  const isSectionFailed = React.useCallback(
+    (sectionId: string) => {
+      return failedSections.has(sectionId);
+    },
+    [failedSections]
+  );
 
   return {
     failedSections,

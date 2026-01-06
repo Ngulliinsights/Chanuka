@@ -2,7 +2,6 @@ import { InvalidNavigationPathError } from '@/core/error';
 import type { NavigationItem, UserRole } from '@/shared/types';
 import { validateNavigationPath, validateUserRole } from '@/validation';
 
-
 import { findNavigationItemByPath } from './navigation-utils';
 
 /**
@@ -67,7 +66,7 @@ export const checkRouteAccess = (
       return {
         canAccess: false,
         denialReason: 'unauthenticated',
-        requiredRole: navigationItem.allowedRoles
+        requiredRole: navigationItem.allowedRoles,
       };
     }
 
@@ -76,7 +75,7 @@ export const checkRouteAccess = (
       return {
         canAccess: false,
         denialReason: 'admin_required',
-        requiredRole: ['admin']
+        requiredRole: ['admin'],
       };
     }
 
@@ -85,7 +84,7 @@ export const checkRouteAccess = (
       return {
         canAccess: false,
         denialReason: 'insufficient_role',
-        requiredRole: navigationItem.allowedRoles
+        requiredRole: navigationItem.allowedRoles,
       };
     }
 
@@ -94,7 +93,7 @@ export const checkRouteAccess = (
       return {
         canAccess: false,
         denialReason: 'custom_condition',
-        requiredRole: navigationItem.allowedRoles
+        requiredRole: navigationItem.allowedRoles,
       };
     }
 

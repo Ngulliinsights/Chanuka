@@ -1,6 +1,7 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response,Router } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPost } from 'inversify-express-utils';
+
 import { MarketService } from './market.service';
 
 @controller('/api/market')

@@ -6,12 +6,20 @@ import { NavigationValidationError, InvalidNavigationPathError } from './errors'
  * Navigation validation schemas and utilities
  */
 
-export const NavigationPathSchema = z.string()
+export const NavigationPathSchema = z
+  .string()
   .min(1, 'Navigation path cannot be empty')
   .regex(/^\/[a-zA-Z0-9\-_\/]*$/, 'Invalid navigation path format')
   .max(200, 'Navigation path too long');
 
-export const UserRoleSchema = z.enum(['public', 'citizen', 'expert', 'admin', 'journalist', 'advocate']);
+export const UserRoleSchema = z.enum([
+  'public',
+  'citizen',
+  'expert',
+  'admin',
+  'journalist',
+  'advocate',
+]);
 
 export const NavigationItemSchema = z.object({
   id: z.string().min(1, 'ID cannot be empty'),
@@ -116,7 +124,11 @@ export function validateUseRelatedPagesOptions(options: unknown): any {
  * Safe validation functions that return validation results
  */
 
-export function safeValidateNavigationPath(path: string): { success: boolean; data?: string; error?: NavigationValidationError } {
+export function safeValidateNavigationPath(path: string): {
+  success: boolean;
+  data?: string;
+  error?: NavigationValidationError;
+} {
   try {
     const data = validateNavigationPath(path);
     return { success: true, data };
@@ -125,7 +137,11 @@ export function safeValidateNavigationPath(path: string): { success: boolean; da
   }
 }
 
-export function safeValidateUserRole(role: string): { success: boolean; data?: string; error?: NavigationValidationError } {
+export function safeValidateUserRole(role: string): {
+  success: boolean;
+  data?: string;
+  error?: NavigationValidationError;
+} {
   try {
     const data = validateUserRole(role);
     return { success: true, data };
@@ -133,4 +149,3 @@ export function safeValidateUserRole(role: string): { success: boolean; data?: s
     return { success: false, error: error as NavigationValidationError };
   }
 }
-

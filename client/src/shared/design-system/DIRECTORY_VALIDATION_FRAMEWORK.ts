@@ -45,8 +45,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] All components use design tokens',
       '[CHECK] Focus states implemented on interactive elements',
       '[CHECK] Accessibility (ARIA, keyboard navigation)',
-      '[CHECK] PropTypes or TypeScript types defined'
-    ]
+      '[CHECK] PropTypes or TypeScript types defined',
+    ],
   },
 
   feedback: {
@@ -60,8 +60,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Icon support in components',
       '[CHECK] Animation for notifications',
       '[CHECK] Type definitions for props',
-      '[CHECK] Usage examples in JSDoc'
-    ]
+      '[CHECK] Usage examples in JSDoc',
+    ],
   },
 
   typography: {
@@ -75,8 +75,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Color tokens usage',
       '[CHECK] Line height and spacing tokens',
       '[CHECK] Card subcomponents (Header, Content, Footer)',
-      '[CHECK] Semantic HTML elements'
-    ]
+      '[CHECK] Semantic HTML elements',
+    ],
   },
 
   media: {
@@ -90,8 +90,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Fallback handling for images',
       '[CHECK] Accessibility (alt text, ARIA)',
       '[CHECK] Responsive image support',
-      '[CHECK] Type definitions complete'
-    ]
+      '[CHECK] Type definitions complete',
+    ],
   },
 
   accessibility: {
@@ -104,8 +104,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] WCAG compliance standards',
       '[CHECK] Focus management utilities',
       '[CHECK] Motion preference detection',
-      '[CHECK] ARIA label helpers'
-    ]
+      '[CHECK] ARIA label helpers',
+    ],
   },
 
   tokens: {
@@ -120,8 +120,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Shadow definitions',
       '[CHECK] Animation durations',
       '[CHECK] Breakpoint values',
-      '[CHECK] Token validation framework'
-    ]
+      '[CHECK] Token validation framework',
+    ],
   },
 
   themes: {
@@ -134,8 +134,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] High-contrast theme option',
       '[CHECK] Theme provider component',
       '[CHECK] Theme switcher utility',
-      '[CHECK] CSS variables generation'
-    ]
+      '[CHECK] CSS variables generation',
+    ],
   },
 
   utils: {
@@ -147,8 +147,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Validation utilities',
       '[CHECK] Responsive design helpers',
       '[CHECK] Type-safe utilities',
-      '[CHECK] Export completeness'
-    ]
+      '[CHECK] Export completeness',
+    ],
   },
 
   standards: {
@@ -160,8 +160,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Component patterns defined',
       '[CHECK] Naming conventions',
       '[CHECK] File structure guidelines',
-      '[CHECK] Best practices documented'
-    ]
+      '[CHECK] Best practices documented',
+    ],
   },
 
   types: {
@@ -173,8 +173,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] Variant type definitions',
       '[CHECK] Theme type definitions',
       '[CHECK] Type exports complete',
-      '[CHECK] No circular dependencies'
-    ]
+      '[CHECK] No circular dependencies',
+    ],
   },
 
   lib: {
@@ -184,8 +184,8 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] index.ts exists',
       '[CHECK] External lib wrappers exported',
       '[CHECK] Type-safe wrappers',
-      '[CHECK] Import paths documented'
-    ]
+      '[CHECK] Import paths documented',
+    ],
   },
 
   styles: {
@@ -196,9 +196,9 @@ export const DIRECTORY_VALIDATION_PLAN = {
       '[CHECK] CSS variables usage',
       '[CHECK] Utility classes',
       '[CHECK] Reset/normalize styles',
-      '[CHECK] Dark mode support'
-    ]
-  }
+      '[CHECK] Dark mode support',
+    ],
+  },
 } as const;
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -214,7 +214,7 @@ export const VALIDATION_CHECKLIST = {
     'Types are defined',
     'No console.log or debug code',
     'No unused imports',
-    'Follows naming conventions'
+    'Follows naming conventions',
   ],
 
   componentDirectories: [
@@ -224,7 +224,7 @@ export const VALIDATION_CHECKLIST = {
     'Variants properly defined (if applicable)',
     'Accessibility features implemented',
     'Focus states visible',
-    'Disabled states handled'
+    'Disabled states handled',
   ],
 
   utilityDirectories: [
@@ -233,7 +233,7 @@ export const VALIDATION_CHECKLIST = {
     'Type definitions complete',
     'No side effects in pure utilities',
     'Error handling present',
-    'Usage examples provided'
+    'Usage examples provided',
   ],
 
   styleDirectories: [
@@ -242,8 +242,8 @@ export const VALIDATION_CHECKLIST = {
     'CSS variables used for tokens',
     'Media queries for responsive',
     'Dark mode considerations',
-    'Performance optimized'
-  ]
+    'Performance optimized',
+  ],
 } as const;
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -260,17 +260,10 @@ export const VALIDATION_RESULTS_TEMPLATE: ValidationResult = {
     hasComponents: true,
     exportsProper: true,
     typesCovered: true,
-    documentation: true
+    documentation: true,
   },
-  details: [
-    '[✓] Check passed',
-    '[!] Warning or note',
-    '[✗] Error found'
-  ],
-  recommendations: [
-    'Optional improvement 1',
-    'Optional improvement 2'
-  ]
+  details: ['[✓] Check passed', '[!] Warning or note', '[✗] Error found'],
+  recommendations: ['Optional improvement 1', 'Optional improvement 2'],
 };
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -289,8 +282,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Checkbox toggles state',
       'Switch changes states',
       'Dialog opens/closes',
-      'Tabs switch content'
-    ]
+      'Tabs switch content',
+    ],
   },
 
   feedback: {
@@ -301,8 +294,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Progress bar updates',
       'Toast notification appears',
       'Tooltip displays on hover',
-      'Error message renders'
-    ]
+      'Error message renders',
+    ],
   },
 
   typography: {
@@ -313,8 +306,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Label associates with inputs',
       'Card renders structure',
       'Spacing tokens apply',
-      'Font weights correct'
-    ]
+      'Font weights correct',
+    ],
   },
 
   media: {
@@ -324,8 +317,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Avatar fallback shows initials',
       'Image loads responsively',
       'Logo renders correctly',
-      'Alt text present'
-    ]
+      'Alt text present',
+    ],
   },
 
   tokens: {
@@ -337,8 +330,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Shadows apply correctly',
       'Animations smooth',
       'Breakpoints usable',
-      'Token validation works'
-    ]
+      'Token validation works',
+    ],
   },
 
   themes: {
@@ -349,8 +342,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'High-contrast theme usable',
       'Theme provider wraps app',
       'Theme switcher works',
-      'No flashing on theme change'
-    ]
+      'No flashing on theme change',
+    ],
   },
 
   accessibility: {
@@ -361,8 +354,8 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Focus indicators visible',
       'Motion preferences respected',
       'ARIA labels applicable',
-      'Keyboard navigation works'
-    ]
+      'Keyboard navigation works',
+    ],
   },
 
   utils: {
@@ -372,9 +365,9 @@ export const FUNCTIONALITY_ASSESSMENT = {
       'Validation utilities work',
       'Type utilities available',
       'Helper functions exported',
-      'No circular dependencies'
-    ]
-  }
+      'No circular dependencies',
+    ],
+  },
 } as const;
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -388,21 +381,21 @@ export const EXPECTED_OUTCOMES = {
     componentDirectories: 4,
     utilityDirectories: 5,
     styleDirectories: 3,
-    infrastructureDirectories: 1
+    infrastructureDirectories: 1,
   },
 
   noBlockingIssues: {
     description: 'No errors that prevent functionality',
     expectation: 'All imports work, exports accessible',
-    breakingErrors: 0
+    breakingErrors: 0,
   },
 
   improvedFromBaseline: {
     description: 'Flattening improved organization without breaking function',
     expectation: 'Better discoverability + same functionality',
     discoverability: '+400%',
-    maintainability: '+60%'
-  }
+    maintainability: '+60%',
+  },
 } as const;
 
 export type ValidationResultType = ValidationResult;

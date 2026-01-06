@@ -42,7 +42,7 @@ class ServiceRecovery {
           signal: controller.signal,
           method: 'GET',
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
         });
 
@@ -59,7 +59,7 @@ class ServiceRecovery {
         };
 
         this.services.set(serviceName, status);
-        
+
         logger.info('Service health check completed', {
           component: 'ServiceRecovery',
           serviceName,
@@ -90,7 +90,7 @@ class ServiceRecovery {
       };
 
       this.services.set(serviceName, status);
-      
+
       logger.error('Service health check failed', {
         component: 'ServiceRecovery',
         serviceName,
@@ -145,7 +145,7 @@ class ServiceRecovery {
     if (interval) {
       clearInterval(interval);
       this.checkIntervals.delete(serviceName);
-      
+
       logger.info('Stopped service monitoring', {
         component: 'ServiceRecovery',
         serviceName,
@@ -173,20 +173,20 @@ class ServiceRecovery {
         });
 
         const success = await recoveryAction();
-        
+
         if (success) {
           logger.info('Service recovery successful', {
             component: 'ServiceRecovery',
             serviceName,
             attempt,
           });
-          
+
           // Update service status
           this.services.set(serviceName, {
             isAvailable: true,
             lastChecked: Date.now(),
           });
-          
+
           return true;
         }
       } catch (error) {
@@ -218,11 +218,11 @@ class ServiceRecovery {
    */
   getAllServiceStatuses(): Record<string, ServiceStatus> {
     const statuses: Record<string, ServiceStatus> = {};
-    
+
     for (const [serviceName, status] of this.services.entries()) {
       statuses[serviceName] = status;
     }
-    
+
     return statuses;
   }
 

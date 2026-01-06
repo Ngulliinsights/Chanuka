@@ -189,7 +189,13 @@ export interface DashboardActionType {
 // Application-Specific Dashboard Types (from client/src/core/dashboard/types.ts)
 // ============================================================================
 
-export type WidgetType = 'analytics' | 'performance' | 'engagement' | 'metrics' | 'chart' | 'custom';
+export type WidgetType =
+  | 'analytics'
+  | 'performance'
+  | 'engagement'
+  | 'metrics'
+  | 'chart'
+  | 'custom';
 export type WidgetSizeType = 'small' | 'medium' | 'large' | 'full';
 export type ChartType = 'line' | 'bar' | 'pie' | 'area' | 'scatter';
 
@@ -355,7 +361,10 @@ export type DashboardAction =
   | { type: 'SET_WIDGET_DATA'; payload: { widgetId: string; data: unknown } }
   | { type: 'SET_WIDGET_LOADING'; payload: { widgetId: string; loading: boolean } }
   | { type: 'SET_WIDGET_ERROR'; payload: { widgetId: string; error: Error | null } }
-  | { type: 'UPDATE_WIDGET_CONFIG'; payload: { widgetId: string; config: Partial<AppWidgetConfig> } }
+  | {
+      type: 'UPDATE_WIDGET_CONFIG';
+      payload: { widgetId: string; config: Partial<AppWidgetConfig> };
+    }
   | { type: 'ADD_WIDGET'; payload: AppWidgetConfig }
   | { type: 'REMOVE_WIDGET'; payload: string }
   | { type: 'UPDATE_LAYOUT'; payload: AppDashboardLayout }

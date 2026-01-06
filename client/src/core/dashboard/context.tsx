@@ -5,9 +5,13 @@
 
 import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DashboardState, WidgetConfig, DashboardLayout, DashboardSettings } from '@client/shared/types';
+import {
+  DashboardState,
+  WidgetConfig,
+  DashboardLayout,
+  DashboardSettings,
+} from '@client/shared/types';
 import { logger } from '@client/utils/logger';
-
 
 const initialState: DashboardState = {
   id: '',
@@ -53,13 +57,11 @@ export interface DashboardContextValue {
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
-export function createDashboardProvider(
-  dashboardService: {
-    loadDashboard: (id: string) => Promise<DashboardState>;
-    saveDashboard: (state: DashboardState) => Promise<void>;
-    loadWidgetData: (widgetId: string, config: WidgetConfig) => Promise<unknown>;
-  }
-) {
+export function createDashboardProvider(dashboardService: {
+  loadDashboard: (id: string) => Promise<DashboardState>;
+  saveDashboard: (state: DashboardState) => Promise<void>;
+  loadWidgetData: (widgetId: string, config: WidgetConfig) => Promise<unknown>;
+}) {
   return function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [state, setState] = useState<DashboardState>(initialState);
 
@@ -73,7 +75,7 @@ export function createDashboardProvider(
             // Use a self-executing function to avoid closure issues
             const w = state.widgets.find(aw => aw.id === widget.id);
             if (w) {
-              dashboardService.loadWidgetData(widget.id, w).catch((error) => {
+              dashboardService.loadWidgetData(widget.id, w).catch(error => {
                 logger.error('Failed to refresh widget:', { widgetId: widget.id }, error);
               });
             }
@@ -132,23 +134,24 @@ export function createDashboardProvider(
     const updateWidget = useCallback((widgetId: string, config: Partial<WidgetConfig>) => {
       setState(prev => ({
         ...prev,
-        widgets: prev.widgets.map(w =>
-          w.id === widgetId ? { ...w, ...config } : w
-        ),
+        widgets: prev.widgets.map(w => (w.id === widgetId ? { ...w, ...config } : w)),
         updatedAt: new Date(),
       }));
     }, []);
 
-    const refreshWidget = useCallback(async (widgetId: string) => {
-      const widget = state.widgets.find(w => w.id === widgetId);
-      if (!widget) return;
+    const refreshWidget = useCallback(
+      async (widgetId: string) => {
+        const widget = state.widgets.find(w => w.id === widgetId);
+        if (!widget) return;
 
-      try {
-        await dashboardService.loadWidgetData(widgetId, widget);
-      } catch (error) {
-        logger.error('Failed to refresh widget:', { widgetId }, error);
-      }
-    }, [state.widgets]);
+        try {
+          await dashboardService.loadWidgetData(widgetId, widget);
+        } catch (error) {
+          logger.error('Failed to refresh widget:', { widgetId }, error);
+        }
+      },
+      [state.widgets]
+    );
 
     const refreshAllWidgets = useCallback(async () => {
       const refreshPromises = state.widgets.map(widget =>
@@ -166,41 +169,43 @@ export function createDashboardProvider(
       }));
     }, []);
 
-    const getWidget = useCallback((widgetId: string) => {
-      return state.widgets.find(w => w.id === widgetId);
-    }, [state.widgets]);
-
-    const value: DashboardContextValue = useMemo(() => ({
-      state,
-      loadDashboard,
-      saveDashboard,
-      updateSettings,
-      addWidget,
-      removeWidget,
-      updateWidget,
-      refreshWidget,
-      refreshAllWidgets,
-      updateLayout,
-      getWidget,
-    }), [
-      state,
-      loadDashboard,
-      saveDashboard,
-      updateSettings,
-      addWidget,
-      removeWidget,
-      updateWidget,
-      refreshWidget,
-      refreshAllWidgets,
-      updateLayout,
-      getWidget,
-    ]);
-
-    return (
-      <DashboardContext.Provider value={value}>
-        {children}
-      </DashboardContext.Provider>
+    const getWidget = useCallback(
+      (widgetId: string) => {
+        return state.widgets.find(w => w.id === widgetId);
+      },
+      [state.widgets]
     );
+
+    const value: DashboardContextValue = useMemo(
+      () => ({
+        state,
+        loadDashboard,
+        saveDashboard,
+        updateSettings,
+        addWidget,
+        removeWidget,
+        updateWidget,
+        refreshWidget,
+        refreshAllWidgets,
+        updateLayout,
+        getWidget,
+      }),
+      [
+        state,
+        loadDashboard,
+        saveDashboard,
+        updateSettings,
+        addWidget,
+        removeWidget,
+        updateWidget,
+        refreshWidget,
+        refreshAllWidgets,
+        updateLayout,
+        getWidget,
+      ]
+    );
+
+    return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
   };
 }
 
@@ -211,4 +216,3 @@ export function useDashboard(): DashboardContextValue {
   }
   return context;
 }
-

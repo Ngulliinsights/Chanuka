@@ -4,22 +4,22 @@
  * ============================================================================
  * Core API communication layer for all community engagement functionality
  * including discussions, comments, voting, expert insights, and moderation.
- * 
+ *
  * Strategic Design Philosophy:
  * ---------------------------------------------------------------------------
  * This service handles the social backbone of the platform where users engage
  * in civic discourse. The design prioritizes:
- * 
+ *
  * 1. Real-time responsiveness for user-generated actions (comments, votes)
  * 2. Optimistic UI updates by returning immediately and syncing in background
  * 3. Graceful degradation for non-critical features (activity feeds, stats)
  * 4. Aggressive cache invalidation for user-authored content
  * 5. Longer caching for stable reference data (expert verifications, insights)
- * 
+ *
  * The service implements intelligent retry logic for critical operations while
  * failing silently for nice-to-have features, ensuring that community issues
  * never prevent users from accessing core legislative information.
- * 
+ *
  * OPTIMIZATIONS IN THIS VERSION:
  * - Fixed all import ordering and grouping issues
  * - Removed all unused type imports
@@ -349,14 +349,14 @@ export type { VoteRequest };
  * - Moderate TTLs for aggregate data (stats, trending topics)
  */
 const CACHE_TTL = {
-  DISCUSSION: 2 * 60 * 1000,      // 2 minutes - active discussions
-  COMMENTS: 1 * 60 * 1000,        // 1 minute - needs real-time feel
+  DISCUSSION: 2 * 60 * 1000, // 2 minutes - active discussions
+  COMMENTS: 1 * 60 * 1000, // 1 minute - needs real-time feel
   EXPERT_INSIGHTS: 15 * 60 * 1000, // 15 minutes - curated, stable content
-  EXPERT_VERIFY: 30 * 60 * 1000,   // 30 minutes - verification rarely changes
-  ACTIVITY_FEED: 3 * 60 * 1000,    // 3 minutes - balance freshness/performance
-  TRENDING: 5 * 60 * 1000,         // 5 minutes - trends change gradually
-  STATS: 10 * 60 * 1000,           // 10 minutes - aggregate data acceptable with delay
-  SEARCH: 2 * 60 * 1000            // 2 minutes - search results
+  EXPERT_VERIFY: 30 * 60 * 1000, // 30 minutes - verification rarely changes
+  ACTIVITY_FEED: 3 * 60 * 1000, // 3 minutes - balance freshness/performance
+  TRENDING: 5 * 60 * 1000, // 5 minutes - trends change gradually
+  STATS: 10 * 60 * 1000, // 10 minutes - aggregate data acceptable with delay
+  SEARCH: 2 * 60 * 1000, // 2 minutes - search results
 } as const;
 
 /**
@@ -364,11 +364,11 @@ const CACHE_TTL = {
  * Critical user actions get shorter timeouts for better UX.
  */
 const TIMEOUTS = {
-  DEFAULT: 10000,        // 10 seconds for standard reads
-  WRITE: 8000,          // 8 seconds for write operations
-  VOTE: 3000,           // 3 seconds for voting (non-blocking)
-  FEED: 12000,          // 12 seconds for feed aggregation
-  INSIGHT: 15000        // 15 seconds for large insight content
+  DEFAULT: 10000, // 10 seconds for standard reads
+  WRITE: 8000, // 8 seconds for write operations
+  VOTE: 3000, // 3 seconds for voting (non-blocking)
+  FEED: 12000, // 12 seconds for feed aggregation
+  INSIGHT: 15000, // 15 seconds for large insight content
 } as const;
 
 // ============================================================================
@@ -377,7 +377,7 @@ const TIMEOUTS = {
 
 /**
  * Centralized service for all community and social engagement operations.
- * 
+ *
  * This service implements a sophisticated caching and error handling strategy
  * designed to provide the best possible user experience while managing server
  * load effectively. Write operations always skip cache and should trigger
@@ -436,14 +436,11 @@ export class CommunityApiService {
     this.abortControllers.set(requestKey, abortController);
 
     try {
-      const response = await globalApiClient.get<DiscussionThreadMetadata>(
-        endpoint,
-        {
-          timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.DISCUSSION,
-          signal: abortController.signal
-        }
-      );
+      const response = await globalApiClient.get<DiscussionThreadMetadata>(endpoint, {
+        timeout: TIMEOUTS.DEFAULT,
+        cacheTTL: CACHE_TTL.DISCUSSION,
+        signal: abortController.signal,
+      });
 
       this.abortControllers.delete(requestKey);
 
@@ -451,7 +448,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         billId,
         participantCount: response.data.participants,
-        commentCount: response.data.comment_count
+        commentCount: response.data.comment_count,
       });
 
       return response.data;
@@ -460,7 +457,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch discussion thread', {
         component: 'CommunityApiService',
         billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getDiscussionThread', { billId });
     }
@@ -477,14 +474,14 @@ export class CommunityApiService {
       limit = 50,
       offset = 0,
       includeReplies = true,
-      minVotes
+      minVotes,
     } = options;
 
     try {
       const params = new URLSearchParams({
         sort,
         limit: limit.toString(),
-        offset: offset.toString()
+        offset: offset.toString(),
       });
 
       if (expertOnly) params.append('expert', 'true');
@@ -495,7 +492,7 @@ export class CommunityApiService {
         `${this.baseUrl}/comments/${billId}?${params.toString()}`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.COMMENTS
+          cacheTTL: CACHE_TTL.COMMENTS,
         }
       );
 
@@ -504,7 +501,7 @@ export class CommunityApiService {
         billId,
         count: response.data.length,
         sort,
-        expertOnly
+        expertOnly,
       });
 
       return response.data;
@@ -513,7 +510,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         billId,
         options,
-        error
+        error,
       });
       throw await this.handleError(error, 'getBillComments', { billId });
     }
@@ -532,11 +529,11 @@ export class CommunityApiService {
           content: data.content,
           parent_id: data.parentId,
           mentions: data.mentions,
-          attachments: data.attachments
+          attachments: data.attachments,
         },
         {
           timeout: TIMEOUTS.WRITE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
@@ -545,7 +542,7 @@ export class CommunityApiService {
         billId: data.billId,
         commentId: response.data.id,
         isReply: !!data.parentId,
-        hasMentions: (data.mentions?.length || 0) > 0
+        hasMentions: (data.mentions?.length || 0) > 0,
       });
 
       return response.data;
@@ -554,7 +551,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         billId: data.billId,
         isReply: !!data.parentId,
-        error
+        error,
       });
       throw await this.handleError(error, 'addComment', { billId: data.billId });
     }
@@ -571,14 +568,14 @@ export class CommunityApiService {
         { content },
         {
           timeout: TIMEOUTS.WRITE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
       logger.info('Comment updated successfully', {
         component: 'CommunityApiService',
         commentId,
-        contentLength: content.length
+        contentLength: content.length,
       });
 
       return response.data;
@@ -586,7 +583,7 @@ export class CommunityApiService {
       logger.error('Failed to update comment', {
         component: 'CommunityApiService',
         commentId,
-        error
+        error,
       });
       throw await this.handleError(error, 'updateComment', { commentId });
     }
@@ -598,23 +595,20 @@ export class CommunityApiService {
    */
   async deleteComment(commentId: string): Promise<void> {
     try {
-      await globalApiClient.delete(
-        `${this.baseUrl}/comments/${commentId}`,
-        { 
-          timeout: TIMEOUTS.DEFAULT,
-          skipCache: true 
-        }
-      );
+      await globalApiClient.delete(`${this.baseUrl}/comments/${commentId}`, {
+        timeout: TIMEOUTS.DEFAULT,
+        skipCache: true,
+      });
 
       logger.info('Comment deleted successfully', {
         component: 'CommunityApiService',
-        commentId
+        commentId,
       });
     } catch (error) {
       logger.error('Failed to delete comment', {
         component: 'CommunityApiService',
         commentId,
-        error
+        error,
       });
       throw await this.handleError(error, 'deleteComment', { commentId });
     }
@@ -635,7 +629,7 @@ export class CommunityApiService {
         { type: voteType },
         {
           timeout: TIMEOUTS.VOTE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
@@ -643,7 +637,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         commentId,
         voteType,
-        newScore: response.data.score
+        newScore: response.data.score,
       });
 
       return response.data;
@@ -653,7 +647,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         commentId,
         voteType,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return null;
     }
@@ -669,14 +663,14 @@ export class CommunityApiService {
         `${this.baseUrl}/comments/${commentId}/vote`,
         {
           timeout: TIMEOUTS.VOTE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
       logger.debug('Vote removed', {
         component: 'CommunityApiService',
         commentId,
-        newScore: response.data.score
+        newScore: response.data.score,
       });
 
       return response.data;
@@ -684,7 +678,7 @@ export class CommunityApiService {
       logger.warn('Vote removal failed (non-blocking)', {
         component: 'CommunityApiService',
         commentId,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return null;
     }
@@ -708,11 +702,11 @@ export class CommunityApiService {
           flagType: violationType,
           reason,
           description,
-          evidence
+          evidence,
         },
         {
           timeout: TIMEOUTS.DEFAULT,
-          skipCache: true
+          skipCache: true,
         }
       );
 
@@ -720,7 +714,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         commentId,
         violationType,
-        reportId: response.data.id
+        reportId: response.data.id,
       });
 
       return response.data;
@@ -729,7 +723,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         commentId,
         violationType,
-        error
+        error,
       });
       throw await this.handleError(error, 'reportComment', { commentId });
     }
@@ -749,7 +743,7 @@ export class CommunityApiService {
         `${this.baseUrl}/experts/${userId}/verification`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.EXPERT_VERIFY
+          cacheTTL: CACHE_TTL.EXPERT_VERIFY,
         }
       );
 
@@ -757,7 +751,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         userId,
         isVerified: response.data.verified,
-        expertiseCount: response.data.expertise_areas.length
+        expertiseCount: response.data.expertise_areas.length,
       });
 
       return response.data;
@@ -765,7 +759,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch expert verification', {
         component: 'CommunityApiService',
         userId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getExpertVerification', { userId });
     }
@@ -781,14 +775,14 @@ export class CommunityApiService {
         `${this.baseUrl}/bills/${billId}/expert-insights`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.EXPERT_INSIGHTS
+          cacheTTL: CACHE_TTL.EXPERT_INSIGHTS,
         }
       );
 
       logger.info('Expert insights loaded', {
         component: 'CommunityApiService',
         billId,
-        count: response.data.length
+        count: response.data.length,
       });
 
       return response.data;
@@ -796,7 +790,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch expert insights', {
         component: 'CommunityApiService',
         billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getExpertInsights', { billId });
     }
@@ -813,7 +807,7 @@ export class CommunityApiService {
         insight,
         {
           timeout: TIMEOUTS.INSIGHT,
-          skipCache: true
+          skipCache: true,
         }
       );
 
@@ -821,7 +815,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         billId: insight.billId,
         insightId: response.data.id,
-        status: response.data.status
+        status: response.data.status,
       });
 
       return response.data;
@@ -829,7 +823,7 @@ export class CommunityApiService {
       logger.error('Failed to submit expert insight', {
         component: 'CommunityApiService',
         billId: insight.billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'submitExpertInsight');
     }
@@ -850,14 +844,14 @@ export class CommunityApiService {
       contentTypes,
       timeRange = 'day',
       geography,
-      followedOnly = false
+      followedOnly = false,
     } = options;
 
     try {
       const params = new URLSearchParams({
         limit: limit.toString(),
         offset: offset.toString(),
-        timeRange
+        timeRange,
       });
 
       if (contentTypes?.length) {
@@ -878,7 +872,7 @@ export class CommunityApiService {
         `${this.baseUrl}/activity?${params.toString()}`,
         {
           timeout: TIMEOUTS.FEED,
-          cacheTTL: CACHE_TTL.ACTIVITY_FEED
+          cacheTTL: CACHE_TTL.ACTIVITY_FEED,
         }
       );
 
@@ -887,7 +881,7 @@ export class CommunityApiService {
         count: response.data.length,
         timeRange,
         hasGeography: !!geography,
-        followedOnly
+        followedOnly,
       });
 
       return response.data;
@@ -895,7 +889,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch activity feed', {
         component: 'CommunityApiService',
         options,
-        error
+        error,
       });
       throw await this.handleError(error, 'getActivityFeed');
     }
@@ -911,13 +905,13 @@ export class CommunityApiService {
         `${this.baseUrl}/trending?limit=${limit}`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.TRENDING
+          cacheTTL: CACHE_TTL.TRENDING,
         }
       );
 
       logger.info('Trending topics loaded', {
         component: 'CommunityApiService',
-        count: response.data.length
+        count: response.data.length,
       });
 
       return response.data;
@@ -925,7 +919,7 @@ export class CommunityApiService {
       // Graceful degradation for nice-to-have feature
       logger.warn('Failed to fetch trending topics (non-blocking)', {
         component: 'CommunityApiService',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return [];
     }
@@ -937,18 +931,15 @@ export class CommunityApiService {
    */
   async getCommunityStats(): Promise<ExtendedCommunityStats> {
     try {
-      const response = await globalApiClient.get<ExtendedCommunityStats>(
-        `${this.baseUrl}/stats`,
-        {
-          timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.STATS
-        }
-      );
+      const response = await globalApiClient.get<ExtendedCommunityStats>(`${this.baseUrl}/stats`, {
+        timeout: TIMEOUTS.DEFAULT,
+        cacheTTL: CACHE_TTL.STATS,
+      });
 
       logger.info('Community stats loaded', {
         component: 'CommunityApiService',
         totalMembers: response.data.totalMembers,
-        activeToday: response.data.activeToday
+        activeToday: response.data.activeToday,
       });
 
       return response.data;
@@ -956,7 +947,7 @@ export class CommunityApiService {
       // Stats are informational, not critical - provide fallback empty stats
       logger.warn('Failed to fetch community stats (non-blocking)', {
         component: 'CommunityApiService',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return {
         totalMembers: 0,
@@ -965,7 +956,7 @@ export class CommunityApiService {
         activeThisMonth: 0,
         totalComments: 0,
         totalThreads: 0,
-        averageEngagement: 0
+        averageEngagement: 0,
       } as ExtendedCommunityStats;
     }
   }
@@ -991,14 +982,14 @@ export class CommunityApiService {
         `${this.baseUrl}/local-impact?${params.toString()}`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.STATS
+          cacheTTL: CACHE_TTL.STATS,
         }
       );
 
       logger.info('Local impact metrics loaded', {
         component: 'CommunityApiService',
         location,
-        billCount: response.data.billsDiscussed
+        billCount: response.data.billsDiscussed,
       });
 
       return response.data;
@@ -1006,7 +997,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch local impact metrics', {
         component: 'CommunityApiService',
         location,
-        error
+        error,
       });
       throw await this.handleError(error, 'getLocalImpactMetrics', { location });
     }
@@ -1026,14 +1017,14 @@ export class CommunityApiService {
         `${this.baseUrl}/bills/${billId}/threads`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.DISCUSSION
+          cacheTTL: CACHE_TTL.DISCUSSION,
         }
       );
 
       logger.info('Bill threads loaded', {
         component: 'CommunityApiService',
         billId,
-        threadCount: response.data.length
+        threadCount: response.data.length,
       });
 
       return response.data;
@@ -1041,7 +1032,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch bill threads', {
         component: 'CommunityApiService',
         billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getBillThreads', { billId });
     }
@@ -1058,18 +1049,18 @@ export class CommunityApiService {
         {
           bill_id: data.billId,
           title: data.title,
-          description: data.description
+          description: data.description,
         },
         {
           timeout: TIMEOUTS.WRITE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
       logger.info('Thread created successfully', {
         component: 'CommunityApiService',
         billId: data.billId,
-        threadId: response.data.id
+        threadId: response.data.id,
       });
 
       return response.data;
@@ -1077,7 +1068,7 @@ export class CommunityApiService {
       logger.error('Failed to create thread', {
         component: 'CommunityApiService',
         billId: data.billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'createThread', { billId: data.billId });
     }
@@ -1093,14 +1084,14 @@ export class CommunityApiService {
         `${this.baseUrl}/threads/${threadId}`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.DISCUSSION
+          cacheTTL: CACHE_TTL.DISCUSSION,
         }
       );
 
       logger.info('Thread loaded', {
         component: 'CommunityApiService',
         threadId,
-        commentCount: response.data.totalComments
+        commentCount: response.data.totalComments,
       });
 
       return response.data;
@@ -1108,7 +1099,7 @@ export class CommunityApiService {
       logger.error('Failed to fetch thread', {
         component: 'CommunityApiService',
         threadId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getThread', { threadId });
     }
@@ -1125,13 +1116,13 @@ export class CommunityApiService {
         updates,
         {
           timeout: TIMEOUTS.WRITE,
-          skipCache: true
+          skipCache: true,
         }
       );
 
       logger.info('Thread updated successfully', {
         component: 'CommunityApiService',
-        threadId
+        threadId,
       });
 
       return response.data;
@@ -1139,7 +1130,7 @@ export class CommunityApiService {
       logger.error('Failed to update thread', {
         component: 'CommunityApiService',
         threadId,
-        error
+        error,
       });
       throw await this.handleError(error, 'updateThread', { threadId });
     }
@@ -1151,23 +1142,20 @@ export class CommunityApiService {
    */
   async deleteThread(threadId: string): Promise<void> {
     try {
-      await globalApiClient.delete(
-        `${this.baseUrl}/threads/${threadId}`,
-        {
-          timeout: TIMEOUTS.DEFAULT,
-          skipCache: true
-        }
-      );
+      await globalApiClient.delete(`${this.baseUrl}/threads/${threadId}`, {
+        timeout: TIMEOUTS.DEFAULT,
+        skipCache: true,
+      });
 
       logger.info('Thread deleted successfully', {
         component: 'CommunityApiService',
-        threadId
+        threadId,
       });
     } catch (error) {
       logger.error('Failed to delete thread', {
         component: 'CommunityApiService',
         threadId,
-        error
+        error,
       });
       throw await this.handleError(error, 'deleteThread', { threadId });
     }
@@ -1187,7 +1175,7 @@ export class CommunityApiService {
       const params = new URLSearchParams({
         q: query,
         limit: (options.limit || 20).toString(),
-        offset: (options.offset || 0).toString()
+        offset: (options.offset || 0).toString(),
       });
 
       if (options.contentTypes?.length) {
@@ -1202,14 +1190,14 @@ export class CommunityApiService {
         `${this.baseUrl}/search?${params.toString()}`,
         {
           timeout: TIMEOUTS.DEFAULT,
-          cacheTTL: CACHE_TTL.SEARCH
+          cacheTTL: CACHE_TTL.SEARCH,
         }
       );
 
       logger.info('Community search completed', {
         component: 'CommunityApiService',
         query,
-        resultCount: response.data.length
+        resultCount: response.data.length,
       });
 
       return response.data;
@@ -1217,7 +1205,7 @@ export class CommunityApiService {
       logger.error('Failed to search community', {
         component: 'CommunityApiService',
         query,
-        error
+        error,
       });
       throw await this.handleError(error, 'searchCommunity', { query });
     }
@@ -1229,16 +1217,16 @@ export class CommunityApiService {
 
   /**
    * Centralized error handling with context enrichment.
-   * 
+   *
    * This method ensures consistent error reporting across all community
    * operations while preserving critical context for debugging. The global
    * error handler can then implement sophisticated error tracking, user
    * notifications, and automatic retry logic as appropriate.
-   * 
+   *
    * The method is designed to never throw its own errors, instead always
    * returning the original error after logging and processing, which maintains
    * the error propagation chain for proper handling upstream.
-   * 
+   *
    * @param error - Original error object from the API call
    * @param operation - Name of the operation that failed
    * @param context - Additional context for debugging
@@ -1251,19 +1239,19 @@ export class CommunityApiService {
   ): Promise<Error> {
     // Ensure we have an Error object to work with
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    
+
     // globalErrorHandler may be a function that optionally returns a Promise.
     // Call it and treat the result as unknown, then check for a `then` function.
     const maybePromise: unknown = globalErrorHandler(errorObj, {
       component: 'CommunityApiService',
       operation,
-      ...context
+      ...context,
     }) as unknown;
 
     if (maybePromise && typeof (maybePromise as { then?: unknown }).then === 'function') {
-      await maybePromise as Promise<void>;
+      (await maybePromise) as Promise<void>;
     }
-    
+
     return errorObj;
   }
 }
@@ -1274,30 +1262,30 @@ export class CommunityApiService {
 
 /**
  * Pre-configured global instance of the community API service.
- * 
+ *
  * Use this singleton throughout your application to ensure consistent
  * caching behavior, error handling, and logging across all community
  * features. The singleton pattern also enables potential future enhancements
  * like connection pooling, request batching, and global rate limiting.
- * 
+ *
  * Example usage:
- * 
+ *
  * ```typescript
  * import { communityApiService } from './api/community';
- * 
+ *
  * // Fetch comments for a bill
  * const comments = await communityApiService.getBillComments(12345, {
  *   sort: 'most_voted',
  *   expertOnly: true
  * });
- * 
+ *
  * // Add a new comment
  * const newComment = await communityApiService.addComment({
  *   billId: 12345,
  *   content: 'This legislation could significantly impact healthcare...',
  *   mentions: ['@expert-user-id']
  * });
- * 
+ *
  * // Vote on a comment
  * await communityApiService.voteComment(newComment.id, 'up');
  * ```

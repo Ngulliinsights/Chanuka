@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import type { Command, CommandPaletteConfig } from './types';
 
 interface UseCommandPaletteOptions {
@@ -69,6 +70,6 @@ export const useCommandPalette = (options: UseCommandPaletteOptions = {}) => {
     setIsOpen,
     config,
     customCommands,
-    onCommandExecute
+    onCommandExecute,
   };
 };

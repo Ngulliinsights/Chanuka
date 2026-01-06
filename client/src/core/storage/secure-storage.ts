@@ -1,27 +1,28 @@
 /**
  * Secure Storage Module
- * 
+ *
  * Provides encrypted local storage with automatic expiration, compression,
  * and comprehensive error handling. Uses AES-GCM encryption when available.
  */
 
 import { logger } from '../../utils/logger';
-import { 
-  StorageOptions, 
-  StoredData, 
-  StorageStats, 
-  StorageError, 
+
+import {
+  StorageOptions,
+  StoredData,
+  StorageStats,
+  StorageError,
   StorageErrorCode,
   StorageBackend,
-  EncryptionConfig
+  EncryptionConfig,
 } from './types';
 
 /**
  * Creates a standardized storage error
  */
 function createStorageError(
-  code: StorageErrorCode, 
-  message: string, 
+  code: StorageErrorCode,
+  message: string,
   context?: Record<string, unknown>
 ): StorageError {
   const error = new Error(message) as StorageError;
@@ -38,7 +39,7 @@ const DEFAULT_ENCRYPTION_CONFIG: EncryptionConfig = {
   algorithm: 'AES-GCM',
   keyLength: 256,
   ivLength: 12,
-  tagLength: 128
+  tagLength: 128,
 };
 
 /**
@@ -89,7 +90,7 @@ export class SecureStorage {
 
     try {
       const keyData = localStorage.getItem(`${this.storagePrefix}${this.keyStorageKey}`);
-      
+
       if (keyData) {
         // Import existing key
         const keyBuffer = Uint8Array.from(JSON.parse(keyData));
@@ -103,24 +104,27 @@ export class SecureStorage {
       } else {
         // Generate new key
         this.encryptionKey = await window.crypto.subtle.generateKey(
-          { 
-            name: this.encryptionConfig.algorithm, 
-            length: this.encryptionConfig.keyLength 
+          {
+            name: this.encryptionConfig.algorithm,
+            length: this.encryptionConfig.keyLength,
           },
           true,
           ['encrypt', 'decrypt']
         );
-        
+
         // Persist key for future use
         const keyBuffer = await window.crypto.subtle.exportKey('raw', this.encryptionKey);
         const keyArray = Array.from(new Uint8Array(keyBuffer));
-        localStorage.setItem(`${this.storagePrefix}${this.keyStorageKey}`, JSON.stringify(keyArray));
+        localStorage.setItem(
+          `${this.storagePrefix}${this.keyStorageKey}`,
+          JSON.stringify(keyArray)
+        );
       }
 
       logger.info('Encryption initialized', {
         component: 'SecureStorage',
         algorithm: this.encryptionConfig.algorithm,
-        keyLength: this.encryptionConfig.keyLength
+        keyLength: this.encryptionConfig.keyLength,
       });
     } catch (error) {
       logger.error('Failed to initialize encryption', { error });
@@ -142,7 +146,7 @@ export class SecureStorage {
         ttl: options.ttl,
         namespace: options.namespace,
         encrypted: options.encrypt && !!this.encryptionKey,
-        version: '1.0'
+        version: '1.0',
       };
 
       let serialized = JSON.stringify(storedData);
@@ -157,25 +161,27 @@ export class SecureStorage {
 
       const storageKey = this.buildStorageKey(key, options.namespace);
       const storage = this.getStorageBackend(options.backend);
-      
+
       if (storage) {
         storage.setItem(storageKey, serialized);
-        
+
         logger.debug('Storage item set', {
           component: 'SecureStorage',
           key,
           namespace: options.namespace,
           encrypted: storedData.encrypted,
-          ttl: options.ttl
+          ttl: options.ttl,
         });
       } else {
         throw createStorageError('STORAGE_NOT_AVAILABLE', 'Storage backend not available');
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'QuotaExceededError') {
-        throw createStorageError('QUOTA_EXCEEDED', `Storage quota exceeded for key: ${key}`, { key });
+        throw createStorageError('QUOTA_EXCEEDED', `Storage quota exceeded for key: ${key}`, {
+          key,
+        });
       }
-      
+
       logger.error('Failed to set secure storage item', { key, error });
       throw createStorageError('INVALID_DATA', `Failed to store item: ${key}`, { key, error });
     }
@@ -190,7 +196,7 @@ export class SecureStorage {
     try {
       const storageKey = this.buildStorageKey(key, options.namespace);
       const storage = this.getStorageBackend(options.backend);
-      
+
       if (!storage) {
         return null;
       }
@@ -213,7 +219,7 @@ export class SecureStorage {
       }
 
       const parsed: StoredData = JSON.parse(decrypted);
-      
+
       // Check TTL expiration
       if (parsed.ttl && Date.now() - parsed.timestamp > parsed.ttl) {
         this.removeItem(key, options);
@@ -224,7 +230,7 @@ export class SecureStorage {
         component: 'SecureStorage',
         key,
         namespace: options.namespace,
-        encrypted: parsed.encrypted
+        encrypted: parsed.encrypted,
       });
 
       return parsed.data as T;
@@ -232,7 +238,7 @@ export class SecureStorage {
       if (error instanceof Error && (error as StorageError).code) {
         throw error; // Re-throw storage errors
       }
-      
+
       logger.error('Failed to get secure storage item', { key, error });
       return null;
     }
@@ -245,14 +251,14 @@ export class SecureStorage {
     try {
       const storageKey = this.buildStorageKey(key, options.namespace);
       const storage = this.getStorageBackend(options.backend);
-      
+
       if (storage) {
         storage.removeItem(storageKey);
-        
+
         logger.debug('Storage item removed', {
           component: 'SecureStorage',
           key,
-          namespace: options.namespace
+          namespace: options.namespace,
         });
       }
     } catch (error) {
@@ -293,11 +299,11 @@ export class SecureStorage {
 
       // Remove all collected keys
       keysToRemove.forEach(key => storage.removeItem(key));
-      
+
       logger.info('Storage cleared', {
         component: 'SecureStorage',
         namespace,
-        itemsRemoved: keysToRemove.length
+        itemsRemoved: keysToRemove.length,
       });
     } catch (error) {
       logger.error('Failed to clear secure storage', { namespace, error });
@@ -343,7 +349,7 @@ export class SecureStorage {
           totalSize: 0,
           namespaces: [],
           encryptedEntries: 0,
-          expiredEntries: 0
+          expiredEntries: 0,
         };
       }
 
@@ -360,27 +366,27 @@ export class SecureStorage {
         const key = storage.key(i);
         if (key?.startsWith(prefix)) {
           totalEntries++;
-          
+
           try {
             const value = storage.getItem(key);
             if (value) {
               totalSize += value.length;
-              
+
               // Try to parse the stored data to get metadata
               const parsed: StoredData = JSON.parse(value);
-              
+
               if (parsed.encrypted) {
                 encryptedEntries++;
               }
-              
+
               if (parsed.ttl && Date.now() - parsed.timestamp > parsed.ttl) {
                 expiredEntries++;
               }
-              
+
               if (parsed.namespace) {
                 namespaces.add(parsed.namespace);
               }
-              
+
               const entryDate = new Date(parsed.timestamp);
               if (!oldestEntry || entryDate < oldestEntry) {
                 oldestEntry = entryDate;
@@ -402,7 +408,7 @@ export class SecureStorage {
         oldestEntry,
         newestEntry,
         encryptedEntries,
-        expiredEntries
+        expiredEntries,
       };
     } catch (error) {
       logger.error('Failed to get storage stats', { error });
@@ -411,7 +417,7 @@ export class SecureStorage {
         totalSize: 0,
         namespaces: [],
         encryptedEntries: 0,
-        expiredEntries: 0
+        expiredEntries: 0,
       };
     }
   }
@@ -427,9 +433,9 @@ export class SecureStorage {
     try {
       // Generate new key
       const newKey = await window.crypto.subtle.generateKey(
-        { 
-          name: this.encryptionConfig.algorithm, 
-          length: this.encryptionConfig.keyLength 
+        {
+          name: this.encryptionConfig.algorithm,
+          length: this.encryptionConfig.keyLength,
         },
         true,
         ['encrypt', 'decrypt']
@@ -450,7 +456,7 @@ export class SecureStorage {
       localStorage.setItem(`${this.storagePrefix}${this.keyStorageKey}`, JSON.stringify(keyArray));
 
       logger.info('Encryption key rotated', {
-        component: 'SecureStorage'
+        component: 'SecureStorage',
       });
     } catch (error) {
       logger.error('Failed to rotate encryption key', { error });
@@ -490,7 +496,7 @@ export class SecureStorage {
 
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    
+
     // Generate random initialization vector
     const iv = window.crypto.getRandomValues(new Uint8Array(this.encryptionConfig.ivLength || 12));
 
@@ -519,7 +525,7 @@ export class SecureStorage {
 
     // Decode from base64
     const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
-    
+
     // Extract IV and encrypted data
     const ivLength = this.encryptionConfig.ivLength || 12;
     const iv = combined.slice(0, ivLength);

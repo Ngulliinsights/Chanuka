@@ -17,9 +17,9 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React from 'react';
 
 import { LowBandwidthConfig, defaultLowBandwidthConfig } from '../standards/low-bandwidth';
-import React from 'react';
 
 interface LowBandwidthContextType {
   /**
@@ -76,13 +76,15 @@ export function LowBandwidthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Detect network speed
     const checkConnection = () => {
-      const connection = (navigator as unknown as {
-        connection?: {
-          effectiveType?: 'slow-2g' | 'fast-2g' | '3g' | '4g';
-          saveData?: boolean;
-          type?: string;
-        };
-      }).connection;
+      const connection = (
+        navigator as unknown as {
+          connection?: {
+            effectiveType?: 'slow-2g' | 'fast-2g' | '3g' | '4g';
+            saveData?: boolean;
+            type?: string;
+          };
+        }
+      ).connection;
       if (!connection) return;
 
       const effectiveType = connection.effectiveType as
@@ -104,12 +106,14 @@ export function LowBandwidthProvider({ children }: { children: ReactNode }) {
 
     checkConnection();
 
-    const connection = (navigator as unknown as {
-      connection?: {
-        addEventListener?: (event: string, cb: () => void) => void;
-        removeEventListener?: (event: string, cb: () => void) => void;
-      };
-    }).connection;
+    const connection = (
+      navigator as unknown as {
+        connection?: {
+          addEventListener?: (event: string, cb: () => void) => void;
+          removeEventListener?: (event: string, cb: () => void) => void;
+        };
+      }
+    ).connection;
     if (connection) {
       connection.addEventListener?.('change', checkConnection);
       return () => connection.removeEventListener?.('change', checkConnection);
@@ -143,9 +147,7 @@ export function LowBandwidthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LowBandwidthContext.Provider value={contextValue}>
-      {children}
-    </LowBandwidthContext.Provider>
+    <LowBandwidthContext.Provider value={contextValue}>{children}</LowBandwidthContext.Provider>
   );
 }
 
@@ -177,10 +179,7 @@ export interface ConditionalLowBandwidthProps {
 /**
  * Component that switches between low and normal bandwidth renders
  */
-export function ConditionalBandwidth({
-  lowBandwidth,
-  normal,
-}: ConditionalLowBandwidthProps) {
+export function ConditionalBandwidth({ lowBandwidth, normal }: ConditionalLowBandwidthProps) {
   const { isLowBandwidth } = useLowBandwidth();
   return <>{isLowBandwidth ? lowBandwidth : normal}</>;
 }
@@ -188,10 +187,7 @@ export function ConditionalBandwidth({
 /**
  * Hook to conditionally render based on bandwidth
  */
-export function useBandwidthAware<T>(
-  lowBandwidthValue: T,
-  normalValue: T,
-): T {
+export function useBandwidthAware<T>(lowBandwidthValue: T, normalValue: T): T {
   const { isLowBandwidth } = useLowBandwidth();
   return isLowBandwidth ? lowBandwidthValue : normalValue;
 }

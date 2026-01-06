@@ -4,6 +4,7 @@
 // Scores transparency levels of bills, sponsors, and processes
 
 import { z } from 'zod';
+
 import { Statistics, Cache } from './shared_utils';
 
 export const TransparencyInputSchema = z.object({

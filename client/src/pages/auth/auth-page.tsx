@@ -8,12 +8,12 @@
 
 import { AlertTriangle, CheckCircle, ArrowLeft, Shield, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import React from 'react';
 import {
   Card,
   CardContent,
@@ -301,7 +301,8 @@ export default function AuthPage() {
                 <span>Reset Password</span>
               </CardTitle>
               <CardDescription>
-                Enter your email address and we&apos;ll send you instructions to reset your password.
+                Enter your email address and we&apos;ll send you instructions to reset your
+                password.
               </CardDescription>
             </CardHeader>
             <CardContent>

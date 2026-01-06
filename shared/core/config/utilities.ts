@@ -6,8 +6,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { configManager, getConfig } from './index';
+
 import type { AppConfig } from './schema';
+
+import { configManager, getConfig } from './index';
 
 export type AssetsConfig = AppConfig['utilities']['assets'] & {
   getConfigForType: (type: 'critical' | 'script' | 'style' | 'image' | 'font') => any;

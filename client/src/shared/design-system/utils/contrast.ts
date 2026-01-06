@@ -19,11 +19,13 @@ export type TextSize = 'normal' | 'large';
  */
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
 }
 
 /**
@@ -43,17 +45,17 @@ function getLuminance(r: number, g: number, b: number): number {
 export function getContrastRatio(color1: string, color2: string): number {
   const rgb1 = hexToRgb(color1);
   const rgb2 = hexToRgb(color2);
-  
+
   if (!rgb1 || !rgb2) {
     throw new Error('Invalid color format. Use hex colors like #ffffff');
   }
-  
+
   const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
   const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
-  
+
   const brightest = Math.max(lum1, lum2);
   const darkest = Math.min(lum1, lum2);
-  
+
   return (brightest + 0.05) / (darkest + 0.05);
 }
 
@@ -67,11 +69,16 @@ export function meetsContrastRequirement(
   textSize: TextSize = 'normal'
 ): boolean {
   const ratio = getContrastRatio(foreground, background);
-  
-  const threshold = level === 'AAA' 
-    ? (textSize === 'large' ? CONTRAST_THRESHOLDS.AAA_LARGE : CONTRAST_THRESHOLDS.AAA_NORMAL)
-    : (textSize === 'large' ? CONTRAST_THRESHOLDS.AA_LARGE : CONTRAST_THRESHOLDS.AA_NORMAL);
-  
+
+  const threshold =
+    level === 'AAA'
+      ? textSize === 'large'
+        ? CONTRAST_THRESHOLDS.AAA_LARGE
+        : CONTRAST_THRESHOLDS.AAA_NORMAL
+      : textSize === 'large'
+        ? CONTRAST_THRESHOLDS.AA_LARGE
+        : CONTRAST_THRESHOLDS.AA_NORMAL;
+
   return ratio >= threshold;
 }
 
@@ -84,10 +91,12 @@ export function getContrastLevel(
   textSize: TextSize = 'normal'
 ): 'AAA' | 'AA' | 'FAIL' {
   const ratio = getContrastRatio(foreground, background);
-  
-  const aaaThreshold = textSize === 'large' ? CONTRAST_THRESHOLDS.AAA_LARGE : CONTRAST_THRESHOLDS.AAA_NORMAL;
-  const aaThreshold = textSize === 'large' ? CONTRAST_THRESHOLDS.AA_LARGE : CONTRAST_THRESHOLDS.AA_NORMAL;
-  
+
+  const aaaThreshold =
+    textSize === 'large' ? CONTRAST_THRESHOLDS.AAA_LARGE : CONTRAST_THRESHOLDS.AAA_NORMAL;
+  const aaThreshold =
+    textSize === 'large' ? CONTRAST_THRESHOLDS.AA_LARGE : CONTRAST_THRESHOLDS.AA_NORMAL;
+
   if (ratio >= aaaThreshold) return 'AAA';
   if (ratio >= aaThreshold) return 'AA';
   return 'FAIL';
@@ -96,7 +105,10 @@ export function getContrastLevel(
 /**
  * Generate accessible color variations
  */
-export function generateAccessibleColors(baseColor: string, background: string = '#ffffff'): {
+export function generateAccessibleColors(
+  baseColor: string,
+  background: string = '#ffffff'
+): {
   aa: string;
   aaa: string;
   original: string;
@@ -107,7 +119,7 @@ export function generateAccessibleColors(baseColor: string, background: string =
   };
 } {
   const originalRatio = getContrastRatio(baseColor, background);
-  
+
   // If already meets AAA, return as-is
   if (originalRatio >= CONTRAST_THRESHOLDS.AAA_NORMAL) {
     return {
@@ -121,36 +133,36 @@ export function generateAccessibleColors(baseColor: string, background: string =
       },
     };
   }
-  
+
   const rgb = hexToRgb(baseColor);
   if (!rgb) throw new Error('Invalid base color');
-  
+
   // Darken or lighten to meet requirements
   const isLightBackground = getLuminance(255, 255, 255) > 0.5;
-  
+
   let aaColor = baseColor;
   let aaaColor = baseColor;
-  
+
   // Adjust color to meet AA standard
   for (let adjustment = 0; adjustment <= 100; adjustment += 5) {
     const factor = isLightBackground ? (100 - adjustment) / 100 : (100 + adjustment) / 100;
     const adjustedR = Math.round(rgb.r * factor);
     const adjustedG = Math.round(rgb.g * factor);
     const adjustedB = Math.round(rgb.b * factor);
-    
+
     const adjustedColor = `#${adjustedR.toString(16).padStart(2, '0')}${adjustedG.toString(16).padStart(2, '0')}${adjustedB.toString(16).padStart(2, '0')}`;
     const ratio = getContrastRatio(adjustedColor, background);
-    
+
     if (ratio >= CONTRAST_THRESHOLDS.AA_NORMAL && aaColor === baseColor) {
       aaColor = adjustedColor;
     }
-    
+
     if (ratio >= CONTRAST_THRESHOLDS.AAA_NORMAL) {
       aaaColor = adjustedColor;
       break;
     }
   }
-  
+
   return {
     aa: aaColor,
     aaa: aaaColor,
@@ -185,7 +197,7 @@ export function validateThemeContrast(theme: Record<string, any>): {
     required: number;
     level: 'AA' | 'AAA' | 'FAIL';
   }> = [];
-  
+
   // Common color combinations to check
   const combinations = [
     { fg: 'foreground', bg: 'background', name: 'text-on-background' },
@@ -198,12 +210,12 @@ export function validateThemeContrast(theme: Record<string, any>): {
     { fg: 'successForeground', bg: 'success', name: 'success-text' },
     { fg: 'warningForeground', bg: 'warning', name: 'warning-text' },
   ];
-  
+
   combinations.forEach(({ fg, bg, name }) => {
     if (theme.colors?.[fg] && theme.colors?.[bg]) {
       const ratio = getContrastRatio(theme.colors[fg], theme.colors[bg]);
       const level = getContrastLevel(theme.colors[fg], theme.colors[bg]);
-      
+
       if (level === 'FAIL') {
         issues.push({
           property: name,
@@ -216,7 +228,7 @@ export function validateThemeContrast(theme: Record<string, any>): {
       }
     }
   });
-  
+
   return {
     isValid: issues.length === 0,
     issues,

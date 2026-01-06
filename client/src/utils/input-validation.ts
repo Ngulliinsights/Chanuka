@@ -28,7 +28,8 @@ export const VALIDATION_PATTERNS = {
   alpha: /^[a-zA-Z\s]+$/,
   noSpecialChars: /^[a-zA-Z0-9\s\-_.]+$/,
   strongPassword: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-  sqlInjection: /('(''|[^'])*')|(;)|(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b)/i,
+  sqlInjection:
+    /('(''|[^'])*')|(;)|(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b)/i,
   xss: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
 };
 

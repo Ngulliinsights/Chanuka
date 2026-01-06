@@ -6,4 +6,3 @@ export class useErrorHandler extends Error {
     this.name = 'useErrorHandler';
   }
 }
-

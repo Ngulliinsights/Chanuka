@@ -6,6 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import { Result, ok, err } from '../../primitives/types/result';
 
 export interface CacheWarmerConfig {

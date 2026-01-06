@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 // Remove unused import
 
 /**
@@ -24,169 +24,175 @@ export interface ScriptFallbackProps {
 /**
  * Script fallback component with retry logic
  */
-export const ScriptFallback = React.memo<ScriptFallbackProps>(({
-  src,
-  fallbackSrc,
-  retryAttempts = 2,
-  timeout = 10000,
-  async = true,
-  defer = false,
-  crossOrigin,
-  integrity,
-  onLoad,
-  onError,
-  children,
-  loadingComponent,
-  errorComponent
-}) => {
-  const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'fallback'>('loading');
-  const [retryCount, setRetryCount] = useState(0);
-  const [error, setError] = useState<Error | null>(null);
+export const ScriptFallback = React.memo<ScriptFallbackProps>(
+  ({
+    src,
+    fallbackSrc,
+    retryAttempts = 2,
+    timeout = 10000,
+    async = true,
+    defer = false,
+    crossOrigin,
+    integrity,
+    onLoad,
+    onError,
+    children,
+    loadingComponent,
+    errorComponent,
+  }) => {
+    const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'fallback'>(
+      'loading'
+    );
+    const [retryCount, setRetryCount] = useState(0);
+    const [error, setError] = useState<Error | null>(null);
 
-  const loadScript = useCallback((scriptSrc: string, _isFallback = false): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      // Check if script already exists
-      const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
-      if (existingScript) {
-        resolve();
-        return;
-      }
+    const loadScript = useCallback(
+      (scriptSrc: string, _isFallback = false): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          // Check if script already exists
+          const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
+          if (existingScript) {
+            resolve();
+            return;
+          }
 
-      const script = document.createElement('script');
-      script.src = scriptSrc;
-      script.async = async;
-      script.defer = defer;
+          const script = document.createElement('script');
+          script.src = scriptSrc;
+          script.async = async;
+          script.defer = defer;
 
-      if (crossOrigin) {
-        script.crossOrigin = crossOrigin;
-      }
+          if (crossOrigin) {
+            script.crossOrigin = crossOrigin;
+          }
 
-      if (integrity) {
-        script.integrity = integrity;
-      }
+          if (integrity) {
+            script.integrity = integrity;
+          }
 
-      const timeoutId = setTimeout(() => {
-        script.remove();
-        reject(new Error(`Script loading timeout: ${scriptSrc}`));
-      }, timeout);
+          const timeoutId = setTimeout(() => {
+            script.remove();
+            reject(new Error(`Script loading timeout: ${scriptSrc}`));
+          }, timeout);
 
-      const cleanup = () => {
-        clearTimeout(timeoutId);
-        script.removeEventListener('load', handleLoad);
-        script.removeEventListener('error', handleError);
-      };
+          const cleanup = () => {
+            clearTimeout(timeoutId);
+            script.removeEventListener('load', handleLoad);
+            script.removeEventListener('error', handleError);
+          };
 
-      const handleLoad = () => {
-        cleanup();
-        resolve();
-      };
+          const handleLoad = () => {
+            cleanup();
+            resolve();
+          };
 
-      const handleError = () => {
-        cleanup();
-        script.remove();
-        reject(new Error(`Failed to load script: ${scriptSrc}`));
-      };
+          const handleError = () => {
+            cleanup();
+            script.remove();
+            reject(new Error(`Failed to load script: ${scriptSrc}`));
+          };
 
-      script.addEventListener('load', handleLoad);
-      script.addEventListener('error', handleError);
+          script.addEventListener('load', handleLoad);
+          script.addEventListener('error', handleError);
 
-      document.head.appendChild(script);
-    });
-  }, [async, defer, crossOrigin, integrity, timeout]);
+          document.head.appendChild(script);
+        });
+      },
+      [async, defer, crossOrigin, integrity, timeout]
+    );
 
-  const attemptLoad = useCallback(async (scriptSrc: string, attempt: number) => {
-    try {
-      await loadScript(scriptSrc, attempt > 0);
-      setLoadState('loaded');
-      onLoad?.();
-    } catch (err) {
-      const error = err as Error;
-      setError(error);
-
-      // Try fallback if available and this is the first attempt
-      if (fallbackSrc && attempt === 0) {
-        setLoadState('fallback');
+    const attemptLoad = useCallback(
+      async (scriptSrc: string, attempt: number) => {
         try {
-          await loadScript(fallbackSrc);
+          await loadScript(scriptSrc, attempt > 0);
           setLoadState('loaded');
           onLoad?.();
-        } catch (fallbackError) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Script fallback failed:', fallbackError);
+        } catch (err) {
+          const error = err as Error;
+          setError(error);
+
+          // Try fallback if available and this is the first attempt
+          if (fallbackSrc && attempt === 0) {
+            setLoadState('fallback');
+            try {
+              await loadScript(fallbackSrc);
+              setLoadState('loaded');
+              onLoad?.();
+            } catch (fallbackError) {
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('Script fallback failed:', fallbackError);
+              }
+            }
+          }
+
+          // Retry if attempts remaining
+          if (attempt < retryAttempts) {
+            setRetryCount(attempt + 1);
+            const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+
+            setTimeout(() => {
+              attemptLoad(scriptSrc, attempt + 1);
+            }, delay);
+          } else {
+            // Final failure
+            setLoadState('error');
+            onError?.(error);
           }
         }
-      }
-
-      // Retry if attempts remaining
-      if (attempt < retryAttempts) {
-        setRetryCount(attempt + 1);
-        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
-        
-        setTimeout(() => {
-          attemptLoad(scriptSrc, attempt + 1);
-        }, delay);
-      } else {
-        // Final failure
-        setLoadState('error');
-        onError?.(error);
-      }
-    }
-  }, [loadScript, fallbackSrc, retryAttempts, onLoad, onError]);
-
-  useEffect(() => {
-    attemptLoad(src, 0);
-  }, [src, attemptLoad]);
-
-  // Loading state
-  if (loadState === 'loading' || loadState === 'fallback') {
-    return children ? (
-      <div className="relative">
-        {children}
-        {loadingComponent}
-      </div>
-    ) : (
-      loadingComponent || (
-        <div className="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
-          <span className="text-sm text-blue-700 dark:text-blue-300">
-            Loading script...
-            {loadState === 'fallback' && ' (using fallback)'}
-            {retryCount > 0 && ` (attempt ${retryCount + 1})`}
-          </span>
-        </div>
-      )
+      },
+      [loadScript, fallbackSrc, retryAttempts, onLoad, onError]
     );
-  }
 
-  // Error state
-  if (loadState === 'error') {
-    return children ? (
-      <div className="relative">
-        {children}
-        {errorComponent}
-      </div>
-    ) : (
-      errorComponent || (
-        <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <div className="flex-1">
-            <span className="text-sm text-red-700 dark:text-red-300">
-              Failed to load script
+    useEffect(() => {
+      attemptLoad(src, 0);
+    }, [src, attemptLoad]);
+
+    // Loading state
+    if (loadState === 'loading' || loadState === 'fallback') {
+      return children ? (
+        <div className="relative">
+          {children}
+          {loadingComponent}
+        </div>
+      ) : (
+        loadingComponent || (
+          <div className="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              Loading script...
+              {loadState === 'fallback' && ' (using fallback)'}
+              {retryCount > 0 && ` (attempt ${retryCount + 1})`}
             </span>
-            {error && (
-              <div className="text-xs text-red-600 dark:text-red-400 mt-1">
-                {error.message}
-              </div>
-            )}
           </div>
-        </div>
-      )
-    );
-  }
+        )
+      );
+    }
 
-  // Success state
-  return <>{children}</>;
-});
+    // Error state
+    if (loadState === 'error') {
+      return children ? (
+        <div className="relative">
+          {children}
+          {errorComponent}
+        </div>
+      ) : (
+        errorComponent || (
+          <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <div className="flex-1">
+              <span className="text-sm text-red-700 dark:text-red-300">Failed to load script</span>
+              {error && (
+                <div className="text-xs text-red-600 dark:text-red-400 mt-1">{error.message}</div>
+              )}
+            </div>
+          </div>
+        )
+      );
+    }
+
+    // Success state
+    return <>{children}</>;
+  }
+);
 
 ScriptFallback.displayName = 'ScriptFallback';
 
@@ -305,7 +311,16 @@ export function useScriptFallback(
     return () => {
       mounted = false;
     };
-  }, [src, options.fallbackSrc, options.retryAttempts, options.timeout, options.async, options.defer, options.crossOrigin, options.integrity]);
+  }, [
+    src,
+    options.fallbackSrc,
+    options.retryAttempts,
+    options.timeout,
+    options.async,
+    options.defer,
+    options.crossOrigin,
+    options.integrity,
+  ]);
 
   return { state, error };
 }

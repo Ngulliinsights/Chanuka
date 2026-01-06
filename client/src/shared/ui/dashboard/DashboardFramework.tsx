@@ -278,7 +278,6 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
       [updateWidget, onWidgetUpdate]
     );
 
-
     const handleThemeChange = useCallback(
       (updates: Partial<DashboardThemeConfig>) => {
         // Ensure we preserve the colorScheme if not provided in updates, to match required type
@@ -377,7 +376,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
                   columns={breakpoint === 'mobile' ? 1 : breakpoint === 'tablet' ? 2 : 3}
                   rowHeight={120}
                   gap={24}
-                  onLayoutChange={(newLayout) => {
+                  onLayoutChange={newLayout => {
                     // Handle grid layout changes
                     handleLayoutChange({ type: 'grid' });
                     console.log('Grid layout changed:', newLayout);

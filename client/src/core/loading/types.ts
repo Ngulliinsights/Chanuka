@@ -4,7 +4,14 @@
  * Platform-agnostic types for cross-cutting loading concerns
  */
 
-export type LoadingType = 'page' | 'component' | 'api' | 'asset' | 'progressive' | 'form' | 'navigation';
+export type LoadingType =
+  | 'page'
+  | 'component'
+  | 'api'
+  | 'asset'
+  | 'progressive'
+  | 'form'
+  | 'navigation';
 export type LoadingPriority = 'high' | 'medium' | 'low';
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error' | 'timeout' | 'cancelled';
 export type ConnectionType = 'fast' | 'slow' | 'offline' | 'unknown';
@@ -116,7 +123,13 @@ export interface LoadingScenario {
 
 // Action types for reducer
 export type LoadingAction =
-  | { type: 'START_OPERATION'; payload: Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled'> }
+  | {
+      type: 'START_OPERATION';
+      payload: Omit<
+        LoadingOperation,
+        'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled'
+      >;
+    }
   | { type: 'UPDATE_OPERATION'; payload: { id: string; updates: Partial<LoadingOperation> } }
   | { type: 'COMPLETE_OPERATION'; payload: { id: string; success: boolean; error?: Error } }
   | { type: 'RETRY_OPERATION'; payload: { id: string } }
@@ -200,7 +213,12 @@ export interface TimeoutAwareLoadingResult {
 // Context interface
 export interface LoadingContextValue {
   state: LoadingStateData;
-  startOperation: (operation: Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled'>) => void;
+  startOperation: (
+    operation: Omit<
+      LoadingOperation,
+      'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled'
+    >
+  ) => void;
   updateOperation: (id: string, updates: Partial<LoadingOperation>) => void;
   completeOperation: (id: string, success: boolean, error?: Error) => void;
   retryOperation: (id: string) => void;
@@ -218,7 +236,11 @@ export interface LoadingContextValue {
   // Convenience methods
   startPageLoading: (pageId: string, message?: string, options?: Partial<LoadingOptions>) => void;
   completePageLoading: (pageId: string, success?: boolean, error?: Error) => void;
-  startComponentLoading: (componentId: string, message?: string, options?: Partial<LoadingOptions>) => void;
+  startComponentLoading: (
+    componentId: string,
+    message?: string,
+    options?: Partial<LoadingOptions>
+  ) => void;
   completeComponentLoading: (componentId: string, success?: boolean, error?: Error) => void;
   startApiLoading: (apiId: string, message?: string, options?: Partial<LoadingOptions>) => void;
   completeApiLoading: (apiId: string, success?: boolean, error?: Error) => void;
@@ -268,7 +290,12 @@ export class LoadingConnectionError extends LoadingError {
     public connectionType: ConnectionType,
     metadata?: Record<string, any>
   ) {
-    super(operationId, `Operation failed due to connection (${connectionType})`, 'CONNECTION', metadata);
+    super(
+      operationId,
+      `Operation failed due to connection (${connectionType})`,
+      'CONNECTION',
+      metadata
+    );
     this.name = 'LoadingConnectionError';
   }
 }

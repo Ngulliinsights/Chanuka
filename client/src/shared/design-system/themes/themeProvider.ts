@@ -9,9 +9,12 @@ import { darkTheme } from './dark';
 import { highContrastTheme, darkHighContrastTheme } from './high-contrast';
 import { lightTheme } from './light';
 
-
 export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'dark-high-contrast';
-export type Theme = typeof lightTheme | typeof darkTheme | typeof highContrastTheme | typeof darkHighContrastTheme;
+export type Theme =
+  | typeof lightTheme
+  | typeof darkTheme
+  | typeof highContrastTheme
+  | typeof darkHighContrastTheme;
 export type ContrastPreference = 'normal' | 'high';
 
 export const themes = {
@@ -31,10 +34,10 @@ export class ThemeProvider {
   constructor() {
     this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     this.contrastQuery = window.matchMedia('(prefers-contrast: high)');
-    
+
     this.mediaQuery.addEventListener('change', this.handleSystemThemeChange.bind(this));
     this.contrastQuery.addEventListener('change', this.handleContrastChange.bind(this));
-    
+
     this.initializeTheme();
   }
 
@@ -44,24 +47,24 @@ export class ThemeProvider {
   private initializeTheme(): void {
     const savedTheme = localStorage.getItem('chanuka-theme') as ThemeName;
     const savedContrast = localStorage.getItem('chanuka-contrast') as ContrastPreference;
-    
+
     // Set contrast preference
     this.contrastPreference = savedContrast || (this.contrastQuery.matches ? 'high' : 'normal');
-    
+
     if (savedTheme && savedTheme in themes) {
       this.setTheme(savedTheme);
     } else {
       // Use system preference with contrast consideration
       const isDark = this.mediaQuery.matches;
       const isHighContrast = this.contrastPreference === 'high';
-      
+
       let systemTheme: ThemeName;
       if (isHighContrast) {
         systemTheme = isDark ? 'dark-high-contrast' : 'high-contrast';
       } else {
         systemTheme = isDark ? 'dark' : 'light';
       }
-      
+
       this.setTheme(systemTheme);
     }
   }
@@ -75,14 +78,14 @@ export class ThemeProvider {
     if (!savedTheme) {
       const isDark = e.matches;
       const isHighContrast = this.contrastPreference === 'high';
-      
+
       let systemTheme: ThemeName;
       if (isHighContrast) {
         systemTheme = isDark ? 'dark-high-contrast' : 'high-contrast';
       } else {
         systemTheme = isDark ? 'dark' : 'light';
       }
-      
+
       this.setTheme(systemTheme);
     }
   }
@@ -94,17 +97,17 @@ export class ThemeProvider {
     const savedContrast = localStorage.getItem('chanuka-contrast');
     if (!savedContrast) {
       this.contrastPreference = e.matches ? 'high' : 'normal';
-      
+
       // Update theme to match contrast preference
       const isDark = this.currentTheme.includes('dark');
       let newTheme: ThemeName;
-      
+
       if (this.contrastPreference === 'high') {
         newTheme = isDark ? 'dark-high-contrast' : 'high-contrast';
       } else {
         newTheme = isDark ? 'dark' : 'light';
       }
-      
+
       this.setTheme(newTheme);
     }
   }
@@ -120,7 +123,7 @@ export class ThemeProvider {
 
     this.currentTheme = themeName;
     this.contrastPreference = themeName.includes('high-contrast') ? 'high' : 'normal';
-    
+
     const theme = themes[themeName];
 
     // Validate theme contrast
@@ -137,7 +140,7 @@ export class ThemeProvider {
       .replace(/theme-\w+/g, '')
       .replace(/contrast-\w+/g, '')
       .trim();
-    
+
     document.documentElement.classList.add(`theme-${themeName}`);
     document.documentElement.classList.add(`contrast-${this.contrastPreference}`);
 
@@ -171,7 +174,7 @@ export class ThemeProvider {
    */
   toggleTheme(): void {
     const isHighContrast = this.contrastPreference === 'high';
-    
+
     if (this.currentTheme.includes('dark')) {
       this.setTheme(isHighContrast ? 'high-contrast' : 'light');
     } else {
@@ -184,7 +187,7 @@ export class ThemeProvider {
    */
   toggleContrast(): void {
     const isDark = this.currentTheme.includes('dark');
-    
+
     if (this.contrastPreference === 'high') {
       this.setTheme(isDark ? 'dark' : 'light');
     } else {
@@ -220,13 +223,13 @@ export class ThemeProvider {
   private applyContrastCSS(theme: Theme): void {
     const contrastCSS = generateContrastCSS(theme);
     let styleElement = document.getElementById('chanuka-contrast-styles');
-    
+
     if (!styleElement) {
       styleElement = document.createElement('style');
       styleElement.id = 'chanuka-contrast-styles';
       document.head.appendChild(styleElement);
     }
-    
+
     styleElement.textContent = contrastCSS;
   }
 
@@ -243,7 +246,7 @@ export class ThemeProvider {
    */
   private updateCSSVariables(variables: Record<string, string>): void {
     const root = document.documentElement;
-    
+
     Object.entries(variables).forEach(([property, value]) => {
       root.style.setProperty(property, value);
     });
@@ -276,4 +279,3 @@ export class ThemeProvider {
 
 // Singleton instance
 export const themeProvider = new ThemeProvider();
-

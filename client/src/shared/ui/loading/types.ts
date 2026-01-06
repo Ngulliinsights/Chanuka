@@ -4,7 +4,16 @@
 
 // Basic loading types
 export type LoadingSize = 'sm' | 'md' | 'lg';
-export type LoadingType = 'page' | 'component' | 'asset' | 'data' | 'network' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware';
+export type LoadingType =
+  | 'page'
+  | 'component'
+  | 'asset'
+  | 'data'
+  | 'network'
+  | 'inline'
+  | 'progressive'
+  | 'network-aware'
+  | 'timeout-aware';
 export type LoadingPriority = 'low' | 'medium' | 'high';
 export type LoadingState = 'loading' | 'success' | 'error' | 'timeout' | 'offline';
 export type LoadingPhase = 'initial' | 'loading' | 'complete' | 'error';

@@ -40,7 +40,7 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
     // In development mode, create a minimal security system to reduce console noise
     if (process.env.NODE_ENV === 'development') {
       logger.info('Development mode: using minimal security configuration');
-      
+
       // Create minimal mock security system
       const mockSecuritySystem = {
         csp: { initialize: async () => {}, getNonce: () => 'dev-nonce' },
@@ -48,9 +48,9 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
         sanitizer: { sanitize: (input: string) => input },
         rateLimiter: { initialize: async () => {} },
         vulnerabilityScanner: { initialize: async () => {} },
-        monitor: { initialize: async () => {} }
+        monitor: { initialize: async () => {} },
       };
-      
+
       return mockSecuritySystem as any;
     }
 
@@ -60,14 +60,14 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
     const csp = new CSPManager({
       enabled: config.enableCSP,
       reportUri: '/api/security/csp-report',
-      reportOnly: process.env.NODE_ENV === 'development'
+      reportOnly: process.env.NODE_ENV === 'development',
     });
 
     // Initialize CSRF Protection
     const csrf = new CSRFProtection({
       enabled: config.enableCSRF,
       tokenName: 'chanuka-csrf-token',
-      headerName: 'X-CSRF-Token'
+      headerName: 'X-CSRF-Token',
     });
 
     // Initialize Input Sanitizer
@@ -75,9 +75,9 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
       enabled: config.enableInputSanitization,
       allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
       allowedAttributes: {
-        'a': ['href', 'title'],
-        'img': ['src', 'alt', 'title']
-      }
+        a: ['href', 'title'],
+        img: ['src', 'alt', 'title'],
+      },
     });
 
     // Initialize Rate Limiter
@@ -85,21 +85,21 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
       enabled: config.enableRateLimit,
       windowMs: 15 * 60 * 1000, // 15 minutes
       maxRequests: 100, // per window
-      skipSuccessfulRequests: false
+      skipSuccessfulRequests: false,
     });
 
     // Initialize Vulnerability Scanner
     const vulnerabilityScanner = new VulnerabilityScanner({
       enabled: config.enableVulnerabilityScanning,
       scanInterval: config.scanInterval,
-      reportEndpoint: '/api/security/vulnerability-report'
+      reportEndpoint: '/api/security/vulnerability-report',
     });
 
     // Initialize Security Monitor
     const monitor = new SecurityMonitor({
       enabled: true,
       alertThreshold: 5,
-      monitoringInterval: 30000 // 30 seconds
+      monitoringInterval: 30000, // 30 seconds
     });
 
     securitySystem = {
@@ -108,7 +108,7 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
       sanitizer,
       rateLimiter,
       vulnerabilityScanner,
-      monitor
+      monitor,
     };
 
     // Start security services
@@ -120,7 +120,6 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
 
     logger.info('Security infrastructure initialized successfully');
     return securitySystem;
-
   } catch (error) {
     logger.error('Failed to initialize security infrastructure', error);
     throw error;

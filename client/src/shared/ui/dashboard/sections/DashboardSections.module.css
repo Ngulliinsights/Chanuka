@@ -68,27 +68,27 @@
 }
 
 /* Icon container activity colors */
-.iconContainer[data-activity-type="view"] {
+.iconContainer[data-activity-type='view'] {
   background-color: hsl(var(--civic-transparency));
 }
 
-.iconContainer[data-activity-type="comment"] {
+.iconContainer[data-activity-type='comment'] {
   background-color: hsl(var(--civic-community));
 }
 
-.iconContainer[data-activity-type="share"] {
+.iconContainer[data-activity-type='share'] {
   background-color: hsl(var(--civic-community));
 }
 
-.iconContainer[data-activity-type="save"] {
+.iconContainer[data-activity-type='save'] {
   background-color: hsl(var(--civic-urgent));
 }
 
-.iconContainer[data-activity-type="vote"] {
+.iconContainer[data-activity-type='vote'] {
   background-color: hsl(var(--civic-expert));
 }
 
-.iconContainer[data-activity-type="expert_contribution"] {
+.iconContainer[data-activity-type='expert_contribution'] {
   background-color: hsl(var(--civic-expert));
 }
 

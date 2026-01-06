@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ArrowLeft,
   MessageSquare,
@@ -8,16 +7,29 @@ import {
   Flag,
   Send,
   Filter,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
 
@@ -55,12 +67,12 @@ export default function CommentsPage() {
   useEffect(() => {
     const loadCommentsAndBill = async () => {
       setLoading(true);
-      
+
       // Mock data
       const mockBill: BillInfo = {
         id: id || '1',
         title: 'Digital Privacy Protection and Data Rights Act',
-        billNumber: 'HB-2024-001'
+        billNumber: 'HB-2024-001',
       };
 
       const mockComments: Comment[] = [
@@ -69,9 +81,10 @@ export default function CommentsPage() {
           author: {
             name: 'Dr. Sarah Kimani',
             verified: true,
-            title: 'Privacy Law Expert'
+            title: 'Privacy Law Expert',
           },
-          content: 'This bill represents a significant step forward in protecting digital rights in Kenya. The provisions for data portability and the right to be forgotten align well with international standards like GDPR. However, I would recommend strengthening the enforcement mechanisms in Section 15.',
+          content:
+            'This bill represents a significant step forward in protecting digital rights in Kenya. The provisions for data portability and the right to be forgotten align well with international standards like GDPR. However, I would recommend strengthening the enforcement mechanisms in Section 15.',
           timestamp: '2024-01-20T10:30:00Z',
           likes: 45,
           dislikes: 3,
@@ -80,39 +93,41 @@ export default function CommentsPage() {
               id: '1-1',
               author: {
                 name: 'Michael Chen',
-                verified: false
+                verified: false,
               },
               content: 'Great point about enforcement. What specific mechanisms would you suggest?',
               timestamp: '2024-01-20T11:15:00Z',
               likes: 12,
               dislikes: 0,
-              replies: []
-            }
+              replies: [],
+            },
           ],
-          isExpert: true
+          isExpert: true,
         },
         {
           id: '2',
           author: {
             name: 'Jane Wanjiku',
             verified: true,
-            title: 'Small Business Owner'
+            title: 'Small Business Owner',
           },
-          content: 'As a small business owner, I\'m concerned about the compliance costs. While I support privacy protection, we need clear guidelines and perhaps a phased implementation for SMEs. The current timeline seems too aggressive.',
+          content:
+            "As a small business owner, I'm concerned about the compliance costs. While I support privacy protection, we need clear guidelines and perhaps a phased implementation for SMEs. The current timeline seems too aggressive.",
           timestamp: '2024-01-20T09:45:00Z',
           likes: 28,
           dislikes: 8,
           replies: [],
-          isExpert: false
+          isExpert: false,
         },
         {
           id: '3',
           author: {
             name: 'Prof. David Mwangi',
             verified: true,
-            title: 'Constitutional Law Professor'
+            title: 'Constitutional Law Professor',
           },
-          content: 'From a constitutional perspective, this bill excellently balances individual privacy rights with legitimate business interests. The provisions in Article 31 are well-addressed, and the bill creates a robust framework for digital rights protection.',
+          content:
+            'From a constitutional perspective, this bill excellently balances individual privacy rights with legitimate business interests. The provisions in Article 31 are well-addressed, and the bill creates a robust framework for digital rights protection.',
           timestamp: '2024-01-20T08:20:00Z',
           likes: 67,
           dislikes: 2,
@@ -121,34 +136,36 @@ export default function CommentsPage() {
               id: '3-1',
               author: {
                 name: 'Mary Njeri',
-                verified: false
+                verified: false,
               },
-              content: 'Thank you for this analysis, Professor. Could you elaborate on how this compares to similar legislation in other African countries?',
+              content:
+                'Thank you for this analysis, Professor. Could you elaborate on how this compares to similar legislation in other African countries?',
               timestamp: '2024-01-20T09:00:00Z',
               likes: 15,
               dislikes: 1,
-              replies: []
-            }
+              replies: [],
+            },
           ],
-          isExpert: true
+          isExpert: true,
         },
         {
           id: '4',
           author: {
             name: 'Tech Enthusiast',
-            verified: false
+            verified: false,
           },
-          content: 'Finally! Kenya is taking digital privacy seriously. This will put us ahead of many countries in the region. I especially like the provisions for algorithmic transparency.',
+          content:
+            'Finally! Kenya is taking digital privacy seriously. This will put us ahead of many countries in the region. I especially like the provisions for algorithmic transparency.',
           timestamp: '2024-01-19T16:30:00Z',
           likes: 34,
           dislikes: 5,
-          replies: []
-        }
+          replies: [],
+        },
       ];
 
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       setBillInfo(mockBill);
       setComments(mockComments);
       setLoading(false);
@@ -164,13 +181,13 @@ export default function CommentsPage() {
       id: Date.now().toString(),
       author: {
         name: 'Current User',
-        verified: false
+        verified: false,
       },
       content: newComment,
       timestamp: new Date().toISOString(),
       likes: 0,
       dislikes: 0,
-      replies: []
+      replies: [],
     };
 
     setComments(prev => [comment, ...prev]);
@@ -178,18 +195,18 @@ export default function CommentsPage() {
   };
 
   const handleLike = (commentId: string) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
-        ? { ...comment, likes: comment.likes + 1 }
-        : comment
-    ));
+    setComments(prev =>
+      prev.map(comment =>
+        comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
+      )
+    );
   };
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     return `${Math.floor(diffInHours / 24)}d ago`;
@@ -200,7 +217,7 @@ export default function CommentsPage() {
       case 'oldest':
         return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
       case 'popular':
-        return (b.likes - b.dislikes) - (a.likes - a.dislikes);
+        return b.likes - b.dislikes - (a.likes - a.dislikes);
       default: // newest
         return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     }
@@ -234,7 +251,10 @@ export default function CommentsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Link to={`/bills/${id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link
+          to={`/bills/${id}`}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Bill Details
         </Link>
@@ -242,7 +262,9 @@ export default function CommentsPage() {
         {billInfo && (
           <div>
             <p className="text-lg text-muted-foreground">{billInfo.title}</p>
-            <Badge variant="outline" className="mt-2">{billInfo.billNumber}</Badge>
+            <Badge variant="outline" className="mt-2">
+              {billInfo.billNumber}
+            </Badge>
           </div>
         )}
       </div>
@@ -264,7 +286,7 @@ export default function CommentsPage() {
                 <Textarea
                   placeholder="Share your thoughts on this bill..."
                   value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
+                  onChange={e => setNewComment(e.target.value)}
                   rows={4}
                 />
                 <div className="flex justify-between items-center">
@@ -319,7 +341,7 @@ export default function CommentsPage() {
 
           {/* Comments List */}
           <div className="space-y-6">
-            {filteredComments.map((comment) => (
+            {filteredComments.map(comment => (
               <Card key={comment.id}>
                 <CardContent className="p-6">
                   {/* Comment Header */}
@@ -327,24 +349,33 @@ export default function CommentsPage() {
                     <Avatar>
                       <AvatarImage src={comment.author.avatar} />
                       <AvatarFallback>
-                        {comment.author.name.split(' ').map(n => n[0]).join('')}
+                        {comment.author.name
+                          .split(' ')
+                          .map(n => n[0])
+                          .join('')}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h4 className="font-semibold">{comment.author.name}</h4>
                         {comment.author.verified && (
-                          <Badge variant="secondary" className="text-xs">Verified</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            Verified
+                          </Badge>
                         )}
                         {comment.isExpert && (
-                          <Badge variant="default" className="text-xs">Expert</Badge>
+                          <Badge variant="default" className="text-xs">
+                            Expert
+                          </Badge>
                         )}
                       </div>
                       {comment.author.title && (
                         <p className="text-sm text-muted-foreground">{comment.author.title}</p>
                       )}
-                      <p className="text-xs text-muted-foreground">{formatTimeAgo(comment.timestamp)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatTimeAgo(comment.timestamp)}
+                      </p>
                     </div>
                   </div>
 
@@ -355,8 +386,8 @@ export default function CommentsPage() {
 
                   {/* Comment Actions */}
                   <div className="flex items-center space-x-4">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleLike(comment.id)}
                       className="text-muted-foreground hover:text-green-600"
@@ -364,21 +395,21 @@ export default function CommentsPage() {
                       <ThumbsUp className="h-4 w-4 mr-1" />
                       {comment.likes}
                     </Button>
-                    
-                    <Button 
-                      variant="ghost" 
+
+                    <Button
+                      variant="ghost"
                       size="sm"
                       className="text-muted-foreground hover:text-red-600"
                     >
                       <ThumbsDown className="h-4 w-4 mr-1" />
                       {comment.dislikes}
                     </Button>
-                    
+
                     <Button variant="ghost" size="sm" className="text-muted-foreground">
                       <Reply className="h-4 w-4 mr-1" />
                       Reply
                     </Button>
-                    
+
                     <Button variant="ghost" size="sm" className="text-muted-foreground">
                       <Flag className="h-4 w-4 mr-1" />
                       Report
@@ -388,19 +419,24 @@ export default function CommentsPage() {
                   {/* Replies */}
                   {comment.replies.length > 0 && (
                     <div className="mt-6 pl-8 border-l-2 border-gray-100 space-y-4">
-                      {comment.replies.map((reply) => (
+                      {comment.replies.map(reply => (
                         <div key={reply.id} className="space-y-2">
                           <div className="flex items-start space-x-3">
                             <Avatar className="h-8 w-8">
                               <AvatarFallback className="text-xs">
-                                {reply.author.name.split(' ').map(n => n[0]).join('')}
+                                {reply.author.name
+                                  .split(' ')
+                                  .map(n => n[0])
+                                  .join('')}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-1">
                                 <h5 className="font-medium text-sm">{reply.author.name}</h5>
                                 {reply.author.verified && (
-                                  <Badge variant="secondary" className="text-xs">Verified</Badge>
+                                  <Badge variant="secondary" className="text-xs">
+                                    Verified
+                                  </Badge>
                                 )}
                                 <span className="text-xs text-muted-foreground">
                                   {formatTimeAgo(reply.timestamp)}
@@ -408,11 +444,19 @@ export default function CommentsPage() {
                               </div>
                               <p className="text-sm text-gray-700">{reply.content}</p>
                               <div className="flex items-center space-x-3 mt-2">
-                                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground p-0 h-auto">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-xs text-muted-foreground p-0 h-auto"
+                                >
                                   <ThumbsUp className="h-3 w-3 mr-1" />
                                   {reply.likes}
                                 </Button>
-                                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground p-0 h-auto">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-xs text-muted-foreground p-0 h-auto"
+                                >
                                   <Reply className="h-3 w-3 mr-1" />
                                   Reply
                                 </Button>
@@ -485,4 +529,3 @@ export default function CommentsPage() {
     </div>
   );
 }
-

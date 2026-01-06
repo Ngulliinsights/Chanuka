@@ -1,11 +1,10 @@
 /**
  * ConflictOfInterestAnalysis - Main component integrating all conflict analysis features
- * 
+ *
  * Combines network visualization, financial tracking, transparency scoring,
  * historical patterns, and implementation workarounds into a comprehensive analysis.
  */
 
-import React from 'react';
 import {
   Network,
   DollarSign,
@@ -14,25 +13,30 @@ import {
   FileText,
   AlertTriangle,
   Download,
-  Share2
+  Share2,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useMemo } from 'react';
 
-import type { Bill } from '@client/shared/types';
 import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/features/analysis/types';
-
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 import { ConflictNetworkVisualization } from './ConflictNetworkVisualization';
 import { FinancialExposureTracker } from './FinancialExposureTracker';
 import { HistoricalPatternAnalysis } from './HistoricalPatternAnalysis';
 import { ImplementationWorkaroundsTracker } from './ImplementationWorkaroundsTracker';
 import { TransparencyScoring } from './TransparencyScoring';
-
 
 export interface ConflictOfInterestAnalysisProps {
   bill: Bill;
@@ -58,7 +62,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           category: 'investment',
           date: '2023-08-15',
           description: 'Stock holdings in healthcare technology company',
-          verified: true
+          verified: true,
         },
         {
           id: 'fi-2',
@@ -68,7 +72,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           category: 'donation',
           date: '2023-12-01',
           description: 'Campaign contribution from industry association',
-          verified: true
+          verified: true,
         },
         {
           id: 'fi-3',
@@ -78,7 +82,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           category: 'contract',
           date: '2023-06-20',
           description: 'Consulting agreement for regulatory affairs',
-          verified: false
+          verified: false,
         },
         {
           id: 'fi-4',
@@ -88,8 +92,8 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           category: 'investment',
           date: '2024-01-10',
           description: 'Investment in insurance technology startup',
-          verified: true
-        }
+          verified: true,
+        },
       ],
       organizationalConnections: [
         {
@@ -100,7 +104,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           strength: 0.8,
           startDate: '2022-01-15',
           description: 'Board member focusing on healthcare policy',
-          verified: true
+          verified: true,
         },
         {
           id: 'oc-2',
@@ -111,7 +115,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           startDate: '2023-03-01',
           endDate: '2023-12-31',
           description: 'Former consulting relationship',
-          verified: true
+          verified: true,
         },
         {
           id: 'oc-3',
@@ -121,8 +125,8 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           strength: 0.4,
           startDate: '2023-09-01',
           description: 'Partnership on healthcare access initiatives',
-          verified: true
-        }
+          verified: true,
+        },
       ],
       votingPatterns: [
         {
@@ -131,7 +135,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           vote: 'yes',
           date: '2023-11-15',
           relatedIndustries: ['Healthcare', 'Insurance'],
-          financialCorrelation: 0.65
+          financialCorrelation: 0.65,
         },
         {
           billId: 'hb-2023-067',
@@ -139,7 +143,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           vote: 'no',
           date: '2023-12-08',
           relatedIndustries: ['Healthcare', 'Pharmaceuticals'],
-          financialCorrelation: -0.45
+          financialCorrelation: -0.45,
         },
         {
           billId: 'hb-2024-012',
@@ -147,7 +151,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           vote: 'abstain',
           date: '2024-02-20',
           relatedIndustries: ['Insurance'],
-          financialCorrelation: 0.25
+          financialCorrelation: 0.25,
         },
         {
           billId: 'hb-2024-023',
@@ -155,37 +159,47 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           vote: 'no',
           date: '2024-03-05',
           relatedIndustries: ['Pharmaceuticals'],
-          financialCorrelation: 0.75
-        }
+          financialCorrelation: 0.75,
+        },
       ],
       transparencyScore: {
         overall: 72,
         financialDisclosure: 85,
         votingHistory: 68,
         industryConnections: 63,
-        methodology: 'Weighted average of disclosure completeness, voting consistency, and connection transparency',
-        lastUpdated: '2024-03-15'
+        methodology:
+          'Weighted average of disclosure completeness, voting consistency, and connection transparency',
+        lastUpdated: '2024-03-15',
       },
       riskLevel: 'medium',
-      summary: 'Moderate conflict risk with significant healthcare industry exposure and some concerning voting correlations'
+      summary:
+        'Moderate conflict risk with significant healthcare industry exposure and some concerning voting correlations',
     };
   }, [bill]);
 
   // Calculate overall risk assessment
   const riskAssessment = useMemo(() => {
-    const totalFinancialExposure = conflictAnalysis.financialInterests.reduce((sum, interest) => sum + interest.amount, 0);
-    const highCorrelationVotes = conflictAnalysis.votingPatterns.filter(vote => Math.abs(vote.financialCorrelation) > 0.5).length;
-    const strongConnections = conflictAnalysis.organizationalConnections.filter(conn => conn.strength > 0.6).length;
+    const totalFinancialExposure = conflictAnalysis.financialInterests.reduce(
+      (sum, interest) => sum + interest.amount,
+      0
+    );
+    const highCorrelationVotes = conflictAnalysis.votingPatterns.filter(
+      vote => Math.abs(vote.financialCorrelation) > 0.5
+    ).length;
+    const strongConnections = conflictAnalysis.organizationalConnections.filter(
+      conn => conn.strength > 0.6
+    ).length;
 
     let riskScore = 0;
-    
+
     // Financial exposure risk (0-40 points)
     if (totalFinancialExposure > 200000) riskScore += 40;
     else if (totalFinancialExposure > 100000) riskScore += 25;
     else if (totalFinancialExposure > 50000) riskScore += 15;
 
     // Voting correlation risk (0-35 points)
-    const correlationPercentage = (highCorrelationVotes / conflictAnalysis.votingPatterns.length) * 100;
+    const correlationPercentage =
+      (highCorrelationVotes / conflictAnalysis.votingPatterns.length) * 100;
     if (correlationPercentage > 50) riskScore += 35;
     else if (correlationPercentage > 30) riskScore += 25;
     else if (correlationPercentage > 15) riskScore += 15;
@@ -201,8 +215,8 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
       factors: {
         financialExposure: totalFinancialExposure,
         votingCorrelation: correlationPercentage,
-        strongConnections
-      }
+        strongConnections,
+      },
     };
   }, [conflictAnalysis]);
 
@@ -219,11 +233,11 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
       bill: {
         id: bill.id,
         title: bill.title,
-        billNumber: bill.billNumber
+        billNumber: bill.billNumber,
       },
       conflictAnalysis,
       riskAssessment,
-      exportDate: new Date().toISOString()
+      exportDate: new Date().toISOString(),
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -245,7 +259,10 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" style={{ color: 'hsl(var(--civic-transparency))' }} />
+                <AlertTriangle
+                  className="h-5 w-5"
+                  style={{ color: 'hsl(var(--civic-transparency))' }}
+                />
                 Conflict of Interest Analysis
               </CardTitle>
               <CardDescription>
@@ -268,9 +285,14 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center p-4 border rounded-lg">
               <div className="text-2xl font-bold">
-                <Badge 
-                  variant={riskAssessment.level === 'high' ? 'destructive' : 
-                          riskAssessment.level === 'medium' ? 'secondary' : 'default'}
+                <Badge
+                  variant={
+                    riskAssessment.level === 'high'
+                      ? 'destructive'
+                      : riskAssessment.level === 'medium'
+                        ? 'secondary'
+                        : 'default'
+                  }
                   className="text-lg px-3 py-1"
                 >
                   {riskAssessment.level.toUpperCase()}
@@ -295,9 +317,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
             </div>
 
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold">
-                {conflictAnalysis.transparencyScore.overall}
-              </div>
+              <div className="text-2xl font-bold">{conflictAnalysis.transparencyScore.overall}</div>
               <div className="text-sm text-muted-foreground">Transparency Score</div>
             </div>
           </div>
@@ -306,8 +326,9 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
             <Alert className="mt-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>High Risk Detected:</strong> This analysis indicates significant potential conflicts of interest. 
-                Review the detailed analysis below for specific concerns and recommendations.
+                <strong>High Risk Detected:</strong> This analysis indicates significant potential
+                conflicts of interest. Review the detailed analysis below for specific concerns and
+                recommendations.
               </AlertDescription>
             </Alert>
           )}
@@ -336,9 +357,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">Key Findings</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {conflictAnalysis.summary}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{conflictAnalysis.summary}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -362,9 +381,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
                     </div>
                     <div>
                       <div className="font-medium">Risk Level</div>
-                      <div className="text-muted-foreground">
-                        {conflictAnalysis.riskLevel}
-                      </div>
+                      <div className="text-muted-foreground">{conflictAnalysis.riskLevel}</div>
                     </div>
                   </div>
                 </div>
@@ -378,40 +395,40 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-3">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="justify-start"
                     onClick={() => setActiveTab('network')}
                   >
                     <Network className="h-4 w-4 mr-2" />
                     View Network Visualization
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="justify-start"
                     onClick={() => setActiveTab('financial')}
                   >
                     <DollarSign className="h-4 w-4 mr-2" />
                     Analyze Financial Exposure
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="justify-start"
                     onClick={() => setActiveTab('transparency')}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Review Transparency Score
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="justify-start"
                     onClick={() => setActiveTab('patterns')}
                   >
                     <TrendingUp className="h-4 w-4 mr-2" />
                     Examine Voting Patterns
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="justify-start"
                     onClick={() => setActiveTab('workarounds')}
                   >
@@ -442,7 +459,8 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
                   <div>
                     <h4 className="font-medium mb-2">Selected Connection</h4>
                     <div className="text-sm text-muted-foreground">
-                      Type: {selectedLink.type} • Strength: {(selectedLink.strength * 100).toFixed(1)}%
+                      Type: {selectedLink.type} • Strength:{' '}
+                      {(selectedLink.strength * 100).toFixed(1)}%
                     </div>
                     <div className="text-sm mt-1">{selectedLink.description}</div>
                   </div>

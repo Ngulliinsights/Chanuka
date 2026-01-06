@@ -32,6 +32,7 @@ client/src/core/realtime/
 ## Features
 
 ### Core WebSocket Management
+
 - **Unified WebSocket Manager**: Single instance managing all WebSocket connections
 - **Automatic Reconnection**: Built-in reconnection logic with exponential backoff
 - **Heartbeat Monitoring**: Connection health monitoring
@@ -39,12 +40,14 @@ client/src/core/realtime/
 - **Subscription Management**: Dynamic subscription/unsubscription
 
 ### Real-time Services
+
 - **Bill Tracking**: Real-time bill status, engagement metrics, and updates
 - **Community Features**: Discussion threads, typing indicators, comments, votes
 - **Notifications**: User notifications, system alerts, push notifications
 - **Expert Activities**: Expert insights and activity tracking
 
 ### React Hooks
+
 - **useWebSocket**: General WebSocket connection management
 - **useBillTracking**: Bill-specific real-time features
 - **useCommunityRealTime**: Community discussion features
@@ -70,16 +73,16 @@ const isConnected = realTimeService.isConnected();
 import { useBillTracking, useCommunityRealTime } from '@client/core/realtime';
 
 function MyComponent() {
-  const { 
-    subscribeToBill, 
-    unsubscribeFromBill, 
-    getBillUpdates 
+  const {
+    subscribeToBill,
+    unsubscribeFromBill,
+    getBillUpdates
   } = useBillTracking();
 
-  const { 
-    subscribeToDiscussion, 
-    sendTypingIndicator, 
-    typingIndicators 
+  const {
+    subscribeToDiscussion,
+    sendTypingIndicator,
+    typingIndicators
   } = useCommunityRealTime();
 
   // Subscribe to bill updates
@@ -90,7 +93,7 @@ function MyComponent() {
 
   // Get bill updates
   const updates = getBillUpdates(123);
-  
+
   return (
     <div>
       {/* Render updates */}
@@ -190,9 +193,9 @@ jest.mock('@client/core/realtime', () => ({
     getBillTrackingService: jest.fn(() => ({
       subscribeToBill: jest.fn(),
       unsubscribeFromBill: jest.fn(),
-      getBillUpdates: jest.fn(() => [])
-    }))
-  }
+      getBillUpdates: jest.fn(() => []),
+    })),
+  },
 }));
 ```
 
@@ -234,6 +237,7 @@ logger.setLevel('debug');
 ## Support
 
 For issues or questions:
+
 1. Check existing GitHub issues
 2. Review the troubleshooting section
 3. Consult the TypeScript definitions

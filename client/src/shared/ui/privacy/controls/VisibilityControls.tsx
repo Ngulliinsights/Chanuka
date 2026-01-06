@@ -7,10 +7,9 @@ import { Eye } from 'lucide-react';
 import React from 'react';
 
 import { PrivacySettings } from '@/core/auth';
-
+import { Switch } from '@/shared/design-system/interactive/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Label } from '@/shared/design-system/typography/Label';
-import { Switch } from '@/shared/design-system/interactive/Switch';
 
 interface VisibilityControlsProps {
   settings: PrivacySettings;
@@ -21,7 +20,7 @@ interface VisibilityControlsProps {
 export const VisibilityControls = React.memo<VisibilityControlsProps>(function VisibilityControls({
   settings,
   onSettingChange,
-  className = ''
+  className = '',
 }) {
   return (
     <Card className={className}>
@@ -38,14 +37,12 @@ export const VisibilityControls = React.memo<VisibilityControlsProps>(function V
               <Label htmlFor="profile-visibility" className="text-base font-medium">
                 Profile Visibility
               </Label>
-              <p className="text-sm text-gray-600">
-                Control who can see your profile information
-              </p>
+              <p className="text-sm text-gray-600">Control who can see your profile information</p>
             </div>
             <select
               id="profile-visibility"
               value={settings.profile_visibility}
-              onChange={(e) => onSettingChange('profile_visibility', e.target.value)}
+              onChange={e => onSettingChange('profile_visibility', e.target.value)}
               className="border rounded-md px-3 py-2"
               aria-label="Profile visibility setting"
             >
@@ -60,14 +57,12 @@ export const VisibilityControls = React.memo<VisibilityControlsProps>(function V
               <Label htmlFor="email-visibility" className="text-base font-medium">
                 Email Visibility
               </Label>
-              <p className="text-sm text-gray-600">
-                Control who can see your email address
-              </p>
+              <p className="text-sm text-gray-600">Control who can see your email address</p>
             </div>
             <select
               id="email-visibility"
               value={settings.email_visibility}
-              onChange={(e) => onSettingChange('email_visibility', e.target.value)}
+              onChange={e => onSettingChange('email_visibility', e.target.value)}
               className="border rounded-md px-3 py-2"
               aria-label="Email visibility setting"
             >
@@ -86,7 +81,7 @@ export const VisibilityControls = React.memo<VisibilityControlsProps>(function V
             </div>
             <Switch
               checked={settings.activity_tracking}
-              onCheckedChange={(checked) => onSettingChange('activity_tracking', checked)}
+              onCheckedChange={checked => onSettingChange('activity_tracking', checked)}
               aria-label="Activity tracking toggle"
             />
           </div>
@@ -100,12 +95,12 @@ export const VisibilityControls = React.memo<VisibilityControlsProps>(function V
             </div>
             <Switch
               checked={settings.personalized_content}
-              onCheckedChange={(checked) => onSettingChange('personalized_content', checked)}
+              onCheckedChange={checked => onSettingChange('personalized_content', checked)}
               aria-label="Personalized content toggle"
             />
           </div>
         </div>
       </CardContent>
     </Card>
-    );
-  });
+  );
+});

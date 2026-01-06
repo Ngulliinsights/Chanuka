@@ -31,160 +31,185 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<DashboardTopicError | null>(null);
 
-  const addTopic = useCallback(async (topicData: Omit<TrackedTopic, 'id' | 'created_at'>) => {
-    setLoading(true);
-    setError(null);
+  const addTopic = useCallback(
+    async (topicData: Omit<TrackedTopic, 'id' | 'created_at'>) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const newTopic: TrackedTopic = {
-        id: `topic-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        name: topicData.name,
-        category: topicData.category,
-        billCount: topicData.billCount,
-        is_active: topicData.is_active,
-        description: topicData.description,
-        keywords: topicData.keywords,
-        created_at: new Date()
-      };
+      try {
+        const newTopic: TrackedTopic = {
+          id: `topic-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: topicData.name,
+          category: topicData.category,
+          billCount: topicData.billCount,
+          is_active: topicData.is_active,
+          description: topicData.description,
+          keywords: topicData.keywords,
+          created_at: new Date(),
+        };
 
-      validateTrackedTopic(newTopic);
+        validateTrackedTopic(newTopic);
 
-      // Check for duplicate topic names
-      const existingTopic = topics.find(topic =>
-        topic.name.toLowerCase() === newTopic.name.toLowerCase()
-      );
-
-      if (existingTopic) {
-        throw new Error(`Topic "${newTopic.name}" already exists`);
-      }
-
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setTopics(prev => [...prev, newTopic]);
-    } catch (topicError) {
-      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to add topic';
-      const error = new DashboardTopicError('add', undefined, errorMessage);
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [topics]);
-
-  const updateTopic = useCallback(async (topicId: string, updates: Partial<TrackedTopic>) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const topicIndex = topics.findIndex(topic => topic.id === topicId);
-      if (topicIndex === -1) {
-        throw new Error(`Topic with ID ${topicId} not found`);
-      }
-
-      const existingTopic = topics[topicIndex];
-      if (!existingTopic) {
-        throw new Error(`Topic with ID ${topicId} not found`);
-      }
-
-      const updatedTopic: TrackedTopic = {
-        id: existingTopic.id,
-        name: updates.name ?? existingTopic.name,
-        category: updates.category ?? existingTopic.category,
-        billCount: updates.billCount ?? existingTopic.billCount,
-        is_active: updates.is_active ?? existingTopic.is_active,
-        description: updates.description ?? existingTopic.description,
-        keywords: updates.keywords ?? existingTopic.keywords,
-        created_at: existingTopic.created_at
-      };
-
-      validateTrackedTopic(updatedTopic);
-
-      // Check for duplicate names if name is being updated
-      if (updates.name && updates.name !== topics[topicIndex]?.name) {
-        const existingTopic = topics.find(topic =>
-          topic.id !== topicId && topic.name.toLowerCase() === updates.name!.toLowerCase()
+        // Check for duplicate topic names
+        const existingTopic = topics.find(
+          topic => topic.name.toLowerCase() === newTopic.name.toLowerCase()
         );
 
         if (existingTopic) {
-          throw new Error(`Topic "${updates.name}" already exists`);
+          throw new Error(`Topic "${newTopic.name}" already exists`);
         }
+
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        setTopics(prev => [...prev, newTopic]);
+      } catch (topicError) {
+        const errorMessage =
+          topicError instanceof Error ? topicError.message : 'Failed to add topic';
+        const error = new DashboardTopicError('add', undefined, errorMessage);
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
+    },
+    [topics]
+  );
 
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 300));
+  const updateTopic = useCallback(
+    async (topicId: string, updates: Partial<TrackedTopic>) => {
+      setLoading(true);
+      setError(null);
 
-      setTopics(prev => prev.map(topic =>
-        topic.id === topicId ? updatedTopic : topic
-      ));
-    } catch (topicError) {
-      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to update topic';
-      const error = new DashboardTopicError('update', topicId, errorMessage);
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [topics]);
+      try {
+        const topicIndex = topics.findIndex(topic => topic.id === topicId);
+        if (topicIndex === -1) {
+          throw new Error(`Topic with ID ${topicId} not found`);
+        }
 
-  const removeTopic = useCallback(async (topicId: string) => {
-    setLoading(true);
-    setError(null);
+        const existingTopic = topics[topicIndex];
+        if (!existingTopic) {
+          throw new Error(`Topic with ID ${topicId} not found`);
+        }
 
-    try {
-      const topicExists = topics.some(topic => topic.id === topicId);
-      if (!topicExists) {
-        throw new Error(`Topic with ID ${topicId} not found`);
+        const updatedTopic: TrackedTopic = {
+          id: existingTopic.id,
+          name: updates.name ?? existingTopic.name,
+          category: updates.category ?? existingTopic.category,
+          billCount: updates.billCount ?? existingTopic.billCount,
+          is_active: updates.is_active ?? existingTopic.is_active,
+          description: updates.description ?? existingTopic.description,
+          keywords: updates.keywords ?? existingTopic.keywords,
+          created_at: existingTopic.created_at,
+        };
+
+        validateTrackedTopic(updatedTopic);
+
+        // Check for duplicate names if name is being updated
+        if (updates.name && updates.name !== topics[topicIndex]?.name) {
+          const existingTopic = topics.find(
+            topic =>
+              topic.id !== topicId && topic.name.toLowerCase() === updates.name!.toLowerCase()
+          );
+
+          if (existingTopic) {
+            throw new Error(`Topic "${updates.name}" already exists`);
+          }
+        }
+
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        setTopics(prev => prev.map(topic => (topic.id === topicId ? updatedTopic : topic)));
+      } catch (topicError) {
+        const errorMessage =
+          topicError instanceof Error ? topicError.message : 'Failed to update topic';
+        const error = new DashboardTopicError('update', topicId, errorMessage);
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
+    },
+    [topics]
+  );
 
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 300));
+  const removeTopic = useCallback(
+    async (topicId: string) => {
+      setLoading(true);
+      setError(null);
 
-      setTopics(prev => prev.filter(topic => topic.id !== topicId));
-    } catch (topicError) {
-      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to remove topic';
-      const error = new DashboardTopicError('remove', topicId, errorMessage);
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [topics]);
+      try {
+        const topicExists = topics.some(topic => topic.id === topicId);
+        if (!topicExists) {
+          throw new Error(`Topic with ID ${topicId} not found`);
+        }
 
-  const toggleTopicStatus = useCallback(async (topicId: string) => {
-    try {
-      const topic = topics.find(t => t.id === topicId);
-      if (!topic) {
-        throw new Error(`Topic with ID ${topicId} not found`);
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        setTopics(prev => prev.filter(topic => topic.id !== topicId));
+      } catch (topicError) {
+        const errorMessage =
+          topicError instanceof Error ? topicError.message : 'Failed to remove topic';
+        const error = new DashboardTopicError('remove', topicId, errorMessage);
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
+    },
+    [topics]
+  );
 
-      await updateTopic(topicId, { is_active: !topic.is_active });
-    } catch (topicError) {
-      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to toggle topic';
-      const error = new DashboardTopicError('toggle', topicId, errorMessage);
-      setError(error);
-      throw error;
-    }
-  }, [topics, updateTopic]);
+  const toggleTopicStatus = useCallback(
+    async (topicId: string) => {
+      try {
+        const topic = topics.find(t => t.id === topicId);
+        if (!topic) {
+          throw new Error(`Topic with ID ${topicId} not found`);
+        }
 
-  const filterByCategory = useCallback((category: TopicCategory): TrackedTopic[] => {
-    return topics.filter(topic => topic.category === category);
-  }, [topics]);
+        await updateTopic(topicId, { is_active: !topic.is_active });
+      } catch (topicError) {
+        const errorMessage =
+          topicError instanceof Error ? topicError.message : 'Failed to toggle topic';
+        const error = new DashboardTopicError('toggle', topicId, errorMessage);
+        setError(error);
+        throw error;
+      }
+    },
+    [topics, updateTopic]
+  );
 
-  const filterByStatus = useCallback((is_active: boolean): TrackedTopic[] => {
-    return topics.filter(topic => topic.is_active === is_active);
-  }, [topics]);
+  const filterByCategory = useCallback(
+    (category: TopicCategory): TrackedTopic[] => {
+      return topics.filter(topic => topic.category === category);
+    },
+    [topics]
+  );
 
-  const searchTopics = useCallback((query: string): TrackedTopic[] => {
-    if (!query.trim()) return topics;
+  const filterByStatus = useCallback(
+    (is_active: boolean): TrackedTopic[] => {
+      return topics.filter(topic => topic.is_active === is_active);
+    },
+    [topics]
+  );
 
-    const lowercaseQuery = query.toLowerCase();
-    return topics.filter(topic =>
-      topic.name.toLowerCase().includes(lowercaseQuery) ||
-      topic.description?.toLowerCase().includes(lowercaseQuery) ||
-      topic.keywords?.some((keyword: string) => keyword.toLowerCase().includes(lowercaseQuery))
-    );
-  }, [topics]);
+  const searchTopics = useCallback(
+    (query: string): TrackedTopic[] => {
+      if (!query.trim()) return topics;
+
+      const lowercaseQuery = query.toLowerCase();
+      return topics.filter(
+        topic =>
+          topic.name.toLowerCase().includes(lowercaseQuery) ||
+          topic.description?.toLowerCase().includes(lowercaseQuery) ||
+          topic.keywords?.some((keyword: string) => keyword.toLowerCase().includes(lowercaseQuery))
+      );
+    },
+    [topics]
+  );
 
   const sortByBillCount = useCallback((): TrackedTopic[] => {
     return [...topics].sort((a, b) => b.billCount - a.billCount);
@@ -207,8 +232,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
       filterByStatus,
       searchTopics,
       sortByBillCount,
-      sortByName
-    }
+      sortByName,
+    },
   };
 }
-

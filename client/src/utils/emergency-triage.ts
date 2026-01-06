@@ -1,6 +1,6 @@
 /**
  * Emergency Triage Tool - Frontend Race Condition Diagnostics
- * 
+ *
  * This tool captures and analyzes console errors in real-time to identify
  * the worst offending components causing infinite renders and race conditions.
  */
@@ -11,7 +11,14 @@ import { logger } from './logger';
 
 export interface ComponentError {
   component: string;
-  errorType: 'infinite-render' | 'race-condition' | 'memory-leak' | 'dependency-issue' | 'state-mutation' | 'event-listener-leak' | 'unknown';
+  errorType:
+    | 'infinite-render'
+    | 'race-condition'
+    | 'memory-leak'
+    | 'dependency-issue'
+    | 'state-mutation'
+    | 'event-listener-leak'
+    | 'unknown';
   message: string;
   stack?: string;
   timestamp: number;
@@ -122,15 +129,23 @@ class EmergencyTriageTool {
    */
   private captureError(level: 'error' | 'warn', args: unknown[]): void {
     const message = args
-      .map(arg => (typeof arg === 'string' ? arg : (() => {
-        try { return JSON.stringify(arg); } catch { return String(arg); }
-      })()))
+      .map(arg =>
+        typeof arg === 'string'
+          ? arg
+          : (() => {
+              try {
+                return JSON.stringify(arg);
+              } catch {
+                return String(arg);
+              }
+            })()
+      )
       .join(' ');
 
     const componentError = this.analyzeError(message, level);
     if (componentError) {
       this.errors.push(componentError);
-      
+
       // Update frequency count
       const key = `${componentError.component}-${componentError.errorType}`;
       this.errorCounts.set(key, (this.errorCounts.get(key) || 0) + 1);
@@ -146,14 +161,14 @@ class EmergencyTriageTool {
    */
   private analyzeError(message: string, level: 'error' | 'warn'): ComponentError | null {
     const timestamp = Date.now();
-    
+
     // Extract component name from common patterns
     const component = this.extractComponentName(message);
     if (!component) return null;
 
     // Classify error type
     const errorType = this.classifyErrorType(message);
-    
+
     // Determine severity
     const severity = this.determineSeverity(message, errorType, level);
 
@@ -169,7 +184,7 @@ class EmergencyTriageTool {
       severity,
       filePath,
       lineNumber,
-      stack: new Error().stack
+      stack: new Error().stack,
     };
   }
 
@@ -179,13 +194,13 @@ class EmergencyTriageTool {
   private extractComponentName(message: string): string | null {
     // Common React component patterns
     const patterns = [
-      /at (\w+) \(/,                           // Stack trace pattern
-      /in (\w+) \(/,                           // React DevTools pattern
-      /(\w+)\.tsx?:/,                          // File name pattern
-      /Warning: (\w+)/,                        // React warning pattern
-      /Error in (\w+)/,                        // Custom error pattern
-      /component="(\w+)"/,                     // Logged component pattern
-      /\[(\w+)\]/,                            // Bracketed component pattern
+      /at (\w+) \(/, // Stack trace pattern
+      /in (\w+) \(/, // React DevTools pattern
+      /(\w+)\.tsx?:/, // File name pattern
+      /Warning: (\w+)/, // React warning pattern
+      /Error in (\w+)/, // Custom error pattern
+      /component="(\w+)"/, // Logged component pattern
+      /\[(\w+)\]/, // Bracketed component pattern
     ];
 
     for (const pattern of patterns) {
@@ -197,9 +212,17 @@ class EmergencyTriageTool {
 
     // Check for known problematic components
     const knownComponents = [
-      'AppLayout', 'DesktopSidebar', 'MobileNavigation', 'WebSocketClient',
-      'RealTimeTracker', 'PerformanceMonitor', 'NavigationPreferences',
-      'BillCard', 'BillDetail', 'AuthPage', 'ErrorBoundary'
+      'AppLayout',
+      'DesktopSidebar',
+      'MobileNavigation',
+      'WebSocketClient',
+      'RealTimeTracker',
+      'PerformanceMonitor',
+      'NavigationPreferences',
+      'BillCard',
+      'BillDetail',
+      'AuthPage',
+      'ErrorBoundary',
     ];
 
     for (const comp of knownComponents) {
@@ -217,39 +240,51 @@ class EmergencyTriageTool {
   private classifyErrorType(message: string): ComponentError['errorType'] {
     const lowerMessage = message.toLowerCase();
 
-    if (lowerMessage.includes('maximum update depth') || 
-        lowerMessage.includes('too many re-renders') ||
-        lowerMessage.includes('infinite loop')) {
+    if (
+      lowerMessage.includes('maximum update depth') ||
+      lowerMessage.includes('too many re-renders') ||
+      lowerMessage.includes('infinite loop')
+    ) {
       return 'infinite-render';
     }
 
-    if (lowerMessage.includes('race condition') ||
-        lowerMessage.includes('state update') ||
-        lowerMessage.includes('concurrent')) {
+    if (
+      lowerMessage.includes('race condition') ||
+      lowerMessage.includes('state update') ||
+      lowerMessage.includes('concurrent')
+    ) {
       return 'race-condition';
     }
 
-    if (lowerMessage.includes('memory') ||
-        lowerMessage.includes('leak') ||
-        lowerMessage.includes('cleanup')) {
+    if (
+      lowerMessage.includes('memory') ||
+      lowerMessage.includes('leak') ||
+      lowerMessage.includes('cleanup')
+    ) {
       return 'memory-leak';
     }
 
-    if (lowerMessage.includes('dependency') ||
-        lowerMessage.includes('useeffect') ||
-        lowerMessage.includes('missing dep')) {
+    if (
+      lowerMessage.includes('dependency') ||
+      lowerMessage.includes('useeffect') ||
+      lowerMessage.includes('missing dep')
+    ) {
       return 'dependency-issue';
     }
 
-    if (lowerMessage.includes('mutation') ||
-        lowerMessage.includes('immutable') ||
-        lowerMessage.includes('direct assignment')) {
+    if (
+      lowerMessage.includes('mutation') ||
+      lowerMessage.includes('immutable') ||
+      lowerMessage.includes('direct assignment')
+    ) {
       return 'state-mutation';
     }
 
-    if (lowerMessage.includes('event listener') ||
-        lowerMessage.includes('websocket') ||
-        lowerMessage.includes('cleanup')) {
+    if (
+      lowerMessage.includes('event listener') ||
+      lowerMessage.includes('websocket') ||
+      lowerMessage.includes('cleanup')
+    ) {
       return 'event-listener-leak';
     }
 
@@ -259,27 +294,32 @@ class EmergencyTriageTool {
   /**
    * Determine error severity
    */
-  private determineSeverity(message: string, errorType: ComponentError['errorType'], level: 'error' | 'warn'): ComponentError['severity'] {
+  private determineSeverity(
+    message: string,
+    errorType: ComponentError['errorType'],
+    level: 'error' | 'warn'
+  ): ComponentError['severity'] {
     // Critical errors that block the application
-    if (errorType === 'infinite-render' || 
-        message.includes('maximum update depth') ||
-        message.includes('browser crash')) {
+    if (
+      errorType === 'infinite-render' ||
+      message.includes('maximum update depth') ||
+      message.includes('browser crash')
+    ) {
       return 'critical';
     }
 
     // High priority errors that degrade performance
-    if (level === 'error' && (
-        errorType === 'race-condition' ||
+    if (
+      level === 'error' &&
+      (errorType === 'race-condition' ||
         errorType === 'memory-leak' ||
-        message.includes('performance')
-    )) {
+        message.includes('performance'))
+    ) {
       return 'high';
     }
 
     // Medium priority for warnings and less severe errors
-    if (level === 'warn' || 
-        errorType === 'dependency-issue' ||
-        errorType === 'state-mutation') {
+    if (level === 'warn' || errorType === 'dependency-issue' || errorType === 'state-mutation') {
       return 'medium';
     }
 
@@ -292,11 +332,11 @@ class EmergencyTriageTool {
   private extractLocationInfo(message: string): { filePath?: string; lineNumber?: number } {
     const filePattern = /at .+ \((.+):(\d+):\d+\)/;
     const match = message.match(filePattern);
-    
+
     if (match) {
       return {
         filePath: match[1],
-        lineNumber: parseInt(match[2], 10)
+        lineNumber: parseInt(match[2], 10),
       };
     }
 
@@ -317,18 +357,22 @@ class EmergencyTriageTool {
     this.lastRenderTime.set(componentName, now);
 
     // Detect infinite renders (>50 renders per second)
-    if (now - lastRender < 20) { // 20ms = 50 renders/second
+    if (now - lastRender < 20) {
+      // 20ms = 50 renders/second
       const error: ComponentError = {
         component: componentName,
         errorType: 'infinite-render',
         message: `Infinite render detected: ${componentName} rendered ${renderCount + 1} times`,
         timestamp: now,
         frequency: renderCount + 1,
-        severity: 'critical'
+        severity: 'critical',
       };
 
       this.errors.push(error);
-      logger.error('🚨 INFINITE RENDER DETECTED', { component: componentName, count: renderCount + 1 } as Record<string, unknown>);
+      logger.error('🚨 INFINITE RENDER DETECTED', {
+        component: componentName,
+        count: renderCount + 1,
+      } as Record<string, unknown>);
     }
   }
 
@@ -337,14 +381,21 @@ class EmergencyTriageTool {
    */
   private setupReactDevToolsMonitoring(): void {
     // Check if React DevTools is available
-    if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+    if (
+      typeof window !== 'undefined' &&
+      (window as unknown as Record<string, unknown>).__REACT_DEVTOOLS_GLOBAL_HOOK__
+    ) {
       const hook = (window as unknown as Record<string, any>).__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
       // Monitor fiber commits for render tracking
       if (typeof hook.onCommitFiberRoot === 'function') {
         const originalOnCommit = hook.onCommitFiberRoot as (...args: unknown[]) => unknown;
         hook.onCommitFiberRoot = (id: unknown, root: unknown, ...args: unknown[]) => {
-          try { this.trackFiberCommit(root); } catch (_) { /* ignore */ }
+          try {
+            this.trackFiberCommit(root);
+          } catch (_) {
+            /* ignore */
+          }
           return originalOnCommit(id, root, ...args);
         };
       }
@@ -401,17 +452,18 @@ class EmergencyTriageTool {
     // Monitor long tasks
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             const duration = (entry as PerformanceEntry & { duration?: number }).duration ?? 0;
-            if (duration > 50) { // Tasks longer than 50ms
+            if (duration > 50) {
+              // Tasks longer than 50ms
               const error: ComponentError = {
                 component: 'PerformanceMonitor',
                 errorType: 'unknown',
                 message: `Long task detected: ${duration}ms`,
                 timestamp: Date.now(),
                 frequency: 1,
-                severity: duration > 100 ? 'high' : 'medium'
+                severity: duration > 100 ? 'high' : 'medium',
               };
               this.errors.push(error);
             }
@@ -436,7 +488,10 @@ class EmergencyTriageTool {
     if (!breaker || !breaker.enabled) return;
 
     if (error.frequency >= breaker.errorThreshold) {
-      logger.error('🔥 CIRCUIT BREAKER TRIGGERED', { component: error.component } as Record<string, unknown>);
+      logger.error('🔥 CIRCUIT BREAKER TRIGGERED', { component: error.component } as Record<
+        string,
+        unknown
+      >);
       this.triggerCircuitBreaker(error.component);
     }
   }
@@ -446,13 +501,18 @@ class EmergencyTriageTool {
    */
   private triggerCircuitBreaker(componentName: string): void {
     // This would disable the component in a real implementation
-    logger.error('Circuit breaker activated', { component: componentName } as Record<string, unknown>);
-    
+    logger.error('Circuit breaker activated', { component: componentName } as Record<
+      string,
+      unknown
+    >);
+
     // Emit custom event for component to handle
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('circuit-breaker-triggered', {
-        detail: { component: componentName }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('circuit-breaker-triggered', {
+          detail: { component: componentName },
+        })
+      );
     }
   }
 
@@ -461,7 +521,10 @@ class EmergencyTriageTool {
    */
   configureCircuitBreaker(config: CircuitBreakerConfig): void {
     this.circuitBreakers.set(config.component, config);
-    logger.info('Circuit breaker configured', { component: config.component } as Record<string, unknown>);
+    logger.info('Circuit breaker configured', { component: config.component } as Record<
+      string,
+      unknown
+    >);
   }
 
   /**
@@ -512,8 +575,8 @@ class EmergencyTriageTool {
         startTime: this.startTime,
         endTime,
         duration,
-        errorRate
-      }
+        errorRate,
+      },
     };
   }
 
@@ -542,7 +605,7 @@ class EmergencyTriageTool {
       isMonitoring: this.isMonitoring,
       errorCount: this.errors.length,
       duration: this.isMonitoring ? now - this.startTime : 0,
-      topComponents
+      topComponents,
     };
   }
 }

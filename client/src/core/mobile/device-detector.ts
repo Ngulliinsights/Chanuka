@@ -1,10 +1,10 @@
 /**
  * Device Detector Module
- * 
+ *
  * Singleton class for detecting and monitoring device characteristics.
  * Uses modern APIs and fallbacks to accurately identify mobile devices,
  * screen sizes, and capabilities.
- * 
+ *
  * @module core/mobile/device-detector
  */
 
@@ -63,8 +63,9 @@ export class DeviceDetector {
     const isDesktop = !isMobile && !isTablet;
 
     // Detect specific platforms
-    const isIOS = /iphone|ipad|ipod/i.test(userAgent) || 
-                  (platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isIOS =
+      /iphone|ipad|ipod/i.test(userAgent) ||
+      (platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isAndroid = /android/i.test(userAgent);
 
     // Detect browser engine
@@ -87,7 +88,7 @@ export class DeviceDetector {
       vendor,
       isIOS,
       isAndroid,
-      browserEngine
+      browserEngine,
     };
 
     // Notify subscribers of device info changes
@@ -123,7 +124,7 @@ export class DeviceDetector {
       vendor: 'unknown',
       isIOS: false,
       isAndroid: false,
-      browserEngine: 'unknown'
+      browserEngine: 'unknown',
     };
   }
 

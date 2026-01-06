@@ -6,11 +6,11 @@
 export const breakpointTokens = {
   // Breakpoint values
   values: {
-    xs: '0px',      // Extra small devices
-    sm: '640px',    // Small devices (phones)
-    md: '768px',    // Medium devices (tablets)
-    lg: '1024px',   // Large devices (laptops)
-    xl: '1280px',   // Extra large devices (desktops)
+    xs: '0px', // Extra small devices
+    sm: '640px', // Small devices (phones)
+    md: '768px', // Medium devices (tablets)
+    lg: '1024px', // Large devices (laptops)
+    xl: '1280px', // Extra large devices (desktops)
     '2xl': '1536px', // 2X large devices (large desktops)
   },
 
@@ -67,4 +67,3 @@ export const responsiveUtils = {
     return breakpointTokens.container[breakpoint];
   },
 } as const;
-

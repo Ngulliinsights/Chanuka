@@ -19,7 +19,7 @@ export function Cache(options: {
       const cache = getDefaultCache();
 
       // Skip caching if condition is met
-      if (options.skipCondition && options.skipCondition(...args)) {
+      if (options.skipCondition?.(...args)) {
         return originalMethod.apply(this, args);
       }
 

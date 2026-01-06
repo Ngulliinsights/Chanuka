@@ -468,10 +468,7 @@ class PrivacyAnalyticsService {
     }
 
     // Load state asynchronously
-    await Promise.all([
-      this.loadUserConsent(),
-      this.loadRetryState(),
-    ]);
+    await Promise.all([this.loadUserConsent(), this.loadRetryState()]);
 
     this.startFlushTimer();
     this.attachEventListeners();
@@ -767,9 +764,7 @@ class PrivacyAnalyticsService {
       userId: this.getCurrentUserId(),
       anonymized: this.config.anonymizeData,
       consentGiven: this.hasConsentForCategory(category),
-      metadata: this.config.anonymizeData
-        ? this.anonymizeMetadata(metadata)
-        : metadata,
+      metadata: this.config.anonymizeData ? this.anonymizeMetadata(metadata) : metadata,
     };
 
     if (this.config.anonymizeData && event.userId) {
@@ -828,12 +823,16 @@ class PrivacyAnalyticsService {
   private hasConsentForCategory(category: string): boolean {
     if (!this.userConsent) return false;
     switch (category) {
-      case 'performance': return this.userConsent.performance;
-      default: return this.userConsent.analytics;
+      case 'performance':
+        return this.userConsent.performance;
+      default:
+        return this.userConsent.analytics;
     }
   }
 
-  private anonymizeMetadata(metadata?: Record<string, unknown>): Record<string, unknown> | undefined {
+  private anonymizeMetadata(
+    metadata?: Record<string, unknown>
+  ): Record<string, unknown> | undefined {
     if (!metadata) return undefined;
     const anonymized = { ...metadata };
     for (const field of SENSITIVE_FIELDS) {
@@ -844,7 +843,9 @@ class PrivacyAnalyticsService {
     return anonymized;
   }
 
-  private sanitizeErrorContext(context?: Record<string, unknown>): Record<string, unknown> | undefined {
+  private sanitizeErrorContext(
+    context?: Record<string, unknown>
+  ): Record<string, unknown> | undefined {
     if (!context) return undefined;
     const sanitized = { ...context };
     for (const field of SENSITIVE_CONTEXT_FIELDS) {
@@ -872,7 +873,9 @@ class PrivacyAnalyticsService {
   private exportLocalUserData(userId: string): ExportedUserData {
     const hashedUserId = this.config.anonymizeData ? privacyUtils.hashValue(userId) : userId;
     const allEvents = [...this.eventQueue, ...(this.retryState?.events || [])];
-    const userEvents = allEvents.filter(event => event.userId === userId || event.userId === hashedUserId);
+    const userEvents = allEvents.filter(
+      event => event.userId === userId || event.userId === hashedUserId
+    );
 
     return {
       events: userEvents,
@@ -885,7 +888,9 @@ class PrivacyAnalyticsService {
   private deleteLocalUserData(userId: string): DeleteResult {
     const hashedUserId = this.config.anonymizeData ? privacyUtils.hashValue(userId) : userId;
     const initialCount = this.eventQueue.length;
-    this.eventQueue = this.eventQueue.filter(event => event.userId !== userId && event.userId !== hashedUserId);
+    this.eventQueue = this.eventQueue.filter(
+      event => event.userId !== userId && event.userId !== hashedUserId
+    );
     const eventsDeleted = initialCount - this.eventQueue.length;
 
     return {

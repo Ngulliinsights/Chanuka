@@ -1,6 +1,7 @@
+import Redis from 'ioredis';
+
 import { Result, ok, err } from '../../primitives/types/result';
 import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
-import Redis from 'ioredis';
 
 export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
   private redis: Redis;

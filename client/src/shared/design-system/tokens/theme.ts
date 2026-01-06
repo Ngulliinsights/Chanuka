@@ -1,6 +1,6 @@
 /**
  * Design System Theme Tokens
- * 
+ *
  * Centralized design tokens for consistent theming across the application.
  */
 
@@ -19,7 +19,7 @@ export const theme = {
       800: '#1e40af',
       900: '#1e3a8a',
     },
-    
+
     // Secondary colors
     secondary: {
       50: '#f8fafc',
@@ -33,7 +33,7 @@ export const theme = {
       800: '#1e293b',
       900: '#0f172a',
     },
-    
+
     // Semantic colors
     success: {
       50: '#f0fdf4',
@@ -47,7 +47,7 @@ export const theme = {
       800: '#166534',
       900: '#14532d',
     },
-    
+
     warning: {
       50: '#fffbeb',
       100: '#fef3c7',
@@ -60,7 +60,7 @@ export const theme = {
       800: '#92400e',
       900: '#78350f',
     },
-    
+
     error: {
       50: '#fef2f2',
       100: '#fee2e2',
@@ -73,7 +73,7 @@ export const theme = {
       800: '#991b1b',
       900: '#7f1d1d',
     },
-    
+
     // Neutral colors
     neutral: {
       50: '#fafafa',
@@ -88,7 +88,7 @@ export const theme = {
       900: '#171717',
     },
   },
-  
+
   spacing: {
     0: '0px',
     1: '0.25rem',
@@ -109,14 +109,14 @@ export const theme = {
     56: '14rem',
     64: '16rem',
   },
-  
+
   typography: {
     fontFamily: {
       sans: ['Inter', 'system-ui', 'sans-serif'],
       serif: ['Georgia', 'serif'],
       mono: ['Fira Code', 'monospace'],
     },
-    
+
     fontSize: {
       xs: ['0.75rem', { lineHeight: '1rem' }],
       sm: ['0.875rem', { lineHeight: '1.25rem' }],
@@ -129,7 +129,7 @@ export const theme = {
       '5xl': ['3rem', { lineHeight: '1' }],
       '6xl': ['3.75rem', { lineHeight: '1' }],
     },
-    
+
     fontWeight: {
       thin: '100',
       extralight: '200',
@@ -142,7 +142,7 @@ export const theme = {
       black: '900',
     },
   },
-  
+
   borderRadius: {
     none: '0px',
     sm: '0.125rem',
@@ -154,7 +154,7 @@ export const theme = {
     '3xl': '1.5rem',
     full: '9999px',
   },
-  
+
   shadows: {
     sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
     base: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -164,7 +164,7 @@ export const theme = {
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
     inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
   },
-  
+
   breakpoints: {
     sm: '640px',
     md: '768px',
@@ -172,7 +172,7 @@ export const theme = {
     xl: '1280px',
     '2xl': '1536px',
   },
-  
+
   animations: {
     duration: {
       75: '75ms',
@@ -184,7 +184,7 @@ export const theme = {
       700: '700ms',
       1000: '1000ms',
     },
-    
+
     easing: {
       linear: 'linear',
       in: 'cubic-bezier(0.4, 0, 1, 1)',

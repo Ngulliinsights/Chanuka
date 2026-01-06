@@ -7,4 +7,3 @@ export * from './light';
 export * from './dark';
 export * from './high-contrast';
 export * from './themeProvider';
-

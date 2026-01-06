@@ -4,7 +4,6 @@
  * Allows users to customize their dashboard layout and preferences.
  */
 
-import React from 'react';
 import {
   Settings,
   Clock,
@@ -14,6 +13,7 @@ import {
   List,
   Maximize2,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Button } from '@/shared/design-system/interactive/Button';

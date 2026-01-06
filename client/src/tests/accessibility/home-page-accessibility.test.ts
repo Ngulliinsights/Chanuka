@@ -5,8 +5,8 @@
  * Requirements: 8.1, 8.2
  */
 
-import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axwright';
+import { test, expect } from '@playwright/test';
 
 test.describe('Home Page Accessibility', () => {
   test('should pass axe accessibility audit', async ({ page }) => {
@@ -23,8 +23,10 @@ test.describe('Home Page Accessibility', () => {
 
     // Log any incomplete tests for manual review
     if (accessibilityScanResults.incomplete.length > 0) {
-      console.log('Incomplete accessibility tests (manual review needed):',
-        accessibilityScanResults.incomplete.map(item => item.id));
+      console.log(
+        'Incomplete accessibility tests (manual review needed):',
+        accessibilityScanResults.incomplete.map(item => item.id)
+      );
     }
   });
 
@@ -33,11 +35,11 @@ test.describe('Home Page Accessibility', () => {
     await page.waitForSelector('[data-testid="home-hero"]');
 
     // Get all headings
-    const headings = await page.$$eval('h1, h2, h3, h4, h5, h6', (elements) =>
+    const headings = await page.$$eval('h1, h2, h3, h4, h5, h6', elements =>
       elements.map(el => ({
         level: parseInt(el.tagName.charAt(1)),
         text: el.textContent?.trim() || '',
-        visible: el.offsetParent !== null
+        visible: el.offsetParent !== null,
       }))
     );
 
@@ -56,7 +58,10 @@ test.describe('Home Page Accessibility', () => {
       expect(current.level - previous.level).toBeLessThanOrEqual(1);
     }
 
-    console.log('Heading structure:', visibleHeadings.map(h => `h${h.level}: ${h.text}`));
+    console.log(
+      'Heading structure:',
+      visibleHeadings.map(h => `h${h.level}: ${h.text}`)
+    );
   });
 
   test('should have proper ARIA labels and roles', async ({ page }) => {
@@ -74,11 +79,11 @@ test.describe('Home Page Accessibility', () => {
     await expect(searchButton).toBeVisible();
 
     // Check that interactive elements have accessible names
-    const buttons = await page.$$eval('button', (elements) =>
+    const buttons = await page.$$eval('button', elements =>
       elements.map(el => ({
         text: el.textContent?.trim() || '',
         ariaLabel: el.getAttribute('aria-label') || '',
-        hasAccessibleName: !!(el.textContent?.trim() || el.getAttribute('aria-label'))
+        hasAccessibleName: !!(el.textContent?.trim() || el.getAttribute('aria-label')),
       }))
     );
 
@@ -99,7 +104,8 @@ test.describe('Home Page Accessibility', () => {
     // Track focusable elements
     const focusableElements: string[] = [];
 
-    for (let i = 0; i < 20; i++) { // Test first 20 tab stops
+    for (let i = 0; i < 20; i++) {
+      // Test first 20 tab stops
       const focusedElement = await page.evaluate(() => {
         const focused = document.activeElement;
         if (!focused || focused === document.body) return null;
@@ -109,7 +115,7 @@ test.describe('Home Page Accessibility', () => {
           text: focused.textContent?.trim().substring(0, 50) || '',
           ariaLabel: focused.getAttribute('aria-label') || '',
           role: focused.getAttribute('role') || '',
-          type: focused.getAttribute('type') || ''
+          type: focused.getAttribute('type') || '',
         };
       });
 
@@ -121,7 +127,12 @@ test.describe('Home Page Accessibility', () => {
       await page.keyboard.press('Tab');
 
       // Break if we've cycled back to the beginning
-      if (i > 5 && focusedElement && focusedElement.tagName === 'a' && focusedElement.text.includes('Skip')) {
+      if (
+        i > 5 &&
+        focusedElement &&
+        focusedElement.tagName === 'a' &&
+        focusedElement.text.includes('Skip')
+      ) {
         break;
       }
     }
@@ -146,7 +157,7 @@ test.describe('Home Page Accessibility', () => {
     expect(accessibilityScanResults.violations).toEqual([]);
 
     // Check specific elements that might have contrast issues
-    const textElements = await page.$$eval('p, span, div, h1, h2, h3, h4, h5, h6', (elements) =>
+    const textElements = await page.$$eval('p, span, div, h1, h2, h3, h4, h5, h6', elements =>
       elements
         .filter(el => el.offsetParent !== null && el.textContent?.trim())
         .slice(0, 10) // Check first 10 text elements
@@ -156,7 +167,7 @@ test.describe('Home Page Accessibility', () => {
             text: el.textContent?.trim().substring(0, 30) || '',
             color: styles.color,
             backgroundColor: styles.backgroundColor,
-            fontSize: styles.fontSize
+            fontSize: styles.fontSize,
           };
         })
     );
@@ -169,27 +180,29 @@ test.describe('Home Page Accessibility', () => {
     await page.waitForSelector('[data-testid="home-hero"]');
 
     // Check for screen reader specific attributes
-    const srElements = await page.$$eval('[aria-label], [aria-describedby], [aria-labelledby], [role]', (elements) =>
-      elements.map(el => ({
-        tagName: el.tagName.toLowerCase(),
-        ariaLabel: el.getAttribute('aria-label'),
-        ariaDescribedby: el.getAttribute('aria-describedby'),
-        ariaLabelledby: el.getAttribute('aria-labelledby'),
-        role: el.getAttribute('role'),
-        text: el.textContent?.trim().substring(0, 30) || ''
-      }))
+    const srElements = await page.$$eval(
+      '[aria-label], [aria-describedby], [aria-labelledby], [role]',
+      elements =>
+        elements.map(el => ({
+          tagName: el.tagName.toLowerCase(),
+          ariaLabel: el.getAttribute('aria-label'),
+          ariaDescribedby: el.getAttribute('aria-describedby'),
+          ariaLabelledby: el.getAttribute('aria-labelledby'),
+          role: el.getAttribute('role'),
+          text: el.textContent?.trim().substring(0, 30) || '',
+        }))
     );
 
     // Should have elements with screen reader attributes
     expect(srElements.length).toBeGreaterThan(0);
 
     // Check for skip links
-    const skipLinks = await page.$$eval('a[href^="#"]', (elements) =>
+    const skipLinks = await page.$$eval('a[href^="#"]', elements =>
       elements
         .filter(el => el.textContent?.toLowerCase().includes('skip'))
         .map(el => ({
           text: el.textContent?.trim(),
-          href: el.getAttribute('href')
+          href: el.getAttribute('href'),
         }))
     );
 
@@ -240,9 +253,7 @@ test.describe('Home Page Accessibility', () => {
     await page.waitForSelector('[data-testid="home-hero"]');
 
     // Run accessibility audit with high contrast considerations
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2aa'])
-      .analyze();
+    const accessibilityScanResults = await new AxeBuilder({ page }).withTags(['wcag2aa']).analyze();
 
     // Should still pass accessibility tests in high contrast mode
     expect(accessibilityScanResults.violations).toEqual([]);
@@ -263,17 +274,19 @@ test.describe('Home Page Accessibility', () => {
     expect(accessibilityScanResults.violations).toEqual([]);
 
     // Check touch target sizes
-    const touchTargets = await page.$$eval('button, a, input[type="button"], input[type="submit"]', (elements) =>
-      elements.map(el => {
-        const rect = el.getBoundingClientRect();
-        return {
-          width: rect.width,
-          height: rect.height,
-          area: rect.width * rect.height,
-          text: el.textContent?.trim().substring(0, 20) || '',
-          meetsMinimum: rect.width >= 44 && rect.height >= 44
-        };
-      })
+    const touchTargets = await page.$$eval(
+      'button, a, input[type="button"], input[type="submit"]',
+      elements =>
+        elements.map(el => {
+          const rect = el.getBoundingClientRect();
+          return {
+            width: rect.width,
+            height: rect.height,
+            area: rect.width * rect.height,
+            text: el.textContent?.trim().substring(0, 20) || '',
+            meetsMinimum: rect.width >= 44 && rect.height >= 44,
+          };
+        })
     );
 
     // All touch targets should meet minimum size requirements (44x44px)
@@ -283,4 +296,4 @@ test.describe('Home Page Accessibility', () => {
     console.log('Touch target sizes:', touchTargets);
   });
 });
-e-c
+e - c;

@@ -9,7 +9,7 @@ export enum NavigationErrorType {
   INVALID_NAVIGATION_PATH = 'INVALID_NAVIGATION_PATH',
   NAVIGATION_ACCESS_DENIED = 'NAVIGATION_ACCESS_DENIED',
   NAVIGATION_VALIDATION_ERROR = 'NAVIGATION_VALIDATION_ERROR',
-  NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR'
+  NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR',
 }
 
 export class NavigationError extends Error {
@@ -78,23 +78,16 @@ export class NavigationAccessDeniedError extends NavigationError {
 
 export class NavigationValidationError extends NavigationError {
   constructor(message: string, field: string, value: any, details?: Record<string, any>) {
-    super(
-      message,
-      NavigationErrorType.NAVIGATION_VALIDATION_ERROR,
-      422,
-      { field, value, ...details }
-    );
+    super(message, NavigationErrorType.NAVIGATION_VALIDATION_ERROR, 422, {
+      field,
+      value,
+      ...details,
+    });
   }
 }
 
 export class NavigationConfigurationError extends NavigationError {
   constructor(message: string, details?: Record<string, any>) {
-    super(
-      message,
-      NavigationErrorType.NAVIGATION_CONFIGURATION_ERROR,
-      500,
-      details
-    );
+    super(message, NavigationErrorType.NAVIGATION_CONFIGURATION_ERROR, 500, details);
   }
 }
-

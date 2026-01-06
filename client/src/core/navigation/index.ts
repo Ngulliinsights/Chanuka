@@ -44,7 +44,7 @@ export {
   addToRecentPages,
   addToFavorites,
   removeFromFavorites,
-  isPageFavorite
+  isPageFavorite,
 } from './preferences';
 
 // Lookup utilities
@@ -59,7 +59,7 @@ export * from './persistence';
 export {
   validateNavigationItem,
   validateNavigationItems,
-  isValidNavigationPath
+  isValidNavigationPath,
 } from './validation';
 
 export {
@@ -67,24 +67,17 @@ export {
   filterNavigationByAccess,
   requiresAuthentication,
   requiresRole,
-  getNavigationMenuItems
+  getNavigationMenuItems,
 } from './access-control';
 
-export {
-  generateBreadcrumbs,
-  findRelatedPages,
-  calculateRelatedPages
-} from './breadcrumbs';
+export { generateBreadcrumbs, findRelatedPages, calculateRelatedPages } from './breadcrumbs';
 
-export {
-  searchNavigationItems,
-  fuzzyMatchScore
-} from './search';
+export { searchNavigationItems, fuzzyMatchScore } from './search';
 
 export {
   trackNavigationEvent,
   getNavigationAnalytics,
-  clearNavigationAnalytics
+  clearNavigationAnalytics,
 } from './analytics';
 
 export {
@@ -96,6 +89,5 @@ export {
   determineNavigationSection,
   isNavigationPathActive,
   normalizePath,
-  extractPageTitle
+  extractPageTitle,
 } from './lookup';
-

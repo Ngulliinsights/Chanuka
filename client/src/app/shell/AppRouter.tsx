@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { ErrorBoundary } from '@/core/error/components';
 import { LoadingStateManager } from '@/shared/ui/loading/LoadingStates';
+
 import { logger } from '../../utils/logger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
@@ -28,9 +29,7 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Failed to Load {componentName}
               </h2>
-              <p className="text-gray-600 mb-4">
-                There was an error loading this page component.
-              </p>
+              <p className="text-gray-600 mb-4">There was an error loading this page component.</p>
               <button
                 onClick={() => window.location.reload()}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -40,28 +39,64 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
               </button>
             </div>
           </div>
-        )
+        ),
       };
     })
   );
 };
 
 // Lazy-loaded page components with enhanced error handling
-const HomePage = createLazyComponent(() => import('@client/pages/StrategicHomePage'), 'Strategic Home Page');
-const BillsPortal = createLazyComponent(() => import('@client/pages/bills/BillsPortalPage'), 'Bills Portal');
-const BillsDashboard = createLazyComponent(() => import('@client/pages/bills/bills-dashboard-page'), 'Bills Dashboard');
-const BillDetail = createLazyComponent(() => import('@client/pages/bills/bill-detail'), 'Bill Detail');
-const BillAnalysis = createLazyComponent(() => import('@client/pages/bills/bill-analysis'), 'Bill Analysis');
-const CommunityHub = createLazyComponent(() => import('@client/pages/community-input'), 'Community Hub');
-const UniversalSearchPage = createLazyComponent(() => import('@client/pages/UniversalSearchPage'), 'Universal Search');
-const AuthPage = createLazyComponent(() => import('@client/pages/auth/auth-page'), 'Authentication');
+const HomePage = createLazyComponent(
+  () => import('@client/pages/StrategicHomePage'),
+  'Strategic Home Page'
+);
+const BillsPortal = createLazyComponent(
+  () => import('@client/pages/bills/BillsPortalPage'),
+  'Bills Portal'
+);
+const BillsDashboard = createLazyComponent(
+  () => import('@client/pages/bills/bills-dashboard-page'),
+  'Bills Dashboard'
+);
+const BillDetail = createLazyComponent(
+  () => import('@client/pages/bills/bill-detail'),
+  'Bill Detail'
+);
+const BillAnalysis = createLazyComponent(
+  () => import('@client/pages/bills/bill-analysis'),
+  'Bill Analysis'
+);
+const CommunityHub = createLazyComponent(
+  () => import('@client/pages/community-input'),
+  'Community Hub'
+);
+const UniversalSearchPage = createLazyComponent(
+  () => import('@client/pages/UniversalSearchPage'),
+  'Universal Search'
+);
+const AuthPage = createLazyComponent(
+  () => import('@client/pages/auth/auth-page'),
+  'Authentication'
+);
 const Onboarding = createLazyComponent(() => import('@client/pages/onboarding'), 'Onboarding');
 const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
-const UserProfile = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Account');
-const UserDashboard = createLazyComponent(() => import('@client/pages/UserAccountPage'), 'User Dashboard');
-const AdminDashboard = createLazyComponent(() => import('@client/pages/admin/admin'), 'Admin Dashboard');
-const AnalyticsDashboard = createLazyComponent(() => import('@client/pages/admin/AnalyticsDashboardPage'), 'Analytics Dashboard');
+const UserProfile = createLazyComponent(
+  () => import('@client/pages/UserAccountPage'),
+  'User Account'
+);
+const UserDashboard = createLazyComponent(
+  () => import('@client/pages/UserAccountPage'),
+  'User Dashboard'
+);
+const AdminDashboard = createLazyComponent(
+  () => import('@client/pages/admin/admin'),
+  'Admin Dashboard'
+);
+const AnalyticsDashboard = createLazyComponent(
+  () => import('@client/pages/admin/AnalyticsDashboardPage'),
+  'Analytics Dashboard'
+);
 const NotFoundPage = createLazyComponent(() => import('@client/pages/not-found'), 'Not Found');
 
 interface RouteConfig {
@@ -121,7 +156,7 @@ const RouteErrorFallback = React.memo<{
             Try Again
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = '/')}
             className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
             type="button"
           >
@@ -130,12 +165,8 @@ const RouteErrorFallback = React.memo<{
         </div>
         {process.env.NODE_ENV === 'development' && (
           <details className="mt-4 text-left">
-            <summary className="cursor-pointer text-sm text-gray-500">
-              Error Details
-            </summary>
-            <pre className="mt-2 text-xs text-red-600 whitespace-pre-wrap">
-              {error.message}
-            </pre>
+            <summary className="cursor-pointer text-sm text-gray-500">Error Details</summary>
+            <pre className="mt-2 text-xs text-red-600 whitespace-pre-wrap">{error.message}</pre>
           </details>
         )}
       </div>
@@ -156,14 +187,21 @@ const RouteWrapper = React.memo<{
   routeName: string;
 }>(({ children, routeName }) => {
   // Memoize error handler to prevent recreation on each render
-  const handleError = useCallback((error: Error, errorInfo?: { componentStack?: string | null }) => {
-    const componentStack = errorInfo?.componentStack;
-    logger.error(`Route error in ${routeName}:`, { component: 'AppRouter' }, {
-      error: error.message,
-      stack: error.stack,
-      componentStack
-    });
-  }, [routeName]);
+  const handleError = useCallback(
+    (error: Error, errorInfo?: { componentStack?: string | null }) => {
+      const componentStack = errorInfo?.componentStack;
+      logger.error(
+        `Route error in ${routeName}:`,
+        { component: 'AppRouter' },
+        {
+          error: error.message,
+          stack: error.stack,
+          componentStack,
+        }
+      );
+    },
+    [routeName]
+  );
 
   return (
     <ErrorBoundary
@@ -171,9 +209,7 @@ const RouteWrapper = React.memo<{
       context={`route:${routeName}`}
       showTechnicalDetails={process.env.NODE_ENV === 'development'}
     >
-      <Suspense fallback={<RouteLoadingFallback routeName={routeName} />}>
-        {children}
-      </Suspense>
+      <Suspense fallback={<RouteLoadingFallback routeName={routeName} />}>{children}</Suspense>
     </ErrorBoundary>
   );
 });
@@ -190,66 +226,66 @@ const routes: RouteConfig[] = [
     id: 'home',
     path: '/',
     element: <HomePage />,
-    preload: true
+    preload: true,
   },
   {
     id: 'bills-portal',
     path: '/bills',
     element: <BillsPortal />,
-    preload: true
+    preload: true,
   },
   {
     id: 'bills-dashboard-legacy',
     path: '/bills/dashboard',
-    element: <BillsDashboard />
+    element: <BillsDashboard />,
   },
   {
     id: 'bill-detail',
     path: '/bills/:id',
-    element: <BillDetail />
+    element: <BillDetail />,
   },
   {
     id: 'bill-analysis',
     path: '/bills/:id/analysis',
-    element: <BillAnalysis />
+    element: <BillAnalysis />,
   },
   {
     id: 'community',
     path: '/community',
-    element: <CommunityHub />
+    element: <CommunityHub />,
   },
   // Consolidated search route - main search interface
   {
     id: 'search',
     path: '/search',
     element: <UniversalSearchPage />,
-    preload: true
+    preload: true,
   },
   // Search results route - clean results display without "Intelligent Search" branding
   {
     id: 'search-results',
     path: '/results',
-    element: <UniversalSearchPage />
+    element: <UniversalSearchPage />,
   },
   {
     id: 'auth',
     path: '/auth',
-    element: <AuthPage />
+    element: <AuthPage />,
   },
   {
     id: 'onboarding',
     path: '/onboarding',
-    element: <Onboarding />
+    element: <Onboarding />,
   },
   {
     id: 'terms',
     path: '/terms',
-    element: <TermsPage />
+    element: <TermsPage />,
   },
   {
     id: 'privacy',
     path: '/privacy',
-    element: <PrivacyPage />
+    element: <PrivacyPage />,
   },
 
   // Protected routes - require authentication
@@ -261,7 +297,7 @@ const routes: RouteConfig[] = [
         <UserDashboard />
       </ProtectedRoute>
     ),
-    protected: true
+    protected: true,
   },
   {
     id: 'user-account',
@@ -271,7 +307,7 @@ const routes: RouteConfig[] = [
         <UserProfile />
       </ProtectedRoute>
     ),
-    protected: true
+    protected: true,
   },
 
   // Verified user routes
@@ -284,7 +320,7 @@ const routes: RouteConfig[] = [
       </VerifiedUserRoute>
     ),
     protected: true,
-    requireVerification: true
+    requireVerification: true,
   },
 
   // Admin routes
@@ -298,7 +334,7 @@ const routes: RouteConfig[] = [
     ),
     protected: true,
     roles: ['admin', 'super_admin'],
-    requireVerification: true
+    requireVerification: true,
   },
   {
     id: 'admin-analytics',
@@ -310,32 +346,32 @@ const routes: RouteConfig[] = [
     ),
     protected: true,
     roles: ['admin', 'super_admin'],
-    requireVerification: true
+    requireVerification: true,
   },
 
   // Legacy redirects - preserve old links for backward compatibility
   {
     id: 'legacy-profile-redirect',
     path: '/profile',
-    element: <Navigate to="/account" replace />
+    element: <Navigate to="/account" replace />,
   },
   {
     id: 'legacy-intelligent-search-redirect',
     path: '/IntelligentSearchPage',
-    element: <Navigate to="/search" replace />
+    element: <Navigate to="/search" replace />,
   },
   {
     id: 'legacy-intelligent-search-redirect-alt',
     path: '/intelligent-search',
-    element: <Navigate to="/search" replace />
+    element: <Navigate to="/search" replace />,
   },
 
   // Catch-all route
   {
     id: 'not-found',
     path: '*',
-    element: <NotFoundPage />
-  }
+    element: <NotFoundPage />,
+  },
 ];
 
 /**
@@ -344,9 +380,9 @@ const routes: RouteConfig[] = [
  */
 type PreloadMapEntry = () => Promise<{ default: React.ComponentType<unknown> }>;
 const preloadMap: Record<string, PreloadMapEntry> = {
-  'home': () => import('@client/pages/StrategicHomePage'),
+  home: () => import('@client/pages/StrategicHomePage'),
   'bills-portal': () => import('@client/pages/bills/BillsPortalPage'),
-  'search': () => import('@client/pages/UniversalSearchPage')
+  search: () => import('@client/pages/UniversalSearchPage'),
 };
 
 /**
@@ -376,7 +412,7 @@ export function AppRouter() {
       component: 'AppRouter',
       path: location.pathname,
       search: location.search,
-      hash: location.hash
+      hash: location.hash,
     });
   }, [location.pathname, location.search, location.hash]);
 
@@ -392,8 +428,15 @@ export function AppRouter() {
             // Trigger lazy loading for critical routes
             await preloadFn();
           } catch (err: unknown) {
-            const errorObj = err instanceof Error ? { message: err.message, stack: err.stack } : { error: String(err) };
-            logger.warn(`Failed to preload route ${route.id}:`, { component: 'AppRouter' }, errorObj);
+            const errorObj =
+              err instanceof Error
+                ? { message: err.message, stack: err.stack }
+                : { error: String(err) };
+            logger.warn(
+              `Failed to preload route ${route.id}:`,
+              { component: 'AppRouter' },
+              errorObj
+            );
           }
         }
       }
@@ -405,15 +448,22 @@ export function AppRouter() {
   }, []); // Empty deps - only run once on mount
 
   // Memoized error handler for router-level errors
-  const handleRouteError = useCallback((error: Error, errorInfo?: { componentStack?: string | null }) => {
-    const componentStack = errorInfo?.componentStack;
-    logger.error('Router error boundary caught error:', { component: 'AppRouter' }, {
-      error: error.message,
-      stack: error.stack,
-      componentStack,
-      currentPath: location.pathname
-    });
-  }, [location.pathname]);
+  const handleRouteError = useCallback(
+    (error: Error, errorInfo?: { componentStack?: string | null }) => {
+      const componentStack = errorInfo?.componentStack;
+      logger.error(
+        'Router error boundary caught error:',
+        { component: 'AppRouter' },
+        {
+          error: error.message,
+          stack: error.stack,
+          componentStack,
+          currentPath: location.pathname,
+        }
+      );
+    },
+    [location.pathname]
+  );
 
   // Memoized fallback component for router-level errors
   // Note: This doesn't use the full ErrorFallbackProps as we're using a simpler pattern
@@ -423,26 +473,18 @@ export function AppRouter() {
   // Memoize route elements to prevent unnecessary re-renders.
   // This is particularly important for routes with complex protection logic.
   const routeElements = useMemo(() => {
-    return routes.map((route) => (
+    return routes.map(route => (
       <Route
         key={route.id}
         path={route.path}
-        element={
-          <RouteWrapper routeName={route.id}>
-            {route.element}
-          </RouteWrapper>
-        }
+        element={<RouteWrapper routeName={route.id}>{route.element}</RouteWrapper>}
       />
     ));
   }, []); // Empty deps - routes are static
 
   return (
-    <ErrorBoundary
-      onError={handleRouteError}
-    >
-      <Routes>
-        {routeElements}
-      </Routes>
+    <ErrorBoundary onError={handleRouteError}>
+      <Routes>{routeElements}</Routes>
     </ErrorBoundary>
   );
 }

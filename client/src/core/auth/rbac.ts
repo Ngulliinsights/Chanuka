@@ -1,4 +1,3 @@
-
 /**
  * Role-Based Access Control (RBAC) System - Optimized
  *
@@ -11,7 +10,14 @@
 // ============================================================================
 
 export type UserRole = 'admin' | 'expert' | 'citizen' | 'guest';
-export type PermissionAction = 'read' | 'write' | 'delete' | 'admin' | 'moderate' | 'create' | 'update';
+export type PermissionAction =
+  | 'read'
+  | 'write'
+  | 'delete'
+  | 'admin'
+  | 'moderate'
+  | 'create'
+  | 'update';
 export type PermissionEffect = 'allow' | 'deny';
 
 export interface Permission {
@@ -74,8 +80,8 @@ const ROLE_DEFINITIONS: Record<string, Role> = {
     permissions: [
       { resource: 'bills', action: 'read', effect: 'allow' },
       { resource: 'public_comments', action: 'read', effect: 'allow' },
-      { resource: 'public_analysis', action: 'read', effect: 'allow' }
-    ]
+      { resource: 'public_analysis', action: 'read', effect: 'allow' },
+    ],
   },
   CITIZEN: {
     id: 'citizen',
@@ -85,24 +91,30 @@ const ROLE_DEFINITIONS: Record<string, Role> = {
     permissions: [
       { resource: 'comments', action: 'read', effect: 'allow' },
       { resource: 'comments', action: 'write', effect: 'allow' },
-      { resource: 'comments', action: 'delete', effect: 'allow',
+      {
+        resource: 'comments',
+        action: 'delete',
+        effect: 'allow',
         conditions: [
           {
             type: 'ownership',
-            evaluate: (ctx) => ctx.metadata?.ownerId === ctx.userId
-          }
-        ]
+            evaluate: ctx => ctx.metadata?.ownerId === ctx.userId,
+          },
+        ],
       },
       { resource: 'profile', action: 'read', effect: 'allow' },
-      { resource: 'profile', action: 'update', effect: 'allow',
+      {
+        resource: 'profile',
+        action: 'update',
+        effect: 'allow',
         conditions: [
           {
             type: 'ownership',
-            evaluate: (ctx) => ctx.resourceId === ctx.userId
-          }
-        ]
-      }
-    ]
+            evaluate: ctx => ctx.resourceId === ctx.userId,
+          },
+        ],
+      },
+    ],
   },
   EXPERT: {
     id: 'expert',
@@ -115,8 +127,8 @@ const ROLE_DEFINITIONS: Record<string, Role> = {
       { resource: 'comments', action: 'moderate', effect: 'allow' },
       { resource: 'analysis', action: 'write', effect: 'allow' },
       { resource: 'analysis', action: 'create', effect: 'allow' },
-      { resource: 'verification', action: 'write', effect: 'allow' }
-    ]
+      { resource: 'verification', action: 'write', effect: 'allow' },
+    ],
   },
   ADMIN: {
     id: 'admin',
@@ -127,9 +139,9 @@ const ROLE_DEFINITIONS: Record<string, Role> = {
       { resource: '*', action: '*', effect: 'allow', priority: 100 },
       { resource: 'users', action: 'admin', effect: 'allow' },
       { resource: 'system', action: 'admin', effect: 'allow' },
-      { resource: 'analytics', action: '*', effect: 'allow' }
-    ]
-  }
+      { resource: 'analytics', action: '*', effect: 'allow' },
+    ],
+  },
 };
 
 // ============================================================================
@@ -145,11 +157,7 @@ class RBACManager {
   private enableCache = true;
   private maxAuditLogs = 1000;
 
-  constructor(config?: {
-    enableAudit?: boolean;
-    enableCache?: boolean;
-    maxAuditLogs?: number;
-  }) {
+  constructor(config?: { enableAudit?: boolean; enableCache?: boolean; maxAuditLogs?: number }) {
     this.enableAudit = config?.enableAudit ?? false;
     this.enableCache = config?.enableCache ?? true;
     this.maxAuditLogs = config?.maxAuditLogs ?? 1000;
@@ -285,7 +293,7 @@ class RBACManager {
         result = {
           granted,
           reason: granted ? 'Permission granted' : 'Explicitly denied',
-          matchedPermission: permission
+          matchedPermission: permission,
         };
 
         // If explicitly denied, stop checking
@@ -314,7 +322,7 @@ class RBACManager {
         resource: context.resource,
         action: context.action,
         granted: result.granted,
-        reason: result.reason
+        reason: result.reason,
       });
     }
 
@@ -362,7 +370,7 @@ class RBACManager {
       userId: 'unknown',
       userRole,
       resource,
-      action
+      action,
     });
     return result.granted;
   }
@@ -552,15 +560,11 @@ class RBACManager {
 
 export const rbacManager = new RBACManager({
   enableAudit: false,
-  enableCache: true
+  enableCache: true,
 });
 
 // Convenience functions
-export function hasPermission(
-  userRole: UserRole,
-  resource: string,
-  action: string
-): boolean {
+export function hasPermission(userRole: UserRole, resource: string, action: string): boolean {
   return rbacManager.hasPermission(userRole, resource, action);
 }
 
@@ -591,26 +595,26 @@ export function getEffectivePermissions(roleId: string): Permission[] {
 export const PermissionConditions = {
   ownership: (ownerIdKey = 'ownerId'): PermissionCondition => ({
     type: 'ownership',
-    evaluate: (ctx) => ctx.metadata?.[ownerIdKey] === ctx.userId
+    evaluate: ctx => ctx.metadata?.[ownerIdKey] === ctx.userId,
   }),
 
   timeWindow: (startTime: number, endTime: number): PermissionCondition => ({
     type: 'time',
-    evaluate: (ctx) => {
+    evaluate: ctx => {
       const now = ctx.timestamp ?? Date.now();
       return now >= startTime && now <= endTime;
-    }
+    },
   }),
 
   attribute: (attributeKey: string, expectedValue: unknown): PermissionCondition => ({
     type: 'attribute',
-    evaluate: (ctx) => ctx.metadata?.[attributeKey] === expectedValue
+    evaluate: ctx => ctx.metadata?.[attributeKey] === expectedValue,
   }),
 
   custom: (evaluator: (ctx: PermissionContext) => boolean): PermissionCondition => ({
     type: 'custom',
-    evaluate: evaluator
-  })
+    evaluate: evaluator,
+  }),
 };
 
 // Export the manager for advanced usage
@@ -625,5 +629,5 @@ export const rbacUtils = {
   filterByPermissions,
   getEffectivePermissions,
   manager: rbacManager,
-  conditions: PermissionConditions
+  conditions: PermissionConditions,
 };

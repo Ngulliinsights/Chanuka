@@ -1,4 +1,15 @@
-import { ChevronDown, ChevronRight, Clock, MapPin, Menu, CheckCircle, Circle, ArrowRight, BookOpen, Target } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  MapPin,
+  Menu,
+  CheckCircle,
+  Circle,
+  ArrowRight,
+  BookOpen,
+  Target,
+} from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import React from 'react';
 
@@ -33,24 +44,25 @@ const ComplexityDots = ({ complexity }: { complexity: 1 | 2 | 3 }) => {
   const complexityLabels = {
     1: 'Easy read',
     2: 'Moderate complexity',
-    3: 'Complex content'
+    3: 'Complex content',
   };
 
   const complexityColors = {
     1: 'bg-green-500',
     2: 'bg-yellow-500',
-    3: 'bg-red-500'
+    3: 'bg-red-500',
   };
 
   return (
-    <div className="flex items-center gap-1" aria-label={`${complexityLabels[complexity]} - ${complexity} out of 3 dots`}>
+    <div
+      className="flex items-center gap-1"
+      aria-label={`${complexityLabels[complexity]} - ${complexity} out of 3 dots`}
+    >
       {Array.from({ length: 3 }, (_, i) => (
         <div
           key={i}
           className={`w-2 h-2 rounded-full transition-all duration-200 complexity-dot ${
-            i < complexity
-              ? complexityColors[complexity]
-              : 'bg-gray-300'
+            i < complexity ? complexityColors[complexity] : 'bg-gray-300'
           }`}
           title={i < complexity ? complexityLabels[complexity] : ''}
         />
@@ -71,7 +83,7 @@ const ReadingTime = ({ minutes }: { minutes: number }) => (
 const MobileTabSelector = ({
   sections,
   currentSectionId,
-  onSectionChange
+  onSectionChange,
 }: {
   sections: SimpleSection[];
   currentSectionId?: string;
@@ -118,12 +130,14 @@ const MobileTabSelector = ({
             )}
           </div>
         </div>
-        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
-          {sections.map((section) => (
+          {sections.map(section => (
             <button
               key={section.id}
               type="button"
@@ -139,12 +153,8 @@ const MobileTabSelector = ({
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900">{section.title}</span>
-                    {section.isRequired && (
-                      <span className="required-badge">Required</span>
-                    )}
-                    {section.isCompleted && (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    )}
+                    {section.isRequired && <span className="required-badge">Required</span>}
+                    {section.isCompleted && <CheckCircle className="w-4 h-4 text-green-500" />}
                   </div>
                   <div className="flex items-center gap-3 mt-1">
                     <ComplexityDots complexity={section.complexity} />
@@ -164,7 +174,7 @@ const MobileTabSelector = ({
 const ReadingPathGuidance = ({
   sections,
   currentSectionId,
-  onSectionChange
+  onSectionChange,
 }: {
   sections: SimpleSection[];
   currentSectionId?: string;
@@ -194,18 +204,16 @@ const ReadingPathGuidance = ({
             onClick={() => onSectionChange?.(section.id)}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                section.isCompleted
-                  ? 'bg-green-100 text-green-700'
-                  : currentSectionId === section.id
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600'
-              }`}>
-                {section.isCompleted ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : (
-                  index + 1
-                )}
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
+                  section.isCompleted
+                    ? 'bg-green-100 text-green-700'
+                    : currentSectionId === section.id
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-600'
+                }`}
+              >
+                {section.isCompleted ? <CheckCircle className="w-4 h-4" /> : index + 1}
               </div>
 
               <div className="flex-1">
@@ -216,9 +224,7 @@ const ReadingPathGuidance = ({
                 </div>
               </div>
 
-              {currentSectionId === section.id && (
-                <Target className="w-4 h-4 text-blue-600" />
-              )}
+              {currentSectionId === section.id && <Target className="w-4 h-4 text-blue-600" />}
             </div>
           </div>
         ))}
@@ -228,9 +234,7 @@ const ReadingPathGuidance = ({
         <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
           <div className="flex items-center gap-2 text-blue-800">
             <ArrowRight className="w-4 h-4" />
-            <span className="text-sm font-medium">
-              Next: {nextRecommended.title}
-            </span>
+            <span className="text-sm font-medium">Next: {nextRecommended.title}</span>
           </div>
         </div>
       )}
@@ -245,7 +249,7 @@ const SimpleSection = ({
   onToggle,
   isActive,
   onSectionClick,
-  onSectionComplete
+  onSectionComplete,
 }: {
   section: SimpleSection;
   isOpen: boolean;
@@ -276,12 +280,8 @@ const SimpleSection = ({
             <h3 className={`font-medium ${isActive ? 'text-blue-600' : 'text-gray-900'}`}>
               {section.title}
             </h3>
-            {section.isRequired && (
-              <span className="required-badge">Required</span>
-            )}
-            {section.isCompleted && (
-              <CheckCircle className="w-4 h-4 text-green-500" />
-            )}
+            {section.isRequired && <span className="required-badge">Required</span>}
+            {section.isCompleted && <CheckCircle className="w-4 h-4 text-green-500" />}
           </div>
 
           {/* Reading progress bar for current section */}
@@ -312,7 +312,7 @@ const SimpleSection = ({
             {!section.isCompleted && (
               <button
                 type="button"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   onSectionComplete?.(section.id);
                 }}
@@ -330,7 +330,7 @@ const SimpleSection = ({
           <div className="collapsible-subsection">
             <h4 className="font-medium text-gray-900 mb-3">Subsections:</h4>
             <div className="space-y-2">
-              {section.subsections.map((subsection) => (
+              {section.subsections.map(subsection => (
                 <div
                   key={subsection.id}
                   className="flex items-center gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50"
@@ -358,7 +358,7 @@ export const SimpleProgressiveDisclosure = ({
   onSectionChange,
   onSectionComplete,
   showMobileSelector = true,
-  enableReadingPath = true
+  enableReadingPath = true,
 }: SimpleProgressiveDisclosureProps) => {
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
@@ -375,25 +375,32 @@ export const SimpleProgressiveDisclosure = ({
     });
   }, []);
 
-  const handleSectionClick = useCallback((sectionId: string) => {
-    onSectionChange?.(sectionId);
-  }, [onSectionChange]);
+  const handleSectionClick = useCallback(
+    (sectionId: string) => {
+      onSectionChange?.(sectionId);
+    },
+    [onSectionChange]
+  );
 
-  const handleSectionComplete = useCallback((sectionId: string) => {
-    setCompletedSections(prev => new Set([...prev, sectionId]));
-    onSectionComplete?.(sectionId);
-  }, [onSectionComplete]);
+  const handleSectionComplete = useCallback(
+    (sectionId: string) => {
+      setCompletedSections(prev => new Set([...prev, sectionId]));
+      onSectionComplete?.(sectionId);
+    },
+    [onSectionComplete]
+  );
 
   // Update sections with completion status
   const enhancedSections = sections.map(section => ({
     ...section,
-    isCompleted: completedSections.has(section.id)
+    isCompleted: completedSections.has(section.id),
   }));
 
   // Context navigation helper with enhanced features
   const currentSection = enhancedSections.find(s => s.id === currentSectionId);
   const currentIndex = enhancedSections.findIndex(s => s.id === currentSectionId);
-  const nextSection = currentIndex < enhancedSections.length - 1 ? enhancedSections[currentIndex + 1] : null;
+  const nextSection =
+    currentIndex < enhancedSections.length - 1 ? enhancedSections[currentIndex + 1] : null;
   const prevSection = currentIndex > 0 ? enhancedSections[currentIndex - 1] : null;
 
   // Calculate overall progress
@@ -513,7 +520,7 @@ export const SimpleProgressiveDisclosure = ({
 
       {/* Enhanced Collapsible Sections */}
       <div className="space-y-2">
-        {enhancedSections.map((section) => (
+        {enhancedSections.map(section => (
           <SimpleSection
             key={section.id}
             section={section}

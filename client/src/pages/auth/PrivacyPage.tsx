@@ -4,10 +4,16 @@
  */
 
 import { Shield, Eye, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import React from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 
 export default function PrivacyPage() {
   return (
@@ -16,9 +22,7 @@ export default function PrivacyPage() {
         {/* Header */}
         <div className="text-center">
           <Eye className="mx-auto h-12 w-12 text-blue-600" />
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">
-            Privacy Settings
-          </h1>
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">Privacy Settings</h1>
           <p className="mt-2 text-gray-600">
             Control your privacy preferences and data sharing settings
           </p>
@@ -28,8 +32,8 @@ export default function PrivacyPage() {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Privacy Controls Coming Soon:</strong> Comprehensive privacy management 
-            including data export, deletion requests, and granular privacy controls will be 
+            <strong>Privacy Controls Coming Soon:</strong> Comprehensive privacy management
+            including data export, deletion requests, and granular privacy controls will be
             available in the next update.
           </AlertDescription>
         </Alert>
@@ -42,9 +46,7 @@ export default function PrivacyPage() {
                 <Eye className="h-5 w-5" />
                 Data Visibility
               </CardTitle>
-              <CardDescription>
-                Control who can see your profile and activity
-              </CardDescription>
+              <CardDescription>Control who can see your profile and activity</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
@@ -59,9 +61,7 @@ export default function PrivacyPage() {
                 <Shield className="h-5 w-5" />
                 Data Management
               </CardTitle>
-              <CardDescription>
-                Export or delete your personal data
-              </CardDescription>
+              <CardDescription>Export or delete your personal data</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">

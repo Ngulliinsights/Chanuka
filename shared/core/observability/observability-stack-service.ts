@@ -6,13 +6,14 @@
  */
 
 import { Result, ok, err } from '../primitives/types/result';
+
 import { BaseError } from './error-management/errors/base-error';
+import { CorrelationContext, ObservabilityConfig } from './interfaces';
 import {
   IObservabilityStack,
   ObservabilityStackRegistry
 } from './iobservability-stack';
 import { ObservabilityStack } from './stack';
-import { CorrelationContext, ObservabilityConfig } from './interfaces';
 
 /**
  * Observability operation error

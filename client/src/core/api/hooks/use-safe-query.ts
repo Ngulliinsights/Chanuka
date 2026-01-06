@@ -1,6 +1,6 @@
 /**
  * Enhanced React Query hooks with race condition prevention and robust error handling
- * 
+ *
  * These hooks solve common problems when fetching data in React applications:
  * - Race conditions: When a new request starts before the previous one finishes
  * - Duplicate requests: Multiple components triggering the same fetch
@@ -66,98 +66,100 @@ export function useSafeQuery<T = unknown>(
    * Core query function that handles the actual data fetching.
    * This is where race condition prevention happens through AbortController.
    */
-  const queryFn = useCallback(async ({ signal }: { signal?: AbortSignal }): Promise<T> => {
-    // Step 1: Cancel any existing request to prevent race conditions
-    // If a previous request is still running, abort it before starting a new one
-    abortControllerRef.current?.abort();
+  const queryFn = useCallback(
+    async ({ signal }: { signal?: AbortSignal }): Promise<T> => {
+      // Step 1: Cancel any existing request to prevent race conditions
+      // If a previous request is still running, abort it before starting a new one
+      abortControllerRef.current?.abort();
 
-    // Step 2: Create a new abort controller for this request
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+      // Step 2: Create a new abort controller for this request
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-    // Step 3: Link React Query's signal to our controller
-    // This ensures the request is canceled if React Query unmounts the component
-    const abortHandler = () => controller.abort();
-    signal?.addEventListener('abort', abortHandler);
+      // Step 3: Link React Query's signal to our controller
+      // This ensures the request is canceled if React Query unmounts the component
+      const abortHandler = () => controller.abort();
+      signal?.addEventListener('abort', abortHandler);
 
-    try {
-      let result: { data?: T; error?: string; status?: number };
+      try {
+        let result: { data?: T; error?: string; status?: number };
 
-      // Step 4: Make the actual API request based on auth requirements
-      if (requireAuth) {
-        // Use global API client with built-in retry logic
-        result = await globalApiClient.get<T>(endpoint!, {
-          signal: controller.signal,
-          timeout,
-          retries
-        });
-      } else {
-        // Use standard fetch for public endpoints with timeout handling
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-        try {
-          const response = await fetch(endpoint!, {
+        // Step 4: Make the actual API request based on auth requirements
+        if (requireAuth) {
+          // Use global API client with built-in retry logic
+          result = await globalApiClient.get<T>(endpoint!, {
             signal: controller.signal,
-            headers: {
-              'Content-Type': 'application/json'
-            }
+            timeout,
+            retries,
           });
+        } else {
+          // Use standard fetch for public endpoints with timeout handling
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-          clearTimeout(timeoutId);
+          try {
+            const response = await fetch(endpoint!, {
+              signal: controller.signal,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
 
-          if (!response.ok) {
-            throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            result = { data, status: response.status };
+          } catch (error) {
+            clearTimeout(timeoutId);
+            throw error;
           }
+        }
 
-          const data = await response.json();
-          result = { data, status: response.status };
-        } catch (error) {
-          clearTimeout(timeoutId);
+        // Step 5: Handle API-level errors
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        const data = result.data!;
+
+        // Only trigger success callback if component is still mounted
+        if (isMountedRef.current) {
+          onSuccess?.(data);
+        }
+
+        return data;
+      } catch (error) {
+        // Don't handle abort errors - they're expected when canceling requests
+        if (error instanceof Error && error.name === 'AbortError') {
           throw error;
         }
+
+        // Transform error into a consistent format and trigger error callback
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        const queryError = new Error(errorMessage);
+
+        if (isMountedRef.current) {
+          onError?.(queryError);
+        }
+
+        throw queryError;
+      } finally {
+        // Clean up: remove the controller reference if this was the active request
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+        }
+
+        // Clean up event listener
+        if (signal) {
+          signal.removeEventListener('abort', abortHandler);
+        }
       }
-
-      // Step 5: Handle API-level errors
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      const data = result.data!;
-
-      // Only trigger success callback if component is still mounted
-      if (isMountedRef.current) {
-        onSuccess?.(data);
-      }
-
-      return data;
-
-    } catch (error) {
-      // Don't handle abort errors - they're expected when canceling requests
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw error;
-      }
-
-      // Transform error into a consistent format and trigger error callback
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      const queryError = new Error(errorMessage);
-
-      if (isMountedRef.current) {
-        onError?.(queryError);
-      }
-
-      throw queryError;
-    } finally {
-      // Clean up: remove the controller reference if this was the active request
-      if (abortControllerRef.current === controller) {
-        abortControllerRef.current = null;
-      }
-
-      // Clean up event listener
-      if (signal) {
-        signal.removeEventListener('abort', abortHandler);
-      }
-    }
-  }, [endpoint, requireAuth, timeout, retries, onError, onSuccess]);
+    },
+    [endpoint, requireAuth, timeout, retries, onError, onSuccess]
+  );
 
   // Configure React Query with our enhanced query function
   const query = useQuery<T>({
@@ -199,18 +201,18 @@ export function useSafeQuery<T = unknown>(
   return {
     ...query,
     refetchSafely,
-    isRefetching: isRefetchingRef.current
+    isRefetching: isRefetchingRef.current,
   };
 }
 
 /**
  * Specialized hook for admin-specific queries with enhanced security and longer timeouts.
- * 
+ *
  * Admin operations typically require:
  * - Authentication
  * - Longer timeouts (complex operations)
  * - Fewer retries (fail security)
- * 
+ *
  * Example:
  * const { data: users } = useAdminQuery({
  *   queryKey: ['admin', 'users'],
@@ -235,10 +237,10 @@ export function useAdminQuery<T = unknown>(
  * Fixed: Uses useQueries to comply with Rules of Hooks
  * Hook for coordinating multiple related queries to prevent race conditions
  * when fetching interdependent data.
- * 
+ *
  * IMPORTANT: This hook is designed for a FIXED number of queries (max 5).
  * For dynamic query lists, use React Query's useQueries hook directly.
- * 
+ *
  * Example:
  * const { data, isLoading, refetchAll } = useCoordinatedQueries([
  *   { key: 'profile', endpoint: '/api/profile' },
@@ -260,7 +262,9 @@ export function useCoordinatedQueries<T extends Record<string, unknown>>(
 } {
   // Validate input to prevent hook rule violations
   if (queries.length > 5) {
-    throw new Error('useCoordinatedQueries supports maximum 5 queries. Use React Query\'s useQueries for more.');
+    throw new Error(
+      "useCoordinatedQueries supports maximum 5 queries. Use React Query's useQueries for more."
+    );
   }
 
   // Create stable query configurations
@@ -309,7 +313,7 @@ export function useCoordinatedQueries<T extends Record<string, unknown>>(
     data,
     isLoading,
     error,
-    refetchAll
+    refetchAll,
   };
 }
 

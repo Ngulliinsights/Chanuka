@@ -8,8 +8,9 @@
 import React, { useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { useNavigation } from './context';
 import { logger } from '../../utils/logger';
+
+import { useNavigation } from './context';
 
 interface NavigationConsistencyProps {
   children: React.ReactNode;
@@ -32,85 +33,85 @@ const ROUTE_METADATA: Record<string, RouteMetadata> = {
     description: 'Track bills, analyze legislation, and engage with Kenyan democracy',
     section: 'home',
     requiresAuth: false,
-    breadcrumbLabel: 'Home'
+    breadcrumbLabel: 'Home',
   },
   '/bills': {
     title: 'Bills Dashboard - Chanuka',
     description: 'Browse and track Kenyan legislative bills',
     section: 'bills',
     requiresAuth: false,
-    breadcrumbLabel: 'Bills'
+    breadcrumbLabel: 'Bills',
   },
   '/search': {
     title: 'Search - Chanuka',
     description: 'Search bills, sponsors, and legislative content',
     section: 'search',
     requiresAuth: false,
-    breadcrumbLabel: 'Search'
+    breadcrumbLabel: 'Search',
   },
   '/results': {
     title: 'Search Results - Chanuka',
     description: 'Search results for legislative content',
     section: 'search',
     requiresAuth: false,
-    breadcrumbLabel: 'Results'
+    breadcrumbLabel: 'Results',
   },
   '/community': {
     title: 'Community Hub - Chanuka',
     description: 'Engage with the civic community',
     section: 'community',
     requiresAuth: false,
-    breadcrumbLabel: 'Community'
+    breadcrumbLabel: 'Community',
   },
   '/dashboard': {
     title: 'Dashboard - Chanuka',
     description: 'Your personalized legislative dashboard',
     section: 'dashboard',
     requiresAuth: true,
-    breadcrumbLabel: 'Dashboard'
+    breadcrumbLabel: 'Dashboard',
   },
   '/account': {
     title: 'Account - Chanuka',
     description: 'Manage your account settings',
     section: 'account',
     requiresAuth: true,
-    breadcrumbLabel: 'Account'
+    breadcrumbLabel: 'Account',
   },
   '/account/settings': {
     title: 'Settings - Chanuka',
     description: 'Configure your preferences',
     section: 'account',
     requiresAuth: true,
-    breadcrumbLabel: 'Settings'
+    breadcrumbLabel: 'Settings',
   },
   '/admin': {
     title: 'Admin Dashboard - Chanuka',
     description: 'Administrative controls',
     section: 'admin',
     requiresAuth: true,
-    breadcrumbLabel: 'Admin'
+    breadcrumbLabel: 'Admin',
   },
   '/auth': {
     title: 'Sign In - Chanuka',
     description: 'Sign in to your account',
     section: 'auth',
     requiresAuth: false,
-    breadcrumbLabel: 'Sign In'
+    breadcrumbLabel: 'Sign In',
   },
   '/terms': {
     title: 'Terms of Service - Chanuka',
     description: 'Terms and conditions',
     section: 'legal',
     requiresAuth: false,
-    breadcrumbLabel: 'Terms'
+    breadcrumbLabel: 'Terms',
   },
   '/privacy': {
     title: 'Privacy Policy - Chanuka',
     description: 'Privacy policy and data handling',
     section: 'legal',
     requiresAuth: false,
-    breadcrumbLabel: 'Privacy'
-  }
+    breadcrumbLabel: 'Privacy',
+  },
 };
 
 /**
@@ -130,7 +131,7 @@ function getRouteMetadata(pathname: string): RouteMetadata {
         description: 'Detailed bill analysis',
         section: 'bills',
         requiresAuth: false,
-        breadcrumbLabel: 'Analysis'
+        breadcrumbLabel: 'Analysis',
       };
     } else {
       return {
@@ -138,7 +139,7 @@ function getRouteMetadata(pathname: string): RouteMetadata {
         description: 'Legislative bill details',
         section: 'bills',
         requiresAuth: false,
-        breadcrumbLabel: 'Bill Details'
+        breadcrumbLabel: 'Bill Details',
       };
     }
   }
@@ -149,7 +150,7 @@ function getRouteMetadata(pathname: string): RouteMetadata {
     description: 'Track bills, analyze legislation, and engage with Kenyan democracy',
     section: 'unknown',
     requiresAuth: false,
-    breadcrumbLabel: 'Page'
+    breadcrumbLabel: 'Page',
   };
 }
 
@@ -214,14 +215,14 @@ export const NavigationConsistency: React.FC<NavigationConsistencyProps> = ({ ch
       component: 'NavigationConsistency',
       pathname,
       section: metadata.section,
-      title: metadata.title
+      title: metadata.title,
     });
 
     // Track page view for analytics (if analytics service is available)
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('config', 'GA_MEASUREMENT_ID', {
         page_title: metadata.title,
-        page_location: window.location.href
+        page_location: window.location.href,
       });
     }
   }, [location.pathname, navigation]);

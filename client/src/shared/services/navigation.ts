@@ -63,7 +63,7 @@ class NavigationService {
 
     logger.info('Navigation service initialized', {
       component: 'NavigationService',
-      currentPath: this.currentState.currentPath
+      currentPath: this.currentState.currentPath,
     });
   }
 
@@ -100,14 +100,13 @@ class NavigationService {
         component: 'NavigationService',
         from: previousPath,
         to: path,
-        options
+        options,
       });
-
     } catch (error) {
       logger.error('Navigation failed', {
         component: 'NavigationService',
         path,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -224,7 +223,7 @@ class NavigationService {
     logger.debug('Route registered', {
       component: 'NavigationService',
       path: route.path,
-      name: route.name
+      name: route.name,
     });
   }
 
@@ -245,7 +244,11 @@ class NavigationService {
   /**
    * Navigate to a named route
    */
-  navigateToRoute(routeName: string, params: Record<string, string> = {}, options: NavigationOptions = {}): void {
+  navigateToRoute(
+    routeName: string,
+    params: Record<string, string> = {},
+    options: NavigationOptions = {}
+  ): void {
     const route = Array.from(this.routes.values()).find(r => r.name === routeName);
 
     if (!route) {
@@ -334,7 +337,7 @@ class NavigationService {
       previousPath: null,
       params: {},
       query: Object.fromEntries(url.searchParams.entries()),
-      hash: url.hash
+      hash: url.hash,
     };
   }
 
@@ -355,7 +358,7 @@ class NavigationService {
       } catch (error) {
         logger.error('Navigation listener error', {
           component: 'NavigationService',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     });
@@ -369,7 +372,7 @@ class NavigationService {
       component: 'NavigationService',
       from: previousPath,
       to: this.currentState.currentPath,
-      state: event.state
+      state: event.state,
     });
   }
 
@@ -380,7 +383,7 @@ class NavigationService {
     logger.debug('Hash change detected', {
       component: 'NavigationService',
       oldHash: new URL(event.oldURL).hash,
-      newHash: new URL(event.newURL).hash
+      newHash: new URL(event.newURL).hash,
     });
   }
 
@@ -390,43 +393,43 @@ class NavigationService {
       {
         path: '/',
         name: 'home',
-        title: 'Home - Civic Engagement Platform'
+        title: 'Home - Civic Engagement Platform',
       },
       {
         path: '/bills',
         name: 'bills',
-        title: 'Bills - Legislative Content'
+        title: 'Bills - Legislative Content',
       },
       {
         path: '/bills/:id',
         name: 'bill-detail',
-        title: 'Bill Details'
+        title: 'Bill Details',
       },
       {
         path: '/discussions',
         name: 'discussions',
-        title: 'Community Discussions'
+        title: 'Community Discussions',
       },
       {
         path: '/discussions/:id',
         name: 'discussion-detail',
-        title: 'Discussion Details'
+        title: 'Discussion Details',
       },
       {
         path: '/profile',
         name: 'profile',
-        title: 'User Profile'
+        title: 'User Profile',
       },
       {
         path: '/settings',
         name: 'settings',
-        title: 'Settings'
+        title: 'Settings',
       },
       {
         path: '/about',
         name: 'about',
-        title: 'About Us'
-      }
+        title: 'About Us',
+      },
     ];
 
     commonRoutes.forEach(route => {
@@ -448,7 +451,7 @@ class NavigationService {
     this.isInitialized = false;
 
     logger.info('Navigation service cleaned up', {
-      component: 'NavigationService'
+      component: 'NavigationService',
     });
   }
 }
@@ -475,7 +478,9 @@ export const navigationUtils = {
   },
 
   parseQuery(queryString: string): Record<string, string> {
-    const params = new URLSearchParams(queryString.startsWith('?') ? queryString.slice(1) : queryString);
+    const params = new URLSearchParams(
+      queryString.startsWith('?') ? queryString.slice(1) : queryString
+    );
     return Object.fromEntries(params.entries());
   },
 
@@ -492,7 +497,7 @@ export const navigationUtils = {
   isSamePath(path1: string, path2: string): boolean {
     const normalize = (path: string) => path.replace(/\/+$/, '') || '/';
     return normalize(path1) === normalize(path2);
-  }
+  },
 };
 
 export default navigationService;

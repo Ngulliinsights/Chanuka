@@ -16,17 +16,17 @@ export const LOADING_SIZES: Record<LoadingSize, string> = {
 } as const;
 
 export const LOADING_TIMEOUTS = {
-  SHORT: 5000,    // 5 seconds
-  MEDIUM: 15000,  // 15 seconds
-  LONG: 30000,    // 30 seconds
+  SHORT: 5000, // 5 seconds
+  MEDIUM: 15000, // 15 seconds
+  LONG: 30000, // 30 seconds
   EXTENDED: 60000, // 1 minute
 } as const;
 
 export const RETRY_DELAYS = {
   IMMEDIATE: 0,
-  SHORT: 1000,    // 1 second
-  MEDIUM: 3000,   // 3 seconds
-  LONG: 5000,     // 5 seconds
+  SHORT: 1000, // 1 second
+  MEDIUM: 3000, // 3 seconds
+  LONG: 5000, // 5 seconds
 } as const;
 
 export const MAX_RETRIES = {
@@ -36,9 +36,9 @@ export const MAX_RETRIES = {
 } as const;
 
 export const CONNECTION_THRESHOLDS = {
-  SLOW_CONNECTION_RTT: 1000,     // 1 second RTT
+  SLOW_CONNECTION_RTT: 1000, // 1 second RTT
   SLOW_CONNECTION_DOWNLINK: 1.5, // 1.5 Mbps
-  OFFLINE_TIMEOUT: 5000,         // 5 seconds to consider offline
+  OFFLINE_TIMEOUT: 5000, // 5 seconds to consider offline
 } as const;
 
 export const PROGRESS_PHASES = {
@@ -131,7 +131,7 @@ export const POSITION_CLASSES = {
   'top-left': 'fixed top-4 left-4 z-50',
   'bottom-right': 'fixed bottom-4 right-4 z-50',
   'bottom-left': 'fixed bottom-4 left-4 z-50',
-  'center': 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50',
+  center: 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50',
 } as const;
 
 export const SKELETON_VARIANTS = {
@@ -191,4 +191,3 @@ export const DEBOUNCE_DELAYS = {
   SCROLL: 50,
   INPUT: 500,
 } as const;
-

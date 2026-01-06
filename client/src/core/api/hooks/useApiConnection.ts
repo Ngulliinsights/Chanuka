@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import { globalApiClient } from '../index';
 
-
 // Define types locally since they're not exported
 export interface ConnectionInfo {
   status: 'connected' | 'disconnected' | 'connecting';
@@ -57,7 +56,7 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
       last_checked: new Date(),
       apiReachable: true,
       corsEnabled: true,
-      errors: []
+      errors: [],
     };
   } catch (error) {
     return {
@@ -66,7 +65,7 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
       last_checked: new Date(),
       apiReachable: false,
       corsEnabled: false,
-      errors: [error instanceof Error ? error.message : 'Connection failed']
+      errors: [error instanceof Error ? error.message : 'Connection failed'],
     };
   }
 };
@@ -74,13 +73,13 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
 const checkApiHealth = async (): Promise<HealthStatus> => {
   try {
     const response = await globalApiClient.get('/api/health/detailed');
-    
+
     // Type guard: safely access the response data with proper type checking
     // We cast to our defined interface, providing TypeScript with structural information
     // while still using defensive programming patterns (optional chaining and nullish coalescing)
     // This approach gives us compile-time type safety and runtime error resilience
     const data = response.data as HealthApiResponse | undefined;
-    
+
     // Use nullish coalescing (??) instead of logical OR (||) to preserve falsy values
     // This is important because we want to keep values like `false` or `0` when they're intentional
     // The ?? operator only uses the default when the value is null or undefined
@@ -91,7 +90,7 @@ const checkApiHealth = async (): Promise<HealthStatus> => {
       api: data?.services?.api ?? false,
       frontend: data?.services?.frontend ?? false,
       database: data?.services?.database ?? false,
-      latency: data?.latency ?? 0
+      latency: data?.latency ?? 0,
     };
   } catch (error) {
     // Always return a complete HealthStatus object even on error
@@ -103,7 +102,7 @@ const checkApiHealth = async (): Promise<HealthStatus> => {
       api: false,
       frontend: false,
       database: false,
-      latency: 0
+      latency: 0,
     };
   }
 };
@@ -157,20 +156,20 @@ interface UseApiConnectionOptions {
 
 /**
  * Hook for monitoring API connection status and health
- * 
+ *
  * This hook provides comprehensive connection monitoring with the following optimizations:
- * 
+ *
  * Performance optimizations:
  * - Memoized callbacks prevent unnecessary re-renders in consuming components
  * - Smart state comparison avoids redundant updates when connection status hasn't meaningfully changed
  * - Separate intervals for connection and health checks reduce API load
  * - Proper cleanup of all intervals and listeners prevents memory leaks
- * 
+ *
  * Stability improvements:
  * - Callback refs ensure effect dependencies don't cause recreation loops
  * - Previous state tracking enables accurate change detection for callbacks
  * - Deep comparison of connection properties prevents flickering UI states
- * 
+ *
  * Usage example:
  * const { isConnected, isHealthy, checkConnection } = useApiConnection({
  *   autoStart: true,
@@ -184,7 +183,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     checkInterval = 30000,
     enableHealthChecks = true,
     onConnectionChange,
-    onHealthChange
+    onHealthChange,
   } = options;
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionInfo | null>(null);
@@ -198,14 +197,14 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   // This prevents the effect from re-running every time the parent component updates the callback
   const onConnectionChangeRef = useRef(onConnectionChange);
   const onHealthChangeRef = useRef(onHealthChange);
-  
+
   // Keep refs updated without causing re-renders
   // Use useCallback to ensure this effect only runs when callbacks actually change
   const updateCallbackRefs = useCallback(() => {
     onConnectionChangeRef.current = onConnectionChange;
     onHealthChangeRef.current = onHealthChange;
   }, [onConnectionChange, onHealthChange]);
-  
+
   useEffect(() => {
     updateCallbackRefs();
   }, [updateCallbackRefs]);
@@ -226,26 +225,28 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       // Perform deep comparison for meaningful changes
       // We check the properties that actually matter for UI updates
       // Ignoring transient properties like latency variations prevents unnecessary re-renders
-      if (prevStatus && 
-          prevStatus.apiReachable === status.apiReachable &&
-          prevStatus.corsEnabled === status.corsEnabled &&
-          (prevStatus.errors?.length || 0) === (status.errors?.length || 0)) {
+      if (
+        prevStatus &&
+        prevStatus.apiReachable === status.apiReachable &&
+        prevStatus.corsEnabled === status.corsEnabled &&
+        (prevStatus.errors?.length || 0) === (status.errors?.length || 0)
+      ) {
         return prevStatus; // No meaningful change, skip update to prevent re-render
       }
       return status;
     });
-    
+
     setIsLoading(false);
-    
+
     const isNowConnected = status.apiReachable && status.corsEnabled;
-    
+
     // Trigger connection change callback only if status actually changed
     // The prevConnectionRef.current !== null check prevents callback on initial mount
     if (prevConnectionRef.current !== null && prevConnectionRef.current !== isNowConnected) {
       onConnectionChangeRef.current?.(isNowConnected || false);
     }
     prevConnectionRef.current = isNowConnected || false;
-    
+
     // Update error state based on connection status
     if (isNowConnected) {
       setError(null);
@@ -262,18 +263,18 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   const performConnectionCheck = useCallback(async () => {
     // Prevent state updates if component is unmounted
     if (!isMountedRef.current) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const status = await checkConnection();
-      
+
       // Only update state if component is still mounted
       if (!isMountedRef.current) return;
-      
+
       handleConnectionUpdate(status);
-      
+
       // Extract the most relevant error for display
       if (status.errors && status.errors.length > 0) {
         const corsError = status.errors.find(err => err.toLowerCase().includes('cors'));
@@ -282,11 +283,11 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     } catch (err) {
       // Only update state if component is still mounted
       if (!isMountedRef.current) return;
-      
+
       // Handle unexpected errors that weren't caught in checkConnection
       const errorMessage = err instanceof Error ? err.message : 'Connection check failed';
       setError(errorMessage);
-      
+
       // Set a failed connection status on error so UI has complete information
       const failedStatus: ConnectionInfo = {
         status: 'disconnected',
@@ -294,9 +295,9 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
         last_checked: new Date(),
         apiReachable: false,
         corsEnabled: false,
-        errors: [errorMessage]
+        errors: [errorMessage],
       };
-      
+
       handleConnectionUpdate(failedStatus);
     } finally {
       // Always clear loading state, even if an error occurred
@@ -310,41 +311,42 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   // Stable reference due to empty deps array (only depends on enableHealthChecks which is in the function body)
   const performHealthCheck = useCallback(async () => {
     if (!enableHealthChecks || !isMountedRef.current) return;
-    
+
     try {
       const health = await checkApiHealth();
-      
+
       // Only update state if component is still mounted
       if (!isMountedRef.current) return;
-      
+
       // Use functional setState to compare with previous health status
       // This prevents unnecessary re-renders when health status hasn't changed
       setHealthStatus(prevHealth => {
         // Only update if health status changed in meaningful ways
         // We ignore timestamp changes since those happen on every check
-        if (prevHealth &&
-            prevHealth.api === health.api &&
-            prevHealth.frontend === health.frontend &&
-            prevHealth.database === health.database) {
+        if (
+          prevHealth &&
+          prevHealth.api === health.api &&
+          prevHealth.frontend === health.frontend &&
+          prevHealth.database === health.database
+        ) {
           return prevHealth; // Skip update to prevent re-render
         }
         return health;
       });
-      
+
       const isNowHealthy = health.api && health.frontend;
-      
+
       // Trigger health change callback only when health status actually changes
       if (prevHealthRef.current !== null && prevHealthRef.current !== isNowHealthy) {
         onHealthChangeRef.current?.(isNowHealthy || false);
       }
       prevHealthRef.current = isNowHealthy || false;
-      
     } catch (err) {
       // Only update state if component is still mounted
       if (!isMountedRef.current) return;
-      
+
       logger.error('Health check failed:', { component: 'Chanuka' }, err);
-      
+
       // Set failed health status with all services marked as down
       const failedHealth: HealthStatus = {
         healthy: false,
@@ -353,11 +355,11 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
         api: false,
         frontend: false,
         database: false,
-        latency: 0
+        latency: 0,
       };
-      
+
       setHealthStatus(failedHealth);
-      
+
       // Notify listeners of health status change
       if (prevHealthRef.current !== false) {
         onHealthChangeRef.current?.(false);
@@ -376,10 +378,10 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     connectionInterval?: NodeJS.Timeout;
     healthInterval?: NodeJS.Timeout;
   }>({});
-  
+
   // Track component mount state to prevent state updates after unmount
   const isMountedRef = useRef(true);
-  
+
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -394,14 +396,14 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 
     // Perform initial connection check
     performConnectionCheck();
-    
+
     // Set up periodic connection checks
     intervalRefs.current.connectionInterval = setInterval(() => {
       if (isMountedRef.current) {
         performConnectionCheck();
       }
     }, checkInterval);
-    
+
     // Perform initial health check if enabled
     // This ensures we have health data immediately rather than waiting for the first interval
     if (enableHealthChecks) {
@@ -446,13 +448,13 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
   // Memoize derived state to prevent unnecessary recalculations
   // These computations are cheap, but memoization ensures they only run when inputs change
   // This is especially valuable when the hook is used in frequently re-rendering components
-  const isConnected = useMemo(() => 
-    Boolean(connectionStatus?.apiReachable && connectionStatus?.corsEnabled),
+  const isConnected = useMemo(
+    () => Boolean(connectionStatus?.apiReachable && connectionStatus?.corsEnabled),
     [connectionStatus]
   );
-  
-  const isHealthy = useMemo(() => 
-    Boolean(healthStatus?.api && healthStatus?.frontend),
+
+  const isHealthy = useMemo(
+    () => Boolean(healthStatus?.api && healthStatus?.frontend),
     [healthStatus]
   );
 
@@ -465,23 +467,23 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     error,
     checkConnection: performConnectionCheck,
     checkHealth: performHealthCheck,
-    diagnose: performDiagnosis
+    diagnose: performDiagnosis,
   };
 }
 
 /**
  * Hook for simple connection status (lightweight version)
- * 
+ *
  * This is a simplified version of useApiConnection for components that only need
  * basic connection status without full health monitoring. It's more performant
  * when you don't need the additional features.
- * 
+ *
  * Optimizations:
  * - Minimal state tracking reduces memory footprint and re-render frequency
  * - Single listener pattern prevents duplicate event handlers
  * - Proper event listener cleanup prevents memory leaks
  * - Memoized derived state prevents unnecessary recalculations
- * 
+ *
  * Usage example:
  * const { isOnline, isConnected } = useConnectionStatus();
  */
@@ -492,10 +494,10 @@ export function useConnectionStatus(): {
 } {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
-  
+
   // Track component mount state to prevent state updates after unmount
   const isMountedRef = useRef(true);
-  
+
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -511,7 +513,7 @@ export function useConnectionStatus(): {
         setIsOnline(true);
       }
     };
-    
+
     const handleOffline = () => {
       if (isMountedRef.current) {
         setIsOnline(false);
@@ -524,13 +526,15 @@ export function useConnectionStatus(): {
     // Connection monitor listener with smart updates and mount state checking
     const __handleConnectionUpdate = (info: ConnectionInfo) => {
       if (!isMountedRef.current) return;
-      
+
       setConnectionInfo(prevInfo => {
         // Skip update if connection status hasn't changed
         // This prevents unnecessary re-renders when only transient properties change
-        if (prevInfo &&
-            prevInfo.apiReachable === info.apiReachable &&
-            prevInfo.corsEnabled === info.corsEnabled) {
+        if (
+          prevInfo &&
+          prevInfo.apiReachable === info.apiReachable &&
+          prevInfo.corsEnabled === info.corsEnabled
+        ) {
           return prevInfo;
         }
         return info;
@@ -550,24 +554,24 @@ export function useConnectionStatus(): {
 
   // Memoize derived connection state
   // This calculation only runs when connectionInfo changes
-  const isConnected = useMemo(() => 
-    Boolean(connectionInfo?.apiReachable && connectionInfo?.corsEnabled),
+  const isConnected = useMemo(
+    () => Boolean(connectionInfo?.apiReachable && connectionInfo?.corsEnabled),
     [connectionInfo]
   );
 
   return {
     isOnline,
     isConnected,
-    last_checked: connectionInfo?.last_checked || null
+    last_checked: connectionInfo?.last_checked || null,
   };
 }
 
 /**
  * Hook for API retry logic with connection awareness
- * 
+ *
  * This hook wraps API calls with intelligent retry logic that respects connection state.
  * It's particularly useful for operations that might fail due to temporary network issues.
- * 
+ *
  * Key features and optimizations:
  * - Exponential backoff prevents overwhelming the server during outages
  * - Connection-aware auto-retry resumes operations when connectivity returns
@@ -575,7 +579,7 @@ export function useConnectionStatus(): {
  * - Component mount tracking prevents state updates after unmount
  * - Abort controller support enables proper cleanup of in-flight requests
  * - Authentication error detection stops futile retry attempts
- * 
+ *
  * Usage example:
  * const { execute, isLoading, error, retryCount } = useApiRetry(
  *   () => fetchUserData(user_id),
@@ -598,19 +602,19 @@ export function useApiRetry<T>(
   canRetry: boolean;
   reset: () => void;
 } {
-  const { 
-    maxRetries = 3, 
-    retryDelay = 1000, 
+  const {
+    maxRetries = 3,
+    retryDelay = 1000,
     retryOnConnectionRestore = true,
-    exponentialBackoff = true 
+    exponentialBackoff = true,
   } = options;
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  
+
   const { isConnected } = useConnectionStatus();
-  
+
   // Track component mount state to prevent updates after unmount
   // This is crucial for preventing "Can't perform a React state update on an unmounted component" warnings
   const isMountedRef = useRef(true);
@@ -630,69 +634,73 @@ export function useApiRetry<T>(
   // Calculate retry delay with optional exponential backoff
   // Exponential backoff helps prevent overwhelming the server during outages
   // by progressively increasing wait time between retries
-  const calculateRetryDelay = useCallback((attempt: number): number => {
-    if (!exponentialBackoff) return retryDelay;
-    // Formula: baseDelay * 2^(attempt-1)
-    // This gives us: 1s, 2s, 4s, 8s, etc.
-    return retryDelay * Math.pow(2, attempt - 1);
-  }, [retryDelay, exponentialBackoff]);
+  const calculateRetryDelay = useCallback(
+    (attempt: number): number => {
+      if (!exponentialBackoff) return retryDelay;
+      // Formula: baseDelay * 2^(attempt-1)
+      // This gives us: 1s, 2s, 4s, 8s, etc.
+      return retryDelay * Math.pow(2, attempt - 1);
+    },
+    [retryDelay, exponentialBackoff]
+  );
 
   const execute = useCallback(async (): Promise<T> => {
     // Early exit if component unmounted
     if (!isMountedRef.current) {
       throw new Error('Component unmounted');
     }
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     let lastError: Error | null = null;
     let attempts = 0;
-    
+
     // Retry loop continues until success or max retries exceeded
     while (attempts <= maxRetries) {
       // Check if component still mounted before each attempt
       if (!isMountedRef.current) {
         throw new Error('Component unmounted');
       }
-      
+
       try {
         const result = await apiCall();
-        
+
         // Only update state if component still mounted
         if (isMountedRef.current) {
           setRetryCount(0); // Reset count on success
           setIsLoading(false);
         }
         return result;
-        
       } catch (err) {
         lastError = err instanceof Error ? err : new Error('Unknown error');
         attempts++;
-        
+
         if (isMountedRef.current) {
           setRetryCount(attempts);
         }
-        
+
         // Stop retrying if max attempts reached
         if (attempts > maxRetries) {
           break;
         }
-        
+
         // Stop retrying on authentication/authorization errors
         // These errors won't be resolved by retrying and indicate a different problem
-        if (lastError.message.includes('401') || 
-            lastError.message.includes('403') ||
-            lastError.message.includes('Unauthorized')) {
+        if (
+          lastError.message.includes('401') ||
+          lastError.message.includes('403') ||
+          lastError.message.includes('Unauthorized')
+        ) {
           break;
         }
-        
+
         // Wait with calculated delay before next retry
         const delay = calculateRetryDelay(attempts);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-    
+
     // Update final error state if component still mounted
     if (isMountedRef.current) {
       setError(lastError?.message || 'Request failed');
@@ -721,12 +729,12 @@ export function useApiRetry<T>(
     if (!retryOnConnectionRestore || !isConnected || !error || retryCount === 0) {
       return;
     }
-    
+
     // Clear any pending retry to avoid multiple simultaneous retries
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
     }
-    
+
     // Debounce retry to avoid retry storms when connection flickers
     // The 2 second delay ensures the connection is stable before retrying
     retryTimeoutRef.current = setTimeout(() => {
@@ -737,7 +745,7 @@ export function useApiRetry<T>(
         });
       }
     }, 2000); // 2 second debounce provides stability
-    
+
     return () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
@@ -746,8 +754,8 @@ export function useApiRetry<T>(
   }, [isConnected, error, retryCount, retryOnConnectionRestore, execute]);
 
   // Memoize canRetry to prevent unnecessary recalculations
-  const canRetry = useMemo(() => 
-    retryCount < maxRetries && Boolean(error),
+  const canRetry = useMemo(
+    () => retryCount < maxRetries && Boolean(error),
     [retryCount, maxRetries, error]
   );
 
@@ -757,6 +765,6 @@ export function useApiRetry<T>(
     error,
     retryCount,
     canRetry,
-    reset
+    reset,
   };
 }

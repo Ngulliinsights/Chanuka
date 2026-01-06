@@ -329,7 +329,15 @@ export function IntelligentAutocomplete({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.isOpen, state.selectedIndex, state.results, hasValidQuery, handleSelect, handleSearch, closeDropdown]);
+  }, [
+    state.isOpen,
+    state.selectedIndex,
+    state.results,
+    hasValidQuery,
+    handleSelect,
+    handleSearch,
+    closeDropdown,
+  ]);
 
   // Click outside to close
   useEffect(() => {
@@ -458,9 +466,7 @@ export function IntelligentAutocomplete({
 
     if (state.results && totalSuggestions === 0) {
       return (
-        <div className="p-4 text-center text-sm text-muted-foreground">
-          No suggestions found
-        </div>
+        <div className="p-4 text-center text-sm text-muted-foreground">No suggestions found</div>
       );
     }
 
@@ -503,7 +509,10 @@ export function IntelligentAutocomplete({
   return (
     <div className={`relative ${className}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" aria-hidden="true" />
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none"
+          aria-hidden="true"
+        />
         <Input
           ref={inputRef}
           type="text"
@@ -524,9 +533,7 @@ export function IntelligentAutocomplete({
           aria-expanded={state.isOpen}
           aria-controls="autocomplete-dropdown"
           aria-activedescendant={
-            state.selectedIndex >= 0
-              ? `suggestion-${state.selectedIndex}`
-              : undefined
+            state.selectedIndex >= 0 ? `suggestion-${state.selectedIndex}` : undefined
           }
         />
       </div>

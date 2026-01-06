@@ -71,7 +71,8 @@ class PerformanceRegressionTester {
   /**
    * Start automated regression testing
    */
-  startAutomatedTesting(intervalMs: number = 300000): void { // 5 minutes default
+  startAutomatedTesting(intervalMs: number = 300000): void {
+    // 5 minutes default
     if (this.isRunning) {
       logger.warn('Performance regression testing already running');
       return;
@@ -140,7 +141,7 @@ class PerformanceRegressionTester {
       ...metrics,
       timestamp: new Date(),
       passed: true,
-      regressions: []
+      regressions: [],
     };
 
     if (baseline) {
@@ -163,9 +164,9 @@ class PerformanceRegressionTester {
     // Simplified measurement - in real implementation would navigate and measure
     return {
       loadTime: Math.random() * 2000 + 500, // 500-2500ms
-      renderTime: Math.random() * 100 + 10,  // 10-110ms
+      renderTime: Math.random() * 100 + 10, // 10-110ms
       resourceCount: Math.floor(Math.random() * 50) + 10, // 10-60 resources
-      memoryUsage: Math.random() * 50 + 20   // 20-70MB
+      memoryUsage: Math.random() * 50 + 20, // 20-70MB
     };
   }
 
@@ -180,10 +181,30 @@ class PerformanceRegressionTester {
 
     // Check each metric against baseline and thresholds
     const checks = [
-      { metric: 'loadTime' as const, current: metrics.loadTime, baseline: baseline.averageLoadTime, threshold: baseline.thresholds.loadTimeThreshold },
-      { metric: 'renderTime' as const, current: metrics.renderTime, baseline: baseline.averageRenderTime, threshold: baseline.thresholds.renderTimeThreshold },
-      { metric: 'resourceCount' as const, current: metrics.resourceCount, baseline: baseline.averageResourceCount, threshold: baseline.thresholds.resourceCountThreshold },
-      { metric: 'memoryUsage' as const, current: metrics.memoryUsage, baseline: baseline.averageMemoryUsage, threshold: baseline.thresholds.memoryUsageThreshold }
+      {
+        metric: 'loadTime' as const,
+        current: metrics.loadTime,
+        baseline: baseline.averageLoadTime,
+        threshold: baseline.thresholds.loadTimeThreshold,
+      },
+      {
+        metric: 'renderTime' as const,
+        current: metrics.renderTime,
+        baseline: baseline.averageRenderTime,
+        threshold: baseline.thresholds.renderTimeThreshold,
+      },
+      {
+        metric: 'resourceCount' as const,
+        current: metrics.resourceCount,
+        baseline: baseline.averageResourceCount,
+        threshold: baseline.thresholds.resourceCountThreshold,
+      },
+      {
+        metric: 'memoryUsage' as const,
+        current: metrics.memoryUsage,
+        baseline: baseline.averageMemoryUsage,
+        threshold: baseline.thresholds.memoryUsageThreshold,
+      },
     ];
 
     for (const check of checks) {
@@ -200,7 +221,7 @@ class PerformanceRegressionTester {
           baselineValue: check.baseline,
           threshold: check.threshold,
           severity,
-          percentageIncrease
+          percentageIncrease,
         });
       }
     }
@@ -214,7 +235,7 @@ class PerformanceRegressionTester {
   private handleRegressionDetected(result: PerformanceTestResult): void {
     logger.error('Performance regression detected', {
       route: result.routePath,
-      regressions: result.regressions
+      regressions: result.regressions,
     });
 
     // In a real implementation, this would:
@@ -228,23 +249,20 @@ class PerformanceRegressionTester {
    * Get routes to test
    */
   private getTestRoutes(): string[] {
-    return [
-      '/',
-      '/dashboard',
-      '/search',
-      '/bills',
-      '/community'
-    ];
+    return ['/', '/dashboard', '/search', '/bills', '/community'];
   }
 
   /**
    * Set baseline for a route
    */
-  setBaseline(routePath: string, baseline: Omit<PerformanceBaseline, 'routePath' | 'lastUpdated'>): void {
+  setBaseline(
+    routePath: string,
+    baseline: Omit<PerformanceBaseline, 'routePath' | 'lastUpdated'>
+  ): void {
     this.baselines.set(routePath, {
       ...baseline,
       routePath,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     });
 
     logger.info(`Performance baseline set for ${routePath}`, { baseline });
@@ -276,8 +294,4 @@ class PerformanceRegressionTester {
 export const performanceRegressionTester = PerformanceRegressionTester.getInstance();
 
 // Export types
-export type {
-  PerformanceBaseline,
-  PerformanceTestResult,
-  PerformanceRegression
-};
+export type { PerformanceBaseline, PerformanceTestResult, PerformanceRegression };

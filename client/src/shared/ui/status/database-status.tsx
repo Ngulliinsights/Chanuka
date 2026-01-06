@@ -4,10 +4,11 @@
  * Simple component to display database connection status
  */
 
-import { useState, useEffect } from 'react';
 import { Database, AlertCircle, CheckCircle, X as XCircle } from 'lucide-react';
-import { Badge } from '@/shared/design-system';
+import { useState, useEffect } from 'react';
 import React from 'react';
+
+import { Badge } from '@/shared/design-system';
 
 interface DatabaseStatusProps {
   className?: string;
@@ -43,31 +44,46 @@ export default function DatabaseStatus({ className = '' }: DatabaseStatusProps) 
 
   const getStatusColor = () => {
     switch (status) {
-      case 'connected': return 'bg-green-100 text-green-800';
-      case 'disconnected': return 'bg-gray-100 text-gray-800';
-      case 'error': return 'bg-red-100 text-red-800';
-      case 'loading': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'connected':
+        return 'bg-green-100 text-green-800';
+      case 'disconnected':
+        return 'bg-gray-100 text-gray-800';
+      case 'error':
+        return 'bg-red-100 text-red-800';
+      case 'loading':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusIcon = () => {
     switch (status) {
-      case 'connected': return <CheckCircle className="w-4 h-4" />;
-      case 'disconnected': return <Database className="w-4 h-4" />;
-      case 'error': return <XCircle className="w-4 h-4" />;
-      case 'loading': return <AlertCircle className="w-4 h-4 animate-pulse" />;
-      default: return <Database className="w-4 h-4" />;
+      case 'connected':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'disconnected':
+        return <Database className="w-4 h-4" />;
+      case 'error':
+        return <XCircle className="w-4 h-4" />;
+      case 'loading':
+        return <AlertCircle className="w-4 h-4 animate-pulse" />;
+      default:
+        return <Database className="w-4 h-4" />;
     }
   };
 
   const getStatusText = () => {
     switch (status) {
-      case 'connected': return 'Database Connected';
-      case 'disconnected': return 'Database Disconnected';
-      case 'error': return 'Database Error';
-      case 'loading': return 'Checking Database...';
-      default: return 'Unknown Status';
+      case 'connected':
+        return 'Database Connected';
+      case 'disconnected':
+        return 'Database Disconnected';
+      case 'error':
+        return 'Database Error';
+      case 'loading':
+        return 'Checking Database...';
+      default:
+        return 'Unknown Status';
     }
   };
 

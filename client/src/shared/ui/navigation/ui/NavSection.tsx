@@ -31,8 +31,9 @@ export const NavSection = ({ section, items }: Props) => {
     <div className="mb-6">
       <h3 className="chanuka-nav-section-title">{SECTION_TITLES[section]}</h3>
       <div className="space-y-1">
-        {items.map((it) => {
-          const IconComponent = it.icon && typeof it.icon === 'string' ? ICON_MAP[it.icon] : undefined;
+        {items.map(it => {
+          const IconComponent =
+            it.icon && typeof it.icon === 'string' ? ICON_MAP[it.icon] : undefined;
           return (
             <NavLink key={it.id} to={it.href} icon={IconComponent}>
               {it.label}
@@ -43,4 +44,3 @@ export const NavSection = ({ section, items }: Props) => {
     </div>
   );
 };
-

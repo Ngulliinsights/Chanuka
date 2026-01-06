@@ -61,60 +61,69 @@ export function useLoginForm(options: UseLoginFormOptions = {}): UseLoginFormRet
   const lastSubmissionRef = useRef<LoginFormData | null>(null);
 
   // Validate individual field
-  const validateField = useCallback((name: keyof LoginFormData, value: string): string | undefined => {
-    switch (name) {
-      case 'email':
-        if (!value.trim()) {
-          return 'Email is required';
-        }
-        const emailValidation = validateEmail(value);
-        return emailValidation.isValid ? undefined : emailValidation.errors[0];
+  const validateField = useCallback(
+    (name: keyof LoginFormData, value: string): string | undefined => {
+      switch (name) {
+        case 'email':
+          if (!value.trim()) {
+            return 'Email is required';
+          }
+          const emailValidation = validateEmail(value);
+          return emailValidation.isValid ? undefined : emailValidation.errors[0];
 
-      case 'password':
-        if (!value) {
-          return 'Password is required';
-        }
-        // Basic password validation - could be enhanced
-        return value.length < 6 ? 'Password must be at least 6 characters' : undefined;
+        case 'password':
+          if (!value) {
+            return 'Password is required';
+          }
+          // Basic password validation - could be enhanced
+          return value.length < 6 ? 'Password must be at least 6 characters' : undefined;
 
-      default:
-        return undefined;
-    }
-  }, []);
+        default:
+          return undefined;
+      }
+    },
+    []
+  );
 
   // Handle field updates
-  const updateField = useCallback((name: string, value: string) => {
-    const fieldName = name as keyof LoginFormData;
+  const updateField = useCallback(
+    (name: string, value: string) => {
+      const fieldName = name as keyof LoginFormData;
 
-    // Sanitize input
-    const sanitizedValue = value.replace(/[\x00-\x1F\x7F]/g, '');
+      // Sanitize input
+      const sanitizedValue = value.replace(/[\x00-\x1F\x7F]/g, '');
 
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: sanitizedValue,
-    }));
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: sanitizedValue,
+      }));
 
-    // Clear API response when user types
-    if (apiResponse) {
-      setApiResponse(null);
-    }
+      // Clear API response when user types
+      if (apiResponse) {
+        setApiResponse(null);
+      }
 
-    // Clear error for this field
-    setErrors(prev => ({
-      ...prev,
-      [fieldName]: undefined,
-    }));
-  }, [apiResponse]);
+      // Clear error for this field
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: undefined,
+      }));
+    },
+    [apiResponse]
+  );
 
   // Manual field validation (for blur events)
-  const validateFieldManual = useCallback((name: string, value: string) => {
-    const fieldName = name as keyof LoginFormData;
-    const error = validateField(fieldName, value);
-    setErrors(prev => ({
-      ...prev,
-      [fieldName]: error,
-    }));
-  }, [validateField]);
+  const validateFieldManual = useCallback(
+    (name: string, value: string) => {
+      const fieldName = name as keyof LoginFormData;
+      const error = validateField(fieldName, value);
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: error,
+      }));
+    },
+    [validateField]
+  );
 
   // Validate entire form
   const validateForm = useCallback((): boolean => {
@@ -133,40 +142,44 @@ export function useLoginForm(options: UseLoginFormOptions = {}): UseLoginFormRet
   }, [formData, validateField]);
 
   // Submit form
-  const submitForm = useCallback(async (mode?: string): Promise<{ success: boolean; error?: string }> => {
-    if (!validateForm()) {
-      return { success: false, error: 'Please correct the form errors' };
-    }
+  const submitForm = useCallback(
+    async (mode?: string): Promise<{ success: boolean; error?: string }> => {
+      if (!validateForm()) {
+        return { success: false, error: 'Please correct the form errors' };
+      }
 
-    setIsLoading(true);
-    setApiResponse(null);
+      setIsLoading(true);
+      setApiResponse(null);
 
-    try {
-      const result = await auth.login({
-        email: formData.email,
-        password: formData.password,
-      });
+      try {
+        const result = await auth.login({
+          email: formData.email,
+          password: formData.password,
+        });
 
-      if (result.success) {
-        setApiResponse({ success: 'Login successful!' });
-        lastSubmissionRef.current = formData;
-        return { success: true };
-      } else {
-        const errorMessage = result.error || 'Login failed';
+        if (result.success) {
+          setApiResponse({ success: 'Login successful!' });
+          lastSubmissionRef.current = formData;
+          return { success: true };
+        } else {
+          const errorMessage = result.error || 'Login failed';
+          setApiResponse({ error: errorMessage });
+          onError?.(errorMessage);
+          return { success: false, error: errorMessage };
+        }
+      } catch (error) {
+        logger.error('Login form submission failed:', { component: 'useLoginForm' }, error);
+        const errorMessage =
+          error instanceof Error ? error.message : 'An unexpected error occurred';
         setApiResponse({ error: errorMessage });
         onError?.(errorMessage);
         return { success: false, error: errorMessage };
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      logger.error('Login form submission failed:', { component: 'useLoginForm' }, error);
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setApiResponse({ error: errorMessage });
-      onError?.(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setIsLoading(false);
-    }
-  }, [validateForm, formData, auth, onError]);
+    },
+    [validateForm, formData, auth, onError]
+  );
 
   // Reset form
   const resetForm = useCallback(() => {

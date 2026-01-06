@@ -1,10 +1,4 @@
-import { 
-  FileText, 
-  AlertTriangle, 
-  Shield,
-  TrendingUp, 
-  Clock,
-} from 'lucide-react';
+import { FileText, AlertTriangle, Shield, TrendingUp, Clock } from 'lucide-react';
 import React from 'react';
 
 import { Card, CardContent } from '@client/shared/design-system';
@@ -72,7 +66,7 @@ export const StatsOverview = React.memo<StatsOverviewProps>(({ stats, className 
     <div className={className}>
       {/* Grid layout that adapts from 2 columns on mobile to 4 columns on large screens */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        {statItems.map((item) => {
+        {statItems.map(item => {
           const Icon = item.icon;
           return (
             <Card key={item.label} className="hover:shadow-md transition-shadow">
@@ -92,16 +86,14 @@ export const StatsOverview = React.memo<StatsOverviewProps>(({ stats, className 
           );
         })}
       </div>
-      
+
       {/* Footer section showing when data was last refreshed */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center">
           <Clock className="h-4 w-4 mr-1" />
           <span>Last updated: {formatRelativeTime(stats.lastUpdated)}</span>
         </div>
-        <div>
-          Data refreshes every 5 minutes
-        </div>
+        <div>Data refreshes every 5 minutes</div>
       </div>
     </div>
   );

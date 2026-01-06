@@ -4,7 +4,7 @@
  * ============================================================================
  * Core API communication layer for all user-related functionality including
  * profiles, preferences, saved content, engagement tracking, and achievements.
- * 
+ *
  * This service implements intelligent caching strategies, graceful degradation
  * for non-critical operations, and comprehensive error handling to ensure a
  * smooth user experience even when backend services face issues.
@@ -26,7 +26,7 @@ export type {
   ActivitySummary,
   SavedBill,
   UserEngagementHistory,
-  UserPreferences
+  UserPreferences,
 } from '@client/services/userService';
 
 // ============================================================================
@@ -121,7 +121,7 @@ export interface DashboardData {
 
 /**
  * Centralized service for all user-related API operations.
- * 
+ *
  * Design Philosophy:
  * - Profile operations are cached moderately (5 min) since they don't change frequently
  * - Preferences updates skip cache to ensure immediate consistency
@@ -132,12 +132,12 @@ export interface DashboardData {
 export class UserApiService {
   private readonly baseUrl: string;
   private readonly defaultTimeout = 10000;
-  
+
   // Different cache TTLs for different data types based on update frequency
-  private readonly profileCacheTTL = 5 * 60 * 1000;      // 5 minutes - profiles change occasionally
-  private readonly savedBillsCacheTTL = 3 * 60 * 1000;   // 3 minutes - saved collection changes frequently
+  private readonly profileCacheTTL = 5 * 60 * 1000; // 5 minutes - profiles change occasionally
+  private readonly savedBillsCacheTTL = 3 * 60 * 1000; // 3 minutes - saved collection changes frequently
   private readonly achievementsCacheTTL = 10 * 60 * 1000; // 10 minutes - achievements unlock gradually
-  private readonly dashboardCacheTTL = 2 * 60 * 1000;    // 2 minutes - needs freshness for good UX
+  private readonly dashboardCacheTTL = 2 * 60 * 1000; // 2 minutes - needs freshness for good UX
 
   constructor(baseUrl: string = '/api') {
     this.baseUrl = baseUrl;
@@ -149,29 +149,29 @@ export class UserApiService {
 
   /**
    * Retrieves complete user profile with all related metadata.
-   * 
+   *
    * This is one of the most frequently called endpoints, so it uses moderate
    * caching to balance data freshness with performance. When userId is omitted,
    * it fetches the current authenticated user's profile.
-   * 
+   *
    * @param userId - Optional user ID; omit to fetch current user's profile
    * @returns Complete user profile with stats, preferences, and settings
    */
   async getUserProfile(userId?: string): Promise<Record<string, unknown>> {
     try {
-      const endpoint = userId 
-        ? `${this.baseUrl}/users/${userId}/profile` 
+      const endpoint = userId
+        ? `${this.baseUrl}/users/${userId}/profile`
         : `${this.baseUrl}/users/profile`;
-      
+
       const response = await globalApiClient.get<Record<string, unknown>>(endpoint, {
         timeout: this.defaultTimeout,
-        cacheTTL: this.profileCacheTTL
+        cacheTTL: this.profileCacheTTL,
       });
 
       logger.info('User profile loaded', {
         component: 'UserApiService',
         userId: userId || 'current',
-        hasData: !!response.data
+        hasData: !!response.data,
       });
 
       return response.data;
@@ -179,7 +179,7 @@ export class UserApiService {
       logger.error('Failed to fetch user profile', {
         component: 'UserApiService',
         userId,
-        error
+        error,
       });
       throw await this.handleError(error, 'getUserProfile', { userId });
     }
@@ -187,28 +187,30 @@ export class UserApiService {
 
   /**
    * Updates user profile information with immediate cache invalidation.
-   * 
+   *
    * Profile updates need to be reflected immediately, so we skip caching
    * on the write operation. This ensures the next profile read gets fresh data.
-   * 
+   *
    * @param profileData - Partial profile data to update
    * @returns Updated profile object
    */
-  async updateProfile(profileData: Partial<Record<string, unknown>>): Promise<Record<string, unknown>> {
+  async updateProfile(
+    profileData: Partial<Record<string, unknown>>
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await globalApiClient.put<Record<string, unknown>>(
         `${this.baseUrl}/users/profile`,
         profileData,
-        { 
+        {
           timeout: this.defaultTimeout,
-          skipCache: true 
+          skipCache: true,
         }
       );
 
       logger.info('User profile updated', {
         component: 'UserApiService',
         updatedFields: Object.keys(profileData),
-        fieldCount: Object.keys(profileData).length
+        fieldCount: Object.keys(profileData).length,
       });
 
       return response.data;
@@ -216,7 +218,7 @@ export class UserApiService {
       logger.error('Failed to update user profile', {
         component: 'UserApiService',
         fields: Object.keys(profileData),
-        error
+        error,
       });
       throw await this.handleError(error, 'updateProfile');
     }
@@ -224,28 +226,30 @@ export class UserApiService {
 
   /**
    * Updates user preferences for notifications, privacy, and display settings.
-   * 
+   *
    * Preferences changes should take effect immediately throughout the application,
    * so we aggressively skip all caching on this operation.
-   * 
+   *
    * @param preferences - Preference settings to update
    * @returns Updated preferences object
    */
-  async updatePreferences(preferences: Partial<Record<string, unknown>>): Promise<Record<string, unknown>> {
+  async updatePreferences(
+    preferences: Partial<Record<string, unknown>>
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await globalApiClient.put<Record<string, unknown>>(
         `${this.baseUrl}/users/preferences`,
         preferences,
-        { 
+        {
           timeout: this.defaultTimeout,
-          skipCache: true 
+          skipCache: true,
         }
       );
 
       logger.info('User preferences updated', {
         component: 'UserApiService',
         updatedPreferences: Object.keys(preferences),
-        count: Object.keys(preferences).length
+        count: Object.keys(preferences).length,
       });
 
       return response.data;
@@ -253,7 +257,7 @@ export class UserApiService {
       logger.error('Failed to update user preferences', {
         component: 'UserApiService',
         preferences: Object.keys(preferences),
-        error
+        error,
       });
       throw await this.handleError(error, 'updatePreferences');
     }
@@ -261,10 +265,10 @@ export class UserApiService {
 
   /**
    * Uploads a new user avatar image with file type validation.
-   * 
+   *
    * This method handles multipart form data uploads and includes detailed
    * logging of file characteristics for debugging upload issues.
-   * 
+   *
    * @param file - Image file (JPEG, PNG, WebP recommended)
    * @returns Object containing the new avatar URL
    */
@@ -272,11 +276,13 @@ export class UserApiService {
     // Validate file type before sending to prevent unnecessary uploads
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!validTypes.includes(file.type)) {
-      const error = new Error(`Invalid file type: ${file.type}. Allowed types: ${validTypes.join(', ')}`);
+      const error = new Error(
+        `Invalid file type: ${file.type}. Allowed types: ${validTypes.join(', ')}`
+      );
       logger.warn('Avatar upload rejected - invalid file type', {
         component: 'UserApiService',
         fileType: file.type,
-        fileName: file.name
+        fileName: file.name,
       });
       throw error;
     }
@@ -284,11 +290,13 @@ export class UserApiService {
     // Validate file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      const error = new Error(`File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum: 5MB`);
+      const error = new Error(
+        `File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum: 5MB`
+      );
       logger.warn('Avatar upload rejected - file too large', {
         component: 'UserApiService',
         fileSize: file.size,
-        fileName: file.name
+        fileName: file.name,
       });
       throw error;
     }
@@ -297,20 +305,16 @@ export class UserApiService {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await globalApiClient.post(
-        `${this.baseUrl}/users/avatar`,
-        formData,
-        { 
-          timeout: 30000, // Longer timeout for file uploads
-          skipCache: true 
-        }
-      );
+      const response = await globalApiClient.post(`${this.baseUrl}/users/avatar`, formData, {
+        timeout: 30000, // Longer timeout for file uploads
+        skipCache: true,
+      });
 
       logger.info('Avatar uploaded successfully', {
         component: 'UserApiService',
         fileSize: file.size,
         fileType: file.type,
-        fileName: file.name
+        fileName: file.name,
       });
 
       return response.data as { avatar_url: string };
@@ -319,7 +323,7 @@ export class UserApiService {
         component: 'UserApiService',
         fileSize: file.size,
         fileType: file.type,
-        error
+        error,
       });
       throw await this.handleError(error, 'uploadAvatar');
     }
@@ -331,25 +335,25 @@ export class UserApiService {
 
   /**
    * Retrieves user's saved bills with pagination and filtering.
-   * 
+   *
    * Saved bills are a core feature for users tracking legislation, so this
    * endpoint is optimized for quick response times with smart caching that
    * gets invalidated when users modify their saved collection.
-   * 
+   *
    * @param page - Page number (1-indexed)
    * @param limit - Items per page
    * @param filters - Optional filtering criteria
    * @returns Paginated saved bills with metadata
    */
   async getSavedBills(
-    page = 1, 
-    limit = 20, 
+    page = 1,
+    limit = 20,
     filters?: SavedBillsFilters
   ): Promise<SavedBillsResponse> {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: limit.toString()
+        limit: limit.toString(),
       });
 
       // Add filters only if they have values
@@ -369,18 +373,18 @@ export class UserApiService {
         `${this.baseUrl}/users/saved-bills?${params.toString()}`,
         {
           timeout: this.defaultTimeout,
-          cacheTTL: this.savedBillsCacheTTL
+          cacheTTL: this.savedBillsCacheTTL,
         }
       );
 
       const data = response.data as SavedBillsResponse;
-      
+
       logger.info('Saved bills loaded', {
         component: 'UserApiService',
         page,
         count: data.bills?.length || 0,
         total: data.total,
-        hasFilters: !!filters
+        hasFilters: !!filters,
       });
 
       return data;
@@ -389,7 +393,7 @@ export class UserApiService {
         component: 'UserApiService',
         page,
         filters,
-        error
+        error,
       });
       throw await this.handleError(error, 'getSavedBills');
     }
@@ -397,17 +401,21 @@ export class UserApiService {
 
   /**
    * Saves a bill to user's collection with optional notes and tags.
-   * 
+   *
    * This operation immediately invalidates the saved bills cache to ensure
    * the new item appears in subsequent queries. Notifications are enabled
    * by default to keep users informed of bill updates.
-   * 
+   *
    * @param billId - ID of the bill to save
    * @param notes - Optional personal notes about the bill
    * @param tags - Optional tags for organization
    * @returns Saved bill object with metadata
    */
-  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<Record<string, unknown>> {
+  async saveBill(
+    billId: string,
+    notes?: string,
+    tags: string[] = []
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await globalApiClient.post<Record<string, unknown>>(
         `${this.baseUrl}/users/saved-bills`,
@@ -415,11 +423,11 @@ export class UserApiService {
           bill_id: billId,
           notes,
           tags,
-          notification_enabled: true // Default to notifications on
+          notification_enabled: true, // Default to notifications on
         },
-        { 
+        {
           timeout: this.defaultTimeout,
-          skipCache: true 
+          skipCache: true,
         }
       );
 
@@ -427,7 +435,7 @@ export class UserApiService {
         component: 'UserApiService',
         billId,
         hasNotes: !!notes,
-        tagCount: tags.length
+        tagCount: tags.length,
       });
 
       return response.data;
@@ -435,7 +443,7 @@ export class UserApiService {
       logger.error('Failed to save bill', {
         component: 'UserApiService',
         billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'saveBill', { billId });
     }
@@ -443,31 +451,28 @@ export class UserApiService {
 
   /**
    * Removes a bill from user's saved collection.
-   * 
+   *
    * Cache invalidation ensures the removed item disappears from saved bills
    * lists immediately without requiring a manual refresh.
-   * 
+   *
    * @param billId - ID of the bill to remove
    */
   async unsaveBill(billId: string): Promise<void> {
     try {
-      await globalApiClient.delete(
-        `${this.baseUrl}/users/saved-bills/${billId}`,
-        { 
-          timeout: this.defaultTimeout,
-          skipCache: true 
-        }
-      );
+      await globalApiClient.delete(`${this.baseUrl}/users/saved-bills/${billId}`, {
+        timeout: this.defaultTimeout,
+        skipCache: true,
+      });
 
       logger.info('Bill removed from saved collection', {
         component: 'UserApiService',
-        billId
+        billId,
       });
     } catch (error) {
       logger.error('Failed to remove saved bill', {
         component: 'UserApiService',
         billId,
-        error
+        error,
       });
       throw await this.handleError(error, 'unsaveBill', { billId });
     }
@@ -475,17 +480,17 @@ export class UserApiService {
 
   /**
    * Updates metadata for a saved bill (notes, tags, notification preferences).
-   * 
+   *
    * This allows users to organize and annotate their saved bills without
    * removing and re-adding them. The operation is lightweight and uses
    * PATCH semantics to update only the specified fields.
-   * 
+   *
    * @param billId - ID of the saved bill
    * @param updates - Fields to update
    * @returns Updated saved bill object
    */
   async updateSavedBill(
-    billId: string, 
+    billId: string,
     updates: {
       notes?: string;
       tags?: string[];
@@ -496,9 +501,9 @@ export class UserApiService {
       const response = await globalApiClient.patch<Record<string, unknown>>(
         `${this.baseUrl}/users/saved-bills/${billId}`,
         updates,
-        { 
+        {
           timeout: this.defaultTimeout,
-          skipCache: true 
+          skipCache: true,
         }
       );
 
@@ -506,7 +511,7 @@ export class UserApiService {
         component: 'UserApiService',
         billId,
         updatedFields: Object.keys(updates),
-        fieldCount: Object.keys(updates).length
+        fieldCount: Object.keys(updates).length,
       });
 
       return response.data;
@@ -515,7 +520,7 @@ export class UserApiService {
         component: 'UserApiService',
         billId,
         updates: Object.keys(updates),
-        error
+        error,
       });
       throw await this.handleError(error, 'updateSavedBill', { billId });
     }
@@ -527,11 +532,11 @@ export class UserApiService {
 
   /**
    * Retrieves user's engagement history with comprehensive analytics.
-   * 
+   *
    * This endpoint powers the user activity dashboard, showing patterns in
    * civic participation over time. The analytics help users understand their
    * engagement trends and most active periods.
-   * 
+   *
    * @param page - Page number
    * @param limit - Items per page
    * @param filters - Optional filtering criteria
@@ -545,7 +550,7 @@ export class UserApiService {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: limit.toString()
+        limit: limit.toString(),
       });
 
       if (filters) {
@@ -560,17 +565,17 @@ export class UserApiService {
         `${this.baseUrl}/users/engagement-history?${params.toString()}`,
         {
           timeout: this.defaultTimeout,
-          cacheTTL: 5 * 60 * 1000 // 5 minute cache for history
+          cacheTTL: 5 * 60 * 1000, // 5 minute cache for history
         }
       );
 
       const data = response.data as EngagementHistoryResponse;
-      
+
       logger.info('Engagement history loaded', {
         component: 'UserApiService',
         page,
         count: data.history?.length || 0,
-        total: data.total
+        total: data.total,
       });
 
       return data;
@@ -579,7 +584,7 @@ export class UserApiService {
         component: 'UserApiService',
         page,
         filters,
-        error
+        error,
       });
       throw await this.handleError(error, 'getEngagementHistory');
     }
@@ -587,31 +592,27 @@ export class UserApiService {
 
   /**
    * Records a user engagement action for analytics and recommendations.
-   * 
+   *
    * CRITICAL: This method implements graceful degradation. Tracking failures
    * should NEVER break the user experience, so errors are logged but not thrown.
    * This ensures that even if the analytics service is down, users can still
    * interact with content normally.
-   * 
+   *
    * @param action - Engagement action to record
    */
   async trackEngagement(action: EngagementAction): Promise<void> {
     try {
-      await globalApiClient.post(
-        `${this.baseUrl}/users/engagement`,
-        action,
-        { 
-          timeout: 5000, // Shorter timeout - tracking shouldn't slow down UI
-          skipCache: true 
-        }
-      );
+      await globalApiClient.post(`${this.baseUrl}/users/engagement`, action, {
+        timeout: 5000, // Shorter timeout - tracking shouldn't slow down UI
+        skipCache: true,
+      });
 
       // Use debug level since this happens frequently
       logger.debug('Engagement tracked', {
         component: 'UserApiService',
         action: action.action_type,
         entity: action.entity_type,
-        entityId: action.entity_id
+        entityId: action.entity_id,
       });
     } catch (error) {
       // Silent failure - tracking should never block user actions
@@ -620,7 +621,7 @@ export class UserApiService {
         component: 'UserApiService',
         action: action.action_type,
         entity: action.entity_type,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       // Intentionally NOT throwing error - graceful degradation
     }
@@ -632,11 +633,11 @@ export class UserApiService {
 
   /**
    * Retrieves user's badges, achievements, and progress toward next milestones.
-   * 
+   *
    * This powers the gamification system that encourages civic engagement.
    * Achievements are cached longer since they don't update frequently, and
    * checking too often would make earning them less exciting.
-   * 
+   *
    * @returns Achievement data with progress indicators
    */
   async getAchievements(): Promise<{
@@ -649,13 +650,10 @@ export class UserApiService {
         badges: Record<string, unknown>[];
         achievements: Record<string, unknown>[];
         next_milestones: Record<string, unknown>[];
-      }>(
-        `${this.baseUrl}/users/achievements`,
-        {
-          timeout: this.defaultTimeout,
-          cacheTTL: this.achievementsCacheTTL
-        }
-      );
+      }>(`${this.baseUrl}/users/achievements`, {
+        timeout: this.defaultTimeout,
+        cacheTTL: this.achievementsCacheTTL,
+      });
 
       const data = response.data as {
         badges: Record<string, unknown>[];
@@ -667,14 +665,14 @@ export class UserApiService {
         component: 'UserApiService',
         badgeCount: data.badges?.length || 0,
         achievementCount: data.achievements?.length || 0,
-        milestoneCount: data.next_milestones?.length || 0
+        milestoneCount: data.next_milestones?.length || 0,
       });
 
       return data;
     } catch (error) {
       logger.error('Failed to fetch achievements', {
         component: 'UserApiService',
-        error
+        error,
       });
       throw await this.handleError(error, 'getAchievements');
     }
@@ -686,12 +684,12 @@ export class UserApiService {
 
   /**
    * Fetches comprehensive dashboard data in a single request.
-   * 
+   *
    * This is a critical optimization that combines multiple data sources into
    * one response, dramatically reducing the number of API calls needed to
    * render the user dashboard. The short cache TTL (2 min) keeps the dashboard
    * feeling fresh while preventing excessive backend load.
-   * 
+   *
    * This endpoint aggregates:
    * - User profile and stats
    * - Recent activity feed
@@ -701,18 +699,15 @@ export class UserApiService {
    * - Unread notifications
    * - Civic score trends over time
    * - Achievement progress
-   * 
+   *
    * @returns Comprehensive dashboard data structure
    */
   async getDashboardData(): Promise<DashboardData> {
     try {
-      const response = await globalApiClient.get(
-        `${this.baseUrl}/users/dashboard`,
-        {
-          timeout: 15000, // Longer timeout since this aggregates multiple data sources
-          cacheTTL: this.dashboardCacheTTL
-        }
-      );
+      const response = await globalApiClient.get(`${this.baseUrl}/users/dashboard`, {
+        timeout: 15000, // Longer timeout since this aggregates multiple data sources
+        cacheTTL: this.dashboardCacheTTL,
+      });
 
       const data = response.data as DashboardData;
 
@@ -721,14 +716,14 @@ export class UserApiService {
         activityCount: data.recent_activity?.length || 0,
         savedBillsCount: data.saved_bills?.length || 0,
         recommendationsCount: data.recommendations?.length || 0,
-        notificationsCount: data.notifications?.length || 0
+        notificationsCount: data.notifications?.length || 0,
       });
 
       return data;
     } catch (error) {
       logger.error('Failed to fetch dashboard data', {
         component: 'UserApiService',
-        error
+        error,
       });
       throw await this.handleError(error, 'getDashboardData');
     }
@@ -740,25 +735,28 @@ export class UserApiService {
 
   /**
    * Centralized error handling that enriches errors with context.
-   * 
+   *
    * This method ensures consistent error reporting across all user operations
    * while preserving important context that helps with debugging production issues.
-   * 
+   *
    * @param error - Original error object
    * @param operation - Name of the operation that failed
    * @param context - Additional context for debugging
    * @returns Enriched error object
    */
   private async handleError(
-    error: unknown, 
-    operation: string, 
+    error: unknown,
+    operation: string,
     context?: Record<string, unknown>
   ): Promise<Error> {
-    const handler = globalErrorHandler as ((error: unknown, context?: Record<string, unknown>) => void);
+    const handler = globalErrorHandler as (
+      error: unknown,
+      context?: Record<string, unknown>
+    ) => void;
     handler(error, {
       component: 'UserApiService',
       operation,
-      ...context
+      ...context,
     });
     return error as Error;
   }

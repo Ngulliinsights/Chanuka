@@ -24,12 +24,16 @@ export { getConnectionMultiplier, shouldSkipOperation } from './utils/connection
 export { LoadingPerformanceMonitor, globalLoadingMonitor } from './utils/loading-utils';
 
 // Loading scenarios
-export { LOADING_SCENARIOS, LoadingScenarioBuilder, createOperationFromScenario } from './utils/loading-utils';
+export {
+  LOADING_SCENARIOS,
+  LoadingScenarioBuilder,
+  createOperationFromScenario,
+} from './utils/loading-utils';
 
 // Error types
 export {
   LoadingError,
   LoadingTimeoutError,
   LoadingRetryError,
-  LoadingConnectionError
+  LoadingConnectionError,
 } from './types';

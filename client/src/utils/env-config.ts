@@ -33,7 +33,7 @@ interface EnvironmentConfig {
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const isDevelopment = process.env.NODE_ENV === 'development';
   const isProduction = process.env.NODE_ENV === 'production';
-  
+
   // Helper function to safely access environment variables
   const getEnv = (key: string, defaultValue = ''): string => {
     if (typeof window !== 'undefined' && (window as any).ENV) {
@@ -53,7 +53,11 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     environment: isProduction ? 'production' : isDevelopment ? 'development' : 'staging',
     enableAnalytics: getEnv('VITE_ENABLE_ANALYTICS') === 'true',
     enableSecurityMonitoring: getEnv('VITE_ENABLE_SECURITY_MONITORING') !== 'false',
-    logLevel: (getEnv('VITE_LOG_LEVEL') || (isDevelopment ? 'debug' : 'info')) as 'debug' | 'info' | 'warn' | 'error',
+    logLevel: (getEnv('VITE_LOG_LEVEL') || (isDevelopment ? 'debug' : 'info')) as
+      | 'debug'
+      | 'info'
+      | 'warn'
+      | 'error',
     oauth: {
       google: {
         clientId: getEnv('VITE_GOOGLE_CLIENT_ID'),
@@ -74,15 +78,15 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
 
   // Environment configuration loaded successfully
   if (process.env.NODE_ENV === 'development') {
-    console.log('Environment configuration loaded', { 
+    console.log('Environment configuration loaded', {
       environment: config.environment,
       oauthEnabled: {
         google: config.oauth.google.enabled,
-        github: config.oauth.github.enabled
-      }
+        github: config.oauth.github.enabled,
+      },
     });
   }
-  
+
   return config;
 };
 

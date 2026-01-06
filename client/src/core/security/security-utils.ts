@@ -40,7 +40,7 @@ export const DEFAULT_CSP: CSPDirectives = {
   'child-src': ["'self'"],
   'worker-src': ["'self'"],
   'frame-src': ["'none'"],
-  'form-action': ["'self'"]
+  'form-action': ["'self'"],
 };
 
 /**
@@ -70,7 +70,10 @@ export function sanitizeInput(input: string): string {
 /**
  * Sanitize HTML content while preserving safe tags
  */
-export function sanitizeHTML(html: string, allowedTags: string[] = ['b', 'i', 'em', 'strong', 'p', 'br']): string {
+export function sanitizeHTML(
+  html: string,
+  allowedTags: string[] = ['b', 'i', 'em', 'strong', 'p', 'br']
+): string {
   if (typeof html !== 'string') return '';
 
   // Simple HTML sanitization - in production, use a proper library like DOMPurify
@@ -178,7 +181,7 @@ export function validatePasswordStrength(password: string): {
   return {
     score,
     feedback,
-    isValid: score >= 4
+    isValid: score >= 4,
   };
 }
 
@@ -191,7 +194,7 @@ export const SECURITY_HEADERS = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 } as const;
 
 /**
@@ -246,5 +249,5 @@ export const securityUtils = {
   isSecureContext,
   RateLimiter,
   SECURITY_HEADERS,
-  DEFAULT_CSP
+  DEFAULT_CSP,
 };

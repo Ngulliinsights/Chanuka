@@ -14,6 +14,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/shared/hooks/store';
 import { selectNavigationUIState } from '@/shared/infrastructure/store/slices/navigationSlice';
 import { navigationUtils } from '@/shared/services/navigation';
+
 import { logger } from '../../../../utils/logger';
 
 interface OptimizedNavigationOptions {
@@ -46,7 +47,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
     enableAnalytics = true,
     enablePreloading = true,
     enableCaching = true,
-    cacheSize = 50
+    cacheSize = 50,
   } = options;
 
   const location = useLocation();
@@ -65,137 +66,142 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
    * Analytics tracking helper
    * Tracks navigation events with throttling to avoid excessive logging
    */
-  const trackNavigation = useCallback((eventType: string, data: Record<string, unknown>) => {
-    if (!enableAnalytics) return;
+  const trackNavigation = useCallback(
+    (eventType: string, data: Record<string, unknown>) => {
+      if (!enableAnalytics) return;
 
-    try {
-      const eventKey = `${eventType}:${JSON.stringify(data)}`;
-      const lastTracked = analyticsRef.current.get(eventKey) || 0;
-      const now = Date.now();
+      try {
+        const eventKey = `${eventType}:${JSON.stringify(data)}`;
+        const lastTracked = analyticsRef.current.get(eventKey) || 0;
+        const now = Date.now();
 
-      // Throttle identical events to once per second
-      if (now - lastTracked > 1000) {
-        analyticsRef.current.set(eventKey, now);
-        logger.info('Navigation event', { eventType, ...data });
+        // Throttle identical events to once per second
+        if (now - lastTracked > 1000) {
+          analyticsRef.current.set(eventKey, now);
+          logger.info('Navigation event', { eventType, ...data });
 
-        // Clean up old analytics entries periodically
-        if (analyticsRef.current.size > 100) {
-          const entries = Array.from(analyticsRef.current.entries());
-          const recentEntries = entries.filter(([, timestamp]) => now - timestamp < 60000);
-          analyticsRef.current = new Map(recentEntries);
+          // Clean up old analytics entries periodically
+          if (analyticsRef.current.size > 100) {
+            const entries = Array.from(analyticsRef.current.entries());
+            const recentEntries = entries.filter(([, timestamp]) => now - timestamp < 60000);
+            analyticsRef.current = new Map(recentEntries);
+          }
         }
+      } catch (error) {
+        logger.error('Analytics tracking failed', { error, eventType });
       }
-    } catch (error) {
-      logger.error('Analytics tracking failed', { error, eventType });
-    }
-  }, [enableAnalytics]);
+    },
+    [enableAnalytics]
+  );
 
   /**
    * Preload route data with caching
    * Fetches and caches route-specific data for faster navigation
    */
-  const preloadRoute = useCallback(async (path: string): Promise<unknown> => {
-    if (!enablePreloading) return null;
+  const preloadRoute = useCallback(
+    async (path: string): Promise<unknown> => {
+      if (!enablePreloading) return null;
 
-    try {
-      // Check cache first to avoid redundant fetches
-      const cached = cacheRef.current[path];
-      const cacheMaxAge = 300000; // 5 minutes in milliseconds
+      try {
+        // Check cache first to avoid redundant fetches
+        const cached = cacheRef.current[path];
+        const cacheMaxAge = 300000; // 5 minutes in milliseconds
 
-      if (cached && Date.now() - cached.timestamp < cacheMaxAge) {
-        logger.debug('Route data served from cache', { path });
-        return cached.data;
-      }
-
-      // Simulate route data preloading
-      // In a production app, this would fetch route-specific data from an API
-      // or load code-split components
-      const routeData = {
-        path,
-        timestamp: Date.now(),
-        metadata: {
-          title: path.split('/').filter(Boolean).pop() || 'Home',
-          description: `Content for ${path}`,
-          loadTime: Date.now()
+        if (cached && Date.now() - cached.timestamp < cacheMaxAge) {
+          logger.debug('Route data served from cache', { path });
+          return cached.data;
         }
-      };
 
-      // Cache the fetched data
-      if (enableCaching) {
-        cacheRef.current[path] = {
+        // Simulate route data preloading
+        // In a production app, this would fetch route-specific data from an API
+        // or load code-split components
+        const routeData = {
+          path,
           timestamp: Date.now(),
-          data: routeData
+          metadata: {
+            title: path.split('/').filter(Boolean).pop() || 'Home',
+            description: `Content for ${path}`,
+            loadTime: Date.now(),
+          },
         };
 
-        // Implement LRU cache cleanup to maintain memory efficiency
-        const cacheKeys = Object.keys(cacheRef.current);
-        if (cacheKeys.length > cacheSize) {
-          const sortedKeys = cacheKeys.sort((a, b) =>
-            cacheRef.current[a].timestamp - cacheRef.current[b].timestamp
-          );
-          const keysToRemove = sortedKeys.slice(0, cacheKeys.length - cacheSize);
-          keysToRemove.forEach(key => delete cacheRef.current[key]);
+        // Cache the fetched data
+        if (enableCaching) {
+          cacheRef.current[path] = {
+            timestamp: Date.now(),
+            data: routeData,
+          };
 
-          logger.debug('Cache cleaned up', {
-            removed: keysToRemove.length,
-            remaining: Object.keys(cacheRef.current).length
-          });
+          // Implement LRU cache cleanup to maintain memory efficiency
+          const cacheKeys = Object.keys(cacheRef.current);
+          if (cacheKeys.length > cacheSize) {
+            const sortedKeys = cacheKeys.sort(
+              (a, b) => cacheRef.current[a].timestamp - cacheRef.current[b].timestamp
+            );
+            const keysToRemove = sortedKeys.slice(0, cacheKeys.length - cacheSize);
+            keysToRemove.forEach(key => delete cacheRef.current[key]);
+
+            logger.debug('Cache cleaned up', {
+              removed: keysToRemove.length,
+              remaining: Object.keys(cacheRef.current).length,
+            });
+          }
         }
-      }
 
-      return routeData;
-    } catch (error) {
-      logger.error('Route preloading failed', { error, path });
-      return null;
-    }
-  }, [enablePreloading, enableCaching, cacheSize]);
+        return routeData;
+      } catch (error) {
+        logger.error('Route preloading failed', { error, path });
+        return null;
+      }
+    },
+    [enablePreloading, enableCaching, cacheSize]
+  );
 
   /**
    * Optimized navigation function with preloading support
    * Handles navigation with performance tracking and optional route preloading
    */
-  const navigateOptimized = useCallback((
-    path: string,
-    options?: { replace?: boolean; preload?: boolean; state?: unknown }
-  ) => {
-    const startTime = performance.now();
+  const navigateOptimized = useCallback(
+    (path: string, options?: { replace?: boolean; preload?: boolean; state?: unknown }) => {
+      const startTime = performance.now();
 
-    try {
-      // Track navigation event with relevant context
-      trackNavigation('navigation_click', {
-        path,
-        source: 'optimized_navigation',
-        replace: options?.replace || false
-      });
-
-      // Preload route if enabled and not already preloaded
-      if (enablePreloading && options?.preload && !preloadedRef.current.has(path)) {
-        preloadRoute(path).then(() => {
-          preloadedRef.current.add(path);
-          logger.debug('Route preloaded', { path });
+      try {
+        // Track navigation event with relevant context
+        trackNavigation('navigation_click', {
+          path,
+          source: 'optimized_navigation',
+          replace: options?.replace || false,
         });
+
+        // Preload route if enabled and not already preloaded
+        if (enablePreloading && options?.preload && !preloadedRef.current.has(path)) {
+          preloadRoute(path).then(() => {
+            preloadedRef.current.add(path);
+            logger.debug('Route preloaded', { path });
+          });
+        }
+
+        // Perform navigation with optional replace or state
+        navigate(path, {
+          replace: options?.replace || false,
+          state: options?.state,
+        });
+
+        // Log performance metrics for monitoring
+        const navigationTime = performance.now() - startTime;
+        logger.debug('Navigation completed', {
+          path,
+          navigationTime: navigationTime.toFixed(2),
+          cached: Boolean(cacheRef.current[path]),
+          preloaded: preloadedRef.current.has(path),
+        });
+      } catch (error) {
+        logger.error('Navigation failed', { error, path });
+        throw error;
       }
-
-      // Perform navigation with optional replace or state
-      navigate(path, {
-        replace: options?.replace || false,
-        state: options?.state
-      });
-
-      // Log performance metrics for monitoring
-      const navigationTime = performance.now() - startTime;
-      logger.debug('Navigation completed', {
-        path,
-        navigationTime: navigationTime.toFixed(2),
-        cached: Boolean(cacheRef.current[path]),
-        preloaded: preloadedRef.current.has(path)
-      });
-
-    } catch (error) {
-      logger.error('Navigation failed', { error, path });
-      throw error;
-    }
-  }, [navigate, enablePreloading, trackNavigation, preloadRoute]);
+    },
+    [navigate, enablePreloading, trackNavigation, preloadRoute]
+  );
 
   /**
    * Generate breadcrumbs from current path
@@ -210,7 +216,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       currentPath += `/${segment}`;
       crumbs.push({
         path: currentPath,
-        label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
+        label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
       });
     }
 
@@ -231,7 +237,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       related.push({
         path: `/${parentPath}`,
         title: `Back to ${currentSegments[currentSegments.length - 2]}`,
-        relevance: 0.9
+        relevance: 0.9,
       });
     }
 
@@ -242,7 +248,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
       .map(([path]) => ({
         path,
         title: path.split('/').pop() || path,
-        relevance: 0.7
+        relevance: 0.7,
       }))
       .filter(page => page.path !== location.pathname);
 
@@ -254,50 +260,53 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
    * Provides filtered navigation results based on query string
    */
   const searchRef = useRef<NodeJS.Timeout>();
-  const searchNavigation = useCallback((
-    query: string,
-    callback?: (results: Array<{ path: string; title: string; score: number }>) => void
-  ) => {
-    // Clear previous search timeout to implement debouncing
-    if (searchRef.current) {
-      clearTimeout(searchRef.current);
-    }
-
-    // Debounce search to reduce unnecessary processing
-    searchRef.current = setTimeout(() => {
-      try {
-        const lowerQuery = query.toLowerCase();
-
-        // Search through cached routes and breadcrumbs
-        const results = [
-          ...breadcrumbs.map(crumb => ({
-            path: crumb.path,
-            title: crumb.label,
-            score: crumb.label.toLowerCase().includes(lowerQuery) ? 1.0 : 0.0
-          })),
-          ...Object.keys(cacheRef.current).map(path => ({
-            path,
-            title: path.split('/').pop() || path,
-            score: path.toLowerCase().includes(lowerQuery) ? 0.8 : 0.0
-          }))
-        ]
-          .filter(item => item.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 10);
-
-        trackNavigation('search', {
-          query,
-          resultsCount: results.length,
-          source: 'optimized_navigation'
-        });
-
-        callback?.(results);
-      } catch (error) {
-        logger.error('Navigation search failed', { error, query });
-        callback?.([]);
+  const searchNavigation = useCallback(
+    (
+      query: string,
+      callback?: (results: Array<{ path: string; title: string; score: number }>) => void
+    ) => {
+      // Clear previous search timeout to implement debouncing
+      if (searchRef.current) {
+        clearTimeout(searchRef.current);
       }
-    }, 300); // 300ms debounce delay
-  }, [breadcrumbs, trackNavigation]);
+
+      // Debounce search to reduce unnecessary processing
+      searchRef.current = setTimeout(() => {
+        try {
+          const lowerQuery = query.toLowerCase();
+
+          // Search through cached routes and breadcrumbs
+          const results = [
+            ...breadcrumbs.map(crumb => ({
+              path: crumb.path,
+              title: crumb.label,
+              score: crumb.label.toLowerCase().includes(lowerQuery) ? 1.0 : 0.0,
+            })),
+            ...Object.keys(cacheRef.current).map(path => ({
+              path,
+              title: path.split('/').pop() || path,
+              score: path.toLowerCase().includes(lowerQuery) ? 0.8 : 0.0,
+            })),
+          ]
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10);
+
+          trackNavigation('search', {
+            query,
+            resultsCount: results.length,
+            source: 'optimized_navigation',
+          });
+
+          callback?.(results);
+        } catch (error) {
+          logger.error('Navigation search failed', { error, query });
+          callback?.([]);
+        }
+      }, 300); // 300ms debounce delay
+    },
+    [breadcrumbs, trackNavigation]
+  );
 
   /**
    * Cleanup timeouts on unmount to prevent memory leaks
@@ -314,14 +323,17 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
    * Performance metrics for monitoring and optimization
    * Provides insights into cache utilization and navigation efficiency
    */
-  const performanceMetrics = useMemo(() => ({
-    cacheSize: Object.keys(cacheRef.current).length,
-    cacheUtilization: ((Object.keys(cacheRef.current).length / cacheSize) * 100).toFixed(1) + '%',
-    preloadedRoutes: preloadedRef.current.size,
-    currentPath: location.pathname,
-    navigationStateActive: navigationState.sidebarOpen || navigationState.mobileMenuOpen,
-    analyticsEvents: analyticsRef.current.size
-  }), [location.pathname, navigationState.sidebarOpen, navigationState.mobileMenuOpen, cacheSize]);
+  const performanceMetrics = useMemo(
+    () => ({
+      cacheSize: Object.keys(cacheRef.current).length,
+      cacheUtilization: ((Object.keys(cacheRef.current).length / cacheSize) * 100).toFixed(1) + '%',
+      preloadedRoutes: preloadedRef.current.size,
+      currentPath: location.pathname,
+      navigationStateActive: navigationState.sidebarOpen || navigationState.mobileMenuOpen,
+      analyticsEvents: analyticsRef.current.size,
+    }),
+    [location.pathname, navigationState.sidebarOpen, navigationState.mobileMenuOpen, cacheSize]
+  );
 
   /**
    * Clear all caches and reset state
@@ -345,15 +357,22 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
     return {
       totalEntries: cacheEntries.length,
       preloadedCount: preloadedRef.current.size,
-      oldestEntry: cacheEntries.length > 0
-        ? Math.floor((now - Math.min(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)
-        : 0,
-      newestEntry: cacheEntries.length > 0
-        ? Math.floor((now - Math.max(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)
-        : 0,
-      averageAge: cacheEntries.length > 0
-        ? Math.floor(cacheEntries.reduce((sum, [, v]) => sum + (now - v.timestamp), 0) / cacheEntries.length / 1000)
-        : 0
+      oldestEntry:
+        cacheEntries.length > 0
+          ? Math.floor((now - Math.min(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)
+          : 0,
+      newestEntry:
+        cacheEntries.length > 0
+          ? Math.floor((now - Math.max(...cacheEntries.map(([, v]) => v.timestamp))) / 1000)
+          : 0,
+      averageAge:
+        cacheEntries.length > 0
+          ? Math.floor(
+              cacheEntries.reduce((sum, [, v]) => sum + (now - v.timestamp), 0) /
+                cacheEntries.length /
+                1000
+            )
+          : 0,
     };
   }, []);
 
@@ -377,7 +396,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
 
     // Cache management
     clearCache,
-    getCacheStats
+    getCacheStats,
   };
 }
 

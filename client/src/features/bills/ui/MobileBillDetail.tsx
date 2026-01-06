@@ -7,7 +7,6 @@
  * accessibility support, and performance optimization.
  */
 
-import React from 'react';
 import {
   ArrowLeft,
   Share2,
@@ -22,6 +21,7 @@ import {
   Bookmark,
   Globe,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 
 // Type definitions for better type safety and code documentation

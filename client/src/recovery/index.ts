@@ -23,12 +23,7 @@ export class RecoveryManager {
     operation: () => Promise<T>,
     options: RecoveryOptions = {}
   ): Promise<T | null> {
-    const {
-      maxRetries = 3,
-      retryDelay = 1000,
-      fallbackValue = null,
-      onError
-    } = options;
+    const { maxRetries = 3, retryDelay = 1000, fallbackValue = null, onError } = options;
 
     let lastError: Error | null = null;
 
@@ -37,7 +32,7 @@ export class RecoveryManager {
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
         }
@@ -53,7 +48,7 @@ export class RecoveryManager {
 
   recoverFromError(error: Error, context?: string): void {
     console.error(`Recovery triggered for ${context || 'unknown context'}:`, error);
-    
+
     // Log to external service if available
     if (typeof window !== 'undefined' && (window as any).errorReporting) {
       (window as any).errorReporting.report(error, { context });
@@ -72,11 +67,7 @@ export class RecoveryManager {
 
 export const recoveryManager = RecoveryManager.getInstance();
 
-export function withErrorRecovery<T>(
-  fn: () => T,
-  fallback: T,
-  context?: string
-): T {
+export function withErrorRecovery<T>(fn: () => T, fallback: T, context?: string): T {
   try {
     return fn();
   } catch (error) {
@@ -87,23 +78,23 @@ export function withErrorRecovery<T>(
 
 export function getRecoverySuggestions(error: Error, context?: string): string[] {
   const suggestions: string[] = [];
-  
+
   if (error.message.includes('navigation') || error.message.includes('route')) {
     suggestions.push('Try navigating to the home page');
     suggestions.push('Check if you have the required permissions');
     suggestions.push('Refresh the page and try again');
   }
-  
+
   if (error.message.includes('auth') || error.message.includes('login')) {
     suggestions.push('Please log in to continue');
     suggestions.push('Check your credentials and try again');
   }
-  
+
   if (error.message.includes('network') || error.message.includes('fetch')) {
     suggestions.push('Check your internet connection');
     suggestions.push('Try again in a few moments');
   }
-  
+
   return suggestions.length > 0 ? suggestions : ['Please try again or contact support'];
 }
 

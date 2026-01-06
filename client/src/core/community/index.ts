@@ -1,9 +1,9 @@
 /**
  * Core Community Module
- * 
+ *
  * Unified community and discussion system consolidating:
  * - features/community/hooks/useDiscussion.ts
- * - features/community/hooks/useCommunity.ts  
+ * - features/community/hooks/useCommunity.ts
  * - Resolving type conflicts and state management inconsistencies
  */
 

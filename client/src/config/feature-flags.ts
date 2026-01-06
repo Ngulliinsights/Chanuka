@@ -29,7 +29,7 @@ export const FEATURE_FLAGS = {
 export const ROLLOUT_CONFIG = {
   UNIFIED_SEARCH_ENABLED: {
     internal: 100, // 100% for development team
-    beta: 25,      // 25% for beta users
+    beta: 25, // 25% for beta users
     production: 0, // 0% for production users initially
   },
   ADAPTIVE_DASHBOARD_ENABLED: {
@@ -149,7 +149,7 @@ function simpleHash(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   return Math.abs(hash);
@@ -181,7 +181,7 @@ export const getFeatureRolloutStatus = (userGroup?: UserGroup, userId?: string) 
   const currentUserGroup = userGroup || getCurrentUserGroup();
   const rolloutStatus: Record<string, boolean> = {};
 
-  Object.keys(ROLLOUT_CONFIG).forEach((flag) => {
+  Object.keys(ROLLOUT_CONFIG).forEach(flag => {
     rolloutStatus[flag] = isFeatureEnabledForUser(
       flag as RolloutConfigKey,
       currentUserGroup,

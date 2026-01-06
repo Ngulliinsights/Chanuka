@@ -1,6 +1,6 @@
 /**
  * Community Feature Services
- * 
+ *
  * Business logic services for community-related operations.
  * Integrated from client/src/services/ following FSD principles.
  */
@@ -17,5 +17,5 @@ export type {
   CommunityServiceConfig,
   DiscussionCreateRequest,
   CommentCreateRequest,
-  ModerationRequest
+  ModerationRequest,
 } from './community-service';

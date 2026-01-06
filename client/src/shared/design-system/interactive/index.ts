@@ -35,7 +35,7 @@ export {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
 } from './Dialog';
 
 export {
@@ -43,7 +43,7 @@ export {
   PopoverTrigger,
   PopoverContent,
   EnhancedPopover,
-  EnhancedPopoverContent
+  EnhancedPopoverContent,
 } from './Popover';
 
 // ════════════════════════════════════════════════════════════════════
@@ -65,7 +65,7 @@ export {
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
-  ContextMenuRadioGroup
+  ContextMenuRadioGroup,
 } from './ContextMenu';
 
 export {
@@ -85,7 +85,7 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
   EnhancedDropdownMenu,
-  EnhancedDropdownMenuItem
+  EnhancedDropdownMenuItem,
 } from './DropdownMenu';
 
 export {
@@ -97,7 +97,7 @@ export {
   NavigationMenuTrigger,
   NavigationMenuLink,
   NavigationMenuIndicator,
-  NavigationMenuViewport
+  NavigationMenuViewport,
 } from './NavigationMenu';
 
 export {
@@ -109,7 +109,7 @@ export {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut
+  CommandShortcut,
 } from './Command';
 
 // ════════════════════════════════════════════════════════════════════
@@ -140,7 +140,7 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-  useSidebar
+  useSidebar,
 } from './Sidebar';
 
 export {
@@ -153,7 +153,7 @@ export {
   SheetHeader,
   SheetFooter,
   SheetTitle,
-  SheetDescription
+  SheetDescription,
 } from './Sheet';
 
 // ════════════════════════════════════════════════════════════════════
@@ -187,9 +187,4 @@ export { ThemeToggle, ThemeToggleButton } from './ThemeToggle';
 // TOOLTIP COMPONENTS (Contextual help and information)
 // ════════════════════════════════════════════════════════════════════
 
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from './tooltip';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';

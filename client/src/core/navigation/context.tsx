@@ -25,7 +25,12 @@ import {
 import { UserRole } from '../../shared/types/navigation';
 
 import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
-import { generateBreadcrumbs, calculateRelatedPages, determineNavigationSection, isNavigationPathActive } from './utils';
+import {
+  generateBreadcrumbs,
+  calculateRelatedPages,
+  determineNavigationSection,
+  isNavigationPathActive,
+} from './utils';
 // navigationPersistenceUtils intentionally unused here
 
 const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);
@@ -68,9 +73,7 @@ export function createNavigationProvider(
       }
 
       // Check user role
-      const newUserRole = isAuthenticated && user?.role
-        ? (user.role as UserRole)
-        : 'public';
+      const newUserRole = isAuthenticated && user?.role ? (user.role as UserRole) : 'public';
 
       if (state.user_role !== newUserRole) {
         updates.push(() => dispatch(setUserRole(newUserRole)));
@@ -110,35 +113,61 @@ export function createNavigationProvider(
       user?.role,
       state.currentPath,
       location.pathname,
-      dispatch
+      dispatch,
     ]);
 
     // Navigation actions
-    const navigateTo = useCallback((path: string) => {
-      navigate(path);
-    }, [navigate]);
+    const navigateTo = useCallback(
+      (path: string) => {
+        navigate(path);
+      },
+      [navigate]
+    );
 
-    const updateBreadcrumbsAction = useCallback((breadcrumbs: BreadcrumbItem[]) => {
-      dispatch(updateBreadcrumbs(breadcrumbs));
-    }, [dispatch]);
+    const updateBreadcrumbsAction = useCallback(
+      (breadcrumbs: BreadcrumbItem[]) => {
+        dispatch(updateBreadcrumbs(breadcrumbs));
+      },
+      [dispatch]
+    );
 
-    const updateRelatedPagesAction = useCallback((pages: RelatedPage[]) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      dispatch(updateRelatedPages(pages as any));
-    }, [dispatch]);
+    const updateRelatedPagesAction = useCallback(
+      (pages: RelatedPage[]) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch(updateRelatedPages(pages as any));
+      },
+      [dispatch]
+    );
 
-    const updateUserRole = useCallback((role: UserRole) => {
-      dispatch(setUserRole(role));
-    }, [dispatch]);
+    const updateUserRole = useCallback(
+      (role: UserRole) => {
+        dispatch(setUserRole(role));
+      },
+      [dispatch]
+    );
 
-    const updatePreferencesAction = useCallback((preferences: Partial<{ defaultLandingPage: string; favoritePages: string[]; compactMode: boolean; showBreadcrumbs: boolean; autoExpand: boolean }>) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      dispatch(updatePreferences(preferences as any));
-    }, [dispatch]);
+    const updatePreferencesAction = useCallback(
+      (
+        preferences: Partial<{
+          defaultLandingPage: string;
+          favoritePages: string[];
+          compactMode: boolean;
+          showBreadcrumbs: boolean;
+          autoExpand: boolean;
+        }>
+      ) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch(updatePreferences(preferences as any));
+      },
+      [dispatch]
+    );
 
-    const addToRecentPagesAction = useCallback((page: { path: string; title: string }) => {
-      dispatch(addToRecentPages(page));
-    }, [dispatch]);
+    const addToRecentPagesAction = useCallback(
+      (page: { path: string; title: string }) => {
+        dispatch(addToRecentPages(page));
+      },
+      [dispatch]
+    );
 
     const toggleSidebarAction = useCallback(() => {
       dispatch(toggleSidebar());
@@ -148,20 +177,26 @@ export function createNavigationProvider(
       dispatch(toggleMobileMenu());
     }, [dispatch]);
 
-    const setSidebarCollapsedAction = useCallback((collapsed: boolean) => {
-      dispatch(setSidebarCollapsed(collapsed));
-    }, [dispatch]);
+    const setSidebarCollapsedAction = useCallback(
+      (collapsed: boolean) => {
+        dispatch(setSidebarCollapsed(collapsed));
+      },
+      [dispatch]
+    );
 
-    const is_active = useCallback((path: string) => {
-      return isNavigationPathActive(path, state.currentPath);
-    }, [state.currentPath]);
+    const is_active = useCallback(
+      (path: string) => {
+        return isNavigationPathActive(path, state.currentPath);
+      },
+      [state.currentPath]
+    );
 
     // Context value with all functionality - no memoization to avoid dependency issues
     // Use `any` here to bridge type differences between core and shared navigation types.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contextValue: any = {
       ...state,
-      
+
       // Navigation actions
       navigateTo,
       updateBreadcrumbs: updateBreadcrumbsAction,
@@ -169,7 +204,7 @@ export function createNavigationProvider(
       updateUserRole,
       updatePreferences: updatePreferencesAction,
       addToRecentPages: addToRecentPagesAction,
-      
+
       // UI actions (merged from ResponsiveNavigationContext)
       toggleSidebar: toggleSidebarAction,
       toggleMobileMenu: toggleMobileMenuAction,
@@ -177,11 +212,7 @@ export function createNavigationProvider(
       is_active,
     };
 
-    return (
-      <NavigationContext.Provider value={contextValue}>
-        {children}
-      </NavigationContext.Provider>
-    );
+    return <NavigationContext.Provider value={contextValue}>{children}</NavigationContext.Provider>;
   };
 }
 
@@ -192,4 +223,3 @@ export function useNavigation(): NavigationContextValue {
   }
   return context;
 }
-

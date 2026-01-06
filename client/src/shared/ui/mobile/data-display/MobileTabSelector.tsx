@@ -60,9 +60,7 @@ export const MobileTabSelector = React.forwardRef<HTMLDivElement, MobileTabSelec
           ))}
         </div>
 
-        <div className="tabs-content">
-          {tabs.find(tab => tab.id === active)?.content}
-        </div>
+        <div className="tabs-content">{tabs.find(tab => tab.id === active)?.content}</div>
       </div>
     );
   }

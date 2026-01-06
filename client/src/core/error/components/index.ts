@@ -1,18 +1,14 @@
 // Enhanced Error Boundary - Main error boundary component
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { SimpleErrorBoundary } from './SimpleErrorBoundary';
-export type {
-  ErrorFallbackProps,
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-} from './ErrorBoundary';
+export type { ErrorFallbackProps, ErrorBoundaryProps, ErrorBoundaryState } from './ErrorBoundary';
 
 // Community Error Boundary - Specialized for community features
 export { default as CommunityErrorBoundary } from './CommunityErrorBoundary';
 export { useIncrementalErrorBoundary, withCommunityErrorBoundary } from './CommunityErrorBoundary';
 export type {
   CommunityErrorBoundaryProps,
-  CommunityErrorBoundaryState
+  CommunityErrorBoundaryState,
 } from './CommunityErrorBoundary';
 
 // Error Fallback Components - Specialized fallback UIs
@@ -22,7 +18,7 @@ export {
   ComponentErrorFallback,
   ChunkErrorFallback,
   NetworkErrorFallback,
-  CriticalErrorFallback
+  CriticalErrorFallback,
 } from './ErrorFallback';
 
 // Service Unavailable Component - Specialized service outage display
@@ -35,28 +31,24 @@ export { default as RecoveryUI } from './RecoveryUI';
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 
 // Re-export error types from core error (excluding BaseError which comes from logger)
-export type { 
-  AppError, 
-  ErrorContext, 
-  ErrorRecoveryStrategy, 
+export type {
+  AppError,
+  ErrorContext,
+  ErrorRecoveryStrategy,
   ErrorHandlerConfig,
   ErrorListener,
   ErrorStats,
   ReactErrorInfo,
   ErrorBoundaryProps as CoreErrorBoundaryProps,
   ErrorFallbackProps as CoreErrorFallbackProps,
-  RecoveryResult
+  RecoveryResult,
 } from '@client/core/error/types';
 
-export { 
-  ErrorDomain, 
-  ErrorSeverity, 
-  RecoveryAction 
-} from '@client/core/error/constants';
+export { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/core/error/constants';
 
 // Re-export all error classes from core/error where they are actually defined
-export { 
-  BaseError, 
+export {
+  BaseError,
   ValidationError,
   NetworkError,
   UnauthorizedError,
@@ -72,47 +64,3 @@ export { getErrorIcon } from './utils/error-icons';
 
 // Lightweight tracing utilities (uses existing logger under the hood)
 export { startTrace, finishTrace, getActiveTracesCount } from '@client/utils/tracing';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

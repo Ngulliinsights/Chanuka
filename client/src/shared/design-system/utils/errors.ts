@@ -35,7 +35,7 @@ export class UIComponentError extends Error {
       operation: this.operation,
       timestamp: this.timestamp.toISOString(),
       recoverable: this.recoverable,
-      stack: this.stack
+      stack: this.stack,
     };
   }
 }
@@ -60,12 +60,7 @@ export class UIValidationError extends UIComponentError {
   public readonly field?: string;
   public readonly value?: any;
 
-  constructor(
-    componentName: string,
-    message: string,
-    field?: string,
-    value?: any
-  ) {
+  constructor(componentName: string, message: string, field?: string, value?: any) {
     super(componentName, 'validation', message, true);
     this.name = 'UIValidationError';
     this.field = field;
@@ -76,11 +71,7 @@ export class UIValidationError extends UIComponentError {
 export class UIInputError extends UIComponentError {
   public readonly inputType: string;
 
-  constructor(
-    componentName: string,
-    message: string,
-    inputType: string
-  ) {
+  constructor(componentName: string, message: string, inputType: string) {
     super(componentName, 'input', message, true);
     this.name = 'UIInputError';
     this.inputType = inputType;
@@ -90,11 +81,7 @@ export class UIInputError extends UIComponentError {
 export class UIFormError extends UIComponentError {
   public readonly fields: Record<string, string>;
 
-  constructor(
-    componentName: string,
-    message: string,
-    fields: Record<string, string> = {}
-  ) {
+  constructor(componentName: string, message: string, fields: Record<string, string> = {}) {
     super(componentName, 'form', message, true);
     this.name = 'UIFormError';
     this.fields = fields;
@@ -104,11 +91,7 @@ export class UIFormError extends UIComponentError {
 export class UIDateError extends UIComponentError {
   public readonly date?: Date;
 
-  constructor(
-    componentName: string,
-    message: string,
-    date?: Date
-  ) {
+  constructor(componentName: string, message: string, date?: Date) {
     super(componentName, 'date', message, true);
     this.name = 'UIDateError';
     this.date = date;

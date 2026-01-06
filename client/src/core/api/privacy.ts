@@ -8,7 +8,10 @@ import type { DataExportResponse, DataDeletionResponse } from './types/error-res
 export class PrivacyAnalyticsApiService {
   private readonly endpoint = '/analytics/data';
 
-  async exportUserData(userId: string, format: 'json' | 'csv' = 'json'): Promise<DataExportResponse> {
+  async exportUserData(
+    userId: string,
+    format: 'json' | 'csv' = 'json'
+  ): Promise<DataExportResponse> {
     try {
       // ✅ Uses globalApiClient, so Auth Token is automatically attached
       const response = await globalApiClient.get<DataExportResponse>(

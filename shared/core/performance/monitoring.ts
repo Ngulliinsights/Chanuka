@@ -8,6 +8,7 @@
 import { EventEmitter } from 'events';
 
 import { logger } from '../observability/logging';
+
 import { PerformanceBudget, PerformanceBudgetConfig, getPerformanceBudgets, validateBudgetConfig } from './budgets';
 
 export interface PerformanceMetric {

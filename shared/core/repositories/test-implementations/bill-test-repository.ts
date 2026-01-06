@@ -5,11 +5,11 @@
  * created in Phase 1. Provides in-memory storage and schema-agnostic operations for testing.
  */
 
+import type { ITestDataFactory } from '../../../../../test-data-factory';
+import type { Bill, NewBill } from '../../../../schema/foundation';
 import { ok, err, some, none } from '../../primitives';
 import type { Result, Maybe } from '../../primitives';
-import type { Bill, NewBill } from '../../../../schema/foundation';
 import type { IBillRepository } from '../interfaces/bill-repository.interface';
-import type { ITestDataFactory } from '../../../../../test-data-factory';
 
 export class BillTestRepository implements IBillRepository {
   private bills = new Map<string, Bill>();

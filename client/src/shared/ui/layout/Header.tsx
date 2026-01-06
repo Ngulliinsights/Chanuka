@@ -1,11 +1,11 @@
 import { BarChart3, Search, Bell, User } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 
 import { cn } from '../../design-system/utils/cn';
-import React from 'react';
 
 interface HeaderProps {
   className?: string;
@@ -26,22 +26,19 @@ export default function Header({
   showSearch = true,
   showNotifications = true,
   showUserMenu = true,
-  notificationCount = 0
+  notificationCount = 0,
 }: HeaderProps) {
   return (
-    <header className={cn(
-      "flex items-center justify-between px-4 py-3 bg-background border-b",
-      className
-    )}>
+    <header
+      className={cn(
+        'flex items-center justify-between px-4 py-3 bg-background border-b',
+        className
+      )}
+    >
       {/* Left Section */}
       <div className="flex items-center gap-4">
         {onMenuToggle && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onMenuToggle}
-            className="md:hidden"
-          >
+          <Button variant="ghost" size="sm" onClick={onMenuToggle} className="md:hidden">
             <BarChart3 className="h-5 w-5" />
           </Button>
         )}

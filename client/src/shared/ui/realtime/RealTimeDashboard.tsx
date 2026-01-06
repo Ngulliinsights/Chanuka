@@ -5,8 +5,6 @@
  * using the integrated WebSocket client with polling fallback.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import React from 'react';
 import {
   Bell,
   Activity,
@@ -15,14 +13,16 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
+import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // import { useWebSocket } from '@/hooks/use-websocket';
-import { cn } from '@/shared/design-system/utils/cn';
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { cn } from '@/shared/design-system/utils/cn';
 
 interface RealTimeDashboardProps {
   className?: string;
@@ -35,7 +35,7 @@ export function RealTimeDashboard({
   className,
   showNotifications = true,
   showEngagementMetrics = true,
-  showRecentActivity = true
+  showRecentActivity = true,
 }: RealTimeDashboardProps) {
   // Placeholder for useWebSocket hook
   const isConnected = false;
@@ -55,13 +55,15 @@ export function RealTimeDashboard({
   const markNotificationRead = (_id: string) => {};
   const connect = () => {};
 
-  const [recentActivity, setRecentActivity] = useState<Array<{
-    id: string;
-    type: string;
-    message: string;
-    timestamp: string;
-    user?: string;
-  }>>([]);
+  const [recentActivity, setRecentActivity] = useState<
+    Array<{
+      id: string;
+      type: string;
+      message: string;
+      timestamp: string;
+      user?: string;
+    }>
+  >([]);
 
   // Update recent activity periodically
   useEffect(() => {
@@ -100,7 +102,7 @@ export function RealTimeDashboard({
   };
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       {/* Connection Status */}
       <Card>
         <CardHeader className="pb-3">
@@ -110,12 +112,7 @@ export function RealTimeDashboard({
               Real-time Status
             </span>
             {error && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => connect()}
-                className="text-xs"
-              >
+              <Button variant="outline" size="sm" onClick={() => connect()} className="text-xs">
                 Retry
               </Button>
             )}
@@ -123,9 +120,7 @@ export function RealTimeDashboard({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {getConnectionStatus()}
-            </span>
+            <span className="text-sm text-muted-foreground">{getConnectionStatus()}</span>
             {!isConnected && (
               <Badge variant="secondary" className="text-xs">
                 Using Polling Fallback
@@ -159,23 +154,19 @@ export function RealTimeDashboard({
           </CardHeader>
           <CardContent className="pt-0">
             {notifications.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No new notifications
-              </p>
+              <p className="text-sm text-muted-foreground">No new notifications</p>
             ) : (
               <div className="space-y-2">
-                {notifications.slice(0, 3).map((notification) => (
+                {notifications.slice(0, 3).map(notification => (
                   <div
                     key={notification.id}
                     className={cn(
-                      "flex items-start gap-3 p-2 rounded-md border",
-                      !notification.read && "bg-blue-50 border-blue-200"
+                      'flex items-start gap-3 p-2 rounded-md border',
+                      !notification.read && 'bg-blue-50 border-blue-200'
                     )}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {notification.title}
-                      </p>
+                      <p className="text-sm font-medium truncate">{notification.title}</p>
                       <p className="text-xs text-muted-foreground truncate">
                         {notification.message}
                       </p>
@@ -217,16 +208,11 @@ export function RealTimeDashboard({
           </CardHeader>
           <CardContent className="pt-0">
             {recentActivity.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No recent activity
-              </p>
+              <p className="text-sm text-muted-foreground">No recent activity</p>
             ) : (
               <div className="space-y-2">
                 {recentActivity.map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-2 rounded-md border"
-                  >
+                  <div key={index} className="flex items-center gap-3 p-2 rounded-md border">
                     <div className="flex-shrink-0">
                       {'bill_id' in activity ? (
                         <TrendingUp className="h-4 w-4 text-blue-500" />
@@ -238,8 +224,7 @@ export function RealTimeDashboard({
                       <p className="text-sm font-medium">
                         {'bill_id' in activity
                           ? `Bill ${activity.bill_id} updated`
-                          : 'Community discussion'
-                        }
+                          : 'Community discussion'}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {activity.type.replace('_', ' ')}
@@ -271,17 +256,13 @@ export function RealTimeDashboard({
                 <div className="text-2xl font-bold text-blue-600">
                   {isConnected ? Math.floor(Math.random() * 200 + 150).toString() : '---'}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  Active Users
-                </div>
+                <div className="text-xs text-muted-foreground">Active Users</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
                   {isConnected ? Math.floor(Math.random() * 50 + 25).toString() : '---'}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  Comments Today
-                </div>
+                <div className="text-xs text-muted-foreground">Comments Today</div>
               </div>
             </div>
             {!isConnected && (

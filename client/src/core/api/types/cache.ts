@@ -1,6 +1,6 @@
 /**
  * Cache Types
- * 
+ *
  * Type definitions for caching strategies and configurations
  */
 

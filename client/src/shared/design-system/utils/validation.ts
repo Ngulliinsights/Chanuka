@@ -28,45 +28,52 @@ export const ValidationStateSchema = z.object({
  * Input validation schemas
  */
 
-export const InputValueSchema = z.string()
+export const InputValueSchema = z
+  .string()
   .min(0, 'Input value cannot be negative length')
   .max(10000, 'Input value too long');
 
-export const EmailSchema = z.string()
+export const EmailSchema = z
+  .string()
   .email('Invalid email format')
   .min(1, 'Email is required')
   .max(254, 'Email too long');
 
-export const PasswordSchema = z.string()
+export const PasswordSchema = z
+  .string()
   .min(8, 'Password must be at least 8 characters')
   .max(128, 'Password too long')
-  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number');
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    'Password must contain uppercase, lowercase, and number'
+  );
 
-export const PhoneSchema = z.string()
+export const PhoneSchema = z
+  .string()
   .regex(/^\+?[\d\s\-\(\)]+$/, 'Invalid phone number format')
   .min(10, 'Phone number too short')
   .max(20, 'Phone number too long');
 
-export const URLSchema = z.string()
-  .url('Invalid URL format')
-  .max(2048, 'URL too long');
+export const URLSchema = z.string().url('Invalid URL format').max(2048, 'URL too long');
 
-export const NumberInputSchema = z.union([
-  z.string().transform((val) => {
-    if (/^\d*\.?\d*$/.test(val)) {
+export const NumberInputSchema = z
+  .union([
+    z.string().transform(val => {
+      if (/^\d*\.?\d*$/.test(val)) {
+        const num = parseFloat(val);
+        return isNaN(num) ? undefined : num;
+      }
+      return undefined;
+    }),
+    z.number(),
+  ])
+  .transform(val => {
+    if (typeof val === 'string') {
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }
-    return undefined;
-  }),
-  z.number()
-]).transform((val) => {
-  if (typeof val === 'string') {
-    const num = parseFloat(val);
-    return isNaN(num) ? undefined : num;
-  }
-  return val;
-});
+    return val;
+  });
 
 /**
  * Form validation schemas
@@ -98,8 +105,7 @@ export const SelectOptionSchema = z.object({
   disabled: z.boolean().optional(),
 });
 
-export const SelectValueSchema = z.string()
-  .min(1, 'Please select an option');
+export const SelectValueSchema = z.string().min(1, 'Please select an option');
 
 /**
  * Button validation schemas
@@ -111,7 +117,14 @@ export const ButtonStateSchema = z.object({
   success: z.boolean().optional(),
 });
 
-export const ButtonVariantSchema = z.enum(['default', 'destructive', 'outline', 'secondary', 'ghost', 'link']);
+export const ButtonVariantSchema = z.enum([
+  'default',
+  'destructive',
+  'outline',
+  'secondary',
+  'ghost',
+  'link',
+]);
 export const ButtonSizeSchema = z.enum(['default', 'sm', 'lg', 'icon']);
 
 /**
@@ -123,18 +136,23 @@ export const DateSchema = z.date({
   invalid_type_error: 'Invalid date format',
 });
 
-export const DateRangeSchema = z.object({
-  from: DateSchema.optional(),
-  to: DateSchema.optional(),
-}).refine((data) => {
-  if (data.from && data.to) {
-    return data.from <= data.to;
-  }
-  return true;
-}, {
-  message: 'End date must be after start date',
-  path: ['to'],
-});
+export const DateRangeSchema = z
+  .object({
+    from: DateSchema.optional(),
+    to: DateSchema.optional(),
+  })
+  .refine(
+    data => {
+      if (data.from && data.to) {
+        return data.from <= data.to;
+      }
+      return true;
+    },
+    {
+      message: 'End date must be after start date',
+      path: ['to'],
+    }
+  );
 
 /**
  * Table validation schemas
@@ -188,17 +206,20 @@ export function validateInputValue(value: string, type?: string): string {
   }
 }
 
-export function validateSelectValue(value: string, options?: Array<{ value: string; label: string }>): string {
+export function validateSelectValue(
+  value: string,
+  options?: Array<{ value: string; label: string }>
+): string {
   try {
     const validatedValue = SelectValueSchema.parse(value);
-    
+
     if (options && options.length > 0) {
       const validOptions = options.map(opt => opt.value);
       if (!validOptions.includes(validatedValue)) {
         throw new UIValidationError('Invalid option selected', 'select', value, { validOptions });
       }
     }
-    
+
     return validatedValue;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -215,7 +236,7 @@ export function validateFormData(data: Record<string, any>, schema: z.ZodSchema)
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string> = {};
-      error.errors.forEach((err) => {
+      error.errors.forEach(err => {
         const field = err.path.join('.');
         errors[field] = err.message;
       });
@@ -228,7 +249,7 @@ export function validateFormData(data: Record<string, any>, schema: z.ZodSchema)
 export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date): Date {
   try {
     let parsedDate: Date;
-    
+
     if (typeof date === 'string') {
       parsedDate = new Date(date);
       if (isNaN(parsedDate.getTime())) {
@@ -237,15 +258,23 @@ export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date
     } else {
       parsedDate = DateSchema.parse(date);
     }
-    
+
     if (minDate && parsedDate < minDate) {
-      throw new UIDateError('date-picker', `Date must be after ${minDate.toLocaleDateString()}`, parsedDate);
+      throw new UIDateError(
+        'date-picker',
+        `Date must be after ${minDate.toLocaleDateString()}`,
+        parsedDate
+      );
     }
-    
+
     if (maxDate && parsedDate > maxDate) {
-      throw new UIDateError('date-picker', `Date must be before ${maxDate.toLocaleDateString()}`, parsedDate);
+      throw new UIDateError(
+        'date-picker',
+        `Date must be before ${maxDate.toLocaleDateString()}`,
+        parsedDate
+      );
     }
-    
+
     return parsedDate;
   } catch (error) {
     if (error instanceof UIDateError) {
@@ -261,33 +290,37 @@ export function validateDate(date: Date | string, minDate?: Date, maxDate?: Date
   }
 }
 
-export function validateTableData(data: unknown[], columns: Array<{ key: string; validator?: z.ZodSchema; required?: boolean }>): unknown[] {
+export function validateTableData(
+  data: unknown[],
+  columns: Array<{ key: string; validator?: z.ZodSchema; required?: boolean }>
+): unknown[] {
   try {
     const validatedData = TableDataSchema.parse(data);
-    
+
     const errors: Array<{ row: number; column: string; message: string; value: any }> = [];
-    
+
     validatedData.forEach((row, rowIndex) => {
-      columns.forEach((column) => {
+      columns.forEach(column => {
         const value = row[column.key];
-        
+
         if (column.required && (value === undefined || value === null || value === '')) {
           errors.push({
             row: rowIndex,
             column: column.key,
             message: `${column.key} is required`,
-            value
+            value,
           });
         }
-        
+
         if (column.validator) {
           if (value === undefined || value === null || value === '') {
-            if (column.required !== false) { // Treat fields with validators as required unless explicitly optional
+            if (column.required !== false) {
+              // Treat fields with validators as required unless explicitly optional
               errors.push({
                 row: rowIndex,
                 column: column.key,
                 message: `${column.key} is required`,
-                value
+                value,
               });
             }
           } else {
@@ -299,7 +332,7 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
                   row: rowIndex,
                   column: column.key,
                   message: validationError.errors[0]?.message || 'Invalid value',
-                  value
+                  value,
                 });
               }
             }
@@ -309,16 +342,16 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
             row: rowIndex,
             column: column.key,
             message: `${column.key} is required`,
-            value
+            value,
           });
         }
       });
     });
-    
+
     if (errors.length > 0) {
       throw new UIValidationError('table', 'Table data validation failed', 'data', data);
     }
-    
+
     return validatedData;
   } catch (error) {
     if (error instanceof UIValidationError) {
@@ -335,7 +368,10 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
  * Safe validation functions that return validation results
  */
 
-export function safeValidateInputValue(value: string, type?: string): { success: boolean; data?: string; error?: UIInputError } {
+export function safeValidateInputValue(
+  value: string,
+  type?: string
+): { success: boolean; data?: string; error?: UIInputError } {
   try {
     const data = validateInputValue(value, type);
     return { success: true, data };
@@ -344,7 +380,10 @@ export function safeValidateInputValue(value: string, type?: string): { success:
   }
 }
 
-export function safeValidateSelectValue(value: string, options?: Array<{ value: string; label: string }>): { success: boolean; data?: string; error?: UIValidationError } {
+export function safeValidateSelectValue(
+  value: string,
+  options?: Array<{ value: string; label: string }>
+): { success: boolean; data?: string; error?: UIValidationError } {
   try {
     const data = validateSelectValue(value, options);
     return { success: true, data };
@@ -353,7 +392,10 @@ export function safeValidateSelectValue(value: string, options?: Array<{ value: 
   }
 }
 
-export function safeValidateFormData(data: Record<string, any>, schema: z.ZodSchema): { success: boolean; data?: any; error?: UIFormError } {
+export function safeValidateFormData(
+  data: Record<string, any>,
+  schema: z.ZodSchema
+): { success: boolean; data?: any; error?: UIFormError } {
   try {
     const validatedData = validateFormData(data, schema);
     return { success: true, data: validatedData };
@@ -362,7 +404,11 @@ export function safeValidateFormData(data: Record<string, any>, schema: z.ZodSch
   }
 }
 
-export function safeValidateDate(date: Date | string, minDate?: Date, maxDate?: Date): { success: boolean; data?: Date; error?: UIDateError } {
+export function safeValidateDate(
+  date: Date | string,
+  minDate?: Date,
+  maxDate?: Date
+): { success: boolean; data?: Date; error?: UIDateError } {
   try {
     const data = validateDate(date, minDate, maxDate);
     return { success: true, data };
@@ -370,4 +416,3 @@ export function safeValidateDate(date: Date | string, minDate?: Date, maxDate?: 
     return { success: false, error: error as UIDateError };
   }
 }
-

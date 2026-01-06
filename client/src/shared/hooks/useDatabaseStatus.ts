@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 export function useDatabaseStatus() {
   // Updated database status endpoint to match refactored routes

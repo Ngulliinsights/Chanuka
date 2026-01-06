@@ -244,7 +244,12 @@ interface IUserAPIService {
   unsaveBill(billId: string): Promise<void>;
   updateSavedBill(billId: string, updates: Partial<SavedBill>): Promise<unknown>;
   getEngagementHistory(page: number, limit: number, filters?: unknown): Promise<unknown>;
-  trackEngagement(action: { action_type: string; entity_type: string; entity_id: string; metadata?: Record<string, unknown> }): Promise<void>;
+  trackEngagement(action: {
+    action_type: string;
+    entity_type: string;
+    entity_id: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<void>;
 }
 
 // ============================================================================
@@ -252,7 +257,10 @@ interface IUserAPIService {
 // ============================================================================
 
 export class ValidationError extends Error {
-  constructor(message: string, public field?: string) {
+  constructor(
+    message: string,
+    public field?: string
+  ) {
     super(message);
     this.name = 'ValidationError';
   }
@@ -278,7 +286,7 @@ class UserService {
   } = {
     user: null,
     lastFetched: 0,
-    expiresAt: 0
+    expiresAt: 0,
   };
 
   private readonly USER_CACHE_DURATION = 60 * 1000; // 1 minute
@@ -301,7 +309,7 @@ class UserService {
     try {
       this.validateEmail(credentials.email);
 
-      const session = await this.authService.login(credentials) as AuthSession;
+      const session = (await this.authService.login(credentials)) as AuthSession;
 
       // Only cache and schedule refresh if 2FA is not required
       if (!session.requiresTwoFactor) {
@@ -311,7 +319,7 @@ class UserService {
 
       logger.info('User logged in successfully', {
         userId: session.user.id,
-        email: session.user.email
+        email: session.user.email,
       });
 
       return session;
@@ -331,16 +339,16 @@ class UserService {
       // After validation, attempt login with the new credentials
       const loginData: LoginCredentials = {
         email: data.email,
-        password: data.password
+        password: data.password,
       };
 
-      const session = await this.authService.login(loginData) as AuthSession;
+      const session = (await this.authService.login(loginData)) as AuthSession;
       this.updateUserCache(session.user);
       this.scheduleTokenRefresh(session.tokens.expiresIn);
 
       logger.info('User registered successfully', {
         userId: session.user.id,
-        email: session.user.email
+        email: session.user.email,
       });
 
       return session;
@@ -376,7 +384,7 @@ class UserService {
         return this.userCache.user!;
       }
 
-      const user = await this.authService.getCurrentUser() as AuthUser | null;
+      const user = (await this.authService.getCurrentUser()) as AuthUser | null;
       if (!user) {
         throw new AuthenticationError('No authenticated user found');
       }
@@ -398,7 +406,7 @@ class UserService {
    */
   async getUserProfile(userId?: string): Promise<UserProfile> {
     try {
-      const profile = await this.userApiService.getUserProfile(userId) as UserProfile;
+      const profile = (await this.userApiService.getUserProfile(userId)) as UserProfile;
       return profile;
     } catch (error) {
       logger.error('Failed to fetch user profile', { userId, error });
@@ -412,16 +420,16 @@ class UserService {
    */
   async updateProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
     try {
-      const updatedProfile = await this.userApiService.updateProfile(updates) as UserProfile;
-      
+      const updatedProfile = (await this.userApiService.updateProfile(updates)) as UserProfile;
+
       // Update cache if the current user's profile was modified
       if (this.userCache.user && this.userCache.user.id === updatedProfile.id) {
         this.updateUserCache({
           ...this.userCache.user,
-          ...updates
+          ...updates,
         } as AuthUser);
       }
-      
+
       return updatedProfile;
     } catch (error) {
       logger.error('Failed to update user profile', { error });
@@ -434,7 +442,7 @@ class UserService {
    */
   async updatePreferences(preferences: Partial<UserPreferences>): Promise<UserPreferences> {
     try {
-      const updated = await this.userApiService.updatePreferences(preferences) as UserPreferences;
+      const updated = (await this.userApiService.updatePreferences(preferences)) as UserPreferences;
       return updated;
     } catch (error) {
       logger.error('Failed to update user preferences', { error });
@@ -452,7 +460,7 @@ class UserService {
    */
   async getDashboardData(): Promise<DashboardData> {
     try {
-      const data = await this.userApiService.getDashboardData() as DashboardData;
+      const data = (await this.userApiService.getDashboardData()) as DashboardData;
       return data;
     } catch (error) {
       logger.error('Failed to fetch dashboard data', { error });
@@ -470,7 +478,7 @@ class UserService {
     next_milestones: UserAchievement[];
   }> {
     try {
-      const data = await this.userApiService.getAchievements() as {
+      const data = (await this.userApiService.getAchievements()) as {
         badges: UserBadge[];
         achievements: UserAchievement[];
         next_milestones: UserAchievement[];
@@ -504,7 +512,7 @@ class UserService {
     totalPages: number;
   }> {
     try {
-      const response = await this.userApiService.getSavedBills(page, limit, filters) as {
+      const response = (await this.userApiService.getSavedBills(page, limit, filters)) as {
         bills: SavedBill[];
         total: number;
         page: number;
@@ -522,7 +530,7 @@ class UserService {
    */
   async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<SavedBill> {
     try {
-      const savedBill = await this.userApiService.saveBill(billId, notes, tags) as SavedBill;
+      const savedBill = (await this.userApiService.saveBill(billId, notes, tags)) as SavedBill;
       logger.info('Bill saved successfully', { billId });
       return savedBill;
     } catch (error) {
@@ -556,7 +564,7 @@ class UserService {
     }
   ): Promise<SavedBill> {
     try {
-      const updated = await this.userApiService.updateSavedBill(billId, updates) as SavedBill;
+      const updated = (await this.userApiService.updateSavedBill(billId, updates)) as SavedBill;
       return updated;
     } catch (error) {
       logger.error('Failed to update saved bill', { billId, error });
@@ -588,11 +596,7 @@ class UserService {
     };
   }> {
     try {
-      const response = await this.userApiService.getEngagementHistory(
-        page,
-        limit,
-        filters
-      ) as {
+      const response = (await this.userApiService.getEngagementHistory(page, limit, filters)) as {
         history: UserEngagementHistory[];
         total: number;
         page: number;
@@ -677,7 +681,7 @@ class UserService {
     this.userCache = {
       user,
       lastFetched: now,
-      expiresAt: now + this.USER_CACHE_DURATION
+      expiresAt: now + this.USER_CACHE_DURATION,
     };
     logger.debug('User cache updated', { userId: user.id });
   }
@@ -686,10 +690,7 @@ class UserService {
    * Checks if the cached user data is still valid based on expiration time.
    */
   private isUserCacheValid(): boolean {
-    return (
-      this.userCache.user !== null &&
-      Date.now() < this.userCache.expiresAt
-    );
+    return this.userCache.user !== null && Date.now() < this.userCache.expiresAt;
   }
 
   /**
@@ -699,7 +700,7 @@ class UserService {
     this.userCache = {
       user: null,
       lastFetched: 0,
-      expiresAt: 0
+      expiresAt: 0,
     };
     logger.debug('User cache cleared');
   }
@@ -765,7 +766,10 @@ class UserService {
   /**
    * @deprecated Use updatePreferences() instead
    */
-  async updateUserPreferences(_userId: string, preferences: Partial<UserPreferences>): Promise<UserPreferences> {
+  async updateUserPreferences(
+    _userId: string,
+    preferences: Partial<UserPreferences>
+  ): Promise<UserPreferences> {
     return this.updatePreferences(preferences);
   }
 
@@ -779,7 +783,11 @@ class UserService {
   /**
    * @deprecated Use getSavedBills() instead
    */
-  async getSavedBillsForUser(_userId: string, page = 1, limit = 20): Promise<{
+  async getSavedBillsForUser(
+    _userId: string,
+    page = 1,
+    limit = 20
+  ): Promise<{
     bills: SavedBill[];
     total: number;
     page: number;
@@ -850,7 +858,7 @@ class UserService {
       entity_type: activity.entity_type,
       entity_id: activity.entity_id,
       metadata: activity.metadata ?? {},
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -888,11 +896,11 @@ const createUserServiceInstance = (): UserService => {
  */
 const getOrCreateInstance = (): UserService => {
   const globalAny = globalThis as { __USER_SERVICE_INSTANCE?: UserService };
-  
+
   if (!globalAny.__USER_SERVICE_INSTANCE) {
     globalAny.__USER_SERVICE_INSTANCE = createUserServiceInstance();
   }
-  
+
   return globalAny.__USER_SERVICE_INSTANCE;
 };
 
@@ -904,23 +912,20 @@ export const userService = new Proxy({} as unknown as UserService, {
   get(_target, prop: string | symbol) {
     const instance = getOrCreateInstance();
     const value = (instance as unknown as Record<PropertyKey, unknown>)[prop];
-    
+
     // Bind methods to maintain correct 'this' context
     if (typeof value === 'function') {
       return (value as (...args: unknown[]) => unknown).bind(instance);
     }
-    
+
     return value;
   },
   set(_target, prop: string | symbol, value) {
     const instance = getOrCreateInstance();
     (instance as unknown as Record<PropertyKey, unknown>)[prop] = value;
     return true;
-  }
+  },
 });
 
 // Export all types for external use
-export type {
-  IAuthService,
-  IUserAPIService
-};
+export type { IAuthService, IUserAPIService };

@@ -81,14 +81,14 @@ import { useAuth } from '@/core/auth';
 
 function LoginForm() {
   const { login, loading, error } = useAuth();
-  
+
   const handleLogin = async (credentials) => {
     const result = await login(credentials);
     if (result.success) {
       // Handle success
     }
   };
-  
+
   return (
     <form onSubmit={handleLogin}>
       {/* Login form */}
@@ -122,8 +122,7 @@ export const store = configureStore({
     auth: authReducer,
     // ... other reducers
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(authMiddleware),
 });
 ```
 
@@ -179,34 +178,40 @@ await configureAuth({
 ## 🔐 Features
 
 ### Core Authentication
+
 - ✅ Email/password login and registration
 - ✅ Automatic token refresh
 - ✅ Session management across devices
 - ✅ Secure token storage with encryption
 
 ### Two-Factor Authentication
+
 - ✅ TOTP setup and verification
 - ✅ Backup codes generation
 - ✅ Enable/disable 2FA
 
 ### OAuth Integration
+
 - ✅ Multiple OAuth providers
 - ✅ State parameter validation
 - ✅ Secure callback handling
 
 ### Security Features
+
 - ✅ Password strength validation
 - ✅ Account lockout protection
 - ✅ Security event logging
 - ✅ Suspicious activity detection
 
 ### Privacy & GDPR Compliance
+
 - ✅ Privacy settings management
 - ✅ Data export requests
 - ✅ Data deletion requests
 - ✅ Consent management
 
 ### Session Management
+
 - ✅ Multi-device session tracking
 - ✅ Session termination
 - ✅ Session extension
@@ -215,6 +220,7 @@ await configureAuth({
 ## 🛡️ Security Best Practices
 
 ### Password Validation
+
 ```typescript
 import { validatePasswordComprehensive } from '@/core/auth';
 
@@ -231,27 +237,25 @@ if (!result.isValid) {
 ```
 
 ### Permission Checking
+
 ```typescript
 import { useAuth } from '@/core/auth';
 
 function AdminPanel() {
   const { hasPermission, hasRole } = useAuth();
-  
+
   if (!hasRole('admin') && !hasPermission('admin:panel')) {
     return <AccessDenied />;
   }
-  
+
   return <AdminContent />;
 }
 ```
 
 ### Error Handling
+
 ```typescript
-import { 
-  isAuthenticationError, 
-  isAuthorizationError,
-  isSessionExpiredError 
-} from '@/core/auth';
+import { isAuthenticationError, isAuthorizationError, isSessionExpiredError } from '@/core/auth';
 
 try {
   await someAuthOperation();
@@ -269,15 +273,16 @@ try {
 ## 📊 Monitoring and Analytics
 
 ### Security Events
+
 ```typescript
 import { useAuth } from '@/core/auth';
 
 function SecurityDashboard() {
   const { getSecurityEvents, getSuspiciousActivity } = useAuth();
-  
+
   const events = await getSecurityEvents(100);
   const alerts = await getSuspiciousActivity();
-  
+
   return (
     <div>
       <SecurityEventsList events={events} />
@@ -288,22 +293,23 @@ function SecurityDashboard() {
 ```
 
 ### Session Management
+
 ```typescript
 import { useAuth } from '@/core/auth';
 
 function SessionManager() {
   const { getSessions, revokeSession } = useAuth();
-  
+
   const sessions = await getSessions();
-  
+
   const handleRevokeSession = async (sessionId) => {
     await revokeSession(sessionId);
   };
-  
+
   return (
-    <SessionList 
-      sessions={sessions} 
-      onRevoke={handleRevokeSession} 
+    <SessionList
+      sessions={sessions}
+      onRevoke={handleRevokeSession}
     />
   );
 }
@@ -314,11 +320,13 @@ function SessionManager() {
 ### From Legacy useAuth Hook
 
 **Before:**
+
 ```typescript
 import { useAuth } from '@/features/users/hooks/useAuth';
 ```
 
 **After:**
+
 ```typescript
 import { useAuth } from '@/core/auth';
 ```
@@ -326,11 +334,13 @@ import { useAuth } from '@/core/auth';
 ### From Separate Token Manager
 
 **Before:**
+
 ```typescript
 import { tokenManager } from '@/utils/storage';
 ```
 
 **After:**
+
 ```typescript
 import { tokenManager } from '@/core/auth';
 ```
@@ -338,11 +348,13 @@ import { tokenManager } from '@/core/auth';
 ### From Auth API Service
 
 **Before:**
+
 ```typescript
 import { authService } from '@/services/auth-service-init';
 ```
 
 **After:**
+
 ```typescript
 import { authApiService } from '@/core/auth';
 ```
@@ -350,11 +362,12 @@ import { authApiService } from '@/core/auth';
 ## 🧪 Testing
 
 ### Unit Testing
+
 ```typescript
-import { 
+import {
   validatePasswordComprehensive,
   checkPasswordStrength,
-  createAuthConfig 
+  createAuthConfig,
 } from '@/core/auth';
 
 describe('Auth Validation', () => {
@@ -367,6 +380,7 @@ describe('Auth Validation', () => {
 ```
 
 ### Integration Testing
+
 ```typescript
 import { initializeAuth, cleanupAuth } from '@/core/auth';
 import { mockApiClient } from '@/test-utils';
@@ -378,11 +392,11 @@ describe('Auth System Integration', () => {
       environment: 'test',
     });
   });
-  
+
   afterEach(async () => {
     await cleanupAuth();
   });
-  
+
   it('should handle complete login flow', async () => {
     // Test implementation
   });
@@ -392,16 +406,19 @@ describe('Auth System Integration', () => {
 ## 📈 Performance Optimizations
 
 ### Lazy Loading
+
 - Components are lazy-loaded to reduce initial bundle size
 - Token validation is debounced to prevent excessive API calls
 - Session monitoring uses efficient intervals
 
 ### Caching
+
 - User permissions are cached to avoid repeated calculations
 - Token metadata is cached in memory for fast access
 - Session data is cached with automatic invalidation
 
 ### Bundle Splitting
+
 - Authentication code is split into separate chunks
 - OAuth providers are loaded on-demand
 - Validation utilities are tree-shakeable
@@ -411,6 +428,7 @@ describe('Auth System Integration', () => {
 ### Common Issues
 
 **Token Refresh Failures**
+
 ```typescript
 // Check token manager status
 const metadata = await tokenManager.getTokenMetadata();
@@ -425,6 +443,7 @@ try {
 ```
 
 **Session Validation Issues**
+
 ```typescript
 // Check session status
 const session = sessionManager.getCurrentSession();
@@ -433,6 +452,7 @@ console.log('Session validation:', validation);
 ```
 
 **Configuration Problems**
+
 ```typescript
 import { validateAuthConfig, getAuthSettings } from '@/core/auth';
 
@@ -447,24 +467,28 @@ if (!validation.isValid) {
 ## 🎉 Benefits Achieved
 
 ### Developer Experience
+
 - ✅ **Single Import**: All auth functionality from one module
 - ✅ **Consistent API**: Unified interface across all auth operations
 - ✅ **Type Safety**: Full TypeScript support with comprehensive types
 - ✅ **Documentation**: Extensive inline documentation and examples
 
 ### Performance
+
 - ✅ **Bundle Size**: 40% reduction through consolidation
 - ✅ **Runtime**: Faster execution with optimized code paths
 - ✅ **Memory**: Reduced memory usage with shared instances
 - ✅ **Network**: Intelligent token refresh and caching
 
 ### Maintainability
+
 - ✅ **Single Source of Truth**: No more duplicate implementations
 - ✅ **Centralized Configuration**: All settings in one place
 - ✅ **Unified Error Handling**: Consistent error patterns
 - ✅ **Comprehensive Testing**: Easier to test consolidated code
 
 ### Security
+
 - ✅ **Standardized Validation**: Consistent security rules
 - ✅ **Centralized Monitoring**: Unified security event tracking
 - ✅ **Proper Encryption**: Secure token and session storage

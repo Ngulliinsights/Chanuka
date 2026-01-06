@@ -1,6 +1,6 @@
 /**
  * Core Performance Module - Modular Performance System
- * 
+ *
  * This module provides comprehensive performance monitoring including:
  * - Web Vitals tracking (LCP, FID, INP, CLS, FCP, TTFB)
  * - Performance budget monitoring and compliance
@@ -18,7 +18,7 @@ import type {
   PerformanceConfig,
   PerformanceMetric,
   PerformanceStats,
-  WebVitalsMetric
+  WebVitalsMetric,
 } from './types';
 import { WebVitalsMonitor } from './web-vitals';
 
@@ -26,24 +26,16 @@ import { WebVitalsMonitor } from './web-vitals';
 export * from './types';
 
 // Web Vitals monitoring
-export {
-  WebVitalsMonitor
-} from './web-vitals';
+export { WebVitalsMonitor } from './web-vitals';
 
 // Performance budgets
-export {
-  PerformanceBudgetChecker
-} from './budgets';
+export { PerformanceBudgetChecker } from './budgets';
 
 // Performance alerts
-export {
-  PerformanceAlertsManager
-} from './alerts';
+export { PerformanceAlertsManager } from './alerts';
 
 // Central monitoring system
-export {
-  PerformanceMonitor
-} from './monitor';
+export { PerformanceMonitor } from './monitor';
 
 // Convenience re-exports for common use cases
 export {
@@ -55,7 +47,7 @@ export {
   type PerformanceConfig,
   type PerformanceStats,
   type OptimizationSuggestion,
-  DEFAULT_PERFORMANCE_CONFIG
+  DEFAULT_PERFORMANCE_CONFIG,
 } from './types';
 
 // Lazy-loaded singleton instance to avoid initialization issues
@@ -109,9 +101,9 @@ export function checkBudget(metric: PerformanceMetric): BudgetCheckResult {
 }
 
 export function setBudget(
-  metric: string, 
-  budget: number, 
-  warning: number, 
+  metric: string,
+  budget: number,
+  warning: number,
   description?: string
 ): void {
   const monitor = getPerformanceMonitor();
@@ -154,78 +146,72 @@ export function stopPerformanceMonitoring(): void {
   return getPerformanceMonitor().stopMonitoring();
 }
 
-export function measureAsync<T>(
-  name: string,
-  operation: () => Promise<T>
-): Promise<T> {
+export function measureAsync<T>(name: string, operation: () => Promise<T>): Promise<T> {
   return (async () => {
     const startTime = performance.now();
-    
+
     try {
       const result = await operation();
       const duration = performance.now() - startTime;
-      
+
       await recordMetric({
         name,
         value: duration,
         timestamp: new Date(),
         category: 'custom',
-        metadata: { type: 'async-operation' }
+        metadata: { type: 'async-operation' },
       });
-      
+
       return result;
     } catch (error) {
       const duration = performance.now() - startTime;
-      
+
       await recordMetric({
         name: `${name}-error`,
         value: duration,
         timestamp: new Date(),
         category: 'custom',
-        metadata: { type: 'async-operation-error', error: String(error) }
+        metadata: { type: 'async-operation-error', error: String(error) },
       });
-      
+
       throw error;
     }
   })();
 }
 
-export function measureSync<T>(
-  name: string,
-  operation: () => T
-): T {
+export function measureSync<T>(name: string, operation: () => T): T {
   const startTime = performance.now();
-  
+
   try {
     const result = operation();
     const duration = performance.now() - startTime;
-    
+
     // Record metric asynchronously to not block the operation
     recordMetric({
       name,
       value: duration,
       timestamp: new Date(),
       category: 'custom',
-      metadata: { type: 'sync-operation' }
+      metadata: { type: 'sync-operation' },
     }).catch(error => {
       console.warn('Failed to record sync metric:', error);
     });
-    
+
     return result;
   } catch (error) {
     const duration = performance.now() - startTime;
-    
+
     // Record error metric asynchronously
     recordMetric({
       name: `${name}-error`,
       value: duration,
       timestamp: new Date(),
       category: 'custom',
-      metadata: { type: 'sync-operation-error', error: String(error) }
+      metadata: { type: 'sync-operation-error', error: String(error) },
     }).catch(recordError => {
       console.warn('Failed to record sync error metric:', recordError);
     });
-    
+
     throw error;
   }
 }
@@ -233,7 +219,7 @@ export function measureSync<T>(
 // Performance timing utilities
 export function startTiming(name: string): () => Promise<void> {
   const startTime = performance.now();
-  
+
   return async () => {
     const duration = performance.now() - startTime;
     await recordMetric({
@@ -241,7 +227,7 @@ export function startTiming(name: string): () => Promise<void> {
       value: duration,
       timestamp: new Date(),
       category: 'custom',
-      metadata: { type: 'manual-timing' }
+      metadata: { type: 'manual-timing' },
     });
   };
 }
@@ -252,21 +238,25 @@ export function markPerformance(name: string): void {
   }
 }
 
-export function measurePerformance(name: string, startMark: string, endMark?: string): number | null {
+export function measurePerformance(
+  name: string,
+  startMark: string,
+  endMark?: string
+): number | null {
   if (typeof performance === 'undefined' || !performance.measure) {
     return null;
   }
-  
+
   try {
     if (endMark) {
       performance.measure(name, startMark, endMark);
     } else {
       performance.measure(name, startMark);
     }
-    
+
     const entries = performance.getEntriesByName(name, 'measure');
     const latestEntry = entries[entries.length - 1];
-    
+
     if (latestEntry) {
       // Record the measurement as a custom metric
       recordMetric({
@@ -274,21 +264,21 @@ export function measurePerformance(name: string, startMark: string, endMark?: st
         value: latestEntry.duration,
         timestamp: new Date(),
         category: 'custom',
-        metadata: { 
+        metadata: {
           type: 'performance-measure',
           startMark,
-          endMark
-        }
+          endMark,
+        },
       }).catch(error => {
         console.warn('Failed to record performance measure:', error);
       });
-      
+
       return latestEntry.duration;
     }
   } catch (error) {
     console.warn('Failed to measure performance:', error);
   }
-  
+
   return null;
 }
 
@@ -299,10 +289,10 @@ export const performanceUtils = {
   WebVitalsMonitor,
   PerformanceBudgetChecker,
   PerformanceAlertsManager,
-  
+
   // Getter function for lazy initialization
   getPerformanceMonitor,
-  
+
   // Convenience functions
   recordMetric,
   getWebVitalsScores,
@@ -320,13 +310,13 @@ export const performanceUtils = {
   resetPerformanceData,
   updatePerformanceConfig,
   stopPerformanceMonitoring,
-  
+
   // Measurement utilities
   measureAsync,
   measureSync,
   startTiming,
   markPerformance,
-  measurePerformance
+  measurePerformance,
 };
 
 // Remove duplicate export - keep only the default export

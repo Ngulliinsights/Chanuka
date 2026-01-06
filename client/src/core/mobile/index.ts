@@ -1,13 +1,13 @@
 /**
  * Mobile Core Module
- * 
+ *
  * Unified mobile utilities providing comprehensive support including:
  * - Advanced Touch Gesture Recognition
  * - Intelligent Device Detection
  * - Responsive Layout Management
  * - Mobile-Specific Error Handling
  * - Performance Optimization for Mobile Devices
- * 
+ *
  * @module core/mobile
  * @version 2.0.0
  */
@@ -213,8 +213,8 @@ export function initializeMobileUtils(config?: {
       type: deviceInfo.isMobile ? 'mobile' : deviceInfo.isTablet ? 'tablet' : 'desktop',
       screenSize: deviceInfo.screenSize,
       hasTouch: deviceInfo.hasTouch,
-      platform: deviceInfo.platform
-    }
+      platform: deviceInfo.platform,
+    },
   });
 }
 
@@ -267,5 +267,5 @@ export default {
 
   // Lifecycle
   initializeMobileUtils,
-  destroyMobileUtils
+  destroyMobileUtils,
 };

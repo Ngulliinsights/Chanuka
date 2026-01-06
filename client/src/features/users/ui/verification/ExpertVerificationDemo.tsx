@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 
-import { 
-  Expert, 
-  CredibilityMetrics, 
+import {
+  Expert,
+  CredibilityMetrics,
   CommunityValidation as CommunityValidationType,
   VerificationWorkflow as VerificationWorkflowType,
-  ExpertConsensus as ExpertConsensusType
+  ExpertConsensus as ExpertConsensusType,
 } from '@client/features/users/types';
-
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
-import { 
-  ExpertBadge, 
+import {
+  ExpertBadge,
   ExpertBadgeGroup,
   CredibilityIndicator,
   CredibilityBreakdown,
@@ -23,13 +28,12 @@ import {
   ValidationSummary,
   VerificationWorkflow,
   ExpertConsensus,
-  ConsensusIndicator
+  ConsensusIndicator,
 } from './index';
-
 
 /**
  * ExpertVerificationDemo - Comprehensive demo of the expert verification system
- * 
+ *
  * This component demonstrates all the expert verification features:
  * - Expert badges and credibility scoring
  * - Expert profile cards with credentials
@@ -54,7 +58,7 @@ export function ExpertVerificationDemo() {
         institution: 'Harvard Law School',
         year: 2010,
         verified: true,
-        verificationDate: '2023-01-15T00:00:00Z'
+        verificationDate: '2023-01-15T00:00:00Z',
       },
       {
         id: 'cred-2',
@@ -63,7 +67,7 @@ export function ExpertVerificationDemo() {
         institution: 'State Bar of Massachusetts',
         year: 2011,
         verified: true,
-        verificationDate: '2023-01-15T00:00:00Z'
+        verificationDate: '2023-01-15T00:00:00Z',
       },
       {
         id: 'cred-3',
@@ -72,8 +76,8 @@ export function ExpertVerificationDemo() {
         institution: 'Department of Justice',
         year: 2015,
         verified: true,
-        verificationDate: '2023-01-15T00:00:00Z'
-      }
+        verificationDate: '2023-01-15T00:00:00Z',
+      },
     ],
     affiliations: [
       {
@@ -83,7 +87,7 @@ export function ExpertVerificationDemo() {
         type: 'academic',
         current: true,
         verified: true,
-        startDate: '2018-09-01T00:00:00Z'
+        startDate: '2018-09-01T00:00:00Z',
       },
       {
         id: 'aff-2',
@@ -92,10 +96,15 @@ export function ExpertVerificationDemo() {
         type: 'ngo',
         current: true,
         verified: true,
-        startDate: '2020-01-01T00:00:00Z'
-      }
+        startDate: '2020-01-01T00:00:00Z',
+      },
     ],
-    specializations: ['Constitutional Law', 'Civil Rights', 'Federal Legislation', 'Supreme Court Cases'],
+    specializations: [
+      'Constitutional Law',
+      'Civil Rights',
+      'Federal Legislation',
+      'Supreme Court Cases',
+    ],
     credibilityScore: 0.92,
     contributionCount: 47,
     avgCommunityRating: 4.7,
@@ -105,8 +114,8 @@ export function ExpertVerificationDemo() {
     contactInfo: {
       email: 'sarah.johnson@harvard.edu',
       website: 'https://hls.harvard.edu/faculty/sarah-johnson',
-      linkedin: 'https://linkedin.com/in/sarah-johnson-law'
-    }
+      linkedin: 'https://linkedin.com/in/sarah-johnson-law',
+    },
   };
 
   const mockCredibilityMetrics: CredibilityMetrics = {
@@ -114,42 +123,44 @@ export function ExpertVerificationDemo() {
     overallScore: 0.92,
     components: {
       credentialScore: 0.95,
-      affiliationScore: 0.90,
+      affiliationScore: 0.9,
       communityScore: 0.88,
       contributionQuality: 0.94,
-      consensusAlignment: 0.91
+      consensusAlignment: 0.91,
     },
     methodology: {
-      description: 'Credibility scores are calculated using a weighted combination of verified credentials, institutional affiliations, community validation, contribution quality, and alignment with expert consensus.',
+      description:
+        'Credibility scores are calculated using a weighted combination of verified credentials, institutional affiliations, community validation, contribution quality, and alignment with expert consensus.',
       factors: [
         {
           name: 'Verified Credentials',
           weight: 0.25,
-          description: 'Education, certifications, and professional experience verified through official channels'
+          description:
+            'Education, certifications, and professional experience verified through official channels',
         },
         {
           name: 'Institutional Affiliations',
-          weight: 0.20,
-          description: 'Current and former positions at recognized institutions and organizations'
+          weight: 0.2,
+          description: 'Current and former positions at recognized institutions and organizations',
         },
         {
           name: 'Community Validation',
-          weight: 0.20,
-          description: 'Peer recognition and community ratings from other verified experts'
+          weight: 0.2,
+          description: 'Peer recognition and community ratings from other verified experts',
         },
         {
           name: 'Contribution Quality',
           weight: 0.25,
-          description: 'Quality, accuracy, and helpfulness of contributions over time'
+          description: 'Quality, accuracy, and helpfulness of contributions over time',
         },
         {
           name: 'Expert Consensus Alignment',
-          weight: 0.10,
-          description: 'Alignment with established expert consensus on key issues'
-        }
-      ]
+          weight: 0.1,
+          description: 'Alignment with established expert consensus on key issues',
+        },
+      ],
     },
-    lastCalculated: '2024-01-15T10:30:00Z'
+    lastCalculated: '2024-01-15T10:30:00Z',
   };
 
   const mockCommunityValidation: CommunityValidationType = {
@@ -157,7 +168,7 @@ export function ExpertVerificationDemo() {
     downvotes: 8,
     comments: 23,
     userVote: null,
-    validationScore: 0.89
+    validationScore: 0.89,
   };
 
   const mockVerificationWorkflow: VerificationWorkflowType = {
@@ -171,19 +182,20 @@ export function ExpertVerificationDemo() {
     communityFeedback: [
       {
         userId: 'user-001',
-        feedback: 'This analysis is thorough and well-sourced. The constitutional references are accurate.',
+        feedback:
+          'This analysis is thorough and well-sourced. The constitutional references are accurate.',
         vote: 'approve',
-        timestamp: '2024-01-14T15:30:00Z'
+        timestamp: '2024-01-14T15:30:00Z',
       },
       {
         userId: 'user-002',
         feedback: 'Good analysis but could benefit from more recent case law examples.',
         vote: 'needs_revision',
-        timestamp: '2024-01-14T16:45:00Z'
-      }
+        timestamp: '2024-01-14T16:45:00Z',
+      },
     ],
     createdAt: '2024-01-14T10:00:00Z',
-    updatedAt: '2024-01-14T16:45:00Z'
+    updatedAt: '2024-01-14T16:45:00Z',
   };
 
   const mockExpertConsensus: ExpertConsensusType = {
@@ -191,21 +203,24 @@ export function ExpertVerificationDemo() {
     topic: 'Constitutional implications of federal education funding requirements',
     totalExperts: 15,
     agreementLevel: 0.73,
-    majorityPosition: 'The federal funding provisions are consistent with established precedent under South Dakota v. Dole, as they represent conditional spending rather than coercive mandates.',
+    majorityPosition:
+      'The federal funding provisions are consistent with established precedent under South Dakota v. Dole, as they represent conditional spending rather than coercive mandates.',
     minorityPositions: [
       {
-        position: 'The funding requirements may exceed federal authority by effectively coercing state compliance through financial pressure.',
+        position:
+          'The funding requirements may exceed federal authority by effectively coercing state compliance through financial pressure.',
         expertCount: 3,
-        experts: ['expert-002', 'expert-003', 'expert-004']
+        experts: ['expert-002', 'expert-003', 'expert-004'],
       },
       {
-        position: 'Additional constitutional review is needed to assess the balance between federal interests and state autonomy.',
+        position:
+          'Additional constitutional review is needed to assess the balance between federal interests and state autonomy.',
         expertCount: 1,
-        experts: ['expert-005']
-      }
+        experts: ['expert-005'],
+      },
     ],
     controversyLevel: 'medium',
-    lastUpdated: '2024-01-15T14:20:00Z'
+    lastUpdated: '2024-01-15T14:20:00Z',
   };
 
   const handleVote = async (contributionId: string, vote: 'up' | 'down') => {
@@ -239,8 +254,9 @@ export function ExpertVerificationDemo() {
         <CardHeader>
           <CardTitle className="text-2xl">Expert Verification System Demo</CardTitle>
           <CardDescription>
-            Comprehensive demonstration of the expert verification and credibility system components.
-            This system ensures transparency, builds trust, and enables community validation of expert contributions.
+            Comprehensive demonstration of the expert verification and credibility system
+            components. This system ensures transparency, builds trust, and enables community
+            validation of expert contributions.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -260,19 +276,28 @@ export function ExpertVerificationDemo() {
             <CardHeader>
               <CardTitle>Expert Badges</CardTitle>
               <CardDescription>
-                Verification badges indicate expert status and credibility levels using existing Chanuka design system classes.
+                Verification badges indicate expert status and credibility levels using existing
+                Chanuka design system classes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="text-sm font-medium mb-3">Individual Badges</h4>
                 <div className="flex flex-wrap gap-4">
-                  <ExpertBadge verificationType="official" credibilityScore={0.92} showScore={true} />
+                  <ExpertBadge
+                    verificationType="official"
+                    credibilityScore={0.92}
+                    showScore={true}
+                  />
                   <ExpertBadge verificationType="domain" credibilityScore={0.78} showScore={true} />
-                  <ExpertBadge verificationType="identity" credibilityScore={0.65} showScore={true} />
+                  <ExpertBadge
+                    verificationType="identity"
+                    credibilityScore={0.65}
+                    showScore={true}
+                  />
                 </div>
               </div>
-              
+
               <div>
                 <h4 className="text-sm font-medium mb-3">Badge Groups</h4>
                 <ExpertBadgeGroup
@@ -282,7 +307,7 @@ export function ExpertVerificationDemo() {
                   affiliationType="academic"
                 />
               </div>
-              
+
               <div>
                 <h4 className="text-sm font-medium mb-3">Size Variations</h4>
                 <div className="flex items-center gap-4">
@@ -298,7 +323,7 @@ export function ExpertVerificationDemo() {
         <TabsContent value="credibility" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <CredibilityScoring metrics={mockCredibilityMetrics} />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Credibility Indicators</CardTitle>
@@ -314,7 +339,7 @@ export function ExpertVerificationDemo() {
                     <CredibilityIndicator score={0.32} />
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="text-sm font-medium mb-2">Size Variations</h4>
                   <div className="space-y-2">
@@ -330,16 +355,16 @@ export function ExpertVerificationDemo() {
 
         <TabsContent value="profiles" className="space-y-4">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <ExpertProfileCard 
+            <ExpertProfileCard
               expert={mockExpert}
-              onViewProfile={(id) => console.log('View profile:', id)}
-              onContact={(id) => console.log('Contact expert:', id)}
+              onViewProfile={id => console.log('View profile:', id)}
+              onContact={id => console.log('Contact expert:', id)}
             />
-            
-            <ExpertProfileCard 
+
+            <ExpertProfileCard
               expert={mockExpert}
               compact={true}
-              onViewProfile={(id) => console.log('View profile:', id)}
+              onViewProfile={id => console.log('View profile:', id)}
             />
           </div>
         </TabsContent>
@@ -353,7 +378,7 @@ export function ExpertVerificationDemo() {
               onComment={handleComment}
               onReport={handleReport}
             />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Validation Summaries</CardTitle>
@@ -363,12 +388,28 @@ export function ExpertVerificationDemo() {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Different Validation Scores</h4>
                   <div className="space-y-2">
-                    <ValidationSummary validation={{ ...mockCommunityValidation, validationScore: 0.89 }} />
-                    <ValidationSummary validation={{ ...mockCommunityValidation, upvotes: 45, downvotes: 12, validationScore: 0.65 }} />
-                    <ValidationSummary validation={{ ...mockCommunityValidation, upvotes: 15, downvotes: 28, validationScore: 0.32 }} />
+                    <ValidationSummary
+                      validation={{ ...mockCommunityValidation, validationScore: 0.89 }}
+                    />
+                    <ValidationSummary
+                      validation={{
+                        ...mockCommunityValidation,
+                        upvotes: 45,
+                        downvotes: 12,
+                        validationScore: 0.65,
+                      }}
+                    />
+                    <ValidationSummary
+                      validation={{
+                        ...mockCommunityValidation,
+                        upvotes: 15,
+                        downvotes: 28,
+                        validationScore: 0.32,
+                      }}
+                    />
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="text-sm font-medium mb-2">Compact Version</h4>
                   <CommunityValidation
@@ -396,34 +437,36 @@ export function ExpertVerificationDemo() {
         <TabsContent value="consensus" className="space-y-4">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             <ExpertConsensus consensus={mockExpertConsensus} />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Consensus Indicators</CardTitle>
-                <CardDescription>Compact consensus displays for lists and summaries</CardDescription>
+                <CardDescription>
+                  Compact consensus displays for lists and summaries
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="text-sm font-medium mb-2">Different Agreement Levels</h4>
                   <div className="space-y-2">
-                    <ConsensusIndicator 
-                      agreementLevel={0.92} 
-                      totalExperts={15} 
-                      controversyLevel="low" 
+                    <ConsensusIndicator
+                      agreementLevel={0.92}
+                      totalExperts={15}
+                      controversyLevel="low"
                     />
-                    <ConsensusIndicator 
-                      agreementLevel={0.73} 
-                      totalExperts={12} 
-                      controversyLevel="medium" 
+                    <ConsensusIndicator
+                      agreementLevel={0.73}
+                      totalExperts={12}
+                      controversyLevel="medium"
                     />
-                    <ConsensusIndicator 
-                      agreementLevel={0.45} 
-                      totalExperts={18} 
-                      controversyLevel="high" 
+                    <ConsensusIndicator
+                      agreementLevel={0.45}
+                      totalExperts={18}
+                      controversyLevel="high"
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="text-sm font-medium mb-2">Compact Version</h4>
                   <ExpertConsensus consensus={mockExpertConsensus} compact={true} />

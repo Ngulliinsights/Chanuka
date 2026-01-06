@@ -6,8 +6,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
+
 import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import {
   ErrorMonitor,
   ErrorMetrics,

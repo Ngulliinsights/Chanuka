@@ -22,21 +22,21 @@ export interface UseFontFallbackOptions {
  * Common font stacks with fallbacks
  */
 export const FONT_STACKS: Record<string, FontFallbackConfig> = {
-  'Inter': {
+  Inter: {
     primary: 'Inter',
     fallbacks: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto'],
-    generic: 'sans-serif'
+    generic: 'sans-serif',
   },
-  'Roboto': {
+  Roboto: {
     primary: 'Roboto',
     fallbacks: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI'],
-    generic: 'sans-serif'
+    generic: 'sans-serif',
   },
-  'system': {
+  system: {
     primary: '-apple-system',
     fallbacks: ['BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue'],
-    generic: 'sans-serif'
-  }
+    generic: 'sans-serif',
+  },
 };
 
 /**
@@ -50,15 +50,14 @@ export function useFontFallback(
   const [hasError, setHasError] = useState(false);
   const { timeout = 3000, enableSwap = true } = options;
 
-  const fontConfig = typeof config === 'string' 
-    ? FONT_STACKS[config] || { primary: config, fallbacks: [], generic: 'sans-serif' }
-    : config;
+  const fontConfig =
+    typeof config === 'string'
+      ? FONT_STACKS[config] || { primary: config, fallbacks: [], generic: 'sans-serif' }
+      : config;
 
-  const fontFamilyValue = [
-    fontConfig.primary,
-    ...fontConfig.fallbacks,
-    fontConfig.generic
-  ].join(', ');
+  const fontFamilyValue = [fontConfig.primary, ...fontConfig.fallbacks, fontConfig.generic].join(
+    ', '
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('FontFace' in window)) {
@@ -72,7 +71,7 @@ export function useFontFallback(
       try {
         const fontFace = new FontFace(fontConfig.primary, `url(${fontConfig.primary})`);
         await fontFace.load();
-        
+
         if (mounted) {
           document.fonts.add(fontFace);
           setIsLoaded(true);
@@ -106,8 +105,8 @@ export function useFontFallback(
     fontFamily: fontFamilyValue,
     style: {
       fontFamily: fontFamilyValue,
-      fontDisplay: enableSwap ? 'swap' : 'auto'
-    }
+      fontDisplay: enableSwap ? 'swap' : 'auto',
+    },
   };
 }
 
@@ -119,14 +118,16 @@ export function preloadFonts(fonts: Array<string | FontFallbackConfig>): Promise
     return Promise.resolve([]);
   }
 
-  const promises = fonts.map((font) => {
-    const config = typeof font === 'string'
-      ? FONT_STACKS[font] || { primary: font, fallbacks: [], generic: 'sans-serif' }
-      : font;
+  const promises = fonts.map(font => {
+    const config =
+      typeof font === 'string'
+        ? FONT_STACKS[font] || { primary: font, fallbacks: [], generic: 'sans-serif' }
+        : font;
 
     const fontFace = new FontFace(config.primary, `url(${config.primary})`);
-    
-    return fontFace.load()
+
+    return fontFace
+      .load()
       .then(() => {
         document.fonts.add(fontFace);
       })

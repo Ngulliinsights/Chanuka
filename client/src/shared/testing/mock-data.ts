@@ -7,6 +7,7 @@
  */
 
 import type { DiscussionThread } from '@/features/community/types';
+
 import { logger } from '../../utils/logger';
 
 // Note: These imports would need to be updated based on actual mock data structure
@@ -51,10 +52,10 @@ const defaultConfig: MockDataServiceConfig = {
     'activityItems',
     'trendingTopics',
     'expertInsights',
-    'liveEngagementMetrics'
+    'liveEngagementMetrics',
   ],
   enableCaching: true,
-  enableValidation: true
+  enableValidation: true,
 };
 
 /**
@@ -70,7 +71,7 @@ class MockDataService {
 
     logger.info('Mock Data Service initialized', {
       component: 'MockDataService',
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -80,14 +81,14 @@ class MockDataService {
   async initialize(): Promise<void> {
     if (this.initialized) {
       logger.warn('Mock Data Service already initialized', {
-        component: 'MockDataService'
+        component: 'MockDataService',
       });
       return;
     }
 
     try {
       logger.info('Initializing Mock Data Service', {
-        component: 'MockDataService'
+        component: 'MockDataService',
       });
 
       // Validate data integrity if enabled
@@ -96,12 +97,12 @@ class MockDataService {
         if (!validation.valid) {
           logger.error('Data integrity validation failed', {
             component: 'MockDataService',
-            errors: validation.errors
+            errors: validation.errors,
           });
           throw new Error(`Data integrity validation failed: ${validation.errors.join(', ')}`);
         }
         logger.info('Data integrity validation passed', {
-          component: 'MockDataService'
+          component: 'MockDataService',
         });
       }
 
@@ -122,12 +123,12 @@ class MockDataService {
 
       logger.info('Mock Data Service initialization completed', {
         component: 'MockDataService',
-        cacheStats: this.getCacheStats()
+        cacheStats: this.getCacheStats(),
       });
     } catch (error) {
       logger.error('Failed to initialize Mock Data Service', {
         component: 'MockDataService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -140,7 +141,7 @@ class MockDataService {
     // Placeholder implementation
     logger.info('Real-time simulation started', {
       component: 'MockDataService',
-      interval: this.config.realTimeEventInterval
+      interval: this.config.realTimeEventInterval,
     });
   }
 
@@ -149,7 +150,7 @@ class MockDataService {
    */
   stopRealTimeSimulation(): void {
     logger.info('Real-time simulation stopped', {
-      component: 'MockDataService'
+      component: 'MockDataService',
     });
   }
 
@@ -184,7 +185,7 @@ class MockDataService {
     } catch (error) {
       logger.error(`Failed to load data for ${key}`, {
         component: 'MockDataService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -199,13 +200,13 @@ class MockDataService {
     }
 
     const results: Record<string, any> = {};
-    const promises = keys.map(async (key) => {
+    const promises = keys.map(async key => {
       try {
         results[key] = await this.loadData(key);
       } catch (error) {
         logger.error(`Failed to load ${key} in batch`, {
           component: 'MockDataService',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
         results[key] = null;
       }
@@ -257,7 +258,7 @@ class MockDataService {
     return {
       size: 0,
       hits: 0,
-      misses: 0
+      misses: 0,
     };
   }
 
@@ -267,7 +268,7 @@ class MockDataService {
   validateDataIntegrity() {
     return {
       valid: true,
-      errors: []
+      errors: [],
     };
   }
 
@@ -304,7 +305,7 @@ class MockDataService {
       cacheEnabled: this.config.enableCaching,
       validationEnabled: this.config.enableValidation,
       realTimeListeners: this.realTimeListeners.length,
-      cacheStats: this.getCacheStats()
+      cacheStats: this.getCacheStats(),
     };
   }
 
@@ -321,7 +322,7 @@ class MockDataService {
     this.initialized = false;
 
     logger.info('Mock Data Service shutdown completed', {
-      component: 'MockDataService'
+      component: 'MockDataService',
     });
   }
 }
@@ -334,7 +335,9 @@ export const mockDataService = new MockDataService();
 /**
  * Initialize mock data service with custom configuration
  */
-export const initializeMockDataService = async (config?: Partial<MockDataServiceConfig>): Promise<void> => {
+export const initializeMockDataService = async (
+  config?: Partial<MockDataServiceConfig>
+): Promise<void> => {
   const service = new MockDataService(config);
   await service.initialize();
   return;

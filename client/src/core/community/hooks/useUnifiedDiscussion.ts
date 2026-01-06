@@ -1,9 +1,9 @@
 /**
  * Unified Discussion Hook
- * 
+ *
  * Consolidates useDiscussion.ts functionality while resolving:
  * - Mock thread creation from comments data (lines 82-96)
- * - Incomplete moderation implementations (lines 217-240)  
+ * - Incomplete moderation implementations (lines 217-240)
  * - Type casting issues (as any usage)
  * - React Query + WebSocket event coordination
  */
@@ -14,7 +14,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { globalApiClient } from '../../api/client';
 import { StateSyncService } from '../services/state-sync.service';
 import { WebSocketManager } from '../services/websocket-manager';
-
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
@@ -50,14 +49,14 @@ export function useUnifiedDiscussion({
   });
 
   // WebSocket manager for real-time features
-  const wsManager = useMemo(() => 
-    enableRealtime ? WebSocketManager.getInstance() : null, 
+  const wsManager = useMemo(
+    () => (enableRealtime ? WebSocketManager.getInstance() : null),
     [enableRealtime]
   );
 
   // State sync service for coordinating React Query + EventBus
-  const stateSyncService = useMemo(() => 
-    new StateSyncService(queryClient, wsManager), 
+  const stateSyncService = useMemo(
+    () => new StateSyncService(queryClient, wsManager),
     [queryClient, wsManager]
   );
 
@@ -101,7 +100,7 @@ export function useUnifiedDiscussion({
 
   // Current thread (if selected)
   const currentThread = useMemo(() => {
-    return discussionState.currentThreadId 
+    return discussionState.currentThreadId
       ? threads.find(t => t.id === discussionState.currentThreadId)
       : undefined;
   }, [threads, discussionState.currentThreadId]);
@@ -115,13 +114,13 @@ export function useUnifiedDiscussion({
       const response = await globalApiClient.post('/api/comments', data);
       return response.data as UnifiedComment;
     },
-    onSuccess: (newComment) => {
+    onSuccess: newComment => {
       // Update React Query cache
       queryClient.setQueryData(
         ['comments', billId, discussionState.sortBy, discussionState.filterBy],
         (old: UnifiedComment[] = []) => [newComment, ...old]
       );
-      
+
       // Sync with WebSocket if enabled
       stateSyncService.syncCommentCreated(newComment);
     },
@@ -134,16 +133,14 @@ export function useUnifiedDiscussion({
       });
       return response.data as UnifiedComment;
     },
-    onSuccess: (updatedComment) => {
+    onSuccess: updatedComment => {
       // Update React Query cache
       queryClient.setQueryData(
         ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => 
-          old.map(comment => 
-            comment.id === updatedComment.id ? updatedComment : comment
-          )
+        (old: UnifiedComment[] = []) =>
+          old.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
       );
-      
+
       // Sync with WebSocket
       stateSyncService.syncCommentUpdated(updatedComment);
     },
@@ -154,14 +151,13 @@ export function useUnifiedDiscussion({
       await globalApiClient.delete(`/api/comments/${commentId}`);
       return commentId;
     },
-    onSuccess: (commentId) => {
+    onSuccess: commentId => {
       // Update React Query cache
       queryClient.setQueryData(
         ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => 
-          old.filter(comment => comment.id !== commentId)
+        (old: UnifiedComment[] = []) => old.filter(comment => comment.id !== commentId)
       );
-      
+
       // Sync with WebSocket
       stateSyncService.syncCommentDeleted(commentId);
     },
@@ -172,16 +168,14 @@ export function useUnifiedDiscussion({
       const response = await globalApiClient.post(`/api/comments/${commentId}/vote`, { vote });
       return response.data as UnifiedComment;
     },
-    onSuccess: (updatedComment) => {
+    onSuccess: updatedComment => {
       // Update React Query cache
       queryClient.setQueryData(
         ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => 
-          old.map(comment => 
-            comment.id === updatedComment.id ? updatedComment : comment
-          )
+        (old: UnifiedComment[] = []) =>
+          old.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
       );
-      
+
       // Sync with WebSocket
       stateSyncService.syncCommentVoted(updatedComment);
     },
@@ -192,19 +186,19 @@ export function useUnifiedDiscussion({
       const response = await globalApiClient.post('/api/threads', data);
       return response.data as UnifiedThread;
     },
-    onSuccess: (newThread) => {
+    onSuccess: newThread => {
       // Update React Query cache
-      queryClient.setQueryData(
-        ['threads', billId],
-        (old: UnifiedThread[] = []) => [newThread, ...old]
-      );
-      
+      queryClient.setQueryData(['threads', billId], (old: UnifiedThread[] = []) => [
+        newThread,
+        ...old,
+      ]);
+
       // Auto-select the new thread
       setDiscussionState(prev => ({
         ...prev,
         currentThreadId: newThread.id,
       }));
-      
+
       // Sync with WebSocket
       stateSyncService.syncThreadCreated(newThread);
     },
@@ -235,7 +229,7 @@ export function useUnifiedDiscussion({
 
     const unsubscribers = [
       // Comment events
-      wsManager.on('comment:created', (data) => {
+      wsManager.on('comment:created', data => {
         if (data.comment.billId === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
@@ -244,47 +238,44 @@ export function useUnifiedDiscussion({
         }
       }),
 
-      wsManager.on('comment:updated', (data) => {
+      wsManager.on('comment:updated', data => {
         if (data.comment.billId === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-            (old: UnifiedComment[] = []) => 
-              old.map(comment => 
-                comment.id === data.comment.id ? data.comment : comment
-              )
+            (old: UnifiedComment[] = []) =>
+              old.map(comment => (comment.id === data.comment.id ? data.comment : comment))
           );
         }
       }),
 
-      wsManager.on('comment:deleted', (data) => {
+      wsManager.on('comment:deleted', data => {
         queryClient.setQueryData(
           ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-          (old: UnifiedComment[] = []) => 
-            old.filter(comment => comment.id !== data.commentId)
+          (old: UnifiedComment[] = []) => old.filter(comment => comment.id !== data.commentId)
         );
       }),
 
       // Typing indicators
-      wsManager.on('user:typing', (data) => {
+      wsManager.on('user:typing', data => {
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           setTypingUsers(prev => [...prev.filter(id => id !== data.userId), data.userId]);
         }
       }),
 
-      wsManager.on('user:stopped_typing', (data) => {
+      wsManager.on('user:stopped_typing', data => {
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           setTypingUsers(prev => prev.filter(id => id !== data.userId));
         }
       }),
 
       // Active users
-      wsManager.on('user:joined', (data) => {
+      wsManager.on('user:joined', data => {
         if (data.threadId === discussionState.currentThreadId) {
           setActiveUsers(prev => [...prev.filter(id => id !== data.userId), data.userId]);
         }
       }),
 
-      wsManager.on('user:left', (data) => {
+      wsManager.on('user:left', data => {
         if (data.threadId === discussionState.currentThreadId) {
           setActiveUsers(prev => prev.filter(id => id !== data.userId));
         }
@@ -304,31 +295,55 @@ export function useUnifiedDiscussion({
         wsManager.leaveRoom(`thread:${discussionState.currentThreadId}`);
       }
     };
-  }, [wsManager, billId, discussionState.currentThreadId, enableRealtime, enableTypingIndicators, queryClient, discussionState.sortBy, discussionState.filterBy]);
+  }, [
+    wsManager,
+    billId,
+    discussionState.currentThreadId,
+    enableRealtime,
+    enableTypingIndicators,
+    queryClient,
+    discussionState.sortBy,
+    discussionState.filterBy,
+  ]);
 
   // ============================================================================
   // ACTIONS
   // ============================================================================
 
-  const createComment = useCallback(async (data: CreateCommentRequest): Promise<UnifiedComment> => {
-    return createCommentMutation.mutateAsync(data);
-  }, [createCommentMutation]);
+  const createComment = useCallback(
+    async (data: CreateCommentRequest): Promise<UnifiedComment> => {
+      return createCommentMutation.mutateAsync(data);
+    },
+    [createCommentMutation]
+  );
 
-  const updateComment = useCallback(async (data: UpdateCommentRequest): Promise<UnifiedComment> => {
-    return updateCommentMutation.mutateAsync(data);
-  }, [updateCommentMutation]);
+  const updateComment = useCallback(
+    async (data: UpdateCommentRequest): Promise<UnifiedComment> => {
+      return updateCommentMutation.mutateAsync(data);
+    },
+    [updateCommentMutation]
+  );
 
-  const deleteComment = useCallback(async (commentId: string): Promise<void> => {
-    await deleteCommentMutation.mutateAsync(commentId);
-  }, [deleteCommentMutation]);
+  const deleteComment = useCallback(
+    async (commentId: string): Promise<void> => {
+      await deleteCommentMutation.mutateAsync(commentId);
+    },
+    [deleteCommentMutation]
+  );
 
-  const voteComment = useCallback(async (commentId: string, vote: 'up' | 'down'): Promise<void> => {
-    await voteCommentMutation.mutateAsync({ commentId, vote });
-  }, [voteCommentMutation]);
+  const voteComment = useCallback(
+    async (commentId: string, vote: 'up' | 'down'): Promise<void> => {
+      await voteCommentMutation.mutateAsync({ commentId, vote });
+    },
+    [voteCommentMutation]
+  );
 
-  const createThread = useCallback(async (data: CreateThreadRequest): Promise<UnifiedThread> => {
-    return createThreadMutation.mutateAsync(data);
-  }, [createThreadMutation]);
+  const createThread = useCallback(
+    async (data: CreateThreadRequest): Promise<UnifiedThread> => {
+      return createThreadMutation.mutateAsync(data);
+    },
+    [createThreadMutation]
+  );
 
   const selectThread = useCallback((threadId: string) => {
     setDiscussionState(prev => ({
@@ -337,9 +352,12 @@ export function useUnifiedDiscussion({
     }));
   }, []);
 
-  const reportContent = useCallback(async (data: ModerationRequest): Promise<void> => {
-    await reportContentMutation.mutateAsync(data);
-  }, [reportContentMutation]);
+  const reportContent = useCallback(
+    async (data: ModerationRequest): Promise<void> => {
+      await reportContentMutation.mutateAsync(data);
+    },
+    [reportContentMutation]
+  );
 
   const startTyping = useCallback(() => {
     if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
@@ -369,15 +387,15 @@ export function useUnifiedDiscussion({
     comments,
     threads,
     currentThread,
-    
+
     // Loading states
     isLoading: isLoadingComments || isLoadingThreads,
     isLoadingComments,
     isLoadingThreads,
-    
+
     // Error states
     error: commentsError?.message || threadsError?.message,
-    
+
     // Actions
     createComment,
     updateComment,
@@ -386,7 +404,7 @@ export function useUnifiedDiscussion({
     createThread,
     selectThread,
     reportContent,
-    
+
     // Real-time
     typingUsers,
     activeUsers,

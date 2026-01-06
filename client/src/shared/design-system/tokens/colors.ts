@@ -13,8 +13,8 @@ export const colorTokens = {
     200: '#b3cce1',
     300: '#8cb3d2',
     400: '#6699c3',
-    500: '#4080b4',  // Brand primary
-    600: '#0d3b66',  // Deepest - matches roadmap
+    500: '#4080b4', // Brand primary
+    600: '#0d3b66', // Deepest - matches roadmap
     700: '#0a2f54',
     800: '#072642',
     900: '#051c30',
@@ -29,7 +29,7 @@ export const colorTokens = {
     300: '#8cccd8',
     400: '#66bbcb',
     500: '#40aabe',
-    600: '#084c61',  // Matches roadmap
+    600: '#084c61', // Matches roadmap
     700: '#06414f',
     800: '#04363d',
     900: '#022b2b',
@@ -44,7 +44,7 @@ export const colorTokens = {
     300: '#ffc38c',
     400: '#ffaf66',
     500: '#ff9b40',
-    600: '#f38a1f',  // Matches roadmap
+    600: '#f38a1f', // Matches roadmap
     700: '#e67a0f',
     800: '#d96a00',
     900: '#cc5a00',
@@ -263,4 +263,3 @@ export const colorTokens = {
     },
   },
 } as const;
-

@@ -12,7 +12,7 @@ export const useProgressiveLoading = (stages: any[]) => ({
   progress: 0,
   isComplete: false,
   start: () => {},
-  reset: () => {}
+  reset: () => {},
 });
 
 export const useTimeoutAwareLoading = (operation: () => Promise<any>, _timeout: number) => ({
@@ -20,6 +20,5 @@ export const useTimeoutAwareLoading = (operation: () => Promise<any>, _timeout: 
   isLoading: false,
   hasTimedOut: false,
   result: null,
-  error: null
+  error: null,
 });
-

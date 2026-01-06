@@ -25,11 +25,11 @@ export function useLoadingRecovery(options: UseLoadingRecoveryOptions) {
 
   const recover = useCallback(() => {
     if (recoveryState.attempts >= options.maxRecoveryAttempts) {
-      setRecoveryState((prev) => ({ ...prev, canRecover: false }));
+      setRecoveryState(prev => ({ ...prev, canRecover: false }));
       return;
     }
 
-    setRecoveryState((prev) => ({
+    setRecoveryState(prev => ({
       ...prev,
       isRecovering: true,
       attempts: prev.attempts + 1,
@@ -37,7 +37,7 @@ export function useLoadingRecovery(options: UseLoadingRecoveryOptions) {
 
     setTimeout(() => {
       options.onRecoverySuccess();
-      setRecoveryState((prev) => ({ ...prev, isRecovering: false }));
+      setRecoveryState(prev => ({ ...prev, isRecovering: false }));
     }, 1000);
   }, [recoveryState.attempts, options]);
 

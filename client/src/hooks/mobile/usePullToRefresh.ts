@@ -51,7 +51,13 @@ interface UsePullToRefreshReturn {
  * @returns Object with refresh state and touch handlers
  */
 export function usePullToRefresh(config: PullToRefreshConfig): UsePullToRefreshReturn {
-  const { onRefresh, threshold = GESTURE_CONFIG.PULL_TO_REFRESH.threshold, maxDistance = GESTURE_CONFIG.PULL_TO_REFRESH.maxPullDistance, refreshing, disabled } = config;
+  const {
+    onRefresh,
+    threshold = GESTURE_CONFIG.PULL_TO_REFRESH.threshold,
+    maxDistance = GESTURE_CONFIG.PULL_TO_REFRESH.maxPullDistance,
+    refreshing,
+    disabled,
+  } = config;
 
   const [isRefreshing, setIsRefreshing] = useState(refreshing || false);
   const [pullDistance, setPullDistance] = useState(0);
@@ -59,28 +65,34 @@ export function usePullToRefresh(config: PullToRefreshConfig): UsePullToRefreshR
   const startY = useRef<number | null>(null);
   const isPulling = useRef(false);
 
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (disabled || isRefreshing) return;
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || isRefreshing) return;
 
-    const touch = e.touches[0];
-    startY.current = touch.clientY;
-    isPulling.current = false;
-  }, [disabled, isRefreshing]);
+      const touch = e.touches[0];
+      startY.current = touch.clientY;
+      isPulling.current = false;
+    },
+    [disabled, isRefreshing]
+  );
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (disabled || isRefreshing || !startY.current) return;
+  const onTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || isRefreshing || !startY.current) return;
 
-    const touch = e.touches[0];
-    const currentY = touch.clientY;
-    const deltaY = currentY - startY.current;
+      const touch = e.touches[0];
+      const currentY = touch.clientY;
+      const deltaY = currentY - startY.current;
 
-    // Only handle downward pulls from top
-    if (deltaY > 0 && window.scrollY === 0) {
-      isPulling.current = true;
-      const distance = Math.min(deltaY * GESTURE_CONFIG.PULL_TO_REFRESH.resistance, maxDistance);
-      setPullDistance(distance);
-    }
-  }, [disabled, isRefreshing, maxDistance]);
+      // Only handle downward pulls from top
+      if (deltaY > 0 && window.scrollY === 0) {
+        isPulling.current = true;
+        const distance = Math.min(deltaY * GESTURE_CONFIG.PULL_TO_REFRESH.resistance, maxDistance);
+        setPullDistance(distance);
+      }
+    },
+    [disabled, isRefreshing, maxDistance]
+  );
 
   const onTouchEnd = useCallback(async () => {
     if (disabled || !isPulling.current) return;

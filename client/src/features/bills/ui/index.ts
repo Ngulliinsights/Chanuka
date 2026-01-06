@@ -1,6 +1,6 @@
 /**
  * Bills Feature UI Components
- * 
+ *
  * Re-export from flattened structure for backward compatibility
  */
 

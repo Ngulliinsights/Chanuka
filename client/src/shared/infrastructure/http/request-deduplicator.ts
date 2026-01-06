@@ -20,7 +20,7 @@ export class RequestDeduplicator {
 
       console.debug('Request deduplicated', {
         key,
-        duplicateCount: count + 1
+        duplicateCount: count + 1,
       });
 
       return this.pendingRequests.get(key) as Promise<T>;
@@ -35,7 +35,7 @@ export class RequestDeduplicator {
           console.info('Deduplicated request completed', {
             key,
             totalRequests: totalCount,
-            savedRequests: totalCount - 1
+            savedRequests: totalCount - 1,
           });
         }
         return result;
@@ -43,7 +43,7 @@ export class RequestDeduplicator {
       .catch(error => {
         console.error('Deduplicated request failed', {
           key,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
         throw error;
       })
@@ -72,12 +72,14 @@ export class RequestDeduplicator {
     pendingRequests: number;
     totalDuplicates: number;
   } {
-    const totalDuplicates = Array.from(this.requestCounts.values())
-      .reduce((sum, count) => sum + Math.max(0, count - 1), 0);
+    const totalDuplicates = Array.from(this.requestCounts.values()).reduce(
+      (sum, count) => sum + Math.max(0, count - 1),
+      0
+    );
 
     return {
       pendingRequests: this.pendingRequests.size,
-      totalDuplicates
+      totalDuplicates,
     };
   }
 

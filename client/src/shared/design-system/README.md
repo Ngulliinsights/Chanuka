@@ -43,7 +43,7 @@ import { loadingStateUtils } from '../shared/design-system/components/loading-st
 // Create a loading overlay
 function MyComponent() {
   const [loading, setLoading] = useState(true);
-  
+
   if (loading) {
     return (
       <div className="chanuka-loading-overlay">
@@ -54,7 +54,7 @@ function MyComponent() {
       </div>
     );
   }
-  
+
   return <div>Content loaded!</div>;
 }
 ```
@@ -73,11 +73,13 @@ function ErrorExample() {
 
   return (
     <div className="chanuka-error-boundary">
-      <div className="chanuka-error-boundary-icon" aria-hidden="true">⚠️</div>
+      <div className="chanuka-error-boundary-icon" aria-hidden="true">
+        ⚠️
+      </div>
       <h2 className="chanuka-error-boundary-title">{errorConfig.children.title.text}</h2>
       <p className="chanuka-error-boundary-description">{errorConfig.children.description.text}</p>
       <div className="chanuka-error-actions">
-        <button 
+        <button
           type="button"
           onClick={errorConfig.children.actions.children[0].onClick}
           className="chanuka-error-action chanuka-error-action-primary"
@@ -93,23 +95,27 @@ function ErrorExample() {
 ## 🎨 Available Components
 
 ### Loading States
+
 - **Spinners**: `chanuka-spinner-{small|medium|large|xlarge}`
 - **Skeletons**: `chanuka-skeleton-{text|title|paragraph|avatar|button}`
 - **Overlays**: `chanuka-loading-overlay`
 - **Progress**: `chanuka-progress-bar`
 
 ### Error States
+
 - **Severities**: `chanuka-error-{info|warning|error|critical}`
 - **Boundaries**: `chanuka-error-boundary`
 - **Inline**: `chanuka-error-inline`
 - **Actions**: `chanuka-error-action-{primary|secondary}`
 
 ### Buttons
+
 - **Variants**: `chanuka-btn-{primary|secondary|outline|ghost}`
 - **Sizes**: `chanuka-btn-{sm|md|lg}`
 - **States**: Hover, focus, disabled built-in
 
 ### Cards
+
 - **Base**: `chanuka-card`
 - **Sections**: `chanuka-card-{header|content|footer}`
 - **Interactive**: Hover effects included
@@ -117,6 +123,7 @@ function ErrorExample() {
 ## 🎯 Design Tokens
 
 ### Colors
+
 ```css
 /* Primary brand colors */
 --primary: 213 94% 23%;
@@ -130,16 +137,18 @@ function ErrorExample() {
 ```
 
 ### Spacing
+
 ```css
 /* T-shirt sizing */
---space-xs: 0.25rem;  /* 4px */
---space-sm: 0.5rem;   /* 8px */
---space-md: 1rem;     /* 16px */
---space-lg: 1.5rem;   /* 24px */
---space-xl: 2rem;     /* 32px */
+--space-xs: 0.25rem; /* 4px */
+--space-sm: 0.5rem; /* 8px */
+--space-md: 1rem; /* 16px */
+--space-lg: 1.5rem; /* 24px */
+--space-xl: 2rem; /* 32px */
 ```
 
 ### Typography
+
 ```css
 /* Font scale */
 --text-xs: 0.75rem;
@@ -152,12 +161,14 @@ function ErrorExample() {
 ## ♿ Accessibility Features
 
 ### Built-in ARIA Support
+
 - Loading states include `role="status"` and `aria-live="polite"`
 - Error states include `role="alert"` for critical errors
 - Focus management with visible focus indicators
 - Screen reader announcements for state changes
 
 ### Reduced Motion Support
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   .chanuka-spinner,
@@ -169,6 +180,7 @@ function ErrorExample() {
 ```
 
 ### High Contrast Support
+
 ```css
 @media (prefers-contrast: high) {
   .chanuka-error,
@@ -181,11 +193,13 @@ function ErrorExample() {
 ## 📱 Mobile Optimization
 
 ### Touch Targets
+
 - Minimum 44px touch targets on mobile
 - Proper spacing between interactive elements
 - Touch-friendly hover states
 
 ### Performance
+
 - GPU-accelerated animations
 - Optimized for 60fps scrolling
 - Minimal layout shifts
@@ -193,12 +207,13 @@ function ErrorExample() {
 ## 🔧 Migration Guide
 
 ### From Inline Styles
+
 ```tsx
 // ❌ Before (inline styles)
-<div style={{ 
-  display: 'flex', 
-  alignItems: 'center', 
-  backgroundColor: '#3b82f6' 
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: '#3b82f6'
 }}>
 
 // ✅ After (design system)
@@ -206,6 +221,7 @@ function ErrorExample() {
 ```
 
 ### From CSS Modules
+
 ```tsx
 // ❌ Before (CSS modules)
 import styles from './Component.module.css';
@@ -227,12 +243,14 @@ import styles from './Component.module.css';
 ## 🎯 When to Use Inline Styles vs Classes
 
 ### ✅ Use Inline Styles For:
+
 - Dynamic calculations: `style={{ width: \`\${progress}%\` }}`
 - Performance transforms: `style={{ transform: \`translate3d(\${x}px, \${y}px, 0)\` }}`
 - Data visualization: `style={{ backgroundColor: getColor(data) }}`
 - CSS custom properties: `style={{ "--theme-color": color }}`
 
 ### ✅ Use Design System Classes For:
+
 - Static button styling: `className="chanuka-btn-primary"`
 - Layout containers: `className="chanuka-loading-overlay"`
 - Typography: `className="chanuka-text-lg"`
@@ -241,16 +259,21 @@ import styles from './Component.module.css';
 ## 🔍 Debugging
 
 ### CSS Class Inspector
+
 Use browser dev tools to inspect applied classes:
+
 ```css
 /* Check if design system CSS is loaded */
-.chanuka-spinner { /* Should show design system styles */ }
+.chanuka-spinner {
+  /* Should show design system styles */
+}
 ```
 
 ### Performance Monitoring
+
 ```tsx
 // Check for layout shifts
-const observer = new PerformanceObserver((list) => {
+const observer = new PerformanceObserver(list => {
   for (const entry of list.getEntries()) {
     if (entry.entryType === 'layout-shift') {
       console.log('Layout shift detected:', entry.value);
@@ -270,6 +293,7 @@ observer.observe({ entryTypes: ['layout-shift'] });
 ## 🤝 Contributing
 
 When adding new components:
+
 1. Follow the existing naming convention (`chanuka-*`)
 2. Include accessibility attributes
 3. Support reduced motion preferences

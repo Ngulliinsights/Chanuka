@@ -1,6 +1,6 @@
 /**
  * Navigation Access Control Module
- * 
+ *
  * Handles route access permissions and user authorization
  */
 
@@ -45,7 +45,7 @@ export function hasRouteAccess(
       } catch (error) {
         logger.warn('Error evaluating navigation item condition', {
           itemId: item.id,
-          error
+          error,
         });
         return false;
       }
@@ -86,13 +86,13 @@ export function requiresRole(path: string, requiredRole: UserRole): boolean {
     '/admin': ['admin'],
     '/expert-verification': ['expert', 'admin'],
   };
-  
+
   for (const [pathPrefix, roles] of Object.entries(roleBasedPaths)) {
     if (path.startsWith(pathPrefix)) {
       return roles.includes(requiredRole);
     }
   }
-  
+
   return true; // Allow access by default
 }
 
@@ -105,19 +105,19 @@ export function getNavigationMenuItems(user_role: UserRole) {
     { label: 'Bills', path: '/bills', icon: 'document' },
     { label: 'Community', path: '/community', icon: 'users' },
   ];
-  
+
   if (user_role !== 'public') {
     baseItems.push({ label: 'Dashboard', path: '/dashboard', icon: 'dashboard' });
     baseItems.push({ label: 'Profile', path: '/profile', icon: 'user' });
   }
-  
+
   if (user_role === 'expert' || user_role === 'admin') {
     baseItems.push({ label: 'Expert Verification', path: '/expert-verification', icon: 'shield' });
   }
-  
+
   if (user_role === 'admin') {
     baseItems.push({ label: 'Admin', path: '/admin', icon: 'settings' });
   }
-  
+
   return baseItems;
 }

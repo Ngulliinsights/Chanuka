@@ -1,19 +1,20 @@
 /**
  * Community Service - Core Real-time Module
- * 
+ *
  * Handles real-time community features including discussions, comments,
  * typing indicators, and expert activities through WebSocket connections.
  */
 
-import { UnifiedWebSocketManager } from '../manager';
-import { 
-  CommunityUpdate, 
-  TypingIndicator, 
-  CommentUpdate, 
-  VoteUpdate,
-  WebSocketMessage 
-} from '../types';
 import { logger } from '@client/utils/logger';
+
+import { UnifiedWebSocketManager } from '../manager';
+import {
+  CommunityUpdate,
+  TypingIndicator,
+  CommentUpdate,
+  VoteUpdate,
+  WebSocketMessage,
+} from '../types';
 
 export class CommunityService {
   private wsManager: UnifiedWebSocketManager;
@@ -43,12 +44,16 @@ export class CommunityService {
       this.isInitialized = true;
 
       logger.info('CommunityService initialized', {
-        component: 'CommunityService'
+        component: 'CommunityService',
       });
     } catch (error) {
-      logger.error('Failed to initialize CommunityService', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Failed to initialize CommunityService',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -78,12 +83,16 @@ export class CommunityService {
       this.isInitialized = false;
 
       logger.info('CommunityService shut down', {
-        component: 'CommunityService'
+        component: 'CommunityService',
       });
     } catch (error) {
-      logger.error('Error during CommunityService shutdown', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error during CommunityService shutdown',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
@@ -93,18 +102,17 @@ export class CommunityService {
 
   subscribeToDiscussion(billId: number): string {
     const discussionId = `bill_${billId}`;
-    
+
     if (this.subscribedDiscussions.has(discussionId)) {
       logger.debug('Already subscribed to discussion', {
         component: 'CommunityService',
-        discussionId
+        discussionId,
       });
       return discussionId;
     }
 
-    const subscriptionId = this.wsManager.subscribe(
-      `discussion:${billId}`,
-      (message) => this.handleDiscussionMessage(discussionId, message)
+    const subscriptionId = this.wsManager.subscribe(`discussion:${billId}`, message =>
+      this.handleDiscussionMessage(discussionId, message)
     );
 
     this.subscribedDiscussions.add(discussionId);
@@ -113,7 +121,7 @@ export class CommunityService {
       component: 'CommunityService',
       discussionId,
       billId,
-      subscriptionId
+      subscriptionId,
     });
 
     return subscriptionId;
@@ -131,7 +139,7 @@ export class CommunityService {
 
     logger.info('Unsubscribed from discussion', {
       component: 'CommunityService',
-      discussionId
+      discussionId,
     });
   }
 
@@ -140,28 +148,26 @@ export class CommunityService {
   // ============================================================================
 
   subscribeToExpertUpdates(): string {
-    const subscriptionId = this.wsManager.subscribe(
-      'expert:updates',
-      (message) => this.handleExpertMessage(message)
+    const subscriptionId = this.wsManager.subscribe('expert:updates', message =>
+      this.handleExpertMessage(message)
     );
 
     logger.info('Subscribed to expert updates', {
       component: 'CommunityService',
-      subscriptionId
+      subscriptionId,
     });
 
     return subscriptionId;
   }
 
   subscribeToModerationEvents(): string {
-    const subscriptionId = this.wsManager.subscribe(
-      'moderation:events',
-      (message) => this.handleModerationMessage(message)
+    const subscriptionId = this.wsManager.subscribe('moderation:events', message =>
+      this.handleModerationMessage(message)
     );
 
     logger.info('Subscribed to moderation events', {
       component: 'CommunityService',
-      subscriptionId
+      subscriptionId,
     });
 
     return subscriptionId;
@@ -177,8 +183,8 @@ export class CommunityService {
       data: {
         billId,
         parentId,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
@@ -198,7 +204,7 @@ export class CommunityService {
     logger.debug('Sent typing indicator', {
       component: 'CommunityService',
       billId,
-      parentId
+      parentId,
     });
   }
 
@@ -208,8 +214,8 @@ export class CommunityService {
       data: {
         billId,
         parentId,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
@@ -224,7 +230,7 @@ export class CommunityService {
     logger.debug('Stopped typing indicator', {
       component: 'CommunityService',
       billId,
-      parentId
+      parentId,
     });
   }
 
@@ -238,8 +244,8 @@ export class CommunityService {
       data: {
         billId,
         ...commentData,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
@@ -247,7 +253,7 @@ export class CommunityService {
     logger.debug('Sent comment update', {
       component: 'CommunityService',
       billId,
-      commentData
+      commentData,
     });
   }
 
@@ -257,8 +263,8 @@ export class CommunityService {
       data: {
         billId,
         ...voteData,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
@@ -266,7 +272,7 @@ export class CommunityService {
     logger.debug('Sent vote update', {
       component: 'CommunityService',
       billId,
-      voteData
+      voteData,
     });
   }
 
@@ -304,14 +310,18 @@ export class CommunityService {
         default:
           logger.debug('Unknown community message type', {
             component: 'CommunityService',
-            messageType: message.type
+            messageType: message.type,
           });
       }
     } catch (error) {
-      logger.error('Error handling community message', {
-        component: 'CommunityService',
-        messageType: message.type
-      }, error);
+      logger.error(
+        'Error handling community message',
+        {
+          component: 'CommunityService',
+          messageType: message.type,
+        },
+        error
+      );
     }
   }
 
@@ -322,20 +332,24 @@ export class CommunityService {
         type: message.type || 'update',
         discussionId,
         data: (message as any).data || message,
-        timestamp: (message as any).timestamp || new Date().toISOString()
+        timestamp: (message as any).timestamp || new Date().toISOString(),
       };
 
       logger.debug('Received discussion update', {
         component: 'CommunityService',
         discussionId,
-        updateType: update.type
+        updateType: update.type,
       });
     } catch (error) {
-      logger.error('Error handling discussion message', {
-        component: 'CommunityService',
-        discussionId,
-        messageType: message.type
-      }, error);
+      logger.error(
+        'Error handling discussion message',
+        {
+          component: 'CommunityService',
+          discussionId,
+          messageType: message.type,
+        },
+        error
+      );
     }
   }
 
@@ -346,18 +360,22 @@ export class CommunityService {
         type: data.type || 'update',
         discussionId: data.discussion_id || data.discussionId || 'general',
         data: data.data || data,
-        timestamp: data.timestamp || new Date().toISOString()
+        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       logger.debug('Processed community update', {
         component: 'CommunityService',
         updateType: update.type,
-        discussionId: update.discussionId
+        discussionId: update.discussionId,
       });
     } catch (error) {
-      logger.error('Error handling community update message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling community update message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
@@ -369,12 +387,12 @@ export class CommunityService {
         billId: data.bill_id || data.billId,
         parentId: data.parent_id || data.parentId,
         isTyping: data.is_typing !== false, // Default to true
-        timestamp: data.timestamp || new Date().toISOString()
+        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       const key = `${indicator.billId}_${indicator.parentId || 'root'}`;
       const existing = this.typingIndicators.get(key) || [];
-      
+
       if (indicator.isTyping) {
         // Add or update typing indicator
         const filtered = existing.filter(t => t.userId !== indicator.userId);
@@ -389,12 +407,16 @@ export class CommunityService {
         component: 'CommunityService',
         userId: indicator.userId,
         billId: indicator.billId,
-        isTyping: indicator.isTyping
+        isTyping: indicator.isTyping,
       });
     } catch (error) {
-      logger.error('Error handling typing indicator message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling typing indicator message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
@@ -407,7 +429,7 @@ export class CommunityService {
         parentId: data.parent_id || data.parentId,
         action: data.action || 'created',
         data: data.data || data,
-        timestamp: data.timestamp || new Date().toISOString()
+        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       // Keep only recent comments (last 100)
@@ -417,12 +439,16 @@ export class CommunityService {
         component: 'CommunityService',
         commentId: update.commentId,
         billId: update.billId,
-        action: update.action
+        action: update.action,
       });
     } catch (error) {
-      logger.error('Error handling comment update message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling comment update message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
@@ -433,7 +459,7 @@ export class CommunityService {
         billId: data.bill_id || data.billId,
         userId: data.user_id || data.userId || 'unknown',
         voteType: data.vote_type || data.voteType || 'neutral',
-        timestamp: data.timestamp || new Date().toISOString()
+        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       // Keep only recent votes (last 100)
@@ -443,44 +469,56 @@ export class CommunityService {
         component: 'CommunityService',
         billId: update.billId,
         userId: update.userId,
-        voteType: update.voteType
+        voteType: update.voteType,
       });
     } catch (error) {
-      logger.error('Error handling vote update message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling vote update message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
   private handleExpertMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
-      
+
       logger.debug('Processed expert activity', {
         component: 'CommunityService',
         expertId: data.expert_id || data.expertId,
-        activityType: data.type
+        activityType: data.type,
       });
     } catch (error) {
-      logger.error('Error handling expert message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling expert message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
   private handleModerationMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
-      
+
       logger.debug('Processed moderation event', {
         component: 'CommunityService',
         eventType: data.type,
-        targetId: data.target_id || data.targetId
+        targetId: data.target_id || data.targetId,
       });
     } catch (error) {
-      logger.error('Error handling moderation message', {
-        component: 'CommunityService'
-      }, error);
+      logger.error(
+        'Error handling moderation message',
+        {
+          component: 'CommunityService',
+        },
+        error
+      );
     }
   }
 
@@ -514,7 +552,7 @@ export class CommunityService {
       // Re-subscribe to discussions on reconnection
       const discussionIds = Array.from(this.subscribedDiscussions);
       this.subscribedDiscussions.clear();
-      
+
       discussionIds.forEach(discussionId => {
         const billId = parseInt(discussionId.replace('bill_', ''));
         if (!isNaN(billId)) {
@@ -524,16 +562,16 @@ export class CommunityService {
 
       logger.info('Re-subscribed to discussions after reconnection', {
         component: 'CommunityService',
-        discussionCount: discussionIds.length
+        discussionCount: discussionIds.length,
       });
     });
 
     this.wsManager.on('disconnected', () => {
       // Clear typing indicators on disconnect
       this.typingIndicators.clear();
-      
+
       logger.warn('WebSocket disconnected, community features paused', {
-        component: 'CommunityService'
+        component: 'CommunityService',
       });
     });
   }
@@ -549,15 +587,17 @@ export class CommunityService {
     recentComments: number;
     recentVotes: number;
   } {
-    const activeTypingIndicators = Array.from(this.typingIndicators.values())
-      .reduce((sum, indicators) => sum + indicators.length, 0);
+    const activeTypingIndicators = Array.from(this.typingIndicators.values()).reduce(
+      (sum, indicators) => sum + indicators.length,
+      0
+    );
 
     return {
       subscribedDiscussions: this.subscribedDiscussions.size,
       subscribedExperts: this.subscribedExperts.size,
       activeTypingIndicators,
       recentComments: this.recentComments.length,
-      recentVotes: this.recentVotes.length
+      recentVotes: this.recentVotes.length,
     };
   }
 }

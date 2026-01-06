@@ -1,14 +1,32 @@
-import { AlertTriangle, ArrowLeft, Building, Calendar, CheckCircle, Clock, Eye, FileText, Settings, Shield, Users, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Building,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Eye,
+  FileText,
+  Settings,
+  Shield,
+  Users,
+  X,
+} from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@client/shared/design-system';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {
@@ -144,7 +162,6 @@ export function ImplementationWorkarounds({ bill_id }: ImplementationWorkarounds
   useEffect(() => {
     fetchWorkarounds();
   }, [bill_id, fetchWorkarounds]);
-
 
   const handleConfirmWorkaround = async (workaroundId: string) => {
     try {
@@ -340,7 +357,9 @@ export function ImplementationWorkarounds({ bill_id }: ImplementationWorkarounds
                 </label>
                 <Textarea
                   value={reportReason}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReportReason(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setReportReason(e.target.value)
+                  }
                   placeholder="Explain similarities to previous rejected legislation, executive directives that bypass parliamentary intent, regulatory implementations that circumvent public participation, budget allocations, emergency authority usage, statutory instruments, or other constitutional bypass mechanisms..."
                   rows={4}
                 />

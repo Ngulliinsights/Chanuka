@@ -12,11 +12,14 @@
  * - Performance optimizations in preprocessing pipeline
  */
 
-import { ZodSchema, ZodError } from 'zod';
 import * as crypto from 'crypto';
+
+import { ZodSchema, ZodError } from 'zod';
+
 import { logger } from '../observability/logging';
-import { ValidationError } from './types';
+
 import { commonSchemas } from './schemas/common';
+import { ValidationError } from './types';
 import {
   ValidationOptions,
   ValidationResult,
@@ -504,7 +507,7 @@ export class ValidationService {
 
     // String preprocessing with ordered transformations
     if (typeof data === 'string') {
-      let processed = config.trimStrings ? data.trim() : data;
+      const processed = config.trimStrings ? data.trim() : data;
 
       // Check for empty string conversion
       if (config.emptyStringToNull && processed === '') {

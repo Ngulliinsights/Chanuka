@@ -1,6 +1,6 @@
 /**
  * Activity Feed - Displays community activity with real-time updates
- * 
+ *
  * Features:
  * - Real-time activity updates
  * - Activity type filtering
@@ -11,7 +11,6 @@
  */
 
 import { formatDistanceToNow } from 'date-fns';
-import React from 'react';
 import {
   MessageSquare,
   Heart,
@@ -24,12 +23,13 @@ import {
   FileText,
   Megaphone,
   PenTool,
-  Bookmark
+  Bookmark,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useCallback, memo } from 'react';
 
-import { cn } from '@client/lib/utils';
 import { ActivityItem } from '@client/features/community/types';
+import { cn } from '@client/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
@@ -48,9 +48,9 @@ const ActivityFeedComponent = ({
   loading = false,
   hasMore = false,
   onLoadMore,
-  className
+  className,
 }: ActivityFeedProps) => {
-   const [expandedItems, setExpandedItems] = useState<Set<string>>(() => new Set());
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => new Set());
 
   const getActivityIcon = (type: ActivityItem['type']) => {
     switch (type) {
@@ -202,13 +202,14 @@ const ActivityFeedComponent = ({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {activities.map((activity) => {
+      {activities.map(activity => {
         const IconComponent = getActivityIcon(activity.type);
         const isExpanded = expandedItems.has(activity.id);
         const shouldTruncate = activity.content && activity.content.length > 200;
-        const displayContent = shouldTruncate && !isExpanded && activity.content
-          ? activity.content.slice(0, 200) + '...'
-          : activity.content || '';
+        const displayContent =
+          shouldTruncate && !isExpanded && activity.content
+            ? activity.content.slice(0, 200) + '...'
+            : activity.content || '';
 
         return (
           <Card key={activity.id} className="chanuka-card hover:shadow-md transition-shadow">
@@ -225,7 +226,7 @@ const ActivityFeedComponent = ({
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-sm">{activity.userName}</span>
-                      
+
                       {/* Expert Badge */}
                       {activity.expertInfo && (
                         <Badge variant="outline" className="text-xs">
@@ -235,7 +236,9 @@ const ActivityFeedComponent = ({
 
                       {/* Activity Type */}
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <IconComponent className={cn('h-4 w-4', getActivityTypeColor(activity.type))} />
+                        <IconComponent
+                          className={cn('h-4 w-4', getActivityTypeColor(activity.type))}
+                        />
                         <span>{getActivityTypeLabel(activity.type)}</span>
                       </div>
 
@@ -263,9 +266,7 @@ const ActivityFeedComponent = ({
                   </div>
 
                   {/* Activity Title */}
-                  <h3 className="font-medium text-sm mb-2 leading-tight">
-                    {activity.title}
-                  </h3>
+                  <h3 className="font-medium text-sm mb-2 leading-tight">{activity.title}</h3>
 
                   {/* Activity Content */}
                   {activity.content && (
@@ -317,10 +318,7 @@ const ActivityFeedComponent = ({
                           activity.userHasLiked && 'text-red-500'
                         )}
                       >
-                        <Heart className={cn(
-                          'h-4 w-4',
-                          activity.userHasLiked && 'fill-current'
-                        )} />
+                        <Heart className={cn('h-4 w-4', activity.userHasLiked && 'fill-current')} />
                         <span>{activity.likes}</span>
                       </Button>
 
@@ -349,13 +347,11 @@ const ActivityFeedComponent = ({
 
                     {/* External Link */}
                     {activity.billId && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="text-xs h-auto p-1"
-                      >
-                        <a href={`/bills/${activity.billId}`} title={`View bill: ${activity.billTitle || activity.title}`}>
+                      <Button variant="ghost" size="sm" asChild className="text-xs h-auto p-1">
+                        <a
+                          href={`/bills/${activity.billId}`}
+                          title={`View bill: ${activity.billTitle || activity.title}`}
+                        >
                           <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>

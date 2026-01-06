@@ -72,10 +72,10 @@ class BundleAnalyzer {
       // Generate optimization recommendations
       const recommendations = this.generateRecommendations();
 
-      logger.info('Bundle analysis completed', { 
+      logger.info('Bundle analysis completed', {
         component: 'BundleAnalyzer',
         metrics: this.metrics,
-        recommendations: recommendations.length
+        recommendations: recommendations.length,
       });
 
       return this.metrics;
@@ -92,18 +92,21 @@ class BundleAnalyzer {
    */
   private async collectChunkInfo(): Promise<void> {
     if (!window.performance) {
-      logger.warn('Performance API not available for bundle analysis', { component: 'BundleAnalyzer' });
+      logger.warn('Performance API not available for bundle analysis', {
+        component: 'BundleAnalyzer',
+      });
       return;
     }
 
     try {
       // Get all resource entries
       const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-      
+
       // Filter JavaScript chunks
-      const jsResources = resources.filter(resource => 
-        resource.name.includes('.js') && 
-        (resource.name.includes('/assets/') || resource.name.includes('chunk'))
+      const jsResources = resources.filter(
+        resource =>
+          resource.name.includes('.js') &&
+          (resource.name.includes('/assets/') || resource.name.includes('chunk'))
       );
 
       for (const resource of jsResources) {
@@ -115,11 +118,13 @@ class BundleAnalyzer {
           size,
           modules: [], // Would need build-time analysis for accurate module info
           dependencies: [],
-          loadTime: resource.duration
+          loadTime: resource.duration,
         });
       }
 
-      logger.debug(`Collected info for ${this.chunks.size} chunks`, { component: 'BundleAnalyzer' });
+      logger.debug(`Collected info for ${this.chunks.size} chunks`, {
+        component: 'BundleAnalyzer',
+      });
     } catch (error) {
       logger.error('Failed to collect chunk info', { component: 'BundleAnalyzer' }, error);
     }
@@ -154,13 +159,13 @@ class BundleAnalyzer {
   private async calculateMetrics(): Promise<BundleMetrics> {
     const chunks = Array.from(this.chunks.values());
     const totalSize = chunks.reduce((sum, chunk) => sum + chunk.size, 0);
-    
+
     // Estimate gzipped size (typically 70% of original)
     const gzippedSize = Math.round(totalSize * 0.7);
 
     // Find largest chunk
-    const largestChunk = chunks.reduce((largest, chunk) => 
-      chunk.size > largest.size ? chunk : largest,
+    const largestChunk = chunks.reduce(
+      (largest, chunk) => (chunk.size > largest.size ? chunk : largest),
       { name: 'none', size: 0 }
     );
 
@@ -171,7 +176,7 @@ class BundleAnalyzer {
       largestChunk,
       duplicateModules: [], // Would need build-time analysis
       unusedModules: [], // Would need runtime usage tracking
-      criticalPath: this.identifyCriticalPath()
+      criticalPath: this.identifyCriticalPath(),
     };
   }
 
@@ -180,10 +185,9 @@ class BundleAnalyzer {
    */
   private identifyCriticalPath(): string[] {
     const criticalChunks = Array.from(this.chunks.values())
-      .filter(chunk => 
-        chunk.name.includes('main') || 
-        chunk.name.includes('app') || 
-        chunk.name.includes('vendor')
+      .filter(
+        chunk =>
+          chunk.name.includes('main') || chunk.name.includes('app') || chunk.name.includes('vendor')
       )
       .sort((a, b) => (a.loadTime || 0) - (b.loadTime || 0))
       .map(chunk => chunk.name);
@@ -202,13 +206,14 @@ class BundleAnalyzer {
     const recommendations: OptimizationRecommendation[] = [];
 
     // Check bundle size
-    if (this.metrics.totalSize > 2 * 1024 * 1024) { // 2MB
+    if (this.metrics.totalSize > 2 * 1024 * 1024) {
+      // 2MB
       recommendations.push({
         type: 'code-splitting',
         priority: 'high',
         description: 'Bundle size exceeds 2MB threshold',
         impact: 'Reduce initial load time by 30-50%',
-        implementation: 'Implement route-based code splitting and lazy loading'
+        implementation: 'Implement route-based code splitting and lazy loading',
       });
     }
 
@@ -219,18 +224,19 @@ class BundleAnalyzer {
         priority: 'medium',
         description: 'Too few chunks - missing optimization opportunities',
         impact: 'Improve caching and parallel loading',
-        implementation: 'Split vendor libraries and feature modules into separate chunks'
+        implementation: 'Split vendor libraries and feature modules into separate chunks',
       });
     }
 
     // Check largest chunk
-    if (this.metrics.largestChunk.size > 500 * 1024) { // 500KB
+    if (this.metrics.largestChunk.size > 500 * 1024) {
+      // 500KB
       recommendations.push({
         type: 'tree-shaking',
         priority: 'high',
         description: `Largest chunk (${this.metrics.largestChunk.name}) is too large`,
         impact: 'Reduce chunk size by 20-40%',
-        implementation: 'Enable tree shaking and remove unused dependencies'
+        implementation: 'Enable tree shaking and remove unused dependencies',
       });
     }
 
@@ -242,7 +248,7 @@ class BundleAnalyzer {
         priority: 'medium',
         description: 'Poor compression ratio detected',
         impact: 'Reduce transfer size by 15-25%',
-        implementation: 'Enable Brotli compression and optimize asset formats'
+        implementation: 'Enable Brotli compression and optimize asset formats',
       });
     }
 
@@ -270,18 +276,18 @@ class BundleAnalyzer {
     if (!window.performance) return;
 
     // Monitor new resource loads
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
-      
-      entries.forEach((entry) => {
+
+      entries.forEach(entry => {
         if (entry.entryType === 'resource' && entry.name.includes('.js')) {
           const chunkName = this.extractChunkName(entry.name);
           const resource = entry as PerformanceResourceTiming;
-          
+
           logger.debug(`Chunk loaded: ${chunkName}`, {
             component: 'BundleAnalyzer',
             size: resource.transferSize || 'unknown',
-            loadTime: resource.duration
+            loadTime: resource.duration,
           });
         }
       });
@@ -310,7 +316,7 @@ class BundleAnalyzer {
       largestChunk: { name: 'unknown', size: 0 },
       duplicateModules: [],
       unusedModules: [],
-      criticalPath: []
+      criticalPath: [],
     };
   }
 
@@ -322,7 +328,7 @@ class BundleAnalyzer {
       timestamp: new Date().toISOString(),
       metrics: this.metrics,
       chunks: this.getChunks(),
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     };
 
     return JSON.stringify(report, null, 2);

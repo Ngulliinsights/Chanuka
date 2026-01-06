@@ -2,7 +2,13 @@
  * Dashboard Widget Definitions - Consolidated widget configurations
  */
 
-import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/shared/types';
+import {
+  WidgetConfig,
+  WidgetType,
+  AnalyticsMetrics,
+  PerformanceMetrics,
+  EngagementMetrics,
+} from '@client/shared/types';
 
 /**
  * Widget factory functions for creating common widget configurations
@@ -153,11 +159,17 @@ export const DashboardTemplates = {
       columns: 12,
       responsive: true,
       widgets: [
-        WidgetFactory.createAnalyticsWidget('analytics-overview', 'Analytics Overview', { x: 0, y: 0 }),
+        WidgetFactory.createAnalyticsWidget('analytics-overview', 'Analytics Overview', {
+          x: 0,
+          y: 0,
+        }),
         WidgetFactory.createEngagementWidget('user-engagement', 'User Engagement', { x: 6, y: 0 }),
         WidgetFactory.createMetricsWidget('total-views', 'Total Views', 'views', { x: 0, y: 4 }),
         WidgetFactory.createMetricsWidget('total-users', 'Active Users', 'users', { x: 3, y: 4 }),
-        WidgetFactory.createChartWidget('engagement-trend', 'Engagement Trend', 'line', { x: 6, y: 4 }),
+        WidgetFactory.createChartWidget('engagement-trend', 'Engagement Trend', 'line', {
+          x: 6,
+          y: 4,
+        }),
       ],
     },
     permissions: {
@@ -185,9 +197,18 @@ export const DashboardTemplates = {
       columns: 12,
       responsive: true,
       widgets: [
-        WidgetFactory.createPerformanceWidget('performance-overview', 'Performance Overview', { x: 0, y: 0 }),
-        WidgetFactory.createMetricsWidget('performance-score', 'Performance Score', 'performance', { x: 6, y: 0 }),
-        WidgetFactory.createChartWidget('core-web-vitals', 'Core Web Vitals', 'bar', { x: 0, y: 3 }),
+        WidgetFactory.createPerformanceWidget('performance-overview', 'Performance Overview', {
+          x: 0,
+          y: 0,
+        }),
+        WidgetFactory.createMetricsWidget('performance-score', 'Performance Score', 'performance', {
+          x: 6,
+          y: 0,
+        }),
+        WidgetFactory.createChartWidget('core-web-vitals', 'Core Web Vitals', 'bar', {
+          x: 0,
+          y: 3,
+        }),
         WidgetFactory.createMetricsWidget('bundle-size', 'Bundle Size', 'bundle', { x: 9, y: 0 }),
       ],
     },
@@ -218,10 +239,19 @@ export const DashboardTemplates = {
       widgets: [
         WidgetFactory.createMetricsWidget('total-bills', 'Total Bills', 'bills', { x: 0, y: 0 }),
         WidgetFactory.createMetricsWidget('active-users', 'Active Users', 'users', { x: 3, y: 0 }),
-        WidgetFactory.createMetricsWidget('engagement-score', 'Engagement Score', 'engagement', { x: 6, y: 0 }),
-        WidgetFactory.createMetricsWidget('system-health', 'System Health', 'health', { x: 9, y: 0 }),
+        WidgetFactory.createMetricsWidget('engagement-score', 'Engagement Score', 'engagement', {
+          x: 6,
+          y: 0,
+        }),
+        WidgetFactory.createMetricsWidget('system-health', 'System Health', 'health', {
+          x: 9,
+          y: 0,
+        }),
         WidgetFactory.createChartWidget('monthly-trends', 'Monthly Trends', 'area', { x: 0, y: 2 }),
-        WidgetFactory.createChartWidget('user-distribution', 'User Distribution', 'pie', { x: 6, y: 2 }),
+        WidgetFactory.createChartWidget('user-distribution', 'User Distribution', 'pie', {
+          x: 6,
+          y: 2,
+        }),
       ],
     },
     permissions: {
@@ -259,7 +289,11 @@ export class WidgetValidator {
       errors.push('Widget title is required');
     }
 
-    if (!config.position || typeof config.position.x !== 'number' || typeof config.position.y !== 'number') {
+    if (
+      !config.position ||
+      typeof config.position.x !== 'number' ||
+      typeof config.position.y !== 'number'
+    ) {
       errors.push('Valid position coordinates are required');
     }
 
@@ -281,4 +315,3 @@ export class WidgetValidator {
     return permissions.includes(user_role);
   }
 }
-

@@ -6,12 +6,18 @@
 
 import { Shield, User, Settings, Lock } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { useAuth } from '@client/core/auth';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
-import React from 'react';
 
 // Session Display Component
 function SessionDisplay() {
@@ -79,10 +85,10 @@ export function UserProfileSection() {
                 <p className="text-slate-900 capitalize">{user.role || 'User'}</p>
               </div>
               <div data-testid="profile-verification">
-                <label className="text-sm font-medium text-slate-500">
-                  Verification Status
-                </label>
-                <p className="text-slate-900 capitalize">{user.verification_status || 'Unverified'}</p>
+                <label className="text-sm font-medium text-slate-500">Verification Status</label>
+                <p className="text-slate-900 capitalize">
+                  {user.verification_status || 'Unverified'}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -195,10 +201,7 @@ export function UserProfileSection() {
                   System
                 </Button>
               </div>
-              <div
-                className="flex items-center justify-between"
-                data-testid="profile-email-digest"
-              >
+              <div className="flex items-center justify-between" data-testid="profile-email-digest">
                 <div>
                   <h4 className="font-medium">Email Digest</h4>
                   <p className="text-sm text-slate-500">Receive a daily summary of activity</p>
@@ -215,15 +218,10 @@ export function UserProfileSection() {
           <div data-testid="profile-notifications">
             <h3 className="text-lg font-medium">Notifications</h3>
             <div className="mt-2 space-y-3">
-              <div
-                className="flex items-center justify-between"
-                data-testid="profile-bill-updates"
-              >
+              <div className="flex items-center justify-between" data-testid="profile-bill-updates">
                 <div>
                   <h4 className="font-medium">Bill Updates</h4>
-                  <p className="text-sm text-slate-500">
-                    Get notified about tracked bill changes
-                  </p>
+                  <p className="text-sm text-slate-500">Get notified about tracked bill changes</p>
                 </div>
                 <Switch
                   checked={billUpdates}
@@ -237,9 +235,7 @@ export function UserProfileSection() {
               >
                 <div>
                   <h4 className="font-medium">Comment Responses</h4>
-                  <p className="text-sm text-slate-500">
-                    Get notified when someone replies to you
-                  </p>
+                  <p className="text-sm text-slate-500">Get notified when someone replies to you</p>
                 </div>
                 <Switch
                   checked={commentResponses}
@@ -247,10 +243,7 @@ export function UserProfileSection() {
                   data-testid="profile-comment-responses-switch"
                 />
               </div>
-              <div
-                className="flex items-center justify-between"
-                data-testid="profile-new-features"
-              >
+              <div className="flex items-center justify-between" data-testid="profile-new-features">
                 <div>
                   <h4 className="font-medium">New Features</h4>
                   <p className="text-sm text-slate-500">Learn about platform updates</p>

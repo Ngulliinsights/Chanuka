@@ -1,15 +1,14 @@
 /**
  * Responsive Utils Module
- * 
+ *
  * Utility class for managing responsive layouts and breakpoints.
  * Provides methods for creating responsive styles and checking breakpoint states.
- * 
+ *
  * @module core/mobile/responsive-utils
  */
 
-import { logger } from '../../utils/logger';
-
 import { MOBILE_BREAKPOINTS } from '../../config';
+import { logger } from '../../utils/logger';
 
 import type { ResponsiveBreakpoints } from './types';
 
@@ -17,24 +16,24 @@ import type { ResponsiveBreakpoints } from './types';
  * Utility class for managing responsive layouts and breakpoints.
  */
 export class ResponsiveUtils {
-   private static instance: ResponsiveUtils;
-   private mediaQueries: Map<string, MediaQueryList> = new Map();
+  private static instance: ResponsiveUtils;
+  private mediaQueries: Map<string, MediaQueryList> = new Map();
 
-   private getBreakpointValue(key: keyof ResponsiveBreakpoints): number {
-     const upperKey = key.toUpperCase() as keyof typeof MOBILE_BREAKPOINTS;
-     return MOBILE_BREAKPOINTS[upperKey];
-   }
+  private getBreakpointValue(key: keyof ResponsiveBreakpoints): number {
+    const upperKey = key.toUpperCase() as keyof typeof MOBILE_BREAKPOINTS;
+    return MOBILE_BREAKPOINTS[upperKey];
+  }
 
-   private getBreakpointsMap(): ResponsiveBreakpoints {
-     return {
-       xs: MOBILE_BREAKPOINTS.XS,
-       sm: MOBILE_BREAKPOINTS.SM,
-       md: MOBILE_BREAKPOINTS.MD,
-       lg: MOBILE_BREAKPOINTS.LG,
-       xl: MOBILE_BREAKPOINTS.XL,
-       '2xl': MOBILE_BREAKPOINTS['2XL']
-     };
-   }
+  private getBreakpointsMap(): ResponsiveBreakpoints {
+    return {
+      xs: MOBILE_BREAKPOINTS.XS,
+      sm: MOBILE_BREAKPOINTS.SM,
+      md: MOBILE_BREAKPOINTS.MD,
+      lg: MOBILE_BREAKPOINTS.LG,
+      xl: MOBILE_BREAKPOINTS.XL,
+      '2xl': MOBILE_BREAKPOINTS['2XL'],
+    };
+  }
 
   private constructor() {
     this.setupMediaQueries();
@@ -61,7 +60,6 @@ export class ResponsiveUtils {
     });
   }
 
-
   getBreakpoints(): Readonly<ResponsiveBreakpoints> {
     return { ...this.getBreakpointsMap() };
   }
@@ -70,8 +68,7 @@ export class ResponsiveUtils {
     if (typeof window === 'undefined') return 'lg';
 
     const width = window.innerWidth;
-    const breakpoints = Object.entries(this.getBreakpointsMap())
-      .sort(([, a], [, b]) => b - a);
+    const breakpoints = Object.entries(this.getBreakpointsMap()).sort(([, a], [, b]) => b - a);
 
     for (const [name, minWidth] of breakpoints) {
       if (width >= minWidth) {
@@ -129,7 +126,7 @@ export class ResponsiveUtils {
   ): Record<string, unknown> {
     const currentBreakpoint = this.getCurrentBreakpoint();
     const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-    
+
     let finalStyles: Record<string, unknown> = {};
 
     for (const bp of breakpointOrder) {
@@ -158,16 +155,16 @@ export class ResponsiveUtils {
   getResponsiveValue<T>(values: Partial<Record<keyof ResponsiveBreakpoints, T>>): T | undefined {
     const currentBp = this.getCurrentBreakpoint();
     const breakpointOrder: (keyof ResponsiveBreakpoints)[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-    
+
     let result: T | undefined;
-    
+
     for (const bp of breakpointOrder) {
       if (values[bp] !== undefined) {
         result = values[bp];
       }
       if (bp === currentBp) break;
     }
-    
+
     return result;
   }
 }

@@ -4,15 +4,13 @@
  */
 
 import { Database, Info } from 'lucide-react';
-
-import { PrivacySettings, ConsentRecord } from '@/core/auth';
-
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import { Label } from '@/shared/design-system/typography/Label';
-import { Switch } from '@/shared/design-system/interactive/Switch';
 import React from 'react';
 
+import { PrivacySettings, ConsentRecord } from '@/core/auth';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Switch } from '@/shared/design-system/interactive/Switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Label } from '@/shared/design-system/typography/Label';
 
 interface DataUsageControlsProps {
   settings: PrivacySettings;
@@ -27,7 +25,7 @@ export function DataUsageControls({
   onSettingChange,
   onConsentChange,
   onOpenConsentModal,
-  className = ''
+  className = '',
 }: DataUsageControlsProps) {
   return (
     <Card className={className}>
@@ -49,7 +47,7 @@ export function DataUsageControls({
             <div className="flex items-center gap-2">
               <Switch
                 checked={settings.analytics_consent}
-                onCheckedChange={(checked) => onConsentChange('analytics', checked)}
+                onCheckedChange={checked => onConsentChange('analytics', checked)}
                 aria-label="Analytics consent toggle"
               />
               <Button
@@ -73,7 +71,7 @@ export function DataUsageControls({
             <div className="flex items-center gap-2">
               <Switch
                 checked={settings.marketing_consent}
-                onCheckedChange={(checked) => onConsentChange('marketing', checked)}
+                onCheckedChange={checked => onConsentChange('marketing', checked)}
                 aria-label="Marketing consent toggle"
               />
               <Button
@@ -97,7 +95,7 @@ export function DataUsageControls({
             <div className="flex items-center gap-2">
               <Switch
                 checked={settings.data_sharing_consent}
-                onCheckedChange={(checked) => onConsentChange('data_sharing', checked)}
+                onCheckedChange={checked => onConsentChange('data_sharing', checked)}
                 aria-label="Data sharing consent toggle"
               />
               <Button
@@ -121,7 +119,7 @@ export function DataUsageControls({
             <div className="flex items-center gap-2">
               <Switch
                 checked={settings.location_tracking}
-                onCheckedChange={(checked) => onConsentChange('location', checked)}
+                onCheckedChange={checked => onConsentChange('location', checked)}
                 aria-label="Location tracking toggle"
               />
               <Button
@@ -144,7 +142,7 @@ export function DataUsageControls({
             </div>
             <Switch
               checked={settings.third_party_integrations}
-              onCheckedChange={(checked) => onSettingChange('third_party_integrations', checked)}
+              onCheckedChange={checked => onSettingChange('third_party_integrations', checked)}
               aria-label="Third-party integrations toggle"
             />
           </div>

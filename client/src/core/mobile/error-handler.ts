@@ -1,13 +1,14 @@
 /**
  * Mobile Error Handler Module
- * 
+ *
  * Specialized error handler for mobile devices that provides context-aware
  * error handling and automatic recovery strategies.
- * 
+ *
  * @module core/mobile/error-handler
  */
 
 import { logger } from '../../utils/logger';
+
 import { DeviceDetector } from './device-detector';
 import type { MobileErrorContext } from './types';
 
@@ -39,21 +40,21 @@ export class MobileErrorHandler {
     if (typeof window === 'undefined') return;
 
     // Global error handler
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.handleMobileError(event.error, {
         type: 'javascript',
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
-        colno: event.colno
+        colno: event.colno,
       });
     });
 
     // Promise rejection handler
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.handleMobileError(event.reason, {
         type: 'promise',
-        promise: event.promise
+        promise: event.promise,
       });
     });
 
@@ -61,13 +62,13 @@ export class MobileErrorHandler {
     window.addEventListener('offline', () => {
       this.handleMobileError(new Error('Network connection lost'), {
         type: 'network',
-        status: 'offline'
+        status: 'offline',
       });
     });
 
     window.addEventListener('online', () => {
       logger.info('Network connection restored', {
-        deviceInfo: this.deviceDetector.getDeviceInfo()
+        deviceInfo: this.deviceDetector.getDeviceInfo(),
       });
       this.errorCount = 0; // Reset error count on network recovery
     });
@@ -86,7 +87,7 @@ export class MobileErrorHandler {
 
   private handleMobileError(error: unknown, context: unknown): void {
     const now = Date.now();
-    
+
     // Track error rate to detect cascading failures
     if (now - this.lastErrorTime < this.ERROR_WINDOW) {
       this.errorCount++;
@@ -101,7 +102,7 @@ export class MobileErrorHandler {
       touchSupport: deviceInfo.hasTouch,
       ...this.getNetworkInfo(),
       ...this.getMemoryInfo(),
-      timestamp: now
+      timestamp: now,
     };
 
     logger.error('Mobile error occurred', {
@@ -110,7 +111,7 @@ export class MobileErrorHandler {
       context,
       mobileContext,
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-      errorCount: this.errorCount
+      errorCount: this.errorCount,
     });
 
     // Implement progressive recovery strategies based on error frequency
@@ -127,26 +128,33 @@ export class MobileErrorHandler {
       return {};
     }
 
-    const connection = (navigator as Navigator & { 
-      connection?: { effectiveType?: string; type?: string; downlink?: number };
-      mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
-      webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
-    }).connection || 
-    (navigator as Navigator & { 
-      connection?: { effectiveType?: string; type?: string; downlink?: number };
-      mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
-      webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
-    }).mozConnection || 
-    (navigator as Navigator & { 
-      connection?: { effectiveType?: string; type?: string; downlink?: number };
-      mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
-      webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
-    }).webkitConnection;
+    const connection =
+      (
+        navigator as Navigator & {
+          connection?: { effectiveType?: string; type?: string; downlink?: number };
+          mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
+          webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
+        }
+      ).connection ||
+      (
+        navigator as Navigator & {
+          connection?: { effectiveType?: string; type?: string; downlink?: number };
+          mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
+          webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
+        }
+      ).mozConnection ||
+      (
+        navigator as Navigator & {
+          connection?: { effectiveType?: string; type?: string; downlink?: number };
+          mozConnection?: { effectiveType?: string; type?: string; downlink?: number };
+          webkitConnection?: { effectiveType?: string; type?: string; downlink?: number };
+        }
+      ).webkitConnection;
     if (!connection) return {};
 
     return {
       networkType: connection.effectiveType || connection.type,
-      connectionSpeed: connection.downlink ? `${connection.downlink} Mbps` : undefined
+      connectionSpeed: connection.downlink ? `${connection.downlink} Mbps` : undefined,
     };
   }
 
@@ -155,15 +163,19 @@ export class MobileErrorHandler {
       return {};
     }
 
-    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    const memory = (
+      performance as Performance & {
+        memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number };
+      }
+    ).memory;
     if (!memory) return {};
 
     return {
       memoryInfo: {
         usedJSHeapSize: memory.usedJSHeapSize,
         totalJSHeapSize: memory.totalJSHeapSize,
-        jsHeapSizeLimit: memory.jsHeapSizeLimit
-      }
+        jsHeapSizeLimit: memory.jsHeapSizeLimit,
+      },
     };
   }
 
@@ -182,12 +194,20 @@ export class MobileErrorHandler {
 
     // Strategy 3: Handle memory pressure on mobile devices
     const errorMessage = String((error as Error)?.message || error).toLowerCase();
-    if (errorMessage.includes('memory') || errorMessage.includes('quota') || errorMessage.includes('heap')) {
+    if (
+      errorMessage.includes('memory') ||
+      errorMessage.includes('quota') ||
+      errorMessage.includes('heap')
+    ) {
       this.clearMobileCaches();
     }
 
     // Strategy 4: Handle network-related errors
-    if ((context as { type?: string })?.type === 'network' || errorMessage.includes('network') || errorMessage.includes('fetch')) {
+    if (
+      (context as { type?: string })?.type === 'network' ||
+      errorMessage.includes('network') ||
+      errorMessage.includes('fetch')
+    ) {
       this.handleNetworkError();
     }
 
@@ -205,8 +225,8 @@ export class MobileErrorHandler {
       detail: {
         errorCount: this.errorCount,
         deviceInfo: this.deviceDetector.getDeviceInfo(),
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     });
     window.dispatchEvent(event);
 
@@ -224,62 +244,65 @@ export class MobileErrorHandler {
 
   private enableLowPowerMode(): void {
     logger.info('Enabling low power mode for mobile device');
-    
+
     // Reduce or disable animations globally
     if (typeof document !== 'undefined') {
       document.documentElement.style.setProperty('--animation-duration', '0s');
       document.documentElement.style.setProperty('--transition-duration', '0s');
     }
-    
+
     // Dispatch event for application to reduce functionality
     const event = new CustomEvent('mobile:lowPowerMode', {
-      detail: { 
+      detail: {
         enabled: true,
-        reason: 'performance_optimization'
-      }
+        reason: 'performance_optimization',
+      },
     });
     window.dispatchEvent(event);
   }
 
   private resetTouchHandlers(): void {
     logger.info('Resetting touch handlers due to touch-related error');
-    
+
     // Dispatch event to notify components to reset their touch state
     const event = new CustomEvent('mobile:resetTouch', {
-      detail: { timestamp: Date.now() }
+      detail: { timestamp: Date.now() },
     });
     window.dispatchEvent(event);
   }
 
   private clearMobileCaches(): void {
     logger.info('Clearing mobile caches due to memory pressure');
-    
+
     try {
       // Clear Cache API if available
       if ('caches' in window) {
-        caches.keys().then(names => {
-          // Only clear non-essential caches, preserve critical assets
-          names.forEach(name => {
-            if (!name.includes('critical') && !name.includes('essential')) {
-              caches.delete(name);
-            }
+        caches
+          .keys()
+          .then(names => {
+            // Only clear non-essential caches, preserve critical assets
+            names.forEach(name => {
+              if (!name.includes('critical') && !name.includes('essential')) {
+                caches.delete(name);
+              }
+            });
+          })
+          .catch(err => {
+            logger.error('Failed to clear cache API', { error: err });
           });
-        }).catch(err => {
-          logger.error('Failed to clear cache API', { error: err });
-        });
       }
 
       // Selectively clear localStorage to free memory
       if (typeof localStorage !== 'undefined') {
         const keysToRemove: string[] = [];
-        
+
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (key && (key.startsWith('cache_') || key.startsWith('temp_'))) {
             keysToRemove.push(key);
           }
         }
-        
+
         keysToRemove.forEach(key => {
           try {
             localStorage.removeItem(key);
@@ -293,10 +316,9 @@ export class MobileErrorHandler {
 
       // Notify application to clear in-memory caches
       const event = new CustomEvent('mobile:clearCaches', {
-        detail: { timestamp: Date.now() }
+        detail: { timestamp: Date.now() },
       });
       window.dispatchEvent(event);
-
     } catch (error) {
       logger.error('Failed to clear mobile caches', { error });
     }
@@ -304,44 +326,44 @@ export class MobileErrorHandler {
 
   private handleNetworkError(): void {
     logger.info('Handling network-related error');
-    
+
     // Notify application to switch to offline mode or retry logic
     const event = new CustomEvent('mobile:networkError', {
       detail: {
         online: navigator.onLine,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     });
     window.dispatchEvent(event);
   }
 
   private handleIOSSpecificError(): void {
     logger.info('Handling iOS-specific error');
-    
+
     // iOS has specific quirks, especially with viewport and touch events
     // Notify application to apply iOS-specific fixes
     const event = new CustomEvent('mobile:iosError', {
-      detail: { timestamp: Date.now() }
+      detail: { timestamp: Date.now() },
     });
     window.dispatchEvent(event);
   }
 
   private handleBackgroundTransition(): void {
     logger.debug('Application moved to background');
-    
+
     // Notify application to reduce resource usage
     const event = new CustomEvent('mobile:background', {
-      detail: { timestamp: Date.now() }
+      detail: { timestamp: Date.now() },
     });
     window.dispatchEvent(event);
   }
 
   private handleForegroundTransition(): void {
     logger.debug('Application moved to foreground');
-    
+
     // Notify application to resume normal operations
     const event = new CustomEvent('mobile:foreground', {
-      detail: { timestamp: Date.now() }
+      detail: { timestamp: Date.now() },
     });
     window.dispatchEvent(event);
   }
@@ -369,7 +391,7 @@ export class MobileErrorHandler {
     return {
       count: this.errorCount,
       lastErrorTime: this.lastErrorTime,
-      isInErrorState: this.errorCount >= this.ERROR_THRESHOLD
+      isInErrorState: this.errorCount >= this.ERROR_THRESHOLD,
     };
   }
 }

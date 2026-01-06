@@ -1,46 +1,36 @@
 /**
  * WebSocket Integration Example
- * 
+ *
  * Demonstrates how to integrate real-time WebSocket features
  * with bill tracking and community engagement.
  */
 
-import { 
-  Activity, 
-  Bell, 
-  MessageSquare, 
-  TrendingUp, 
-  Users,
-  Wifi,
-  WifiOff
-} from 'lucide-react';
+import { useWebSocket } from '@client/hooks/use-websocket';
+import { Activity, Bell, MessageSquare, TrendingUp, Users, Wifi, WifiOff } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
+import { useNotifications } from '@client/hooks/useNotifications';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { useWebSocket } from '@client/hooks/use-websocket';
-import { useNotifications } from '@client/hooks/useNotifications';
 
 /**
  * Example 1: Basic WebSocket Connection
  */
 export function BasicWebSocketExample() {
-  const {
-    isConnected,
-    connectionQuality,
-    connect,
-    disconnect,
-    error
-  } = useWebSocket({
-    autoConnect: true
+  const { isConnected, connectionQuality, connect, disconnect, error } = useWebSocket({
+    autoConnect: true,
   });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {isConnected ? <Wifi className="h-5 w-5 text-green-500" /> : <WifiOff className="h-5 w-5 text-red-500" />}
+          {isConnected ? (
+            <Wifi className="h-5 w-5 text-green-500" />
+          ) : (
+            <WifiOff className="h-5 w-5 text-red-500" />
+          )}
           WebSocket Connection Status
         </CardTitle>
       </CardHeader>
@@ -48,38 +38,23 @@ export function BasicWebSocketExample() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span>Status:</span>
-            <Badge variant={isConnected ? "default" : "destructive"}>
+            <Badge variant={isConnected ? 'default' : 'destructive'}>
               {isConnected ? 'Connected' : 'Disconnected'}
             </Badge>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <span>Quality:</span>
-            <Badge variant="outline">
-              {connectionQuality}
-            </Badge>
+            <Badge variant="outline">{connectionQuality}</Badge>
           </div>
-          
-          {error && (
-            <div className="text-sm text-red-600">
-              Error: {error}
-            </div>
-          )}
-          
+
+          {error && <div className="text-sm text-red-600">Error: {error}</div>}
+
           <div className="flex gap-2">
-            <Button 
-              onClick={connect} 
-              disabled={isConnected}
-              size="sm"
-            >
+            <Button onClick={connect} disabled={isConnected} size="sm">
               Connect
             </Button>
-            <Button 
-              onClick={disconnect} 
-              disabled={!isConnected}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={disconnect} disabled={!isConnected} variant="outline" size="sm">
               Disconnect
             </Button>
           </div>
@@ -94,13 +69,8 @@ export function BasicWebSocketExample() {
  */
 export function BillTrackingExample() {
   const billId = 123;
-  const {
-    isConnected,
-    billUpdates,
-    engagementMetrics,
-    getBillUpdates,
-    getEngagementMetrics
-  } = useBillRealTime(billId);
+  const { isConnected, billUpdates, engagementMetrics, getBillUpdates, getEngagementMetrics } =
+    useBillRealTime(billId);
 
   const updates = getBillUpdates(billId);
   const metrics = getEngagementMetrics(billId);
@@ -117,11 +87,11 @@ export function BillTrackingExample() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span>Connection:</span>
-            <Badge variant={isConnected ? "default" : "secondary"}>
+            <Badge variant={isConnected ? 'default' : 'secondary'}>
               {isConnected ? 'Live Updates' : 'Cached Data'}
             </Badge>
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-2">Recent Updates ({updates.length})</h4>
             {updates.length === 0 ? (
@@ -139,7 +109,7 @@ export function BillTrackingExample() {
               </div>
             )}
           </div>
-          
+
           {metrics && (
             <div>
               <h4 className="font-medium mb-2">Engagement Metrics</h4>
@@ -165,12 +135,7 @@ export function BillTrackingExample() {
  * Example 3: Notifications System
  */
 export function NotificationsExample() {
-  const {
-    notifications,
-    notificationCount,
-    markAsRead,
-    isConnected
-  } = useNotifications();
+  const { notifications, notificationCount, markAsRead, isConnected } = useNotifications();
 
   return (
     <Card>
@@ -178,29 +143,27 @@ export function NotificationsExample() {
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
           Notifications
-          {notificationCount > 0 && (
-            <Badge variant="destructive">{notificationCount}</Badge>
-          )}
+          {notificationCount > 0 && <Badge variant="destructive">{notificationCount}</Badge>}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span>Real-time:</span>
-            <Badge variant={isConnected ? "default" : "secondary"}>
+            <Badge variant={isConnected ? 'default' : 'secondary'}>
               {isConnected ? 'Active' : 'Offline'}
             </Badge>
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-2">Recent Notifications</h4>
             {notifications.length === 0 ? (
               <p className="text-sm text-muted-foreground">No notifications</p>
             ) : (
               <div className="space-y-2">
-                {notifications.slice(0, 3).map((notification) => (
-                  <div 
-                    key={notification.id} 
+                {notifications.slice(0, 3).map(notification => (
+                  <div
+                    key={notification.id}
                     className={`p-2 border rounded text-sm ${
                       !notification.read ? 'bg-blue-50 border-blue-200' : ''
                     }`}
@@ -208,9 +171,7 @@ export function NotificationsExample() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="font-medium">{notification.title}</div>
-                        <div className="text-muted-foreground text-xs">
-                          {notification.message}
-                        </div>
+                        <div className="text-muted-foreground text-xs">{notification.message}</div>
                         <div className="text-muted-foreground text-xs mt-1">
                           {new Date(notification.created_at).toLocaleString()}
                         </div>
@@ -243,39 +204,25 @@ export function NotificationsExample() {
 export function AdvancedWebSocketExample() {
   const [activityLog, setActivityLog] = useState<string[]>([]);
 
-  const {
-    isConnected,
-    subscribe,
-    unsubscribe,
-    getRecentActivity
-  } = useWebSocket({
+  const { isConnected, subscribe, unsubscribe, getRecentActivity } = useWebSocket({
     autoConnect: true,
     handlers: {
-      onBillUpdate: (update) => {
-        setActivityLog(prev => [
-          `Bill ${update.bill_id}: ${update.type}`,
-          ...prev.slice(0, 9)
-        ]);
+      onBillUpdate: update => {
+        setActivityLog(prev => [`Bill ${update.bill_id}: ${update.type}`, ...prev.slice(0, 9)]);
       },
-      onCommunityUpdate: (update) => {
-        setActivityLog(prev => [
-          `Community: ${update.type}`,
-          ...prev.slice(0, 9)
-        ]);
+      onCommunityUpdate: update => {
+        setActivityLog(prev => [`Community: ${update.type}`, ...prev.slice(0, 9)]);
       },
-      onNotification: (notification) => {
-        setActivityLog(prev => [
-          `Notification: ${notification.title}`,
-          ...prev.slice(0, 9)
-        ]);
+      onNotification: notification => {
+        setActivityLog(prev => [`Notification: ${notification.title}`, ...prev.slice(0, 9)]);
       },
-      onConnectionChange: (connected) => {
+      onConnectionChange: connected => {
         setActivityLog(prev => [
           `Connection ${connected ? 'established' : 'lost'}`,
-          ...prev.slice(0, 9)
+          ...prev.slice(0, 9),
         ]);
-      }
-    }
+      },
+    },
   });
 
   const handleSubscribeToBill = () => {
@@ -299,14 +246,10 @@ export function AdvancedWebSocketExample() {
       <CardContent>
         <div className="space-y-4">
           <div className="flex gap-2">
-            <Button 
-              onClick={handleSubscribeToBill}
-              disabled={!isConnected}
-              size="sm"
-            >
+            <Button onClick={handleSubscribeToBill} disabled={!isConnected} size="sm">
               Subscribe to Bill 456
             </Button>
-            <Button 
+            <Button
               onClick={handleUnsubscribeFromBill}
               disabled={!isConnected}
               variant="outline"
@@ -315,7 +258,7 @@ export function AdvancedWebSocketExample() {
               Unsubscribe
             </Button>
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-2">Activity Log</h4>
             <div className="max-h-40 overflow-y-auto space-y-1">
@@ -349,7 +292,7 @@ export function WebSocketIntegrationExample() {
             Demonstrations of real-time WebSocket features for civic engagement
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <BasicWebSocketExample />
           <BillTrackingExample />

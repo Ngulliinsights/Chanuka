@@ -1,6 +1,6 @@
 /**
  * API Retry Module
- * 
+ *
  * Handles retry logic with exponential backoff, configurable retry conditions,
  * and comprehensive error handling for API requests.
  */
@@ -33,15 +33,17 @@ export interface RetryContext {
 /**
  * Result of a retry operation
  */
-export type RetryResult<T> = {
-  success: true;
-  data: T;
-  attempts: number;
-} | {
-  success: false;
-  error: Error;
-  attempts: number;
-};
+export type RetryResult<T> =
+  | {
+      success: true;
+      data: T;
+      attempts: number;
+    }
+  | {
+      success: false;
+      error: Error;
+      attempts: number;
+    };
 
 /**
  * Default retry configuration
@@ -50,7 +52,7 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
   baseDelay: 1000,
   maxDelay: 30000,
-  backoffMultiplier: 2
+  backoffMultiplier: 2,
 };
 
 /**
@@ -64,7 +66,7 @@ export class RetryHandler {
       ...DEFAULT_RETRY_CONFIG,
       retryCondition: config.retryCondition || this.defaultRetryCondition.bind(this),
       onRetry: config.onRetry || this.defaultOnRetry.bind(this),
-      ...config
+      ...config,
     } as Required<RetryConfig>;
   }
 
@@ -77,14 +79,14 @@ export class RetryHandler {
     for (let attempt = 0; attempt <= this.config.maxRetries; attempt++) {
       try {
         const result = await operation();
-        
+
         if (attempt > 0) {
           logger.info('Operation succeeded after retry', {
             component: 'RetryHandler',
-            attempts: attempt + 1
+            attempts: attempt + 1,
           });
         }
-        
+
         return result;
       } catch (error) {
         lastError = error as Error;
@@ -101,27 +103,24 @@ export class RetryHandler {
 
         // Calculate delay with exponential backoff and jitter
         const delay = this.calculateRetryDelay(attempt);
-        
+
         // Call retry callback
         this.config.onRetry(lastError, attempt, delay);
-        
+
         // Wait before retrying
         await this.delay(delay);
       }
     }
 
     // All retries exhausted or retry condition failed
-    throw ErrorFactory.createNetworkError(
-      lastError?.message || 'Operation failed after retries',
-      {
-        domain: 'API' as ErrorDomain,
-        severity: 'ERROR' as ErrorSeverity,
-        context: {
-          attempts: this.config.maxRetries + 1,
-          originalError: lastError
-        }
-      }
-    );
+    throw ErrorFactory.createNetworkError(lastError?.message || 'Operation failed after retries', {
+      domain: 'API' as ErrorDomain,
+      severity: 'ERROR' as ErrorSeverity,
+      context: {
+        attempts: this.config.maxRetries + 1,
+        originalError: lastError,
+      },
+    });
   }
 
   /**
@@ -129,19 +128,19 @@ export class RetryHandler {
    */
   async safeExecute<T>(operation: () => Promise<T>): Promise<RetryResult<T>> {
     const attempts = 0;
-    
+
     try {
       const result = await this.execute(operation);
       return {
         success: true,
         data: result,
-        attempts: attempts + 1
+        attempts: attempts + 1,
       };
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        attempts: this.config.maxRetries + 1
+        attempts: this.config.maxRetries + 1,
       };
     }
   }
@@ -166,9 +165,11 @@ export class RetryHandler {
     const errorMessage = error.message.toLowerCase();
 
     // Never retry 4xx errors except timeouts (408) and rate limits (429)
-    if (errorMessage.includes('40') &&
-        !errorMessage.includes('408') &&
-        !errorMessage.includes('429')) {
+    if (
+      errorMessage.includes('40') &&
+      !errorMessage.includes('408') &&
+      !errorMessage.includes('429')
+    ) {
       return false;
     }
 
@@ -179,9 +180,9 @@ export class RetryHandler {
     if (isNetworkError || isServerError) {
       // On final attempt, only retry specific recoverable errors
       if (attempt === this.config.maxRetries - 1) {
-        return errorMessage.includes('503') ||
-               errorMessage.includes('504') ||
-               error.name === 'TypeError';
+        return (
+          errorMessage.includes('503') || errorMessage.includes('504') || error.name === 'TypeError'
+        );
       }
       return true;
     }
@@ -198,7 +199,7 @@ export class RetryHandler {
       attempt: attempt + 1,
       maxAttempts: this.config.maxRetries + 1,
       error: error.message,
-      delayMs: Math.round(delayMs)
+      delayMs: Math.round(delayMs),
     });
   }
 
@@ -217,7 +218,7 @@ export class RetryHandler {
       ...this.config,
       ...config,
       retryCondition: config.retryCondition || this.config.retryCondition,
-      onRetry: config.onRetry || this.config.onRetry
+      onRetry: config.onRetry || this.config.onRetry,
     } as Required<RetryConfig>;
   }
 
@@ -259,24 +260,26 @@ export function createHttpRetryHandler(config?: Partial<RetryConfig>): RetryHand
     ...config,
     retryCondition: (error: Error, _attempt: number) => {
       const message = error.message.toLowerCase();
-      
+
       // Retry on network errors
       if (error.name === 'TypeError' || error.name === 'TimeoutError') {
         return true;
       }
-      
+
       // Retry on specific HTTP status codes
-      if (message.includes('500') || 
-          message.includes('502') || 
-          message.includes('503') || 
-          message.includes('504') ||
-          message.includes('408') ||
-          message.includes('429')) {
+      if (
+        message.includes('500') ||
+        message.includes('502') ||
+        message.includes('503') ||
+        message.includes('504') ||
+        message.includes('408') ||
+        message.includes('429')
+      ) {
         return true;
       }
-      
+
       return false;
-    }
+    },
   });
 }
 
@@ -288,26 +291,26 @@ export const SERVICE_RETRY_CONFIGS = {
     maxRetries: 2,
     baseDelay: 500,
     maxDelay: 5000,
-    backoffMultiplier: 2
+    backoffMultiplier: 2,
   },
   bills: {
     maxRetries: 3,
     baseDelay: 1000,
     maxDelay: 10000,
-    backoffMultiplier: 1.5
+    backoffMultiplier: 1.5,
   },
   community: {
     maxRetries: 2,
     baseDelay: 800,
     maxDelay: 8000,
-    backoffMultiplier: 2
+    backoffMultiplier: 2,
   },
   search: {
     maxRetries: 4,
     baseDelay: 600,
     maxDelay: 15000,
-    backoffMultiplier: 1.8
-  }
+    backoffMultiplier: 1.8,
+  },
 } as const;
 
 /**
@@ -320,6 +323,6 @@ export function createServiceRetryHandler(
   const serviceConfig = SERVICE_RETRY_CONFIGS[service];
   return new RetryHandler({
     ...serviceConfig,
-    ...overrides
+    ...overrides,
   });
 }

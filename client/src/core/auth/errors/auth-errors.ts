@@ -503,7 +503,9 @@ export function isAccountLockedError(error: unknown): error is AccountLockedErro
 /**
  * Type guard for EmailVerificationRequiredError
  */
-export function isEmailVerificationRequiredError(error: unknown): error is EmailVerificationRequiredError {
+export function isEmailVerificationRequiredError(
+  error: unknown
+): error is EmailVerificationRequiredError {
   return error instanceof EmailVerificationRequiredError;
 }
 
@@ -534,7 +536,7 @@ export default {
   SessionInvalidError,
   SessionNotFoundError,
   SessionRevokedError,
-  
+
   // Factory functions
   createValidationError,
   createAuthenticationError,
@@ -548,7 +550,7 @@ export default {
   createSessionInvalidError,
   createSessionNotFoundError,
   createSessionRevokedError,
-  
+
   // Type guards
   isAuthError,
   isAuthValidationError,

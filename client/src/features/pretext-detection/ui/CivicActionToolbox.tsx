@@ -12,18 +12,8 @@ import React, { useState } from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@client/shared/design-system';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 // Define types locally
 interface CivicAction {
@@ -70,167 +60,166 @@ interface CivicActionToolboxProps {
   onRightsCardOpen: (card: RightsCard) => void;
 }
 
-export const CivicActionToolbox = React.memo<CivicActionToolboxProps>(({
-  billId: _billId,
-  actions,
-  rightsCards,
-  onActionSelect,
-  onRightsCardOpen,
-}) => {
-  const [selectedTab, setSelectedTab] = useState('actions');
+export const CivicActionToolbox = React.memo<CivicActionToolboxProps>(
+  ({ billId: _billId, actions, rightsCards, onActionSelect, onRightsCardOpen }) => {
+    const [selectedTab, setSelectedTab] = useState('actions');
 
-  const getActionIcon = (type: string) => {
-    switch (type) {
-      case 'foi':
-        return <FileText className="h-4 w-4" />;
-      case 'petition':
-        return <Users className="h-4 w-4" />;
-      case 'complaint':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'public_participation':
-        return <Scale className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
+    const getActionIcon = (type: string) => {
+      switch (type) {
+        case 'foi':
+          return <FileText className="h-4 w-4" />;
+        case 'petition':
+          return <Users className="h-4 w-4" />;
+        case 'complaint':
+          return <AlertCircle className="h-4 w-4" />;
+        case 'public_participation':
+          return <Scale className="h-4 w-4" />;
+        default:
+          return <FileText className="h-4 w-4" />;
+      }
+    };
 
-  const getRightsIcon = (scenario: string) => {
-    switch (scenario) {
-      case 'arrest':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'accident':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'corruption_report':
-        return <Scale className="h-4 w-4" />;
-      case 'small_claims':
-        return <FileText className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
+    const getRightsIcon = (scenario: string) => {
+      switch (scenario) {
+        case 'arrest':
+          return <AlertCircle className="h-4 w-4" />;
+        case 'accident':
+          return <AlertCircle className="h-4 w-4" />;
+        case 'corruption_report':
+          return <Scale className="h-4 w-4" />;
+        case 'small_claims':
+          return <FileText className="h-4 w-4" />;
+        default:
+          return <FileText className="h-4 w-4" />;
+      }
+    };
 
-  const getDifficultyColor = (
-    difficulty: string
-  ): 'secondary' | 'destructive' | 'outline' | 'default' => {
-    switch (difficulty) {
-      case 'easy':
-        return 'secondary';
-      case 'medium':
-        return 'outline';
-      case 'hard':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
+    const getDifficultyColor = (
+      difficulty: string
+    ): 'secondary' | 'destructive' | 'outline' | 'default' => {
+      switch (difficulty) {
+        case 'easy':
+          return 'secondary';
+        case 'medium':
+          return 'outline';
+        case 'hard':
+          return 'destructive';
+        default:
+          return 'secondary';
+      }
+    };
 
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Scale className="h-5 w-5" />
-          Civic Action Toolbox
-        </CardTitle>
-      </CardHeader>
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="h-5 w-5" />
+            Civic Action Toolbox
+          </CardTitle>
+        </CardHeader>
 
-      <CardContent>
-        <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="actions">Take Action</TabsTrigger>
-            <TabsTrigger value="rights">Know Your Rights</TabsTrigger>
-          </TabsList>
+        <CardContent>
+          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="actions">Take Action</TabsTrigger>
+              <TabsTrigger value="rights">Know Your Rights</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="actions" className="space-y-4">
-            <div className="text-sm text-muted-foreground mb-4">
-              Choose an action to respond to this bill or situation:
-            </div>
+            <TabsContent value="actions" className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Choose an action to respond to this bill or situation:
+              </div>
 
-            {actions.map(action => (
-              <Card key={action.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      {getActionIcon(action.type)}
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{action.title}</h4>
-                          <Badge variant={getDifficultyColor(action.difficulty)}>
-                            {action.difficulty}
-                          </Badge>
-                        </div>
-
-                        <p className="text-sm text-muted-foreground">{action.description}</p>
-
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {action.estimatedTime}
+              {actions.map(action => (
+                <Card
+                  key={action.id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        {getActionIcon(action.type)}
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium">{action.title}</h4>
+                            <Badge variant={getDifficultyColor(action.difficulty)}>
+                              {action.difficulty}
+                            </Badge>
                           </div>
-                          {action.successRate && (
+
+                          <p className="text-sm text-muted-foreground">{action.description}</p>
+
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
-                              <TrendingUp className="h-3 w-3" />
-                              {Math.round(action.successRate * 100)}% success rate
+                              <Clock className="h-3 w-3" />
+                              {action.estimatedTime}
                             </div>
-                          )}
-                          <div>{action.localContacts.length} local contacts</div>
+                            {action.successRate && (
+                              <div className="flex items-center gap-1">
+                                <TrendingUp className="h-3 w-3" />
+                                {Math.round(action.successRate * 100)}% success rate
+                              </div>
+                            )}
+                            <div>{action.localContacts.length} local contacts</div>
+                          </div>
                         </div>
                       </div>
+
+                      <Button onClick={() => onActionSelect(action)} size="sm">
+                        Start
+                      </Button>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
 
-                    <Button onClick={() => onActionSelect(action)} size="sm">
-                      Start
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
+            <TabsContent value="rights" className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Essential legal knowledge for common situations:
+              </div>
 
-          <TabsContent value="rights" className="space-y-4">
-            <div className="text-sm text-muted-foreground mb-4">
-              Essential legal knowledge for common situations:
-            </div>
+              {rightsCards.map(card => (
+                <Card key={card.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        {getRightsIcon(card.scenario)}
+                        <div className="space-y-2 flex-1">
+                          <h4 className="font-medium">{card.title}</h4>
+                          <p className="text-sm text-muted-foreground">{card.description}</p>
 
-            {rightsCards.map(card => (
-              <Card key={card.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      {getRightsIcon(card.scenario)}
-                      <div className="space-y-2 flex-1">
-                        <h4 className="font-medium">{card.title}</h4>
-                        <p className="text-sm text-muted-foreground">{card.description}</p>
-
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div>{card.steps.length} steps</div>
-                          <div>{card.contacts.length} local contacts</div>
-                          <div>Updated {card.lastUpdated.toLocaleDateString()}</div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <div>{card.steps.length} steps</div>
+                            <div>{card.contacts.length} local contacts</div>
+                            <div>Updated {card.lastUpdated.toLocaleDateString()}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex gap-2">
-                      <Button onClick={() => onRightsCardOpen(card)} variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          /* Download PDF */
-                        }}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        <Download className="h-3 w-3" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button onClick={() => onRightsCardOpen(card)} variant="outline" size="sm">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            /* Download PDF */
+                          }}
+                          variant="ghost"
+                          size="sm"
+                        >
+                          <Download className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
-});
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    );
+  }
+);

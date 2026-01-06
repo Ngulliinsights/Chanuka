@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 1/6/2026, 10:19:56 AM
+**Generated:** 1/7/2026, 12:17:48 AM
 **Max Depth:** 7 levels
 
 ```
@@ -25,7 +25,6 @@
 │   ├── global/
 │   │   ├── declarations.d.ts
 │   │   ├── index.ts
-│   │   ├── lucide.d.ts
 │   │   └── shims.d.ts
 │   ├── server/
 │   │   ├── features.d.ts
@@ -105,6 +104,7 @@
 │   │   │   │   ├── AnalyticsIntegration.tsx
 │   │   │   │   ├── AnalyticsProvider.tsx
 │   │   │   │   ├── comprehensive-tracker.ts
+│   │   │   │   ├── data-retention-service.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── api/
 │   │   │   │   ├── examples/
@@ -324,11 +324,13 @@
 │   │   │   │   ├── hooks.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── lookup.ts
+│   │   │   │   ├── navigation-service.ts
 │   │   │   │   ├── navigation-wrapper.ts
 │   │   │   │   ├── NavigationConsistency.test.tsx
 │   │   │   │   ├── NavigationConsistency.tsx
 │   │   │   │   ├── NavigationPerformance.test.tsx
 │   │   │   │   ├── NavigationPerformance.tsx
+│   │   │   │   ├── page-relationship-service.ts
 │   │   │   │   ├── persistence.ts
 │   │   │   │   ├── preferences.ts
 │   │   │   │   ├── search.ts
@@ -346,7 +348,7 @@
 │   │   │   │   └── web-vitals.ts
 │   │   │   ├── personalization/
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── persona-detector.test.ts
+│   │   │   │   ├── persona-detector.test.tsx
 │   │   │   │   ├── persona-detector.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── realtime/
@@ -385,6 +387,7 @@
 │   │   │   ├── storage/
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── offline-data-manager.ts
 │   │   │   │   ├── secure-storage.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── validation/
@@ -571,6 +574,9 @@
 │   │   │   │   │   ├── render-tracker.ts
 │   │   │   │   │   ├── render-tracking-integration.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── navigation/
+│   │   │   │   └── model/
+│   │   │   │       └── index.ts
 │   │   │   ├── notifications/
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── index.ts
@@ -645,6 +651,9 @@
 │   │   │   │   │   ├── usePasswordUtils.ts
 │   │   │   │   │   ├── useUserAPI.ts
 │   │   │   │   │   └── useUsers.ts
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── user-service.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── onboarding-service.ts
 │   │   │   │   │   └── user-api.ts
@@ -799,11 +808,11 @@
 │   │   ├── services/
 │   │   │   ├── auth-service-init.ts
 │   │   │   ├── dataRetentionService.ts
+│   │   │   ├── FSD_MIGRATION_SUMMARY.md
 │   │   │   ├── index.ts
 │   │   │   ├── mockUserData.ts
 │   │   │   ├── navigation.ts
 │   │   │   ├── notification-system-integration-summary.md
-│   │   │   ├── PageRelationshipService.ts
 │   │   │   ├── realistic-demo-data.ts
 │   │   │   └── userService.ts
 │   │   ├── shared/
@@ -976,8 +985,6 @@
 │   │   │   │   ├── cache/
 │   │   │   │   │   ├── cache-invalidation.ts
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── compatibility/
-│   │   │   │   │   └── index.ts
 │   │   │   │   ├── events/
 │   │   │   │   │   ├── event-bus.ts
 │   │   │   │   │   └── index.ts
@@ -990,9 +997,6 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── monitoring-integration.ts
 │   │   │   │   │   └── performance-monitor.ts
-│   │   │   │   ├── storage/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── offline-data-manager.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   ├── middleware/
 │   │   │   │   │   │   ├── apiMiddleware.ts
@@ -1021,7 +1025,6 @@
 │   │   │   │   ├── workers/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── service-worker.ts
-│   │   │   │   ├── data-retention.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── integration-validator.ts
 │   │   │   │   └── quality-optimizer.ts
@@ -1329,7 +1332,7 @@
 │   │   │   ├── accessibility/
 │   │   │   │   └── home-page-accessibility.test.ts
 │   │   │   └── performance/
-│   │   │       └── home-page-performance.test.ts
+│   │   │       └── home-page-performance.test.tsx
 │   │   ├── types/
 │   │   │   └── lucide-react.d.ts
 │   │   ├── utils/
@@ -1373,11 +1376,13 @@
 │   ├── postcss.config.js
 │   ├── project.json
 │   ├── tailwind.config.ts
+│   ├── test-lucide-imports.ts
 │   ├── tsconfig.json
 │   ├── validate-fixes.cjs
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
-│   └── vite.production.config.ts
+│   ├── vite.production.config.ts
+│   └── vitest.config.ts
 ├── deployment/
 │   ├── environment-configs/
 │   │   ├── development.env
@@ -2942,9 +2947,6 @@
 │   ├── package.json
 │   ├── project.json
 │   └── tsconfig.json
-├── test-results/
-│   ├── results.json
-│   └── results.xml
 ├── tests/
 │   ├── e2e/
 │   │   └── test-results/
@@ -3024,6 +3026,12 @@
 │   │   │   ├── classification/
 │   │   │   │   └── IssueClassifier.test.ts
 │   │   │   ├── fixtures/
+│   │   │   │   ├── ast/
+│   │   │   │   │   ├── export-test.ts
+│   │   │   │   │   ├── import-test.ts
+│   │   │   │   │   ├── test.js
+│   │   │   │   │   ├── test.ts
+│   │   │   │   │   └── test.tsx
 │   │   │   │   ├── circular-dep-b.ts
 │   │   │   │   ├── import-issues.ts
 │   │   │   │   └── sample-issues.ts
@@ -3063,6 +3071,7 @@
 ├── chanuka_error_extractor.py
 ├── circular-dependency-resolver.mjs
 ├── clear-sw.html
+├── CLIENT_ERROR_FIX_SUMMARY.md
 ├── client-fix-report-20251220-180156.md
 ├── codebase_errors.json
 ├── combined_analysis.json

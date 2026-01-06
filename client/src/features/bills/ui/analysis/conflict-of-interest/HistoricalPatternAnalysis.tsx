@@ -1,35 +1,38 @@
 /**
  * HistoricalPatternAnalysis - Voting correlation with financial interests
- * 
+ *
  * Analyzes historical voting patterns and their correlation with
  * financial interests and organizational connections.
  */
 
 import { TrendingUp, Vote, Calendar, AlertTriangle, BarChart3 } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   ScatterChart,
   Scatter,
   BarChart,
   Bar,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
 
 import { VotingPattern, ConflictAnalysis } from '@client/features/analysis/types';
-
 import { Badge } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
-
 
 interface HistoricalPatternAnalysisProps {
   conflictAnalysis: ConflictAnalysis;
@@ -41,71 +44,85 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
     const { votingPatterns, financialInterests } = conflictAnalysis;
 
     // Group votes by year and calculate correlations
-    const votesByYear = votingPatterns.reduce((acc, vote) => {
-      const year = new Date(vote.date).getFullYear();
-      if (!acc[year]) {
-        acc[year] = {
-          year,
-          votes: [],
-          avgCorrelation: 0,
-          highCorrelationVotes: 0,
-          totalVotes: 0,
-          yesVotes: 0,
-          noVotes: 0,
-          abstainVotes: 0,
-          absentVotes: 0
-        };
-      }
-      
-      acc[year].votes.push(vote);
-      acc[year].totalVotes++;
-      acc[year][`${vote.vote}Votes`]++;
-      
-      return acc;
-    }, {} as Record<number, any>);
+    const votesByYear = votingPatterns.reduce(
+      (acc, vote) => {
+        const year = new Date(vote.date).getFullYear();
+        if (!acc[year]) {
+          acc[year] = {
+            year,
+            votes: [],
+            avgCorrelation: 0,
+            highCorrelationVotes: 0,
+            totalVotes: 0,
+            yesVotes: 0,
+            noVotes: 0,
+            abstainVotes: 0,
+            absentVotes: 0,
+          };
+        }
+
+        acc[year].votes.push(vote);
+        acc[year].totalVotes++;
+        acc[year][`${vote.vote}Votes`]++;
+
+        return acc;
+      },
+      {} as Record<number, any>
+    );
 
     // Calculate average correlations and patterns
     Object.values(votesByYear).forEach((yearData: any) => {
-      const correlations = yearData.votes.map((v: VotingPattern) => Math.abs(v.financialCorrelation));
-      yearData.avgCorrelation = correlations.reduce((sum: number, c: number) => sum + c, 0) / correlations.length;
-      yearData.highCorrelationVotes = yearData.votes.filter((v: VotingPattern) => Math.abs(v.financialCorrelation) > 0.5).length;
+      const correlations = yearData.votes.map((v: VotingPattern) =>
+        Math.abs(v.financialCorrelation)
+      );
+      yearData.avgCorrelation =
+        correlations.reduce((sum: number, c: number) => sum + c, 0) / correlations.length;
+      yearData.highCorrelationVotes = yearData.votes.filter(
+        (v: VotingPattern) => Math.abs(v.financialCorrelation) > 0.5
+      ).length;
     });
 
     // Industry-specific voting patterns
-    const industryPatterns = financialInterests.reduce((acc, interest) => {
-      if (!acc[interest.industry]) {
-        acc[interest.industry] = {
-          industry: interest.industry,
-          totalAmount: 0,
-          relatedVotes: [],
-          avgCorrelation: 0,
-          favorableVotes: 0,
-          unfavorableVotes: 0
-        };
-      }
-      
-      acc[interest.industry].totalAmount += interest.amount;
-      
-      // Find votes related to this industry
-      const relatedVotes = votingPatterns.filter(vote => 
-        vote.relatedIndustries.includes(interest.industry)
-      );
-      
-      acc[interest.industry].relatedVotes = relatedVotes;
-      
-      if (relatedVotes.length > 0) {
-        acc[interest.industry].avgCorrelation = 
-          relatedVotes.reduce((sum, vote) => sum + vote.financialCorrelation, 0) / relatedVotes.length;
-        
-        acc[interest.industry].favorableVotes = 
-          relatedVotes.filter(vote => vote.financialCorrelation > 0.2).length;
-        
-        acc[interest.industry].unfavorableVotes = 
-          relatedVotes.filter(vote => vote.financialCorrelation < -0.2).length;
-      }
-      
-      return acc;
-    }, {} as Record<string, any>);
+    const industryPatterns = financialInterests.reduce(
+      (acc, interest) => {
+        if (!acc[interest.industry]) {
+          acc[interest.industry] = {
+            industry: interest.industry,
+            totalAmount: 0,
+            relatedVotes: [],
+            avgCorrelation: 0,
+            favorableVotes: 0,
+            unfavorableVotes: 0,
+          };
+        }
+
+        acc[interest.industry].totalAmount += interest.amount;
+
+        // Find votes related to this industry
+        const relatedVotes = votingPatterns.filter(vote =>
+          vote.relatedIndustries.includes(interest.industry)
+        );
+
+        acc[interest.industry].relatedVotes = relatedVotes;
+
+        if (relatedVotes.length > 0) {
+          acc[interest.industry].avgCorrelation =
+            relatedVotes.reduce((sum, vote) => sum + vote.financialCorrelation, 0) /
+            relatedVotes.length;
+
+          acc[interest.industry].favorableVotes = relatedVotes.filter(
+            vote => vote.financialCorrelation > 0.2
+          ).length;
+
+          acc[interest.industry].unfavorableVotes = relatedVotes.filter(
+            vote => vote.financialCorrelation < -0.2
+          ).length;
+        }
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
 
     // Correlation timeline data
     const correlationTimeline = votingPatterns
@@ -116,23 +133,33 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
         correlation: vote.financialCorrelation,
         billTitle: vote.billTitle,
         vote: vote.vote,
-        industries: vote.relatedIndustries
+        industries: vote.relatedIndustries,
       }));
 
     // Risk assessment
     const riskMetrics = {
-      highCorrelationPercentage: (votingPatterns.filter(v => Math.abs(v.financialCorrelation) > 0.5).length / votingPatterns.length) * 100,
-      consistentPatternRisk: Object.values(industryPatterns).filter((p: any) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3).length,
-      recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation) > 0.4).length
+      highCorrelationPercentage:
+        (votingPatterns.filter(v => Math.abs(v.financialCorrelation) > 0.5).length /
+          votingPatterns.length) *
+        100,
+      consistentPatternRisk: Object.values(industryPatterns).filter(
+        (p: any) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3
+      ).length,
+      recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation) > 0.4)
+        .length,
     };
 
     return {
       yearlyData: Object.values(votesByYear).sort((a: any, b: any) => a.year - b.year),
-      industryPatterns: Object.values(industryPatterns).sort((a: any, b: any) => b.totalAmount - a.totalAmount),
+      industryPatterns: Object.values(industryPatterns).sort(
+        (a: any, b: any) => b.totalAmount - a.totalAmount
+      ),
       correlationTimeline,
       riskMetrics,
       totalVotes: votingPatterns.length,
-      avgOverallCorrelation: votingPatterns.reduce((sum, vote) => sum + Math.abs(vote.financialCorrelation), 0) / votingPatterns.length
+      avgOverallCorrelation:
+        votingPatterns.reduce((sum, vote) => sum + Math.abs(vote.financialCorrelation), 0) /
+        votingPatterns.length,
     };
   }, [conflictAnalysis]);
 
@@ -169,9 +196,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
               <span className="text-sm font-medium">Total Votes</span>
             </div>
             <div className="text-2xl font-bold">{analysisData.totalVotes}</div>
-            <div className="text-xs text-muted-foreground">
-              Analyzed voting records
-            </div>
+            <div className="text-xs text-muted-foreground">Analyzed voting records</div>
           </CardContent>
         </Card>
 
@@ -184,9 +209,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
             <div className="text-2xl font-bold">
               {formatCorrelation(analysisData.avgOverallCorrelation)}
             </div>
-            <div className="text-xs text-muted-foreground">
-              Financial interest correlation
-            </div>
+            <div className="text-xs text-muted-foreground">Financial interest correlation</div>
           </CardContent>
         </Card>
 
@@ -199,9 +222,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
             <div className="text-2xl font-bold">
               {analysisData.riskMetrics.highCorrelationPercentage.toFixed(1)}%
             </div>
-            <div className="text-xs text-muted-foreground">
-              Correlation &gt; 50%
-            </div>
+            <div className="text-xs text-muted-foreground">Correlation &gt; 50%</div>
           </CardContent>
         </Card>
 
@@ -213,13 +234,14 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
             </div>
             <div className="text-2xl font-bold">
               <Badge variant={getRiskBadge(analysisData.riskMetrics.consistentPatternRisk * 10)}>
-                {analysisData.riskMetrics.consistentPatternRisk > 2 ? 'HIGH' : 
-                 analysisData.riskMetrics.consistentPatternRisk > 0 ? 'MEDIUM' : 'LOW'}
+                {analysisData.riskMetrics.consistentPatternRisk > 2
+                  ? 'HIGH'
+                  : analysisData.riskMetrics.consistentPatternRisk > 0
+                    ? 'MEDIUM'
+                    : 'LOW'}
               </Badge>
             </div>
-            <div className="text-xs text-muted-foreground">
-              Consistent patterns detected
-            </div>
+            <div className="text-xs text-muted-foreground">Consistent patterns detected</div>
           </CardContent>
         </Card>
       </div>
@@ -237,34 +259,34 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
           <Card>
             <CardHeader>
               <CardTitle>Voting Correlation Timeline</CardTitle>
-              <CardDescription>
-                Financial correlation of votes over time
-              </CardDescription>
+              <CardDescription>Financial correlation of votes over time</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={analysisData.correlationTimeline}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
+                    <XAxis
                       dataKey="index"
                       label={{ value: 'Vote Number', position: 'insideBottom', offset: -5 }}
                     />
-                    <YAxis 
+                    <YAxis
                       domain={[-1, 1]}
-                      tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                      tickFormatter={value => `${(value * 100).toFixed(0)}%`}
                       label={{ value: 'Correlation', angle: -90, position: 'insideLeft' }}
                     />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number) => [formatCorrelation(value), 'Correlation']}
-                      labelFormatter={(index) => {
+                      labelFormatter={index => {
                         const vote = analysisData.correlationTimeline[index - 1];
-                        return vote ? `${vote.billTitle} (${new Date(vote.date).toLocaleDateString()})` : '';
+                        return vote
+                          ? `${vote.billTitle} (${new Date(vote.date).toLocaleDateString()})`
+                          : '';
                       }}
-                      contentStyle={{ 
+                      contentStyle={{
                         backgroundColor: 'hsl(var(--popover))',
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius-md)'
+                        borderRadius: 'var(--radius-md)',
                       }}
                     />
                     <Area
@@ -286,24 +308,27 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
                     .filter(vote => Math.abs(vote.correlation) > 0.4)
                     .slice(-5)
                     .map((vote, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{vote.billTitle}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(vote.date).toLocaleDateString()} • Vote: {vote.vote}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Industries: {vote.industries.join(', ')}
-                        </div>
-                      </div>
-                      <Badge 
-                        variant={Math.abs(vote.correlation) > 0.7 ? 'destructive' : 'secondary'}
-                        style={{ color: getCorrelationColor(vote.correlation) }}
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-lg"
                       >
-                        {formatCorrelation(vote.correlation)}
-                      </Badge>
-                    </div>
-                  ))}
+                        <div className="flex-1">
+                          <div className="font-medium">{vote.billTitle}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(vote.date).toLocaleDateString()} • Vote: {vote.vote}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Industries: {vote.industries.join(', ')}
+                          </div>
+                        </div>
+                        <Badge
+                          variant={Math.abs(vote.correlation) > 0.7 ? 'destructive' : 'secondary'}
+                          style={{ color: getCorrelationColor(vote.correlation) }}
+                        >
+                          {formatCorrelation(vote.correlation)}
+                        </Badge>
+                      </div>
+                    ))}
                 </div>
               </div>
             </CardContent>
@@ -323,52 +348,60 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
                 {analysisData.industryPatterns
                   .filter((pattern: any) => pattern.relatedVotes.length > 0)
                   .map((pattern: any, index: number) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <div className="font-medium">{pattern.industry}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Financial exposure: ${pattern.totalAmount.toLocaleString()} • 
-                          {pattern.relatedVotes.length} related votes
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <div className="font-medium">{pattern.industry}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Financial exposure: ${pattern.totalAmount.toLocaleString()} •
+                            {pattern.relatedVotes.length} related votes
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge
+                            variant={
+                              Math.abs(pattern.avgCorrelation) > 0.5
+                                ? 'destructive'
+                                : Math.abs(pattern.avgCorrelation) > 0.3
+                                  ? 'secondary'
+                                  : 'default'
+                            }
+                          >
+                            {formatCorrelation(pattern.avgCorrelation)}
+                          </Badge>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge 
-                          variant={Math.abs(pattern.avgCorrelation) > 0.5 ? 'destructive' : 
-                                  Math.abs(pattern.avgCorrelation) > 0.3 ? 'secondary' : 'default'}
-                        >
-                          {formatCorrelation(pattern.avgCorrelation)}
-                        </Badge>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="text-center p-2 bg-muted rounded">
-                        <div className="font-medium">{pattern.favorableVotes}</div>
-                        <div className="text-xs text-muted-foreground">Favorable</div>
-                      </div>
-                      <div className="text-center p-2 bg-muted rounded">
-                        <div className="font-medium">
-                          {pattern.relatedVotes.length - pattern.favorableVotes - pattern.unfavorableVotes}
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div className="text-center p-2 bg-muted rounded">
+                          <div className="font-medium">{pattern.favorableVotes}</div>
+                          <div className="text-xs text-muted-foreground">Favorable</div>
                         </div>
-                        <div className="text-xs text-muted-foreground">Neutral</div>
+                        <div className="text-center p-2 bg-muted rounded">
+                          <div className="font-medium">
+                            {pattern.relatedVotes.length -
+                              pattern.favorableVotes -
+                              pattern.unfavorableVotes}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Neutral</div>
+                        </div>
+                        <div className="text-center p-2 bg-muted rounded">
+                          <div className="font-medium">{pattern.unfavorableVotes}</div>
+                          <div className="text-xs text-muted-foreground">Unfavorable</div>
+                        </div>
                       </div>
-                      <div className="text-center p-2 bg-muted rounded">
-                        <div className="font-medium">{pattern.unfavorableVotes}</div>
-                        <div className="text-xs text-muted-foreground">Unfavorable</div>
-                      </div>
-                    </div>
 
-                    {Math.abs(pattern.avgCorrelation) > 0.4 && (
-                      <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                        <AlertTriangle className="h-4 w-4 inline mr-2 text-yellow-600" />
-                        <span className="text-yellow-800">
-                          High correlation detected - voting pattern may align with financial interests
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      {Math.abs(pattern.avgCorrelation) > 0.4 && (
+                        <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                          <AlertTriangle className="h-4 w-4 inline mr-2 text-yellow-600" />
+                          <span className="text-yellow-800">
+                            High correlation detected - voting pattern may align with financial
+                            interests
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -378,9 +411,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
           <Card>
             <CardHeader>
               <CardTitle>Yearly Voting Trends</CardTitle>
-              <CardDescription>
-                Annual patterns in voting behavior and correlations
-              </CardDescription>
+              <CardDescription>Annual patterns in voting behavior and correlations</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-80">
@@ -390,20 +421,37 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
                     <XAxis dataKey="year" />
                     <YAxis yAxisId="left" orientation="left" />
                     <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number, name: string) => {
-                        if (name === 'avgCorrelation') return [formatCorrelation(value), 'Avg Correlation'];
+                        if (name === 'avgCorrelation')
+                          return [formatCorrelation(value), 'Avg Correlation'];
                         return [value, name];
                       }}
-                      contentStyle={{ 
+                      contentStyle={{
                         backgroundColor: 'hsl(var(--popover))',
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius-md)'
+                        borderRadius: 'var(--radius-md)',
                       }}
                     />
-                    <Bar yAxisId="left" dataKey="totalVotes" fill="hsl(var(--civic-constitutional))" name="Total Votes" />
-                    <Bar yAxisId="left" dataKey="highCorrelationVotes" fill="hsl(var(--status-high))" name="High Correlation" />
-                    <Line yAxisId="right" type="monotone" dataKey="avgCorrelation" stroke="hsl(var(--status-critical))" name="Avg Correlation" />
+                    <Bar
+                      yAxisId="left"
+                      dataKey="totalVotes"
+                      fill="hsl(var(--civic-constitutional))"
+                      name="Total Votes"
+                    />
+                    <Bar
+                      yAxisId="left"
+                      dataKey="highCorrelationVotes"
+                      fill="hsl(var(--status-high))"
+                      name="High Correlation"
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="avgCorrelation"
+                      stroke="hsl(var(--status-critical))"
+                      name="Avg Correlation"
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -447,35 +495,32 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart data={analysisData.correlationTimeline}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
+                    <XAxis
                       type="number"
                       dataKey="index"
                       domain={[1, analysisData.correlationTimeline.length]}
                       label={{ value: 'Vote Number', position: 'insideBottom', offset: -5 }}
                     />
-                    <YAxis 
+                    <YAxis
                       type="number"
                       dataKey="correlation"
                       domain={[-1, 1]}
-                      tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                      tickFormatter={value => `${(value * 100).toFixed(0)}%`}
                       label={{ value: 'Correlation', angle: -90, position: 'insideLeft' }}
                     />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number) => [formatCorrelation(value), 'Correlation']}
-                      labelFormatter={(index) => {
+                      labelFormatter={index => {
                         const vote = analysisData.correlationTimeline[index - 1];
                         return vote ? vote.billTitle : '';
                       }}
-                      contentStyle={{ 
+                      contentStyle={{
                         backgroundColor: 'hsl(var(--popover))',
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius-md)'
+                        borderRadius: 'var(--radius-md)',
                       }}
                     />
-                    <Scatter 
-                      dataKey="correlation" 
-                      fill="hsl(var(--civic-transparency))"
-                    />
+                    <Scatter dataKey="correlation" fill="hsl(var(--civic-transparency))" />
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>

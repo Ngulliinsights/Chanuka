@@ -213,10 +213,12 @@ export const loadingStateUtils = {
     className: 'chanuka-loading-overlay',
     children: {
       spinner: { className: 'chanuka-spinner chanuka-spinner-large' },
-      message: message ? { 
-        className: 'chanuka-loading-message',
-        text: message 
-      } : null,
+      message: message
+        ? {
+            className: 'chanuka-loading-message',
+            text: message,
+          }
+        : null,
     },
   }),
 
@@ -234,25 +236,28 @@ export const loadingStateUtils = {
     button?: boolean;
   }): SkeletonElement[] => {
     const elements: SkeletonElement[] = [];
-    
+
     if (config.avatar) {
       elements.push({ type: 'avatar', className: 'chanuka-skeleton chanuka-skeleton-avatar' });
     }
-    
+
     if (config.title) {
       elements.push({ type: 'title', className: 'chanuka-skeleton chanuka-skeleton-title' });
     }
-    
+
     if (config.paragraphs && config.paragraphs > 0) {
       for (let i = 0; i < config.paragraphs; i++) {
-        elements.push({ type: 'paragraph', className: 'chanuka-skeleton chanuka-skeleton-paragraph' });
+        elements.push({
+          type: 'paragraph',
+          className: 'chanuka-skeleton chanuka-skeleton-paragraph',
+        });
       }
     }
-    
+
     if (config.button) {
       elements.push({ type: 'button', className: 'chanuka-skeleton chanuka-skeleton-button' });
     }
-    
+
     return elements;
   },
 
@@ -265,9 +270,7 @@ export const loadingStateUtils = {
    */
   createProgressBar: (progress?: number, indeterminate: boolean = false) => {
     // Clamp progress value between 0 and 100 to prevent overflow or invalid states
-    const clampedProgress = progress !== undefined 
-      ? Math.max(0, Math.min(100, progress)) 
-      : 0;
+    const clampedProgress = progress !== undefined ? Math.max(0, Math.min(100, progress)) : 0;
 
     return {
       className: 'chanuka-progress-bar',
@@ -498,23 +501,23 @@ export const loadingStateUtils = {
     hasTextAlternative: boolean;
   }): { isValid: boolean; issues: string[] } => {
     const issues: string[] = [];
-    
+
     if (!loadingState.hasAriaLabel) {
       issues.push('Loading state must have aria-label or aria-labelledby');
     }
-    
+
     if (!loadingState.hasLiveRegion) {
       issues.push('Loading state should use aria-live="polite" for screen reader announcements');
     }
-    
+
     if (!loadingState.hasVisualIndicator) {
       issues.push('Loading state must have a visible indicator for sighted users');
     }
-    
+
     if (!loadingState.hasTextAlternative) {
       issues.push('Loading state should provide text alternative for screen readers');
     }
-    
+
     return {
       isValid: issues.length === 0,
       issues,
@@ -529,10 +532,7 @@ export const loadingStateUtils = {
    * @param politeness - ARIA live region politeness level ('polite' for non-urgent, 'assertive' for urgent)
    * @returns Object with ARIA attributes ready to spread onto elements
    */
-  createAccessibleAnnouncement: (
-    message: string,
-    politeness: AriaPoliteness = 'polite'
-  ) => ({
+  createAccessibleAnnouncement: (message: string, politeness: AriaPoliteness = 'polite') => ({
     role: 'status',
     'aria-live': politeness,
     'aria-atomic': 'true',

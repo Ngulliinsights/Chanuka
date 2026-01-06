@@ -7,15 +7,10 @@
  */
 
 // Import types and classes for re-export
-import type {
-  DatabaseConfig,
-  FeatureConfig,
-} from './core/unified-config';
 import {
-  DatabaseConfigManager,
-  getDatabaseConfig,
-  createTestDatabaseConfig,
-} from './core/unified-config';
+  UnifiedConnectionManager,
+  closeConnectionManager,
+} from './core/connection-manager';
 import {
   DatabaseOrchestrator,
   getDatabaseOrchestrator,
@@ -25,10 +20,15 @@ import type {
   DatabaseStatus,
   DatabaseMetrics,
 } from './core/database-orchestrator';
+import type {
+  DatabaseConfig,
+  FeatureConfig,
+} from './core/unified-config';
 import {
-  UnifiedConnectionManager,
-  closeConnectionManager,
-} from './core/connection-manager';
+  DatabaseConfigManager,
+  getDatabaseConfig,
+  createTestDatabaseConfig,
+} from './core/unified-config';
 import { BaseDatabaseScript } from './utils/base-script';
 
 // ============================================================================

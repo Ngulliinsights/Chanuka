@@ -4,8 +4,9 @@
 // Integrates ML model outputs with database schemas with enhanced reliability
 
 import { z } from 'zod';
-import { mlOrchestrator } from './ml-orchestrator';
+
 import { analysisPipeline, type PipelineResult } from './analysis-pipeline';
+import { mlOrchestrator } from './ml-orchestrator';
 
 // ============================================================================
 // DATABASE SCHEMAS

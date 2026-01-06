@@ -1,13 +1,19 @@
 /**
  * Mock Bills Data
- * 
+ *
  * Comprehensive mock data for bills including metadata, engagement metrics,
  * constitutional analysis, and sponsor information.
  */
 
 import { faker } from '@faker-js/faker';
 
-import { BillStatus, UrgencyLevel, ComplexityLevel, type ConstitutionalFlag, type Severity } from '@client/core/api/types/bill';
+import {
+  BillStatus,
+  UrgencyLevel,
+  ComplexityLevel,
+  type ConstitutionalFlag,
+  type Severity,
+} from '@client/core/api/types/bill';
 
 interface BillsStats {
   totalBills: number;
@@ -24,7 +30,7 @@ import {
   generateBillNumber,
   generateBillTitle,
   generateBillSummary,
-  weightedRandom
+  weightedRandom,
 } from './generators';
 
 // Seed faker for consistent data
@@ -40,25 +46,34 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
     { category: 'Equal Protection', description: 'May create unequal treatment' },
     { category: 'First Amendment', description: 'Potential free speech implications' },
     { category: 'Tenth Amendment', description: 'May infringe on state powers' },
-    { category: 'Separation of Powers', description: 'Executive authority concerns' }
+    { category: 'Separation of Powers', description: 'Executive authority concerns' },
   ];
 
   const severityLevels: Array<Severity> =
-    severity === 'high' ? ['critical', 'high'] :
-    severity === 'medium' ? ['high', 'medium'] :
-    ['medium', 'low'];
+    severity === 'high'
+      ? ['critical', 'high']
+      : severity === 'medium'
+        ? ['high', 'medium']
+        : ['medium', 'low'];
 
-  const flagCount = severity === 'high' ? faker.number.int({ min: 2, max: 4 }) :
-                   severity === 'medium' ? faker.number.int({ min: 1, max: 2 }) :
-                   faker.number.int({ min: 0, max: 1 });
+  const flagCount =
+    severity === 'high'
+      ? faker.number.int({ min: 2, max: 4 })
+      : severity === 'medium'
+        ? faker.number.int({ min: 1, max: 2 })
+        : faker.number.int({ min: 0, max: 1 });
 
   return faker.helpers.arrayElements(flagTypes, flagCount).map(flag => ({
     id: faker.number.int({ min: 1, max: 1000 }),
     type: flag.category,
     description: flag.description,
     severity: faker.helpers.arrayElement(severityLevels),
-    article: faker.helpers.maybe(() => `Article ${faker.number.int({ min: 1, max: 7 })}`, { probability: 0.7 }),
-    clause: faker.helpers.maybe(() => `Section ${faker.number.int({ min: 1, max: 10 })}`, { probability: 0.5 })
+    article: faker.helpers.maybe(() => `Article ${faker.number.int({ min: 1, max: 7 })}`, {
+      probability: 0.7,
+    }),
+    clause: faker.helpers.maybe(() => `Section ${faker.number.int({ min: 1, max: 10 })}`, {
+      probability: 0.5,
+    }),
   }));
 };
 
@@ -68,9 +83,9 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
 const generateSponsors = (count: number = 3) => {
   const parties = ['Republican', 'Democratic', 'Independent'];
   const positions = ['Senator', 'Representative', 'Delegate'];
-  
+
   const sponsors = [];
-  
+
   // Always have one primary sponsor
   sponsors.push({
     id: faker.number.int({ min: 1, max: 1000 }),
@@ -78,9 +93,9 @@ const generateSponsors = (count: number = 3) => {
     party: faker.helpers.arrayElement(parties),
     district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
     position: faker.helpers.arrayElement(positions),
-    isPrimary: true
+    isPrimary: true,
   });
-  
+
   // Add cosponsors
   for (let i = 1; i < count; i++) {
     sponsors.push({
@@ -89,27 +104,46 @@ const generateSponsors = (count: number = 3) => {
       party: faker.helpers.arrayElement(parties),
       district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
       position: faker.helpers.arrayElement(positions),
-      isPrimary: false
+      isPrimary: false,
     });
   }
-  
+
   return sponsors;
 };
 
 /**
  * Generate a single mock bill
  */
-export const generateMockBill = (id: number, options: {
-  urgency?: UrgencyLevel;
-  status?: BillStatus;
-  popularity?: number;
-  constitutionalConcerns?: 'low' | 'medium' | 'high';
-} = {}): ReadonlyBill => {
+export const generateMockBill = (
+  id: number,
+  options: {
+    urgency?: UrgencyLevel;
+    status?: BillStatus;
+    popularity?: number;
+    constitutionalConcerns?: 'low' | 'medium' | 'high';
+  } = {}
+): ReadonlyBill => {
   const {
-    urgency = weightedRandom([UrgencyLevel.LOW, UrgencyLevel.MEDIUM, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL], [40, 35, 20, 5]),
-    status = weightedRandom([BillStatus.INTRODUCED, BillStatus.COMMITTEE, BillStatus.FLOOR_DEBATE, BillStatus.PASSED_HOUSE, BillStatus.PASSED_SENATE, BillStatus.PASSED, BillStatus.FAILED, BillStatus.SIGNED, BillStatus.VETOED], [25, 30, 10, 8, 7, 10, 5, 3, 2]),
+    urgency = weightedRandom(
+      [UrgencyLevel.LOW, UrgencyLevel.MEDIUM, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL],
+      [40, 35, 20, 5]
+    ),
+    status = weightedRandom(
+      [
+        BillStatus.INTRODUCED,
+        BillStatus.COMMITTEE,
+        BillStatus.FLOOR_DEBATE,
+        BillStatus.PASSED_HOUSE,
+        BillStatus.PASSED_SENATE,
+        BillStatus.PASSED,
+        BillStatus.FAILED,
+        BillStatus.SIGNED,
+        BillStatus.VETOED,
+      ],
+      [25, 30, 10, 8, 7, 10, 5, 3, 2]
+    ),
     popularity = faker.number.float({ min: 0.1, max: 2.0 }),
-    constitutionalConcerns = weightedRandom(['low', 'medium', 'high'], [70, 25, 5])
+    constitutionalConcerns = weightedRandom(['low', 'medium', 'high'], [70, 25, 5]),
   } = options;
 
   const introducedDate = generateDateInRange(180, 1);
@@ -132,8 +166,11 @@ export const generateMockBill = (id: number, options: {
     constitutionalFlags,
     ...engagement,
     policyAreas,
-    complexity: weightedRandom([ComplexityLevel.LOW, ComplexityLevel.MEDIUM, ComplexityLevel.HIGH, ComplexityLevel.EXPERT], [30, 40, 25, 5]),
-    readingTime: faker.number.int({ min: 5, max: 45 })
+    complexity: weightedRandom(
+      [ComplexityLevel.LOW, ComplexityLevel.MEDIUM, ComplexityLevel.HIGH, ComplexityLevel.EXPERT],
+      [30, 40, 25, 5]
+    ),
+    readingTime: faker.number.int({ min: 5, max: 45 }),
   };
 };
 
@@ -142,11 +179,11 @@ export const generateMockBill = (id: number, options: {
  */
 export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
   const bills: ReadonlyBill[] = [];
-  
+
   for (let i = 1; i <= count; i++) {
     // Create some variety in bill characteristics
     const options: Parameters<typeof generateMockBill>[1] = {};
-    
+
     // Make some bills more urgent/popular for testing
     if (i <= 5) {
       options.urgency = UrgencyLevel.CRITICAL;
@@ -171,10 +208,10 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
     } else if (i <= 12) {
       options.status = BillStatus.FAILED;
     }
-    
+
     bills.push(generateMockBill(i, options));
   }
-  
+
   return bills;
 };
 
@@ -182,27 +219,25 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
  * Generate mock bills statistics
  */
 export const generateMockBillsStats = (bills: ReadonlyBill[]): BillsStats => {
-  const urgentCount = bills.filter(b => 
-    b.urgencyLevel === 'high' || b.urgencyLevel === 'critical'
+  const urgentCount = bills.filter(
+    b => b.urgencyLevel === 'high' || b.urgencyLevel === 'critical'
   ).length;
-  
-  const constitutionalFlags = bills.reduce((sum, b) => 
-    sum + b.constitutionalFlags.length, 0
-  );
-  
+
+  const constitutionalFlags = bills.reduce((sum, b) => sum + b.constitutionalFlags.length, 0);
+
   // Calculate trending based on recent activity and engagement
   const trendingCount = bills.filter(b => {
     const recentActivity = new Date(b.lastUpdated) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const highEngagement = (b.viewCount + b.commentCount + b.shareCount) > 200;
+    const highEngagement = b.viewCount + b.commentCount + b.shareCount > 200;
     return recentActivity && highEngagement;
   }).length;
-  
+
   return {
     totalBills: bills.length,
     urgentCount,
     constitutionalFlags,
     trendingCount,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   };
 };
 
@@ -212,7 +247,7 @@ export const generateMockBillsStats = (bills: ReadonlyBill[]): BillsStats => {
 export const getMockBillsByCategory = (category: string, count: number = 10): ReadonlyBill[] => {
   return generateMockBills(count).map(bill => ({
     ...bill,
-    policyAreas: [category, ...bill.policyAreas.slice(1)]
+    policyAreas: [category, ...bill.policyAreas.slice(1)],
   }));
 };
 
@@ -220,7 +255,7 @@ export const getMockBillsByCategory = (category: string, count: number = 10): Re
  * Get mock bills with high constitutional concerns
  */
 export const getMockBillsWithConstitutionalConcerns = (count: number = 5): ReadonlyBill[] => {
-  return Array.from({ length: count }, (_, i) => 
+  return Array.from({ length: count }, (_, i) =>
     generateMockBill(i + 1000, { constitutionalConcerns: 'high' })
   );
 };

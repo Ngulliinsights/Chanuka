@@ -41,10 +41,13 @@ export function EnhancedAssetLoadingProvider({ children }: { children: React.Rea
     }
   }, [connectionState]);
 
-  const contextValue = useMemo(() => ({
-    assetManager: assetManagerRef.current!,
-    connectionState
-  }), [connectionState]);
+  const contextValue = useMemo(
+    () => ({
+      assetManager: assetManagerRef.current!,
+      connectionState,
+    }),
+    [connectionState]
+  );
 
   return (
     <EnhancedAssetLoadingContext.Provider value={contextValue}>

@@ -1,11 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
+import { BarChart3, Target, Award, Star } from 'lucide-react';
 import React from 'react';
-import {
-  BarChart3,
-  Target,
-  Award,
-  Star
-} from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
@@ -31,13 +26,9 @@ interface SectionDashboardProps {
 }
 
 export function SectionDashboard({ className = '' }: SectionDashboardProps) {
-  const {
-    user,
-    dashboardData,
-    loading
-  } = useDashboardData({
+  const { user, dashboardData, loading } = useDashboardData({
     autoLoad: true,
-    trackEngagement: true
+    trackEngagement: true,
   });
 
   if (!user) {
@@ -52,14 +43,16 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
           <Avatar className="h-16 w-16">
             <AvatarImage src={user.avatar_url} alt={user.name} />
             <AvatarFallback>
-              {user.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+              {user.name
+                ?.split(' ')
+                .map((n: string) => n[0])
+                .join('')
+                .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">{user.name}</h2>
-            <p className="text-muted-foreground">
-              Engaged citizen working for better governance
-            </p>
+            <p className="text-muted-foreground">Engaged citizen working for better governance</p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary">
                 Civic Score: {dashboardData?.civicMetrics?.personalScore || 0}
@@ -118,9 +111,7 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
                   <BarChart3 className="h-5 w-5" />
                   Civic Engagement Overview
                 </CardTitle>
-                <CardDescription>
-                  Your civic engagement metrics and progress
-                </CardDescription>
+                <CardDescription>Your civic engagement metrics and progress</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid lg:grid-cols-3 gap-4 mb-6">
@@ -177,16 +168,21 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
               <CardContent>
                 {dashboardData?.civicMetrics?.achievements?.length ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map((achievement) => (
-                      <div key={achievement.id} className="text-center p-3 border rounded-lg">
-                        <div className="text-2xl mb-2">🏆</div>
-                        <h4 className="font-medium text-sm">{achievement.title}</h4>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Earned {formatDistanceToNow(new Date(achievement.earnedAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    ))}
+                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map(
+                      achievement => (
+                        <div key={achievement.id} className="text-center p-3 border rounded-lg">
+                          <div className="text-2xl mb-2">🏆</div>
+                          <h4 className="font-medium text-sm">{achievement.title}</h4>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Earned{' '}
+                            {formatDistanceToNow(new Date(achievement.earnedAt), {
+                              addSuffix: true,
+                            })}
+                          </p>
+                        </div>
+                      )
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8">
@@ -208,20 +204,25 @@ export function SectionDashboard({ className = '' }: SectionDashboardProps) {
               <CardContent>
                 {dashboardData?.civicMetrics?.achievements?.length ? (
                   <div className="space-y-4">
-                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map((achievement) => (
-                      <div key={achievement.id} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm">{achievement.title}</h4>
-                          <Badge variant="secondary" className="text-xs">
-                            {achievement.category}
-                          </Badge>
+                    {(dashboardData.civicMetrics.achievements as DashboardAchievement[]).map(
+                      achievement => (
+                        <div key={achievement.id} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-sm">{achievement.title}</h4>
+                            <Badge variant="secondary" className="text-xs">
+                              {achievement.category}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Earned{' '}
+                            {formatDistanceToNow(new Date(achievement.earnedAt), {
+                              addSuffix: true,
+                            })}
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Earned {formatDistanceToNow(new Date(achievement.earnedAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8">

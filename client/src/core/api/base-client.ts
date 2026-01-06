@@ -1,6 +1,6 @@
 /**
  * Base API Client Module
- * 
+ *
  * Core HTTP client with interceptors, retry logic, caching, and error handling.
  * This is the foundation for all API communication in the application.
  */
@@ -108,8 +108,8 @@ export const DEFAULT_API_CONFIG: ApiClientConfig = {
   },
   cache: {
     enabled: true,
-    ttl: 5 * 60 * 1000 // 5 minutes
-  }
+    ttl: 5 * 60 * 1000, // 5 minutes
+  },
 };
 
 /**
@@ -129,10 +129,10 @@ export class BaseApiClient {
       maxRetries: this.config.retries,
       baseDelay: this.config.retryDelay,
       maxDelay: 30000,
-      backoffMultiplier: 2
+      backoffMultiplier: 2,
     });
     this.cache = new ApiCacheManager({
-      defaultTTL: this.config.cache?.ttl || 5 * 60 * 1000
+      defaultTTL: this.config.cache?.ttl || 5 * 60 * 1000,
     });
   }
 
@@ -176,7 +176,7 @@ export class BaseApiClient {
    */
   async request<T = unknown>(request: ApiRequest): Promise<ApiResponse<T>> {
     const startTime = Date.now();
-    
+
     try {
       // Apply request interceptors
       let processedRequest = { ...request };
@@ -191,13 +191,13 @@ export class BaseApiClient {
           undefined,
           processedRequest.method
         );
-        
+
         const cachedData = await this.cache.get<T>(cacheKey);
         if (cachedData !== null) {
           logger.debug('Cache hit for request', {
             component: 'BaseApiClient',
             url: processedRequest.url,
-            method: processedRequest.method
+            method: processedRequest.method,
           });
 
           return {
@@ -206,29 +206,31 @@ export class BaseApiClient {
             statusText: 'OK',
             headers: {},
             cached: true,
-            duration: Date.now() - startTime
+            duration: Date.now() - startTime,
           };
         }
       }
 
       // Execute request with retry logic
-      const response = await this.retryHandler.execute(() => 
+      const response = await this.retryHandler.execute(() =>
         this.executeRequest<T>(processedRequest)
       );
 
       // Cache successful GET responses
-      if (processedRequest.method === 'GET' && 
-          this.config.cache?.enabled && 
-          response.status >= 200 && 
-          response.status < 300) {
+      if (
+        processedRequest.method === 'GET' &&
+        this.config.cache?.enabled &&
+        response.status >= 200 &&
+        response.status < 300
+      ) {
         const cacheKey = CacheKeyGenerator.generate(
           processedRequest.url,
           undefined,
           processedRequest.method
         );
-        
+
         await this.cache.set(cacheKey, response.data, {
-          ttl: this.config.cache.ttl
+          ttl: this.config.cache.ttl,
         });
       }
 
@@ -240,7 +242,6 @@ export class BaseApiClient {
 
       processedResponse.duration = Date.now() - startTime;
       return processedResponse;
-
     } catch (error) {
       // Apply error interceptors
       let apiError = this.normalizeError(error);
@@ -248,29 +249,23 @@ export class BaseApiClient {
         apiError = await interceptor(apiError);
       }
 
-      throw ErrorFactory.createNetworkError(
-        apiError.message,
-        {
-          statusCode: apiError.statusCode,
-          domain: apiError.domain || 'API' as ErrorDomain,
-          severity: apiError.severity || 'ERROR' as ErrorSeverity,
-          context: {
-            url: request.url,
-            method: request.method,
-            duration: Date.now() - startTime
-          }
-        }
-      );
+      throw ErrorFactory.createNetworkError(apiError.message, {
+        statusCode: apiError.statusCode,
+        domain: apiError.domain || ('API' as ErrorDomain),
+        severity: apiError.severity || ('ERROR' as ErrorSeverity),
+        context: {
+          url: request.url,
+          method: request.method,
+          duration: Date.now() - startTime,
+        },
+      });
     }
   }
 
   /**
    * GET request
    */
-  async get<T = unknown>(
-    url: string, 
-    headers?: Record<string, string>
-  ): Promise<ApiResponse<T>> {
+  async get<T = unknown>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.request<T>({ url, method: 'GET', headers });
   }
 
@@ -278,8 +273,8 @@ export class BaseApiClient {
    * POST request
    */
   async post<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<ApiResponse<T>> {
     return this.request<T>({ url, method: 'POST', body, headers });
@@ -289,8 +284,8 @@ export class BaseApiClient {
    * PUT request
    */
   async put<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<ApiResponse<T>> {
     return this.request<T>({ url, method: 'PUT', body, headers });
@@ -300,7 +295,7 @@ export class BaseApiClient {
    * DELETE request
    */
   async delete<T = unknown>(
-    url: string, 
+    url: string,
     headers?: Record<string, string>
   ): Promise<ApiResponse<T>> {
     return this.request<T>({ url, method: 'DELETE', headers });
@@ -310,8 +305,8 @@ export class BaseApiClient {
    * PATCH request
    */
   async patch<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<ApiResponse<T>> {
     return this.request<T>({ url, method: 'PATCH', body, headers });
@@ -321,17 +316,17 @@ export class BaseApiClient {
    * Executes a single HTTP request
    */
   private async executeRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-    const url = request.url.startsWith('http') 
-      ? request.url 
+    const url = request.url.startsWith('http')
+      ? request.url
       : `${this.config.baseURL}${request.url}`;
 
     const fetchOptions: RequestInit = {
       method: request.method,
       headers: {
         ...this.config.headers,
-        ...request.headers
+        ...request.headers,
       },
-      signal: AbortSignal.timeout(request.timeout || this.config.timeout)
+      signal: AbortSignal.timeout(request.timeout || this.config.timeout),
     };
 
     // Add body for non-GET requests
@@ -348,11 +343,11 @@ export class BaseApiClient {
     }
 
     const response = await fetch(url, fetchOptions);
-    
+
     // Parse response data
     let data: T;
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType?.includes('application/json')) {
       const text = await response.text();
       data = text ? JSON.parse(text) : null;
@@ -366,11 +361,12 @@ export class BaseApiClient {
         message: `HTTP ${response.status}: ${response.statusText}`,
         statusCode: response.status,
         domain: 'API' as ErrorDomain,
-        severity: response.status >= 500 ? 'ERROR' as ErrorSeverity : 'WARNING' as ErrorSeverity,
+        severity:
+          response.status >= 500 ? ('ERROR' as ErrorSeverity) : ('WARNING' as ErrorSeverity),
         code: response.status.toString(),
         details: data as Record<string, unknown>,
         retryable: response.status >= 500 && response.status < 600,
-        recoverable: response.status < 500
+        recoverable: response.status < 500,
       };
 
       throw error;
@@ -380,7 +376,7 @@ export class BaseApiClient {
       data,
       status: response.status,
       statusText: response.statusText,
-      headers: this.parseHeaders(response.headers)
+      headers: this.parseHeaders(response.headers),
     };
   }
 
@@ -409,7 +405,7 @@ export class BaseApiClient {
       domain: 'API' as ErrorDomain,
       severity: 'ERROR' as ErrorSeverity,
       retryable: true,
-      recoverable: false
+      recoverable: false,
     };
   }
 

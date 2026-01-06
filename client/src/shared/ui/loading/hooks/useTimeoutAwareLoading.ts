@@ -27,29 +27,29 @@ export interface UseTimeoutAwareLoadingResult {
   isTimeout: boolean;
   isWarning: boolean;
   error: LoadingError | null;
-  
+
   // Time information
   elapsedTime: number;
   remainingTime: number;
   timeoutDuration: number;
   warningThreshold: number;
-  
+
   // Formatted time strings
   elapsedTimeFormatted: string;
   remainingTimeFormatted: string;
-  
+
   // Retry information
   retryCount: number;
   maxRetries: number;
   canRetry: boolean;
-  
+
   // Actions
   start: (operationTimeout?: number) => void;
   stop: () => void;
   reset: () => void;
   retry: () => void;
   extendTimeout: (additionalTime: number) => void;
-  
+
   // Utilities
   withTimeout: <T>(asyncFn: () => Promise<T>, operationTimeout?: number) => Promise<T>;
 }
@@ -86,7 +86,7 @@ export function useTimeoutAwareLoading(
       intervalRef.current = setInterval(() => {
         const elapsed = timeoutManagerRef.current?.getElapsedTime() || 0;
         const remaining = timeoutManagerRef.current?.getRemainingTime() || 0;
-        
+
         setElapsedTime(elapsed);
         setRemainingTime(remaining);
       }, 1000);
@@ -97,7 +97,7 @@ export function useTimeoutAwareLoading(
         }
       };
     }
-    
+
     return undefined;
   }, [state]);
 
@@ -119,16 +119,14 @@ export function useTimeoutAwareLoading(
   }, []);
 
   const handleTimeout = useCallback(() => {
-    const timeoutError = new LoadingTimeoutError(
-      operationIdRef.current,
-      currentTimeout,
-      { retryCount }
-    );
-    
+    const timeoutError = new LoadingTimeoutError(operationIdRef.current, currentTimeout, {
+      retryCount,
+    });
+
     setError(timeoutError);
     setState('timeout');
     setIsWarning(false);
-    
+
     onTimeout?.();
   }, [currentTimeout, retryCount, onTimeout]);
 
@@ -139,42 +137,45 @@ export function useTimeoutAwareLoading(
     }
   }, [showWarning, remainingTime, onWarning]);
 
-  const start = useCallback((operationTimeout?: number) => {
-    const timeoutDuration = operationTimeout || timeout;
-    const warningTime = showWarning ? warningThreshold : undefined;
-    
-    operationIdRef.current = `timeout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    setCurrentTimeout(timeoutDuration);
-    setState('loading');
-    setError(null);
-    setIsWarning(false);
-    setElapsedTime(0);
-    setRemainingTime(timeoutDuration);
+  const start = useCallback(
+    (operationTimeout?: number) => {
+      const timeoutDuration = operationTimeout || timeout;
+      const warningTime = showWarning ? warningThreshold : undefined;
 
-    if (timeoutManagerRef.current) {
-      timeoutManagerRef.current.stop();
-    }
+      operationIdRef.current = `timeout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    timeoutManagerRef.current = createTimeoutManager({
-      timeout: timeoutDuration,
-      warningThreshold: warningTime,
-      onTimeout: handleTimeout,
-      onWarning: handleWarning,
-    });
+      setCurrentTimeout(timeoutDuration);
+      setState('loading');
+      setError(null);
+      setIsWarning(false);
+      setElapsedTime(0);
+      setRemainingTime(timeoutDuration);
 
-    timeoutManagerRef.current.start();
-  }, [timeout, warningThreshold, showWarning, handleTimeout, handleWarning]);
+      if (timeoutManagerRef.current) {
+        timeoutManagerRef.current.stop();
+      }
+
+      timeoutManagerRef.current = createTimeoutManager({
+        timeout: timeoutDuration,
+        warningThreshold: warningTime,
+        onTimeout: handleTimeout,
+        onWarning: handleWarning,
+      });
+
+      timeoutManagerRef.current.start();
+    },
+    [timeout, warningThreshold, showWarning, handleTimeout, handleWarning]
+  );
 
   const stop = useCallback(() => {
     if (timeoutManagerRef.current) {
       timeoutManagerRef.current.stop();
     }
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     setState('success');
     setIsWarning(false);
   }, []);
@@ -183,11 +184,11 @@ export function useTimeoutAwareLoading(
     if (timeoutManagerRef.current) {
       timeoutManagerRef.current.stop();
     }
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     setState('loading');
     setError(null);
     setIsWarning(false);
@@ -200,75 +201,87 @@ export function useTimeoutAwareLoading(
     if (!retryable || retryCount >= maxRetries) {
       return;
     }
-    
+
     setRetryCount(prev => prev + 1);
-    
+
     // Increase timeout for retry (exponential backoff)
     const newTimeout = currentTimeout * Math.pow(1.5, retryCount + 1);
     start(newTimeout);
   }, [retryable, retryCount, maxRetries, currentTimeout, start]);
 
-  const extendTimeout = useCallback((additionalTime: number) => {
-    if (timeoutManagerRef.current && state === 'loading') {
-      timeoutManagerRef.current.extend(additionalTime);
-      setCurrentTimeout(prev => prev + additionalTime);
-      setRemainingTime(prev => prev + additionalTime);
-    }
-  }, [state]);
+  const extendTimeout = useCallback(
+    (additionalTime: number) => {
+      if (timeoutManagerRef.current && state === 'loading') {
+        timeoutManagerRef.current.extend(additionalTime);
+        setCurrentTimeout(prev => prev + additionalTime);
+        setRemainingTime(prev => prev + additionalTime);
+      }
+    },
+    [state]
+  );
 
-  const withTimeout = useCallback(async <T>(
-    asyncFn: () => Promise<T>,
-    operationTimeout?: number
-  ): Promise<T> => {
-    return new Promise<T>((resolve, reject) => {
-      start(operationTimeout);
-      
-      const timeoutPromise = new Promise<never>((_, timeoutReject) => {
-        const cleanup = () => {
+  const withTimeout = useCallback(
+    async <T>(asyncFn: () => Promise<T>, operationTimeout?: number): Promise<T> => {
+      return new Promise<T>((resolve, reject) => {
+        start(operationTimeout);
+
+        const timeoutPromise = new Promise<never>((_, timeoutReject) => {
+          const cleanup = () => {
+            if (timeoutManagerRef.current) {
+              timeoutManagerRef.current.stop();
+            }
+          };
+
+          // Override the timeout handler to reject the promise
           if (timeoutManagerRef.current) {
             timeoutManagerRef.current.stop();
           }
-        };
-        
-        // Override the timeout handler to reject the promise
-        if (timeoutManagerRef.current) {
-          timeoutManagerRef.current.stop();
-        }
-        
-        timeoutManagerRef.current = createTimeoutManager({
-          timeout: operationTimeout || currentTimeout,
-          warningThreshold: showWarning ? warningThreshold : undefined,
-          onTimeout: () => {
-            cleanup();
-            const timeoutError = new LoadingTimeoutError(
-              operationIdRef.current,
-              operationTimeout || currentTimeout,
-              { retryCount }
-            );
-            handleTimeout();
-            timeoutReject(timeoutError);
-          },
-          onWarning: handleWarning,
+
+          timeoutManagerRef.current = createTimeoutManager({
+            timeout: operationTimeout || currentTimeout,
+            warningThreshold: showWarning ? warningThreshold : undefined,
+            onTimeout: () => {
+              cleanup();
+              const timeoutError = new LoadingTimeoutError(
+                operationIdRef.current,
+                operationTimeout || currentTimeout,
+                { retryCount }
+              );
+              handleTimeout();
+              timeoutReject(timeoutError);
+            },
+            onWarning: handleWarning,
+          });
+
+          timeoutManagerRef.current.start();
         });
-        
-        timeoutManagerRef.current.start();
-      });
-      
-      Promise.race([asyncFn(), timeoutPromise])
-        .then((result) => {
-          stop();
-          resolve(result);
-        })
-        .catch((error) => {
-          if (error instanceof LoadingTimeoutError) {
-            reject(error);
-          } else {
+
+        Promise.race([asyncFn(), timeoutPromise])
+          .then(result => {
             stop();
-            reject(error);
-          }
-        });
-    });
-  }, [start, stop, currentTimeout, showWarning, warningThreshold, retryCount, handleTimeout, handleWarning]);
+            resolve(result);
+          })
+          .catch(error => {
+            if (error instanceof LoadingTimeoutError) {
+              reject(error);
+            } else {
+              stop();
+              reject(error);
+            }
+          });
+      });
+    },
+    [
+      start,
+      stop,
+      currentTimeout,
+      showWarning,
+      warningThreshold,
+      retryCount,
+      handleTimeout,
+      handleWarning,
+    ]
+  );
 
   const formatTime = (ms: number): string => {
     const seconds = Math.ceil(ms / 1000);
@@ -289,29 +302,29 @@ export function useTimeoutAwareLoading(
     isTimeout: state === 'timeout',
     isWarning,
     error,
-    
+
     // Time information
     elapsedTime,
     remainingTime,
     timeoutDuration: currentTimeout,
     warningThreshold,
-    
+
     // Formatted time strings
     elapsedTimeFormatted,
     remainingTimeFormatted,
-    
+
     // Retry information
     retryCount,
     maxRetries,
     canRetry,
-    
+
     // Actions
     start,
     stop,
     reset,
     retry,
     extendTimeout,
-    
+
     // Utilities
     withTimeout,
   };
@@ -329,20 +342,20 @@ export interface UseMultiTimeoutAwareLoadingOptions {
 
 export interface UseMultiTimeoutAwareLoadingResult {
   operations: Record<string, UseTimeoutAwareLoadingResult>;
-  
+
   // Aggregate state
   isAnyLoading: boolean;
   hasAnyTimeout: boolean;
   hasAnyWarning: boolean;
   overallProgress: number;
-  
+
   // Actions
   startOperation: (operationId: string, options?: UseTimeoutAwareLoadingOptions) => void;
   stopOperation: (operationId: string) => void;
   retryOperation: (operationId: string) => void;
   extendOperation: (operationId: string, additionalTime: number) => void;
   resetOperation: (operationId: string) => void;
-  
+
   startAll: () => void;
   stopAll: () => void;
   resetAll: () => void;
@@ -352,58 +365,76 @@ export function useMultiTimeoutAwareLoading(
   options: UseMultiTimeoutAwareLoadingOptions = {}
 ): UseMultiTimeoutAwareLoadingResult {
   const { defaultTimeout, onAnyTimeout, onAllComplete } = options;
-  
+
   const [operations, setOperations] = useState<Record<string, UseTimeoutAwareLoadingResult>>({});
-  
-  const createOperation = useCallback((operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {
-    // Return configuration object instead of calling hooks
-    const operationConfig = {
-      timeout: defaultTimeout,
-      ...operationOptions,
-      onTimeout: () => {
-        operationOptions?.onTimeout?.();
-        onAnyTimeout?.(operationId);
-      },
-      onStateChange: (state: LoadingState) => {
-        operationOptions?.onStateChange?.(state);
-        
-        // Check if all operations are complete
-        if (state === 'success') {
-          const allComplete = Object.values(operations).every(op => 
-            op.state === 'success' || op.state === 'timeout'
-          );
-          if (allComplete) {
-            onAllComplete?.();
+
+  const createOperation = useCallback(
+    (operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {
+      // Return configuration object instead of calling hooks
+      const operationConfig = {
+        timeout: defaultTimeout,
+        ...operationOptions,
+        onTimeout: () => {
+          operationOptions?.onTimeout?.();
+          onAnyTimeout?.(operationId);
+        },
+        onStateChange: (state: LoadingState) => {
+          operationOptions?.onStateChange?.(state);
+
+          // Check if all operations are complete
+          if (state === 'success') {
+            const allComplete = Object.values(operations).every(
+              op => op.state === 'success' || op.state === 'timeout'
+            );
+            if (allComplete) {
+              onAllComplete?.();
+            }
           }
-        }
-      },
-    };
-    
-    // Store the configuration instead of the hook result
-    setOperations(prev => ({ ...prev, [operationId]: operationConfig as any }));
-    return operationConfig as any;
-  }, [defaultTimeout, onAnyTimeout, onAllComplete, operations]);
+        },
+      };
 
-  const startOperation = useCallback((operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {
-    const operation = operations[operationId] || createOperation(operationId, operationOptions);
-    operation.start(operationOptions?.timeout);
-  }, [operations, createOperation]);
+      // Store the configuration instead of the hook result
+      setOperations(prev => ({ ...prev, [operationId]: operationConfig as any }));
+      return operationConfig as any;
+    },
+    [defaultTimeout, onAnyTimeout, onAllComplete, operations]
+  );
 
-  const stopOperation = useCallback((operationId: string) => {
-    operations[operationId]?.stop();
-  }, [operations]);
+  const startOperation = useCallback(
+    (operationId: string, operationOptions?: UseTimeoutAwareLoadingOptions) => {
+      const operation = operations[operationId] || createOperation(operationId, operationOptions);
+      operation.start(operationOptions?.timeout);
+    },
+    [operations, createOperation]
+  );
 
-  const retryOperation = useCallback((operationId: string) => {
-    operations[operationId]?.retry();
-  }, [operations]);
+  const stopOperation = useCallback(
+    (operationId: string) => {
+      operations[operationId]?.stop();
+    },
+    [operations]
+  );
 
-  const extendOperation = useCallback((operationId: string, additionalTime: number) => {
-    operations[operationId]?.extendTimeout(additionalTime);
-  }, [operations]);
+  const retryOperation = useCallback(
+    (operationId: string) => {
+      operations[operationId]?.retry();
+    },
+    [operations]
+  );
 
-  const resetOperation = useCallback((operationId: string) => {
-    operations[operationId]?.reset();
-  }, [operations]);
+  const extendOperation = useCallback(
+    (operationId: string, additionalTime: number) => {
+      operations[operationId]?.extendTimeout(additionalTime);
+    },
+    [operations]
+  );
+
+  const resetOperation = useCallback(
+    (operationId: string) => {
+      operations[operationId]?.reset();
+    },
+    [operations]
+  );
 
   const startAll = useCallback(() => {
     Object.values(operations).forEach(op => op.start());
@@ -421,31 +452,32 @@ export function useMultiTimeoutAwareLoading(
   const isAnyLoading = operationValues.some(op => op.isLoading);
   const hasAnyTimeout = operationValues.some(op => op.isTimeout);
   const hasAnyWarning = operationValues.some(op => op.isWarning);
-  
-  const overallProgress = operationValues.length > 0 ?
-    operationValues.reduce((sum, op) => {
-      if (op.state === 'success') return sum + 100;
-      if (op.state === 'timeout' || op.state === 'error') return sum + 0;
-      return sum + ((op.timeoutDuration - op.remainingTime) / op.timeoutDuration) * 100;
-    }, 0) / operationValues.length : 0;
+
+  const overallProgress =
+    operationValues.length > 0
+      ? operationValues.reduce((sum, op) => {
+          if (op.state === 'success') return sum + 100;
+          if (op.state === 'timeout' || op.state === 'error') return sum + 0;
+          return sum + ((op.timeoutDuration - op.remainingTime) / op.timeoutDuration) * 100;
+        }, 0) / operationValues.length
+      : 0;
 
   return {
     operations,
-    
+
     isAnyLoading,
     hasAnyTimeout,
     hasAnyWarning,
     overallProgress,
-    
+
     startOperation,
     stopOperation,
     retryOperation,
     extendOperation,
     resetOperation,
-    
+
     startAll,
     stopAll,
     resetAll,
   };
 }
-

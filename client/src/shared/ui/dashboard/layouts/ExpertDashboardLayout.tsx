@@ -23,15 +23,19 @@ import {
   ArrowRight,
   ExternalLink,
   Calendar,
-  Clock
+  Clock,
 } from 'lucide-react';
 
+import type {
+  PersonaType,
+  PersonaClassification,
+  PersonaPreferences,
+} from '@client/core/personalization/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import type { PersonaType, PersonaClassification, PersonaPreferences } from '@client/core/personalization/types';
 
 interface ExpertDashboardLayoutProps {
   persona: PersonaType;
@@ -49,9 +53,8 @@ export function ExpertDashboardLayout({
   expandedSections,
   hiddenWidgets,
   classification,
-  onSectionToggle: _onSectionToggle
+  onSectionToggle: _onSectionToggle,
 }: ExpertDashboardLayoutProps) {
-
   const isExpanded = (sectionId: string) => expandedSections.has(sectionId);
   const isHidden = (widgetId: string) => hiddenWidgets.has(widgetId);
 
@@ -59,10 +62,8 @@ export function ExpertDashboardLayout({
     <div className="expert-dashboard-layout">
       {/* Three-column grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
         {/* Left Column - Analytics & Insights */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* Professional Analytics Dashboard */}
           {!isHidden('analytics-dashboard') && (
             <Card>
@@ -106,8 +107,11 @@ export function ExpertDashboardLayout({
                         Professional Impact Summary
                       </h4>
                       <p className="text-sm text-blue-700 mb-3">
-                        Your expert contributions have helped {classification?.confidence ? Math.round(classification.confidence * 1000) : 500}+
-                        citizens better understand complex legislation this month.
+                        Your expert contributions have helped{' '}
+                        {classification?.confidence
+                          ? Math.round(classification.confidence * 1000)
+                          : 500}
+                        + citizens better understand complex legislation this month.
                       </p>
                       <div className="flex gap-2">
                         <Badge variant="secondary">Top 5% Contributor</Badge>
@@ -182,7 +186,7 @@ export function ExpertDashboardLayout({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[1, 2, 3].map((bill) => (
+                  {[1, 2, 3].map(bill => (
                     <div key={bill} className="p-4 border rounded-lg">
                       <div className="flex items-start justify-between mb-3">
                         <div>
@@ -225,14 +229,10 @@ export function ExpertDashboardLayout({
                         </div>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="sm" asChild>
-                            <a href={`/expert/analysis/${bill}`}>
-                              Analyze
-                            </a>
+                            <a href={`/expert/analysis/${bill}`}>Analyze</a>
                           </Button>
                           <Button variant="ghost" size="sm" asChild>
-                            <a href={`/bills/constitutional-${bill}`}>
-                              Full Text
-                            </a>
+                            <a href={`/bills/constitutional-${bill}`}>Full Text</a>
                           </Button>
                         </div>
                       </div>
@@ -264,7 +264,8 @@ export function ExpertDashboardLayout({
                       </Badge>
                     </div>
                     <p className="text-xs text-red-700 mb-3">
-                      Bill structure suggests potential circumvention of constitutional spending limits
+                      Bill structure suggests potential circumvention of constitutional spending
+                      limits
                     </p>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" className="border-red-300 text-red-700">
@@ -288,7 +289,11 @@ export function ExpertDashboardLayout({
                     <p className="text-xs text-yellow-700 mb-3">
                       Unusual amendment pattern requires expert review
                     </p>
-                    <Button variant="outline" size="sm" className="border-yellow-300 text-yellow-700">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-yellow-300 text-yellow-700"
+                    >
                       Schedule Review
                     </Button>
                   </div>
@@ -300,7 +305,6 @@ export function ExpertDashboardLayout({
 
         {/* Middle Column - Professional Tools */}
         <div className="space-y-6">
-
           {/* Expert Tools */}
           {!isHidden('expert-tools') && (
             <Card>
@@ -362,9 +366,7 @@ export function ExpertDashboardLayout({
                 <div className="space-y-3">
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-sm">
-                        Bill Analysis: Healthcare Reform
-                      </h4>
+                      <h4 className="font-medium text-sm">Bill Analysis: Healthcare Reform</h4>
                       <Badge variant="outline" className="text-xs">
                         Priority
                       </Badge>
@@ -374,8 +376,7 @@ export function ExpertDashboardLayout({
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3 inline mr-1" />
-                        2 days remaining
+                        <Clock className="h-3 w-3 inline mr-1" />2 days remaining
                       </span>
                       <Button variant="ghost" size="sm">
                         Review
@@ -385,9 +386,7 @@ export function ExpertDashboardLayout({
 
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-sm">
-                        Constitutional Compliance Check
-                      </h4>
+                      <h4 className="font-medium text-sm">Constitutional Compliance Check</h4>
                       <Badge variant="secondary" className="text-xs">
                         Standard
                       </Badge>
@@ -397,8 +396,7 @@ export function ExpertDashboardLayout({
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3 inline mr-1" />
-                        5 days remaining
+                        <Clock className="h-3 w-3 inline mr-1" />5 days remaining
                       </span>
                       <Button variant="ghost" size="sm">
                         Review
@@ -409,9 +407,7 @@ export function ExpertDashboardLayout({
 
                 <div className="pt-3 border-t mt-3">
                   <Button variant="ghost" size="sm" className="w-full" asChild>
-                    <a href="/expert/verification-queue">
-                      View All (12)
-                    </a>
+                    <a href="/expert/verification-queue">View All (12)</a>
                   </Button>
                 </div>
               </CardContent>
@@ -435,9 +431,7 @@ export function ExpertDashboardLayout({
                       <p className="text-xs text-muted-foreground">24 active experts</p>
                     </div>
                     <Button variant="ghost" size="sm" asChild>
-                      <a href="/expert/network">
-                        Join
-                      </a>
+                      <a href="/expert/network">Join</a>
                     </Button>
                   </div>
 
@@ -447,9 +441,7 @@ export function ExpertDashboardLayout({
                       <p className="text-xs text-muted-foreground">3 pending reviews</p>
                     </div>
                     <Button variant="ghost" size="sm" asChild>
-                      <a href="/expert/peer-review">
-                        Review
-                      </a>
+                      <a href="/expert/peer-review">Review</a>
                     </Button>
                   </div>
 
@@ -459,9 +451,7 @@ export function ExpertDashboardLayout({
                       <p className="text-xs text-muted-foreground">5 active groups</p>
                     </div>
                     <Button variant="ghost" size="sm" asChild>
-                      <a href="/expert/research-groups">
-                        Browse
-                      </a>
+                      <a href="/expert/research-groups">Browse</a>
                     </Button>
                   </div>
                 </div>
@@ -472,7 +462,6 @@ export function ExpertDashboardLayout({
 
         {/* Right Column - Insights & Monitoring */}
         <div className="space-y-6">
-
           {/* Real-time Monitoring */}
           {!isHidden('realtime-monitoring') && (
             <Card>
@@ -487,39 +476,27 @@ export function ExpertDashboardLayout({
                   <div className="p-2 bg-green-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <p className="text-sm font-medium text-green-800">
-                        Bill Status Update
-                      </p>
+                      <p className="text-sm font-medium text-green-800">Bill Status Update</p>
                     </div>
-                    <p className="text-xs text-green-600">
-                      HB-2024-156 moved to committee
-                    </p>
+                    <p className="text-xs text-green-600">HB-2024-156 moved to committee</p>
                     <p className="text-xs text-muted-foreground">Just now</p>
                   </div>
 
                   <div className="p-2 bg-blue-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                      <p className="text-sm font-medium text-blue-800">
-                        New Analysis Request
-                      </p>
+                      <p className="text-sm font-medium text-blue-800">New Analysis Request</p>
                     </div>
-                    <p className="text-xs text-blue-600">
-                      Constitutional review needed
-                    </p>
+                    <p className="text-xs text-blue-600">Constitutional review needed</p>
                     <p className="text-xs text-muted-foreground">2 min ago</p>
                   </div>
 
                   <div className="p-2 bg-purple-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-                      <p className="text-sm font-medium text-purple-800">
-                        Expert Verification
-                      </p>
+                      <p className="text-sm font-medium text-purple-800">Expert Verification</p>
                     </div>
-                    <p className="text-xs text-purple-600">
-                      Analysis verified by peer
-                    </p>
+                    <p className="text-xs text-purple-600">Analysis verified by peer</p>
                     <p className="text-xs text-muted-foreground">5 min ago</p>
                   </div>
                 </div>

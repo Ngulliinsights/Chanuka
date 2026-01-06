@@ -1,22 +1,22 @@
 /**
  * Performance Monitor Module
- * 
+ *
  * Central performance monitoring system that coordinates Web Vitals tracking,
  * budget checking, alert management, and provides unified performance insights.
- * 
+ *
  * @module PerformanceMonitor
  * @version 2.0.0
  */
 
 import { PerformanceAlertsManager } from './alerts';
 import { PerformanceBudgetChecker } from './budgets';
-import { 
+import {
   DEFAULT_PERFORMANCE_CONFIG,
   PerformanceAlert,
-  PerformanceConfig, 
-  PerformanceMetric, 
+  PerformanceConfig,
+  PerformanceMetric,
   PerformanceStats,
-  WebVitalsMetric
+  WebVitalsMetric,
 } from './types';
 import { WebVitalsMonitor } from './web-vitals';
 
@@ -41,7 +41,7 @@ enum MonitorErrorType {
   METRIC_COLLECTION = 'METRIC_COLLECTION_ERROR',
   BUDGET_CHECK = 'BUDGET_CHECK_ERROR',
   ALERT_CHECK = 'ALERT_CHECK_ERROR',
-  SYSTEM_METRIC = 'SYSTEM_METRIC_ERROR'
+  SYSTEM_METRIC = 'SYSTEM_METRIC_ERROR',
 }
 
 /**
@@ -79,15 +79,15 @@ export class PerformanceMonitor {
     try {
       // Merge configuration with defensive defaults
       this.config = this.mergeConfig(config);
-      
+
       // Initialize subsystems with error boundaries
       this.webVitalsMonitor = WebVitalsMonitor.getInstance(this.config.webVitals);
       this.budgetChecker = PerformanceBudgetChecker.getInstance();
       this.alertsManager = PerformanceAlertsManager.getInstance(this.config.alerts);
-      
+
       // Set up cross-system communication
       this.setupEventListeners();
-      
+
       // Start monitoring if enabled
       if (this.config.enabled) {
         this.startMonitoring();
@@ -131,16 +131,16 @@ export class PerformanceMonitor {
    */
   private mergeConfig(userConfig: Partial<PerformanceConfig>): PerformanceConfig {
     const merged = { ...DEFAULT_PERFORMANCE_CONFIG, ...userConfig };
-    
+
     // Validate and constrain check interval to prevent performance issues
     if (merged.budgets.checkInterval < this.MIN_CHECK_INTERVAL) {
       console.warn(
         `Check interval ${merged.budgets.checkInterval}ms is too low. ` +
-        `Setting to minimum ${this.MIN_CHECK_INTERVAL}ms`
+          `Setting to minimum ${this.MIN_CHECK_INTERVAL}ms`
       );
       merged.budgets.checkInterval = this.MIN_CHECK_INTERVAL;
     }
-    
+
     return merged;
   }
 
@@ -160,20 +160,22 @@ export class PerformanceMonitor {
             timestamp: webVital.timestamp,
             url: webVital.url,
             category: this.getMetricCategory(webVital.name),
-            metadata: { 
+            metadata: {
               ...webVital.metadata,
-              source: 'web-vitals' // Track metric origin for debugging
-            }
+              source: 'web-vitals', // Track metric origin for debugging
+            },
           };
 
           // Process metric through budget and alert systems in parallel
           await this.processMetric(metric);
         } catch (error) {
-          this.handleError(new PerformanceMonitorError(
-            MonitorErrorType.METRIC_COLLECTION,
-            'Failed to process Web Vitals metric',
-            error instanceof Error ? error : undefined
-          ));
+          this.handleError(
+            new PerformanceMonitorError(
+              MonitorErrorType.METRIC_COLLECTION,
+              'Failed to process Web Vitals metric',
+              error instanceof Error ? error : undefined
+            )
+          );
         }
       });
     } catch (error) {
@@ -242,12 +244,12 @@ export class PerformanceMonitor {
    */
   private getMetricCategory(metricName: string): PerformanceMetric['category'] {
     const categoryMap: Record<string, PerformanceMetric['category']> = {
-      'LCP': 'loading',      // Largest Contentful Paint
-      'FCP': 'loading',      // First Contentful Paint
-      'TTFB': 'loading',     // Time to First Byte
-      'FID': 'interactivity', // First Input Delay
-      'INP': 'interactivity', // Interaction to Next Paint
-      'CLS': 'visual-stability' // Cumulative Layout Shift
+      LCP: 'loading', // Largest Contentful Paint
+      FCP: 'loading', // First Contentful Paint
+      TTFB: 'loading', // Time to First Byte
+      FID: 'interactivity', // First Input Delay
+      INP: 'interactivity', // Interaction to Next Paint
+      CLS: 'visual-stability', // Cumulative Layout Shift
     };
 
     return categoryMap[metricName] || 'custom';
@@ -268,11 +270,13 @@ export class PerformanceMonitor {
     // Schedule periodic system checks at configured interval
     this.monitoringInterval = setInterval(() => {
       this.performPeriodicChecks().catch(error => {
-        this.handleError(new PerformanceMonitorError(
-          MonitorErrorType.SYSTEM_METRIC,
-          'Periodic check failed',
-          error instanceof Error ? error : undefined
-        ));
+        this.handleError(
+          new PerformanceMonitorError(
+            MonitorErrorType.SYSTEM_METRIC,
+            'Periodic check failed',
+            error instanceof Error ? error : undefined
+          )
+        );
       });
     }, this.config.budgets.checkInterval);
   }
@@ -291,7 +295,7 @@ export class PerformanceMonitor {
     await Promise.allSettled([
       this.collectSystemMetrics(),
       this.checkResourceUsage(),
-      this.monitorMemoryUsage()
+      this.monitorMemoryUsage(),
     ]);
   }
 
@@ -313,7 +317,7 @@ export class PerformanceMonitor {
         domSize: document.querySelectorAll('*').length,
         scriptCount: document.querySelectorAll('script').length,
         stylesheetCount: document.querySelectorAll('link[rel="stylesheet"]').length,
-        imageCount: document.querySelectorAll('img').length
+        imageCount: document.querySelectorAll('img').length,
       };
 
       // Record each metric
@@ -324,40 +328,42 @@ export class PerformanceMonitor {
           timestamp,
           category: 'loading',
           url,
-          metadata: { 
+          metadata: {
             description: 'Total number of DOM elements',
-            threshold: 1500 // Common performance budget for DOM size
-          }
+            threshold: 1500, // Common performance budget for DOM size
+          },
         }),
         this.recordCustomMetric({
           name: 'script-count',
           value: metrics.scriptCount,
           timestamp,
           category: 'loading',
-          url
+          url,
         }),
         this.recordCustomMetric({
           name: 'stylesheet-count',
           value: metrics.stylesheetCount,
           timestamp,
           category: 'loading',
-          url
+          url,
         }),
         this.recordCustomMetric({
           name: 'image-count',
           value: metrics.imageCount,
           timestamp,
           category: 'loading',
-          url
-        })
+          url,
+        }),
       ]);
     } catch (error) {
       // Log error but don't throw to prevent monitoring disruption
-      this.handleError(new PerformanceMonitorError(
-        MonitorErrorType.SYSTEM_METRIC,
-        'Failed to collect system metrics',
-        error instanceof Error ? error : undefined
-      ));
+      this.handleError(
+        new PerformanceMonitorError(
+          MonitorErrorType.SYSTEM_METRIC,
+          'Failed to collect system metrics',
+          error instanceof Error ? error : undefined
+        )
+      );
     }
   }
 
@@ -378,26 +384,26 @@ export class PerformanceMonitor {
       const navigationEntries = performance.getEntriesByType('navigation');
       if (navigationEntries.length > 0) {
         const navigation = navigationEntries[0] as PerformanceNavigationTiming;
-        
+
         // Calculate key timing metrics with validation
         const timings = {
           pageLoad: this.calculateTiming(navigation.loadEventEnd, navigation.fetchStart),
           dnsLookup: this.calculateTiming(navigation.domainLookupEnd, navigation.domainLookupStart),
           tcpConnection: this.calculateTiming(navigation.connectEnd, navigation.connectStart),
           serverResponse: this.calculateTiming(navigation.responseEnd, navigation.requestStart),
-          domProcessing: this.calculateTiming(navigation.domComplete, navigation.domInteractive)
+          domProcessing: this.calculateTiming(navigation.domComplete, navigation.domInteractive),
         };
 
         // Record valid timings
         const metricPromises = Object.entries(timings)
           .filter(([, value]) => value > 0)
-          .map(([name, value]) => 
+          .map(([name, value]) =>
             this.recordCustomMetric({
               name: `${name.replace(/([A-Z])/g, '-$1').toLowerCase()}`,
               value,
               timestamp,
               category: 'loading',
-              url
+              url,
             })
           );
 
@@ -406,14 +412,17 @@ export class PerformanceMonitor {
 
       // Analyze resource loading
       const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-      
+
       // Calculate aggregate resource metrics
-      const resourceStats = resources.reduce((acc, resource) => {
-        acc.totalSize += resource.transferSize || 0;
-        acc.totalDuration += resource.duration;
-        acc.count += 1;
-        return acc;
-      }, { totalSize: 0, totalDuration: 0, count: 0 });
+      const resourceStats = resources.reduce(
+        (acc, resource) => {
+          acc.totalSize += resource.transferSize || 0;
+          acc.totalDuration += resource.duration;
+          acc.count += 1;
+          return acc;
+        },
+        { totalSize: 0, totalDuration: 0, count: 0 }
+      );
 
       if (resourceStats.totalSize > 0) {
         await this.recordCustomMetric({
@@ -424,18 +433,19 @@ export class PerformanceMonitor {
           url,
           metadata: {
             resourceCount: resourceStats.count,
-            averageDuration: resourceStats.count > 0 
-              ? resourceStats.totalDuration / resourceStats.count 
-              : 0
-          }
+            averageDuration:
+              resourceStats.count > 0 ? resourceStats.totalDuration / resourceStats.count : 0,
+          },
         });
       }
     } catch (error) {
-      this.handleError(new PerformanceMonitorError(
-        MonitorErrorType.SYSTEM_METRIC,
-        'Failed to check resource usage',
-        error instanceof Error ? error : undefined
-      ));
+      this.handleError(
+        new PerformanceMonitorError(
+          MonitorErrorType.SYSTEM_METRIC,
+          'Failed to check resource usage',
+          error instanceof Error ? error : undefined
+        )
+      );
     }
   }
 
@@ -462,15 +472,15 @@ export class PerformanceMonitor {
       // Using type-safe approach instead of 'as any'
       const perfWithMemory = window.performance as PerformanceWithMemory;
       const memory = perfWithMemory.memory;
-      
+
       if (memory && typeof memory.usedJSHeapSize === 'number') {
         const usedHeap = memory.usedJSHeapSize;
         const totalHeap = memory.totalJSHeapSize;
         const heapLimit = memory.jsHeapSizeLimit;
-        
+
         // Calculate memory usage percentage
         const usagePercent = (usedHeap / heapLimit) * 100;
-        
+
         await this.recordCustomMetric({
           name: 'memory-usage',
           value: usedHeap,
@@ -481,16 +491,18 @@ export class PerformanceMonitor {
             totalJSHeapSize: totalHeap,
             jsHeapSizeLimit: heapLimit,
             usagePercent: Math.round(usagePercent * 100) / 100,
-            unit: 'bytes'
-          }
+            unit: 'bytes',
+          },
         });
       }
     } catch (error) {
-      this.handleError(new PerformanceMonitorError(
-        MonitorErrorType.SYSTEM_METRIC,
-        'Failed to monitor memory usage',
-        error instanceof Error ? error : undefined
-      ));
+      this.handleError(
+        new PerformanceMonitorError(
+          MonitorErrorType.SYSTEM_METRIC,
+          'Failed to monitor memory usage',
+          error instanceof Error ? error : undefined
+        )
+      );
     }
   }
 
@@ -507,7 +519,7 @@ export class PerformanceMonitor {
 
       // Add metric to history with size management
       this.customMetrics.push(metric);
-      
+
       // Maintain metrics history within size limit using efficient slicing
       if (this.customMetrics.length > this.MAX_CUSTOM_METRICS) {
         this.customMetrics = this.customMetrics.slice(-this.MAX_CUSTOM_METRICS);
@@ -516,11 +528,13 @@ export class PerformanceMonitor {
       // Process metric through subsystems
       await this.processMetric(metric);
     } catch (error) {
-      this.handleError(new PerformanceMonitorError(
-        MonitorErrorType.METRIC_COLLECTION,
-        `Failed to record custom metric: ${metric.name}`,
-        error instanceof Error ? error : undefined
-      ));
+      this.handleError(
+        new PerformanceMonitorError(
+          MonitorErrorType.METRIC_COLLECTION,
+          `Failed to record custom metric: ${metric.name}`,
+          error instanceof Error ? error : undefined
+        )
+      );
     }
   }
 
@@ -530,11 +544,11 @@ export class PerformanceMonitor {
   private isValidMetric(metric: PerformanceMetric): boolean {
     return Boolean(
       metric &&
-      typeof metric.name === 'string' &&
-      typeof metric.value === 'number' &&
-      !isNaN(metric.value) &&
-      metric.timestamp instanceof Date &&
-      typeof metric.category === 'string'
+        typeof metric.name === 'string' &&
+        typeof metric.value === 'number' &&
+        !isNaN(metric.value) &&
+        metric.timestamp instanceof Date &&
+        typeof metric.category === 'string'
     );
   }
 
@@ -546,15 +560,16 @@ export class PerformanceMonitor {
     const webVitalsScores = this.webVitalsMonitor.getWebVitalsScores();
     const budgetStats = this.budgetChecker.getComplianceStats();
     const alertStats = this.alertsManager.getAlertStats();
-    
+
     // Calculate average load time from collected metrics
-    const loadTimeMetrics = this.customMetrics.filter(m => 
-      m.name === 'page-load-time' || m.name === 'page-load'
+    const loadTimeMetrics = this.customMetrics.filter(
+      m => m.name === 'page-load-time' || m.name === 'page-load'
     );
-    
-    const averageLoadTime = loadTimeMetrics.length > 0
-      ? loadTimeMetrics.reduce((sum, m) => sum + m.value, 0) / loadTimeMetrics.length
-      : 0;
+
+    const averageLoadTime =
+      loadTimeMetrics.length > 0
+        ? loadTimeMetrics.reduce((sum, m) => sum + m.value, 0) / loadTimeMetrics.length
+        : 0;
 
     return {
       totalMetrics: this.webVitalsMonitor.getMetrics().length + this.customMetrics.length,
@@ -565,9 +580,9 @@ export class PerformanceMonitor {
       budgetCompliance: {
         passing: budgetStats.passing,
         warning: budgetStats.warning,
-        failing: budgetStats.failing
+        failing: budgetStats.failing,
       },
-      lastAnalysis: new Date()
+      lastAnalysis: new Date(),
     };
   }
 
@@ -612,17 +627,17 @@ export class PerformanceMonitor {
    */
   updateConfig(config: Partial<PerformanceConfig>): void {
     const previousEnabled = this.config.enabled;
-    
+
     // Merge and validate new configuration
     this.config = this.mergeConfig({ ...this.config, ...config });
-    
+
     // Update subsystem configurations
     this.webVitalsMonitor.updateConfig(this.config.webVitals);
     this.alertsManager.updateConfig(this.config.alerts);
-    
+
     // Handle monitoring state changes
     const enabledChanged = previousEnabled !== this.config.enabled;
-    
+
     if (enabledChanged) {
       if (this.config.enabled && !this.isMonitoring) {
         this.startMonitoring();
@@ -669,7 +684,7 @@ export class PerformanceMonitor {
       webVitals: this.getWebVitalsMetrics(),
       customMetrics: this.getCustomMetrics(),
       alerts: this.getActiveAlerts(),
-      budgetCompliance: this.getBudgetCompliance()
+      budgetCompliance: this.getBudgetCompliance(),
     };
   }
 
@@ -697,7 +712,7 @@ export class PerformanceMonitor {
   /**
    * Sets a custom error handler for monitoring errors.
    * Allows applications to integrate monitoring errors with their error tracking.
-   * 
+   *
    * @param handler - Callback function that receives PerformanceMonitorError instances
    */
   setErrorHandler(handler: (error: PerformanceMonitorError) => void): void {
@@ -718,7 +733,7 @@ export class PerformanceMonitor {
         console.error('Error in custom error handler:', handlerError);
       }
     }
-    
+
     // Always log to console in development
     if (process.env.NODE_ENV !== 'production') {
       console.error(`[PerformanceMonitor] ${error.type}:`, error.message, error.originalError);

@@ -1,6 +1,3 @@
-import React, { useState, useCallback } from 'react';
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
 import {
   Heart,
   Share2,
@@ -9,8 +6,12 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Users
+  Users,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+
+import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
 
 /**
  * Bill Actions Panel Props
@@ -56,22 +57,25 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
   onBookmark,
   onShare,
   onComment,
-  className = ''
+  className = '',
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAction = useCallback(async (action: () => void | undefined) => {
-    if (!action || isLoading) return;
+  const handleAction = useCallback(
+    async (action: () => void | undefined) => {
+      if (!action || isLoading) return;
 
-    setIsLoading(true);
-    try {
-      await action();
-    } catch (error) {
-      console.error('Action failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading]);
+      setIsLoading(true);
+      try {
+        await action();
+      } catch (error) {
+        console.error('Action failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading]
+  );
 
   const getStatusIcon = () => {
     switch (status) {
@@ -121,15 +125,13 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Support Button */}
         <Button
-          variant={userActions.hasSupported ? "default" : "outline"}
+          variant={userActions.hasSupported ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleAction(onSupport)}
           disabled={isLoading}
           className="flex items-center justify-center space-x-2"
         >
-          <Heart
-            className={`h-4 w-4 ${userActions.hasSupported ? 'fill-current' : ''}`}
-          />
+          <Heart className={`h-4 w-4 ${userActions.hasSupported ? 'fill-current' : ''}`} />
           <span>Support</span>
           {supportCount > 0 && (
             <Badge variant="secondary" className="ml-1">
@@ -140,15 +142,13 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
 
         {/* Oppose Button */}
         <Button
-          variant={userActions.hasOpposed ? "destructive" : "outline"}
+          variant={userActions.hasOpposed ? 'destructive' : 'outline'}
           size="sm"
           onClick={() => handleAction(onOppose)}
           disabled={isLoading}
           className="flex items-center justify-center space-x-2"
         >
-          <AlertTriangle
-            className={`h-4 w-4 ${userActions.hasOpposed ? 'fill-current' : ''}`}
-          />
+          <AlertTriangle className={`h-4 w-4 ${userActions.hasOpposed ? 'fill-current' : ''}`} />
           <span>Oppose</span>
           {opposeCount > 0 && (
             <Badge variant="secondary" className="ml-1">
@@ -215,7 +215,7 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
               <div
                 className="bg-green-500"
                 style={{
-                  width: `${(supportCount / (supportCount + opposeCount)) * 100}%`
+                  width: `${(supportCount / (supportCount + opposeCount)) * 100}%`,
                 }}
               />
             )}
@@ -223,7 +223,7 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
               <div
                 className="bg-red-500"
                 style={{
-                  width: `${(opposeCount / (supportCount + opposeCount)) * 100}%`
+                  width: `${(opposeCount / (supportCount + opposeCount)) * 100}%`,
                 }}
               />
             )}

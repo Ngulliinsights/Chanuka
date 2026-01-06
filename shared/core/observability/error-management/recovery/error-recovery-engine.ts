@@ -5,9 +5,10 @@
  * based on error patterns, context, and historical success rates.
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import { ErrorRecoveryEngine, RecoverySuggestion } from '@shared/core/src/caching/types.ts';
 import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 
 export interface RecoveryRule {
   id: string;

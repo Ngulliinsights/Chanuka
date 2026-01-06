@@ -4,23 +4,24 @@
  * Tests for navigation consistency across routes
  */
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 
-import { NavigationConsistency } from './NavigationConsistency';
-import { createNavigationProvider } from './context';
 import navigationSlice from '../../shared/infrastructure/store/slices/navigationSlice';
+
+import { createNavigationProvider } from './context';
+import { NavigationConsistency } from './NavigationConsistency';
 
 // Mock logger
 vi.mock('../../utils/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
-    error: vi.fn()
-  }
+    error: vi.fn(),
+  },
 }));
 
 // Mock navigation hooks
@@ -32,7 +33,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -40,7 +41,7 @@ vi.mock('react-router-dom', async () => {
 const createTestStore = () => {
   return configureStore({
     reducer: {
-      navigation: navigationSlice
+      navigation: navigationSlice,
     },
     preloadedState: {
       navigation: {
@@ -59,11 +60,11 @@ const createTestStore = () => {
           favoritePages: [],
           compactMode: false,
           showBreadcrumbs: true,
-          autoExpand: false
+          autoExpand: false,
         },
-        recentPages: []
-      }
-    }
+        recentPages: [],
+      },
+    },
   });
 };
 
@@ -77,7 +78,7 @@ const TestNavigationProvider = createNavigationProvider(
 
 const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
   children,
-  route = '/'
+  route = '/',
 }) => {
   const store = createTestStore();
 
@@ -85,9 +86,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
     <Provider store={store}>
       <MemoryRouter initialEntries={[route]}>
         <TestNavigationProvider>
-          <NavigationConsistency>
-            {children}
-          </NavigationConsistency>
+          <NavigationConsistency>{children}</NavigationConsistency>
         </TestNavigationProvider>
       </MemoryRouter>
     </Provider>
@@ -143,7 +142,9 @@ describe('NavigationConsistency', () => {
       );
 
       const metaDescription = document.querySelector('meta[name="description"]');
-      expect(metaDescription?.getAttribute('content')).toBe('Browse and track Kenyan legislative bills');
+      expect(metaDescription?.getAttribute('content')).toBe(
+        'Browse and track Kenyan legislative bills'
+      );
     });
 
     it('should update Open Graph tags', () => {
@@ -216,7 +217,7 @@ describe('NavigationConsistency', () => {
   });
 
   describe('Performance Optimizations', () => {
-    it('should create prefetch links for critical routes', (done) => {
+    it('should create prefetch links for critical routes', done => {
       render(
         <TestWrapper route="/">
           <div>Home Content</div>
@@ -244,7 +245,7 @@ describe('NavigationConsistency', () => {
       { path: '/search', expectedTitle: 'Search - Chanuka', section: 'search' },
       { path: '/dashboard', expectedTitle: 'Dashboard - Chanuka', section: 'dashboard' },
       { path: '/account', expectedTitle: 'Account - Chanuka', section: 'account' },
-      { path: '/auth', expectedTitle: 'Sign In - Chanuka', section: 'auth' }
+      { path: '/auth', expectedTitle: 'Sign In - Chanuka', section: 'auth' },
     ];
 
     testRoutes.forEach(({ path, expectedTitle, section }) => {
@@ -273,7 +274,7 @@ describe('NavigationConsistency', () => {
 
       expect(mockGtag).toHaveBeenCalledWith('config', 'GA_MEASUREMENT_ID', {
         page_title: 'Bills Dashboard - Chanuka',
-        page_location: expect.any(String)
+        page_location: expect.any(String),
       });
 
       // Cleanup

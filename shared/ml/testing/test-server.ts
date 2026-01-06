@@ -3,8 +3,9 @@
 // ============================================================================
 // Standalone server for testing ML models externally via HTTP API
 
-import express = require('express');
 import cors = require('cors');
+import express = require('express');
+
 import { mlOrchestrator, analysisPipeline } from '../index';
 
 const app: express.Application = express();

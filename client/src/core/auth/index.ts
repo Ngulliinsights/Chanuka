@@ -1,6 +1,6 @@
 /**
  * Unified Authentication Module
- * 
+ *
  * Consolidates all authentication implementations into a single, coherent system.
  * This module eliminates redundancy while preserving all functionality from:
  * - useAuth hook (React Context + Redux)
@@ -24,19 +24,19 @@ export type {
   AuthResponse,
   AuthTokens,
   TokenInfo,
-  
+
   // Session Types
   SessionInfo,
   SessionValidation,
   TokenValidation,
-  
+
   // Security Types
   TwoFactorSetup,
   SecurityEvent,
   SuspiciousActivityAlert,
   PasswordRequirements,
   PasswordValidationResult,
-  
+
   // Privacy Types
   PrivacySettings,
   NotificationPreferences,
@@ -46,10 +46,10 @@ export type {
   DataDeletionRequest,
   UserPreferences,
   SocialLoginProvider,
-  
+
   // Context Types
   AuthContextType,
-  
+
   // UI Component Types
   ConsentModalProps,
   PrivacyDashboardProps,
@@ -103,10 +103,10 @@ export {
 export {
   // Auth Context Provider
   AuthProvider,
-  
+
   // Primary Auth Hook
   useAuth,
-  
+
   // Legacy compatibility
   useAuthStore,
 } from './hooks/useAuth';
@@ -118,7 +118,7 @@ export {
 export {
   // Auth Slice
   default as authReducer,
-  
+
   // Actions
   login,
   register,
@@ -145,7 +145,7 @@ export {
   getSecurityEvents,
   getSuspiciousActivity,
   validateStoredTokens,
-  
+
   // Selectors
   selectUser,
   selectIsAuthenticated,
@@ -156,7 +156,7 @@ export {
   selectTwoFactorRequired,
   selectAuthStatus,
   selectUserProfile,
-  
+
   // State type
   type AuthState,
 } from './store/auth-slice';

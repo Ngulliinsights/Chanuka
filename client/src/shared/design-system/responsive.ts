@@ -320,8 +320,15 @@ export const responsiveUtils = {
 
     // Fall back to smaller breakpoints
     const breakpointOrder: (keyof typeof breakpoints)[] = [
-      'desktop-xl', 'desktop', 'laptop-lg', 'laptop',
-      'tablet-lg', 'tablet', 'mobile-lg', 'mobile-sm', 'mobile'
+      'desktop-xl',
+      'desktop',
+      'laptop-lg',
+      'laptop',
+      'tablet-lg',
+      'tablet',
+      'mobile-lg',
+      'mobile-sm',
+      'mobile',
     ];
 
     const currentIndex = breakpointOrder.indexOf(currentBreakpoint);
@@ -346,7 +353,8 @@ export const createResponsiveStyles = (
 
 // Hook for responsive behavior
 export const useResponsive = () => {
-  const [currentBreakpoint, setCurrentBreakpoint] = React.useState<keyof typeof breakpoints>('mobile');
+  const [currentBreakpoint, setCurrentBreakpoint] =
+    React.useState<keyof typeof breakpoints>('mobile');
   const [isTouchDevice, setIsTouchDevice] = React.useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
@@ -390,7 +398,10 @@ export const useResponsive = () => {
     prefersReducedMotion,
     isDesktop: currentBreakpoint === 'desktop' || currentBreakpoint === 'desktop-xl',
     isTablet: currentBreakpoint === 'tablet' || currentBreakpoint === 'tablet-lg',
-    isMobile: currentBreakpoint === 'mobile' || currentBreakpoint === 'mobile-sm' || currentBreakpoint === 'mobile-lg',
+    isMobile:
+      currentBreakpoint === 'mobile' ||
+      currentBreakpoint === 'mobile-sm' ||
+      currentBreakpoint === 'mobile-lg',
     matchesBreakpoint: responsiveUtils.matchesBreakpoint,
     getResponsiveValue: responsiveUtils.getResponsiveValue,
   };
@@ -399,4 +410,3 @@ export const useResponsive = () => {
 // Type definitions
 export type Breakpoint = keyof typeof breakpoints;
 export type ResponsiveValue<T> = Partial<Record<Breakpoint, T>>;
-

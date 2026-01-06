@@ -28,7 +28,7 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    
+
     // Execute custom onClick if provided
     if (onClick) {
       onClick();
@@ -38,15 +38,15 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
     // Find target element
     const targetId = href.replace('#', '');
     const targetElement = document.getElementById(targetId);
-    
+
     if (targetElement) {
       // Focus the target element
       targetElement.focus();
-      
+
       // If the element isn't naturally focusable, make it focusable temporarily
       if (!targetElement.hasAttribute('tabindex')) {
         targetElement.setAttribute('tabindex', '-1');
-        
+
         // Remove tabindex after focus to maintain natural tab order
         const handleBlur = () => {
           targetElement.removeAttribute('tabindex');
@@ -54,13 +54,13 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
         };
         targetElement.addEventListener('blur', handleBlur);
       }
-      
+
       // Scroll to element with smooth behavior
-      targetElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
       });
-      
+
       // Announce to screen readers
       const announcement = `Navigated to ${children}`;
       const announcer = document.createElement('div');
@@ -69,7 +69,7 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
       announcer.className = 'sr-only';
       announcer.textContent = announcement;
       document.body.appendChild(announcer);
-      
+
       setTimeout(() => {
         document.body.removeChild(announcer);
       }, 1000);
@@ -83,11 +83,11 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
       onClick={handleClick}
       className={cn(
         // Base styles - hidden by default
-        "absolute left-0 top-0 z-50 px-4 py-2 bg-blue-600 text-white font-medium rounded-br-md",
-        "transform -translate-y-full transition-transform duration-200 ease-in-out",
-        "focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+        'absolute left-0 top-0 z-50 px-4 py-2 bg-blue-600 text-white font-medium rounded-br-md',
+        'transform -translate-y-full transition-transform duration-200 ease-in-out',
+        'focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
         // Ensure it's accessible but hidden from visual users when not focused
-        "sr-only focus:not-sr-only",
+        'sr-only focus:not-sr-only',
         className
       )}
       tabIndex={0}
@@ -103,25 +103,25 @@ export function SkipLink({ href, children, className, onClick }: SkipLinkProps) 
 const defaultSkipLinks = [
   {
     href: '#main-content',
-    label: 'Skip to main content'
+    label: 'Skip to main content',
   },
   {
     href: '#navigation',
-    label: 'Skip to navigation'
+    label: 'Skip to navigation',
   },
   {
     href: '#search',
-    label: 'Skip to search'
+    label: 'Skip to search',
   },
   {
     href: '#footer',
-    label: 'Skip to footer'
-  }
+    label: 'Skip to footer',
+  },
 ];
 
 /**
  * SkipLinks component provides keyboard navigation shortcuts
- * 
+ *
  * Features:
  * - Accessible skip navigation
  * - Customizable link destinations
@@ -130,10 +130,10 @@ const defaultSkipLinks = [
  * - Focus management
  * - WCAG 2.1 AA compliance
  */
-export function SkipLinks({ 
-  links = defaultSkipLinks, 
+export function SkipLinks({
+  links = defaultSkipLinks,
   className,
-  showOnFocus = true 
+  showOnFocus = true,
 }: SkipLinksProps) {
   const [isVisible, setIsVisible] = useState(!showOnFocus);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -178,11 +178,7 @@ export function SkipLinks({
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "fixed top-0 left-0 z-50",
-        showOnFocus && !isVisible && "sr-only",
-        className
-      )}
+      className={cn('fixed top-0 left-0 z-50', showOnFocus && !isVisible && 'sr-only', className)}
       onKeyDown={handleKeyDown}
       role="navigation"
       aria-label="Skip navigation links"
@@ -194,11 +190,11 @@ export function SkipLinks({
           onClick={link.onClick}
           className={cn(
             // Position skip links in a row
-            index > 0 && "ml-2",
+            index > 0 && 'ml-2',
             // Ensure proper stacking
-            "relative",
+            'relative',
             // Add visual separation
-            "border border-blue-700"
+            'border border-blue-700'
           )}
         >
           {link.label}
@@ -219,11 +215,13 @@ export function useSkipLinkTargets(targetIds: string[]) {
       const element = document.getElementById(id);
       if (element) {
         // Ensure the element can receive focus
-        if (!element.hasAttribute('tabindex') && 
-            !['INPUT', 'BUTTON', 'SELECT', 'TEXTAREA', 'A'].includes(element.tagName)) {
+        if (
+          !element.hasAttribute('tabindex') &&
+          !['INPUT', 'BUTTON', 'SELECT', 'TEXTAREA', 'A'].includes(element.tagName)
+        ) {
           element.setAttribute('tabindex', '-1');
         }
-        
+
         // Add skip target class for styling
         element.classList.add('skip-link-target');
       }

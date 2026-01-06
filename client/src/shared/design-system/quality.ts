@@ -16,9 +16,9 @@ export const A11Y_STANDARDS = {
     version: '2.1',
     level: 'AA',
     contrastRatio: {
-      normalText: 4.5,  // Normal text: 4.5:1
-      largeText: 3,    // Large text (18pt+): 3:1
-      graphics: 3,     // Graphics and UI components: 3:1
+      normalText: 4.5, // Normal text: 4.5:1
+      largeText: 3, // Large text (18pt+): 3:1
+      graphics: 3, // Graphics and UI components: 3:1
     },
   },
 
@@ -119,13 +119,7 @@ export const COMPONENT_GUIDELINES = {
    * 7. Pass accessibility tests
    * 8. Have documented variants
    */
-  required: [
-    'Design tokens',
-    'Theme support',
-    'Accessibility',
-    'Type safety',
-    'Documentation',
-  ],
+  required: ['Design tokens', 'Theme support', 'Accessibility', 'Type safety', 'Documentation'],
 
   /**
    * Component structure template
@@ -167,16 +161,19 @@ export const qualityUtils = {
     }
 
     // Check ARIA labels
-    if (!componentElement.getAttribute('aria-label') && 
-        !componentElement.querySelector('[aria-label]')) {
+    if (
+      !componentElement.getAttribute('aria-label') &&
+      !componentElement.querySelector('[aria-label]')
+    ) {
       issues.push('Missing ARIA labels');
     }
 
     // Check semantic HTML
-    const hasSemanticRole = componentElement.hasAttribute('role') || 
-                           ['button', 'input', 'a', 'select', 'textarea'].includes(
-                             componentElement.tagName.toLowerCase()
-                           );
+    const hasSemanticRole =
+      componentElement.hasAttribute('role') ||
+      ['button', 'input', 'a', 'select', 'textarea'].includes(
+        componentElement.tagName.toLowerCase()
+      );
     if (!hasSemanticRole) {
       issues.push('Missing semantic HTML or role');
     }
@@ -207,14 +204,18 @@ export const qualityUtils = {
   /**
    * Check component performance
    */
-  checkPerformance: (_componentName: string, renderTime: number): { acceptable: boolean; feedback: string } => {
+  checkPerformance: (
+    _componentName: string,
+    renderTime: number
+  ): { acceptable: boolean; feedback: string } => {
     const acceptableTime = 16; // 60fps = 16.67ms per frame
-    
+
     return {
       acceptable: renderTime < acceptableTime,
-      feedback: renderTime < acceptableTime 
-        ? 'Good performance' 
-        : `Render time ${renderTime.toFixed(2)}ms exceeds budget`,
+      feedback:
+        renderTime < acceptableTime
+          ? 'Good performance'
+          : `Render time ${renderTime.toFixed(2)}ms exceeds budget`,
     };
   },
 };

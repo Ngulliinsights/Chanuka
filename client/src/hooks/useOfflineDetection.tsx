@@ -4,9 +4,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import React from 'react';
 
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 export interface ConnectionQuality {
   type: 'offline' | 'slow' | 'fast' | 'unknown';
@@ -46,7 +46,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
+
     debounceTimerRef.current = setTimeout(() => {
       if (typeof navigator !== 'undefined' && 'connection' in navigator) {
         const connection = (navigator as any).connection;
@@ -101,7 +101,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
       clearTimeout(timeoutId);
 
       const isConnected = response.ok;
-      
+
       if (isMountedRef.current) {
         setState(prev => ({
           ...prev,
@@ -140,7 +140,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
   // Listen for online/offline events
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     const handleOnline = () => {
       logger.info('Browser reports online', { component: 'useOfflineDetection' });
       if (isMountedRef.current) {
@@ -177,7 +177,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
 
     return () => {
       isMountedRef.current = false;
-      
+
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       clearInterval(qualityInterval);
@@ -200,7 +200,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
         return () => connection.removeEventListener('change', handleConnectionChange);
       }
     }
-    
+
     return undefined;
   }, [updateConnectionQuality]);
 
@@ -225,4 +225,3 @@ export function useOfflineDetection(): OfflineDetectionState & {
     forceReconnect,
   };
 }
-

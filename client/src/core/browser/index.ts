@@ -1,9 +1,9 @@
 /**
  * Browser Compatibility Module - Main Entry Point
- * 
+ *
  * Provides centralized access to all browser detection, feature testing,
  * and polyfill management functionality.
- * 
+ *
  * This module consolidates browser-related utilities into a single, well-organized system:
  * - Detects browser type and version using user agent parsing
  * - Tests for modern web API support through feature detection
@@ -98,12 +98,16 @@ export async function loadPolyfills(): Promise<void> {
 /**
  * Automatically initialize compatibility checking when this module loads in a browser.
  * This ensures that compatibility issues are detected as early as possible.
- * 
+ *
  * We skip this in test environments to avoid false failures from headless browsers.
  */
 if (isBrowserEnv() && !isTestEnv()) {
   initializeBrowserCompatibility().catch(error => {
-    logger.error('Failed to initialize browser compatibility', { component: 'BrowserUtils' }, error);
+    logger.error(
+      'Failed to initialize browser compatibility',
+      { component: 'BrowserUtils' },
+      error
+    );
   });
 }
 

@@ -37,22 +37,21 @@ interface MobileDataVisualizationProps {
  *
  * Renders mobile-optimized charts and graphs.
  */
-export const MobileDataVisualization = React.forwardRef<HTMLDivElement, MobileDataVisualizationProps>(
-  ({ data: _data, title, type = 'bar', className }, ref) => {
-    return (
-      <div ref={ref} className={`mobile-data-viz ${type} ${className || ''}`}>
-        {title && <h3 className="viz-title">{title}</h3>}
+export const MobileDataVisualization = React.forwardRef<
+  HTMLDivElement,
+  MobileDataVisualizationProps
+>(({ data: _data, title, type = 'bar', className }, ref) => {
+  return (
+    <div ref={ref} className={`mobile-data-viz ${type} ${className || ''}`}>
+      {title && <h3 className="viz-title">{title}</h3>}
 
-        <div className="viz-container">
-          {/* Component implementation will be added here */}
-          <svg className="chart">
-            {/* Chart SVG will be rendered here */}
-          </svg>
-        </div>
+      <div className="viz-container">
+        {/* Component implementation will be added here */}
+        <svg className="chart">{/* Chart SVG will be rendered here */}</svg>
       </div>
-    );
-  }
-);
+    </div>
+  );
+});
 
 MobileDataVisualization.displayName = 'MobileDataVisualization';
 

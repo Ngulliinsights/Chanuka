@@ -38,11 +38,11 @@ export interface UseProgressiveDisclosureOptions {
 
 export const useProgressiveDisclosure = ({
   sections,
-  readingPaths = [],
+  _readingPaths = [],
   autoSave = true,
   storageKey = 'progressive-disclosure-state',
   onSectionChange,
-  onProgressUpdate
+  onProgressUpdate,
 }: UseProgressiveDisclosureOptions) => {
   const [state, setState] = useState<ProgressiveDisclosureState>({
     currentSectionId: null,
@@ -50,7 +50,7 @@ export const useProgressiveDisclosure = ({
     openSections: new Set(),
     selectedReadingPath: null,
     readingProgress: 0,
-    scrollProgress: 0
+    scrollProgress: 0,
   });
 
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
@@ -66,7 +66,7 @@ export const useProgressiveDisclosure = ({
           setState(prev => ({
             ...prev,
             ...parsed,
-            openSections: new Set(parsed.openSections || [])
+            openSections: new Set(parsed.openSections || []),
           }));
         }
       } catch (error) {
@@ -81,7 +81,7 @@ export const useProgressiveDisclosure = ({
       try {
         const stateToSave = {
           ...state,
-          openSections: Array.from(state.openSections)
+          openSections: Array.from(state.openSections),
         };
         localStorage.setItem(storageKey, JSON.stringify(stateToSave));
       } catch (error) {
@@ -93,10 +93,10 @@ export const useProgressiveDisclosure = ({
   // Calculate reading progress
   const calculateReadingProgress = useCallback(() => {
     if (!state.currentSectionId || sections.length === 0) return 0;
-    
+
     const currentIndex = sections.findIndex(s => s.id === state.currentSectionId);
     if (currentIndex === -1) return 0;
-    
+
     return ((currentIndex + 1) / sections.length) * 100;
   }, [state.currentSectionId, sections]);
 
@@ -108,36 +108,39 @@ export const useProgressiveDisclosure = ({
   }, [calculateReadingProgress, onProgressUpdate]);
 
   // Navigate to section
-  const navigateToSection = useCallback((sectionId: string) => {
-    setState(prev => ({
-      ...prev,
-      currentSectionId: sectionId,
-      completedSections: prev.completedSections.includes(sectionId)
-        ? prev.completedSections
-        : [...prev.completedSections, sectionId],
-      openSections: (() => {
-        const newSet = new Set(prev.openSections);
-        newSet.add(sectionId);
-        return newSet;
-      })()
-    }));
-    
-    onSectionChange?.(sectionId);
+  const navigateToSection = useCallback(
+    (sectionId: string) => {
+      setState(prev => ({
+        ...prev,
+        currentSectionId: sectionId,
+        completedSections: prev.completedSections.includes(sectionId)
+          ? prev.completedSections
+          : [...prev.completedSections, sectionId],
+        openSections: (() => {
+          const newSet = new Set(prev.openSections);
+          newSet.add(sectionId);
+          return newSet;
+        })(),
+      }));
 
-    // Scroll to section if ref exists
-    const sectionElement = sectionRefs.current.get(sectionId);
-    if (sectionElement) {
-      sectionElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-      });
-    }
-  }, [onSectionChange]);
+      onSectionChange?.(sectionId);
+
+      // Scroll to section if ref exists
+      const sectionElement = sectionRefs.current.get(sectionId);
+      if (sectionElement) {
+        sectionElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    },
+    [onSectionChange]
+  );
 
   // Navigate to next section
   const navigateToNext = useCallback(() => {
     if (!state.currentSectionId) return;
-    
+
     const currentIndex = sections.findIndex(s => s.id === state.currentSectionId);
     if (currentIndex < sections.length - 1) {
       navigateToSection(sections[currentIndex + 1].id);
@@ -147,7 +150,7 @@ export const useProgressiveDisclosure = ({
   // Navigate to previous section
   const navigateToPrevious = useCallback(() => {
     if (!state.currentSectionId) return;
-    
+
     const currentIndex = sections.findIndex(s => s.id === state.currentSectionId);
     if (currentIndex > 0) {
       navigateToSection(sections[currentIndex - 1].id);
@@ -168,19 +171,22 @@ export const useProgressiveDisclosure = ({
   }, []);
 
   // Select reading path
-  const selectReadingPath = useCallback((path: ReadingPath) => {
-    setState(prev => ({ ...prev, selectedReadingPath: path }));
-    
-    // Navigate to first section in path
-    if (path.sections.length > 0) {
-      navigateToSection(path.sections[0]);
-    }
-  }, [navigateToSection]);
+  const selectReadingPath = useCallback(
+    (path: ReadingPath) => {
+      setState(prev => ({ ...prev, selectedReadingPath: path }));
+
+      // Navigate to first section in path
+      if (path.sections.length > 0) {
+        navigateToSection(path.sections[0]);
+      }
+    },
+    [navigateToSection]
+  );
 
   // Follow reading path (navigate to next section in path)
   const followReadingPath = useCallback(() => {
     if (!state.selectedReadingPath || !state.currentSectionId) return;
-    
+
     const currentIndex = state.selectedReadingPath.sections.indexOf(state.currentSectionId);
     if (currentIndex >= 0 && currentIndex < state.selectedReadingPath.sections.length - 1) {
       navigateToSection(state.selectedReadingPath.sections[currentIndex + 1]);
@@ -193,7 +199,7 @@ export const useProgressiveDisclosure = ({
       ...prev,
       completedSections: prev.completedSections.includes(sectionId)
         ? prev.completedSections
-        : [...prev.completedSections, sectionId]
+        : [...prev.completedSections, sectionId],
     }));
   }, []);
 
@@ -205,7 +211,7 @@ export const useProgressiveDisclosure = ({
       openSections: new Set(),
       selectedReadingPath: null,
       readingProgress: 0,
-      scrollProgress: 0
+      scrollProgress: 0,
     });
   }, []);
 
@@ -226,7 +232,7 @@ export const useProgressiveDisclosure = ({
       const viewportHeight = window.innerHeight;
       const scrolled = Math.max(0, viewportHeight - rect.top);
       const progress = Math.min(100, (scrolled / elementHeight) * 100);
-      
+
       setState(prev => ({ ...prev, scrollProgress: progress }));
     };
 
@@ -256,7 +262,7 @@ export const useProgressiveDisclosure = ({
   // Get next section
   const getNextSection = useCallback(() => {
     if (!state.currentSectionId) return null;
-    
+
     const currentIndex = sections.findIndex(s => s.id === state.currentSectionId);
     return currentIndex < sections.length - 1 ? sections[currentIndex + 1] : null;
   }, [sections, state.currentSectionId]);
@@ -264,7 +270,7 @@ export const useProgressiveDisclosure = ({
   // Get previous section
   const getPreviousSection = useCallback(() => {
     if (!state.currentSectionId) return null;
-    
+
     const currentIndex = sections.findIndex(s => s.id === state.currentSectionId);
     return currentIndex > 0 ? sections[currentIndex - 1] : null;
   }, [sections, state.currentSectionId]);
@@ -284,14 +290,14 @@ export const useProgressiveDisclosure = ({
   return {
     // State
     ...state,
-    
+
     // Computed values
     currentSection: getCurrentSection(),
     nextSection: getNextSection(),
     previousSection: getPreviousSection(),
     completionPercentage: getCompletionPercentage(),
     estimatedRemainingTime: getEstimatedRemainingTime(),
-    
+
     // Actions
     navigateToSection,
     navigateToNext,
@@ -302,7 +308,7 @@ export const useProgressiveDisclosure = ({
     markSectionCompleted,
     resetProgress,
     registerSectionRef,
-    trackScrollProgress
+    trackScrollProgress,
   };
 };
 

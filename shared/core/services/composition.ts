@@ -16,11 +16,11 @@
  * - Support for both synchronous and asynchronous composition
  */
 
-import { Result, err, isOk } from '../primitives/types/result';
-import { BaseError, BaseErrorOptions } from '../observability/error-management';
-import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
-import { timeout, delay } from '../utils/async-utils';
 import { MiddlewareServices } from '../middleware/factory';
+import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
+import { BaseError, BaseErrorOptions } from '../observability/error-management';
+import { Result, err, isOk } from '../primitives/types/result';
+import { timeout, delay } from '../utils/async-utils';
 
 // ==================== Core Composition Types ====================
 

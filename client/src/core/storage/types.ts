@@ -1,6 +1,6 @@
 /**
  * Storage System Types
- * 
+ *
  * Comprehensive type definitions for the storage system including
  * secure storage, session management, token handling, and caching.
  */
@@ -169,7 +169,7 @@ export interface BackupInfo {
 /**
  * Storage error types
  */
-export type StorageErrorCode = 
+export type StorageErrorCode =
   | 'STORAGE_NOT_AVAILABLE'
   | 'ENCRYPTION_FAILED'
   | 'DECRYPTION_FAILED'
@@ -194,7 +194,7 @@ export interface StorageError extends Error {
 /**
  * Storage event types
  */
-export type StorageEventType = 
+export type StorageEventType =
   | 'item_set'
   | 'item_get'
   | 'item_removed'

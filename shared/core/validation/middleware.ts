@@ -8,6 +8,7 @@
 import 'reflect-metadata';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { ZodSchema, ZodError } from 'zod';
+
 import { ValidationError, ValidationOptions, ValidationContext } from './types';
 import { validationService } from './validation-service';
 
@@ -338,7 +339,7 @@ function findParameterIndex(fn: Function, paramName: string): number {
   const fnStr = fn.toString();
   const match = fnStr.match(/\(([^)]*)\)/);
 
-  if (!match || !match[1]) return -1;
+  if (!match?.[1]) return -1;
 
   const params = match[1].split(',').map(p => p.trim().split(/[\s:]/)[0]);
   return params.indexOf(paramName);

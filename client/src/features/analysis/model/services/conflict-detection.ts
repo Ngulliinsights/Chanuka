@@ -38,7 +38,7 @@ export class MockConflictDetectionService implements ConflictDetectionService {
         overallRisk: 72,
         conflictDetected: true,
         riskLevel: 'high',
-        confidence: 0.85
+        confidence: 0.85,
       },
       conflicts: [],
       votingHistory: [],
@@ -47,13 +47,17 @@ export class MockConflictDetectionService implements ConflictDetectionService {
         components: {
           financialDisclosure: { score: 65, weight: 0.4, details: 'Complete but late disclosure' },
           votingHistory: { score: 52, weight: 0.35, details: 'Limited voting explanations' },
-          industryConnections: { score: 48, weight: 0.25, details: 'Significant undisclosed connections' }
+          industryConnections: {
+            score: 48,
+            weight: 0.25,
+            details: 'Significant undisclosed connections',
+          },
         },
-        methodology: 'Multi-factor transparency scoring'
+        methodology: 'Multi-factor transparency scoring',
       },
       implementationWorkarounds: [],
       networkNodes: [],
-      networkLinks: []
+      networkLinks: [],
     };
   }
 
@@ -83,7 +87,7 @@ export class RealConflictDetectionService implements ConflictDetectionService {
     const response = await fetch(`${this.apiBaseUrl}/api/analysis/conflicts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sponsorId, billTopics, financialInterests })
+      body: JSON.stringify({ sponsorId, billTopics, financialInterests }),
     });
 
     if (!response.ok) {

@@ -5,11 +5,11 @@
  * with the unified error management system.
  */
 
-import { Request, Response, NextFunction } from 'express';
 
-import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
 import { BaseError, BaseErrorOptions, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 import { ErrorHandlerChain } from '@shared/core/src/observability/error-management/handlers/error-handler-chain.ts';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+import { Request, Response, NextFunction } from 'express';
 
 export interface ErrorMiddlewareOptions {
   includeStackTrace?: boolean;

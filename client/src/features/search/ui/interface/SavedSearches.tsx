@@ -1,12 +1,12 @@
 import { format } from 'date-fns';
 import { Search, Star, ChevronRight, Trash, Bell } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { useSavedSearches } from '@client/features/search/hooks/useSearch';
 import { intelligentSearch } from '@client/features/search/services/intelligent-search';
 import type { SavedSearch } from '@client/features/search/types';
 import { useToast } from '@client/hooks/use-toast';
-import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ import {
   Badge,
   Label,
   Separator,
-  Switch
+  Switch,
 } from '@client/shared/design-system';
 
 interface SavedSearchesProps {
@@ -34,16 +34,13 @@ interface EmailAlertConfig {
   threshold: number;
 }
 
-export function SavedSearches({
-  onExecuteSearch,
-  className = ''
-}: SavedSearchesProps) {
+export function SavedSearches({ onExecuteSearch, className = '' }: SavedSearchesProps) {
   const [selectedSearch, setSelectedSearch] = useState<SavedSearch | null>(null);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertConfig, setAlertConfig] = useState<EmailAlertConfig>({
     enabled: false,
     frequency: 'daily',
-    threshold: 1
+    threshold: 1,
   });
 
   const { toast } = useToast();
@@ -58,14 +55,14 @@ export function SavedSearches({
       }
 
       toast({
-        title: "Search Executed",
-        description: `"${search.name}" search has been executed.`
+        title: 'Search Executed',
+        description: `"${search.name}" search has been executed.`,
       });
     } catch (error) {
       toast({
-        title: "Execution Failed",
-        description: "Failed to execute saved search.",
-        variant: "destructive"
+        title: 'Execution Failed',
+        description: 'Failed to execute saved search.',
+        variant: 'destructive',
       });
     }
   };
@@ -88,7 +85,7 @@ export function SavedSearches({
     setAlertConfig({
       enabled: search.emailAlerts?.enabled || false,
       frequency: search.emailAlerts?.frequency || 'daily',
-      threshold: search.emailAlerts?.threshold || 1
+      threshold: search.emailAlerts?.threshold || 1,
     });
     setAlertDialogOpen(true);
   };
@@ -101,21 +98,21 @@ export function SavedSearches({
         name: selectedSearch.name,
         query: selectedSearch.query,
         emailAlerts: alertConfig,
-        isPublic: selectedSearch.is_public
+        isPublic: selectedSearch.is_public,
       });
 
       toast({
-        title: "Alert Settings Saved",
-        description: `Email alerts ${alertConfig.enabled ? 'enabled' : 'disabled'} for "${selectedSearch.name}".`
+        title: 'Alert Settings Saved',
+        description: `Email alerts ${alertConfig.enabled ? 'enabled' : 'disabled'} for "${selectedSearch.name}".`,
       });
 
       setAlertDialogOpen(false);
       setSelectedSearch(null);
     } catch (error) {
       toast({
-        title: "Save Failed",
-        description: "Failed to save alert settings.",
-        variant: "destructive"
+        title: 'Save Failed',
+        description: 'Failed to save alert settings.',
+        variant: 'destructive',
       });
     }
   };
@@ -174,7 +171,9 @@ export function SavedSearches({
                       <div className="flex items-center space-x-2 mb-2">
                         <h4 className="font-medium truncate">{search.name}</h4>
                         {search.is_public && (
-                          <Badge variant="outline" className="text-xs">Public</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Public
+                          </Badge>
                         )}
                         {search.emailAlerts?.enabled && (
                           <Badge variant="secondary" className="text-xs flex items-center">
@@ -213,7 +212,9 @@ export function SavedSearches({
                         size="sm"
                         onClick={() => handleConfigureAlerts(search)}
                       >
-                        <Bell className={`h-3 w-3 ${search.emailAlerts?.enabled ? '' : 'opacity-50'}`} />
+                        <Bell
+                          className={`h-3 w-3 ${search.emailAlerts?.enabled ? '' : 'opacity-50'}`}
+                        />
                       </Button>
 
                       <Button
@@ -257,7 +258,7 @@ export function SavedSearches({
                   </div>
                   <Switch
                     checked={alertConfig.enabled}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       setAlertConfig(prev => ({ ...prev, enabled: checked }))
                     }
                   />
@@ -276,8 +277,14 @@ export function SavedSearches({
                           aria-label="Alert Frequency"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           value={alertConfig.frequency}
-                          onChange={(e) =>
-                            setAlertConfig(prev => ({ ...prev, frequency: (e.target as HTMLSelectElement).value as 'immediate' | 'daily' | 'weekly' }))
+                          onChange={e =>
+                            setAlertConfig(prev => ({
+                              ...prev,
+                              frequency: (e.target as HTMLSelectElement).value as
+                                | 'immediate'
+                                | 'daily'
+                                | 'weekly',
+                            }))
                           }
                         >
                           <option value="immediate">Immediate</option>
@@ -294,8 +301,11 @@ export function SavedSearches({
                           aria-labelledby="alert-threshold-label"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           value={alertConfig.threshold.toString()}
-                          onChange={(e) =>
-                            setAlertConfig(prev => ({ ...prev, threshold: parseInt((e.target as HTMLSelectElement).value) }))
+                          onChange={e =>
+                            setAlertConfig(prev => ({
+                              ...prev,
+                              threshold: parseInt((e.target as HTMLSelectElement).value),
+                            }))
                           }
                         >
                           <option value="1">1 or more new results</option>
@@ -315,9 +325,7 @@ export function SavedSearches({
                   <Button variant="outline" onClick={() => setAlertDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleSaveAlertConfig}>
-                    Save Alert Settings
-                  </Button>
+                  <Button onClick={handleSaveAlertConfig}>Save Alert Settings</Button>
                 </div>
               </div>
             )}

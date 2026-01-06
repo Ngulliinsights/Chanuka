@@ -1,6 +1,6 @@
 /**
  * Mobile UI Constants
- * 
+ *
  * Shared constants for mobile components to comply with react-refresh rules.
  */
 
@@ -18,11 +18,11 @@ export const MOBILE_FALLBACK_PROPS = {
 } as const;
 
 // Type definitions
-export type MobileTab = { 
-  id: string; 
-  label: string; 
-  icon?: React.ReactNode; 
-  badge?: string; 
+export type MobileTab = {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  badge?: string;
 };
 
 export type ChartData = Record<string, string | number>;

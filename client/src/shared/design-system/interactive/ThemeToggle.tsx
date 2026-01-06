@@ -27,7 +27,7 @@ interface ThemeToggleProps {
 export function ThemeToggle({
   variant = 'dropdown',
   size = 'md',
-  className = ''
+  className = '',
 }: ThemeToggleProps) {
   const { theme, setTheme, isDark } = useTheme();
 
@@ -103,4 +103,3 @@ export function ThemeToggle({
 export function ThemeToggleButton({ className = '' }: { className?: string }) {
   return <ThemeToggle variant="button" className={className} />;
 }
-

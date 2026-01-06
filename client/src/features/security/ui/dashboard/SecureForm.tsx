@@ -3,15 +3,20 @@
  * Example component demonstrating security features usage
  */
 
+import { useSecureForm, useSecurity, ValidationSchemas } from '@client/hooks/useSecurity';
 import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
-
-import { useSecureForm, useSecurity, ValidationSchemas } from '@client/hooks/useSecurity';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
 
@@ -29,44 +34,30 @@ interface SecureFormProps {
 }
 
 export function SecureForm({ onSubmit, className }: SecureFormProps) {
-  const { 
-    performSecurityCheck, 
-    checkRateLimit,
-    status 
-  } = useSecurity();
+  const { performSecurityCheck, checkRateLimit, status } = useSecurity();
 
-  const {
-    values,
-    errors,
-    isValidating,
-    setValue,
-    validate,
-    reset,
-    hasErrors
-  } = useSecureForm<UserFormValues>(
-    ValidationSchemas.User.registration,
-    {
+  const { values, errors, isValidating, setValue, validate, reset, hasErrors } =
+    useSecureForm<UserFormValues>(ValidationSchemas.User.registration, {
       email: '',
       password: '',
       firstName: '',
       lastName: '',
-      acceptTerms: false
-    }
-  );
+      acceptTerms: false,
+    });
 
   const [securityWarnings, setSecurityWarnings] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: keyof UserFormValues, value: any) => {
     setValue(field, value);
-    
+
     // Perform real-time security check for text inputs
     if (typeof value === 'string' && value.length > 0) {
       const securityResult = performSecurityCheck(value);
       if (!securityResult.isSafe) {
         setSecurityWarnings(prev => [
           ...prev.filter(w => !w.includes(field)),
-          `${field}: ${securityResult.threats.join(', ')}`
+          `${field}: ${securityResult.threats.join(', ')}`,
         ]);
       } else {
         setSecurityWarnings(prev => prev.filter(w => !w.includes(field)));
@@ -76,7 +67,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check rate limit
     const rateLimitResult = checkRateLimit('form-submission', 'normal');
     if (!rateLimitResult.allowed) {
@@ -85,7 +76,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Validate form
       const isValid = await validate();
@@ -105,11 +96,10 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
       if (onSubmit) {
         await onSubmit(values);
       }
-      
+
       // Reset form on success
       reset();
       setSecurityWarnings([]);
-      
     } catch (error) {
       console.error('Form submission error:', error);
     } finally {
@@ -135,24 +125,24 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
           Secure Registration Form
         </CardTitle>
         <CardDescription>
-          This form demonstrates security features including input validation, 
-          sanitization, CSRF protection, and rate limiting.
+          This form demonstrates security features including input validation, sanitization, CSRF
+          protection, and rate limiting.
         </CardDescription>
-        
+
         {/* Security Status */}
         <div className="flex flex-wrap gap-2 mt-2">
-          <Badge variant={status.csrf.hasValidToken ? "default" : "destructive"}>
-            CSRF: {status.csrf.hasValidToken ? "Protected" : "Vulnerable"}
+          <Badge variant={status.csrf.hasValidToken ? 'default' : 'destructive'}>
+            CSRF: {status.csrf.hasValidToken ? 'Protected' : 'Vulnerable'}
           </Badge>
-          <Badge variant={status.inputSanitization.enabled ? "default" : "destructive"}>
-            Input Sanitization: {status.inputSanitization.enabled ? "Enabled" : "Disabled"}
+          <Badge variant={status.inputSanitization.enabled ? 'default' : 'destructive'}>
+            Input Sanitization: {status.inputSanitization.enabled ? 'Enabled' : 'Disabled'}
           </Badge>
-          <Badge variant={status.rateLimit.enabled ? "default" : "destructive"}>
-            Rate Limiting: {status.rateLimit.enabled ? "Enabled" : "Disabled"}
+          <Badge variant={status.rateLimit.enabled ? 'default' : 'destructive'}>
+            Rate Limiting: {status.rateLimit.enabled ? 'Enabled' : 'Disabled'}
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Security Warnings */}
@@ -178,14 +168,10 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               type="email"
               value={values.email}
               placeholder="you@example.com"
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={e => handleInputChange('email', e.target.value)}
               className={errors.email ? 'border-red-500' : ''}
             />
-            {errors.email && (
-              <div className="text-sm text-red-500">
-                {errors.email.join(', ')}
-              </div>
-            )}
+            {errors.email && <div className="text-sm text-red-500">{errors.email.join(', ')}</div>}
           </div>
 
           {/* Password Field */}
@@ -196,13 +182,11 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               type="password"
               value={values.password}
               placeholder="Enter a strong password"
-              onChange={(e) => handleInputChange('password', e.target.value)}
+              onChange={e => handleInputChange('password', e.target.value)}
               className={errors.password ? 'border-red-500' : ''}
             />
             {errors.password && (
-              <div className="text-sm text-red-500">
-                {errors.password.join(', ')}
-              </div>
+              <div className="text-sm text-red-500">{errors.password.join(', ')}</div>
             )}
           </div>
 
@@ -213,13 +197,11 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               id="firstName"
               value={values.firstName}
               placeholder="First name"
-              onChange={(e) => handleInputChange('firstName', e.target.value)}
+              onChange={e => handleInputChange('firstName', e.target.value)}
               className={errors.firstName ? 'border-red-500' : ''}
             />
             {errors.firstName && (
-              <div className="text-sm text-red-500">
-                {errors.firstName.join(', ')}
-              </div>
+              <div className="text-sm text-red-500">{errors.firstName.join(', ')}</div>
             )}
           </div>
 
@@ -230,13 +212,11 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               id="lastName"
               value={values.lastName}
               placeholder="Last name"
-              onChange={(e) => handleInputChange('lastName', e.target.value)}
+              onChange={e => handleInputChange('lastName', e.target.value)}
               className={errors.lastName ? 'border-red-500' : ''}
             />
             {errors.lastName && (
-              <div className="text-sm text-red-500">
-                {errors.lastName.join(', ')}
-              </div>
+              <div className="text-sm text-red-500">{errors.lastName.join(', ')}</div>
             )}
           </div>
 
@@ -248,16 +228,14 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
               aria-label="Accept terms and conditions"
               title="Accept terms and conditions"
               checked={values.acceptTerms}
-              onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
+              onChange={e => handleInputChange('acceptTerms', e.target.checked)}
               className="rounded border-gray-300"
             />
             <Label htmlFor="acceptTerms" className="text-sm">
               I accept the terms and conditions
             </Label>
             {errors.acceptTerms && (
-              <div className="text-sm text-red-500">
-                {errors.acceptTerms.join(', ')}
-              </div>
+              <div className="text-sm text-red-500">{errors.acceptTerms.join(', ')}</div>
             )}
           </div>
 
@@ -270,12 +248,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
             >
               {isSubmitting ? 'Submitting...' : 'Register'}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reset}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={reset} disabled={isSubmitting}>
               Reset
             </Button>
           </div>

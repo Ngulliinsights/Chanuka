@@ -96,19 +96,19 @@ export * from './quality';
 // THE STRATEGIST: Vision, sustainability, long-term goals
 // ════════════════════════════════════════════════════════════════════════════
 // export { PERSONAS_CHARTER, type PersonasCharterType } from './4-personas-charter';
-export { IMPLEMENTATION_SCHEDULE, type ImplementationScheduleType } from './4-personas-implementation-guide';
+export {
+  IMPLEMENTATION_SCHEDULE,
+  type ImplementationScheduleType,
+} from './4-personas-implementation-guide';
 
 // ════════════════════════════════════════════════════════════════════════════
 // COMPONENT FLATTENING ANALYSIS & VALIDATION
 // ════════════════════════════════════════════════════════════════════════════
-export {
-  COMPONENT_VALIDATION,
-  COMPONENT_CHECKLIST
-} from './COMPONENT_FLATTENING_STRATEGY';
+export { COMPONENT_VALIDATION, COMPONENT_CHECKLIST } from './COMPONENT_FLATTENING_STRATEGY';
 
 export {
   FLATTENING_EXECUTION,
-  type FlatteningExecutionType
+  type FlatteningExecutionType,
 } from './COMPONENT_FLATTENING_EXECUTION_REPORT';
 
 export {
@@ -119,7 +119,7 @@ export {
   QUALITY_METRICS,
   RECOMMENDED_NEXT_STEPS,
   type MigrationSummaryType,
-  type ExportVerificationType
+  type ExportVerificationType,
 } from './MIGRATION_SUMMARY';
 
 export {
@@ -135,7 +135,7 @@ export {
   FINAL_STATUS,
   type CompletionReportType,
   type MigrationDetailsType,
-  type VerificationResultsType
+  type VerificationResultsType,
 } from './COMPLETION_REPORT';
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -164,4 +164,3 @@ export * from './standards';
 // - ChanukaProviders: All-in-one wrapper for complete standards
 // ════════════════════════════════════════════════════════════════════════════
 export * from './contexts';
-

@@ -1,19 +1,21 @@
 /**
  * WebSocket Hook
- * 
+ *
  * A hook for managing WebSocket connections with fallback to polling
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { logger } from '@client/utils/logger';
-import { WebSocketClient, createWebSocketClient } from './websocket-client';
-import type { 
-  WebSocketHookReturn, 
-  NotificationData, 
+
+import type {
+  WebSocketHookReturn,
+  NotificationData,
   ConnectionState,
-  ClientWebSocketMessage 
+  ClientWebSocketMessage,
 } from '../api/types/websocket';
+
+import { WebSocketClient, createWebSocketClient } from './websocket-client';
 
 export interface WebSocketOptions {
   autoConnect?: boolean;
@@ -29,22 +31,26 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     subscriptions = [],
     reconnectAttempts = 3,
     reconnectInterval = 5000,
-    url = process.env.NODE_ENV === 'production' 
-      ? 'wss://api.chanuka.org/ws' 
-      : 'ws://localhost:3001/api/ws'
+    url = process.env.NODE_ENV === 'production'
+      ? 'wss://api.chanuka.org/ws'
+      : 'ws://localhost:3001/api/ws',
   } = options;
 
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor' | 'disconnected'>('disconnected');
+  const [connectionQuality, setConnectionQuality] = useState<
+    'excellent' | 'good' | 'poor' | 'disconnected'
+  >('disconnected');
   const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
-  const [recentActivity, setRecentActivity] = useState<Array<{
-    id: string;
-    type: string;
-    timestamp: string;
-    bill_id?: string;
-  }>>([]);
+  const [recentActivity, setRecentActivity] = useState<
+    Array<{
+      id: string;
+      type: string;
+      timestamp: string;
+      bill_id?: string;
+    }>
+  >([]);
 
   const wsClientRef = useRef<WebSocketClient | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -61,13 +67,13 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
         enabled: true,
         maxAttempts: reconnectAttempts,
         baseDelay: reconnectInterval,
-        maxDelay: 30000
+        maxDelay: 30000,
       },
       heartbeat: {
         enabled: true,
         interval: 30000,
-        timeout: 5000
-      }
+        timeout: 5000,
+      },
     });
 
     // Set up event handlers
@@ -76,7 +82,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       setIsConnecting(false);
       setConnectionQuality('good');
       setError(null);
-      
+
       // Subscribe to initial topics
       subscriptions.forEach(sub => {
         wsClientRef.current?.subscribe(`${sub.type}:${sub.id}`);
@@ -87,8 +93,9 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       setIsConnected(false);
       setIsConnecting(false);
       setConnectionQuality('disconnected');
-      
-      if (code !== 1000) { // Not a normal closure
+
+      if (code !== 1000) {
+        // Not a normal closure
         setError(`Connection lost: ${reason}`);
         startPollingFallback();
       }
@@ -109,10 +116,9 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       setConnectionQuality('poor');
       logger.info('WebSocket reconnecting', {
         component: 'useWebSocket',
-        attempt
+        attempt,
       });
     });
-
   }, [url, reconnectAttempts, reconnectInterval, subscriptions]);
 
   // Handle incoming messages
@@ -126,7 +132,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
             title: message.data.title || 'Notification',
             message: message.data.message || '',
             data: message.data.data,
-            timestamp: message.data.timestamp || new Date().toISOString()
+            timestamp: message.data.timestamp || new Date().toISOString(),
           };
           setNotifications(prev => [notification, ...prev.slice(0, 9)]);
         }
@@ -138,7 +144,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
             id: `activity_${Date.now()}`,
             type: 'bill_updated',
             timestamp: new Date().toISOString(),
-            bill_id: message.data.billId.toString()
+            bill_id: message.data.billId.toString(),
           };
           setRecentActivity(prev => [activity, ...prev.slice(0, 19)]);
         }
@@ -148,7 +154,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
         const communityActivity = {
           id: `activity_${Date.now()}`,
           type: 'community_update',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
         setRecentActivity(prev => [communityActivity, ...prev.slice(0, 19)]);
         break;
@@ -156,7 +162,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       default:
         logger.debug('Unhandled message type', {
           component: 'useWebSocket',
-          messageType: message.type
+          messageType: message.type,
         });
     }
   }, []);
@@ -166,7 +172,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     if (pollingIntervalRef.current) return; // Already polling
 
     logger.info('Starting polling fallback', {
-      component: 'useWebSocket'
+      component: 'useWebSocket',
     });
 
     pollingIntervalRef.current = setInterval(() => {
@@ -176,8 +182,8 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
           id: `notification_${Date.now()}`,
           type: 'info',
           title: 'Bill Update',
-          message: 'A bill you\'re following has been updated',
-          timestamp: new Date().toISOString()
+          message: "A bill you're following has been updated",
+          timestamp: new Date().toISOString(),
         };
         setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
       }
@@ -188,7 +194,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
           id: `activity_${Date.now()}`,
           type: 'bill_updated',
           timestamp: new Date().toISOString(),
-          bill_id: `B${Math.floor(Math.random() * 1000)}`
+          bill_id: `B${Math.floor(Math.random() * 1000)}`,
         };
         setRecentActivity(prev => [newActivity, ...prev.slice(0, 19)]);
       }
@@ -214,9 +220,13 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     }
 
     wsClientRef.current?.connect().catch(err => {
-      logger.error('WebSocket connection failed', {
-        component: 'useWebSocket'
-      }, err);
+      logger.error(
+        'WebSocket connection failed',
+        {
+          component: 'useWebSocket',
+        },
+        err
+      );
       setIsConnecting(false);
       setError('Connection failed, using polling fallback');
       startPollingFallback();
@@ -244,16 +254,17 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     return wsClientRef.current?.send(message) || false;
   }, []);
 
-  const getRecentActivity = useCallback((limit: number) => {
-    return recentActivity.slice(0, limit);
-  }, [recentActivity]);
+  const getRecentActivity = useCallback(
+    (limit: number) => {
+      return recentActivity.slice(0, limit);
+    },
+    [recentActivity]
+  );
 
   const markNotificationRead = useCallback((id: string) => {
     setNotifications(prev =>
       prev.map(notification =>
-        notification.id === id
-          ? { ...notification, read: true }
-          : notification
+        notification.id === id ? { ...notification, read: true } : notification
       )
     );
   }, []);
@@ -285,6 +296,6 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     disconnect,
     subscribe,
     unsubscribe,
-    send
+    send,
   };
 }

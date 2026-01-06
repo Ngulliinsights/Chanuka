@@ -24,7 +24,7 @@ export interface UseLoadingStateResult {
   isTimeout: boolean;
   isOffline: boolean;
   error: Error | null;
-  
+
   // Actions
   setLoading: (message?: string) => void;
   setSuccess: (message?: string) => void;
@@ -32,10 +32,12 @@ export interface UseLoadingStateResult {
   setTimeout: () => void;
   setOffline: () => void;
   reset: () => void;
-  
+
   // Utilities
   withLoading: <T>(asyncFn: () => Promise<T>) => Promise<T>;
-  withLoadingCallback: <T extends unknown[]>(fn: (...args: T) => Promise<unknown>) => (...args: T) => Promise<void>;
+  withLoadingCallback: <T extends unknown[]>(
+    fn: (...args: T) => Promise<unknown>
+  ) => (...args: T) => Promise<void>;
 }
 
 export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingStateResult {
@@ -52,17 +54,20 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
   const autoResetTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Create debounced setter inline to satisfy React hooks rules
-  const debouncedSetState = useCallback((newState: LoadingState) => {
-    if (debounceMs > 0) {
-      const debouncedFn = debounce((...args: unknown[]) => {
-        const state = args[0] as LoadingState;
-        setState(state);
-      }, debounceMs);
-      debouncedFn(newState);
-    } else {
-      setState(newState);
-    }
-  }, [debounceMs]);
+  const debouncedSetState = useCallback(
+    (newState: LoadingState) => {
+      if (debounceMs > 0) {
+        const debouncedFn = debounce((...args: unknown[]) => {
+          const state = args[0] as LoadingState;
+          setState(state);
+        }, debounceMs);
+        debouncedFn(newState);
+      } else {
+        setState(newState);
+      }
+    },
+    [debounceMs]
+  );
 
   // Clear auto-reset timeout
   const clearAutoReset = useCallback(() => {
@@ -95,26 +100,35 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
     };
   }, [clearAutoReset]);
 
-  const setLoading = useCallback((_message?: string) => {
-    clearAutoReset();
-    setErrorState(null);
-    debouncedSetState('loading');
-  }, [clearAutoReset, debouncedSetState]);
+  const setLoading = useCallback(
+    (_message?: string) => {
+      clearAutoReset();
+      setErrorState(null);
+      debouncedSetState('loading');
+    },
+    [clearAutoReset, debouncedSetState]
+  );
 
-  const setSuccess = useCallback((_message?: string) => {
-    clearAutoReset();
-    setErrorState(null);
-    debouncedSetState('success');
-    setAutoReset();
-  }, [clearAutoReset, debouncedSetState, setAutoReset]);
+  const setSuccess = useCallback(
+    (_message?: string) => {
+      clearAutoReset();
+      setErrorState(null);
+      debouncedSetState('success');
+      setAutoReset();
+    },
+    [clearAutoReset, debouncedSetState, setAutoReset]
+  );
 
-  const setError = useCallback((errorInput: Error | string) => {
-    clearAutoReset();
-    const errorObj = typeof errorInput === 'string' ? new Error(errorInput) : errorInput;
-    setErrorState(errorObj);
-    debouncedSetState('error');
-    setAutoReset();
-  }, [clearAutoReset, debouncedSetState, setAutoReset]);
+  const setError = useCallback(
+    (errorInput: Error | string) => {
+      clearAutoReset();
+      const errorObj = typeof errorInput === 'string' ? new Error(errorInput) : errorInput;
+      setErrorState(errorObj);
+      debouncedSetState('error');
+      setAutoReset();
+    },
+    [clearAutoReset, debouncedSetState, setAutoReset]
+  );
 
   const setTimeoutState = useCallback(() => {
     clearAutoReset();
@@ -135,34 +149,38 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
   }, [clearAutoReset]);
 
   // Utility function to wrap async operations
-  const withLoading = useCallback(async <T>(asyncFn: () => Promise<T>): Promise<T> => {
-    try {
-      setLoading();
-      const result = await asyncFn();
-      setSuccess();
-      return result;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
-      throw error;
-    }
-  }, [setLoading, setSuccess, setError]);
-
-  // Utility function to create loading-wrapped callbacks
-  const withLoadingCallback = useCallback(<T extends unknown[]>(
-    fn: (...args: T) => Promise<unknown>
-  ) => {
-    return async (...args: T): Promise<void> => {
+  const withLoading = useCallback(
+    async <T>(asyncFn: () => Promise<T>): Promise<T> => {
       try {
         setLoading();
-        await fn(...args);
+        const result = await asyncFn();
         setSuccess();
+        return result;
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error);
+        throw error;
       }
-    };
-  }, [setLoading, setSuccess, setError]);
+    },
+    [setLoading, setSuccess, setError]
+  );
+
+  // Utility function to create loading-wrapped callbacks
+  const withLoadingCallback = useCallback(
+    <T extends unknown[]>(fn: (...args: T) => Promise<unknown>) => {
+      return async (...args: T): Promise<void> => {
+        try {
+          setLoading();
+          await fn(...args);
+          setSuccess();
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          setError(error);
+        }
+      };
+    },
+    [setLoading, setSuccess, setError]
+  );
 
   return {
     state,
@@ -172,14 +190,14 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
     isTimeout: state === 'timeout',
     isOffline: state === 'offline',
     error,
-    
+
     setLoading,
     setSuccess,
     setError,
     setTimeout: setTimeoutState,
     setOffline,
     reset,
-    
+
     withLoading,
     withLoadingCallback,
   };
@@ -196,14 +214,14 @@ export interface UseMultiLoadingStateOptions {
 export interface UseMultiLoadingStateResult {
   states: Record<string, LoadingState>;
   errors: Record<string, Error | null>;
-  
+
   // State checks
   isAnyLoading: boolean;
   isAllSuccess: boolean;
   hasAnyError: boolean;
   getState: (key: string) => LoadingState;
   getError: (key: string) => Error | null;
-  
+
   // Actions
   setLoading: (key: string, message?: string) => void;
   setSuccess: (key: string, message?: string) => void;
@@ -211,14 +229,16 @@ export interface UseMultiLoadingStateResult {
   setTimeout: (key: string) => void;
   setOffline: (key: string) => void;
   reset: (key?: string) => void;
-  
+
   // Utilities
   withLoading: <T>(key: string, asyncFn: () => Promise<T>) => Promise<T>;
 }
 
-export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}): UseMultiLoadingStateResult {
+export function useMultiLoadingState(
+  options: UseMultiLoadingStateOptions = {}
+): UseMultiLoadingStateResult {
   const { onStateChange } = options;
-  
+
   const [states, setStates] = useState<Record<string, LoadingState>>({});
   const [errors, setErrors] = useState<Record<string, Error | null>>({});
 
@@ -237,26 +257,41 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     }
   }, []);
 
-  const setLoading = useCallback((key: string, _message?: string) => {
-    updateState(key, 'loading', null);
-  }, [updateState]);
+  const setLoading = useCallback(
+    (key: string, _message?: string) => {
+      updateState(key, 'loading', null);
+    },
+    [updateState]
+  );
 
-  const setSuccess = useCallback((key: string, _message?: string) => {
-    updateState(key, 'success', null);
-  }, [updateState]);
+  const setSuccess = useCallback(
+    (key: string, _message?: string) => {
+      updateState(key, 'success', null);
+    },
+    [updateState]
+  );
 
-  const setError = useCallback((key: string, errorInput: Error | string) => {
-    const errorObj = typeof errorInput === 'string' ? new Error(errorInput) : errorInput;
-    updateState(key, 'error', errorObj);
-  }, [updateState]);
+  const setError = useCallback(
+    (key: string, errorInput: Error | string) => {
+      const errorObj = typeof errorInput === 'string' ? new Error(errorInput) : errorInput;
+      updateState(key, 'error', errorObj);
+    },
+    [updateState]
+  );
 
-  const setTimeoutState = useCallback((key: string) => {
-    updateState(key, 'timeout');
-  }, [updateState]);
+  const setTimeoutState = useCallback(
+    (key: string) => {
+      updateState(key, 'timeout');
+    },
+    [updateState]
+  );
 
-  const setOffline = useCallback((key: string) => {
-    updateState(key, 'offline');
-  }, [updateState]);
+  const setOffline = useCallback(
+    (key: string) => {
+      updateState(key, 'offline');
+    },
+    [updateState]
+  );
 
   const reset = useCallback((key?: string) => {
     if (key) {
@@ -276,49 +311,61 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     }
   }, []);
 
-  const getState = useCallback((key: string): LoadingState => {
-    return states[key] || 'loading';
-  }, [states]);
+  const getState = useCallback(
+    (key: string): LoadingState => {
+      return states[key] || 'loading';
+    },
+    [states]
+  );
 
-  const getError = useCallback((key: string): Error | null => {
-    return errors[key] || null;
-  }, [errors]);
+  const getError = useCallback(
+    (key: string): Error | null => {
+      return errors[key] || null;
+    },
+    [errors]
+  );
 
-  const withLoading = useCallback(async <T>(key: string, asyncFn: () => Promise<T>): Promise<T> => {
-    try {
-      setLoading(key);
-      const result = await asyncFn();
-      setSuccess(key);
-      return result;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setError(key, error);
-      throw error;
-    }
-  }, [setLoading, setSuccess, setError]);
+  const withLoading = useCallback(
+    async <T>(key: string, asyncFn: () => Promise<T>): Promise<T> => {
+      try {
+        setLoading(key);
+        const result = await asyncFn();
+        setSuccess(key);
+        return result;
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(key, error);
+        throw error;
+      }
+    },
+    [setLoading, setSuccess, setError]
+  );
 
   const stateValues = Object.values(states);
   const isAnyLoading = stateValues.includes('loading');
   const isAllSuccess = stateValues.length > 0 && stateValues.every(state => state === 'success');
-  const hasAnyError = stateValues.includes('error') || stateValues.includes('timeout') || stateValues.includes('offline');
+  const hasAnyError =
+    stateValues.includes('error') ||
+    stateValues.includes('timeout') ||
+    stateValues.includes('offline');
 
   return {
     states,
     errors,
-    
+
     isAnyLoading,
     isAllSuccess,
     hasAnyError,
     getState,
     getError,
-    
+
     setLoading,
     setSuccess,
     setError,
     setTimeout: setTimeoutState,
     setOffline,
     reset,
-    
+
     withLoading,
   };
 }

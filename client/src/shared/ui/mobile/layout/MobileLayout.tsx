@@ -47,7 +47,6 @@ export function MobileLayout({
     headerToggleThreshold: 10,
   });
 
-
   if (!isMobile) {
     return (
       <div className={cn('min-h-screen bg-background', className)}>
@@ -82,11 +81,7 @@ export function MobileLayout({
       )}
 
       {showNavigation && (
-        <MobileNavigation
-          mode="both"
-          items={customNavigationItems}
-          onLogout={() => {}}
-        />
+        <MobileNavigation mode="both" items={customNavigationItems} onLogout={() => {}} />
       )}
 
       {showScrollToTop && <ScrollToTopButton />}

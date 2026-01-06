@@ -7,12 +7,21 @@
  * Requirements: 11.4, 11.5
  */
 
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Download,
+  Eye,
+  RefreshCw,
+  Settings,
+  TrendingDown,
+  TrendingUp,
+  Zap,
+  XCircle,
+} from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
 import {
   BarChart,
   Bar,
@@ -27,23 +36,20 @@ import {
   Pie,
   Cell,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Download,
-  Eye,
-  RefreshCw,
-  Settings,
-  TrendingDown,
-  TrendingUp,
-  Zap,
-  XCircle
-} from 'lucide-react';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
 // Simplified development dashboard for shared infrastructure

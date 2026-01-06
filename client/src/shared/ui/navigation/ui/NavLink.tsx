@@ -13,11 +13,7 @@ export const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
     <Link
       ref={ref}
       {...rest}
-      className={cn(
-        'chanuka-nav-item',
-        is_active && 'chanuka-nav-item.active',
-        className
-      )}
+      className={cn('chanuka-nav-item', is_active && 'chanuka-nav-item.active', className)}
     >
       {Icon && <Icon className="h-4 w-4" />}
       <span>{children}</span>
@@ -26,4 +22,3 @@ export const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
 );
 
 NavLink.displayName = 'NavLink';
-

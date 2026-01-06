@@ -1,6 +1,6 @@
 /**
  * Sponsor Types
- * 
+ *
  * Type definitions for sponsors and stakeholder models
  */
 

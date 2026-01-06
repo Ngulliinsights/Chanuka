@@ -1,14 +1,14 @@
 /**
  * Notification API Service
  * Core API communication layer for notification functionality
- * 
+ *
  * Provides comprehensive notification management including:
  * - Push notification subscription and delivery
  * - User preference management
  * - Notification CRUD operations
  * - Bulk operations and statistics
  * - Real-time notification delivery
- * 
+ *
  * @module api/notifications
  */
 
@@ -28,7 +28,7 @@ import { globalErrorHandler } from './errors';
 export type {
   Notification,
   NotificationPreferences,
-  NotificationType
+  NotificationType,
 } from '@client/services/notification-service';
 
 // ============================================================================
@@ -176,7 +176,7 @@ export interface UserPreferences {
   quietHours?: {
     enabled: boolean;
     start: string; // Format: "HH:mm"
-    end: string;   // Format: "HH:mm"
+    end: string; // Format: "HH:mm"
   };
 }
 
@@ -186,10 +186,10 @@ export interface UserPreferences {
 
 /**
  * Centralized service for all notification-related API operations.
- * 
+ *
  * This service provides a clean, type-safe interface for interacting with
  * the notification backend. It handles:
- * 
+ *
  * - Push notification subscription management
  * - User preference loading and updates
  * - Notification fetching with flexible filtering
@@ -198,12 +198,12 @@ export interface UserPreferences {
  * - Sending notifications (admin/system use)
  * - Statistics and analytics
  * - Bulk operations for efficiency
- * 
+ *
  * All methods include comprehensive error handling with structured logging,
  * automatic error reporting, and user-friendly error messages. The service
  * integrates with the global API client for consistent request handling,
  * caching, and retry logic.
- * 
+ *
  * @example
  * ```typescript
  * // Subscribe to push notifications
@@ -213,13 +213,13 @@ export interface UserPreferences {
  *   applicationServerKey: vapidKey
  * });
  * await notificationApiService.sendPushSubscription(subscription, navigator.userAgent);
- * 
+ *
  * // Fetch recent unread notifications
- * const unread = await notificationApiService.getNotifications({ 
+ * const unread = await notificationApiService.getNotifications({
  *   unreadOnly: true,
- *   limit: 20 
+ *   limit: 20
  * });
- * 
+ *
  * // Mark notification as read
  * await notificationApiService.markAsRead(notificationId);
  * ```
@@ -229,20 +229,20 @@ export class NotificationApiService {
 
   /**
    * Creates a new NotificationApiService instance.
-   * 
+   *
    * The service configures its endpoint based on the provided base URL,
    * defaulting to '/api' for standard API configurations. All subsequent
    * API calls will use this configured endpoint.
-   * 
+   *
    * @param baseUrl - Base API URL, defaults to '/api'
    */
   constructor(baseUrl: string = '/api') {
     this.notificationsEndpoint = `${baseUrl}/notifications`;
-    
+
     logger.debug('NotificationApiService initialized', {
       component: 'NotificationApiService',
       baseUrl,
-      endpoint: this.notificationsEndpoint
+      endpoint: this.notificationsEndpoint,
     });
   }
 
@@ -252,18 +252,18 @@ export class NotificationApiService {
 
   /**
    * Retrieves the VAPID public key required for push subscriptions.
-   * 
+   *
    * VAPID (Voluntary Application Server Identification) is a protocol that
    * allows push services to verify the application server's identity. Before
    * subscribing to push notifications through the browser's Push API, you
    * need this public key to authenticate the subscription request.
-   * 
+   *
    * The key is returned as a base64-encoded string that should be converted
    * to a Uint8Array before passing to the Push API.
-   * 
+   *
    * @returns Promise resolving to the base64-encoded VAPID public key
    * @throws Error if the key cannot be retrieved from the server
-   * 
+   *
    * @example
    * ```typescript
    * const publicKey = await notificationApiService.getVapidPublicKey();
@@ -276,11 +276,11 @@ export class NotificationApiService {
    */
   async getVapidPublicKey(): Promise<string> {
     const operation = 'getVapidPublicKey';
-    
+
     try {
       logger.debug('Fetching VAPID public key', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       const response = await globalApiClient.get<VapidKeyResponse>(
@@ -289,7 +289,7 @@ export class NotificationApiService {
 
       logger.info('VAPID public key retrieved successfully', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       return response.data.publicKey;
@@ -297,7 +297,7 @@ export class NotificationApiService {
       logger.error('Failed to get VAPID public key', {
         component: 'NotificationApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to retrieve VAPID public key');
     }
@@ -305,19 +305,19 @@ export class NotificationApiService {
 
   /**
    * Registers a push notification subscription with the backend server.
-   * 
+   *
    * After successfully subscribing through the browser's Push API, the
    * subscription must be sent to your backend so it knows where to send
    * push notifications for this device. The subscription contains endpoints
    * and encryption keys needed for secure message delivery.
-   * 
+   *
    * The userAgent string is included for debugging purposes and to help
    * identify which device/browser a subscription belongs to.
-   * 
+   *
    * @param subscription - PushSubscription object from browser Push API
    * @param userAgent - Browser user agent string for identification
    * @throws Error if subscription cannot be registered
-   * 
+   *
    * @example
    * ```typescript
    * const registration = await navigator.serviceWorker.ready;
@@ -325,46 +325,41 @@ export class NotificationApiService {
    *   userVisibleOnly: true,
    *   applicationServerKey: vapidKey
    * });
-   * 
+   *
    * await notificationApiService.sendPushSubscription(
    *   subscription,
    *   navigator.userAgent
    * );
    * ```
    */
-  async sendPushSubscription(
-    subscription: PushSubscription,
-    userAgent: string
-  ): Promise<void> {
+  async sendPushSubscription(subscription: PushSubscription, userAgent: string): Promise<void> {
     const operation = 'sendPushSubscription';
-    
+
     try {
       logger.debug('Sending push subscription', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       const payload: PushSubscriptionPayload = {
         subscription: subscription.toJSON(),
         userAgent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
-      await globalApiClient.post(
-        `${this.notificationsEndpoint}/push-subscription`,
-        payload,
-        { skipCache: true }
-      );
+      await globalApiClient.post(`${this.notificationsEndpoint}/push-subscription`, payload, {
+        skipCache: true,
+      });
 
       logger.info('Push subscription registered successfully', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
     } catch (error) {
       logger.error('Failed to send push subscription', {
         component: 'NotificationApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to register push subscription');
     }
@@ -376,17 +371,17 @@ export class NotificationApiService {
 
   /**
    * Retrieves the current user's notification preferences.
-   * 
+   *
    * Preferences control the notification experience, including which types
    * of notifications are enabled, which delivery channels to use (email,
    * push, in-app), and timing preferences like quiet hours or digest frequency.
-   * 
+   *
    * The preferences are cached by the API client to avoid repeated requests,
    * but can be refreshed by using the skipCache option if needed.
-   * 
+   *
    * @returns Promise resolving to user's notification preferences
    * @throws Error if preferences cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const preferences = await notificationApiService.getPreferences();
@@ -398,11 +393,11 @@ export class NotificationApiService {
    */
   async getPreferences(): Promise<UserPreferences> {
     const operation = 'getPreferences';
-    
+
     try {
       logger.debug('Fetching notification preferences', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       const response = await globalApiClient.get<UserPreferences>(
@@ -411,7 +406,7 @@ export class NotificationApiService {
 
       logger.info('Notification preferences retrieved successfully', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       return response.data;
@@ -419,25 +414,28 @@ export class NotificationApiService {
       logger.error('Failed to get notification preferences', {
         component: 'NotificationApiService',
         operation,
-        error
+        error,
       });
-      throw await this.handleNotificationError(error, 'Failed to retrieve notification preferences');
+      throw await this.handleNotificationError(
+        error,
+        'Failed to retrieve notification preferences'
+      );
     }
   }
 
   /**
    * Updates the current user's notification preferences.
-   * 
+   *
    * Allows partial updates - you only need to include the fields you want
    * to change. The backend will merge your updates with existing preferences.
    * This is useful for settings UIs where users toggle individual options.
-   * 
+   *
    * After updating, the cache is invalidated to ensure fresh data on next fetch.
-   * 
+   *
    * @param preferences - Partial preferences object with fields to update
    * @returns Promise resolving to complete updated preferences
    * @throws Error if preferences cannot be updated
-   * 
+   *
    * @example
    * ```typescript
    * // Enable email notifications and set to daily digest
@@ -445,7 +443,7 @@ export class NotificationApiService {
    *   emailNotifications: true,
    *   emailFrequency: 'daily'
    * });
-   * 
+   *
    * // Disable specific notification type
    * await notificationApiService.updatePreferences({
    *   notificationTypes: {
@@ -456,11 +454,11 @@ export class NotificationApiService {
    */
   async updatePreferences(preferences: Partial<UserPreferences>): Promise<UserPreferences> {
     const operation = 'updatePreferences';
-    
+
     try {
       logger.debug('Updating notification preferences', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       const response = await globalApiClient.put<UserPreferences>(
@@ -471,7 +469,7 @@ export class NotificationApiService {
 
       logger.info('Notification preferences updated successfully', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       return response.data;
@@ -479,7 +477,7 @@ export class NotificationApiService {
       logger.error('Failed to update notification preferences', {
         component: 'NotificationApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to update notification preferences');
     }
@@ -491,22 +489,22 @@ export class NotificationApiService {
 
   /**
    * Retrieves notifications with flexible filtering and pagination support.
-   * 
+   *
    * This is the primary method for fetching notifications in the UI. It supports
    * multiple query patterns:
-   * 
+   *
    * - Pagination via limit/offset for infinite scroll or page-based UIs
    * - Filtering by read status to show only unread items
    * - Time-based filtering to show recent notifications
    * - Category filtering to show specific types
-   * 
+   *
    * Results are returned in reverse chronological order (newest first).
    * The API client automatically caches results for improved performance.
-   * 
+   *
    * @param options - Query options for filtering and pagination
    * @returns Promise resolving to array of notifications
    * @throws Error if notifications cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * // Get first page of unread notifications
@@ -515,7 +513,7 @@ export class NotificationApiService {
    *   offset: 0,
    *   unreadOnly: true
    * });
-   * 
+   *
    * // Get bill-related notifications from last 24 hours
    * const yesterday = new Date(Date.now() - 86400000).toISOString();
    * const recent = await notificationApiService.getNotifications({
@@ -523,7 +521,7 @@ export class NotificationApiService {
    *   since: yesterday,
    *   limit: 50
    * });
-   * 
+   *
    * // Load next page for infinite scroll
    * const nextPage = await notificationApiService.getNotifications({
    *   limit: 20,
@@ -533,12 +531,12 @@ export class NotificationApiService {
    */
   async getNotifications(options: GetNotificationsOptions = {}): Promise<NotificationResponse[]> {
     const operation = 'getNotifications';
-    
+
     try {
       logger.debug('Fetching notifications', {
         component: 'NotificationApiService',
         operation,
-        options
+        options,
       });
 
       // Build query parameters from options
@@ -560,7 +558,7 @@ export class NotificationApiService {
       }
 
       const queryString = params.toString();
-      const url = queryString 
+      const url = queryString
         ? `${this.notificationsEndpoint}?${queryString}`
         : this.notificationsEndpoint;
 
@@ -569,7 +567,7 @@ export class NotificationApiService {
       logger.info('Notifications retrieved successfully', {
         component: 'NotificationApiService',
         operation,
-        count: response.data.length
+        count: response.data.length,
       });
 
       return response.data;
@@ -578,7 +576,7 @@ export class NotificationApiService {
         component: 'NotificationApiService',
         operation,
         options,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to retrieve notifications');
     }
@@ -590,23 +588,23 @@ export class NotificationApiService {
 
   /**
    * Marks a specific notification as read.
-   * 
+   *
    * Updates the notification's read status and records the timestamp
    * when it was read. This affects:
    * - Unread count badges in the UI
    * - Whether the notification appears in "unread" filtered views
    * - Visual styling in notification lists
-   * 
+   *
    * The operation invalidates relevant caches to ensure UIs update properly.
-   * 
+   *
    * @param notificationId - Unique identifier of the notification
    * @throws Error if notification cannot be marked as read
-   * 
+   *
    * @example
    * ```typescript
    * // Mark as read when user clicks on notification
    * await notificationApiService.markAsRead(notification.id);
-   * 
+   *
    * // Mark as read when notification is displayed
    * useEffect(() => {
    *   if (notification && !notification.read) {
@@ -617,12 +615,12 @@ export class NotificationApiService {
    */
   async markAsRead(notificationId: string): Promise<void> {
     const operation = 'markAsRead';
-    
+
     try {
       logger.debug('Marking notification as read', {
         component: 'NotificationApiService',
         operation,
-        notificationId
+        notificationId,
       });
 
       await globalApiClient.post(
@@ -634,34 +632,31 @@ export class NotificationApiService {
       logger.info('Notification marked as read', {
         component: 'NotificationApiService',
         operation,
-        notificationId
+        notificationId,
       });
     } catch (error) {
       logger.error('Failed to mark notification as read', {
         component: 'NotificationApiService',
         operation,
         notificationId,
-        error
-      });
-      throw await this.handleNotificationError(
         error,
-        'Failed to mark notification as read'
-      );
+      });
+      throw await this.handleNotificationError(error, 'Failed to mark notification as read');
     }
   }
 
   /**
    * Marks all notifications as read for the current user.
-   * 
+   *
    * This is a batch operation that efficiently marks every unread notification
    * as read in a single request. It's commonly used for "mark all as read" or
    * "clear all" buttons in notification centers.
-   * 
+   *
    * The operation is atomic on the backend, so either all notifications are
    * marked as read or none are (in case of errors).
-   * 
+   *
    * @throws Error if operation fails
-   * 
+   *
    * @example
    * ```typescript
    * // Add to "Clear All" button click handler
@@ -673,33 +668,26 @@ export class NotificationApiService {
    */
   async markAllAsRead(): Promise<void> {
     const operation = 'markAllAsRead';
-    
+
     try {
       logger.debug('Marking all notifications as read', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
-      await globalApiClient.post(
-        `${this.notificationsEndpoint}/read-all`,
-        {},
-        { skipCache: true }
-      );
+      await globalApiClient.post(`${this.notificationsEndpoint}/read-all`, {}, { skipCache: true });
 
       logger.info('All notifications marked as read', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
     } catch (error) {
       logger.error('Failed to mark all notifications as read', {
         component: 'NotificationApiService',
         operation,
-        error
-      });
-      throw await this.handleNotificationError(
         error,
-        'Failed to mark all notifications as read'
-      );
+      });
+      throw await this.handleNotificationError(error, 'Failed to mark all notifications as read');
     }
   }
 
@@ -709,17 +697,17 @@ export class NotificationApiService {
 
   /**
    * Permanently deletes a specific notification.
-   * 
+   *
    * Removes the notification from the user's notification list. This action
    * is permanent and cannot be undone. The notification will no longer appear
    * in any views or counts.
-   * 
+   *
    * Consider implementing a soft delete (archive) feature if you need to
    * support notification recovery or maintain history.
-   * 
+   *
    * @param notificationId - Unique identifier of the notification
    * @throws Error if notification cannot be deleted
-   * 
+   *
    * @example
    * ```typescript
    * // Add to notification dismiss/delete button
@@ -733,30 +721,29 @@ export class NotificationApiService {
    */
   async deleteNotification(notificationId: string): Promise<void> {
     const operation = 'deleteNotification';
-    
+
     try {
       logger.debug('Deleting notification', {
         component: 'NotificationApiService',
         operation,
-        notificationId
+        notificationId,
       });
 
-      await globalApiClient.delete(
-        `${this.notificationsEndpoint}/${notificationId}`,
-        { skipCache: true }
-      );
+      await globalApiClient.delete(`${this.notificationsEndpoint}/${notificationId}`, {
+        skipCache: true,
+      });
 
       logger.info('Notification deleted', {
         component: 'NotificationApiService',
         operation,
-        notificationId
+        notificationId,
       });
     } catch (error) {
       logger.error('Failed to delete notification', {
         component: 'NotificationApiService',
         operation,
         notificationId,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to delete notification');
     }
@@ -768,20 +755,20 @@ export class NotificationApiService {
 
   /**
    * Sends a notification to one or more users.
-   * 
+   *
    * This method is typically restricted to administrators and system services.
    * It creates and delivers a new notification, which will be:
    * - Added to recipient notification lists
    * - Sent via enabled channels (push, email, etc.)
    * - Subject to recipient preference filters
-   * 
+   *
    * You can target a specific user by including userId, or broadcast to all
    * users by omitting it. Priority affects delivery urgency and UI prominence.
-   * 
+   *
    * @param notification - Notification content and targeting information
    * @returns Promise resolving to created notification data
    * @throws Error if notification cannot be sent
-   * 
+   *
    * @example
    * ```typescript
    * // Send targeted notification
@@ -793,7 +780,7 @@ export class NotificationApiService {
    *   priority: 'high',
    *   data: { billId: 'HB-123', newStatus: 'in_committee' }
    * });
-   * 
+   *
    * // Broadcast system announcement
    * await notificationApiService.sendNotification({
    *   type: 'system_maintenance',
@@ -805,13 +792,13 @@ export class NotificationApiService {
    */
   async sendNotification(notification: SendNotificationPayload): Promise<NotificationResponse> {
     const operation = 'sendNotification';
-    
+
     try {
       logger.debug('Sending notification', {
         component: 'NotificationApiService',
         operation,
         type: notification.type,
-        userId: notification.userId || 'broadcast'
+        userId: notification.userId || 'broadcast',
       });
 
       const response = await globalApiClient.post<NotificationResponse>(
@@ -824,7 +811,7 @@ export class NotificationApiService {
         component: 'NotificationApiService',
         operation,
         type: notification.type,
-        userId: notification.userId || 'broadcast'
+        userId: notification.userId || 'broadcast',
       });
 
       return response.data;
@@ -833,7 +820,7 @@ export class NotificationApiService {
         component: 'NotificationApiService',
         operation,
         type: notification.type,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to send notification');
     }
@@ -845,33 +832,33 @@ export class NotificationApiService {
 
   /**
    * Retrieves aggregated notification statistics for the current user.
-   * 
+   *
    * Provides a high-level overview of notification state without fetching
    * all notification data. This is much more efficient than loading all
    * notifications just to count them, especially for users with many notifications.
-   * 
+   *
    * Statistics include:
    * - Total and unread counts for badge displays
    * - Category breakdown for filtering UI
    * - Priority distribution for analytics
-   * 
+   *
    * Stats are typically cached aggressively since they don't need real-time
    * accuracy and are accessed frequently for UI badges.
-   * 
+   *
    * @returns Promise resolving to notification statistics
    * @throws Error if statistics cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const stats = await notificationApiService.getStats();
-   * 
+   *
    * // Update notification badge
    * setBadgeCount(stats.unread);
-   * 
+   *
    * // Show category breakdown
    * console.log(`Bill updates: ${stats.byCategory.bills || 0}`);
    * console.log(`Comments: ${stats.byCategory.comments || 0}`);
-   * 
+   *
    * // Check for urgent notifications
    * if (stats.byPriority.urgent > 0) {
    *   showUrgentNotificationAlert();
@@ -880,11 +867,11 @@ export class NotificationApiService {
    */
   async getStats(): Promise<NotificationStats> {
     const operation = 'getStats';
-    
+
     try {
       logger.debug('Fetching notification statistics', {
         component: 'NotificationApiService',
-        operation
+        operation,
       });
 
       const response = await globalApiClient.get<NotificationStats>(
@@ -895,7 +882,7 @@ export class NotificationApiService {
         component: 'NotificationApiService',
         operation,
         total: response.data.total,
-        unread: response.data.unread
+        unread: response.data.unread,
       });
 
       return response.data;
@@ -903,7 +890,7 @@ export class NotificationApiService {
       logger.error('Failed to get notification statistics', {
         component: 'NotificationApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to retrieve notification statistics');
     }
@@ -915,24 +902,24 @@ export class NotificationApiService {
 
   /**
    * Performs bulk operations on multiple notifications efficiently.
-   * 
+   *
    * Instead of making individual API calls for each notification, this method
    * processes multiple notifications in a single request. This is significantly
    * more efficient and faster, especially when dealing with dozens or hundreds
    * of notifications.
-   * 
+   *
    * Supported operations:
    * - mark_read: Mark multiple notifications as read
    * - delete: Delete multiple notifications permanently
-   * 
+   *
    * The operation is partially atomic: individual notification operations can
    * fail while others succeed. The response includes detailed information about
    * what succeeded and what failed.
-   * 
+   *
    * @param bulkOperation - Operation configuration with action and target IDs
    * @returns Promise resolving to operation results with success/failure details
    * @throws Error if the entire bulk operation fails
-   * 
+   *
    * @example
    * ```typescript
    * // Mark selected notifications as read
@@ -941,19 +928,19 @@ export class NotificationApiService {
    *   action: 'mark_read',
    *   notificationIds: selectedIds
    * });
-   * 
+   *
    * if (result.success) {
    *   console.log(`Marked ${result.processed} notifications as read`);
    * }
    * if (result.errors.length > 0) {
    *   console.error('Some operations failed:', result.errors);
    * }
-   * 
+   *
    * // Delete old notifications in bulk
    * const oldNotificationIds = notifications
    *   .filter(n => isOlderThan(n.createdAt, 30, 'days'))
    *   .map(n => n.id);
-   * 
+   *
    * await notificationApiService.bulkOperation({
    *   action: 'delete',
    *   notificationIds: oldNotificationIds
@@ -965,13 +952,13 @@ export class NotificationApiService {
     notificationIds: string[];
   }): Promise<BulkOperationResult> {
     const operationName = 'bulkOperation';
-    
+
     try {
       logger.debug('Performing bulk notification operation', {
         component: 'NotificationApiService',
         operation: operationName,
         action: bulkOperation.action,
-        count: bulkOperation.notificationIds.length
+        count: bulkOperation.notificationIds.length,
       });
 
       const response = await globalApiClient.post<BulkOperationResult>(
@@ -985,7 +972,7 @@ export class NotificationApiService {
         operation: operationName,
         action: bulkOperation.action,
         processed: response.data.processed,
-        errors: response.data.errors.length
+        errors: response.data.errors.length,
       });
 
       return response.data;
@@ -994,7 +981,7 @@ export class NotificationApiService {
         component: 'NotificationApiService',
         operation: operationName,
         action: bulkOperation.action,
-        error
+        error,
       });
       throw await this.handleNotificationError(error, 'Failed to perform bulk operation');
     }
@@ -1006,35 +993,34 @@ export class NotificationApiService {
 
   /**
    * Centralized error handling for all notification operations.
-   * 
+   *
    * This method provides consistent error processing across the entire service:
-   * 
+   *
    * 1. Extracts meaningful error messages from various error structures
    *    (axios errors, fetch errors, custom API errors)
    * 2. Creates a standardized Error object with user-friendly message
    * 3. Reports the error to the global error handler for logging and tracking
    * 4. Returns the processed error for throwing to the caller
-   * 
+   *
    * The error handler prioritizes messages in this order:
    * - Server error message from response.data.message
    * - Server error from response.data.error
    * - Client-side error message
    * - Default fallback message
-   * 
+   *
    * @param error - Raw error object from API call or other source
    * @param defaultMessage - Fallback message if no specific error details available
    * @returns Processed Error object ready to be thrown
    */
-  private async handleNotificationError(
-    error: unknown,
-    defaultMessage: string
-  ): Promise<Error> {
+  private async handleNotificationError(error: unknown, defaultMessage: string): Promise<Error> {
     // Type guard to safely access error properties
-    const isErrorWithResponse = (err: unknown): err is { 
-      response?: { 
-        data?: { message?: string; error?: string }; 
-        status?: number 
-      }; 
+    const isErrorWithResponse = (
+      err: unknown
+    ): err is {
+      response?: {
+        data?: { message?: string; error?: string };
+        status?: number;
+      };
       message?: string;
       config?: { url?: string };
     } => {
@@ -1047,12 +1033,12 @@ export class NotificationApiService {
     let endpoint: string | undefined;
 
     if (isErrorWithResponse(error)) {
-      errorMessage = 
+      errorMessage =
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.message ||
         defaultMessage;
-      
+
       status = error.response?.status;
       endpoint = error.config?.url;
     } else if (error instanceof Error) {
@@ -1067,7 +1053,7 @@ export class NotificationApiService {
       component: 'NotificationApiService',
       operation: 'notification_operation',
       status,
-      endpoint
+      endpoint,
     });
 
     return notificationError;
@@ -1080,27 +1066,27 @@ export class NotificationApiService {
 
 /**
  * Pre-configured global singleton instance of the notification API service.
- * 
+ *
  * Use this instance throughout your application instead of creating new
  * instances. This ensures:
  * - Consistent configuration across all notification operations
  * - Shared state and caching behavior
  * - Centralized logging context
  * - Efficient resource usage
- * 
+ *
  * @example
  * ```typescript
  * import { notificationApiService } from '@client/api/notifications';
- * 
+ *
  * // In a component
  * const notifications = await notificationApiService.getNotifications({
  *   limit: 10,
  *   unreadOnly: true
  * });
- * 
+ *
  * // In a service
  * await notificationApiService.markAsRead(notificationId);
- * 
+ *
  * // In a background task
  * const stats = await notificationApiService.getStats();
  * updateNotificationBadge(stats.unread);

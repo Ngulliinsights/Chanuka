@@ -96,9 +96,9 @@ export class ConsoleReporter implements ErrorReporter {
 
     const colors = {
       [ErrorSeverity.CRITICAL]: '\x1b[91m', // Red
-      [ErrorSeverity.HIGH]: '\x1b[93m',     // Yellow
-      [ErrorSeverity.MEDIUM]: '\x1b[94m',   // Blue
-      [ErrorSeverity.LOW]: '\x1b[92m',      // Green
+      [ErrorSeverity.HIGH]: '\x1b[93m', // Yellow
+      [ErrorSeverity.MEDIUM]: '\x1b[94m', // Blue
+      [ErrorSeverity.LOW]: '\x1b[92m', // Green
     };
 
     const reset = '\x1b[0m';

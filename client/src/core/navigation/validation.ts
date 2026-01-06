@@ -1,6 +1,6 @@
 /**
  * Navigation Validation Module
- * 
+ *
  * Handles validation of navigation items and structures
  */
 
@@ -61,10 +61,7 @@ export function validateNavigationItems(items: NavigationItem[]): NavigationItem
 /**
  * Checks if a path is valid for navigation
  */
-export function isValidNavigationPath(
-  path: string,
-  navigationItems: NavigationItem[]
-): boolean {
+export function isValidNavigationPath(path: string, navigationItems: NavigationItem[]): boolean {
   try {
     if (!path || typeof path !== 'string') {
       return false;

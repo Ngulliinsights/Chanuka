@@ -150,16 +150,41 @@ export async function initAuthSystem(
       ...envDefaults.settings,
       ...customOptions.settings,
       security: {
-        enableMonitoring: customOptions.settings?.security?.enableMonitoring ?? envDefaults.settings?.security?.enableMonitoring ?? false,
-        enableAutoRefresh: customOptions.settings?.security?.enableAutoRefresh ?? envDefaults.settings?.security?.enableAutoRefresh ?? true,
-        enableSessionValidation: customOptions.settings?.security?.enableSessionValidation ?? envDefaults.settings?.security?.enableSessionValidation ?? true,
-        maxFailedAttempts: customOptions.settings?.security?.maxFailedAttempts ?? envDefaults.settings?.security?.maxFailedAttempts ?? 3,
-        lockoutDuration: customOptions.settings?.security?.lockoutDuration ?? envDefaults.settings?.security?.lockoutDuration ?? 900000,
+        enableMonitoring:
+          customOptions.settings?.security?.enableMonitoring ??
+          envDefaults.settings?.security?.enableMonitoring ??
+          false,
+        enableAutoRefresh:
+          customOptions.settings?.security?.enableAutoRefresh ??
+          envDefaults.settings?.security?.enableAutoRefresh ??
+          true,
+        enableSessionValidation:
+          customOptions.settings?.security?.enableSessionValidation ??
+          envDefaults.settings?.security?.enableSessionValidation ??
+          true,
+        maxFailedAttempts:
+          customOptions.settings?.security?.maxFailedAttempts ??
+          envDefaults.settings?.security?.maxFailedAttempts ??
+          3,
+        lockoutDuration:
+          customOptions.settings?.security?.lockoutDuration ??
+          envDefaults.settings?.security?.lockoutDuration ??
+          900000,
       },
       validation: {
-        password: customOptions.settings?.validation?.password ?? envDefaults.settings?.validation?.password ?? { minLength: 6, strongMinLength: 8, requireUppercase: false, requireLowercase: true, requireNumbers: true, requireSpecialChars: false },
-        email: customOptions.settings?.validation?.email ?? envDefaults.settings?.validation?.email ?? { maxLength: 254 },
-        name: customOptions.settings?.validation?.name ?? envDefaults.settings?.validation?.name ?? { minLength: 2, maxLength: 50 },
+        password: customOptions.settings?.validation?.password ??
+          envDefaults.settings?.validation?.password ?? {
+            minLength: 6,
+            strongMinLength: 8,
+            requireUppercase: false,
+            requireLowercase: true,
+            requireNumbers: true,
+            requireSpecialChars: false,
+          },
+        email: customOptions.settings?.validation?.email ??
+          envDefaults.settings?.validation?.email ?? { maxLength: 254 },
+        name: customOptions.settings?.validation?.name ??
+          envDefaults.settings?.validation?.name ?? { minLength: 2, maxLength: 50 },
       },
     };
 
@@ -217,7 +242,7 @@ export async function setupAuthForReact(
   const environment = (process.env.NODE_ENV as Environment) || 'development';
 
   await initAuthSystem(apiClient, environment, {
-    onInitialized: (success) => {
+    onInitialized: success => {
       if (success) {
         logger.info('Auth system ready for React app', {
           component: 'AuthInit',
@@ -229,7 +254,7 @@ export async function setupAuthForReact(
       }
       callbacks?.onInitialized?.(success);
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Auth initialization error', {
         component: 'AuthInit',
         error: error.message,

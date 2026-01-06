@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { useNavigationPreferences } from "@/core/navigation/hooks";
-import { Button } from "@/shared/design-system/interactive/Button";
-import { Switch } from "@/shared/design-system/interactive/Switch";
-import { Label } from "@/shared/design-system/typography/Label";
+import { useNavigationPreferences } from '@/core/navigation/hooks';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Switch } from '@/shared/design-system/interactive/Switch';
+import { Label } from '@/shared/design-system/typography/Label';
 
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../design-system/interactive/Dialog";
+} from '../../design-system/interactive/Dialog';
 
 interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;
@@ -39,7 +39,7 @@ export const NavigationPreferencesDialog = React.memo<NavigationPreferencesDialo
                 id="show-breadcrumbs"
                 checked={preferences.showBreadcrumbs}
                 onCheckedChange={(checked: boolean) =>
-                  handlePreferenceChange("showBreadcrumbs", checked)
+                  handlePreferenceChange('showBreadcrumbs', checked)
                 }
               />
               <Label htmlFor="show-breadcrumbs">Show breadcrumbs</Label>
@@ -49,7 +49,7 @@ export const NavigationPreferencesDialog = React.memo<NavigationPreferencesDialo
                 id="compact-mode"
                 checked={preferences.compactMode}
                 onCheckedChange={(checked: boolean) =>
-                  handlePreferenceChange("compactMode", checked)
+                  handlePreferenceChange('compactMode', checked)
                 }
               />
               <Label htmlFor="compact-mode">Compact mode</Label>
@@ -59,7 +59,7 @@ export const NavigationPreferencesDialog = React.memo<NavigationPreferencesDialo
                 id="auto-expand"
                 checked={preferences.autoExpand}
                 onCheckedChange={(checked: boolean) =>
-                  handlePreferenceChange("autoExpand", checked)
+                  handlePreferenceChange('autoExpand', checked)
                 }
               />
               <Label htmlFor="auto-expand">Auto-expand sections</Label>
@@ -74,6 +74,6 @@ export const NavigationPreferencesDialog = React.memo<NavigationPreferencesDialo
   }
 );
 
-NavigationPreferencesDialog.displayName = "NavigationPreferencesDialog";
+NavigationPreferencesDialog.displayName = 'NavigationPreferencesDialog';
 
 export default NavigationPreferencesDialog;

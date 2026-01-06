@@ -17,12 +17,12 @@ export type WidgetType =
 
 // Widget Size Presets
 export type WidgetSize =
-  | 'small'    // 1x1
-  | 'medium'   // 2x2
-  | 'large'    // 3x2
-  | 'wide'     // 4x2
-  | 'tall'     // 2x3
-  | 'full';    // 4x3
+  | 'small' // 1x1
+  | 'medium' // 2x2
+  | 'large' // 3x2
+  | 'wide' // 4x2
+  | 'tall' // 2x3
+  | 'full'; // 4x3
 
 // Widget Position
 export interface WidgetPosition {

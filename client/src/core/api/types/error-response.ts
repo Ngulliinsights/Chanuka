@@ -1,6 +1,6 @@
 /**
  * Error Response Types
- * 
+ *
  * Comprehensive type definitions for API error responses to replace any types
  */
 

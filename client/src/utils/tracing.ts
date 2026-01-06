@@ -29,25 +29,25 @@ function generateTraceId(): string {
 export function startTrace(name: string, metadata?: Record<string, unknown>): string {
   const traceId = generateTraceId();
   const spanId = generateTraceId();
-  
+
   const trace: TraceContext = {
     traceId,
     spanId,
     startTime: performance.now(),
     name,
-    metadata
+    metadata,
   };
-  
+
   activeTraces.set(traceId, trace);
-  
+
   logger.debug('Trace started', {
     component: 'Tracing',
     traceId,
     spanId,
     name,
-    metadata
+    metadata,
   });
-  
+
   return traceId;
 }
 
@@ -56,19 +56,19 @@ export function startTrace(name: string, metadata?: Record<string, unknown>): st
  */
 export function finishTrace(traceId: string, result?: 'success' | 'error', error?: Error): void {
   const trace = activeTraces.get(traceId);
-  
+
   if (!trace) {
     logger.warn('Attempted to finish non-existent trace', {
       component: 'Tracing',
-      traceId
+      traceId,
     });
     return;
   }
-  
+
   const duration = performance.now() - trace.startTime;
-  
+
   activeTraces.delete(traceId);
-  
+
   const logData = {
     component: 'Tracing',
     traceId: trace.traceId,
@@ -76,9 +76,9 @@ export function finishTrace(traceId: string, result?: 'success' | 'error', error
     name: trace.name,
     duration,
     result,
-    metadata: trace.metadata
+    metadata: trace.metadata,
   };
-  
+
   if (result === 'error' && error) {
     logger.error('Trace completed with error', logData, error);
   } else {
@@ -99,11 +99,11 @@ export function getActiveTracesCount(): number {
 export function clearActiveTraces(): void {
   const count = activeTraces.size;
   activeTraces.clear();
-  
+
   if (count > 0) {
     logger.warn('Cleared active traces', {
       component: 'Tracing',
-      clearedCount: count
+      clearedCount: count,
     });
   }
 }
@@ -118,25 +118,21 @@ export function getActiveTraces(): Array<{
   metadata?: Record<string, unknown>;
 }> {
   const now = performance.now();
-  
+
   return Array.from(activeTraces.values()).map(trace => ({
     traceId: trace.traceId,
     name: trace.name,
     duration: now - trace.startTime,
-    metadata: trace.metadata
+    metadata: trace.metadata,
   }));
 }
 
 /**
  * Trace a function execution
  */
-export function traceFunction<T>(
-  name: string,
-  fn: () => T,
-  metadata?: Record<string, unknown>
-): T {
+export function traceFunction<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
   const traceId = startTrace(name, metadata);
-  
+
   try {
     const result = fn();
     finishTrace(traceId, 'success');
@@ -156,7 +152,7 @@ export async function traceAsyncFunction<T>(
   metadata?: Record<string, unknown>
 ): Promise<T> {
   const traceId = startTrace(name, metadata);
-  
+
   try {
     const result = await fn();
     finishTrace(traceId, 'success');

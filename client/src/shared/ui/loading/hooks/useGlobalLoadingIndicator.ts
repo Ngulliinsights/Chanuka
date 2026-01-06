@@ -1,6 +1,6 @@
 /**
  * Hook for controlling the global loading indicator
- * 
+ *
  * This hook provides a simple interface for showing/hiding the global loading
  * indicator and integrates with the existing Redux-based loading system.
  */
@@ -41,31 +41,27 @@ export interface UseGlobalLoadingIndicatorReturn {
 
 /**
  * Hook for controlling global loading indicator
- * 
+ *
  * Provides a simplified interface for showing/hiding loading states
  * that integrates with the existing Redux-based loading system.
- * 
+ *
  * @example
  * ```tsx
  * const { show, hide, isLoading } = useGlobalLoadingIndicator();
- * 
+ *
  * // Show loading
  * const operationId = await show({
  *   message: 'Saving data...',
  *   priority: 'high'
  * });
- * 
+ *
  * // Hide when done
  * await hide(operationId);
  * ```
  */
 export const useGlobalLoadingIndicator = (): UseGlobalLoadingIndicatorReturn => {
-  const {
-    startOperation,
-    completeOperation,
-    activeOperationsCount,
-    shouldShowGlobalLoader,
-  } = useGlobalLoading();
+  const { startOperation, completeOperation, activeOperationsCount, shouldShowGlobalLoader } =
+    useGlobalLoading();
 
   /**
    * Show the loading indicator with optional configuration

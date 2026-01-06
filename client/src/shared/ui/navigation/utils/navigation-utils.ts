@@ -1,16 +1,15 @@
-
 import { InvalidNavigationPathError } from '@/core/error';
+import type { NavigationItem, UserRole } from '@/shared/types/navigation';
 import { validateNavigationPath } from '@/validation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import type { NavigationItem as SharedNavigationItem, UserRole as SharedUserRole } from '../types';
-import type { NavigationItem, UserRole } from '@/shared/types/navigation';
 
 // Type conversion helpers
 function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
   return {
     ...item,
-    icon: typeof item.icon === 'string' ? (() => null) as any : item.icon as any,
+    icon: typeof item.icon === 'string' ? ((() => null) as any) : (item.icon as any),
     section: (item.section === 'system' ? 'tools' : item.section) || 'tools', // Map system to tools, provide default
     badge: typeof item.badge === 'string' ? parseInt(item.badge, 10) || undefined : item.badge,
     allowedRoles: item.allowedRoles as any, // Type assertion to resolve conflict
@@ -20,14 +19,14 @@ function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
 function convertUserRole(role: SharedUserRole): UserRole {
   // Map shared roles to navigation roles
   const roleMap: Record<SharedUserRole, UserRole> = {
-    'public': 'public',
-    'citizen': 'citizen',
-    'expert': 'expert',
-    'admin': 'admin',
-    'journalist': 'journalist',
-    'advocate': 'advocate',
-    'official': 'citizen', // Map official to citizen for compatibility
-    'moderator': 'admin', // Map moderator to admin for compatibility
+    public: 'public',
+    citizen: 'citizen',
+    expert: 'expert',
+    admin: 'admin',
+    journalist: 'journalist',
+    advocate: 'advocate',
+    official: 'citizen', // Map official to citizen for compatibility
+    moderator: 'admin', // Map moderator to admin for compatibility
   };
   return roleMap[role] || 'public';
 }
@@ -67,7 +66,9 @@ export const findNavigationItemById = (id: string): SharedNavigationItem | null 
 /**
  * Gets all navigation items for a specific section
  */
-export const getNavigationItemsBySection = (section: NavigationItem['section']): SharedNavigationItem[] => {
+export const getNavigationItemsBySection = (
+  section: NavigationItem['section']
+): SharedNavigationItem[] => {
   if (!section) {
     return [];
   }
@@ -140,4 +141,3 @@ export const isValidNavigationPath = (path: string): boolean => {
     return false;
   }
 };
-

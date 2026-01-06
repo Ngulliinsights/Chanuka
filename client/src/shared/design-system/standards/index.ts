@@ -50,10 +50,7 @@ export type {
   NetworkAdaptation,
   LowBandwidthComponents,
 } from './low-bandwidth';
-export {
-  defaultLowBandwidthConfig,
-  shouldUseLowBandwidthMode,
-} from './low-bandwidth';
+export { defaultLowBandwidthConfig, shouldUseLowBandwidthMode } from './low-bandwidth';
 
 /**
  * Design Standards Overview

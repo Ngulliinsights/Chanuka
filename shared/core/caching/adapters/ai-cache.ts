@@ -9,8 +9,9 @@
  * - Intelligent cache invalidation based on data freshness
  */
 
-import { CacheService, getDefaultCache } from '../../cache/index';
 import { performance } from 'perf_hooks';
+
+import { CacheService, getDefaultCache } from '../../cache/index';
 import { logger } from '../../observability/logging';
 
 export interface AICacheOptions {

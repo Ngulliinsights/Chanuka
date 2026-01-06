@@ -41,13 +41,11 @@ export const cssPerformance = {
     easing: string = 'ease-out'
   ): string => {
     // Only animate transform and opacity for best performance
-    const optimizedProperties = properties.filter(prop => 
+    const optimizedProperties = properties.filter(prop =>
       ['transform', 'opacity', 'filter'].includes(prop)
     );
-    
-    return optimizedProperties
-      .map(prop => `${prop} ${duration} ${easing}`)
-      .join(', ');
+
+    return optimizedProperties.map(prop => `${prop} ${duration} ${easing}`).join(', ');
   },
 };
 
@@ -65,7 +63,10 @@ export const animationPerformance = {
   /**
    * Create performance-optimized keyframes
    */
-  createOptimizedKeyframes: (name: string, keyframes: Record<string, Record<string, string>>): string => {
+  createOptimizedKeyframes: (
+    name: string,
+    keyframes: Record<string, Record<string, string>>
+  ): string => {
     const keyframeString = Object.entries(keyframes)
       .map(([percentage, styles]) => {
         const styleString = Object.entries(styles)
@@ -86,7 +87,7 @@ export const animationPerformance = {
     delay: number = 16 // ~60fps
   ): (() => void) => {
     let timeoutId: number;
-    
+
     return () => {
       clearTimeout(timeoutId);
       timeoutId = window.setTimeout(callback, delay);
@@ -112,7 +113,7 @@ export const renderingPerformance = {
     // Use DocumentFragment for multiple DOM insertions
     // Create document fragment for performance (unused but kept for future use)
     document.createDocumentFragment();
-    
+
     updates.forEach(update => {
       try {
         update();
@@ -173,7 +174,7 @@ export const memoryManagement = {
     delete: (key: T) => boolean;
   } => {
     const storage = new WeakMap();
-    
+
     return {
       set: (key: T, value: any) => storage.set(key, value),
       get: (key: T) => storage.get(key),
@@ -206,12 +207,10 @@ export const bundleOptimization = {
   /**
    * Lazy load design system modules
    */
-  lazyLoadModule: async <T>(
-    importFn: () => Promise<{ default: T } | T>
-  ): Promise<T> => {
+  lazyLoadModule: async <T>(importFn: () => Promise<{ default: T } | T>): Promise<T> => {
     try {
       const module = await importFn();
-      return 'default' in (module as any) ? (module as any).default : module as T;
+      return 'default' in (module as any) ? (module as any).default : (module as T);
     } catch (error) {
       console.error('Failed to lazy load module:', error);
       throw error;
@@ -231,7 +230,7 @@ export const performanceMonitoring = {
     renderFn();
     const endTime = performance.now();
     const duration = endTime - startTime;
-    
+
     console.log(`${componentName} render time: ${duration.toFixed(2)}ms`);
     return duration;
   },
@@ -240,11 +239,11 @@ export const performanceMonitoring = {
    * Monitor layout shifts
    */
   monitorLayoutShifts: (callback: (entries: unknown[]) => void): PerformanceObserver => {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries() as any[];
       callback(entries);
     });
-    
+
     observer.observe({ entryTypes: ['layout-shift'] });
     return observer;
   },
@@ -262,7 +261,7 @@ export const performanceMonitoring = {
     let lcp = 0;
 
     // Track Cumulative Layout Shift
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries() as any[]) {
         if (!entry.hadRecentInput) {
           cls += entry.value;
@@ -271,7 +270,7 @@ export const performanceMonitoring = {
     }).observe({ entryTypes: ['layout-shift'] });
 
     // Track First Contentful Paint and Largest Contentful Paint
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'paint' && entry.name === 'first-contentful-paint') {
           fcp = entry.startTime;
@@ -289,4 +288,3 @@ export const performanceMonitoring = {
     };
   },
 };
-

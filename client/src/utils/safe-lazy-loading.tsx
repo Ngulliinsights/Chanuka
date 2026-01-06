@@ -61,7 +61,8 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
   } = {}
 ): LazyExoticComponent<ComponentType<P>> {
   const { displayName } = options;
-  const componentName = displayName || path.split('/').pop()?.replace('.tsx', '').replace('.ts', '') || 'UnknownPage';
+  const componentName =
+    displayName || path.split('/').pop()?.replace('.tsx', '').replace('.ts', '') || 'UnknownPage';
 
   const importFn = () => {
     // Simple dynamic import based on path

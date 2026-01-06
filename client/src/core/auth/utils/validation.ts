@@ -1,6 +1,6 @@
 /**
  * Consolidated Auth Validation Utilities
- * 
+ *
  * Unified implementation that consolidates:
  * - Auth validation from components/auth/utils/auth-validation.ts
  * - Core validation utilities
@@ -111,7 +111,7 @@ export function checkPasswordStrength(password: string): PasswordStrength {
     uppercase: /[A-Z]/.test(password),
     lowercase: /[a-z]/.test(password),
     numbers: /\d/.test(password),
-    specialChars: /[@$!%*?&]/.test(password)
+    specialChars: /[@$!%*?&]/.test(password),
   };
 
   const metRequirements = Object.values(requirements).filter(Boolean).length;
@@ -119,7 +119,9 @@ export function checkPasswordStrength(password: string): PasswordStrength {
 
   // Generate feedback
   if (!requirements.length) {
-    feedback.push(`Password must be at least ${AUTH_VALIDATION_RULES.PASSWORD.STRONG_MIN_LENGTH} characters long`);
+    feedback.push(
+      `Password must be at least ${AUTH_VALIDATION_RULES.PASSWORD.STRONG_MIN_LENGTH} characters long`
+    );
   }
   if (!requirements.uppercase) {
     feedback.push('Add at least one uppercase letter');
@@ -148,7 +150,7 @@ export function checkPasswordStrength(password: string): PasswordStrength {
     score: Math.min(score, 4),
     feedback,
     isValid,
-    requirements
+    requirements,
   };
 }
 
@@ -167,14 +169,14 @@ export function validateEmailDomain(email: string, allowedDomains?: string[]): b
   try {
     const validEmail = validateEmail(email);
     const domain = validEmail.split('@')[1]?.toLowerCase();
-    
+
     if (!domain) {
       return false;
     }
 
-    return allowedDomains.some(allowedDomain => 
-      domain === allowedDomain.toLowerCase() || 
-      domain.endsWith(`.${allowedDomain.toLowerCase()}`)
+    return allowedDomains.some(
+      allowedDomain =>
+        domain === allowedDomain.toLowerCase() || domain.endsWith(`.${allowedDomain.toLowerCase()}`)
     );
   } catch {
     return false;
@@ -186,9 +188,21 @@ export function validateEmailDomain(email: string, allowedDomains?: string[]): b
  */
 export function isCommonPassword(password: string): boolean {
   const commonPasswords = [
-    'password', 'password123', '123456', '123456789', 'qwerty',
-    'abc123', 'password1', 'admin', 'letmein', 'welcome',
-    'monkey', '1234567890', 'dragon', 'master', 'login'
+    'password',
+    'password123',
+    '123456',
+    '123456789',
+    'qwerty',
+    'abc123',
+    'password1',
+    'admin',
+    'letmein',
+    'welcome',
+    'monkey',
+    '1234567890',
+    'dragon',
+    'master',
+    'login',
   ];
 
   return commonPasswords.includes(password.toLowerCase());
@@ -203,16 +217,18 @@ export function hasSequentialChars(password: string, maxSequential: number = 3):
     '0123456789',
     'qwertyuiop',
     'asdfghjkl',
-    'zxcvbnm'
+    'zxcvbnm',
   ];
 
   for (const sequence of sequences) {
     for (let i = 0; i <= sequence.length - maxSequential; i++) {
       const subseq = sequence.substring(i, i + maxSequential);
       const reverseSubseq = subseq.split('').reverse().join('');
-      
-      if (password.toLowerCase().includes(subseq) || 
-          password.toLowerCase().includes(reverseSubseq)) {
+
+      if (
+        password.toLowerCase().includes(subseq) ||
+        password.toLowerCase().includes(reverseSubseq)
+      ) {
         return true;
       }
     }
@@ -261,7 +277,7 @@ export interface PasswordValidationResult {
  * Comprehensive password validation with all security checks
  */
 export function validatePasswordComprehensive(
-  password: string, 
+  password: string,
   strict: boolean = true,
   options: {
     checkCommon?: boolean;
@@ -269,11 +285,7 @@ export function validatePasswordComprehensive(
     checkRepeated?: boolean;
   } = {}
 ): PasswordValidationResult {
-  const {
-    checkCommon = true,
-    checkSequential = true,
-    checkRepeated = true
-  } = options;
+  const { checkCommon = true, checkSequential = true, checkRepeated = true } = options;
 
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -310,7 +322,7 @@ export function validatePasswordComprehensive(
     isValid: errors.length === 0,
     errors,
     warnings,
-    strength
+    strength,
   };
 }
 
@@ -330,24 +342,37 @@ export interface BatchValidationResult {
 /**
  * Safe validation wrapper that returns result instead of throwing
  */
-export function safeValidateEmail(email: string): { success: boolean; data?: string; error?: Error } {
+export function safeValidateEmail(email: string): {
+  success: boolean;
+  data?: string;
+  error?: Error;
+} {
   try {
     const validEmail = validateEmail(email);
     return { success: true, data: validEmail };
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error : new Error('Validation failed') };
+    return {
+      success: false,
+      error: error instanceof Error ? error : new Error('Validation failed'),
+    };
   }
 }
 
 /**
  * Safe password validation wrapper
  */
-export function safeValidatePassword(password: string, strict: boolean = true): { success: boolean; data?: string; error?: Error } {
+export function safeValidatePassword(
+  password: string,
+  strict: boolean = true
+): { success: boolean; data?: string; error?: Error } {
   try {
     const validPassword = validatePassword(password, strict);
     return { success: true, data: validPassword };
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error : new Error('Validation failed') };
+    return {
+      success: false,
+      error: error instanceof Error ? error : new Error('Validation failed'),
+    };
   }
 }
 
@@ -379,7 +404,10 @@ export function validateFormBatch(
 
   // Password validation
   if (formData.password) {
-    const passwordResult = validatePasswordComprehensive(formData.password, mode === 'register' && strict);
+    const passwordResult = validatePasswordComprehensive(
+      formData.password,
+      mode === 'register' && strict
+    );
     if (!passwordResult.isValid) {
       errors.password = passwordResult.errors;
     }
@@ -419,7 +447,7 @@ export function validateFormBatch(
   return {
     isValid: Object.keys(errors).length === 0,
     errors,
-    fieldResults
+    fieldResults,
   };
 }
 
@@ -430,7 +458,10 @@ export function validateFormBatch(
 /**
  * Form field sanitization
  */
-export function sanitizeInput(input: string, type: 'email' | 'name' | 'password' | 'general' = 'general'): string {
+export function sanitizeInput(
+  input: string,
+  type: 'email' | 'name' | 'password' | 'general' = 'general'
+): string {
   if (!input) return '';
 
   let sanitized = input;
@@ -444,16 +475,16 @@ export function sanitizeInput(input: string, type: 'email' | 'name' | 'password'
       // Remove spaces and convert to lowercase
       sanitized = sanitized.replace(/\s/g, '').toLowerCase();
       break;
-    
+
     case 'name':
       // Trim and normalize spaces
       sanitized = sanitized.trim().replace(/\s+/g, ' ');
       break;
-    
+
     case 'password':
       // No additional sanitization for passwords to preserve intentional characters
       break;
-    
+
     case 'general':
     default:
       // Basic trimming
@@ -478,15 +509,18 @@ export function createDebouncedValidator(
   let timeoutId: NodeJS.Timeout;
 
   return (value: string): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       clearTimeout(timeoutId);
-      
+
       timeoutId = setTimeout(async () => {
         try {
           const result = await validationFn(value);
           resolve(result);
         } catch (error) {
-          logger.error('Debounced validation failed', { error, value: value.substring(0, 10) + '...' });
+          logger.error('Debounced validation failed', {
+            error,
+            value: value.substring(0, 10) + '...',
+          });
           resolve(false);
         }
       }, delay);
@@ -497,17 +531,15 @@ export function createDebouncedValidator(
 /**
  * Validation error formatter for UI display
  */
-export function formatValidationErrors(
-  errors: Record<string, string[]>
-): Record<string, string> {
+export function formatValidationErrors(errors: Record<string, string[]>): Record<string, string> {
   const formatted: Record<string, string> = {};
-  
+
   for (const [field, fieldErrors] of Object.entries(errors)) {
     if (fieldErrors.length > 0) {
       formatted[field] = fieldErrors[0] ?? ''; // Take first error for display
     }
   }
-  
+
   return formatted;
 }
 
@@ -529,7 +561,11 @@ export class AuthValidationError extends Error {
 /**
  * Creates a validation error with proper context
  */
-export function createValidationError(message: string, field?: string, code?: string): AuthValidationError {
+export function createValidationError(
+  message: string,
+  field?: string,
+  code?: string
+): AuthValidationError {
   return new AuthValidationError(message, field, code);
 }
 
@@ -540,25 +576,25 @@ export default {
   isCommonPassword,
   hasSequentialChars,
   hasRepeatedChars,
-  
+
   // Email validation
   validateEmailDomain,
   safeValidateEmail,
-  
+
   // Form validation
   validateFormBatch,
   formatValidationErrors,
-  
+
   // Sanitization
   sanitizeInput,
-  
+
   // Real-time validation
   createDebouncedValidator,
-  
+
   // Error handling
   createValidationError,
   AuthValidationError,
-  
+
   // Constants
   AUTH_VALIDATION_RULES,
   AUTH_ERROR_MESSAGES,

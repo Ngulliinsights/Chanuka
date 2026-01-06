@@ -1,6 +1,7 @@
 # Bills Feature - Flattened Structure
 
 ## Overview
+
 The bills feature has been restructured to eliminate unnecessary nesting while maintaining clear separation of concerns and keeping the API centralized.
 
 ## New Structure
@@ -12,7 +13,7 @@ client/src/features/bills/
 ├── hooks.ts                    # React Query hooks
 ├── services.ts                 # Business logic services
 ├── BillCard.tsx               # Bill card component
-├── BillList.tsx               # Bill list component  
+├── BillList.tsx               # Bill list component
 ├── BillAnalysis.tsx           # Bill analysis component
 ├── BillDetail.tsx             # Bill detail component
 ├── services/                   # Service implementations
@@ -25,18 +26,21 @@ client/src/features/bills/
 ## Key Changes
 
 ### ✅ Flattened Structure
+
 - Eliminated `model/hooks/` nesting - hooks are now in `hooks.ts`
 - Eliminated `api/` directory - API stays centralized in `client/src/core/api/bills.ts`
 - Main UI components moved to feature root
 - Types consolidated into single `types.ts` file
 
 ### ✅ Centralized API
+
 - All API logic remains in `client/src/core/api/bills.ts`
 - No duplication between core and feature API
 - Single source of truth for data access
 - Better reusability across features
 
 ### ✅ Backward Compatibility
+
 - Legacy exports maintained in `ui/index.ts`
 - Existing imports continue to work
 - Gradual migration path available

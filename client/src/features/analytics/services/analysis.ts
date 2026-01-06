@@ -1,6 +1,6 @@
 /**
  * Analysis Service - Analytics Feature
- * 
+ *
  * Migrated from client/src/services/analysis.ts
  * Core service for analyzing legislative bills with conflict detection,
  * transparency rating, and stakeholder impact analysis.
@@ -57,7 +57,7 @@ class AnalysisService {
     HIGH_CONFLICT: 70,
     MEDIUM_CONFLICT: 40,
     LOW_TRANSPARENCY: 50,
-    HIGH_INFLUENCE: 7
+    HIGH_INFLUENCE: 7,
   } as const;
 
   /**
@@ -70,21 +70,21 @@ class AnalysisService {
 
     try {
       const response = await globalApiClient.get(`/api/bills/${bill_id}/analysis`);
-      
+
       if (response.status === 200 && response.data) {
         return this.validateAnalysisData(response.data);
       } else {
         // Use fallback data
         logger.warn(`Using fallback analysis for bill ${bill_id}`, {
           component: 'AnalysisService',
-          status: response.status
+          status: response.status,
         });
         return this.generateMockAnalysis(bill_id);
       }
     } catch (error) {
       logger.warn(`API failed for bill ${bill_id}, using fallback analysis`, {
         component: 'AnalysisService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return this.generateMockAnalysis(bill_id);
     }
@@ -96,14 +96,14 @@ class AnalysisService {
   private validateAnalysisData(data: unknown): BillAnalysis {
     const required = ['id', 'bill_id', 'conflictScore', 'transparencyRating'];
     const missing = required.filter(field => !(field in data));
-    
+
     if (missing.length > 0) {
       throw new Error(`Invalid analysis data from API: missing fields ${missing.join(', ')}`);
     }
-    
+
     return {
       ...data,
-      timestamp: new Date(data.timestamp || Date.now())
+      timestamp: new Date(data.timestamp || Date.now()),
     };
   }
 
@@ -113,7 +113,7 @@ class AnalysisService {
   private generateMockAnalysis(bill_id: number): BillAnalysis {
     const seed = bill_id * 9301 + 49297;
     const seededRandom = () => ((seed * 233280) % 2147483647) / 2147483647;
-    
+
     return {
       id: `analysis-${bill_id}-${Date.now()}`,
       bill_id,
@@ -123,7 +123,7 @@ class AnalysisService {
       constitutionalConcerns: this.generateMockConcerns(bill_id),
       publicBenefit: Math.floor(seededRandom() * 100),
       corporateInfluence: this.generateMockCorporateInfluence(bill_id),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -132,14 +132,14 @@ class AnalysisService {
       { group: 'Small Businesses', population: 150000, impact: 'high' as const },
       { group: 'Healthcare Workers', population: 45000, impact: 'medium' as const },
       { group: 'Rural Communities', population: 200000, impact: 'medium' as const },
-      { group: 'Tech Sector', population: 85000, impact: 'low' as const }
+      { group: 'Tech Sector', population: 85000, impact: 'low' as const },
     ];
     const count = 2 + (bill_id % 2);
     return stakeholderGroups.slice(0, count).map(s => ({
       group: s.group,
       impactLevel: s.impact,
       affectedPopulation: s.population,
-      description: `${s.impact.charAt(0).toUpperCase() + s.impact.slice(1)} impact on ${s.group.toLowerCase()}`
+      description: `${s.impact.charAt(0).toUpperCase() + s.impact.slice(1)} impact on ${s.group.toLowerCase()}`,
     }));
   }
 
@@ -148,7 +148,7 @@ class AnalysisService {
       'Potential federalism issues with state authority',
       'Due process considerations in enforcement mechanisms',
       'First Amendment implications for speech regulations',
-      'Commerce Clause scope and limitations'
+      'Commerce Clause scope and limitations',
     ];
     return concerns.slice(0, 1 + (bill_id % 2));
   }
@@ -159,14 +159,14 @@ class AnalysisService {
         organization: 'TechCorp Industries',
         connectionType: 'financial',
         influenceLevel: 8,
-        potentialConflict: true
+        potentialConflict: true,
       },
       {
         organization: 'Healthcare Alliance',
         connectionType: 'advisory',
         influenceLevel: 5,
-        potentialConflict: false
-      }
+        potentialConflict: false,
+      },
     ];
     return bill_id % 2 === 0 ? connections : connections.slice(0, 1).filter(Boolean);
   }
@@ -176,15 +176,15 @@ class AnalysisService {
    */
   async getConflictAnalysis(bill_id: number): Promise<ConflictAnalysisResult> {
     const analysis = await this.analyzeBill(bill_id);
-    
+
     const overallRisk = this.calculateRiskLevel(analysis.conflictScore);
     const conflicts = analysis.corporateInfluence.filter(c => c.potentialConflict);
-    
+
     return {
       overallRisk,
       conflicts,
       recommendations: this.generateRecommendations(analysis),
-      analysisDate: analysis.timestamp
+      analysisDate: analysis.timestamp,
     };
   }
 
@@ -202,35 +202,27 @@ class AnalysisService {
    */
   private generateRecommendations(analysis: BillAnalysis): string[] {
     const recommendations: string[] = [];
-    
+
     if (analysis.conflictScore > this.RISK_THRESHOLDS.HIGH_CONFLICT) {
-      recommendations.push(
-        'Recommend independent ethics review before proceeding with vote'
-      );
+      recommendations.push('Recommend independent ethics review before proceeding with vote');
     }
-    
+
     if (analysis.transparencyRating < this.RISK_THRESHOLDS.LOW_TRANSPARENCY) {
-      recommendations.push(
-        'Require additional disclosure documentation and public comment period'
-      );
+      recommendations.push('Require additional disclosure documentation and public comment period');
     }
-    
+
     const hasHighInfluence = analysis.corporateInfluence.some(
       c => c.influenceLevel > this.RISK_THRESHOLDS.HIGH_INFLUENCE
     );
     if (hasHighInfluence) {
-      recommendations.push(
-        'Consider recusal from voting by sponsors with direct financial ties'
-      );
+      recommendations.push('Consider recusal from voting by sponsors with direct financial ties');
     }
 
     const hasHighImpactStakeholders = analysis.stakeholderAnalysis.some(
       s => s.impactLevel === 'high'
     );
     if (hasHighImpactStakeholders) {
-      recommendations.push(
-        'Conduct public hearings with affected stakeholder groups'
-      );
+      recommendations.push('Conduct public hearings with affected stakeholder groups');
     }
 
     if (analysis.publicBenefit < 50 && analysis.conflictScore > 60) {
@@ -238,7 +230,7 @@ class AnalysisService {
         'Re-evaluate bill provisions: low public benefit with high conflict risk'
       );
     }
-    
+
     return recommendations;
   }
 
@@ -246,22 +238,20 @@ class AnalysisService {
    * Batch analysis method for processing multiple bills efficiently
    */
   async analyzeBills(bill_ids: number[]): Promise<Map<number, BillAnalysis>> {
-    const analyses = await Promise.allSettled(
-      bill_ids.map(id => this.analyzeBill(id))
-    );
+    const analyses = await Promise.allSettled(bill_ids.map(id => this.analyzeBill(id)));
 
     const results = new Map<number, BillAnalysis>();
-    
+
     analyses.forEach((result, index) => {
       const billId = bill_ids[index];
       if (!billId) return;
-      
+
       if (result.status === 'fulfilled') {
         results.set(billId, result.value);
       } else {
         logger.error(`Failed to analyze bill ${billId} in batch`, {
           component: 'AnalysisService',
-          error: result.reason
+          error: result.reason,
         });
       }
     });

@@ -3,12 +3,12 @@
  * Following navigation component utility patterns
  */
 
-import type { 
-  ActivitySummary, 
-  ActionItem, 
-  TrackedTopic, 
+import type {
+  ActivitySummary,
+  ActionItem,
+  TrackedTopic,
   ActionPriority,
-  TopicCategory 
+  TopicCategory,
 } from '../types';
 
 /**
@@ -23,16 +23,17 @@ export function formatActivitySummary(summary: ActivitySummary): {
 } {
   // Since ActivitySummary doesn't have completed/pending actions,
   // we'll calculate completion rate based on actionsNeeded vs total potential actions
-  const completionRate = summary.actionsNeeded > 0 
-    ? Math.max(0, 100 - Math.min(100, (summary.actionsNeeded / summary.billsTracked) * 100))
-    : 100;
+  const completionRate =
+    summary.actionsNeeded > 0
+      ? Math.max(0, 100 - Math.min(100, (summary.actionsNeeded / summary.billsTracked) * 100))
+      : 100;
 
   return {
     billsTracked: formatNumber(summary.billsTracked),
     actionsNeeded: formatNumber(summary.actionsNeeded),
     topicsCount: formatNumber(summary.topicsCount),
     completionRate: `${Math.round(completionRate)}%`,
-    lastUpdatedText: formatRelativeTime(summary.lastUpdated)
+    lastUpdatedText: formatRelativeTime(summary.lastUpdated),
   };
 }
 
@@ -51,7 +52,7 @@ export function formatActionItem(item: ActionItem): {
   updatedText: string;
 } {
   const dueDateInfo = item.due_date ? formatDueDate(item.due_date) : null;
-  
+
   return {
     title: item.title,
     description: truncateText(item.description, 100),
@@ -61,7 +62,7 @@ export function formatActionItem(item: ActionItem): {
     dueDateColor: dueDateInfo?.color || 'text-slate-600',
     isOverdue: dueDateInfo?.isOverdue || false,
     createdText: formatRelativeTime(item.createdAt),
-    updatedText: formatRelativeTime(item.updatedAt)
+    updatedText: formatRelativeTime(item.updatedAt),
   };
 }
 
@@ -86,7 +87,7 @@ export function formatTrackedTopic(topic: TrackedTopic): {
     statusText: topic.is_active ? 'Active' : 'Inactive',
     statusColor: topic.is_active ? 'text-green-600' : 'text-slate-400',
     createdText: formatRelativeTime(topic.createdAt),
-    description: topic.description ? truncateText(topic.description, 150) : ''
+    description: topic.description ? truncateText(topic.description, 150) : '',
   };
 }
 
@@ -102,7 +103,7 @@ export function formatDashboardData(data: {
     summary: formatActivitySummary(data.summary),
     actionItems: data.actionItems.map(formatActionItem),
     trackedTopics: data.trackedTopics.map(formatTrackedTopic),
-    exportedAt: new Date().toISOString()
+    exportedAt: new Date().toISOString(),
   };
 
   return JSON.stringify(exportData, null, 2);
@@ -154,25 +155,25 @@ function formatDueDate(due_date: Date): {
     return {
       text: `${Math.abs(diffDays)} days overdue`,
       color: 'text-red-600',
-      isOverdue: true
+      isOverdue: true,
     };
   } else if (diffDays === 0) {
     return {
       text: 'Due today',
       color: 'text-orange-600',
-      isOverdue: false
+      isOverdue: false,
     };
   } else if (diffDays <= 3) {
     return {
       text: `Due in ${diffDays} days`,
       color: 'text-slate-600', // Changed from 'text-yellow-600' to 'text-slate-600'
-      isOverdue: false
+      isOverdue: false,
     };
   } else {
     return {
       text: `Due in ${diffDays} days`,
       color: 'text-slate-600',
-      isOverdue: false
+      isOverdue: false,
     };
   }
 }
@@ -215,4 +216,3 @@ function getCategoryColor(category: TopicCategory): string {
       return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 }
-

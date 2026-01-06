@@ -6,7 +6,11 @@
 import { LoadingOperation, ProgressiveStage, LoadingError } from '@client/shared/types';
 
 export class LoadingValidationError extends LoadingError {
-  constructor(message: string, public field?: string, metadata?: Record<string, any>) {
+  constructor(
+    message: string,
+    public field?: string,
+    metadata?: Record<string, any>
+  ) {
     super('validation', message, 'VALIDATION_ERROR', { field, ...metadata });
     this.name = 'LoadingValidationError';
   }
@@ -20,7 +24,12 @@ export function validateLoadingOperation(operation: LoadingOperation): void {
     throw new LoadingValidationError('Operation ID is required and must be a string', 'id');
   }
 
-  if (!operation.type || !['page', 'component', 'api', 'asset', 'progressive', 'form', 'navigation'].includes(operation.type)) {
+  if (
+    !operation.type ||
+    !['page', 'component', 'api', 'asset', 'progressive', 'form', 'navigation'].includes(
+      operation.type
+    )
+  ) {
     throw new LoadingValidationError('Invalid operation type', 'type');
   }
 
@@ -48,14 +57,20 @@ export function validateLoadingOperation(operation: LoadingOperation): void {
 /**
  * Safe validation that returns result instead of throwing
  */
-export function safeValidateLoadingOperation(operation: LoadingOperation): { success: boolean; error?: LoadingValidationError } {
+export function safeValidateLoadingOperation(operation: LoadingOperation): {
+  success: boolean;
+  error?: LoadingValidationError;
+} {
   try {
     validateLoadingOperation(operation);
     return { success: true };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof LoadingValidationError ? error : new LoadingValidationError('Unknown validation error')
+      error:
+        error instanceof LoadingValidationError
+          ? error
+          : new LoadingValidationError('Unknown validation error'),
     };
   }
 }
@@ -84,7 +99,10 @@ export function validateLoadingScenario(scenario: LoadingScenario): void {
     throw new LoadingValidationError('Default timeout must be positive', 'defaultTimeout');
   }
 
-  if (!scenario.retryStrategy || !['exponential', 'linear', 'none'].includes(scenario.retryStrategy)) {
+  if (
+    !scenario.retryStrategy ||
+    !['exponential', 'linear', 'none'].includes(scenario.retryStrategy)
+  ) {
     throw new LoadingValidationError('Invalid retry strategy', 'retryStrategy');
   }
 
@@ -139,9 +157,14 @@ export function validateLoadingConfig(config: any): void {
     throw new LoadingValidationError('Retry delay cannot be negative', 'retryDelay');
   }
 
-  if (config.timeoutWarningThreshold !== undefined &&
-      (config.timeoutWarningThreshold < 0 || config.timeoutWarningThreshold > 1)) {
-    throw new LoadingValidationError('Timeout warning threshold must be between 0 and 1', 'timeoutWarningThreshold');
+  if (
+    config.timeoutWarningThreshold !== undefined &&
+    (config.timeoutWarningThreshold < 0 || config.timeoutWarningThreshold > 1)
+  ) {
+    throw new LoadingValidationError(
+      'Timeout warning threshold must be between 0 and 1',
+      'timeoutWarningThreshold'
+    );
   }
 }
 
@@ -156,14 +179,14 @@ export function validateOperationConnectionCompatibility(
   if (!isOnline && operation.priority === 'low') {
     return {
       compatible: false,
-      reason: 'Low priority operations are skipped when offline'
+      reason: 'Low priority operations are skipped when offline',
     };
   }
 
   if (connectionType === 'slow' && operation.priority === 'low') {
     return {
       compatible: false,
-      reason: 'Low priority operations are skipped on slow connections'
+      reason: 'Low priority operations are skipped on slow connections',
     };
   }
 

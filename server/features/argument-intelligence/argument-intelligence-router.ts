@@ -3,9 +3,8 @@
 // ============================================================================
 // Complete REST API for argument intelligence operations
 
-import { Router } from 'express';
-
 import { logger } from '@shared/core';
+import { Router } from 'express';
 
 import { argumentIntelligenceService } from './application/argument-intelligence-service.js';
 import { ArgumentProcessor } from './application/argument-processor.js';

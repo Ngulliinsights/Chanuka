@@ -8,13 +8,16 @@
 
 export type SupportedLanguage = 'en' | 'sw';
 
-export const LanguageMetadata: Record<SupportedLanguage, {
-  name: string;
-  nativeName: string;
-  direction: 'ltr' | 'rtl';
-  locale: string;
-  region: string[];
-}> = {
+export const LanguageMetadata: Record<
+  SupportedLanguage,
+  {
+    name: string;
+    nativeName: string;
+    direction: 'ltr' | 'rtl';
+    locale: string;
+    region: string[];
+  }
+> = {
   en: {
     name: 'English',
     nativeName: 'English',
@@ -91,12 +94,15 @@ export const MultilingualTypographyScale = {
 /**
  * Font Recommendations by Language
  */
-export const FontSelectionByLanguage: Record<SupportedLanguage, {
-  primary: string[];
-  fallback: string[];
-  features: string[];
-  cssVars: string;
-}> = {
+export const FontSelectionByLanguage: Record<
+  SupportedLanguage,
+  {
+    primary: string[];
+    fallback: string[];
+    features: string[];
+    cssVars: string;
+  }
+> = {
   en: {
     primary: ['Inter', 'system-ui', 'sans-serif'],
     fallback: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI'],

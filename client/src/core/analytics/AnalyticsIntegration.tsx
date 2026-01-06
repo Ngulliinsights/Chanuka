@@ -7,15 +7,15 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
+import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
 import { useAuth } from '@client/core/auth';
 import { useNavigation } from '@client/core/navigation/context';
-import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
-import { logger } from '@client/utils/logger';
+import { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
 import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
+import { logger } from '@client/utils/logger';
 
 /**
  * Analytics Integration Hook
@@ -35,12 +35,12 @@ export function useAnalyticsIntegration() {
     trackConversion,
     trackError,
     trackPerformance,
-    isEnabled
+    isEnabled,
   } = useComprehensiveAnalytics({
     enabled: true,
     autoTrackPageViews: true,
     autoTrackPerformance: true,
-    autoTrackErrors: true
+    autoTrackErrors: true,
   });
 
   const journeyTracker = useRef(UserJourneyTracker.getInstance());
@@ -55,20 +55,14 @@ export function useAnalyticsIntegration() {
     if (!sessionId.current) {
       sessionId.current = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      const userRole: UserRole = isAuthenticated
-        ? (user?.role as UserRole || 'citizen')
-        : 'public';
+      const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
 
-      journeyTracker.current.startJourney(
-        sessionId.current,
-        user?.id,
-        userRole
-      );
+      journeyTracker.current.startJourney(sessionId.current, user?.id, userRole);
 
       logger.info('Analytics session started', {
         sessionId: sessionId.current,
         userRole,
-        userId: user?.id
+        userId: user?.id,
       });
     }
   }, [isAuthenticated, user]);
@@ -80,9 +74,7 @@ export function useAnalyticsIntegration() {
     if (!sessionId.current || !isEnabled) return;
 
     const currentSection = getCurrentSection(location.pathname);
-    const userRole: UserRole = isAuthenticated
-      ? (user?.role as UserRole || 'citizen')
-      : 'public';
+    const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
 
     // Track journey step
     journeyTracker.current.trackStep(
@@ -98,7 +90,7 @@ export function useAnalyticsIntegration() {
       section: currentSection,
       userRole,
       referrer: document.referrer,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Reset interaction count for new page
@@ -108,7 +100,7 @@ export function useAnalyticsIntegration() {
     logger.debug('Page navigation tracked', {
       path: location.pathname,
       section: currentSection,
-      userRole
+      userRole,
     });
   }, [location.pathname, isAuthenticated, user, trackPageView, isEnabled]);
 
@@ -128,7 +120,7 @@ export function useAnalyticsIntegration() {
         elementText: elementInfo.text,
         elementType: elementInfo.type,
         timestamp: new Date().toISOString(),
-        interactionCount: interactionCount.current
+        interactionCount: interactionCount.current,
       });
     };
 
@@ -139,7 +131,7 @@ export function useAnalyticsIntegration() {
       trackConversion('form_submission', 1, {
         formId,
         formAction: form.action,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Track journey conversion event
@@ -150,12 +142,14 @@ export function useAnalyticsIntegration() {
 
     const handleSearchSubmit = (event: Event) => {
       const form = event.target as HTMLFormElement;
-      const searchInput = form.querySelector('input[type="search"], input[name*="search"], input[placeholder*="search"]') as HTMLInputElement;
+      const searchInput = form.querySelector(
+        'input[type="search"], input[name*="search"], input[placeholder*="search"]'
+      ) as HTMLInputElement;
 
       if (searchInput?.value) {
         trackConversion('search_performed', 1, {
           query: searchInput.value,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         // Track journey conversion event
@@ -187,7 +181,9 @@ export function useAnalyticsIntegration() {
       if (typeof window === 'undefined' || !window.performance) return;
 
       try {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const navigation = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming;
         if (navigation) {
           trackPerformance({
             pageId: location.pathname,
@@ -199,7 +195,7 @@ export function useAnalyticsIntegration() {
             timeToInteractive: navigation.domInteractive - navigation.fetchStart,
             resourceCount: performance.getEntriesByType('resource').length,
             errorCount: 0,
-            timestamp: new Date()
+            timestamp: new Date(),
           });
         }
       } catch (error) {
@@ -229,7 +225,7 @@ export function useAnalyticsIntegration() {
         colno: event.colno,
         stack: event.error?.stack,
         url: window.location.href,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
       });
     };
 
@@ -237,7 +233,7 @@ export function useAnalyticsIntegration() {
       trackError(new Error('Unhandled Promise Rejection'), {
         reason: event.reason,
         url: window.location.href,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
       });
     };
 
@@ -270,7 +266,7 @@ export function useAnalyticsIntegration() {
     trackConversion,
     trackError,
     trackPerformance,
-    isEnabled
+    isEnabled,
   };
 }
 
@@ -321,7 +317,7 @@ function getElementInfo(element: HTMLElement): {
   return {
     selector,
     text,
-    type: tagName
+    type: tagName,
   };
 }
 

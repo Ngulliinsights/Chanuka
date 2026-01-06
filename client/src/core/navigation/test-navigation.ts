@@ -18,7 +18,7 @@ const testNavItem: NavigationItem = {
   icon: 'document' as any, // Simplified for testing
   section: 'legislative',
   description: 'A test bill for navigation',
-  requiresAuth: false
+  requiresAuth: false,
 };
 
 const testNavItems: NavigationItem[] = [
@@ -27,7 +27,7 @@ const testNavItems: NavigationItem[] = [
     label: 'Home',
     href: '/',
     icon: 'home' as any,
-    section: 'legislative'
+    section: 'legislative',
   },
   testNavItem,
   {
@@ -36,8 +36,8 @@ const testNavItems: NavigationItem[] = [
     href: '/community',
     icon: 'users' as any,
     section: 'community',
-    requiresAuth: true
-  }
+    requiresAuth: true,
+  },
 ];
 
 // Test validation

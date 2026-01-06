@@ -137,14 +137,8 @@ function useWebSocketMock(config: {
   };
 }
 
-export function useErrorAnalytics(
-  options: UseErrorAnalyticsOptions = {}
-): ErrorAnalyticsReturn {
-  const {
-    enableRealTime = true,
-    refreshInterval = 30000,
-    autoRefresh = true,
-  } = options;
+export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}): ErrorAnalyticsReturn {
+  const { enableRealTime = true, refreshInterval = 30000, autoRefresh = true } = options;
 
   const dispatch = useDispatch<AppDispatch>();
   const refreshTimerRef = useRef<NodeJS.Timeout>();
@@ -496,28 +490,16 @@ export function useErrorAnalyticsExport() {
     URL.revokeObjectURL(url);
 
     return data;
-  }, [
-    overviewMetrics,
-    trendData,
-    patterns,
-    recoveryAnalytics,
-    realTimeMetrics,
-    filters,
-  ]);
+  }, [overviewMetrics, trendData, patterns, recoveryAnalytics, realTimeMetrics, filters]);
 
   const exportCSV = useCallback(() => {
     if (!patterns.length) return;
 
     // CSV export based on actual ErrorPattern interface from @client/services
     // Adjust headers and mapping based on the actual properties available
-    const headers = [
-      'Pattern',
-      'Frequency',
-      'Impact',
-      'Trend',
-    ];
+    const headers = ['Pattern', 'Frequency', 'Impact', 'Trend'];
 
-    const rows = patterns.map((pattern) => [
+    const rows = patterns.map(pattern => [
       pattern.pattern || 'N/A',
       pattern.frequency?.toString() || '0',
       pattern.impact || 'N/A',
@@ -525,7 +507,7 @@ export function useErrorAnalyticsExport() {
     ]);
 
     const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(','))
+      .map(row => row.map(cell => `"${cell}"`).join(','))
       .join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });

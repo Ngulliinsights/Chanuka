@@ -5,17 +5,19 @@
  * Consolidates rate limiting, validation, caching, error handling, and logging
  */
 
-import { Request, Response, NextFunction, Application } from 'express';
 import { performance } from 'perf_hooks';
+
+import { unifiedErrorHandler } from '@shared/core/src/observability/error-management/middleware/express-error-middleware.ts';
+import { Request, Response, NextFunction, Application } from 'express';
 
 // Import core utilities
 // import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting'; // Unused import
-import { unifiedErrorHandler } from '@shared/core/src/observability/error-management/middleware/express-error-middleware.ts';
+
+import { getDefaultCache } from '../cache';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 // Removed - module deleted by design during development
 import { logger } from '../observability/logging';
 import { ValidationService } from '../validation';
-import { getDefaultCache } from '../cache';
 
 export interface UnifiedMiddlewareConfig {
   // Rate limiting configuration

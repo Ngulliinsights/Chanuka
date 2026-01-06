@@ -9,7 +9,14 @@ import { LoadingValidationError } from './errors';
 
 export const LoadingSizeSchema = z.enum(['sm', 'md', 'lg']);
 
-export const LoadingTypeSchema = z.enum(['page', 'component', 'inline', 'progressive', 'network-aware', 'timeout-aware']);
+export const LoadingTypeSchema = z.enum([
+  'page',
+  'component',
+  'inline',
+  'progressive',
+  'network-aware',
+  'timeout-aware',
+]);
 
 export const LoadingStateSchema = z.enum(['loading', 'success', 'error', 'timeout', 'offline']);
 
@@ -19,15 +26,17 @@ export const ConnectionTypeSchema = z.enum(['slow', 'fast', 'offline']);
 
 export const LoadingPrioritySchema = z.enum(['low', 'medium', 'high']);
 
-export const LoadingProgressSchema = z.object({
-  loaded: z.number().int().min(0),
-  total: z.number().int().min(0),
-  phase: LoadingPhaseSchema,
-  currentAsset: z.string().optional(),
-}).refine(data => data.loaded <= data.total, {
-  message: 'Loaded count cannot exceed total count',
-  path: ['loaded'],
-});
+export const LoadingProgressSchema = z
+  .object({
+    loaded: z.number().int().min(0),
+    total: z.number().int().min(0),
+    phase: LoadingPhaseSchema,
+    currentAsset: z.string().optional(),
+  })
+  .refine(data => data.loaded <= data.total, {
+    message: 'Loaded count cannot exceed total count',
+    path: ['loaded'],
+  });
 
 export const LoadingStageSchema = z.object({
   id: z.string().min(1, 'Stage ID cannot be empty'),
@@ -36,23 +45,28 @@ export const LoadingStageSchema = z.object({
   retryable: z.boolean().optional(),
 });
 
-export const LoadingOperationSchema = z.object({
-  id: z.string().min(1, 'Operation ID cannot be empty'),
-  type: LoadingTypeSchema,
-  message: z.string().min(1, 'Operation message cannot be empty').max(200, 'Operation message too long'),
-  priority: LoadingPrioritySchema,
-  progress: z.number().min(0).max(100).optional(),
-  stage: z.string().max(100, 'Stage name too long').optional(),
-  error: z.string().optional(), // Changed from Error to string
-  startTime: z.number().int().min(0),
-  timeout: z.number().int().min(1000).optional(), // Minimum 1 second
-  retryCount: z.number().int().min(0),
-  maxRetries: z.number().int().min(0).max(10), // Maximum 10 retries
-  connectionAware: z.boolean(),
-}).refine(data => data.retryCount <= data.maxRetries, {
-  message: 'Retry count cannot exceed max retries',
-  path: ['retryCount'],
-});
+export const LoadingOperationSchema = z
+  .object({
+    id: z.string().min(1, 'Operation ID cannot be empty'),
+    type: LoadingTypeSchema,
+    message: z
+      .string()
+      .min(1, 'Operation message cannot be empty')
+      .max(200, 'Operation message too long'),
+    priority: LoadingPrioritySchema,
+    progress: z.number().min(0).max(100).optional(),
+    stage: z.string().max(100, 'Stage name too long').optional(),
+    error: z.string().optional(), // Changed from Error to string
+    startTime: z.number().int().min(0),
+    timeout: z.number().int().min(1000).optional(), // Minimum 1 second
+    retryCount: z.number().int().min(0),
+    maxRetries: z.number().int().min(0).max(10), // Maximum 10 retries
+    connectionAware: z.boolean(),
+  })
+  .refine(data => data.retryCount <= data.maxRetries, {
+    message: 'Retry count cannot exceed max retries',
+    path: ['retryCount'],
+  });
 
 export const LoadingConfigSchema = z.object({
   timeout: z.number().int().min(1000).max(300000), // 1s to 5 minutes
@@ -61,29 +75,37 @@ export const LoadingConfigSchema = z.object({
   showProgress: z.boolean(),
   enableCaching: z.boolean(),
   priority: LoadingPrioritySchema,
-  validation: z.object({
-    enabled: z.boolean(),
-    strict: z.boolean(),
-    validateProgress: z.boolean(),
-  }).optional(),
-  errorHandling: z.object({
-    enableRecovery: z.boolean(),
-    maxRetries: z.number().int().min(0).max(10),
-    retryDelay: z.number().int().min(100).max(30000), // 100ms to 30s
-    fallbackComponent: z.any().optional(),
-  }).optional(),
-  performance: z.object({
-    enableMemoization: z.boolean(),
-    debounceMs: z.number().int().min(0).max(5000), // 0 to 5 seconds
-    maxConcurrentOperations: z.number().int().min(1).max(20),
-  }).optional(),
-  display: z.object({
-    autoHide: z.boolean(),
-    autoHideDelay: z.number().int().min(1000).max(60000), // 1s to 60s
-    showProgress: z.boolean(),
-    showDetails: z.boolean(),
-    position: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'center']),
-  }).optional(),
+  validation: z
+    .object({
+      enabled: z.boolean(),
+      strict: z.boolean(),
+      validateProgress: z.boolean(),
+    })
+    .optional(),
+  errorHandling: z
+    .object({
+      enableRecovery: z.boolean(),
+      maxRetries: z.number().int().min(0).max(10),
+      retryDelay: z.number().int().min(100).max(30000), // 100ms to 30s
+      fallbackComponent: z.any().optional(),
+    })
+    .optional(),
+  performance: z
+    .object({
+      enableMemoization: z.boolean(),
+      debounceMs: z.number().int().min(0).max(5000), // 0 to 5 seconds
+      maxConcurrentOperations: z.number().int().min(1).max(20),
+    })
+    .optional(),
+  display: z
+    .object({
+      autoHide: z.boolean(),
+      autoHideDelay: z.number().int().min(1000).max(60000), // 1s to 60s
+      showProgress: z.boolean(),
+      showDetails: z.boolean(),
+      position: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'center']),
+    })
+    .optional(),
 });
 
 export const LoadingStatsSchema = z.object({
@@ -173,13 +195,11 @@ export function validateRetryCount(retryCount: number, maxRetries: number): numb
   try {
     const validatedRetryCount = z.number().int().min(0).parse(retryCount);
     const validatedMaxRetries = z.number().int().min(0).max(10).parse(maxRetries);
-    
+
     if (validatedRetryCount > validatedMaxRetries) {
-      throw new LoadingValidationError(
-        'Retry count cannot exceed max retries'
-      );
+      throw new LoadingValidationError('Retry count cannot exceed max retries');
     }
-    
+
     return validatedRetryCount;
   } catch (error) {
     if (error instanceof LoadingValidationError) {
@@ -197,7 +217,11 @@ export function validateRetryCount(retryCount: number, maxRetries: number): numb
  * Safe validation functions that return validation results
  */
 
-export function safeValidateLoadingProgress(progress: unknown): { success: boolean; data?: any; error?: LoadingValidationError } {
+export function safeValidateLoadingProgress(progress: unknown): {
+  success: boolean;
+  data?: any;
+  error?: LoadingValidationError;
+} {
   try {
     const data = validateLoadingProgress(progress);
     return { success: true, data };
@@ -206,7 +230,11 @@ export function safeValidateLoadingProgress(progress: unknown): { success: boole
   }
 }
 
-export function safeValidateLoadingOperation(operation: unknown): { success: boolean; data?: any; error?: LoadingValidationError } {
+export function safeValidateLoadingOperation(operation: unknown): {
+  success: boolean;
+  data?: any;
+  error?: LoadingValidationError;
+} {
   try {
     const data = validateLoadingOperation(operation);
     return { success: true, data };
@@ -215,7 +243,11 @@ export function safeValidateLoadingOperation(operation: unknown): { success: boo
   }
 }
 
-export function safeValidateLoadingConfig(config: unknown): { success: boolean; data?: any; error?: LoadingValidationError } {
+export function safeValidateLoadingConfig(config: unknown): {
+  success: boolean;
+  data?: any;
+  error?: LoadingValidationError;
+} {
   try {
     const data = validateLoadingConfig(config);
     return { success: true, data };
@@ -247,11 +279,19 @@ export function normalizeLoadingSize(size: unknown): 'sm' | 'md' | 'lg' {
   return 'md'; // Default fallback
 }
 
-export function normalizeLoadingType(type: unknown): 'page' | 'component' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware' {
-  const validTypes = ['page', 'component', 'inline', 'progressive', 'network-aware', 'timeout-aware'];
+export function normalizeLoadingType(
+  type: unknown
+): 'page' | 'component' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware' {
+  const validTypes = [
+    'page',
+    'component',
+    'inline',
+    'progressive',
+    'network-aware',
+    'timeout-aware',
+  ];
   if (typeof type === 'string' && validTypes.includes(type)) {
     return type as any;
   }
   return 'component'; // Default fallback
 }
-

@@ -12,13 +12,13 @@ export type {
   SearchProgress,
   UnifiedSearchInterfaceProps,
   SearchDecisionMatrix,
-  SearchStrategyDecision
+  SearchStrategyDecision,
 } from './types';
 
 export {
   SearchStrategySelector,
   DEFAULT_SEARCH_STRATEGY_CONFIG,
-  createSearchStrategySelector
+  createSearchStrategySelector,
 } from './search-strategy-selector';
 
 export { UnifiedSearchInterface as default } from './UnifiedSearchInterface';

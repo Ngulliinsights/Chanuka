@@ -4,6 +4,6 @@ export {
   FinancialExposureTracker,
   HistoricalPatternAnalysis,
   TransparencyScoring,
-  ImplementationWorkaroundsTracker
+  ImplementationWorkaroundsTracker,
 } from '@client/features/bills/ui/analysis/conflict-of-interest';
 export type { ConflictOfInterestAnalysisProps } from '@client/features/bills/ui/analysis/conflict-of-interest';

@@ -214,11 +214,13 @@ export function BillCard({
       )}
 
       <CardHeader className="pb-3">
-        <div className={cn(
-          'flex items-start justify-between gap-2',
-          showQuickActions && 'pr-20',
-          showCheckbox && 'pl-10'
-        )}>
+        <div
+          className={cn(
+            'flex items-start justify-between gap-2',
+            showQuickActions && 'pr-20',
+            showCheckbox && 'pl-10'
+          )}
+        >
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-mono">{bill.id}</span>
@@ -314,7 +316,7 @@ export function BillCard({
             to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors text-sm"
             tabIndex={0}
-            onClick={(e) => {
+            onClick={e => {
               if (onClick) {
                 e.preventDefault();
                 onClick(bill.id);

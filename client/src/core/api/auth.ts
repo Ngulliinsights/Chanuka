@@ -7,7 +7,11 @@
 import { logger } from '../../utils/logger';
 
 import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
-import type { PrivacySettings, DataExportResponse, DataDeletionResponse } from './types/error-response';
+import type {
+  PrivacySettings,
+  DataExportResponse,
+  DataDeletionResponse,
+} from './types/error-response';
 
 // ============================================================================
 // Core Authentication Types
@@ -286,7 +290,7 @@ export class AuthApiService {
   /**
    * Authenticate user with email and password credentials.
    * Supports optional remember-me functionality and two-factor authentication.
-   * 
+   *
    * @param credentials - User login credentials including optional 2FA token
    * @returns Authentication session with user data and tokens
    * @throws Error if authentication fails or credentials are invalid
@@ -302,7 +306,7 @@ export class AuthApiService {
       logger.info('User login successful', {
         email: credentials.email,
         rememberMe: credentials.rememberMe,
-        hasTwoFactor: !!credentials.twoFactorToken
+        hasTwoFactor: !!credentials.twoFactorToken,
       });
 
       return response.data;
@@ -314,7 +318,7 @@ export class AuthApiService {
 
   /**
    * Register a new user account with validation and terms acceptance.
-   * 
+   *
    * @param data - Registration data including credentials and user info
    * @returns New authentication session for the registered user
    * @throws Error if registration fails or validation errors occur
@@ -338,7 +342,7 @@ export class AuthApiService {
 
       logger.info('User registration successful', {
         email: data.email,
-        name: data.name
+        name: data.name,
       });
 
       return response.data;
@@ -354,11 +358,7 @@ export class AuthApiService {
    */
   async logout(): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/logout`,
-        {},
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/logout`, {}, { skipCache: true });
 
       logger.info('User logout successful');
     } catch (error) {
@@ -369,7 +369,7 @@ export class AuthApiService {
 
   /**
    * Retrieve the currently authenticated user's profile information.
-   * 
+   *
    * @returns Current user data with preferences and permissions
    * @throws Error if user is not authenticated or request fails
    */
@@ -400,7 +400,7 @@ export class AuthApiService {
       );
 
       logger.info('Profile updated successfully', {
-        updatedFields: Object.keys(updates)
+        updatedFields: Object.keys(updates),
       });
 
       return response.data;
@@ -418,11 +418,9 @@ export class AuthApiService {
    */
   async updatePrivacySettings(settings: PrivacySettings): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/privacy-settings`,
-        settings,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/privacy-settings`, settings, {
+        skipCache: true,
+      });
 
       logger.info('Privacy settings updated successfully');
     } catch (error) {
@@ -502,7 +500,9 @@ export class AuthApiService {
 
       return response.data?.valid ?? false;
     } catch (error) {
-      logger.debug('Token validation failed (this is expected if backend is not running)', { error });
+      logger.debug('Token validation failed (this is expected if backend is not running)', {
+        error,
+      });
       return false;
     }
   }
@@ -510,7 +510,7 @@ export class AuthApiService {
   /**
    * Refresh expired or expiring authentication tokens.
    * Uses the refresh token to obtain new access and refresh tokens.
-   * 
+   *
    * @returns New token set with updated expiration
    * @throws Error if refresh token is invalid or expired
    */
@@ -566,7 +566,7 @@ export class AuthApiService {
   /**
    * Initialize two-factor authentication setup for the current user.
    * Generates QR code and backup codes for authenticator app configuration.
-   * 
+   *
    * @returns Setup data including secret, QR code, and backup codes
    * @throws Error if 2FA is already enabled or setup fails
    */
@@ -588,7 +588,7 @@ export class AuthApiService {
 
   /**
    * Enable two-factor authentication after verifying user has configured their app.
-   * 
+   *
    * @param token - Verification token from authenticator app
    * @returns Confirmation of 2FA activation
    * @throws Error if token is invalid or 2FA cannot be enabled
@@ -612,17 +612,13 @@ export class AuthApiService {
   /**
    * Disable two-factor authentication for the current user.
    * Requires current 2FA token for security verification.
-   * 
+   *
    * @param token - Current 2FA token for verification
    * @throws Error if token is invalid or 2FA cannot be disabled
    */
   async disableTwoFactor(token: string): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/2fa/disable`,
-        { token },
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/2fa/disable`, { token }, { skipCache: true });
 
       logger.info('2FA disabled successfully');
     } catch (error) {
@@ -638,42 +634,42 @@ export class AuthApiService {
    * @returns Complete authentication session after 2FA verification
    * @throws Error if token is invalid or verification fails
    */
-   async verifyTwoFactor(token: string): Promise<AuthSession> {
-     try {
-       const response = await this.apiClient.post<AuthSession>(
-         `${this.authEndpoint}/2fa/verify`,
-         { token },
-         { skipCache: true }
-       );
+  async verifyTwoFactor(token: string): Promise<AuthSession> {
+    try {
+      const response = await this.apiClient.post<AuthSession>(
+        `${this.authEndpoint}/2fa/verify`,
+        { token },
+        { skipCache: true }
+      );
 
-       logger.info('2FA verification successful');
-       return response.data;
-     } catch (error) {
-       logger.error('2FA verification failed', { error });
-       throw await this.handleAuthError(error, 'Two-factor authentication failed');
-     }
-   }
+      logger.info('2FA verification successful');
+      return response.data;
+    } catch (error) {
+      logger.error('2FA verification failed', { error });
+      throw await this.handleAuthError(error, 'Two-factor authentication failed');
+    }
+  }
 
-   /**
-    * Verify user email address with verification token.
-    *
-    * @param token - Email verification token
-    * @throws Error if token is invalid or verification fails
-    */
-   async verifyEmail(token: string): Promise<void> {
-     try {
-       await this.apiClient.post(
-         `${this.authEndpoint}/verify-email`,
-         { token },
-         { skipCache: true }
-       );
+  /**
+   * Verify user email address with verification token.
+   *
+   * @param token - Email verification token
+   * @throws Error if token is invalid or verification fails
+   */
+  async verifyEmail(token: string): Promise<void> {
+    try {
+      await this.apiClient.post(
+        `${this.authEndpoint}/verify-email`,
+        { token },
+        { skipCache: true }
+      );
 
-       logger.info('Email verification successful');
-     } catch (error) {
-       logger.error('Email verification failed', { error });
-       throw await this.handleAuthError(error, 'Email verification failed');
-     }
-   }
+      logger.info('Email verification successful');
+    } catch (error) {
+      logger.error('Email verification failed', { error });
+      throw await this.handleAuthError(error, 'Email verification failed');
+    }
+  }
 
   // ==========================================================================
   // Password Management Methods
@@ -682,7 +678,7 @@ export class AuthApiService {
   /**
    * Change the current user's password.
    * Requires current password for security verification.
-   * 
+   *
    * @param currentPassword - User's current password
    * @param newPassword - New password to set
    * @throws Error if current password is incorrect or new password is invalid
@@ -705,16 +701,14 @@ export class AuthApiService {
   /**
    * Request a password reset email for a user account.
    * Safe to call with any email - does not reveal if account exists.
-   * 
+   *
    * @param request - Email and optional redirect URL for reset flow
    */
   async requestPasswordReset(request: PasswordResetRequest): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/password/reset-request`,
-        request,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/password/reset-request`, request, {
+        skipCache: true,
+      });
 
       logger.info('Password reset requested', { email: request.email });
     } catch (error) {
@@ -725,7 +719,7 @@ export class AuthApiService {
 
   /**
    * Complete password reset using token from reset email.
-   * 
+   *
    * @param reset - Reset token and new password
    * @throws Error if token is invalid, expired, or passwords don't match
    */
@@ -735,11 +729,7 @@ export class AuthApiService {
         throw new Error('Passwords do not match');
       }
 
-      await this.apiClient.post(
-        `${this.authEndpoint}/password/reset`,
-        reset,
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/password/reset`, reset, { skipCache: true });
 
       logger.info('Password reset completed successfully');
     } catch (error) {
@@ -758,11 +748,7 @@ export class AuthApiService {
    */
   async extendSession(): Promise<void> {
     try {
-      await this.apiClient.post(
-        `${this.authEndpoint}/session/extend`,
-        {},
-        { skipCache: true }
-      );
+      await this.apiClient.post(`${this.authEndpoint}/session/extend`, {}, { skipCache: true });
 
       logger.debug('Session extended successfully');
     } catch (error) {
@@ -773,15 +759,13 @@ export class AuthApiService {
 
   /**
    * Retrieve all active sessions for the current user across devices.
-   * 
+   *
    * @returns List of active sessions with device and location info
    * @throws Error if unable to fetch sessions
    */
   async getActiveSessions(): Promise<SessionInfo[]> {
     try {
-      const response = await this.apiClient.get<SessionInfo[]>(
-        `${this.authEndpoint}/sessions`
-      );
+      const response = await this.apiClient.get<SessionInfo[]>(`${this.authEndpoint}/sessions`);
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch active sessions', { error });
@@ -798,10 +782,9 @@ export class AuthApiService {
    */
   async terminateSession(sessionId: string): Promise<void> {
     try {
-      await this.apiClient.delete(
-        `${this.authEndpoint}/sessions/${sessionId}`,
-        { skipCache: true }
-      );
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/${sessionId}`, {
+        skipCache: true,
+      });
 
       logger.info('Session revoked successfully', { sessionId });
     } catch (error) {
@@ -816,10 +799,7 @@ export class AuthApiService {
    */
   async terminateAllOtherSessions(): Promise<void> {
     try {
-      await this.apiClient.delete(
-        `${this.authEndpoint}/sessions/others`,
-        { skipCache: true }
-      );
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/others`, { skipCache: true });
 
       logger.info('All other sessions revoked successfully');
     } catch (error) {
@@ -848,7 +828,7 @@ export class AuthApiService {
 
   /**
    * Fetch all roles assigned to a specific user.
-   * 
+   *
    * @param userId - User ID to query roles for
    * @returns Array of user roles with permissions
    * @throws Error if unable to fetch roles
@@ -868,7 +848,7 @@ export class AuthApiService {
   /**
    * Check if a user has permission to perform an action on a resource.
    * Supports context-based permission checks with custom conditions.
-   * 
+   *
    * @param context - Permission check context with user, resource, action
    * @returns Boolean indicating if permission is granted
    */
@@ -890,7 +870,7 @@ export class AuthApiService {
 
   /**
    * Get all permissions a user has for a specific resource.
-   * 
+   *
    * @param userId - User ID to check permissions for
    * @param resource - Resource identifier to check
    * @returns Array of permission strings (e.g., ['read', 'write'])
@@ -915,7 +895,7 @@ export class AuthApiService {
   /**
    * Retrieve recent security events for the current user.
    * Includes login attempts, permission changes, and suspicious activity.
-   * 
+   *
    * @param limit - Maximum number of events to retrieve (default: 50)
    * @returns Array of security events ordered by timestamp
    * @throws Error if unable to fetch events
@@ -934,7 +914,7 @@ export class AuthApiService {
 
   /**
    * Retrieve any suspicious activity alerts for the current user.
-   * 
+   *
    * @returns Array of unresolved suspicious activity alerts
    * @throws Error if unable to fetch alerts
    */
@@ -953,7 +933,7 @@ export class AuthApiService {
   /**
    * Report a security incident for investigation.
    * Use this to flag unusual behavior or potential security threats.
-   * 
+   *
    * @param incident - Details of the security incident
    * @returns Response indicating if report was successful
    */
@@ -967,19 +947,19 @@ export class AuthApiService {
 
       logger.info('Security incident reported successfully', {
         type: incident.type,
-        severity: incident.severity
+        severity: incident.severity,
       });
 
       return {
         success: true,
         data: response.data,
-        message: 'Security incident reported successfully'
+        message: 'Security incident reported successfully',
       };
     } catch (error) {
       logger.error('Failed to report security incident', { incident, error });
       return {
         success: false,
-        error: 'Failed to report security incident'
+        error: 'Failed to report security incident',
       };
     }
   }
@@ -998,7 +978,7 @@ export class AuthApiService {
    */
   private async handleAuthError(error: unknown, defaultMessage: string): Promise<Error> {
     const errorResponse = error as UnknownError;
-    
+
     // Extract error message from various possible error structures
     const errorMessage =
       (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
@@ -1014,7 +994,7 @@ export class AuthApiService {
       operation: 'authentication',
       status: (errorResponse as AxiosErrorResponse)?.response?.status,
       endpoint: (errorResponse as AxiosErrorResponse)?.config?.url,
-      error: errorMessage
+      error: errorMessage,
     });
 
     return authError;

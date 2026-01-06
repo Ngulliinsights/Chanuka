@@ -1,6 +1,6 @@
 /**
  * Consolidated Session Manager - Final Optimized Version
- * 
+ *
  * Enterprise-grade session management with:
  * - Type-safe operations
  * - Encrypted storage
@@ -15,7 +15,12 @@ import { logger } from '@client/utils/logger';
 import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';
 import { SecureStorage } from '../../storage/secure-storage';
-import { SESSION_KEY, SESSION_STORAGE_NAMESPACE, SESSION_MONITORING_INTERVAL_MS, SESSION_WARNING_THRESHOLD_MS } from '../constants/auth-constants';
+import {
+  SESSION_KEY,
+  SESSION_STORAGE_NAMESPACE,
+  SESSION_MONITORING_INTERVAL_MS,
+  SESSION_WARNING_THRESHOLD_MS,
+} from '../constants/auth-constants';
 import type {
   SessionInfo,
   SessionValidation,
@@ -23,7 +28,7 @@ import type {
   UpdateSessionParams,
   SessionStats,
   SessionEvent,
-  SessionEventListener
+  SessionEventListener,
 } from '../types';
 
 /**
@@ -97,8 +102,8 @@ export class SessionManager {
           version: '1.0',
           deviceId: params.deviceId,
           ipAddress: params.ipAddress,
-          userAgent: params.userAgent
-        }
+          userAgent: params.userAgent,
+        },
       };
 
       this.currentSession = session;
@@ -106,29 +111,24 @@ export class SessionManager {
       await this.storage.setItem(this.sessionKey, session, {
         encrypt: true,
         namespace: this.sessionNamespace,
-        ttl: params.expiresIn
+        ttl: params.expiresIn,
       });
 
       logger.info('Session created', {
         userId: session.userId,
         sessionId: session.sessionId,
         expiresAt: session.expiresAt,
-        permissions: session.permissions?.length || 0
+        permissions: session.permissions?.length || 0,
       });
 
       this.emitEvent('session:created', { sessionId: session.sessionId });
     } catch (error) {
       logger.error('Failed to create session', { error });
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.HIGH,
-        'Failed to create session',
-        {
-          details: { userId: params.userId },
-          recoverable: true,
-          retryable: true
-        }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.HIGH, 'Failed to create session', {
+        details: { userId: params.userId },
+        recoverable: true,
+        retryable: true,
+      });
     }
   }
 
@@ -137,12 +137,9 @@ export class SessionManager {
    */
   async updateSession(updates: UpdateSessionParams): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session to update',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session to update', {
+        recoverable: false,
+      });
     }
 
     try {
@@ -152,7 +149,7 @@ export class SessionManager {
       const updatedSession: SessionInfo = {
         ...this.currentSession,
         ...updates,
-        lastAccessedAt: now.toISOString()
+        lastAccessedAt: now.toISOString(),
       };
 
       this.currentSession = updatedSession;
@@ -164,30 +161,25 @@ export class SessionManager {
       await this.storage.setItem(this.sessionKey, updatedSession, {
         encrypt: true,
         namespace: this.sessionNamespace,
-        ttl: ttl > 0 ? ttl : undefined
+        ttl: ttl > 0 ? ttl : undefined,
       });
 
       logger.debug('Session updated', {
         sessionId: this.currentSession.sessionId,
-        updatedFields: Object.keys(updates)
+        updatedFields: Object.keys(updates),
       });
 
       this.emitEvent('session:updated', {
         sessionId: updatedSession.sessionId,
-        updates: Object.keys(updates)
+        updates: Object.keys(updates),
       });
     } catch (error) {
       logger.error('Failed to update session', { error });
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'Failed to update session',
-        {
-          details: { updates },
-          recoverable: true,
-          retryable: true
-        }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'Failed to update session', {
+        details: { updates },
+        recoverable: true,
+        retryable: true,
+      });
     }
   }
 
@@ -224,19 +216,16 @@ export class SessionManager {
 
       this.currentSession = null;
       await this.storage.removeItem(this.sessionKey, {
-        namespace: this.sessionNamespace
+        namespace: this.sessionNamespace,
       });
 
       logger.info('Session cleared', { sessionId });
       this.emitEvent('session:cleared', { sessionId });
     } catch (error) {
       logger.error('Failed to clear session', { error });
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'Failed to clear session',
-        { recoverable: true }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'Failed to clear session', {
+        recoverable: true,
+      });
     }
   }
 
@@ -251,7 +240,7 @@ export class SessionManager {
     if (!session) {
       return {
         isValid: false,
-        reason: 'not_found'
+        reason: 'not_found',
       };
     }
 
@@ -264,7 +253,7 @@ export class SessionManager {
         return {
           isValid: false,
           reason: 'expired',
-          expiresIn: 0
+          expiresIn: 0,
         };
       }
 
@@ -272,7 +261,7 @@ export class SessionManager {
       if (!session.userId || !session.sessionId || !session.token) {
         return {
           isValid: false,
-          reason: 'invalid_format'
+          reason: 'invalid_format',
         };
       }
 
@@ -290,16 +279,16 @@ export class SessionManager {
       return {
         isValid: true,
         expiresIn,
-        warnings: warnings.length > 0 ? warnings : undefined
+        warnings: warnings.length > 0 ? warnings : undefined,
       };
     } catch (error) {
       logger.error('Session validation failed', {
         error,
-        sessionId: session?.sessionId
+        sessionId: session?.sessionId,
       });
       return {
         isValid: false,
-        reason: 'corrupted'
+        reason: 'corrupted',
       };
     }
   }
@@ -329,18 +318,18 @@ export class SessionManager {
       const newExpiresAt = new Date(now.getTime() + additionalMinutes * 60 * 1000);
 
       await this.updateSession({
-        expiresAt: newExpiresAt.toISOString()
+        expiresAt: newExpiresAt.toISOString(),
       });
 
       logger.info('Session extended', {
         sessionId: this.currentSession.sessionId,
         newExpiresAt: newExpiresAt.toISOString(),
-        additionalMinutes
+        additionalMinutes,
       });
 
       this.emitEvent('session:extended', {
         sessionId: this.currentSession.sessionId,
-        additionalMinutes
+        additionalMinutes,
       });
 
       return true;
@@ -392,12 +381,9 @@ export class SessionManager {
    */
   async addPermission(permission: string): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
     const permissions = [...(this.currentSession.permissions || [])];
@@ -413,12 +399,9 @@ export class SessionManager {
    */
   async addPermissions(permissions: string[]): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
     const currentPermissions = new Set(this.currentSession.permissions || []);
@@ -433,7 +416,7 @@ export class SessionManager {
 
     if (added) {
       await this.updateSession({
-        permissions: Array.from(currentPermissions)
+        permissions: Array.from(currentPermissions),
       });
       logger.debug('Permissions added', { count: permissions.length });
     }
@@ -444,16 +427,14 @@ export class SessionManager {
    */
   async removePermission(permission: string): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
-    const permissions = (this.currentSession.permissions || [])
-      .filter((p: string) => p !== permission);
+    const permissions = (this.currentSession.permissions || []).filter(
+      (p: string) => p !== permission
+    );
 
     await this.updateSession({ permissions });
     logger.debug('Permission removed', { permission });
@@ -464,12 +445,9 @@ export class SessionManager {
    */
   async setPermissions(permissions: string[]): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
     await this.updateSession({ permissions });
@@ -499,17 +477,14 @@ export class SessionManager {
    */
   async setMetadata(key: string, value: unknown): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
     const metadata = {
       ...this.currentSession.metadata,
-      [key]: value
+      [key]: value,
     };
 
     await this.updateSession({ metadata });
@@ -521,17 +496,14 @@ export class SessionManager {
    */
   async setMetadataMultiple(data: Record<string, unknown>): Promise<void> {
     if (!this.currentSession) {
-      throw createError(
-        ErrorDomain.SESSION,
-        ErrorSeverity.MEDIUM,
-        'No active session',
-        { recoverable: false }
-      );
+      throw createError(ErrorDomain.SESSION, ErrorSeverity.MEDIUM, 'No active session', {
+        recoverable: false,
+      });
     }
 
     const metadata = {
       ...this.currentSession.metadata,
-      ...data
+      ...data,
     };
 
     await this.updateSession({ metadata });
@@ -568,9 +540,7 @@ export class SessionManager {
 
     const now = new Date();
     const createdAt = new Date(session.createdAt);
-    const lastAccessedAt = session.lastAccessedAt
-      ? new Date(session.lastAccessedAt)
-      : null;
+    const lastAccessedAt = session.lastAccessedAt ? new Date(session.lastAccessedAt) : null;
     const expiresAt = new Date(session.expiresAt);
 
     return {
@@ -579,12 +549,10 @@ export class SessionManager {
       isValid: this.isSessionValid(),
       expiresIn: expiresAt.getTime() - now.getTime(),
       duration: now.getTime() - createdAt.getTime(),
-      lastAccessed: lastAccessedAt
-        ? now.getTime() - lastAccessedAt.getTime()
-        : null,
+      lastAccessed: lastAccessedAt ? now.getTime() - lastAccessedAt.getTime() : null,
       permissionCount: session.permissions?.length || 0,
       hasRefreshToken: !!session.refreshToken,
-      metadata: session.metadata
+      metadata: session.metadata,
     };
   }
 
@@ -612,7 +580,7 @@ export class SessionManager {
       userId: session.userId,
       sessionId: session.sessionId,
       expiresIn,
-      permissions: session.permissions
+      permissions: session.permissions,
     };
   }
 
@@ -687,13 +655,10 @@ export class SessionManager {
    */
   private async loadSession(): Promise<void> {
     try {
-      const session = await this.storage.getItem<SessionInfo>(
-        this.sessionKey,
-        {
-          encrypt: true,
-          namespace: this.sessionNamespace
-        }
-      );
+      const session = await this.storage.getItem<SessionInfo>(this.sessionKey, {
+        encrypt: true,
+        namespace: this.sessionNamespace,
+      });
 
       if (session) {
         const validation = this.validateSession(session);
@@ -704,7 +669,7 @@ export class SessionManager {
         } else {
           await this.clearSession();
           logger.info('Invalid session cleared on load', {
-            reason: validation.reason
+            reason: validation.reason,
           });
         }
       }
@@ -725,14 +690,10 @@ export class SessionManager {
     this.currentSession.lastAccessedAt = now.toISOString();
 
     try {
-      await this.storage.setItem(
-        this.sessionKey,
-        this.currentSession,
-        {
-          encrypt: true,
-          namespace: this.sessionNamespace
-        }
-      );
+      await this.storage.setItem(this.sessionKey, this.currentSession, {
+        encrypt: true,
+        namespace: this.sessionNamespace,
+      });
     } catch (error) {
       logger.warn('Failed to update last accessed time', { error });
     }
@@ -768,12 +729,12 @@ export class SessionManager {
         if (!validation.isValid) {
           logger.info('Session expired during monitoring', {
             sessionId: this.currentSession.sessionId,
-            reason: validation.reason
+            reason: validation.reason,
           });
 
           this.emitEvent('session:expired', {
             sessionId: this.currentSession.sessionId,
-            reason: validation.reason
+            reason: validation.reason,
           });
 
           this.clearSession().catch(error => {
@@ -782,7 +743,7 @@ export class SessionManager {
         } else if (validation.warnings?.length) {
           logger.warn('Session validation warnings', {
             sessionId: this.currentSession.sessionId,
-            warnings: validation.warnings
+            warnings: validation.warnings,
           });
         }
       }

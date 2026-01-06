@@ -23,7 +23,7 @@ export const en = {
     sort: 'Sort',
     refresh: 'Refresh',
     selectLanguage: 'Select Language',
-    changeLanguage: 'Language changed to {{current}}'
+    changeLanguage: 'Language changed to {{current}}',
   },
   navigation: {
     home: 'Home',
@@ -33,7 +33,7 @@ export const en = {
     settings: 'Settings',
     profile: 'Profile',
     logout: 'Logout',
-    menu: 'Menu'
+    menu: 'Menu',
   },
   errors: {
     generic: 'Something went wrong',
@@ -42,7 +42,7 @@ export const en = {
     unauthorized: 'Unauthorized access',
     forbidden: 'Access forbidden',
     validation: 'Validation error',
-    timeout: 'Request timed out'
+    timeout: 'Request timed out',
   },
   auth: {
     login: 'Login',
@@ -54,8 +54,8 @@ export const en = {
     rememberMe: 'Remember Me',
     signIn: 'Sign In',
     signUp: 'Sign Up',
-    signOut: 'Sign Out'
-  }
+    signOut: 'Sign Out',
+  },
 };
 
 export const sw = {
@@ -76,7 +76,7 @@ export const sw = {
     sort: 'Panga',
     refresh: 'Onyesha Upya',
     selectLanguage: 'Chagua Lugha',
-    changeLanguage: 'Lugha imebadilishwa kuwa {{current}}'
+    changeLanguage: 'Lugha imebadilishwa kuwa {{current}}',
   },
   navigation: {
     home: 'Nyumbani',
@@ -86,7 +86,7 @@ export const sw = {
     settings: 'Mipangilio',
     profile: 'Wasifu',
     logout: 'Toka',
-    menu: 'Menyu'
+    menu: 'Menyu',
   },
   errors: {
     generic: 'Kuna tatizo lililotokea',
@@ -95,7 +95,7 @@ export const sw = {
     unauthorized: 'Hauruhusiwi',
     forbidden: 'Marufuku',
     validation: 'Hitilafu ya uthibitisho',
-    timeout: 'Muda umeisha'
+    timeout: 'Muda umeisha',
   },
   auth: {
     login: 'Ingia',
@@ -107,8 +107,8 @@ export const sw = {
     rememberMe: 'Nikumbuke',
     signIn: 'Ingia',
     signUp: 'Jisajili',
-    signOut: 'Toka'
-  }
+    signOut: 'Toka',
+  },
 };
 
 export const languages = { en, sw };
@@ -154,15 +154,6 @@ export const getKenyanContext = () => {
     timeFormat: '24h',
     firstDayOfWeek: 1, // Monday
     phoneFormat: '+254',
-    regions: [
-      'Nairobi',
-      'Mombasa',
-      'Kisumu',
-      'Nakuru',
-      'Eldoret',
-      'Thika',
-      'Malindi',
-      'Kitale'
-    ]
+    regions: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Malindi', 'Kitale'],
   };
 };

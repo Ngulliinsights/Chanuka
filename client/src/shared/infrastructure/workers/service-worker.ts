@@ -22,7 +22,9 @@ const networkListeners: Array<(online: boolean) => void> = [];
 /**
  * Register service worker with configuration options
  */
-export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<ServiceWorkerRegistration | null> {
+export async function registerServiceWorker(
+  config: ServiceWorkerConfig = {}
+): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) {
     console.warn('Service workers not supported');
     return null;
@@ -66,7 +68,7 @@ export function sendMessageToServiceWorker(message: ServiceWorkerMessage): Promi
     }
 
     const messageChannel = new MessageChannel();
-    messageChannel.port1.onmessage = (event) => {
+    messageChannel.port1.onmessage = event => {
       if (event.data.error) {
         reject(new Error(event.data.error));
       } else {

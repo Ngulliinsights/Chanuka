@@ -1,6 +1,6 @@
 /**
  * Shared Search Types
- * 
+ *
  * These types are used across both core and features to avoid circular dependencies.
  * Moved from features/search/types to enable core API integration.
  */

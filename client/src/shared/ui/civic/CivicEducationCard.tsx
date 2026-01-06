@@ -2,7 +2,13 @@ import { Book, Users, Shield, Target, ExternalLink } from 'lucide-react';
 import React from 'react';
 
 // import { useKenyanContext } from '@client/shared/context/KenyanContextProvider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { useI18n } from '@client/shared/hooks/use-i18n';
@@ -42,7 +48,7 @@ export const CivicEducationCard: React.FC<CivicEducationCardProps> = ({
         return {
           icon: Users,
           title: t('civic.legislature.nationalAssembly'),
-          description: 'Learn about Kenya\'s legislative bodies and law-making process',
+          description: "Learn about Kenya's legislative bodies and law-making process",
           items: [
             t('civic.legislature.nationalAssembly'),
             t('civic.legislature.senate'),
@@ -57,7 +63,7 @@ export const CivicEducationCard: React.FC<CivicEducationCardProps> = ({
         return {
           icon: Target,
           title: 'Government Structure',
-          description: 'Understanding Kenya\'s three arms of government',
+          description: "Understanding Kenya's three arms of government",
           items: [
             t('civic.government.executive'),
             t('civic.government.judiciary'),
@@ -72,7 +78,7 @@ export const CivicEducationCard: React.FC<CivicEducationCardProps> = ({
         return {
           icon: Book,
           title: t('civic.participation.title'),
-          description: 'Ways to participate in Kenya\'s democratic processes',
+          description: "Ways to participate in Kenya's democratic processes",
           items: [
             t('civic.participation.voting'),
             t('civic.participation.petitions'),
@@ -113,9 +119,7 @@ export const CivicEducationCard: React.FC<CivicEducationCardProps> = ({
                   {config.badge}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground line-clamp-2">
-                {config.description}
-              </p>
+              <p className="text-xs text-muted-foreground line-clamp-2">{config.description}</p>
             </div>
           </div>
         </CardContent>
@@ -139,9 +143,7 @@ export const CivicEducationCard: React.FC<CivicEducationCardProps> = ({
             </div>
           </div>
         </div>
-        <CardDescription className="mt-2">
-          {config.description}
-        </CardDescription>
+        <CardDescription className="mt-2">{config.description}</CardDescription>
       </CardHeader>
 
       <CardContent className="pt-0">

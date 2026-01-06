@@ -1,23 +1,36 @@
 /**
  * TransparencyScoring - Algorithmic transparency assessment
- * 
+ *
  * Displays transparency scores with methodology explanation
  * and detailed scoring breakdowns.
  */
 
 import { Eye, Info, ChevronDown, ChevronUp, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { RadialBarChart, RadialBar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import {
+  RadialBarChart,
+  RadialBar,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
 
 import { TransparencyScore, ConflictAnalysis } from '@client/features/analysis/types';
-
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-
-
 
 interface TransparencyScoringProps {
   conflictAnalysis: ConflictAnalysis;
@@ -28,7 +41,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
 
   // Calculate detailed scoring breakdown
   const scoringBreakdown = useMemo(() => {
-    const { transparencyScore, financialInterests, organizationalConnections, votingPatterns } = conflictAnalysis;
+    const { transparencyScore, financialInterests, organizationalConnections, votingPatterns } =
+      conflictAnalysis;
 
     // Financial Disclosure Score (0-100)
     const financialScore = {
@@ -36,26 +50,42 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       factors: [
         {
           name: 'Disclosure Completeness',
-          score: Math.min(100, (financialInterests.filter(f => f.verified).length / Math.max(1, financialInterests.length)) * 100),
+          score: Math.min(
+            100,
+            (financialInterests.filter(f => f.verified).length /
+              Math.max(1, financialInterests.length)) *
+              100
+          ),
           weight: 0.4,
-          description: 'Percentage of financial interests that are verified and complete'
+          description: 'Percentage of financial interests that are verified and complete',
         },
         {
           name: 'Timeliness',
-          score: Math.min(100, financialInterests.filter(f => {
-            const daysSinceDisclosure = (Date.now() - new Date(f.date).getTime()) / (1000 * 60 * 60 * 24);
-            return daysSinceDisclosure <= 90; // Within 90 days
-          }).length / Math.max(1, financialInterests.length) * 100),
+          score: Math.min(
+            100,
+            (financialInterests.filter(f => {
+              const daysSinceDisclosure =
+                (Date.now() - new Date(f.date).getTime()) / (1000 * 60 * 60 * 24);
+              return daysSinceDisclosure <= 90; // Within 90 days
+            }).length /
+              Math.max(1, financialInterests.length)) *
+              100
+          ),
           weight: 0.3,
-          description: 'How recently financial interests were disclosed'
+          description: 'How recently financial interests were disclosed',
         },
         {
           name: 'Detail Level',
-          score: Math.min(100, financialInterests.filter(f => f.description && f.description.length > 20).length / Math.max(1, financialInterests.length) * 100),
+          score: Math.min(
+            100,
+            (financialInterests.filter(f => f.description && f.description.length > 20).length /
+              Math.max(1, financialInterests.length)) *
+              100
+          ),
           weight: 0.3,
-          description: 'Quality and detail of financial interest descriptions'
-        }
-      ]
+          description: 'Quality and detail of financial interest descriptions',
+        },
+      ],
     };
 
     // Voting History Score (0-100)
@@ -64,23 +94,33 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       factors: [
         {
           name: 'Vote Consistency',
-          score: Math.min(100, votingPatterns.filter(v => Math.abs(v.financialCorrelation) < 0.3).length / Math.max(1, votingPatterns.length) * 100),
+          score: Math.min(
+            100,
+            (votingPatterns.filter(v => Math.abs(v.financialCorrelation) < 0.3).length /
+              Math.max(1, votingPatterns.length)) *
+              100
+          ),
           weight: 0.5,
-          description: 'Votes that show low correlation with financial interests'
+          description: 'Votes that show low correlation with financial interests',
         },
         {
           name: 'Explanation Provided',
           score: 85, // Mock score - would be calculated from actual vote explanations
           weight: 0.3,
-          description: 'Percentage of votes with public explanations'
+          description: 'Percentage of votes with public explanations',
         },
         {
           name: 'Attendance Rate',
-          score: Math.min(100, votingPatterns.filter(v => v.vote !== 'absent').length / Math.max(1, votingPatterns.length) * 100),
+          score: Math.min(
+            100,
+            (votingPatterns.filter(v => v.vote !== 'absent').length /
+              Math.max(1, votingPatterns.length)) *
+              100
+          ),
           weight: 0.2,
-          description: 'Attendance rate for relevant votes'
-        }
-      ]
+          description: 'Attendance rate for relevant votes',
+        },
+      ],
     };
 
     // Industry Connections Score (0-100)
@@ -89,23 +129,33 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       factors: [
         {
           name: 'Connection Disclosure',
-          score: Math.min(100, organizationalConnections.filter(c => c.verified).length / Math.max(1, organizationalConnections.length) * 100),
+          score: Math.min(
+            100,
+            (organizationalConnections.filter(c => c.verified).length /
+              Math.max(1, organizationalConnections.length)) *
+              100
+          ),
           weight: 0.4,
-          description: 'Percentage of organizational connections that are verified'
+          description: 'Percentage of organizational connections that are verified',
         },
         {
           name: 'Conflict Management',
-          score: Math.min(100, organizationalConnections.filter(c => c.endDate !== undefined).length / Math.max(1, organizationalConnections.length) * 100),
+          score: Math.min(
+            100,
+            (organizationalConnections.filter(c => c.endDate !== undefined).length /
+              Math.max(1, organizationalConnections.length)) *
+              100
+          ),
           weight: 0.4,
-          description: 'Evidence of managing potential conflicts'
+          description: 'Evidence of managing potential conflicts',
         },
         {
           name: 'Transparency Proactivity',
           score: 75, // Mock score - would be calculated from proactive disclosures
           weight: 0.2,
-          description: 'Proactive disclosure beyond legal requirements'
-        }
-      ]
+          description: 'Proactive disclosure beyond legal requirements',
+        },
+      ],
     };
 
     return {
@@ -113,7 +163,7 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       financial: financialScore,
       voting: votingScore,
       connections: connectionsScore,
-      lastUpdated: transparencyScore.lastUpdated
+      lastUpdated: transparencyScore.lastUpdated,
     };
   }, [conflictAnalysis]);
 
@@ -133,32 +183,34 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
   };
 
   // Get score interpretation
-  const getScoreInterpretation = (score: number): { level: string; description: string; icon: React.ReactNode } => {
+  const getScoreInterpretation = (
+    score: number
+  ): { level: string; description: string; icon: React.ReactNode } => {
     if (score >= 80) {
       return {
         level: 'Excellent',
         description: 'High transparency with comprehensive disclosure and accountability',
-        icon: <CheckCircle className="h-4 w-4 text-green-600" />
+        icon: <CheckCircle className="h-4 w-4 text-green-600" />,
       };
     }
     if (score >= 60) {
       return {
         level: 'Good',
         description: 'Adequate transparency with room for improvement in some areas',
-        icon: <Shield className="h-4 w-4 text-blue-600" />
+        icon: <Shield className="h-4 w-4 text-blue-600" />,
       };
     }
     if (score >= 40) {
       return {
         level: 'Fair',
         description: 'Basic transparency requirements met but significant gaps exist',
-        icon: <AlertCircle className="h-4 w-4 text-yellow-600" />
+        icon: <AlertCircle className="h-4 w-4 text-yellow-600" />,
       };
     }
     return {
       level: 'Poor',
       description: 'Limited transparency with major disclosure gaps and accountability concerns',
-      icon: <AlertCircle className="h-4 w-4 text-red-600" />
+      icon: <AlertCircle className="h-4 w-4 text-red-600" />,
     };
   };
 
@@ -167,8 +219,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
     {
       name: 'Overall',
       score: scoringBreakdown.overall,
-      fill: getScoreColor(scoringBreakdown.overall)
-    }
+      fill: getScoreColor(scoringBreakdown.overall),
+    },
   ];
 
   // Prepare data for breakdown chart
@@ -176,18 +228,18 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
     {
       category: 'Financial Disclosure',
       score: scoringBreakdown.financial.score,
-      fill: getScoreColor(scoringBreakdown.financial.score)
+      fill: getScoreColor(scoringBreakdown.financial.score),
     },
     {
       category: 'Voting History',
       score: scoringBreakdown.voting.score,
-      fill: getScoreColor(scoringBreakdown.voting.score)
+      fill: getScoreColor(scoringBreakdown.voting.score),
     },
     {
       category: 'Industry Connections',
       score: scoringBreakdown.connections.score,
-      fill: getScoreColor(scoringBreakdown.connections.score)
-    }
+      fill: getScoreColor(scoringBreakdown.connections.score),
+    },
   ];
 
   const overallInterpretation = getScoreInterpretation(scoringBreakdown.overall);
@@ -211,7 +263,13 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
             <div className="flex flex-col items-center">
               <div className="h-48 w-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart cx="50%" cy="50%" innerRadius="60%" outerRadius="90%" data={radialData}>
+                  <RadialBarChart
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="60%"
+                    outerRadius="90%"
+                    data={radialData}
+                  >
                     <RadialBar
                       dataKey="score"
                       cornerRadius={10}
@@ -277,9 +335,7 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       <Card>
         <CardHeader>
           <CardTitle>Detailed Score Analysis</CardTitle>
-          <CardDescription>
-            Component scores and contributing factors
-          </CardDescription>
+          <CardDescription>Component scores and contributing factors</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -288,20 +344,20 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={breakdownData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="category" 
+                  <XAxis
+                    dataKey="category"
                     angle={-45}
                     textAnchor="end"
                     height={80}
                     fontSize={12}
                   />
                   <YAxis domain={[0, 100]} />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => [`${value}/100`, 'Score']}
-                    contentStyle={{ 
+                    contentStyle={{
                       backgroundColor: 'hsl(var(--popover))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: 'var(--radius-md)'
+                      borderRadius: 'var(--radius-md)',
                     }}
                   />
                   <Bar dataKey="score" radius={[4, 4, 0, 0]} />
@@ -314,7 +370,9 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
               {/* Financial Disclosure Factors */}
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium">Financial Disclosure ({scoringBreakdown.financial.score}/100)</h4>
+                  <h4 className="font-medium">
+                    Financial Disclosure ({scoringBreakdown.financial.score}/100)
+                  </h4>
                   <Badge variant={getScoreBadge(scoringBreakdown.financial.score)}>
                     {getScoreInterpretation(scoringBreakdown.financial.score).level}
                   </Badge>
@@ -338,7 +396,9 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
               {/* Voting History Factors */}
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium">Voting History ({scoringBreakdown.voting.score}/100)</h4>
+                  <h4 className="font-medium">
+                    Voting History ({scoringBreakdown.voting.score}/100)
+                  </h4>
                   <Badge variant={getScoreBadge(scoringBreakdown.voting.score)}>
                     {getScoreInterpretation(scoringBreakdown.voting.score).level}
                   </Badge>
@@ -362,7 +422,9 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
               {/* Industry Connections Factors */}
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium">Industry Connections ({scoringBreakdown.connections.score}/100)</h4>
+                  <h4 className="font-medium">
+                    Industry Connections ({scoringBreakdown.connections.score}/100)
+                  </h4>
                   <Badge variant={getScoreBadge(scoringBreakdown.connections.score)}>
                     {getScoreInterpretation(scoringBreakdown.connections.score).level}
                   </Badge>
@@ -397,7 +459,11 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
                   <Info className="h-4 w-4" />
                   <span>Scoring Methodology</span>
                 </div>
-                {showMethodology ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {showMethodology ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-4">
@@ -405,7 +471,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
                 <div>
                   <h4 className="font-medium mb-2">Overall Score Calculation</h4>
                   <p className="text-muted-foreground">
-                    The overall transparency score is calculated as a weighted average of three component scores:
+                    The overall transparency score is calculated as a weighted average of three
+                    component scores:
                   </p>
                   <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground">
                     <li>Financial Disclosure (40% weight)</li>
@@ -417,32 +484,36 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
                 <div>
                   <h4 className="font-medium mb-2">Financial Disclosure Score</h4>
                   <p className="text-muted-foreground">
-                    Evaluates the completeness, timeliness, and detail level of financial interest disclosures.
-                    Higher scores indicate more comprehensive and timely disclosure practices.
+                    Evaluates the completeness, timeliness, and detail level of financial interest
+                    disclosures. Higher scores indicate more comprehensive and timely disclosure
+                    practices.
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-medium mb-2">Voting History Score</h4>
                   <p className="text-muted-foreground">
-                    Assesses voting consistency relative to financial interests, explanation quality, and attendance.
-                    Higher scores indicate voting patterns that show independence from financial conflicts.
+                    Assesses voting consistency relative to financial interests, explanation
+                    quality, and attendance. Higher scores indicate voting patterns that show
+                    independence from financial conflicts.
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-medium mb-2">Industry Connections Score</h4>
                   <p className="text-muted-foreground">
-                    Measures disclosure of organizational connections, conflict management practices, and proactive transparency.
-                    Higher scores indicate better management and disclosure of potential conflicts.
+                    Measures disclosure of organizational connections, conflict management
+                    practices, and proactive transparency. Higher scores indicate better management
+                    and disclosure of potential conflicts.
                   </p>
                 </div>
 
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Note:</strong> This scoring system is designed to promote transparency and accountability.
-                    Scores are calculated using publicly available information and may not reflect all relevant factors.
-                    Regular updates ensure accuracy as new information becomes available.
+                    <strong>Note:</strong> This scoring system is designed to promote transparency
+                    and accountability. Scores are calculated using publicly available information
+                    and may not reflect all relevant factors. Regular updates ensure accuracy as new
+                    information becomes available.
                   </p>
                 </div>
               </div>

@@ -232,28 +232,38 @@ export function analyzeLoadingPerformance(
 
   // Basic counts for categorization
   const totalOperations = operations.length;
-  const operationsByType = operations.reduce((acc, op) => {
-    acc[op.type] = (acc[op.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const operationsByType = operations.reduce(
+    (acc, op) => {
+      acc[op.type] = (acc[op.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
-  const operationsByPriority = operations.reduce((acc, op) => {
-    acc[op.priority] = (acc[op.priority] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const operationsByPriority = operations.reduce(
+    (acc, op) => {
+      acc[op.priority] = (acc[op.priority] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Performance metrics calculation
   const completedLoadTimes = completedOperations.map(op => op.completedAt - op.startTime);
-  const averageLoadTime = completedLoadTimes.length > 0
-    ? completedLoadTimes.reduce((sum, time) => sum + time, 0) / completedLoadTimes.length
-    : 0;
+  const averageLoadTime =
+    completedLoadTimes.length > 0
+      ? completedLoadTimes.reduce((sum, time) => sum + time, 0) / completedLoadTimes.length
+      : 0;
 
   // Find the operation that has been running the longest
-  const longestRunningOperation = operations.reduce((longest, current) => {
-    const currentRunTime = now - current.startTime;
-    const longestRunTime = longest ? now - longest.startTime : 0;
-    return currentRunTime > longestRunTime ? current : longest;
-  }, null as LoadingOperation | null);
+  const longestRunningOperation = operations.reduce(
+    (longest, current) => {
+      const currentRunTime = now - current.startTime;
+      const longestRunTime = longest ? now - longest.startTime : 0;
+      return currentRunTime > longestRunTime ? current : longest;
+    },
+    null as LoadingOperation | null
+  );
 
   const failedOperations = completedOperations.filter(op => !op.success).length;
   const totalRetries = operations.reduce((sum, op) => sum + op.retryCount, 0);
@@ -357,7 +367,9 @@ export class LoadingScenarioBuilder {
     return this;
   }
 
-  stages(stages: Array<{ id: string; message: string; duration?: number }>): LoadingScenarioBuilder {
+  stages(
+    stages: Array<{ id: string; message: string; duration?: number }>
+  ): LoadingScenarioBuilder {
     this.scenario.stages = stages;
     return this;
   }
@@ -398,9 +410,13 @@ export function createOperationFromScenario(
 
   return {
     id: `${scenario.id}-${instanceId}`,
-    type: scenario.id.includes('page') ? 'page' :
-          scenario.id.includes('component') ? 'component' :
-          scenario.id.includes('api') ? 'network-aware' : 'inline',
+    type: scenario.id.includes('page')
+      ? 'page'
+      : scenario.id.includes('component')
+        ? 'component'
+        : scenario.id.includes('api')
+          ? 'network-aware'
+          : 'inline',
     message: scenario.description,
     priority: scenario.priority,
     timeout: adjustedTimeout,
@@ -480,7 +496,10 @@ export const globalLoadingMonitor = new LoadingPerformanceMonitor();
 // Utility functions for common loading patterns
 export const LoadingUtils = {
   // Create a page loading operation with proper scenario lookup
-  createPageLoading: (pageId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
+  createPageLoading: (
+    pageId: string,
+    connectionInfo?: { connectionType?: string; isOnline?: boolean }
+  ) => {
     const scenario = LOADING_SCENARIOS.PAGE_INITIAL;
     if (!scenario) {
       throw new Error('PAGE_INITIAL scenario not found');
@@ -489,7 +508,10 @@ export const LoadingUtils = {
   },
 
   // Create an API loading operation with proper scenario lookup
-  createApiLoading: (apiId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
+  createApiLoading: (
+    apiId: string,
+    connectionInfo?: { connectionType?: string; isOnline?: boolean }
+  ) => {
     const scenario = LOADING_SCENARIOS.API_REQUEST;
     if (!scenario) {
       throw new Error('API_REQUEST scenario not found');
@@ -498,7 +520,10 @@ export const LoadingUtils = {
   },
 
   // Create a component loading operation with proper scenario lookup
-  createComponentLoading: (componentId: string, connectionInfo?: { connectionType?: string; isOnline?: boolean }) => {
+  createComponentLoading: (
+    componentId: string,
+    connectionInfo?: { connectionType?: string; isOnline?: boolean }
+  ) => {
     const scenario = LOADING_SCENARIOS.COMPONENT_LAZY;
     if (!scenario) {
       throw new Error('COMPONENT_LAZY scenario not found');
@@ -507,7 +532,11 @@ export const LoadingUtils = {
   },
 
   // Check if operation should be delayed based on connection quality
-  shouldDelayOperation: (priority: 'high' | 'medium' | 'low', connectionType: string, isOnline: boolean): boolean => {
+  shouldDelayOperation: (
+    priority: 'high' | 'medium' | 'low',
+    connectionType: string,
+    isOnline: boolean
+  ): boolean => {
     if (!isOnline && priority !== 'high') return true;
     if (connectionType === 'slow' && priority === 'low') return true;
     return false;
@@ -516,10 +545,14 @@ export const LoadingUtils = {
   // Get optimal batch size for operations based on connection speed
   getOptimalBatchSize: (connectionType: string): number => {
     switch (connectionType) {
-      case 'slow': return 1;
-      case '3g': return 2;
-      case '4g': return 4;
-      default: return 3;
+      case 'slow':
+        return 1;
+      case '3g':
+        return 2;
+      case '4g':
+        return 4;
+      default:
+        return 3;
     }
   },
 

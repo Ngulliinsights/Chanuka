@@ -1,12 +1,12 @@
 /**
  * Circuit Breaker API Client
- * 
+ *
  * Enhanced API client that integrates circuit breaker patterns with retry logic
  * and error correlation for robust external service communication.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 import { logger } from '../../utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 import { processRequestInterceptors, processResponseInterceptors } from './interceptors';
 import { RetryHandler, createRetryHandler, RetryConfig } from './retry-handler';
@@ -46,31 +46,25 @@ export class CircuitBreakerClient {
     this.config = {
       correlationIdHeader: 'X-Correlation-ID',
       ...config,
-      timeout: config.timeout || 10000
+      timeout: config.timeout || 10000,
     };
 
-    this.retryHandler = createRetryHandler(
-      this.config.serviceName,
-      this.config.retryConfig
-    );
+    this.retryHandler = createRetryHandler(this.config.serviceName, this.config.retryConfig);
   }
 
   /**
    * Makes an HTTP request with circuit breaker and retry logic
    */
-  async request<T = unknown>(
-    url: string,
-    config: RequestConfig = {}
-  ): Promise<ApiResponse<T>> {
+  async request<T = unknown>(url: string, config: RequestConfig = {}): Promise<ApiResponse<T>> {
     const fullUrl = this.buildUrl(url);
     const correlationId = config.correlationId || this.generateCorrelationId();
-    
+
     logger.debug('Making API request', {
       component: 'CircuitBreakerClient',
       serviceName: this.config.serviceName,
       url: fullUrl,
       method: config.method || 'GET',
-      correlationId
+      correlationId,
     });
 
     // Skip circuit breaker and retry if requested
@@ -105,14 +99,14 @@ export class CircuitBreakerClient {
       headers: {
         ...this.config.defaultHeaders,
         [this.config.correlationIdHeader!]: correlationId,
-        ...config.headers
+        ...config.headers,
       },
       body: config.body,
       credentials: config.credentials || 'same-origin',
       mode: config.mode || 'cors',
       cache: config.cache || 'default',
       redirect: config.redirect || 'follow',
-      referrerPolicy: config.referrerPolicy || 'strict-origin-when-cross-origin'
+      referrerPolicy: config.referrerPolicy || 'strict-origin-when-cross-origin',
     };
 
     // Set up timeout
@@ -123,13 +117,13 @@ export class CircuitBreakerClient {
 
     try {
       // Process request interceptors (includes circuit breaker check)
-      const processedConfig = config.skipCircuitBreaker 
-        ? requestConfig 
+      const processedConfig = config.skipCircuitBreaker
+        ? requestConfig
         : await processRequestInterceptors(requestConfig);
 
       // Make the actual request
       const response = await fetch(processedConfig.url, processedConfig);
-      
+
       clearTimeout(timeoutId);
 
       // Process response interceptors (includes circuit breaker recording)
@@ -140,16 +134,18 @@ export class CircuitBreakerClient {
       // Handle HTTP errors
       if (!processedResponse.ok) {
         const httpError = this.createHttpError(processedResponse, correlationId);
-        
+
         // Record error for monitoring if in browser environment
         if (typeof window !== 'undefined') {
-          import('./circuit-breaker-monitor').then(({ recordError }) => {
-            recordError(httpError);
-          }).catch(() => {
-            // Ignore import errors in test environment
-          });
+          import('./circuit-breaker-monitor')
+            .then(({ recordError }) => {
+              recordError(httpError);
+            })
+            .catch(() => {
+              // Ignore import errors in test environment
+            });
         }
-        
+
         throw httpError;
       }
 
@@ -161,16 +157,15 @@ export class CircuitBreakerClient {
         serviceName: this.config.serviceName,
         url,
         status: processedResponse.status,
-        correlationId
+        correlationId,
       });
 
       return {
         data,
         status: processedResponse.status,
         headers: processedResponse.headers,
-        correlationId
+        correlationId,
       };
-
     } catch (error) {
       clearTimeout(timeoutId);
 
@@ -184,9 +179,9 @@ export class CircuitBreakerClient {
           context: {
             url,
             timeout,
-            serviceName: this.config.serviceName
+            serviceName: this.config.serviceName,
           },
-          retryable: true
+          retryable: true,
         });
       }
 
@@ -206,19 +201,21 @@ export class CircuitBreakerClient {
           correlationId,
           context: {
             url,
-            serviceName: this.config.serviceName
+            serviceName: this.config.serviceName,
           },
-          retryable: true
+          retryable: true,
         }
       );
 
       // Record error for monitoring if in browser environment
       if (typeof window !== 'undefined') {
-        import('./circuit-breaker-monitor').then(({ recordError }) => {
-          recordError(networkError);
-        }).catch(() => {
-          // Ignore import errors in test environment
-        });
+        import('./circuit-breaker-monitor')
+          .then(({ recordError }) => {
+            recordError(networkError);
+          })
+          .catch(() => {
+            // Ignore import errors in test environment
+          });
       }
 
       throw networkError;
@@ -228,47 +225,65 @@ export class CircuitBreakerClient {
   /**
    * Convenience methods for common HTTP verbs
    */
-  async get<T = unknown>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
+  async get<T = unknown>(
+    url: string,
+    config: Omit<RequestConfig, 'method'> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: 'GET' });
   }
 
-  async post<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async post<T = unknown>(
+    url: string,
+    data?: unknown,
+    config: Omit<RequestConfig, 'method' | 'body'> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
       headers: {
         'Content-Type': 'application/json',
-        ...config.headers
-      }
+        ...config.headers,
+      },
     });
   }
 
-  async put<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async put<T = unknown>(
+    url: string,
+    data?: unknown,
+    config: Omit<RequestConfig, 'method' | 'body'> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
       headers: {
         'Content-Type': 'application/json',
-        ...config.headers
-      }
+        ...config.headers,
+      },
     });
   }
 
-  async patch<T = unknown>(url: string, data?: unknown, config: Omit<RequestConfig, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
+  async patch<T = unknown>(
+    url: string,
+    data?: unknown,
+    config: Omit<RequestConfig, 'method' | 'body'> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
       headers: {
         'Content-Type': 'application/json',
-        ...config.headers
-      }
+        ...config.headers,
+      },
     });
   }
 
-  async delete<T = unknown>(url: string, config: Omit<RequestConfig, 'method'> = {}): Promise<ApiResponse<T>> {
+  async delete<T = unknown>(
+    url: string,
+    config: Omit<RequestConfig, 'method'> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: 'DELETE' });
   }
 
@@ -281,8 +296,8 @@ export class CircuitBreakerClient {
     }
 
     if (this.config.baseUrl) {
-      const base = this.config.baseUrl.endsWith('/') 
-        ? this.config.baseUrl.slice(0, -1) 
+      const base = this.config.baseUrl.endsWith('/')
+        ? this.config.baseUrl.slice(0, -1)
         : this.config.baseUrl;
       const cleanPath = path.startsWith('/') ? path : `/${path}`;
       return `${base}${cleanPath}`;
@@ -317,23 +332,20 @@ export class CircuitBreakerClient {
       severity = ErrorSeverity.HIGH;
     }
 
-    return new BaseError(
-      `HTTP ${response.status}: ${response.statusText}`,
-      {
-        statusCode: response.status,
-        code: isServerError ? 'HTTP_SERVER_ERROR' : 'HTTP_CLIENT_ERROR',
-        domain,
-        severity,
-        correlationId,
-        context: {
-          url: response.url,
-          status: response.status,
-          statusText: response.statusText,
-          serviceName: this.config.serviceName
-        },
-        retryable
-      }
-    );
+    return new BaseError(`HTTP ${response.status}: ${response.statusText}`, {
+      statusCode: response.status,
+      code: isServerError ? 'HTTP_SERVER_ERROR' : 'HTTP_CLIENT_ERROR',
+      domain,
+      severity,
+      correlationId,
+      context: {
+        url: response.url,
+        status: response.status,
+        statusText: response.statusText,
+        serviceName: this.config.serviceName,
+      },
+      retryable,
+    });
   }
 
   private async parseResponseData<T>(response: Response): Promise<T> {
@@ -357,7 +369,7 @@ export class CircuitBreakerClient {
     }
 
     // For other content types, return as blob
-    return await response.blob() as unknown as T;
+    return (await response.blob()) as unknown as T;
   }
 
   /**
@@ -365,7 +377,7 @@ export class CircuitBreakerClient {
    */
   updateConfig(newConfig: Partial<CircuitBreakerClientConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     if (newConfig.retryConfig) {
       this.retryHandler.updateConfig(newConfig.retryConfig);
     }
@@ -373,7 +385,7 @@ export class CircuitBreakerClient {
     logger.info('Circuit breaker client configuration updated', {
       component: 'CircuitBreakerClient',
       serviceName: this.config.serviceName,
-      newConfig: this.config
+      newConfig: this.config,
     });
   }
 
@@ -390,22 +402,22 @@ export class CircuitBreakerClient {
    */
   async healthCheck(): Promise<{ healthy: boolean; latency?: number; error?: string }> {
     const startTime = Date.now();
-    
+
     try {
-      await this.get('/health', { 
+      await this.get('/health', {
         timeout: 5000,
         skipCircuitBreaker: true,
-        skipRetry: true 
+        skipRetry: true,
       });
-      
+
       const latency = Date.now() - startTime;
       return { healthy: true, latency };
     } catch (error) {
       const latency = Date.now() - startTime;
-      return { 
-        healthy: false, 
+      return {
+        healthy: false,
         latency,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -431,8 +443,8 @@ export const apiClients = {
     retryConfig: {
       maxAttempts: 5,
       baseDelay: 2000,
-      maxDelay: 60000
-    }
+      maxDelay: 60000,
+    },
   }),
 
   socialMedia: createCircuitBreakerClient({
@@ -442,8 +454,8 @@ export const apiClients = {
     retryConfig: {
       maxAttempts: 2,
       baseDelay: 500,
-      maxDelay: 10000
-    }
+      maxDelay: 10000,
+    },
   }),
 
   internalApi: createCircuitBreakerClient({
@@ -453,8 +465,8 @@ export const apiClients = {
     retryConfig: {
       maxAttempts: 4,
       baseDelay: 500,
-      maxDelay: 15000
-    }
+      maxDelay: 15000,
+    },
   }),
 
   externalApi: createCircuitBreakerClient({
@@ -463,7 +475,7 @@ export const apiClients = {
     retryConfig: {
       maxAttempts: 3,
       baseDelay: 1000,
-      maxDelay: 20000
-    }
-  })
+      maxDelay: 20000,
+    },
+  }),
 };

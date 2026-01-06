@@ -1,6 +1,6 @@
 /**
  * API Cache Manager Module
- * 
+ *
  * Provides intelligent caching for API responses with TTL, invalidation,
  * and storage management capabilities.
  */
@@ -65,7 +65,7 @@ export const DEFAULT_CACHE_CONFIG: CacheConfig = {
   storage: 'memory',
   keyPrefix: 'api_cache_',
   enableCompression: false,
-  enableEncryption: false
+  enableEncryption: false,
 };
 
 /**
@@ -82,7 +82,7 @@ export class ApiCacheManager {
     evictions: 0,
     totalSize: 0,
     entryCount: 0,
-    hitRate: 0
+    hitRate: 0,
   };
 
   constructor(config: Partial<CacheConfig> = {}) {
@@ -123,14 +123,14 @@ export class ApiCacheManager {
     // Update access metadata
     entry.accessCount = (entry.accessCount ?? 0) + 1;
     entry.lastAccessed = Date.now();
-    
+
     this.stats.hits++;
     this.updateHitRate();
 
     logger.debug('Cache hit', {
       component: 'ApiCacheManager',
       key,
-      accessCount: entry.accessCount
+      accessCount: entry.accessCount,
     });
 
     return entry.data as T;
@@ -139,7 +139,11 @@ export class ApiCacheManager {
   /**
    * Sets a value in the cache
    */
-  async set<T>(key: string, data: T, options: { ttl?: number; tags?: string[] } = {}): Promise<void> {
+  async set<T>(
+    key: string,
+    data: T,
+    options: { ttl?: number; tags?: string[] } = {}
+  ): Promise<void> {
     const fullKey = this.getFullKey(key);
     const ttl = options.ttl || this.config.defaultTTL;
     const size = this.calculateSize(data);
@@ -154,7 +158,7 @@ export class ApiCacheManager {
       accessCount: 0,
       lastAccessed: Date.now(),
       size,
-      tags: options.tags
+      tags: options.tags,
     };
 
     this.cache.set(fullKey, entry);
@@ -172,7 +176,7 @@ export class ApiCacheManager {
       key,
       size,
       ttl,
-      tags: options.tags
+      tags: options.tags,
     });
   }
 
@@ -196,7 +200,7 @@ export class ApiCacheManager {
 
       logger.debug('Cache delete', {
         component: 'ApiCacheManager',
-        key
+        key,
       });
 
       return true;
@@ -244,7 +248,7 @@ export class ApiCacheManager {
     }
 
     logger.info('Cache cleared', {
-      component: 'ApiCacheManager'
+      component: 'ApiCacheManager',
     });
   }
 
@@ -294,7 +298,7 @@ export class ApiCacheManager {
     logger.info('Cache invalidation completed', {
       component: 'ApiCacheManager',
       invalidatedCount,
-      options
+      options,
     });
 
     return invalidatedCount;
@@ -321,7 +325,7 @@ export class ApiCacheManager {
     this.config = { ...this.config, ...config };
     logger.info('Cache configuration updated', {
       component: 'ApiCacheManager',
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -357,7 +361,7 @@ export class ApiCacheManager {
     for (const { key, entry } of entries) {
       keysToEvict.push(key);
       freedSize += entry.size ?? 0;
-      
+
       if (freedSize >= requiredSize) {
         break;
       }
@@ -373,7 +377,7 @@ export class ApiCacheManager {
     logger.debug('Cache eviction by size completed', {
       component: 'ApiCacheManager',
       evictedCount: keysToEvict.length,
-      freedSize
+      freedSize,
     });
   }
 
@@ -387,7 +391,7 @@ export class ApiCacheManager {
 
     // Evict 10% of entries or at least 1
     const evictCount = Math.max(1, Math.floor(this.config.maxEntries * 0.1));
-    
+
     for (let i = 0; i < evictCount && i < entries.length; i++) {
       const shortKey = entries[i].key.replace(this.config.keyPrefix, '');
       await this.delete(shortKey);
@@ -396,7 +400,7 @@ export class ApiCacheManager {
 
     logger.debug('Cache eviction by count completed', {
       component: 'ApiCacheManager',
-      evictedCount: evictCount
+      evictedCount: evictCount,
     });
   }
 
@@ -453,9 +457,7 @@ export class ApiCacheManager {
       const storage = this.getStorage();
       if (!storage) return;
 
-      const keys = Object.keys(storage).filter(key => 
-        key.startsWith(this.config.keyPrefix)
-      );
+      const keys = Object.keys(storage).filter(key => key.startsWith(this.config.keyPrefix));
 
       for (const key of keys) {
         const entryData = storage.getItem(key);
@@ -473,7 +475,7 @@ export class ApiCacheManager {
             logger.warn('Failed to parse cache entry from storage', {
               component: 'ApiCacheManager',
               key,
-              error
+              error,
             });
             storage.removeItem(key);
           }
@@ -483,12 +485,12 @@ export class ApiCacheManager {
       logger.info('Cache loaded from storage', {
         component: 'ApiCacheManager',
         entryCount: this.stats.entryCount,
-        totalSize: this.stats.totalSize
+        totalSize: this.stats.totalSize,
       });
     } catch (error) {
       logger.error('Failed to load cache from storage', {
         component: 'ApiCacheManager',
-        error
+        error,
       });
     }
   }
@@ -510,7 +512,7 @@ export class ApiCacheManager {
       logger.warn('Failed to get cache entry from storage', {
         component: 'ApiCacheManager',
         key,
-        error
+        error,
       });
     }
     return undefined;
@@ -529,7 +531,7 @@ export class ApiCacheManager {
       logger.warn('Failed to set cache entry to storage', {
         component: 'ApiCacheManager',
         key,
-        error
+        error,
       });
     }
   }
@@ -547,7 +549,7 @@ export class ApiCacheManager {
       logger.warn('Failed to delete cache entry from storage', {
         component: 'ApiCacheManager',
         key,
-        error
+        error,
       });
     }
   }
@@ -560,9 +562,7 @@ export class ApiCacheManager {
       const storage = this.getStorage();
       if (!storage) return;
 
-      const keys = Object.keys(storage).filter(key => 
-        key.startsWith(this.config.keyPrefix)
-      );
+      const keys = Object.keys(storage).filter(key => key.startsWith(this.config.keyPrefix));
 
       for (const key of keys) {
         storage.removeItem(key);
@@ -570,7 +570,7 @@ export class ApiCacheManager {
     } catch (error) {
       logger.error('Failed to clear cache storage', {
         component: 'ApiCacheManager',
-        error
+        error,
       });
     }
   }
@@ -620,7 +620,7 @@ export class ApiCacheManager {
     if (expiredKeys.length > 0) {
       logger.debug('Cleaned up expired cache entries', {
         component: 'ApiCacheManager',
-        cleanedCount: expiredKeys.length
+        cleanedCount: expiredKeys.length,
       });
     }
   }
@@ -633,15 +633,11 @@ export class CacheKeyGenerator {
   /**
    * Generates a cache key from URL and parameters
    */
-  static generate(
-    url: string, 
-    params?: Record<string, unknown>, 
-    method: string = 'GET'
-  ): string {
+  static generate(url: string, params?: Record<string, unknown>, method: string = 'GET'): string {
     const normalizedUrl = url.toLowerCase();
     const sortedParams = params ? this.sortParams(params) : '';
     const normalizedMethod = method.toUpperCase();
-    
+
     return `${normalizedMethod}:${normalizedUrl}${sortedParams}`;
   }
 
@@ -651,10 +647,13 @@ export class CacheKeyGenerator {
   private static sortParams(params: Record<string, unknown>): string {
     const sorted = Object.keys(params)
       .sort()
-      .reduce((result, key) => {
-        result[key] = params[key];
-        return result;
-      }, {} as Record<string, unknown>);
+      .reduce(
+        (result, key) => {
+          result[key] = params[key];
+          return result;
+        },
+        {} as Record<string, unknown>
+      );
 
     return `:${JSON.stringify(sorted)}`;
   }

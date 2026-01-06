@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
 import {
   Command,
   CommandInput,
@@ -14,28 +15,25 @@ import {
   CommandGroup,
   CommandItem,
   CommandShortcut,
-  CommandSeparator
+  CommandSeparator,
 } from '../../shared/design-system/interactive/Command';
-import { Modal } from './Modal';
 import { cn } from '../../shared/design-system/utils/cn';
+
+import { createDefaultSections, filterCommands, groupCommandsBySection } from './commands';
+import { Modal } from './Modal';
 import type {
   Command as CommandType,
   CommandSection,
   CommandPaletteProps,
-  CommandPaletteConfig
+  CommandPaletteConfig,
 } from './types';
-import {
-  createDefaultSections,
-  filterCommands,
-  groupCommandsBySection
-} from './commands';
 
 const DEFAULT_CONFIG: CommandPaletteConfig = {
   maxRecentCommands: 5,
   enableKeyboardShortcuts: true,
   enableSearchHistory: true,
   placeholder: 'Type a command or search...',
-  emptyStateMessage: 'No commands found.'
+  emptyStateMessage: 'No commands found.',
 };
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -43,7 +41,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onOpenChange,
   config = {},
   customCommands = [],
-  onCommandExecute
+  onCommandExecute,
 }) => {
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
 
@@ -88,7 +86,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       logout: () => {
         // Logout implementation - could dispatch an event
         window.dispatchEvent(new CustomEvent('logout'));
-      }
+      },
     };
 
     const helpActions = {
@@ -101,7 +99,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       openKeyboardShortcuts: () => {
         // Could open a modal or navigate to shortcuts page
         window.dispatchEvent(new CustomEvent('show-keyboard-shortcuts'));
-      }
+      },
     };
 
     return createDefaultSections(navigate, quickActions, helpActions);
@@ -118,9 +116,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     if (!query.trim()) {
       // Show recent commands first when no query
       const recent = recentCommands.slice(0, finalConfig.maxRecentCommands);
-      const remaining = allCommands.filter(cmd =>
-        !recent.some(recent => recent.id === cmd.id)
-      );
+      const remaining = allCommands.filter(cmd => !recent.some(recent => recent.id === cmd.id));
       return [...recent, ...remaining].slice(0, 20); // Limit to 20 items
     }
 
@@ -133,33 +129,35 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   }, [filteredCommands]);
 
   // Handle command execution
-  const executeCommand = useCallback(async (command: CommandType) => {
-    if (command.disabled) return;
+  const executeCommand = useCallback(
+    async (command: CommandType) => {
+      if (command.disabled) return;
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    try {
-      // Execute the command
-      await command.action();
+      try {
+        // Execute the command
+        await command.action();
 
-      // Add to recent commands
-      setRecentCommands(prev => {
-        const filtered = prev.filter(cmd => cmd.id !== command.id);
-        return [command, ...filtered].slice(0, finalConfig.maxRecentCommands);
-      });
+        // Add to recent commands
+        setRecentCommands(prev => {
+          const filtered = prev.filter(cmd => cmd.id !== command.id);
+          return [command, ...filtered].slice(0, finalConfig.maxRecentCommands);
+        });
 
-      // Call external handler
-      onCommandExecute?.(command);
+        // Call external handler
+        onCommandExecute?.(command);
 
-      // Close the palette
-      onOpenChange(false);
-
-    } catch (error) {
-      console.error('Command execution failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [onCommandExecute, onOpenChange, finalConfig.maxRecentCommands]);
+        // Close the palette
+        onOpenChange(false);
+      } catch (error) {
+        console.error('Command execution failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onCommandExecute, onOpenChange, finalConfig.maxRecentCommands]
+  );
 
   // Keyboard navigation
   useEffect(() => {
@@ -169,16 +167,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev =>
-            prev < filteredCommands.length - 1 ? prev + 1 : 0
-          );
+          setSelectedIndex(prev => (prev < filteredCommands.length - 1 ? prev + 1 : 0));
           break;
 
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex(prev =>
-            prev > 0 ? prev - 1 : filteredCommands.length - 1
-          );
+          setSelectedIndex(prev => (prev > 0 ? prev - 1 : filteredCommands.length - 1));
           break;
 
         case 'Enter':
@@ -235,9 +229,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   // Render command sections
   const renderSections = () => {
-    const sections = defaultSections.filter(section =>
-      groupedCommands[section.id]?.length > 0
-    );
+    const sections = defaultSections.filter(section => groupedCommands[section.id]?.length > 0);
 
     // Add custom sections from grouped commands
     Object.keys(groupedCommands).forEach(sectionId => {
@@ -249,7 +241,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             id: sectionId,
             title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1) + ' Commands',
             commands,
-            priority: 0
+            priority: 0,
           });
         }
       }
@@ -261,7 +253,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         id: 'other',
         title: 'Custom Commands',
         commands: groupedCommands.other,
-        priority: 0
+        priority: 0,
       });
     }
 
@@ -277,9 +269,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
           <CommandGroup heading={section.title}>
             {commands.map((command, commandIndex) => {
-              const globalIndex = sections
-                .slice(0, sectionIndex)
-                .reduce((sum, s) => sum + (groupedCommands[s.id]?.length || 0), 0) + commandIndex;
+              const globalIndex =
+                sections
+                  .slice(0, sectionIndex)
+                  .reduce((sum, s) => sum + (groupedCommands[s.id]?.length || 0), 0) + commandIndex;
 
               const isSelected = globalIndex === selectedIndex;
               const Icon = command.icon;
@@ -296,17 +289,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   )}
                   disabled={command.disabled}
                 >
-                  {Icon && (
-                    <Icon
-                      className="h-4 w-4 shrink-0"
-                      aria-hidden="true"
-                    />
-                  )}
+                  {Icon && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
 
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm">
-                      {command.label}
-                    </div>
+                    <div className="font-medium text-sm">{command.label}</div>
                     {command.description && (
                       <div className="text-xs text-muted-foreground truncate">
                         {command.description}
@@ -314,11 +300,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     )}
                   </div>
 
-                  {command.shortcut && (
-                    <CommandShortcut>
-                      {command.shortcut}
-                    </CommandShortcut>
-                  )}
+                  {command.shortcut && <CommandShortcut>{command.shortcut}</CommandShortcut>}
                 </CommandItem>
               );
             })}
@@ -350,9 +332,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               Executing command...
             </div>
           ) : filteredCommands.length === 0 ? (
-            <CommandEmpty>
-              {finalConfig.emptyStateMessage}
-            </CommandEmpty>
+            <CommandEmpty>{finalConfig.emptyStateMessage}</CommandEmpty>
           ) : (
             renderSections()
           )}
@@ -361,14 +341,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Footer with keyboard hints */}
         <div className="border-t px-3 py-2 text-xs text-muted-foreground bg-muted/50">
           <div className="flex items-center justify-between">
-            <span>
-              ↑↓ Navigate • ↵ Select • Esc Close
-            </span>
-            {finalConfig.enableKeyboardShortcuts && (
-              <span>
-                ⌘K to open
-              </span>
-            )}
+            <span>↑↓ Navigate • ↵ Select • Esc Close</span>
+            {finalConfig.enableKeyboardShortcuts && <span>⌘K to open</span>}
           </div>
         </div>
       </Command>

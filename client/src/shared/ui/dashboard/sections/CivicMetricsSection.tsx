@@ -5,7 +5,6 @@
  */
 
 import { format } from 'date-fns';
-import React from 'react';
 import {
   TrendingUp,
   Award,
@@ -18,16 +17,12 @@ import {
   Info,
   Calendar,
 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Progress } from '@/shared/design-system/feedback/Progress';
 import { Button } from '@/shared/design-system/interactive/Button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/design-system/typography/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { CivicImpactMetrics } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';

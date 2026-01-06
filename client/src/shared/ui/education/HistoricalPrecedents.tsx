@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BookOpen,
   ChevronDown,
@@ -16,6 +15,7 @@ import {
   Scale,
   AlertCircle,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useMemo } from 'react';
 
 // Types

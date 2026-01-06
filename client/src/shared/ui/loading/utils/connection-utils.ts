@@ -3,8 +3,8 @@
  * Following navigation component patterns for utility organization
  */
 
-import { ConnectionType } from '../types';
 import { CONNECTION_THRESHOLDS } from '../constants';
+import { ConnectionType } from '../types';
 
 export interface ConnectionInfo {
   isOnline: boolean;
@@ -27,9 +27,11 @@ export interface NetworkAdapter {
  */
 
 export function getNetworkConnection(): any {
-  return (navigator as any).connection || 
-         (navigator as any).mozConnection || 
-         (navigator as any).webkitConnection;
+  return (
+    (navigator as any).connection ||
+    (navigator as any).mozConnection ||
+    (navigator as any).webkitConnection
+  );
 }
 
 export function hasNetworkAPI(): boolean {
@@ -39,7 +41,7 @@ export function hasNetworkAPI(): boolean {
 export function getConnectionInfo(): ConnectionInfo {
   const connection = getNetworkConnection();
   const isOnline = navigator.onLine;
-  
+
   if (!connection) {
     return {
       isOnline,
@@ -54,11 +56,11 @@ export function getConnectionInfo(): ConnectionInfo {
 
   // Determine connection type based on effective type and metrics
   let connectionType: ConnectionType = 'fast';
-  
+
   if (!isOnline) {
     connectionType = 'offline';
   } else if (
-    effectiveType === 'slow-2g' || 
+    effectiveType === 'slow-2g' ||
     effectiveType === '2g' ||
     (rtt && rtt > CONNECTION_THRESHOLDS.SLOW_CONNECTION_RTT) ||
     (downlink && downlink < CONNECTION_THRESHOLDS.SLOW_CONNECTION_DOWNLINK)
@@ -91,7 +93,7 @@ export function createConnectionMonitor(): NetworkAdapter {
   const updateConnectionInfo = () => {
     const newInfo = getConnectionInfo();
     const hasChanged = JSON.stringify(newInfo) !== JSON.stringify(currentInfo);
-    
+
     if (hasChanged) {
       currentInfo = newInfo;
       notifyListeners();
@@ -123,10 +125,10 @@ export function createConnectionMonitor(): NetworkAdapter {
 
   return {
     getConnectionInfo: () => currentInfo,
-    
+
     onConnectionChange: (callback: (info: ConnectionInfo) => void) => {
       listeners.push(callback);
-      
+
       // Return cleanup function
       return () => {
         const index = listeners.indexOf(callback);
@@ -135,11 +137,11 @@ export function createConnectionMonitor(): NetworkAdapter {
         }
       };
     },
-    
+
     isSlowConnection: () => {
       return currentInfo.connectionType === 'slow';
     },
-    
+
     shouldReduceQuality: () => {
       return currentInfo.connectionType === 'slow' || currentInfo.saveData === true;
     },
@@ -174,7 +176,10 @@ export function getOptimalRetryDelay(baseDelay: number, connectionType: Connecti
   }
 }
 
-export function getOptimalConcurrency(baseConcurrency: number, connectionType: ConnectionType): number {
+export function getOptimalConcurrency(
+  baseConcurrency: number,
+  connectionType: ConnectionType
+): number {
   switch (connectionType) {
     case 'slow':
       return Math.max(1, Math.floor(baseConcurrency / 2)); // Reduce concurrency
@@ -210,40 +215,40 @@ export interface AdaptiveLoadingConfig {
 
 export function createAdaptiveLoader(config: AdaptiveLoadingConfig) {
   const monitor = createConnectionMonitor();
-  
+
   return {
     getConnectionInfo: monitor.getConnectionInfo,
     onConnectionChange: monitor.onConnectionChange,
-    
+
     adaptTimeout: (baseTimeout: number) => {
       if (!config.enableAdaptation) return baseTimeout;
       return getOptimalTimeout(baseTimeout, monitor.getConnectionInfo().connectionType);
     },
-    
+
     adaptRetryDelay: (baseDelay: number) => {
       if (!config.enableAdaptation) return baseDelay;
       return getOptimalRetryDelay(baseDelay, monitor.getConnectionInfo().connectionType);
     },
-    
+
     adaptConcurrency: (baseConcurrency: number) => {
       if (!config.enableAdaptation) return baseConcurrency;
       return getOptimalConcurrency(baseConcurrency, monitor.getConnectionInfo().connectionType);
     },
-    
+
     shouldPreload: () => {
       if (!config.enableAdaptation || !config.preloadingEnabled) return true;
       const info = monitor.getConnectionInfo();
       return shouldPreload(info.connectionType, info.saveData);
     },
-    
+
     shouldReduceQuality: () => {
       if (!config.enableAdaptation || !config.qualityReduction) return false;
       return monitor.shouldReduceQuality();
     },
-    
+
     getRecommendedStrategy: () => {
       const info = monitor.getConnectionInfo();
-      
+
       if (!info.isOnline) {
         return {
           strategy: 'offline',
@@ -253,7 +258,7 @@ export function createAdaptiveLoader(config: AdaptiveLoadingConfig) {
           quality: 'low',
         };
       }
-      
+
       if (info.connectionType === 'slow') {
         return {
           strategy: 'conservative',
@@ -263,7 +268,7 @@ export function createAdaptiveLoader(config: AdaptiveLoadingConfig) {
           quality: info.saveData ? 'low' : 'medium',
         };
       }
-      
+
       return {
         strategy: 'aggressive',
         timeout: 'normal',
@@ -279,17 +284,20 @@ export function createAdaptiveLoader(config: AdaptiveLoadingConfig) {
  * Connection testing utilities
  */
 
-export async function testConnection(url: string = '/symbol.svg', timeout: number = 5000): Promise<boolean> {
+export async function testConnection(
+  url: string = '/symbol.svg',
+  timeout: number = 5000
+): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
+
     const response = await fetch(url, {
       method: 'HEAD',
       cache: 'no-cache',
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
     return response.ok;
   } catch {
@@ -303,20 +311,20 @@ export async function measureConnectionSpeed(
 ): Promise<{ speed: number; latency: number } | null> {
   try {
     const startTime = performance.now();
-    
+
     const response = await fetch(`${testUrl}?t=${Date.now()}`, {
       cache: 'no-cache',
     });
-    
+
     if (!response.ok) return null;
-    
+
     const data = await response.arrayBuffer();
     const endTime = performance.now();
-    
+
     const duration = endTime - startTime; // milliseconds
     const size = data.byteLength || testSize;
     const speed = (size * 8) / (duration / 1000); // bits per second
-    
+
     return {
       speed: speed / 1000000, // Mbps
       latency: duration,
@@ -337,11 +345,11 @@ export function createOfflineDetector(
   let isOnline = navigator.onLine;
   let testTimer: NodeJS.Timeout;
   const listeners: Array<(online: boolean) => void> = [];
-  
+
   const notifyListeners = () => {
     listeners.forEach(listener => listener(isOnline));
   };
-  
+
   const testOnlineStatus = async () => {
     const online = await testConnection(testUrl, 5000);
     if (online !== isOnline) {
@@ -349,40 +357,40 @@ export function createOfflineDetector(
       notifyListeners();
     }
   };
-  
+
   const handleOnline = () => {
     isOnline = true;
     notifyListeners();
   };
-  
+
   const handleOffline = () => {
     isOnline = false;
     notifyListeners();
   };
-  
+
   // Start periodic testing
   const startTesting = () => {
     testTimer = setInterval(testOnlineStatus, testInterval);
   };
-  
+
   const stopTesting = () => {
     if (testTimer) {
       clearInterval(testTimer);
     }
   };
-  
+
   // Listen for browser events
   window.addEventListener('online', handleOnline);
   window.addEventListener('offline', handleOffline);
-  
+
   startTesting();
-  
+
   return {
     isOnline: () => isOnline,
-    
+
     onStatusChange: (callback: (online: boolean) => void) => {
       listeners.push(callback);
-      
+
       return () => {
         const index = listeners.indexOf(callback);
         if (index > -1) {
@@ -390,9 +398,9 @@ export function createOfflineDetector(
         }
       };
     },
-    
+
     testNow: testOnlineStatus,
-    
+
     destroy: () => {
       stopTesting();
       window.removeEventListener('online', handleOnline);
@@ -405,11 +413,13 @@ export function createOfflineDetector(
  * Connection quality assessment
  */
 
-export function assessConnectionQuality(info: ConnectionInfo): 'poor' | 'fair' | 'good' | 'excellent' {
+export function assessConnectionQuality(
+  info: ConnectionInfo
+): 'poor' | 'fair' | 'good' | 'excellent' {
   if (!info.isOnline) return 'poor';
-  
+
   const { effectiveType, downlink, rtt } = info;
-  
+
   // Use effective type if available
   if (effectiveType) {
     switch (effectiveType) {
@@ -425,27 +435,26 @@ export function assessConnectionQuality(info: ConnectionInfo): 'poor' | 'fair' |
         return 'excellent';
     }
   }
-  
+
   // Use metrics if available
   let score = 0;
-  
+
   if (downlink !== undefined) {
     if (downlink >= 10) score += 2;
     else if (downlink >= 5) score += 1;
     else if (downlink >= 1.5) score += 0;
     else score -= 1;
   }
-  
+
   if (rtt !== undefined) {
     if (rtt <= 100) score += 2;
     else if (rtt <= 300) score += 1;
     else if (rtt <= 1000) score += 0;
     else score -= 1;
   }
-  
+
   if (score >= 3) return 'excellent';
   if (score >= 1) return 'good';
   if (score >= -1) return 'fair';
   return 'poor';
 }
-

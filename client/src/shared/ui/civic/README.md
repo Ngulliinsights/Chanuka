@@ -5,10 +5,11 @@ This directory contains components specifically designed for Kenyan civic educat
 ## Components Overview
 
 ### 1. CivicEducationHub
+
 **Main entry point for civic education content**
 
 - **Purpose**: Central hub that provides access to all civic education materials
-- **Features**: 
+- **Features**:
   - Topic selection with difficulty levels
   - Government statistics display
   - Cultural context information
@@ -17,6 +18,7 @@ This directory contains components specifically designed for Kenyan civic educat
 - **Requirements**: 10.4, 10.5
 
 ### 2. KenyanLegislativeProcess
+
 **Detailed legislative process information**
 
 - **Purpose**: Comprehensive guide to Kenya's law-making process
@@ -29,6 +31,7 @@ This directory contains components specifically designed for Kenyan civic educat
 - **Requirements**: 10.4, 10.5
 
 ### 3. LegislativeProcessGuide
+
 **Simplified step-by-step guide**
 
 - **Purpose**: User-friendly introduction to legislative processes
@@ -41,6 +44,7 @@ This directory contains components specifically designed for Kenyan civic educat
 - **Requirements**: 10.4, 10.5
 
 ### 4. CivicEducationCard
+
 **Reusable topic cards**
 
 - **Purpose**: Modular cards for different civic topics
@@ -51,6 +55,7 @@ This directory contains components specifically designed for Kenyan civic educat
 ## Context Integration
 
 ### KenyanContextProvider
+
 **Cultural and legal context provider**
 
 - **Government Structure**: National, county, and ward levels
@@ -61,21 +66,25 @@ This directory contains components specifically designed for Kenyan civic educat
 ## Key Features
 
 ### 🌍 Cultural Adaptation
+
 - **Bilingual Support**: English and Kiswahili throughout
 - **Cultural Sensitivity**: Appropriate formality levels and respect terms
 - **Local Context**: Kenyan government structure and legal framework
 
 ### 📚 Educational Design
+
 - **Progressive Disclosure**: Information presented at appropriate complexity levels
 - **Interactive Learning**: Step-by-step guides and interactive elements
 - **Visual Aids**: Icons, progress indicators, and status visualization
 
 ### ♿ Accessibility
+
 - **WCAG AA Compliance**: Proper ARIA labels and keyboard navigation
 - **Screen Reader Support**: Semantic HTML and descriptive text
 - **Color Contrast**: Meets accessibility standards
 
 ### 📱 Responsive Design
+
 - **Mobile-First**: Optimized for mobile devices
 - **Flexible Layouts**: Adapts to different screen sizes
 - **Touch-Friendly**: Appropriate touch targets and interactions
@@ -83,6 +92,7 @@ This directory contains components specifically designed for Kenyan civic educat
 ## Usage Examples
 
 ### Basic Hub Integration
+
 ```tsx
 import { CivicEducationHub } from '@client/shared/ui/civic';
 
@@ -96,6 +106,7 @@ function CivicPage() {
 ```
 
 ### Detailed Process Component
+
 ```tsx
 import { KenyanLegislativeProcess } from '@client/shared/ui/civic';
 
@@ -109,27 +120,26 @@ function LegislationPage() {
 ```
 
 ### Context Provider Setup
+
 ```tsx
 import { KenyanContextProvider } from '@client/shared/ui/civic';
 
 function App() {
-  return (
-    <KenyanContextProvider>
-      {/* Your app components */}
-    </KenyanContextProvider>
-  );
+  return <KenyanContextProvider>{/* Your app components */}</KenyanContextProvider>;
 }
 ```
 
 ## Testing
 
 ### Test Coverage
+
 - **Unit Tests**: Component rendering and interaction
 - **Integration Tests**: Context provider integration
 - **Accessibility Tests**: WCAG compliance verification
 - **Performance Tests**: Render time and responsiveness
 
 ### Running Tests
+
 ```bash
 # Run all civic education tests
 npm test -- civic
@@ -141,15 +151,18 @@ npm test -- CivicEducationHub.test.tsx
 ## Localization
 
 ### Supported Languages
+
 - **English (en)**: Primary language
 - **Kiswahili (sw)**: National language of Kenya
 
 ### Adding Translations
+
 1. Add translation keys to the i18n system
 2. Update component text using the `useI18n` hook
 3. Test both language variants
 
 ### Cultural Considerations
+
 - **Formality Levels**: High formality for government content
 - **Respect Terms**: Appropriate titles and honorifics
 - **Communication Patterns**: Direct but respectful tone
@@ -157,11 +170,13 @@ npm test -- CivicEducationHub.test.tsx
 ## Performance
 
 ### Optimization Strategies
+
 - **Code Splitting**: Components are lazy-loaded when needed
 - **Memoization**: Context values and expensive calculations are memoized
 - **Bundle Size**: Minimal dependencies and tree-shaking
 
 ### Performance Targets
+
 - **Initial Render**: < 100ms
 - **Language Switch**: < 50ms
 - **Navigation**: < 200ms
@@ -169,12 +184,14 @@ npm test -- CivicEducationHub.test.tsx
 ## Future Enhancements
 
 ### Planned Features
+
 - **Audio Content**: Spoken explanations in local languages
 - **Video Guides**: Visual demonstrations of processes
 - **Interactive Quizzes**: Knowledge assessment tools
 - **Offline Support**: Content available without internet
 
 ### Extensibility
+
 - **Additional Languages**: Support for more Kenyan languages
 - **Regional Customization**: County-specific information
 - **Integration Points**: APIs for external civic data
@@ -182,12 +199,14 @@ npm test -- CivicEducationHub.test.tsx
 ## Contributing
 
 ### Development Guidelines
+
 1. **Cultural Sensitivity**: Ensure content is appropriate for Kenyan context
 2. **Accessibility First**: All components must meet WCAG AA standards
 3. **Bilingual Support**: All user-facing text must support both languages
 4. **Testing Required**: Comprehensive test coverage for new features
 
 ### Code Style
+
 - **TypeScript**: Strict typing for all components
 - **React Best Practices**: Hooks, functional components, proper state management
 - **Consistent Imports**: Use absolute imports with @client prefix
@@ -195,11 +214,13 @@ npm test -- CivicEducationHub.test.tsx
 ## Dependencies
 
 ### Core Dependencies
+
 - **React**: UI framework
 - **Lucide React**: Icon library
 - **Design System**: Shared UI components
 
 ### Context Dependencies
+
 - **i18n System**: Internationalization support
 - **Kenyan Context**: Cultural and legal context provider
 

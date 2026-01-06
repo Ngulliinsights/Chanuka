@@ -6,8 +6,8 @@
 import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
 import { Alert, AlertDescription, Button } from '@/shared/design-system';
+import { cn } from '@/shared/design-system/utils/cn';
 
 export interface AuthAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';
@@ -18,115 +18,107 @@ export interface AuthAlertProps {
   'data-testid'?: string;
 }
 
-export const AuthAlert = React.memo<AuthAlertProps>(({
-  type,
-  message,
-  onRetry,
-  retryLoading = false,
-  className,
-  'data-testid': testId,
-}) => {
-  const getAlertConfig = () => {
-    switch (type) {
-      case 'success':
-        return {
-          icon: CheckCircle,
-          className: 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300',
-          iconClassName: 'text-green-600 dark:text-green-400',
-        };
-      case 'error':
-        return {
-          icon: AlertCircle,
-          className: 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
-          iconClassName: 'text-red-600 dark:text-red-400',
-        };
-      case 'warning':
-        return {
-          icon: AlertCircle,
-          className: 'border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-          iconClassName: 'text-yellow-600 dark:text-yellow-400',
-        };
-      case 'info':
-        return {
-          icon: AlertCircle,
-          className: 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-          iconClassName: 'text-blue-600 dark:text-blue-400',
-        };
-      default:
-        return {
-          icon: AlertCircle,
-          className: '',
-          iconClassName: '',
-        };
-    }
-  };
+export const AuthAlert = React.memo<AuthAlertProps>(
+  ({ type, message, onRetry, retryLoading = false, className, 'data-testid': testId }) => {
+    const getAlertConfig = () => {
+      switch (type) {
+        case 'success':
+          return {
+            icon: CheckCircle,
+            className:
+              'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300',
+            iconClassName: 'text-green-600 dark:text-green-400',
+          };
+        case 'error':
+          return {
+            icon: AlertCircle,
+            className:
+              'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
+            iconClassName: 'text-red-600 dark:text-red-400',
+          };
+        case 'warning':
+          return {
+            icon: AlertCircle,
+            className:
+              'border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+            iconClassName: 'text-yellow-600 dark:text-yellow-400',
+          };
+        case 'info':
+          return {
+            icon: AlertCircle,
+            className:
+              'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+            iconClassName: 'text-blue-600 dark:text-blue-400',
+          };
+        default:
+          return {
+            icon: AlertCircle,
+            className: '',
+            iconClassName: '',
+          };
+      }
+    };
 
-  const { icon: Icon, className: alertClassName, iconClassName } = getAlertConfig();
+    const { icon: Icon, className: alertClassName, iconClassName } = getAlertConfig();
 
-  return (
-    <Alert
-      className={cn(alertClassName, className)}
-      data-testid={testId}
-      role="alert"
-    >
-      <Icon className={cn('h-4 w-4', iconClassName)} />
-      <div className="flex items-center justify-between w-full">
-        <AlertDescription className="flex-1">
-          {message}
-        </AlertDescription>
+    return (
+      <Alert className={cn(alertClassName, className)} data-testid={testId} role="alert">
+        <Icon className={cn('h-4 w-4', iconClassName)} />
+        <div className="flex items-center justify-between w-full">
+          <AlertDescription className="flex-1">{message}</AlertDescription>
 
-        {onRetry && type === 'error' && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onRetry}
-            disabled={retryLoading}
-            className={cn(
-              'ml-2 h-auto p-1 text-xs',
-              'hover:bg-red-100 dark:hover:bg-red-900/30',
-              'text-red-700 dark:text-red-300'
-            )}
-          >
-            {retryLoading ? (
-              <>
-                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                Retrying...
-              </>
-            ) : (
-              'Retry'
-            )}
-          </Button>
-        )}
-      </div>
-    </Alert>
-  );
-});
+          {onRetry && type === 'error' && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onRetry}
+              disabled={retryLoading}
+              className={cn(
+                'ml-2 h-auto p-1 text-xs',
+                'hover:bg-red-100 dark:hover:bg-red-900/30',
+                'text-red-700 dark:text-red-300'
+              )}
+            >
+              {retryLoading ? (
+                <>
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                  Retrying...
+                </>
+              ) : (
+                'Retry'
+              )}
+            </Button>
+          )}
+        </div>
+      </Alert>
+    );
+  }
+);
 
 AuthAlert.displayName = 'AuthAlert';
 
 // Specialized alert components
-export const SuccessAlert = React.memo<Omit<AuthAlertProps, 'type'>>((props) => (
+export const SuccessAlert = React.memo<Omit<AuthAlertProps, 'type'>>(props => (
   <AuthAlert {...props} type="success" />
 ));
 
 SuccessAlert.displayName = 'SuccessAlert';
 
-export const ErrorAlert = React.memo<Omit<AuthAlertProps, 'type'>>((props) => (
+export const ErrorAlert = React.memo<Omit<AuthAlertProps, 'type'>>(props => (
   <AuthAlert {...props} type="error" />
 ));
 
 ErrorAlert.displayName = 'ErrorAlert';
 
-export const WarningAlert = React.memo<Omit<AuthAlertProps, 'type'>>((props) => (
+export const WarningAlert = React.memo<Omit<AuthAlertProps, 'type'>>(props => (
   <AuthAlert {...props} type="warning" />
 ));
 
 WarningAlert.displayName = 'WarningAlert';
 
-export const InfoAlert = React.memo<Omit<AuthAlertProps, 'type'>>((props) => (
+export const InfoAlert = React.memo<Omit<AuthAlertProps, 'type'>>(props => (
   <AuthAlert {...props} type="info" />
 ));
 
 InfoAlert.displayName = 'InfoAlert';
-

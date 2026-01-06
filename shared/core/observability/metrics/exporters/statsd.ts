@@ -1,9 +1,10 @@
 // import { Metric, MetricsExporter } from '../../../types';
 type Metric = any;
 type MetricsExporter = any;
-import { Result, Ok, Err } from '@shared/core/src/primitives/types/result.ts';
 import * as dgram from 'dgram';
 import * as net from 'net';
+
+import { Result, Ok, Err } from '@shared/core/src/primitives/types/result.ts';
 
 // ==================== StatsD Configuration ====================
 

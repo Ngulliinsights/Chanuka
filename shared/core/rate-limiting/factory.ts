@@ -6,12 +6,13 @@
  */
 
 import { Redis } from 'ioredis';
-import { RateLimitStore, RateLimitConfig } from './types';
+
 // import { SlidingWindowStore } from './algorithms/sliding-window';
 // import { TokenBucketStore } from './algorithms/token-bucket';
 // import { FixedWindowStore } from './algorithms/fixed-window';
 import { MemoryRateLimitStore } from './stores/memory-store';
 import { RedisRateLimitStore } from './stores/redis-store';
+import { RateLimitStore, RateLimitConfig } from './types';
 // import { logger } from '../observability/logging'; // Unused import
 
 export interface RateLimitFactoryOptions {

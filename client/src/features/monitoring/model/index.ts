@@ -32,11 +32,6 @@ export type {
   PerformanceRegression,
 } from './performance-regression-tester';
 
-export type {
-  MonitoringConfig,
-  PerformanceAlert,
-} from './continuous-performance-monitor';
+export type { MonitoringConfig, PerformanceAlert } from './continuous-performance-monitor';
 
-export type {
-  RouteMetrics,
-} from './route-profiler';
+export type { RouteMetrics } from './route-profiler';

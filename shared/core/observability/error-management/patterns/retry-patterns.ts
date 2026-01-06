@@ -5,9 +5,10 @@
  * with exponential backoff, jitter, and circuit breaker integration.
  */
 
-import { BaseError, ErrorSeverity } from '../errors/base-error';
-import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
 import { BaseError } from '@shared/core/src/observability/error-management/errors/base-error.ts';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
+
+import { BaseError, ErrorSeverity } from '../errors/base-error';
 
 export interface RetryOptions {
   maxAttempts?: number;

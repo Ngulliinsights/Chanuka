@@ -15,49 +15,49 @@
 // ============================================================================
 
 export {
-    // Types
-    type AppError,
-    type ErrorContext,
-    type ErrorRecoveryStrategy,
-    type ErrorHandlerConfig,
-    type ErrorListener,
-    type ErrorStats,
-    type ReactErrorInfo,
-    type ErrorBoundaryProps,
-    type ErrorFallbackProps,
-    type RecoveryResult,
+  // Types
+  type AppError,
+  type ErrorContext,
+  type ErrorRecoveryStrategy,
+  type ErrorHandlerConfig,
+  type ErrorListener,
+  type ErrorStats,
+  type ReactErrorInfo,
+  type ErrorBoundaryProps,
+  type ErrorFallbackProps,
+  type RecoveryResult,
 
-    // Enums
-    ErrorDomain,
-    ErrorSeverity,
-    RecoveryAction,
+  // Enums
+  ErrorDomain,
+  ErrorSeverity,
+  RecoveryAction,
 
-    // Core handler
-    coreErrorHandler,
+  // Core handler
+  coreErrorHandler,
 
-    // Convenience functions
-    createNetworkError,
-    createValidationError,
-    createAuthError,
+  // Convenience functions
+  createNetworkError,
+  createValidationError,
+  createAuthError,
 
-    // Recovery strategies
-    networkRetryStrategy,
-    cacheClearStrategy,
-    pageReloadStrategy,
-    authRefreshStrategy,
-    defaultRecoveryStrategies,
-    registerDefaultRecoveryStrategies,
-    executeRecovery,
-    useRecovery,
-    isRecoverable,
+  // Recovery strategies
+  networkRetryStrategy,
+  cacheClearStrategy,
+  pageReloadStrategy,
+  authRefreshStrategy,
+  defaultRecoveryStrategies,
+  registerDefaultRecoveryStrategies,
+  executeRecovery,
+  useRecovery,
+  isRecoverable,
 
-    // Initialization and utilities
-    initializeCoreErrorHandling,
-    getErrorStats,
-    handleError,
-    createError,
-    logError,
-    useCoreErrorHandler,
+  // Initialization and utilities
+  initializeCoreErrorHandling,
+  getErrorStats,
+  handleError,
+  createError,
+  logError,
+  useCoreErrorHandler,
 } from './error';
 
 // ============================================================================
@@ -65,49 +65,49 @@ export {
 // ============================================================================
 
 export {
-    // Types
-    type BrowserInfo,
-    type FeatureSet,
-    type CompatibilityStatus,
-    type CompatibilityRecommendation,
-    type PolyfillStatus,
-    type FetchOptions,
-    type FetchResponse,
-    type IntersectionObserverEntry,
-    type IntersectionObserverOptions,
-    type StoragePolyfill,
+  // Types
+  type BrowserInfo,
+  type FeatureSet,
+  type CompatibilityStatus,
+  type CompatibilityRecommendation,
+  type PolyfillStatus,
+  type FetchOptions,
+  type FetchResponse,
+  type IntersectionObserverEntry,
+  type IntersectionObserverOptions,
+  type StoragePolyfill,
 
-    // Classes
-    FeatureDetector,
-    BrowserDetector,
-    PolyfillManager,
-    BrowserCompatibilityManager,
+  // Classes
+  FeatureDetector,
+  BrowserDetector,
+  PolyfillManager,
+  BrowserCompatibilityManager,
 
-    // Singleton instances
-    featureDetector,
-    browserDetector,
-    polyfillManager,
-    browserCompatibilityManager,
+  // Singleton instances
+  featureDetector,
+  browserDetector,
+  polyfillManager,
+  browserCompatibilityManager,
 
-    // Constants
-    MINIMUM_VERSIONS,
-    CRITICAL_FEATURES,
-    BROWSER_NAME_MAP,
+  // Constants
+  MINIMUM_VERSIONS,
+  CRITICAL_FEATURES,
+  BROWSER_NAME_MAP,
 
-    // Utilities
-    isBrowserEnv,
-    isTestEnv,
+  // Utilities
+  isBrowserEnv,
+  isTestEnv,
 
-    // Convenience functions
-    getBrowserInfo,
-    isBrowserSupported,
-    hasFeature,
-    hasCriticalFeatures,
-    initializeBrowserCompatibility,
-    getBrowserCompatibilityStatus,
-    shouldBlockBrowser,
-    getCompatibilityWarnings,
-    loadPolyfills,
+  // Convenience functions
+  getBrowserInfo,
+  isBrowserSupported,
+  hasFeature,
+  hasCriticalFeatures,
+  initializeBrowserCompatibility,
+  getBrowserCompatibilityStatus,
+  shouldBlockBrowser,
+  getCompatibilityWarnings,
+  loadPolyfills,
 } from './browser';
 
 // ============================================================================
@@ -115,66 +115,66 @@ export {
 // ============================================================================
 
 export {
-    // Main auth module
-    default as auth,
+  // Main auth module
+  default as auth,
 
-    // Services
-    AuthApiService,
-    createAuthApiService,
-    authApiService,
-    TokenManager,
-    tokenManager,
-    SessionManager,
-    sessionManager,
+  // Services
+  AuthApiService,
+  createAuthApiService,
+  authApiService,
+  TokenManager,
+  tokenManager,
+  SessionManager,
+  sessionManager,
 
-    // React Integration
-    AuthProvider,
-    useAuth,
-    useAuthStore,
+  // React Integration
+  AuthProvider,
+  useAuth,
+  useAuthStore,
 
-    // Redux Integration
-    authReducer,
-    authMiddleware,
-    createAuthMiddleware,
+  // Redux Integration
+  authReducer,
+  authMiddleware,
+  createAuthMiddleware,
 
-    // HTTP Integration
-    AuthenticatedApiClient,
-    AuthenticationInterceptor,
-    TokenRefreshInterceptor,
-    createAuthInterceptors,
+  // HTTP Integration
+  AuthenticatedApiClient,
+  AuthenticationInterceptor,
+  TokenRefreshInterceptor,
+  createAuthInterceptors,
 
-    // Validation
-    validatePasswordComprehensive,
-    checkPasswordStrength,
-    validateEmailDomain,
-    validateFormBatch,
-    createDebouncedValidator,
-    formatValidationErrors,
+  // Validation
+  validatePasswordComprehensive,
+  checkPasswordStrength,
+  validateEmailDomain,
+  validateFormBatch,
+  createDebouncedValidator,
+  formatValidationErrors,
 
-    // Configuration
-    createAuthConfig,
-    initializeAuth,
-    configureAuth,
+  // Configuration
+  createAuthConfig,
+  initializeAuth,
+  configureAuth,
 
-    // Constants
-    AUTH_VALIDATION_RULES,
-    AUTH_ERROR_MESSAGES,
-    SESSION_REFRESH_BUFFER_MS,
-    MINIMUM_REFRESH_DELAY_MS,
+  // Constants
+  AUTH_VALIDATION_RULES,
+  AUTH_ERROR_MESSAGES,
+  SESSION_REFRESH_BUFFER_MS,
+  MINIMUM_REFRESH_DELAY_MS,
 
-    // Error Classes
-    AuthValidationError,
-    AuthenticationError,
-    AuthorizationError,
-    SessionExpiredError,
-    TokenRefreshError,
+  // Error Classes
+  AuthValidationError,
+  AuthenticationError,
+  AuthorizationError,
+  SessionExpiredError,
+  TokenRefreshError,
 
-    // Types
-    type AuthSettings,
-    type AuthInitOptions,
-    type AuthMiddlewareConfig,
-    type PasswordStrength,
-    type BatchValidationResult,
+  // Types
+  type AuthSettings,
+  type AuthInitOptions,
+  type AuthMiddlewareConfig,
+  type PasswordStrength,
+  type BatchValidationResult,
 } from './auth';
 
 // ============================================================================
@@ -226,8 +226,17 @@ export * from './navigation';
 
 // Export core domain types from consolidated locations
 export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../shared/types';
-export type { UserProfile, UserPreferences as FeatureUserPreferences } from '../features/users/types';
-export type { SearchQuery, SearchResult, SearchFilters, SearchResponse, SearchMetadata } from '../features/search/types';
+export type {
+  UserProfile,
+  UserPreferences as FeatureUserPreferences,
+} from '../features/users/types';
+export type {
+  SearchQuery,
+  SearchResult,
+  SearchFilters,
+  SearchResponse,
+  SearchMetadata,
+} from '../features/search/types';
 
 // ============================================================================
 // Client Architecture Foundation

@@ -1,14 +1,17 @@
 /**
  * Browser Compatibility Report Component
- * 
+ *
  * This component provides a comprehensive report of browser compatibility
  * with actionable recommendations and fallback solutions.
  */
 
 import React, { useState, useEffect } from 'react';
 
-import { getBrowserInfo, getBrowserCompatibilityStatus, getCompatibilityWarnings } from '@client/core/browser';
-
+import {
+  getBrowserInfo,
+  getBrowserCompatibilityStatus,
+  getCompatibilityWarnings,
+} from '@client/core/browser';
 
 import BrowserCompatibilityTester from './BrowserCompatibilityTester';
 
@@ -19,7 +22,7 @@ interface BrowserCompatibilityReportProps {
 
 const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
   showFullReport = false,
-  onIssuesDetected
+  onIssuesDetected,
 }) => {
   const [browserInfo] = useState(() => getBrowserInfo());
   const [compatibilityStatus] = useState(() => getBrowserCompatibilityStatus());
@@ -38,13 +41,20 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
 
   const getBrowserIcon = (browserName: string) => {
     switch (browserName) {
-      case 'chrome': return '🌐';
-      case 'firefox': return '🦊';
-      case 'safari': return '🧭';
-      case 'edge': return '🔷';
-      case 'opera': return '🎭';
-      case 'ie': return '⚠️';
-      default: return '❓';
+      case 'chrome':
+        return '🌐';
+      case 'firefox':
+        return '🦊';
+      case 'safari':
+        return '🧭';
+      case 'edge':
+        return '🔷';
+      case 'opera':
+        return '🎭';
+      case 'ie':
+        return '⚠️';
+      default:
+        return '❓';
     }
   };
 
@@ -79,19 +89,20 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
             <span className="text-2xl">{getBrowserIcon(browserInfo.name)}</span>
             <div>
               <h3 className="font-semibold text-gray-900">
-                {browserInfo.name.charAt(0).toUpperCase() + browserInfo.name.slice(1)} {browserInfo.version}
+                {browserInfo.name.charAt(0).toUpperCase() + browserInfo.name.slice(1)}{' '}
+                {browserInfo.version}
               </h3>
               <div className="flex items-center space-x-2 text-sm">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSupportStatusColor(browserInfo.isSupported)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getSupportStatusColor(browserInfo.isSupported)}`}
+                >
                   {browserInfo.isSupported ? 'Supported' : 'Not Supported'}
                 </span>
-                <span className="font-medium text-green-600">
-                  95% Compatible
-                </span>
+                <span className="font-medium text-green-600">95% Compatible</span>
               </div>
             </div>
           </div>
-          
+
           <button
             type="button"
             onClick={() => setShowTester(!showTester)}
@@ -111,7 +122,7 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
                   <span>{browserInfo.warnings.length} Issues</span>
                 </div>
               )}
-              
+
               {browserInfo.warnings.length > 0 && (
                 <div className="flex items-center text-yellow-600">
                   <span className="mr-1">⚠️</span>
@@ -200,7 +211,8 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
             <div>
               <h3 className="text-yellow-800 font-semibold">Safari Version Warning</h3>
               <p className="text-yellow-700 text-sm mt-1">
-                Your Safari version may have compatibility issues. Consider updating to Safari 14 or later.
+                Your Safari version may have compatibility issues. Consider updating to Safari 14 or
+                later.
               </p>
             </div>
           </div>
@@ -215,7 +227,8 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
             <div>
               <h3 className="text-blue-800 font-semibold">Mobile Browser Detected</h3>
               <p className="text-blue-700 text-sm mt-1">
-                Some features may be optimized for desktop. For the best experience, consider using the desktop version.
+                Some features may be optimized for desktop. For the best experience, consider using
+                the desktop version.
               </p>
             </div>
           </div>
@@ -226,4 +239,3 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
 };
 
 export default BrowserCompatibilityReport;
-

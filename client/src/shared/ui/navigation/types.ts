@@ -1,4 +1,12 @@
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate' | 'official' | 'moderator';
+export type UserRole =
+  | 'public'
+  | 'citizen'
+  | 'expert'
+  | 'admin'
+  | 'journalist'
+  | 'advocate'
+  | 'official'
+  | 'moderator';
 export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
 export interface NavigationItem {
   id: string;
@@ -14,7 +22,11 @@ export interface NavigationItem {
   condition?: (role: UserRole, user: any) => boolean;
   priority?: number;
 }
-export type AccessDenialReason = 'unauthenticated' | 'insufficient_role' | 'admin_required' | 'custom_condition';
+export type AccessDenialReason =
+  | 'unauthenticated'
+  | 'insufficient_role'
+  | 'admin_required'
+  | 'custom_condition';
 
 export interface RelatedPage {
   pageId: string;
@@ -27,4 +39,3 @@ export interface RelatedPage {
   context?: string;
   relevanceScore: number;
 }
-

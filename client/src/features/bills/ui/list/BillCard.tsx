@@ -1,11 +1,10 @@
 /**
  * Bill Card Component
- * 
+ *
  * A card component for displaying bill information in lists and grids.
  * This component is specific to the bills feature.
  */
 
-import { Bill } from '@client/shared/types';
 import {
   Calendar,
   Users,
@@ -24,6 +23,7 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { cn } from '@client/shared/design-system';
+import { Bill } from '@client/shared/types';
 
 interface BillCardProps {
   bill: Bill;

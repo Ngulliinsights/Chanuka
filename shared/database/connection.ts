@@ -1,5 +1,6 @@
-import { logger } from '../core/index';
 import type { Pool } from 'pg';
+
+import { logger } from '../core/index';
 
 // ============================================================================
 // TYPE DEFINITIONS

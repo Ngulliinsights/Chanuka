@@ -3,28 +3,28 @@
  * Comprehensive interface with all privacy controls (tabs for visibility, data, notifications, cookies, rights)
  */
 
-import {
-  Shield,
-  AlertTriangle
-} from 'lucide-react';
+import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState, useCallback, Suspense } from 'react';
 
 import { useAuth } from '@/core/auth';
-import {
-  PrivacySettings,
-  ConsentRecord
-} from '@/core/auth';
-import { logger } from '../../../utils/logger';
-
+import { PrivacySettings, ConsentRecord } from '@/core/auth';
 
 // import { ConsentModal } from '../../auth/ConsentModal';
 import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
 import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
-const VisibilityControls = React.lazy(() => import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls })));
-const DataUsageControls = React.lazy(() => import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls })));
-const ConsentControls = React.lazy(() => import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls })));
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+
+import { logger } from '../../../utils/logger';
+const VisibilityControls = React.lazy(() =>
+  import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls }))
+);
+const DataUsageControls = React.lazy(() =>
+  import('./controls/DataUsageControls').then(module => ({ default: module.DataUsageControls }))
+);
+const ConsentControls = React.lazy(() =>
+  import('./controls/ConsentControls').then(module => ({ default: module.ConsentControls }))
+);
 
 interface FullInterfaceProps {
   settings: PrivacySettings | null;
@@ -35,7 +35,7 @@ interface FullInterfaceProps {
 export const FullInterface = React.memo<FullInterfaceProps>(function FullInterface({
   settings,
   onSettingsChange,
-  className = ''
+  className = '',
 }) {
   const auth = useAuth();
   const [loading, setLoading] = useState(false);
@@ -45,54 +45,67 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
   const [_exportRequests, setExportRequests] = useState<any[]>([]);
   const [_deletionRequests, setDeletionRequests] = useState<any[]>([]);
 
-  const handleSettingChange = useCallback(async (key: keyof PrivacySettings, value: any) => {
-    if (!settings) return;
+  const handleSettingChange = useCallback(
+    async (key: keyof PrivacySettings, value: any) => {
+      if (!settings) return;
 
-    const newSettings = { ...settings, [key]: value };
-    onSettingsChange(newSettings);
+      const newSettings = { ...settings, [key]: value };
+      onSettingsChange(newSettings);
 
-    try {
-      const result = await auth.updatePrivacySettings({ [key]: value });
-      if (!result.success) {
-        // Revert on failure to maintain UI consistency
+      try {
+        const result = await auth.updatePrivacySettings({ [key]: value });
+        if (!result.success) {
+          // Revert on failure to maintain UI consistency
+          onSettingsChange(settings);
+          logger.error(
+            'Failed to update privacy setting:',
+            { component: 'FullInterface' },
+            result.error
+          );
+        }
+      } catch (error) {
+        // Revert on error to prevent UI from showing incorrect state
         onSettingsChange(settings);
-        logger.error('Failed to update privacy setting:', { component: 'FullInterface' }, result.error);
+        logger.error('Privacy setting update failed:', { component: 'FullInterface' }, error);
       }
-    } catch (error) {
-      // Revert on error to prevent UI from showing incorrect state
-      onSettingsChange(settings);
-      logger.error('Privacy setting update failed:', { component: 'FullInterface' }, error);
-    }
-  }, [settings, onSettingsChange, auth]);
+    },
+    [settings, onSettingsChange, auth]
+  );
 
-  const handleNotificationChange = useCallback(async (key: keyof PrivacySettings['notification_preferences'], value: boolean) => {
-    if (!settings) return;
+  const handleNotificationChange = useCallback(
+    async (key: keyof PrivacySettings['notification_preferences'], value: boolean) => {
+      if (!settings) return;
 
-    const newNotificationPrefs = {
-      ...settings.notification_preferences,
-      [key]: value,
-    };
+      const newNotificationPrefs = {
+        ...settings.notification_preferences,
+        [key]: value,
+      };
 
-    await handleSettingChange('notification_preferences', newNotificationPrefs);
-  }, [settings, handleSettingChange]);
+      await handleSettingChange('notification_preferences', newNotificationPrefs);
+    },
+    [settings, handleSettingChange]
+  );
 
-  const requestDataExport = useCallback(async (format: 'json' | 'csv' | 'xml') => {
-    setLoading(true);
-    try {
-      const exportRequest = await auth.requestDataExport(format, [
-        'profile',
-        'activity',
-        'analytics',
-        'communications'
-      ]);
+  const requestDataExport = useCallback(
+    async (format: 'json' | 'csv' | 'xml') => {
+      setLoading(true);
+      try {
+        const exportRequest = await auth.requestDataExport(format, [
+          'profile',
+          'activity',
+          'analytics',
+          'communications',
+        ]);
 
-      setExportRequests(prev => [...prev, exportRequest]);
-    } catch (error) {
-      logger.error('Data export request failed:', { component: 'FullInterface' }, error);
-    } finally {
-      setLoading(false);
-    }
-  }, [auth]);
+        setExportRequests(prev => [...prev, exportRequest]);
+      } catch (error) {
+        logger.error('Data export request failed:', { component: 'FullInterface' }, error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [auth]
+  );
 
   const requestDataDeletion = useCallback(async () => {
     setLoading(true);
@@ -101,7 +114,7 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
         'profile',
         'activity',
         'analytics',
-        'communications'
+        'communications',
       ]);
 
       setDeletionRequests(prev => [...prev, deletionRequest]);
@@ -117,31 +130,32 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
     setShowConsentModal(true);
   }, []);
 
-  const handleConsentChange = useCallback((type: ConsentRecord['consent_type'], granted: boolean) => {
-    switch (type) {
-      case 'analytics':
-        handleSettingChange('analytics_consent', granted);
-        break;
-      case 'marketing':
-        handleSettingChange('marketing_consent', granted);
-        break;
-      case 'data_sharing':
-        handleSettingChange('data_sharing_consent', granted);
-        break;
-      case 'location':
-        handleSettingChange('location_tracking', granted);
-        break;
-    }
-  }, [handleSettingChange]);
+  const handleConsentChange = useCallback(
+    (type: ConsentRecord['consent_type'], granted: boolean) => {
+      switch (type) {
+        case 'analytics':
+          handleSettingChange('analytics_consent', granted);
+          break;
+        case 'marketing':
+          handleSettingChange('marketing_consent', granted);
+          break;
+        case 'data_sharing':
+          handleSettingChange('data_sharing_consent', granted);
+          break;
+        case 'location':
+          handleSettingChange('location_tracking', granted);
+          break;
+      }
+    },
+    [handleSettingChange]
+  );
 
   // Show login prompt if user is not authenticated
   if (!auth.user || !settings) {
     return (
       <Alert>
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Please log in to manage your privacy settings.
-        </AlertDescription>
+        <AlertDescription>Please log in to manage your privacy settings.</AlertDescription>
       </Alert>
     );
   }
@@ -187,7 +201,12 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
               >
                 Read our Privacy Policy
                 <svg className="h-3 w-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
                 </svg>
               </a>
             </AlertDescription>
@@ -208,10 +227,7 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
         {/* Profile Visibility Tab */}
         <TabsContent value="visibility">
           <Suspense fallback={<TabLoadingFallback />}>
-            <VisibilityControls
-              settings={settings}
-              onSettingChange={handleSettingChange}
-            />
+            <VisibilityControls settings={settings} onSettingChange={handleSettingChange} />
           </Suspense>
         </TabsContent>
 
@@ -246,7 +262,12 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
                 </svg>
                 Cookie Preferences
               </CardTitle>
@@ -257,9 +278,7 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <h4 className="font-medium">{category.name}</h4>
-                      {category.required && (
-                        <Badge variant="secondary">Required</Badge>
-                      )}
+                      {category.required && <Badge variant="secondary">Required</Badge>}
                     </div>
                     <input
                       type="checkbox"
@@ -301,7 +320,9 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
           <div className="bg-white p-6 rounded-lg">
             <h3>Consent Modal</h3>
             <p>Consent type: {consentType}</p>
-            <button type="button" onClick={() => setShowConsentModal(false)}>Close</button>
+            <button type="button" onClick={() => setShowConsentModal(false)}>
+              Close
+            </button>
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ import { Check, ChevronRight, Circle, AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@/shared/design-system/utils/cn';
+
 import { logger } from '../../../utils/logger';
 
 import { UIComponentError } from './errors';

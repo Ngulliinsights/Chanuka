@@ -4,7 +4,9 @@
  * Routes between legacy and new concurrency implementations based on feature flags
  */
 
+import type { FeatureFlagsService } from '@shared/core/src/caching/feature-flags.ts';
 import { ConcurrencyAdapter, Mutex as NewMutex, Semaphore as NewSemaphore } from '@shared/core/src/utils/concurrency-adapter.ts';
+
 import {
   Mutex as LegacyMutex,
   Semaphore as LegacySemaphore,
@@ -14,7 +16,6 @@ import {
   apiSemaphore as legacyApiSemaphore,
   fileSemaphore as legacyFileSemaphore
 } from './race-condition-prevention.js';
-import type { FeatureFlagsService } from '@shared/core/src/caching/feature-flags.ts';
 
 export interface MigrationMetrics {
   startTime: number;

@@ -7,12 +7,20 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
+import {
+  Users,
+  Activity,
+  TrendingUp,
+  AlertTriangle,
+  Clock,
+  Eye,
+  MousePointer,
+  Zap,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
 import {
   BarChart,
   Bar,
@@ -27,25 +35,27 @@ import {
   Pie,
   Cell,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
-import {
-  Users,
-  Activity,
-  TrendingUp,
-  AlertTriangle,
-  Clock,
-  Eye,
-  MousePointer,
-  Zap,
-  CheckCircle,
-  XCircle,
-  AlertCircle
-} from 'lucide-react';
 
-import { ComprehensiveAnalyticsTracker, AnalyticsDashboardData } from '@client/core/analytics/comprehensive-tracker';
-import { useAnalyticsDashboard } from '../../hooks/useAnalytics';
+import {
+  ComprehensiveAnalyticsTracker,
+  AnalyticsDashboardData,
+} from '@client/core/analytics/comprehensive-tracker';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
+
+import { useAnalyticsDashboard } from '../../hooks/useAnalytics';
 
 /**
  * Color scheme for charts and visualizations
@@ -61,8 +71,8 @@ const COLORS = {
     public: '#6b7280',
     citizen: '#3b82f6',
     expert: '#10b981',
-    admin: '#f59e0b'
-  }
+    admin: '#f59e0b',
+  },
 };
 
 /**
@@ -83,7 +93,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
   change,
   icon,
   description,
-  trend
+  trend,
 }) => {
   const getTrendColor = () => {
     if (trend === 'up') return 'text-green-600';
@@ -109,13 +119,12 @@ const MetricCard: React.FC<MetricCardProps> = ({
           <div className={`flex items-center text-xs ${getTrendColor()}`}>
             {getTrendIcon()}
             <span className="ml-1">
-              {change > 0 ? '+' : ''}{change}%
+              {change > 0 ? '+' : ''}
+              {change}%
             </span>
           </div>
         )}
-        {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
       </CardContent>
     </Card>
   );
@@ -132,21 +141,31 @@ interface AlertItemProps {
 const AlertItem: React.FC<AlertItemProps> = ({ alert, onAcknowledge }) => {
   const getAlertVariant = () => {
     switch (alert.severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'default';
-      case 'low': return 'default';
-      default: return 'default';
+      case 'critical':
+        return 'destructive';
+      case 'high':
+        return 'destructive';
+      case 'medium':
+        return 'default';
+      case 'low':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getAlertIcon = () => {
     switch (alert.severity) {
-      case 'critical': return <XCircle className="h-4 w-4" />;
-      case 'high': return <AlertTriangle className="h-4 w-4" />;
-      case 'medium': return <AlertCircle className="h-4 w-4" />;
-      case 'low': return <CheckCircle className="h-4 w-4" />;
-      default: return <AlertCircle className="h-4 w-4" />;
+      case 'critical':
+        return <XCircle className="h-4 w-4" />;
+      case 'high':
+        return <AlertTriangle className="h-4 w-4" />;
+      case 'medium':
+        return <AlertCircle className="h-4 w-4" />;
+      case 'low':
+        return <CheckCircle className="h-4 w-4" />;
+      default:
+        return <AlertCircle className="h-4 w-4" />;
     }
   };
 
@@ -162,15 +181,9 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert, onAcknowledge }) => {
       <AlertDescription className="mt-2">
         <p>{alert.message}</p>
         <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-muted-foreground">
-            {alert.timestamp.toLocaleString()}
-          </span>
+          <span className="text-xs text-muted-foreground">{alert.timestamp.toLocaleString()}</span>
           {!alert.acknowledged && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onAcknowledge(alert.id)}
-            >
+            <Button size="sm" variant="outline" onClick={() => onAcknowledge(alert.id)}>
               Acknowledge
             </Button>
           )}
@@ -201,24 +214,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="loadTime"
-          stroke={COLORS.primary}
-          name="Load Time (ms)"
-        />
-        <Line
-          type="monotone"
-          dataKey="fcp"
-          stroke={COLORS.secondary}
-          name="FCP (ms)"
-        />
-        <Line
-          type="monotone"
-          dataKey="lcp"
-          stroke={COLORS.warning}
-          name="LCP (ms)"
-        />
+        <Line type="monotone" dataKey="loadTime" stroke={COLORS.primary} name="Load Time (ms)" />
+        <Line type="monotone" dataKey="fcp" stroke={COLORS.secondary} name="FCP (ms)" />
+        <Line type="monotone" dataKey="lcp" stroke={COLORS.warning} name="LCP (ms)" />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -262,19 +260,27 @@ interface RealTimeActivityProps {
 const RealTimeActivity: React.FC<RealTimeActivityProps> = ({ data }) => {
   const getSystemHealthColor = () => {
     switch (data.systemHealth) {
-      case 'healthy': return 'text-green-600';
-      case 'warning': return 'text-yellow-600';
-      case 'critical': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'healthy':
+        return 'text-green-600';
+      case 'warning':
+        return 'text-yellow-600';
+      case 'critical':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const getSystemHealthIcon = () => {
     switch (data.systemHealth) {
-      case 'healthy': return <CheckCircle className="h-5 w-5" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5" />;
-      case 'critical': return <XCircle className="h-5 w-5" />;
-      default: return <AlertCircle className="h-5 w-5" />;
+      case 'healthy':
+        return <CheckCircle className="h-5 w-5" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5" />;
+      case 'critical':
+        return <XCircle className="h-5 w-5" />;
+      default:
+        return <AlertCircle className="h-5 w-5" />;
     }
   };
 
@@ -312,11 +318,12 @@ const RealTimeActivity: React.FC<RealTimeActivityProps> = ({ data }) => {
         <h4 className="text-sm font-medium mb-2">Recent Events</h4>
         <div className="space-y-2 max-h-40 overflow-y-auto">
           {data.recentEvents.map((event, index) => (
-            <div key={index} className="flex items-center justify-between text-xs p-2 bg-gray-50 rounded">
+            <div
+              key={index}
+              className="flex items-center justify-between text-xs p-2 bg-gray-50 rounded"
+            >
               <span className="font-medium">{event.type.replace('_', ' ')}</span>
-              <span className="text-muted-foreground">
-                {event.timestamp.toLocaleTimeString()}
-              </span>
+              <span className="text-muted-foreground">{event.timestamp.toLocaleTimeString()}</span>
             </div>
           ))}
         </div>
@@ -376,7 +383,7 @@ export const AnalyticsDashboard: React.FC = () => {
         );
         setDashboardData({
           ...dashboardData,
-          alerts: updatedAlerts
+          alerts: updatedAlerts,
         });
       }
 
@@ -414,7 +421,7 @@ export const AnalyticsDashboard: React.FC = () => {
       name: role.charAt(0).toUpperCase() + role.slice(1),
       users: data.userCount,
       engagement: Math.round(data.averageEngagement),
-      conversions: Math.round(data.conversionRate * 100)
+      conversions: Math.round(data.conversionRate * 100),
     }));
   }, [dashboardData]);
 
@@ -427,7 +434,13 @@ export const AnalyticsDashboard: React.FC = () => {
       { name: '45m ago', loadTime: 2300, fcp: 1300, lcp: 2200, cls: 0.12 },
       { name: '30m ago', loadTime: 1900, fcp: 1100, lcp: 1800, cls: 0.08 },
       { name: '15m ago', loadTime: 2000, fcp: 1150, lcp: 1900, cls: 0.09 },
-      { name: 'Now', loadTime: dashboardData.performanceMetrics.averageLoadTime, fcp: 1100, lcp: 1850, cls: 0.07 }
+      {
+        name: 'Now',
+        loadTime: dashboardData.performanceMetrics.averageLoadTime,
+        fcp: 1100,
+        lcp: 1850,
+        cls: 0.07,
+      },
     ];
   }, [dashboardData]);
 
@@ -474,9 +487,7 @@ export const AnalyticsDashboard: React.FC = () => {
           <Button variant="outline" onClick={loadDashboardData}>
             Refresh
           </Button>
-          <Badge variant="outline">
-            Last updated: {new Date().toLocaleTimeString()}
-          </Badge>
+          <Badge variant="outline">Last updated: {new Date().toLocaleTimeString()}</Badge>
         </div>
       </div>
 
@@ -570,9 +581,7 @@ export const AnalyticsDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Performance Trends</CardTitle>
-                <CardDescription>
-                  Page load time and Core Web Vitals over time
-                </CardDescription>
+                <CardDescription>Page load time and Core Web Vitals over time</CardDescription>
               </CardHeader>
               <CardContent>
                 <PerformanceChart data={performanceChartData} />
@@ -588,7 +597,11 @@ export const AnalyticsDashboard: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <span>{role.charAt(0).toUpperCase() + role.slice(1)} Users</span>
-                    <Badge style={{ backgroundColor: COLORS.personas[role as keyof typeof COLORS.personas] }}>
+                    <Badge
+                      style={{
+                        backgroundColor: COLORS.personas[role as keyof typeof COLORS.personas],
+                      }}
+                    >
                       {data.userCount}
                     </Badge>
                   </CardTitle>
@@ -601,7 +614,9 @@ export const AnalyticsDashboard: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Conversion Rate</p>
-                      <p className="text-2xl font-bold">{(data.conversionRate * 100).toFixed(1)}%</p>
+                      <p className="text-2xl font-bold">
+                        {(data.conversionRate * 100).toFixed(1)}%
+                      </p>
                     </div>
                   </div>
 
@@ -702,9 +717,7 @@ export const AnalyticsDashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Real-time Activity</CardTitle>
-              <CardDescription>
-                Current system status and live user activity
-              </CardDescription>
+              <CardDescription>Current system status and live user activity</CardDescription>
             </CardHeader>
             <CardContent>
               <RealTimeActivity data={dashboardData.realTimeData} />
@@ -731,12 +744,8 @@ export const AnalyticsDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              dashboardData.alerts.map((alert) => (
-                <AlertItem
-                  key={alert.id}
-                  alert={alert}
-                  onAcknowledge={handleAcknowledgeAlert}
-                />
+              dashboardData.alerts.map(alert => (
+                <AlertItem key={alert.id} alert={alert} onAcknowledge={handleAcknowledgeAlert} />
               ))
             )}
           </div>

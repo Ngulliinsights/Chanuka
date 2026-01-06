@@ -3,9 +3,10 @@
  * Centralizes all monitoring services for the Chanuka Client
  */
 
+import SentryMonitoring from '@client/core/monitoring/sentry-config';
+
 import { ErrorMonitor } from './error-monitor';
 import { PerformanceMonitor } from './performance-monitor';
-import SentryMonitoring from '@client/core/monitoring/sentry-config';
 
 interface MonitoringConfig {
   environment: string;
@@ -83,7 +84,6 @@ class MonitoringIntegration {
 
       this.initialized = true;
       console.log('🎉 All monitoring services initialized successfully');
-
     } catch (error) {
       console.error('❌ Failed to initialize monitoring:', error);
       throw error;
@@ -92,7 +92,7 @@ class MonitoringIntegration {
 
   private setupPerformanceIntegration(): void {
     // Integrate performance monitoring with Sentry
-    this.performance.onMetricsChange((metrics) => {
+    this.performance.onMetricsChange(metrics => {
       // Report Core Web Vitals to Sentry
       if (metrics.coreWebVitals.lcp) {
         this.sentry.setContext('performance', {
@@ -106,17 +106,11 @@ class MonitoringIntegration {
 
       // Alert on poor performance
       if (metrics.coreWebVitals.lcp && metrics.coreWebVitals.lcp > 4000) {
-        this.sentry.captureMessage(
-          `Poor LCP detected: ${metrics.coreWebVitals.lcp}ms`,
-          'warning'
-        );
+        this.sentry.captureMessage(`Poor LCP detected: ${metrics.coreWebVitals.lcp}ms`, 'warning');
       }
 
       if (metrics.coreWebVitals.cls && metrics.coreWebVitals.cls > 0.25) {
-        this.sentry.captureMessage(
-          `High CLS detected: ${metrics.coreWebVitals.cls}`,
-          'warning'
-        );
+        this.sentry.captureMessage(`High CLS detected: ${metrics.coreWebVitals.cls}`, 'warning');
       }
     });
   }
@@ -139,7 +133,7 @@ class MonitoringIntegration {
 
   private setupUserActionTracking(): void {
     // Track clicks on important elements
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
 
       // Track button clicks
@@ -147,14 +141,10 @@ class MonitoringIntegration {
         const button = target.tagName === 'BUTTON' ? target : target.closest('button');
         const buttonText = button?.textContent?.trim() || 'Unknown';
 
-        this.sentry.addBreadcrumb(
-          `Button clicked: ${buttonText}`,
-          'user',
-          {
-            element: button?.className,
-            text: buttonText,
-          }
-        );
+        this.sentry.addBreadcrumb(`Button clicked: ${buttonText}`, 'user', {
+          element: button?.className,
+          text: buttonText,
+        });
       }
 
       // Track link clicks
@@ -162,24 +152,16 @@ class MonitoringIntegration {
         const link = target.tagName === 'A' ? target : target.closest('a');
         const href = (link as HTMLAnchorElement)?.href;
 
-        this.sentry.addBreadcrumb(
-          `Link clicked: ${href}`,
-          'navigation',
-          { href }
-        );
+        this.sentry.addBreadcrumb(`Link clicked: ${href}`, 'navigation', { href });
       }
     });
 
     // Track form submissions
-    document.addEventListener('submit', (event) => {
+    document.addEventListener('submit', event => {
       const form = event.target as HTMLFormElement;
       const formId = form.id || form.className || 'unknown';
 
-      this.sentry.addBreadcrumb(
-        `Form submitted: ${formId}`,
-        'user',
-        { formId }
-      );
+      this.sentry.addBreadcrumb(`Form submitted: ${formId}`, 'user', { formId });
     });
   }
 
@@ -190,14 +172,10 @@ class MonitoringIntegration {
     const trackNavigation = () => {
       const newPath = window.location.pathname;
       if (newPath !== currentPath) {
-        this.sentry.addBreadcrumb(
-          `Navigation: ${currentPath} → ${newPath}`,
-          'navigation',
-          {
-            from: currentPath,
-            to: newPath,
-          }
-        );
+        this.sentry.addBreadcrumb(`Navigation: ${currentPath} → ${newPath}`, 'navigation', {
+          from: currentPath,
+          to: newPath,
+        });
 
         // Mark performance measurement
         this.performance.mark(`navigation-${Date.now()}`);
@@ -213,12 +191,12 @@ class MonitoringIntegration {
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
-    history.pushState = function(...args) {
+    history.pushState = function (...args) {
       originalPushState.apply(this, args);
       trackNavigation();
     };
 
-    history.replaceState = function(...args) {
+    history.replaceState = function (...args) {
       originalReplaceState.apply(this, args);
       trackNavigation();
     };
@@ -226,16 +204,13 @@ class MonitoringIntegration {
 
   private setupFeatureTracking(): void {
     // Track feature usage based on data attributes
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
-      const feature = target.dataset.feature || target.closest('[data-feature]')?.getAttribute('data-feature');
+      const feature =
+        target.dataset.feature || target.closest('[data-feature]')?.getAttribute('data-feature');
 
       if (feature) {
-        this.sentry.addBreadcrumb(
-          `Feature used: ${feature}`,
-          'user',
-          { feature }
-        );
+        this.sentry.addBreadcrumb(`Feature used: ${feature}`, 'user', { feature });
 
         // Track feature adoption metrics
         this.sentry.setTag('last_feature_used', feature);

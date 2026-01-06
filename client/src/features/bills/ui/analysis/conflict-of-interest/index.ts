@@ -1,6 +1,6 @@
 /**
  * Conflict of Interest Components - Export Index
- * 
+ *
  * Centralized exports for all conflict of interest analysis components.
  */
 
@@ -23,7 +23,7 @@ export type {
   NetworkData,
   ImplementationWorkaround,
   ConflictVisualizationProps,
-  AccessibilityFallbackData
+  AccessibilityFallbackData,
 } from '@client/features/analysis/types';
 
 export type { ConflictOfInterestAnalysisProps } from './ConflictOfInterestAnalysis';

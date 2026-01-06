@@ -1,6 +1,6 @@
 /**
  * Navigation Types
- * 
+ *
  * Shared navigation types for UI components and routing logic.
  * Migrated from client/src/types/navigation.ts
  */
@@ -46,7 +46,16 @@ export type NavigationSection = 'legislative' | 'community' | 'user' | 'admin' |
 
 // Include both 'citizen' and 'user' to remain compatible with different parts
 // of the codebase that use either term for an authenticated regular users.
-export type UserRole = 'public' | 'citizen' | 'user' | 'expert' | 'admin' | 'official' | 'moderator' | 'journalist' | 'advocate';
+export type UserRole =
+  | 'public'
+  | 'citizen'
+  | 'user'
+  | 'expert'
+  | 'admin'
+  | 'official'
+  | 'moderator'
+  | 'journalist'
+  | 'advocate';
 
 export interface NavigationPreferences {
   defaultLandingPage: string;

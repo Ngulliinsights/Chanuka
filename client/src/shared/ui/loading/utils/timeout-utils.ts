@@ -3,8 +3,8 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingOperation } from '../types';
 import { LOADING_TIMEOUTS } from '../constants';
+import { LoadingOperation } from '../types';
 
 export interface TimeoutConfig {
   timeout: number;
@@ -211,7 +211,7 @@ export function createTimeoutWarning(
   warningPercentage: number = 0.7
 ) {
   const warningTime = calculateWarningThreshold(timeout, warningPercentage);
-  
+
   return setTimeout(() => {
     const remaining = timeout - warningTime;
     onWarning(remaining);
@@ -300,9 +300,9 @@ export function addTimeoutToOperation(
   onTimeout: () => void,
   onWarning?: () => void
 ): TimeoutManager {
-  const warningThreshold = operation.timeout ? 
-    calculateWarningThreshold(operation.timeout) : 
-    undefined;
+  const warningThreshold = operation.timeout
+    ? calculateWarningThreshold(operation.timeout)
+    : undefined;
 
   return createTimeoutManager({
     timeout: operation.timeout || LOADING_TIMEOUTS.MEDIUM,
@@ -322,13 +322,13 @@ export function createOperationTimeoutHandler(
     addOperation: (operation: LoadingOperation) => {
       timeoutManager.add(operation.id, {
         timeout: operation.timeout || LOADING_TIMEOUTS.MEDIUM,
-        warningThreshold: operation.timeout ? 
-          calculateWarningThreshold(operation.timeout) : 
-          undefined,
+        warningThreshold: operation.timeout
+          ? calculateWarningThreshold(operation.timeout)
+          : undefined,
         onTimeout: () => onTimeout(operation.id),
-        onWarning: onWarning ? 
-          () => onWarning(operation.id, timeoutManager.getRemainingTime(operation.id)) : 
-          undefined,
+        onWarning: onWarning
+          ? () => onWarning(operation.id, timeoutManager.getRemainingTime(operation.id))
+          : undefined,
       });
     },
 
@@ -361,34 +361,34 @@ export function createOperationTimeoutHandler(
 
 export function formatTimeout(milliseconds: number): string {
   const seconds = Math.ceil(milliseconds / 1000);
-  
+
   if (seconds < 60) {
     return `${seconds}s`;
   }
-  
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  
+
   if (remainingSeconds === 0) {
     return `${minutes}m`;
   }
-  
+
   return `${minutes}m ${remainingSeconds}s`;
 }
 
 export function formatTimeRemaining(milliseconds: number): string {
   if (milliseconds <= 0) return 'Expired';
-  
+
   const seconds = Math.ceil(milliseconds / 1000);
-  
+
   if (seconds <= 10) {
     return `${seconds}s remaining`;
   }
-  
+
   if (seconds < 60) {
     return `${Math.ceil(seconds / 5) * 5}s remaining`;
   }
-  
+
   const minutes = Math.ceil(seconds / 60);
   return `${minutes}m remaining`;
 }
@@ -402,7 +402,7 @@ export function createTimeoutTester(
   timeout: number
 ): Promise<{ success: boolean; duration: number; timedOut: boolean }> {
   const startTime = Date.now();
-  
+
   return Promise.race([
     testFunction().then(result => ({
       success: true,
@@ -411,11 +411,15 @@ export function createTimeoutTester(
       result,
     })),
     new Promise<{ success: boolean; duration: number; timedOut: boolean }>((_, reject) =>
-      setTimeout(() => reject({
-        success: false,
-        duration: Date.now() - startTime,
-        timedOut: true,
-      }), timeout)
+      setTimeout(
+        () =>
+          reject({
+            success: false,
+            duration: Date.now() - startTime,
+            timedOut: true,
+          }),
+        timeout
+      )
     ),
   ]).catch(error => ({
     success: false,
@@ -431,7 +435,7 @@ export async function measureOperationTimeout(
   tolerance: number = 100
 ): Promise<{ accurate: boolean; actualDuration: number; expectedDuration: number }> {
   const startTime = Date.now();
-  
+
   try {
     await operation();
     const actualDuration = Date.now() - startTime;
@@ -449,4 +453,3 @@ export async function measureOperationTimeout(
     };
   }
 }
-

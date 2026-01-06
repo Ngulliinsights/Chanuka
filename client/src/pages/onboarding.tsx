@@ -6,7 +6,6 @@ import type { UserPersona } from '@client/features/users/ui/onboarding/UserJourn
 import { UserJourneyOptimizer } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
 import AppLayout from '@client/shared/ui/layout/AppLayout';
 
-
 export default function Onboarding() {
   const navigate = useNavigate();
 
@@ -19,7 +18,7 @@ export default function Onboarding() {
     const routeMap: Record<string, string> = {
       beginner: '/bills',
       intermediate: '/community',
-      advanced: '/expert-verification'
+      advanced: '/expert-verification',
     };
 
     const targetRoute = routeMap[persona.complexity] || '/dashboard';
@@ -34,12 +33,8 @@ export default function Onboarding() {
   return (
     <AppLayout>
       <div className="w-full">
-        <UserJourneyOptimizer
-          onPersonaSelected={handlePersonaSelected}
-          onSkip={handleSkip}
-        />
+        <UserJourneyOptimizer onPersonaSelected={handlePersonaSelected} onSkip={handleSkip} />
       </div>
     </AppLayout>
   );
 }
-

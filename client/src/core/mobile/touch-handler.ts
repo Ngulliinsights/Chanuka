@@ -28,15 +28,20 @@ export class TouchHandler {
   private longPressTimer: NodeJS.Timeout | null = null;
   private initialPinchDistance: number = 0;
   private config: Required<TouchConfig>;
-  private boundHandlers: WeakMap<HTMLElement, {
-    touchstart: (e: globalThis.TouchEvent) => void;
-    touchend: (e: globalThis.TouchEvent) => void;
-    touchmove: (e: globalThis.TouchEvent) => void;
-    touchcancel: (e: globalThis.TouchEvent) => void;
-  }> = new WeakMap();
+  private boundHandlers: WeakMap<
+    HTMLElement,
+    {
+      touchstart: (e: globalThis.TouchEvent) => void;
+      touchend: (e: globalThis.TouchEvent) => void;
+      touchmove: (e: globalThis.TouchEvent) => void;
+      touchcancel: (e: globalThis.TouchEvent) => void;
+    }
+  > = new WeakMap();
 
   private constructor(config: TouchConfig = {}) {
-    console.warn('TouchHandler is deprecated. Use SwipeGestures component or useSwipeGesture hook instead.');
+    console.warn(
+      'TouchHandler is deprecated. Use SwipeGestures component or useSwipeGesture hook instead.'
+    );
 
     this.config = {
       enableSwipe: config.enableSwipe ?? true,
@@ -50,7 +55,7 @@ export class TouchHandler {
       preventDefaultOnTouch: config.preventDefaultOnTouch ?? false,
       onSwipe: config.onSwipe || (() => {}),
       onLongPress: config.onLongPress || (() => {}),
-      onTap: config.onTap || (() => {})
+      onTap: config.onTap || (() => {}),
     };
   }
 
@@ -128,14 +133,14 @@ export class TouchHandler {
       touchstart: this.handleTouchStart.bind(this),
       touchend: this.handleTouchEnd.bind(this),
       touchmove: this.handleTouchMove.bind(this),
-      touchcancel: this.handleTouchCancel.bind(this)
+      touchcancel: this.handleTouchCancel.bind(this),
     };
 
     this.boundHandlers.set(element, handlers);
 
-    const options = { 
+    const options = {
       passive: !this.config.preventDefaultOnTouch,
-      capture: false
+      capture: false,
     };
 
     element.addEventListener('touchstart', handlers.touchstart, options);
@@ -165,10 +170,7 @@ export class TouchHandler {
 
     // Detect pinch gesture (two fingers)
     if (event.touches.length === 2) {
-      this.initialPinchDistance = this.calculateDistance(
-        event.touches[0],
-        event.touches[1]
-      );
+      this.initialPinchDistance = this.calculateDistance(event.touches[0], event.touches[1]);
     }
 
     // Setup long press detection
@@ -179,7 +181,7 @@ export class TouchHandler {
         target,
         coordinates: this.touchStartPos,
         duration: Date.now() - this.touchStartTime,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }, this.config.longPressDelay);
 
@@ -218,7 +220,7 @@ export class TouchHandler {
           target,
           coordinates: endPos,
           duration,
-          timestamp: now
+          timestamp: now,
         });
         // Reset to prevent triple-tap
         this.lastTapTime = 0;
@@ -229,12 +231,12 @@ export class TouchHandler {
           target,
           coordinates: endPos,
           duration,
-          timestamp: now
+          timestamp: now,
         });
         this.lastTapTime = now;
         this.lastTapPos = endPos;
       }
-    } 
+    }
     // Detect swipe
     else if (distance > this.config.swipeThreshold) {
       const direction = this.getSwipeDirection(this.touchStartPos, endPos);
@@ -248,7 +250,7 @@ export class TouchHandler {
         distance,
         duration,
         velocity,
-        timestamp: now
+        timestamp: now,
       });
     }
 
@@ -271,7 +273,7 @@ export class TouchHandler {
         // Trigger pan gesture
         const target = event.target as HTMLElement;
         const direction = this.getSwipeDirection(this.touchStartPos, currentPos);
-        
+
         this.triggerTouchEvent(target, {
           type: 'pan',
           target,
@@ -279,17 +281,14 @@ export class TouchHandler {
           direction,
           distance,
           duration: Date.now() - this.touchStartTime,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
     }
 
     // Handle pinch gesture
     if (event.touches.length === 2 && this.initialPinchDistance > 0) {
-      const currentDistance = this.calculateDistance(
-        event.touches[0],
-        event.touches[1]
-      );
+      const currentDistance = this.calculateDistance(event.touches[0], event.touches[1]);
       const scale = currentDistance / this.initialPinchDistance;
 
       const target = event.target as HTMLElement;
@@ -302,7 +301,7 @@ export class TouchHandler {
         coordinates: { x: centerX, y: centerY },
         scale,
         duration: Date.now() - this.touchStartTime,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
 
@@ -359,9 +358,9 @@ export class TouchHandler {
       try {
         callback(touchEvent);
       } catch (error) {
-        logger.error('Touch event callback error', { 
-          error, 
-          touchEvent: { ...touchEvent, target: undefined } // Avoid circular refs
+        logger.error('Touch event callback error', {
+          error,
+          touchEvent: { ...touchEvent, target: undefined }, // Avoid circular refs
         });
       }
     });

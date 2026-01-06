@@ -42,7 +42,7 @@ interface CommentFormProps {
 
 /**
  * CommentForm - Form for creating and editing comments with quality validation
- * 
+ *
  * Features:
  * - Real-time character count and validation
  * - Quality assessment (50+ character minimum)
@@ -54,15 +54,15 @@ interface CommentFormProps {
 export function CommentForm({
   billId,
   parentId,
-  placeholder = "Share your thoughts on this bill...",
-  initialContent = "",
+  placeholder = 'Share your thoughts on this bill...',
+  initialContent = '',
   isEditing = false,
   onSubmit,
   onCancel,
   className,
   autoFocus = false,
   allowAnonymous = true,
-  showGuidelines = true
+  showGuidelines = true,
 }: CommentFormProps) {
   const [content, setContent] = useState(initialContent);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,42 +109,48 @@ export function CommentForm({
       isValid: Object.keys(errors).length === 0,
       errors,
       warnings,
-      score: Math.max(0, Math.min(100, score))
+      score: Math.max(0, Math.min(100, score)),
     };
   }, [content]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validation.isValid || isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit({
-        content: content.trim(),
-        parentId,
-        isAnonymous,
-        billId
-      });
-      
-      // Reset form after successful submission
-      if (!isEditing) {
-        setContent('');
-        setIsAnonymous(false);
-      }
-    } catch (error) {
-      console.error('Failed to submit comment:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [content, parentId, isAnonymous, billId, validation.isValid, isSubmitting, onSubmit, isEditing]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 'Enter') {
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      handleSubmit(e as any);
-    }
-  }, [handleSubmit]);
+
+      if (!validation.isValid || isSubmitting) return;
+
+      setIsSubmitting(true);
+      try {
+        await onSubmit({
+          content: content.trim(),
+          parentId,
+          isAnonymous,
+          billId,
+        });
+
+        // Reset form after successful submission
+        if (!isEditing) {
+          setContent('');
+          setIsAnonymous(false);
+        }
+      } catch (error) {
+        console.error('Failed to submit comment:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [content, parentId, isAnonymous, billId, validation.isValid, isSubmitting, onSubmit, isEditing]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit(e as any);
+      }
+    },
+    [handleSubmit]
+  );
 
   const getQualityColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
@@ -167,49 +173,51 @@ export function CommentForm({
           {isEditing ? 'Edit Comment' : parentId ? 'Reply to Comment' : 'Add Comment'}
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Main textarea */}
           <div className="space-y-2">
             <textarea
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={e => setContent(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               autoFocus={autoFocus}
               className={cn(
-                "w-full min-h-[120px] p-3 border rounded-md resize-none",
-                "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-                "placeholder:text-muted-foreground",
-                validation.errors.content || validation.errors.length ? "border-red-300" : ""
+                'w-full min-h-[120px] p-3 border rounded-md resize-none',
+                'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+                'placeholder:text-muted-foreground',
+                validation.errors.content || validation.errors.length ? 'border-red-300' : ''
               )}
               disabled={isSubmitting}
             />
-            
+
             {/* Character count and quality indicator */}
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-4">
-                <span className={cn(
-                  "text-muted-foreground",
-                  content.length > 1000 ? "text-red-600" : ""
-                )}>
+                <span
+                  className={cn(
+                    'text-muted-foreground',
+                    content.length > 1000 ? 'text-red-600' : ''
+                  )}
+                >
                   {content.length}/1000 characters
                 </span>
-                
+
                 {content.length >= 10 && (
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Quality:</span>
-                    <Badge 
-                      variant="outline" 
-                      className={cn("text-xs", getQualityColor(validation.score))}
+                    <Badge
+                      variant="outline"
+                      className={cn('text-xs', getQualityColor(validation.score))}
                     >
                       {getQualityLabel(validation.score)} ({validation.score}%)
                     </Badge>
                   </div>
                 )}
               </div>
-              
+
               {showGuidelines && (
                 <Button
                   type="button"
@@ -217,7 +225,11 @@ export function CommentForm({
                   size="sm"
                   onClick={() => setShowGuidelinesPanel(!showGuidelinesPanel)}
                 >
-                  {showGuidelinesPanel ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showGuidelinesPanel ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                   Guidelines
                 </Button>
               )}
@@ -272,17 +284,15 @@ export function CommentForm({
                   <input
                     type="checkbox"
                     checked={isAnonymous}
-                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    onChange={e => setIsAnonymous(e.target.checked)}
                     disabled={isSubmitting}
                     className="rounded"
                   />
                   Post anonymously
                 </label>
               )}
-              
-              <div className="text-xs text-muted-foreground">
-                Ctrl+Enter to submit
-              </div>
+
+              <div className="text-xs text-muted-foreground">Ctrl+Enter to submit</div>
             </div>
           </div>
 
@@ -298,19 +308,14 @@ export function CommentForm({
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center gap-2">
               {onCancel && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onCancel}
-                  disabled={isSubmitting}
-                >
+                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
                   Cancel
                 </Button>
               )}
-              
+
               <Button
                 type="submit"
                 disabled={!validation.isValid || isSubmitting}

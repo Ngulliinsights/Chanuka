@@ -76,7 +76,8 @@ export function findNextAvailablePosition(
   const dimensions = getWidgetDimensions(widget.size);
 
   // Try to place widget in the first available position
-  for (let y = 0; y < 100; y++) { // Reasonable upper limit
+  for (let y = 0; y < 100; y++) {
+    // Reasonable upper limit
     for (let x = 0; x <= layout.columns - dimensions.width; x++) {
       const testWidget = {
         ...widget,
@@ -90,10 +91,13 @@ export function findNextAvailablePosition(
   }
 
   // Fallback to bottom of layout
-  const maxY = Math.max(...layout.widgets.map(w => {
-    const dims = getWidgetDimensions(w.size);
-    return w.position.y + dims.height;
-  }), 0);
+  const maxY = Math.max(
+    ...layout.widgets.map(w => {
+      const dims = getWidgetDimensions(w.size);
+      return w.position.y + dims.height;
+    }),
+    0
+  );
 
   return { x: 0, y: maxY };
 }
@@ -112,10 +116,10 @@ export function optimizeLayout(layout: DashboardLayout): DashboardLayout {
   const optimizedWidgets: WidgetConfig[] = [];
 
   for (const widget of sortedWidgets) {
-    const optimizedPosition = findNextAvailablePosition(
-      widget,
-      { ...layout, widgets: optimizedWidgets }
-    );
+    const optimizedPosition = findNextAvailablePosition(widget, {
+      ...layout,
+      widgets: optimizedWidgets,
+    });
 
     optimizedWidgets.push({
       ...widget,
@@ -135,10 +139,12 @@ export function optimizeLayout(layout: DashboardLayout): DashboardLayout {
 export function calculateLayoutHeight(layout: DashboardLayout): number {
   if (layout.widgets.length === 0) return 0;
 
-  return Math.max(...layout.widgets.map(widget => {
-    const dimensions = getWidgetDimensions(widget.size);
-    return widget.position.y + dimensions.height;
-  }));
+  return Math.max(
+    ...layout.widgets.map(widget => {
+      const dimensions = getWidgetDimensions(widget.size);
+      return widget.position.y + dimensions.height;
+    })
+  );
 }
 
 /**
@@ -164,7 +170,7 @@ export function generateResponsiveLayout(
   const stackedWidgets = layout.widgets.map((widget, index) => ({
     ...widget,
     position: { x: 0, y: index * 4 }, // Stack with some spacing
-    size: breakpoint === 'mobile' ? 'full' as WidgetSize : widget.size,
+    size: breakpoint === 'mobile' ? ('full' as WidgetSize) : widget.size,
   }));
 
   return {
@@ -195,50 +201,51 @@ export function formatChartData(
     case 'line':
       return {
         labels,
-        datasets: [{
-          ...baseDataset,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderWidth: 2,
-        }],
+        datasets: [
+          {
+            ...baseDataset,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+          },
+        ],
       };
 
     case 'bar':
       return {
         labels,
-        datasets: [{
-          ...baseDataset,
-          backgroundColor: '#3b82f6',
-          borderColor: '#1d4ed8',
-          borderWidth: 1,
-        }],
+        datasets: [
+          {
+            ...baseDataset,
+            backgroundColor: '#3b82f6',
+            borderColor: '#1d4ed8',
+            borderWidth: 1,
+          },
+        ],
       };
 
     case 'pie':
       return {
         labels,
-        datasets: [{
-          ...baseDataset,
-          backgroundColor: [
-            '#3b82f6',
-            '#10b981',
-            '#f59e0b',
-            '#ef4444',
-            '#8b5cf6',
-            '#06b6d4',
-          ],
-        }],
+        datasets: [
+          {
+            ...baseDataset,
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+          },
+        ],
       };
 
     case 'area':
       return {
         labels,
-        datasets: [{
-          ...baseDataset,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.3)',
-          borderWidth: 2,
-        }],
+        datasets: [
+          {
+            ...baseDataset,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.3)',
+            borderWidth: 2,
+          },
+        ],
       };
 
     default:
@@ -331,7 +338,6 @@ export function validateDashboardConfig(config: any): { valid: boolean; errors: 
     errors,
   };
 }
-
 
 const defaultExport = {};
 export default defaultExport;

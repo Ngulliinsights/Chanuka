@@ -3,30 +3,32 @@
  * Allows users to configure security preferences
  */
 
+import { Shield, Lock, Eye, Zap, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
 import React from 'react';
-import {
-  Shield, 
-  Lock, 
-  Eye, 
-  Zap,
-  AlertTriangle,
-  CheckCircle,
-  Settings
-} from 'lucide-react';
 import { useState, useEffect } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { getSecuritySystem } from '@client/features/security/ui/dashboard/SecurityDashboard.tsx';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
+import { logger } from '@client/utils/logger';
 
 interface SecuritySettingsProps {
   className?: string;
@@ -67,32 +69,32 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
   const [config, setConfig] = useState<SecurityConfig>({
     csp: {
       enabled: true,
-      reportOnly: false
+      reportOnly: false,
     },
     csrf: {
       enabled: true,
-      tokenRefreshInterval: 30
+      tokenRefreshInterval: 30,
     },
     rateLimiting: {
       enabled: true,
       maxRequests: 100,
-      windowMs: 15
+      windowMs: 15,
     },
     inputSanitization: {
       enabled: true,
       maxLength: 10000,
-      strictMode: false
+      strictMode: false,
     },
     vulnerabilityScanning: {
       enabled: true,
       scanInterval: 60,
-      autoFix: false
+      autoFix: false,
     },
     monitoring: {
       enabled: true,
       alertThreshold: 5,
-      realTimeAlerts: true
-    }
+      realTimeAlerts: true,
+    },
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -156,32 +158,32 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
     setConfig({
       csp: {
         enabled: true,
-        reportOnly: false
+        reportOnly: false,
       },
       csrf: {
         enabled: true,
-        tokenRefreshInterval: 30
+        tokenRefreshInterval: 30,
       },
       rateLimiting: {
         enabled: true,
         maxRequests: 100,
-        windowMs: 15
+        windowMs: 15,
       },
       inputSanitization: {
         enabled: true,
         maxLength: 10000,
-        strictMode: false
+        strictMode: false,
       },
       vulnerabilityScanning: {
         enabled: true,
         scanInterval: 60,
-        autoFix: false
+        autoFix: false,
       },
       monitoring: {
         enabled: true,
         alertThreshold: 5,
-        realTimeAlerts: true
-      }
+        realTimeAlerts: true,
+      },
     });
   };
 
@@ -190,8 +192,8 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
       ...prev,
       [section]: {
         ...prev[section],
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
@@ -203,24 +205,16 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
           <Settings className="h-8 w-8 text-blue-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Security Settings</h1>
-            <p className="text-sm text-gray-500">
-              Configure security features and policies
-            </p>
+            <p className="text-sm text-gray-500">Configure security features and policies</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           <Button onClick={resetToDefaults} variant="outline" size="sm">
             Reset to Defaults
           </Button>
-          <Button 
-            onClick={saveConfig} 
-            disabled={isLoading}
-            className="relative"
-          >
+          <Button onClick={saveConfig} disabled={isLoading} className="relative">
             {isLoading ? 'Saving...' : 'Save Settings'}
-            {saveStatus === 'saved' && (
-              <CheckCircle className="h-4 w-4 ml-2 text-green-600" />
-            )}
+            {saveStatus === 'saved' && <CheckCircle className="h-4 w-4 ml-2 text-green-600" />}
           </Button>
         </div>
       </div>
@@ -270,14 +264,12 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="csp-enabled">Enable CSP</Label>
-                  <p className="text-sm text-gray-500">
-                    Enable Content Security Policy protection
-                  </p>
+                  <p className="text-sm text-gray-500">Enable Content Security Policy protection</p>
                 </div>
                 <Switch
                   id="csp-enabled"
                   checked={config.csp.enabled}
-                  onCheckedChange={(checked) => updateConfig('csp', 'enabled', checked)}
+                  onCheckedChange={checked => updateConfig('csp', 'enabled', checked)}
                 />
               </div>
 
@@ -291,7 +283,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="csp-report-only"
                   checked={config.csp.reportOnly}
-                  onCheckedChange={(checked) => updateConfig('csp', 'reportOnly', checked)}
+                  onCheckedChange={checked => updateConfig('csp', 'reportOnly', checked)}
                   disabled={!config.csp.enabled}
                 />
               </div>
@@ -306,9 +298,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Lock className="h-5 w-5" />
                 <span>CSRF Protection</span>
               </CardTitle>
-              <CardDescription>
-                Configure Cross-Site Request Forgery protection
-              </CardDescription>
+              <CardDescription>Configure Cross-Site Request Forgery protection</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -321,7 +311,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="csrf-enabled"
                   checked={config.csrf.enabled}
-                  onCheckedChange={(checked) => updateConfig('csrf', 'enabled', checked)}
+                  onCheckedChange={checked => updateConfig('csrf', 'enabled', checked)}
                 />
               </div>
 
@@ -333,7 +323,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                   min="5"
                   max="120"
                   value={config.csrf.tokenRefreshInterval}
-                  onChange={(e) => updateConfig('csrf', 'tokenRefreshInterval', parseInt(e.target.value))}
+                  onChange={e =>
+                    updateConfig('csrf', 'tokenRefreshInterval', parseInt(e.target.value))
+                  }
                   disabled={!config.csrf.enabled}
                 />
                 <p className="text-sm text-gray-500">
@@ -351,9 +343,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Zap className="h-5 w-5" />
                 <span>Rate Limiting</span>
               </CardTitle>
-              <CardDescription>
-                Configure request rate limiting to prevent abuse
-              </CardDescription>
+              <CardDescription>Configure request rate limiting to prevent abuse</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -366,7 +356,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="rate-limiting-enabled"
                   checked={config.rateLimiting.enabled}
-                  onCheckedChange={(checked) => updateConfig('rateLimiting', 'enabled', checked)}
+                  onCheckedChange={checked => updateConfig('rateLimiting', 'enabled', checked)}
                 />
               </div>
 
@@ -379,7 +369,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                     min="10"
                     max="1000"
                     value={config.rateLimiting.maxRequests}
-                    onChange={(e) => updateConfig('rateLimiting', 'maxRequests', parseInt(e.target.value))}
+                    onChange={e =>
+                      updateConfig('rateLimiting', 'maxRequests', parseInt(e.target.value))
+                    }
                     disabled={!config.rateLimiting.enabled}
                   />
                 </div>
@@ -392,7 +384,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                     min="1"
                     max="60"
                     value={config.rateLimiting.windowMs}
-                    onChange={(e) => updateConfig('rateLimiting', 'windowMs', parseInt(e.target.value))}
+                    onChange={e =>
+                      updateConfig('rateLimiting', 'windowMs', parseInt(e.target.value))
+                    }
                     disabled={!config.rateLimiting.enabled}
                   />
                 </div>
@@ -408,9 +402,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Shield className="h-5 w-5" />
                 <span>Input Sanitization</span>
               </CardTitle>
-              <CardDescription>
-                Configure input sanitization and XSS prevention
-              </CardDescription>
+              <CardDescription>Configure input sanitization and XSS prevention</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -423,7 +415,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="sanitization-enabled"
                   checked={config.inputSanitization.enabled}
-                  onCheckedChange={(checked) => updateConfig('inputSanitization', 'enabled', checked)}
+                  onCheckedChange={checked => updateConfig('inputSanitization', 'enabled', checked)}
                 />
               </div>
 
@@ -435,7 +427,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                   min="1000"
                   max="100000"
                   value={config.inputSanitization.maxLength}
-                  onChange={(e) => updateConfig('inputSanitization', 'maxLength', parseInt(e.target.value))}
+                  onChange={e =>
+                    updateConfig('inputSanitization', 'maxLength', parseInt(e.target.value))
+                  }
                   disabled={!config.inputSanitization.enabled}
                 />
                 <p className="text-sm text-gray-500">
@@ -453,7 +447,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="strict-mode"
                   checked={config.inputSanitization.strictMode}
-                  onCheckedChange={(checked) => updateConfig('inputSanitization', 'strictMode', checked)}
+                  onCheckedChange={checked =>
+                    updateConfig('inputSanitization', 'strictMode', checked)
+                  }
                   disabled={!config.inputSanitization.enabled}
                 />
               </div>
@@ -468,9 +464,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Eye className="h-5 w-5" />
                 <span>Vulnerability Scanning</span>
               </CardTitle>
-              <CardDescription>
-                Configure automated vulnerability detection
-              </CardDescription>
+              <CardDescription>Configure automated vulnerability detection</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -483,7 +477,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="scanning-enabled"
                   checked={config.vulnerabilityScanning.enabled}
-                  onCheckedChange={(checked) => updateConfig('vulnerabilityScanning', 'enabled', checked)}
+                  onCheckedChange={checked =>
+                    updateConfig('vulnerabilityScanning', 'enabled', checked)
+                  }
                 />
               </div>
 
@@ -491,7 +487,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Label htmlFor="scan-interval">Scan Interval (minutes)</Label>
                 <Select
                   value={config.vulnerabilityScanning.scanInterval.toString()}
-                  onValueChange={(value) => updateConfig('vulnerabilityScanning', 'scanInterval', parseInt(value))}
+                  onValueChange={value =>
+                    updateConfig('vulnerabilityScanning', 'scanInterval', parseInt(value))
+                  }
                   disabled={!config.vulnerabilityScanning.enabled}
                 >
                   <SelectTrigger>
@@ -519,7 +517,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="auto-fix"
                   checked={config.vulnerabilityScanning.autoFix}
-                  onCheckedChange={(checked) => updateConfig('vulnerabilityScanning', 'autoFix', checked)}
+                  onCheckedChange={checked =>
+                    updateConfig('vulnerabilityScanning', 'autoFix', checked)
+                  }
                   disabled={!config.vulnerabilityScanning.enabled}
                 />
               </div>
@@ -534,22 +534,18 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Eye className="h-5 w-5" />
                 <span>Security Monitoring</span>
               </CardTitle>
-              <CardDescription>
-                Configure security event monitoring and alerting
-              </CardDescription>
+              <CardDescription>Configure security event monitoring and alerting</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="monitoring-enabled">Enable Security Monitoring</Label>
-                  <p className="text-sm text-gray-500">
-                    Monitor and log security events
-                  </p>
+                  <p className="text-sm text-gray-500">Monitor and log security events</p>
                 </div>
                 <Switch
                   id="monitoring-enabled"
                   checked={config.monitoring.enabled}
-                  onCheckedChange={(checked) => updateConfig('monitoring', 'enabled', checked)}
+                  onCheckedChange={checked => updateConfig('monitoring', 'enabled', checked)}
                 />
               </div>
 
@@ -561,7 +557,9 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                   min="1"
                   max="50"
                   value={config.monitoring.alertThreshold}
-                  onChange={(e) => updateConfig('monitoring', 'alertThreshold', parseInt(e.target.value))}
+                  onChange={e =>
+                    updateConfig('monitoring', 'alertThreshold', parseInt(e.target.value))
+                  }
                   disabled={!config.monitoring.enabled}
                 />
                 <p className="text-sm text-gray-500">
@@ -579,7 +577,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
                 <Switch
                   id="real-time-alerts"
                   checked={config.monitoring.realTimeAlerts}
-                  onCheckedChange={(checked) => updateConfig('monitoring', 'realTimeAlerts', checked)}
+                  onCheckedChange={checked => updateConfig('monitoring', 'realTimeAlerts', checked)}
                   disabled={!config.monitoring.enabled}
                 />
               </div>

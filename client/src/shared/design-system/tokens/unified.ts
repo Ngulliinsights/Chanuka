@@ -1,6 +1,6 @@
 /**
  * Unified Design Tokens
- * 
+ *
  * ✅ Single source of truth for all design decisions
  * ✅ Auto-generates CSS custom properties
  * ✅ Type-safe token access
@@ -29,9 +29,15 @@ function hexToHsl(hex: string): string {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
     }
     h /= 6;
   }
@@ -51,7 +57,7 @@ export const unifiedTokens = {
         '--color-primary': hexToHsl(colorTokens.primary[500]),
         '--color-primary-foreground': '0 0% 100%',
         '--color-primary-muted': hexToHsl(colorTokens.primary[100]),
-      }
+      },
     },
 
     // Secondary colors
@@ -61,7 +67,7 @@ export const unifiedTokens = {
         '--color-secondary': hexToHsl(colorTokens.secondary[500]),
         '--color-secondary-foreground': '0 0% 100%',
         '--color-secondary-muted': hexToHsl(colorTokens.secondary[100]),
-      }
+      },
     },
 
     // Accent colors
@@ -71,7 +77,7 @@ export const unifiedTokens = {
         '--color-accent': hexToHsl(colorTokens.accent[500]),
         '--color-accent-foreground': '0 0% 100%',
         '--color-accent-muted': hexToHsl(colorTokens.accent[100]),
-      }
+      },
     },
 
     // Semantic colors
@@ -81,7 +87,7 @@ export const unifiedTokens = {
         '--color-success': hexToHsl(colorTokens.semantic.success[500]),
         '--color-success-foreground': '0 0% 100%',
         '--color-success-muted': hexToHsl(colorTokens.semantic.success[100]),
-      }
+      },
     },
 
     warning: {
@@ -90,7 +96,7 @@ export const unifiedTokens = {
         '--color-warning': hexToHsl(colorTokens.semantic.warning[500]),
         '--color-warning-foreground': '0 0% 0%',
         '--color-warning-muted': hexToHsl(colorTokens.semantic.warning[100]),
-      }
+      },
     },
 
     error: {
@@ -100,7 +106,7 @@ export const unifiedTokens = {
         '--color-destructive': hexToHsl(colorTokens.semantic.error[500]),
         '--color-error-foreground': '0 0% 100%',
         '--color-error-muted': hexToHsl(colorTokens.semantic.error[100]),
-      }
+      },
     },
 
     // Neutral colors
@@ -115,7 +121,7 @@ export const unifiedTokens = {
         '--color-muted-foreground': hexToHsl(colorTokens.neutral[500]),
         '--color-border': hexToHsl(colorTokens.neutral[200]),
         '--color-input': hexToHsl(colorTokens.neutral[200]),
-      }
+      },
     },
   },
 
@@ -128,7 +134,7 @@ export const unifiedTokens = {
  */
 export function generateThemeCSS(theme: 'light' | 'dark' = 'light'): string {
   const tokens = unifiedTokens.colors;
-  
+
   const lightVariables = {
     ...tokens.primary.css,
     ...tokens.secondary.css,

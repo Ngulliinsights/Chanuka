@@ -4,10 +4,11 @@
  * Simple component to display connection status information
  */
 
-import { useState, useEffect } from 'react';
 import { Wifi, WifiOff, AlertCircle } from 'lucide-react';
-import { Badge } from '@/shared/design-system';
+import { useState, useEffect } from 'react';
 import React from 'react';
+
+import { Badge } from '@/shared/design-system';
 
 interface ConnectionStatusProps {
   className?: string;
@@ -38,13 +39,15 @@ export default function ConnectionStatus({ className = '' }: ConnectionStatusPro
 
   const getStatusColor = () => {
     if (!isOnline) return 'bg-red-100 text-red-800';
-    if (connectionType === 'slow-2g' || connectionType === '2g') return 'bg-orange-100 text-orange-800';
+    if (connectionType === 'slow-2g' || connectionType === '2g')
+      return 'bg-orange-100 text-orange-800';
     return 'bg-green-100 text-green-800';
   };
 
   const getStatusIcon = () => {
     if (!isOnline) return <WifiOff className="w-4 h-4" />;
-    if (connectionType === 'slow-2g' || connectionType === '2g') return <AlertCircle className="w-4 h-4" />;
+    if (connectionType === 'slow-2g' || connectionType === '2g')
+      return <AlertCircle className="w-4 h-4" />;
     return <Wifi className="w-4 h-4" />;
   };
 
@@ -61,9 +64,7 @@ export default function ConnectionStatus({ className = '' }: ConnectionStatusPro
         {getStatusText()}
       </Badge>
       {connectionType !== 'unknown' && isOnline && (
-        <span className="text-xs text-gray-500">
-          {connectionType.toUpperCase()}
-        </span>
+        <span className="text-xs text-gray-500">{connectionType.toUpperCase()}</span>
       )}
     </div>
   );

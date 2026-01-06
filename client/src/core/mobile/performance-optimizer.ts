@@ -1,13 +1,14 @@
 /**
  * Mobile Performance Optimizer Module
- * 
+ *
  * Utility class for mobile performance optimization including
  * frame rate monitoring, resource management, and adaptive quality settings.
- * 
+ *
  * @module core/mobile/performance-optimizer
  */
 
 import { logger } from '../../utils/logger';
+
 import { DeviceDetector } from './device-detector';
 
 /**
@@ -41,20 +42,20 @@ export class MobilePerformanceOptimizer {
     // Use PerformanceObserver for detailed metrics if available
     if ('PerformanceObserver' in window) {
       try {
-        this.performanceObserver = new PerformanceObserver((list) => {
+        this.performanceObserver = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'measure' || entry.entryType === 'longtask') {
               logger.debug('Performance entry', {
                 name: entry.name,
                 duration: entry.duration,
-                type: entry.entryType
+                type: entry.entryType,
               });
             }
           }
         });
 
-        this.performanceObserver.observe({ 
-          entryTypes: ['measure', 'navigation', 'resource', 'longtask'] 
+        this.performanceObserver.observe({
+          entryTypes: ['measure', 'navigation', 'resource', 'longtask'],
         });
       } catch (error) {
         logger.warn('PerformanceObserver not fully supported', { error });
@@ -121,10 +122,21 @@ export class MobilePerformanceOptimizer {
       recommendations.push('Reduce concurrent network requests');
     }
 
-    if (typeof performance !== 'undefined' && (performance as Performance & { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory) {
-      const memory = (performance as Performance & { memory: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    if (
+      typeof performance !== 'undefined' &&
+      (
+        performance as Performance & {
+          memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number };
+        }
+      ).memory
+    ) {
+      const memory = (
+        performance as Performance & {
+          memory: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number };
+        }
+      ).memory;
       const usagePercent = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
-      
+
       if (usagePercent > 80) {
         recommendations.push('Memory usage high - clear caches and reduce in-memory data');
       }
@@ -145,8 +157,8 @@ export class MobilePerformanceOptimizer {
       deviceInfo: {
         screenSize: deviceInfo.screenSize,
         pixelRatio: deviceInfo.pixelRatio,
-        isMobile: deviceInfo.isMobile
-      }
+        isMobile: deviceInfo.isMobile,
+      },
     });
 
     // Reduce quality on low-end devices
@@ -154,8 +166,8 @@ export class MobilePerformanceOptimizer {
       const event = new CustomEvent('mobile:reduceQuality', {
         detail: {
           level: fps < 20 ? 'low' : 'medium',
-          reason: fps < 30 ? 'low_fps' : 'small_screen'
-        }
+          reason: fps < 30 ? 'low_fps' : 'small_screen',
+        },
       });
       window.dispatchEvent(event);
     }
@@ -163,7 +175,7 @@ export class MobilePerformanceOptimizer {
     // Optimize for high-DPI displays
     if (deviceInfo.pixelRatio > 2) {
       const event = new CustomEvent('mobile:optimizeForHighDPI', {
-        detail: { pixelRatio: deviceInfo.pixelRatio }
+        detail: { pixelRatio: deviceInfo.pixelRatio },
       });
       window.dispatchEvent(event);
     }
@@ -184,9 +196,9 @@ export class MobilePerformanceOptimizer {
     try {
       performance.measure(measureName, startMark, endMark);
       const measure = performance.getEntriesByName(measureName)[0];
-      
+
       logger.debug(`Performance: ${name}`, {
-        duration: measure.duration.toFixed(2) + 'ms'
+        duration: measure.duration.toFixed(2) + 'ms',
       });
 
       // Clean up marks and measures

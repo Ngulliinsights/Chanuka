@@ -12,7 +12,7 @@ export {
   LanguageSwitcher,
   LanguageToggle,
   LanguageStatus,
-  default as LanguageSwitcherDefault
+  default as LanguageSwitcherDefault,
 } from './LanguageSwitcher';
 
 // Re-export i18n hook for convenience
@@ -31,12 +31,12 @@ export const getLanguageDisplayName = (language: string, inLanguage?: string): s
   const displayNames: Record<string, Record<string, string>> = {
     en: {
       en: 'English',
-      sw: 'Swahili'
+      sw: 'Swahili',
     },
     sw: {
       en: 'Kiingereza',
-      sw: 'Kiswahili'
-    }
+      sw: 'Kiswahili',
+    },
   };
 
   return displayNames[inLanguage || 'en']?.[language] || language;
@@ -48,7 +48,7 @@ export const getLanguageDisplayName = (language: string, inLanguage?: string): s
 export const getLanguageFlag = (language: string): string => {
   const flags: Record<string, string> = {
     en: '🇬🇧',
-    sw: '🇰🇪'
+    sw: '🇰🇪',
   };
 
   return flags[language] || '🌐';
@@ -73,5 +73,5 @@ export default {
   LanguageStatus,
   getLanguageDisplayName,
   getLanguageFlag,
-  isRTLLanguage
+  isRTLLanguage,
 };

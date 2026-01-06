@@ -6,14 +6,17 @@
  */
 
 import { EventEmitter } from 'events';
-import * as chokidar from 'chokidar';
-import * as dotenvExpand from 'dotenv-expand';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
-import { Result, err, ok } from '../primitives/types/result';
-import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
+
+import * as chokidar from 'chokidar';
+import * as dotenvExpand from 'dotenv-expand';
+
 import { BaseError, ErrorDomain, ErrorSeverity } from '../observability/error-management';
 import { ObservabilityStack } from '../observability/stack';
+import { Result, err, ok } from '../primitives/types/result';
+
+import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 import type {
   ConfigLoadOptions,
   ConfigChangeEvent,

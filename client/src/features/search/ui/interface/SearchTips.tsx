@@ -15,7 +15,7 @@ import {
   Filter,
   Lightbulb,
   Keyboard,
-  Quote
+  Quote,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -50,7 +50,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'healthcare reform',
     result: 'Finds all content containing "healthcare" or "reform"',
     category: 'basic',
-    icon: <Search className="h-4 w-4" />
+    icon: <Search className="h-4 w-4" />,
   },
   {
     id: 'exact-phrase',
@@ -59,7 +59,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: '"climate change"',
     result: 'Finds content with the exact phrase "climate change"',
     category: 'basic',
-    icon: <Quote className="h-4 w-4" />
+    icon: <Quote className="h-4 w-4" />,
   },
   {
     id: 'boolean-and',
@@ -68,7 +68,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'healthcare AND insurance',
     result: 'Finds content containing both "healthcare" and "insurance"',
     category: 'advanced',
-    icon: <Target className="h-4 w-4" />
+    icon: <Target className="h-4 w-4" />,
   },
   {
     id: 'boolean-or',
@@ -77,7 +77,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'tax OR taxation',
     result: 'Finds content containing either "tax" or "taxation"',
     category: 'advanced',
-    icon: <Target className="h-4 w-4" />
+    icon: <Target className="h-4 w-4" />,
   },
   {
     id: 'exclude-terms',
@@ -86,7 +86,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'budget -military',
     result: 'Finds budget-related content excluding military topics',
     category: 'advanced',
-    icon: <Filter className="h-4 w-4" />
+    icon: <Filter className="h-4 w-4" />,
   },
   {
     id: 'wildcard-search',
@@ -95,7 +95,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'environ*',
     result: 'Finds "environment", "environmental", "environmentally", etc.',
     category: 'syntax',
-    icon: <Settings className="h-4 w-4" />
+    icon: <Settings className="h-4 w-4" />,
   },
   {
     id: 'field-search',
@@ -104,7 +104,7 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'sponsor:smith',
     result: 'Finds bills sponsored by anyone named Smith',
     category: 'filters',
-    icon: <Filter className="h-4 w-4" />
+    icon: <Filter className="h-4 w-4" />,
   },
   {
     id: 'date-range',
@@ -113,8 +113,8 @@ const SEARCH_TIPS: SearchTip[] = [
     example: 'date:2024',
     result: 'Finds content from 2024',
     category: 'filters',
-    icon: <Filter className="h-4 w-4" />
-  }
+    icon: <Filter className="h-4 w-4" />,
+  },
 ];
 
 const KEYBOARD_SHORTCUTS = [
@@ -123,17 +123,17 @@ const KEYBOARD_SHORTCUTS = [
   { key: 'Enter', description: 'Execute search' },
   { key: 'Ctrl + Enter', description: 'Advanced search' },
   { key: 'Esc', description: 'Clear search' },
-  { key: '↑ ↓', description: 'Navigate suggestions' }
+  { key: '↑ ↓', description: 'Navigate suggestions' },
 ];
 
 /**
  * SearchTips - Interactive search help and examples
  */
-export function SearchTips({ 
-  className, 
-  compact = false, 
+export function SearchTips({
+  className,
+  compact = false,
   showKeyboardShortcuts = true,
-  onTipSelect 
+  onTipSelect,
 }: SearchTipsProps) {
   const [activeCategory, setActiveCategory] = useState<string>('basic');
   const [selectedTip, setSelectedTip] = useState<SearchTip | null>(null);
@@ -142,7 +142,7 @@ export function SearchTips({
     { id: 'basic', label: 'Basic', icon: <Search className="h-4 w-4" /> },
     { id: 'advanced', label: 'Advanced', icon: <Target className="h-4 w-4" /> },
     { id: 'syntax', label: 'Syntax', icon: <Settings className="h-4 w-4" /> },
-    { id: 'filters', label: 'Filters', icon: <Filter className="h-4 w-4" /> }
+    { id: 'filters', label: 'Filters', icon: <Filter className="h-4 w-4" /> },
   ];
 
   const filteredTips = SEARCH_TIPS.filter(tip => tip.category === activeCategory);
@@ -171,7 +171,7 @@ export function SearchTips({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {SEARCH_TIPS.slice(0, 3).map((tip) => (
+          {SEARCH_TIPS.slice(0, 3).map(tip => (
             <div key={tip.id} className="text-xs">
               <div className="font-medium">{tip.title}</div>
               <div className="text-muted-foreground">{tip.example}</div>
@@ -193,11 +193,11 @@ export function SearchTips({
           Search Tips & Help
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent>
         <Tabs value={activeCategory} onValueChange={setActiveCategory}>
           <TabsList className="grid w-full grid-cols-4">
-            {categories.map((category) => (
+            {categories.map(category => (
               <TabsTrigger key={category.id} value={category.id} className="text-xs">
                 <span className="flex items-center gap-1">
                   {category.icon}
@@ -207,12 +207,12 @@ export function SearchTips({
             ))}
           </TabsList>
 
-          {categories.map((category) => (
+          {categories.map(category => (
             <TabsContent key={category.id} value={category.id} className="space-y-4">
               <div className="grid gap-3">
-                {filteredTips.map((tip) => (
-                  <Card 
-                    key={tip.id} 
+                {filteredTips.map(tip => (
+                  <Card
+                    key={tip.id}
                     className={`cursor-pointer transition-colors hover:bg-muted/50 ${
                       selectedTip?.id === tip.id ? 'ring-2 ring-primary' : ''
                     }`}
@@ -220,10 +220,8 @@ export function SearchTips({
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-md">
-                          {tip.icon}
-                        </div>
-                        
+                        <div className="p-2 bg-primary/10 rounded-md">{tip.icon}</div>
+
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium">{tip.title}</h4>
@@ -231,17 +229,15 @@ export function SearchTips({
                               {tip.category}
                             </Badge>
                           </div>
-                          
-                          <p className="text-sm text-muted-foreground">
-                            {tip.description}
-                          </p>
-                          
+
+                          <p className="text-sm text-muted-foreground">{tip.description}</p>
+
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-medium">Example:</span>
-                              <code 
+                              <code
                                 className="text-xs bg-muted px-2 py-1 rounded cursor-pointer hover:bg-muted/80"
-                                onClick={(e) => {
+                                onClick={e => {
                                   e.stopPropagation();
                                   copyExample(tip.example);
                                 }}
@@ -249,7 +245,7 @@ export function SearchTips({
                                 {tip.example}
                               </code>
                             </div>
-                            
+
                             <div className="text-xs text-muted-foreground">
                               <span className="font-medium">Result:</span> {tip.result}
                             </div>
@@ -267,13 +263,13 @@ export function SearchTips({
         {showKeyboardShortcuts && (
           <>
             <Separator className="my-6" />
-            
+
             <div>
               <h4 className="font-medium mb-3 flex items-center gap-2">
                 <Keyboard className="h-4 w-4" />
                 Keyboard Shortcuts
               </h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {KEYBOARD_SHORTCUTS.map((shortcut, index) => (
                   <div key={index} className="flex items-center justify-between text-sm">
@@ -290,18 +286,18 @@ export function SearchTips({
 
         {/* Quick Actions */}
         <Separator className="my-6" />
-        
+
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm">
             <Info className="h-4 w-4 mr-2" />
             Search Guide
           </Button>
-          
+
           <Button variant="outline" size="sm">
             <CheckCircle className="h-4 w-4 mr-2" />
             Examples
           </Button>
-          
+
           <Button variant="outline" size="sm">
             <Settings className="h-4 w-4 mr-2" />
             Advanced Options

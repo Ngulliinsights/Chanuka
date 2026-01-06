@@ -5,7 +5,6 @@
  * capabilities for power users and detailed search requirements.
  */
 
-import React from 'react';
 import {
   Search,
   Plus,
@@ -18,16 +17,13 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { useToast } from '@client/hooks/use-toast.ts';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@client/shared/design-system';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';
 import {
   Dialog,
   DialogContent,
@@ -45,7 +41,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@client/shared/design-system';
-
 
 import type { DualSearchRequest } from '../../services/intelligent-search';
 
@@ -386,8 +381,10 @@ export function AdvancedSearchInterface({
                   <select
                     className="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     value={field.booleanOperator}
-                    onChange={(e) =>
-                      updateSearchField(field.id, { booleanOperator: e.target.value as 'AND' | 'OR' | 'NOT' })
+                    onChange={e =>
+                      updateSearchField(field.id, {
+                        booleanOperator: e.target.value as 'AND' | 'OR' | 'NOT',
+                      })
                     }
                     aria-label="Boolean operator"
                   >
@@ -403,7 +400,7 @@ export function AdvancedSearchInterface({
                 <select
                   className="w-40 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   value={field.field}
-                  onChange={(e) =>
+                  onChange={e =>
                     updateSearchField(field.id, { field: e.target.value as SearchField['field'] })
                   }
                   aria-label="Search field"
@@ -419,8 +416,10 @@ export function AdvancedSearchInterface({
                 <select
                   className="w-36 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   value={field.operator}
-                  onChange={(e) =>
-                    updateSearchField(field.id, { operator: e.target.value as SearchField['operator'] })
+                  onChange={e =>
+                    updateSearchField(field.id, {
+                      operator: e.target.value as SearchField['operator'],
+                    })
                   }
                   aria-label="Search operator"
                 >
@@ -539,7 +538,7 @@ export function AdvancedSearchInterface({
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     value={advancedOptions.proximity?.toString()}
-                    onChange={(e) =>
+                    onChange={e =>
                       setAdvancedOptions(prev => ({ ...prev, proximity: parseInt(e.target.value) }))
                     }
                     aria-label="Word proximity"
@@ -556,7 +555,7 @@ export function AdvancedSearchInterface({
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     value={searchSettings.maxResults.toString()}
-                    onChange={(e) =>
+                    onChange={e =>
                       setSearchSettings(prev => ({ ...prev, maxResults: parseInt(e.target.value) }))
                     }
                     aria-label="Maximum results"
@@ -575,8 +574,11 @@ export function AdvancedSearchInterface({
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   value={advancedOptions.dateBoost}
-                  onChange={(e) =>
-                    setAdvancedOptions(prev => ({ ...prev, dateBoost: e.target.value as 'recent' | 'none' }))
+                  onChange={e =>
+                    setAdvancedOptions(prev => ({
+                      ...prev,
+                      dateBoost: e.target.value as 'recent' | 'none',
+                    }))
                   }
                   aria-label="Date relevance boost"
                 >

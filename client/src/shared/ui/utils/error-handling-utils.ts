@@ -8,7 +8,8 @@
 
 import { createError, coreErrorHandler, handleError as coreHandleError } from '@/core/error';
 import type { AppError, ErrorDomain, ErrorSeverity } from '@/core/error';
-import { logger } from '../.././logger';
+
+import { logger } from '../../logger';
 
 // ============================================================================
 // UI-Specific Error Types (extending core)
@@ -331,11 +332,7 @@ export const integrateWithMonitoring = (): void => {
 // Re-exports from Core (for convenience)
 // ============================================================================
 
-export {
-  coreErrorHandler,
-  createError,
-  coreHandleError as handleError,
-};
+export { coreErrorHandler, createError, coreHandleError as handleError };
 
 // ============================================================================
 // Default Export

@@ -4,15 +4,20 @@
  * Tests for the useBreadcrumbNavigation hook and related utilities.
  */
 
-import React from 'react';
-import { renderHook, act } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { renderHook, act } from '@testing-library/react';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 
-import { useBreadcrumbNavigation, generateEnhancedBreadcrumbs, routeBreadcrumbConfig } from '../useBreadcrumbNavigation';
 import navigationReducer from '@/shared/infrastructure/store/slices/navigationSlice';
 import type { BreadcrumbItem } from '@/shared/types/navigation';
+
+import {
+  useBreadcrumbNavigation,
+  generateEnhancedBreadcrumbs,
+  routeBreadcrumbConfig,
+} from '../useBreadcrumbNavigation';
 
 // Mock store setup
 const createMockStore = (initialState = {}) => {
@@ -51,7 +56,7 @@ const createMockStore = (initialState = {}) => {
 const TestWrapper: React.FC<{ children: React.ReactNode; store?: any; initialPath?: string }> = ({
   children,
   store = createMockStore(),
-  initialPath = '/'
+  initialPath = '/',
 }) => (
   <Provider store={store}>
     <BrowserRouter>
@@ -187,7 +192,8 @@ describe('routeBreadcrumbConfig', () => {
     expect(billDetailBreadcrumbs[2].is_active).toBe(true);
 
     // Test bill analysis route
-    const billAnalysisBreadcrumbs = routeBreadcrumbConfig['/bills/:id/analysis']('/bills/123/analysis');
+    const billAnalysisBreadcrumbs =
+      routeBreadcrumbConfig['/bills/:id/analysis']('/bills/123/analysis');
     expect(billAnalysisBreadcrumbs).toHaveLength(4);
     expect(billAnalysisBreadcrumbs[3].label).toBe('Analysis');
     expect(billAnalysisBreadcrumbs[3].is_active).toBe(true);
@@ -239,9 +245,7 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should provide addBreadcrumb function', () => {
-    const initialBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: true },
-    ];
+    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: true }];
 
     store = createMockStore({
       breadcrumbs: initialBreadcrumbs,
@@ -291,9 +295,7 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should not pop breadcrumb if only one remains', () => {
-    const initialBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: true },
-    ];
+    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: true }];
 
     store = createMockStore({
       breadcrumbs: initialBreadcrumbs,
@@ -350,11 +352,15 @@ describe('useBreadcrumbNavigation', () => {
       { label: 'Custom Page', path: pathname, is_active: true },
     ]);
 
-    const { result } = renderHook(() => useBreadcrumbNavigation({
-      customGenerator,
-    }), {
-      wrapper: ({ children }) => <TestWrapper store={store}>{children}</TestWrapper>,
-    });
+    const { result } = renderHook(
+      () =>
+        useBreadcrumbNavigation({
+          customGenerator,
+        }),
+      {
+        wrapper: ({ children }) => <TestWrapper store={store}>{children}</TestWrapper>,
+      }
+    );
 
     const breadcrumbs = result.current.generateBreadcrumbsForPath('/test');
 
@@ -366,11 +372,15 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should disable auto-generation when autoGenerate is false', () => {
-    const { result } = renderHook(() => useBreadcrumbNavigation({
-      autoGenerate: false,
-    }), {
-      wrapper: ({ children }) => <TestWrapper store={store}>{children}</TestWrapper>,
-    });
+    const { result } = renderHook(
+      () =>
+        useBreadcrumbNavigation({
+          autoGenerate: false,
+        }),
+      {
+        wrapper: ({ children }) => <TestWrapper store={store}>{children}</TestWrapper>,
+      }
+    );
 
     // Should still have empty breadcrumbs since auto-generation is disabled
     expect(result.current.breadcrumbs).toEqual([]);

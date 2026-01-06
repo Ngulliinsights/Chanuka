@@ -4,10 +4,10 @@
  */
 
 import { Shield } from 'lucide-react';
+import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const handleLoginSuccess = () => {
     logger.info('Login successful, redirecting', {
       component: 'LoginPage',
-      redirectTo: from
+      redirectTo: from,
     });
     navigate(from, { replace: true });
   };
@@ -38,15 +38,10 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-sm text-gray-600">
             Or{' '}
-            <Link
-              to="/auth/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
+            <Link to="/auth/register" className="font-medium text-blue-600 hover:text-blue-500">
               create a new account
             </Link>
           </p>
@@ -55,11 +50,31 @@ export default function LoginPage() {
         {/* Consolidated Login Form - placeholder (LoginForm not exported from @client/core/auth) */}
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white shadow rounded-lg p-6 text-center text-muted-foreground">
-            <p>Login component is not available in this build. Use the shared login form component.</p>
+            <p>
+              Login component is not available in this build. Use the shared login form component.
+            </p>
             <div className="mt-4 flex justify-center gap-2">
-              <button type="button" onClick={handleLoginSuccess} className="px-4 py-2 bg-blue-600 text-white rounded">Simulate Sign In</button>
-              <button type="button" onClick={handleSwitchToRegister} className="px-4 py-2 border rounded">Register</button>
-              <button type="button" onClick={handleForgotPassword} className="px-4 py-2 border rounded">Forgot</button>
+              <button
+                type="button"
+                onClick={handleLoginSuccess}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Simulate Sign In
+              </button>
+              <button
+                type="button"
+                onClick={handleSwitchToRegister}
+                className="px-4 py-2 border rounded"
+              >
+                Register
+              </button>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="px-4 py-2 border rounded"
+              >
+                Forgot
+              </button>
             </div>
           </div>
         </div>

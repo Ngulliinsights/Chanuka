@@ -59,7 +59,7 @@ export class SecurityService {
       enableVulnerabilityScanning: true,
       enableInputSanitization: true,
       scanInterval: isDevelopment ? 600000 : 300000, // 10 minutes in dev, 5 minutes in prod
-      ...config
+      ...config,
     };
 
     // Initialize asynchronously
@@ -80,7 +80,9 @@ export class SecurityService {
    */
   private async initialize(): Promise<void> {
     const isDevelopment = process.env.NODE_ENV === 'development';
-    console.log(`🔒 Initializing Security Service (${isDevelopment ? 'Development' : 'Production'} mode)...`);
+    console.log(
+      `🔒 Initializing Security Service (${isDevelopment ? 'Development' : 'Production'} mode)...`
+    );
 
     try {
       // Initialize CSP if enabled
@@ -163,10 +165,15 @@ export class SecurityService {
       if (initialScan.threats.length > 0) {
         const isDevelopment = process.env.NODE_ENV === 'development';
         if (isDevelopment) {
-          console.info(`ℹ️ Security scan found ${initialScan.threats.length} expected development issues. Score: ${initialScan.score}/100`);
+          console.info(
+            `ℹ️ Security scan found ${initialScan.threats.length} expected development issues. Score: ${initialScan.score}/100`
+          );
           console.debug('Development security issues (expected):', initialScan.threats);
         } else {
-          console.warn(`⚠️ Found ${initialScan.threats.length} security threats:`, initialScan.threats);
+          console.warn(
+            `⚠️ Found ${initialScan.threats.length} security threats:`,
+            initialScan.threats
+          );
         }
       }
 
@@ -176,7 +183,9 @@ export class SecurityService {
           try {
             const scan = await vulnerabilityScanner.scan();
             if (scan.threats.length > 0) {
-              console.warn(`🚨 Security scan found ${scan.threats.length} threats. Score: ${scan.score}/100`);
+              console.warn(
+                `🚨 Security scan found ${scan.threats.length} threats. Score: ${scan.score}/100`
+              );
               this.notifyThreats(scan.threats);
             }
           } catch (error) {
@@ -202,10 +211,12 @@ export class SecurityService {
    * Start real-time threat monitoring
    */
   private startThreatMonitoring(): void {
-    this.threatMonitoringCleanup = vulnerabilityScanner.startMonitoring((threat: SecurityThreat) => {
-      console.warn('🚨 Real-time threat detected:', threat);
-      this.notifyThreats([threat]);
-    });
+    this.threatMonitoringCleanup = vulnerabilityScanner.startMonitoring(
+      (threat: SecurityThreat) => {
+        console.warn('🚨 Real-time threat detected:', threat);
+        this.notifyThreats([threat]);
+      }
+    );
   }
 
   /**
@@ -226,7 +237,13 @@ export class SecurityService {
   /**
    * Setup axios interceptors for security
    */
-  public setupAxiosInterceptors(axiosInstance: { interceptors: { request: { use: (callback: (config: Record<string, unknown>) => Record<string, unknown>) => void } } }): void {
+  public setupAxiosInterceptors(axiosInstance: {
+    interceptors: {
+      request: {
+        use: (callback: (config: Record<string, unknown>) => Record<string, unknown>) => void;
+      };
+    };
+  }): void {
     if (this.config.enableCSRF) {
       setupCSRFInterceptor(axiosInstance);
     }
@@ -252,8 +269,8 @@ export class SecurityService {
   }
 
   /**
-    * Sanitize input using configured sanitizer
-    */
+   * Sanitize input using configured sanitizer
+   */
   public sanitizeInput(input: string): string {
     if (!this.config.enableInputSanitization) {
       return input;
@@ -262,8 +279,8 @@ export class SecurityService {
   }
 
   /**
-    * Sanitize HTML content
-    */
+   * Sanitize HTML content
+   */
   public sanitizeHtml(html: string): string {
     if (!this.config.enableInputSanitization) {
       return html;
@@ -274,7 +291,10 @@ export class SecurityService {
   /**
    * Validate input with schema
    */
-  public async validateInput<T>(schema: Record<string, unknown>, input: unknown): Promise<{ success: true; data: T } | { success: false; errors: string[] }> {
+  public async validateInput<T>(
+    schema: Record<string, unknown>,
+    input: unknown
+  ): Promise<{ success: true; data: T } | { success: false; errors: string[] }> {
     if (!this.config.enableInputSanitization) {
       return { success: true, data: input as T };
     }
@@ -309,25 +329,25 @@ export class SecurityService {
     return {
       csp: {
         enabled: this.config.enableCSP,
-        currentNonce: cspNonceManager.getCurrentNonce()
+        currentNonce: cspNonceManager.getCurrentNonce(),
       },
       csrf: {
         enabled: this.config.enableCSRF,
-        hasValidToken: csrfMetadata?.hasToken && !csrfMetadata?.isExpired || false,
-        tokenExpiresIn: csrfMetadata?.expiresIn || 0
+        hasValidToken: (csrfMetadata?.hasToken && !csrfMetadata?.isExpired) || false,
+        tokenExpiresIn: csrfMetadata?.expiresIn || 0,
       },
       rateLimit: {
         enabled: this.config.enableRateLimit,
-        activeKeys: clientRateLimiter.getActiveKeys()
+        activeKeys: clientRateLimiter.getActiveKeys(),
       },
       vulnerabilityScanning: {
         enabled: this.config.enableVulnerabilityScanning,
         lastScanScore: latestScan?.score || 0,
-        threatsFound: latestScan?.threats.length || 0
+        threatsFound: latestScan?.threats.length || 0,
       },
       inputSanitization: {
-        enabled: this.config.enableInputSanitization
-      }
+        enabled: this.config.enableInputSanitization,
+      },
     };
   }
 
@@ -401,10 +421,4 @@ export class SecurityService {
 export const securityService = SecurityService.getInstance();
 
 // Export individual services for direct access if needed
-export {
-  cspNonceManager,
-  inputSanitizer,
-  csrfProtection,
-  clientRateLimiter,
-  vulnerabilityScanner
-};
+export { cspNonceManager, inputSanitizer, csrfProtection, clientRateLimiter, vulnerabilityScanner };

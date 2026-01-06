@@ -1,12 +1,12 @@
 /**
  * Enhanced Retry Handler with Circuit Breaker Integration
- * 
+ *
  * Provides exponential backoff retry logic that works with circuit breakers
  * and integrates with the error correlation system.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 import { logger } from '../../utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 export interface RetryConfig {
   maxAttempts: number;
@@ -49,8 +49,8 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
     'TIMEOUT_ERROR',
     'SERVER_ERROR',
     'RATE_LIMITED',
-    'SERVICE_UNAVAILABLE'
-  ]
+    'SERVICE_UNAVAILABLE',
+  ],
 };
 
 /**
@@ -80,7 +80,7 @@ export const SERVICE_RETRY_CONFIGS: Record<string, Partial<RetryConfig>> = {
     baseDelay: 500,
     maxDelay: 15000,
     backoffMultiplier: 1.8,
-  }
+  },
 };
 
 /**
@@ -92,23 +92,20 @@ export class RetryHandler {
 
   constructor(serviceName: string = 'default', customConfig?: Partial<RetryConfig>) {
     this.serviceName = serviceName;
-    
+
     // Merge default config with service-specific and custom configs
     const serviceConfig = SERVICE_RETRY_CONFIGS[serviceName] || {};
     this.config = {
       ...DEFAULT_RETRY_CONFIG,
       ...serviceConfig,
-      ...customConfig
+      ...customConfig,
     };
   }
 
   /**
    * Executes an operation with retry logic and exponential backoff
    */
-  async execute<T>(
-    operation: () => Promise<T>,
-    correlationId?: string
-  ): Promise<RetryResult<T>> {
+  async execute<T>(operation: () => Promise<T>, correlationId?: string): Promise<RetryResult<T>> {
     const startTime = Date.now();
     let totalDelay = 0;
     let lastError: Error;
@@ -120,11 +117,11 @@ export class RetryHandler {
           serviceName: this.serviceName,
           attempt,
           maxAttempts: this.config.maxAttempts,
-          correlationId
+          correlationId,
         });
 
         const result = await operation();
-        
+
         const executionTime = Date.now() - startTime;
         logger.info('Operation succeeded', {
           component: 'RetryHandler',
@@ -132,26 +129,25 @@ export class RetryHandler {
           attempt,
           executionTime,
           totalDelay,
-          correlationId
+          correlationId,
         });
 
         return {
           success: true,
           data: result,
           attempts: attempt,
-          totalDelay
+          totalDelay,
         };
-
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown error');
-        
+
         logger.warn('Operation failed, evaluating retry', {
           component: 'RetryHandler',
           serviceName: this.serviceName,
           attempt,
           maxAttempts: this.config.maxAttempts,
           error: lastError.message,
-          correlationId
+          correlationId,
         });
 
         // Don't retry on the last attempt
@@ -165,7 +161,7 @@ export class RetryHandler {
             component: 'RetryHandler',
             serviceName: this.serviceName,
             error: lastError.message,
-            correlationId
+            correlationId,
           });
           break;
         }
@@ -180,7 +176,7 @@ export class RetryHandler {
           attempt,
           delay,
           totalDelay,
-          correlationId
+          correlationId,
         });
 
         // Wait before retry
@@ -189,22 +185,27 @@ export class RetryHandler {
     }
 
     // All attempts failed
-    const finalError = this.createFinalError(lastError!, this.config.maxAttempts, totalDelay, correlationId);
-    
+    const finalError = this.createFinalError(
+      lastError!,
+      this.config.maxAttempts,
+      totalDelay,
+      correlationId
+    );
+
     logger.error('All retry attempts failed', {
       component: 'RetryHandler',
       serviceName: this.serviceName,
       maxAttempts: this.config.maxAttempts,
       totalDelay,
       finalError: finalError.message,
-      correlationId
+      correlationId,
     });
 
     return {
       success: false,
       error: finalError,
       attempts: this.config.maxAttempts,
-      totalDelay
+      totalDelay,
     };
   }
 
@@ -247,7 +248,7 @@ export class RetryHandler {
       'fetch',
       'server error',
       'service unavailable',
-      'rate limit'
+      'rate limit',
     ];
 
     return retryablePatterns.some(pattern => errorMessage.includes(pattern));
@@ -258,14 +259,15 @@ export class RetryHandler {
    */
   private calculateDelay(attempt: number): number {
     // Exponential backoff: baseDelay * (backoffMultiplier ^ (attempt - 1))
-    const exponentialDelay = this.config.baseDelay * Math.pow(this.config.backoffMultiplier, attempt - 1);
-    
+    const exponentialDelay =
+      this.config.baseDelay * Math.pow(this.config.backoffMultiplier, attempt - 1);
+
     // Apply maximum delay limit
     const cappedDelay = Math.min(exponentialDelay, this.config.maxDelay);
-    
+
     // Add jitter to prevent thundering herd
     const jitter = cappedDelay * this.config.jitterFactor * (Math.random() - 0.5);
-    
+
     return Math.max(0, cappedDelay + jitter);
   }
 
@@ -279,26 +281,23 @@ export class RetryHandler {
     correlationId?: string
   ): BaseError {
     const isBaseError = lastError instanceof BaseError;
-    
-    return new BaseError(
-      `Operation failed after ${attempts} attempts: ${lastError.message}`,
-      {
-        statusCode: isBaseError ? lastError.statusCode : 503,
-        code: 'MAX_RETRIES_EXCEEDED',
-        domain: isBaseError ? lastError.metadata.domain : ErrorDomain.NETWORK,
-        severity: ErrorSeverity.HIGH,
-        cause: lastError,
-        correlationId: correlationId || (isBaseError ? lastError.metadata.correlationId : undefined),
-        context: {
-          serviceName: this.serviceName,
-          maxAttempts: attempts,
-          totalDelay,
-          lastErrorCode: isBaseError ? lastError.code : 'UNKNOWN',
-          retryConfig: this.config
-        },
-        retryable: false // Final error should not be retried
-      }
-    );
+
+    return new BaseError(`Operation failed after ${attempts} attempts: ${lastError.message}`, {
+      statusCode: isBaseError ? lastError.statusCode : 503,
+      code: 'MAX_RETRIES_EXCEEDED',
+      domain: isBaseError ? lastError.metadata.domain : ErrorDomain.NETWORK,
+      severity: ErrorSeverity.HIGH,
+      cause: lastError,
+      correlationId: correlationId || (isBaseError ? lastError.metadata.correlationId : undefined),
+      context: {
+        serviceName: this.serviceName,
+        maxAttempts: attempts,
+        totalDelay,
+        lastErrorCode: isBaseError ? lastError.code : 'UNKNOWN',
+        retryConfig: this.config,
+      },
+      retryable: false, // Final error should not be retried
+    });
   }
 
   /**
@@ -313,11 +312,11 @@ export class RetryHandler {
    */
   updateConfig(newConfig: Partial<RetryConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     logger.info('Retry configuration updated', {
       component: 'RetryHandler',
       serviceName: this.serviceName,
-      newConfig: this.config
+      newConfig: this.config,
     });
   }
 
@@ -357,7 +356,7 @@ export async function retryOperation<T>(
 ): Promise<T> {
   const retryHandler = createRetryHandler(serviceName, config);
   const result = await retryHandler.execute(operation, correlationId);
-  
+
   if (result.success) {
     return result.data!;
   } else {
@@ -373,5 +372,5 @@ export const retryHandlers = {
   socialMedia: createRetryHandler('social-media'),
   externalApi: createRetryHandler('external-api'),
   internalApi: createRetryHandler('internal-api'),
-  default: createRetryHandler('default')
+  default: createRetryHandler('default'),
 };

@@ -67,9 +67,14 @@ export function useSwipeGesture({
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       const velocity = distance / duration;
 
-      const direction: 'up' | 'down' | 'left' | 'right' = Math.abs(deltaX) > Math.abs(deltaY)
-        ? deltaX > 0 ? 'right' : 'left'
-        : deltaY > 0 ? 'down' : 'up';
+      const direction: 'up' | 'down' | 'left' | 'right' =
+        Math.abs(deltaX) > Math.abs(deltaY)
+          ? deltaX > 0
+            ? 'right'
+            : 'left'
+          : deltaY > 0
+            ? 'down'
+            : 'up';
 
       return {
         direction,
@@ -85,119 +90,164 @@ export function useSwipeGesture({
     []
   );
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (disabled) return;
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (disabled) return;
 
-    const touch = e.touches[0];
-    swipeData.current = {
-      startX: touch.clientX,
-      startY: touch.clientY,
-      startTime: Date.now(),
-      isSwiping: true,
-      isMouseDown: false,
-    };
-  }, [disabled]);
-
-  const handleTouchEnd = useCallback((e: TouchEvent) => {
-    if (disabled || !swipeData.current.isSwiping) return;
-
-    const touch = e.changedTouches[0];
-    const event = createSwipeEvent(touch.clientX, touch.clientY, Date.now());
-
-    swipeData.current.isSwiping = false;
-
-    if (event.distance < minDistance || event.velocity < minVelocity) return;
-    if (event.duration > maxDuration) return;
-
-    onSwipe?.(event);
-    switch (event.direction) {
-      case 'left':
-        onSwipeLeft?.(event);
-        break;
-      case 'right':
-        onSwipeRight?.(event);
-        break;
-      case 'up':
-        onSwipeUp?.(event);
-        break;
-      case 'down':
-        onSwipeDown?.(event);
-        break;
-    }
-  }, [disabled, minDistance, minVelocity, maxDuration, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, createSwipeEvent]);
-
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    if (disabled) return;
-
-    swipeData.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      startTime: Date.now(),
-      isSwiping: true,
-      isMouseDown: true,
-    };
-  }, [disabled]);
-
-  const handleMouseUp = useCallback((e: MouseEvent) => {
-    if (disabled || !swipeData.current.isMouseDown) return;
-
-    const event = createSwipeEvent(e.clientX, e.clientY, Date.now());
-
-    swipeData.current.isSwiping = false;
-    swipeData.current.isMouseDown = false;
-
-    if (event.distance < minDistance || event.velocity < minVelocity) return;
-    if (event.duration > maxDuration) return;
-
-    onSwipe?.(event);
-    switch (event.direction) {
-      case 'left':
-        onSwipeLeft?.(event);
-        break;
-      case 'right':
-        onSwipeRight?.(event);
-        break;
-      case 'up':
-        onSwipeUp?.(event);
-        break;
-      case 'down':
-        onSwipeDown?.(event);
-        break;
-    }
-  }, [disabled, minDistance, minVelocity, maxDuration, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, createSwipeEvent]);
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (disabled) return;
-
-    const keyToDirection: Record<string, 'up' | 'down' | 'left' | 'right'> = {
-      ArrowLeft: 'left',
-      ArrowRight: 'right',
-      ArrowUp: 'up',
-      ArrowDown: 'down',
-    };
-
-    const direction = keyToDirection[e.key];
-    if (direction) {
-      e.preventDefault();
-      const event: SwipeEvent = {
-        direction,
-        distance: minDistance,
-        velocity: 1,
-        duration: 100,
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
+      const touch = e.touches[0];
+      swipeData.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startTime: Date.now(),
+        isSwiping: true,
+        isMouseDown: false,
       };
+    },
+    [disabled]
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      if (disabled || !swipeData.current.isSwiping) return;
+
+      const touch = e.changedTouches[0];
+      const event = createSwipeEvent(touch.clientX, touch.clientY, Date.now());
+
+      swipeData.current.isSwiping = false;
+
+      if (event.distance < minDistance || event.velocity < minVelocity) return;
+      if (event.duration > maxDuration) return;
+
       onSwipe?.(event);
-      switch (direction) {
-        case 'left': onSwipeLeft?.(event); break;
-        case 'right': onSwipeRight?.(event); break;
-        case 'up': onSwipeUp?.(event); break;
-        case 'down': onSwipeDown?.(event); break;
+      switch (event.direction) {
+        case 'left':
+          onSwipeLeft?.(event);
+          break;
+        case 'right':
+          onSwipeRight?.(event);
+          break;
+        case 'up':
+          onSwipeUp?.(event);
+          break;
+        case 'down':
+          onSwipeDown?.(event);
+          break;
       }
-    }
-  }, [disabled, minDistance, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown]);
+    },
+    [
+      disabled,
+      minDistance,
+      minVelocity,
+      maxDuration,
+      onSwipe,
+      onSwipeLeft,
+      onSwipeRight,
+      onSwipeUp,
+      onSwipeDown,
+      createSwipeEvent,
+    ]
+  );
+
+  const handleMouseDown = useCallback(
+    (e: MouseEvent) => {
+      if (disabled) return;
+
+      swipeData.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        startTime: Date.now(),
+        isSwiping: true,
+        isMouseDown: true,
+      };
+    },
+    [disabled]
+  );
+
+  const handleMouseUp = useCallback(
+    (e: MouseEvent) => {
+      if (disabled || !swipeData.current.isMouseDown) return;
+
+      const event = createSwipeEvent(e.clientX, e.clientY, Date.now());
+
+      swipeData.current.isSwiping = false;
+      swipeData.current.isMouseDown = false;
+
+      if (event.distance < minDistance || event.velocity < minVelocity) return;
+      if (event.duration > maxDuration) return;
+
+      onSwipe?.(event);
+      switch (event.direction) {
+        case 'left':
+          onSwipeLeft?.(event);
+          break;
+        case 'right':
+          onSwipeRight?.(event);
+          break;
+        case 'up':
+          onSwipeUp?.(event);
+          break;
+        case 'down':
+          onSwipeDown?.(event);
+          break;
+      }
+    },
+    [
+      disabled,
+      minDistance,
+      minVelocity,
+      maxDuration,
+      onSwipe,
+      onSwipeLeft,
+      onSwipeRight,
+      onSwipeUp,
+      onSwipeDown,
+      createSwipeEvent,
+    ]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (disabled) return;
+
+      const keyToDirection: Record<string, 'up' | 'down' | 'left' | 'right'> = {
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+      };
+
+      const direction = keyToDirection[e.key];
+      if (direction) {
+        e.preventDefault();
+        const event: SwipeEvent = {
+          direction,
+          distance: minDistance,
+          velocity: 1,
+          duration: 100,
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0,
+        };
+        onSwipe?.(event);
+        switch (direction) {
+          case 'left':
+            onSwipeLeft?.(event);
+            break;
+          case 'right':
+            onSwipeRight?.(event);
+            break;
+          case 'up':
+            onSwipeUp?.(event);
+            break;
+          case 'down':
+            onSwipeDown?.(event);
+            break;
+        }
+      }
+    },
+    [disabled, minDistance, onSwipe, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown]
+  );
 
   // Set up event listeners when element is available
   const setupListeners = useCallback(() => {

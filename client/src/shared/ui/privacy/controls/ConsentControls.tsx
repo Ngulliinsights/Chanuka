@@ -4,27 +4,23 @@
  */
 
 // Remove unused React import
+import { Bell, Download, Trash, AlertTriangle } from 'lucide-react';
 import React from 'react';
-import {
-  Bell,
-  Download,
-  Trash,
-  AlertTriangle
-} from 'lucide-react';
 
 import { PrivacySettings } from '@/core/auth';
-
 import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
 // import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
+import { Switch } from '@/shared/design-system/interactive/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Label } from '@/shared/design-system/typography/Label';
-import { Switch } from '@/shared/design-system/interactive/Switch';
-
 
 interface ConsentControlsProps {
   settings: PrivacySettings;
-  onNotificationChange: (key: keyof PrivacySettings['notification_preferences'], value: boolean) => void;
+  onNotificationChange: (
+    key: keyof PrivacySettings['notification_preferences'],
+    value: boolean
+  ) => void;
   onRequestDataExport: (format: 'json' | 'csv' | 'xml') => void;
   onRequestDataDeletion: () => void;
   loading?: boolean;
@@ -37,7 +33,7 @@ export function ConsentControls({
   onRequestDataExport,
   onRequestDataDeletion,
   loading = false,
-  className = ''
+  className = '',
 }: ConsentControlsProps) {
   return (
     <div className={`space-y-6 ${className}`}>
@@ -54,13 +50,11 @@ export function ConsentControls({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Email Notifications</Label>
-                <p className="text-sm text-gray-600">
-                  Receive notifications via email
-                </p>
+                <p className="text-sm text-gray-600">Receive notifications via email</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.email_notifications}
-                onCheckedChange={(checked) => onNotificationChange('email_notifications', checked)}
+                onCheckedChange={checked => onNotificationChange('email_notifications', checked)}
                 aria-label="Email notifications toggle"
               />
             </div>
@@ -68,13 +62,11 @@ export function ConsentControls({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Push Notifications</Label>
-                <p className="text-sm text-gray-600">
-                  Receive browser push notifications
-                </p>
+                <p className="text-sm text-gray-600">Receive browser push notifications</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.push_notifications}
-                onCheckedChange={(checked) => onNotificationChange('push_notifications', checked)}
+                onCheckedChange={checked => onNotificationChange('push_notifications', checked)}
                 aria-label="Push notifications toggle"
               />
             </div>
@@ -88,7 +80,7 @@ export function ConsentControls({
               </div>
               <Switch
                 checked={settings.notification_preferences.sms_notifications}
-                onCheckedChange={(checked) => onNotificationChange('sms_notifications', checked)}
+                onCheckedChange={checked => onNotificationChange('sms_notifications', checked)}
                 aria-label="SMS notifications toggle"
               />
             </div>
@@ -98,13 +90,11 @@ export function ConsentControls({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Bill Updates</Label>
-                <p className="text-sm text-gray-600">
-                  Notifications about bills you're following
-                </p>
+                <p className="text-sm text-gray-600">Notifications about bills you're following</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.bill_updates}
-                onCheckedChange={(checked) => onNotificationChange('bill_updates', checked)}
+                onCheckedChange={checked => onNotificationChange('bill_updates', checked)}
                 aria-label="Bill updates toggle"
               />
             </div>
@@ -118,7 +108,7 @@ export function ConsentControls({
               </div>
               <Switch
                 checked={settings.notification_preferences.comment_replies}
-                onCheckedChange={(checked) => onNotificationChange('comment_replies', checked)}
+                onCheckedChange={checked => onNotificationChange('comment_replies', checked)}
                 aria-label="Comment replies toggle"
               />
             </div>
@@ -132,7 +122,7 @@ export function ConsentControls({
               </div>
               <Switch
                 checked={settings.notification_preferences.expert_insights}
-                onCheckedChange={(checked) => onNotificationChange('expert_insights', checked)}
+                onCheckedChange={checked => onNotificationChange('expert_insights', checked)}
                 aria-label="Expert insights toggle"
               />
             </div>
@@ -146,7 +136,7 @@ export function ConsentControls({
               </div>
               <Switch
                 checked={settings.notification_preferences.security_alerts}
-                onCheckedChange={(checked) => onNotificationChange('security_alerts', checked)}
+                onCheckedChange={checked => onNotificationChange('security_alerts', checked)}
                 aria-label="Security alerts toggle"
               />
             </div>
@@ -154,13 +144,11 @@ export function ConsentControls({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Privacy Updates</Label>
-                <p className="text-sm text-gray-600">
-                  Notifications about privacy policy changes
-                </p>
+                <p className="text-sm text-gray-600">Notifications about privacy policy changes</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.privacy_updates}
-                onCheckedChange={(checked) => onNotificationChange('privacy_updates', checked)}
+                onCheckedChange={checked => onNotificationChange('privacy_updates', checked)}
                 aria-label="Privacy updates toggle"
               />
             </div>
@@ -173,7 +161,12 @@ export function ConsentControls({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             Your Data Rights
           </CardTitle>
@@ -214,14 +207,11 @@ export function ConsentControls({
             <Alert variant="destructive" className="mb-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Warning:</strong> Some data may be retained for legal compliance or civic transparency requirements.
+                <strong>Warning:</strong> Some data may be retained for legal compliance or civic
+                transparency requirements.
               </AlertDescription>
             </Alert>
-            <Button
-              variant="destructive"
-              onClick={onRequestDataDeletion}
-              disabled={loading}
-            >
+            <Button variant="destructive" onClick={onRequestDataDeletion} disabled={loading}>
               <Trash className="h-4 w-4 mr-2" />
               Request Account Deletion
             </Button>

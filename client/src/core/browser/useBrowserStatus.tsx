@@ -2,34 +2,31 @@
 
 /**
  * Browser Status Hook for React Components
- * 
+ *
  * Provides React components with browser compatibility information for display purposes.
  * This is NOT for implementing fallbacks - all fallbacks are handled globally by browser.ts.
- * 
+ *
  * Note: react-refresh/only-export-components disabled because this module exports
  * both hooks and components as a cohesive API for browser compatibility management.
  * Note: Inline style used for dynamic progress bar width (necessary for dynamic values).
- * 
+ *
  * Use this hook to:
  * - Display compatibility warnings to users
  * - Show browser version information
  * - Check compatibility score
  * - Display recommendations
- * 
+ *
  * Do NOT use this hook for:
  * - Feature detection (use polyfilled APIs directly instead)
  * - Loading fallbacks (done globally at startup)
  * - Runtime compatibility checks (already initialized)
- * 
+ *
  * @module useBrowserStatus
  */
 
 import React, { useState, useEffect } from 'react';
 
-import {
-  browserCompatibilityManager,
-  type CompatibilityStatus,
-} from '@client/core';
+import { browserCompatibilityManager, type CompatibilityStatus } from '@client/core';
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -50,7 +47,7 @@ const ProgressBarFill: React.FC<ProgressBarFillProps> = React.memo(({ score }) =
       className="h-2 rounded-full transition-all"
       style={{
         width: `${scorePercentage}%`,
-        backgroundColor: bgColor
+        backgroundColor: bgColor,
       }}
     />
   );
@@ -64,10 +61,10 @@ ProgressBarFill.displayName = 'ProgressBarFill';
 
 /**
  * Hook to get the current browser compatibility status.
- * 
+ *
  * Returns null during initialization, then the full status.
  * Use this to display compatibility information to users.
- * 
+ *
  * @returns Current compatibility status or null if not yet initialized
  */
 export function useBrowserCompatibilityStatus(): CompatibilityStatus | null {
@@ -98,7 +95,7 @@ export function useBrowserCompatibilityStatus(): CompatibilityStatus | null {
 /**
  * Hook to check if the browser is supported.
  * Returns true while initializing, false after initialization reveals unsupported browser.
- * 
+ *
  * @returns Whether the browser is supported
  */
 export function useBrowserIsSupported(): boolean {
@@ -109,13 +106,13 @@ export function useBrowserIsSupported(): boolean {
 
 /**
  * Hook to get the compatibility score (0-100).
- * 
+ *
  * Scores guide:
  * - 90-100: Excellent, all features supported
  * - 70-89: Good, most features supported
  * - 50-69: Fair, some features need polyfills
  * - 0-49: Poor, many features need polyfills or have issues
- * 
+ *
  * @returns Compatibility score or null if not yet initialized
  */
 export function useBrowserCompatibilityScore(): number | null {
@@ -125,7 +122,7 @@ export function useBrowserCompatibilityScore(): number | null {
 
 /**
  * Hook to get browser information (name, version, features).
- * 
+ *
  * @returns Browser information or null if not yet initialized
  */
 export function useBrowserInfo() {
@@ -135,7 +132,7 @@ export function useBrowserInfo() {
 
 /**
  * Hook to get compatibility warnings for the current browser.
- * 
+ *
  * @returns Array of warning messages or empty array
  */
 export function useBrowserWarnings(): string[] {
@@ -145,7 +142,7 @@ export function useBrowserWarnings(): string[] {
 
 /**
  * Hook to check if browser should be blocked (critical incompatibility).
- * 
+ *
  * @returns Whether to block the browser entirely
  */
 export function useShouldBlockBrowser(): boolean {
@@ -159,7 +156,7 @@ export function useShouldBlockBrowser(): boolean {
 
 /**
  * Example component: Display compatibility warning banner if browser has issues.
- * 
+ *
  * Shows a warning if the compatibility score is below 80.
  * Can be placed near the top of the app to inform users of potential issues.
  */
@@ -188,13 +185,11 @@ export const BrowserCompatibilityWarning = React.memo(() => {
           </svg>
         </div>
         <div className="ml-3">
-          <h3 className="text-sm font-medium text-yellow-800">
-            Browser Compatibility Notice
-          </h3>
+          <h3 className="text-sm font-medium text-yellow-800">Browser Compatibility Notice</h3>
           <div className="mt-2 text-sm text-yellow-700">
             <p>
-              Your browser may not fully support all features.
-              Compatibility score: {status.compatibilityScore}%
+              Your browser may not fully support all features. Compatibility score:{' '}
+              {status.compatibilityScore}%
             </p>
             {status.recommendations.length > 0 && (
               <ul className="mt-2 list-disc list-inside space-y-1">
@@ -214,7 +209,7 @@ BrowserCompatibilityWarning.displayName = 'BrowserCompatibilityWarning';
 
 /**
  * Example component: Display detailed browser information.
- * 
+ *
  * Shows browser name, version, features, and recommendations.
  * Useful for debugging or detailed compatibility information.
  */
@@ -259,9 +254,7 @@ export const BrowserCompatibilityDetails = React.memo(() => {
               <div className="flex-1 bg-gray-300 rounded-full h-2">
                 <ProgressBarFill score={status.compatibilityScore} />
               </div>
-              <span className="text-gray-700 font-medium">
-                {status.compatibilityScore}%
-              </span>
+              <span className="text-gray-700 font-medium">{status.compatibilityScore}%</span>
             </div>
           </div>
         </div>
@@ -280,8 +273,7 @@ export const BrowserCompatibilityDetails = React.memo(() => {
             </p>
             {polyfillsRequired.length > 0 && (
               <p>
-                <span className="font-medium">Required:</span>{' '}
-                {polyfillsRequired.join(', ')}
+                <span className="font-medium">Required:</span> {polyfillsRequired.join(', ')}
               </p>
             )}
           </div>
@@ -325,9 +317,9 @@ BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';
 
 /**
  * USAGE EXAMPLE:
- * 
+ *
  * import { useBrowserCompatibilityStatus, BrowserCompatibilityWarning } from '@client/core/browser/useBrowserStatus';
- * 
+ *
  * export function App() {
  *   return (
  *     <div>
@@ -336,7 +328,7 @@ BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';
  *     </div>
  *   );
  * }
- * 
+ *
  * KEY POINTS:
  * - This hook is for DISPLAY ONLY
  * - All actual browser compatibility is handled by polyfills in browser.ts

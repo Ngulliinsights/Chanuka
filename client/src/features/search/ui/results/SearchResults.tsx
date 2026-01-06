@@ -18,16 +18,27 @@ import {
   LayoutGrid,
   LayoutList,
   Download,
-  MoreHorizontal
+  MoreHorizontal,
 } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/shared/design-system';
 import { Skeleton } from '@client/shared/design-system';
 
 // Type definitions for better type safety throughout the component
@@ -87,7 +98,20 @@ type ViewMode = 'list' | 'grid';
 // Helper function to format dates in a readable format without external libraries
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
 
@@ -99,7 +123,7 @@ export function SearchResults({
   onSaveResult,
   onShareResult,
   onExportResults,
-  className = ''
+  className = '',
 }: SearchResultsProps) {
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -172,58 +196,60 @@ export function SearchResults({
     return Array.from(typeCounts.entries()).map(([type, count]) => ({
       value: type,
       label: type.charAt(0).toUpperCase() + type.slice(1),
-      count
+      count,
     }));
   }, [results]);
 
   // Helper function to extract highlight terms from SearchHighlight objects
   // This handles both string arrays and object arrays for flexibility
-  const extractHighlightTerms = useCallback((highlights: SearchHighlight[] | string[] | undefined): string[] => {
-    if (!highlights || highlights.length === 0) return [];
+  const extractHighlightTerms = useCallback(
+    (highlights: SearchHighlight[] | string[] | undefined): string[] => {
+      if (!highlights || highlights.length === 0) return [];
 
-    // Check if highlights are objects or strings
-    if (typeof highlights[0] === 'string') {
-      return highlights as string[];
-    }
+      // Check if highlights are objects or strings
+      if (typeof highlights[0] === 'string') {
+        return highlights as string[];
+      }
 
-    // Extract text from SearchHighlight objects
-    return (highlights as SearchHighlight[]).map(h => h.text);
-  }, []);
+      // Extract text from SearchHighlight objects
+      return (highlights as SearchHighlight[]).map(h => h.text);
+    },
+    []
+  );
 
   // Highlight matching search terms within text content
   // This creates a visual emphasis on the parts of the text that matched the search query
   // We use React elements instead of dangerouslySetInnerHTML for better security
-  const highlightText = useCallback((text: string, highlights?: SearchHighlight[] | string[]): React.ReactNode => {
-    const terms = extractHighlightTerms(highlights);
+  const highlightText = useCallback(
+    (text: string, highlights?: SearchHighlight[] | string[]): React.ReactNode => {
+      const terms = extractHighlightTerms(highlights);
 
-    if (!terms.length) return text;
+      if (!terms.length) return text;
 
-    // We escape special regex characters to safely handle terms like "C++" or "$100"
-    const pattern = terms
-      .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-      .join('|');
+      // We escape special regex characters to safely handle terms like "C++" or "$100"
+      const pattern = terms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
 
-    const regex = new RegExp(`(${pattern})`, 'gi');
-    const parts = text.split(regex);
+      const regex = new RegExp(`(${pattern})`, 'gi');
+      const parts = text.split(regex);
 
-    // Reconstruct the text with highlighted portions wrapped in mark elements
-    return (
-      <>
-        {parts.map((part, index) => {
-          const isHighlight = terms.some(term =>
-            part.toLowerCase().includes(term.toLowerCase())
-          );
-          return isHighlight ? (
-            <mark key={index} className="bg-yellow-200 px-0.5 rounded">
-              {part}
-            </mark>
-          ) : (
-            <span key={index}>{part}</span>
-          );
-        })}
-      </>
-    );
-  }, [extractHighlightTerms]);
+      // Reconstruct the text with highlighted portions wrapped in mark elements
+      return (
+        <>
+          {parts.map((part, index) => {
+            const isHighlight = terms.some(term => part.toLowerCase().includes(term.toLowerCase()));
+            return isHighlight ? (
+              <mark key={index} className="bg-yellow-200 px-0.5 rounded">
+                {part}
+              </mark>
+            ) : (
+              <span key={index}>{part}</span>
+            );
+          })}
+        </>
+      );
+    },
+    [extractHighlightTerms]
+  );
 
   // Determine the color coding for relevance scores
   // This provides quick visual feedback on result quality
@@ -242,7 +268,7 @@ export function SearchResults({
       article: '📰',
       document: '📋',
       video: '🎥',
-      image: '🖼️'
+      image: '🖼️',
     };
     return iconMap[type] || '📋';
   }, []);
@@ -258,7 +284,7 @@ export function SearchResults({
 
   // Toggle sort order between ascending and descending
   const toggleSortOrder = useCallback(() => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
 
   // Render skeleton loaders while data is being fetched
@@ -289,155 +315,158 @@ export function SearchResults({
   );
 
   // Render an individual search result card with all its metadata and actions
-  const renderResult = useCallback((result: SearchResult) => (
-    <Card
-      key={`${result.type}-${result.id}`}
-      className="hover:shadow-md transition-shadow cursor-pointer"
-      onClick={() => onResultClick?.(result)}
-      role="article"
-      aria-label={`Search result: ${result.title}`}
-    >
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          {/* Header row with type badge, relevance score, and action menu */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg" role="img" aria-label={`${result.type} type`}>
-                {getTypeIcon(result.type)}
-              </span>
-              <Badge variant="outline" className="text-xs">
-                {result.type}
-              </Badge>
-              <div className="flex items-center space-x-1">
-                <Star className="h-3 w-3 text-yellow-500" aria-hidden="true" />
-                <span
-                  className={`text-xs font-medium ${getRelevanceColor(result.relevanceScore)}`}
-                  aria-label={`Relevance score: ${Math.round(result.relevanceScore)} percent`}
-                >
-                  {Math.round(result.relevanceScore)}%
+  const renderResult = useCallback(
+    (result: SearchResult) => (
+      <Card
+        key={`${result.type}-${result.id}`}
+        className="hover:shadow-md transition-shadow cursor-pointer"
+        onClick={() => onResultClick?.(result)}
+        role="article"
+        aria-label={`Search result: ${result.title}`}
+      >
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            {/* Header row with type badge, relevance score, and action menu */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg" role="img" aria-label={`${result.type} type`}>
+                  {getTypeIcon(result.type)}
                 </span>
+                <Badge variant="outline" className="text-xs">
+                  {result.type}
+                </Badge>
+                <div className="flex items-center space-x-1">
+                  <Star className="h-3 w-3 text-yellow-500" aria-hidden="true" />
+                  <span
+                    className={`text-xs font-medium ${getRelevanceColor(result.relevanceScore)}`}
+                    aria-label={`Relevance score: ${Math.round(result.relevanceScore)} percent`}
+                  >
+                    {Math.round(result.relevanceScore)}%
+                  </span>
+                </div>
               </div>
+
+              {/* Dropdown menu for save and share actions */}
+              {(onSaveResult || onShareResult) && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={e => e.stopPropagation()}
+                      aria-label="More actions"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {onSaveResult && (
+                      <DropdownMenuItem
+                        onClick={e => {
+                          e.stopPropagation();
+                          onSaveResult(result);
+                        }}
+                      >
+                        <Bookmark className="h-4 w-4 mr-2" />
+                        Save
+                      </DropdownMenuItem>
+                    )}
+                    {onShareResult && (
+                      <DropdownMenuItem
+                        onClick={e => {
+                          e.stopPropagation();
+                          onShareResult(result);
+                        }}
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
-            {/* Dropdown menu for save and share actions */}
-            {(onSaveResult || onShareResult) && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label="More actions"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {onSaveResult && (
-                    <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      onSaveResult(result);
-                    }}>
-                      <Bookmark className="h-4 w-4 mr-2" />
-                      Save
-                    </DropdownMenuItem>
-                  )}
-                  {onShareResult && (
-                    <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      onShareResult(result);
-                    }}>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
+            {/* Result title with search term highlighting */}
+            <h3 className="font-semibold text-lg leading-tight">
+              {highlightText(result.title, result.highlights)}
+            </h3>
 
-          {/* Result title with search term highlighting */}
-          <h3 className="font-semibold text-lg leading-tight">
-            {highlightText(result.title, result.highlights)}
-          </h3>
+            {/* Content excerpt with search term highlighting */}
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {highlightText(result.excerpt || result.content, result.highlights)}
+            </p>
 
-          {/* Content excerpt with search term highlighting */}
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            {highlightText(result.excerpt || result.content, result.highlights)}
-          </p>
+            {/* Metadata row showing date, views, comments, and status */}
+            <div className="flex items-center flex-wrap gap-4 text-xs text-muted-foreground">
+              {result.metadata.created_at && (
+                <div className="flex items-center space-x-1">
+                  <Clock className="h-3 w-3" aria-hidden="true" />
+                  <span>{formatDate(result.metadata.created_at)}</span>
+                </div>
+              )}
 
-          {/* Metadata row showing date, views, comments, and status */}
-          <div className="flex items-center flex-wrap gap-4 text-xs text-muted-foreground">
-            {result.metadata.created_at && (
-              <div className="flex items-center space-x-1">
-                <Clock className="h-3 w-3" aria-hidden="true" />
-                <span>{formatDate(result.metadata.created_at)}</span>
-              </div>
-            )}
+              {result.metadata.view_count !== undefined && (
+                <div className="flex items-center space-x-1">
+                  <Eye className="h-3 w-3" aria-hidden="true" />
+                  <span>{result.metadata.view_count.toLocaleString()} views</span>
+                </div>
+              )}
 
-            {result.metadata.view_count !== undefined && (
-              <div className="flex items-center space-x-1">
-                <Eye className="h-3 w-3" aria-hidden="true" />
-                <span>{result.metadata.view_count.toLocaleString()} views</span>
-              </div>
-            )}
+              {result.metadata.comment_count !== undefined && (
+                <div className="flex items-center space-x-1">
+                  <MessageSquare className="h-3 w-3" aria-hidden="true" />
+                  <span>{result.metadata.comment_count} comments</span>
+                </div>
+              )}
 
-            {result.metadata.comment_count !== undefined && (
-              <div className="flex items-center space-x-1">
-                <MessageSquare className="h-3 w-3" aria-hidden="true" />
-                <span>{result.metadata.comment_count} comments</span>
-              </div>
-            )}
-
-            {result.metadata.status && (
-              <Badge variant="secondary" className="text-xs">
-                {result.metadata.status}
-              </Badge>
-            )}
-          </div>
-
-          {/* Tag badges if available */}
-          {result.metadata.tags && result.metadata.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {result.metadata.tags.slice(0, 3).map((tag: string, tagIndex: number) => (
-                <Badge key={tagIndex} variant="outline" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-              {result.metadata.tags.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{result.metadata.tags.length - 3} more
+              {result.metadata.status && (
+                <Badge variant="secondary" className="text-xs">
+                  {result.metadata.status}
                 </Badge>
               )}
             </div>
-          )}
 
-          {/* Visual relevance score indicator */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Relevance</span>
-              <span className={getRelevanceColor(result.relevanceScore)}>
-                {Math.round(result.relevanceScore)}%
-              </span>
+            {/* Tag badges if available */}
+            {result.metadata.tags && result.metadata.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {result.metadata.tags.slice(0, 3).map((tag: string, tagIndex: number) => (
+                  <Badge key={tagIndex} variant="outline" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+                {result.metadata.tags.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{result.metadata.tags.length - 3} more
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Visual relevance score indicator */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Relevance</span>
+                <span className={getRelevanceColor(result.relevanceScore)}>
+                  {Math.round(result.relevanceScore)}%
+                </span>
+              </div>
+              <Progress
+                value={result.relevanceScore}
+                className="h-1"
+                aria-label={`Relevance: ${Math.round(result.relevanceScore)}%`}
+              />
             </div>
-            <Progress
-              value={result.relevanceScore}
-              className="h-1"
-              aria-label={`Relevance: ${Math.round(result.relevanceScore)}%`}
-            />
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  ), [onResultClick, onSaveResult, onShareResult, getTypeIcon, getRelevanceColor, highlightText]);
+        </CardContent>
+      </Card>
+    ),
+    [onResultClick, onSaveResult, onShareResult, getTypeIcon, getRelevanceColor, highlightText]
+  );
 
   // Show loading state with skeleton placeholders
   if (isLoading) {
-    return (
-      <div className={className}>
-        {renderSkeleton()}
-      </div>
-    );
+    return <div className={className}>{renderSkeleton()}</div>;
   }
 
   // Show error message if search failed
@@ -472,9 +501,7 @@ export function SearchResults({
       {/* Results header with count, timing, and controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center flex-wrap gap-4">
-          <h2 className="text-lg font-semibold">
-            {results.totalCount.toLocaleString()} results
-          </h2>
+          <h2 className="text-lg font-semibold">{results.totalCount.toLocaleString()} results</h2>
           <Badge variant="outline" className="text-xs">
             {results.searchTime}ms
           </Badge>
@@ -496,8 +523,8 @@ export function SearchResults({
           {/* Type filter dropdown - only shown when multiple types exist */}
           {availableTypes.length > 1 && (
             <Select
-              value={selectedTypes[0] || "all"}
-              onChange={(e) => handleTypeFilterChange(e.target.value)}
+              value={selectedTypes[0] || 'all'}
+              onChange={e => handleTypeFilterChange(e.target.value)}
               className="w-32"
             >
               <SelectItem value="all">All Types</SelectItem>
@@ -512,7 +539,7 @@ export function SearchResults({
           {/* Sort criteria selector */}
           <Select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
+            onChange={e => setSortBy(e.target.value as SortOption)}
             className="w-32"
           >
             <SelectItem value="relevance">Relevance</SelectItem>
@@ -528,7 +555,11 @@ export function SearchResults({
             onClick={toggleSortOrder}
             aria-label={`Sort ${sortOrder === 'asc' ? 'ascending' : 'descending'}`}
           >
-            {sortOrder === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {sortOrder === 'asc' ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
 
           {/* View mode toggle between list and grid layouts */}
@@ -601,7 +632,7 @@ export function SearchResults({
 
       {/* Results display area - adapts layout based on view mode */}
       <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
-        {processedResults.map((result) => renderResult(result))}
+        {processedResults.map(result => renderResult(result))}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 /**
  * Example usage of the Global Loading Indicator system
- * 
+ *
  * This example demonstrates how to integrate and use the global loading
  * indicator with your existing Redux store and React application.
  */
@@ -8,11 +8,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import { 
-  GlobalLoadingProvider, 
-  GlobalLoadingIndicator,
-  useGlobalLoadingIndicator 
-} from '../index';
+import { GlobalLoadingProvider, GlobalLoadingIndicator, useGlobalLoadingIndicator } from '../index';
 
 // Mock store - replace with your actual store
 const mockStore = {
@@ -22,7 +18,7 @@ const mockStore = {
       isOnline: true,
       globalLoading: false,
       highPriorityLoading: false,
-    }
+    },
   }),
   dispatch: () => {},
   subscribe: () => () => {},
@@ -58,16 +54,19 @@ const LoadingControlExample: React.FC = () => {
 
     // Complete them one by one with delays
     operations.forEach((opId, index) => {
-      setTimeout(async () => {
-        await hide(opId);
-      }, (index + 1) * 1000);
+      setTimeout(
+        async () => {
+          await hide(opId);
+        },
+        (index + 1) * 1000
+      );
     });
   };
 
   return (
     <div className="p-6 space-y-4">
       <h2 className="text-xl font-semibold">Global Loading Indicator Example</h2>
-      
+
       <div className="space-y-2">
         <p>Loading Status: {isLoading ? 'Active' : 'Idle'}</p>
         <p>Active Operations: {activeCount}</p>
@@ -82,7 +81,7 @@ const LoadingControlExample: React.FC = () => {
         >
           Start Single Operation
         </button>
-        
+
         <button
           onClick={handleMultipleOperations}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -106,7 +105,7 @@ const AppExample: React.FC = () => {
         <div className="min-h-screen bg-gray-50">
           {/* Your app content */}
           <LoadingControlExample />
-          
+
           {/* Global loading indicator - automatically shows/hides */}
           <GlobalLoadingIndicator
             position="top-right"
@@ -127,7 +126,7 @@ const AppExample: React.FC = () => {
 
 /**
  * INTEGRATION STEPS:
- * 
+ *
  * 1. Wrap your app with the providers:
  * ```tsx
  * function App() {
@@ -141,11 +140,11 @@ const AppExample: React.FC = () => {
  *   );
  * }
  * ```
- * 
+ *
  * 2. Use the hook in components:
  * ```tsx
  * const { show, hide } = useGlobalLoadingIndicator();
- * 
+ *
  * const handleAsyncAction = async () => {
  *   const opId = await show({ message: 'Loading...' });
  *   try {
@@ -155,12 +154,12 @@ const AppExample: React.FC = () => {
  *   }
  * };
  * ```
- * 
+ *
  * 3. Or use with existing loading hooks:
  * ```tsx
  * const { withLoading } = useLoadingState();
  * const { show, hide } = useGlobalLoadingIndicator();
- * 
+ *
  * const handleAction = withLoading(async () => {
  *   const opId = await show({ message: 'Processing...' });
  *   try {

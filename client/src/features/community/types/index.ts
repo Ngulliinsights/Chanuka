@@ -223,7 +223,12 @@ export interface CommentValidation {
   };
 }
 
-export type CommentSortOption = 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
+export type CommentSortOption =
+  | 'newest'
+  | 'oldest'
+  | 'most_voted'
+  | 'controversial'
+  | 'expert_first';
 export type CommentFilterOption = 'all' | 'expert_only' | 'high_quality' | 'recent';
 
 export type ModerationViolationType =

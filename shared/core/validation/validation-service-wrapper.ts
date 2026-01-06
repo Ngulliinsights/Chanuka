@@ -5,8 +5,11 @@
  * ValidationService and provides a unified API for client and server modules.
  */
 
-import { Result, ok, err } from '../primitives/types/result';
+import { ZodSchema } from 'zod';
+
 import { BaseError } from '../observability/error-management/errors/base-error';
+import { Result, ok, err } from '../primitives/types/result';
+
 import {
   IValidationService,
   ValidationServiceRegistry,
@@ -18,7 +21,7 @@ import {
   SchemaRegistrationOptions
 } from './ivalidation-service';
 import { ValidationService } from './validation-service';
-import { ZodSchema } from 'zod';
+
 
 /**
  * Validation operation error

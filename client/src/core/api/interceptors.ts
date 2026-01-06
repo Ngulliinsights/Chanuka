@@ -1,10 +1,10 @@
 /**
  * Request and Response Interceptor System
- * 
+ *
  * This module provides a flexible interceptor pipeline for modifying HTTP requests
  * and responses. Interceptors can be used for authentication, logging, error handling,
  * request transformation, and more.
- * 
+ *
  * Key features:
  * - Type-safe interceptor interfaces
  * - Sequential processing with error handling
@@ -16,7 +16,9 @@ import { logger } from '../../utils/logger';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 // Define interceptor types locally since @client/types is not available
-type RequestInterceptor = (config: RequestInit & { url: string }) => Promise<RequestInit & { url: string }> | RequestInit & { url: string };
+type RequestInterceptor = (
+  config: RequestInit & { url: string }
+) => Promise<RequestInit & { url: string }> | (RequestInit & { url: string });
 type ResponseInterceptor = (response: Response) => Promise<Response> | Response;
 
 // ============================================================================
@@ -54,7 +56,7 @@ class CircuitBreaker {
       recoveryTimeout: 60000, // 1 minute
       monitoringPeriod: 10000, // 10 seconds
       halfOpenMaxCalls: 3,
-      ...config
+      ...config,
     };
   }
 
@@ -77,7 +79,7 @@ class CircuitBreaker {
         successes: 0,
         rejected: 0,
         failureRate: 0,
-        averageResponseTime: 0
+        averageResponseTime: 0,
       });
     }
     return this.states.get(serviceKey)!;
@@ -102,13 +104,13 @@ class CircuitBreaker {
           // Transition to half-open
           this.updateState(serviceKey, {
             state: 'half-open',
-            successCount: 0
+            successCount: 0,
           });
           return { allowed: true };
         }
         return {
           allowed: false,
-          reason: `Circuit breaker is open for ${serviceKey}. Next retry at ${new Date(state.nextRetryTime || 0).toISOString()}`
+          reason: `Circuit breaker is open for ${serviceKey}. Next retry at ${new Date(state.nextRetryTime || 0).toISOString()}`,
         };
 
       case 'half-open':
@@ -117,7 +119,7 @@ class CircuitBreaker {
         }
         return {
           allowed: false,
-          reason: `Circuit breaker is half-open and has reached max calls for ${serviceKey}`
+          reason: `Circuit breaker is half-open and has reached max calls for ${serviceKey}`,
         };
 
       default:
@@ -145,21 +147,21 @@ class CircuitBreaker {
           lastFailureTime: undefined,
           nextRetryTime: undefined,
           successes: newSuccesses,
-          failureRate: newFailureRate
+          failureRate: newFailureRate,
         });
       } else {
-        this.updateState(serviceKey, { 
+        this.updateState(serviceKey, {
           successCount: newSuccessCount,
           successes: newSuccesses,
-          failureRate: newFailureRate
+          failureRate: newFailureRate,
         });
       }
     } else if (state.state === 'closed') {
       // Reset failure count on success
-      this.updateState(serviceKey, { 
+      this.updateState(serviceKey, {
         failureCount: 0,
         successes: newSuccesses,
-        failureRate: newFailureRate
+        failureRate: newFailureRate,
       });
     }
   }
@@ -170,7 +172,7 @@ class CircuitBreaker {
     const now = Date.now();
 
     const newFailureCount = state.failureCount + 1;
-    
+
     // Update monitoring properties
     const newFailures = state.failures + 1;
     const totalRequests = newFailures + state.successes;
@@ -185,7 +187,7 @@ class CircuitBreaker {
         nextRetryTime: now + this.config.recoveryTimeout,
         successCount: 0,
         failures: newFailures,
-        failureRate: newFailureRate
+        failureRate: newFailureRate,
       });
     } else if (newFailureCount >= this.config.failureThreshold) {
       // Transition to open
@@ -195,14 +197,14 @@ class CircuitBreaker {
         lastFailureTime: now,
         nextRetryTime: now + this.config.recoveryTimeout,
         failures: newFailures,
-        failureRate: newFailureRate
+        failureRate: newFailureRate,
       });
     } else {
       this.updateState(serviceKey, {
         failureCount: newFailureCount,
         lastFailureTime: now,
         failures: newFailures,
-        failureRate: newFailureRate
+        failureRate: newFailureRate,
       });
     }
   }
@@ -292,17 +294,17 @@ function normalizeHeaders(headers: HeadersInit | undefined): Headers {
 
 /**
  * Header Interceptor
- * 
+ *
  * Adds essential headers to every outgoing request:
  * 1. X-CSRF-Token: Security token for preventing CSRF attacks
  * 2. X-Request-ID: Unique identifier for request tracking and correlation
  * 3. Content-Type: Default JSON content type for POST/PUT/PATCH requests
  * 4. Accept: Default accepted response type
- * 
+ *
  * Note: Authentication is handled via HttpOnly cookies sent automatically by the browser.
  * This approach is more secure than storing tokens in localStorage or sessionStorage.
  */
-export const headerInterceptor: RequestInterceptor = (config) => {
+export const headerInterceptor: RequestInterceptor = config => {
   const headers = normalizeHeaders(config.headers);
 
   // Add CSRF token if available in the DOM (Rails/Django style)
@@ -330,23 +332,21 @@ export const headerInterceptor: RequestInterceptor = (config) => {
 
   return {
     ...config,
-    headers
+    headers,
   };
 };
 
 /**
  * Logging Interceptor
- * 
+ *
  * Logs all outgoing requests for debugging and monitoring purposes.
  * Includes method, URL, and request ID for correlation with server logs.
- * 
+ *
  * In production, this should be configured to only log errors or
  * can be disabled entirely for performance.
  */
-export const loggingInterceptor: RequestInterceptor = (config) => {
-  const headers = config.headers instanceof Headers
-    ? config.headers
-    : new Headers(config.headers);
+export const loggingInterceptor: RequestInterceptor = config => {
+  const headers = config.headers instanceof Headers ? config.headers : new Headers(config.headers);
 
   const requestId = headers.get('X-Request-ID') || 'unknown';
 
@@ -355,7 +355,7 @@ export const loggingInterceptor: RequestInterceptor = (config) => {
     requestId,
     url: config.url,
     method: config.method || 'GET',
-    hasBody: !!config.body
+    hasBody: !!config.body,
   });
 
   return config;
@@ -363,12 +363,12 @@ export const loggingInterceptor: RequestInterceptor = (config) => {
 
 /**
  * Timeout Interceptor
- * 
+ *
  * Adds AbortSignal-based timeout to requests if not already present.
  * This ensures all requests have a maximum execution time.
  */
 export const timeoutInterceptor = (defaultTimeout: number = 10000): RequestInterceptor => {
-  return (config) => {
+  return config => {
     // Don't override existing signal
     if (config.signal) {
       return config;
@@ -384,18 +384,18 @@ export const timeoutInterceptor = (defaultTimeout: number = 10000): RequestInter
 
     return {
       ...config,
-      signal: controller.signal
+      signal: controller.signal,
     };
   };
 };
 
 /**
  * Request Sanitization Interceptor
- * 
+ *
  * Removes sensitive information from requests before they're sent.
  * This is useful for preventing accidental exposure of sensitive data.
  */
-export const sanitizationInterceptor: RequestInterceptor = (config) => {
+export const sanitizationInterceptor: RequestInterceptor = config => {
   // Remove any potential password fields from URL params
   const url = new URL(config.url, window.location.origin);
   const sensitiveParams = ['password', 'token', 'secret', 'key'];
@@ -405,24 +405,24 @@ export const sanitizationInterceptor: RequestInterceptor = (config) => {
       url.searchParams.delete(param);
       logger.warn('Removed sensitive parameter from URL', {
         component: 'RequestInterceptor',
-        parameter: param
+        parameter: param,
       });
     }
   });
 
   return {
     ...config,
-    url: url.toString()
+    url: url.toString(),
   };
 };
 
 /**
  * Request Compression Interceptor
- * 
+ *
  * Adds compression headers to indicate the client supports compressed responses.
  * This can significantly reduce bandwidth usage for large responses.
  */
-export const compressionInterceptor: RequestInterceptor = (config) => {
+export const compressionInterceptor: RequestInterceptor = config => {
   const headers = normalizeHeaders(config.headers);
 
   if (!headers.has('Accept-Encoding')) {
@@ -431,24 +431,24 @@ export const compressionInterceptor: RequestInterceptor = (config) => {
 
   return {
     ...config,
-    headers
+    headers,
   };
 };
 
 /**
  * Circuit Breaker Interceptor
- * 
+ *
  * Implements circuit breaker pattern to prevent cascading failures.
  * Monitors service health and temporarily blocks requests to failing services.
  */
-export const circuitBreakerInterceptor: RequestInterceptor = (config) => {
+export const circuitBreakerInterceptor: RequestInterceptor = config => {
   const { allowed, reason } = circuitBreaker.canExecute(config.url);
 
   if (!allowed) {
     logger.warn('Circuit breaker blocked request', {
       component: 'CircuitBreakerInterceptor',
       url: config.url,
-      reason
+      reason,
     });
 
     // Throw a BaseError with circuit breaker information
@@ -461,8 +461,8 @@ export const circuitBreakerInterceptor: RequestInterceptor = (config) => {
       context: {
         url: config.url,
         reason,
-        circuitBreakerStats: circuitBreaker.getStats()
-      }
+        circuitBreakerStats: circuitBreaker.getStats(),
+      },
     });
   }
 
@@ -475,11 +475,11 @@ export const circuitBreakerInterceptor: RequestInterceptor = (config) => {
 
 /**
  * Response Logging Interceptor
- * 
+ *
  * Logs all incoming responses for debugging and monitoring.
  * Includes status, timing, and correlation information.
  */
-export const responseLoggingInterceptor: ResponseInterceptor = async (response) => {
+export const responseLoggingInterceptor: ResponseInterceptor = async response => {
   const requestId = response.headers.get('X-Request-ID') || 'unknown';
   const duration = response.headers.get('X-Response-Time') || 'unknown';
 
@@ -489,7 +489,7 @@ export const responseLoggingInterceptor: ResponseInterceptor = async (response) 
     status: response.status,
     statusText: response.statusText,
     duration,
-    url: response.url
+    url: response.url,
   });
 
   return response;
@@ -497,11 +497,11 @@ export const responseLoggingInterceptor: ResponseInterceptor = async (response) 
 
 /**
  * Error Response Interceptor
- * 
+ *
  * Handles error responses and provides additional context.
  * Transforms error responses into a consistent format.
  */
-export const errorResponseInterceptor: ResponseInterceptor = async (response) => {
+export const errorResponseInterceptor: ResponseInterceptor = async response => {
   if (!response.ok) {
     const requestId = response.headers.get('X-Request-ID') || 'unknown';
 
@@ -510,7 +510,7 @@ export const errorResponseInterceptor: ResponseInterceptor = async (response) =>
       requestId,
       status: response.status,
       statusText: response.statusText,
-      url: response.url
+      url: response.url,
     });
 
     // Clone response before reading body (can only be read once)
@@ -521,13 +521,13 @@ export const errorResponseInterceptor: ResponseInterceptor = async (response) =>
       logger.debug('Error Response Body', {
         component: 'ResponseInterceptor',
         requestId,
-        errorData
+        errorData,
       });
     } catch (error) {
       // Body is not JSON or couldn't be parsed
       logger.debug('Error Response Body (non-JSON)', {
         component: 'ResponseInterceptor',
-        requestId
+        requestId,
       });
     }
   }
@@ -537,11 +537,11 @@ export const errorResponseInterceptor: ResponseInterceptor = async (response) =>
 
 /**
  * Cache Header Interceptor
- * 
+ *
  * Processes cache-related headers and adds metadata to the response.
  * This helps the cache layer make decisions about storing responses.
  */
-export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
+export const cacheHeaderInterceptor: ResponseInterceptor = response => {
   const cacheControl = response.headers.get('Cache-Control');
   const etag = response.headers.get('ETag');
   const lastModified = response.headers.get('Last-Modified');
@@ -552,7 +552,7 @@ export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
       cacheControl,
       etag,
       lastModified,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // Store metadata on the response object for later use
@@ -564,13 +564,14 @@ export const cacheHeaderInterceptor: ResponseInterceptor = (response) => {
 
 /**
  * Circuit Breaker Response Interceptor
- * 
+ *
  * Records success/failure results for circuit breaker monitoring.
  * Updates circuit breaker state based on response status.
  */
-export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response) => {
+export const circuitBreakerResponseInterceptor: ResponseInterceptor = response => {
   const serviceName = getServiceNameFromUrl(response.url);
-  const correlationId = response.headers.get('X-Correlation-ID') || response.headers.get('X-Request-ID') || undefined;
+  const correlationId =
+    response.headers.get('X-Correlation-ID') || response.headers.get('X-Request-ID') || undefined;
 
   if (response.ok) {
     circuitBreaker.recordSuccess(response.url);
@@ -579,7 +580,7 @@ export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response)
       url: response.url,
       status: response.status,
       serviceName,
-      correlationId
+      correlationId,
     });
 
     // Record success event for monitoring
@@ -598,9 +599,9 @@ export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response)
               successes: serviceStats.successes,
               rejected: serviceStats.rejected,
               failureRate: serviceStats.failureRate,
-              averageResponseTime: serviceStats.averageResponseTime
+              averageResponseTime: serviceStats.averageResponseTime,
             },
-            correlationId
+            correlationId,
           });
         }
       });
@@ -613,7 +614,7 @@ export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response)
       url: response.url,
       status: response.status,
       serviceName,
-      correlationId
+      correlationId,
     });
 
     // Record failure event for monitoring
@@ -632,9 +633,9 @@ export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response)
               successes: serviceStats.successes,
               rejected: serviceStats.rejected,
               failureRate: serviceStats.failureRate,
-              averageResponseTime: serviceStats.averageResponseTime
+              averageResponseTime: serviceStats.averageResponseTime,
             },
-            correlationId
+            correlationId,
           });
         }
       });
@@ -651,7 +652,7 @@ export const circuitBreakerResponseInterceptor: ResponseInterceptor = (response)
 /**
  * List of all active request interceptors.
  * These are executed in order for every outgoing request.
- * 
+ *
  * To add custom interceptors, simply push them to this array.
  * To disable an interceptor, remove it from the array.
  */
@@ -660,14 +661,14 @@ export const requestInterceptors: RequestInterceptor[] = [
   headerInterceptor,
   sanitizationInterceptor,
   compressionInterceptor,
-  loggingInterceptor
+  loggingInterceptor,
   // Add more interceptors here as needed
 ];
 
 /**
  * List of all active response interceptors.
  * These are executed in order for every incoming response.
- * 
+ *
  * Response interceptors can transform responses, handle errors,
  * or perform side effects like logging or caching.
  */
@@ -675,7 +676,7 @@ export const responseInterceptors: ResponseInterceptor[] = [
   circuitBreakerResponseInterceptor, // Record circuit breaker results first
   cacheHeaderInterceptor,
   errorResponseInterceptor,
-  responseLoggingInterceptor
+  responseLoggingInterceptor,
   // Add more interceptors here as needed
 ];
 
@@ -685,11 +686,11 @@ export const responseInterceptors: ResponseInterceptor[] = [
 
 /**
  * Processes all request interceptors sequentially.
- * 
+ *
  * Each interceptor receives the config from the previous interceptor,
  * allowing for composition and transformation. If an interceptor throws
  * an error, the pipeline stops and the error is propagated.
- * 
+ *
  * @param config - Initial request configuration
  * @returns Processed request configuration after all interceptors
  */
@@ -705,7 +706,7 @@ export async function processRequestInterceptors(
       logger.error('Request interceptor failed', {
         component: 'InterceptorPipeline',
         error: error instanceof Error ? error.message : 'Unknown error',
-        url: config.url
+        url: config.url,
       });
       throw error;
     }
@@ -716,17 +717,15 @@ export async function processRequestInterceptors(
 
 /**
  * Processes all response interceptors sequentially.
- * 
+ *
  * Each interceptor receives the response from the previous interceptor,
  * allowing for composition and transformation. If an interceptor throws
  * an error, the pipeline stops and the error is propagated.
- * 
+ *
  * @param response - Initial response object
  * @returns Processed response after all interceptors
  */
-export async function processResponseInterceptors(
-  response: Response
-): Promise<Response> {
+export async function processResponseInterceptors(response: Response): Promise<Response> {
   let processedResponse = response;
 
   for (const interceptor of responseInterceptors) {
@@ -737,7 +736,7 @@ export async function processResponseInterceptors(
         component: 'InterceptorPipeline',
         error: error instanceof Error ? error.message : 'Unknown error',
         status: response.status,
-        url: response.url
+        url: response.url,
       });
       throw error;
     }
@@ -752,7 +751,7 @@ export async function processResponseInterceptors(
 
 /**
  * Creates a conditional interceptor that only runs when a condition is met.
- * 
+ *
  * @param condition - Function that determines if the interceptor should run
  * @param interceptor - The interceptor to conditionally execute
  * @returns A new interceptor that conditionally executes
@@ -761,7 +760,7 @@ export function conditionalRequestInterceptor(
   condition: (config: RequestInit & { url: string }) => boolean,
   interceptor: RequestInterceptor
 ): RequestInterceptor {
-  return async (config) => {
+  return async config => {
     if (condition(config)) {
       return interceptor(config);
     }
@@ -771,7 +770,7 @@ export function conditionalRequestInterceptor(
 
 /**
  * Creates a conditional response interceptor that only runs when a condition is met.
- * 
+ *
  * @param condition - Function that determines if the interceptor should run
  * @param interceptor - The interceptor to conditionally execute
  * @returns A new interceptor that conditionally executes
@@ -780,7 +779,7 @@ export function conditionalResponseInterceptor(
   condition: (response: Response) => boolean,
   interceptor: ResponseInterceptor
 ): ResponseInterceptor {
-  return async (response) => {
+  return async response => {
     if (condition(response)) {
       return interceptor(response);
     }
@@ -791,14 +790,14 @@ export function conditionalResponseInterceptor(
 /**
  * Combines multiple request interceptors into a single interceptor.
  * The interceptors are executed in the order they are provided.
- * 
+ *
  * @param interceptors - Array of interceptors to combine
  * @returns A single interceptor that executes all provided interceptors
  */
 export function combineRequestInterceptors(
   ...interceptors: RequestInterceptor[]
 ): RequestInterceptor {
-  return async (config) => {
+  return async config => {
     let result = config;
     for (const interceptor of interceptors) {
       result = await interceptor(result);
@@ -810,14 +809,14 @@ export function combineRequestInterceptors(
 /**
  * Combines multiple response interceptors into a single interceptor.
  * The interceptors are executed in the order they are provided.
- * 
+ *
  * @param interceptors - Array of interceptors to combine
  * @returns A single interceptor that executes all provided interceptors
  */
 export function combineResponseInterceptors(
   ...interceptors: ResponseInterceptor[]
 ): ResponseInterceptor {
-  return async (response) => {
+  return async response => {
     let result = response;
     for (const interceptor of interceptors) {
       result = await interceptor(result);
@@ -833,14 +832,11 @@ export function combineResponseInterceptors(
 /**
  * Adds a request interceptor to the pipeline.
  * The interceptor will be executed for all future requests.
- * 
+ *
  * @param interceptor - The interceptor to add
  * @param position - Optional position to insert the interceptor (default: end)
  */
-export function addRequestInterceptor(
-  interceptor: RequestInterceptor,
-  position?: number
-): void {
+export function addRequestInterceptor(interceptor: RequestInterceptor, position?: number): void {
   if (position !== undefined) {
     requestInterceptors.splice(position, 0, interceptor);
   } else {
@@ -851,14 +847,11 @@ export function addRequestInterceptor(
 /**
  * Adds a response interceptor to the pipeline.
  * The interceptor will be executed for all future responses.
- * 
+ *
  * @param interceptor - The interceptor to add
  * @param position - Optional position to insert the interceptor (default: end)
  */
-export function addResponseInterceptor(
-  interceptor: ResponseInterceptor,
-  position?: number
-): void {
+export function addResponseInterceptor(interceptor: ResponseInterceptor, position?: number): void {
   if (position !== undefined) {
     responseInterceptors.splice(position, 0, interceptor);
   } else {
@@ -868,7 +861,7 @@ export function addResponseInterceptor(
 
 /**
  * Removes a request interceptor from the pipeline.
- * 
+ *
  * @param interceptor - The interceptor to remove
  */
 export function removeRequestInterceptor(interceptor: RequestInterceptor): void {
@@ -880,7 +873,7 @@ export function removeRequestInterceptor(interceptor: RequestInterceptor): void 
 
 /**
  * Removes a response interceptor from the pipeline.
- * 
+ *
  * @param interceptor - The interceptor to remove
  */
 export function removeResponseInterceptor(interceptor: ResponseInterceptor): void {

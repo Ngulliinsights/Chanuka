@@ -1,4 +1,3 @@
-
 /**
  * User Dashboard State Management with Redux Toolkit
  *
@@ -19,7 +18,7 @@ import type {
   PrivacyControls,
   DataExportRequest,
   TemporalFilter,
-  DashboardPreferences
+  DashboardPreferences,
 } from '@/shared/types/user-dashboard';
 
 import type { RootState } from '../index';
@@ -60,28 +59,30 @@ export const refreshRecommendations = createAsyncThunk(
             summary: 'Enhances digital privacy protections for citizens',
             status: 'committee',
             urgencyLevel: 'medium',
-            policyAreas: ['Privacy', 'Technology']
+            policyAreas: ['Privacy', 'Technology'],
           },
           relevanceScore: 0.85,
           reasons: [
             {
               type: 'interest_match',
               description: 'Matches your interest in privacy legislation',
-              weight: 0.4
+              weight: 0.4,
             },
             {
               type: 'activity_pattern',
-              description: 'Similar to bills you\'ve engaged with',
-              weight: 0.3
-            }
+              description: "Similar to bills you've engaged with",
+              weight: 0.3,
+            },
           ],
-          confidence: 0.78
-        }
+          confidence: 0.78,
+        },
       ];
 
       return mockRecommendations;
     } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh recommendations');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Failed to refresh recommendations'
+      );
     }
   }
 );
@@ -110,13 +111,15 @@ export const refreshDashboard = createAsyncThunk(
 
       return { timestamp: new Date().toISOString() };
     } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh dashboard');
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Failed to refresh dashboard'
+      );
     }
   }
 );
 
 const initialTimeFilter: TemporalFilter = {
-  period: 'month'
+  period: 'month',
 };
 
 const initialPreferences: DashboardPreferences = {
@@ -125,7 +128,7 @@ const initialPreferences: DashboardPreferences = {
   defaultTimeFilter: 'month',
   pinnedSections: ['tracked-bills', 'civic-metrics'],
   hiddenSections: [],
-  refreshInterval: 15
+  refreshInterval: 15,
 };
 
 const initialPrivacyControls: PrivacyControls = {
@@ -134,7 +137,7 @@ const initialPrivacyControls: PrivacyControls = {
   showMetrics: true,
   showRecommendations: true,
   allowDataExport: true,
-  allowAnalytics: true
+  allowAnalytics: true,
 };
 
 const initialState: UserDashboardState = {
@@ -145,7 +148,7 @@ const initialState: UserDashboardState = {
   preferences: initialPreferences,
   privacyControls: initialPrivacyControls,
   lastUpdateTime: null,
-  pendingUpdates: 0
+  pendingUpdates: 0,
 };
 
 const userDashboardSlice = createSlice({
@@ -158,7 +161,10 @@ const userDashboardSlice = createSlice({
       state.lastUpdateTime = new Date().toISOString();
     },
 
-    updateTrackedBill: (state, action: PayloadAction<{ billId: number; updates: Partial<TrackedBill> }>) => {
+    updateTrackedBill: (
+      state,
+      action: PayloadAction<{ billId: number; updates: Partial<TrackedBill> }>
+    ) => {
       const { billId, updates } = action.payload;
       if (!state.dashboardData) return;
 
@@ -166,7 +172,7 @@ const userDashboardSlice = createSlice({
       if (billIndex !== -1) {
         state.dashboardData.trackedBills[billIndex] = {
           ...state.dashboardData.trackedBills[billIndex],
-          ...updates
+          ...updates,
         };
       }
     },
@@ -188,12 +194,15 @@ const userDashboardSlice = createSlice({
 
       state.dashboardData.civicMetrics = {
         ...state.dashboardData.civicMetrics,
-        ...metrics
+        ...metrics,
       };
     },
 
     // Bill tracking
-    trackBill: (state, action: PayloadAction<{ billId: number; notifications?: TrackedBill['notifications'] }>) => {
+    trackBill: (
+      state,
+      action: PayloadAction<{ billId: number; notifications?: TrackedBill['notifications'] }>
+    ) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
 
@@ -213,13 +222,13 @@ const userDashboardSlice = createSlice({
             commented: false,
             shared: false,
             viewCount: 1,
-            lastViewed: new Date().toISOString()
+            lastViewed: new Date().toISOString(),
           },
           notifications: notifications || {
             statusChanges: true,
             newComments: false,
-            expertAnalysis: true
-          }
+            expertAnalysis: true,
+          },
         };
 
         state.dashboardData.trackedBills.unshift(newTrackedBill);
@@ -238,7 +247,10 @@ const userDashboardSlice = createSlice({
       }
     },
 
-    updateBillNotifications: (state, action: PayloadAction<{ billId: number; notifications: TrackedBill['notifications'] }>) => {
+    updateBillNotifications: (
+      state,
+      action: PayloadAction<{ billId: number; notifications: TrackedBill['notifications'] }>
+    ) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
 
@@ -265,13 +277,13 @@ const userDashboardSlice = createSlice({
       // Track the bill
       userDashboardSlice.caseReducers.trackBill(state, {
         payload: { billId },
-        type: 'userDashboard/trackBill'
+        type: 'userDashboard/trackBill',
       });
 
       // Dismiss the recommendation
       userDashboardSlice.caseReducers.dismissRecommendation(state, {
         payload: billId,
-        type: 'userDashboard/dismissRecommendation'
+        type: 'userDashboard/dismissRecommendation',
       });
     },
 
@@ -298,7 +310,10 @@ const userDashboardSlice = createSlice({
     },
 
     // Real-time updates
-    handleRealTimeUpdate: (state, action: PayloadAction<{ type: string; data: Record<string, unknown> }>) => {
+    handleRealTimeUpdate: (
+      state,
+      action: PayloadAction<{ type: string; data: Record<string, unknown> }>
+    ) => {
       const { type, data } = action.payload;
 
       switch (type) {
@@ -308,33 +323,57 @@ const userDashboardSlice = createSlice({
               b => b.id === data.bill_id
             );
             if (billIndex !== -1 && typeof data.newStatus === 'string') {
-              const validStatuses = ['committee', 'introduced', 'passed', 'failed', 'signed', 'vetoed'];
+              const validStatuses = [
+                'committee',
+                'introduced',
+                'passed',
+                'failed',
+                'signed',
+                'vetoed',
+              ];
               if (validStatuses.includes(data.newStatus)) {
-                state.dashboardData.trackedBills[billIndex].status = data.newStatus as 'committee' | 'introduced' | 'passed' | 'failed' | 'signed' | 'vetoed';
-                state.dashboardData.trackedBills[billIndex].lastStatusChange = new Date().toISOString();
+                state.dashboardData.trackedBills[billIndex].status = data.newStatus as
+                  | 'committee'
+                  | 'introduced'
+                  | 'passed'
+                  | 'failed'
+                  | 'signed'
+                  | 'vetoed';
+                state.dashboardData.trackedBills[billIndex].lastStatusChange =
+                  new Date().toISOString();
               }
             }
           }
           break;
 
         case 'civic_metrics_update':
-          if (state.dashboardData && data.userId === state.dashboardData.stats &&
-              data.metrics && typeof data.metrics === 'object') {
+          if (
+            state.dashboardData &&
+            data.userId === state.dashboardData.stats &&
+            data.metrics &&
+            typeof data.metrics === 'object'
+          ) {
             state.dashboardData.civicMetrics = {
               ...state.dashboardData.civicMetrics,
-              ...(data.metrics as Partial<CivicImpactMetrics>)
+              ...(data.metrics as Partial<CivicImpactMetrics>),
             };
           }
           break;
 
         case 'new_recommendation':
-          if (state.dashboardData && data.recommendation &&
-              typeof data.recommendation === 'object' &&
-              'bill' in data.recommendation) {
+          if (
+            state.dashboardData &&
+            data.recommendation &&
+            typeof data.recommendation === 'object' &&
+            'bill' in data.recommendation
+          ) {
             state.dashboardData.recommendations.unshift(data.recommendation as BillRecommendation);
             // Keep only top 10 recommendations
             if (state.dashboardData.recommendations.length > 10) {
-              state.dashboardData.recommendations = state.dashboardData.recommendations.slice(0, 10);
+              state.dashboardData.recommendations = state.dashboardData.recommendations.slice(
+                0,
+                10
+              );
             }
           }
           break;
@@ -347,10 +386,10 @@ const userDashboardSlice = createSlice({
     // Utility actions
     reset: () => initialState,
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Refresh recommendations
     builder
-      .addCase(refreshRecommendations.pending, (state) => {
+      .addCase(refreshRecommendations.pending, state => {
         state.loading = true;
       })
       .addCase(refreshRecommendations.fulfilled, (state, action) => {
@@ -366,10 +405,10 @@ const userDashboardSlice = createSlice({
 
     // Request data export
     builder
-      .addCase(requestDataExport.pending, (state) => {
+      .addCase(requestDataExport.pending, state => {
         state.loading = true;
       })
-      .addCase(requestDataExport.fulfilled, (state) => {
+      .addCase(requestDataExport.fulfilled, state => {
         state.loading = false;
       })
       .addCase(requestDataExport.rejected, (state, action) => {
@@ -379,7 +418,7 @@ const userDashboardSlice = createSlice({
 
     // Refresh dashboard
     builder
-      .addCase(refreshDashboard.pending, (state) => {
+      .addCase(refreshDashboard.pending, state => {
         state.loading = true;
       })
       .addCase(refreshDashboard.fulfilled, (state, action) => {
@@ -424,7 +463,7 @@ export const selectUserDashboardState = (state: RootState) => {
 
 export const selectDashboardData = createSelector(
   [selectUserDashboardState],
-  (userDashboard) => userDashboard.dashboardData
+  userDashboard => userDashboard.dashboardData
 );
 
 export const selectFilteredEngagementHistory = createSelector(
@@ -454,8 +493,12 @@ export const selectFilteredEngagementHistory = createSelector(
       }
 
       const itemDate = new Date(item.timestamp);
-      const start = userDashboard.timeFilter.startDate ? new Date(userDashboard.timeFilter.startDate) : null;
-      const end = userDashboard.timeFilter.endDate ? new Date(userDashboard.timeFilter.endDate) : null;
+      const start = userDashboard.timeFilter.startDate
+        ? new Date(userDashboard.timeFilter.startDate)
+        : null;
+      const end = userDashboard.timeFilter.endDate
+        ? new Date(userDashboard.timeFilter.endDate)
+        : null;
 
       if (start && itemDate < start) return false;
       if (end && itemDate > end) return false;
@@ -467,24 +510,24 @@ export const selectFilteredEngagementHistory = createSelector(
 
 export const selectEngagementStats = createSelector(
   [selectFilteredEngagementHistory],
-  (filteredHistory) => ({
+  filteredHistory => ({
     totalActivities: filteredHistory.length,
-    commentCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'comment').length,
-    shareCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'share').length,
+    commentCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'comment')
+      .length,
+    shareCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'share')
+      .length,
     viewCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'view').length,
-    saveCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'save').length
+    saveCount: filteredHistory.filter((item: EngagementHistoryItem) => item.type === 'save').length,
   })
 );
 
-export const selectDashboardMeta = createSelector(
-  [selectUserDashboardState],
-  (userDashboard) => ({
-    hasData: !!userDashboard.dashboardData,
-    isDataStale: userDashboard.lastUpdateTime ?
-      (Date.now() - new Date(userDashboard.lastUpdateTime).getTime()) > (userDashboard.preferences.refreshInterval * 60 * 1000) :
-      true
-  })
-);
+export const selectDashboardMeta = createSelector([selectUserDashboardState], userDashboard => ({
+  hasData: !!userDashboard.dashboardData,
+  isDataStale: userDashboard.lastUpdateTime
+    ? Date.now() - new Date(userDashboard.lastUpdateTime).getTime() >
+      userDashboard.preferences.refreshInterval * 60 * 1000
+    : true,
+}));
 
 // Hook for components that need to interact with the user dashboard store
 export const useUserDashboardStore = () => {
@@ -503,7 +546,7 @@ export const useUserDashboardStore = () => {
     updatePrivacyControls: (controls: Partial<PrivacyControls>) =>
       dispatch(updatePrivacyControls(controls)),
     setDashboardData: (data: UserDashboardData) => dispatch(setDashboardData(data)),
-    requestDataExport: (request: DataExportRequest) => dispatch(requestDataExport(request))
+    requestDataExport: (request: DataExportRequest) => dispatch(requestDataExport(request)),
   };
 };
 
@@ -549,6 +592,6 @@ export const useUserDashboardSelectors = () => {
     engagementStats,
     refreshDashboard: () => dispatch(refreshDashboard()),
     setTimeFilter: (filter: TemporalFilter) => dispatch(setTimeFilter(filter)),
-    setError: (error: string | null) => dispatch(setError(error))
+    setError: (error: string | null) => dispatch(setError(error)),
   };
 };

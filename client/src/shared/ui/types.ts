@@ -82,7 +82,10 @@ export interface UseDashboardDataReturn {
 
 export interface UsePrivacySettingsReturn {
   settings: PrivacySettings;
-  updateSetting: <K extends keyof PrivacySettings>(key: K, value: PrivacySettings[K]) => Promise<void>;
+  updateSetting: <K extends keyof PrivacySettings>(
+    key: K,
+    value: PrivacySettings[K]
+  ) => Promise<void>;
   loading: boolean;
   error: string | null;
 }

@@ -32,53 +32,59 @@ export interface FeedbackSubmission {
   userContext?: Record<string, any>;
 }
 
-export function createErrorReporter(options: { 
-  enableFeedback?: boolean; 
+export function createErrorReporter(options: {
+  enableFeedback?: boolean;
   enableTechnicalDetails?: boolean;
 }) {
   return {
     report: (error: Record<string, unknown>) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      logger.error('User error reported', { 
+      logger.error('User error reported', {
         component: 'ErrorReporter',
-        error 
+        error,
       });
     },
-    
+
     generateReport: (error: BaseError, _metadata?: Record<string, unknown>): ErrorReport => {
-      const errorId = (error as any).errorId || `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      
+      const errorId =
+        (error as any).errorId ||
+        `err_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
       let recoveryOptions: Array<{ label: string; action: string; description?: string }>;
-      
+
       // Note: recoveryStrategies may not be present in all ErrorMetadata instances
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const recoveryStrategies = (error.metadata as any)?.recoveryStrategies as RecoveryStrategy[] | undefined;
-      
+      const recoveryStrategies = (error.metadata as any)?.recoveryStrategies as
+        | RecoveryStrategy[]
+        | undefined;
+
       if (recoveryStrategies && recoveryStrategies.length > 0) {
         recoveryOptions = recoveryStrategies.map(strategy => ({
           label: strategy.name,
           action: strategy.automatic ? 'auto' : 'manual',
-          description: strategy.description
+          description: strategy.description,
         }));
       } else {
         recoveryOptions = [
           { label: 'Retry', action: 'retry', description: 'Attempt the operation again' },
           { label: 'Go Home', action: 'home', description: 'Return to the homepage' },
-          { label: 'Report Issue', action: 'report', description: 'Send error details to support' }
+          { label: 'Report Issue', action: 'report', description: 'Send error details to support' },
         ];
-        
+
         const errorDomain = error.metadata?.domain as ErrorDomain | undefined;
         if (errorDomain === ErrorDomain.NETWORK) {
-          recoveryOptions.unshift({ 
-            label: 'Check Connection', 
+          recoveryOptions.unshift({
+            label: 'Check Connection',
             action: 'check-connection',
-            description: 'Verify your internet connection status'
+            description: 'Verify your internet connection status',
           });
         }
       }
 
-      const errorDomain = (error.metadata?.domain as ErrorDomain | undefined) || ErrorDomain.UNKNOWN;
-      const errorSeverity = (error.metadata?.severity as ErrorSeverity | undefined) || ErrorSeverity.MEDIUM;
+      const errorDomain =
+        (error.metadata?.domain as ErrorDomain | undefined) || ErrorDomain.UNKNOWN;
+      const errorSeverity =
+        (error.metadata?.severity as ErrorSeverity | undefined) || ErrorSeverity.MEDIUM;
 
       return {
         id: errorId,
@@ -90,17 +96,17 @@ export function createErrorReporter(options: {
         severity: errorSeverity,
         context: error.metadata?.context || {},
         technicalDetails: options.enableTechnicalDetails ? error.stack : undefined,
-        recoveryOptions
+        recoveryOptions,
       };
     },
-    
+
     submitFeedback: async (feedback: FeedbackSubmission): Promise<void> => {
-      logger.info('User feedback submitted', { 
+      logger.info('User feedback submitted', {
         component: 'ErrorReporter',
-        ...feedback 
+        ...feedback,
       });
     },
-    
-    options
+
+    options,
   };
 }

@@ -76,10 +76,10 @@ class StreamingSearchService {
         total: 0,
         percentage: 0,
         currentEngine: '',
-        searchTime: 0
+        searchTime: 0,
       },
       startTime: Date.now(),
-      abortController
+      abortController,
     };
 
     this.activeSessions.set(sessionId, session);
@@ -95,7 +95,7 @@ class StreamingSearchService {
       logger.error('Failed to start streaming search', {
         sessionId,
         query: query.q,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       this.cleanupSession(sessionId);
@@ -126,7 +126,7 @@ class StreamingSearchService {
     } catch (error) {
       logger.error('Failed to cancel search session', {
         sessionId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -164,13 +164,13 @@ class StreamingSearchService {
       sessionId: session.id,
       ...(session.query.type && { type: session.query.type }),
       ...(session.query.limit && { limit: session.query.limit.toString() }),
-      ...(session.query.offset && { offset: session.query.offset.toString() })
+      ...(session.query.offset && { offset: session.query.offset.toString() }),
     });
 
     const eventSource = new EventSource(`/api/search/stream?${params.toString()}`);
     this.eventSources.set(session.id, eventSource);
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = event => {
       try {
         const data = JSON.parse(event.data);
 
@@ -193,15 +193,15 @@ class StreamingSearchService {
         logger.error('Failed to parse SSE data', {
           sessionId: session.id,
           data: event.data,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     };
 
-    eventSource.onerror = (error) => {
+    eventSource.onerror = error => {
       logger.error('SSE connection error', {
         sessionId: session.id,
-        error
+        error,
       });
 
       this.cleanupSession(session.id);
@@ -235,7 +235,7 @@ class StreamingSearchService {
           q: session.query.q,
           sessionId: session.id,
           limit: session.query.limit || 50,
-          offset: session.results.length
+          offset: session.results.length,
         };
 
         if (session.query.type) {
@@ -279,11 +279,10 @@ class StreamingSearchService {
         if (!isComplete) {
           setTimeout(poll, pollInterval);
         }
-
       } catch (error) {
         logger.error('Polling search failed', {
           sessionId: session.id,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
 
         this.cleanupSession(session.id);

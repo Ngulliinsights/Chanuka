@@ -1,11 +1,5 @@
+import { Settings, Download, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import React from 'react';
-import {
-  Settings,
-  Download,
-  RefreshCw,
-  Eye,
-  EyeOff
-} from 'lucide-react';
 
 import { Button } from '@/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
@@ -33,7 +27,7 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
     refreshDashboard,
     setShowPrivacyModal,
     setShowExportModal,
-    setShowPreferencesModal
+    setShowPreferencesModal,
   } = useDashboardData({ autoLoad: true });
 
   // Don't render if user is not authenticated
@@ -97,21 +91,12 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshDashboard}
-            disabled={loading}
-          >
+          <Button variant="outline" size="sm" onClick={refreshDashboard} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPreferencesModal(true)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPreferencesModal(true)}>
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
@@ -176,9 +161,7 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
           <Card>
             <CardHeader>
               <CardTitle>Civic Impact Metrics</CardTitle>
-              <CardDescription>
-                Your contribution to democratic engagement
-              </CardDescription>
+              <CardDescription>Your contribution to democratic engagement</CardDescription>
             </CardHeader>
             <CardContent>
               {dashboardData?.civicMetrics && (
@@ -218,11 +201,7 @@ export function FullPageDashboard({ className = '' }: FullPageDashboardProps) {
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPrivacyModal(true)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPrivacyModal(true)}>
             {privacyControls.profileVisibility === 'private' ? (
               <EyeOff className="h-4 w-4 mr-2" />
             ) : (

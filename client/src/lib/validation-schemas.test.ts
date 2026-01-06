@@ -327,7 +327,8 @@ describe('billValidationSchemas', () => {
   describe('billCreate', () => {
     const validBill = {
       title: 'Comprehensive Healthcare Reform Act',
-      description: 'This bill proposes comprehensive reforms to the healthcare system to improve access and reduce costs for all Americans.',
+      description:
+        'This bill proposes comprehensive reforms to the healthcare system to improve access and reduce costs for all Americans.',
       policyArea: 'Healthcare',
       urgency: 'high' as const,
       tags: ['healthcare', 'reform'],
@@ -399,7 +400,8 @@ describe('billValidationSchemas', () => {
     it('should accept bill with optional fields omitted', () => {
       const result = billValidationSchemas.billCreate.safeParse({
         title: 'Comprehensive Healthcare Reform Act',
-        description: 'This bill proposes comprehensive reforms to the healthcare system to improve access and reduce costs for all Americans.',
+        description:
+          'This bill proposes comprehensive reforms to the healthcare system to improve access and reduce costs for all Americans.',
         policyArea: 'Healthcare',
         urgency: 'high',
       });

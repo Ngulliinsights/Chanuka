@@ -3,11 +3,11 @@
  * This provides a convenient import path for components
  */
 
-export { 
-  useSafeQuery, 
-  useAdminQuery, 
+export {
+  useSafeQuery,
+  useAdminQuery,
   useCoordinatedQueries,
-  type SafeQueryOptions 
+  type SafeQueryOptions,
 } from '@client/core/api/hooks/use-safe-query';
 
 export default useSafeQuery;

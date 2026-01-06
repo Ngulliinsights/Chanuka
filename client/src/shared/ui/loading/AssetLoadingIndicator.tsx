@@ -1,19 +1,30 @@
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { useMemo, useState, useEffect, memo } from 'react';
+import React from 'react';
 
 import { cn } from '@/shared/design-system/utils/cn';
+
 import { logger } from '../../../utils/logger';
 
 import { useAssetLoading } from './hooks/useAssetLoading';
 import { useLoadingRecovery } from './hooks/useLoadingRecovery';
 import type { AssetLoadingIndicatorProps } from './types';
-import { LoadingError, getErrorDisplayMessage, safeValidateLoadingProgress } from './utils/loadingUtils';
-import React from 'react';
+import {
+  LoadingError,
+  getErrorDisplayMessage,
+  safeValidateLoadingProgress,
+} from './utils/loadingUtils';
 
 // ===== MAIN COMPONENT =====
 
 export const AssetLoadingIndicator = memo<AssetLoadingIndicatorProps>(
-  ({ className, showDetails = false, showProgress = true, minimal = false, position = 'fixed' }) => {
+  ({
+    className,
+    showDetails = false,
+    showProgress = true,
+    minimal = false,
+    position = 'fixed',
+  }) => {
     const { progress, getStats, applyDegradedMode } = useAssetLoading();
     const [stats, setStats] = useState(getStats());
     const [isVisible, setIsVisible] = useState(true);
@@ -193,7 +204,12 @@ export const AssetLoadingIndicator = memo<AssetLoadingIndicatorProps>(
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
-              <p className={cn('text-sm font-medium', currentError ? 'text-red-600' : 'text-foreground')}>
+              <p
+                className={cn(
+                  'text-sm font-medium',
+                  currentError ? 'text-red-600' : 'text-foreground'
+                )}
+              >
                 {currentError ? getErrorDisplayMessage(currentError) : getPhaseMessage()}
               </p>
               {showDetails && getConnectionIcon()}
@@ -272,7 +288,8 @@ export const AssetLoadingIndicator = memo<AssetLoadingIndicatorProps>(
                     <span className="font-medium">Connection:</span> {stats.connectionType}
                   </div>
                   <div>
-                    <span className="font-medium">Status:</span> {stats.isOnline ? 'Online' : 'Offline'}
+                    <span className="font-medium">Status:</span>{' '}
+                    {stats.isOnline ? 'Online' : 'Offline'}
                   </div>
                 </div>
               </div>
@@ -281,7 +298,8 @@ export const AssetLoadingIndicator = memo<AssetLoadingIndicatorProps>(
             {hasErrors && showDetails && !currentError && (
               <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs">
                 <p className="text-yellow-700 dark:text-yellow-300">
-                  Some assets failed to load. The app will continue to function with reduced features.
+                  Some assets failed to load. The app will continue to function with reduced
+                  features.
                 </p>
               </div>
             )}
@@ -297,7 +315,12 @@ AssetLoadingIndicator.displayName = 'AssetLoadingIndicator';
 // Re-export from separate modules
 export { AssetLoadingProvider } from './context/AssetLoadingContext';
 export { useAssetLoadingContext } from './hooks/useAssetLoadingContext';
-export type { AssetLoadingIndicatorProps, LoadingProgress, LoadingStats, RecoveryState } from './types';
+export type {
+  AssetLoadingIndicatorProps,
+  LoadingProgress,
+  LoadingStats,
+  RecoveryState,
+} from './types';
 export { LoadingError, getErrorDisplayMessage } from './utils/loadingUtils';
 
 // ===== SPECIALIZED COMPONENTS =====
@@ -361,7 +384,9 @@ export const DevAssetLoadingDebug = memo(() => {
       <div>Connection: {stats.connectionType}</div>
       <div>Online: {stats.isOnline ? 'Yes' : 'No'}</div>
       <div>Failed: {stats.failed}</div>
-      {progress.currentAsset && <div className="mt-1 truncate">Current: {progress.currentAsset.split('/').pop()}</div>}
+      {progress.currentAsset && (
+        <div className="mt-1 truncate">Current: {progress.currentAsset.split('/').pop()}</div>
+      )}
     </div>
   );
 });

@@ -5,9 +5,9 @@
  * like Sentry, Rollbar, Bugsnag, and others.
  */
 
-import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
-import { BaseError } from '@shared/core/src/observability/error-management/errors/base-error.ts';
 import { ErrorContext, ErrorTrackingIntegration } from '@shared/core/src/caching/types.ts';
+import { BaseError } from '@shared/core/src/observability/error-management/errors/base-error.ts';
+import { logger } from '@shared/core/src/observability/logging/logging-service.ts';
 
 export interface IntegrationConfig {
   dsn?: string;

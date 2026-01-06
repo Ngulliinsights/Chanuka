@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   CheckCircle,
   Clock,
@@ -8,8 +7,9 @@ import {
   Shield,
   Database,
   LayoutGrid as Layers, // Using LayoutGrid as Layers replacement
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
@@ -61,7 +61,7 @@ export function MigrationDashboard({
   featureFlags,
   metrics,
   onRefresh,
-  loading = false
+  loading = false,
 }: MigrationDashboardProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -105,9 +105,8 @@ export function MigrationDashboard({
     return icons[phaseId as keyof typeof icons] || <Settings className="h-5 w-5" />;
   };
 
-  const overallProgress = metrics.totalTasks > 0
-    ? (metrics.completedTasks / metrics.totalTasks) * 100
-    : 0;
+  const overallProgress =
+    metrics.totalTasks > 0 ? (metrics.completedTasks / metrics.totalTasks) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -119,12 +118,7 @@ export function MigrationDashboard({
             Track consolidation progress and feature flag status
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={loading}
-        >
+        <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
@@ -144,17 +138,13 @@ export function MigrationDashboard({
               <span className="text-sm font-medium">
                 {metrics.completedTasks} of {metrics.totalTasks} tasks completed
               </span>
-              <span className="text-sm text-muted-foreground">
-                {Math.round(overallProgress)}%
-              </span>
+              <span className="text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
             </div>
             <Progress value={overallProgress} className="h-2" />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-green-600">
-                  {metrics.completedTasks}
-                </div>
+                <div className="text-2xl font-bold text-green-600">{metrics.completedTasks}</div>
                 <div className="text-xs text-muted-foreground">Completed</div>
               </div>
               <div>
@@ -164,9 +154,7 @@ export function MigrationDashboard({
                 <div className="text-xs text-muted-foreground">In Progress</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-red-600">
-                  {metrics.blockedTasks}
-                </div>
+                <div className="text-2xl font-bold text-red-600">{metrics.blockedTasks}</div>
                 <div className="text-xs text-muted-foreground">Blocked</div>
               </div>
               <div>
@@ -188,7 +176,7 @@ export function MigrationDashboard({
 
       {/* Migration Phases */}
       <div className="grid gap-4 md:grid-cols-2">
-        {phases.map((phase) => (
+        {phases.map(phase => (
           <Card key={phase.id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -200,9 +188,7 @@ export function MigrationDashboard({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {phase.description}
-              </p>
+              <p className="text-sm text-muted-foreground mb-4">{phase.description}</p>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
@@ -214,7 +200,7 @@ export function MigrationDashboard({
 
               <div className="mt-4 space-y-2">
                 <h4 className="text-sm font-medium">Tasks</h4>
-                {phase.tasks.slice(0, 3).map((task) => (
+                {phase.tasks.slice(0, 3).map(task => (
                   <div key={task.id} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(task.status)}
@@ -248,22 +234,29 @@ export function MigrationDashboard({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {featureFlags.map((flag) => (
-              <div key={flag.id} className="flex items-center justify-between p-4 border rounded-lg">
+            {featureFlags.map(flag => (
+              <div
+                key={flag.id}
+                className="flex items-center justify-between p-4 border rounded-lg"
+              >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium">{flag.name}</h4>
                     {getStatusBadge(flag.status)}
                     <Badge
-                      variant={flag.impact === 'high' ? 'destructive' : flag.impact === 'medium' ? 'secondary' : 'outline'}
+                      variant={
+                        flag.impact === 'high'
+                          ? 'destructive'
+                          : flag.impact === 'medium'
+                            ? 'secondary'
+                            : 'outline'
+                      }
                       className="text-xs"
                     >
                       {flag.impact} impact
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {flag.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-2">{flag.description}</p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>Last updated: {new Date(flag.lastUpdated).toLocaleDateString()}</span>
                     {flag.rolloutPercentage !== undefined && (

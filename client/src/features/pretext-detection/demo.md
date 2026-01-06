@@ -5,11 +5,13 @@
 The Pretext Detection system is now integrated into your bill detail pages. Here's how it works:
 
 ### 1. Navigate to any bill detail page
+
 ```
 http://localhost:3000/bill-detail/BILL-2024-001
 ```
 
 ### 2. The system will show:
+
 - **Initial state**: "Start Analysis" button
 - **Loading state**: "Analyzing bill for pretext indicators..."
 - **Results**: Pretext Watch Card with score and civic actions
@@ -34,6 +36,7 @@ For a bill with potential pretext indicators, you'll see:
 ### 4. Civic Action Toolbox
 
 Users can then:
+
 - **File FOI requests** with pre-filled templates
 - **Submit petitions** for public hearings
 - **Report ethics violations** to authorities
@@ -44,21 +47,25 @@ Users can then:
 The system currently uses mock data that demonstrates:
 
 ### Timing Indicators
+
 - Crisis events → Policy responses
 - Rapid legislative introductions
 - Emergency law patterns
 
 ### Beneficiary Analysis
+
 - Sponsor-contractor connections
 - Procurement award timing
 - Financial interest mapping
 
 ### Scope Creep Detection
+
 - Broad language analysis
 - Powers beyond stated purpose
 - Amendment pattern analysis
 
 ### Network Analysis
+
 - Actor connection density
 - Financial relationship mapping
 - Influence pattern detection
@@ -66,6 +73,7 @@ The system currently uses mock data that demonstrates:
 ## Ethical Safeguards
 
 Every analysis includes:
+
 - **Source transparency**: All claims link to primary sources
 - **Human review**: High-risk flags require editorial verification
 - **Explainable scoring**: Clear rationale for each indicator
@@ -108,6 +116,7 @@ Court Records   Audit Trail     Legal Aid Directory
 ```
 
 The system is designed to be:
+
 - **Transparent**: All methodology published
 - **Auditable**: Complete source tracking
 - **Actionable**: Immediate civic remediation tools

@@ -21,7 +21,7 @@ import {
   ExpertActivityUpdate,
   RealTimeNotification,
   WebSocketSubscription,
-  RealTimeHandlers
+  RealTimeHandlers,
 } from './types';
 import { ConnectionState } from './types';
 import { EventEmitter } from './utils/event-emitter';
@@ -83,7 +83,7 @@ export class RealTimeHub {
   async initialize(token?: string): Promise<void> {
     if (this.isInitialized) {
       logger.debug('RealTimeHub already initialized', {
-        component: 'RealTimeHub'
+        component: 'RealTimeHub',
       });
       return;
     }
@@ -103,12 +103,16 @@ export class RealTimeHub {
       this.isInitialized = true;
 
       logger.info('RealTimeHub initialized successfully', {
-        component: 'RealTimeHub'
+        component: 'RealTimeHub',
       });
     } catch (error) {
-      logger.error('Failed to initialize RealTimeHub', {
-        component: 'RealTimeHub'
-      }, error);
+      logger.error(
+        'Failed to initialize RealTimeHub',
+        {
+          component: 'RealTimeHub',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -128,12 +132,16 @@ export class RealTimeHub {
       this.isInitialized = false;
 
       logger.info('RealTimeHub shut down successfully', {
-        component: 'RealTimeHub'
+        component: 'RealTimeHub',
       });
     } catch (error) {
-      logger.error('Error during RealTimeHub shutdown', {
-        component: 'RealTimeHub'
-      }, error);
+      logger.error(
+        'Error during RealTimeHub shutdown',
+        {
+          component: 'RealTimeHub',
+        },
+        error
+      );
     }
   }
 
@@ -163,9 +171,13 @@ export class RealTimeHub {
         try {
           listener(this.getState());
         } catch (error) {
-          logger.error('Error in state listener', {
-            component: 'RealTimeHub'
-          }, error);
+          logger.error(
+            'Error in state listener',
+            {
+              component: 'RealTimeHub',
+            },
+            error
+          );
         }
       });
     }
@@ -184,7 +196,7 @@ export class RealTimeHub {
       notification_subscriptions: false,
       connection_quality: 'disconnected',
       last_heartbeat: null,
-      message_count: 0
+      message_count: 0,
     };
 
     return {
@@ -447,7 +459,7 @@ export class RealTimeHub {
       billSubscriptions: this.state.connection.bill_subscriptions.length,
       communitySubscriptions: this.state.connection.community_subscriptions.length,
       notificationSubscriptions: this.state.connection.notification_subscriptions ? 1 : 0,
-      stateUpdateCount: this.stateListeners.size
+      stateUpdateCount: this.stateListeners.size,
     };
   }
 
@@ -500,7 +512,12 @@ export class RealTimeHub {
   private handleIncomingMessage(subscription: WebSocketSubscription, message: unknown): void {
     try {
       // Cast message to WebSocketMessage type for service handlers
-      const wsMessage = message as { type: string; data?: unknown; timestamp?: number;[key: string]: unknown };
+      const wsMessage = message as {
+        type: string;
+        data?: unknown;
+        timestamp?: number;
+        [key: string]: unknown;
+      };
 
       // Route to appropriate service
       switch (subscription.type) {
@@ -516,14 +533,18 @@ export class RealTimeHub {
         default:
           logger.warn('Unknown subscription type in hub', {
             component: 'RealTimeHub',
-            type: subscription.type
+            type: subscription.type,
           });
       }
     } catch (error) {
-      logger.error('Error handling message in hub', {
-        component: 'RealTimeHub',
-        subscription
-      }, error);
+      logger.error(
+        'Error handling message in hub',
+        {
+          component: 'RealTimeHub',
+          subscription,
+        },
+        error
+      );
     }
   }
 }

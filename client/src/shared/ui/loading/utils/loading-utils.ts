@@ -3,8 +3,14 @@
  * Following navigation component patterns for utility organization
  */
 
-import { LoadingOperation, LoadingStage, LoadingProgress, LoadingPriority, LoadingType } from '../types';
 import { LOADING_PRIORITIES, LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
+import {
+  LoadingOperation,
+  LoadingStage,
+  LoadingProgress,
+  LoadingPriority,
+  LoadingType,
+} from '../types';
 import { validateLoadingOperation, validateLoadingStage } from '../validation';
 
 /**
@@ -15,7 +21,7 @@ export function generateOperationId(type: LoadingType, prefix?: string): string 
   const random = Math.random().toString(36).substr(2, 9);
   const typePrefix = type.replace('-', '_').toUpperCase();
   const customPrefix = prefix ? `${prefix}_` : '';
-  
+
   return `${customPrefix}${typePrefix}_${timestamp}_${random}`;
 }
 
@@ -88,7 +94,10 @@ export function getDefaultTimeout(type: LoadingType): number {
 /**
  * Calculate retry delay with exponential backoff
  */
-export function calculateRetryDelay(retryCount: number, baseDelay: number = RETRY_DELAYS.MEDIUM): number {
+export function calculateRetryDelay(
+  retryCount: number,
+  baseDelay: number = RETRY_DELAYS.MEDIUM
+): number {
   const exponentialDelay = baseDelay * Math.pow(2, retryCount);
   const jitter = Math.random() * 0.1 * exponentialDelay; // Add 10% jitter
   return Math.min(exponentialDelay + jitter, RETRY_DELAYS.LONG * 2);
@@ -101,11 +110,11 @@ export function sortOperationsByPriority(operations: LoadingOperation[]): Loadin
   return operations.sort((a, b) => {
     const priorityA = LOADING_PRIORITIES[a.priority];
     const priorityB = LOADING_PRIORITIES[b.priority];
-    
+
     if (priorityA !== priorityB) {
       return priorityB - priorityA; // Higher priority first
     }
-    
+
     // If same priority, sort by start time (older first)
     return a.startTime - b.startTime;
   });
@@ -159,11 +168,11 @@ export function getOperationDuration(operation: LoadingOperation): number {
 export function formatOperationDuration(operation: LoadingOperation): string {
   const duration = getOperationDuration(operation);
   const seconds = Math.floor(duration / 1000);
-  
+
   if (seconds < 60) {
     return `${seconds}s`;
   }
-  
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds}s`;
@@ -176,15 +185,15 @@ export function getOperationStatusText(operation: LoadingOperation): string {
   if (operation.error) {
     return `Failed (retry ${operation.retryCount}/${operation.maxRetries})`;
   }
-  
+
   if (operation.stage) {
     return `${operation.stage}...`;
   }
-  
+
   if (operation.progress !== undefined) {
     return `${Math.round(operation.progress)}% complete`;
   }
-  
+
   return 'Loading...';
 }
 
@@ -230,7 +239,8 @@ export function mergeProgress(
   return {
     loaded: progress1.loaded + progress2.loaded,
     total: progress1.total + progress2.total,
-    phase: progress1.phase === 'complete' && progress2.phase === 'complete' ? 'complete' : 'critical',
+    phase:
+      progress1.phase === 'complete' && progress2.phase === 'complete' ? 'complete' : 'critical',
     currentAsset: progress2.currentAsset || progress1.currentAsset,
   };
 }
@@ -238,7 +248,9 @@ export function mergeProgress(
 /**
  * Create loading stages for common scenarios
  */
-export function createCommonStages(scenario: 'page-load' | 'data-fetch' | 'asset-load'): LoadingStage[] {
+export function createCommonStages(
+  scenario: 'page-load' | 'data-fetch' | 'asset-load'
+): LoadingStage[] {
   switch (scenario) {
     case 'page-load':
       return [
@@ -247,25 +259,23 @@ export function createCommonStages(scenario: 'page-load' | 'data-fetch' | 'asset
         createLoadingStage('data', 'Loading data...', { duration: 2000 }),
         createLoadingStage('render', 'Rendering...', { duration: 500 }),
       ];
-    
+
     case 'data-fetch':
       return [
         createLoadingStage('validate', 'Validating request...', { duration: 200 }),
         createLoadingStage('fetch', 'Fetching data...', { duration: 1500 }),
         createLoadingStage('process', 'Processing data...', { duration: 300 }),
       ];
-    
+
     case 'asset-load':
       return [
         createLoadingStage('discover', 'Discovering assets...', { duration: 300 }),
         createLoadingStage('download', 'Downloading assets...', { duration: 3000 }),
         createLoadingStage('cache', 'Caching assets...', { duration: 500 }),
       ];
-    
+
     default:
-      return [
-        createLoadingStage('loading', 'Loading...', { duration: 1000 }),
-      ];
+      return [createLoadingStage('loading', 'Loading...', { duration: 1000 })];
   }
 }
 
@@ -277,7 +287,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
@@ -292,7 +302,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let lastCall = 0;
-  
+
   return (...args: Parameters<T>) => {
     const now = Date.now();
     if (now - lastCall >= delay) {
@@ -335,7 +345,7 @@ export function batchOperations<T>(
       for (let i = 0; i < items.length; i += batchSize) {
         const batch = items.slice(i, i + batchSize);
         await processor(batch);
-        
+
         if (delay > 0 && i + batchSize < items.length) {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
@@ -346,4 +356,3 @@ export function batchOperations<T>(
     }
   });
 }
-

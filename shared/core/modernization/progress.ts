@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+
 import { logger } from '../observability/logging';
 
 import {

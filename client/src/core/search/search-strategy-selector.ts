@@ -9,7 +9,7 @@ import type {
   SearchStrategy,
   SearchDecisionMatrix,
   SearchStrategyDecision,
-  SearchStrategyConfig
+  SearchStrategyConfig,
 } from './types';
 
 export class SearchStrategySelector {
@@ -48,7 +48,7 @@ export class SearchStrategySelector {
       strategy: primary.strategy,
       reason: primary.reason,
       confidence: primary.score,
-      fallback: fallback.strategy !== primary.strategy ? fallback.strategy : undefined
+      fallback: fallback.strategy !== primary.strategy ? fallback.strategy : undefined,
     };
   }
 
@@ -105,7 +105,7 @@ export class SearchStrategySelector {
     return {
       strategy: 'intelligent',
       score: Math.min(1, Math.max(0, score)),
-      reason: reasons.join(', ') || 'default intelligent search'
+      reason: reasons.join(', ') || 'default intelligent search',
     };
   }
 
@@ -121,8 +121,10 @@ export class SearchStrategySelector {
     const reasons: string[] = [];
 
     // Large result set bonus
-    if (matrix.expectedResultCount &&
-        matrix.expectedResultCount >= this.config.thresholds.resultCountForStreaming) {
+    if (
+      matrix.expectedResultCount &&
+      matrix.expectedResultCount >= this.config.thresholds.resultCountForStreaming
+    ) {
       score += 0.5;
       reasons.push('large result set benefits from streaming');
     }
@@ -157,7 +159,7 @@ export class SearchStrategySelector {
     return {
       strategy: 'streaming',
       score: Math.min(1, Math.max(0, score)),
-      reason: reasons.join(', ') || 'streaming for large datasets'
+      reason: reasons.join(', ') || 'streaming for large datasets',
     };
   }
 
@@ -210,7 +212,7 @@ export class SearchStrategySelector {
     return {
       strategy: 'api',
       score: Math.min(1, Math.max(0, score)),
-      reason: reasons.join(', ')
+      reason: reasons.join(', '),
     };
   }
 
@@ -296,14 +298,14 @@ export const DEFAULT_SEARCH_STRATEGY_CONFIG: SearchStrategyConfig = {
   thresholds: {
     resultCountForStreaming: 1000,
     queryLengthForIntelligent: 3,
-    timeoutMs: 5000
+    timeoutMs: 5000,
   },
   options: {
     enableFuzzySearch: true,
     enableCaching: true,
     enableAnalytics: true,
-    maxResults: 100
-  }
+    maxResults: 100,
+  },
 };
 
 /**

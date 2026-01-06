@@ -3,15 +3,14 @@
  * Consolidates profile management, dashboard, privacy, and accessibility settings
  */
 
-
 import { Shield, User, BarChart3, Eye } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { useAuth } from '@client/core/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Card, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Alert, AlertDescription } from '@client/shared/design-system';
-import React from 'react';
 
 export default function UserAccountPage() {
   const { user, isAuthenticated } = useAuth();

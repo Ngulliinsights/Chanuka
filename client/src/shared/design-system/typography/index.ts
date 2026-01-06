@@ -3,7 +3,7 @@
  *
  * Typography components and structural containers for consistent text styling,
  * content hierarchy, and content organization.
- * 
+ *
  * STRATEGIC PLACEMENT:
  * - Text Display: Heading, Text, Label
  * - Structural Containers: Card (with CardHeader, CardContent, CardFooter)
@@ -29,5 +29,5 @@ export {
   CardTitle,
   CardDescription,
   cardVariants,
-  type CardProps
+  type CardProps,
 } from './Card';

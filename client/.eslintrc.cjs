@@ -16,7 +16,7 @@ module.exports = {
   },
   rules: {
     // Re-enable import resolution with better error handling
-    'import/no-unresolved': ['error', { 
+    'import/no-unresolved': ['error', {
       ignore: [
         // Ignore known problematic patterns
         '^@/',
@@ -28,4 +28,13 @@ module.exports = {
       ]
     }],
   },
+  overrides: [
+    {
+      files: ['**/*.test.{ts,tsx,js,jsx}', '**/__tests__/**/*.{ts,tsx,js,jsx}'],
+      rules: {
+        '@typescript-eslint/prefer-nullish-coalescing': 'off',
+        '@typescript-eslint/prefer-optional-chain': 'off',
+      },
+    },
+  ],
 };

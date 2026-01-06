@@ -4,6 +4,7 @@
 // Detects hidden provisions and deceptive techniques in legislation
 
 import { z } from 'zod';
+
 import { TextProcessor, Cache } from './shared_utils';
 
 export const TrojanBillInputSchema = z.object({

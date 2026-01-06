@@ -1,6 +1,6 @@
 /**
  * Privacy Compliance Utilities
- * 
+ *
  * Implements GDPR/CCPA compliance helpers for data protection
  */
 
@@ -39,7 +39,7 @@ export const privacyUtils = {
     let hash = 0;
     for (let i = 0; i < value.length; i++) {
       const char = value.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return `hash_${Math.abs(hash).toString(36)}`;
@@ -50,7 +50,7 @@ export const privacyUtils = {
    */
   isRetentionExpired(timestamp: string, retentionDays: number): boolean {
     const recordDate = new Date(timestamp);
-    const expiryDate = new Date(recordDate.getTime() + (retentionDays * 24 * 60 * 60 * 1000));
+    const expiryDate = new Date(recordDate.getTime() + retentionDays * 24 * 60 * 60 * 1000);
     return new Date() > expiryDate;
   },
 

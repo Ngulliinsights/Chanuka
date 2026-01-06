@@ -52,7 +52,7 @@ export function usePerformanceMonitor(
     trackRenders = true,
     trackMemory = false,
     alertThreshold = 16, // 60fps threshold
-    enableLogging = false
+    enableLogging = false,
   } = options;
 
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
@@ -61,7 +61,7 @@ export function usePerformanceMonitor(
     lastRenderTime: 0,
     averageRenderTime: 0,
     maxRenderTime: 0,
-    minRenderTime: Infinity
+    minRenderTime: Infinity,
   });
 
   const renderStartRef = useRef(0);
@@ -101,7 +101,7 @@ export function usePerformanceMonitor(
       lastRenderTime: renderTime,
       averageRenderTime,
       maxRenderTime,
-      minRenderTime
+      minRenderTime,
     };
 
     setMetrics(newMetrics);
@@ -111,7 +111,7 @@ export function usePerformanceMonitor(
       logger.warn(`Slow render detected in ${componentName}`, {
         renderTime: renderTime.toFixed(2),
         threshold: alertThreshold,
-        renderCount: newRenderCount
+        renderCount: newRenderCount,
       });
     }
 
@@ -134,7 +134,7 @@ export function usePerformanceMonitor(
       lastRenderTime: 0,
       averageRenderTime: 0,
       maxRenderTime: 0,
-      minRenderTime: Infinity
+      minRenderTime: Infinity,
     });
     renderTimesRef.current = [];
     renderStartRef.current = 0;
@@ -143,9 +143,12 @@ export function usePerformanceMonitor(
   /**
    * Add a custom metric to the global monitor
    */
-  const addCustomMetric = useCallback((name: string, value: number) => {
-    runtimePerformanceMonitor.addCustomMetric(`${componentName}_${name}`, value);
-  }, [componentName]);
+  const addCustomMetric = useCallback(
+    (name: string, value: number) => {
+      runtimePerformanceMonitor.addCustomMetric(`${componentName}_${name}`, value);
+    },
+    [componentName]
+  );
 
   // Auto-track renders if enabled
   useEffect(() => {
@@ -168,7 +171,7 @@ export function usePerformanceMonitor(
     markRenderStart,
     markRenderEnd,
     resetMetrics,
-    addCustomMetric
+    addCustomMetric,
   };
 }
 
@@ -194,7 +197,7 @@ export function usePerformanceBudget(
   const {
     componentName = 'UnknownComponent',
     checkInterval = 30000, // 30 seconds
-    enableAlerts = true
+    enableAlerts = true,
   } = options;
 
   const [isWithinBudget, setIsWithinBudget] = useState(true);
@@ -219,7 +222,7 @@ export function usePerformanceBudget(
       if (enableAlerts && hasViolations) {
         logger.warn(`Performance budget violations detected in ${componentName}`, {
           violations: budgetResult.violations.length,
-          warnings: budgetResult.warnings.length
+          warnings: budgetResult.warnings.length,
         });
       }
     } catch (error) {
@@ -240,7 +243,7 @@ export function usePerformanceBudget(
     isWithinBudget,
     violations,
     lastCheckTime,
-    checkBudget
+    checkBudget,
   };
 }
 
@@ -258,7 +261,7 @@ interface UseCoreWebVitalsReturn {
  */
 export function useCoreWebVitals(): UseCoreWebVitalsReturn {
   const [metrics, setMetrics] = useState<UseCoreWebVitalsReturn>({
-    allMetricsLoaded: false
+    allMetricsLoaded: false,
   });
 
   useEffect(() => {
@@ -277,7 +280,7 @@ export function useCoreWebVitals(): UseCoreWebVitalsReturn {
           currentMetrics.coreWebVitals.cls &&
           currentMetrics.coreWebVitals.fcp &&
           currentMetrics.coreWebVitals.ttfb
-        )
+        ),
       };
 
       setMetrics(newMetrics);
@@ -303,7 +306,12 @@ interface UsePerformanceAlertOptions {
 }
 
 interface UsePerformanceAlertReturn {
-  sendAlert: (type: 'violation' | 'regression' | 'warning', title: string, description: string, metrics?: Record<string, any>) => Promise<void>;
+  sendAlert: (
+    type: 'violation' | 'regression' | 'warning',
+    title: string,
+    description: string,
+    metrics?: Record<string, any>
+  ) => Promise<void>;
   updateAlertConfig: (config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => void;
 }
 
@@ -318,42 +326,48 @@ export function usePerformanceAlert(
   /**
    * Send a performance alert
    */
-  const sendAlert = useCallback(async (
-    type: 'violation' | 'regression' | 'warning',
-    title: string,
-    description: string,
-    metrics: Record<string, any> = {}
-  ) => {
-    try {
-      await import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
-        performanceAlerts.sendAlert({
-          type,
-          title: `${componentName}: ${title}`,
-          description,
-          metrics,
-          severity: type === 'violation' ? 'high' : type === 'regression' ? 'medium' : 'low',
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          timestamp: Date.now()
-        })
-      );
-    } catch (error) {
-      logger.error(`Failed to send performance alert for ${componentName}`, { error });
-    }
-  }, [componentName]);
+  const sendAlert = useCallback(
+    async (
+      type: 'violation' | 'regression' | 'warning',
+      title: string,
+      description: string,
+      metrics: Record<string, any> = {}
+    ) => {
+      try {
+        await import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
+          performanceAlerts.sendAlert({
+            type,
+            title: `${componentName}: ${title}`,
+            description,
+            metrics,
+            severity: type === 'violation' ? 'high' : type === 'regression' ? 'medium' : 'low',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: Date.now(),
+          })
+        );
+      } catch (error) {
+        logger.error(`Failed to send performance alert for ${componentName}`, { error });
+      }
+    },
+    [componentName]
+  );
 
   /**
    * Update alert configuration
    */
-  const updateAlertConfig = useCallback((config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => {
-    import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
-      performanceAlerts.updateConfig(config)
-    );
-  }, []);
+  const updateAlertConfig = useCallback(
+    (config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => {
+      import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
+        performanceAlerts.updateConfig(config)
+      );
+    },
+    []
+  );
 
   return {
     sendAlert,
-    updateAlertConfig
+    updateAlertConfig,
   };
 }
 
@@ -372,14 +386,8 @@ interface UseLazyLoadingReturn {
 /**
  * Hook for performance-optimized lazy loading
  */
-export function useLazyLoading(
-  options: UseLazyLoadingOptions = {}
-): UseLazyLoadingReturn {
-  const {
-    threshold = 0.1,
-    rootMargin = '50px',
-    triggerOnce = true
-  } = options;
+export function useLazyLoading(options: UseLazyLoadingOptions = {}): UseLazyLoadingReturn {
+  const { threshold = 0.1, rootMargin = '50px', triggerOnce = true } = options;
 
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
@@ -390,7 +398,7 @@ export function useLazyLoading(
     if (!element) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         const entry = entries[0];
         setIsIntersecting(entry.isIntersecting);
 
@@ -400,7 +408,7 @@ export function useLazyLoading(
       },
       {
         threshold,
-        rootMargin
+        rootMargin,
       }
     );
 
@@ -414,6 +422,6 @@ export function useLazyLoading(
   return {
     ref,
     isIntersecting,
-    hasTriggered
+    hasTriggered,
   };
 }

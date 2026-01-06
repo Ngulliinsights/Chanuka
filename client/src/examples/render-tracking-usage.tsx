@@ -5,16 +5,16 @@
  * render tracking capabilities into React components.
  */
 
-import { useState, useEffect, useCallback } from "react";
-
-import { logger } from "@client/utils/logger";
-
+import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
+
+import { logger } from '@client/utils/logger';
+
 import {
   useRenderTracker,
   withRenderTracking,
   usePerformanceMeasurement,
-} from "../features/analytics/hooks/use-render-tracker";
+} from '../features/analytics/hooks/use-render-tracker';
 
 // Example 1: Manual render tracking in a component
 export function ManualRenderTrackingExample() {
@@ -22,28 +22,26 @@ export function ManualRenderTrackingExample() {
   const [data, setData] = useState<any[]>([]);
 
   const renderTracker = useRenderTracker({
-    componentName: "ManualRenderTrackingExample",
+    componentName: 'ManualRenderTrackingExample',
     trackProps: true,
     trackState: true,
     performanceThreshold: 10, // Warn if render takes > 10ms
     infiniteRenderThreshold: 30, // Alert if > 30 renders/second
   });
 
-  const measurePerformance = usePerformanceMeasurement(
-    "ManualRenderTrackingExample"
-  );
+  const measurePerformance = usePerformanceMeasurement('ManualRenderTrackingExample');
 
   // Track specific render triggers
   const handleIncrement = useCallback(() => {
-    renderTracker.trackRender("button-click", {
-      action: "increment",
+    renderTracker.trackRender('button-click', {
+      action: 'increment',
       previousCount: count,
     });
-    setCount((prev) => prev + 1);
+    setCount(prev => prev + 1);
   }, [count, renderTracker]);
 
   const handleDataLoad = useCallback(() => {
-    measurePerformance("data-load", async () => {
+    measurePerformance('data-load', async () => {
       // Simulate expensive data loading
       const newData = Array.from({ length: 1000 }, (_, i) => ({
         id: i,
@@ -51,7 +49,7 @@ export function ManualRenderTrackingExample() {
       }));
 
       setData(newData);
-      renderTracker.trackRender("data-loaded", {
+      renderTracker.trackRender('data-loaded', {
         dataLength: newData.length,
       });
     });
@@ -59,13 +57,13 @@ export function ManualRenderTrackingExample() {
 
   // Example of tracking performance for expensive operations
   const expensiveCalculation = useCallback(() => {
-    measurePerformance("expensive-calculation", () => {
+    measurePerformance('expensive-calculation', () => {
       // Simulate expensive calculation
       let result = 0;
       for (let i = 0; i < 100000; i++) {
         result += Math.sqrt(i);
       }
-      console.log("Calculation result:", result);
+      console.log('Calculation result:', result);
     });
   }, [measurePerformance]);
 
@@ -75,14 +73,18 @@ export function ManualRenderTrackingExample() {
       <p>Count: {count}</p>
       <p>Data items: {data.length}</p>
 
-      <button type="button" onClick={handleIncrement}>Increment Count</button>
+      <button type="button" onClick={handleIncrement}>
+        Increment Count
+      </button>
 
-      <button type="button" onClick={handleDataLoad}>Load Data</button>
+      <button type="button" onClick={handleDataLoad}>
+        Load Data
+      </button>
 
       <button
         onClick={() => {
           const result = expensiveCalculation();
-          console.log("Calculation result:", result);
+          console.log('Calculation result:', result);
         }}
       >
         Run Expensive Calculation
@@ -92,7 +94,9 @@ export function ManualRenderTrackingExample() {
         <h4>Render Stats:</h4>
         <pre>{JSON.stringify(renderTracker.getRenderStats(), null, 2)}</pre>
 
-        <button type="button" onClick={renderTracker.clearStats}>Clear Stats</button>
+        <button type="button" onClick={renderTracker.clearStats}>
+          Clear Stats
+        </button>
       </div>
     </div>
   );
@@ -106,17 +110,18 @@ const SimpleCounter = ({ initialValue = 0 }: { initialValue?: number }) => {
     <div>
       <h3>HOC Tracked Counter</h3>
       <p>Value: {value}</p>
-      <button type="button" onClick={() => setValue((v) => v + 1)}>Increment</button>
-      <button type="button" onClick={() => setValue((v) => v - 1)}>Decrement</button>
+      <button type="button" onClick={() => setValue(v => v + 1)}>
+        Increment
+      </button>
+      <button type="button" onClick={() => setValue(v => v - 1)}>
+        Decrement
+      </button>
     </div>
   );
 };
 
 // Wrap with render tracking HOC
-export const TrackedCounter = withRenderTracking(
-  SimpleCounter,
-  "TrackedCounter"
-);
+export const TrackedCounter = withRenderTracking(SimpleCounter, 'TrackedCounter');
 
 // Example 3: Component that demonstrates infinite render detection
 export function InfiniteRenderExample() {
@@ -124,15 +129,15 @@ export function InfiniteRenderExample() {
   const [renderCount, setRenderCount] = useState(0);
 
   const renderTracker = useRenderTracker({
-    componentName: "InfiniteRenderExample",
+    componentName: 'InfiniteRenderExample',
     infiniteRenderThreshold: 10, // Low threshold for demo
   });
 
   // This will cause infinite renders when triggerInfinite is true
   useEffect(() => {
     if (triggerInfinite) {
-      setRenderCount((prev) => prev + 1);
-      renderTracker.trackRender("infinite-loop-trigger", { renderCount });
+      setRenderCount(prev => prev + 1);
+      renderTracker.trackRender('infinite-loop-trigger', { renderCount });
     }
   }, [renderCount, triggerInfinite, renderTracker]);
 
@@ -140,16 +145,16 @@ export function InfiniteRenderExample() {
     <div>
       <h3>Infinite Render Detection Example</h3>
       <p>Render Count: {renderCount}</p>
-      <p>Trigger Infinite: {triggerInfinite ? "ON" : "OFF"}</p>
+      <p>Trigger Infinite: {triggerInfinite ? 'ON' : 'OFF'}</p>
 
       <button
         onClick={() => setTriggerInfinite(!triggerInfinite)}
         style={{
-          backgroundColor: triggerInfinite ? "red" : "green",
-          color: "white",
+          backgroundColor: triggerInfinite ? 'red' : 'green',
+          color: 'white',
         }}
       >
-        {triggerInfinite ? "Stop" : "Start"} Infinite Renders
+        {triggerInfinite ? 'Stop' : 'Start'} Infinite Renders
       </button>
 
       <div>
@@ -163,7 +168,7 @@ export function InfiniteRenderExample() {
 // Example 4: Performance monitoring dashboard
 export function RenderTrackingDashboard() {
   const [allStats, setAllStats] = useState<any>({});
-  const [selectedComponent, setSelectedComponent] = useState<string>("");
+  const [selectedComponent, setSelectedComponent] = useState<string>('');
 
   const refreshStats = useCallback(() => {
     // Get stats for all components
@@ -193,16 +198,18 @@ export function RenderTrackingDashboard() {
     <div>
       <h3>Render Tracking Dashboard</h3>
 
-      <div style={{ marginBottom: "20px" }}>
-        <button type="button" onClick={refreshStats}>Refresh Stats</button>
-        <button type="button" onClick={clearAllStats} style={{ marginLeft: "10px" }}>
+      <div style={{ marginBottom: '20px' }}>
+        <button type="button" onClick={refreshStats}>
+          Refresh Stats
+        </button>
+        <button type="button" onClick={clearAllStats} style={{ marginLeft: '10px' }}>
           Clear All Stats
         </button>
       </div>
 
       <div>
         <h4>Global Statistics:</h4>
-        <pre style={{ backgroundColor: "#f5f5f5", padding: "10px" }}>
+        <pre style={{ backgroundColor: '#f5f5f5', padding: '10px' }}>
           {JSON.stringify(allStats, null, 2)}
         </pre>
       </div>
@@ -213,14 +220,14 @@ export function RenderTrackingDashboard() {
           type="text"
           placeholder="Enter component name"
           value={selectedComponent}
-          onChange={(e) => setSelectedComponent(e.target.value)}
+          onChange={e => setSelectedComponent(e.target.value)}
         />
-        <button type="button" onClick={clearComponentStats} style={{ marginLeft: "10px" }}>
+        <button type="button" onClick={clearComponentStats} style={{ marginLeft: '10px' }}>
           Clear Component Stats
         </button>
 
         {selectedComponent && (
-          <pre style={{ backgroundColor: "#f0f8ff", padding: "10px" }}>
+          <pre style={{ backgroundColor: '#f0f8ff', padding: '10px' }}>
             {JSON.stringify(logger.getRenderStats(selectedComponent), null, 2)}
           </pre>
         )}
@@ -236,15 +243,15 @@ export function IntegrateWithAppLayout() {
       <h3>Integration Instructions</h3>
       <div
         style={{
-          backgroundColor: "#f9f9f9",
-          padding: "15px",
-          borderRadius: "5px",
+          backgroundColor: '#f9f9f9',
+          padding: '15px',
+          borderRadius: '5px',
         }}
       >
         <h4>To integrate render tracking with existing components:</h4>
 
         <h5>1. Add to AppLayout component:</h5>
-        <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
+        <pre style={{ backgroundColor: '#fff', padding: '10px' }}>
           {`import { useRenderTracker } from '@client/features/analytics/hooks/use-render-tracker';
 
 function AppLayout() {
@@ -264,7 +271,7 @@ function AppLayout() {
         </pre>
 
         <h5>2. Add to WebSocket components:</h5>
-        <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
+        <pre style={{ backgroundColor: '#fff', padding: '10px' }}>
           {`import { logger } from '@client/utils/logger';
 
 function WebSocketClient() {
@@ -297,7 +304,7 @@ function WebSocketClient() {
         </pre>
 
         <h5>3. Monitor for infinite renders:</h5>
-        <pre style={{ backgroundColor: "#fff", padding: "10px" }}>
+        <pre style={{ backgroundColor: '#fff', padding: '10px' }}>
           {`// In development, check for infinite renders periodically
 if (process.env.NODE_ENV === 'development') {
   setInterval(() => {
@@ -315,7 +322,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Main demo component
 export function RenderTrackingDemo() {
-  const [activeExample, setActiveExample] = useState<string>("manual");
+  const [activeExample, setActiveExample] = useState<string>('manual');
 
   const examples = {
     manual: ManualRenderTrackingExample,
@@ -328,22 +335,22 @@ export function RenderTrackingDemo() {
   const ActiveComponent = examples[activeExample as keyof typeof examples];
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: '20px' }}>
       <h2>Render Tracking Examples</h2>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: '20px' }}>
         <h3>Select Example:</h3>
-        {Object.keys(examples).map((key) => (
+        {Object.keys(examples).map(key => (
           <button
             key={key}
             onClick={() => setActiveExample(key)}
             style={{
-              margin: "5px",
-              padding: "10px",
-              backgroundColor: activeExample === key ? "#007bff" : "#f8f9fa",
-              color: activeExample === key ? "white" : "black",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
+              margin: '5px',
+              padding: '10px',
+              backgroundColor: activeExample === key ? '#007bff' : '#f8f9fa',
+              color: activeExample === key ? 'white' : 'black',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
             }}
           >
             {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -353,9 +360,9 @@ export function RenderTrackingDemo() {
 
       <div
         style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          borderRadius: "5px",
+          border: '1px solid #ddd',
+          padding: '20px',
+          borderRadius: '5px',
         }}
       >
         <ActiveComponent />

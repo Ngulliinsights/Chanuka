@@ -43,7 +43,11 @@ export interface NotificationData {
 }
 
 export interface NotificationEvent {
-  type: 'notification_received' | 'notification_read' | 'notification_dismissed' | 'preferences_updated';
+  type:
+    | 'notification_received'
+    | 'notification_read'
+    | 'notification_dismissed'
+    | 'preferences_updated';
   data: NotificationData | NotificationPreferences;
 }
 
@@ -77,7 +81,7 @@ class NotificationService {
       weeklyDigest: true,
       trendingBills: false,
       communityUpdates: true,
-      frequency: 'immediate'
+      frequency: 'immediate',
     };
   }
 
@@ -108,7 +112,7 @@ class NotificationService {
       ...notification,
       id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
-      read: false
+      read: false,
     };
 
     // Check if this type of notification is enabled
@@ -125,15 +129,19 @@ class NotificationService {
 
     this.emit({
       type: 'notification_received',
-      data: fullNotification
+      data: fullNotification,
     });
 
     // Show browser notification if enabled
-    if (this.preferences.push && 'Notification' in window && Notification.permission === 'granted') {
+    if (
+      this.preferences.push &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
       new Notification(notification.title, {
         body: notification.message,
         icon: '/favicon.ico',
-        tag: fullNotification.id
+        tag: fullNotification.id,
       });
     }
   }
@@ -147,7 +155,7 @@ class NotificationService {
       notification.read = true;
       this.emit({
         type: 'notification_read',
-        data: notification
+        data: notification,
       });
     }
   }
@@ -167,7 +175,7 @@ class NotificationService {
     if (hasChanges) {
       this.emit({
         type: 'notification_read',
-        data: this.notifications[0] // Send first notification as representative
+        data: this.notifications[0], // Send first notification as representative
       });
     }
   }
@@ -181,7 +189,7 @@ class NotificationService {
       const notification = this.notifications.splice(index, 1)[0];
       this.emit({
         type: 'notification_dismissed',
-        data: notification
+        data: notification,
       });
     }
   }
@@ -216,7 +224,7 @@ class NotificationService {
 
     this.emit({
       type: 'preferences_updated',
-      data: this.preferences
+      data: this.preferences,
     });
 
     // Request push notification permission if enabled
@@ -293,7 +301,7 @@ class NotificationService {
       priority: 'medium',
       category: 'bills',
       actionUrl: `/bills/${billId}`,
-      metadata: { billId, newStatus }
+      metadata: { billId, newStatus },
     });
   }
 
@@ -308,7 +316,7 @@ class NotificationService {
       priority: 'low',
       category: 'comments',
       actionUrl: `/bills/${billId}#comments`,
-      metadata: { billId, commenterName }
+      metadata: { billId, commenterName },
     });
   }
 
@@ -323,7 +331,7 @@ class NotificationService {
       priority: 'high',
       category: 'analysis',
       actionUrl: `/bills/${billId}/analysis`,
-      metadata: { billId, expertName }
+      metadata: { billId, expertName },
     });
   }
 }

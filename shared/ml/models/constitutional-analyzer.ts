@@ -4,6 +4,7 @@
 // Analyzes bills for constitutional violations and alignment
 
 import { z } from 'zod';
+
 import { TextProcessor, Statistics, Cache } from './shared_utils';
 
 export const ConstitutionalInputSchema = z.object({

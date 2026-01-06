@@ -6,9 +6,9 @@
  * connection management across the platform.
  */
 
+import { logger, LoggerChild } from '../../core/src/observability/logging';
 import { DatabaseOrchestrator } from '../core/database-orchestrator';
 import { DatabaseConfigManager } from '../core/unified-config';
-import { logger, LoggerChild } from '../../core/src/observability/logging';
 
 // ============================================================================
 // Types and Interfaces

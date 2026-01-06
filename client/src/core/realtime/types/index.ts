@@ -6,18 +6,11 @@
  */
 
 // Import unified types from shared schema
-import type {
-  ConnectionQuality,
-  WebSocketMessage
-} from '../../../../shared/schema/websocket';
-
+import type { ConnectionQuality, WebSocketMessage } from '../../../../shared/schema/websocket';
 import { WebSocketClient } from '../websocket-client';
 
 // Re-export shared types for backward compatibility
-export type {
-  ConnectionQuality,
-  WebSocketMessage
-} from '../../../../shared/schema/websocket';
+export type { ConnectionQuality, WebSocketMessage } from '../../../../shared/schema/websocket';
 
 export { WebSocketClient };
 
@@ -31,7 +24,7 @@ export enum ConnectionState {
   CONNECTED = 'connected',
   RECONNECTING = 'reconnecting',
   CLOSED = 'closed',
-  FAILED = 'failed'
+  FAILED = 'failed',
 }
 
 // ============================================================================
@@ -159,16 +152,27 @@ export interface BatchMessage {
  */
 
 export interface BillRealTimeUpdate {
-  type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' |
-        'engagement_change' | 'constitutional_flag' | 'expert_analysis';
+  type:
+    | 'status_change'
+    | 'new_comment'
+    | 'amendment'
+    | 'voting_scheduled'
+    | 'engagement_change'
+    | 'constitutional_flag'
+    | 'expert_analysis';
   data: Record<string, unknown>;
   timestamp: string;
   bill_id: number;
 }
 
 export interface CommunityRealTimeUpdate {
-  type: 'new_discussion' | 'comment_added' | 'expert_joined' | 'consensus_change' |
-        'moderation_action' | 'trending_topic';
+  type:
+    | 'new_discussion'
+    | 'comment_added'
+    | 'expert_joined'
+    | 'consensus_change'
+    | 'moderation_action'
+    | 'trending_topic';
   bill_id?: number;
   discussion_id?: string;
   data: {
@@ -218,8 +222,13 @@ export interface ExpertActivityUpdate {
 
 export interface RealTimeNotification {
   id: string;
-  type: 'bill_status' | 'community_activity' | 'expert_response' | 'trending_bill' |
-        'constitutional_alert' | 'engagement_milestone';
+  type:
+    | 'bill_status'
+    | 'community_activity'
+    | 'expert_response'
+    | 'trending_bill'
+    | 'constitutional_alert'
+    | 'engagement_milestone';
   title: string;
   message: string;
   priority: 'low' | 'medium' | 'high' | 'critical';

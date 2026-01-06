@@ -102,7 +102,7 @@ class UserJourneyTracker {
       steps: [],
       completed: false,
       totalTimeSpent: 0,
-      conversionEvents: []
+      conversionEvents: [],
     };
 
     this.currentStepStart = Date.now();
@@ -130,7 +130,7 @@ class UserJourneyTracker {
       user_role: this.currentJourney!.user_role,
       section,
       referrer,
-      interactionCount: 0
+      interactionCount: 0,
     };
 
     this.currentJourney!.steps.push(step);
@@ -165,7 +165,8 @@ class UserJourneyTracker {
     this.currentJourney.completed = true;
     this.currentJourney.goalAchieved = goalAchieved;
     this.currentJourney.totalTimeSpent = this.currentJourney.steps.reduce(
-      (total, step) => total + step.timeSpent, 0
+      (total, step) => total + step.timeSpent,
+      0
     );
 
     // Calculate bounce rate (single page visit with minimal time)
@@ -186,9 +187,9 @@ class UserJourneyTracker {
     let journeys = this.journeyHistory;
 
     if (timeRange) {
-      journeys = journeys.filter(journey =>
-        journey.startTime >= timeRange.start &&
-        (journey.endTime || new Date()) <= timeRange.end
+      journeys = journeys.filter(
+        journey =>
+          journey.startTime >= timeRange.start && (journey.endTime || new Date()) <= timeRange.end
       );
     }
 
@@ -206,7 +207,7 @@ class UserJourneyTracker {
       bounceRate: this.calculateBounceRate(journeys),
       popularPaths: this.calculatePopularPaths(journeys),
       dropOffPoints: this.calculateDropOffPoints(journeys),
-      conversionFunnels: this.calculateConversionFunnels(journeys)
+      conversionFunnels: this.calculateConversionFunnels(journeys),
     };
   }
 
@@ -216,7 +217,7 @@ class UserJourneyTracker {
       'comment_submit',
       'expert_verification_request',
       'profile_complete',
-      'newsletter_signup'
+      'newsletter_signup',
     ];
     return conversionEvents.includes(interactionType);
   }
@@ -240,7 +241,7 @@ class UserJourneyTracker {
           frequency: 0,
           averageTimeSpent: 0,
           completionRate: 0,
-          userRoles: []
+          userRoles: [],
         });
       }
 
@@ -265,12 +266,15 @@ class UserJourneyTracker {
   }
 
   private calculateDropOffPoints(journeys: UserJourney[]): DropOffPoint[] {
-    const dropOffMap = new Map<string, {
-      total: number;
-      dropOffs: number;
-      timeBeforeDropOff: number[];
-      previousPages: string[];
-    }>();
+    const dropOffMap = new Map<
+      string,
+      {
+        total: number;
+        dropOffs: number;
+        timeBeforeDropOff: number[];
+        previousPages: string[];
+      }
+    >();
 
     journeys.forEach(journey => {
       journey.steps.forEach((step, index) => {
@@ -281,7 +285,7 @@ class UserJourneyTracker {
             total: 0,
             dropOffs: 0,
             timeBeforeDropOff: [],
-            previousPages: []
+            previousPages: [],
           });
         }
 
@@ -306,10 +310,12 @@ class UserJourneyTracker {
           pageId,
           section: section as NavigationSection,
           dropOffRate: data.total > 0 ? data.dropOffs / data.total : 0,
-          averageTimeBeforeDropOff: data.timeBeforeDropOff.length > 0
-            ? data.timeBeforeDropOff.reduce((sum, time) => sum + time, 0) / data.timeBeforeDropOff.length
-            : 0,
-          commonPreviousPages: [...new Set(data.previousPages)]
+          averageTimeBeforeDropOff:
+            data.timeBeforeDropOff.length > 0
+              ? data.timeBeforeDropOff.reduce((sum, time) => sum + time, 0) /
+                data.timeBeforeDropOff.length
+              : 0,
+          commonPreviousPages: [...new Set(data.previousPages)],
         };
       })
       .filter(point => point.dropOffRate > 0.1) // Only significant drop-off points
@@ -321,16 +327,16 @@ class UserJourneyTracker {
     const funnels = [
       {
         name: 'Bill Engagement',
-        steps: ['/', '/bills', '/bills/:id', '/bills/:id/comments']
+        steps: ['/', '/bills', '/bills/:id', '/bills/:id/comments'],
       },
       {
         name: 'User Onboarding',
-        steps: ['/', '/auth', '/onboarding', '/dashboard']
+        steps: ['/', '/auth', '/onboarding', '/dashboard'],
       },
       {
         name: 'Expert Verification',
-        steps: ['/', '/expert-verification', '/profile', '/dashboard']
-      }
+        steps: ['/', '/expert-verification', '/profile', '/dashboard'],
+      },
     ];
 
     return funnels.map(funnel => {
@@ -372,7 +378,7 @@ class UserJourneyTracker {
         steps: funnel.steps,
         conversionRates,
         dropOffPoints,
-        averageTimePerStep
+        averageTimePerStep,
       };
     });
   }

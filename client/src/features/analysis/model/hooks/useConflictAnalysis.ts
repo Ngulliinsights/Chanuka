@@ -19,11 +19,11 @@ export function useConflictAnalysis(billId: number, sponsorId: number) {
       // Phase 1: Generate mock data
       const mockData = generateMockConflictAnalysis(billId, sponsorId);
       setData(mockData);
-      
+
       // Phase 2: Service abstraction
       // const analysisService = createConflictDetectionService();
       // const data = await analysisService.detectConflicts(sponsorId, ['environment'], mockData.conflicts[0]?.financialExposures || []);
-      
+
       // Phase 3: Real API integration
       // const response = await fetch(`/api/analysis/${billId}/${sponsorId}`);
       // const data = await response.json();
@@ -48,7 +48,7 @@ export function useConflictAnalysis(billId: number, sponsorId: number) {
  */
 function generateMockConflictAnalysis(billId: number, sponsorId: number): ConflictAnalysis {
   const currentYear = new Date().getFullYear();
-  
+
   return {
     billId,
     sponsorId,
@@ -58,7 +58,7 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
       overallRisk: 72,
       conflictDetected: true,
       riskLevel: 'high',
-      confidence: 0.85
+      confidence: 0.85,
     },
     conflicts: [
       {
@@ -76,7 +76,7 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
             industry: 'Energy',
             category: 'Stocks',
             verificationStatus: 'verified',
-            description: 'Direct stock holdings in major energy companies'
+            description: 'Direct stock holdings in major energy companies',
           },
           {
             id: 'exp2',
@@ -86,10 +86,10 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
             industry: 'Healthcare',
             category: 'Bonds',
             verificationStatus: 'verified',
-            description: 'Bond portfolio in healthcare sector'
-          }
-        ]
-      }
+            description: 'Bond portfolio in healthcare sector',
+          },
+        ],
+      },
     ],
     votingHistory: [
       {
@@ -99,7 +99,7 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
         billTitle: 'Energy Deregulation Act',
         date: new Date(currentYear - 1, 3, 15).toISOString(),
         financialCorrelation: 0.92,
-        explanation: 'Supports energy sector interests'
+        explanation: 'Supports energy sector interests',
       },
       {
         id: 'vote2',
@@ -108,17 +108,21 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
         billTitle: 'Healthcare Tax Incentives',
         date: new Date(currentYear - 1, 5, 10).toISOString(),
         financialCorrelation: 0.88,
-        explanation: 'Supports healthcare investments'
-      }
+        explanation: 'Supports healthcare investments',
+      },
     ],
     transparencyScore: {
       overallScore: 58,
       components: {
         financialDisclosure: { score: 65, weight: 0.4, details: 'Complete but late disclosure' },
         votingHistory: { score: 52, weight: 0.35, details: 'Limited voting explanations' },
-        industryConnections: { score: 48, weight: 0.25, details: 'Significant undisclosed connections' }
+        industryConnections: {
+          score: 48,
+          weight: 0.25,
+          details: 'Significant undisclosed connections',
+        },
       },
-      methodology: 'Multi-factor transparency scoring'
+      methodology: 'Multi-factor transparency scoring',
     },
     implementationWorkarounds: [
       {
@@ -128,21 +132,21 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
         workaround: 'Exemption for companies with <1000 employees',
         implemented: true,
         successRate: 0.75,
-        timeline: `Q2 ${currentYear}`
-      }
+        timeline: `Q2 ${currentYear}`,
+      },
     ],
     networkNodes: [
       { id: 'sponsor', label: 'Senator Jane Smith', type: 'sponsor', value: 10 },
       { id: 'company1', label: 'Energy Corp Inc', type: 'company', value: 8 },
       { id: 'company2', label: 'HealthTech Systems', type: 'company', value: 7 },
-      { id: 'org1', label: 'Industry Coalition', type: 'organization', value: 6 }
+      { id: 'org1', label: 'Industry Coalition', type: 'organization', value: 6 },
     ],
     networkLinks: [
       { source: 'sponsor', target: 'company1', type: 'financial', strength: 0.9 },
       { source: 'sponsor', target: 'company2', type: 'financial', strength: 0.85 },
       { source: 'sponsor', target: 'org1', type: 'membership', strength: 0.7 },
-      { source: 'company1', target: 'org1', type: 'association', strength: 0.8 }
-    ]
+      { source: 'company1', target: 'org1', type: 'association', strength: 0.8 },
+    ],
   };
 }
 
@@ -158,9 +162,7 @@ export function useBillAnalysis(billId: number, sponsorIds: number[]) {
     setLoading(true);
     try {
       // Phase 1: Generate mock analyses for all sponsors
-      const analyses = sponsorIds.map(sponsorId =>
-        generateMockConflictAnalysis(billId, sponsorId)
-      );
+      const analyses = sponsorIds.map(sponsorId => generateMockConflictAnalysis(billId, sponsorId));
       setAnalysisData(analyses);
 
       // Phase 3: Real API integration

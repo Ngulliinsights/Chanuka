@@ -1,12 +1,18 @@
 import { FileText, Download, Search, Copy, BookOpen, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-import type { Bill } from '@client/shared/types';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 interface BillFullTextTabProps {
   bill: Bill;
@@ -85,7 +91,7 @@ This Act shall take effect 180 days after the date of enactment.
         if (currentSection.title && currentSection.content) {
           sections.push({
             ...currentSection,
-            lineNumbers: { start: currentSection.lineNumbers?.start || 1, end: lineNumber - 1 }
+            lineNumbers: { start: currentSection.lineNumbers?.start || 1, end: lineNumber - 1 },
           } as BillSection);
         }
 
@@ -95,7 +101,7 @@ This Act shall take effect 180 days after the date of enactment.
           title: trimmed,
           content: '',
           level: 1,
-          lineNumbers: { start: lineNumber, end: lineNumber }
+          lineNumbers: { start: lineNumber, end: lineNumber },
         };
       } else if (currentSection.title) {
         // Add content to current section
@@ -109,7 +115,7 @@ This Act shall take effect 180 days after the date of enactment.
     if (currentSection.title && currentSection.content) {
       sections.push({
         ...currentSection,
-        lineNumbers: { start: currentSection.lineNumbers?.start || 1, end: lineNumber }
+        lineNumbers: { start: currentSection.lineNumbers?.start || 1, end: lineNumber },
       } as BillSection);
     }
 
@@ -119,10 +125,11 @@ This Act shall take effect 180 days after the date of enactment.
   // Filter sections based on search term
   const filteredSections = useMemo(() => {
     if (!searchTerm) return parsedSections;
-    
-    return parsedSections.filter(section => 
-      section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      section.content.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return parsedSections.filter(
+      section =>
+        section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        section.content.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [parsedSections, searchTerm]);
 
@@ -157,12 +164,12 @@ This Act shall take effect 180 days after the date of enactment.
 
   const highlightSearchTerm = (text: string, term: string): React.ReactNode => {
     if (!term) return text;
-    
+
     // Escape special regex characters to prevent regex injection
     const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`(${escapedTerm})`, 'gi');
     const parts = text.split(regex);
-    
+
     return parts.map((part, index) => {
       if (part.toLowerCase() === term.toLowerCase()) {
         return (
@@ -197,7 +204,7 @@ This Act shall take effect 180 days after the date of enactment.
                 <Input
                   placeholder="Search within bill text..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -213,21 +220,21 @@ This Act shall take effect 180 days after the date of enactment.
                 {showLineNumbers ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 Line Numbers
               </Button>
-              
+
               <Button variant="outline" size="sm" onClick={expandAll}>
                 <BookOpen className="h-4 w-4 mr-2" />
                 Expand All
               </Button>
-              
+
               <Button variant="outline" size="sm" onClick={collapseAll}>
                 Collapse All
               </Button>
-              
+
               <Button variant="outline" size="sm" onClick={() => copyToClipboard(mockFullText)}>
                 <Copy className="h-4 w-4 mr-2" />
                 Copy All
               </Button>
-              
+
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
@@ -239,7 +246,8 @@ This Act shall take effect 180 days after the date of enactment.
           {searchTerm && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-sm text-blue-800">
-                Found {filteredSections.length} section{filteredSections.length !== 1 ? 's' : ''} containing "{searchTerm}"
+                Found {filteredSections.length} section{filteredSections.length !== 1 ? 's' : ''}{' '}
+                containing "{searchTerm}"
               </div>
             </div>
           )}
@@ -256,7 +264,9 @@ This Act shall take effect 180 days after the date of enactment.
             </div>
             <div>
               <span className="font-medium">Introduced:</span>
-              <div className="text-muted-foreground">{new Date(bill.introducedDate).toLocaleDateString()}</div>
+              <div className="text-muted-foreground">
+                {new Date(bill.introducedDate).toLocaleDateString()}
+              </div>
             </div>
             <div>
               <span className="font-medium">Status:</span>
@@ -283,12 +293,12 @@ This Act shall take effect 180 days after the date of enactment.
             </CardContent>
           </Card>
         ) : (
-          filteredSections.map((section) => {
+          filteredSections.map(section => {
             const isExpanded = expandedSections.has(section.id);
-            
+
             return (
               <Card key={section.id}>
-                <CardHeader 
+                <CardHeader
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => toggleSection(section.id)}
                 >
@@ -308,25 +318,27 @@ This Act shall take effect 180 days after the date of enactment.
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 {isExpanded && (
                   <CardContent>
                     <Separator className="mb-4" />
                     <div className="relative">
                       <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono bg-muted/30 p-4 rounded-lg overflow-x-auto">
-                        {searchTerm ? highlightSearchTerm(section.content, searchTerm) : section.content}
+                        {searchTerm
+                          ? highlightSearchTerm(section.content, searchTerm)
+                          : section.content}
                       </pre>
-                      
+
                       <div className="flex items-center gap-2 mt-3">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(section.content)}
                         >
                           <Copy className="h-4 w-4 mr-2" />
                           Copy Section
                         </Button>
-                        
+
                         <Button variant="outline" size="sm">
                           <BookOpen className="h-4 w-4 mr-2" />
                           Analyze

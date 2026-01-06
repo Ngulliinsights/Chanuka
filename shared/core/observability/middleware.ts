@@ -7,6 +7,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
+
 // import { Result, ok, err } from '../../primitives/types/result'; // Unused import
 import { BaseError } from './error-management';
 import {

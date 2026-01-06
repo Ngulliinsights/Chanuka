@@ -85,11 +85,11 @@ export const designTokens = {
     '10': 'var(--space-10)',
     '12': 'var(--space-12)',
     // Semantic aliases
-    'xs': 'var(--space-xs)',
-    'sm': 'var(--space-sm)',
-    'md': 'var(--space-md)',
-    'lg': 'var(--space-lg)',
-    'xl': 'var(--space-xl)',
+    xs: 'var(--space-xs)',
+    sm: 'var(--space-sm)',
+    md: 'var(--space-md)',
+    lg: 'var(--space-lg)',
+    xl: 'var(--space-xl)',
     '2xl': 'var(--space-2xl)',
   },
 
@@ -124,10 +124,7 @@ export type BreakpointKey = keyof typeof designTokens.breakpoints;
  * Utility function to get token value
  * Usage: getToken('colors', 'primary', 'light')
  */
-export function getToken<T extends keyof DesignTokens>(
-  category: T,
-  ...path: string[]
-): string {
+export function getToken<T extends keyof DesignTokens>(category: T, ...path: string[]): string {
   let current: any = designTokens[category];
   for (const key of path) {
     current = current?.[key];

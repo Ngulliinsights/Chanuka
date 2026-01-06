@@ -1,4 +1,9 @@
-import { NavigationError, NavigationValidationError, NavigationAccessDeniedError, NavigationConfigurationError } from './errors';
+import {
+  NavigationError,
+  NavigationValidationError,
+  NavigationAccessDeniedError,
+  NavigationConfigurationError,
+} from './errors';
 
 /**
  * Recovery strategies for navigation errors
@@ -32,7 +37,7 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
         // This would typically use a navigation hook or router
         console.log('Recovery: Navigating to home page');
         // window.location.href = '/'; // or use router.push('/')
-      }
+      },
     },
     {
       name: 'clear_invalid_cache',
@@ -43,8 +48,8 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
         // Clear local storage, session storage, etc.
         localStorage.removeItem('navigation-cache');
         sessionStorage.removeItem('navigation-state');
-      }
-    }
+      },
+    },
   ],
 
   [NavigationAccessDeniedError.name]: [
@@ -55,7 +60,7 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
       action: async () => {
         console.log('Recovery: Redirecting to login');
         // window.location.href = '/login';
-      }
+      },
     },
     {
       name: 'show_upgrade_prompt',
@@ -64,7 +69,7 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
       action: async () => {
         console.log('Recovery: Showing upgrade prompt');
         // Show modal or toast with upgrade options
-      }
+      },
     },
     {
       name: 'navigate_to_allowed_page',
@@ -73,8 +78,8 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
       action: async () => {
         console.log('Recovery: Navigating to allowed page');
         // window.location.href = '/dashboard'; // or user's default page
-      }
-    }
+      },
+    },
   ],
 
   [NavigationConfigurationError.name]: [
@@ -86,7 +91,7 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
         console.log('Recovery: Reloading navigation configuration');
         // Force reload of navigation config
         window.location.reload();
-      }
+      },
     },
     {
       name: 'fallback_to_basic_navigation',
@@ -95,9 +100,9 @@ export const NAVIGATION_RECOVERY_STRATEGIES: Record<string, RecoveryStrategy[]> 
       action: async () => {
         console.log('Recovery: Using basic navigation fallback');
         // Switch to minimal navigation mode
-      }
-    }
-  ]
+      },
+    },
+  ],
 };
 
 /**
@@ -162,7 +167,7 @@ export function createRecoveryContext(
     path,
     user_role,
     user,
-    retryCount
+    retryCount,
   };
 }
 
@@ -185,4 +190,3 @@ export async function handleNavigationErrorWithRecovery(
 
   return { recovered: false, suggestions };
 }
-

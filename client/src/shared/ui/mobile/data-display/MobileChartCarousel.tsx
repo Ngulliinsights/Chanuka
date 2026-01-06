@@ -43,10 +43,7 @@ export const MobileChartCarousel = React.forwardRef<HTMLDivElement, MobileChartC
         {/* Component implementation will be added here */}
         <div className="carousel-container">
           {charts.map((chart, index) => (
-            <div
-              key={index}
-              className={`carousel-slide ${index === activeIndex ? 'active' : ''}`}
-            >
+            <div key={index} className={`carousel-slide ${index === activeIndex ? 'active' : ''}`}>
               <div className="chart-wrapper">
                 {chart.title && <h3>{chart.title}</h3>}
                 {/* Chart visualization will be rendered here */}

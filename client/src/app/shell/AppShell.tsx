@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState, useCallback, useMemo } from 'react';
-import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from '@/core/auth';
 import { ErrorBoundary } from '@/core/error/components';
@@ -10,20 +10,20 @@ import { Toaster } from '@/shared/design-system';
 import {
   setCurrentPath,
   addToRecentPages,
-  setUserRole
+  setUserRole,
 } from '@/shared/infrastructure/store/slices/navigationSlice';
 import { LoadingStateManager } from '@/shared/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@/shared/ui/navigation/BreadcrumbNavigation';
 import { useBreadcrumbNavigation } from '@/shared/ui/navigation/hooks/useBreadcrumbNavigation';
 import { OfflineProvider } from '@/shared/ui/offline';
-import { logger } from '../../utils/logger';
 
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { AnalyticsIntegration } from '../../core/analytics/AnalyticsIntegration';
-import { DevelopmentMonitoringDashboard } from '../../core/monitoring/DevelopmentMonitoringDashboard';
-import { RouteProfiler } from '../../core/monitoring/RouteProfiler';
+// import { DevelopmentMonitoringDashboard } from '../../core/monitoring/DevelopmentMonitoringDashboard';
+// import { RouteProfiler } from '../../core/monitoring/RouteProfiler';
 import { NavigationConsistency } from '../../core/navigation/NavigationConsistency';
 import { NavigationPerformance } from '../../core/navigation/NavigationPerformance';
+import { logger } from '../../utils/logger';
 
 import { AppRouter } from './AppRouter';
 import { NavigationBar } from './NavigationBar';
@@ -77,16 +77,16 @@ function AppLoadingFallback() {
 const defaultSkipLinks: SkipLink[] = [
   {
     href: '#main-content',
-    label: 'Skip to main content'
+    label: 'Skip to main content',
   },
   {
     href: '#navigation',
-    label: 'Skip to navigation'
+    label: 'Skip to navigation',
   },
   {
     href: '#search',
-    label: 'Skip to search'
-  }
+    label: 'Skip to search',
+  },
 ];
 
 /**
@@ -126,20 +126,12 @@ const defaultSkipLinks: SkipLink[] = [
  */
 function NavigationWrapper({ children }: { children: React.ReactNode }) {
   // Create NavigationProvider with proper hooks
-  const NavigationProvider = useMemo(() =>
-    createNavigationProvider(
-      useLocation,
-      useNavigate,
-      useAuth,
-      useDeviceInfo
-    ), []
+  const NavigationProvider = useMemo(
+    () => createNavigationProvider(useLocation, useNavigate, useAuth, useDeviceInfo),
+    []
   );
 
-  return (
-    <NavigationProvider>
-      {children}
-    </NavigationProvider>
-  );
+  return <NavigationProvider>{children}</NavigationProvider>;
 }
 
 /**
@@ -162,22 +154,26 @@ function NavigationTracker({ children }: { children: React.ReactNode }) {
     dispatch(setCurrentPath(location.pathname));
 
     // Add to recent pages if it's a meaningful page (not auth, etc.)
-    if (!location.pathname.startsWith('/auth') &&
-        !location.pathname.startsWith('/error') &&
-        location.pathname !== '/') {
-
+    if (
+      !location.pathname.startsWith('/auth') &&
+      !location.pathname.startsWith('/error') &&
+      location.pathname !== '/'
+    ) {
       // Generate a title from the pathname
       const pathSegments = location.pathname.split('/').filter(Boolean);
-      const title = pathSegments.length > 0
-        ? pathSegments[pathSegments.length - 1]
-            .replace(/[-_]/g, ' ')
-            .replace(/\b\w/g, l => l.toUpperCase())
-        : 'Home';
+      const title =
+        pathSegments.length > 0
+          ? pathSegments[pathSegments.length - 1]
+              .replace(/[-_]/g, ' ')
+              .replace(/\b\w/g, l => l.toUpperCase())
+          : 'Home';
 
-      dispatch(addToRecentPages({
-        path: location.pathname,
-        title
-      }));
+      dispatch(
+        addToRecentPages({
+          path: location.pathname,
+          title,
+        })
+      );
     }
   }, [location.pathname, dispatch]);
 
@@ -200,7 +196,7 @@ export function AppShell({
   enableThemeProvider = true,
   enableRouter = true,
   enableNavigation = true,
-  skipLinks = defaultSkipLinks
+  skipLinks = defaultSkipLinks,
 }: AppShellProps) {
   // Track whether the shell has completed its initialization
   const [isInitialized, setIsInitialized] = useState(false);
@@ -222,9 +218,13 @@ export function AppShell({
          * These occur when a Promise is rejected but there's no .catch() handler
          */
         const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-          logger.error('Unhandled promise rejection:', {
-            component: 'AppShell'
-          }, event.reason);
+          logger.error(
+            'Unhandled promise rejection:',
+            {
+              component: 'AppShell',
+            },
+            event.reason
+          );
 
           // Prevent the default browser behavior (console error)
           event.preventDefault();
@@ -235,9 +235,13 @@ export function AppShell({
          * This is a last-resort error handler
          */
         const handleError = (event: ErrorEvent) => {
-          logger.error('Global error:', {
-            component: 'AppShell'
-          }, event.error);
+          logger.error(
+            'Global error:',
+            {
+              component: 'AppShell',
+            },
+            event.error
+          );
         };
 
         // Register the global error handlers
@@ -255,9 +259,13 @@ export function AppShell({
         };
       } catch (error) {
         // If initialization fails, log the error but still allow the app to render
-        logger.error('AppShell initialization failed:', {
-          component: 'AppShell'
-        }, error);
+        logger.error(
+          'AppShell initialization failed:',
+          {
+            component: 'AppShell',
+          },
+          error
+        );
         setIsInitialized(true);
       }
     };
@@ -271,17 +279,18 @@ export function AppShell({
    * This callback is invoked when the ErrorBoundary catches an error.
    * We use it to log detailed error information for debugging.
    */
-  const handleError = useCallback((
-    error: Error,
-    errorInfo: { componentStack?: string | null }
-  ) => {
-    logger.error('AppShell error boundary caught error:', {
-      component: 'AppShell'
-    }, {
-      error: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack
-    });
+  const handleError = useCallback((error: Error, errorInfo: { componentStack?: string | null }) => {
+    logger.error(
+      'AppShell error boundary caught error:',
+      {
+        component: 'AppShell',
+      },
+      {
+        error: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+      }
+    );
   }, []);
 
   /**
@@ -290,76 +299,66 @@ export function AppShell({
    * This is memoized to prevent unnecessary re-renders when props haven't changed.
    * The application content includes the layout, navigation, and main content area.
    */
-  const appContent = useMemo(() => (
-    <Suspense fallback={<AppLoadingFallback />}>
-      <ErrorBoundary
-        onError={handleError}
-      >
-        <NavigationWrapper>
-          <NavigationTracker>
-            <AnalyticsIntegration>
-              <RouteProfiler>
+  const appContent = useMemo(
+    () => (
+      <Suspense fallback={<AppLoadingFallback />}>
+        <ErrorBoundary onError={handleError}>
+          <NavigationWrapper>
+            <NavigationTracker>
+              <AnalyticsIntegration>
+                {/* <RouteProfiler> */}
                 <NavigationConsistency>
                   <NavigationPerformance>
-                {/* Skip Links for keyboard navigation accessibility */}
-                {enableAccessibility && <SkipLinks links={skipLinks} />}
+                    {/* Skip Links for keyboard navigation accessibility */}
+                    {enableAccessibility && <SkipLinks links={skipLinks} />}
 
-                {/* Main Application Layout */}
-                <div id="app-shell" className="min-h-screen bg-gray-50">
-                  {/* Top Navigation Bar */}
-                  {enableNavigation && (
-                    <NavigationBar
-                      showSearch={true}
-                      showNotifications={true}
-                      showUserMenu={true}
-                    />
-                  )}
+                    {/* Main Application Layout */}
+                    <div id="app-shell" className="min-h-screen bg-gray-50">
+                      {/* Top Navigation Bar */}
+                      {enableNavigation && (
+                        <NavigationBar
+                          showSearch={true}
+                          showNotifications={true}
+                          showUserMenu={true}
+                        />
+                      )}
 
-                  {/* Breadcrumb Navigation */}
-                  <div className="bg-white border-b border-gray-200">
-                    <div className="container mx-auto px-4 py-2">
-                      <BreadcrumbNavigation
-                        showHome={true}
-                        maxItems={5}
-                        className="py-2"
-                      />
+                      {/* Breadcrumb Navigation */}
+                      <div className="bg-white border-b border-gray-200">
+                        <div className="container mx-auto px-4 py-2">
+                          <BreadcrumbNavigation showHome={true} maxItems={5} className="py-2" />
+                        </div>
+                      </div>
+
+                      {/* Main Content Area - The heart of the application */}
+                      <main
+                        id="main-content"
+                        className="flex-1"
+                        role="main"
+                        aria-label="Main content"
+                        tabIndex={-1} // Allows focus for skip links
+                      >
+                        {/* Either render the router (for full app) or children (for testing) */}
+                        {enableRouter ? <AppRouter /> : children}
+                      </main>
                     </div>
-                  </div>
 
-                  {/* Main Content Area - The heart of the application */}
-                  <main
-                    id="main-content"
-                    className="flex-1"
-                    role="main"
-                    aria-label="Main content"
-                    tabIndex={-1} // Allows focus for skip links
-                  >
-                    {/* Either render the router (for full app) or children (for testing) */}
-                    {enableRouter ? <AppRouter /> : children}
-                  </main>
-                </div>
+                    {/* Toast notification system for user feedback */}
+                    <Toaster />
 
-                {/* Toast notification system for user feedback */}
-                <Toaster />
-
-                {/* Development Monitoring Dashboard (Development Only) */}
-                <DevelopmentMonitoringDashboard />
-              </NavigationPerformance>
-            </NavigationConsistency>
-              </RouteProfiler>
-            </AnalyticsIntegration>
-          </NavigationTracker>
-        </NavigationWrapper>
-      </ErrorBoundary>
-    </Suspense>
-  ), [
-    enableAccessibility,
-    enableNavigation,
-    enableRouter,
-    skipLinks,
-    children,
-    handleError
-  ]);
+                    {/* Development Monitoring Dashboard (Development Only) */}
+                    {/* <DevelopmentMonitoringDashboard /> */}
+                  </NavigationPerformance>
+                </NavigationConsistency>
+                {/* </RouteProfiler> */}
+              </AnalyticsIntegration>
+            </NavigationTracker>
+          </NavigationWrapper>
+        </ErrorBoundary>
+      </Suspense>
+    ),
+    [enableAccessibility, enableNavigation, enableRouter, skipLinks, children, handleError]
+  );
 
   /**
    * Build the provider tree from the inside out
@@ -378,49 +377,28 @@ export function AppShell({
 
     // Layer 4: Wrap with authentication provider
     // This makes auth state available throughout the app
-    content = (
-      <AuthProvider>
-        {content}
-      </AuthProvider>
-    );
+    content = <AuthProvider>{content}</AuthProvider>;
 
     // Layer 3: Wrap with offline provider if enabled
     // This monitors network connectivity
     if (enableOfflineSupport) {
-      content = (
-        <OfflineProvider>
-          {content}
-        </OfflineProvider>
-      );
+      content = <OfflineProvider>{content}</OfflineProvider>;
     }
 
     // Layer 2: Wrap with theme provider if enabled
     // This provides theme context (dark/light mode, colors, etc.)
     if (enableThemeProvider) {
-      content = (
-        <ThemeProvider>
-          {content}
-        </ThemeProvider>
-      );
+      content = <ThemeProvider>{content}</ThemeProvider>;
     }
 
     // Layer 1: Wrap with router if enabled (outermost layer)
     // BrowserRouter must be outside everything that uses routing hooks
     if (enableRouter) {
-      content = (
-        <BrowserRouter>
-          {content}
-        </BrowserRouter>
-      );
+      content = <BrowserRouter>{content}</BrowserRouter>;
     }
 
     return content;
-  }, [
-    appContent,
-    enableOfflineSupport,
-    enableThemeProvider,
-    enableRouter
-  ]);
+  }, [appContent, enableOfflineSupport, enableThemeProvider, enableRouter]);
 
   /**
    * Show loading state during initialization

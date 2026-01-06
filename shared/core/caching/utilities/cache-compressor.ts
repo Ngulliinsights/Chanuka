@@ -5,8 +5,8 @@
  * with support for multiple algorithms and automatic threshold detection
  */
 
-import { gzip, gunzip, deflate, inflate } from 'zlib';
 import { promisify } from 'util';
+import { gzip, gunzip, deflate, inflate } from 'zlib';
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);

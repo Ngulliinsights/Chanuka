@@ -6,9 +6,9 @@
  * from both existing database systems.
  */
 
+import { createDatabaseConfig } from '@shared/database/core/config.ts';
 import type { ConnectionManagerConfig } from '@shared/database/core/connection-manager.ts';
 import { createConnectionManager, closeConnectionManager } from '@shared/database/core/connection-manager.ts';
-import { createDatabaseConfig } from '@shared/database/core/config.ts';
 import { createHealthMonitor, stopHealthMonitor } from '@shared/database/core/health-monitor.ts';
 
 // ============================================================================

@@ -1,9 +1,9 @@
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  ChevronUp, 
-  ChevronDown, 
-  Reply, 
-  Flag, 
+import {
+  ChevronUp,
+  ChevronDown,
+  Reply,
+  Flag,
   MoreHorizontal,
   Edit,
   Trash2,
@@ -11,12 +11,12 @@ import {
   AlertTriangle,
   User,
   Award,
-  MessageSquare
+  MessageSquare,
 } from 'lucide-react';
 import React, { useState, useCallback, useMemo } from 'react';
 
-import { cn } from '@client/shared/design-system';
 import type { CommunityComment } from '@client/features/community/types';
+import { cn } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
@@ -44,7 +44,7 @@ interface CommentItemProps {
 
 /**
  * CommentItem - Individual comment with voting, replying, and moderation actions
- * 
+ *
  * Features:
  * - Nested threading up to 5 levels deep
  * - Voting system with visual feedback
@@ -67,7 +67,7 @@ export function CommentItem({
   onModerate,
   className,
   showReplies = true,
-  replies = []
+  replies = [],
 }: CommentItemProps) {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -87,16 +87,19 @@ export function CommentItem({
   }, [comment.createdAt]);
 
   // Handle voting
-  const handleVote = useCallback((voteType: 'up' | 'down') => {
-    // Optimistic update
-    setUserVote(prev => prev === voteType ? null : voteType);
-    onVote(comment.id, voteType);
-  }, [comment.id, onVote]);
+  const handleVote = useCallback(
+    (voteType: 'up' | 'down') => {
+      // Optimistic update
+      setUserVote(prev => (prev === voteType ? null : voteType));
+      onVote(comment.id, voteType);
+    },
+    [comment.id, onVote]
+  );
 
   // Get quality indicator
   const getQualityIndicator = (score?: number) => {
     if (!score) return null;
-    
+
     if (score >= 80) return { color: 'text-green-600', label: 'High Quality' };
     if (score >= 60) return { color: 'text-yellow-600', label: 'Good' };
     if (score >= 40) return { color: 'text-orange-600', label: 'Fair' };
@@ -109,23 +112,37 @@ export function CommentItem({
   const getUserRoleBadge = (role?: string) => {
     switch (role) {
       case 'expert':
-        return <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">Expert</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+            Expert
+          </Badge>
+        );
       case 'official':
-        return <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">Official</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+            Official
+          </Badge>
+        );
       case 'moderator':
-        return <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">Moderator</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+            Moderator
+          </Badge>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className={cn("comment-item", className)}>
-      <Card className={cn(
-        "transition-colors",
-        comment.isModerated && "border-orange-200 bg-orange-50/50",
-        depth > 0 && "ml-4 border-l-2 border-l-muted"
-      )}>
+    <div className={cn('comment-item', className)}>
+      <Card
+        className={cn(
+          'transition-colors',
+          comment.isModerated && 'border-orange-200 bg-orange-50/50',
+          depth > 0 && 'ml-4 border-l-2 border-l-muted'
+        )}
+      >
         <CardContent className="p-4">
           <div className="space-y-3">
             {/* Comment Header */}
@@ -134,24 +151,23 @@ export function CommentItem({
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={comment.author?.avatar} alt={comment.author?.name} />
                   <AvatarFallback>
-                    {comment.author?.name?.split(' ').map(n => n[0]).join('') || <User className="h-4 w-4" />}
+                    {comment.author?.name
+                      ?.split(' ')
+                      .map(n => n[0])
+                      .join('') || <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
-                
+
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">
-                    {comment.author?.name || 'Anonymous'}
-                  </span>
-                  
-                  {comment.author?.isVerified && (
-                    <Award className="h-4 w-4 text-blue-500" />
-                  )}
-                  
+                  <span className="font-medium text-sm">{comment.author?.name || 'Anonymous'}</span>
+
+                  {comment.author?.isVerified && <Award className="h-4 w-4 text-blue-500" />}
+
                   {getUserRoleBadge(comment.author?.role)}
-                  
+
                   <span className="text-xs text-muted-foreground">•</span>
                   <span className="text-xs text-muted-foreground">{relativeTime}</span>
-                  
+
                   {comment.updatedAt !== comment.createdAt && (
                     <>
                       <span className="text-xs text-muted-foreground">•</span>
@@ -164,11 +180,11 @@ export function CommentItem({
               {/* Actions Menu */}
               <div className="flex items-center gap-1">
                 {qualityIndicator && (
-                  <Badge variant="outline" className={cn("text-xs", qualityIndicator.color)}>
+                  <Badge variant="outline" className={cn('text-xs', qualityIndicator.color)}>
                     {qualityIndicator.label}
                   </Badge>
                 )}
-                
+
                 <Button variant="ghost" size="sm">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -185,9 +201,7 @@ export function CommentItem({
 
             {/* Comment Content */}
             <div className="prose prose-sm max-w-none">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {comment.content}
-              </p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
             </div>
 
             {/* Comment Actions */}
@@ -199,23 +213,17 @@ export function CommentItem({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleVote('up')}
-                    className={cn(
-                      "h-8 px-2",
-                      userVote === 'up' && "text-green-600 bg-green-50"
-                    )}
+                    className={cn('h-8 px-2', userVote === 'up' && 'text-green-600 bg-green-50')}
                   >
                     <ChevronUp className="h-4 w-4" />
                     <span className="text-xs ml-1">{comment.upvotes || 0}</span>
                   </Button>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleVote('down')}
-                    className={cn(
-                      "h-8 px-2",
-                      userVote === 'down' && "text-red-600 bg-red-50"
-                    )}
+                    className={cn('h-8 px-2', userVote === 'down' && 'text-red-600 bg-red-50')}
                   >
                     <ChevronDown className="h-4 w-4" />
                     <span className="text-xs ml-1">{comment.downvotes || 0}</span>
@@ -306,7 +314,7 @@ export function CommentItem({
       {/* Nested Replies */}
       {showReplies && hasReplies && isExpanded && (
         <div className="mt-3 space-y-3">
-          {replies.map((reply) => (
+          {replies.map(reply => (
             <CommentItem
               key={reply.id}
               comment={reply}

@@ -16,26 +16,31 @@ The system is built around several key components:
 ## Key Features
 
 ### 🔄 Connection-Aware Loading
+
 - Automatic adaptation based on network conditions
 - Smart operation prioritization for slow/offline connections
 - Adaptive timeouts and retry strategies
 
 ### ⏱️ Timeout & Retry Management
+
 - Configurable timeouts with warning thresholds
 - Exponential and linear backoff strategies
 - Automatic retry with connection-aware delays
 
 ### 🎯 Error Integration
+
 - Seamless integration with existing error management system
 - Automatic error reporting and analytics
 - Recovery suggestions and retry logic
 
 ### 📊 Performance Monitoring
+
 - Global loading performance tracking
 - Success rate and retry rate analytics
 - Connection impact assessment
 
 ### 🎨 Unified Components
+
 - Accessible loading spinners and skeletons
 - Progress bars and indicators
 - Global loading overlay
@@ -70,12 +75,7 @@ function MyComponent() {
 import { useProgressiveLoading } from '@core/loading';
 
 function FileUploadComponent() {
-  const {
-    currentStage,
-    progress,
-    start,
-    completeCurrentStage
-  } = useProgressiveLoading([
+  const { currentStage, progress, start, completeCurrentStage } = useProgressiveLoading([
     { id: 'prepare', message: 'Preparing file...' },
     { id: 'upload', message: 'Uploading...' },
     { id: 'process', message: 'Processing...' },
@@ -136,11 +136,7 @@ import { useErrorAnalytics } from '@hooks/useErrorAnalytics';
 function App() {
   const errorAnalytics = useErrorAnalytics();
 
-  return (
-    <LoadingProvider errorAnalytics={errorAnalytics}>
-      {/* App content */}
-    </LoadingProvider>
-  );
+  return <LoadingProvider errorAnalytics={errorAnalytics}>{/* App content */}</LoadingProvider>;
 }
 ```
 
@@ -170,11 +166,13 @@ const apiScenario = LOADING_SCENARIOS.API_REQUEST;
 ### From Legacy Loading Hooks
 
 **Before:**
+
 ```tsx
 const { loading, error } = useApi('/api/data');
 ```
 
 **After:**
+
 ```tsx
 const { isLoading, error, execute } = useLoadingOperation('api-data');
 const result = await execute(() => fetch('/api/data').then(r => r.json()));
@@ -183,11 +181,13 @@ const result = await execute(() => fetch('/api/data').then(r => r.json()));
 ### From Component-Level Loading
 
 **Before:**
+
 ```tsx
 const [loading, setLoading] = useState(false);
 ```
 
 **After:**
+
 ```tsx
 const { startLoading, completeLoading } = useComponentLoading('my-component');
 ```
@@ -202,6 +202,7 @@ const { startLoading, completeLoading } = useComponentLoading('my-component');
 ## Accessibility
 
 All loading components include proper ARIA attributes:
+
 - `role="status"` for loading states
 - `aria-label` for screen reader announcements
 - `aria-live` regions for dynamic updates
@@ -210,6 +211,7 @@ All loading components include proper ARIA attributes:
 ## Error Handling
 
 The system integrates with the error management system:
+
 - Automatic error tracking and analytics
 - Recovery suggestions based on error patterns
 - Connection-aware retry strategies
@@ -222,17 +224,14 @@ import { render, screen } from '@testing-library/react';
 import { LoadingProvider } from '@core/loading';
 
 const renderWithLoading = (component: React.ReactElement) => {
-  return render(
-    <LoadingProvider>
-      {component}
-    </LoadingProvider>
-  );
+  return render(<LoadingProvider>{component}</LoadingProvider>);
 };
 ```
 
 ## API Reference
 
 ### Hooks
+
 - `useLoadingOperation()` - Basic loading operations
 - `usePageLoading()` - Page-level loading
 - `useComponentLoading()` - Component-level loading
@@ -241,12 +240,14 @@ const renderWithLoading = (component: React.ReactElement) => {
 - `useTimeoutAwareLoading()` - Timeout-aware operations
 
 ### Components
+
 - `LoadingSpinner` - Animated spinner
 - `LoadingSkeleton` - Skeleton screens
 - `LoadingProgress` - Progress bars/circles
 - `GlobalLoadingIndicator` - App-wide loading overlay
 
 ### Utilities
+
 - `detectConnectionType()` - Network detection
 - `calculateRetryDelay()` - Retry timing
 - `LoadingPerformanceMonitor` - Performance tracking
@@ -265,22 +266,27 @@ const renderWithLoading = (component: React.ReactElement) => {
 ### Common Issues
 
 **Operations not starting:**
+
 - Check connection status and priority settings
 - Verify provider is properly configured
 
 **Timeouts not working:**
+
 - Ensure timeout values are reasonable for operation type
 - Check connection multiplier settings
 
 **Components not updating:**
+
 - Verify hooks are used within LoadingProvider
 - Check for proper dependency arrays in useEffect
 
 ### Debug Mode
 
 Enable debug logging:
+
 ```tsx
 const loadingConfig = {
   validation: { enabled: true, strict: false },
-  logging: { level: 'debug' }
+  logging: { level: 'debug' },
 };
+```

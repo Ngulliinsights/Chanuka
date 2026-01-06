@@ -14,7 +14,9 @@ export const defaultApiConfig = {
   timeout: globalConfig.get('api').timeout,
   retries: globalConfig.get('api').retry.maxRetries,
   retryDelay: globalConfig.get('api').retry.baseDelay,
-  enableLogging: globalConfig.get('monitoring').logLevel === 'debug' || globalConfig.get('monitoring').logLevel === 'info',
+  enableLogging:
+    globalConfig.get('monitoring').logLevel === 'debug' ||
+    globalConfig.get('monitoring').logLevel === 'info',
 };
 
 /**
@@ -81,7 +83,7 @@ export const CORS_CONFIG: Readonly<RequestInit> = {
   credentials: 'include',
   mode: 'cors',
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 } as const;

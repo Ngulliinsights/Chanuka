@@ -18,8 +18,9 @@ import {
   LogOut,
   Moon,
   Sun,
-  Palette
+  Palette,
 } from 'lucide-react';
+
 import type { Command, CommandSection } from './types';
 
 /**
@@ -35,7 +36,7 @@ export const createNavigationCommands = (navigate: (path: string) => void): Comm
     action: () => navigate('/'),
     keywords: ['home', 'dashboard', 'main'],
     section: 'navigation',
-    priority: 10
+    priority: 10,
   },
   {
     id: 'nav-bills',
@@ -46,7 +47,7 @@ export const createNavigationCommands = (navigate: (path: string) => void): Comm
     action: () => navigate('/bills'),
     keywords: ['bills', 'legislation', 'laws'],
     section: 'navigation',
-    priority: 9
+    priority: 9,
   },
   {
     id: 'nav-search',
@@ -57,7 +58,7 @@ export const createNavigationCommands = (navigate: (path: string) => void): Comm
     action: () => navigate('/search'),
     keywords: ['search', 'find', 'lookup'],
     section: 'navigation',
-    priority: 8
+    priority: 8,
   },
   {
     id: 'nav-community',
@@ -67,7 +68,7 @@ export const createNavigationCommands = (navigate: (path: string) => void): Comm
     action: () => navigate('/community'),
     keywords: ['community', 'discussions', 'forum'],
     section: 'navigation',
-    priority: 7
+    priority: 7,
   },
   {
     id: 'nav-dashboard',
@@ -78,23 +79,21 @@ export const createNavigationCommands = (navigate: (path: string) => void): Comm
     action: () => navigate('/dashboard'),
     keywords: ['dashboard', 'analytics', 'personal'],
     section: 'navigation',
-    priority: 6
-  }
+    priority: 6,
+  },
 ];
 
 /**
  * Quick Action Commands
  */
-export const createQuickActionCommands = (
-  actions: {
-    openSearch?: () => void;
-    toggleTheme?: () => void;
-    openNotifications?: () => void;
-    openSettings?: () => void;
-    openProfile?: () => void;
-    logout?: () => void;
-  }
-): Command[] => {
+export const createQuickActionCommands = (actions: {
+  openSearch?: () => void;
+  toggleTheme?: () => void;
+  openNotifications?: () => void;
+  openSettings?: () => void;
+  openProfile?: () => void;
+  logout?: () => void;
+}): Command[] => {
   const commands: Command[] = [];
 
   if (actions.openSearch) {
@@ -107,7 +106,7 @@ export const createQuickActionCommands = (
       action: actions.openSearch,
       keywords: ['search', 'find', 'bills'],
       section: 'actions',
-      priority: 10
+      priority: 10,
     });
   }
 
@@ -121,7 +120,7 @@ export const createQuickActionCommands = (
       action: actions.toggleTheme,
       keywords: ['theme', 'dark', 'light', 'mode'],
       section: 'actions',
-      priority: 5
+      priority: 5,
     });
   }
 
@@ -135,7 +134,7 @@ export const createQuickActionCommands = (
       action: actions.openNotifications,
       keywords: ['notifications', 'alerts', 'updates'],
       section: 'actions',
-      priority: 7
+      priority: 7,
     });
   }
 
@@ -149,7 +148,7 @@ export const createQuickActionCommands = (
       action: actions.openSettings,
       keywords: ['settings', 'preferences', 'config'],
       section: 'actions',
-      priority: 6
+      priority: 6,
     });
   }
 
@@ -162,7 +161,7 @@ export const createQuickActionCommands = (
       action: actions.openProfile,
       keywords: ['profile', 'account', 'user'],
       section: 'actions',
-      priority: 4
+      priority: 4,
     });
   }
 
@@ -175,7 +174,7 @@ export const createQuickActionCommands = (
       action: actions.logout,
       keywords: ['logout', 'signout', 'exit'],
       section: 'actions',
-      priority: 1
+      priority: 1,
     });
   }
 
@@ -185,13 +184,11 @@ export const createQuickActionCommands = (
 /**
  * Help Commands
  */
-export const createHelpCommands = (
-  actions: {
-    openHelp?: () => void;
-    openAbout?: () => void;
-    openKeyboardShortcuts?: () => void;
-  }
-): Command[] => {
+export const createHelpCommands = (actions: {
+  openHelp?: () => void;
+  openAbout?: () => void;
+  openKeyboardShortcuts?: () => void;
+}): Command[] => {
   const commands: Command[] = [];
 
   if (actions.openHelp) {
@@ -204,7 +201,7 @@ export const createHelpCommands = (
       action: actions.openHelp,
       keywords: ['help', 'docs', 'documentation', 'support'],
       section: 'help',
-      priority: 10
+      priority: 10,
     });
   }
 
@@ -217,7 +214,7 @@ export const createHelpCommands = (
       action: actions.openKeyboardShortcuts,
       keywords: ['shortcuts', 'keyboard', 'hotkeys'],
       section: 'help',
-      priority: 8
+      priority: 8,
     });
   }
 
@@ -230,7 +227,7 @@ export const createHelpCommands = (
       action: actions.openAbout,
       keywords: ['about', 'info', 'platform'],
       section: 'help',
-      priority: 5
+      priority: 5,
     });
   }
 
@@ -254,7 +251,7 @@ export const createDefaultSections = (
       id: 'actions',
       title: 'Quick Actions',
       commands: quickActionCommands,
-      priority: 10
+      priority: 10,
     });
   }
 
@@ -263,7 +260,7 @@ export const createDefaultSections = (
     id: 'navigation',
     title: 'Go to Page',
     commands: createNavigationCommands(navigate),
-    priority: 8
+    priority: 8,
   });
 
   // Help Section
@@ -273,7 +270,7 @@ export const createDefaultSections = (
       id: 'help',
       title: 'Help & Support',
       commands: helpCommands,
-      priority: 5
+      priority: 5,
     });
   }
 
@@ -295,11 +292,9 @@ export const filterCommands = (commands: Command[], query: string): Command[] =>
       if (command.disabled) return false;
 
       // Search in label, description, and keywords
-      const searchText = [
-        command.label,
-        command.description || '',
-        ...command.keywords
-      ].join(' ').toLowerCase();
+      const searchText = [command.label, command.description || '', ...command.keywords]
+        .join(' ')
+        .toLowerCase();
 
       return searchText.includes(normalizedQuery);
     })
@@ -320,12 +315,15 @@ export const filterCommands = (commands: Command[], query: string): Command[] =>
  * Group commands by section
  */
 export const groupCommandsBySection = (commands: Command[]): Record<string, Command[]> => {
-  return commands.reduce((groups, command) => {
-    const section = command.section || 'other';
-    if (!groups[section]) {
-      groups[section] = [];
-    }
-    groups[section].push(command);
-    return groups;
-  }, {} as Record<string, Command[]>);
+  return commands.reduce(
+    (groups, command) => {
+      const section = command.section || 'other';
+      if (!groups[section]) {
+        groups[section] = [];
+      }
+      groups[section].push(command);
+      return groups;
+    },
+    {} as Record<string, Command[]>
+  );
 };

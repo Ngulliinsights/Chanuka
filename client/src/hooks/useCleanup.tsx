@@ -1,20 +1,20 @@
 /**
  * useCleanup Hook
- * 
+ *
  * A utility hook to manage cleanup operations and prevent memory leaks.
  * Provides a centralized way to register cleanup functions that will be
  * called when the component unmounts.
- * 
+ *
  * @example
  * const { addCleanup, isMounted } = useCleanup();
- * 
+ *
  * useEffect(() => {
  *   const timer = setTimeout(() => {
  *     if (isMounted()) {
  *       // Safe to update state
  *     }
  *   }, 1000);
- *   
+ *
  *   addCleanup(() => clearTimeout(timer));
  * }, []);
  */
@@ -27,7 +27,7 @@ type CleanupFunction = () => void;
 export function useCleanup() {
   // Store cleanup functions in a ref to avoid recreating the array on each render
   const cleanupFunctionsRef = useRef<CleanupFunction[]>([]);
-  
+
   // Track mount status to prevent operations on unmounted components
   const isMountedRef = useRef(false);
 
@@ -77,7 +77,7 @@ export function useCleanup() {
   useEffect(() => {
     // Mark component as mounted when effect runs
     isMountedRef.current = true;
-    
+
     return () => {
       // Mark as unmounted first to prevent any new cleanup registrations
       isMountedRef.current = false;
@@ -90,21 +90,21 @@ export function useCleanup() {
     addCleanup,
     removeCleanup,
     runCleanup,
-    isMounted
+    isMounted,
   };
 }
 
 /**
  * useAbortController Hook
- * 
+ *
  * A specialized hook for managing AbortController instances to cancel
  * async operations and prevent race conditions. This is particularly
  * useful for fetch requests, timers, and other async work that should
  * be cancelled when the component unmounts or when starting new operations.
- * 
+ *
  * @example
  * const { getController, abort } = useAbortController();
- * 
+ *
  * const fetchData = async () => {
  *   const controller = getController();
  *   const response = await fetch(url, { signal: controller.signal });
@@ -126,10 +126,10 @@ export function useAbortController() {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      
+
       // Create fresh controller for new operations
       abortControllerRef.current = new AbortController();
-      
+
       // Register automatic cleanup on unmount
       addCleanup(() => {
         if (abortControllerRef.current) {
@@ -138,7 +138,7 @@ export function useAbortController() {
         }
       });
     }
-    
+
     return abortControllerRef.current;
   }, [addCleanup]);
 
@@ -164,23 +164,23 @@ export function useAbortController() {
     getController,
     abort,
     isAborted,
-    isMounted
+    isMounted,
   };
 }
 
 /**
  * useAsyncOperation Hook
- * 
+ *
  * A comprehensive hook that combines abort controller with mounted state checking
  * to safely handle async operations. This hook ensures that:
  * - Operations are cancelled when the component unmounts
  * - State updates don't happen on unmounted components
  * - Race conditions are avoided when multiple operations are triggered
  * - Errors are handled gracefully
- * 
+ *
  * @example
  * const { safeAsync, abort } = useAsyncOperation();
- * 
+ *
  * const loadData = async () => {
  *   await safeAsync(
  *     async (signal) => {
@@ -197,7 +197,7 @@ export function useAsyncOperation() {
 
   /**
    * Wraps an async operation with safety checks and cancellation support.
-   * 
+   *
    * @param operation - The async function to execute, receives an AbortSignal
    * @param onSuccess - Optional callback when operation succeeds (only called if mounted)
    * @param onError - Optional callback when operation fails (only called if mounted and not aborted)
@@ -235,7 +235,7 @@ export function useAsyncOperation() {
         if (isMounted()) {
           onError?.(error instanceof Error ? error : new Error('Unknown error'));
         }
-        
+
         // Re-throw so calling code can also handle the error if needed
         throw error;
       }
@@ -247,6 +247,6 @@ export function useAsyncOperation() {
     safeAsync,
     abort,
     isAborted,
-    isMounted
+    isMounted,
   };
 }

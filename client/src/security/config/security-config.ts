@@ -21,13 +21,13 @@ export const securityConfig: SecurityConfig = {
         ...(isDevelopment ? ["'unsafe-eval'"] : []),
         'https://cdn.chanuka.ke',
         'https://www.google-analytics.com',
-        'https://www.googletagmanager.com'
+        'https://www.googletagmanager.com',
       ],
       'style-src': [
         "'self'",
         "'unsafe-inline'", // Required for Tailwind CSS
         'https://cdn.chanuka.ke',
-        'https://fonts.googleapis.com'
+        'https://fonts.googleapis.com',
       ],
       'img-src': [
         "'self'",
@@ -35,20 +35,16 @@ export const securityConfig: SecurityConfig = {
         'blob:',
         'https:',
         'https://cdn.chanuka.ke',
-        'https://www.google-analytics.com'
+        'https://www.google-analytics.com',
       ],
       'connect-src': [
         "'self'",
         'https://api.chanuka.ke',
         'wss://ws.chanuka.ke',
         'https://www.google-analytics.com',
-        ...(isDevelopment ? ['ws://localhost:*', 'http://localhost:*'] : [])
+        ...(isDevelopment ? ['ws://localhost:*', 'http://localhost:*'] : []),
       ],
-      'font-src': [
-        "'self'",
-        'https://cdn.chanuka.ke',
-        'https://fonts.gstatic.com'
-      ],
+      'font-src': ["'self'", 'https://cdn.chanuka.ke', 'https://fonts.gstatic.com'],
       'object-src': ["'none'"],
       'media-src': ["'self'", 'https://cdn.chanuka.ke'],
       'frame-src': ["'none'"],
@@ -56,12 +52,12 @@ export const securityConfig: SecurityConfig = {
       'base-uri': ["'self'"],
       'form-action': ["'self'"],
       'upgrade-insecure-requests': isProduction,
-      'block-all-mixed-content': isProduction
+      'block-all-mixed-content': isProduction,
     },
     nonce: {
       enabled: true,
-      length: 32
-    }
+      length: 32,
+    },
   },
   csrf: {
     enabled: true,
@@ -70,49 +66,61 @@ export const securityConfig: SecurityConfig = {
     cookieName: 'chanuka_csrf',
     secure: isProduction,
     sameSite: 'strict',
-    maxAge: 3600000 // 1 hour
+    maxAge: 3600000, // 1 hour
   },
   rateLimit: {
     enabled: true,
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 100,
     skipSuccessfulRequests: false,
-    skipFailedRequests: false
+    skipFailedRequests: false,
   },
   headers: {
     hsts: {
       enabled: isProduction,
       maxAge: 31536000, // 1 year
       includeSubDomains: true,
-      preload: true
+      preload: true,
     },
     xFrameOptions: 'DENY',
     xContentTypeOptions: true,
     referrerPolicy: 'strict-origin-when-cross-origin',
-    permissionsPolicy: [
-      'camera=()',
-      'microphone=()',
-      'geolocation=(self)',
-      'payment=()'
-    ]
+    permissionsPolicy: ['camera=()', 'microphone=()', 'geolocation=(self)', 'payment=()'],
   },
   sanitization: {
     enabled: true,
     allowedTags: [
-      'p', 'br', 'strong', 'em', 'u', 'i', 'b',
-      'ul', 'ol', 'li', 'blockquote', 'code',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'a', 'span', 'div'
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      'i',
+      'b',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'code',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'a',
+      'span',
+      'div',
     ],
     allowedAttributes: {
-      'a': ['href', 'title', 'target', 'rel'],
-      'span': ['class'],
-      'div': ['class'],
-      '*': ['class', 'id']
+      a: ['href', 'title', 'target', 'rel'],
+      span: ['class'],
+      div: ['class'],
+      '*': ['class', 'id'],
     },
     stripIgnoreTag: true,
-    stripIgnoreTagBody: ['script', 'style', 'iframe', 'object', 'embed']
-  }
+    stripIgnoreTagBody: ['script', 'style', 'iframe', 'object', 'embed'],
+  },
 };
 
 // Environment-specific overrides

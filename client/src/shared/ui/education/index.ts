@@ -3,10 +3,10 @@ export { ConstitutionalContext } from './ConstitutionalContext';
 export { HistoricalPrecedents } from './HistoricalPrecedents';
 export { ProcessEducation } from './ProcessEducation';
 export { EducationalFramework } from './EducationalFramework';
-export { 
+export {
   EducationalTooltip,
   LegalTermTooltip,
   ConstitutionalTermTooltip,
   ProceduralTermTooltip,
-  CivicTermTooltip
+  CivicTermTooltip,
 } from './EducationalTooltip';

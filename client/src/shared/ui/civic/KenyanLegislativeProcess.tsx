@@ -17,12 +17,18 @@ import {
   Calendar,
   MessageSquare,
   Eye,
-  Building
+  Building,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { useKenyanContext } from '@client/shared/context/KenyanContextProvider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
@@ -45,36 +51,44 @@ const BillStage: React.FC<BillStageProps> = ({
   description,
   isActive = false,
   isCompleted = false,
-  duration
+  duration,
 }) => {
   return (
-    <div className={`flex items-start space-x-3 p-3 rounded-lg ${
-      isActive ? 'bg-blue-50 border border-blue-200' :
-      isCompleted ? 'bg-green-50 border border-green-200' :
-      'bg-gray-50 border border-gray-200'
-    }`}>
-      <div className={`mt-1 ${
-        isCompleted ? 'text-green-600' :
-        isActive ? 'text-blue-600' :
-        'text-gray-400'
-      }`}>
-        {isCompleted ? <CheckCircle className="h-4 w-4" /> :
-         isActive ? <Clock className="h-4 w-4" /> :
-         <AlertCircle className="h-4 w-4" />}
+    <div
+      className={`flex items-start space-x-3 p-3 rounded-lg ${
+        isActive
+          ? 'bg-blue-50 border border-blue-200'
+          : isCompleted
+            ? 'bg-green-50 border border-green-200'
+            : 'bg-gray-50 border border-gray-200'
+      }`}
+    >
+      <div
+        className={`mt-1 ${
+          isCompleted ? 'text-green-600' : isActive ? 'text-blue-600' : 'text-gray-400'
+        }`}
+      >
+        {isCompleted ? (
+          <CheckCircle className="h-4 w-4" />
+        ) : isActive ? (
+          <Clock className="h-4 w-4" />
+        ) : (
+          <AlertCircle className="h-4 w-4" />
+        )}
       </div>
       <div className="flex-1">
-        <h4 className={`font-medium ${
-          isActive ? 'text-blue-900' :
-          isCompleted ? 'text-green-900' :
-          'text-gray-700'
-        }`}>
+        <h4
+          className={`font-medium ${
+            isActive ? 'text-blue-900' : isCompleted ? 'text-green-900' : 'text-gray-700'
+          }`}
+        >
           {stage}
         </h4>
-        <p className={`text-sm mt-1 ${
-          isActive ? 'text-blue-700' :
-          isCompleted ? 'text-green-700' :
-          'text-gray-600'
-        }`}>
+        <p
+          className={`text-sm mt-1 ${
+            isActive ? 'text-blue-700' : isCompleted ? 'text-green-700' : 'text-gray-600'
+          }`}
+        >
           {description}
         </p>
         {duration && (
@@ -101,29 +115,29 @@ const civicEngagementData: CivicEngagementData = {
     'Attending Barazas (community meetings)',
     'Engaging with local chiefs and elders',
     'Writing petitions to representatives',
-    'Participating in town hall meetings'
+    'Participating in town hall meetings',
   ],
   modernMethods: [
     'Online public participation portals',
     'Social media engagement',
     'Email submissions to parliament',
     'Virtual town halls and webinars',
-    'Mobile apps for civic engagement'
+    'Mobile apps for civic engagement',
   ],
   barriers: [
     'Limited awareness of participation opportunities',
     'Language barriers (technical legal language)',
     'Geographic distance from participation venues',
     'Limited internet access in rural areas',
-    'Time constraints and conflicting priorities'
+    'Time constraints and conflicting priorities',
   ],
   opportunities: [
     'Increased digital literacy and smartphone adoption',
     'Growing youth engagement in civic matters',
     'County government decentralization',
     'Improved transparency through online platforms',
-    'Community-based organizations facilitating participation'
-  ]
+    'Community-based organizations facilitating participation',
+  ],
 };
 
 /**
@@ -132,7 +146,8 @@ const civicEngagementData: CivicEngagementData = {
 export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { language } = useI18n();
   const { legalProcesses } = useKenyanContext();
-  const [selectedBillType, setSelectedBillType] = useState<keyof typeof legalProcesses.billTypes>('ordinary');
+  const [selectedBillType, setSelectedBillType] =
+    useState<keyof typeof legalProcesses.billTypes>('ordinary');
 
   const currentBillType = legalProcesses.billTypes[selectedBillType];
 
@@ -142,23 +157,20 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
         <CardTitle className="flex items-center space-x-2">
           <Building className="h-5 w-5" />
           <span>
-            {language === 'sw' ? 'Mchakato wa Kutunga Sheria Kenya' : 'Kenya\'s Law-Making Process'}
+            {language === 'sw' ? 'Mchakato wa Kutunga Sheria Kenya' : "Kenya's Law-Making Process"}
           </span>
         </CardTitle>
         <CardDescription>
           {language === 'sw'
             ? 'Jifunze jinsi miswada ya sheria inavyopitia mchakato wa kuwa sheria'
-            : 'Learn how bills become laws in Kenya\'s legislative system'
-          }
+            : "Learn how bills become laws in Kenya's legislative system"}
         </CardDescription>
       </CardHeader>
 
       <CardContent>
         <Tabs defaultValue="process" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="process">
-              {language === 'sw' ? 'Mchakato' : 'Process'}
-            </TabsTrigger>
+            <TabsTrigger value="process">{language === 'sw' ? 'Mchakato' : 'Process'}</TabsTrigger>
             <TabsTrigger value="types">
               {language === 'sw' ? 'Aina za Miswada' : 'Bill Types'}
             </TabsTrigger>
@@ -173,7 +185,7 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
               {Object.entries(legalProcesses.billTypes).map(([type, info]) => (
                 <Button
                   key={type}
-                  variant={selectedBillType === type ? "primary" : "outline"}
+                  variant={selectedBillType === type ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedBillType(type as keyof typeof legalProcesses.billTypes)}
                   className="text-xs"
@@ -198,8 +210,13 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                 <div key={index} className="relative">
                   <BillStage
                     stage={`${index + 1}. ${stage}`}
-                    description={legalProcesses.stages[stage as keyof typeof legalProcesses.stages]?.description ||
-                      (language === 'sw' ? 'Hatua ya mchakato wa kisheria' : 'Legislative process stage')}
+                    description={
+                      legalProcesses.stages[stage as keyof typeof legalProcesses.stages]
+                        ?.description ||
+                      (language === 'sw'
+                        ? 'Hatua ya mchakato wa kisheria'
+                        : 'Legislative process stage')
+                    }
                     isActive={index === 2}
                     isCompleted={index < 2}
                     duration={index === 0 ? '1-2 weeks' : index === 1 ? '2-4 weeks' : '4-8 weeks'}
@@ -220,18 +237,20 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                   {language === 'sw' ? 'Muda wa Kawaida' : 'Typical Timeline'}
                 </span>
                 <Badge variant="outline">
-                  {selectedBillType === 'constitutional' ? '6-12 months' :
-                   selectedBillType === 'money' ? '4-8 months' :
-                   selectedBillType === 'county' ? '3-6 months' :
-                   '2-4 months'}
+                  {selectedBillType === 'constitutional'
+                    ? '6-12 months'
+                    : selectedBillType === 'money'
+                      ? '4-8 months'
+                      : selectedBillType === 'county'
+                        ? '3-6 months'
+                        : '2-4 months'}
                 </Badge>
               </div>
               <Progress value={60} className="h-2" />
               <p className="text-xs text-gray-500 mt-1">
                 {language === 'sw'
                   ? 'Muda unaweza kutofautiana kulingana na ugumu wa mswada'
-                  : 'Timeline may vary based on bill complexity and public interest'
-                }
+                  : 'Timeline may vary based on bill complexity and public interest'}
               </p>
             </div>
           </TabsContent>
@@ -253,7 +272,10 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                         {language === 'sw' ? 'Hatua Muhimu' : 'Key Stages'}
                       </h5>
                       {info.process.slice(0, 3).map((stage: string, index: number) => (
-                        <div key={index} className="flex items-center space-x-2 text-xs text-gray-600">
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2 text-xs text-gray-600"
+                        >
                           <div className="w-1 h-1 bg-gray-400 rounded-full" />
                           <span>{stage}</span>
                         </div>
@@ -278,18 +300,25 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                   <CardTitle className="text-base flex items-center space-x-2 text-green-900">
                     <Users className="h-4 w-4" />
                     <span>
-                      {language === 'sw' ? 'Mahitaji ya Ushiriki wa Umma' : 'Public Participation Requirements'}
+                      {language === 'sw'
+                        ? 'Mahitaji ya Ushiriki wa Umma'
+                        : 'Public Participation Requirements'}
                     </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {legalProcesses.publicParticipation.requirements.map((requirement: string, index: number) => (
-                      <div key={index} className="flex items-start space-x-2 text-sm text-green-700">
-                        <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <span>{requirement}</span>
-                      </div>
-                    ))}
+                    {legalProcesses.publicParticipation.requirements.map(
+                      (requirement: string, index: number) => (
+                        <div
+                          key={index}
+                          className="flex items-start space-x-2 text-sm text-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          <span>{requirement}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                   <div className="mt-4 p-3 bg-green-100 rounded-lg">
                     <div className="flex items-center space-x-2 text-green-800">
@@ -307,9 +336,7 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center space-x-2">
                     <MessageSquare className="h-4 w-4" />
-                    <span>
-                      {language === 'sw' ? 'Njia za Kushiriki' : 'How to Participate'}
-                    </span>
+                    <span>{language === 'sw' ? 'Njia za Kushiriki' : 'How to Participate'}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -322,25 +349,31 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                         </span>
                       </h5>
                       <div className="space-y-2">
-                        {civicEngagementData.traditionalMethods.map((method: string, index: number) => (
-                          <div key={index} className="flex items-center space-x-2 text-sm text-gray-600">
-                            <div className="w-2 h-2 bg-orange-400 rounded-full" />
-                            <span>{method}</span>
-                          </div>
-                        ))}
+                        {civicEngagementData.traditionalMethods.map(
+                          (method: string, index: number) => (
+                            <div
+                              key={index}
+                              className="flex items-center space-x-2 text-sm text-gray-600"
+                            >
+                              <div className="w-2 h-2 bg-orange-400 rounded-full" />
+                              <span>{method}</span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
 
                     <div>
                       <h5 className="font-medium text-gray-900 mb-3 flex items-center space-x-2">
                         <Eye className="h-4 w-4" />
-                        <span>
-                          {language === 'sw' ? 'Njia za Kisasa' : 'Modern Methods'}
-                        </span>
+                        <span>{language === 'sw' ? 'Njia za Kisasa' : 'Modern Methods'}</span>
                       </h5>
                       <div className="space-y-2">
                         {civicEngagementData.modernMethods.map((method: string, index: number) => (
-                          <div key={index} className="flex items-center space-x-2 text-sm text-gray-600">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-2 text-sm text-gray-600"
+                          >
                             <div className="w-2 h-2 bg-blue-400 rounded-full" />
                             <span>{method}</span>
                           </div>
@@ -357,15 +390,16 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center space-x-2 text-red-900">
                       <AlertCircle className="h-4 w-4" />
-                      <span>
-                        {language === 'sw' ? 'Vikwazo' : 'Barriers'}
-                      </span>
+                      <span>{language === 'sw' ? 'Vikwazo' : 'Barriers'}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       {civicEngagementData.barriers.map((barrier: string, index: number) => (
-                        <div key={index} className="flex items-start space-x-2 text-sm text-red-700">
+                        <div
+                          key={index}
+                          className="flex items-start space-x-2 text-sm text-red-700"
+                        >
                           <div className="w-2 h-2 bg-red-400 rounded-full mt-2" />
                           <span>{barrier}</span>
                         </div>
@@ -378,19 +412,22 @@ export const KenyanLegislativeProcess: React.FC<{ className?: string }> = ({ cla
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center space-x-2 text-green-900">
                       <CheckCircle className="h-4 w-4" />
-                      <span>
-                        {language === 'sw' ? 'Fursa' : 'Opportunities'}
-                      </span>
+                      <span>{language === 'sw' ? 'Fursa' : 'Opportunities'}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {civicEngagementData.opportunities.map((opportunity: string, index: number) => (
-                        <div key={index} className="flex items-start space-x-2 text-sm text-green-700">
-                          <div className="w-2 h-2 bg-green-400 rounded-full mt-2" />
-                          <span>{opportunity}</span>
-                        </div>
-                      ))}
+                      {civicEngagementData.opportunities.map(
+                        (opportunity: string, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-start space-x-2 text-sm text-green-700"
+                          >
+                            <div className="w-2 h-2 bg-green-400 rounded-full mt-2" />
+                            <span>{opportunity}</span>
+                          </div>
+                        )
+                      )}
                     </div>
                   </CardContent>
                 </Card>

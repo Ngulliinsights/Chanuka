@@ -1,7 +1,7 @@
 /**
  * Discussion State Management - Optimized Redux Toolkit Slice
  * Manages discussion threads, comments, real-time updates, and moderation
- * 
+ *
  * Key optimizations:
  * - Normalized state structure for O(1) lookups
  * - Efficient comment tree operations
@@ -105,7 +105,7 @@ const logger = {
   },
   info: (message: string, context?: Record<string, unknown>) => {
     console.info(message, context);
-  }
+  },
 };
 
 // Extended Comment type with computed properties for efficient tree operations
@@ -176,7 +176,7 @@ const normalizeComments = (comments: Comment[]): Record<string, ExtendedComment>
       parentId: parentId || comment.parentId,
       replies: replyIds,
       replyCount: replies.length,
-      userVote: (comment as Comment & { userVote?: 'up' | 'down' | null }).userVote || null
+      userVote: (comment as Comment & { userVote?: 'up' | 'down' | null }).userVote || null,
     };
 
     // Recursively process nested replies
@@ -219,7 +219,7 @@ export const loadDiscussionData = createAsyncThunk<LoadDiscussionDataResult, num
         isPinned: false,
         lastActivity: now,
         tags: [],
-        metadata: {}
+        metadata: {},
       };
 
       return { billId, thread, comments: normalizedComments };
@@ -256,7 +256,7 @@ export const addCommentAsync = createAsyncThunk<ExtendedComment, CommentFormData
         isEdited: false,
         editHistory: [],
         qualityScore: 0.5,
-        isExpertComment: false
+        isExpertComment: false,
       };
 
       return newComment;
@@ -270,55 +270,52 @@ export const addCommentAsync = createAsyncThunk<ExtendedComment, CommentFormData
 export const voteCommentAsync = createAsyncThunk<
   VoteCommentResult,
   { commentId: string; voteType: 'up' | 'down' }
->(
-  'discussion/voteComment',
-  async ({ commentId, voteType }, { getState, rejectWithValue }) => {
-    try {
-      // TODO: Replace with actual API call
-      // const response = await api.comments.vote(commentId, voteType);
+>('discussion/voteComment', async ({ commentId, voteType }, { getState, rejectWithValue }) => {
+  try {
+    // TODO: Replace with actual API call
+    // const response = await api.comments.vote(commentId, voteType);
 
-      const state = getState() as RootState;
-      const comment = state.discussion.comments[commentId];
+    const state = getState() as RootState;
+    const comment = state.discussion.comments[commentId];
 
-      if (!comment) {
-        throw new Error('Comment not found');
-      }
-
-      // Calculate new vote counts based on previous state
-      let upvotes = comment.upvotes;
-      let downvotes = comment.downvotes;
-      let newUserVote: 'up' | 'down' | null = voteType;
-
-      // Remove previous vote if exists
-      if (comment.userVote === 'up') {
-        upvotes -= 1;
-      } else if (comment.userVote === 'down') {
-        downvotes -= 1;
-      }
-
-      // Toggle or apply new vote
-      if (comment.userVote === voteType) {
-        newUserVote = null; // User is removing their vote
-      } else {
-        if (voteType === 'up') {
-          upvotes += 1;
-        } else {
-          downvotes += 1;
-        }
-      }
-
-      return {
-        commentId,
-        upvotes,
-        downvotes,
-        userVote: newUserVote
-      };
-    } catch (error) {
-      logger.error('Failed to vote on comment:', { commentId, voteType, error });
-      return rejectWithValue(error instanceof Error ? error.message : 'Failed to vote');
+    if (!comment) {
+      throw new Error('Comment not found');
     }
+
+    // Calculate new vote counts based on previous state
+    let upvotes = comment.upvotes;
+    let downvotes = comment.downvotes;
+    let newUserVote: 'up' | 'down' | null = voteType;
+
+    // Remove previous vote if exists
+    if (comment.userVote === 'up') {
+      upvotes -= 1;
+    } else if (comment.userVote === 'down') {
+      downvotes -= 1;
+    }
+
+    // Toggle or apply new vote
+    if (comment.userVote === voteType) {
+      newUserVote = null; // User is removing their vote
+    } else {
+      if (voteType === 'up') {
+        upvotes += 1;
+      } else {
+        downvotes += 1;
+      }
+    }
+
+    return {
+      commentId,
+      upvotes,
+      downvotes,
+      userVote: newUserVote,
+    };
+  } catch (error) {
+    logger.error('Failed to vote on comment:', { commentId, voteType, error });
+    return rejectWithValue(error instanceof Error ? error.message : 'Failed to vote');
   }
-);
+});
 
 export const reportCommentAsync = createAsyncThunk<
   CommentReport,
@@ -343,7 +340,7 @@ export const reportCommentAsync = createAsyncThunk<
         reason,
         description,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
 
       logger.info('Comment reported:', { commentId, violationType });
@@ -373,13 +370,23 @@ const discussionSlice = createSlice({
   name: 'discussion',
   initialState,
   reducers: {
-    setThread: (state, action: PayloadAction<{ billId: number; thread: ExtendedDiscussionThread; comments: Record<string, ExtendedComment> }>) => {
+    setThread: (
+      state,
+      action: PayloadAction<{
+        billId: number;
+        thread: ExtendedDiscussionThread;
+        comments: Record<string, ExtendedComment>;
+      }>
+    ) => {
       const { billId, thread, comments } = action.payload;
       state.threads[billId] = thread;
       Object.assign(state.comments, comments);
     },
 
-    updateThread: (state, action: PayloadAction<{ billId: number; updates: Partial<ExtendedDiscussionThread> }>) => {
+    updateThread: (
+      state,
+      action: PayloadAction<{ billId: number; updates: Partial<ExtendedDiscussionThread> }>
+    ) => {
       const { billId, updates } = action.payload;
       const thread = state.threads[billId];
       if (thread) {
@@ -410,7 +417,10 @@ const discussionSlice = createSlice({
       thread.lastActivity = comment.createdAt;
     },
 
-    updateComment: (state, action: PayloadAction<{ commentId: string; updates: Partial<ExtendedComment> }>) => {
+    updateComment: (
+      state,
+      action: PayloadAction<{ commentId: string; updates: Partial<ExtendedComment> }>
+    ) => {
       const { commentId, updates } = action.payload;
       const comment = state.comments[commentId];
 
@@ -489,7 +499,7 @@ const discussionSlice = createSlice({
       state.isConnected = action.payload;
     },
 
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
 
@@ -509,15 +519,17 @@ const discussionSlice = createSlice({
           }
         };
 
-        thread.topLevelCommentIds.forEach((commentId: string) => removeCommentAndReplies(commentId));
+        thread.topLevelCommentIds.forEach((commentId: string) =>
+          removeCommentAndReplies(commentId)
+        );
         delete state.threads[billId];
       }
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Load discussion data
-      .addCase(loadDiscussionData.pending, (state) => {
+      .addCase(loadDiscussionData.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -529,18 +541,18 @@ const discussionSlice = createSlice({
       })
       .addCase(loadDiscussionData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || 'Failed to load discussion';
+        state.error = (action.payload as string) || 'Failed to load discussion';
       })
 
       // Add comment
-      .addCase(addCommentAsync.pending, (state) => {
+      .addCase(addCommentAsync.pending, state => {
         state.error = null;
       })
       .addCase(addCommentAsync.fulfilled, (state, action) => {
         discussionSlice.caseReducers.addComment(state, action);
       })
       .addCase(addCommentAsync.rejected, (state, action) => {
-        state.error = action.payload as string || 'Failed to add comment';
+        state.error = (action.payload as string) || 'Failed to add comment';
       })
 
       // Vote on comment
@@ -554,7 +566,7 @@ const discussionSlice = createSlice({
         }
       })
       .addCase(voteCommentAsync.rejected, (state, action) => {
-        state.error = action.payload as string || 'Failed to vote';
+        state.error = (action.payload as string) || 'Failed to vote';
       })
 
       // Report comment
@@ -568,7 +580,7 @@ const discussionSlice = createSlice({
         }
       })
       .addCase(reportCommentAsync.rejected, (state, action) => {
-        state.error = action.payload as string || 'Failed to report comment';
+        state.error = (action.payload as string) || 'Failed to report comment';
       });
   },
 });
@@ -622,7 +634,7 @@ const buildCommentTree = (
     ...comment,
     replies: comment.replies
       .map((replyId: string) => buildCommentTree(replyId, commentsMap))
-      .filter((node): node is CommentTreeNode => node !== null)
+      .filter((node): node is CommentTreeNode => node !== null),
   };
 };
 
@@ -631,7 +643,7 @@ export const selectThreadComments = createSelector(
     selectDiscussionState,
     (_: RootState, billId: number) => billId,
     (_: RootState, __: number, sortBy?: CommentSortOption) => sortBy,
-    (_: RootState, __: number, ___?: CommentSortOption, filterBy?: CommentFilterOption) => filterBy
+    (_: RootState, __: number, ___?: CommentSortOption, filterBy?: CommentFilterOption) => filterBy,
   ],
   (discussion, billId, sortBy, filterBy) => {
     const thread = discussion.threads[billId];
@@ -649,14 +661,21 @@ export const selectThreadComments = createSelector(
     if (filter === 'expert_only') {
       comments = comments.filter((c: CommentTreeNode) => c.isExpertComment);
     } else if (filter === 'high_quality') {
-      comments = comments.filter((c: CommentTreeNode) => c.isHighQuality || (c.qualityScore && c.qualityScore > 0.7));
+      comments = comments.filter(
+        (c: CommentTreeNode) => c.isHighQuality || (c.qualityScore && c.qualityScore > 0.7)
+      );
     } else if (filter === 'recent') {
       const cutoffTime = Date.now() - 24 * 60 * 60 * 1000;
-      comments = comments.filter((c: CommentTreeNode) => new Date(c.createdAt).getTime() > cutoffTime);
+      comments = comments.filter(
+        (c: CommentTreeNode) => new Date(c.createdAt).getTime() > cutoffTime
+      );
     }
 
     // Apply sorting with optimized comparators
-    const comparators: Record<CommentSortOption, (a: CommentTreeNode, b: CommentTreeNode) => number> = {
+    const comparators: Record<
+      CommentSortOption,
+      (a: CommentTreeNode, b: CommentTreeNode) => number
+    > = {
       oldest: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       newest: (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       most_voted: (a, b) => {
@@ -678,7 +697,7 @@ export const selectThreadComments = createSelector(
           return a.isExpertComment ? -1 : 1;
         }
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
+      },
     };
 
     return comments.sort(comparators[sort]);
@@ -697,32 +716,26 @@ export const selectCommentReplies = createSelector(
   }
 );
 
-export const selectModerationStats = createSelector(
-  [selectDiscussionState],
-  (discussion) => {
-    const reports = Object.values(discussion.reports);
-    return {
-      totalReports: reports.length,
-      pendingReports: discussion.pendingReports,
-      resolvedReports: reports.filter((r: CommentReport) => r.status === 'resolved').length,
-      dismissedReports: reports.filter((r: CommentReport) => r.status === 'dismissed').length,
-      totalActions: Object.keys(discussion.moderationActions).length,
-      queueLength: discussion.moderationQueue.length
-    };
-  }
-);
+export const selectModerationStats = createSelector([selectDiscussionState], discussion => {
+  const reports = Object.values(discussion.reports);
+  return {
+    totalReports: reports.length,
+    pendingReports: discussion.pendingReports,
+    resolvedReports: reports.filter((r: CommentReport) => r.status === 'resolved').length,
+    dismissedReports: reports.filter((r: CommentReport) => r.status === 'dismissed').length,
+    totalActions: Object.keys(discussion.moderationActions).length,
+    queueLength: discussion.moderationQueue.length,
+  };
+});
 
-export const selectThreadStats = createSelector(
-  [selectThread],
-  (thread) => {
-    if (!thread) return null;
+export const selectThreadStats = createSelector([selectThread], thread => {
+  if (!thread) return null;
 
-    return {
-      totalComments: thread.totalComments,
-      participantCount: thread.participantCount,
-      isLocked: thread.isLocked,
-      isPinned: thread.isPinned || false,
-      lastActivity: thread.lastActivity
-    };
-  }
-);
+  return {
+    totalComments: thread.totalComments,
+    participantCount: thread.participantCount,
+    isLocked: thread.isLocked,
+    isPinned: thread.isPinned || false,
+    lastActivity: thread.lastActivity,
+  };
+});

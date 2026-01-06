@@ -1,6 +1,6 @@
 /**
  * Navigation Preferences Module
- * 
+ *
  * Handles user navigation preferences and settings
  */
 
@@ -29,7 +29,7 @@ export function getNavigationPreferences(): NavigationPreferences {
     defaultLandingPage: '/',
     compactMode: false,
     showBreadcrumbs: true,
-    autoExpand: false
+    autoExpand: false,
   };
 }
 
@@ -53,16 +53,16 @@ export function addToRecentPages(path: string, title: string): void {
   try {
     const preferences = getNavigationPreferences();
     const recentPages = preferences.recentPages || [];
-    
+
     // Remove if already exists
     const filtered = recentPages.filter(page => page !== path);
-    
+
     // Add to beginning
     filtered.unshift(path);
-    
+
     // Keep only last 10 pages
     const updated = filtered.slice(0, 10);
-    
+
     saveNavigationPreferences({ recentPages: updated });
   } catch (error) {
     logger.error('Failed to add to recent pages', { error, path, title });
@@ -76,7 +76,7 @@ export function addToFavorites(path: string): void {
   try {
     const preferences = getNavigationPreferences();
     const favoritePages = preferences.favoritePages || [];
-    
+
     if (!favoritePages.includes(path)) {
       favoritePages.push(path);
       saveNavigationPreferences({ favoritePages });

@@ -129,7 +129,9 @@ export const userApi = {
   },
 
   async refreshToken(refresh_token: string): Promise<AuthResponse> {
-    const response = await globalApiClient.post<AuthResponse>('/api/auth/refresh', { refresh_token });
+    const response = await globalApiClient.post<AuthResponse>('/api/auth/refresh', {
+      refresh_token,
+    });
     return response.data;
   },
 
@@ -154,11 +156,15 @@ export const userApi = {
     const formData = new FormData();
     formData.append('avatar', file);
 
-    const response = await globalApiClient.post<{ avatar: string }>('/api/users/profile/avatar', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await globalApiClient.post<{ avatar: string }>(
+      '/api/users/profile/avatar',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return response.data;
   },
 
@@ -197,16 +203,22 @@ export const userApi = {
       formData.append('notes', data.notes);
     }
 
-    const response = await globalApiClient.post<VerificationResponse>('/api/users/verification', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await globalApiClient.post<VerificationResponse>(
+      '/api/users/verification',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return response.data;
   },
 
   async verifyPhone(code: string): Promise<{ verified: boolean }> {
-    const response = await globalApiClient.post<{ verified: boolean }>('/api/users/verify-phone', { code });
+    const response = await globalApiClient.post<{ verified: boolean }>('/api/users/verify-phone', {
+      code,
+    });
     return response.data;
   },
 
@@ -229,7 +241,9 @@ export const userApi = {
 
   // User search and discovery
   async searchUsers(query: string, limit = 20): Promise<User[]> {
-    const response = await globalApiClient.get<User[]>(`/api/users/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+    const response = await globalApiClient.get<User[]>(
+      `/api/users/search?q=${encodeURIComponent(query)}&limit=${limit}`
+    );
     return response.data;
   },
 
@@ -241,7 +255,9 @@ export const userApi = {
   // Activity and engagement
   async getUserActivity(user_id?: string, limit = 50): Promise<Record<string, unknown>[]> {
     const endpoint = user_id ? `/api/users/${user_id}/activity` : '/api/users/activity';
-    const response = await globalApiClient.get<Record<string, unknown>[]>(`${endpoint}?limit=${limit}`);
+    const response = await globalApiClient.get<Record<string, unknown>[]>(
+      `${endpoint}?limit=${limit}`
+    );
     return response.data;
   },
 
@@ -259,7 +275,7 @@ export const userApi = {
   ): Promise<SavedBillsResponse> {
     const params = new URLSearchParams({
       page: page.toString(),
-      limit: limit.toString()
+      limit: limit.toString(),
     });
 
     // Add filters only if they have values
@@ -282,13 +298,21 @@ export const userApi = {
     return response.data;
   },
 
-  async saveBill(billId: string, notes?: string, tags: string[] = []): Promise<Record<string, unknown>> {
-    const response = await globalApiClient.post<Record<string, unknown>>('/api/users/saved-bills', {
-      bill_id: billId,
-      notes,
-      tags,
-      notification_enabled: true
-    }, { skipCache: true });
+  async saveBill(
+    billId: string,
+    notes?: string,
+    tags: string[] = []
+  ): Promise<Record<string, unknown>> {
+    const response = await globalApiClient.post<Record<string, unknown>>(
+      '/api/users/saved-bills',
+      {
+        bill_id: billId,
+        notes,
+        tags,
+        notification_enabled: true,
+      },
+      { skipCache: true }
+    );
     return response.data;
   },
 
@@ -304,7 +328,11 @@ export const userApi = {
       notification_enabled?: boolean;
     }
   ): Promise<Record<string, unknown>> {
-    const response = await globalApiClient.patch<Record<string, unknown>>(`/api/users/saved-bills/${billId}`, updates, { skipCache: true });
+    const response = await globalApiClient.patch<Record<string, unknown>>(
+      `/api/users/saved-bills/${billId}`,
+      updates,
+      { skipCache: true }
+    );
     return response.data;
   },
 
@@ -316,7 +344,7 @@ export const userApi = {
   ): Promise<EngagementHistoryResponse> {
     const params = new URLSearchParams({
       page: page.toString(),
-      limit: limit.toString()
+      limit: limit.toString(),
     });
 
     if (filters) {
@@ -338,13 +366,13 @@ export const userApi = {
     try {
       await globalApiClient.post('/api/users/engagement', action, {
         timeout: 5000, // Shorter timeout for tracking
-        skipCache: true
+        skipCache: true,
       });
       logger.debug('Engagement tracked', {
         component: 'UserApiService',
         action: action.action_type,
         entity: action.entity_type,
-        entityId: action.entity_id
+        entityId: action.entity_id,
       });
     } catch (error) {
       // Silent failure - tracking should never block user actions
@@ -352,7 +380,7 @@ export const userApi = {
         component: 'UserApiService',
         action: action.action_type,
         entity: action.entity_type,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   },
@@ -375,45 +403,8 @@ export const userApi = {
   async getDashboardData(): Promise<DashboardData> {
     const response = await globalApiClient.get<DashboardData>('/api/users/dashboard', {
       timeout: 15000, // Longer timeout for aggregated data
-      cacheTTL: 2 * 60 * 1000 // 2 minutes cache
+      cacheTTL: 2 * 60 * 1000, // 2 minutes cache
     });
     return response.data;
-  }
+  },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

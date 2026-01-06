@@ -7,13 +7,13 @@ Get started using the Chanuka design system in 5 minutes.
 ## 1️⃣ Import What You Need
 
 ```typescript
-import { 
-  useBrandVoice,      // Get UI text and tone
-  useLanguage,        // Handle localization
-  useLowBandwidth,    // Detect network speed
-  FormattedNumber,    // Format numbers correctly
-  FormattedDate,      // Format dates correctly
-  FormattedCurrency,  // Format money correctly
+import {
+  useBrandVoice, // Get UI text and tone
+  useLanguage, // Handle localization
+  useLowBandwidth, // Detect network speed
+  FormattedNumber, // Format numbers correctly
+  FormattedDate, // Format dates correctly
+  FormattedCurrency, // Format money correctly
 } from '@shared/design-system';
 ```
 
@@ -22,6 +22,7 @@ import {
 ## 2️⃣ Use Brand Voice (Text)
 
 ### Get UI Text
+
 ```typescript
 function SaveButton() {
   const { getMicrocopy } = useBrandVoice();
@@ -31,6 +32,7 @@ function SaveButton() {
 ```
 
 ### Get Tone for Context
+
 ```typescript
 function ErrorMessage({ message }) {
   const { getTone } = useBrandVoice();
@@ -38,7 +40,7 @@ function ErrorMessage({ message }) {
   // tone.voice = "clear, specific, actionable"
   // tone.emoji = "⚠️"
   // tone.audience = "frustrated user trying to succeed"
-  
+
   return (
     <div className={`tone-${tone.emoji}`}>
       {message}
@@ -48,6 +50,7 @@ function ErrorMessage({ message }) {
 ```
 
 ### Available Microcopy Paths
+
 ```
 buttons.primary.*           // Primary actions
 buttons.secondary.*         // Secondary actions
@@ -62,10 +65,11 @@ form_help_text.*            // Supporting text
 ## 3️⃣ Use Multilingual Support
 
 ### Get Current Language
+
 ```typescript
 function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
-  
+
   return (
     <>
       <p>Current: {language}</p>
@@ -77,6 +81,7 @@ function LanguageSwitcher() {
 ```
 
 ### Format Numbers
+
 ```typescript
 function BudgetDisplay({ amount }) {
   return (
@@ -90,6 +95,7 @@ function BudgetDisplay({ amount }) {
 ```
 
 ### Format Dates
+
 ```typescript
 function LastUpdated({ date }) {
   return (
@@ -101,6 +107,7 @@ function LastUpdated({ date }) {
 ```
 
 ### Format Currency
+
 ```typescript
 function PriceTag({ price }) {
   return (
@@ -116,29 +123,32 @@ function PriceTag({ price }) {
 ## 4️⃣ Use Network-Aware Rendering
 
 ### Check Network Speed
+
 ```typescript
 function GalleryComponent() {
   const { isLowBandwidth, networkSpeed } = useLowBandwidth();
-  
+
   if (isLowBandwidth) {
     return <SimplifiedGallery />;
   }
-  
+
   return <FullFeaturedGallery />;
 }
 ```
 
 ### Available Network States
+
 ```typescript
 const {
-  isLowBandwidth,    // bool: true if 2G/3G or data saver
-  networkSpeed,      // string: '2g' | '3g' | '4g' | 'unknown'
-  dataSaverEnabled,  // bool: user has enabled data saver
-  isOffline,         // bool: no internet connection
+  isLowBandwidth, // bool: true if 2G/3G or data saver
+  networkSpeed, // string: '2g' | '3g' | '4g' | 'unknown'
+  dataSaverEnabled, // bool: user has enabled data saver
+  isOffline, // bool: no internet connection
 } = useLowBandwidth();
 ```
 
 ### Conditional Components
+
 ```typescript
 import { ConditionalBandwidth } from '@shared/design-system';
 
@@ -157,10 +167,11 @@ function SmartImage() {
 ## 5️⃣ Common Patterns
 
 ### Pattern: Error Message with Tone
+
 ```typescript
 function FormField({ value, error }) {
   const { getMicrocopy, getTone } = useBrandVoice();
-  
+
   if (error) {
     const errorTone = getTone('error');
     return (
@@ -173,7 +184,7 @@ function FormField({ value, error }) {
       </>
     );
   }
-  
+
   return (
     <>
       <label>{getMicrocopy('form_labels.email')}</label>
@@ -184,15 +195,16 @@ function FormField({ value, error }) {
 ```
 
 ### Pattern: Multi-language Budget Display
+
 ```typescript
 function BudgetWidget({ total, breakdown }) {
   const { language, format } = useLanguage();
-  
+
   return (
     <div>
       <h2>{format.pluralize(total, 'shilling')}</h2>
       <p>Total: <FormattedCurrency value={total} currency="KES" /></p>
-      
+
       <ul>
         {breakdown.map(item => (
           <li key={item.id}>
@@ -206,10 +218,11 @@ function BudgetWidget({ total, breakdown }) {
 ```
 
 ### Pattern: Network-Optimized Image Gallery
+
 ```typescript
 function ImageGallery({ images }) {
   const { isLowBandwidth } = useLowBandwidth();
-  
+
   return (
     <div className="gallery">
       {images.map(img => (
@@ -248,19 +261,23 @@ function ImageGallery({ images }) {
 ## 🐛 Troubleshooting
 
 **"Cannot find module"**
+
 - Make sure you imported from `@shared/design-system`
 - Check that AppProviders wraps your component
 
 **"Hook returned undefined"**
+
 - Make sure your component is inside ChanukaProviders
 - Check browser console for initialization errors
 
 **"Language didn't change"**
+
 - Make sure you called `setLanguage()` in the same component tree
 - Verify localStorage is enabled
 - Check browser language preference
 
 **"Images not optimizing"**
+
 - Open DevTools → Network → Throttle to "Slow 3G"
 - Verify `<ConditionalBandwidth>` or `useLowBandwidth()` is used
 - Check console for any errors

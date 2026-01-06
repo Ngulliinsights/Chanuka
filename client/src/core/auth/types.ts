@@ -1,7 +1,7 @@
 /**
  * Authentication and Privacy Types
  * Comprehensive type definitions for secure authentication and privacy controls
- * 
+ *
  * Consolidated from client/src/types/auth.ts into core/auth module
  */
 
@@ -203,7 +203,7 @@ export interface AuthContextType {
   sessionExpiry: string | null;
   isInitialized: boolean;
   twoFactorRequired: boolean;
-  
+
   login: (credentials: LoginCredentials) => Promise<AuthResponse>;
   register: (data: RegisterData) => Promise<AuthResponse>;
   logout: () => Promise<void>;
@@ -213,33 +213,39 @@ export interface AuthContextType {
   requestPasswordReset: (email: string) => Promise<AuthResponse>;
   resetPassword: (token: string, password: string) => Promise<AuthResponse>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<AuthResponse>;
-  
+
   setupTwoFactor: () => Promise<TwoFactorSetup>;
   enableTwoFactor: (code: string) => Promise<AuthResponse>;
   disableTwoFactor: (password: string) => Promise<AuthResponse>;
   verifyTwoFactor: (code: string) => Promise<AuthResponse>;
-  
+
   updateUser: (userData: Partial<User>) => void;
   updateUserProfile: (profile: Partial<User>) => Promise<AuthResponse>;
-  
+
   loginWithOAuth: (provider: string, code: string) => Promise<AuthResponse>;
   getOAuthUrl: (provider: string) => string;
-  
+
   updatePrivacySettings: (settings: Partial<PrivacySettings>) => Promise<AuthResponse>;
-  requestDataExport: (format: 'json' | 'csv' | 'xml', includes: string[]) => Promise<DataExportRequest>;
-  requestDataDeletion: (retentionPeriod: string, includes: string[]) => Promise<DataDeletionRequest>;
+  requestDataExport: (
+    format: 'json' | 'csv' | 'xml',
+    includes: string[]
+  ) => Promise<DataExportRequest>;
+  requestDataDeletion: (
+    retentionPeriod: string,
+    includes: string[]
+  ) => Promise<DataDeletionRequest>;
   getSecurityEvents: (limit?: number) => Promise<SecurityEvent[]>;
   getSuspiciousActivity: () => Promise<SuspiciousActivityAlert[]>;
-  
+
   getActiveSessions: () => Promise<SessionInfo[]>;
   terminateSession: (sessionId: string) => Promise<AuthResponse>;
   terminateAllSessions: () => Promise<AuthResponse>;
   extendSession: () => Promise<AuthResponse>;
-  
+
   hasPermission: (permission: string) => boolean;
   hasRole: (role: string) => boolean;
   hasAnyRole: (roles: string[]) => boolean;
-  
+
   clearError: () => void;
   requestPushPermission: () => Promise<{ granted: boolean }>;
 }

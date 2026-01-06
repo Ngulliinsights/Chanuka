@@ -1,6 +1,6 @@
 /**
  * User API Hooks
- * 
+ *
  * React hooks for integrating user backend services with components.
  * Provides data fetching, caching, and state management for user-related operations.
  */
@@ -8,18 +8,15 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 
-import { userService as userBackendService } from '@client/services/userService';
-import type {
-  UserProfile,
-  NotificationPreferences,
-} from '@client/services/userService';
 import { useAuth } from '@client/core/auth';
+import { userService as userBackendService } from '@client/services/userService';
+import type { UserProfile, NotificationPreferences } from '@client/services/userService';
 import { useUserDashboardStore } from '@client/shared/infrastructure/store/slices/userDashboardSlice';
 import type {
   PrivacyControls,
   DataExportRequest,
   DashboardPreferences,
-  UserDashboardData
+  UserDashboardData,
 } from '@client/shared/types/user-dashboard';
 import { logger } from '@client/utils/logger';
 
@@ -48,15 +45,19 @@ export const userQueryKeys = {
   all: ['user'] as const,
   profile: (userId: string) => [...userQueryKeys.all, 'profile', userId] as const,
   dashboard: (userId: string) => [...userQueryKeys.all, 'dashboard', userId] as const,
-  savedBills: (userId: string, page?: number) => [...userQueryKeys.all, 'savedBills', userId, page] as const,
-  engagementHistory: (userId: string, options?: EngagementHistoryOptions) => [...userQueryKeys.all, 'engagement', userId, options] as const,
-  civicMetrics: (userId: string, timeRange?: string) => [...userQueryKeys.all, 'civicMetrics', userId, timeRange] as const,
+  savedBills: (userId: string, page?: number) =>
+    [...userQueryKeys.all, 'savedBills', userId, page] as const,
+  engagementHistory: (userId: string, options?: EngagementHistoryOptions) =>
+    [...userQueryKeys.all, 'engagement', userId, options] as const,
+  civicMetrics: (userId: string, timeRange?: string) =>
+    [...userQueryKeys.all, 'civicMetrics', userId, timeRange] as const,
   badges: (userId: string) => [...userQueryKeys.all, 'badges', userId] as const,
   achievements: (userId: string) => [...userQueryKeys.all, 'achievements', userId] as const,
   recommendations: (userId: string) => [...userQueryKeys.all, 'recommendations', userId] as const,
   preferences: (userId: string) => [...userQueryKeys.all, 'preferences', userId] as const,
-  notificationPreferences: (userId: string) => [...userQueryKeys.all, 'notificationPreferences', userId] as const,
-  privacyControls: (userId: string) => [...userQueryKeys.all, 'privacyControls', userId] as const
+  notificationPreferences: (userId: string) =>
+    [...userQueryKeys.all, 'notificationPreferences', userId] as const,
+  privacyControls: (userId: string) => [...userQueryKeys.all, 'privacyControls', userId] as const,
 };
 
 // User Profile Hook - Fetches the authenticated user's profile data
@@ -70,7 +71,7 @@ export function useUserProfile(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
     retry: 2,
-    gcTime: 10 * 60 * 1000
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -91,9 +92,9 @@ export function useUpdateUserProfile() {
         logger.info('User profile updated successfully', { userId });
       }
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update user profile', { error });
-    }
+    },
   });
 }
 
@@ -108,7 +109,7 @@ export function useUserDashboard(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 2 * 60 * 1000, // Refresh dashboard data every 2 minutes
     retry: 2,
-    gcTime: 5 * 60 * 1000
+    gcTime: 5 * 60 * 1000,
   });
 }
 
@@ -125,7 +126,7 @@ export function useSavedBills(userId?: string, page: number = 1, limit: number =
     retry: 2,
     gcTime: 10 * 60 * 1000,
     // Use placeholderData to keep previous page visible while loading new page
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -136,13 +137,8 @@ export function useSaveBill() {
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      billId
-    }: {
-      userId: string;
-      billId: number;
-    }) => userBackendService.saveBillForUser(userId, billId),
+    mutationFn: ({ userId, billId }: { userId: string; billId: number }) =>
+      userBackendService.saveBillForUser(userId, billId),
     onSuccess: (_, { userId, billId }) => {
       // Invalidate queries to trigger refetch
       queryClient.invalidateQueries({ queryKey: userQueryKeys.savedBills(userId) });
@@ -155,9 +151,9 @@ export function useSaveBill() {
 
       logger.info('Bill saved successfully', { billId, userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to save bill', { error });
-    }
+    },
   });
 }
 
@@ -180,9 +176,9 @@ export function useUnsaveBill() {
 
       logger.info('Bill unsaved successfully', { billId, userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to unsave bill', { error });
-    }
+    },
   });
 }
 
@@ -196,7 +192,7 @@ export function useTrackBill() {
   return useMutation({
     mutationFn: ({
       userId,
-      billId
+      billId,
     }: {
       userId: string;
       billId: number;
@@ -211,9 +207,9 @@ export function useTrackBill() {
 
       logger.info('Bill tracking started', { billId, userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to track bill', { error });
-    }
+    },
   });
 }
 
@@ -236,17 +232,14 @@ export function useUntrackBill() {
 
       logger.info('Bill tracking stopped', { billId, userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to untrack bill', { error });
-    }
+    },
   });
 }
 
 // Engagement History Hook - Retrieves user's interaction history with bills
-export function useEngagementHistory(
-  userId?: string,
-  options?: EngagementHistoryOptions
-) {
+export function useEngagementHistory(userId?: string, options?: EngagementHistoryOptions) {
   const { user } = useAuth();
   const targetUserId = userId || user?.id;
 
@@ -257,7 +250,7 @@ export function useEngagementHistory(
     staleTime: 30 * 1000, // Refresh frequently for up-to-date engagement data
     retry: 2,
     gcTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -276,25 +269,27 @@ export function useTrackEngagement() {
     onSuccess: (_, activity) => {
       // Invalidate relevant queries to refresh data
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
-      
+
       // Update dashboard store with new engagement activity if the method exists
       if (user?.id && dashboardStore.addEngagementItem) {
         // Map action_type to the engagement type expected by the store
-        const engagementType = (activity.action_type === 'track' ? 'save' : activity.action_type) as EngagementType;
-        
+        const engagementType = (
+          activity.action_type === 'track' ? 'save' : activity.action_type
+        ) as EngagementType;
+
         dashboardStore.addEngagementItem({
           id: `${activity.action_type}_${activity.entity_id}_${Date.now()}`,
           type: engagementType,
           billId: activity.entity_type === 'bill' ? parseInt(activity.entity_id) : undefined,
           timestamp: new Date().toISOString(),
-          metadata: activity.metadata
+          metadata: activity.metadata,
         });
       }
     },
-    onError: (error) => {
+    onError: error => {
       // Engagement tracking failures shouldn't disrupt user experience
       logger.warn('Failed to track engagement (non-critical)', { error });
-    }
+    },
   });
 }
 
@@ -308,8 +303,13 @@ export function useCivicMetrics(userId?: string, timeRange?: string) {
     queryKey: userQueryKeys.civicMetrics(targetUserId || '', timeRange),
     queryFn: async () => {
       // If the service has getCivicMetrics, use it
-      if ('getCivicMetrics' in userBackendService && typeof userBackendService.getCivicMetrics === 'function') {
-        const service = userBackendService as unknown as { getCivicMetrics: (userId: string, timeRange?: string) => Promise<unknown> };
+      if (
+        'getCivicMetrics' in userBackendService &&
+        typeof userBackendService.getCivicMetrics === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          getCivicMetrics: (userId: string, timeRange?: string) => Promise<unknown>;
+        };
         return service.getCivicMetrics(targetUserId!, timeRange);
       }
       // Otherwise return null - civic metrics not available
@@ -318,7 +318,7 @@ export function useCivicMetrics(userId?: string, timeRange?: string) {
     enabled: !!targetUserId,
     staleTime: 5 * 60 * 1000,
     retry: 2,
-    gcTime: 10 * 60 * 1000
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -333,7 +333,7 @@ export function useUserBadges(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 10 * 60 * 1000,
     retry: 2,
-    gcTime: 20 * 60 * 1000
+    gcTime: 20 * 60 * 1000,
   });
 }
 
@@ -348,7 +348,7 @@ export function useUserAchievements(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 10 * 60 * 1000,
     retry: 2,
-    gcTime: 20 * 60 * 1000
+    gcTime: 20 * 60 * 1000,
   });
 }
 
@@ -362,8 +362,13 @@ export function useRecommendations(userId?: string, limit: number = 10) {
     queryKey: userQueryKeys.recommendations(targetUserId || ''),
     queryFn: async () => {
       // If the service has getRecommendations, use it
-      if ('getRecommendations' in userBackendService && typeof userBackendService.getRecommendations === 'function') {
-        const service = userBackendService as unknown as { getRecommendations: (userId: string, limit: number) => Promise<unknown> };
+      if (
+        'getRecommendations' in userBackendService &&
+        typeof userBackendService.getRecommendations === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          getRecommendations: (userId: string, limit: number) => Promise<unknown>;
+        };
         return service.getRecommendations(targetUserId!, limit);
       }
       // Return empty array if method not available
@@ -372,7 +377,7 @@ export function useRecommendations(userId?: string, limit: number = 10) {
     enabled: !!targetUserId,
     staleTime: 15 * 60 * 1000, // Recommendations can be cached longer
     retry: 2,
-    gcTime: 30 * 60 * 1000
+    gcTime: 30 * 60 * 1000,
   });
 }
 
@@ -384,10 +389,23 @@ export function useDismissRecommendation() {
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
-    mutationFn: async ({ userId, billId, reason }: { userId: string; billId: number; reason?: string }) => {
+    mutationFn: async ({
+      userId,
+      billId,
+      reason,
+    }: {
+      userId: string;
+      billId: number;
+      reason?: string;
+    }) => {
       // Check if the method exists in the service
-      if ('dismissRecommendation' in userBackendService && typeof userBackendService.dismissRecommendation === 'function') {
-        const service = userBackendService as unknown as { dismissRecommendation: (userId: string, billId: number, reason?: string) => Promise<void> };
+      if (
+        'dismissRecommendation' in userBackendService &&
+        typeof userBackendService.dismissRecommendation === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          dismissRecommendation: (userId: string, billId: number, reason?: string) => Promise<void>;
+        };
         return service.dismissRecommendation(userId, billId, reason);
       }
       // If not available, just invalidate queries and let the store handle it
@@ -402,9 +420,9 @@ export function useDismissRecommendation() {
 
       logger.info('Recommendation dismissed', { billId, userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to dismiss recommendation', { error });
-    }
+    },
   });
 }
 
@@ -424,7 +442,7 @@ export function useUserPreferences(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 10 * 60 * 1000,
     retry: 2,
-    gcTime: 20 * 60 * 1000
+    gcTime: 20 * 60 * 1000,
   });
 }
 
@@ -435,8 +453,13 @@ export function useUpdateUserPreferences() {
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
-    mutationFn: ({ userId, preferences }: { userId: string; preferences: Record<string, unknown> }) =>
-      userBackendService.updateUserPreferences(userId, preferences),
+    mutationFn: ({
+      userId,
+      preferences,
+    }: {
+      userId: string;
+      preferences: Record<string, unknown>;
+    }) => userBackendService.updateUserPreferences(userId, preferences),
     onSuccess: (data, { userId }) => {
       queryClient.setQueryData(userQueryKeys.preferences(userId), data);
 
@@ -446,9 +469,9 @@ export function useUpdateUserPreferences() {
 
       logger.info('User preferences updated', { userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update user preferences', { error });
-    }
+    },
   });
 }
 
@@ -462,8 +485,13 @@ export function useNotificationPreferences(userId?: string) {
     queryKey: userQueryKeys.notificationPreferences(targetUserId || ''),
     queryFn: async () => {
       // Check if the method exists in the service
-      if ('getNotificationPreferences' in userBackendService && typeof userBackendService.getNotificationPreferences === 'function') {
-        const service = userBackendService as unknown as { getNotificationPreferences: (userId: string) => Promise<NotificationPreferences> };
+      if (
+        'getNotificationPreferences' in userBackendService &&
+        typeof userBackendService.getNotificationPreferences === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          getNotificationPreferences: (userId: string) => Promise<NotificationPreferences>;
+        };
         return service.getNotificationPreferences(targetUserId!);
       }
       // If not available, return null to indicate it's not separately accessible
@@ -472,7 +500,7 @@ export function useNotificationPreferences(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 10 * 60 * 1000,
     retry: 2,
-    gcTime: 20 * 60 * 1000
+    gcTime: 20 * 60 * 1000,
   });
 }
 
@@ -481,10 +509,24 @@ export function useUpdateNotificationPreferences() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, preferences }: { userId: string; preferences: Partial<NotificationPreferences> }) => {
+    mutationFn: async ({
+      userId,
+      preferences,
+    }: {
+      userId: string;
+      preferences: Partial<NotificationPreferences>;
+    }) => {
       // Check if the method exists in the service
-      if ('updateNotificationPreferences' in userBackendService && typeof userBackendService.updateNotificationPreferences === 'function') {
-        const service = userBackendService as unknown as { updateNotificationPreferences: (userId: string, preferences: Partial<NotificationPreferences>) => Promise<NotificationPreferences> };
+      if (
+        'updateNotificationPreferences' in userBackendService &&
+        typeof userBackendService.updateNotificationPreferences === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          updateNotificationPreferences: (
+            userId: string,
+            preferences: Partial<NotificationPreferences>
+          ) => Promise<NotificationPreferences>;
+        };
         return service.updateNotificationPreferences(userId, preferences);
       }
       // If not available, return the preferences unchanged (they'll be managed elsewhere)
@@ -495,9 +537,9 @@ export function useUpdateNotificationPreferences() {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.profile(userId) });
       logger.info('Notification preferences updated', { userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update notification preferences', { error });
-    }
+    },
   });
 }
 
@@ -510,8 +552,13 @@ export function usePrivacyControls(userId?: string) {
     queryKey: userQueryKeys.privacyControls(targetUserId || ''),
     queryFn: async () => {
       // Check if the method exists in the service
-      if ('getPrivacyControls' in userBackendService && typeof userBackendService.getPrivacyControls === 'function') {
-        const service = userBackendService as unknown as { getPrivacyControls: (userId: string) => Promise<PrivacyControls> };
+      if (
+        'getPrivacyControls' in userBackendService &&
+        typeof userBackendService.getPrivacyControls === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          getPrivacyControls: (userId: string) => Promise<PrivacyControls>;
+        };
         return service.getPrivacyControls(targetUserId!);
       }
       // If not available, return null to indicate privacy controls are managed elsewhere
@@ -520,7 +567,7 @@ export function usePrivacyControls(userId?: string) {
     enabled: !!targetUserId,
     staleTime: 10 * 60 * 1000,
     retry: 2,
-    gcTime: 20 * 60 * 1000
+    gcTime: 20 * 60 * 1000,
   });
 }
 
@@ -531,10 +578,24 @@ export function useUpdatePrivacyControls() {
   const dashboardStore = useUserDashboardStore();
 
   return useMutation({
-    mutationFn: async ({ userId, controls }: { userId: string; controls: Partial<PrivacyControls> }) => {
+    mutationFn: async ({
+      userId,
+      controls,
+    }: {
+      userId: string;
+      controls: Partial<PrivacyControls>;
+    }) => {
       // Check if the method exists in the service
-      if ('updatePrivacyControls' in userBackendService && typeof userBackendService.updatePrivacyControls === 'function') {
-        const service = userBackendService as unknown as { updatePrivacyControls: (userId: string, controls: Partial<PrivacyControls>) => Promise<PrivacyControls> };
+      if (
+        'updatePrivacyControls' in userBackendService &&
+        typeof userBackendService.updatePrivacyControls === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          updatePrivacyControls: (
+            userId: string,
+            controls: Partial<PrivacyControls>
+          ) => Promise<PrivacyControls>;
+        };
         return service.updatePrivacyControls(userId, controls);
       }
       // If not available, return the controls unchanged
@@ -549,9 +610,9 @@ export function useUpdatePrivacyControls() {
 
       logger.info('Privacy controls updated', { userId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to update privacy controls', { error });
-    }
+    },
   });
 }
 
@@ -560,19 +621,27 @@ export function useRequestDataExport() {
   return useMutation({
     mutationFn: async ({ userId, request }: { userId: string; request: DataExportRequest }) => {
       // Check if the method exists in the service
-      if ('requestDataExport' in userBackendService && typeof userBackendService.requestDataExport === 'function') {
-        const service = userBackendService as unknown as { requestDataExport: (userId: string, request: DataExportRequest) => Promise<{ exportId: string }> };
+      if (
+        'requestDataExport' in userBackendService &&
+        typeof userBackendService.requestDataExport === 'function'
+      ) {
+        const service = userBackendService as unknown as {
+          requestDataExport: (
+            userId: string,
+            request: DataExportRequest
+          ) => Promise<{ exportId: string }>;
+        };
         return service.requestDataExport(userId, request);
       }
       // If method doesn't exist, return a mock response
       return { exportId: `export_${Date.now()}`, status: 'pending' as const };
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       logger.info('Data export requested', { exportId: data.exportId });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to request data export', { error });
-    }
+    },
   });
 }
 
@@ -581,22 +650,29 @@ export function useRecordActivity() {
   const { user } = useAuth();
   const trackEngagement = useTrackEngagement();
 
-  return useCallback((activity: EngagementActivity) => {
-    if (!user?.id) return;
+  return useCallback(
+    (activity: EngagementActivity) => {
+      if (!user?.id) return;
 
-    // Check if recordActivity exists in the service
-    if ('recordActivity' in userBackendService && typeof userBackendService.recordActivity === 'function') {
-      // Record activity in backend (fire and forget, non-blocking)
-      const service = userBackendService as unknown as { recordActivity: (activity: EngagementActivity) => Promise<void> };
-      service.recordActivity(activity)
-        .catch((error: Error) => {
+      // Check if recordActivity exists in the service
+      if (
+        'recordActivity' in userBackendService &&
+        typeof userBackendService.recordActivity === 'function'
+      ) {
+        // Record activity in backend (fire and forget, non-blocking)
+        const service = userBackendService as unknown as {
+          recordActivity: (activity: EngagementActivity) => Promise<void>;
+        };
+        service.recordActivity(activity).catch((error: Error) => {
           logger.warn('Failed to record activity (non-critical)', { error });
         });
-    }
+      }
 
-    // Also track in engagement system for analytics
-    trackEngagement.mutate(activity);
-  }, [user?.id, trackEngagement]);
+      // Also track in engagement system for analytics
+      trackEngagement.mutate(activity);
+    },
+    [user?.id, trackEngagement]
+  );
 }
 
 // Sync Dashboard Data Hook - Manually refreshes dashboard data
@@ -634,7 +710,7 @@ export function useSyncDashboardData() {
   return {
     syncData,
     isLoading: dashboardQuery.isLoading,
-    error: dashboardQuery.error
+    error: dashboardQuery.error,
   };
 }
 
@@ -647,11 +723,14 @@ export function useAutoSyncDashboard(intervalMinutes: number = 15) {
     if (!user?.id || intervalMinutes <= 0) return;
 
     // Set up interval for automatic background syncing
-    const interval = setInterval(() => {
-      queryClient.invalidateQueries({ 
-        queryKey: userQueryKeys.dashboard(user.id) 
-      });
-    }, intervalMinutes * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        queryClient.invalidateQueries({
+          queryKey: userQueryKeys.dashboard(user.id),
+        });
+      },
+      intervalMinutes * 60 * 1000
+    );
 
     return () => clearInterval(interval);
   }, [user?.id, intervalMinutes, queryClient]);

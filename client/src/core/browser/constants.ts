@@ -1,6 +1,6 @@
 /**
  * Browser Compatibility Constants
- * 
+ *
  * Minimum browser versions, critical features, and browser name mappings.
  */
 
@@ -11,15 +11,15 @@ import type { FeatureSet } from './types';
  * features like ES6, Fetch API, and modern CSS are available natively.
  */
 export const MINIMUM_VERSIONS = {
-  chrome: 70,      // Released Oct 2018
-  firefox: 65,     // Released Jan 2019
-  safari: 12,      // Released Sep 2018
-  edge: 79,        // Released Jan 2020 (Chromium-based)
-  opera: 57,       // Released Dec 2018
-  samsung: 10,     // Released Feb 2019
-  ios: 12,         // Released Sep 2018
-  android: 70,     // Based on Chrome version
-  ie: 11           // Not truly supported, but included for detection
+  chrome: 70, // Released Oct 2018
+  firefox: 65, // Released Jan 2019
+  safari: 12, // Released Sep 2018
+  edge: 79, // Released Jan 2020 (Chromium-based)
+  opera: 57, // Released Dec 2018
+  samsung: 10, // Released Feb 2019
+  ios: 12, // Released Sep 2018
+  android: 70, // Based on Chrome version
+  ie: 11, // Not truly supported, but included for detection
 } as const;
 
 /**
@@ -31,7 +31,7 @@ export const CRITICAL_FEATURES: ReadonlyArray<keyof FeatureSet> = [
   'fetch',
   'promises',
   'localStorage',
-  'modules'
+  'modules',
 ] as const;
 
 /**
@@ -48,5 +48,5 @@ export const BROWSER_NAME_MAP: Record<string, string> = {
   ios: 'iOS Safari',
   android: 'Android Chrome',
   ie: 'Internet Explorer',
-  unknown: 'your browser'
+  unknown: 'your browser',
 };

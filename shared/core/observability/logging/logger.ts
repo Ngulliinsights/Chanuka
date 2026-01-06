@@ -207,7 +207,7 @@ function calculatePercentile(sortedValues: number[], percentile: number): number
 function generateCorrelationId(): string {
    const timestamp = Date.now().toString(36);
    // Use crypto if available (Node.js), otherwise fallback to Math.random for browser
-   const random = crypto && crypto.randomBytes
+   const random = crypto?.randomBytes
      ? crypto.randomBytes(4).toString('hex').substring(0, 8)
      : Math.random().toString(36).substring(2, 10);
    return `${timestamp}-${random}`;
@@ -306,7 +306,7 @@ export function createLogRotationManager(config: LogRotationConfig): LogRotation
   const maxSizeBytes = parseSize(config.maxFileSize);
 
   async function shouldRotate(filePath: string): Promise<boolean> {
-    if (!fs || !fs.stat) return false;
+    if (!fs?.stat) return false;
     try {
       const stats = await fs.stat(filePath);
       return stats.size >= maxSizeBytes;
@@ -455,7 +455,7 @@ class FileTransport implements LogTransport {
     this.level = level;
     this.filePath = filePath;
 
-    if (rotationConfig && fsSync && fsSync.createWriteStream) {
+    if (rotationConfig && fsSync?.createWriteStream) {
       this.rotationManager = createLogRotationManager(rotationConfig);
       this.rotationManager.setupRotationCheck(filePath);
     }
@@ -464,7 +464,7 @@ class FileTransport implements LogTransport {
   }
 
   private initializeWriteStream(): void {
-    if (fsSync && fsSync.createWriteStream) {
+    if (fsSync?.createWriteStream) {
       this.writeStream = fsSync.createWriteStream(this.filePath, { flags: 'a' });
     }
   }

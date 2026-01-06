@@ -35,10 +35,7 @@ export function GlobalLoadingIndicator({
     center: 'inset-0 flex items-center justify-center',
   };
 
-  const baseClasses = [
-    'fixed z-50',
-    positionClasses[position],
-  ].join(' ');
+  const baseClasses = ['fixed z-50', positionClasses[position]].join(' ');
 
   if (variant === 'overlay') {
     return (
@@ -63,7 +60,9 @@ export function GlobalLoadingIndicator({
           <div className="flex items-center space-x-3">
             <LoadingSpinner size="sm" showMessage={false} />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {state.highPriorityLoading ? 'Loading...' : `${totalOperations} operations in progress`}
+              {state.highPriorityLoading
+                ? 'Loading...'
+                : `${totalOperations} operations in progress`}
             </span>
           </div>
           {showProgress && totalOperations > 1 && (

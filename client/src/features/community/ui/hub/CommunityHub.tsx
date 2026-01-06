@@ -1,6 +1,6 @@
 /**
  * Community Hub - Main community engagement interface
- * 
+ *
  * Features:
  * - Activity feed with real-time updates
  * - Trending topics with velocity-based algorithm
@@ -11,7 +11,6 @@
  */
 
 import { ThumbsUp } from 'lucide-react';
-import React from 'react';
 import {
   Activity,
   TrendingUp,
@@ -21,6 +20,7 @@ import {
   RefreshCw,
   MessageSquare,
 } from 'lucide-react';
+import React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
@@ -61,41 +61,34 @@ export function CommunityHub({ className }: CommunityHubProps) {
     setExpertInsights([
       {
         id: 1,
-        expert: "Dr. Sarah Chen",
-        title: "Constitutional Analysis",
-        insight: "This bill raises important questions about federal vs state jurisdiction...",
+        expert: 'Dr. Sarah Chen',
+        title: 'Constitutional Analysis',
+        insight: 'This bill raises important questions about federal vs state jurisdiction...',
         billId: 123,
-        timestamp: "2 hours ago",
-        likes: 24
-      }
+        timestamp: '2 hours ago',
+        likes: 24,
+      },
     ]);
   }, []);
 
   return (
-    <div className={cn("community-hub space-y-6", className)}>
+    <div className={cn('community-hub space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Community Hub</h1>
-          <p className="text-muted-foreground">
-            Connect with fellow citizens and experts
-          </p>
+          <p className="text-muted-foreground">Connect with fellow citizens and experts</p>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-            {!isMobile && "Refresh"}
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+            <RefreshCw className={cn('h-4 w-4', isRefreshing && 'animate-spin')} />
+            {!isMobile && 'Refresh'}
           </Button>
-          
+
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4" />
-            {!isMobile && "Filter"}
+            {!isMobile && 'Filter'}
           </Button>
         </div>
       </div>
@@ -113,7 +106,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -125,7 +118,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -137,7 +130,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -158,16 +151,16 @@ export function CommunityHub({ className }: CommunityHubProps) {
             { id: 'activity', label: 'Activity Feed', icon: Activity },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'experts', label: 'Expert Insights', icon: Users },
-            { id: 'local', label: 'Local Impact', icon: MapPin }
+            { id: 'local', label: 'Local Impact', icon: MapPin },
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 border-b-2 transition-colors",
+                'flex items-center gap-2 px-4 py-2 border-b-2 transition-colors',
                 activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               )}
             >
               <tab.icon className="h-4 w-4" />
@@ -183,14 +176,14 @@ export function CommunityHub({ className }: CommunityHubProps) {
               <p className="text-muted-foreground">Activity feed content would go here...</p>
             </div>
           )}
-          
+
           {activeTab === 'trending' && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Trending Topics</h3>
               <p className="text-muted-foreground">Trending topics content would go here...</p>
             </div>
           )}
-          
+
           {activeTab === 'experts' && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Expert Insights</h3>
@@ -204,7 +197,9 @@ export function CommunityHub({ className }: CommunityHubProps) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold">{insight.expert}</span>
-                          <Badge variant="secondary" className="text-xs">Expert</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            Expert
+                          </Badge>
                         </div>
                         <h4 className="font-medium mb-2">{insight.title}</h4>
                         <p className="text-sm text-muted-foreground mb-3">{insight.insight}</p>
@@ -222,7 +217,7 @@ export function CommunityHub({ className }: CommunityHubProps) {
               ))}
             </div>
           )}
-          
+
           {activeTab === 'local' && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Local Impact</h3>

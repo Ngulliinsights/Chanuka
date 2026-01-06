@@ -11,13 +11,18 @@
  */
 
 import { ReactNode } from 'react';
+import React from 'react';
 
 import { BrandVoiceProvider } from './BrandVoiceProvider';
 import { LowBandwidthProvider } from './LowBandwidthProvider';
 import { MultilingualProvider } from './MultilingualProvider';
-import React from 'react';
 
-export { BrandVoiceProvider, useBrandVoice, BrandText, type BrandTextProps } from './BrandVoiceProvider';
+export {
+  BrandVoiceProvider,
+  useBrandVoice,
+  BrandText,
+  type BrandTextProps,
+} from './BrandVoiceProvider';
 export {
   LowBandwidthProvider,
   useLowBandwidth,

@@ -1,6 +1,6 @@
 /**
  * Common Types
- * 
+ *
  * Shared types and utilities used across multiple modules
  */
 
@@ -14,17 +14,17 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type SortOrder = 'asc' | 'desc';
 
-export type ErrorCode = 
-  | string 
-  | 'NETWORK_ERROR' 
-  | 'TIMEOUT' 
-  | 'VALIDATION_ERROR' 
-  | 'UNAUTHORIZED' 
-  | 'FORBIDDEN' 
-  | 'NOT_FOUND' 
-  | 'CONFLICT' 
-  | 'SERVER_ERROR' 
-  | 'RATE_LIMITED' 
+export type ErrorCode =
+  | string
+  | 'NETWORK_ERROR'
+  | 'TIMEOUT'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'SERVER_ERROR'
+  | 'RATE_LIMITED'
   | 'UNKNOWN';
 
 // ============================================================================
@@ -185,8 +185,12 @@ export interface ValidationOptions {
 export type RequestPriority = 'low' | 'normal' | 'high' | 'critical';
 
 // Interceptor types
-export type RequestInterceptor = (request: BaseApiRequest) => BaseApiRequest | Promise<BaseApiRequest>;
-export type ResponseInterceptor = (response: BaseApiResponse) => BaseApiResponse | Promise<BaseApiResponse>;
+export type RequestInterceptor = (
+  request: BaseApiRequest
+) => BaseApiRequest | Promise<BaseApiRequest>;
+export type ResponseInterceptor = (
+  response: BaseApiResponse
+) => BaseApiResponse | Promise<BaseApiResponse>;
 
 export interface UnifiedApiClient extends ApiClient {
   request<T>(request: ApiRequest): Promise<ApiResponse<T>>;
@@ -210,5 +214,5 @@ export {
   ErrorDomain,
   ErrorSeverity,
   type AppError as UnifiedError,
-  type ErrorContext
+  type ErrorContext,
 } from '../../error';

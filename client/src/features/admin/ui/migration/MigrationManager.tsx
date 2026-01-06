@@ -1,7 +1,16 @@
-import React from 'react';
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from '@client/shared/design-system';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@client/shared/design-system';
 
 interface Migration {
   name: string;
@@ -32,9 +41,13 @@ const getStatusIcon = (status: string) => {
 const getStatusBadge = (status: string) => {
   switch (status.toLowerCase()) {
     case 'applied':
-      return <Badge className="bg-success text-success-foreground hover:bg-success/80">Applied</Badge>;
+      return (
+        <Badge className="bg-success text-success-foreground hover:bg-success/80">Applied</Badge>
+      );
     case 'pending':
-      return <Badge className="bg-warning text-warning-foreground hover:bg-warning/80">Pending</Badge>;
+      return (
+        <Badge className="bg-warning text-warning-foreground hover:bg-warning/80">Pending</Badge>
+      );
     case 'ready':
       return <Badge className="bg-info text-info-foreground hover:bg-info/80">Ready</Badge>;
     default:
@@ -69,9 +82,7 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
           <GitBranch className="h-5 w-5 mr-2 text-primary" />
           Migration Management
         </CardTitle>
-        <CardDescription>
-          Manage database schema migrations and track changes
-        </CardDescription>
+        <CardDescription>Manage database schema migrations and track changes</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -89,9 +100,7 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
                   <div className="flex items-center space-x-2 mt-1">
                     {getStatusBadge(migration.status)}
                     {migration.conflicts && migration.conflicts > 0 && (
-                      <Badge variant="destructive">
-                        {migration.conflicts} Conflicts
-                      </Badge>
+                      <Badge variant="destructive">{migration.conflicts} Conflicts</Badge>
                     )}
                     {migration.enhanced && (
                       <Badge className="bg-accent text-accent-foreground hover:bg-accent/80">
@@ -104,8 +113,7 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
                       ? `Applied at ${migration.appliedAt}`
                       : migration.status === 'pending'
                         ? 'Pending - Conflicts detected'
-                        : 'Ready to apply'
-                    }
+                        : 'Ready to apply'}
                   </p>
                 </div>
               </div>
@@ -115,11 +123,7 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
                     Review
                   </Button>
                 )}
-                {migration.status === 'ready' && (
-                  <Button size="sm">
-                    Apply
-                  </Button>
-                )}
+                {migration.status === 'ready' && <Button size="sm">Apply</Button>}
               </div>
             </div>
           ))}

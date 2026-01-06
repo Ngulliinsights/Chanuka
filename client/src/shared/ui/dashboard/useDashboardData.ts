@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/core/auth';
 import type { DataExportRequest } from '@/shared/types/user-dashboard';
+
 import { logger } from '../../../utils/logger';
-
-import { useUserDashboardSelectors, useUserDashboardStore } from '../../infrastructure/store/slices/userDashboardSlice';
-
-
+import {
+  useUserDashboardSelectors,
+  useUserDashboardStore,
+} from '../../infrastructure/store/slices/userDashboardSlice';
 
 export interface UseDashboardDataOptions {
   autoLoad?: boolean;
@@ -31,7 +32,7 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
     engagementStats,
     refreshDashboard,
     setTimeFilter,
-    setError
+    setError,
   } = useUserDashboardSelectors();
 
   const dashboardStore = useUserDashboardStore();
@@ -63,11 +64,14 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
   useEffect(() => {
     if (!preferences.refreshInterval || preferences.refreshInterval <= 0) return;
 
-    const interval = setInterval(() => {
-      if (isDataStale) {
-        refreshDashboard();
-      }
-    }, preferences.refreshInterval * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        if (isDataStale) {
+          refreshDashboard();
+        }
+      },
+      preferences.refreshInterval * 60 * 1000
+    );
 
     return () => clearInterval(interval);
   }, [preferences.refreshInterval, isDataStale, refreshDashboard]);
@@ -79,7 +83,7 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
         id: `dashboard_view_${Date.now()}`,
         type: 'view',
         billId: undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }, [activeTab, user, trackEngagement, dashboardStore]);
@@ -133,6 +137,6 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
     setShowPreferencesModal,
 
     // Store access for advanced usage
-    dashboardStore
+    dashboardStore,
   };
 }

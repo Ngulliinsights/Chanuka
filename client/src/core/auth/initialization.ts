@@ -1,6 +1,6 @@
 /**
  * Authentication Service Initialization - Core Auth
- * 
+ *
  * Migrated from client/src/services/auth-service-init.ts
  * Handles the initialization and configuration of authentication services
  * for the civic engagement platform.
@@ -48,7 +48,7 @@ class AuthServiceInitializer {
       user: null,
       token: null,
       refreshToken: null,
-      expiresAt: null
+      expiresAt: null,
     };
   }
 
@@ -101,7 +101,7 @@ class AuthServiceInitializer {
   private async performInitialization(customConfig?: Partial<AuthConfig>): Promise<void> {
     try {
       logger.info('Initializing authentication service', {
-        component: 'AuthServiceInitializer'
+        component: 'AuthServiceInitializer',
       });
 
       // Merge custom config with defaults
@@ -129,13 +129,12 @@ class AuthServiceInitializer {
       logger.info('Authentication service initialized successfully', {
         component: 'AuthServiceInitializer',
         isAuthenticated: this.state.isAuthenticated,
-        hasUser: !!this.state.user
+        hasUser: !!this.state.user,
       });
-
     } catch (error) {
       logger.error('Failed to initialize authentication service', {
         component: 'AuthServiceInitializer',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -156,8 +155,8 @@ class AuthServiceInitializer {
         requireUppercase: true,
         requireLowercase: true,
         requireNumbers: true,
-        requireSpecialChars: false
-      }
+        requireSpecialChars: false,
+      },
     };
   }
 
@@ -180,8 +179,8 @@ class AuthServiceInitializer {
         apiBaseUrl: this.config.apiBaseUrl,
         sessionTimeout: this.config.sessionTimeout,
         enableSocialAuth: this.config.enableSocialAuth,
-        enableMFA: this.config.enableMFA
-      }
+        enableMFA: this.config.enableMFA,
+      },
     });
   }
 
@@ -190,7 +189,7 @@ class AuthServiceInitializer {
       // Check if localStorage is available
       if (typeof Storage === 'undefined') {
         logger.warn('localStorage not available, using memory storage', {
-          component: 'AuthServiceInitializer'
+          component: 'AuthServiceInitializer',
         });
         return;
       }
@@ -199,13 +198,12 @@ class AuthServiceInitializer {
       await this.migrateOldTokens();
 
       logger.debug('Token storage initialized', {
-        component: 'AuthServiceInitializer'
+        component: 'AuthServiceInitializer',
       });
-
     } catch (error) {
       logger.error('Failed to initialize token storage', {
         component: 'AuthServiceInitializer',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -218,7 +216,7 @@ class AuthServiceInitializer {
 
       if (!token) {
         logger.debug('No existing session found', {
-          component: 'AuthServiceInitializer'
+          component: 'AuthServiceInitializer',
         });
         return;
       }
@@ -227,9 +225,9 @@ class AuthServiceInitializer {
       const tokenData = this.parseToken(token);
       if (!tokenData || this.isTokenExpired(tokenData)) {
         logger.debug('Existing token is invalid or expired', {
-          component: 'AuthServiceInitializer'
+          component: 'AuthServiceInitializer',
         });
-        
+
         // Try to refresh if refresh token exists
         if (refreshToken) {
           await this.attemptTokenRefresh(refreshToken);
@@ -249,15 +247,14 @@ class AuthServiceInitializer {
       logger.info('Existing session restored', {
         component: 'AuthServiceInitializer',
         userId: tokenData?.user?.id || 'unknown',
-        expiresAt: new Date(this.state.expiresAt!)
+        expiresAt: new Date(this.state.expiresAt!),
       });
-
     } catch (error) {
       logger.error('Failed to check existing session', {
         component: 'AuthServiceInitializer',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       // Clear potentially corrupted tokens
       this.clearStoredTokens();
     }
@@ -270,7 +267,7 @@ class AuthServiceInitializer {
 
     const now = Date.now();
     const expiresAt = this.state.expiresAt;
-    const refreshTime = expiresAt - (5 * 60 * 1000); // Refresh 5 minutes before expiry
+    const refreshTime = expiresAt - 5 * 60 * 1000; // Refresh 5 minutes before expiry
 
     if (refreshTime <= now) {
       // Token expires soon, refresh immediately
@@ -287,7 +284,7 @@ class AuthServiceInitializer {
     logger.debug('Token refresh scheduled', {
       component: 'AuthServiceInitializer',
       refreshAt: new Date(refreshTime),
-      timeUntilRefresh: Math.round(timeUntilRefresh / 1000 / 60) // minutes
+      timeUntilRefresh: Math.round(timeUntilRefresh / 1000 / 60), // minutes
     });
   }
 
@@ -297,11 +294,11 @@ class AuthServiceInitializer {
     }
 
     const timeoutMs = this.config.sessionTimeout * 60 * 1000;
-    
+
     setTimeout(() => {
       if (this.state.isAuthenticated) {
         logger.info('Session timeout reached, logging out', {
-          component: 'AuthServiceInitializer'
+          component: 'AuthServiceInitializer',
         });
         this.logout();
       }
@@ -312,13 +309,13 @@ class AuthServiceInitializer {
     try {
       const payload = token.split('.')[1];
       if (!payload) return null;
-      
+
       const decoded = atob(payload);
       return JSON.parse(decoded);
     } catch (error) {
       logger.debug('Failed to parse token', {
         component: 'AuthServiceInitializer',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
     }
@@ -326,7 +323,7 @@ class AuthServiceInitializer {
 
   private isTokenExpired(tokenData: { exp?: number }): boolean {
     if (!tokenData.exp) return true;
-    
+
     const now = Math.floor(Date.now() / 1000);
     return tokenData.exp <= now;
   }
@@ -338,7 +335,7 @@ class AuthServiceInitializer {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({ refreshToken }),
       });
 
       if (!response.ok) {
@@ -346,7 +343,7 @@ class AuthServiceInitializer {
       }
 
       const data = await response.json();
-      
+
       // Update stored tokens
       localStorage.setItem(this.config.tokenStorageKey, data.token);
       if (data.refreshToken) {
@@ -362,15 +359,14 @@ class AuthServiceInitializer {
       this.state.isAuthenticated = true;
 
       logger.info('Token refreshed successfully', {
-        component: 'AuthServiceInitializer'
+        component: 'AuthServiceInitializer',
       });
-
     } catch (error) {
       logger.error('Token refresh failed', {
         component: 'AuthServiceInitializer',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       this.clearStoredTokens();
     }
   }
@@ -381,7 +377,7 @@ class AuthServiceInitializer {
     }
 
     await this.attemptTokenRefresh(this.state.refreshToken);
-    
+
     // Schedule next refresh
     this.setupTokenRefresh();
   }
@@ -389,17 +385,17 @@ class AuthServiceInitializer {
   private async migrateOldTokens(): Promise<void> {
     // Check for old token keys and migrate them
     const oldTokenKeys = ['auth_token', 'user_token', 'access_token'];
-    
+
     for (const oldKey of oldTokenKeys) {
       const oldToken = localStorage.getItem(oldKey);
       if (oldToken && !localStorage.getItem(this.config.tokenStorageKey)) {
         localStorage.setItem(this.config.tokenStorageKey, oldToken);
         localStorage.removeItem(oldKey);
-        
+
         logger.info('Migrated old token', {
           component: 'AuthServiceInitializer',
           oldKey,
-          newKey: this.config.tokenStorageKey
+          newKey: this.config.tokenStorageKey,
         });
       }
     }
@@ -408,7 +404,7 @@ class AuthServiceInitializer {
   private clearStoredTokens(): void {
     localStorage.removeItem(this.config.tokenStorageKey);
     localStorage.removeItem(this.config.refreshTokenKey);
-    
+
     this.state.token = null;
     this.state.refreshToken = null;
     this.state.expiresAt = null;
@@ -418,12 +414,12 @@ class AuthServiceInitializer {
 
   private logout(): void {
     this.clearStoredTokens();
-    
+
     // Redirect to login page or emit logout event
     window.dispatchEvent(new CustomEvent('auth:logout'));
-    
+
     logger.info('User logged out', {
-      component: 'AuthServiceInitializer'
+      component: 'AuthServiceInitializer',
     });
   }
 }
@@ -438,7 +434,10 @@ export const authUtils = {
     return emailRegex.test(email);
   },
 
-  validatePassword(password: string, policy: AuthConfig['passwordPolicy']): {
+  validatePassword(
+    password: string,
+    policy: AuthConfig['passwordPolicy']
+  ): {
     isValid: boolean;
     errors: string[];
   } {
@@ -466,20 +465,20 @@ export const authUtils = {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   },
 
   generateSecurePassword(length: number = 12): string {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     let password = '';
-    
+
     for (let i = 0; i < length; i++) {
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
-    
+
     return password;
-  }
+  },
 };
 
 export default authServiceInitializer;

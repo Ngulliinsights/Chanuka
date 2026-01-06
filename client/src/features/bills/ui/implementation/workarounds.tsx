@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ChevronUp,
   ChevronDown,
@@ -9,6 +8,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { Badge } from '@client/shared/design-system';

@@ -55,7 +55,9 @@ export function LoadingProgress({
     const radius = size === 'sm' ? 12 : size === 'md' ? 16 : size === 'lg' ? 20 : 24;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = indeterminate ? circumference * 0.75 : circumference - (clampedProgress / 100) * circumference;
+    const strokeDashoffset = indeterminate
+      ? circumference * 0.75
+      : circumference - (clampedProgress / 100) * circumference;
 
     return (
       <div
@@ -103,9 +105,7 @@ export function LoadingProgress({
           </span>
         )}
         {showMessage && message && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-            {message}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">{message}</p>
         )}
       </div>
     );
@@ -121,7 +121,9 @@ export function LoadingProgress({
       aria-valuemax={100}
       aria-label={ariaLabel || message || `Loading progress: ${clampedProgress}%`}
     >
-      <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${thicknessClasses[thickness]}`}>
+      <div
+        className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${thicknessClasses[thickness]}`}
+      >
         <div
           className={`${colorClasses[color]} ${thicknessClasses[thickness]} transition-all duration-300 ease-out ${
             indeterminate ? 'animate-pulse' : ''
@@ -133,9 +135,7 @@ export function LoadingProgress({
       </div>
       <div className="flex justify-between items-center">
         {showMessage && message && (
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {message}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
         )}
         {showPercentage && !indeterminate && (
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -153,14 +153,7 @@ export function LoadingProgressBar({
   className = '',
   ...props
 }: Omit<LoadingProgressProps, 'variant'>) {
-  return (
-    <LoadingProgress
-      {...props}
-      progress={progress}
-      variant="linear"
-      className={className}
-    />
-  );
+  return <LoadingProgress {...props} progress={progress} variant="linear" className={className} />;
 }
 
 export function LoadingProgressCircle({
@@ -169,11 +162,6 @@ export function LoadingProgressCircle({
   ...props
 }: Omit<LoadingProgressProps, 'variant'>) {
   return (
-    <LoadingProgress
-      {...props}
-      progress={progress}
-      variant="circular"
-      className={className}
-    />
+    <LoadingProgress {...props} progress={progress} variant="circular" className={className} />
   );
 }

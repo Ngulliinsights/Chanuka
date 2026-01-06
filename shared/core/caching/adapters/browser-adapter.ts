@@ -618,7 +618,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
         const toRemove = Math.ceil(entries.length * 0.1);
         for (let i = 0; i < toRemove; i++) {
           const entry = entries[i];
-          if (entry && entry.key) {
+          if (entry?.key) {
             storage.removeItem(entry.key);
           }
         }

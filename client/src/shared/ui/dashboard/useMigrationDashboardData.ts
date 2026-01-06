@@ -76,7 +76,11 @@ export function useMigrationDashboardData(): MigrationDashboardData & {
           tasks: [
             { id: 'remove-artifacts', name: 'Remove migration artifacts', status: 'completed' },
             { id: 'baseline-tests', name: 'Establish baseline test suite', status: 'completed' },
-            { id: 'document-architecture', name: 'Document current architecture', status: 'completed' },
+            {
+              id: 'document-architecture',
+              name: 'Document current architecture',
+              status: 'completed',
+            },
           ],
         },
         {
@@ -86,8 +90,16 @@ export function useMigrationDashboardData(): MigrationDashboardData & {
           progress: 100,
           description: 'Consolidated caching, observability, and shared infrastructure',
           tasks: [
-            { id: 'consolidate-caching', name: 'Consolidate caching infrastructure', status: 'completed' },
-            { id: 'consolidate-observability', name: 'Consolidate observability stack', status: 'completed' },
+            {
+              id: 'consolidate-caching',
+              name: 'Consolidate caching infrastructure',
+              status: 'completed',
+            },
+            {
+              id: 'consolidate-observability',
+              name: 'Consolidate observability stack',
+              status: 'completed',
+            },
           ],
         },
         {
@@ -108,7 +120,11 @@ export function useMigrationDashboardData(): MigrationDashboardData & {
           progress: 100,
           description: 'Migrated client to feature-sliced architecture',
           tasks: [
-            { id: 'feature-sliced-design', name: 'Implement feature-sliced design', status: 'completed' },
+            {
+              id: 'feature-sliced-design',
+              name: 'Implement feature-sliced design',
+              status: 'completed',
+            },
             { id: 'component-migration', name: 'Migrate components', status: 'completed' },
           ],
         },
@@ -119,10 +135,30 @@ export function useMigrationDashboardData(): MigrationDashboardData & {
           progress: 75,
           description: 'Enable module boundary enforcement and integration testing',
           tasks: [
-            { id: 'boundary-enforcement', name: 'Enable module boundary enforcement', status: 'completed', assignee: 'System' },
-            { id: 'integration-testing', name: 'Implement integration testing', status: 'completed', assignee: 'System' },
-            { id: 'migration-dashboard', name: 'Create migration dashboard', status: 'completed', assignee: 'System' },
-            { id: 'final-validation', name: 'Run final validation and documentation', status: 'in-progress', assignee: 'System' },
+            {
+              id: 'boundary-enforcement',
+              name: 'Enable module boundary enforcement',
+              status: 'completed',
+              assignee: 'System',
+            },
+            {
+              id: 'integration-testing',
+              name: 'Implement integration testing',
+              status: 'completed',
+              assignee: 'System',
+            },
+            {
+              id: 'migration-dashboard',
+              name: 'Create migration dashboard',
+              status: 'completed',
+              assignee: 'System',
+            },
+            {
+              id: 'final-validation',
+              name: 'Run final validation and documentation',
+              status: 'in-progress',
+              assignee: 'System',
+            },
           ],
         },
       ];

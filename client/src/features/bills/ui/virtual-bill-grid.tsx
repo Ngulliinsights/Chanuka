@@ -1,8 +1,9 @@
 import React from 'react';
-import { Bill } from '../model/types';
+
 import { cn } from '@client/lib/utils';
 
 import { BillCard } from '../BillCard';
+import { Bill } from '../model/types';
 
 interface VirtualBillGridProps {
   bills: Bill[];
@@ -16,7 +17,7 @@ interface VirtualBillGridProps {
 
 /**
  * VirtualBillGrid - Renders a responsive grid of bill cards
- * 
+ *
  * This component displays bills in a CSS Grid layout that automatically
  * adjusts columns based on screen size (1 column on mobile, 2 on tablet,
  * 3 on desktop). For large datasets, consider implementing virtualization
@@ -35,9 +36,7 @@ export function VirtualBillGrid({
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 text-lg">No bills found</p>
-        <p className="text-gray-400 text-sm mt-2">
-          Try adjusting your search criteria or filters
-        </p>
+        <p className="text-gray-400 text-sm mt-2">Try adjusting your search criteria or filters</p>
       </div>
     );
   }
@@ -51,7 +50,7 @@ export function VirtualBillGrid({
         className
       )}
     >
-      {bills.map((bill) => (
+      {bills.map(bill => (
         <BillCard
           key={bill.id}
           bill={bill}

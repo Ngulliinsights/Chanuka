@@ -11,11 +11,7 @@ export type {
   PersonaPreferences,
   PersonaDetectionConfig,
   PersonaThresholds,
-  UserPersonaProfile
+  UserPersonaProfile,
 } from './types';
 
-export {
-  PersonaDetector,
-  personaDetector,
-  createPersonaDetector
-} from './persona-detector';
+export { PersonaDetector, personaDetector, createPersonaDetector } from './persona-detector';

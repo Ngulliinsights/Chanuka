@@ -18,7 +18,7 @@ class PreloadOptimizer {
 
   private setupResourceUsageTracking() {
     // Track when resources are actually used
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'resource') {
           this.markResourceAsUsed(entry.name);
@@ -56,7 +56,7 @@ class PreloadOptimizer {
     link.rel = 'preload';
     link.href = config.href;
     link.as = config.as;
-    
+
     if (config.type) link.type = config.type;
     if (config.crossorigin) link.crossOrigin = config.crossorigin;
 
@@ -83,7 +83,7 @@ class PreloadOptimizer {
 
   private markResourceAsUsed(resourceUrl: string) {
     this.usedResources.add(resourceUrl);
-    
+
     // Clear timeout for this resource
     const timeout = this.preloadTimeouts.get(resourceUrl);
     if (timeout) {
@@ -114,9 +114,10 @@ class PreloadOptimizer {
       preloaded: this.preloadedResources.size,
       used: this.usedResources.size,
       pending: this.preloadTimeouts.size,
-      efficiency: this.preloadedResources.size > 0 
-        ? (this.usedResources.size / this.preloadedResources.size) * 100 
-        : 0
+      efficiency:
+        this.preloadedResources.size > 0
+          ? (this.usedResources.size / this.preloadedResources.size) * 100
+          : 0,
     };
   }
 }
@@ -129,26 +130,26 @@ export const smartPreloads: PreloadConfig[] = [
   {
     href: '/src/index.css',
     as: 'style',
-    priority: 'high'
+    priority: 'high',
   },
-  
+
   // Main app modules - preload only if not already loaded
   {
     href: '/src/main.tsx',
     as: 'script',
     type: 'module',
     priority: 'high',
-    condition: () => !document.querySelector('script[src="/src/main.tsx"]')
+    condition: () => !document.querySelector('script[src="/src/main.tsx"]'),
   },
-  
+
   // App component - preload only if on home page
   {
     href: '/src/App.tsx',
     as: 'script',
     type: 'module',
-    condition: () => window.location.pathname === '/' || window.location.pathname === '/home'
+    condition: () => window.location.pathname === '/' || window.location.pathname === '/home',
   },
-  
+
   // Dashboard - preload only if user is authenticated
   {
     href: '/src/pages/bills-dashboard-page.tsx',
@@ -158,16 +159,16 @@ export const smartPreloads: PreloadConfig[] = [
       // Check if user is likely to navigate to dashboard
       const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
       return !!token;
-    }
+    },
   },
-  
+
   // Critical images - preload only if visible
   {
     href: '/symbol.svg',
     as: 'image',
     type: 'image/svg+xml',
-    priority: 'low'
-  }
+    priority: 'low',
+  },
 ];
 
 // Initialize smart preloading
@@ -190,4 +191,3 @@ export function initializeSmartPreloading() {
     }
   }, 1000);
 }
-

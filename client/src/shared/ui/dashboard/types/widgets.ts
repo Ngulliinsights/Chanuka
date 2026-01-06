@@ -11,7 +11,13 @@ import { WidgetConfig } from './core';
 // Widget Component Types
 // ============================================================================
 
-export type WidgetType = 'analytics' | 'performance' | 'engagement' | 'metrics' | 'chart' | 'custom';
+export type WidgetType =
+  | 'analytics'
+  | 'performance'
+  | 'engagement'
+  | 'metrics'
+  | 'chart'
+  | 'custom';
 
 export interface WidgetProps extends BaseComponentProps {
   config: WidgetConfig;

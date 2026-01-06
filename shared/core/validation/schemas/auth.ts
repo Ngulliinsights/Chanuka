@@ -5,10 +5,12 @@
  */
 
 import { z } from 'zod';
+
+import { isAgeBetween } from '../helpers';
+
 import { emailSchema, passwordSchema, strongPasswordSchema, phoneSchema, nameSchema } from './common';
 // import { logger } from '../observability/logging'; // Unused import
 
-import { isAgeBetween } from '../helpers';
 /**
  * User registration schema
  */

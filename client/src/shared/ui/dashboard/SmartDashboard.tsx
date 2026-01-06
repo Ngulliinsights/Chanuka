@@ -10,7 +10,6 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,6 +25,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import React from 'react';
 
 import { Button } from '@/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
@@ -83,25 +83,27 @@ const getWelcomeMessage = (
   const messages = {
     novice: {
       morning: hasRecentActivity
-        ? "Good morning! Ready to continue exploring how legislation affects your community?"
+        ? 'Good morning! Ready to continue exploring how legislation affects your community?'
         : "Good morning! Let's start by finding bills that matter to you.",
       afternoon: hasRecentActivity
         ? "Welcome back! Here's what's new with the bills you're following."
-        : "Good afternoon! Discover legislation that could impact your daily life.",
+        : 'Good afternoon! Discover legislation that could impact your daily life.',
       evening: hasRecentActivity
         ? "Evening! Catch up on today's legislative developments."
-        : "Good evening! A few minutes of civic engagement can make a real difference."
+        : 'Good evening! A few minutes of civic engagement can make a real difference.',
     },
     intermediate: {
-      morning: "Good morning! Your civic engagement dashboard is ready with today's key developments.",
-      afternoon: "Welcome back! Here are the policy updates and community discussions you've been following.",
-      evening: "Evening briefing: Legislative updates and community insights await your review."
+      morning:
+        "Good morning! Your civic engagement dashboard is ready with today's key developments.",
+      afternoon:
+        "Welcome back! Here are the policy updates and community discussions you've been following.",
+      evening: 'Evening briefing: Legislative updates and community insights await your review.',
     },
     expert: {
-      morning: "Good morning! Your professional legislative intelligence briefing is ready.",
-      afternoon: "Welcome back! Constitutional analysis updates and policy intelligence await.",
-      evening: "Evening intelligence: Critical legislative developments and expert analysis."
-    }
+      morning: 'Good morning! Your professional legislative intelligence briefing is ready.',
+      afternoon: 'Welcome back! Constitutional analysis updates and policy intelligence await.',
+      evening: 'Evening intelligence: Critical legislative developments and expert analysis.',
+    },
   };
 
   return messages[userLevel][timeOfDay];
@@ -129,24 +131,24 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
     commentsPosted: recentActivity.filter(a => a.type === 'comment_posted').length,
     analysisViewed: recentActivity.filter(a => a.type === 'analysis_viewed').length,
     // Civic score combines quantity and diversity of engagement
-    civicScore: Math.min(100, (savedBills.length * 10) + (recentActivity.length * 2))
+    civicScore: Math.min(100, savedBills.length * 10 + recentActivity.length * 2),
   };
 
   // Different messaging for different user levels helps users understand
   // their progress in terms that resonate with their experience
   const levelMessages = {
     novice: {
-      title: "Your Civic Journey",
-      description: "Every action you take makes democracy more transparent"
+      title: 'Your Civic Journey',
+      description: 'Every action you take makes democracy more transparent',
     },
     intermediate: {
-      title: "Civic Engagement Impact",
-      description: "Your active participation strengthens democratic discourse"
+      title: 'Civic Engagement Impact',
+      description: 'Your active participation strengthens democratic discourse',
     },
     expert: {
-      title: "Professional Civic Contribution",
-      description: "Your expertise enhances community understanding of governance"
-    }
+      title: 'Professional Civic Contribution',
+      description: 'Your expertise enhances community understanding of governance',
+    },
   };
 
   const currentLevel = levelMessages[userLevel];
@@ -184,7 +186,8 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
         {userLevel === 'novice' && metrics.civicScore < 30 && (
           <div className="mt-4 p-3 bg-blue-100 rounded-lg">
             <p className="text-sm text-blue-800">
-              💡 <strong>Next step:</strong> Save your first bill to start tracking legislation that matters to you!
+              💡 <strong>Next step:</strong> Save your first bill to start tracking legislation that
+              matters to you!
             </p>
           </div>
         )}
@@ -200,20 +203,40 @@ function QuickActions({ userLevel }: { userLevel: User['persona'] }) {
   // Novices get guided learning, experts get advanced analysis tools
   const actions = {
     novice: [
-      { icon: BookOpen, label: "Learn About Bills", href: "/civic-education", color: "bg-green-500" },
-      { icon: Target, label: "Find Relevant Bills", href: "/bills?guided=true", color: "bg-blue-500" },
-      { icon: Users, label: "Join Community", href: "/community", color: "bg-purple-500" }
+      {
+        icon: BookOpen,
+        label: 'Learn About Bills',
+        href: '/civic-education',
+        color: 'bg-green-500',
+      },
+      {
+        icon: Target,
+        label: 'Find Relevant Bills',
+        href: '/bills?guided=true',
+        color: 'bg-blue-500',
+      },
+      { icon: Users, label: 'Join Community', href: '/community', color: 'bg-purple-500' },
     ],
     intermediate: [
-      { icon: Filter, label: "Advanced Search", href: "/search", color: "bg-blue-500" },
-      { icon: MessageSquare, label: "Join Discussions", href: "/community", color: "bg-green-500" },
-      { icon: TrendingUp, label: "View Analytics", href: "/analytics", color: "bg-purple-500" }
+      { icon: Filter, label: 'Advanced Search', href: '/search', color: 'bg-blue-500' },
+      { icon: MessageSquare, label: 'Join Discussions', href: '/community', color: 'bg-green-500' },
+      { icon: TrendingUp, label: 'View Analytics', href: '/analytics', color: 'bg-purple-500' },
     ],
     expert: [
-      { icon: AlertTriangle, label: "Workaround Analysis", href: "/bill-sponsorship-analysis", color: "bg-red-500" },
-      { icon: CheckCircle, label: "Expert Verification", href: "/expert-verification", color: "bg-green-500" },
-      { icon: Earth, label: "Professional Network", href: "/expert-network", color: "bg-blue-500" }
-    ]
+      {
+        icon: AlertTriangle,
+        label: 'Workaround Analysis',
+        href: '/bill-sponsorship-analysis',
+        color: 'bg-red-500',
+      },
+      {
+        icon: CheckCircle,
+        label: 'Expert Verification',
+        href: '/expert-verification',
+        color: 'bg-green-500',
+      },
+      { icon: Earth, label: 'Professional Network', href: '/expert-network', color: 'bg-blue-500' },
+    ],
   };
 
   const currentActions = actions[userLevel];
@@ -233,7 +256,9 @@ function QuickActions({ userLevel }: { userLevel: User['persona'] }) {
                 href={action.href}
                 className="flex items-center justify-start h-auto p-3 rounded-md hover:bg-accent transition-colors"
               >
-                <div className={`w-8 h-8 rounded-lg ${action.color} flex items-center justify-center mr-3 shrink-0`}>
+                <div
+                  className={`w-8 h-8 rounded-lg ${action.color} flex items-center justify-center mr-3 shrink-0`}
+                >
                   <Icon className="w-4 h-4 text-white" />
                 </div>
                 <span className="font-medium">{action.label}</span>
@@ -268,9 +293,8 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
             <Zap className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground mb-4">
               {userLevel === 'novice'
-                ? "Start your civic journey by exploring bills that affect your community"
-                : "Begin engaging with legislation and community discussions"
-              }
+                ? 'Start your civic journey by exploring bills that affect your community'
+                : 'Begin engaging with legislation and community discussions'}
             </p>
             <a href="/bills" className="inline-block">
               <Button>
@@ -331,13 +355,14 @@ function RecentActivity({ userLevel }: { userLevel: User['persona'] }) {
           <div className="text-center py-4 text-muted-foreground">Loading activity...</div>
         ) : (
           <div className="space-y-3">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+            {recentActivity.map(activity => (
+              <div
+                key={activity.id}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors"
+              >
                 {getActivityIcon(activity.type)}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {getActivityMessage(activity)}
-                  </p>
+                  <p className="text-sm font-medium truncate">{getActivityMessage(activity)}</p>
                   <p className="text-xs text-muted-foreground">
                     {formatTimestamp(activity.timestamp)}
                   </p>
@@ -375,9 +400,7 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold mb-2">
-                Welcome back!
-              </h1>
+              <h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
               <p className="text-blue-100 text-lg">{welcomeMessage}</p>
             </div>
             <div className="hidden md:block">
@@ -406,9 +429,13 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-green-700 mb-4">
-                  New to civic engagement? We&apos;ll guide you through understanding how legislation works.
+                  New to civic engagement? We&apos;ll guide you through understanding how
+                  legislation works.
                 </p>
-                <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-100">
+                <Button
+                  variant="outline"
+                  className="border-green-300 text-green-700 hover:bg-green-100"
+                >
                   <a href="/civic-education" className="flex items-center">
                     Start Learning Journey
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -428,9 +455,13 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-purple-700 mb-4">
-                  Your expertise helps the community understand complex legislation. Thank you for contributing!
+                  Your expertise helps the community understand complex legislation. Thank you for
+                  contributing!
                 </p>
-                <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-100">
+                <Button
+                  variant="outline"
+                  className="border-purple-300 text-purple-700 hover:bg-purple-100"
+                >
                   <a href="/expert-verification" className="flex items-center">
                     Review Pending Verifications
                     <ArrowRight className="w-4 h-4 ml-2" />

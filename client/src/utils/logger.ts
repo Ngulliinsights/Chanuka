@@ -1,9 +1,9 @@
 /**
  * Unified Logger - Optimal Direction
- * 
+ *
  * This combines the best of logger-unified.ts with shared module integration
  * and addresses the 1,421-line complexity issue identified in the analysis.
- * 
+ *
  * ARCHITECTURE DECISION:
  * - Use logger-unified.ts as the foundation (135 lines, maintainable)
  * - Integrate with shared module browser logger for advanced features
@@ -13,8 +13,8 @@
 
 // Import error types from our local error system to avoid circular dependencies
 import { ErrorSeverity, ErrorDomain, BaseError } from '../core/error';
-import { PerformanceMonitor } from '../core/performance/monitor';
 import { PerformanceAlertsManager } from '../core/performance/alerts';
+import { PerformanceMonitor } from '../core/performance/monitor';
 import { PerformanceMetric } from '../core/performance/types';
 
 // Re-export error types for backward compatibility
@@ -96,7 +96,7 @@ class SimpleRenderTracker {
       console.debug('Component render tracked', {
         component: 'render-tracker',
         renderComponent: component,
-        renderCount: this.renderCounts.get(component)
+        renderCount: this.renderCounts.get(component),
       });
     }
   }
@@ -106,7 +106,7 @@ class SimpleRenderTracker {
       console.debug('Component lifecycle', {
         component: 'lifecycle-tracker',
         lifecycleComponent: data.component,
-        action: data.action
+        action: data.action,
       });
     }
   }
@@ -134,11 +134,11 @@ class SimpleRenderTracker {
     const now = Date.now();
 
     // Simple infinite render detection
-    if (count > threshold && (now - lastRender) < 1000) {
+    if (count > threshold && now - lastRender < 1000) {
       console.error('Infinite render detected', {
         component: 'render-tracker',
         renderComponent: component,
-        renderCount: count
+        renderCount: count,
       });
       return true;
     }
@@ -150,9 +150,8 @@ class SimpleRenderTracker {
     if (component) {
       const renderCount = this.renderCounts.get(component) || 0;
       const durations = this.performanceData.get(component) || [];
-      const avgDuration = durations.length > 0
-        ? durations.reduce((a, b) => a + b, 0) / durations.length
-        : 0;
+      const avgDuration =
+        durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
 
       return {
         totalRenders: renderCount,
@@ -160,7 +159,7 @@ class SimpleRenderTracker {
         lastRenderTime: this.lastRenderTime.get(component) || 0,
         infiniteRenderAlerts: 0,
         mountCount: 0,
-        unmountCount: 0
+        unmountCount: 0,
       };
     }
 
@@ -172,7 +171,7 @@ class SimpleRenderTracker {
       lastRenderTime: Math.max(...Array.from(this.lastRenderTime.values())),
       infiniteRenderAlerts: 0,
       mountCount: 0,
-      unmountCount: 0
+      unmountCount: 0,
     };
   }
 
@@ -230,7 +229,7 @@ class CoreLogger implements Logger {
       message,
       context,
       metadata,
-      timestamp
+      timestamp,
     };
 
     switch (level) {
@@ -273,16 +272,16 @@ class CoreLogger implements Logger {
         error: {
           message: error.message,
           name: error.name,
-          stack: error.stack
-        }
+          stack: error.stack,
+        },
       };
     }
 
     return {
       error: {
         message: String(error),
-        type: typeof error
-      }
+        type: typeof error,
+      },
     };
   }
 
@@ -299,7 +298,7 @@ class CoreLogger implements Logger {
       },
       error: (message: string, context?: LogContext, error?: Error | unknown) => {
         this.error(message, { ...bindings, ...context }, error);
-      }
+      },
     };
   }
 }
@@ -364,7 +363,11 @@ class UnifiedLogger implements ExtendedLogger {
   }
 
   logError(error: Error | string, context?: LogContext): void {
-    this.error(typeof error === 'string' ? error : error.message, context, error instanceof Error ? error : undefined);
+    this.error(
+      typeof error === 'string' ? error : error.message,
+      context,
+      error instanceof Error ? error : undefined
+    );
   }
 
   // Create child logger

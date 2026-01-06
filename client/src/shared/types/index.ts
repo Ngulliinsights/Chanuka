@@ -87,7 +87,7 @@ export type {
   LocalImpactMetrics,
   VoteRequest,
   Comment,
-  DiscussionThread
+  DiscussionThread,
 } from '@/features/community/types';
 
 // Core types (re-exported from legacy location)

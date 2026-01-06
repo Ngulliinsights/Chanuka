@@ -1,5 +1,3 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -13,9 +11,18 @@ import {
   AlertCircle,
   TrendingUp,
   Clock,
-  FileText
+  FileText,
 } from 'lucide-react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
+import { BillCard } from '@client/features/bills';
+import { useBills } from '@client/features/bills/hooks';
+import type { BillsQueryParams } from '@client/features/bills/types';
+import { FilterPanel } from '@client/features/bills/ui/filter-panel';
+import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/hooks/use-toast';
 import { Button } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
@@ -26,19 +33,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@client/shared/design-system';
-
-import { useBills } from '@client/features/bills/hooks';
-import { BillCard } from '@client/features/bills';
-import { FilterPanel } from '@client/features/bills/ui/filter-panel';
-import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
-import { useToast } from '@client/hooks/use-toast';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { logger } from '@client/utils/logger';
 import { cn } from '@client/shared/design-system/utils/cn';
-
-import type { BillsQueryParams } from '@client/features/bills/types';
+import { logger } from '@client/utils/logger';
 
 // Types for the portal
 interface BillsPortalFilters extends BillsQueryParams {
@@ -80,29 +78,26 @@ export default function BillsPortalPage() {
   const { toast } = useToast();
 
   // Extract current filters from URL params
-  const currentFilters = useMemo<BillsPortalFilters>(() => ({
-    searchQuery: searchParams.get('search') || '',
-    status: searchParams.get('status') || undefined,
-    sortBy: (searchParams.get('sortBy') as BillsPortalFilters['sortBy']) || 'date',
-    sortOrder: (searchParams.get('sortOrder') as BillsPortalFilters['sortOrder']) || 'desc',
-    viewMode: (searchParams.get('view') as BillsPortalFilters['viewMode']) || 'grid',
-    category: (searchParams.get('category') as BillsPortalFilters['category']) || 'all',
-    page: parseInt(searchParams.get('page') || '1'),
-    pageSize: parseInt(searchParams.get('pageSize') || (isMobile ? '8' : '12'))
-  }), [searchParams, isMobile]);
+  const currentFilters = useMemo<BillsPortalFilters>(
+    () => ({
+      searchQuery: searchParams.get('search') || '',
+      status: searchParams.get('status') || undefined,
+      sortBy: (searchParams.get('sortBy') as BillsPortalFilters['sortBy']) || 'date',
+      sortOrder: (searchParams.get('sortOrder') as BillsPortalFilters['sortOrder']) || 'desc',
+      viewMode: (searchParams.get('view') as BillsPortalFilters['viewMode']) || 'grid',
+      category: (searchParams.get('category') as BillsPortalFilters['category']) || 'all',
+      page: parseInt(searchParams.get('page') || '1'),
+      pageSize: parseInt(searchParams.get('pageSize') || (isMobile ? '8' : '12')),
+    }),
+    [searchParams, isMobile]
+  );
 
   // Local state
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
 
   // Fetch bills data
-  const {
-    data: billsResponse,
-    isLoading,
-    isFetching,
-    error,
-    refetch
-  } = useBills(currentFilters);
+  const { data: billsResponse, isLoading, isFetching, error, refetch } = useBills(currentFilters);
 
   const bills = useMemo(() => billsResponse?.bills || [], [billsResponse?.bills]);
   const totalBills = billsResponse?.total || 0;
@@ -116,100 +111,120 @@ export default function BillsPortalPage() {
     return {
       total: totalBills,
       active: bills.filter(bill => bill.status === 'active').length,
-      urgent: bills.filter(bill => bill.urgencyLevel === 'HIGH' || bill.urgencyLevel === 'URGENT').length,
+      urgent: bills.filter(bill => bill.urgencyLevel === 'HIGH' || bill.urgencyLevel === 'URGENT')
+        .length,
       trending: bills.filter(bill => (bill as any).trending).length,
-      saved: bills.filter(bill => (bill as any).saved).length
+      saved: bills.filter(bill => (bill as any).saved).length,
     };
   }, [bills, totalBills]);
 
   // Update URL params when filters change
-  const updateFilters = useCallback((newFilters: Partial<BillsPortalFilters>) => {
-    const updatedParams = new URLSearchParams(searchParams);
+  const updateFilters = useCallback(
+    (newFilters: Partial<BillsPortalFilters>) => {
+      const updatedParams = new URLSearchParams(searchParams);
 
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value && value !== '') {
-        updatedParams.set(key, String(value));
-      } else {
-        updatedParams.delete(key);
+      Object.entries(newFilters).forEach(([key, value]) => {
+        if (value && value !== '') {
+          updatedParams.set(key, String(value));
+        } else {
+          updatedParams.delete(key);
+        }
+      });
+
+      // Reset page when changing filters (except for page itself)
+      if (!newFilters.page) {
+        updatedParams.set('page', '1');
       }
-    });
 
-    // Reset page when changing filters (except for page itself)
-    if (!newFilters.page) {
-      updatedParams.set('page', '1');
-    }
-
-    setSearchParams(updatedParams);
-  }, [searchParams, setSearchParams]);
+      setSearchParams(updatedParams);
+    },
+    [searchParams, setSearchParams]
+  );
 
   // Event handlers
-  const handleSearch = useCallback((searchQuery: string) => {
-    updateFilters({ searchQuery, page: 1 });
-  }, [updateFilters]);
+  const handleSearch = useCallback(
+    (searchQuery: string) => {
+      updateFilters({ searchQuery, page: 1 });
+    },
+    [updateFilters]
+  );
 
-  const handleCategoryChange = useCallback((category: BillsPortalFilters['category']) => {
-    updateFilters({ category, page: 1 });
-  }, [updateFilters]);
+  const handleCategoryChange = useCallback(
+    (category: BillsPortalFilters['category']) => {
+      updateFilters({ category, page: 1 });
+    },
+    [updateFilters]
+  );
 
-  const handleSortChange = useCallback((sortBy: BillsPortalFilters['sortBy']) => {
-    updateFilters({ sortBy, page: 1 });
-  }, [updateFilters]);
+  const handleSortChange = useCallback(
+    (sortBy: BillsPortalFilters['sortBy']) => {
+      updateFilters({ sortBy, page: 1 });
+    },
+    [updateFilters]
+  );
 
   const handleSortOrderToggle = useCallback(() => {
     const newOrder = currentFilters.sortOrder === 'asc' ? 'desc' : 'asc';
     updateFilters({ sortOrder: newOrder });
   }, [currentFilters.sortOrder, updateFilters]);
 
-  const handleViewModeChange = useCallback((viewMode: BillsPortalFilters['viewMode']) => {
-    updateFilters({ viewMode });
-  }, [updateFilters]);
+  const handleViewModeChange = useCallback(
+    (viewMode: BillsPortalFilters['viewMode']) => {
+      updateFilters({ viewMode });
+    },
+    [updateFilters]
+  );
 
   const handleBillSelect = useCallback((billId: string) => {
     setSelectedBills(prev =>
-      prev.includes(billId)
-        ? prev.filter(id => id !== billId)
-        : [...prev, billId]
+      prev.includes(billId) ? prev.filter(id => id !== billId) : [...prev, billId]
     );
   }, []);
 
-  const handleBillClick = useCallback((billId: string) => {
-    navigate(`/bills/${billId}`);
-  }, [navigate]);
+  const handleBillClick = useCallback(
+    (billId: string) => {
+      navigate(`/bills/${billId}`);
+    },
+    [navigate]
+  );
 
   const handleExport = useCallback(() => {
     try {
-      const billsToExport = selectedBills.length > 0
-        ? bills.filter(bill => selectedBills.includes(bill.id || ''))
-        : bills;
+      const billsToExport =
+        selectedBills.length > 0
+          ? bills.filter(bill => selectedBills.includes(bill.id || ''))
+          : bills;
 
       if (billsToExport.length === 0) {
         toast({
-          title: "No bills to export",
-          description: "Select bills or apply filters to export data.",
-          variant: "destructive"
+          title: 'No bills to export',
+          description: 'Select bills or apply filters to export data.',
+          variant: 'destructive',
         });
         return;
       }
 
       // Create CSV content
       const csvData = billsToExport.map(bill => ({
-        'ID': bill.id || '',
-        'Title': bill.title || '',
-        'Status': bill.status || '',
-        'Introduced': bill.introduced_date || '',
-        'Sponsor': (bill as any).sponsor_name || '',
-        'Description': (bill as any).description || ''
+        ID: bill.id || '',
+        Title: bill.title || '',
+        Status: bill.status || '',
+        Introduced: bill.introduced_date || '',
+        Sponsor: (bill as any).sponsor_name || '',
+        Description: (bill as any).description || '',
       }));
 
       const headers = Object.keys(csvData[0]);
       const csvContent = [
         headers.join(','),
         ...csvData.map(row =>
-          headers.map(header => {
-            const value = String(row[header as keyof typeof row]);
-            return value.includes(',') ? `"${value}"` : value;
-          }).join(',')
-        )
+          headers
+            .map(header => {
+              const value = String(row[header as keyof typeof row]);
+              return value.includes(',') ? `"${value}"` : value;
+            })
+            .join(',')
+        ),
       ].join('\n');
 
       // Download CSV
@@ -224,17 +239,17 @@ export default function BillsPortalPage() {
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Export successful",
-        description: `Exported ${csvData.length} bills to CSV`
+        title: 'Export successful',
+        description: `Exported ${csvData.length} bills to CSV`,
       });
 
       logger.info('Bills exported', { count: csvData.length });
     } catch (error) {
       logger.error('Export failed', { error });
       toast({
-        title: "Export failed",
-        description: "Unable to export bills. Please try again.",
-        variant: "destructive"
+        title: 'Export failed',
+        description: 'Unable to export bills. Please try again.',
+        variant: 'destructive',
       });
     }
   }, [bills, selectedBills, toast]);
@@ -243,14 +258,14 @@ export default function BillsPortalPage() {
     try {
       await refetch();
       toast({
-        title: "Bills refreshed",
-        description: "Latest bills data loaded successfully."
+        title: 'Bills refreshed',
+        description: 'Latest bills data loaded successfully.',
       });
     } catch (error) {
       toast({
-        title: "Refresh failed",
-        description: "Unable to refresh data. Please try again.",
-        variant: "destructive"
+        title: 'Refresh failed',
+        description: 'Unable to refresh data. Please try again.',
+        variant: 'destructive',
       });
     }
   }, [refetch, toast]);
@@ -264,9 +279,7 @@ export default function BillsPortalPage() {
             <div className="text-center space-y-4 max-w-md">
               <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
               <div>
-                <h2 className="text-lg font-semibold text-destructive mb-2">
-                  Error loading bills
-                </h2>
+                <h2 className="text-lg font-semibold text-destructive mb-2">Error loading bills</h2>
                 <p className="text-sm text-muted-foreground">
                   {error instanceof Error ? error.message : 'An unexpected error occurred'}
                 </p>
@@ -301,35 +314,29 @@ export default function BillsPortalPage() {
             onClick={handleRefresh}
             disabled={isLoading || isFetching}
           >
-            <RefreshCw className={cn(
-              "h-4 w-4 mr-2",
-              (isLoading || isFetching) && "animate-spin"
-            )} />
+            <RefreshCw
+              className={cn('h-4 w-4 mr-2', (isLoading || isFetching) && 'animate-spin')}
+            />
             Refresh
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            disabled={bills.length === 0}
-          >
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={bills.length === 0}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
 
           {selectedBills.length > 0 && (
-            <Badge variant="secondary">
-              {selectedBills.length} selected
-            </Badge>
+            <Badge variant="secondary">{selectedBills.length} selected</Badge>
           )}
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleCategoryChange('all')}>
+        <Card
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => handleCategoryChange('all')}
+        >
           <CardContent className="p-4 text-center">
             <FileText className="h-6 w-6 mx-auto mb-2 text-blue-600" />
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -337,8 +344,10 @@ export default function BillsPortalPage() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleCategoryChange('urgent')}>
+        <Card
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => handleCategoryChange('urgent')}
+        >
           <CardContent className="p-4 text-center">
             <AlertCircle className="h-6 w-6 mx-auto mb-2 text-red-600" />
             <div className="text-2xl font-bold">{stats.urgent}</div>
@@ -346,8 +355,10 @@ export default function BillsPortalPage() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleCategoryChange('trending')}>
+        <Card
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => handleCategoryChange('trending')}
+        >
           <CardContent className="p-4 text-center">
             <TrendingUp className="h-6 w-6 mx-auto mb-2 text-green-600" />
             <div className="text-2xl font-bold">{stats.trending}</div>
@@ -355,8 +366,10 @@ export default function BillsPortalPage() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleCategoryChange('saved')}>
+        <Card
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => handleCategoryChange('saved')}
+        >
           <CardContent className="p-4 text-center">
             <Bookmark className="h-6 w-6 mx-auto mb-2 text-purple-600" />
             <div className="text-2xl font-bold">{stats.saved}</div>
@@ -381,7 +394,7 @@ export default function BillsPortalPage() {
           <Input
             placeholder="Search bills by title, sponsor, or content..."
             value={currentFilters.searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -392,7 +405,7 @@ export default function BillsPortalPage() {
             variant="outline"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className={cn(showFilters && "bg-accent")}
+            className={cn(showFilters && 'bg-accent')}
           >
             <Filter className="h-4 w-4 mr-2" />
             Filters
@@ -411,11 +424,7 @@ export default function BillsPortalPage() {
             </SelectContent>
           </Select>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSortOrderToggle}
-          >
+          <Button variant="outline" size="sm" onClick={handleSortOrderToggle}>
             {currentFilters.sortOrder === 'asc' ? (
               <ArrowUp className="h-4 w-4" />
             ) : (
@@ -450,7 +459,7 @@ export default function BillsPortalPage() {
           <CardContent className="p-4">
             <FilterPanel
               filters={currentFilters}
-              onFiltersChange={(newFilters) => updateFilters(newFilters)}
+              onFiltersChange={newFilters => updateFilters(newFilters)}
             />
           </CardContent>
         </Card>
@@ -496,7 +505,7 @@ export default function BillsPortalPage() {
                   </CardContent>
                 </Card>
               ) : (
-                bills.map((bill) => (
+                bills.map(bill => (
                   <BillCard
                     key={bill.id}
                     bill={bill}
@@ -532,13 +541,17 @@ export default function BillsPortalPage() {
             </Button>
 
             <span className="text-sm">
-              Page {currentFilters.page || 1} of {Math.ceil(totalBills / (currentFilters.pageSize || 12))}
+              Page {currentFilters.page || 1} of{' '}
+              {Math.ceil(totalBills / (currentFilters.pageSize || 12))}
             </span>
 
             <Button
               variant="outline"
               size="sm"
-              disabled={(currentFilters.page || 1) >= Math.ceil(totalBills / (currentFilters.pageSize || 12))}
+              disabled={
+                (currentFilters.page || 1) >=
+                Math.ceil(totalBills / (currentFilters.pageSize || 12))
+              }
               onClick={() => updateFilters({ page: (currentFilters.page || 1) + 1 })}
             >
               Next

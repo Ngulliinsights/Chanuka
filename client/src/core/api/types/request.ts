@@ -1,13 +1,12 @@
 /**
  * Request/Response Types
- * 
+ *
  * Core API request and response type definitions
  */
 
 import { ZodSchema } from 'zod';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-
 
 // ============================================================================
 // Request Types

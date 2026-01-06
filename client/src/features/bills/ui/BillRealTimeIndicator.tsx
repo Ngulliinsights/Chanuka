@@ -1,25 +1,17 @@
 /**
  * Bill Real-time Indicator Component
- * 
+ *
  * Shows real-time status updates, engagement metrics, and activity indicators
  * for individual bills using WebSocket integration.
  */
 
+import { Activity, MessageSquare, Users, TrendingUp, AlertCircle, Clock, Eye } from 'lucide-react';
 import React from 'react';
-import {
-  Activity, 
-  MessageSquare, 
-  Users, 
-  TrendingUp,
-  AlertCircle,
-  Clock,
-  Eye
-} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { cn } from '@client/lib/utils';
 import { BillRealTimeUpdate } from '@client/core/realtime/types';
+import { cn } from '@client/lib/utils';
+import { Badge } from '@client/shared/design-system';
 
 // Mock implementation until WebSocket hook is ready
 const useBillRealTime = (_billId: number) => ({
@@ -31,8 +23,8 @@ const useBillRealTime = (_billId: number) => ({
     save_count: 0,
     share_count: 0,
     community_sentiment: 'neutral' as 'positive' | 'negative' | 'neutral',
-    controversy_level: 'low' as 'low' | 'medium' | 'high'
-  }
+    controversy_level: 'low' as 'low' | 'medium' | 'high',
+  },
 });
 
 interface BillRealTimeIndicatorProps {
@@ -48,13 +40,9 @@ export function BillRealTimeIndicator({
   className,
   showEngagementMetrics = true,
   showRecentUpdates = true,
-  compact = false
+  compact = false,
 }: BillRealTimeIndicatorProps) {
-  const {
-    isConnected,
-    billUpdates,
-    engagementMetrics
-  } = useBillRealTime(billId);
+  const { isConnected, billUpdates, engagementMetrics } = useBillRealTime(billId);
 
   const [recentUpdate, setRecentUpdate] = useState<BillRealTimeUpdate | null>(null);
   const [showUpdateAnimation, setShowUpdateAnimation] = useState(false);
@@ -67,12 +55,12 @@ export function BillRealTimeIndicator({
       if (!recentUpdate || latest.timestamp !== recentUpdate.timestamp) {
         setRecentUpdate(latest);
         setShowUpdateAnimation(true);
-        
+
         // Remove animation after 3 seconds to avoid visual clutter
         const timer = setTimeout(() => {
           setShowUpdateAnimation(false);
         }, 3000);
-        
+
         return () => clearTimeout(timer);
       }
     }
@@ -128,7 +116,7 @@ export function BillRealTimeIndicator({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
@@ -145,27 +133,24 @@ export function BillRealTimeIndicator({
   // Compact mode: minimal display for tight spaces
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className={cn('flex items-center gap-2', className)}>
         {/* Connection status indicator */}
-        <div className={cn(
-          "w-2 h-2 rounded-full",
-          isConnected ? "bg-green-500" : "bg-gray-400"
-        )} />
-        
+        <div className={cn('w-2 h-2 rounded-full', isConnected ? 'bg-green-500' : 'bg-gray-400')} />
+
         {/* Show most recent update with pulse animation */}
         {recentUpdate && (
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className={cn(
-              "text-xs flex items-center gap-1",
-              showUpdateAnimation && "animate-pulse bg-blue-100 text-blue-700"
+              'text-xs flex items-center gap-1',
+              showUpdateAnimation && 'animate-pulse bg-blue-100 text-blue-700'
             )}
           >
             {getUpdateIcon(recentUpdate.type)}
             {formatTimestamp(recentUpdate.timestamp)}
           </Badge>
         )}
-        
+
         {/* Quick engagement metrics overview */}
         {showEngagementMetrics && engagementMetrics && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -185,19 +170,18 @@ export function BillRealTimeIndicator({
 
   // Full mode: comprehensive display with all metrics and updates
   return (
-    <div className={cn("space-y-3", className)}>
+    <div className={cn('space-y-3', className)}>
       {/* Connection status header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={cn(
-            "w-2 h-2 rounded-full",
-            isConnected ? "bg-green-500" : "bg-gray-400"
-          )} />
+          <div
+            className={cn('w-2 h-2 rounded-full', isConnected ? 'bg-green-500' : 'bg-gray-400')}
+          />
           <span className="text-xs text-muted-foreground">
             {isConnected ? 'Live Updates' : 'Offline Mode'}
           </span>
         </div>
-        
+
         {billUpdates.length > 0 && (
           <Badge variant="outline" className="text-xs">
             {billUpdates.length} updates
@@ -207,16 +191,16 @@ export function BillRealTimeIndicator({
 
       {/* Display the most recent update with visual emphasis */}
       {showRecentUpdates && recentUpdate && (
-        <div className={cn(
-          "p-3 rounded-md border bg-card",
-          showUpdateAnimation && "border-blue-200 bg-blue-50"
-        )}>
+        <div
+          className={cn(
+            'p-3 rounded-md border bg-card',
+            showUpdateAnimation && 'border-blue-200 bg-blue-50'
+          )}
+        >
           <div className="flex items-start gap-2">
             {getUpdateIcon(recentUpdate.type)}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">
-                {getUpdateTypeLabel(recentUpdate.type)}
-              </p>
+              <p className="text-sm font-medium">{getUpdateTypeLabel(recentUpdate.type)}</p>
               <p className="text-xs text-muted-foreground">
                 {formatTimestamp(recentUpdate.timestamp)}
               </p>
@@ -234,21 +218,21 @@ export function BillRealTimeIndicator({
             </div>
             <div className="text-xs text-muted-foreground">Views</div>
           </div>
-          
+
           <div className="text-center p-2 rounded-md bg-muted/50">
             <div className="text-lg font-semibold text-green-600">
               {formatNumber(engagementMetrics.comment_count)}
             </div>
             <div className="text-xs text-muted-foreground">Comments</div>
           </div>
-          
+
           <div className="text-center p-2 rounded-md bg-muted/50">
             <div className="text-lg font-semibold text-purple-600">
               {formatNumber(engagementMetrics.save_count)}
             </div>
             <div className="text-xs text-muted-foreground">Saved</div>
           </div>
-          
+
           <div className="text-center p-2 rounded-md bg-muted/50">
             <div className="text-lg font-semibold text-orange-600">
               {formatNumber(engagementMetrics.share_count)}
@@ -262,11 +246,13 @@ export function BillRealTimeIndicator({
       {engagementMetrics && (
         <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
           <span className="text-xs text-muted-foreground">Community Sentiment</span>
-          <Badge 
+          <Badge
             variant={
-              engagementMetrics.community_sentiment === 'positive' ? 'default' :
-              engagementMetrics.community_sentiment === 'negative' ? 'destructive' :
-              'secondary'
+              engagementMetrics.community_sentiment === 'positive'
+                ? 'default'
+                : engagementMetrics.community_sentiment === 'negative'
+                  ? 'destructive'
+                  : 'secondary'
             }
             className="text-xs"
           >
@@ -279,7 +265,7 @@ export function BillRealTimeIndicator({
       {engagementMetrics && engagementMetrics.controversy_level !== 'low' && (
         <div className="flex items-center justify-between p-2 rounded-md bg-yellow-50 border border-yellow-200">
           <span className="text-xs text-yellow-800">Controversy Level</span>
-          <Badge 
+          <Badge
             variant={engagementMetrics.controversy_level === 'high' ? 'destructive' : 'secondary'}
             className="text-xs"
           >

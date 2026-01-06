@@ -8,7 +8,6 @@ import { cn } from '@/shared/design-system/utils/cn';
 import { useGlobalLoading } from './GlobalLoadingProvider';
 import { LoadingOperation, LoadingPriority } from './types';
 
-
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
@@ -215,7 +214,7 @@ export const GlobalLoadingIndicator = React.memo<GlobalLoadingIndicatorProps>(
         {/* Operation details */}
         {showOperationDetails && visibleOperations.length > 0 && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-            {visibleOperations.map((operation) => (
+            {visibleOperations.map(operation => (
               <div
                 key={operation.id}
                 className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400"

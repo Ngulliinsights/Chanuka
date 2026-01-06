@@ -9,18 +9,13 @@ export { billsPagination } from './services/pagination';
 export { BillTrackingService, billTrackingService } from './services/tracking';
 
 // Export types
-export type {
-  CacheEntry,
-  CacheConfig,
-  CacheStats,
-  OfflineQueueItem
-} from './services/cache';
+export type { CacheEntry, CacheConfig, CacheStats, OfflineQueueItem } from './services/cache';
 
 export type {
   PaginationConfig,
   PaginationState,
   PageData,
-  VirtualScrollData
+  VirtualScrollData,
 } from './services/pagination';
 
 // Legacy service placeholder for compatibility

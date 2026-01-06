@@ -1,6 +1,6 @@
 /**
  * Authentication Constants
- * 
+ *
  * Centralized constants for authentication system
  */
 
@@ -40,13 +40,13 @@ export const AUTH_ERROR_MESSAGES = {
   // General
   REQUIRED_FIELD: 'This field is required',
   INVALID_FORMAT: 'Invalid format',
-  
+
   // Email
   INVALID_EMAIL: 'Please enter a valid email address',
   EMAIL_TOO_LONG: 'Email address is too long',
   EMAIL_ALREADY_EXISTS: 'An account with this email already exists',
   EMAIL_NOT_FOUND: 'No account found with this email address',
-  
+
   // Password
   WEAK_PASSWORD: 'Password does not meet security requirements',
   PASSWORD_TOO_SHORT: 'Password is too short',
@@ -60,12 +60,12 @@ export const AUTH_ERROR_MESSAGES = {
   PASSWORD_REPEATED: 'Password contains too many repeated characters',
   PASSWORDS_DONT_MATCH: 'Passwords do not match',
   CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
-  
+
   // Name
   INVALID_NAME: 'Please enter a valid name',
   NAME_TOO_SHORT: 'Name is too short',
   NAME_TOO_LONG: 'Name is too long',
-  
+
   // Authentication
   LOGIN_FAILED: 'Login failed. Please check your credentials.',
   REGISTRATION_FAILED: 'Registration failed. Please try again.',
@@ -73,33 +73,33 @@ export const AUTH_ERROR_MESSAGES = {
   TOKEN_EXPIRED: 'Your session has expired. Please log in again.',
   TOKEN_INVALID: 'Invalid authentication token',
   TOKEN_REFRESH_FAILED: 'Failed to refresh authentication token',
-  
+
   // Two-Factor Authentication
   TWO_FACTOR_REQUIRED: 'Two-factor authentication is required',
   TWO_FACTOR_INVALID: 'Invalid two-factor authentication code',
   TWO_FACTOR_SETUP_FAILED: 'Failed to set up two-factor authentication',
   TWO_FACTOR_ENABLE_FAILED: 'Failed to enable two-factor authentication',
   TWO_FACTOR_DISABLE_FAILED: 'Failed to disable two-factor authentication',
-  
+
   // Session
   SESSION_EXPIRED: 'Your session has expired',
   SESSION_INVALID: 'Invalid session',
   SESSION_NOT_FOUND: 'No active session found',
-  
+
   // Permissions
   INSUFFICIENT_PERMISSIONS: 'You do not have permission to perform this action',
   ACCESS_DENIED: 'Access denied',
-  
+
   // Account
   ACCOUNT_LOCKED: 'Account is temporarily locked due to too many failed attempts',
   ACCOUNT_DISABLED: 'Account has been disabled',
   ACCOUNT_NOT_VERIFIED: 'Please verify your email address before continuing',
-  
+
   // OAuth
   OAUTH_FAILED: 'OAuth authentication failed',
   OAUTH_CANCELLED: 'OAuth authentication was cancelled',
   OAUTH_STATE_MISMATCH: 'OAuth state parameter mismatch',
-  
+
   // Network
   NETWORK_ERROR: 'Network error. Please check your connection.',
   SERVER_ERROR: 'Server error. Please try again later.',
@@ -173,20 +173,20 @@ export const PERMISSIONS = {
   CREATE_BILLS: 'bills:create',
   EDIT_BILLS: 'bills:edit',
   DELETE_BILLS: 'bills:delete',
-  
+
   // Comment permissions
   VIEW_COMMENTS: 'comments:view',
   CREATE_COMMENTS: 'comments:create',
   EDIT_COMMENTS: 'comments:edit',
   DELETE_COMMENTS: 'comments:delete',
   MODERATE_COMMENTS: 'comments:moderate',
-  
+
   // User permissions
   VIEW_USERS: 'users:view',
   EDIT_USERS: 'users:edit',
   DELETE_USERS: 'users:delete',
   MANAGE_ROLES: 'users:manage_roles',
-  
+
   // Admin permissions
   ADMIN_PANEL: 'admin:panel',
   SYSTEM_CONFIG: 'admin:config',
@@ -207,31 +207,31 @@ export const AUTH_ENDPOINTS = {
   FORGOT_PASSWORD: '/auth/forgot-password',
   RESET_PASSWORD: '/auth/reset-password',
   CHANGE_PASSWORD: '/auth/change-password',
-  
+
   // Profile
   PROFILE: '/auth/profile',
   UPDATE_PROFILE: '/auth/profile',
-  
+
   // Two-Factor Auth
   SETUP_2FA: '/auth/2fa/setup',
   ENABLE_2FA: '/auth/2fa/enable',
   DISABLE_2FA: '/auth/2fa/disable',
   VERIFY_2FA: '/auth/2fa/verify',
-  
+
   // Sessions
   SESSIONS: '/auth/sessions',
   TERMINATE_SESSION: '/auth/sessions/:id',
   TERMINATE_ALL_SESSIONS: '/auth/sessions/all',
-  
+
   // OAuth
   OAUTH_AUTHORIZE: '/auth/oauth/:provider',
   OAUTH_CALLBACK: '/auth/oauth/callback',
-  
+
   // Privacy
   PRIVACY_SETTINGS: '/auth/privacy',
   DATA_EXPORT: '/auth/data-export',
   DATA_DELETION: '/auth/data-deletion',
-  
+
   // Security
   SECURITY_EVENTS: '/auth/security-events',
   SUSPICIOUS_ACTIVITY: '/auth/suspicious-activity',

@@ -1,14 +1,14 @@
-import React from 'react';
 import {
   ArrowLeft,
-  ChevronLeft, 
-  ChevronRight, 
-  AlertTriangle, 
-  DollarSign, 
-  Building, 
-  Eye, 
-  TrendingUp 
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  DollarSign,
+  Building,
+  Eye,
+  TrendingUp,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -17,8 +17,9 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
-interface PrimarySponsorProps { bill_id: string | undefined;
- }
+interface PrimarySponsorProps {
+  bill_id: string | undefined;
+}
 
 interface SponsorData {
   sponsor: {
@@ -82,7 +83,8 @@ interface SponsorData {
   };
 }
 
-export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps) { const [sponsor, setSponsor] = useState<SponsorData | null>(null);
+export default function PrimarySponsorAnalysis({ bill_id }: PrimarySponsorProps) {
+  const [sponsor, setSponsor] = useState<SponsorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,7 +97,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         if (!isMounted) return;
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch(`/api/bills/${bill_id}/sponsorship-analysis/primary-sponsor`, {
           signal: abortController.signal,
         });
@@ -105,7 +107,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         }
 
         const data = await response.json();
-        
+
         // Only update state if component is still mounted
         if (isMounted && !abortController.signal.aborted) {
           setSponsor(data);
@@ -195,9 +197,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Error Loading Analysis</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>
-            Try Again
-          </Button>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
       </div>
     );
@@ -217,18 +217,30 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+        <Link to="/" className="hover:text-primary transition-colors">
+          Home
+        </Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }`} className="hover:text-primary transition-colors">Bills</Link>
+        <Link to={`/bills/${bill_id}`} className="hover:text-primary transition-colors">
+          Bills
+        </Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
+        <Link
+          to={`/bills/${bill_id}/sponsorship-analysis`}
+          className="hover:text-primary transition-colors"
+        >
+          Sponsorship Analysis
+        </Link>
         <span>›</span>
         <span className="text-foreground">Primary Sponsor</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+        <Link
+          to={`/bills/${bill_id}/sponsorship-analysis`}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
+        >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -236,7 +248,9 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         <h1 className="text-3xl font-bold text-foreground mb-2">
           {sponsor.sponsor.name} - Primary Sponsor Analysis
         </h1>
-        <p className="text-muted-foreground">Comprehensive analysis of potential conflicts and transparency measures</p>
+        <p className="text-muted-foreground">
+          Comprehensive analysis of potential conflicts and transparency measures
+        </p>
       </div>
 
       {/* Sponsor Overview */}
@@ -249,9 +263,15 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
             <div>
               <h3 className="text-lg font-semibold mb-2">{sponsor.sponsor.name}</h3>
               <div className="space-y-2">
-                <p><span className="font-medium">Role:</span> {sponsor.sponsor.role}</p>
-                <p><span className="font-medium">Party:</span> {sponsor.sponsor.party}</p>
-                <p><span className="font-medium">Constituency:</span> {sponsor.sponsor.constituency}</p>
+                <p>
+                  <span className="font-medium">Role:</span> {sponsor.sponsor.role}
+                </p>
+                <p>
+                  <span className="font-medium">Party:</span> {sponsor.sponsor.party}
+                </p>
+                <p>
+                  <span className="font-medium">Constituency:</span> {sponsor.sponsor.constituency}
+                </p>
               </div>
             </div>
             <div className="space-y-4">
@@ -367,12 +387,18 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
               <h4 className="font-medium mb-3">Affected Sections</h4>
               <div className="space-y-2">
                 {sponsor.billImpact.affectedSections.map((section, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                  >
                     <div>
                       <span className="font-medium">Section {section.section}</span>
                       <p className="text-sm text-muted-foreground">{section.description}</p>
                     </div>
-                    <Badge className={`${getImpactColor(section.impact)} border-current`} variant="outline">
+                    <Badge
+                      className={`${getImpactColor(section.impact)} border-current`}
+                      variant="outline"
+                    >
                       {section.impact.toUpperCase()}
                     </Badge>
                   </div>
@@ -384,7 +410,9 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Benefit Estimate:</span>
-                  <span className="font-medium">${sponsor.billImpact.benefitEstimate.toLocaleString()}</span>
+                  <span className="font-medium">
+                    ${sponsor.billImpact.benefitEstimate.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Alignment Score:</span>
@@ -426,13 +454,13 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/overview`}>
+        <Link to={`/bills/${bill_id}/sponsorship-analysis/overview`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Overview
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
+        <Link to={`/bills/${bill_id}/sponsorship-analysis/co-sponsors`}>
           <Button>
             Next: Co-sponsors
             <ChevronRight className="h-4 w-4 ml-2" />
@@ -442,4 +470,3 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
     </div>
   );
 }
-

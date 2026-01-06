@@ -6,7 +6,11 @@
 import type { AppError } from '@client/core/error';
 import { BaseError, ErrorDomain } from '@client/utils/logger';
 
-export function getContextualMessage(error: BaseError, errorType?: string, context?: string): string {
+export function getContextualMessage(
+  error: BaseError,
+  errorType?: string,
+  context?: string
+): string {
   if (errorType === 'chunk') {
     return 'Failed to load part of the application. This usually happens after an app update. Try refreshing the page or clearing your browser cache.';
   }
@@ -28,32 +32,32 @@ export function getContextualMessage(error: BaseError, errorType?: string, conte
   }
 
   const domain = (error.metadata?.domain as ErrorDomain | undefined) || ErrorDomain.UNKNOWN;
-  
+
   switch (domain) {
     case ErrorDomain.NETWORK:
       return 'Unable to connect to the server. Please check your internet connection.';
-    
+
     case ErrorDomain.AUTHENTICATION:
       return 'Your session has expired or you are not logged in. Please sign in again to continue.';
-    
+
     case ErrorDomain.AUTHORIZATION:
       return 'You do not have permission to perform this action. Contact your administrator if you believe this is incorrect.';
-    
+
     case ErrorDomain.VALIDATION:
       return 'The information provided is invalid. Please check your input and try again.';
-    
+
     case ErrorDomain.DATABASE:
       return 'There was a problem accessing the database. Please try again in a few moments.';
-    
+
     case ErrorDomain.EXTERNAL_SERVICE:
       return 'An external service is temporarily unavailable. We are working to restore it.';
-    
+
     case ErrorDomain.BUSINESS_LOGIC:
       return 'This operation cannot be completed due to business rules or constraints.';
-    
+
     case ErrorDomain.CACHE:
       return 'There was a problem with cached data. Try refreshing to load fresh data.';
-    
+
     default:
       switch (context) {
         case 'page':

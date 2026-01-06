@@ -120,7 +120,11 @@ export class PageRelationshipService {
             '/bills': { type: 'parent', weight: 0.8, context: 'listing' },
             '/bills/:id/analysis': { type: 'child', weight: 1.0, context: 'analysis' },
             '/bills/:id/comments': { type: 'child', weight: 0.9, context: 'discussion' },
-            '/bills/:id/sponsorship-analysis': { type: 'child', weight: 0.9, context: 'sponsorship' },
+            '/bills/:id/sponsorship-analysis': {
+              type: 'child',
+              weight: 0.9,
+              context: 'sponsorship',
+            },
             '/community': { type: 'related', weight: 0.6, context: 'community-input' },
             '/expert-verification': { type: 'related', weight: 0.5, context: 'verification' },
           },
@@ -129,7 +133,11 @@ export class PageRelationshipService {
           pageId: '/bills/:id/analysis',
           relatedPages: {
             '/bills/:id': { type: 'parent', weight: 0.8, context: 'bill-details' },
-            '/bills/:id/sponsorship-analysis': { type: 'sibling', weight: 0.9, context: 'sponsorship' },
+            '/bills/:id/sponsorship-analysis': {
+              type: 'sibling',
+              weight: 0.9,
+              context: 'sponsorship',
+            },
             '/bills/:id/comments': { type: 'sibling', weight: 0.7, context: 'discussion' },
             '/expert-verification': { type: 'related', weight: 0.6, context: 'expert-input' },
           },
@@ -138,10 +146,26 @@ export class PageRelationshipService {
           pageId: '/bills/:id/sponsorship-analysis',
           relatedPages: {
             '/bills/:id': { type: 'parent', weight: 0.8, context: 'bill-details' },
-            '/bills/:id/sponsorship-analysis/overview': { type: 'child', weight: 1.0, context: 'overview' },
-            '/bills/:id/sponsorship-analysis/primary-sponsor': { type: 'child', weight: 0.9, context: 'primary-sponsor' },
-            '/bills/:id/sponsorship-analysis/co-sponsors': { type: 'child', weight: 0.9, context: 'co-sponsors' },
-            '/bills/:id/sponsorship-analysis/financial-network': { type: 'child', weight: 0.8, context: 'financial-analysis' },
+            '/bills/:id/sponsorship-analysis/overview': {
+              type: 'child',
+              weight: 1.0,
+              context: 'overview',
+            },
+            '/bills/:id/sponsorship-analysis/primary-sponsor': {
+              type: 'child',
+              weight: 0.9,
+              context: 'primary-sponsor',
+            },
+            '/bills/:id/sponsorship-analysis/co-sponsors': {
+              type: 'child',
+              weight: 0.9,
+              context: 'co-sponsors',
+            },
+            '/bills/:id/sponsorship-analysis/financial-network': {
+              type: 'child',
+              weight: 0.8,
+              context: 'financial-analysis',
+            },
             '/bills/:id/analysis': { type: 'sibling', weight: 0.7, context: 'bill-analysis' },
           },
         },
@@ -181,15 +205,51 @@ export class PageRelationshipService {
       },
       metadata: {
         '/': { title: 'Home', description: 'Legislative Transparency Platform', category: 'tools' },
-        '/bills': { title: 'Bills Dashboard', description: 'Browse and track legislative bills', category: 'legislative' },
-        '/bills/:id': { title: 'Bill Details', description: 'Detailed bill information', category: 'legislative' },
-        '/bills/:id/analysis': { title: 'Bill Analysis', description: 'In-depth bill analysis', category: 'tools' },
-        '/bills/:id/sponsorship-analysis': { title: 'Sponsorship Analysis', description: 'Bill sponsorship analysis', category: 'tools' },
-        '/community': { title: 'Community Input', description: 'Community engagement and feedback', category: 'community' },
-        '/expert-verification': { title: 'Expert Verification', description: 'Expert analysis and verification', category: 'tools' },
-        '/dashboard': { title: 'Dashboard', description: 'User dashboard and tracking', category: 'user' },
-        '/admin': { title: 'Admin Panel', description: 'Administrative functions', category: 'admin' },
-        '/admin/database': { title: 'Database Manager', description: 'Database administration', category: 'admin' },
+        '/bills': {
+          title: 'Bills Dashboard',
+          description: 'Browse and track legislative bills',
+          category: 'legislative',
+        },
+        '/bills/:id': {
+          title: 'Bill Details',
+          description: 'Detailed bill information',
+          category: 'legislative',
+        },
+        '/bills/:id/analysis': {
+          title: 'Bill Analysis',
+          description: 'In-depth bill analysis',
+          category: 'tools',
+        },
+        '/bills/:id/sponsorship-analysis': {
+          title: 'Sponsorship Analysis',
+          description: 'Bill sponsorship analysis',
+          category: 'tools',
+        },
+        '/community': {
+          title: 'Community Input',
+          description: 'Community engagement and feedback',
+          category: 'community',
+        },
+        '/expert-verification': {
+          title: 'Expert Verification',
+          description: 'Expert analysis and verification',
+          category: 'tools',
+        },
+        '/dashboard': {
+          title: 'Dashboard',
+          description: 'User dashboard and tracking',
+          category: 'user',
+        },
+        '/admin': {
+          title: 'Admin Panel',
+          description: 'Administrative functions',
+          category: 'admin',
+        },
+        '/admin/database': {
+          title: 'Database Manager',
+          description: 'Database administration',
+          category: 'admin',
+        },
       },
     };
   }
@@ -306,15 +366,11 @@ export class PageRelationshipService {
     // Apply boosts in a single pass
     const boostedPages = relatedPages.map(page => ({
       ...page,
-      weight: visitSet.has(page.pageId)
-        ? page.weight * this.VISIT_HISTORY_BOOST
-        : page.weight,
+      weight: visitSet.has(page.pageId) ? page.weight * this.VISIT_HISTORY_BOOST : page.weight,
     }));
 
     // Sort and slice in one operation
-    return boostedPages
-      .sort((a, b) => b.weight - a.weight)
-      .slice(0, maxSuggestions);
+    return boostedPages.sort((a, b) => b.weight - a.weight).slice(0, maxSuggestions);
   }
 
   /**
@@ -357,9 +413,7 @@ export class PageRelationshipService {
     }
 
     const visited = new Set<string>([startPage]);
-    const queue: Array<{ page: string; path: string[] }> = [
-      { page: startPage, path: [startPage] }
-    ];
+    const queue: Array<{ page: string; path: string[] }> = [{ page: startPage, path: [startPage] }];
 
     while (queue.length > 0) {
       const current = queue.shift()!;
@@ -440,10 +494,7 @@ export class PageRelationshipService {
       const currentWeight = this.userBehaviorWeights.get(key) ?? 0;
 
       // Cap the weight to prevent infinite growth
-      const newWeight = Math.min(
-        currentWeight + 0.1,
-        this.maxBehaviorWeight
-      );
+      const newWeight = Math.min(currentWeight + 0.1, this.maxBehaviorWeight);
 
       this.userBehaviorWeights.set(key, newWeight);
     }
@@ -491,9 +542,7 @@ export class PageRelationshipService {
     });
 
     // Sort and limit results
-    return scoredPages
-      .sort((a, b) => b.weight - a.weight)
-      .slice(0, maxSuggestions);
+    return scoredPages.sort((a, b) => b.weight - a.weight).slice(0, maxSuggestions);
   }
 
   /**
@@ -553,8 +602,9 @@ export class PageRelationshipService {
       }
 
       // Find parent relationship
-      const parentEntry = Object.entries(relationship.relatedPages)
-        .find(([, relation]) => relation.type === 'parent');
+      const parentEntry = Object.entries(relationship.relatedPages).find(
+        ([, relation]) => relation.type === 'parent'
+      );
 
       currentPage = parentEntry ? parentEntry[0] : '';
     }

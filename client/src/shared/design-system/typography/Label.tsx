@@ -7,11 +7,11 @@
  * ✅ Proper typography hierarchy
  */
 
-import * as LabelPrimitive from "@radix-ui/react-label"
-import { cva, type VariantProps } from "class-variance-authority"
-import * as React from "react"
+import * as LabelPrimitive from '@radix-ui/react-label';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
-import { cn } from "@/shared/design-system/utils/cn"
+import { cn } from '@/shared/design-system/utils/cn';
 
 const labelVariants = cva(
   [
@@ -21,7 +21,7 @@ const labelVariants = cva(
     'peer-disabled:cursor-not-allowed',
     'peer-disabled:opacity-50',
   ].join(' ')
-)
+);
 
 export interface LabelProps
   extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>,
@@ -29,21 +29,18 @@ export interface LabelProps
   required?: boolean;
 }
 
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  LabelProps
->(({ className, required, children, ...props }, ref) => (
-  <LabelPrimitive.Root
-    ref={ref}
-    className={cn(labelVariants(), className)}
-    {...props}
-  >
-    {children}
-    {required && (
-      <span className="ml-1 text-[hsl(var(--color-destructive))]" aria-label="required">*</span>
-    )}
-  </LabelPrimitive.Root>
-))
-Label.displayName = 'Label'
+const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
+  ({ className, required, children, ...props }, ref) => (
+    <LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props}>
+      {children}
+      {required && (
+        <span className="ml-1 text-[hsl(var(--color-destructive))]" aria-label="required">
+          *
+        </span>
+      )}
+    </LabelPrimitive.Root>
+  )
+);
+Label.displayName = 'Label';
 
-export { Label, labelVariants }
+export { Label, labelVariants };

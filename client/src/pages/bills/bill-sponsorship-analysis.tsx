@@ -8,18 +8,22 @@ import {
   Network,
   Shield,
   TrendingUp,
-  Users
+  Users,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import {
-  useBillSponsorshipAnalysis as useSponsorshipAnalysis
-} from '@client/features/bills';
+import { useBillSponsorshipAnalysis as useSponsorshipAnalysis } from '@client/features/bills';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 // Define proper TypeScript interfaces for our data structures
@@ -56,7 +60,7 @@ interface SponsorshipData {
 export default function BillSponsorshipAnalysis() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Fetch data with proper typing - cast the unknown type to our defined interface
   // This tells TypeScript exactly what shape the data should have
   const { data: sponsorshipData } = useSponsorshipAnalysis(id || '');
@@ -74,11 +78,21 @@ export default function BillSponsorshipAnalysis() {
       name: 'Hon. Sarah Wanjiku',
       constituency: 'Nairobi Central',
       party: 'Green Alliance',
-      position: 'Chairperson, Environment Committee'
+      position: 'Chairperson, Environment Committee',
     },
     coSponsors: [
-      { id: 'mp-002', name: 'Hon. James Mwangi', constituency: 'Kiambu East', party: 'Progressive Party' },
-      { id: 'mp-003', name: 'Hon. Mary Achieng', constituency: 'Kisumu West', party: 'Democratic Union' }
+      {
+        id: 'mp-002',
+        name: 'Hon. James Mwangi',
+        constituency: 'Kiambu East',
+        party: 'Progressive Party',
+      },
+      {
+        id: 'mp-003',
+        name: 'Hon. Mary Achieng',
+        constituency: 'Kisumu West',
+        party: 'Democratic Union',
+      },
     ],
     totalFinancialExposure: 28700000,
     industryAlignment: 73,
@@ -87,8 +101,8 @@ export default function BillSponsorshipAnalysis() {
     financialBreakdown: {
       directInvestments: 15200000,
       indirectHoldings: 8900000,
-      familyInterests: 4600000
-    }
+      familyInterests: 4600000,
+    },
   };
 
   // Use API data if available, otherwise fall back to mock data
@@ -101,17 +115,21 @@ export default function BillSponsorshipAnalysis() {
       style: 'currency',
       currency: 'KES',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   // Helper function to determine styling based on risk level
   const getConflictRiskColor = (risk: string): string => {
     switch (risk) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-orange-100 text-orange-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-orange-100 text-orange-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -141,7 +159,9 @@ export default function BillSponsorshipAnalysis() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-xl">{data.title}</CardTitle>
-              <CardDescription>{data.number} • Introduced {data.introduced}</CardDescription>
+              <CardDescription>
+                {data.number} • Introduced {data.introduced}
+              </CardDescription>
             </div>
             <Badge className={getConflictRiskColor(data.conflictRisk)}>
               {data.conflictRisk.toUpperCase()} CONFLICT RISK
@@ -265,8 +285,12 @@ export default function BillSponsorshipAnalysis() {
                     <Users className="w-8 h-8 text-blue-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900">{data.primarySponsor.name}</h3>
-                    <p className="text-gray-600">{data.primarySponsor.constituency} • {data.primarySponsor.party}</p>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {data.primarySponsor.name}
+                    </h3>
+                    <p className="text-gray-600">
+                      {data.primarySponsor.constituency} • {data.primarySponsor.party}
+                    </p>
                     {data.primarySponsor.position && (
                       <p className="text-sm text-gray-500 mt-1">{data.primarySponsor.position}</p>
                     )}
@@ -282,7 +306,7 @@ export default function BillSponsorshipAnalysis() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-semibold mb-3">Financial Interests</h4>
@@ -301,7 +325,7 @@ export default function BillSponsorshipAnalysis() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h4 className="font-semibold mb-3">Committee Positions</h4>
                     <div className="space-y-2">
@@ -326,14 +350,19 @@ export default function BillSponsorshipAnalysis() {
             <CardContent>
               <div className="space-y-4">
                 {data.coSponsors.map((sponsor: Sponsor) => (
-                  <div key={sponsor.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div
+                    key={sponsor.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <Users className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">{sponsor.name}</h4>
-                        <p className="text-sm text-gray-600">{sponsor.constituency} • {sponsor.party}</p>
+                        <p className="text-sm text-gray-600">
+                          {sponsor.constituency} • {sponsor.party}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -358,22 +387,27 @@ export default function BillSponsorshipAnalysis() {
                 <Network className="w-5 h-5" />
                 Financial Network Analysis
               </CardTitle>
-              <CardDescription>Mapping of financial connections and influence networks</CardDescription>
+              <CardDescription>
+                Mapping of financial connections and influence networks
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="text-center p-8 bg-gray-50 rounded-lg">
                   <Network className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Interactive Network Visualization</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Interactive Network Visualization
+                  </h3>
                   <p className="text-gray-600 mb-4">
-                    Explore the complex web of financial relationships, corporate connections, and influence pathways
+                    Explore the complex web of financial relationships, corporate connections, and
+                    influence pathways
                   </p>
                   <Button>
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Launch Network Viewer
                   </Button>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-semibold mb-3">Key Corporate Connections</h4>
@@ -392,7 +426,7 @@ export default function BillSponsorshipAnalysis() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h4 className="font-semibold mb-3">Lobbying Activities</h4>
                     <div className="space-y-2">
@@ -415,12 +449,15 @@ export default function BillSponsorshipAnalysis() {
         {/* Workarounds Tab - displays implementation workaround detection */}
         <TabsContent value="workarounds" className="space-y-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Implementation Workaround Detection</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Implementation Workaround Detection
+            </h2>
             <p className="text-gray-600">
-              Analysis of potential workarounds and constitutional bypass mechanisms related to this legislation
+              Analysis of potential workarounds and constitutional bypass mechanisms related to this
+              legislation
             </p>
           </div>
-          
+
           {id && <ImplementationWorkarounds bill_id={id} />}
         </TabsContent>
       </Tabs>

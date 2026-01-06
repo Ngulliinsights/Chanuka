@@ -1,12 +1,18 @@
 import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { Bill } from '@client/shared/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Alert, AlertDescription } from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 interface BillAnalysisTabProps {
   bill: Bill;
@@ -70,7 +76,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             title: 'PhD in Constitutional Law',
             institution: 'Harvard Law School',
             year: 2010,
-            verified: true
+            verified: true,
           },
           {
             id: 'cred-2',
@@ -78,45 +84,52 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             title: 'Former Supreme Court Clerk',
             institution: 'U.S. Supreme Court',
             year: 2012,
-            verified: true
-          }
-        ]
+            verified: true,
+          },
+        ],
       },
       analysis: {
-        summary: 'This bill raises significant constitutional questions regarding federal vs state jurisdiction...',
+        summary:
+          'This bill raises significant constitutional questions regarding federal vs state jurisdiction...',
         constitutionalConcerns: [
           {
             id: 'concern-1',
             concern: 'Commerce Clause Overreach',
             severity: 'high',
-            explanation: 'The bill may exceed federal authority under the Commerce Clause...'
-          }
+            explanation: 'The bill may exceed federal authority under the Commerce Clause...',
+          },
         ],
         recommendation: 'oppose',
-        confidence: 85
+        confidence: 85,
       },
       engagement: {
         likes: 24,
         dislikes: 3,
-        comments: 8
+        comments: 8,
       },
-      timestamp: '2 hours ago'
-    }
+      timestamp: '2 hours ago',
+    },
   ];
 
   const getRecommendationColor = (recommendation: string) => {
     switch (recommendation) {
-      case 'support': return 'text-green-600';
-      case 'oppose': return 'text-red-600';
-      default: return 'text-yellow-600';
+      case 'support':
+        return 'text-green-600';
+      case 'oppose':
+        return 'text-red-600';
+      default:
+        return 'text-yellow-600';
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'border-red-300 text-red-700';
-      case 'medium': return 'border-yellow-300 text-yellow-700';
-      default: return 'border-green-300 text-green-700';
+      case 'high':
+        return 'border-red-300 text-red-700';
+      case 'medium':
+        return 'border-yellow-300 text-yellow-700';
+      default:
+        return 'border-green-300 text-green-700';
     }
   };
 
@@ -155,7 +168,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
@@ -167,7 +180,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
@@ -184,8 +197,8 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  This bill contains provisions that may conflict with existing constitutional precedents. 
-                  Review the Constitutional tab for detailed analysis.
+                  This bill contains provisions that may conflict with existing constitutional
+                  precedents. Review the Constitutional tab for detailed analysis.
                 </AlertDescription>
               </Alert>
             </TabsContent>
@@ -193,7 +206,7 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             <TabsContent value="constitutional" className="space-y-4">
               <div className="space-y-4">
                 <h4 className="font-semibold">Constitutional Concerns</h4>
-                {mockExpertAnalyses[0].analysis.constitutionalConcerns.map((concern) => (
+                {mockExpertAnalyses[0].analysis.constitutionalConcerns.map(concern => (
                   <Card key={concern.id}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
@@ -210,7 +223,9 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             </TabsContent>
 
             <TabsContent value="precedents" className="space-y-4">
-              <p className="text-muted-foreground">Legal precedent analysis would be displayed here...</p>
+              <p className="text-muted-foreground">
+                Legal precedent analysis would be displayed here...
+              </p>
             </TabsContent>
 
             <TabsContent value="impact" className="space-y-4">
@@ -227,13 +242,11 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             <Star className="h-5 w-5 text-yellow-500" />
             Expert Analyses
           </CardTitle>
-          <CardDescription>
-            Verified expert opinions and constitutional analysis
-          </CardDescription>
+          <CardDescription>Verified expert opinions and constitutional analysis</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockExpertAnalyses.map((analysis) => (
+            {mockExpertAnalyses.map(analysis => (
               <Card key={analysis.id}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
@@ -246,17 +259,19 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
                         <Badge variant="secondary" className="text-xs">
                           {analysis.expert.verificationType}
                         </Badge>
-                        <span className={`text-sm font-medium ${getRecommendationColor(analysis.analysis.recommendation)}`}>
+                        <span
+                          className={`text-sm font-medium ${getRecommendationColor(analysis.analysis.recommendation)}`}
+                        >
                           {analysis.analysis.recommendation.toUpperCase()}
                         </span>
                       </div>
-                      
+
                       <div className="text-xs text-muted-foreground mb-2">
                         {analysis.expert.credentials.map(cred => cred.title).join(' • ')}
                       </div>
-                      
+
                       <p className="text-sm mb-3">{analysis.analysis.summary}</p>
-                      
+
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span>{analysis.timestamp}</span>
                         <span>Confidence: {analysis.analysis.confidence}%</span>
@@ -283,30 +298,36 @@ function BillAnalysisTab({ bill }: BillAnalysisTabProps) {
             <FileText className="h-5 w-5 text-purple-500" />
             Take Action
           </CardTitle>
-          <CardDescription>
-            Ways to engage with this legislation
-          </CardDescription>
+          <CardDescription>Ways to engage with this legislation</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
               <span className="font-medium">Contact Representatives</span>
-              <span className="text-sm text-muted-foreground">Share your views with your elected officials</span>
+              <span className="text-sm text-muted-foreground">
+                Share your views with your elected officials
+              </span>
             </Button>
-            
+
             <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
               <span className="font-medium">Join Discussion</span>
-              <span className="text-sm text-muted-foreground">Participate in community dialogue</span>
+              <span className="text-sm text-muted-foreground">
+                Participate in community dialogue
+              </span>
             </Button>
-            
+
             <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
               <span className="font-medium">Share Analysis</span>
-              <span className="text-sm text-muted-foreground">Help others understand the implications</span>
+              <span className="text-sm text-muted-foreground">
+                Help others understand the implications
+              </span>
             </Button>
-            
+
             <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
               <span className="font-medium">Track Progress</span>
-              <span className="text-sm text-muted-foreground">Get updates on legislative progress</span>
+              <span className="text-sm text-muted-foreground">
+                Get updates on legislative progress
+              </span>
             </Button>
           </div>
         </CardContent>

@@ -52,7 +52,7 @@ class BackgroundSyncManager {
       actions.push({
         ...action,
         id: Date.now().toString(),
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       localStorage.setItem('offline-actions', JSON.stringify(actions));
@@ -118,7 +118,7 @@ class BackgroundSyncManager {
     return {
       queueLength: actions.length,
       lastSyncTime: actions.length > 0 ? Math.max(...actions.map(a => a.timestamp)) : null,
-      pendingActions: actions
+      pendingActions: actions,
     };
   }
 }

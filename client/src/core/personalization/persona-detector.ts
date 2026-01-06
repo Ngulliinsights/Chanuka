@@ -5,8 +5,9 @@
  * Requirements: 4.1, 4.2, 7.1
  */
 
-import type { User } from '../auth/types';
 import type { UserActivity } from '../../shared/types/analytics';
+import type { User } from '../auth/types';
+
 import type {
   PersonaType,
   PersonaMetrics,
@@ -14,7 +15,7 @@ import type {
   PersonaPreferences,
   PersonaDetectionConfig,
   PersonaThresholds,
-  UserPersonaProfile
+  UserPersonaProfile,
 } from './types';
 
 export class PersonaDetector {
@@ -27,31 +28,31 @@ export class PersonaDetector {
           maxLoginCount: 10,
           maxDaysActive: 7,
           maxBillsViewed: 5,
-          maxAdvancedFeatureUsage: 2
+          maxAdvancedFeatureUsage: 2,
         },
         intermediate: {
           minLoginCount: 5,
           minDaysActive: 7,
           minBillsViewed: 3,
           minEngagementActions: 5,
-          maxExpertFeatureUsage: 10
+          maxExpertFeatureUsage: 10,
         },
         expert: {
           minLoginCount: 20,
           minDaysActive: 14,
           minAdvancedFeatureUsage: 10,
-          minExpertContributions: 3
-        }
+          minExpertContributions: 3,
+        },
       },
       weights: {
         activity: 0.3,
         engagement: 0.3,
         expertise: 0.25,
-        consistency: 0.15
+        consistency: 0.15,
       },
       minimumDataPoints: 3,
       confidenceThreshold: 0.6,
-      ...config
+      ...config,
     };
   }
 
@@ -91,36 +92,41 @@ export class PersonaDetector {
     );
 
     // Group activities by type
-    const activityByType = activityHistory.reduce((acc, activity) => {
-      acc[activity.action] = (acc[activity.action] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const activityByType = activityHistory.reduce(
+      (acc, activity) => {
+        acc[activity.action] = (acc[activity.action] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Calculate time-based metrics
-    const totalDuration = activityHistory.reduce((sum, activity) =>
-      sum + (activity.duration || 0), 0
+    const totalDuration = activityHistory.reduce(
+      (sum, activity) => sum + (activity.duration || 0),
+      0
     );
 
-    const billViews = activityHistory.filter(a =>
-      a.action === 'view' && a.target_type === 'bill'
-    );
+    const billViews = activityHistory.filter(a => a.action === 'view' && a.target_type === 'bill');
 
-    const averageTimePerBill = billViews.length > 0
-      ? billViews.reduce((sum, view) => sum + (view.duration || 0), 0) / billViews.length / 60
-      : 0;
+    const averageTimePerBill =
+      billViews.length > 0
+        ? billViews.reduce((sum, view) => sum + (view.duration || 0), 0) / billViews.length / 60
+        : 0;
 
     // Advanced feature detection
-    const advancedActions = activityHistory.filter(a =>
-      a.metadata?.advanced_filter ||
-      a.metadata?.export_data ||
-      a.metadata?.api_call ||
-      a.target_type === 'analytics'
+    const advancedActions = activityHistory.filter(
+      a =>
+        a.metadata?.advanced_filter ||
+        a.metadata?.export_data ||
+        a.metadata?.api_call ||
+        a.target_type === 'analytics'
     );
 
-    const expertActions = activityHistory.filter(a =>
-      a.metadata?.expert_analysis ||
-      a.metadata?.verification_contribution ||
-      a.action === 'share' && a.metadata?.expert_insight
+    const expertActions = activityHistory.filter(
+      a =>
+        a.metadata?.expert_analysis ||
+        a.metadata?.verification_contribution ||
+        (a.action === 'share' && a.metadata?.expert_insight)
     );
 
     return {
@@ -143,23 +149,18 @@ export class PersonaDetector {
 
       // Content interaction depth
       averageTimePerBill,
-      fullTextReadsCount: activityHistory.filter(a =>
-        a.metadata?.full_text_read
-      ).length,
-      analysisViewsCount: activityHistory.filter(a =>
-        a.target_type === 'bill' && a.metadata?.section === 'analysis'
+      fullTextReadsCount: activityHistory.filter(a => a.metadata?.full_text_read).length,
+      analysisViewsCount: activityHistory.filter(
+        a => a.target_type === 'bill' && a.metadata?.section === 'analysis'
       ).length,
 
       // Social engagement
-      discussionsParticipated: activityHistory.filter(a =>
-        a.action === 'comment' || (a.action === 'view' && a.target_type === 'comment')
+      discussionsParticipated: activityHistory.filter(
+        a => a.action === 'comment' || (a.action === 'view' && a.target_type === 'comment')
       ).length,
-      expertInsightsShared: activityHistory.filter(a =>
-        a.metadata?.expert_insight
-      ).length,
-      verificationContributions: activityHistory.filter(a =>
-        a.metadata?.verification_contribution
-      ).length
+      expertInsightsShared: activityHistory.filter(a => a.metadata?.expert_insight).length,
+      verificationContributions: activityHistory.filter(a => a.metadata?.verification_contribution)
+        .length,
     };
   }
 
@@ -173,7 +174,11 @@ export class PersonaDetector {
     const noviceScore = this.calculateNoviceScore(metrics, thresholds.novice, weights);
 
     // Intermediate score - balanced engagement
-    const intermediateScore = this.calculateIntermediateScore(metrics, thresholds.intermediate, weights);
+    const intermediateScore = this.calculateIntermediateScore(
+      metrics,
+      thresholds.intermediate,
+      weights
+    );
 
     // Expert score - high advanced usage and contributions
     const expertScore = this.calculateExpertScore(metrics, thresholds.expert, weights, user);
@@ -181,7 +186,7 @@ export class PersonaDetector {
     return {
       novice: noviceScore,
       intermediate: intermediateScore,
-      expert: expertScore
+      expert: expertScore,
     };
   }
 
@@ -193,33 +198,39 @@ export class PersonaDetector {
     let score = 0;
 
     // Activity indicators (inverse scoring - less activity = higher novice score)
-    const activityScore = Math.max(0, 1 - (
-      (metrics.loginCount / thresholds.maxLoginCount) +
-      (metrics.daysActive / thresholds.maxDaysActive) +
-      (metrics.billsViewed / thresholds.maxBillsViewed)
-    ) / 3);
+    const activityScore = Math.max(
+      0,
+      1 -
+        (metrics.loginCount / thresholds.maxLoginCount +
+          metrics.daysActive / thresholds.maxDaysActive +
+          metrics.billsViewed / thresholds.maxBillsViewed) /
+          3
+    );
 
     // Low engagement indicators
-    const engagementScore = Math.max(0, 1 - (
-      (metrics.commentsPosted / 5) +
-      (metrics.searchesPerformed / 10) +
-      (metrics.billsBookmarked / 3)
-    ) / 3);
+    const engagementScore = Math.max(
+      0,
+      1 -
+        (metrics.commentsPosted / 5 +
+          metrics.searchesPerformed / 10 +
+          metrics.billsBookmarked / 3) /
+          3
+    );
 
     // Minimal advanced feature usage
-    const expertiseScore = Math.max(0, 1 - (
-      metrics.advancedFiltersUsed / thresholds.maxAdvancedFeatureUsage
-    ));
+    const expertiseScore = Math.max(
+      0,
+      1 - metrics.advancedFiltersUsed / thresholds.maxAdvancedFeatureUsage
+    );
 
     // Short session times
     const consistencyScore = metrics.averageTimePerBill < 2 ? 0.8 : 0.2;
 
-    score = (
+    score =
       activityScore * weights.activity +
       engagementScore * weights.engagement +
       expertiseScore * weights.expertise +
-      consistencyScore * weights.consistency
-    );
+      consistencyScore * weights.consistency;
 
     return Math.min(1, Math.max(0, score));
   }
@@ -232,34 +243,39 @@ export class PersonaDetector {
     let score = 0;
 
     // Moderate activity
-    const activityScore = (
-      (metrics.loginCount >= thresholds.minLoginCount ? 0.8 : 0.2) +
-      (metrics.daysActive >= thresholds.minDaysActive ? 0.8 : 0.2) +
-      (metrics.billsViewed >= thresholds.minBillsViewed ? 0.8 : 0.2)
-    ) / 3;
+    const activityScore =
+      ((metrics.loginCount >= thresholds.minLoginCount ? 0.8 : 0.2) +
+        (metrics.daysActive >= thresholds.minDaysActive ? 0.8 : 0.2) +
+        (metrics.billsViewed >= thresholds.minBillsViewed ? 0.8 : 0.2)) /
+      3;
 
     // Regular engagement
-    const totalEngagement = metrics.commentsPosted + metrics.searchesPerformed +
-                           metrics.billsBookmarked + metrics.discussionsParticipated;
-    const engagementScore = totalEngagement >= thresholds.minEngagementActions ? 0.8 :
-                           totalEngagement / thresholds.minEngagementActions;
+    const totalEngagement =
+      metrics.commentsPosted +
+      metrics.searchesPerformed +
+      metrics.billsBookmarked +
+      metrics.discussionsParticipated;
+    const engagementScore =
+      totalEngagement >= thresholds.minEngagementActions
+        ? 0.8
+        : totalEngagement / thresholds.minEngagementActions;
 
     // Some advanced features but not expert level
-    const expertiseScore = (
-      metrics.advancedFiltersUsed > 0 && metrics.advancedFiltersUsed <= thresholds.maxExpertFeatureUsage
-    ) ? 0.7 : 0.3;
+    const expertiseScore =
+      metrics.advancedFiltersUsed > 0 &&
+      metrics.advancedFiltersUsed <= thresholds.maxExpertFeatureUsage
+        ? 0.7
+        : 0.3;
 
     // Consistent moderate usage
-    const consistencyScore = (
-      metrics.averageTimePerBill >= 2 && metrics.averageTimePerBill <= 8
-    ) ? 0.8 : 0.4;
+    const consistencyScore =
+      metrics.averageTimePerBill >= 2 && metrics.averageTimePerBill <= 8 ? 0.8 : 0.4;
 
-    score = (
+    score =
       activityScore * weights.activity +
       engagementScore * weights.engagement +
       expertiseScore * weights.expertise +
-      consistencyScore * weights.consistency
-    );
+      consistencyScore * weights.consistency;
 
     return Math.min(1, Math.max(0, score));
   }
@@ -273,40 +289,42 @@ export class PersonaDetector {
     let score = 0;
 
     // High activity
-    const activityScore = (
-      (metrics.loginCount >= thresholds.minLoginCount ? 1 : metrics.loginCount / thresholds.minLoginCount) +
-      (metrics.daysActive >= thresholds.minDaysActive ? 1 : metrics.daysActive / thresholds.minDaysActive)
-    ) / 2;
+    const activityScore =
+      ((metrics.loginCount >= thresholds.minLoginCount
+        ? 1
+        : metrics.loginCount / thresholds.minLoginCount) +
+        (metrics.daysActive >= thresholds.minDaysActive
+          ? 1
+          : metrics.daysActive / thresholds.minDaysActive)) /
+      2;
 
     // Deep engagement
-    const engagementScore = Math.min(1, (
-      (metrics.commentsPosted / 20) +
-      (metrics.analysisViewsCount / 10) +
-      (metrics.fullTextReadsCount / 15)
-    ) / 3);
-
-    // Advanced feature usage and contributions
-    const expertiseScore = (
-      (metrics.advancedFiltersUsed >= thresholds.minAdvancedFeatureUsage ? 0.3 : 0) +
-      (metrics.expertToolsUsed >= 5 ? 0.3 : 0) +
-      (metrics.verificationContributions >= thresholds.minExpertContributions ? 0.4 : 0)
+    const engagementScore = Math.min(
+      1,
+      (metrics.commentsPosted / 20 +
+        metrics.analysisViewsCount / 10 +
+        metrics.fullTextReadsCount / 15) /
+        3
     );
 
+    // Advanced feature usage and contributions
+    const expertiseScore =
+      (metrics.advancedFiltersUsed >= thresholds.minAdvancedFeatureUsage ? 0.3 : 0) +
+      (metrics.expertToolsUsed >= 5 ? 0.3 : 0) +
+      (metrics.verificationContributions >= thresholds.minExpertContributions ? 0.4 : 0);
+
     // Role-based bonus
-    const roleBonus = (user.role === 'expert' || user.role === 'official') ? 0.2 : 0;
+    const roleBonus = user.role === 'expert' || user.role === 'official' ? 0.2 : 0;
 
     // Consistent deep usage
-    const consistencyScore = (
-      metrics.averageTimePerBill >= 5 &&
-      metrics.expertInsightsShared > 0
-    ) ? 1 : 0.5;
+    const consistencyScore =
+      metrics.averageTimePerBill >= 5 && metrics.expertInsightsShared > 0 ? 1 : 0.5;
 
-    score = (
+    score =
       activityScore * weights.activity +
       engagementScore * weights.engagement +
       (expertiseScore + roleBonus) * weights.expertise +
-      consistencyScore * weights.consistency
-    );
+      consistencyScore * weights.consistency;
 
     return Math.min(1, Math.max(0, score));
   }
@@ -318,8 +336,10 @@ export class PersonaDetector {
     scores: Record<PersonaType, number>,
     metrics: PersonaMetrics
   ): PersonaClassification {
-    const sortedPersonas = Object.entries(scores)
-      .sort(([, a], [, b]) => b - a) as [PersonaType, number][];
+    const sortedPersonas = Object.entries(scores).sort(([, a], [, b]) => b - a) as [
+      PersonaType,
+      number,
+    ][];
 
     const [topPersona, topScore] = sortedPersonas[0];
     const [secondPersona, secondScore] = sortedPersonas[1];
@@ -336,7 +356,7 @@ export class PersonaDetector {
       confidence,
       reasons,
       suggestedFeatures,
-      nextLevelRequirements
+      nextLevelRequirements,
     };
   }
 
@@ -384,7 +404,7 @@ export class PersonaDetector {
           'Popular bills widget',
           'Civic education content',
           'Simple search interface',
-          'Basic notifications'
+          'Basic notifications',
         ];
 
       case 'intermediate':
@@ -393,7 +413,7 @@ export class PersonaDetector {
           'Advanced search filters',
           'Community discussions',
           'Bill analysis summaries',
-          'Personalized recommendations'
+          'Personalized recommendations',
         ];
 
       case 'expert':
@@ -402,7 +422,7 @@ export class PersonaDetector {
           'Expert verification tools',
           'API access',
           'Data export functionality',
-          'Professional insights panel'
+          'Professional insights panel',
         ];
 
       default:
@@ -413,7 +433,10 @@ export class PersonaDetector {
   /**
    * Get requirements to reach next persona level
    */
-  private getNextLevelRequirements(persona: PersonaType, metrics: PersonaMetrics): string[] | undefined {
+  private getNextLevelRequirements(
+    persona: PersonaType,
+    metrics: PersonaMetrics
+  ): string[] | undefined {
     switch (persona) {
       case 'novice':
         const requirements: string[] = [];
@@ -426,9 +449,11 @@ export class PersonaDetector {
       case 'intermediate':
         const expertRequirements: string[] = [];
         if (metrics.advancedFiltersUsed < 5) expertRequirements.push('Use advanced search filters');
-        if (metrics.verificationContributions === 0) expertRequirements.push('Contribute to bill verification');
+        if (metrics.verificationContributions === 0)
+          expertRequirements.push('Contribute to bill verification');
         if (metrics.expertInsightsShared === 0) expertRequirements.push('Share expert insights');
-        if (metrics.averageTimePerBill < 5) expertRequirements.push('Spend more time analyzing bills');
+        if (metrics.averageTimePerBill < 5)
+          expertRequirements.push('Spend more time analyzing bills');
         return expertRequirements;
 
       case 'expert':
@@ -444,7 +469,7 @@ export class PersonaDetector {
       metrics.loginCount,
       metrics.billsViewed,
       metrics.searchesPerformed,
-      metrics.totalTimeSpent
+      metrics.totalTimeSpent,
     ].filter(value => value > 0).length;
 
     return dataPoints >= this.config.minimumDataPoints;
@@ -463,7 +488,7 @@ export class PersonaDetector {
       confidence: 0.5, // Low confidence due to lack of data
       reasons: ['New user - classification based on account type'],
       suggestedFeatures: this.getSuggestedFeatures(roleBasedPersona),
-      nextLevelRequirements: this.getNextLevelRequirements(roleBasedPersona, {} as PersonaMetrics)
+      nextLevelRequirements: this.getNextLevelRequirements(roleBasedPersona, {} as PersonaMetrics),
     };
   }
 
@@ -482,7 +507,7 @@ export class PersonaDetector {
     if (newClassification.type === existingProfile.currentPersona) {
       return {
         ...newClassification,
-        confidence: Math.max(newClassification.confidence, existingProfile.confidence * 0.9)
+        confidence: Math.max(newClassification.confidence, existingProfile.confidence * 0.9),
       };
     }
 
@@ -494,7 +519,7 @@ export class PersonaDetector {
         type: existingProfile.currentPersona,
         confidence: existingProfile.confidence * 0.95, // Slight decay
         reasons: ['Maintaining current persona - insufficient confidence for change'],
-        suggestedFeatures: this.getSuggestedFeatures(existingProfile.currentPersona)
+        suggestedFeatures: this.getSuggestedFeatures(existingProfile.currentPersona),
       };
     }
 
@@ -513,7 +538,7 @@ export class PersonaDetector {
           contentComplexity: 'simple',
           dashboardLayout: 'compact',
           showAdvancedFeatures: false,
-          enableExpertMode: false
+          enableExpertMode: false,
         };
 
       case 'intermediate':
@@ -523,7 +548,7 @@ export class PersonaDetector {
           contentComplexity: 'detailed',
           dashboardLayout: 'standard',
           showAdvancedFeatures: true,
-          enableExpertMode: false
+          enableExpertMode: false,
         };
 
       case 'expert':
@@ -533,7 +558,7 @@ export class PersonaDetector {
           contentComplexity: 'technical',
           dashboardLayout: 'expanded',
           showAdvancedFeatures: true,
-          enableExpertMode: true
+          enableExpertMode: true,
         };
     }
   }

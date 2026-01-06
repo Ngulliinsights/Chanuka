@@ -7,12 +7,14 @@ The following services have been successfully migrated from `client/src/services
 ### 🏗️ Infrastructure Services (Cross-cutting concerns)
 
 **Data Retention Service**
+
 - **From:** `client/src/services/dataRetentionService.ts`
 - **To:** `client/src/core/analytics/data-retention-service.ts`
 - **Reason:** Analytics and data management infrastructure
 - **Export:** Available via `@client/core/analytics/data-retention-service`
 
 **Navigation Service**
+
 - **From:** `client/src/services/navigation.ts`
 - **To:** `client/src/shared/infrastructure/navigation/navigation-service.ts`
 - **Reason:** Browser API abstraction for testing (infrastructure concern)
@@ -21,12 +23,14 @@ The following services have been successfully migrated from `client/src/services
 ### 🎯 Feature Services (Domain-specific logic)
 
 **User Service**
+
 - **From:** `client/src/services/userService.ts`
 - **To:** `client/src/features/users/model/user-service.ts`
 - **Reason:** User domain-specific business logic
 - **Export:** Available via `@client/features/users/model/user-service`
 
 **Page Relationship Service**
+
 - **From:** `client/src/services/PageRelationshipService.ts`
 - **To:** `client/src/features/navigation/model/page-relationship-service.ts`
 - **Reason:** Navigation feature-specific logic

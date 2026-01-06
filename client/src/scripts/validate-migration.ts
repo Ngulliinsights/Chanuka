@@ -29,7 +29,7 @@ class MigrationValidator {
     filesChecked: 0,
     unifiedComponentsUsed: 0,
     designTokensUsed: 0,
-    legacyPatternsFound: 0
+    legacyPatternsFound: 0,
   };
 
   async validateMigration(directory: string = 'client/src'): Promise<ValidationResult> {
@@ -37,45 +37,45 @@ class MigrationValidator {
 
     // Check if unified components exist
     await this.checkUnifiedComponents();
-    
+
     // Check if design tokens are properly set up
     await this.checkDesignTokens();
-    
+
     // Scan files for migration compliance
     await this.scanFiles(directory);
-    
+
     // Check CSS structure
     await this.checkCSSStructure();
 
     const passed = this.issues.length === 0;
-    
+
     this.printResults(passed);
-    
+
     return {
       passed,
       issues: this.issues,
       warnings: this.warnings,
-      summary: this.summary
+      summary: this.summary,
     };
   }
 
   private async checkUnifiedComponents(): Promise<void> {
     const unifiedComponentsPath = 'client/src/components/ui/unified-components.tsx';
-    
+
     if (!fs.existsSync(unifiedComponentsPath)) {
       this.issues.push('❌ Unified components file not found');
       return;
     }
 
     const content = fs.readFileSync(unifiedComponentsPath, 'utf8');
-    
+
     // Check for required components
     const requiredComponents = [
       'UnifiedButton',
       'UnifiedCard',
       'UnifiedBadge',
       'unifiedButtonVariants',
-      'unifiedBadgeVariants'
+      'unifiedBadgeVariants',
     ];
 
     for (const component of requiredComponents) {
@@ -89,14 +89,14 @@ class MigrationValidator {
 
   private async checkDesignTokens(): Promise<void> {
     const designTokensPath = 'client/src/styles/design-tokens.css';
-    
+
     if (!fs.existsSync(designTokensPath)) {
       this.issues.push('❌ Design tokens file not found');
       return;
     }
 
     const content = fs.readFileSync(designTokensPath, 'utf8');
-    
+
     // Check for required design tokens
     const requiredTokens = [
       '--color-primary',
@@ -108,7 +108,7 @@ class MigrationValidator {
       '--color-background',
       '--color-foreground',
       '--radius-md',
-      '--touch-target-min'
+      '--touch-target-min',
     ];
 
     for (const token of requiredTokens) {
@@ -128,8 +128,8 @@ class MigrationValidator {
         '**/build/**',
         '**/*.test.*',
         '**/*.spec.*',
-        '**/scripts/**'
-      ]
+        '**/scripts/**',
+      ],
     });
 
     console.log(`📁 Scanning ${files.length} files...`);
@@ -146,12 +146,20 @@ class MigrationValidator {
       const fileName = path.basename(filePath);
 
       // Check for unified component usage
-      if (content.includes('UnifiedButton') || content.includes('UnifiedCard') || content.includes('UnifiedBadge')) {
+      if (
+        content.includes('UnifiedButton') ||
+        content.includes('UnifiedCard') ||
+        content.includes('UnifiedBadge')
+      ) {
         this.summary.unifiedComponentsUsed++;
       }
 
       // Check for design token usage
-      if (content.includes('hsl(var(--color-') || content.includes('var(--radius-') || content.includes('var(--touch-target-')) {
+      if (
+        content.includes('hsl(var(--color-') ||
+        content.includes('var(--radius-') ||
+        content.includes('var(--touch-target-')
+      ) {
         this.summary.designTokensUsed++;
       }
 
@@ -160,11 +168,14 @@ class MigrationValidator {
         { pattern: /className="[^"]*bg-blue-600[^"]*"/g, message: 'Hardcoded blue-600 color' },
         { pattern: /className="[^"]*bg-green-600[^"]*"/g, message: 'Hardcoded green-600 color' },
         { pattern: /className="[^"]*bg-red-600[^"]*"/g, message: 'Hardcoded red-600 color' },
-        { pattern: /className="[^"]*text-gray-600[^"]*"/g, message: 'Hardcoded gray-600 text color' },
+        {
+          pattern: /className="[^"]*text-gray-600[^"]*"/g,
+          message: 'Hardcoded gray-600 text color',
+        },
         { pattern: /<Button\s/g, message: 'Legacy Button component (should use UnifiedButton)' },
         { pattern: /<Card\s/g, message: 'Legacy Card component (should use UnifiedCard)' },
         { pattern: /<Badge\s/g, message: 'Legacy Badge component (should use UnifiedBadge)' },
-        { pattern: /<button[^>]*(?!type=)/g, message: 'Button without type attribute' }
+        { pattern: /<button[^>]*(?!type=)/g, message: 'Button without type attribute' },
       ];
 
       for (const { pattern, message } of legacyPatterns) {
@@ -176,14 +187,16 @@ class MigrationValidator {
       }
 
       // Check for proper imports
-      if (content.includes("from '../components/ui/button'") && !content.includes('UnifiedButton')) {
+      if (
+        content.includes("from '../components/ui/button'") &&
+        !content.includes('UnifiedButton')
+      ) {
         this.warnings.push(`⚠️  ${fileName}: Still importing legacy Button component`);
       }
 
       if (content.includes("from '../components/ui/card'") && !content.includes('UnifiedCard')) {
         this.warnings.push(`⚠️  ${fileName}: Still importing legacy Card component`);
       }
-
     } catch (error) {
       this.warnings.push(`⚠️  Could not validate ${filePath}: ${error}`);
     }
@@ -191,20 +204,20 @@ class MigrationValidator {
 
   private async checkCSSStructure(): Promise<void> {
     const indexCSSPath = 'client/src/index.css';
-    
+
     if (!fs.existsSync(indexCSSPath)) {
       this.issues.push('❌ Main CSS file not found');
       return;
     }
 
     const content = fs.readFileSync(indexCSSPath, 'utf8');
-    
+
     // Check for proper import order
     const expectedOrder = [
       "import './styles/design-tokens.css'",
       '@tailwind base',
       '@tailwind components',
-      '@tailwind utilities'
+      '@tailwind utilities',
     ];
 
     let lastIndex = -1;
@@ -213,7 +226,9 @@ class MigrationValidator {
       if (index === -1) {
         this.warnings.push(`⚠️  Missing or incorrectly placed: ${expectedImport}`);
       } else if (index < lastIndex) {
-        this.warnings.push(`⚠️  Incorrect order: ${expectedImport} should come after previous imports`);
+        this.warnings.push(
+          `⚠️  Incorrect order: ${expectedImport} should come after previous imports`
+        );
       }
       lastIndex = index;
     }
@@ -231,7 +246,7 @@ class MigrationValidator {
   private printResults(passed: boolean): void {
     console.log('\n📊 Migration Validation Results:');
     console.log('═══════════════════════════════════');
-    
+
     if (passed) {
       console.log('🎉 Migration validation PASSED!');
     } else {
@@ -252,7 +267,7 @@ class MigrationValidator {
     if (this.warnings.length > 0) {
       console.log('\n⚠️  Warnings (recommended to fix):');
       this.warnings.slice(0, 10).forEach(warning => console.log(`   ${warning}`));
-      
+
       if (this.warnings.length > 10) {
         console.log(`   ... and ${this.warnings.length - 10} more warnings`);
       }
@@ -275,10 +290,10 @@ class MigrationValidator {
 async function main() {
   const args = process.argv.slice(2);
   const directory = args[0] || 'client/src';
-  
+
   const validator = new MigrationValidator();
   const result = await validator.validateMigration(directory);
-  
+
   // Exit with error code if validation failed
   process.exit(result.passed ? 0 : 1);
 }

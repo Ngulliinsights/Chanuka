@@ -1,32 +1,28 @@
-import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-
-import { useWebSocket } from "@client/hooks/use-websocket";
-import type { BillTrackingPreferences } from '@client/core/api/types';
-import { logger } from '@client/utils/logger';
-
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import React from 'react';
+import { useWebSocket } from '@client/hooks/use-websocket';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@client/shared/ui/Select";
+} from '@client/shared/ui/Select';
 import { Switch } from '@client/shared/ui/Switch';
+import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import React from 'react';
+import { toast } from 'sonner';
 
+import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Button } from '@/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import type { BillTrackingPreferences } from '@client/core/api/types';
+import { logger } from '@client/utils/logger';
 
 interface RealTimeBillTrackerProps {
   billId?: number;
 }
 
-export function RealTimeBillTracker({
-  billId,
-}: RealTimeBillTrackerProps) {
+export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
 
@@ -44,33 +40,33 @@ export function RealTimeBillTracker({
     getBillUpdates,
     markNotificationRead,
     updatePreferences,
-    getPreferences
+    getPreferences,
   } = useWebSocket({
     subscriptions: billId ? [{ type: 'bill', id: billId }] : [],
     handlers: {
-      onBillUpdate: (update) => {
+      onBillUpdate: update => {
         logger.debug('Bill update received in tracker', {
           billId: update.data?.billId,
-          type: update.type
+          type: update.type,
         });
       },
-      onNotification: (notification) => {
+      onNotification: notification => {
         toast.info(notification.title, {
           description: notification.message,
         });
       },
-      onConnectionChange: (connected) => {
+      onConnectionChange: connected => {
         if (connected) {
-          toast.success("Connected to real-time updates");
+          toast.success('Connected to real-time updates');
         } else {
-          toast.warning("Disconnected from real-time updates");
+          toast.warning('Disconnected from real-time updates');
         }
       },
-      onError: (error) => {
-        toast.error("WebSocket error occurred");
+      onError: error => {
+        toast.error('WebSocket error occurred');
         logger.error('WebSocket error in tracker:', error);
-      }
-    }
+      },
+    },
   });
 
   // Get preferences from service
@@ -83,10 +79,14 @@ export function RealTimeBillTracker({
   useEffect(() => {
     if (!isConnected) {
       connect().catch((error: Error) => {
-        logger.error('Failed to connect to WebSocket:', {
-          component: 'RealTimeBillTracker'
-        }, error);
-        toast.error("Failed to connect to real-time updates");
+        logger.error(
+          'Failed to connect to WebSocket:',
+          {
+            component: 'RealTimeBillTracker',
+          },
+          error
+        );
+        toast.error('Failed to connect to real-time updates');
       });
     }
 
@@ -115,36 +115,39 @@ export function RealTimeBillTracker({
 
   const handleUpdatePreferences = () => {
     updatePreferences(preferences);
-    toast.success("Preferences updated successfully");
+    toast.success('Preferences updated successfully');
   };
 
   const handlePreferenceChange = (key: keyof BillTrackingPreferences, value: any) => {
     setPreferences(prev => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
-  const handleNotificationChannelChange = (channel: keyof BillTrackingPreferences['notificationChannels'], value: boolean) => {
+  const handleNotificationChannelChange = (
+    channel: keyof BillTrackingPreferences['notificationChannels'],
+    value: boolean
+  ) => {
     setPreferences(prev => ({
       ...prev,
       notificationChannels: {
         ...prev.notificationChannels,
-        [channel]: value
-      }
+        [channel]: value,
+      },
     }));
   };
 
   const getConnectionStatusColor = () => {
-    if (isConnected) return "text-green-600";
-    if (connectionQuality === 'poor') return "text-yellow-600";
-    return "text-red-600";
+    if (isConnected) return 'text-green-600';
+    if (connectionQuality === 'poor') return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getConnectionStatusText = () => {
-    if (isConnected) return "Connected";
-    if (connectionQuality === 'poor') return "Poor Connection";
-    return "Disconnected";
+    if (isConnected) return 'Connected';
+    if (connectionQuality === 'poor') return 'Poor Connection';
+    return 'Disconnected';
   };
 
   return (
@@ -158,7 +161,7 @@ export function RealTimeBillTracker({
               Real-Time Bill Tracking
             </span>
             <Badge
-              variant={isConnected ? "default" : "destructive"}
+              variant={isConnected ? 'default' : 'destructive'}
               className={getConnectionStatusColor()}
             >
               {getConnectionStatusText()}
@@ -169,13 +172,10 @@ export function RealTimeBillTracker({
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
-                {billId
-                  ? `Tracking Bill #${billId}`
-                  : "No specific bill selected"}
+                {billId ? `Tracking Bill #${billId}` : 'No specific bill selected'}
               </p>
               <p className="text-xs text-muted-foreground">
-                Updates: {updates.length} | Notifications:{" "}
-                {notifications.length}
+                Updates: {updates.length} | Notifications: {notifications.length}
               </p>
             </div>
             <div className="flex gap-2">
@@ -183,7 +183,7 @@ export function RealTimeBillTracker({
                 <Button
                   onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
                   disabled={!isConnected}
-                  variant={isSubscribed ? "outline" : "default"}
+                  variant={isSubscribed ? 'outline' : 'default'}
                   size="sm"
                 >
                   {isSubscribed ? (
@@ -227,36 +227,28 @@ export function RealTimeBillTracker({
                     <label className="text-sm">Status Changes</label>
                     <Switch
                       checked={preferences.statusChanges}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange('statusChanges', checked)
-                      }
+                      onCheckedChange={checked => handlePreferenceChange('statusChanges', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">New Comments</label>
                     <Switch
                       checked={preferences.newComments}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange('newComments', checked)
-                      }
+                      onCheckedChange={checked => handlePreferenceChange('newComments', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">Voting Schedule</label>
                     <Switch
                       checked={preferences.votingSchedule}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange('votingSchedule', checked)
-                      }
+                      onCheckedChange={checked => handlePreferenceChange('votingSchedule', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">Amendments</label>
                     <Switch
                       checked={preferences.amendments}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange('amendments', checked)
-                      }
+                      onCheckedChange={checked => handlePreferenceChange('amendments', checked)}
                     />
                   </div>
                 </div>
@@ -266,7 +258,7 @@ export function RealTimeBillTracker({
                 <h4 className="font-medium">Update Frequency</h4>
                 <Select
                   value={preferences.updateFrequency}
-                  onValueChange={(value: "immediate" | "hourly" | "daily") =>
+                  onValueChange={(value: 'immediate' | 'hourly' | 'daily') =>
                     handlePreferenceChange('updateFrequency', value)
                   }
                 >
@@ -302,7 +294,7 @@ export function RealTimeBillTracker({
                       <label className="text-sm">In-App</label>
                       <Switch
                         checked={preferences.notificationChannels.inApp}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={checked =>
                           handleNotificationChannelChange('inApp', checked)
                         }
                       />
@@ -311,7 +303,7 @@ export function RealTimeBillTracker({
                       <label className="text-sm">Email</label>
                       <Switch
                         checked={preferences.notificationChannels.email}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={checked =>
                           handleNotificationChannelChange('email', checked)
                         }
                       />
@@ -320,7 +312,7 @@ export function RealTimeBillTracker({
                       <label className="text-sm">Push</label>
                       <Switch
                         checked={preferences.notificationChannels.push}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={checked =>
                           handleNotificationChannelChange('push', checked)
                         }
                       />
@@ -331,10 +323,7 @@ export function RealTimeBillTracker({
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button
-                onClick={() => setShowPreferences(false)}
-                variant="outline"
-              >
+              <Button onClick={() => setShowPreferences(false)} variant="outline">
                 Cancel
               </Button>
               <Button onClick={handleUpdatePreferences} disabled={!isConnected}>
@@ -356,9 +345,7 @@ export function RealTimeBillTracker({
               {updates.map((update, index) => (
                 <div key={index} className="border rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline">
-                      {update.type.replace("_", " ")}
-                    </Badge>
+                    <Badge variant="outline">{update.type.replace('_', ' ')}</Badge>
                     <span className="text-xs text-muted-foreground">
                       {new Date(update.timestamp).toLocaleTimeString()}
                     </span>
@@ -369,8 +356,7 @@ export function RealTimeBillTracker({
                     </p>
                     {update.data?.oldStatus && update.data?.newStatus && (
                       <p className="text-muted-foreground">
-                        Status: {update.data.oldStatus} →{" "}
-                        {update.data.newStatus}
+                        Status: {update.data.oldStatus} → {update.data.newStatus}
                       </p>
                     )}
                   </div>
@@ -392,19 +378,17 @@ export function RealTimeBillTracker({
               {notifications.map((notification, index) => (
                 <div key={index} className="border rounded-lg p-3">
                   <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-medium text-sm">
-                      {notification.title}
-                    </h4>
+                    <h4 className="font-medium text-sm">{notification.title}</h4>
                     <Badge variant="secondary">{notification.type}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {notification.message}
-                  </p>
-                  {notification.data && typeof notification.data === 'object' && 'changeCount' in notification.data && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {String(notification.data.changeCount)} changes included
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground">{notification.message}</p>
+                  {notification.data &&
+                    typeof notification.data === 'object' &&
+                    'changeCount' in notification.data && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {String(notification.data.changeCount)} changes included
+                      </p>
+                    )}
                 </div>
               ))}
             </div>
@@ -413,21 +397,25 @@ export function RealTimeBillTracker({
       )}
 
       {/* Connection Debug Info (Development) */}
-      {process.env.NODE_ENV === "development" && (
+      {process.env.NODE_ENV === 'development' && (
         <Card>
           <CardHeader>
             <CardTitle>Debug Info</CardTitle>
           </CardHeader>
           <CardContent>
             <pre className="text-xs bg-muted p-2 rounded">
-              {JSON.stringify({
-                isConnected,
-                connectionQuality,
-                error,
-                billUpdatesCount: Object.keys(billUpdates).length,
-                notificationsCount: notifications.length,
-                updatesCount: updates.length
-              }, null, 2)}
+              {JSON.stringify(
+                {
+                  isConnected,
+                  connectionQuality,
+                  error,
+                  billUpdatesCount: Object.keys(billUpdates).length,
+                  notificationsCount: notifications.length,
+                  updatesCount: updates.length,
+                },
+                null,
+                2
+              )}
             </pre>
           </CardContent>
         </Card>

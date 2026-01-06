@@ -1,8 +1,9 @@
 import type { UserRole, RelatedPage } from '@/shared/types';
+import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@/validation';
+
 import type { UserRole as SharedUserRole } from '../types';
 
 // Remove unused import
-import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';
 
@@ -11,56 +12,66 @@ function convertUserRoleArray(roles: SharedUserRole[] | undefined): UserRole[] |
   if (!roles) return undefined;
 
   const roleMap: Record<SharedUserRole, UserRole> = {
-    'public': 'public',
-    'citizen': 'citizen',
-    'expert': 'expert',
-    'admin': 'admin',
-    'journalist': 'journalist',
-    'advocate': 'advocate',
-    'official': 'citizen', // Map official to citizen for compatibility
-    'moderator': 'admin', // Map moderator to admin for compatibility
+    public: 'public',
+    citizen: 'citizen',
+    expert: 'expert',
+    admin: 'admin',
+    journalist: 'journalist',
+    advocate: 'advocate',
+    official: 'citizen', // Map official to citizen for compatibility
+    moderator: 'admin', // Map moderator to admin for compatibility
   };
 
   return roles.map(role => roleMap[role] || 'public');
 }
 
 // Define page relationships based on the configuration
-const PAGE_RELATIONSHIPS: Record<string, Record<string, { type: 'parent' | 'child' | 'sibling' | 'related'; weight: number; context: string }>> = {
+const PAGE_RELATIONSHIPS: Record<
+  string,
+  Record<
+    string,
+    { type: 'parent' | 'child' | 'sibling' | 'related'; weight: number; context: string }
+  >
+> = {
   '/': {
     '/bills': { type: 'child', weight: 10, context: 'View all bills' },
-    '/bill-sponsorship-analysis': { type: 'related', weight: 8, context: 'Analyze bill sponsorship patterns' },
-    '/search': { type: 'related', weight: 6, context: 'Search legislative content' }
+    '/bill-sponsorship-analysis': {
+      type: 'related',
+      weight: 8,
+      context: 'Analyze bill sponsorship patterns',
+    },
+    '/search': { type: 'related', weight: 6, context: 'Search legislative content' },
   },
   '/bills': {
     '/': { type: 'parent', weight: 10, context: 'Return to home' },
     '/bill-sponsorship-analysis': { type: 'sibling', weight: 9, context: 'Analyze bill data' },
-    '/search': { type: 'related', weight: 7, context: 'Search bills' }
+    '/search': { type: 'related', weight: 7, context: 'Search bills' },
   },
   '/bill-sponsorship-analysis': {
     '/': { type: 'parent', weight: 10, context: 'Return to home' },
     '/bills': { type: 'sibling', weight: 9, context: 'View bill details' },
-    '/search': { type: 'related', weight: 6, context: 'Search analysis data' }
+    '/search': { type: 'related', weight: 6, context: 'Search analysis data' },
   },
   '/community': {
     '/expert-verification': { type: 'sibling', weight: 8, context: 'Expert verification process' },
-    '/': { type: 'parent', weight: 6, context: 'Return to home' }
+    '/': { type: 'parent', weight: 6, context: 'Return to home' },
   },
   '/expert-verification': {
     '/community': { type: 'sibling', weight: 9, context: 'Community input' },
-    '/': { type: 'parent', weight: 7, context: 'Return to home' }
+    '/': { type: 'parent', weight: 7, context: 'Return to home' },
   },
   '/dashboard': {
     '/account': { type: 'sibling', weight: 9, context: 'Manage profile settings' },
-    '/': { type: 'parent', weight: 8, context: 'Return to home' }
+    '/': { type: 'parent', weight: 8, context: 'Return to home' },
   },
   '/account': {
     '/dashboard': { type: 'sibling', weight: 9, context: 'View dashboard' },
-    '/': { type: 'parent', weight: 8, context: 'Return to home' }
+    '/': { type: 'parent', weight: 8, context: 'Return to home' },
   },
   '/admin': {
     '/': { type: 'parent', weight: 10, context: 'Return to home' },
-    '/dashboard': { type: 'related', weight: 5, context: 'User dashboard' }
-  }
+    '/dashboard': { type: 'related', weight: 5, context: 'User dashboard' },
+  },
 };
 
 /**
@@ -90,9 +101,12 @@ export const calculateRelevanceScore = (
     }
 
     // Recency adjustments
-    const lastVisited = preferences?.recentlyVisited?.find((p: any) => p.path === relationship.context);
+    const lastVisited = preferences?.recentlyVisited?.find(
+      (p: any) => p.path === relationship.context
+    );
     if (lastVisited) {
-      const daysSinceVisited = (Date.now() - lastVisited.visitedAt.getTime()) / (1000 * 60 * 60 * 24);
+      const daysSinceVisited =
+        (Date.now() - lastVisited.visitedAt.getTime()) / (1000 * 60 * 60 * 24);
       if (daysSinceVisited < 7) {
         score *= 1.2; // Boost recently visited pages
       }
@@ -141,7 +155,13 @@ export const getPageRelationships = (
           type: rel.type as 'parent' | 'child' | 'sibling' | 'related',
           weight: rel.weight,
           context: rel.context,
-          relevanceScore: calculateRelevanceScore(rel, user_role, preferences, user, convertUserRoleArray(navItem?.allowedRoles))
+          relevanceScore: calculateRelevanceScore(
+            rel,
+            user_role,
+            preferences,
+            user,
+            convertUserRoleArray(navItem?.allowedRoles)
+          ),
         };
 
         // Validate the created related page
@@ -187,7 +207,7 @@ export const generateBreadcrumbRelationships = (
       type: 'parent',
       weight: 10,
       context: 'Return to home',
-      relevanceScore: 10
+      relevanceScore: 10,
     };
 
     try {
@@ -222,7 +242,7 @@ export const generateBreadcrumbRelationships = (
             type: 'parent',
             weight: 8,
             context: `Return to ${navItem.label}`,
-            relevanceScore: 8
+            relevanceScore: 8,
           };
 
           validateRelatedPage(breadcrumbPage);
@@ -241,4 +261,3 @@ export const generateBreadcrumbRelationships = (
     return [];
   }
 };
-

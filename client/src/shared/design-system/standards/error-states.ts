@@ -327,21 +327,31 @@ export const errorStateUtils = {
       },
       description: {
         className: 'chanuka-error-boundary-description',
-        text: config.description || 'An unexpected error occurred. Please try again or contact support if the problem persists.',
+        text:
+          config.description ||
+          'An unexpected error occurred. Please try again or contact support if the problem persists.',
       },
       actions: {
         className: 'chanuka-error-actions',
         children: [
-          ...(config.onRetry ? [{
-            className: 'chanuka-error-action chanuka-error-action-primary',
-            onClick: config.onRetry,
-            text: 'Try Again',
-          }] : []),
-          ...(config.onReport ? [{
-            className: 'chanuka-error-action chanuka-error-action-secondary',
-            onClick: config.onReport,
-            text: 'Report Issue',
-          }] : []),
+          ...(config.onRetry
+            ? [
+                {
+                  className: 'chanuka-error-action chanuka-error-action-primary',
+                  onClick: config.onRetry,
+                  text: 'Try Again',
+                },
+              ]
+            : []),
+          ...(config.onReport
+            ? [
+                {
+                  className: 'chanuka-error-action chanuka-error-action-secondary',
+                  onClick: config.onReport,
+                  text: 'Report Issue',
+                },
+              ]
+            : []),
         ],
       },
     },
@@ -532,27 +542,27 @@ export const errorStateUtils = {
     meetsContrastRequirements: boolean;
   }): { isValid: boolean; issues: string[] } => {
     const issues: string[] = [];
-    
+
     if (!errorState.hasRole) {
       issues.push('Error state must have appropriate role (alert, status, etc.)');
     }
-    
+
     if (!errorState.hasAriaLive) {
       issues.push('Error state should use aria-live for dynamic content');
     }
-    
+
     if (!errorState.hasDescriptiveText) {
       issues.push('Error state must have clear, descriptive text');
     }
-    
+
     if (!errorState.hasRecoveryActions) {
       issues.push('Error state should provide recovery actions when possible');
     }
-    
+
     if (!errorState.meetsContrastRequirements) {
       issues.push('Error state must meet WCAG contrast requirements');
     }
-    
+
     return {
       isValid: issues.length === 0,
       issues,
@@ -562,4 +572,3 @@ export const errorStateUtils = {
 
 export type ErrorSeverity = keyof typeof errorStates.severity;
 export type ErrorComponent = keyof typeof errorStates.component;
-

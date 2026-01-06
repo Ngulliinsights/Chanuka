@@ -45,7 +45,7 @@ interface BrandVoiceContextType {
    * @param audience "novice" | "engaged" | "specialist"
    */
   getAudienceGuidance: (
-    audience: keyof typeof AudienceAdaptation,
+    audience: keyof typeof AudienceAdaptation
   ) => (typeof AudienceAdaptation)[typeof audience];
 
   /**
@@ -118,11 +118,7 @@ export function BrandVoiceProvider({ children }: { children: ReactNode }) {
     personality: BrandPersonality,
   };
 
-  return (
-    <BrandVoiceContext.Provider value={contextValue}>
-      {children}
-    </BrandVoiceContext.Provider>
-  );
+  return <BrandVoiceContext.Provider value={contextValue}>{children}</BrandVoiceContext.Provider>;
 }
 
 /**
@@ -171,7 +167,7 @@ export const BrandText = React.forwardRef<HTMLElement, BrandTextProps>(
       },
       text
     );
-  },
+  }
 );
 
 BrandText.displayName = 'BrandText';

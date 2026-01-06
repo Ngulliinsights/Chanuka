@@ -8,6 +8,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@/shared/ui/loading';
+
 import { logger } from '../../../../utils/logger';
 
 // Extended type definitions
@@ -104,10 +105,7 @@ const initialState: LoadingStateData = {
 // Async thunks for loading operations
 export const startLoadingOperation = createAsyncThunk(
   'loading/startOperation',
-  async (
-    operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>,
-    { rejectWithValue }
-  ) => {
+  async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>, { rejectWithValue }) => {
     try {
       // Validate operation
       if (!operation.id || !operation.type) {
@@ -116,9 +114,7 @@ export const startLoadingOperation = createAsyncThunk(
 
       return operation;
     } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Failed to start operation'
-      );
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to start operation');
     }
   }
 );
@@ -132,9 +128,7 @@ export const completeLoadingOperation = createAsyncThunk(
     try {
       return { id, success, error };
     } catch (err) {
-      return rejectWithValue(
-        err instanceof Error ? err.message : 'Failed to complete operation'
-      );
+      return rejectWithValue(err instanceof Error ? err.message : 'Failed to complete operation');
     }
   }
 );
@@ -156,9 +150,7 @@ export const retryLoadingOperation = createAsyncThunk(
 
       return { id };
     } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Failed to retry operation'
-      );
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to retry operation');
     }
   }
 );
@@ -226,8 +218,11 @@ const loadingSlice = createSlice({
       }
 
       state.stats.connectionImpact =
-        action.payload.type === 'offline' ? 'high' :
-        action.payload.type === 'slow' ? 'medium' : 'low';
+        action.payload.type === 'offline'
+          ? 'high'
+          : action.payload.type === 'slow'
+            ? 'medium'
+            : 'low';
       state.stats.lastUpdate = Date.now();
     },
 
@@ -329,7 +324,7 @@ const loadingSlice = createSlice({
 
     // Batch stats updates to reduce race conditions
     batchStatsUpdate: (state, action: PayloadAction<StatsUpdate[]>) => {
-      action.payload.forEach((update) => {
+      action.payload.forEach(update => {
         const { type, payload } = update;
 
         switch (type) {
@@ -370,8 +365,8 @@ const loadingSlice = createSlice({
     },
 
     // Bulk operations
-    clearCompletedOperations: (state) => {
-      Object.keys(state.operations).forEach((id) => {
+    clearCompletedOperations: state => {
+      Object.keys(state.operations).forEach(id => {
         const operation = state.operations[id];
         if (operation && !operation.error && !operation.cancelled) {
           delete state.operations[id];
@@ -379,8 +374,8 @@ const loadingSlice = createSlice({
       });
     },
 
-    clearFailedOperations: (state) => {
-      Object.keys(state.operations).forEach((id) => {
+    clearFailedOperations: state => {
+      Object.keys(state.operations).forEach(id => {
         const operation = state.operations[id];
         if (operation && operation.error) {
           delete state.operations[id];
@@ -388,7 +383,7 @@ const loadingSlice = createSlice({
       });
     },
 
-    resetLoadingState: (state) => {
+    resetLoadingState: state => {
       // Keep connection info and adaptive settings
       const { connectionInfo, isOnline, adaptiveSettings } = state;
 
@@ -400,7 +395,7 @@ const loadingSlice = createSlice({
       };
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Start operation
     builder
       .addCase(startLoadingOperation.fulfilled, (state, action) => {
@@ -432,7 +427,7 @@ const loadingSlice = createSlice({
         // Update global loading states
         state.globalLoading = state.stats.activeOperations > 0;
         state.highPriorityLoading = Object.values(state.operations).some(
-          (op) => op.priority === 'high'
+          op => op.priority === 'high'
         );
 
         state.stats.lastUpdate = Date.now();
@@ -464,8 +459,7 @@ const loadingSlice = createSlice({
           const totalCompleted = state.stats.completedOperations;
           if (totalCompleted > 0) {
             state.stats.averageLoadTime =
-              (state.stats.averageLoadTime * (totalCompleted - 1) + loadTime) /
-              totalCompleted;
+              (state.stats.averageLoadTime * (totalCompleted - 1) + loadTime) / totalCompleted;
           }
         } else {
           operation.error = error;
@@ -483,7 +477,7 @@ const loadingSlice = createSlice({
         // Update global loading states
         state.globalLoading = state.stats.activeOperations > 0;
         state.highPriorityLoading = Object.values(state.operations).some(
-          (op) => op.priority === 'high'
+          op => op.priority === 'high'
         );
 
         state.stats.lastUpdate = Date.now();
@@ -523,7 +517,7 @@ const loadingSlice = createSlice({
         // Update global loading states
         state.globalLoading = state.stats.activeOperations > 0;
         state.highPriorityLoading = Object.values(state.operations).some(
-          (op) => op.priority === 'high'
+          op => op.priority === 'high'
         );
 
         state.stats.lastUpdate = Date.now();
@@ -552,20 +546,16 @@ export const {
 } = loadingSlice.actions;
 
 // Selectors
-export const selectLoadingOperation = (
-  state: { loading: LoadingStateData },
-  id: string
-) => state.loading.operations[id];
+export const selectLoadingOperation = (state: { loading: LoadingStateData }, id: string) =>
+  state.loading.operations[id];
 
-export const selectOperationsByType = (
-  state: { loading: LoadingStateData },
-  type: LoadingType
-) => Object.values(state.loading.operations).filter((op) => op.type === type);
+export const selectOperationsByType = (state: { loading: LoadingStateData }, type: LoadingType) =>
+  Object.values(state.loading.operations).filter(op => op.type === type);
 
 export const selectOperationsByPriority = (
   state: { loading: LoadingStateData },
   priority: LoadingPriority
-) => Object.values(state.loading.operations).filter((op) => op.priority === priority);
+) => Object.values(state.loading.operations).filter(op => op.priority === priority);
 
 export const selectActiveOperationsCount = (state: { loading: LoadingStateData }) =>
   Object.keys(state.loading.operations).length;
@@ -574,10 +564,7 @@ export const selectShouldShowGlobalLoader = (state: { loading: LoadingStateData 
   state.loading.highPriorityLoading ||
   (state.loading.globalLoading && selectActiveOperationsCount(state) > 2);
 
-export const selectEstimatedTimeRemaining = (
-  state: { loading: LoadingStateData },
-  id: string
-) => {
+export const selectEstimatedTimeRemaining = (state: { loading: LoadingStateData }, id: string) => {
   const operation = state.loading.operations[id];
   if (!operation) return null;
 
@@ -588,8 +575,7 @@ export const selectEstimatedTimeRemaining = (
   return remaining > 0 ? remaining : null;
 };
 
-export const selectLoadingStats = (state: { loading: LoadingStateData }) =>
-  state.loading.stats;
+export const selectLoadingStats = (state: { loading: LoadingStateData }) => state.loading.stats;
 
 export const selectConnectionInfo = (state: { loading: LoadingStateData }) =>
   state.loading.connectionInfo;

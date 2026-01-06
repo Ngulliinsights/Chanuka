@@ -1,10 +1,15 @@
 import { Shield, Eye, Clock, Users, Network } from 'lucide-react';
 import React from 'react';
 
-import { logger } from '@client/utils/logger';
-
 import { Badge } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 export function PrivacyPolicy() {
   return (
@@ -107,9 +112,7 @@ export function PrivacyPolicy() {
               <Shield className="h-5 w-5 text-red-600" />
               <span>How We Protect Your Data</span>
             </CardTitle>
-            <CardDescription>
-              Security measures and safeguards we implement
-            </CardDescription>
+            <CardDescription>Security measures and safeguards we implement</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
@@ -145,9 +148,7 @@ export function PrivacyPolicy() {
               <Clock className="h-5 w-5 text-orange-600" />
               <span>Data Retention</span>
             </CardTitle>
-            <CardDescription>
-              How long we keep different types of information
-            </CardDescription>
+            <CardDescription>How long we keep different types of information</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -245,33 +246,41 @@ export function PrivacyPolicy() {
               <Network className="h-5 w-5 text-teal-600" />
               <span>Data Sharing</span>
             </CardTitle>
-            <CardDescription>
-              When and how we share your information
-            </CardDescription>
+            <CardDescription>When and how we share your information</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                 <h4 className="font-semibold text-green-800 mb-2">We DO NOT sell your data</h4>
                 <p className="text-sm text-green-700">
-                  We never sell, rent, or trade your personal information to third parties for commercial purposes.
+                  We never sell, rent, or trade your personal information to third parties for
+                  commercial purposes.
                 </p>
               </div>
-              
+
               <div className="space-y-3">
                 <h4 className="font-semibold">Limited sharing occurs only for:</h4>
                 <ul className="text-sm space-y-2 text-gray-600">
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Service Providers:</strong> Trusted partners who help us operate the platform (with strict data protection agreements)</span>
+                    <span>
+                      <strong>Service Providers:</strong> Trusted partners who help us operate the
+                      platform (with strict data protection agreements)
+                    </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Legal Requirements:</strong> When required by law or to protect our rights and users' safety</span>
+                    <span>
+                      <strong>Legal Requirements:</strong> When required by law or to protect our
+                      rights and users' safety
+                    </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Public Information:</strong> Comments and profile information you choose to make public</span>
+                    <span>
+                      <strong>Public Information:</strong> Comments and profile information you
+                      choose to make public
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -293,7 +302,8 @@ export function PrivacyPolicy() {
                 <strong>Data Protection Officer:</strong> privacy@chanuka-platform.org
               </p>
               <p className="text-sm">
-                <strong>Privacy Requests:</strong> Use the Privacy Dashboard in your account settings
+                <strong>Privacy Requests:</strong> Use the Privacy Dashboard in your account
+                settings
               </p>
               <p className="text-sm">
                 <strong>General Inquiries:</strong> support@chanuka-platform.org
@@ -305,11 +315,10 @@ export function PrivacyPolicy() {
 
       <div className="text-center text-sm text-gray-500 border-t pt-6">
         <p>
-          This privacy policy is effective as of {new Date().toLocaleDateString()} and may be updated from time to time. 
-          We will notify you of any material changes.
+          This privacy policy is effective as of {new Date().toLocaleDateString()} and may be
+          updated from time to time. We will notify you of any material changes.
         </p>
       </div>
     </div>
   );
 }
-

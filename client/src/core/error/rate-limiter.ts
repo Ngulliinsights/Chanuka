@@ -55,9 +55,9 @@ export class ErrorRateLimiter {
   shouldLimit(error: AppError): { limited: boolean; retryAfter: number } {
     const key = `${error.type}:${error.context?.component ?? 'unknown'}`;
     const now = Date.now();
-    
+
     let entry = this.limits.get(key);
-    
+
     // Create new entry if none exists or window has expired
     if (!entry || now > entry.resetTime) {
       entry = {

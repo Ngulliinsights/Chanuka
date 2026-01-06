@@ -1,17 +1,17 @@
 /**
  * Design Tokens Validation & Consistency Layer
  * THE ARCHITECT PERSONA - Ensures unified token system
- * 
+ *
  * Provides centralized validation, documentation, and consistency checks
  */
 
-import { colorTokens } from './colors';
-import { typographyTokens } from './typography';
-import { spacingTokens } from './spacing';
-import { shadowTokens } from './shadows';
-import { borderTokens } from './borders';
 import { animationTokens } from './animations';
+import { borderTokens } from './borders';
 import { breakpointTokens } from './breakpoints';
+import { colorTokens } from './colors';
+import { shadowTokens } from './shadows';
+import { spacingTokens } from './spacing';
+import { typographyTokens } from './typography';
 
 /**
  * Token validation schema
@@ -64,7 +64,9 @@ export function validateTokenConsistency(): {
   }
 
   // Validate spacing scale consistency
-  const spacingKeys = Object.keys(spacingTokens).filter(k => typeof spacingTokens[k as keyof typeof spacingTokens] === 'string');
+  const spacingKeys = Object.keys(spacingTokens).filter(
+    k => typeof spacingTokens[k as keyof typeof spacingTokens] === 'string'
+  );
   if (spacingKeys.length < 8) {
     warnings.push(`Limited spacing scale: ${spacingKeys.length} (recommended: 12+)`);
   }
@@ -100,7 +102,15 @@ export function getTokenMetadata() {
 /**
  * Export all tokens for component usage
  */
-export { colorTokens, typographyTokens, spacingTokens, shadowTokens, borderTokens, animationTokens, breakpointTokens };
+export {
+  colorTokens,
+  typographyTokens,
+  spacingTokens,
+  shadowTokens,
+  borderTokens,
+  animationTokens,
+  breakpointTokens,
+};
 
 /**
  * Type-safe token access utilities

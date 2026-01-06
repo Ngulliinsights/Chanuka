@@ -14,7 +14,7 @@ import {
   EngagementMetricsUpdate,
   ExpertActivityUpdate,
   RealTimeNotification,
-  WebSocketSubscription
+  WebSocketSubscription,
 } from '@/core/realtime/types';
 
 export interface RealTimeState {
@@ -46,7 +46,7 @@ const initialConnectionState: CivicWebSocketState = {
   notification_subscriptions: false,
   connection_quality: 'disconnected',
   last_heartbeat: null,
-  message_count: 0
+  message_count: 0,
 };
 
 const initialState: RealTimeState = {
@@ -70,12 +70,12 @@ export const realTimeSlice = createSlice({
       state.connection = { ...state.connection, ...action.payload };
     },
 
-    connect: (state) => {
+    connect: state => {
       state.connection.isConnecting = true;
       state.connection.error = null;
     },
 
-    disconnect: (state) => {
+    disconnect: state => {
       state.connection.isConnected = false;
       state.connection.isConnecting = false;
       state.connection.connection_quality = 'disconnected';
@@ -206,12 +206,12 @@ export const realTimeSlice = createSlice({
       }
     },
 
-    clearNotifications: (state) => {
+    clearNotifications: state => {
       state.notifications = [];
       state.notificationCount = 0;
     },
 
-    toggleNotifications: (state) => {
+    toggleNotifications: state => {
       state.showNotifications = !state.showNotifications;
     },
 
@@ -256,7 +256,8 @@ export const {
 } = realTimeSlice.actions;
 
 // Selectors
-export const selectConnectionState = (state: { realTime: RealTimeState }) => state.realTime.connection;
+export const selectConnectionState = (state: { realTime: RealTimeState }) =>
+  state.realTime.connection;
 export const selectBillUpdates = (billId: number) => (state: { realTime: RealTimeState }) =>
   state.realTime.billUpdates[billId] || [];
 export const selectEngagementMetrics = (billId: number) => (state: { realTime: RealTimeState }) =>
@@ -269,12 +270,12 @@ export const selectRecentActivity = (state: { realTime: RealTimeState }) => {
   const allUpdates: (BillRealTimeUpdate | CommunityRealTimeUpdate)[] = [];
 
   // Collect all bill updates
-  Object.values(state.realTime.billUpdates).forEach((updates) => {
+  Object.values(state.realTime.billUpdates).forEach(updates => {
     allUpdates.push(...updates);
   });
 
   // Collect all community updates
-  Object.values(state.realTime.communityUpdates).forEach((updates) => {
+  Object.values(state.realTime.communityUpdates).forEach(updates => {
     allUpdates.push(...updates);
   });
 

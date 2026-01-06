@@ -44,23 +44,37 @@ const SharedErrorDisplay: React.FC<{
   context: string;
 }> = ({ error, config, onRetry, onReport, onGoHome, context }) => {
   return (
-    <div className={`error-display error-display--${config.variant} error-display--${config.severity}`}>
+    <div
+      className={`error-display error-display--${config.variant} error-display--${config.severity}`}
+    >
       <div className="error-display__content">
         <h2 className="error-display__title">Something went wrong</h2>
         <p className="error-display__message">{config.customMessage || error.message}</p>
         <div className="error-display__actions">
           {config.showRetry && (
-            <button type="button" onClick={onRetry} className="error-display__button error-display__button--primary">
+            <button
+              type="button"
+              onClick={onRetry}
+              className="error-display__button error-display__button--primary"
+            >
               Try Again
             </button>
           )}
           {config.showGoHome && (
-            <button type="button" onClick={onGoHome} className="error-display__button error-display__button--secondary">
+            <button
+              type="button"
+              onClick={onGoHome}
+              className="error-display__button error-display__button--secondary"
+            >
               Go Home
             </button>
           )}
           {config.showReport && (
-            <button type="button" onClick={onReport} className="error-display__button error-display__button--secondary">
+            <button
+              type="button"
+              onClick={onReport}
+              className="error-display__button error-display__button--secondary"
+            >
               Report Issue
             </button>
           )}
@@ -133,12 +147,13 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
       error={error}
       config={{
         ...displayConfig,
-        customActions: customActions.length > 0 ? (
-          <div className="space-y-2 mt-4">
-            <div className="text-sm font-medium text-gray-700">Recovery Options:</div>
-            {customActions}
-          </div>
-        ) : undefined,
+        customActions:
+          customActions.length > 0 ? (
+            <div className="space-y-2 mt-4">
+              <div className="text-sm font-medium text-gray-700">Recovery Options:</div>
+              {customActions}
+            </div>
+          ) : undefined,
       }}
       onRetry={onRetry}
       onReport={onContactSupport}
@@ -160,7 +175,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
  * @param props - Error fallback properties
  * @returns React component for network error display
  */
-export const NetworkErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
+export const NetworkErrorFallback: React.FC<ErrorFallbackProps> = props => {
   return <ErrorFallback {...props} />;
 };
 
@@ -173,7 +188,7 @@ export const NetworkErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
  * @param props - Error fallback properties
  * @returns React component for API error display
  */
-export const ApiErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
+export const ApiErrorFallback: React.FC<ErrorFallbackProps> = props => {
   return <ErrorFallback {...props} />;
 };
 
@@ -186,7 +201,7 @@ export const ApiErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
  * @param props - Error fallback properties
  * @returns React component for component error display
  */
-export const ComponentErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
+export const ComponentErrorFallback: React.FC<ErrorFallbackProps> = props => {
   return <ErrorFallback {...props} />;
 };
 
@@ -199,7 +214,7 @@ export const ComponentErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
  * @param props - Error fallback properties
  * @returns React component for chunk loading error display
  */
-export const ChunkErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
+export const ChunkErrorFallback: React.FC<ErrorFallbackProps> = props => {
   return <ErrorFallback {...props} />;
 };
 
@@ -212,6 +227,6 @@ export const ChunkErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
  * @param props - Error fallback properties
  * @returns React component for critical error display
  */
-export const CriticalErrorFallback: React.FC<ErrorFallbackProps> = (props) => {
+export const CriticalErrorFallback: React.FC<ErrorFallbackProps> = props => {
   return <ErrorFallback {...props} />;
 };

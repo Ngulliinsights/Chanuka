@@ -7,9 +7,10 @@
  * ✅ Accessibility support (alt text, ARIA)
  */
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/shared/design-system/utils/cn"
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
+
+import { cn } from '@/shared/design-system/utils/cn';
 
 const avatarVariants = cva(
   [
@@ -31,7 +32,7 @@ const avatarVariants = cva(
       size: 'md',
     },
   }
-)
+);
 
 export interface AvatarProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -39,48 +40,37 @@ export interface AvatarProps
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ className, size, ...props }, ref) => (
-    <div
+    <div ref={ref} className={cn(avatarVariants({ size }), className)} role="img" {...props} />
+  )
+);
+Avatar.displayName = 'Avatar';
+
+const AvatarImage = React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(
+  ({ className, ...props }, ref) => (
+    <img
       ref={ref}
-      className={cn(avatarVariants({ size }), className)}
-      role="img"
+      className={cn('aspect-square h-full w-full', 'object-cover', className)}
       {...props}
     />
   )
-)
-Avatar.displayName = "Avatar"
+);
+AvatarImage.displayName = 'AvatarImage';
 
-const AvatarImage = React.forwardRef<
-  HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
->(({ className, ...props }, ref) => (
-  <img
-    ref={ref}
-    className={cn(
-      'aspect-square h-full w-full',
-      'object-cover',
-      className
-    )}
-    {...props}
-  />
-))
-AvatarImage.displayName = "AvatarImage"
+const AvatarFallback = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'flex h-full w-full items-center justify-center',
+        'bg-[hsl(var(--color-muted))]',
+        'text-[hsl(var(--color-muted-foreground))]',
+        'text-sm font-medium',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+AvatarFallback.displayName = 'AvatarFallback';
 
-const AvatarFallback = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'flex h-full w-full items-center justify-center',
-      'bg-[hsl(var(--color-muted))]',
-      'text-[hsl(var(--color-muted-foreground))]',
-      'text-sm font-medium',
-      className
-    )}
-    {...props}
-  />
-))
-AvatarFallback.displayName = "AvatarFallback"
-
-export { Avatar, AvatarImage, AvatarFallback, avatarVariants }
+export { Avatar, AvatarImage, AvatarFallback, avatarVariants };

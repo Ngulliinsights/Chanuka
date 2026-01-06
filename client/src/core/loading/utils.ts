@@ -3,19 +3,20 @@
  */
 
 import { LoadingType, LoadingPriority, LoadingOperation } from '@client/shared/types';
-
 import {
   getAdjustedTimeout,
   calculateRetryDelay as coreCalculateRetryDelay,
   sortOperationsByPriority,
   filterOperationsByConnection,
   analyzeLoadingPerformance,
-  createOperationFromScenario
+  createOperationFromScenario,
 } from '@client/utils/comprehensiveLoading';
 
 // Re-export cross-cutting utilities
-export const calculateEstimatedTime = (operation: LoadingOperation) => operation.estimatedTime || 5000;
-export const getConnectionMultiplier = (connectionType: string) => connectionType === 'slow' ? 2 : 1;
+export const calculateEstimatedTime = (operation: LoadingOperation) =>
+  operation.estimatedTime || 5000;
+export const getConnectionMultiplier = (connectionType: string) =>
+  connectionType === 'slow' ? 2 : 1;
 export const calculateRetryDelay = coreCalculateRetryDelay;
 export const formatLoadingTime = (ms: number) => `${Math.round(ms / 1000)}s`;
 export const hasOperationTimedOut = (operation: LoadingOperation, currentTime: number) =>
@@ -49,4 +50,3 @@ export function clearTimeoutSafe(timeout: NodeJS.Timeout | undefined): void {
 export function generateOperationId(type: LoadingType, identifier: string): string {
   return `${type}-${identifier}-${Date.now()}`;
 }
-

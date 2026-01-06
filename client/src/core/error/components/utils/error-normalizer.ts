@@ -4,15 +4,14 @@
  */
 
 import { ErrorSeverity } from '@client/core/error';
-import { 
-  BaseError, 
+import {
+  BaseError,
   NetworkError,
   CacheError,
   UnauthorizedError,
   NotFoundError,
   ValidationError,
 } from '@client/core/error';
-
 
 export function normalizeError(
   error: Record<string, unknown> | unknown,

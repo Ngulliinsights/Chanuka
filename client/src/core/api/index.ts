@@ -1,6 +1,6 @@
 /**
  * Core API Module - Modular API System
- * 
+ *
  * This module provides comprehensive API functionality including:
  * - Base HTTP client with retry logic and caching
  * - Authentication with automatic token refresh
@@ -21,18 +21,12 @@ export {
   type ErrorInterceptor,
   type ApiError,
   type HttpMethod,
-  type RequestBody
+  type RequestBody,
 } from './base-client';
 
-export {
-  AuthenticatedApiClient,
-  type AuthenticatedApiClientConfig
-} from './authenticated-client';
+export { AuthenticatedApiClient, type AuthenticatedApiClientConfig } from './authenticated-client';
 
-export {
-  SafeApiClient,
-  type SafeApiResult
-} from './safe-client';
+export { SafeApiClient, type SafeApiResult } from './safe-client';
 
 // Authentication
 export {
@@ -42,7 +36,7 @@ export {
   shouldRefreshToken,
   proactiveTokenRefresh,
   DEFAULT_AUTH_CONFIG,
-  type AuthConfig
+  type AuthConfig,
 } from './authentication';
 
 // Retry logic
@@ -56,7 +50,7 @@ export {
   SERVICE_RETRY_CONFIGS,
   type RetryConfig,
   type RetryContext,
-  type RetryResult
+  type RetryResult,
 } from './retry';
 
 // Cache management
@@ -68,7 +62,7 @@ export {
   type CacheEntry,
   type CacheConfig,
   type CacheStats,
-  type InvalidationOptions
+  type InvalidationOptions,
 } from './cache-manager';
 
 // Legacy circuit breaker exports (for backward compatibility)
@@ -77,13 +71,13 @@ export {
   createCircuitBreakerClient,
   apiClients,
   type CircuitBreakerClientConfig,
-  type RequestConfig
+  type RequestConfig,
 } from './circuit-breaker-client';
 
 export {
   RetryHandler as LegacyRetryHandler,
   createRetryHandler,
-  retryHandlers
+  retryHandlers,
 } from './retry-handler';
 
 export {
@@ -96,7 +90,7 @@ export {
   getMonitoringStatus,
   type CircuitBreakerEvent,
   type ServiceHealthStatus,
-  type ErrorCorrelation
+  type ErrorCorrelation,
 } from './circuit-breaker-monitor';
 
 // Service APIs - Auth now comes from consolidated system
@@ -108,14 +102,10 @@ export {
   type RegisterData,
   type AuthUser,
   type UserPreferences,
-  type AuthTokens
+  type AuthTokens,
 } from '../auth'; // Use consolidated auth system
 
-export {
-  AnalyticsApiService,
-  createAnalyticsApiService,
-  analyticsApiService
-} from './analytics';
+export { AnalyticsApiService, createAnalyticsApiService, analyticsApiService } from './analytics';
 
 // Global clients
 export { globalApiClient } from './client';
@@ -135,7 +125,7 @@ export {
   ForbiddenError,
   NotFoundError,
   ServerError,
-  createAPIError
+  createAPIError,
 } from './errors';
 
 // Re-export error types for convenience

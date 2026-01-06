@@ -1,13 +1,15 @@
-import type { RelatedPage, UserRole } from '@/shared/types';
-
-import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
 import { useAuth } from '@/core/auth';
 import { NavigationValidationError } from '@/core/error';
+import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
 import { getRecoverySuggestions } from '@/recovery';
-import { validateNavigationPath, validateUserRole, validateUseRelatedPagesOptions } from '@/validation';
+import type { RelatedPage, UserRole } from '@/shared/types';
+import {
+  validateNavigationPath,
+  validateUserRole,
+  validateUseRelatedPagesOptions,
+} from '@/validation';
 
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
-
 
 export interface UseRelatedPagesResult {
   relatedPages: RelatedPage[];
@@ -38,16 +40,12 @@ export const useRelatedPages = (
     const { user } = useAuth();
     const { user_role, preferences } = useUnifiedNavigation();
 
-    const {
-      maxResults = 5,
-      includeBreadcrumbs = false,
-      filterByRole = true
-    } = options;
+    const { maxResults = 5, includeBreadcrumbs = false, filterByRole = true } = options;
 
     // Validate and convert the context UserRole to our navigation UserRole
     const contextRole = user_role as string;
     validateUserRole(contextRole);
-    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : contextRole as UserRole;
+    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
 
     // Get relationships for current path
     let relatedPages = getPageRelationships(currentPath, navUserRole, user, preferences);
@@ -76,7 +74,7 @@ export const useRelatedPages = (
     return {
       relatedPages: limitedPages,
       totalCount: relatedPages.length,
-      hasMore: relatedPages.length > maxResults
+      hasMore: relatedPages.length > maxResults,
     };
   } catch (error) {
     // Handle validation errors
@@ -87,7 +85,7 @@ export const useRelatedPages = (
         totalCount: 0,
         hasMore: false,
         error,
-        recoverySuggestions: suggestions
+        recoverySuggestions: suggestions,
       };
     }
 
@@ -97,8 +95,7 @@ export const useRelatedPages = (
       relatedPages: [],
       totalCount: 0,
       hasMore: false,
-      error: error instanceof NavigationValidationError ? error : undefined
+      error: error instanceof NavigationValidationError ? error : undefined,
     };
   }
 };
-

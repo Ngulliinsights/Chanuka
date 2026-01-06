@@ -23,7 +23,7 @@ export async function attemptUIRecovery(error: unknown): Promise<RecoveryResult>
     return {
       success: false,
       message: 'Error is not a UI component error',
-      retryable: false
+      retryable: false,
     };
   }
 
@@ -32,25 +32,27 @@ export async function attemptUIRecovery(error: unknown): Promise<RecoveryResult>
     return {
       success: true,
       message: 'Component error handled gracefully',
-      retryable: true
+      retryable: true,
     };
   }
 
   return {
     success: false,
     message: 'Component error is not recoverable',
-    retryable: false
+    retryable: false,
   };
 }
 
 export function getUIRecoverySuggestions(error: unknown): RecoverySuggestion[] {
   if (!isUIComponentError(error)) {
-    return [{
-      action: 'Check error type',
-      description: 'This error is not a recognized UI component error',
-      automated: false,
-      priority: 'low'
-    }];
+    return [
+      {
+        action: 'Check error type',
+        description: 'This error is not a recognized UI component error',
+        automated: false,
+        priority: 'low',
+      },
+    ];
   }
 
   const suggestions: RecoverySuggestion[] = [];
@@ -61,7 +63,7 @@ export function getUIRecoverySuggestions(error: unknown): RecoverySuggestion[] {
         action: 'Refresh component',
         description: 'Try refreshing the component state',
         automated: true,
-        priority: 'high'
+        priority: 'high',
       });
       break;
     case 'interaction':
@@ -69,7 +71,7 @@ export function getUIRecoverySuggestions(error: unknown): RecoverySuggestion[] {
         action: 'Retry action',
         description: 'Try the action again',
         automated: true,
-        priority: 'high'
+        priority: 'high',
       });
       break;
     default:
@@ -77,7 +79,7 @@ export function getUIRecoverySuggestions(error: unknown): RecoverySuggestion[] {
         action: 'Check console',
         description: 'Check browser console for more details',
         automated: false,
-        priority: 'medium'
+        priority: 'medium',
       });
   }
 

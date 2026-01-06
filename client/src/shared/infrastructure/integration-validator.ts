@@ -63,9 +63,17 @@ export class IntegrationValidator {
     // Check 1: Core module should export all subsystems
     // Core subsystems (defined but not used in current implementation)
     const _coreSubsystems = [
-      'error', 'browser', 'auth', 'api', 'performance',
-      'loading', 'storage', 'mobile', 'community',
-      'dashboard', 'navigation'
+      'error',
+      'browser',
+      'auth',
+      'api',
+      'performance',
+      'loading',
+      'storage',
+      'mobile',
+      'community',
+      'dashboard',
+      'navigation',
     ];
 
     // Check 2: Shared module should NOT import from features
@@ -74,7 +82,7 @@ export class IntegrationValidator {
     return {
       passed: issues.length === 0,
       issues,
-      suggestions
+      suggestions,
     };
   }
 
@@ -94,7 +102,7 @@ export class IntegrationValidator {
     return {
       passed: issues.length === 0,
       issues,
-      suggestions
+      suggestions,
     };
   }
 
@@ -113,13 +121,13 @@ export class IntegrationValidator {
     suggestions.push(
       'Verify all features properly import from core and shared',
       'Ensure core modules only use shared for UI infrastructure',
-      'Check that shared design-system doesn\'t import business logic'
+      "Check that shared design-system doesn't import business logic"
     );
 
     return {
       passed: issues.length === 0,
       issues,
-      suggestions
+      suggestions,
     };
   }
 
@@ -140,7 +148,7 @@ export class IntegrationValidator {
     return {
       passed: true,
       issues,
-      suggestions
+      suggestions,
     };
   }
 
@@ -154,7 +162,7 @@ export class IntegrationValidator {
       typeConsistency: this.validateTypeConsistency(),
       exportCompleteness: this.validateExportCompleteness(),
       circularDeps: this.validateCircularDependencies(),
-      namingConventions: this.validateNamingConventions()
+      namingConventions: this.validateNamingConventions(),
     };
 
     const allIssues = Object.values(checks).flatMap(check => check.issues);
@@ -167,8 +175,8 @@ export class IntegrationValidator {
       summary: {
         totalIssues: allIssues.length,
         criticalIssues: criticalIssues.length,
-        recommendations: this.consolidateRecommendations(checks)
-      }
+        recommendations: this.consolidateRecommendations(checks),
+      },
     };
 
     return this.results;
@@ -181,8 +189,8 @@ export class IntegrationValidator {
       suggestions: [
         'Use strict typing across all modules',
         'Leverage shared types from core for data models',
-        'Document type contracts between modules'
-      ]
+        'Document type contracts between modules',
+      ],
     };
   }
 
@@ -193,8 +201,8 @@ export class IntegrationValidator {
       suggestions: [
         'Every module should have complete index.ts exports',
         'Document public APIs in module README files',
-        'Use barrel exports for ease of importing'
-      ]
+        'Use barrel exports for ease of importing',
+      ],
     };
   }
 
@@ -204,9 +212,9 @@ export class IntegrationValidator {
       issues: [],
       suggestions: [
         'Verify no features import from each other',
-        'Check core modules don\'t have circular imports',
-        'Audit shared imports for backward dependencies'
-      ]
+        "Check core modules don't have circular imports",
+        'Audit shared imports for backward dependencies',
+      ],
     };
   }
 
@@ -244,7 +252,7 @@ export class IntegrationValidator {
       '',
       'RECOMMENDATIONS',
       ...this.results.summary.recommendations.map(r => `  • ${r}`),
-      '═══════════════════════════════════════════════════════════'
+      '═══════════════════════════════════════════════════════════',
     ];
 
     return lines.join('\n');
@@ -260,7 +268,7 @@ export class IntegrationValidator {
       typeConsistency: '3. INTEGRATOR - Type Consistency',
       exportCompleteness: '4. OPTIMIZER - Export Completeness',
       circularDeps: 'Circular Dependencies',
-      namingConventions: 'Naming Conventions'
+      namingConventions: 'Naming Conventions',
     };
 
     Object.entries(this.results.checks).forEach(([key, check]) => {

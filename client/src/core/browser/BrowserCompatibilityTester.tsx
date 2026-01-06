@@ -1,15 +1,18 @@
 /**
  * Browser Compatibility Tester Component
- * 
+ *
  * This component provides a comprehensive browser compatibility testing interface
  * with detailed results and recommendations.
  */
 
 import React, { useState, useEffect } from 'react';
 
-import { getBrowserCompatibilityStatus, getCompatibilityWarnings, getBrowserInfo } from '@client/core/browser';
+import {
+  getBrowserCompatibilityStatus,
+  getCompatibilityWarnings,
+  getBrowserInfo,
+} from '@client/core/browser';
 import { logger } from '@client/utils/logger';
-
 
 interface BrowserCompatibilityTesterProps {
   onTestComplete?: (results: CompatibilityTestSuite) => void;
@@ -20,7 +23,7 @@ interface BrowserCompatibilityTesterProps {
 const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
   onTestComplete,
   showDetailedResults = false,
-  autoRun = false
+  autoRun = false,
 }) => {
   const [testResults, setTestResults] = useState<CompatibilityTestSuite | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -36,7 +39,7 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
   const runTests = async () => {
     setIsRunning(true);
     setError(null);
-    
+
     try {
       const results = await runBrowserCompatibilityTests();
       setTestResults(results);
@@ -50,21 +53,31 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'text-red-600 bg-red-50';
-      case 'high': return 'text-orange-600 bg-orange-50';
-      case 'medium': return 'text-yellow-600 bg-yellow-50';
-      case 'low': return 'text-blue-600 bg-blue-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'critical':
+        return 'text-red-600 bg-red-50';
+      case 'high':
+        return 'text-orange-600 bg-orange-50';
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-50';
+      case 'low':
+        return 'text-blue-600 bg-blue-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return '🚨';
-      case 'high': return '⚠️';
-      case 'medium': return '⚡';
-      case 'low': return 'ℹ️';
-      default: return '❓';
+      case 'critical':
+        return '🚨';
+      case 'high':
+        return '⚠️';
+      case 'medium':
+        return '⚡';
+      case 'low':
+        return 'ℹ️';
+      default:
+        return '❓';
     }
   };
 
@@ -155,14 +168,15 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
             </div>
             <div className="text-sm text-gray-600">Overall Score</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-3xl font-bold text-gray-900">
-              {testResults.testResults.filter(t => t.passed).length}/{testResults.testResults.length}
+              {testResults.testResults.filter(t => t.passed).length}/
+              {testResults.testResults.length}
             </div>
             <div className="text-sm text-gray-600">Tests Passed</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-3xl font-bold text-red-600">
               {testResults.criticalIssues.length}
@@ -178,7 +192,8 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
             <div>
               <span className="text-gray-600">Browser:</span>
               <span className="ml-2 font-medium">
-                {testResults.browserInfo.name.charAt(0).toUpperCase() + testResults.browserInfo.name.slice(1)}
+                {testResults.browserInfo.name.charAt(0).toUpperCase() +
+                  testResults.browserInfo.name.slice(1)}
               </span>
             </div>
             <div>
@@ -187,9 +202,11 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
             </div>
             <div>
               <span className="text-gray-600">Supported:</span>
-              <span className={`ml-2 font-medium ${
-                testResults.browserInfo.isSupported ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <span
+                className={`ml-2 font-medium ${
+                  testResults.browserInfo.isSupported ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
                 {testResults.browserInfo.isSupported ? 'Yes' : 'No'}
               </span>
             </div>
@@ -246,14 +263,14 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
       {showDetails && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Test Results</h3>
-          
+
           <div className="space-y-3">
             {testResults.testResults.map((test, index) => (
               <div
                 key={index}
                 className={`p-3 rounded-lg border ${
-                  test.passed 
-                    ? 'bg-green-50 border-green-200' 
+                  test.passed
+                    ? 'bg-green-50 border-green-200'
                     : `border-gray-200 ${getSeverityColor(test.severity)}`
                 }`}
               >
@@ -265,16 +282,18 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
                     <span className="font-medium">{test.testName}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      test.passed 
-                        ? 'bg-green-100 text-green-800' 
-                        : `${getSeverityColor(test.severity)}`
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        test.passed
+                          ? 'bg-green-100 text-green-800'
+                          : `${getSeverityColor(test.severity)}`
+                      }`}
+                    >
                       {test.passed ? 'PASS' : test.severity.toUpperCase()}
                     </span>
                   </div>
                 </div>
-                
+
                 {!test.passed && (test.recommendation || test.error) && (
                   <div className="mt-2 text-sm">
                     {test.error && (
@@ -299,4 +318,3 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
 };
 
 export default BrowserCompatibilityTester;
-

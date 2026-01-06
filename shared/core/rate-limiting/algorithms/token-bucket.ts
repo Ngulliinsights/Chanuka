@@ -1,4 +1,5 @@
 import { Result, ok, err } from '../../primitives/types/result';
+
 import { RateLimitAlgorithm } from './interfaces';
 
 /**

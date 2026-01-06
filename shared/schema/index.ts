@@ -174,14 +174,14 @@ export {
 // ============================================================================
 // SCHEMA OBJECT - For backward compatibility
 // ============================================================================
-import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable, oauth_providers as oauthProvidersTable, oauth_tokens as oauthTokensTable, user_sessions as userSessionsTable } from "./foundation";
-import { user_interests as userInterestsTable, bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
-import { participation_quality_audits as participationQualityAuditsTable } from "./participation_oversight";
-import { analysis as analysisTable } from "./analysis";
-import { trojan_bill_analysis as trojanBillAnalysisTable, hidden_provisions as hiddenProvisionsTable, trojan_techniques as trojanTechniquesTable, detection_signals as detectionSignalsTable } from "./trojan_bill_detection";
-import { political_appointments as politicalAppointmentsTable, infrastructure_tenders as infrastructureTendersTable, ethnic_advantage_scores as ethnicAdvantageScoresTable, strategic_infrastructure_projects as strategicInfrastructureProjectsTable } from "./political_economy";
-import { market_sectors as marketSectorsTable, economic_impact_assessments as economicImpactAssessmentsTable, market_stakeholders as marketStakeholdersTable, stakeholder_positions as stakeholderPositionsTable, market_trends as marketTrendsTable } from "./market_intelligence";
 import { public_promises as publicPromisesTable, shadow_ledger_entries as shadowLedgerEntriesTable, promise_accountability_tracking as promiseAccountabilityTrackingTable } from "./accountability_ledger";
+import { analysis as analysisTable } from "./analysis";
+import { user_interests as userInterestsTable, bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
+import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable, oauth_providers as oauthProvidersTable, oauth_tokens as oauthTokensTable, user_sessions as userSessionsTable } from "./foundation";
+import { market_sectors as marketSectorsTable, economic_impact_assessments as economicImpactAssessmentsTable, market_stakeholders as marketStakeholdersTable, stakeholder_positions as stakeholderPositionsTable, market_trends as marketTrendsTable } from "./market_intelligence";
+import { participation_quality_audits as participationQualityAuditsTable } from "./participation_oversight";
+import { political_appointments as politicalAppointmentsTable, infrastructure_tenders as infrastructureTendersTable, ethnic_advantage_scores as ethnicAdvantageScoresTable, strategic_infrastructure_projects as strategicInfrastructureProjectsTable } from "./political_economy";
+import { trojan_bill_analysis as trojanBillAnalysisTable, hidden_provisions as hiddenProvisionsTable, trojan_techniques as trojanTechniquesTable, detection_signals as detectionSignalsTable } from "./trojan_bill_detection";
 
 export const schema = {
   users: usersTable,

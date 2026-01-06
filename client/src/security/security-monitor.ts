@@ -9,11 +9,11 @@ import { logger } from '@client/utils/logger';
 // Type definitions for missing types
 export type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';
 
-export type SecurityEventType = 
-  | 'login' 
-  | 'logout' 
-  | 'password_change' 
-  | 'permission_change' 
+export type SecurityEventType =
+  | 'login'
+  | 'logout'
+  | 'password_change'
+  | 'permission_change'
   | 'suspicious_activity'
   | 'rate_limit_exceeded'
   | 'xss_attempt'
@@ -81,7 +81,7 @@ export class SecurityMonitor {
       maxEvents: 1000,
       enableRealTimeAlerts: true,
       alertEndpoint: '/api/security/alerts',
-      ...config
+      ...config,
     };
   }
 
@@ -94,16 +94,16 @@ export class SecurityMonitor {
     try {
       // Set up event listeners
       this.setupEventListeners();
-      
+
       // Start monitoring
       this.startMonitoring();
-      
+
       // Set up periodic cleanup
       this.setupCleanup();
 
       logger.info('Security Monitor initialized successfully', {
         alertThreshold: this.config.alertThreshold,
-        monitoringInterval: this.config.monitoringInterval
+        monitoringInterval: this.config.monitoringInterval,
       });
     } catch (error) {
       logger.error('Failed to initialize Security Monitor', { error });
@@ -118,11 +118,11 @@ export class SecurityMonitor {
     }) as EventListener);
 
     // Listen for browser security events
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.handleError(event);
     });
 
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.handleUnhandledRejection(event);
     });
 
@@ -136,8 +136,8 @@ export class SecurityMonitor {
   }
 
   private setupDOMMonitoring(): void {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         this.analyzeMutation(mutation);
       });
     });
@@ -146,17 +146,17 @@ export class SecurityMonitor {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['onclick', 'onload', 'onerror', 'src', 'href']
+      attributeFilter: ['onclick', 'onload', 'onerror', 'src', 'href'],
     });
   }
 
   private analyzeMutation(mutation: MutationRecord): void {
     // Check for suspicious script injections
     if (mutation.type === 'childList') {
-      mutation.addedNodes.forEach((node) => {
+      mutation.addedNodes.forEach(node => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const element = node as Element;
-          
+
           // Check for script tags
           if (element.tagName === 'SCRIPT') {
             this.recordEvent({
@@ -167,11 +167,11 @@ export class SecurityMonitor {
                 type: 'script_injection',
                 tagName: element.tagName,
                 src: (element as HTMLScriptElement).src,
-                innerHTML: element.innerHTML.substring(0, 100)
-              }
+                innerHTML: element.innerHTML.substring(0, 100),
+              },
             });
           }
-          
+
           // Check for iframe injections
           if (element.tagName === 'IFRAME') {
             this.recordEvent({
@@ -180,8 +180,8 @@ export class SecurityMonitor {
               source: 'SecurityMonitor',
               details: {
                 type: 'iframe_injection',
-                src: (element as HTMLIFrameElement).src
-              }
+                src: (element as HTMLIFrameElement).src,
+              },
             });
           }
         }
@@ -192,7 +192,7 @@ export class SecurityMonitor {
     if (mutation.type === 'attributes' && mutation.attributeName) {
       const element = mutation.target as Element;
       const attrValue = element.getAttribute(mutation.attributeName);
-      
+
       if (attrValue && this.isSuspiciousAttribute(mutation.attributeName, attrValue)) {
         this.recordEvent({
           type: 'suspicious_activity',
@@ -202,25 +202,22 @@ export class SecurityMonitor {
             type: 'suspicious_attribute',
             attributeName: mutation.attributeName,
             attributeValue: attrValue.substring(0, 100),
-            tagName: element.tagName
-          }
+            tagName: element.tagName,
+          },
         });
       }
     }
   }
 
   private isSuspiciousAttribute(name: string, value: string): boolean {
-    const suspiciousPatterns = [
-      /javascript:/i,
-      /data:text\/html/i,
-      /vbscript:/i,
-      /on\w+\s*=/i
-    ];
+    const suspiciousPatterns = [/javascript:/i, /data:text\/html/i, /vbscript:/i, /on\w+\s*=/i];
 
     const suspiciousAttributes = ['onclick', 'onload', 'onerror', 'onmouseover'];
-    
-    return suspiciousAttributes.includes(name.toLowerCase()) ||
-           suspiciousPatterns.some(pattern => pattern.test(value));
+
+    return (
+      suspiciousAttributes.includes(name.toLowerCase()) ||
+      suspiciousPatterns.some(pattern => pattern.test(value))
+    );
   }
 
   private handleError(event: ErrorEvent): void {
@@ -232,7 +229,7 @@ export class SecurityMonitor {
       'blocked',
       'csp',
       'content security policy',
-      'mixed content'
+      'mixed content',
     ];
 
     if (securityKeywords.some(keyword => message.includes(keyword))) {
@@ -245,21 +242,15 @@ export class SecurityMonitor {
           message: event.message,
           filename: event.filename,
           lineno: event.lineno,
-          colno: event.colno
-        }
+          colno: event.colno,
+        },
       });
     }
   }
 
   private handleUnhandledRejection(event: PromiseRejectionEvent): void {
     const reason = event.reason?.toString().toLowerCase() || '';
-    const securityKeywords = [
-      'network error',
-      'cors',
-      'blocked',
-      'unauthorized',
-      'forbidden'
-    ];
+    const securityKeywords = ['network error', 'cors', 'blocked', 'unauthorized', 'forbidden'];
 
     if (securityKeywords.some(keyword => reason.includes(keyword))) {
       this.recordEvent({
@@ -268,8 +259,8 @@ export class SecurityMonitor {
         source: 'SecurityMonitor',
         details: {
           type: 'security_rejection',
-          reason: event.reason?.toString().substring(0, 200)
-        }
+          reason: event.reason?.toString().substring(0, 200),
+        },
       });
     }
   }
@@ -286,7 +277,7 @@ export class SecurityMonitor {
       details: eventData.details || {},
       sessionId: this.getSessionId(),
       userAgent: navigator.userAgent,
-      resolved: false
+      resolved: false,
     };
 
     this.events.push(event);
@@ -300,7 +291,7 @@ export class SecurityMonitor {
       component: 'SecurityMonitor',
       eventId: event.id,
       type: event.type,
-      severity: event.severity
+      severity: event.severity,
     });
 
     // Check if we should create an alert
@@ -325,8 +316,8 @@ export class SecurityMonitor {
         details: {
           eventCount: sameTypeEvents.length,
           timeWindow: '5 minutes',
-          events: sameTypeEvents.map(e => e.id)
-        }
+          events: sameTypeEvents.map(e => e.id),
+        },
       });
     }
 
@@ -336,7 +327,7 @@ export class SecurityMonitor {
 
   private checkAttackPatterns(event: ExtendedSecurityEvent): void {
     const recentEvents = this.getRecentEvents(10 * 60 * 1000); // Last 10 minutes
-    
+
     // Check for brute force patterns
     if (event.type === 'rate_limit_exceeded') {
       const rateLimitEvents = recentEvents.filter(e => e.type === 'rate_limit_exceeded');
@@ -347,8 +338,8 @@ export class SecurityMonitor {
           message: 'Potential brute force attack detected',
           details: {
             eventCount: rateLimitEvents.length,
-            pattern: 'rate_limit_exceeded'
-          }
+            pattern: 'rate_limit_exceeded',
+          },
         });
       }
     }
@@ -363,18 +354,17 @@ export class SecurityMonitor {
           message: 'Multiple XSS attempts detected',
           details: {
             eventCount: xssEvents.length,
-            pattern: 'xss_attempt'
-          }
+            pattern: 'xss_attempt',
+          },
         });
       }
     }
 
     // Check for session hijacking patterns
-    const sessionEvents = recentEvents.filter(e => 
-      e.sessionId === event.sessionId && 
-      e.userAgent !== event.userAgent
+    const sessionEvents = recentEvents.filter(
+      e => e.sessionId === event.sessionId && e.userAgent !== event.userAgent
     );
-    
+
     if (sessionEvents.length >= 2) {
       this.createAlert({
         type: 'session_hijack_attempt',
@@ -382,8 +372,8 @@ export class SecurityMonitor {
         message: 'Potential session hijacking detected',
         details: {
           sessionId: event.sessionId,
-          userAgents: [...new Set(sessionEvents.map(e => e.userAgent))]
-        }
+          userAgents: [...new Set(sessionEvents.map(e => e.userAgent))],
+        },
       });
     }
   }
@@ -396,7 +386,7 @@ export class SecurityMonitor {
       severity: alertData.severity || 'medium',
       message: alertData.message || 'Security alert triggered',
       details: alertData.details || {},
-      acknowledged: false
+      acknowledged: false,
     };
 
     this.alerts.push(alert);
@@ -406,7 +396,7 @@ export class SecurityMonitor {
       alertId: alert.id,
       type: alert.type,
       severity: alert.severity,
-      message: alert.message
+      message: alert.message,
     });
 
     // Send alert to backend
@@ -420,9 +410,9 @@ export class SecurityMonitor {
       await fetch(this.config.alertEndpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(alert)
+        body: JSON.stringify(alert),
       });
     } catch (error) {
       logger.error('Failed to send security alert to backend', { error });
@@ -438,7 +428,7 @@ export class SecurityMonitor {
       severity: 'critical',
       message: `Critical security event: ${event.type}`,
       details: event.details,
-      acknowledged: false
+      acknowledged: false,
     };
 
     await this.sendAlert(alert);
@@ -453,22 +443,22 @@ export class SecurityMonitor {
   private performPeriodicChecks(): void {
     // Check for suspicious activity patterns
     this.checkSuspiciousActivity();
-    
+
     // Clean up old events
     this.cleanupOldEvents();
-    
+
     // Generate metrics
     const metrics = this.generateMetrics();
-    
+
     logger.debug('Security monitoring check completed', {
       component: 'SecurityMonitor',
-      metrics
+      metrics,
     });
   }
 
   private checkSuspiciousActivity(): void {
     const recentEvents = this.getRecentEvents(60 * 60 * 1000); // Last hour
-    
+
     // Check for unusual activity volume
     if (recentEvents.length > 100) {
       this.createAlert({
@@ -477,16 +467,16 @@ export class SecurityMonitor {
         message: `Unusually high security event volume: ${recentEvents.length} events in the last hour`,
         details: {
           eventCount: recentEvents.length,
-          timeWindow: '1 hour'
-        }
+          timeWindow: '1 hour',
+        },
       });
     }
   }
 
   private cleanupOldEvents(): void {
-    const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 hours ago
+    const cutoffTime = Date.now() - 24 * 60 * 60 * 1000; // 24 hours ago
     const cutoffDate = new Date(cutoffTime).toISOString();
-    
+
     this.events = this.events.filter(event => event.timestamp > cutoffDate);
     this.alerts = this.alerts.filter(alert => alert.timestamp.toISOString() > cutoffDate);
   }
@@ -497,10 +487,13 @@ export class SecurityMonitor {
       return acc;
     }, {});
 
-    const eventsBySeverity = this.events.reduce<Record<SecuritySeverity, number>>((acc, event) => {
-      acc[event.severity] = (acc[event.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<SecuritySeverity, number>);
+    const eventsBySeverity = this.events.reduce<Record<SecuritySeverity, number>>(
+      (acc, event) => {
+        acc[event.severity] = (acc[event.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<SecuritySeverity, number>
+    );
 
     const criticalEvents = this.events.filter(e => e.severity === 'critical').length;
     const highEvents = this.events.filter(e => e.severity === 'high').length;
@@ -514,19 +507,23 @@ export class SecurityMonitor {
 
     return {
       // Properties from SecurityMetrics
-      totalIncidents: this.events.filter(e => e.severity === 'high' || e.severity === 'critical').length,
+      totalIncidents: this.events.filter(e => e.severity === 'high' || e.severity === 'critical')
+        .length,
       incidentsBySeverity: {
         low: eventsBySeverity.low || 0,
         medium: eventsBySeverity.medium || 0,
         high: eventsBySeverity.high || 0,
-        critical: eventsBySeverity.critical || 0
+        critical: eventsBySeverity.critical || 0,
       } as Record<ThreatLevel, number>,
       averageResolutionTime: 0, // Would be calculated from resolved incidents
-      complianceScore: Math.max(0, 100 - (criticalEvents * 20) - (highEvents * 5)),
+      complianceScore: Math.max(0, 100 - criticalEvents * 20 - highEvents * 5),
       lastAuditDate: new Date(),
-      vulnerabilitiesCount: eventsByType['xss_attempt'] || 0 + eventsByType['script_injection'] || 0,
-      activeThreats: this.events.filter(e => !e.resolved && (e.severity === 'high' || e.severity === 'critical')).length,
-      
+      vulnerabilitiesCount:
+        eventsByType['xss_attempt'] || 0 + eventsByType['script_injection'] || 0,
+      activeThreats: this.events.filter(
+        e => !e.resolved && (e.severity === 'high' || e.severity === 'critical')
+      ).length,
+
       // Extended properties
       totalEvents: this.events.length,
       eventsByType,
@@ -536,23 +533,23 @@ export class SecurityMonitor {
       rateLimitViolations: eventsByType['rate_limit_exceeded'] || 0,
       cspViolations: eventsByType['csp_violation'] || 0,
       lastScanTime: new Date(),
-      systemHealth
+      systemHealth,
     };
   }
 
   private getRecentEvents(timeWindowMs: number): ExtendedSecurityEvent[] {
     const cutoffTime = Date.now() - timeWindowMs;
     const cutoffDate = new Date(cutoffTime).toISOString();
-    
+
     return this.events.filter(event => event.timestamp > cutoffDate);
   }
 
   private escalateSeverity(severity: SecuritySeverity): SecuritySeverity {
     const escalation: Record<SecuritySeverity, SecuritySeverity> = {
-      'low': 'medium',
-      'medium': 'high',
-      'high': 'critical',
-      'critical': 'critical'
+      low: 'medium',
+      medium: 'high',
+      high: 'critical',
+      critical: 'critical',
     };
     return escalation[severity];
   }
@@ -580,9 +577,12 @@ export class SecurityMonitor {
 
   private setupCleanup(): void {
     // Clean up old data every hour
-    setInterval(() => {
-      this.cleanupOldEvents();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupOldEvents();
+      },
+      60 * 60 * 1000
+    );
   }
 
   /**

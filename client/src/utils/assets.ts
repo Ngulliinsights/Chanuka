@@ -1,6 +1,6 @@
 /**
  * Asset Utilities - Optimized Consolidated Module
- * 
+ *
  * This module provides comprehensive asset management capabilities:
  * - Intelligent asset loading with retry logic and fallback strategies
  * - Advanced image optimization with modern format support (WebP, AVIF)
@@ -8,7 +8,7 @@
  * - Network-aware loading that adapts to connection quality
  * - Progressive enhancement based on device capabilities
  * - Performance monitoring and metrics tracking
- * 
+ *
  * The module automatically initializes in browser environments and provides
  * both imperative APIs and React hooks for flexible integration.
  */
@@ -158,12 +158,14 @@ const DEFAULT_ASSET_FALLBACKS: AssetFallbacks = {
     logo: {
       primary: '/logo.svg',
       fallbacks: ['/logo.png', '/logo.jpg'],
-      offlineFallback: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkMxMy4xIDIgMTQgMi45IDE0IDRWMjBDMTQgMjEuMSAxMy4xIDIyIDEyIDIyQzEwLjkgMjIgMTAgMjEuMSAxMCAyMFY0QzEwIDIuOSAxMC45IDIgMTIgMloiIGZpbGw9IiM2QjcyODAiLz48L3N2Zz4=',
+      offlineFallback:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkMxMy4xIDIgMTQgMi45IDE0IDRWMjBDMTQgMjEuMSAxMy4xIDIyIDEyIDIyQzEwLjkgMjIgMTAgMjEuMSAxMCAyMFY0QzEwIDIuOSAxMC45IDIgMTIgMloiIGZpbGw9IiM2QjcyODAiLz48L3N2Zz4=',
     },
     avatar: {
       primary: '/avatar.jpg',
       fallbacks: ['/avatar.png', '/default-avatar.svg'],
-      offlineFallback: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iI0U1RTdFQiIvPjxwYXRoIGQ9Ik0yMCAyMEMyMi43NjE0IDIwIDI1IDE3Ljc2MTQgMjUgMTVDMjUgMTIuMjM4NiAyMi43NjE0IDEwIDIwIDEwQzE3LjIzODYgMTAgMTUgMTIuMjM4NiAxNSAxNUMxNSAxNy43NjE0IDE3LjIzODYgMjAgMjAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+PHBhdGggZD0iTTMwIDI4QzMwIDI0LjY4NjMgMjYuNDI3MSAyMiAyMiAyMkgxOEMxMy41NzI5IDIyIDEwIDI0LjY4NjMgMTAgMjhWMzBIMzBWMjhaIiBmaWxsPSIjOUNBM0FGIi8+PC9zdmc+',
+      offlineFallback:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iI0U1RTdFQiIvPjxwYXRoIGQ9Ik0yMCAyMEMyMi43NjE0IDIwIDI1IDE3Ljc2MTQgMjUgMTVDMjUgMTIuMjM4NiAyMi43NjE0IDEwIDIwIDEwQzE3LjIzODYgMTAgMTUgMTIuMjM4NiAxNSAxNUMxNSAxNy43NjE0IDE3LjIzODYgMjAgMjAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+PHBhdGggZD0iTTMwIDI4QzMwIDI0LjY4NjMgMjYuNDI3MSAyMiAyMiAyMkgxOEMxMy41NzI5IDIyIDEwIDI0LjY4NjMgMTAgMjhWMzBIMzBWMjhaIiBmaWxsPSIjOUNBM0FGIi8+PC9zdmc+',
     },
   },
   scripts: {
@@ -225,7 +227,7 @@ export class AssetLoader {
         success: true,
         retries: 0,
         loadTime: 0,
-        fromCache: true
+        fromCache: true,
       };
     }
 
@@ -237,7 +239,7 @@ export class AssetLoader {
         error: new Error('Asset recently failed, cooling down'),
         retries: failureInfo.attempts,
         loadTime: 0,
-        fromCache: false
+        fromCache: false,
       };
     }
 
@@ -253,7 +255,7 @@ export class AssetLoader {
       } else {
         this.failedAssets.set(url, {
           timestamp: Date.now(),
-          attempts: result.retries
+          attempts: result.retries,
         });
       }
 
@@ -285,16 +287,15 @@ export class AssetLoader {
           url,
           type,
           loadTime,
-          retries
+          retries,
         });
 
         return {
           success: true,
           retries,
           loadTime,
-          fromCache: false
+          fromCache: false,
         };
-
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Asset load failed');
         retries = attempt;
@@ -303,14 +304,14 @@ export class AssetLoader {
           // Exponential backoff with jitter to prevent thundering herd
           const backoffDelay = finalConfig.retryDelay * Math.pow(1.5, attempt);
           const jitter = Math.random() * 500;
-          
+
           logger.warn('Asset load failed, retrying', {
             component: 'AssetLoader',
             url,
             type,
             attempt: attempt + 1,
             nextRetryIn: Math.round(backoffDelay + jitter),
-            error: lastError.message
+            error: lastError.message,
           });
 
           await this.delay(backoffDelay + jitter);
@@ -320,19 +321,23 @@ export class AssetLoader {
 
     const loadTime = Date.now() - startTime;
 
-    logger.error('Asset load failed after all retries', {
-      component: 'AssetLoader',
-      url,
-      type,
-      retries
-    }, lastError);
+    logger.error(
+      'Asset load failed after all retries',
+      {
+        component: 'AssetLoader',
+        url,
+        type,
+        retries,
+      },
+      lastError
+    );
 
     return {
       success: false,
       error: lastError || new Error('Asset load failed'),
       retries,
       loadTime,
-      fromCache: false
+      fromCache: false,
     };
   }
 
@@ -395,7 +400,7 @@ export class AssetLoader {
       resolve();
     };
 
-    script.onerror = (_event) => {
+    script.onerror = _event => {
       cleanup();
       if (script.parentNode) {
         script.parentNode.removeChild(script);
@@ -467,8 +472,9 @@ export class AssetLoader {
       const fontName = `loaded-font-${Date.now()}`;
       const font = new FontFace(fontName, `url(${url})`);
 
-      font.load()
-        .then((loadedFont) => {
+      font
+        .load()
+        .then(loadedFont => {
           document.fonts.add(loadedFont);
           cleanup();
           resolve();
@@ -491,7 +497,7 @@ export class AssetLoader {
     return {
       loaded: this.loadedAssets.size,
       failed: this.failedAssets.size,
-      loading: this.loadingAssets.size
+      loading: this.loadingAssets.size,
     };
   }
 
@@ -515,7 +521,8 @@ export class AssetLoader {
 export class ImageOptimizer {
   private static instance: ImageOptimizer;
   private config: ImageOptimizationConfig;
-  private loadedAssets: Map<string, { size: number; loadTime: number; optimized: boolean }> = new Map();
+  private loadedAssets: Map<string, { size: number; loadTime: number; optimized: boolean }> =
+    new Map();
   private intersectionObserver: IntersectionObserver | null = null;
   private lazyImages: Set<HTMLImageElement> = new Set();
   private formatSupport: { webp: boolean; avif: boolean } | null = null;
@@ -528,7 +535,7 @@ export class ImageOptimizer {
       enableProgressiveJPEG: true,
       compressionQuality: 85,
       maxWidth: 1920,
-      maxHeight: 1080
+      maxHeight: 1080,
     };
 
     // Asynchronously detect format support
@@ -555,7 +562,7 @@ export class ImageOptimizer {
    */
   private async detectFormatSupport(): Promise<{ webp: boolean; avif: boolean }> {
     const testImage = (_format: string, dataUri: string): Promise<boolean> => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         const img = new Image();
         img.onload = () => resolve(true);
         img.onerror = () => resolve(false);
@@ -564,13 +571,15 @@ export class ImageOptimizer {
     };
 
     // Minimal valid WebP image (1x1 transparent pixel)
-    const webpData = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+    const webpData =
+      'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
     // Minimal valid AVIF image (1x1 transparent pixel)
-    const avifData = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+    const avifData =
+      'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
 
     const [webp, avif] = await Promise.all([
       testImage('webp', webpData),
-      testImage('avif', avifData)
+      testImage('avif', avifData),
     ]);
 
     return { webp, avif };
@@ -578,7 +587,9 @@ export class ImageOptimizer {
 
   private initializeLazyLoading(): void {
     if (!this.config.enableLazyLoading) {
-      logger.warn('Lazy loading not supported, images will load immediately', { component: 'ImageOptimizer' });
+      logger.warn('Lazy loading not supported, images will load immediately', {
+        component: 'ImageOptimizer',
+      });
       return;
     }
 
@@ -588,8 +599,8 @@ export class ImageOptimizer {
 
     // Configure intersection observer with appropriate margins and thresholds
     this.intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target as HTMLImageElement;
             this.loadImage(img);
@@ -600,7 +611,7 @@ export class ImageOptimizer {
       },
       {
         rootMargin: '50px 0px', // Start loading slightly before image enters viewport
-        threshold: 0.01
+        threshold: 0.01,
       }
     );
   }
@@ -637,7 +648,11 @@ export class ImageOptimizer {
       url.search = params.toString();
       return url.toString();
     } catch (error) {
-      logger.warn('Failed to optimize image URL, using original', { component: 'ImageOptimizer', src, error });
+      logger.warn('Failed to optimize image URL, using original', {
+        component: 'ImageOptimizer',
+        src,
+        error,
+      });
       return src;
     }
   }
@@ -674,7 +689,10 @@ export class ImageOptimizer {
     // Fallback to original source on error
     img.onerror = () => {
       if (img.src !== src) {
-        logger.warn('Optimized image failed, trying original', { component: 'ImageOptimizer', src });
+        logger.warn('Optimized image failed, trying original', {
+          component: 'ImageOptimizer',
+          src,
+        });
         img.src = src;
       }
     };
@@ -713,7 +731,7 @@ export class ImageOptimizer {
     this.loadedAssets.set(src, {
       size: estimatedSize,
       loadTime: actualLoadTime,
-      optimized: src.includes('format=') || src.includes('quality=')
+      optimized: src.includes('format=') || src.includes('quality='),
     });
 
     if (loadTime) {
@@ -722,7 +740,7 @@ export class ImageOptimizer {
         src,
         loadTime: Math.round(actualLoadTime),
         dimensions: `${img.naturalWidth}x${img.naturalHeight}`,
-        optimized: src.includes('format=')
+        optimized: src.includes('format='),
       });
     }
   }
@@ -747,7 +765,9 @@ export class ImageOptimizer {
         return canvas.toDataURL('image/png');
       }
     } catch (error) {
-      logger.debug('Canvas placeholder generation failed, using SVG', { component: 'ImageOptimizer' });
+      logger.debug('Canvas placeholder generation failed, using SVG', {
+        component: 'ImageOptimizer',
+      });
     }
 
     // SVG fallback for environments where canvas isn't available
@@ -781,11 +801,11 @@ export class ImageOptimizer {
 
     const results = await Promise.allSettled(preloadPromises);
     const successful = results.filter(r => r.status === 'fulfilled').length;
-    
-    logger.info('Critical images preloaded', { 
-      component: 'ImageOptimizer', 
-      successful, 
-      total: urls.length 
+
+    logger.info('Critical images preloaded', {
+      component: 'ImageOptimizer',
+      successful,
+      total: urls.length,
     });
   }
 
@@ -803,7 +823,7 @@ export class ImageOptimizer {
       optimizedAssets,
       lazyLoadedAssets: this.lazyImages.size,
       cacheHitRate: 0, // Would need additional tracking for accurate cache hit rate
-      averageLoadTime
+      averageLoadTime,
     };
   }
 
@@ -814,7 +834,7 @@ export class ImageOptimizer {
   public optimizeExistingImages(): void {
     const images = document.querySelectorAll('img:not([data-optimized])');
 
-    images.forEach((img) => {
+    images.forEach(img => {
       const htmlImg = img as HTMLImageElement;
       const src = htmlImg.src;
 
@@ -843,7 +863,10 @@ export class ImageOptimizer {
 
   public updateConfig(newConfig: Partial<ImageOptimizationConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    logger.info('Image optimization config updated', { component: 'ImageOptimizer', config: this.config });
+    logger.info('Image optimization config updated', {
+      component: 'ImageOptimizer',
+      config: this.config,
+    });
   }
 
   public getConfig(): ImageOptimizationConfig {
@@ -888,19 +911,21 @@ export class AssetLoadingManager {
   private detectConnectionType(): void {
     if (typeof navigator === 'undefined') return;
 
-    const connection = (navigator as Navigator & { 
-      connection?: { effectiveType?: string; saveData?: boolean } 
-    }).connection;
+    const connection = (
+      navigator as Navigator & {
+        connection?: { effectiveType?: string; saveData?: boolean };
+      }
+    ).connection;
 
     if (connection) {
       const effectiveType = connection.effectiveType;
       const isSlow = effectiveType === 'slow-2g' || effectiveType === '2g' || connection.saveData;
       this.connectionType = isSlow ? 'slow' : 'fast';
-      
-      logger.info('Connection type detected', { 
-        component: 'AssetLoadingManager', 
+
+      logger.info('Connection type detected', {
+        component: 'AssetLoadingManager',
         type: this.connectionType,
-        effectiveType 
+        effectiveType,
       });
     }
   }
@@ -925,8 +950,8 @@ export class AssetLoadingManager {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
 
     try {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      const observer = new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
           if (entry.entryType === 'resource') {
             const resourceEntry = entry as PerformanceResourceTiming;
             this.analyzeResourcePerformance(resourceEntry);
@@ -936,7 +961,10 @@ export class AssetLoadingManager {
 
       observer.observe({ entryTypes: ['resource'] });
     } catch (error) {
-      logger.debug('Performance monitoring setup failed', { component: 'AssetLoadingManager', error });
+      logger.debug('Performance monitoring setup failed', {
+        component: 'AssetLoadingManager',
+        error,
+      });
     }
   }
 
@@ -946,11 +974,11 @@ export class AssetLoadingManager {
 
     // Alert on slow non-cached resources
     if (loadTime > 3000 && !isFromCache) {
-      logger.warn('Slow resource detected', { 
-        component: 'AssetLoadingManager', 
+      logger.warn('Slow resource detected', {
+        component: 'AssetLoadingManager',
         name: entry.name,
         loadTime: Math.round(loadTime),
-        size: entry.transferSize
+        size: entry.transferSize,
       });
     }
   }
@@ -974,7 +1002,11 @@ export class AssetLoadingManager {
       try {
         callback(this.loadingProgress);
       } catch (error) {
-        logger.error('Progress callback error', { component: 'AssetLoadingManager' }, error as Error);
+        logger.error(
+          'Progress callback error',
+          { component: 'AssetLoadingManager' },
+          error as Error
+        );
       }
     });
   }
@@ -1044,7 +1076,7 @@ export class AssetLoadingManager {
   }
 
   private buildConfig(
-    type: AssetType, 
+    type: AssetType,
     config?: Partial<AssetLoadConfig>,
     assetKey?: string
   ): AssetLoadConfig {
@@ -1065,8 +1097,11 @@ export class AssetLoadingManager {
     return baseConfig;
   }
 
-  private getFallbackStrategy(type: AssetType, assetKey: string): AssetFallbackStrategy | undefined {
-    const fallbackType = type === 'critical' ? 'scripts' : `${type}s` as FallbackAssetType;
+  private getFallbackStrategy(
+    type: AssetType,
+    assetKey: string
+  ): AssetFallbackStrategy | undefined {
+    const fallbackType = type === 'critical' ? 'scripts' : (`${type}s` as FallbackAssetType);
     return getAssetFallback(fallbackType, assetKey);
   }
 
@@ -1084,7 +1119,10 @@ export class AssetLoadingManager {
     if (config.connectionAware && !this.isOnline) {
       if (fallbackStrategy?.offlineFallback) {
         currentUrl = fallbackStrategy.offlineFallback;
-        logger.info('Using offline fallback', { component: 'AssetLoadingManager', url: currentUrl });
+        logger.info('Using offline fallback', {
+          component: 'AssetLoadingManager',
+          url: currentUrl,
+        });
       } else {
         return {
           success: false,
@@ -1105,22 +1143,22 @@ export class AssetLoadingManager {
     for (const tryUrl of urlsToTry) {
       try {
         const result = await this.assetLoader.loadAsset(tryUrl, type, config);
-        
+
         if (result.success) {
           return {
             ...result,
             loadTime: performance.now() - startTime,
-            retries
+            retries,
           };
         }
-        
+
         retries++;
       } catch (error) {
         retries++;
-        logger.debug('Asset load attempt failed', { 
-          component: 'AssetLoadingManager', 
-          url: tryUrl, 
-          attempt: retries 
+        logger.debug('Asset load attempt failed', {
+          component: 'AssetLoadingManager',
+          url: tryUrl,
+          attempt: retries,
         });
       }
     }
@@ -1166,7 +1204,7 @@ export class AssetLoadingManager {
             error: result.reason,
             retries: 0,
             loadTime: 0,
-            fromCache: false
+            fromCache: false,
           });
         }
       });
@@ -1183,24 +1221,26 @@ export class AssetLoadingManager {
   ): Array<{ url: string; type: AssetType; config?: Partial<AssetLoadConfig> }> {
     return assets.filter(asset => {
       const config = { ...DEFAULT_CONFIGS[asset.type], ...asset.config };
-      
+
       // Skip if offline and connection-aware
       if (config.connectionAware && !this.isOnline) {
         return false;
       }
-      
+
       // Skip low priority on slow connections
       if (this.connectionType === 'slow' && config.priority === 'low') {
         return false;
       }
-      
+
       return true;
     });
   }
 
-  private async loadAssetWithProgress(
-    asset: { url: string; type: AssetType; config?: Partial<AssetLoadConfig> }
-  ): Promise<AssetLoadResult> {
+  private async loadAssetWithProgress(asset: {
+    url: string;
+    type: AssetType;
+    config?: Partial<AssetLoadConfig>;
+  }): Promise<AssetLoadResult> {
     this.updateProgress({ currentAsset: asset.url });
     return this.loadAsset(asset.url, asset.type, asset.config);
   }
@@ -1219,7 +1259,7 @@ export class AssetLoadingManager {
       failed: this.failedAssets.size,
       progress: { ...this.loadingProgress },
       connectionType: this.connectionType,
-      isOnline: this.isOnline
+      isOnline: this.isOnline,
     };
   }
 
@@ -1243,20 +1283,23 @@ export function initializeAssetFallbacks(customConfig?: Partial<AssetFallbacks>)
       scripts: { ...fallbackConfig.scripts, ...customConfig.scripts },
       styles: { ...fallbackConfig.styles, ...customConfig.styles },
       fonts: { ...fallbackConfig.fonts, ...customConfig.fonts },
-      priorities: { ...fallbackConfig.priorities, ...customConfig.priorities }
+      priorities: { ...fallbackConfig.priorities, ...customConfig.priorities },
     };
   }
 
   logger.info('Asset fallback system initialized', { component: 'AssetFallbacks' });
 }
 
-export function getAssetFallback(type: FallbackAssetType, key: string): AssetFallbackStrategy | undefined {
+export function getAssetFallback(
+  type: FallbackAssetType,
+  key: string
+): AssetFallbackStrategy | undefined {
   return fallbackConfig[type]?.[key];
 }
 
 export function getAssetPriority(assetKey: string): 'critical' | 'high' | 'medium' | 'low' {
   const { critical, high, medium } = fallbackConfig.priorities;
-  
+
   if (critical.includes(assetKey)) return 'critical';
   if (high.includes(assetKey)) return 'high';
   if (medium.includes(assetKey)) return 'medium';
@@ -1282,11 +1325,16 @@ export function setAssetFallback(
 export function determineEnhancementLevel(): EnhancementLevel {
   if (typeof navigator === 'undefined') return EnhancementLevel.FULL;
 
-  const connection = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
-  const isSlowConnection = connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
+  const connection = (navigator as Navigator & { connection?: { effectiveType?: string } })
+    .connection;
+  const isSlowConnection =
+    connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
   const isLowEndDevice = navigator.hardwareConcurrency ? navigator.hardwareConcurrency <= 2 : false;
-  const perfMemory = (performance as Performance & { memory?: { jsHeapSizeLimit?: number } }).memory;
-  const hasLimitedMemory = perfMemory?.jsHeapSizeLimit ? perfMemory.jsHeapSizeLimit < 1000000000 : false;
+  const perfMemory = (performance as Performance & { memory?: { jsHeapSizeLimit?: number } })
+    .memory;
+  const hasLimitedMemory = perfMemory?.jsHeapSizeLimit
+    ? perfMemory.jsHeapSizeLimit < 1000000000
+    : false;
 
   if (isSlowConnection && isLowEndDevice && hasLimitedMemory) {
     return EnhancementLevel.MINIMAL;
@@ -1304,21 +1352,37 @@ export function getFeatureAvailability(): FeatureAvailability {
 
   const features: Record<EnhancementLevel, FeatureAvailability> = {
     [EnhancementLevel.MINIMAL]: {
-      charts: false, maps: false, analytics: false, 
-      animations: false, images: true, fonts: true
+      charts: false,
+      maps: false,
+      analytics: false,
+      animations: false,
+      images: true,
+      fonts: true,
     },
     [EnhancementLevel.BASIC]: {
-      charts: false, maps: false, analytics: true,
-      animations: false, images: true, fonts: true
+      charts: false,
+      maps: false,
+      analytics: true,
+      animations: false,
+      images: true,
+      fonts: true,
     },
     [EnhancementLevel.REDUCED]: {
-      charts: true, maps: false, analytics: true,
-      animations: false, images: true, fonts: true
+      charts: true,
+      maps: false,
+      analytics: true,
+      animations: false,
+      images: true,
+      fonts: true,
     },
     [EnhancementLevel.FULL]: {
-      charts: true, maps: true, analytics: true,
-      animations: true, images: true, fonts: true
-    }
+      charts: true,
+      maps: true,
+      analytics: true,
+      animations: true,
+      images: true,
+      fonts: true,
+    },
   };
 
   return features[level];
@@ -1328,15 +1392,15 @@ export function applyDegradedMode(): void {
   if (typeof document === 'undefined') return;
 
   const features = getFeatureAvailability();
-  
+
   if (!features.animations) {
     document.documentElement.style.setProperty('--animation-duration', '0s');
     document.documentElement.style.setProperty('--transition-duration', '0s');
   }
-  
+
   if (!features.charts) document.documentElement.classList.add('no-charts');
   if (!features.maps) document.documentElement.classList.add('no-maps');
-  
+
   logger.info('Degraded mode applied', { component: 'AssetFallback', features });
 }
 
@@ -1351,7 +1415,7 @@ export function useAssetLoading(
   const [progress, setProgress] = useState<LoadingProgress>({
     loaded: 0,
     total: 0,
-    phase: 'preload'
+    phase: 'preload',
   });
   const [errors, setErrors] = useState<Error[]>([]);
   const managerRef = useRef(null as AssetLoadingManager | null);
@@ -1364,11 +1428,16 @@ export function useAssetLoading(
     const manager = managerRef.current;
     const unsubscribe = manager.onProgress(setProgress);
 
-    manager.loadAssets(assets)
+    manager
+      .loadAssets(assets)
       .then((results: AssetLoadResult[]) => {
         const failedResults = results.filter((r: AssetLoadResult) => !r.success);
         if (failedResults.length > 0) {
-          setErrors(failedResults.map((r: AssetLoadResult) => r.error).filter((e): e is Error => e !== undefined));
+          setErrors(
+            failedResults
+              .map((r: AssetLoadResult) => r.error)
+              .filter((e): e is Error => e !== undefined)
+          );
         }
         setLoading(false);
       })
@@ -1416,10 +1485,15 @@ export const preloadCriticalAssets = (): Promise<void> => {
     { url: '/Chanuka_logo.svg', type: 'image' as AssetType },
   ];
 
-  return assetLoadingManager.loadAssets(criticalAssets, 'preload')
+  return assetLoadingManager
+    .loadAssets(criticalAssets, 'preload')
     .then(() => logger.info('Critical assets preloaded', { component: 'AssetLoadingManager' }))
-    .catch((error) => {
-      logger.error('Failed to preload critical assets', { component: 'AssetLoadingManager' }, error);
+    .catch(error => {
+      logger.error(
+        'Failed to preload critical assets',
+        { component: 'AssetLoadingManager' },
+        error
+      );
       throw error;
     });
 };
@@ -1443,7 +1517,7 @@ export const optimizeExistingImages = (): void => imageOptimizer.optimizeExistin
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   initializeAssetFallbacks();
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       optimizeExistingImages();

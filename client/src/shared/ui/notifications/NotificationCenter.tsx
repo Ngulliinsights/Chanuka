@@ -8,9 +8,9 @@
 // Remove unused React import
 import { Bell, Filter, Settings, Check, X, Trash } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 
 import { useNotifications, useNotificationHistory } from '@/hooks/useNotifications';
-import React from 'react';
 import {
   Badge,
   Button,
@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel
+  DropdownMenuLabel,
 } from '@/shared/design-system';
 import { LoadingSpinner } from '@/shared/ui/loading';
 
@@ -54,7 +54,7 @@ type ViewType = 'recent' | 'history';
 export function NotificationCenter({
   className = '',
   maxHeight = '400px',
-  showPreferences = true
+  showPreferences = true,
 }: NotificationCenterProps) {
   const {
     notifications,
@@ -66,17 +66,11 @@ export function NotificationCenter({
     deleteNotification,
     loadMore,
     refresh,
-    clearError
+    clearError,
   } = useNotifications();
 
-  const {
-    history,
-    categories,
-    loadHistory,
-    bulkMarkAsRead,
-    bulkDelete,
-    archiveOld
-  } = useNotificationHistory();
+  const { history, categories, loadHistory, bulkMarkAsRead, bulkDelete, archiveOld } =
+    useNotificationHistory();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
@@ -88,55 +82,57 @@ export function NotificationCenter({
   useEffect(() => {
     if (view === 'history') {
       loadHistory({
-        limit: 50
+        limit: 50,
       });
     }
   }, [view, loadHistory]);
 
-  const handleNotificationClick = useCallback(async (notificationId: string) => {
-    try {
-      await markAsRead(notificationId);
-    } catch (err) {
-      console.error('Failed to mark notification as read:', err);
-    }
-  }, [markAsRead]);
-
-  const handleBulkAction = useCallback(async (action: BulkActionType) => {
-    if (selectedNotifications.length === 0) return;
-
-    try {
-      switch (action) {
-        case 'read':
-          await bulkMarkAsRead(selectedNotifications);
-          break;
-        case 'delete':
-          await bulkDelete(selectedNotifications);
-          break;
-        case 'archive':
-          // Archive is handled differently - it's time-based
-          await archiveOld(30);
-          break;
+  const handleNotificationClick = useCallback(
+    async (notificationId: string) => {
+      try {
+        await markAsRead(notificationId);
+      } catch (err) {
+        console.error('Failed to mark notification as read:', err);
       }
-      setSelectedNotifications([]);
-    } catch (err) {
-      console.error(`Failed to ${action} notifications:`, err);
-    }
-  }, [selectedNotifications, bulkMarkAsRead, bulkDelete, archiveOld]);
+    },
+    [markAsRead]
+  );
+
+  const handleBulkAction = useCallback(
+    async (action: BulkActionType) => {
+      if (selectedNotifications.length === 0) return;
+
+      try {
+        switch (action) {
+          case 'read':
+            await bulkMarkAsRead(selectedNotifications);
+            break;
+          case 'delete':
+            await bulkDelete(selectedNotifications);
+            break;
+          case 'archive':
+            // Archive is handled differently - it's time-based
+            await archiveOld(30);
+            break;
+        }
+        setSelectedNotifications([]);
+      } catch (err) {
+        console.error(`Failed to ${action} notifications:`, err);
+      }
+    },
+    [selectedNotifications, bulkMarkAsRead, bulkDelete, archiveOld]
+  );
 
   const handleSelectNotification = useCallback((notificationId: string, selected: boolean) => {
     setSelectedNotifications(prev =>
-      selected
-        ? [...prev, notificationId]
-        : prev.filter(id => id !== notificationId)
+      selected ? [...prev, notificationId] : prev.filter(id => id !== notificationId)
     );
   }, []);
 
   const handleSelectAll = useCallback(() => {
     const currentNotifications = view === 'recent' ? notifications : history;
     const allIds = currentNotifications.map(n => n.id);
-    setSelectedNotifications(
-      selectedNotifications.length === allIds.length ? [] : allIds
-    );
+    setSelectedNotifications(selectedNotifications.length === allIds.length ? [] : allIds);
   }, [view, notifications, history, selectedNotifications.length]);
 
   const filteredNotifications = (view === 'recent' ? notifications : history).filter(
@@ -150,7 +146,7 @@ export function NotificationCenter({
     expert: (categories as Partial<CategoryCounts>).expert ?? 0,
     moderation: (categories as Partial<CategoryCounts>).moderation ?? 0,
     system: (categories as Partial<CategoryCounts>).system ?? 0,
-    security: (categories as Partial<CategoryCounts>).security ?? 0
+    security: (categories as Partial<CategoryCounts>).security ?? 0,
   };
 
   const totalCount = Object.values(extendedCategories).reduce((sum, count) => sum + count, 0);
@@ -162,7 +158,7 @@ export function NotificationCenter({
     { value: 'expert', label: 'Expert', count: extendedCategories.expert },
     { value: 'moderation', label: 'Moderation', count: extendedCategories.moderation },
     { value: 'system', label: 'System', count: extendedCategories.system },
-    { value: 'security', label: 'Security', count: extendedCategories.security }
+    { value: 'security', label: 'Security', count: extendedCategories.security },
   ];
 
   const handleLoadMore = useCallback(() => {
@@ -203,9 +199,7 @@ export function NotificationCenter({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                Notifications
-              </h3>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
               {unreadCount > 0 && (
                 <Badge variant="secondary" className="text-xs">
                   {unreadCount} new
@@ -257,9 +251,7 @@ export function NotificationCenter({
                       Preferences
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={refresh}>
-                    Refresh
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={refresh}>Refresh</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -333,7 +325,9 @@ export function NotificationCenter({
                     className="text-xs px-2 py-1"
                     onClick={handleSelectAll}
                   >
-                    {selectedNotifications.length === filteredNotifications.length ? 'Deselect all' : 'Select all'}
+                    {selectedNotifications.length === filteredNotifications.length
+                      ? 'Deselect all'
+                      : 'Select all'}
                   </Button>
                 </div>
               </div>
@@ -371,8 +365,7 @@ export function NotificationCenter({
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {selectedCategory === 'all'
                     ? 'No notifications yet'
-                    : `No ${selectedCategory} notifications`
-                  }
+                    : `No ${selectedCategory} notifications`}
                 </p>
               </div>
             ) : (
@@ -382,7 +375,7 @@ export function NotificationCenter({
                     key={notification.id}
                     notification={notification}
                     selected={selectedNotifications.includes(notification.id)}
-                    onSelect={(selected) => handleSelectNotification(notification.id, selected)}
+                    onSelect={selected => handleSelectNotification(notification.id, selected)}
                     onClick={() => handleNotificationClick(notification.id)}
                     onDelete={() => deleteNotification(notification.id)}
                   />
@@ -416,18 +409,10 @@ export function NotificationCenter({
       )}
 
       {/* Preferences Modal */}
-      {showPreferencesModal && (
-        <NotificationPreferences />
-      )}
+      {showPreferencesModal && <NotificationPreferences />}
 
       {/* Click outside to close */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={handleClose}
-          aria-hidden="true"
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40" onClick={handleClose} aria-hidden="true" />}
     </div>
   );
 }

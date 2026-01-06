@@ -21,9 +21,9 @@ type EmptyStateConfig = {
     content: {
       className: string;
       children: {
-        title: { className: string; text: string; };
-        description: { className: string; text: string; };
-        suggestion: { className: string; text: string; };
+        title: { className: string; text: string };
+        description: { className: string; text: string };
+        suggestion: { className: string; text: string };
         actions?: {
           className: string;
           children: Array<{
@@ -84,7 +84,7 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'No results found',
-      description: 'We couldn\'t find anything matching your search.',
+      description: "We couldn't find anything matching your search.",
       suggestion: 'Try adjusting your search terms or filters.',
     },
 
@@ -96,7 +96,7 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'No items yet',
-      description: 'You haven\'t added any items to this collection.',
+      description: "You haven't added any items to this collection.",
       suggestion: 'Get started by adding your first item.',
     },
 
@@ -108,7 +108,7 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'No content yet',
-      description: 'You haven\'t created any content.',
+      description: "You haven't created any content.",
       suggestion: 'Create your first piece of content to get started.',
     },
 
@@ -120,8 +120,8 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'No notifications',
-      description: 'You\'re all caught up! No new notifications.',
-      suggestion: 'We\'ll notify you when something new happens.',
+      description: "You're all caught up! No new notifications.",
+      suggestion: "We'll notify you when something new happens.",
     },
 
     // No favorites/bookmarks
@@ -132,7 +132,7 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'No favorites yet',
-      description: 'You haven\'t added any items to your favorites.',
+      description: "You haven't added any items to your favorites.",
       suggestion: 'Start favoriting items you want to save for later.',
     },
 
@@ -156,7 +156,7 @@ export const emptyStates = {
         size: '64px',
       },
       title: 'Access denied',
-      description: 'You don\'t have permission to view this content.',
+      description: "You don't have permission to view this content.",
       suggestion: 'Contact an administrator for access.',
     },
 
@@ -169,7 +169,7 @@ export const emptyStates = {
       },
       title: 'Coming soon',
       description: 'This feature is not available yet.',
-      suggestion: 'We\'re working on it! Check back soon.',
+      suggestion: "We're working on it! Check back soon.",
     },
 
     // Maintenance mode
@@ -181,7 +181,7 @@ export const emptyStates = {
       },
       title: 'Under maintenance',
       description: 'This service is temporarily unavailable.',
-      suggestion: 'We\'ll be back shortly. Thank you for your patience.',
+      suggestion: "We'll be back shortly. Thank you for your patience.",
     },
   },
 
@@ -657,11 +657,12 @@ export const emptyStateUtils: {
       ],
     };
 
-    return suggestions[context] || ['Try refreshing the page', 'Contact support if the issue persists'];
+    return (
+      suggestions[context] || ['Try refreshing the page', 'Contact support if the issue persists']
+    );
   },
 } as const;
 
 export type EmptyStateType = keyof typeof emptyStates.types;
 export type EmptyStateLayout = keyof typeof emptyStates.layouts;
 export type EmptyStateContext = keyof typeof emptyStates.context;
-

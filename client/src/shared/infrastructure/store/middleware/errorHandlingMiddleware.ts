@@ -6,15 +6,11 @@
 
 import { Middleware, Action } from '@reduxjs/toolkit';
 
-import {
-  ErrorDomain,
-  ErrorSeverity,
-  coreErrorHandler,
-  createError,
-} from '@/core/error';
+import { ErrorDomain, ErrorSeverity, coreErrorHandler, createError } from '@/core/error';
+
 import { logger } from '../../../../utils/logger';
 
-export const errorHandlingMiddleware: Middleware = (store) => (next) => (action: unknown) => {
+export const errorHandlingMiddleware: Middleware = store => next => (action: unknown) => {
   const reduxAction = action as Action & { type: string };
 
   try {
@@ -64,7 +60,7 @@ export const errorHandlingMiddleware: Middleware = (store) => (next) => (action:
         timestamp: new Date().toISOString(),
         domain: appError.type,
         severity: appError.severity,
-      }
+      },
     });
 
     throw error;

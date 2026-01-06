@@ -1,5 +1,6 @@
 import { ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Feature Imports
@@ -12,7 +13,6 @@ import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
 import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();
@@ -20,12 +20,7 @@ export default function BillDetail() {
   const [activeTab, setActiveTab] = useState('overview');
 
   // ✅ Use the React Query Hook (The Brain)
-  const { 
-    data: bill, 
-    isLoading, 
-    isError,
-    error 
-  } = useBill(id);
+  const { data: bill, isLoading, isError, error } = useBill(id);
 
   // 1. Loading State
   if (isLoading) {
@@ -57,9 +52,9 @@ export default function BillDetail() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
       {/* Navigation */}
-      <Button 
-        variant="ghost" 
-        className="pl-0 hover:bg-transparent hover:text-blue-600" 
+      <Button
+        variant="ghost"
+        className="pl-0 hover:bg-transparent hover:text-blue-600"
         onClick={() => navigate('/bills')}
       >
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Legislation
@@ -71,11 +66,21 @@ export default function BillDetail() {
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto">
-          <TabsTrigger value="overview" className="py-3">Overview</TabsTrigger>
-          <TabsTrigger value="text" className="py-3">Full Text</TabsTrigger>
-          <TabsTrigger value="sponsors" className="py-3">Sponsors</TabsTrigger>
-          <TabsTrigger value="analysis" className="py-3">Analysis</TabsTrigger>
-          <TabsTrigger value="community" className="py-3">Community</TabsTrigger>
+          <TabsTrigger value="overview" className="py-3">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="text" className="py-3">
+            Full Text
+          </TabsTrigger>
+          <TabsTrigger value="sponsors" className="py-3">
+            Sponsors
+          </TabsTrigger>
+          <TabsTrigger value="analysis" className="py-3">
+            Analysis
+          </TabsTrigger>
+          <TabsTrigger value="community" className="py-3">
+            Community
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">

@@ -4,8 +4,6 @@
  * Shows a preview of the user's dashboard based on their persona
  */
 
-import React from 'react';
-import { Link } from 'react-router-dom';
 import {
   BarChart3,
   FileText,
@@ -14,9 +12,19 @@ import {
   Target,
   ChevronRight,
   BookOpen,
-  Shield
+  Shield,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@client/shared/design-system';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+} from '@client/shared/design-system';
 
 interface PersonalizedDashboardPreviewProps {
   persona: 'novice' | 'intermediate' | 'expert';
@@ -25,7 +33,7 @@ interface PersonalizedDashboardPreviewProps {
 
 const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> = ({
   persona,
-  userId: _userId
+  userId: _userId,
 }) => {
   const getPersonaContent = (persona: 'novice' | 'intermediate' | 'expert') => {
     switch (persona) {
@@ -40,7 +48,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: BookOpen,
               color: 'from-blue-500 to-blue-600',
               value: '3 of 5 steps completed',
-              action: 'Continue Learning'
+              action: 'Continue Learning',
             },
             {
               title: 'Popular Bills',
@@ -48,7 +56,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: FileText,
               color: 'from-green-500 to-green-600',
               value: '5 trending bills',
-              action: 'Explore Bills'
+              action: 'Explore Bills',
             },
             {
               title: 'Community Welcome',
@@ -56,9 +64,9 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: Users,
               color: 'from-purple-500 to-purple-600',
               value: '127 new members',
-              action: 'Join Discussion'
-            }
-          ]
+              action: 'Join Discussion',
+            },
+          ],
         };
 
       case 'intermediate':
@@ -72,7 +80,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: FileText,
               color: 'from-blue-500 to-blue-600',
               value: '12 active bills',
-              action: 'View All'
+              action: 'View All',
             },
             {
               title: 'Recent Activity',
@@ -80,7 +88,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: BarChart3,
               color: 'from-green-500 to-green-600',
               value: '8 actions this week',
-              action: 'View Details'
+              action: 'View Details',
             },
             {
               title: 'Recommendations',
@@ -88,9 +96,9 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: TrendingUp,
               color: 'from-orange-500 to-orange-600',
               value: '4 new suggestions',
-              action: 'Explore'
-            }
-          ]
+              action: 'Explore',
+            },
+          ],
         };
 
       case 'expert':
@@ -104,7 +112,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: BarChart3,
               color: 'from-blue-500 to-blue-600',
               value: '23 insights available',
-              action: 'View Analytics'
+              action: 'View Analytics',
             },
             {
               title: 'Expert Tools',
@@ -112,7 +120,7 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: Shield,
               color: 'from-purple-500 to-purple-600',
               value: '7 tools active',
-              action: 'Access Tools'
+              action: 'Access Tools',
             },
             {
               title: 'Verification Queue',
@@ -120,9 +128,9 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
               icon: Target,
               color: 'from-orange-500 to-orange-600',
               value: '3 pending reviews',
-              action: 'Review Now'
-            }
-          ]
+              action: 'Review Now',
+            },
+          ],
         };
     }
   };
@@ -140,10 +148,15 @@ const PersonalizedDashboardPreview: React.FC<PersonalizedDashboardPreviewProps> 
         {content.widgets.map((widget, index) => {
           const Icon = widget.icon;
           return (
-            <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <Card
+              key={index}
+              className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-10 h-10 bg-gradient-to-br ${widget.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`w-10 h-10 bg-gradient-to-br ${widget.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <div>

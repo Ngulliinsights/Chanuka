@@ -1,17 +1,17 @@
 /**
  * Unified Error Boundary Component
- * 
+ *
  * This component integrates with the shared BaseError system from shared/core
  * and provides comprehensive error handling with recovery strategies, correlation IDs,
  * and circuit breaker integration.
  */
 
 import { Component, ReactNode, ErrorInfo } from 'react';
+import React from 'react';
 
 import { getCircuitBreakerStats } from '@client/core/api/interceptors';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/core/error';
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 export interface UnifiedErrorBoundaryProps {
   children: ReactNode;
@@ -45,7 +45,7 @@ export interface UnifiedErrorFallbackProps {
 
 /**
  * Unified Error Boundary using shared BaseError system
- * 
+ *
  * Features:
  * - Integration with shared/core BaseError system
  * - Automatic correlation ID generation
@@ -53,7 +53,10 @@ export interface UnifiedErrorFallbackProps {
  * - Recovery strategy execution
  * - Error correlation across services
  */
-export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, UnifiedErrorBoundaryState> {
+export class UnifiedErrorBoundary extends Component<
+  UnifiedErrorBoundaryProps,
+  UnifiedErrorBoundaryState
+> {
   constructor(props: UnifiedErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -69,21 +72,22 @@ export class UnifiedErrorBoundary extends Component<UnifiedErrorBoundaryProps, U
    */
   static getDerivedStateFromError(error: Error): Partial<UnifiedErrorBoundaryState> {
     // Use shared BaseError system with proper correlation ID
-    const baseError = error instanceof BaseError 
-      ? error 
-      : new BaseError(error.message, {
-          statusCode: 500,
-          code: 'REACT_ERROR_BOUNDARY',
-          domain: ErrorDomain.SYSTEM,
-          severity: ErrorSeverity.HIGH,
-          cause: error,
-          context: {
-            component: 'UnifiedErrorBoundary',
-            timestamp: Date.now(),
-            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-            url: typeof window !== 'undefined' ? window.location.href : undefined,
-          },
-        });
+    const baseError =
+      error instanceof BaseError
+        ? error
+        : new BaseError(error.message, {
+            statusCode: 500,
+            code: 'REACT_ERROR_BOUNDARY',
+            domain: ErrorDomain.SYSTEM,
+            severity: ErrorSeverity.HIGH,
+            cause: error,
+            context: {
+              component: 'UnifiedErrorBoundary',
+              timestamp: Date.now(),
+              userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+              url: typeof window !== 'undefined' ? window.location.href : undefined,
+            },
+          });
 
     return {
       hasError: true,
@@ -185,12 +189,10 @@ function UnifiedErrorFallback(props: UnifiedErrorFallbackProps) {
     circuitBreakerStats,
   } = props;
 
-  const hasCircuitBreakerIssues = Object.values(circuitBreakerStats).some(
-    (state: unknown) => {
-      const s = state as { state?: string };
-      return s.state === 'open' || s.state === 'half-open';
-    }
-  );
+  const hasCircuitBreakerIssues = Object.values(circuitBreakerStats).some((state: unknown) => {
+    const s = state as { state?: string };
+    return s.state === 'open' || s.state === 'half-open';
+  });
 
   return (
     <div
@@ -315,7 +317,8 @@ function UnifiedErrorFallback(props: UnifiedErrorFallbackProps) {
                   ⚠️ Some services are experiencing issues and have been temporarily disabled.
                 </p>
                 <p className="text-sm text-orange-700 mt-1">
-                  This is a protective measure to prevent further problems. Services will be restored automatically.
+                  This is a protective measure to prevent further problems. Services will be
+                  restored automatically.
                 </p>
               </div>
             </div>

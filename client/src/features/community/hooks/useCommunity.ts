@@ -1,15 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { communityApiService } from '@client/core/api/community';
-import type {
-  CommentQueryOptions,
-  VoteResponse
-} from '@client/core/api/community';
+import type { CommentQueryOptions, VoteResponse } from '@client/core/api/community';
+import type { Comment, DiscussionThread } from '@client/features/community/types';
 import { useToast } from '@client/hooks/use-toast';
-import type {
-  Comment,
-  DiscussionThread
-} from '@client/features/community/types';
 
 // Define CommunityFilters interface locally since it's not exported from types
 interface CommunityFilters {
@@ -63,7 +57,10 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
 
   const comments = useQuery({
     queryKey: ['community', 'comments', bill_id, filters],
-    queryFn: () => bill_id ? communityApiService.getBillComments(parseInt(bill_id), filters) : Promise.resolve([]),
+    queryFn: () =>
+      bill_id
+        ? communityApiService.getBillComments(parseInt(bill_id), filters)
+        : Promise.resolve([]),
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
@@ -73,13 +70,13 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
       const apiRequest = {
         billId: request.bill_id,
         content: request.content,
-        parentId: request.parent_id
+        parentId: request.parent_id,
       };
       return await communityApiService.addComment(apiRequest);
     },
-    onSuccess: (newComment) => {
+    onSuccess: newComment => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', newComment.billId]
+        queryKey: ['community', 'comments', newComment.billId],
       });
       queryClient.setQueryData(
         ['community', 'comments', newComment.billId],
@@ -91,12 +88,16 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
     },
   });
 
-  const updateComment = useMutation<Comment, Error, { comment_id: string; request: UpdateCommentRequest }>({
+  const updateComment = useMutation<
+    Comment,
+    Error,
+    { comment_id: string; request: UpdateCommentRequest }
+  >({
     mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
       communityApiService.updateComment(comment_id, request.content),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments']
+        queryKey: ['community', 'comments'],
       });
     },
     onError: (error: Error) => {
@@ -125,7 +126,7 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments']
+        queryKey: ['community', 'comments'],
       });
     },
     onError: (error: Error) => {
@@ -165,10 +166,10 @@ export function useThreads(billId?: number) {
       return communityApiService.createThread({
         billId: request.billId,
         title: request.title,
-        description: request.description
+        description: request.description,
       });
     },
-    onSuccess: (newThread) => {
+    onSuccess: newThread => {
       queryClient.invalidateQueries({ queryKey: ['community', 'threads', newThread.billId] });
       queryClient.setQueryData(
         ['community', 'threads', newThread.billId],
@@ -181,10 +182,16 @@ export function useThreads(billId?: number) {
   });
 
   const updateThread = useMutation({
-    mutationFn: ({ threadId, updates }: { threadId: string; updates: { title?: string; description?: string } }) => {
+    mutationFn: ({
+      threadId,
+      updates,
+    }: {
+      threadId: string;
+      updates: { title?: string; description?: string };
+    }) => {
       return communityApiService.updateThread(threadId, updates);
     },
-    onSuccess: (updatedThread) => {
+    onSuccess: updatedThread => {
       queryClient.invalidateQueries({ queryKey: ['community', 'threads', updatedThread.billId] });
     },
     onError: (error: Error) => {
@@ -243,15 +250,15 @@ export function useSocialSharing() {
     },
     onSuccess: (share: ShareResponse) => {
       toast({
-        title: "Content shared!",
+        title: 'Content shared!',
         description: `Shared to ${share.platform}`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Share failed",
+        title: 'Share failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -332,18 +339,18 @@ export function useThreadParticipation(threadId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'thread', threadId, 'participants']
+        queryKey: ['community', 'thread', threadId, 'participants'],
       });
       toast({
-        title: "Joined discussion",
-        description: "You are now participating in this thread.",
+        title: 'Joined discussion',
+        description: 'You are now participating in this thread.',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to join",
+        title: 'Failed to join',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -356,18 +363,18 @@ export function useThreadParticipation(threadId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'thread', threadId, 'participants']
+        queryKey: ['community', 'thread', threadId, 'participants'],
       });
       toast({
-        title: "Left discussion",
-        description: "You are no longer participating in this thread.",
+        title: 'Left discussion',
+        description: 'You are no longer participating in this thread.',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to leave",
+        title: 'Failed to leave',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -382,12 +389,15 @@ export function useThreadParticipation(threadId: string) {
 /**
  * Hook for community search
  */
-export function useCommunitySearch(query: string, options?: {
-  contentTypes?: Array<'comment' | 'thread' | 'insight'>;
-  billId?: number;
-  limit?: number;
-  offset?: number;
-}) {
+export function useCommunitySearch(
+  query: string,
+  options?: {
+    contentTypes?: Array<'comment' | 'thread' | 'insight'>;
+    billId?: number;
+    limit?: number;
+    offset?: number;
+  }
+) {
   return useQuery({
     queryKey: ['community', 'search', query, options],
     queryFn: () => {
@@ -427,18 +437,23 @@ export function useActivityFeed(filters?: CommunityFilters, page: number = 1, li
         contentTypes: filters?.contentTypes?.map((type: string) => {
           // Map content types to API expected values
           switch (type) {
-            case 'comments': return 'comment' as const;
-            case 'expert_insights': return 'expert_insight' as const;
-            default: return 'comment' as const; // fallback
+            case 'comments':
+              return 'comment' as const;
+            case 'expert_insights':
+              return 'expert_insight' as const;
+            default:
+              return 'comment' as const; // fallback
           }
         }),
         timeRange: filters?.timeRange,
-        geography: filters?.geography ? {
-          state: filters.geography.states?.[0], // Take first state
-          district: filters.geography.districts?.[0], // Take first district
-          county: filters.geography.counties?.[0] // Take first county
-        } : undefined,
-        followedOnly: false
+        geography: filters?.geography
+          ? {
+              state: filters.geography.states?.[0], // Take first state
+              district: filters.geography.districts?.[0], // Take first district
+              county: filters.geography.counties?.[0], // Take first county
+            }
+          : undefined,
+        followedOnly: false,
       };
       return communityApiService.getActivityFeed(apiFilters);
     },
@@ -527,45 +542,8 @@ export function useRealtimeCommunity(_threadId?: string) {
   return {
     isConnected: false,
     connectionStatus: 'disconnected' as const,
-    subscribeToThread: (_id: string) => { },
-    subscribeToComments: (_bill_id?: string) => { },
-    unsubscribe: () => { },
+    subscribeToThread: (_id: string) => {},
+    subscribeToComments: (_bill_id?: string) => {},
+    unsubscribe: () => {},
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

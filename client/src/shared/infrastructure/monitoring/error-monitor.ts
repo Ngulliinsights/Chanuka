@@ -77,7 +77,7 @@ class ErrorMonitor {
     const monitoringReporter = {
       report: async (error: AppError): Promise<void> => {
         await this.handleCoreError(error);
-      }
+      },
     };
 
     coreErrorHandler.addReporter(monitoringReporter);
@@ -94,7 +94,7 @@ class ErrorMonitor {
         retentionPeriodHours: 24,
         backends: [],
         flushIntervalMs: 30000,
-      }
+      },
     });
   }
 
@@ -130,13 +130,13 @@ class ErrorMonitor {
 
   private setupErrorTracking(): void {
     // Global error handler - captures uncaught JavaScript errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       const error = this.createAppErrorFromEvent(event);
       coreErrorHandler.handleError(error);
     });
 
     // Promise rejection handler - captures unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       const error = this.createAppErrorFromRejection(event);
       coreErrorHandler.handleError(error);
     });
@@ -238,7 +238,7 @@ class ErrorMonitor {
     const originalXHROpen = XMLHttpRequest.prototype.open;
     const originalXHRSend = XMLHttpRequest.prototype.send;
 
-    XMLHttpRequest.prototype.open = function(
+    XMLHttpRequest.prototype.open = function (
       this: XMLHttpRequest & { _startTime?: number; _method?: string; _url?: string },
       method: string,
       url: string | URL,
@@ -256,7 +256,7 @@ class ErrorMonitor {
       return originalXHROpen.call(this, method, url, async);
     };
 
-    XMLHttpRequest.prototype.send = function(
+    XMLHttpRequest.prototype.send = function (
       this: XMLHttpRequest & { _startTime?: number; _method?: string; _url?: string },
       body?: Document | XMLHttpRequestBodyInit | null
     ): void {
@@ -298,7 +298,7 @@ class ErrorMonitor {
     if ('PerformanceObserver' in window) {
       // Long task detection
       try {
-        const longTaskObserver = new PerformanceObserver((list) => {
+        const longTaskObserver = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             if (entry.duration > 50) {
               const performanceError = createError(
@@ -332,7 +332,7 @@ class ErrorMonitor {
 
       // Layout shift detection
       try {
-        const clsObserver = new PerformanceObserver((list) => {
+        const clsObserver = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             const layoutEntry = entry as PerformanceEntry & { value: number; sources?: unknown[] };
             if (layoutEntry.value > 0.1) {
@@ -381,7 +381,8 @@ class ErrorMonitor {
     if (extendedPerf.memory) {
       setInterval(() => {
         const memory = extendedPerf.memory;
-        if (memory && memory.usedJSHeapSize > 150 * 1024 * 1024) { // 150MB threshold
+        if (memory && memory.usedJSHeapSize > 150 * 1024 * 1024) {
+          // 150MB threshold
           const memoryError = createError(
             ErrorDomain.SYSTEM,
             ErrorSeverity.HIGH,
@@ -422,25 +423,20 @@ class ErrorMonitor {
       errorMessage = `Network error: ${error.message}`;
     }
 
-    const networkError = createError(
-      ErrorDomain.NETWORK,
-      severity,
-      errorMessage,
-      {
-        details: {
-          url,
-          duration,
-          status,
-          statusText,
-        },
-        context: {
-          component: 'NetworkMonitoring',
-          operation: 'network_request',
-        },
-        recoverable: true,
-        retryable: !status || status >= 500 || status === 408 || status === 429,
-      }
-    );
+    const networkError = createError(ErrorDomain.NETWORK, severity, errorMessage, {
+      details: {
+        url,
+        duration,
+        status,
+        statusText,
+      },
+      context: {
+        component: 'NetworkMonitoring',
+        operation: 'network_request',
+      },
+      recoverable: true,
+      retryable: !status || status >= 500 || status === 408 || status === 429,
+    });
 
     coreErrorHandler.handleError(networkError);
   }
@@ -534,7 +530,6 @@ class ErrorMonitor {
   // Public API (enhanced with core integration)
   // ============================================================================
 
-
   destroy(): void {
     if (this.metricsInterval) {
       clearInterval(this.metricsInterval);
@@ -557,11 +552,21 @@ class ErrorMonitor {
     this.reportError(error, context);
   }
 
-  addBreadcrumb(message: string, category: string, level: 'info' | 'warn' | 'error' = 'info', data?: Record<string, unknown>): void {
+  addBreadcrumb(
+    message: string,
+    category: string,
+    level: 'info' | 'warn' | 'error' = 'info',
+    data?: Record<string, unknown>
+  ): void {
     this.reportUserAction(message, { category, level, ...data });
   }
 
-  setUserContext(user: { id: string; email?: string; username?: string; sessionId?: string }): void {
+  setUserContext(user: {
+    id: string;
+    email?: string;
+    username?: string;
+    sessionId?: string;
+  }): void {
     this.sentry.setUserContext(user);
   }
 
@@ -577,7 +582,11 @@ class ErrorMonitor {
     this.trackBusinessEvent('visibility-change', { state });
   }
 
-  trackPageLoadMetrics(metrics: { loadTime: number; domReady: number; firstPaint: number | null }): void {
+  trackPageLoadMetrics(metrics: {
+    loadTime: number;
+    domReady: number;
+    firstPaint: number | null;
+  }): void {
     this.trackBusinessEvent('page-load', metrics);
   }
 
@@ -586,7 +595,9 @@ class ErrorMonitor {
   }
 
   trackLayoutShift(entry: PerformanceEntry): void {
-    this.trackBusinessEvent('layout-shift', { value: (entry as PerformanceEntry & { value: number }).value });
+    this.trackBusinessEvent('layout-shift', {
+      value: (entry as PerformanceEntry & { value: number }).value,
+    });
   }
 
   trackLCP(entry: PerformanceEntry): void {

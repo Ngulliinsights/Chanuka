@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -8,6 +7,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '../../design-system';

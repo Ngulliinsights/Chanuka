@@ -1,9 +1,9 @@
 /**
  * Mobile Navigation Hook
- * 
+ *
  * Manages navigation drawer state (open/closed)
  * Provides methods to control drawer visibility
- * 
+ *
  * @module hooks/mobile/useMobileNavigation
  */
 
@@ -37,14 +37,14 @@ export interface UseMobileNavigationReturn {
 
 /**
  * Hook for managing mobile navigation drawer state
- * 
+ *
  * @param options - Configuration options
  * @returns Navigation drawer control methods and state
- * 
+ *
  * @example
  * ```tsx
  * const { isDrawerOpen, openDrawer, closeDrawer } = useMobileNavigation();
- * 
+ *
  * return (
  *   <>
  *     <button onClick={openDrawer}>Menu</button>
@@ -71,7 +71,7 @@ export function useMobileNavigation(
   }, [onDrawerClose]);
 
   const toggleDrawer = useCallback(() => {
-    setIsDrawerOpen((prev) => {
+    setIsDrawerOpen(prev => {
       const newState = !prev;
       if (newState) {
         onDrawerOpen?.();

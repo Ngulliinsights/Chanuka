@@ -1,6 +1,6 @@
 /**
  * Core Storage Module - Modular Storage System
- * 
+ *
  * This module provides comprehensive storage functionality including:
  * - Secure encrypted storage with AES-GCM
  * - Session lifecycle management
@@ -20,30 +20,20 @@ export {
   type CleanupOptions,
   type StorageError,
   type StorageErrorCode,
-  type StorageBackend
+  type StorageBackend,
 } from './types';
 
 // Secure storage
-export {
-  SecureStorage
-} from './secure-storage';
+export { SecureStorage } from './secure-storage';
 
 // Session management (re-exported from consolidated auth module)
-export {
-  SessionManager,
-  sessionManager
-} from '../auth/services/session-manager';
+export { SessionManager, sessionManager } from '../auth/services/session-manager';
 
 // Token management (re-exported from consolidated auth module)
-export {
-  TokenManager,
-  tokenManager
-} from '../auth/services/token-manager';
+export { TokenManager, tokenManager } from '../auth/services/token-manager';
 
 // Cache storage (types are exported from api/cache-manager to avoid duplication)
-export {
-  CacheStorageManager
-} from './cache-storage';
+export { CacheStorageManager } from './cache-storage';
 
 // Import classes first
 import { SessionManager, sessionManager } from '../auth/services/session-manager';
@@ -59,21 +49,21 @@ const cacheStorageManager = CacheStorageManager.getInstance();
 // Export singleton instances
 export {
   secureStorage,
-  cacheStorageManager
+  cacheStorageManager,
   // sessionManager and tokenManager are re-exported above
 };
 
 // Convenience functions for common operations
 export async function storeSecurely<T>(
-  key: string, 
-  value: T, 
+  key: string,
+  value: T,
   options?: Partial<import('./types').StorageOptions>
 ): Promise<void> {
   return secureStorage.setItem(key, value, { encrypt: true, ...options });
 }
 
 export async function retrieveSecurely<T>(
-  key: string, 
+  key: string,
   options?: Partial<import('./types').StorageOptions>
 ): Promise<T | null> {
   return secureStorage.getItem<T>(key, { encrypt: true, ...options });
@@ -82,7 +72,7 @@ export async function retrieveSecurely<T>(
 export function getCurrentSession(): import('./types').SessionInfo | null {
   const authSession = sessionManager.getCurrentSession();
   if (!authSession) return null;
-  
+
   // Convert auth SessionInfo to storage SessionInfo format
   return {
     userId: authSession.userId,
@@ -114,11 +104,7 @@ export async function isTokenValid(): Promise<boolean> {
   return tokenManager.isTokenValid();
 }
 
-export async function cacheData<T>(
-  key: string, 
-  data: T, 
-  ttlMinutes?: number
-): Promise<void> {
+export async function cacheData<T>(key: string, data: T, ttlMinutes?: number): Promise<void> {
   const ttl = ttlMinutes ? ttlMinutes * 60 * 1000 : undefined;
   return cacheStorageManager.set(key, data, { ttl });
 }
@@ -144,7 +130,7 @@ export async function clearAllStorage(): Promise<void> {
     cacheStorageManager.clear(),
     sessionManager.clearSession(),
     tokenManager.clearTokens(),
-    secureStorage.clear()
+    secureStorage.clear(),
   ]);
 }
 
@@ -154,7 +140,7 @@ export async function getStorageStats() {
     secure: secureStorage.getStats(),
     cache: cacheStorageManager.getStats(),
     session: sessionManager.getSessionStats(),
-    tokens: await tokenManager.getTokenMetadata()
+    tokens: await tokenManager.getTokenMetadata(),
   };
 }
 
@@ -165,13 +151,13 @@ export const storageUtils = {
   SessionManager,
   TokenManager,
   CacheStorageManager,
-  
+
   // Instances
   secureStorage,
   sessionManager,
   tokenManager,
   cacheStorageManager,
-  
+
   // Convenience functions
   storeSecurely,
   retrieveSecurely,
@@ -186,7 +172,7 @@ export const storageUtils = {
   clearSession,
   clearTokens,
   clearAllStorage,
-  getStorageStats
+  getStorageStats,
 };
 
 export default storageUtils;

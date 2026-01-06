@@ -3,7 +3,13 @@
  * Platform-agnostic types for cross-cutting dashboard concerns
  */
 
-export type WidgetType = 'analytics' | 'performance' | 'engagement' | 'metrics' | 'chart' | 'custom';
+export type WidgetType =
+  | 'analytics'
+  | 'performance'
+  | 'engagement'
+  | 'metrics'
+  | 'chart'
+  | 'custom';
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full';
 export type ChartType = 'line' | 'bar' | 'pie' | 'area' | 'scatter';
 
@@ -95,20 +101,22 @@ export interface PerformanceMetrics {
   recommendations: string[];
 }
 
-export interface EngagementMetrics { billInteractions: Array<{
+export interface EngagementMetrics {
+  billInteractions: Array<{
     bill_id: number;
     billTitle: string;
     totalEngagement: number;
     viewPattern: {
       peakHours: number[];
       averageSessionDuration: number;
-     };
+    };
   }>;
-  user_profiles: Array<{ user_id: string;
+  user_profiles: Array<{
+    user_id: string;
     userName: string;
     engagementLevel: 'high' | 'medium' | 'low';
     totalEngagementScore: number;
-   }>;
+  }>;
   trends: Array<{
     period: string;
     totalEngagement: number;
@@ -151,4 +159,3 @@ export type DashboardAction =
   | { type: 'REMOVE_WIDGET'; payload: string }
   | { type: 'UPDATE_LAYOUT'; payload: DashboardLayout }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<DashboardSettings> };
-

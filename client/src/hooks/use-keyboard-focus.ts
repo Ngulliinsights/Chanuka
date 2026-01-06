@@ -23,57 +23,15 @@ export function useKeyboardFocus() {
     };
   }, []);
 
-  const getFocusClasses = useCallback((baseClasses: string = '') => {
-    const focusClasses = isKeyboardUser
-      ? 'focus:outline-2 focus:outline-blue-500 focus:outline-offset-2'
-      : 'focus:outline-none';
-    return `${baseClasses} ${focusClasses}`.trim();
-  }, [isKeyboardUser]);
+  const getFocusClasses = useCallback(
+    (baseClasses: string = '') => {
+      const focusClasses = isKeyboardUser
+        ? 'focus:outline-2 focus:outline-blue-500 focus:outline-offset-2'
+        : 'focus:outline-none';
+      return `${baseClasses} ${focusClasses}`.trim();
+    },
+    [isKeyboardUser]
+  );
 
   return { isKeyboardUser, getFocusClasses };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

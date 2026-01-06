@@ -34,9 +34,11 @@ const DEFAULT_RECOVERY_STRATEGIES: RecoveryStrategy[] = [
   {
     id: 'network-retry',
     condition: (error, context) => {
-      return error.message.includes('network') ||
-             error.message.includes('fetch') ||
-             (error.message.includes('timeout') && context.isOnline);
+      return (
+        error.message.includes('network') ||
+        error.message.includes('fetch') ||
+        (error.message.includes('timeout') && context.isOnline)
+      );
     },
     action: async () => {
       // Wait for network recovery
@@ -63,7 +65,7 @@ const DEFAULT_RECOVERY_STRATEGIES: RecoveryStrategy[] = [
   },
   {
     id: 'cache-fallback',
-    condition: (error) => {
+    condition: error => {
       return error.message.includes('network') || error.message.includes('offline');
     },
     action: async () => {
@@ -115,35 +117,41 @@ export function useErrorRecovery(
     suggestions: [],
   });
 
-  const strategiesRef = useRef<RecoveryStrategy[]>([...DEFAULT_RECOVERY_STRATEGIES, ...customStrategies]);
+  const strategiesRef = useRef<RecoveryStrategy[]>([
+    ...DEFAULT_RECOVERY_STRATEGIES,
+    ...customStrategies,
+  ]);
   const recoveryAttemptsRef = useRef<Record<string, number>>({});
 
   const operation = getOperation(operationId);
 
   // Memoize context to prevent infinite re-renders
-  const getApplicableStrategies = useCallback((
-    error: Error,
-    retryCount: number,
-    timeElapsed: number,
-    connectionType: string,
-    isOnline: boolean
-  ): RecoveryStrategy[] => {
-    const context: RecoveryContext = {
-      error,
-      operationId,
-      retryCount,
-      timeElapsed,
-      connectionType,
-      isOnline,
-    };
+  const getApplicableStrategies = useCallback(
+    (
+      error: Error,
+      retryCount: number,
+      timeElapsed: number,
+      connectionType: string,
+      isOnline: boolean
+    ): RecoveryStrategy[] => {
+      const context: RecoveryContext = {
+        error,
+        operationId,
+        retryCount,
+        timeElapsed,
+        connectionType,
+        isOnline,
+      };
 
-    return strategiesRef.current
-      .filter(strategy => {
-        const attempts = recoveryAttemptsRef.current[strategy.id] || 0;
-        return attempts < strategy.maxAttempts && strategy.condition(error, context);
-      })
-      .sort((a, b) => a.priority - b.priority);
-  }, [operationId]);
+      return strategiesRef.current
+        .filter(strategy => {
+          const attempts = recoveryAttemptsRef.current[strategy.id] || 0;
+          return attempts < strategy.maxAttempts && strategy.condition(error, context);
+        })
+        .sort((a, b) => a.priority - b.priority);
+    },
+    [operationId]
+  );
 
   const recover = useCallback(async (): Promise<boolean> => {
     if (!recoveryState.canRecover || recoveryState.isRecovering) {
@@ -157,7 +165,13 @@ export function useErrorRecovery(
     const connectionType = state.connectionInfo?.connectionType || 'unknown';
     const isOnline = state.isOnline;
 
-    const strategies = getApplicableStrategies(error, retryCount, timeElapsed, connectionType, isOnline);
+    const strategies = getApplicableStrategies(
+      error,
+      retryCount,
+      timeElapsed,
+      connectionType,
+      isOnline
+    );
     if (strategies.length === 0) {
       setRecoveryState(prev => ({
         ...prev,
@@ -184,7 +198,7 @@ export function useErrorRecovery(
           operationId,
           strategy: strategy.id,
           attempt: attempts + 1,
-          component: 'useErrorRecovery'
+          component: 'useErrorRecovery',
         });
 
         const success = await strategy.action();
@@ -208,7 +222,7 @@ export function useErrorRecovery(
           logger.info(`Recovery successful with strategy: ${strategy.description}`, {
             operationId,
             strategy: strategy.id,
-            component: 'useErrorRecovery'
+            component: 'useErrorRecovery',
           });
 
           return true;
@@ -218,7 +232,7 @@ export function useErrorRecovery(
           operationId,
           strategy: strategy.id,
           error,
-          component: 'useErrorRecovery'
+          component: 'useErrorRecovery',
         });
 
         // Mark attempt
@@ -239,19 +253,19 @@ export function useErrorRecovery(
     logger.error('All recovery strategies failed', {
       operationId,
       strategies: strategies.map(s => s.id),
-      component: 'useErrorRecovery'
+      component: 'useErrorRecovery',
     });
 
     return false;
   }, [
-    operationId, 
-    recoveryState.canRecover, 
-    recoveryState.isRecovering, 
-    getApplicableStrategies, 
-    retryOperation, 
-    getOperation, 
-    state.connectionInfo?.connectionType, 
-    state.isOnline
+    operationId,
+    recoveryState.canRecover,
+    recoveryState.isRecovering,
+    getApplicableStrategies,
+    retryOperation,
+    getOperation,
+    state.connectionInfo?.connectionType,
+    state.isOnline,
   ]);
 
   const addStrategy = useCallback((strategy: RecoveryStrategy) => {
@@ -283,7 +297,13 @@ export function useErrorRecovery(
       const connectionType = state.connectionInfo?.connectionType || 'unknown';
       const isOnline = state.isOnline;
 
-      const strategies = getApplicableStrategies(error, retryCount, timeElapsed, connectionType, isOnline);
+      const strategies = getApplicableStrategies(
+        error,
+        retryCount,
+        timeElapsed,
+        connectionType,
+        isOnline
+      );
       const suggestions = strategies.slice(0, 3).map(s => s.description);
 
       setRecoveryState(prev => ({
@@ -292,7 +312,15 @@ export function useErrorRecovery(
         suggestions,
       }));
     }
-  }, [operation?.error, operation?.retryCount, operation?.startTime, recoveryState.isRecovering, getApplicableStrategies, state.connectionInfo?.connectionType, state.isOnline]);
+  }, [
+    operation?.error,
+    operation?.retryCount,
+    operation?.startTime,
+    recoveryState.isRecovering,
+    getApplicableStrategies,
+    state.connectionInfo?.connectionType,
+    state.isOnline,
+  ]);
 
   return {
     recover,
@@ -318,8 +346,8 @@ export function useAutoRecovery(
     recoveryDelay: 1000,
     maxAutoAttempts: 2,
     triggerConditions: [
-      (error) => error.message.includes('network'),
-      (error) => error.message.includes('timeout'),
+      error => error.message.includes('network'),
+      error => error.message.includes('timeout'),
     ],
   }
 ) {
@@ -345,14 +373,14 @@ export function useAutoRecovery(
           logger.warn('Auto-recovery failed, manual intervention may be needed', {
             operationId,
             attempts: autoAttemptsRef.current,
-            component: 'useAutoRecovery'
+            component: 'useAutoRecovery',
           });
         }
       }, options.recoveryDelay);
 
       return () => clearTimeout(timeout);
     }
-    
+
     return undefined;
   }, [operation?.error, options, recover, recoveryState.isRecovering, operationId]);
 
@@ -368,11 +396,13 @@ export function useAutoRecovery(
  */
 export function usePredictiveRecovery(operationId: string) {
   const { state } = useLoading();
-  const [predictions, setPredictions] = useState<Array<{
-    type: string;
-    probability: number;
-    suggestedStrategy: string;
-  }>>([]);
+  const [predictions, setPredictions] = useState<
+    Array<{
+      type: string;
+      probability: number;
+      suggestedStrategy: string;
+    }>
+  >([]);
 
   // Analyze patterns and predict potential failures
   useEffect(() => {
@@ -417,4 +447,3 @@ export function usePredictiveRecovery(operationId: string) {
     hasHighRiskPredictions: predictions.some(p => p.probability > 0.7),
   };
 }
-

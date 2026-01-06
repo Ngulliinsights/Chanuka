@@ -17,4 +17,3 @@ export function dashboardReducer(state: DashboardState, _action: DashboardAction
   // For internal state transitions, use the context methods directly
   return state;
 }
-

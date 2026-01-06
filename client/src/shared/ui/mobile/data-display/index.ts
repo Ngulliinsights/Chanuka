@@ -1,9 +1,9 @@
 /**
  * Mobile Data Display Components - Mobile-Optimized Content
- * 
+ *
  * Components for displaying data and content optimized for mobile viewports.
  * These handle charts, cards, tables, and other content display patterns.
- * 
+ *
  * @module components/mobile/data-display
  */
 

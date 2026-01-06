@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BarChart3,
   Bell,
@@ -11,6 +10,7 @@ import {
   Star,
   ThumbsUp,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import ActivityFeed from '@client/features/community/ui/activity/ActivityFeed';
@@ -20,7 +20,13 @@ import CommunityHub from '@client/features/community/ui/hub/CommunityHub';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
@@ -56,49 +62,59 @@ function AnnouncementsSection() {
     {
       id: '1',
       title: 'New Bill Analysis Features Released',
-      content: 'We\'ve launched enhanced bill analysis tools including constitutional impact assessment, economic analysis, and expert opinion integration. These features provide deeper insights into legislative proposals.',
+      content:
+        "We've launched enhanced bill analysis tools including constitutional impact assessment, economic analysis, and expert opinion integration. These features provide deeper insights into legislative proposals.",
       type: 'feature',
       priority: 'high',
       publishedAt: '2024-01-20T10:00:00Z',
       author: 'Platform Team',
-      readCount: 1247
+      readCount: 1247,
     },
     {
       id: '2',
       title: 'Scheduled Maintenance - January 25th',
-      content: 'We will be performing scheduled maintenance on January 25th from 2:00 AM to 4:00 AM EAT. During this time, some features may be temporarily unavailable.',
+      content:
+        'We will be performing scheduled maintenance on January 25th from 2:00 AM to 4:00 AM EAT. During this time, some features may be temporarily unavailable.',
       type: 'maintenance',
       priority: 'medium',
       publishedAt: '2024-01-18T14:30:00Z',
       author: 'Technical Team',
-      readCount: 892
+      readCount: 892,
     },
     {
       id: '3',
       title: 'Community Guidelines Update',
-      content: 'We\'ve updated our community guidelines to ensure respectful and constructive discussions. Please review the new guidelines in your account settings.',
+      content:
+        "We've updated our community guidelines to ensure respectful and constructive discussions. Please review the new guidelines in your account settings.",
       type: 'policy',
       priority: 'medium',
       publishedAt: '2024-01-15T09:00:00Z',
       author: 'Community Team',
-      readCount: 2156
-    }
+      readCount: 2156,
+    },
   ]);
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'feature': return 'bg-blue-100 text-blue-800';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
-      case 'policy': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'feature':
+        return 'bg-blue-100 text-blue-800';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'policy':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'border-red-200 bg-red-50';
-      case 'medium': return 'border-yellow-200 bg-yellow-50';
-      default: return 'border-gray-200 bg-gray-50';
+      case 'high':
+        return 'border-red-200 bg-red-50';
+      case 'medium':
+        return 'border-yellow-200 bg-yellow-50';
+      default:
+        return 'border-gray-200 bg-gray-50';
     }
   };
 
@@ -107,7 +123,9 @@ function AnnouncementsSection() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Platform Announcements</h2>
-          <p className="text-muted-foreground">Stay updated with the latest platform news and updates</p>
+          <p className="text-muted-foreground">
+            Stay updated with the latest platform news and updates
+          </p>
         </div>
         <Button variant="outline">
           <Bell className="h-4 w-4 mr-2" />
@@ -116,7 +134,7 @@ function AnnouncementsSection() {
       </div>
 
       <div className="space-y-4">
-        {announcements.map((announcement) => (
+        {announcements.map(announcement => (
           <Card key={announcement.id} className={getPriorityColor(announcement.priority)}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -136,18 +154,14 @@ function AnnouncementsSection() {
                     <Calendar className="h-3 w-3" />
                     <span>{new Date(announcement.publishedAt).toLocaleDateString()}</span>
                   </div>
-                  <div className="mt-1">
-                    {announcement.readCount.toLocaleString()} reads
-                  </div>
+                  <div className="mt-1">{announcement.readCount.toLocaleString()} reads</div>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700 leading-relaxed mb-4">{announcement.content}</p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  By {announcement.author}
-                </span>
+                <span className="text-sm text-muted-foreground">By {announcement.author}</span>
                 <Button variant="ghost" size="sm">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Read More
@@ -174,7 +188,7 @@ function FeedbackSection() {
       status: 'planned',
       votes: 156,
       submittedAt: '2024-01-18T16:20:00Z',
-      author: 'Sarah K.'
+      author: 'Sarah K.',
     },
     {
       id: '2',
@@ -184,18 +198,19 @@ function FeedbackSection() {
       status: 'reviewing',
       votes: 243,
       submittedAt: '2024-01-15T11:30:00Z',
-      author: 'Michael O.'
+      author: 'Michael O.',
     },
     {
       id: '3',
       title: 'Improved Search Filters',
-      description: 'Add more granular search filters for bills including date ranges, sponsors, and policy areas.',
+      description:
+        'Add more granular search filters for bills including date ranges, sponsors, and policy areas.',
       category: 'improvement',
       status: 'completed',
       votes: 89,
       submittedAt: '2024-01-10T09:15:00Z',
-      author: 'Jane W.'
-    }
+      author: 'Jane W.',
+    },
   ]);
 
   const [newFeedback, setNewFeedback] = useState<{
@@ -205,38 +220,46 @@ function FeedbackSection() {
   }>({
     title: '',
     description: '',
-    category: 'feature'
+    category: 'feature',
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'planned': return 'bg-blue-100 text-blue-800';
-      case 'reviewing': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'planned':
+        return 'bg-blue-100 text-blue-800';
+      case 'reviewing':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'bug': return 'bg-red-100 text-red-800';
-      case 'feature': return 'bg-purple-100 text-purple-800';
-      case 'improvement': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'bug':
+        return 'bg-red-100 text-red-800';
+      case 'feature':
+        return 'bg-purple-100 text-purple-800';
+      case 'improvement':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const handleSubmitFeedback = () => {
     if (!newFeedback.title.trim() || !newFeedback.description.trim()) return;
-    
+
     // In real app, this would submit to API
     console.log('Submitting feedback:', newFeedback);
-    
+
     // Reset form
     setNewFeedback({
       title: '',
       description: '',
-      category: 'feature'
+      category: 'feature',
     });
   };
 
@@ -244,7 +267,9 @@ function FeedbackSection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Community Feedback</h2>
-        <p className="text-muted-foreground">Help us improve the platform by sharing your ideas and reporting issues</p>
+        <p className="text-muted-foreground">
+          Help us improve the platform by sharing your ideas and reporting issues
+        </p>
       </div>
 
       {/* Submit New Feedback */}
@@ -259,17 +284,22 @@ function FeedbackSection() {
             <Input
               placeholder="Brief description of your suggestion..."
               value={newFeedback.title}
-              onChange={(e) => setNewFeedback(prev => ({ ...prev, title: e.target.value }))}
+              onChange={e => setNewFeedback(prev => ({ ...prev, title: e.target.value }))}
             />
           </div>
-          
+
           <div>
             <label className="text-sm font-medium mb-2 block">Category</label>
             <select
               className="w-full p-2 border rounded-md"
               title="Select feedback category"
               value={newFeedback.category}
-              onChange={(e) => setNewFeedback(prev => ({ ...prev, category: e.target.value as 'feature' | 'improvement' | 'bug' | 'other' }))}
+              onChange={e =>
+                setNewFeedback(prev => ({
+                  ...prev,
+                  category: e.target.value as 'feature' | 'improvement' | 'bug' | 'other',
+                }))
+              }
             >
               <option value="feature">New Feature</option>
               <option value="improvement">Improvement</option>
@@ -277,18 +307,18 @@ function FeedbackSection() {
               <option value="other">Other</option>
             </select>
           </div>
-          
+
           <div>
             <label className="text-sm font-medium mb-2 block">Description</label>
             <Textarea
               placeholder="Provide detailed information about your suggestion..."
               rows={4}
               value={newFeedback.description}
-              onChange={(e) => setNewFeedback(prev => ({ ...prev, description: e.target.value }))}
+              onChange={e => setNewFeedback(prev => ({ ...prev, description: e.target.value }))}
             />
           </div>
-          
-          <Button 
+
+          <Button
             onClick={handleSubmitFeedback}
             disabled={!newFeedback.title.trim() || !newFeedback.description.trim()}
           >
@@ -302,7 +332,7 @@ function FeedbackSection() {
       <div>
         <h3 className="text-lg font-semibold mb-4">Community Suggestions</h3>
         <div className="space-y-4">
-          {feedbackItems.map((item) => (
+          {feedbackItems.map(item => (
             <Card key={item.id}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
@@ -322,9 +352,9 @@ function FeedbackSection() {
                     <div>by {item.author}</div>
                   </div>
                 </div>
-                
+
                 <p className="text-gray-700 mb-4">{item.description}</p>
-                
+
                 <div className="flex items-center space-x-4">
                   <Button variant="ghost" size="sm">
                     <ThumbsUp className="h-4 w-4 mr-2" />
@@ -348,7 +378,8 @@ function FeedbackSection() {
       <Alert>
         <Bell className="h-4 w-4" />
         <AlertDescription>
-          Your feedback helps us prioritize development efforts. Popular suggestions are more likely to be implemented in future updates.
+          Your feedback helps us prioritize development efforts. Popular suggestions are more likely
+          to be implemented in future updates.
         </AlertDescription>
       </Alert>
     </div>
@@ -357,13 +388,13 @@ function FeedbackSection() {
 
 /**
  * Community Input Page - Integrated with real API and components
- * 
+ *
  * This page serves as the main hub for community engagement, featuring:
  * - Real-time discussions with voting and interaction
  * - Community polls for gathering opinions on legislation
  * - Feedback submission system for platform improvements
  * - Announcement viewing for official updates
- * 
+ *
  * The CommunityHub component handles all data fetching, state management,
  * and real-time updates through the API layer.
  */
@@ -404,8 +435,10 @@ export default function CommunityInput() {
           <TabsContent value="community" className="mt-0">
             <div className="space-y-6">
               {/* Community Stats Overview */}
-              <CommunityStats stats={{ totalMembers: 0, activeToday: 0, totalDiscussions: 0, totalComments: 0 }} />
-              
+              <CommunityStats
+                stats={{ totalMembers: 0, activeToday: 0, totalDiscussions: 0, totalComments: 0 }}
+              />
+
               {/* Main Community Hub with Filters */}
               <div className="grid gap-6 lg:grid-cols-4">
                 <div className="lg:col-span-3 space-y-6">

@@ -17,6 +17,7 @@ The privacy implementation provides:
 ### CookieConsentBanner
 
 A comprehensive cookie consent banner that:
+
 - Provides granular cookie category controls
 - Remembers user preferences
 - Automatically reconfirms consent annually
@@ -24,6 +25,7 @@ A comprehensive cookie consent banner that:
 - Supports customization and detailed privacy information
 
 **Usage:**
+
 ```tsx
 import { CookieConsentBanner } from '@/components/privacy';
 
@@ -31,9 +33,7 @@ function App() {
   return (
     <div>
       {/* Your app content */}
-      <CookieConsentBanner 
-        onConsentChange={(consent) => console.log('Consent updated:', consent)}
-      />
+      <CookieConsentBanner onConsentChange={consent => console.log('Consent updated:', consent)} />
     </div>
   );
 }
@@ -42,6 +42,7 @@ function App() {
 ### DataUsageReportDashboard
 
 A transparent dashboard showing:
+
 - Data collection statistics
 - Data categories and purposes
 - Retention policies
@@ -49,6 +50,7 @@ A transparent dashboard showing:
 - User data management actions
 
 **Features:**
+
 - Real-time data usage metrics
 - Category-specific data breakdown
 - Export and deletion capabilities
@@ -57,6 +59,7 @@ A transparent dashboard showing:
 ### GDPRComplianceManager
 
 Complete GDPR rights management including:
+
 - Right of Access (data export)
 - Right to Rectification
 - Right to Erasure (deletion)
@@ -67,6 +70,7 @@ Complete GDPR rights management including:
 - Data Protection Officer contact
 
 **GDPR Rights Implemented:**
+
 - ✅ Right of Access (Article 15)
 - ✅ Right to Rectification (Article 16)
 - ✅ Right to Erasure (Article 17)
@@ -95,6 +99,7 @@ const summary = await dataRetentionService.getUserDataSummary(userId);
 ```
 
 **Features:**
+
 - Configurable retention periods per data category
 - Automatic cleanup scheduling
 - Legal basis tracking
@@ -114,7 +119,7 @@ privacyAnalyticsService.initialize({
   performance: true,
   functional: false,
   timestamp: new Date().toISOString(),
-  version: '1.0.0'
+  version: '1.0.0',
 });
 
 // Track events with privacy protection
@@ -125,6 +130,7 @@ privacyAnalyticsService.updateConsent({ analytics: false });
 ```
 
 **Features:**
+
 - Consent-based tracking
 - Data anonymization
 - Do Not Track support
@@ -141,21 +147,16 @@ Core privacy compliance utilities:
 import { privacyCompliance } from '@/utils/privacy-compliance';
 
 // Record consent
-const consent = privacyCompliance.recordConsent(
-  userId, 
-  'analytics', 
-  true
-);
+const consent = privacyCompliance.recordConsent(userId, 'analytics', true);
 
 // Validate privacy settings
 const validation = privacyCompliance.validatePrivacySettings(settings);
 
 // Generate data export
-const exportRequest = await privacyCompliance.generateDataExport(
-  userId, 
-  'json', 
-  ['profile', 'activity']
-);
+const exportRequest = await privacyCompliance.generateDataExport(userId, 'json', [
+  'profile',
+  'activity',
+]);
 ```
 
 ## Integration

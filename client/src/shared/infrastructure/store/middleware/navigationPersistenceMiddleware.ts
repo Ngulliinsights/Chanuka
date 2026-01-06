@@ -8,6 +8,7 @@
 import { Middleware } from '@reduxjs/toolkit';
 
 import { NavigationState, UserRole } from '@/shared/types/navigation';
+
 import { logger } from '../../../../utils/logger';
 
 // Storage keys
@@ -70,19 +71,18 @@ function sanitizePreferences(preferences: unknown): NavigationState['preferences
         ? preferences.defaultLandingPage
         : defaultPreferences.defaultLandingPage,
 
-    favoritePages:
-      Array.isArray(preferences.favoritePages)
-        ? (preferences.favoritePages as unknown[])
-          .filter((page): page is string => typeof page === 'string')
-        : defaultPreferences.favoritePages,
+    favoritePages: Array.isArray(preferences.favoritePages)
+      ? (preferences.favoritePages as unknown[]).filter(
+          (page): page is string => typeof page === 'string'
+        )
+      : defaultPreferences.favoritePages,
 
-    recentlyVisited:
-      Array.isArray(preferences.recentlyVisited)
-        ? (preferences.recentlyVisited as unknown[])
-          .map((page) => sanitizeRecentPage(page))
+    recentlyVisited: Array.isArray(preferences.recentlyVisited)
+      ? (preferences.recentlyVisited as unknown[])
+          .map(page => sanitizeRecentPage(page))
           .filter((page): page is NonNullable<typeof page> => page !== null)
           .slice(0, CONFIG.MAX_RECENT_PAGES)
-        : defaultPreferences.recentlyVisited,
+      : defaultPreferences.recentlyVisited,
 
     compactMode:
       typeof preferences.compactMode === 'boolean'
@@ -117,12 +117,8 @@ function sanitizeRecentPage(
     return {
       path: typeof page.path === 'string' ? page.path : '',
       title: typeof page.title === 'string' ? page.title : '',
-      visitedAt: typeof page.visitedAt === 'string'
-        ? page.visitedAt
-        : new Date().toISOString(),
-      visitCount: typeof page.visitCount === 'number'
-        ? page.visitCount
-        : 1,
+      visitedAt: typeof page.visitedAt === 'string' ? page.visitedAt : new Date().toISOString(),
+      visitCount: typeof page.visitCount === 'number' ? page.visitCount : 1,
     };
   } catch (error) {
     // If any error occurs during sanitization, return null to filter this entry out
@@ -153,18 +149,19 @@ function saveNavigationState(state: NavigationState): void {
         version: CONFIG.VERSION,
       };
 
-      localStorage.setItem(
-        STORAGE_KEYS.NAVIGATION_STATE,
-        JSON.stringify(stateToSave)
-      );
+      localStorage.setItem(STORAGE_KEYS.NAVIGATION_STATE, JSON.stringify(stateToSave));
 
       logger.debug('Navigation state saved to localStorage', {
-        component: 'navigationPersistenceMiddleware'
+        component: 'navigationPersistenceMiddleware',
       });
     } catch (error) {
-      logger.warn('Failed to save navigation state', {
-        component: 'navigationPersistenceMiddleware'
-      }, { error });
+      logger.warn(
+        'Failed to save navigation state',
+        {
+          component: 'navigationPersistenceMiddleware',
+        },
+        { error }
+      );
     }
     saveTimeout = null;
   }, CONFIG.DEBOUNCE_DELAY);
@@ -192,7 +189,7 @@ function loadNavigationState(): Partial<NavigationState> | null {
     // Validate version compatibility to handle migrations
     if (parsed.version !== CONFIG.VERSION) {
       logger.warn('Navigation state version mismatch, clearing stored state', {
-        component: 'navigationPersistenceMiddleware'
+        component: 'navigationPersistenceMiddleware',
       });
       clearNavigationState();
       return null;
@@ -213,7 +210,15 @@ function loadNavigationState(): Partial<NavigationState> | null {
 
     // Validate and assign user role
     if (typeof parsed.user_role === 'string') {
-      const validRoles: UserRole[] = ['public', 'citizen', 'user', 'expert', 'admin', 'journalist', 'advocate'];
+      const validRoles: UserRole[] = [
+        'public',
+        'citizen',
+        'user',
+        'expert',
+        'admin',
+        'journalist',
+        'advocate',
+      ];
       if (validRoles.includes(parsed.user_role as UserRole)) {
         safeState.user_role = parsed.user_role as UserRole;
       }
@@ -221,9 +226,13 @@ function loadNavigationState(): Partial<NavigationState> | null {
 
     return safeState;
   } catch (error) {
-    logger.warn('Failed to load navigation state', {
-      component: 'navigationPersistenceMiddleware'
-    }, { error });
+    logger.warn(
+      'Failed to load navigation state',
+      {
+        component: 'navigationPersistenceMiddleware',
+      },
+      { error }
+    );
     clearNavigationState();
     return null;
   }
@@ -240,12 +249,16 @@ function clearNavigationState(): void {
     localStorage.removeItem(STORAGE_KEYS.NAVIGATION_STATE);
     localStorage.removeItem(STORAGE_KEYS.SIDEBAR_STATE);
     logger.debug('Navigation state cleared from localStorage', {
-      component: 'navigationPersistenceMiddleware'
+      component: 'navigationPersistenceMiddleware',
     });
   } catch (error) {
-    logger.warn('Failed to clear navigation state', {
-      component: 'navigationPersistenceMiddleware'
-    }, { error });
+    logger.warn(
+      'Failed to clear navigation state',
+      {
+        component: 'navigationPersistenceMiddleware',
+      },
+      { error }
+    );
   }
 }
 
@@ -268,46 +281,45 @@ function isReduxAction(action: unknown): action is ReduxAction {
  * Navigation Persistence Middleware
  * Intercepts navigation-related actions and persists state changes to localStorage
  */
-export const navigationPersistenceMiddleware: Middleware =
-  (store) => (next) => (action: unknown) => {
-    // Pass the action through to the next middleware/reducer
-    const result = next(action);
+export const navigationPersistenceMiddleware: Middleware = store => next => (action: unknown) => {
+  // Pass the action through to the next middleware/reducer
+  const result = next(action);
 
-    // Only process actions that match our expected shape
-    if (!isReduxAction(action)) {
-      return result;
-    }
-
-    // Get the updated state after the action has been processed
-    const state = store.getState();
-
-    // Handle specific navigation actions that should trigger persistence
-    switch (action.type) {
-      case 'navigation/persistNavigationState':
-        // Explicit request to persist state immediately
-        saveNavigationState(state.navigation);
-        break;
-
-      case 'navigation/clearPersistedState':
-        // Clear stored state when user logs out or resets preferences
-        clearNavigationState();
-        break;
-
-      // Auto-persist on any preference or navigation state changes
-      case 'navigation/updatePreferences':
-      case 'navigation/addToRecentPages':
-      case 'navigation/addFavoritePage':
-      case 'navigation/removeFavoritePage':
-      case 'navigation/toggleSidebar':
-      case 'navigation/setSidebarOpen':
-      case 'navigation/setUserRole':
-        // Trigger debounced persistence for these actions
-        saveNavigationState(state.navigation);
-        break;
-    }
-
+  // Only process actions that match our expected shape
+  if (!isReduxAction(action)) {
     return result;
-  };
+  }
+
+  // Get the updated state after the action has been processed
+  const state = store.getState();
+
+  // Handle specific navigation actions that should trigger persistence
+  switch (action.type) {
+    case 'navigation/persistNavigationState':
+      // Explicit request to persist state immediately
+      saveNavigationState(state.navigation);
+      break;
+
+    case 'navigation/clearPersistedState':
+      // Clear stored state when user logs out or resets preferences
+      clearNavigationState();
+      break;
+
+    // Auto-persist on any preference or navigation state changes
+    case 'navigation/updatePreferences':
+    case 'navigation/addToRecentPages':
+    case 'navigation/addFavoritePage':
+    case 'navigation/removeFavoritePage':
+    case 'navigation/toggleSidebar':
+    case 'navigation/setSidebarOpen':
+    case 'navigation/setUserRole':
+      // Trigger debounced persistence for these actions
+      saveNavigationState(state.navigation);
+      break;
+  }
+
+  return result;
+};
 
 /**
  * Utility functions for external use

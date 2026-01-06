@@ -1,9 +1,9 @@
 /**
  * Unified Type Definitions Index
- * 
+ *
  * This module provides comprehensive type definitions for the entire API client system.
  * All types are organized by domain and exported for convenient access.
- * 
+ *
  * Note: Using explicit exports to avoid naming conflicts between modules.
  */
 
@@ -27,7 +27,7 @@ export type {
   RetryConfig,
   CacheOptions,
   CacheInvalidationTrigger,
-  ValidationOptions
+  ValidationOptions,
 } from './common';
 
 // Configuration types
@@ -124,22 +124,13 @@ export type {
 } from './community';
 
 // Engagement types
-export {
-  EngagementType,
-  type EngagementMetrics,
-  type EngagementAction,
-} from './engagement';
+export { EngagementType, type EngagementMetrics, type EngagementAction } from './engagement';
 
 // ============================================================================
 // Service Interface Types
 // ============================================================================
 
-export type {
-  ApiService,
-  BillsService,
-  CommunityService,
-  AuthService,
-} from './service';
+export type { ApiService, BillsService, CommunityService, AuthService } from './service';
 
 // ============================================================================
 // Real-time & WebSocket Types

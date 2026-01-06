@@ -20,7 +20,7 @@ export function generateBreadcrumbs(
   breadcrumbs.push({
     label: 'Home',
     path: '/',
-    is_active: path === '/'
+    is_active: path === '/',
   });
 
   // Build breadcrumbs from path segments
@@ -37,7 +37,7 @@ export function generateBreadcrumbs(
       breadcrumbs.push({
         label: navItem.label,
         path: navItem.href,
-        is_active: isLast
+        is_active: isLast,
       });
     } else {
       // Generate human-readable labels from path segments
@@ -96,16 +96,14 @@ export function generateBreadcrumbs(
             }
           } else {
             // Convert kebab-case or snake_case to Title Case
-            label = segment
-              .replace(/[-_]/g, ' ')
-              .replace(/\b\w/g, l => l.toUpperCase());
+            label = segment.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           }
       }
 
       breadcrumbs.push({
         label,
         path: currentPath,
-        is_active: isLast
+        is_active: isLast,
       });
     }
   }
@@ -128,10 +126,11 @@ export function findRelatedPages(
 
   // Find pages with similar paths (same parent directory)
   const currentDir = currentPath.split('/').slice(0, -1).join('/');
-  const siblingPages = navigationItems.filter(item =>
-    item.href !== currentPath &&
-    item.href.startsWith(currentDir) &&
-    item.href.split('/').length === currentPath.split('/').length
+  const siblingPages = navigationItems.filter(
+    item =>
+      item.href !== currentPath &&
+      item.href.startsWith(currentDir) &&
+      item.href.split('/').length === currentPath.split('/').length
   );
 
   // Add sibling pages
@@ -144,16 +143,17 @@ export function findRelatedPages(
       category: item.section || 'legislative',
       type: 'sibling',
       weight: 1,
-      relevanceScore: 0.8
+      relevanceScore: 0.8,
     });
   });
 
   // If we need more results, add pages from the same category
   if (related.length < maxResults) {
-    const categoryPages = navigationItems.filter(item =>
-      item.href !== currentPath &&
-      !siblingPages.includes(item) &&
-      item.section === currentItem.section
+    const categoryPages = navigationItems.filter(
+      item =>
+        item.href !== currentPath &&
+        !siblingPages.includes(item) &&
+        item.section === currentItem.section
     );
 
     categoryPages.slice(0, maxResults - related.length).forEach(item => {
@@ -165,7 +165,7 @@ export function findRelatedPages(
         category: item.section || 'legislative',
         type: 'related',
         weight: 0.5,
-        relevanceScore: 0.6
+        relevanceScore: 0.6,
       });
     });
   }
@@ -189,7 +189,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'legislative',
         type: 'parent',
         weight: 1.0,
-        relevanceScore: 0.9
+        relevanceScore: 0.9,
       },
       {
         pageId: 'bills-analysis',
@@ -199,7 +199,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'legislative',
         type: 'child',
         weight: 0.8,
-        relevanceScore: 0.8
+        relevanceScore: 0.8,
       }
     );
   }
@@ -214,7 +214,7 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'community',
         type: 'related',
         weight: 0.9,
-        relevanceScore: 0.85
+        relevanceScore: 0.85,
       },
       {
         pageId: 'expert-verification',
@@ -224,39 +224,35 @@ export function calculateRelatedPages(path: string, user_role: UserRole): Relate
         category: 'community',
         type: 'related',
         weight: 0.7,
-        relevanceScore: 0.75
+        relevanceScore: 0.75,
       }
     );
   }
 
   if (user_role !== 'public') {
-    relatedPages.push(
-      {
-        pageId: 'dashboard',
-        title: 'Dashboard',
-        path: '/dashboard',
-        description: 'Your personal dashboard',
-        category: 'user',
-        type: 'related',
-        weight: 0.95,
-        relevanceScore: 0.9
-      }
-    );
+    relatedPages.push({
+      pageId: 'dashboard',
+      title: 'Dashboard',
+      path: '/dashboard',
+      description: 'Your personal dashboard',
+      category: 'user',
+      type: 'related',
+      weight: 0.95,
+      relevanceScore: 0.9,
+    });
   }
 
   if (user_role === 'admin') {
-    relatedPages.push(
-      {
-        pageId: 'admin-panel',
-        title: 'Admin Panel',
-        path: '/admin',
-        description: 'System administration',
-        category: 'admin',
-        type: 'related',
-        weight: 1.0,
-        relevanceScore: 0.95
-      }
-    );
+    relatedPages.push({
+      pageId: 'admin-panel',
+      title: 'Admin Panel',
+      path: '/admin',
+      description: 'System administration',
+      category: 'admin',
+      type: 'related',
+      weight: 1.0,
+      relevanceScore: 0.95,
+    });
   }
 
   return relatedPages;

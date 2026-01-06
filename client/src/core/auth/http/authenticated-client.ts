@@ -19,7 +19,7 @@ export class AuthenticatedApiClient {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`,
       },
     });
     return response.json() as Promise<T>;
@@ -30,7 +30,7 @@ export class AuthenticatedApiClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`,
       },
       body: JSON.stringify(data),
     });
@@ -42,7 +42,7 @@ export class AuthenticatedApiClient {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`,
       },
       body: JSON.stringify(data),
     });
@@ -53,7 +53,7 @@ export class AuthenticatedApiClient {
     const response = await fetch(url, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`,
       },
     });
     return response.json() as Promise<T>;

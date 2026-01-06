@@ -9,25 +9,30 @@ The Educational Framework implements **Task 12: Contextual Educational Framework
 ## Components
 
 ### 1. EducationalFramework
+
 The main component that orchestrates all educational features in a tabbed interface.
 
 **Features:**
+
 - Tabbed navigation between different educational aspects
 - Integrated overview with statistics
 - Interactive help demonstrations
 - Quick access to learning resources
 
 **Usage:**
+
 ```tsx
 import { EducationalFramework } from '../education/EducationalFramework';
 
-<EducationalFramework bill={bill} />
+<EducationalFramework bill={bill} />;
 ```
 
 ### 2. PlainLanguageSummary
+
 Converts complex legal content into accessible language with impact analysis.
 
 **Features:**
+
 - Section-by-section breakdown of legal text
 - Plain language translations
 - Impact analysis (who, what, when, cost)
@@ -35,6 +40,7 @@ Converts complex legal content into accessible language with impact analysis.
 - Toggle between plain language and original legal text
 
 **Usage:**
+
 ```tsx
 import { PlainLanguageSummary } from '../education/PlainLanguageSummary';
 
@@ -42,13 +48,15 @@ import { PlainLanguageSummary } from '../education/PlainLanguageSummary';
   billId="1"
   billTitle="Healthcare Access Reform Act"
   sections={plainLanguageSections}
-/>
+/>;
 ```
 
 ### 3. ConstitutionalContext
+
 Integrates constitutional provisions with bill content to show legal basis and potential conflicts.
 
 **Features:**
+
 - Constitutional article references
 - Impact analysis (supports/conflicts/neutral/unclear)
 - Relevance indicators (direct/indirect/contextual)
@@ -56,6 +64,7 @@ Integrates constitutional provisions with bill content to show legal basis and p
 - Article filtering and highlighting
 
 **Usage:**
+
 ```tsx
 import { ConstitutionalContext } from '../education/ConstitutionalContext';
 
@@ -63,13 +72,15 @@ import { ConstitutionalContext } from '../education/ConstitutionalContext';
   billId="1"
   billTitle="Healthcare Access Reform Act"
   provisions={constitutionalProvisions}
-/>
+/>;
 ```
 
 ### 4. HistoricalPrecedents
+
 Shows similar legislation outcomes and lessons learned from historical patterns.
 
 **Features:**
+
 - Similar legislation analysis
 - Outcome tracking (passed/failed/amended/withdrawn)
 - Public support trends
@@ -78,6 +89,7 @@ Shows similar legislation outcomes and lessons learned from historical patterns.
 - Timeline analysis
 
 **Usage:**
+
 ```tsx
 import { HistoricalPrecedents } from '../education/HistoricalPrecedents';
 
@@ -85,13 +97,15 @@ import { HistoricalPrecedents } from '../education/HistoricalPrecedents';
   billId="1"
   billTitle="Healthcare Access Reform Act"
   precedents={historicalPrecedents}
-/>
+/>;
 ```
 
 ### 5. ProcessEducation
+
 Explains legislative procedures and timelines with participation opportunities.
 
 **Features:**
+
 - Step-by-step legislative process
 - Progress tracking
 - Public participation opportunities
@@ -100,6 +114,7 @@ Explains legislative procedures and timelines with participation opportunities.
 - Educational resources
 
 **Usage:**
+
 ```tsx
 import { ProcessEducation } from '../education/ProcessEducation';
 
@@ -110,13 +125,15 @@ import { ProcessEducation } from '../education/ProcessEducation';
   steps={legislativeSteps}
   committees={committees}
   timeline={timeline}
-/>
+/>;
 ```
 
 ### 6. EducationalTooltip
+
 Provides contextual help and definitions throughout the interface.
 
 **Features:**
+
 - Term definitions with context
 - Examples and related terms
 - Context-specific styling (legal/procedural/constitutional/civic)
@@ -124,6 +141,7 @@ Provides contextual help and definitions throughout the interface.
 - Accessible tooltip implementation
 
 **Usage:**
+
 ```tsx
 import { EducationalTooltip } from '../education/EducationalTooltip';
 
@@ -131,13 +149,11 @@ import { EducationalTooltip } from '../education/EducationalTooltip';
   term="Constitutional Review"
   definition="The process of examining whether laws comply with the constitution"
   context="constitutional"
-  examples={["Judicial review of new legislation"]}
-  relatedTerms={["Judicial Review", "Constitutional Court"]}
+  examples={['Judicial review of new legislation']}
+  relatedTerms={['Judicial Review', 'Constitutional Court']}
 >
-  <span className="text-blue-600 underline decoration-dotted">
-    constitutional review
-  </span>
-</EducationalTooltip>
+  <span className="text-blue-600 underline decoration-dotted">constitutional review</span>
+</EducationalTooltip>;
 ```
 
 ## Predefined Tooltips
@@ -152,6 +168,7 @@ The framework includes several predefined tooltips for common terms:
 ## Integration
 
 ### BillAnalysisTab Integration
+
 The Educational Framework is integrated into the BillAnalysisTab as a new "Learn" tab:
 
 ```tsx
@@ -166,6 +183,7 @@ The Educational Framework is integrated into the BillAnalysisTab as a new "Learn
 ```
 
 ### Tooltip Integration
+
 Educational tooltips are integrated throughout existing components to provide contextual help:
 
 ```tsx
@@ -182,6 +200,7 @@ Educational tooltips are integrated throughout existing components to provide co
 ## Data Structure
 
 ### PlainLanguageSection
+
 ```typescript
 interface PlainLanguageSection {
   id: string;
@@ -201,6 +220,7 @@ interface PlainLanguageSection {
 ```
 
 ### ConstitutionalProvision
+
 ```typescript
 interface ConstitutionalProvision {
   id: string;
@@ -215,6 +235,7 @@ interface ConstitutionalProvision {
 ```
 
 ### LegislationOutcome
+
 ```typescript
 interface LegislationOutcome {
   id: string;
@@ -264,6 +285,7 @@ The framework includes comprehensive tests:
 - **Performance Tests**: Rendering and interaction speed
 
 Run tests with:
+
 ```bash
 npm test -- --testPathPattern=education
 ```
@@ -281,21 +303,27 @@ npm test -- --testPathPattern=education
 This implementation fulfills **REQ-BDA-003** from the requirements document:
 
 ✅ **Plain language summaries for complex legal content**
+
 - PlainLanguageSummary component with section-by-section breakdown
 
 ✅ **Constitutional context integration with bill provisions**
+
 - ConstitutionalContext component with article-by-article analysis
 
 ✅ **Historical precedent references with similar legislation outcomes**
+
 - HistoricalPrecedents component with outcome analysis and lessons learned
 
 ✅ **Civic action guidance with specific engagement steps**
+
 - Enhanced CivicActionGuidance component (existing, improved)
 
 ✅ **Process education explaining legislative procedures and timelines**
+
 - ProcessEducation component with step-by-step guidance
 
 ✅ **Educational tooltips and expandable help sections throughout the interface**
+
 - EducationalTooltip component with contextual definitions and examples
 
 The Educational Framework transforms complex legislative information into accessible, actionable knowledge that empowers citizens to engage meaningfully with the democratic process.

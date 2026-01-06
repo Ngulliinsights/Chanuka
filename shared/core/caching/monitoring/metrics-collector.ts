@@ -4,6 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import type { CacheMetrics } from '../core/interfaces';
 
 export interface MetricsCollectorConfig {

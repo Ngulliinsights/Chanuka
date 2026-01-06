@@ -3,9 +3,9 @@
  * Modal wrapper for dashboard integration
  */
 
-import { PrivacySettings } from '@/core/auth';
-
 import React from 'react';
+
+import { PrivacySettings } from '@/core/auth';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +27,7 @@ export function ModalInterface({
   open,
   onOpenChange,
   settings,
-  onSettingsChange
+  onSettingsChange,
 }: ModalInterfaceProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,10 +39,7 @@ export function ModalInterface({
           </DialogDescription>
         </DialogHeader>
 
-        <FullInterface
-          settings={settings}
-          onSettingsChange={onSettingsChange}
-        />
+        <FullInterface settings={settings} onSettingsChange={onSettingsChange} />
       </DialogContent>
     </Dialog>
   );

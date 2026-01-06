@@ -4,15 +4,16 @@
  * Tests for the breadcrumb navigation component and related utilities.
  */
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 
-import { BreadcrumbNavigation, generateBreadcrumbs } from '../BreadcrumbNavigation';
 import navigationReducer from '@/shared/infrastructure/store/slices/navigationSlice';
 import type { BreadcrumbItem } from '@/shared/types/navigation';
+
+import { BreadcrumbNavigation, generateBreadcrumbs } from '../BreadcrumbNavigation';
 
 // Mock store setup
 const createMockStore = (initialState = {}) => {
@@ -50,12 +51,10 @@ const createMockStore = (initialState = {}) => {
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode; store?: any }> = ({
   children,
-  store = createMockStore()
+  store = createMockStore(),
 }) => (
   <Provider store={store}>
-    <BrowserRouter>
-      {children}
-    </BrowserRouter>
+    <BrowserRouter>{children}</BrowserRouter>
   </Provider>
 );
 
@@ -63,9 +62,7 @@ describe('generateBreadcrumbs', () => {
   it('should generate breadcrumbs for home page', () => {
     const breadcrumbs = generateBreadcrumbs('/');
 
-    expect(breadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: true },
-    ]);
+    expect(breadcrumbs).toEqual([{ label: 'Home', path: '/', is_active: true }]);
   });
 
   it('should generate breadcrumbs for bills page', () => {
@@ -298,9 +295,7 @@ describe('BreadcrumbNavigation', () => {
   });
 
   it('should apply custom className', () => {
-    const mockBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: true },
-    ];
+    const mockBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: true }];
 
     const store = createMockStore({
       breadcrumbs: mockBreadcrumbs,

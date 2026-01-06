@@ -11,7 +11,7 @@ export class DashboardError extends BaseError {
       domain: ErrorDomain.BUSINESS_LOGIC,
       severity: ErrorSeverity.MEDIUM,
       recoverable: true,
-      context: details ? { details } : undefined
+      context: details ? { details } : undefined,
     });
     this.name = 'DashboardError';
   }
@@ -32,7 +32,12 @@ export class DashboardActionError extends DashboardError {
 }
 
 export class DashboardTopicError extends DashboardError {
-  constructor(operation: string, topicId?: string, message?: string, details?: Record<string, unknown>) {
+  constructor(
+    operation: string,
+    topicId?: string,
+    message?: string,
+    details?: Record<string, unknown>
+  ) {
     const errorMessage = message || `Topic operation '${operation}' failed`;
     super(errorMessage, { operation, topicId, ...details });
     this.name = 'DashboardTopicError';

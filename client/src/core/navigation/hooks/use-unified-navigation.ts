@@ -20,15 +20,15 @@ export function useUnifiedNavigation() {
     currentSection: navigation.currentSection,
     user_role: navigation.user_role,
     preferences: navigation.preferences,
-    
+
     // Responsive state (now included in navigation)
     isMobile: navigation.isMobile,
     sidebarCollapsed: navigation.sidebarCollapsed,
     mounted: navigation.mounted,
-    
+
     // Accessibility state
     isKeyboardUser,
-    
+
     // Navigation actions
     navigateTo: navigation.navigateTo,
     updateBreadcrumbs: navigation.updateBreadcrumbs,
@@ -36,7 +36,7 @@ export function useUnifiedNavigation() {
     updateUserRole: navigation.updateUserRole,
     updatePreferences: navigation.updatePreferences,
     addToRecentPages: navigation.addToRecentPages,
-    
+
     // Responsive actions (now included in navigation)
     toggleSidebar: navigation.toggleSidebar,
     setSidebarCollapsed: navigation.setSidebarCollapsed,
@@ -46,48 +46,3 @@ export function useUnifiedNavigation() {
     getFocusClasses,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

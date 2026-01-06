@@ -66,7 +66,7 @@ const initialState: UIState = {
     realTimeUpdates: true,
     expertVerification: true,
     communityDiscussions: true,
-    advancedFiltering: true
+    advancedFiltering: true,
   },
 };
 
@@ -78,7 +78,7 @@ const uiSlice = createSlice({
     setTheme: (state, action: PayloadAction<UIState['theme']>) => {
       state.theme = action.payload;
     },
-    toggleSidebar: (state) => {
+    toggleSidebar: state => {
       state.sidebarCollapsed = !state.sidebarCollapsed;
     },
     setSidebarCollapsed: (state, action: PayloadAction<boolean>) => {
@@ -98,7 +98,7 @@ const uiSlice = createSlice({
       state.activeModal = action.payload.modalId;
       state.modalData = action.payload.data || null;
     },
-    closeModal: (state) => {
+    closeModal: state => {
       state.activeModal = null;
       state.modalData = null;
     },
@@ -110,14 +110,21 @@ const uiSlice = createSlice({
     },
 
     // Toast notifications
-    showToast: (state, action: PayloadAction<{ message: string; type: 'success' | 'error' | 'warning' | 'info'; duration?: number }>) => {
+    showToast: (
+      state,
+      action: PayloadAction<{
+        message: string;
+        type: 'success' | 'error' | 'warning' | 'info';
+        duration?: number;
+      }>
+    ) => {
       state.toast = {
         message: action.payload.message,
         type: action.payload.type,
-        duration: action.payload.duration || 5000
+        duration: action.payload.duration || 5000,
       };
     },
-    hideToast: (state) => {
+    hideToast: state => {
       state.toast = null;
     },
 
@@ -142,7 +149,10 @@ const uiSlice = createSlice({
     toggleFeature: (state, action: PayloadAction<keyof UIState['features']>) => {
       state.features[action.payload] = !state.features[action.payload];
     },
-    setFeature: (state, action: PayloadAction<{ feature: keyof UIState['features']; enabled: boolean }>) => {
+    setFeature: (
+      state,
+      action: PayloadAction<{ feature: keyof UIState['features']; enabled: boolean }>
+    ) => {
       state.features[action.payload.feature] = action.payload.enabled;
     },
   },
@@ -164,7 +174,7 @@ export const {
   setScreenSize,
   setIsMobile,
   toggleFeature,
-  setFeature
+  setFeature,
 } = uiSlice.actions;
 
 // Export selectors

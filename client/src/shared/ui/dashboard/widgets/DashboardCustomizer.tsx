@@ -5,8 +5,6 @@
  * and preferences based on their persona type.
  */
 
-import { useState } from 'react';
-import React from 'react';
 import {
   LayoutGrid as Layout, // Using LayoutGrid as Layout replacement
   // Eye, // Unused
@@ -21,8 +19,11 @@ import {
   // Bell, // Unused
   // Clock // Unused
 } from 'lucide-react';
+import { useState } from 'react';
+import React from 'react';
 
 // import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system'; // Unused
+import type { PersonaType, PersonaPreferences } from '@client/core/personalization/types';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
@@ -34,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/shared/design-system';
-import type { PersonaType, PersonaPreferences } from '@client/core/personalization/types';
 
 interface DashboardCustomizerProps {
   persona: PersonaType;
@@ -64,7 +64,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Personalized greeting and getting started guide',
     category: 'core',
     availableFor: ['novice', 'intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'progress',
@@ -72,7 +72,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Your civic engagement journey progress',
     category: 'core',
     availableFor: ['novice', 'intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'quick-actions',
@@ -80,7 +80,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Fast access to common tasks',
     category: 'core',
     availableFor: ['novice', 'intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
 
   // Engagement widgets
@@ -90,7 +90,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Trending legislation this week',
     category: 'engagement',
     availableFor: ['novice', 'intermediate'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'tracked-bills',
@@ -98,7 +98,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Bills you are following',
     category: 'engagement',
     availableFor: ['intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'community-engagement',
@@ -106,7 +106,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Active community conversations',
     category: 'engagement',
     availableFor: ['intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'civic-education',
@@ -114,7 +114,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Learn how government works',
     category: 'engagement',
     availableFor: ['novice'],
-    defaultVisible: true
+    defaultVisible: true,
   },
 
   // Analytics widgets
@@ -124,7 +124,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Your civic engagement statistics',
     category: 'analytics',
     availableFor: ['intermediate', 'expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'analytics-dashboard',
@@ -132,7 +132,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Professional legislative intelligence',
     category: 'analytics',
     availableFor: ['expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'performance-metrics',
@@ -140,7 +140,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Your contribution impact metrics',
     category: 'analytics',
     availableFor: ['expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
 
   // Tools widgets
@@ -150,7 +150,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Professional analysis and verification tools',
     category: 'tools',
     availableFor: ['expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'verification-queue',
@@ -158,7 +158,7 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Pending expert verifications',
     category: 'tools',
     availableFor: ['expert'],
-    defaultVisible: true
+    defaultVisible: true,
   },
   {
     id: 'workaround-detection',
@@ -166,8 +166,8 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
     description: 'Constitutional workaround monitoring',
     category: 'tools',
     availableFor: ['expert'],
-    defaultVisible: false
-  }
+    defaultVisible: false,
+  },
 ];
 
 export function DashboardCustomizer({
@@ -178,7 +178,7 @@ export function DashboardCustomizer({
   onPreferencesUpdate,
   onSectionToggle: _onSectionToggle,
   onWidgetToggle,
-  className = ''
+  className = '',
 }: DashboardCustomizerProps) {
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -213,9 +213,12 @@ export function DashboardCustomizer({
     // Reset preferences to defaults
     const defaultPrefs = {
       defaultView: persona === 'novice' ? 'cards' : persona === 'intermediate' ? 'list' : 'grid',
-      notificationFrequency: persona === 'novice' ? 'weekly' : persona === 'intermediate' ? 'daily' : 'immediate',
-      contentComplexity: persona === 'novice' ? 'simple' : persona === 'intermediate' ? 'detailed' : 'technical',
-      dashboardLayout: persona === 'novice' ? 'compact' : persona === 'intermediate' ? 'standard' : 'expanded'
+      notificationFrequency:
+        persona === 'novice' ? 'weekly' : persona === 'intermediate' ? 'daily' : 'immediate',
+      contentComplexity:
+        persona === 'novice' ? 'simple' : persona === 'intermediate' ? 'detailed' : 'technical',
+      dashboardLayout:
+        persona === 'novice' ? 'compact' : persona === 'intermediate' ? 'standard' : 'expanded',
     } as Partial<PersonaPreferences>;
 
     onPreferencesUpdate(defaultPrefs);
@@ -328,7 +331,10 @@ export function DashboardCustomizer({
                   </h5>
                   <div className="space-y-2">
                     {categoryWidgets.map(widget => (
-                      <div key={widget.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={widget.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h6 className="font-medium text-sm">{widget.name}</h6>
@@ -368,7 +374,7 @@ export function DashboardCustomizer({
                 </div>
                 <Select
                   value={preferences?.notificationFrequency || 'daily'}
-                  onValueChange={(value) => handlePreferenceChange('notificationFrequency', value)}
+                  onValueChange={value => handlePreferenceChange('notificationFrequency', value)}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
@@ -388,7 +394,7 @@ export function DashboardCustomizer({
                 </div>
                 <Select
                   value={preferences?.contentComplexity || 'detailed'}
-                  onValueChange={(value) => handlePreferenceChange('contentComplexity', value)}
+                  onValueChange={value => handlePreferenceChange('contentComplexity', value)}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
@@ -405,11 +411,13 @@ export function DashboardCustomizer({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">Expert Mode</p>
-                    <p className="text-xs text-muted-foreground">Show advanced features and tools</p>
+                    <p className="text-xs text-muted-foreground">
+                      Show advanced features and tools
+                    </p>
                   </div>
                   <Switch
                     checked={preferences?.enableExpertMode || false}
-                    onCheckedChange={(checked) => handlePreferenceChange('enableExpertMode', checked)}
+                    onCheckedChange={checked => handlePreferenceChange('enableExpertMode', checked)}
                   />
                 </div>
               )}
@@ -417,11 +425,15 @@ export function DashboardCustomizer({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm">Advanced Features</p>
-                  <p className="text-xs text-muted-foreground">Show advanced search and analysis tools</p>
+                  <p className="text-xs text-muted-foreground">
+                    Show advanced search and analysis tools
+                  </p>
                 </div>
                 <Switch
                   checked={preferences?.showAdvancedFeatures || false}
-                  onCheckedChange={(checked) => handlePreferenceChange('showAdvancedFeatures', checked)}
+                  onCheckedChange={checked =>
+                    handlePreferenceChange('showAdvancedFeatures', checked)
+                  }
                 />
               </div>
             </div>
@@ -431,11 +443,7 @@ export function DashboardCustomizer({
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-4 border-t mt-6">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleResetToDefaults}
-        >
+        <Button variant="outline" size="sm" onClick={handleResetToDefaults}>
           <RotateCcw className="h-4 w-4 mr-2" />
           Reset to Defaults
         </Button>
@@ -446,11 +454,7 @@ export function DashboardCustomizer({
               Unsaved changes
             </Badge>
           )}
-          <Button
-            size="sm"
-            onClick={handleSaveChanges}
-            disabled={!hasChanges}
-          >
+          <Button size="sm" onClick={handleSaveChanges} disabled={!hasChanges}>
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>

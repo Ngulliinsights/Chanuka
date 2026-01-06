@@ -1,6 +1,6 @@
 /**
  * Cache Storage Module
- * 
+ *
  * Provides in-memory and persistent caching with TTL support, compression,
  * and intelligent eviction policies. Ideal for API responses and computed values.
  */
@@ -8,13 +8,13 @@
 import { logger } from '../../utils/logger';
 
 import { SecureStorage } from './secure-storage';
-import { 
-  CacheEntry, 
-  CacheStats, 
+import {
+  CacheEntry,
+  CacheStats,
   CleanupOptions,
   StorageOptions,
   StorageError,
-  StorageErrorCode
+  StorageErrorCode,
 } from './types';
 
 /**
@@ -58,7 +58,7 @@ const DEFAULT_CACHE_CONFIG: CacheConfig = {
   defaultTTL: 5 * 60 * 1000, // 5 minutes
   evictionPolicy: 'lru',
   persistToDisk: true,
-  compressionThreshold: 1024 // 1KB
+  compressionThreshold: 1024, // 1KB
 };
 
 /**
@@ -78,7 +78,7 @@ export class CacheStorageManager {
     hitRate: 0,
     hits: 0,
     misses: 0,
-    evictions: 0
+    evictions: 0,
   };
   private cleanupInterval: NodeJS.Timeout | null = null;
 
@@ -99,8 +99,8 @@ export class CacheStorageManager {
    * Stores data in cache with optional TTL
    */
   async set<T>(
-    key: string, 
-    data: T, 
+    key: string,
+    data: T,
     options: {
       ttl?: number;
       persist?: boolean;
@@ -111,7 +111,7 @@ export class CacheStorageManager {
     try {
       const ttl = options.ttl || this.config.defaultTTL;
       const persist = options.persist !== false && this.config.persistToDisk;
-      
+
       const entry: CacheEntry<T> = {
         data,
         timestamp: Date.now(),
@@ -122,8 +122,8 @@ export class CacheStorageManager {
         tags: options.tags,
         metadata: {
           compressed: false,
-          persisted: persist
-        }
+          persisted: persist,
+        },
       };
 
       // Check if we need to evict entries to make room
@@ -139,7 +139,7 @@ export class CacheStorageManager {
         const storageOptions: StorageOptions = {
           namespace: this.cacheNamespace,
           ttl,
-          compress: options.compress || (entry.size || 0) > this.config.compressionThreshold
+          compress: options.compress || (entry.size || 0) > this.config.compressionThreshold,
         };
 
         await this.storage.setItem(key, entry, storageOptions);
@@ -152,7 +152,7 @@ export class CacheStorageManager {
         size: entry.size,
         ttl,
         persist,
-        tags: options.tags
+        tags: options.tags,
       });
     } catch (error) {
       logger.error('Failed to set cache entry', { key, error });
@@ -180,14 +180,14 @@ export class CacheStorageManager {
         // Update access metadata
         entry.accessCount = (entry.accessCount || 0) + 1;
         entry.lastAccessed = Date.now();
-        
+
         this.stats.hits++;
         this.updateHitRate();
 
         logger.debug('Cache hit (memory)', {
           component: 'CacheStorageManager',
           key,
-          accessCount: entry.accessCount
+          accessCount: entry.accessCount,
         });
 
         return entry.data;
@@ -195,9 +195,10 @@ export class CacheStorageManager {
 
       // If not in memory and persistence is enabled, check storage
       if (this.config.persistToDisk) {
-        entry = await this.storage.getItem<CacheEntry<T>>(key, {
-          namespace: this.cacheNamespace
-        }) || undefined;
+        entry =
+          (await this.storage.getItem<CacheEntry<T>>(key, {
+            namespace: this.cacheNamespace,
+          })) || undefined;
 
         if (entry) {
           // Check if entry has expired
@@ -215,14 +216,14 @@ export class CacheStorageManager {
           // Update access metadata
           entry.accessCount = (entry.accessCount || 0) + 1;
           entry.lastAccessed = Date.now();
-          
+
           this.stats.hits++;
           this.updateHitRate();
 
           logger.debug('Cache hit (storage)', {
             component: 'CacheStorageManager',
             key,
-            accessCount: entry.accessCount
+            accessCount: entry.accessCount,
           });
 
           return entry.data;
@@ -246,7 +247,7 @@ export class CacheStorageManager {
   async delete(key: string): Promise<void> {
     try {
       const entry = this.memoryCache.get(key);
-      
+
       if (entry) {
         this.memoryCache.delete(key);
         this.stats.memoryEntries = this.memoryCache.size;
@@ -255,13 +256,13 @@ export class CacheStorageManager {
 
       if (this.config.persistToDisk) {
         this.storage.removeItem(key, {
-          namespace: this.cacheNamespace
+          namespace: this.cacheNamespace,
         });
       }
 
       logger.debug('Cache entry deleted', {
         component: 'CacheStorageManager',
-        key
+        key,
       });
     } catch (error) {
       logger.error('Failed to delete cache entry', { key, error });
@@ -283,7 +284,7 @@ export class CacheStorageManager {
       }
 
       logger.info('Cache cleared', {
-        component: 'CacheStorageManager'
+        component: 'CacheStorageManager',
       });
     } catch (error) {
       logger.error('Failed to clear cache', { error });
@@ -302,8 +303,8 @@ export class CacheStorageManager {
    * Gets or sets a cache entry using a factory function
    */
   async getOrSet<T>(
-    key: string, 
-    factory: () => Promise<T>, 
+    key: string,
+    factory: () => Promise<T>,
     options: {
       ttl?: number;
       persist?: boolean;
@@ -311,12 +312,12 @@ export class CacheStorageManager {
     } = {}
   ): Promise<T> {
     let data = await this.get<T>(key);
-    
+
     if (data === null) {
       data = await factory();
       await this.set(key, data, options);
     }
-    
+
     return data;
   }
 
@@ -343,7 +344,7 @@ export class CacheStorageManager {
     logger.info('Cache invalidation by tags completed', {
       component: 'CacheStorageManager',
       tags,
-      invalidatedCount
+      invalidatedCount,
     });
 
     return invalidatedCount;
@@ -367,8 +368,7 @@ export class CacheStorageManager {
         }
 
         // Remove entries older than specified time
-        if (options.removeOlderThan && 
-            Date.now() - entry.timestamp > options.removeOlderThan) {
+        if (options.removeOlderThan && Date.now() - entry.timestamp > options.removeOlderThan) {
           shouldDelete = true;
         }
 
@@ -395,7 +395,7 @@ export class CacheStorageManager {
         component: 'CacheStorageManager',
         deletedCount,
         dryRun: options.dryRun,
-        memoryEntries: this.memoryCache.size
+        memoryEntries: this.memoryCache.size,
       });
     } catch (error) {
       logger.error('Failed to cleanup cache', { error });
@@ -416,7 +416,7 @@ export class CacheStorageManager {
     this.config = { ...this.config, ...config };
     logger.info('Cache configuration updated', {
       component: 'CacheStorageManager',
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -439,13 +439,13 @@ export class CacheStorageManager {
    */
   getEntriesByTag(tag: string): Array<{ key: string; entry: CacheEntry }> {
     const entries: Array<{ key: string; entry: CacheEntry }> = [];
-    
+
     for (const [key, entry] of Array.from(this.memoryCache.entries())) {
       if (entry.tags?.includes(tag)) {
         entries.push({ key, entry });
       }
     }
-    
+
     return entries;
   }
 
@@ -468,8 +468,7 @@ export class CacheStorageManager {
    * Evicts entries based on the configured policy
    */
   private async evictEntries(count: number): Promise<void> {
-    const entries = Array.from(this.memoryCache.entries())
-      .map(([key, entry]) => ({ key, entry }));
+    const entries = Array.from(this.memoryCache.entries()).map(([key, entry]) => ({ key, entry }));
 
     // Sort based on eviction policy
     switch (this.config.evictionPolicy) {
@@ -500,7 +499,7 @@ export class CacheStorageManager {
     logger.debug('Cache eviction completed', {
       component: 'CacheStorageManager',
       evictedCount: Math.min(count, entries.length),
-      policy: this.config.evictionPolicy
+      policy: this.config.evictionPolicy,
     });
   }
 
@@ -518,7 +517,7 @@ export class CacheStorageManager {
     for (const { key, entry } of entries) {
       keysToEvict.push(key);
       freedSize += entry.size || 0;
-      
+
       if (freedSize >= requiredSize) {
         break;
       }
@@ -533,7 +532,7 @@ export class CacheStorageManager {
     logger.debug('Cache eviction by size completed', {
       component: 'CacheStorageManager',
       evictedCount: keysToEvict.length,
-      freedSize
+      freedSize,
     });
   }
 

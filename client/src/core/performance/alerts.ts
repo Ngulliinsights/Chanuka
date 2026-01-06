@@ -1,6 +1,6 @@
 /**
  * Performance Alerts Module
- * 
+ *
  * Manages performance alerts and threshold monitoring with configurable
  * severity levels and external reporting capabilities.
  */
@@ -26,12 +26,14 @@ export class PerformanceAlertsManager {
 
   static getInstance(config?: PerformanceConfig['alerts']): PerformanceAlertsManager {
     if (!PerformanceAlertsManager.instance) {
-      PerformanceAlertsManager.instance = new PerformanceAlertsManager(config || {
-        enabled: true,
-        maxAlerts: 100,
-        retentionMs: 60 * 60 * 1000,
-        externalReporting: false
-      });
+      PerformanceAlertsManager.instance = new PerformanceAlertsManager(
+        config || {
+          enabled: true,
+          maxAlerts: 100,
+          retentionMs: 60 * 60 * 1000,
+          externalReporting: false,
+        }
+      );
     }
     return PerformanceAlertsManager.instance;
   }
@@ -75,23 +77,23 @@ export class PerformanceAlertsManager {
    */
   private setupDefaultThresholds(): void {
     // Core Web Vitals thresholds (aligned with Google's recommendations)
-    this.thresholds.set('LCP', 2500);  // Large Contentful Paint - good threshold
-    this.thresholds.set('FID', 100);   // First Input Delay - good threshold
-    this.thresholds.set('INP', 200);   // Interaction to Next Paint - good threshold
-    this.thresholds.set('CLS', 0.1);   // Cumulative Layout Shift - good threshold
-    this.thresholds.set('FCP', 1800);  // First Contentful Paint - good threshold
-    this.thresholds.set('TTFB', 800);  // Time to First Byte - good threshold
+    this.thresholds.set('LCP', 2500); // Large Contentful Paint - good threshold
+    this.thresholds.set('FID', 100); // First Input Delay - good threshold
+    this.thresholds.set('INP', 200); // Interaction to Next Paint - good threshold
+    this.thresholds.set('CLS', 0.1); // Cumulative Layout Shift - good threshold
+    this.thresholds.set('FCP', 1800); // First Contentful Paint - good threshold
+    this.thresholds.set('TTFB', 800); // Time to First Byte - good threshold
 
     // Resource thresholds
-    this.thresholds.set('bundle-size', 250000);      // 250KB
-    this.thresholds.set('memory-usage', 50000000);   // 50MB
-    this.thresholds.set('dom-size', 1500);           // DOM nodes
-    this.thresholds.set('image-size', 1000000);      // 1MB
-    this.thresholds.set('font-size', 100000);        // 100KB
+    this.thresholds.set('bundle-size', 250000); // 250KB
+    this.thresholds.set('memory-usage', 50000000); // 50MB
+    this.thresholds.set('dom-size', 1500); // DOM nodes
+    this.thresholds.set('image-size', 1000000); // 1MB
+    this.thresholds.set('font-size', 100000); // 100KB
 
     // Network thresholds
-    this.thresholds.set('request-count', 50);        // Number of requests
-    this.thresholds.set('total-size', 2000000);      // 2MB total payload
+    this.thresholds.set('request-count', 50); // Number of requests
+    this.thresholds.set('total-size', 2000000); // 2MB total payload
   }
 
   /**
@@ -103,7 +105,7 @@ export class PerformanceAlertsManager {
     }
 
     const threshold = this.thresholds.get(metric.name);
-    
+
     // Early return if no threshold is defined for this metric
     if (threshold === undefined) {
       return;
@@ -113,7 +115,7 @@ export class PerformanceAlertsManager {
     if (metric.value > threshold) {
       const severity = this.calculateSeverity(metric.value, threshold);
       const exceedancePercentage = ((metric.value - threshold) / threshold) * 100;
-      
+
       const alert: PerformanceAlert = {
         id: this.generateAlertId(),
         type: this.determineAlertType(metric),
@@ -124,7 +126,7 @@ export class PerformanceAlertsManager {
         threshold,
         timestamp: new Date(),
         url: metric.url || (typeof window !== 'undefined' ? window.location.href : ''),
-        resolved: false
+        resolved: false,
       };
 
       await this.createAlert(alert);
@@ -141,7 +143,11 @@ export class PerformanceAlertsManager {
     if (metric.name.includes('network') || metric.name === 'TTFB') {
       return 'network-slow';
     }
-    if (metric.category === 'loading' || metric.category === 'interactivity' || metric.category === 'visual-stability') {
+    if (
+      metric.category === 'loading' ||
+      metric.category === 'interactivity' ||
+      metric.category === 'visual-stability'
+    ) {
       return 'slow-metric';
     }
     return 'custom';
@@ -151,13 +157,13 @@ export class PerformanceAlertsManager {
    * Generates a descriptive alert message
    */
   private generateAlertMessage(
-    metric: PerformanceMetric, 
-    threshold: number, 
+    metric: PerformanceMetric,
+    threshold: number,
     exceedancePercentage: number
   ): string {
     const metricDisplayName = this.getMetricDisplayName(metric.name);
     const unit = this.getMetricUnit(metric.name);
-    
+
     return `${metricDisplayName} exceeded threshold by ${exceedancePercentage.toFixed(1)}%: ${metric.value.toFixed(2)}${unit} > ${threshold}${unit}`;
   }
 
@@ -166,19 +172,19 @@ export class PerformanceAlertsManager {
    */
   private getMetricDisplayName(metricName: string): string {
     const displayNames: Record<string, string> = {
-      'LCP': 'Largest Contentful Paint',
-      'FID': 'First Input Delay',
-      'INP': 'Interaction to Next Paint',
-      'CLS': 'Cumulative Layout Shift',
-      'FCP': 'First Contentful Paint',
-      'TTFB': 'Time to First Byte',
+      LCP: 'Largest Contentful Paint',
+      FID: 'First Input Delay',
+      INP: 'Interaction to Next Paint',
+      CLS: 'Cumulative Layout Shift',
+      FCP: 'First Contentful Paint',
+      TTFB: 'Time to First Byte',
       'bundle-size': 'Bundle Size',
       'memory-usage': 'Memory Usage',
       'dom-size': 'DOM Size',
       'image-size': 'Image Payload',
-      'font-size': 'Font Payload'
+      'font-size': 'Font Payload',
     };
-    
+
     return displayNames[metricName] || metricName;
   }
 
@@ -210,11 +216,11 @@ export class PerformanceAlertsManager {
    */
   private calculateSeverity(value: number, threshold: number): PerformanceAlert['severity'] {
     const ratio = value / threshold;
-    
-    if (ratio > 3) return 'critical';    // More than 3x threshold
-    if (ratio > 2) return 'high';        // More than 2x threshold
-    if (ratio > 1.5) return 'medium';    // More than 1.5x threshold
-    return 'low';                         // Between 1x and 1.5x threshold
+
+    if (ratio > 3) return 'critical'; // More than 3x threshold
+    if (ratio > 2) return 'high'; // More than 2x threshold
+    if (ratio > 1.5) return 'medium'; // More than 1.5x threshold
+    return 'low'; // Between 1x and 1.5x threshold
   }
 
   /**
@@ -222,11 +228,12 @@ export class PerformanceAlertsManager {
    */
   private async createAlert(alert: PerformanceAlert): Promise<void> {
     // Check for duplicate alerts (same metric, similar value, recent timestamp)
-    const isDuplicate = this.alerts.some(existingAlert => 
-      existingAlert.metric === alert.metric &&
-      Math.abs(existingAlert.value - alert.value) / alert.value < 0.1 && // Within 10%
-      alert.timestamp.getTime() - existingAlert.timestamp.getTime() < 60000 && // Within 1 minute
-      !existingAlert.resolved
+    const isDuplicate = this.alerts.some(
+      existingAlert =>
+        existingAlert.metric === alert.metric &&
+        Math.abs(existingAlert.value - alert.value) / alert.value < 0.1 && // Within 10%
+        alert.timestamp.getTime() - existingAlert.timestamp.getTime() < 60000 && // Within 1 minute
+        !existingAlert.resolved
     );
 
     if (isDuplicate) {
@@ -257,7 +264,7 @@ export class PerformanceAlertsManager {
    * Sends alert to external reporting services
    */
   private async sendToExternalReporters(alert: PerformanceAlert): Promise<void> {
-    const reportingPromises = this.externalReporters.map(async (reporter) => {
+    const reportingPromises = this.externalReporters.map(async reporter => {
       try {
         await reporter(alert);
       } catch (error) {
@@ -274,11 +281,9 @@ export class PerformanceAlertsManager {
   private pruneOldAlerts(): void {
     const cutoffTime = Date.now() - this.config.retentionMs;
     const initialCount = this.alerts.length;
-    
+
     // Remove old alerts
-    this.alerts = this.alerts.filter(alert => 
-      alert.timestamp.getTime() > cutoffTime
-    );
+    this.alerts = this.alerts.filter(alert => alert.timestamp.getTime() > cutoffTime);
 
     // Also enforce max alerts limit
     if (this.alerts.length > this.config.maxAlerts) {
@@ -296,9 +301,7 @@ export class PerformanceAlertsManager {
    */
   getActiveAlerts(): PerformanceAlert[] {
     const cutoffTime = Date.now() - this.config.retentionMs;
-    return this.alerts.filter(alert => 
-      alert.timestamp.getTime() > cutoffTime && !alert.resolved
-    );
+    return this.alerts.filter(alert => alert.timestamp.getTime() > cutoffTime && !alert.resolved);
   }
 
   /**
@@ -306,9 +309,7 @@ export class PerformanceAlertsManager {
    */
   getAllAlerts(): PerformanceAlert[] {
     const cutoffTime = Date.now() - this.config.retentionMs;
-    return this.alerts.filter(alert => 
-      alert.timestamp.getTime() > cutoffTime
-    );
+    return this.alerts.filter(alert => alert.timestamp.getTime() > cutoffTime);
   }
 
   /**
@@ -340,7 +341,7 @@ export class PerformanceAlertsManager {
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = new Date();
-      
+
       return true;
     }
     return false;
@@ -351,7 +352,7 @@ export class PerformanceAlertsManager {
    */
   resolveAlertsByMetric(metric: string): number {
     let resolvedCount = 0;
-    
+
     this.alerts.forEach(alert => {
       if (alert.metric === metric && !alert.resolved) {
         alert.resolved = true;
@@ -412,7 +413,7 @@ export class PerformanceAlertsManager {
   } {
     const allAlerts = this.getAllAlerts();
     const activeAlerts = this.getActiveAlerts();
-    
+
     const bySeverity: Record<string, number> = {};
     const byType: Record<string, number> = {};
     const byMetric: Record<string, number> = {};
@@ -429,7 +430,7 @@ export class PerformanceAlertsManager {
       resolved: allAlerts.filter(a => a.resolved).length,
       bySeverity,
       byType,
-      byMetric
+      byMetric,
     };
   }
 
@@ -462,7 +463,7 @@ export class PerformanceAlertsManager {
       timestamp: new Date(),
       alerts: this.getAllAlerts(),
       stats: this.getAlertStats(),
-      thresholds: Object.fromEntries(this.thresholds)
+      thresholds: Object.fromEntries(this.thresholds),
     };
   }
 }

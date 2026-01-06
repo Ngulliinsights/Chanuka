@@ -1,16 +1,28 @@
-import type { Bill, BillsQueryParams } from '@client/shared/types';
 import { Loader2, AlertCircle, Filter, LayoutGrid, LayoutList } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
-import { cn } from '@client/lib/utils';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@client/shared/design-system';
+import type { Bill, BillsQueryParams } from '@client/shared/types';
 
 import { BillCard } from './BillCard';
-import React from 'react';
 
 interface BillListProps {
   bills: Bill[];
@@ -43,7 +55,7 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: 'bg-red-100 text-red-800 border-red-300',
   signed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
   vetoed: 'bg-orange-100 text-orange-800 border-orange-300',
-  default: 'bg-gray-100 text-gray-800 border-gray-300'
+  default: 'bg-gray-100 text-gray-800 border-gray-300',
 };
 
 // Pure function for status style lookup
@@ -53,24 +65,26 @@ const getStatusStyle = (status: string): string => {
 
 // Pure utility function for count formatting with pluralization
 const formatCount = (count: number, singular: string, plural?: string): string => {
-  return `${count} ${count === 1 ? singular : (plural || `${singular}s`)}`;
+  return `${count} ${count === 1 ? singular : plural || `${singular}s`}`;
 };
 
 // Pure function to check if bill matches filter criteria
 const billMatchesFilter = (bill: Bill, filter: FilterStatus): boolean => {
   if (filter === 'all') return true;
-  
+
   const status = bill.status.toLowerCase();
-  return status === filter.toLowerCase() ||
-         (filter === 'introduced' && status === 'active') ||
-         (filter === 'committee' && status === 'upcoming');
+  return (
+    status === filter.toLowerCase() ||
+    (filter === 'introduced' && status === 'active') ||
+    (filter === 'committee' && status === 'upcoming')
+  );
 };
 
 export const BillList = ({
   bills,
   isLoading,
   error,
-  title = "Bills",
+  title = 'Bills',
   onLoadMore,
   hasMore = false,
   filters = {},
@@ -80,7 +94,7 @@ export const BillList = ({
   onSave,
   onShare,
   onComment,
-  savedBills = new Set()
+  savedBills = new Set(),
 }: BillListProps) => {
   const [localFilter, setLocalFilter] = useState<FilterStatus>('all');
   const [page, setPage] = useState(1);
@@ -95,10 +109,10 @@ export const BillList = ({
       // Parent component handles filtering via API or other means
       return bills;
     }
-    
+
     // Apply local client-side filtering only when needed
     if (localFilter === 'all') return bills;
-    
+
     // Use the pure function for cleaner filtering
     return bills.filter(bill => billMatchesFilter(bill, localFilter));
   }, [bills, localFilter, isExternalFiltering]);
@@ -106,7 +120,7 @@ export const BillList = ({
   // Memoize paginated bills to avoid recalculation on unrelated renders
   const paginatedBills = useMemo(() => {
     if (!showPagination) return filteredBills;
-    
+
     const endIndex = page * itemsPerPage;
     return filteredBills.slice(0, endIndex);
   }, [filteredBills, page, itemsPerPage, showPagination]);
@@ -120,11 +134,14 @@ export const BillList = ({
     setPage(1); // Reset to first page when filter changes
   }, []);
 
-  const handleExternalFilterChange = useCallback((status: string[]) => {
-    if (onFiltersChange) {
-      onFiltersChange({ ...filters, status });
-    }
-  }, [onFiltersChange, filters]);
+  const handleExternalFilterChange = useCallback(
+    (status: string[]) => {
+      if (onFiltersChange) {
+        onFiltersChange({ ...filters, status });
+      }
+    },
+    [onFiltersChange, filters]
+  );
 
   const handleClearFilters = useCallback(() => {
     if (isExternalFiltering) {
@@ -155,9 +172,9 @@ export const BillList = ({
           <h3 className="font-semibold">Error Loading {title}</h3>
         </div>
         <p className="text-sm pl-7">{error.message}</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="mt-2 ml-7 border-red-300 text-red-700 hover:bg-red-100"
           onClick={() => window.location.reload()}
         >
@@ -172,10 +189,10 @@ export const BillList = ({
   const currentHasMore = showPagination ? hasMoreLocal : hasMore;
 
   // Generate subtitle text showing filtered results count
-  const subtitleText = isExternalFiltering 
+  const subtitleText = isExternalFiltering
     ? formatCount(displayBills.length, 'bill')
     : `${formatCount(displayBills.length, 'bill')} of ${formatCount(
-        filteredBills.length, 
+        filteredBills.length,
         `${localFilter === 'all' ? '' : localFilter + ' '}bill`
       )}`;
 
@@ -185,9 +202,7 @@ export const BillList = ({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-semibold">{title}</h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            Displaying {subtitleText}
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">Displaying {subtitleText}</p>
         </div>
 
         <div className="flex items-center space-x-2 self-end">
@@ -244,7 +259,11 @@ export const BillList = ({
             // Local client-side filtering with responsive UI
             <>
               {/* Desktop: button group for quick filter access */}
-              <div className="hidden md:flex rounded-md shadow-sm" role="group" aria-label="Filter bills by status">
+              <div
+                className="hidden md:flex rounded-md shadow-sm"
+                role="group"
+                aria-label="Filter bills by status"
+              >
                 <Button
                   variant={localFilter === 'all' ? 'primary' : 'outline'}
                   size="sm"
@@ -325,8 +344,8 @@ export const BillList = ({
               // Grid view: responsive card layout optimized for scanning
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {displayBills.map(bill => (
-                  <BillCard 
-                    key={bill.id} 
+                  <BillCard
+                    key={bill.id}
                     bill={bill}
                     onSave={onSave}
                     onShare={onShare}
@@ -355,9 +374,7 @@ export const BillList = ({
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
                           {bill.title}
                         </CardTitle>
-                        <CardDescription className="line-clamp-2">
-                          {bill.summary}
-                        </CardDescription>
+                        <CardDescription className="line-clamp-2">{bill.summary}</CardDescription>
                       </CardHeader>
                       <CardContent className="pb-4">
                         <div className="text-sm">
@@ -404,11 +421,7 @@ export const BillList = ({
             {/* Load more button appears when additional content exists */}
             {currentHasMore && (
               <div className="flex justify-center mt-8">
-                <Button
-                  variant="outline"
-                  onClick={handleLoadMore}
-                  className="min-w-[150px]"
-                >
+                <Button variant="outline" onClick={handleLoadMore} className="min-w-[150px]">
                   Load More Bills
                 </Button>
               </div>
@@ -418,13 +431,10 @@ export const BillList = ({
           // Empty state when no bills match current filters
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-gray-500 mb-2">
-              No {isExternalFiltering ? '' : (localFilter === 'all' ? '' : localFilter + ' ')}bills found
+              No {isExternalFiltering ? '' : localFilter === 'all' ? '' : localFilter + ' '}bills
+              found
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearFilters}
-            >
+            <Button variant="outline" size="sm" onClick={handleClearFilters}>
               {isExternalFiltering ? 'Clear Filters' : 'Show All Bills'}
             </Button>
           </div>

@@ -40,7 +40,8 @@ export function createRecoveryContext(
 }
 
 export class LoadingRecoveryManager {
-  private strategies: Map<string, (context: RecoveryContext) => Promise<RecoveryResult>> = new Map();
+  private strategies: Map<string, (context: RecoveryContext) => Promise<RecoveryResult>> =
+    new Map();
 
   constructor() {
     this.initializeDefaultStrategies();
@@ -48,7 +49,7 @@ export class LoadingRecoveryManager {
 
   private initializeDefaultStrategies() {
     // Timeout recovery strategy
-    this.strategies.set('timeout', async (context) => {
+    this.strategies.set('timeout', async context => {
       if (context.error instanceof LoadingTimeoutError) {
         const retryDelay = context.config.errorHandling?.retryDelay || context.config.retryDelay;
         const delay = Math.min(retryDelay * (context.retryCount + 1), 10000);
@@ -58,7 +59,7 @@ export class LoadingRecoveryManager {
     });
 
     // Network recovery strategy
-    this.strategies.set('network', async (context) => {
+    this.strategies.set('network', async context => {
       if (context.error instanceof LoadingNetworkError) {
         if (!context.connectionInfo.isOnline) {
           return { success: false, strategy: 'offline' };
@@ -71,7 +72,7 @@ export class LoadingRecoveryManager {
     });
 
     // Generic retry strategy
-    this.strategies.set('generic', async (context) => {
+    this.strategies.set('generic', async context => {
       const maxRetries = context.config.errorHandling?.maxRetries || context.config.maxRetries;
       const retryDelay = context.config.errorHandling?.retryDelay || context.config.retryDelay;
 
@@ -127,4 +128,3 @@ export function useLoadingRecovery(_config: LoadingConfig) {
     },
   };
 }
-

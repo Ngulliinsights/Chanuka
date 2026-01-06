@@ -6,6 +6,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
+
 import { ValidationError } from '../types';
 import { validationService } from '../validation-service';
 // import { logger } from '../observability/logging'; // Unused import
@@ -53,7 +54,7 @@ export function validateRequest(config: RequestValidationConfig) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Check skip condition
-      if (config.skipIf && config.skipIf(req)) {
+      if (config.skipIf?.(req)) {
         return next();
       }
 

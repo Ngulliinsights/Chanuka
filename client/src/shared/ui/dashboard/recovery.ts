@@ -58,39 +58,36 @@ function getDataFetchRecoveryStrategy(context: RecoveryContext): RecoveryStrateg
       suggestions: [
         'Retrying data fetch automatically',
         'Check your internet connection',
-        'Verify server status'
+        'Verify server status',
       ],
       autoRecover: async () => {
         // Implement exponential backoff
         const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
         await new Promise(resolve => setTimeout(resolve, delay));
         return true; // Indicate retry should be attempted
-      }
+      },
     };
   }
 
-  const hasRecentData = Boolean(lastSuccessfulFetch &&
-    (Date.now() - lastSuccessfulFetch.getTime()) < 300000); // 5 minutes
+  const hasRecentData = Boolean(
+    lastSuccessfulFetch && Date.now() - lastSuccessfulFetch.getTime() < 300000
+  ); // 5 minutes
 
   return {
     canRecover: hasRecentData,
     suggestions: hasRecentData
-      ? [
-          'Using cached data from recent fetch',
-          'Try refreshing the page',
-          'Check server status'
-        ]
+      ? ['Using cached data from recent fetch', 'Try refreshing the page', 'Check server status']
       : [
           'Unable to fetch fresh data',
           'Try refreshing the page',
           'Check your internet connection',
-          'Contact support if problem persists'
+          'Contact support if problem persists',
         ],
     manualSteps: [
       'Click the refresh button',
       'Check your network connection',
-      'Try reloading the page'
-    ]
+      'Try reloading the page',
+    ],
   };
 }
 
@@ -103,7 +100,7 @@ function getValidationRecoveryStrategy(context: RecoveryContext): RecoveryStrate
     suggestions: [
       `Validation failed for field: ${field}`,
       'Data will be sanitized automatically',
-      'Some features may be limited'
+      'Some features may be limited',
     ],
     autoRecover: async () => {
       // Auto-recovery for validation errors involves sanitizing data
@@ -112,8 +109,8 @@ function getValidationRecoveryStrategy(context: RecoveryContext): RecoveryStrate
     manualSteps: [
       'Review the data format',
       'Try refreshing to get clean data',
-      'Contact support if validation errors persist'
-    ]
+      'Contact support if validation errors persist',
+    ],
   };
 }
 
@@ -123,7 +120,7 @@ function getConfigurationRecoveryStrategy(_context: RecoveryContext): RecoverySt
     suggestions: [
       'Using default configuration',
       'Some customizations may not be available',
-      'Configuration will be reset to defaults'
+      'Configuration will be reset to defaults',
     ],
     autoRecover: async () => {
       // Reset to default configuration
@@ -132,8 +129,8 @@ function getConfigurationRecoveryStrategy(_context: RecoveryContext): RecoverySt
     manualSteps: [
       'Check dashboard settings',
       'Reset configuration to defaults',
-      'Contact support for configuration issues'
-    ]
+      'Contact support for configuration issues',
+    ],
   };
 }
 
@@ -147,12 +144,12 @@ function getActionRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
       suggestions: [
         `Retrying action: ${action}`,
         'Action will be attempted again',
-        'Please wait for completion'
+        'Please wait for completion',
       ],
       autoRecover: async () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return true;
-      }
+      },
     };
   }
 
@@ -161,13 +158,13 @@ function getActionRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
     suggestions: [
       `Action failed: ${action}`,
       'Manual retry required',
-      'Check if the action is still valid'
+      'Check if the action is still valid',
     ],
     manualSteps: [
       'Try the action again manually',
       'Refresh the dashboard data',
-      'Check if prerequisites are met'
-    ]
+      'Check if prerequisites are met',
+    ],
   };
 }
 
@@ -181,7 +178,7 @@ function getTopicRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
     suggestions: [
       `Topic ${operation} failed${topicId ? ` for ${topicId}` : ''}`,
       'Topic list will be refreshed',
-      'Try the operation again'
+      'Try the operation again',
     ],
     autoRecover: async () => {
       // Refresh topic data
@@ -190,8 +187,8 @@ function getTopicRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
     manualSteps: [
       'Refresh the topic list',
       'Try the operation again',
-      'Check if the topic still exists'
-    ]
+      'Check if the topic still exists',
+    ],
   };
 }
 
@@ -201,7 +198,7 @@ function getGenericRecoveryStrategy(_context: RecoveryContext): RecoveryStrategy
     suggestions: [
       'An unexpected error occurred',
       'Dashboard will attempt to recover',
-      'Some features may be temporarily unavailable'
+      'Some features may be temporarily unavailable',
     ],
     autoRecover: async () => {
       // Generic recovery - refresh all data
@@ -210,8 +207,8 @@ function getGenericRecoveryStrategy(_context: RecoveryContext): RecoveryStrategy
     manualSteps: [
       'Try refreshing the page',
       'Clear browser cache if problems persist',
-      'Contact support for assistance'
-    ]
+      'Contact support for assistance',
+    ],
   };
 }
 
@@ -247,7 +244,6 @@ export function formatRecoverySuggestions(strategy: RecoveryStrategy): {
 } {
   return {
     primary: strategy.suggestions,
-    secondary: strategy.manualSteps || []
+    secondary: strategy.manualSteps || [],
   };
 }
-

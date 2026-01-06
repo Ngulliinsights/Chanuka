@@ -58,7 +58,9 @@ class DataRetentionService {
   /**
    * Add or update a retention policy
    */
-  async setRetentionPolicy(policy: Omit<RetentionPolicy, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  async setRetentionPolicy(
+    policy: Omit<RetentionPolicy, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<string> {
     try {
       const policyId = crypto.randomUUID();
       const now = new Date().toISOString();
@@ -67,7 +69,7 @@ class DataRetentionService {
         id: policyId,
         createdAt: now,
         updatedAt: now,
-        ...policy
+        ...policy,
       };
 
       this.policies.set(policyId, fullPolicy);
@@ -77,14 +79,14 @@ class DataRetentionService {
         policyId,
         name: policy.name,
         dataTypes: policy.dataTypes,
-        retentionPeriod: policy.retentionPeriod
+        retentionPeriod: policy.retentionPeriod,
       });
 
       return policyId;
     } catch (error) {
       logger.error('Failed to create retention policy', {
         component: 'DataRetentionService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -120,7 +122,7 @@ class DataRetentionService {
       const updatedPolicy: RetentionPolicy = {
         ...existingPolicy,
         ...updates,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       this.policies.set(policyId, updatedPolicy);
@@ -128,13 +130,13 @@ class DataRetentionService {
       logger.info('Retention policy updated', {
         component: 'DataRetentionService',
         policyId,
-        updates: Object.keys(updates)
+        updates: Object.keys(updates),
       });
     } catch (error) {
       logger.error('Failed to update retention policy', {
         component: 'DataRetentionService',
         policyId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -158,13 +160,13 @@ class DataRetentionService {
       logger.info('Retention policy deleted', {
         component: 'DataRetentionService',
         policyId,
-        name: policy.name
+        name: policy.name,
       });
     } catch (error) {
       logger.error('Failed to delete retention policy', {
         component: 'DataRetentionService',
         policyId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -178,13 +180,16 @@ class DataRetentionService {
       clearInterval(this.cleanupTimer);
     }
 
-    this.cleanupTimer = setInterval(() => {
-      this.runScheduledCleanup();
-    }, intervalHours * 60 * 60 * 1000);
+    this.cleanupTimer = setInterval(
+      () => {
+        this.runScheduledCleanup();
+      },
+      intervalHours * 60 * 60 * 1000
+    );
 
     logger.info('Data retention scheduler started', {
       component: 'DataRetentionService',
-      intervalHours
+      intervalHours,
     });
   }
 
@@ -198,7 +203,7 @@ class DataRetentionService {
     }
 
     logger.info('Data retention scheduler stopped', {
-      component: 'DataRetentionService'
+      component: 'DataRetentionService',
     });
   }
 
@@ -208,7 +213,7 @@ class DataRetentionService {
   async runScheduledCleanup(): Promise<void> {
     if (this.isRunning) {
       logger.warn('Cleanup already running, skipping', {
-        component: 'DataRetentionService'
+        component: 'DataRetentionService',
       });
       return;
     }
@@ -217,7 +222,7 @@ class DataRetentionService {
 
     try {
       logger.info('Starting scheduled data cleanup', {
-        component: 'DataRetentionService'
+        component: 'DataRetentionService',
       });
 
       const activePolicies = Array.from(this.policies.values()).filter(p => p.enabled);
@@ -228,12 +233,12 @@ class DataRetentionService {
 
       logger.info('Scheduled data cleanup completed', {
         component: 'DataRetentionService',
-        policiesProcessed: activePolicies.length
+        policiesProcessed: activePolicies.length,
       });
     } catch (error) {
       logger.error('Scheduled cleanup failed', {
         component: 'DataRetentionService',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       this.isRunning = false;
@@ -259,13 +264,13 @@ class DataRetentionService {
       logger.info('Policy cleanup completed', {
         component: 'DataRetentionService',
         policyId,
-        name: policy.name
+        name: policy.name,
       });
     } catch (error) {
       logger.error('Policy cleanup failed', {
         component: 'DataRetentionService',
         policyId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -295,9 +300,8 @@ class DataRetentionService {
       return total + (job.recordsDeleted || 0) * 1024; // Rough estimate
     }, 0);
 
-    const lastCleanup = completedJobs.length > 0
-      ? completedJobs[completedJobs.length - 1].executedAt || ''
-      : '';
+    const lastCleanup =
+      completedJobs.length > 0 ? completedJobs[completedJobs.length - 1].executedAt || '' : '';
 
     return {
       totalPolicies: policies.length,
@@ -307,20 +311,24 @@ class DataRetentionService {
       failedJobs: failedJobs.length,
       dataTypesManaged,
       storageFreed,
-      lastCleanup
+      lastCleanup,
     };
   }
 
   /**
    * Check if data should be retained based on policies
    */
-  shouldRetainData(dataType: string, createdAt: string): {
+  shouldRetainData(
+    dataType: string,
+    createdAt: string
+  ): {
     shouldRetain: boolean;
     shouldArchive: boolean;
     policy?: RetentionPolicy;
   } {
-    const applicablePolicies = Array.from(this.policies.values())
-      .filter(p => p.enabled && p.dataTypes.includes(dataType));
+    const applicablePolicies = Array.from(this.policies.values()).filter(
+      p => p.enabled && p.dataTypes.includes(dataType)
+    );
 
     if (applicablePolicies.length === 0) {
       return { shouldRetain: true, shouldArchive: false };
@@ -343,7 +351,7 @@ class DataRetentionService {
     return {
       shouldRetain,
       shouldArchive,
-      policy
+      policy,
     };
   }
 
@@ -360,7 +368,7 @@ class DataRetentionService {
         retentionPeriod: 365, // 1 year
         archiveAfter: 90, // 3 months
         deleteAfter: 365,
-        enabled: true
+        enabled: true,
       },
       {
         name: 'Analytics Data',
@@ -369,7 +377,7 @@ class DataRetentionService {
         retentionPeriod: 730, // 2 years
         archiveAfter: 365, // 1 year
         deleteAfter: 730,
-        enabled: true
+        enabled: true,
       },
       {
         name: 'Error Logs',
@@ -377,7 +385,7 @@ class DataRetentionService {
         dataTypes: ['error_logs', 'crash_reports', 'debug_logs'],
         retentionPeriod: 90, // 3 months
         deleteAfter: 90,
-        enabled: true
+        enabled: true,
       },
       {
         name: 'User Comments',
@@ -386,8 +394,8 @@ class DataRetentionService {
         retentionPeriod: 2555, // 7 years (legal requirement)
         archiveAfter: 1095, // 3 years
         deleteAfter: 2555,
-        enabled: true
-      }
+        enabled: true,
+      },
     ];
 
     defaultPolicies.forEach(policy => {
@@ -396,7 +404,7 @@ class DataRetentionService {
 
     logger.info('Default retention policies initialized', {
       component: 'DataRetentionService',
-      count: defaultPolicies.length
+      count: defaultPolicies.length,
     });
   }
 
@@ -407,7 +415,7 @@ class DataRetentionService {
         policyId: policy.id,
         dataType,
         scheduledAt: new Date().toISOString(),
-        status: 'pending'
+        status: 'pending',
       };
 
       this.jobs.push(job);
@@ -430,9 +438,8 @@ class DataRetentionService {
           dataType,
           processed: result.processed,
           deleted: result.deleted,
-          archived: result.archived
+          archived: result.archived,
         });
-
       } catch (error) {
         job.status = 'failed';
         job.error = error instanceof Error ? error.message : 'Unknown error';
@@ -441,13 +448,16 @@ class DataRetentionService {
           component: 'DataRetentionService',
           jobId: job.id,
           dataType,
-          error: job.error
+          error: job.error,
         });
       }
     }
   }
 
-  private async performDataCleanup(_dataType: string, _policy: RetentionPolicy): Promise<{
+  private async performDataCleanup(
+    _dataType: string,
+    _policy: RetentionPolicy
+  ): Promise<{
     processed: number;
     deleted: number;
     archived: number;
@@ -462,7 +472,7 @@ class DataRetentionService {
     const simulatedCounts = {
       processed: Math.floor(Math.random() * 1000),
       deleted: Math.floor(Math.random() * 100),
-      archived: Math.floor(Math.random() * 200)
+      archived: Math.floor(Math.random() * 200),
     };
 
     // Simulate processing time
@@ -481,7 +491,7 @@ class DataRetentionService {
     this.isRunning = false;
 
     logger.info('Data retention service cleaned up', {
-      component: 'DataRetentionService'
+      component: 'DataRetentionService',
     });
   }
 }
@@ -516,7 +526,10 @@ export const retentionUtils = {
     }
   },
 
-  estimateStorageImpact(recordCount: number, avgRecordSize: number = 1024): {
+  estimateStorageImpact(
+    recordCount: number,
+    avgRecordSize: number = 1024
+  ): {
     totalSize: number;
     formattedSize: string;
   } {
@@ -532,9 +545,9 @@ export const retentionUtils = {
 
     return {
       totalSize,
-      formattedSize: `${size.toFixed(2)} ${units[unitIndex]}`
+      formattedSize: `${size.toFixed(2)} ${units[unitIndex]}`,
     };
-  }
+  },
 };
 
 export default dataRetentionService;

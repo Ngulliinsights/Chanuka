@@ -55,11 +55,7 @@ export type ErrorFallbackVariant =
   | 'technical'
   | 'custom';
 
-export type RecoveryUIVariant =
-  | 'buttons'
-  | 'dropdown'
-  | 'modal'
-  | 'inline-actions';
+export type RecoveryUIVariant = 'buttons' | 'dropdown' | 'modal' | 'inline-actions';
 
 // ============================================================================
 // Error Boundary Props and State

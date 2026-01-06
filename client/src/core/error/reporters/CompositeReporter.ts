@@ -20,8 +20,15 @@ export interface CompositeReporterConfig {
   strategy: 'parallel' | 'sequential' | 'failover' | 'weighted';
   failFast: boolean; // Stop on first failure in sequential mode
   timeout?: number; // Timeout for parallel operations
-  onReporterError?: (reporter: ErrorReporter, reporterError: Error, originalError: AppError) => void;
-  onAllReportersFailed?: (errors: Array<{ reporter: ErrorReporter; error: Error }>, originalError: AppError) => void;
+  onReporterError?: (
+    reporter: ErrorReporter,
+    reporterError: Error,
+    originalError: AppError
+  ) => void;
+  onAllReportersFailed?: (
+    errors: Array<{ reporter: ErrorReporter; error: Error }>,
+    originalError: AppError
+  ) => void;
 }
 
 export class CompositeReporter implements ErrorReporter {
@@ -67,7 +74,7 @@ export class CompositeReporter implements ErrorReporter {
   }
 
   private async reportParallel(reporters: ReporterConfig[], error: AppError): Promise<void> {
-    const promises = reporters.map(async (config) => {
+    const promises = reporters.map(async config => {
       try {
         await config.reporter.report(error);
       } catch (reporterError) {
@@ -128,7 +135,7 @@ export class CompositeReporter implements ErrorReporter {
     this.config.onAllReportersFailed(
       reporters.map(config => ({
         reporter: config.reporter,
-        error: new Error('Reporter failed')
+        error: new Error('Reporter failed'),
       })),
       error
     );
@@ -160,7 +167,10 @@ export class CompositeReporter implements ErrorReporter {
     }
   }
 
-  addReporter(reporter: ErrorReporter, options: Partial<Omit<ReporterConfig, 'reporter'>> = {}): void {
+  addReporter(
+    reporter: ErrorReporter,
+    options: Partial<Omit<ReporterConfig, 'reporter'>> = {}
+  ): void {
     this.config.reporters.push({
       reporter,
       enabled: true,
@@ -197,7 +207,10 @@ export class CompositeReporter implements ErrorReporter {
     return false;
   }
 
-  updateReporterConfig(reporter: ErrorReporter, updates: Partial<Omit<ReporterConfig, 'reporter'>>): boolean {
+  updateReporterConfig(
+    reporter: ErrorReporter,
+    updates: Partial<Omit<ReporterConfig, 'reporter'>>
+  ): boolean {
     const config = this.config.reporters.find(r => r.reporter === reporter);
     if (config) {
       Object.assign(config, updates);

@@ -85,29 +85,32 @@ export class ComponentTemplateGenerator {
   private generateIndexFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const exports = [`export * from './types';`];
-    
+
     if (this.config.hasValidation) {
       exports.push(`export * from './validation';`);
     }
-    
+
     if (this.config.hasErrorHandling) {
-      exports.push(`export * from '@client/shared/design-system/interactive/errors.ts';`, `export * from './recovery';`);
+      exports.push(
+        `export * from '@client/shared/design-system/interactive/errors.ts';`,
+        `export * from './recovery';`
+      );
     }
-    
+
     if (this.config.hasHooks) {
       exports.push(`export * from './hooks';`);
     }
-    
+
     if (this.config.hasUtils) {
       exports.push(`export * from './utils';`);
     }
-    
+
     if (this.config.hasUI) {
       exports.push(`export * from './ui';`);
     }
-    
+
     if (this.config.hasCore) {
       exports.push(`export * from './core/${this.toCamelCase(componentName)}Core';`);
     }
@@ -129,7 +132,7 @@ ${exports.join('\n')}
   private generateTypesFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `/**
  * ${pascalName} component type definitions
  */
@@ -207,7 +210,7 @@ export interface Use${pascalName}Result {
   private generateValidationFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import { z } from 'zod';
 import { ${pascalName}ValidationError } from '@client/shared/design-system/interactive/errors.ts';
 
@@ -311,7 +314,7 @@ export function safeValidate${pascalName}Config(config: unknown): { success: boo
   private generateErrorsFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `/**
  * ${pascalName}-specific error types
  * Following navigation component error patterns
@@ -393,7 +396,7 @@ export class ${pascalName}RuntimeError extends ${pascalName}Error {
   private generateRecoveryFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import { ${pascalName}Error, ${pascalName}ErrorType } from '@client/shared/design-system/interactive/errors.ts';
 
 /**
@@ -543,7 +546,7 @@ export const ${this.toCamelCase(componentName)}RecoveryManager = new ${pascalNam
 
   private generateHooksIndexFile(): TemplateFile {
     const { componentName, directory } = this.config;
-    
+
     const content = `/**
  * ${this.toPascalCase(componentName)} hooks barrel exports
  */
@@ -561,7 +564,7 @@ export * from './use${this.toPascalCase(componentName)}';
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     const camelName = this.toCamelCase(componentName);
-    
+
     const content = `import { useState, useEffect, useCallback } from 'react';
 import { ${pascalName}Data, ${pascalName}Error, Use${pascalName}Options, Use${pascalName}Result } from '@client/shared/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data } from '@shared/validation';` : ''}
@@ -602,12 +605,16 @@ export function use${pascalName}(options: Use${pascalName}Options = {}): Use${pa
         // Add actual data fetching
       };
 
-      ${this.config.hasValidation ? `
+      ${
+        this.config.hasValidation
+          ? `
       const validatedData = validate${pascalName}Data(fetchedData);
       handleSuccess(validatedData);
-      ` : `
+      `
+          : `
       handleSuccess(fetchedData);
-      `}
+      `
+      }
     } catch (err) {
       const ${camelName}Error: ${pascalName}Error = {
         type: 'RUNTIME_ERROR' as any,
@@ -627,7 +634,9 @@ export function use${pascalName}(options: Use${pascalName}Options = {}): Use${pa
   const recover = useCallback(async (): Promise<boolean> => {
     if (!error) return false;
 
-    ${this.config.hasErrorHandling ? `
+    ${
+      this.config.hasErrorHandling
+        ? `
     const context = {
       error,
       attemptCount: 0,
@@ -643,20 +652,26 @@ export function use${pascalName}(options: Use${pascalName}Options = {}): Use${pa
     }
     
     return false;
-    ` : `
+    `
+        : `
     // Implement recovery logic
     return false;
-    `}
+    `
+    }
   }, [error, refresh]);
 
   const getSuggestions = useCallback((): string[] => {
     if (!error) return [];
 
-    ${this.config.hasErrorHandling ? `
+    ${
+      this.config.hasErrorHandling
+        ? `
     return ${camelName}RecoveryManager.getSuggestions(error);
-    ` : `
+    `
+        : `
     return ['Try refreshing the data', 'Check your connection'];
-    `}
+    `
+    }
   }, [error]);
 
   useEffect(() => {
@@ -690,7 +705,7 @@ export function use${pascalName}(options: Use${pascalName}Options = {}): Use${pa
 
   private generateUtilsIndexFile(): TemplateFile {
     const { componentName, directory } = this.config;
-    
+
     const content = `/**
  * ${this.toPascalCase(componentName)} utilities barrel exports
  */
@@ -707,7 +722,7 @@ export * from './${this.toCamelCase(componentName)}-utils';
   private generateMainUtilFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import { ${pascalName}Data, ${pascalName}Config } from '@client/shared/types';
 
 /**
@@ -776,7 +791,7 @@ export function has${pascalName}Error(error: unknown): boolean {
   private generateConfigFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `# ${pascalName} Configuration
 
 ## Overview
@@ -856,7 +871,7 @@ The component includes automatic recovery for configuration errors:
   private generateUIIndexFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `/**
  * ${pascalName} UI components barrel exports
  */
@@ -873,7 +888,7 @@ export * from './${pascalName}UI';
   private generateMainUIFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import React from 'react';
 import { ${pascalName}Props } from '@client/shared/types';
 ${this.config.hasHooks ? `import { use${pascalName} } from '@client/hooks';` : ''}
@@ -892,7 +907,9 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
   onSuccess,
   ...props
 }) => {
-  ${this.config.hasHooks ? `
+  ${
+    this.config.hasHooks
+      ? `
   const {
     data,
     loading: hookLoading,
@@ -907,10 +924,12 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
 
   const isLoading = loading || hookLoading;
   const currentError = error || hookError;
-  ` : `
+  `
+      : `
   const isLoading = loading;
   const currentError = error;
-  `}
+  `
+  }
 
   if (isLoading) {
     return (
@@ -931,7 +950,9 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
         role="alert"
       >
         <p>Error: {currentError.message}</p>
-        ${this.config.hasHooks ? `
+        ${
+          this.config.hasHooks
+            ? `
         {recovery.canRecover && (
           <div className="${this.toCamelCase(componentName)}-recovery">
             <button 
@@ -947,7 +968,9 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
             </ul>
           </div>
         )}
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     );
   }
@@ -961,7 +984,9 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
     >
       {/* Implement component UI here */}
       <h2>${pascalName} Component</h2>
-      ${this.config.hasHooks ? `
+      ${
+        this.config.hasHooks
+          ? `
       {data && (
         <div className="${this.toCamelCase(componentName)}-content">
           <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -983,9 +1008,11 @@ export const ${pascalName}UI: React.FC<${pascalName}Props> = ({
           Reset
         </button>
       </div>
-      ` : `
+      `
+          : `
       <p>Implement ${componentName} content here</p>
-      `}
+      `
+      }
     </div>
   );
 };
@@ -1003,7 +1030,7 @@ export default ${pascalName}UI;
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
     const camelName = this.toCamelCase(componentName);
-    
+
     const content = `import { ${pascalName}Data, ${pascalName}Config, ${pascalName}Error } from '@client/shared/types';
 ${this.config.hasValidation ? `import { validate${pascalName}Data, validate${pascalName}Config } from '@shared/validation';` : ''}
 
@@ -1016,11 +1043,15 @@ export class ${pascalName}Core {
   private data: ${pascalName}Data | null = null;
 
   constructor(config: ${pascalName}Config) {
-    ${this.config.hasValidation ? `
+    ${
+      this.config.hasValidation
+        ? `
     this.config = validate${pascalName}Config(config);
-    ` : `
+    `
+        : `
     this.config = config;
-    `}
+    `
+    }
   }
 
   async initialize(): Promise<void> {
@@ -1038,22 +1069,30 @@ export class ${pascalName}Core {
       // Add actual data loading
     };
 
-    ${this.config.hasValidation ? `
+    ${
+      this.config.hasValidation
+        ? `
     const validatedData = validate${pascalName}Data(rawData);
     this.data = validatedData;
     return validatedData;
-    ` : `
+    `
+        : `
     this.data = rawData as ${pascalName}Data;
     return this.data;
-    `}
+    `
+    }
   }
 
   async saveData(data: ${pascalName}Data): Promise<void> {
-    ${this.config.hasValidation ? `
+    ${
+      this.config.hasValidation
+        ? `
     const validatedData = validate${pascalName}Data(data);
-    ` : `
+    `
+        : `
     const validatedData = data;
-    `}
+    `
+    }
 
     // Implement data saving logic
     this.data = validatedData;
@@ -1066,11 +1105,15 @@ export class ${pascalName}Core {
   updateConfig(newConfig: Partial<${pascalName}Config>): void {
     const updatedConfig = { ...this.config, ...newConfig };
     
-    ${this.config.hasValidation ? `
+    ${
+      this.config.hasValidation
+        ? `
     this.config = validate${pascalName}Config(updatedConfig);
-    ` : `
+    `
+        : `
     this.config = updatedConfig;
-    `}
+    `
+    }
   }
 
   getConfig(): ${pascalName}Config {
@@ -1104,7 +1147,7 @@ export const create${pascalName}Core = (config: ${pascalName}Config): ${pascalNa
   private generateMainTestFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import { render, screen } from '@testing-library/react';
 import { ${pascalName}UI } from '@shared/ui/${pascalName}UI';
 import { ComponentTestHelper } from 'shared/testing';
@@ -1187,7 +1230,7 @@ describe('${pascalName}UI Component', () => {
   private generateHooksTestFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import { renderHook, act } from '@testing-library/react';
 import { use${pascalName} } from '@client/hooks/use${pascalName}';
 
@@ -1285,7 +1328,7 @@ describe('use${pascalName} Hook', () => {
   private generateUtilsTestFile(): TemplateFile {
     const { componentName, directory } = this.config;
     const pascalName = this.toPascalCase(componentName);
-    
+
     const content = `import {
   format${pascalName}Data,
   is${pascalName}DataValid,
@@ -1440,7 +1483,9 @@ export class TemplateValidator {
     }
 
     if (config.componentName && !/^[a-zA-Z][a-zA-Z0-9-_]*$/.test(config.componentName)) {
-      errors.push('Component name must start with a letter and contain only letters, numbers, hyphens, and underscores');
+      errors.push(
+        'Component name must start with a letter and contain only letters, numbers, hyphens, and underscores'
+      );
     }
 
     return errors;
@@ -1473,9 +1518,8 @@ export function generateComponentTemplate(config: ComponentTemplateConfig): {
 
   const generator = new ComponentTemplateGenerator(config);
   const files = generator.generateAllFiles();
-  
+
   const structureErrors = TemplateValidator.validateDirectoryStructure(files);
-  
+
   return { files, errors: structureErrors };
 }
-

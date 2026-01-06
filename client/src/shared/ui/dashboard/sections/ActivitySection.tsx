@@ -1,12 +1,12 @@
 import { formatDistanceToNow, format } from 'date-fns';
-import React from 'react';
 import {
   Activity,
   Eye,
   MessageSquare,
   ThumbsUp as Vote, // Using ThumbsUp as Vote replacement
-  Star
+  Star,
 } from 'lucide-react';
+import React from 'react';
 
 import { Button } from '@/shared/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
@@ -25,7 +25,7 @@ export function ActivitySection({
   loading,
   compact = false,
   showViewAll = true,
-  onViewAll
+  onViewAll,
 }: ActivitySectionProps) {
   if (loading) {
     return (
@@ -53,28 +53,24 @@ export function ActivitySection({
           {compact ? 'Recent Activity' : 'Engagement History'}
         </CardTitle>
         {!compact && (
-          <CardDescription>
-            Your complete activity history on the platform
-          </CardDescription>
+          <CardDescription>Your complete activity history on the platform</CardDescription>
         )}
       </CardHeader>
       <CardContent>
         {activities?.length ? (
           <div className="space-y-4">
-            {activities.slice(0, compact ? 5 : undefined).map((activity) => (
-              <div key={activity.id} className={`flex items-start gap-3 ${!compact ? 'pb-3 border-b last:border-b-0' : ''}`}>
-                <div className="flex-shrink-0 mt-1">
-                  {getActivityIcon(activity.type)}
-                </div>
+            {activities.slice(0, compact ? 5 : undefined).map(activity => (
+              <div
+                key={activity.id}
+                className={`flex items-start gap-3 ${!compact ? 'pb-3 border-b last:border-b-0' : ''}`}
+              >
+                <div className="flex-shrink-0 mt-1">{getActivityIcon(activity.type)}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm">
-                    {getActivityDescription(activity)}
-                  </p>
+                  <p className="text-sm">{getActivityDescription(activity)}</p>
                   <p className="text-xs text-muted-foreground">
                     {compact
                       ? formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })
-                      : format(new Date(activity.timestamp), 'MMM d, yyyy • h:mm a')
-                    }
+                      : format(new Date(activity.timestamp), 'MMM d, yyyy • h:mm a')}
                   </p>
                 </div>
               </div>
@@ -101,9 +97,11 @@ function getActivityIcon(actionType: string) {
     view: <Eye className="h-4 w-4 text-blue-500" />,
     comment: <MessageSquare className="h-4 w-4 text-green-500" />,
     save: <Star className="h-4 w-4 text-yellow-500" />,
-    vote: <Vote className="h-4 w-4 text-red-500" />
+    vote: <Vote className="h-4 w-4 text-red-500" />,
   };
-  return iconMap[actionType as keyof typeof iconMap] || <Activity className="h-4 w-4 text-gray-500" />;
+  return (
+    iconMap[actionType as keyof typeof iconMap] || <Activity className="h-4 w-4 text-gray-500" />
+  );
 }
 
 function getActivityDescription(activity: EngagementHistoryItem) {
@@ -113,7 +111,7 @@ function getActivityDescription(activity: EngagementHistoryItem) {
     share: `Shared ${activity.billId ? 'bill' : 'item'}`,
     save: `Saved ${activity.billId ? 'bill' : 'item'}`,
     vote: `Voted on ${activity.billId ? 'bill' : 'item'}`,
-    expert_contribution: `Made expert contribution`
+    expert_contribution: `Made expert contribution`,
   };
   return actionMap[activity.type] || `Performed ${activity.type}`;
 }

@@ -20,11 +20,9 @@ export const networkRetryStrategy: ErrorRecoveryStrategy = {
   id: 'network-retry',
   name: 'Network Retry',
   description: 'Retry network requests with exponential backoff',
-  canRecover: (error) =>
-    error.type === ErrorDomain.NETWORK &&
-    error.retryable &&
-    (error.retryCount || 0) < 3,
-  recover: async (_error) => {
+  canRecover: error =>
+    error.type === ErrorDomain.NETWORK && error.retryable && (error.retryCount || 0) < 3,
+  recover: async _error => {
     return false; // Let caller handle actual retry
   },
   priority: 1,
@@ -38,10 +36,8 @@ export const cacheClearStrategy: ErrorRecoveryStrategy = {
   id: 'cache-clear',
   name: 'Cache Clear and Reload',
   description: 'Clear application cache and reload the page',
-  canRecover: (error) =>
-    error.severity === ErrorSeverity.CRITICAL &&
-    error.recoverable,
-  recover: async (_error) => {
+  canRecover: error => error.severity === ErrorSeverity.CRITICAL && error.recoverable,
+  recover: async _error => {
     try {
       // Clear all caches
       if ('caches' in window) {
@@ -83,10 +79,8 @@ export const pageReloadStrategy: ErrorRecoveryStrategy = {
   id: 'page-reload',
   name: 'Page Reload',
   description: 'Reload the current page to recover from error',
-  canRecover: (error) =>
-    error.severity >= ErrorSeverity.HIGH &&
-    error.recoverable,
-  recover: async (_error) => {
+  canRecover: error => error.severity >= ErrorSeverity.HIGH && error.recoverable,
+  recover: async _error => {
     setTimeout(() => window.location.reload(), 1000);
     return true;
   },
@@ -100,18 +94,16 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
   id: 'auth-refresh',
   name: 'Authentication Refresh',
   description: 'Attempt to refresh authentication tokens',
-  canRecover: (error) =>
-    error.type === ErrorDomain.AUTHENTICATION &&
-    error.recoverable,
-  recover: async (_error) => {
+  canRecover: error => error.type === ErrorDomain.AUTHENTICATION && error.recoverable,
+  recover: async _error => {
     try {
       // Check for refresh token
-      const refreshToken = localStorage.getItem('refresh_token') ||
-        sessionStorage.getItem('refresh_token');
+      const refreshToken =
+        localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
 
       if (!refreshToken) {
         // No refresh token available, redirect to login
-        setTimeout(() => window.location.href = '/auth/login', 1000);
+        setTimeout(() => (window.location.href = '/auth/login'), 1000);
         return false;
       }
 
@@ -139,7 +131,7 @@ export const authRefreshStrategy: ErrorRecoveryStrategy = {
       return false;
     } catch (refreshError) {
       console.error('Auth refresh failed:', refreshError);
-      setTimeout(() => window.location.href = '/auth/login', 1000);
+      setTimeout(() => (window.location.href = '/auth/login'), 1000);
       return false;
     }
   },
@@ -153,26 +145,28 @@ export const authRetryStrategy: ErrorRecoveryStrategy = {
   id: 'auth-retry',
   name: 'Authentication Retry',
   description: 'Retry request after authentication refresh',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const statusCode = (error as { status?: number; statusCode?: number }).status || (error as { status?: number; statusCode?: number }).statusCode;
+    const statusCode =
+      (error as { status?: number; statusCode?: number }).status ||
+      (error as { status?: number; statusCode?: number }).statusCode;
     const retryCount = error.retryCount || 0;
 
     return (
-      retryCount === 0 && ( // Only on first retry
-        errorMessage.includes('auth') ||
+      retryCount === 0 && // Only on first retry
+      (errorMessage.includes('auth') ||
         errorMessage.includes('token') ||
         statusCode === 401 ||
-        statusCode === 403
-      )
+        statusCode === 403)
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     // Wait a bit for potential auth refresh to complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Check if we now have valid tokens
-    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    const accessToken =
+      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     return !!accessToken;
   },
   priority: 3,
@@ -185,21 +179,22 @@ export const authLogoutStrategy: ErrorRecoveryStrategy = {
   id: 'auth-logout',
   name: 'Authentication Logout',
   description: 'Logout user when authentication cannot be recovered',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const statusCode = (error as { status?: number; statusCode?: number }).status || (error as { status?: number; statusCode?: number }).statusCode;
+    const statusCode =
+      (error as { status?: number; statusCode?: number }).status ||
+      (error as { status?: number; statusCode?: number }).statusCode;
     const retryCount = error.retryCount || 0;
 
     return (
-      retryCount >= 2 && ( // After multiple failed attempts
-        errorMessage.includes('auth') ||
+      retryCount >= 2 && // After multiple failed attempts
+      (errorMessage.includes('auth') ||
         errorMessage.includes('token') ||
         statusCode === 401 ||
-        statusCode === 403
-      )
+        statusCode === 403)
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     try {
       // Perform logout
       // Clear tokens
@@ -236,7 +231,7 @@ export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
   id: 'cache-fallback',
   name: 'Cache Fallback',
   description: 'Load data from cache when network requests fail',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
 
     return (
@@ -246,7 +241,7 @@ export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
       !navigator.onLine
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     try {
       // Check if service worker is available and can serve cached content
       if ('serviceWorker' in navigator && 'caches' in window) {
@@ -258,9 +253,8 @@ export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
             const keys = await cache.keys();
 
             // Look for API-like URLs in cache
-            const apiRequests = keys.filter(request =>
-              request.url.includes('/api/') ||
-              request.url.includes('json')
+            const apiRequests = keys.filter(
+              request => request.url.includes('/api/') || request.url.includes('json')
             );
 
             if (apiRequests.length > 0) {
@@ -272,8 +266,8 @@ export const cacheFallbackStrategy: ErrorRecoveryStrategy = {
       }
 
       // Check for localStorage/sessionStorage fallback data
-      const fallbackKeys = Object.keys(localStorage).filter(key =>
-        key.startsWith('fallback_') || key.startsWith('cache_')
+      const fallbackKeys = Object.keys(localStorage).filter(
+        key => key.startsWith('fallback_') || key.startsWith('cache_')
       );
 
       if (fallbackKeys.length > 0) {
@@ -296,7 +290,7 @@ export const cacheRecoveryStrategy: ErrorRecoveryStrategy = {
   id: 'cache-recovery',
   name: 'Cache Recovery',
   description: 'Recover using stale-while-revalidate cache strategy',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
 
     return (
@@ -305,7 +299,7 @@ export const cacheRecoveryStrategy: ErrorRecoveryStrategy = {
       errorMessage.includes('server error')
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     try {
       // Implement stale-while-revalidate pattern
       if ('caches' in window) {
@@ -344,8 +338,8 @@ export const gracefulDegradationStrategy: ErrorRecoveryStrategy = {
   id: 'graceful-degradation',
   name: 'Graceful Degradation',
   description: 'Enable offline mode or reduced functionality',
-  canRecover: (_error) => true, // Always available as last resort
-  recover: async (_error) => {
+  canRecover: _error => true, // Always available as last resort
+  recover: async _error => {
     try {
       // Enable offline mode or reduced functionality
       if ('serviceWorker' in navigator) {
@@ -358,11 +352,7 @@ export const gracefulDegradationStrategy: ErrorRecoveryStrategy = {
       }
 
       // Check if we have any offline-capable features
-      const offlineFeatures = [
-        'localStorage' in window,
-        'indexedDB' in window,
-        'caches' in window,
-      ];
+      const offlineFeatures = ['localStorage' in window, 'indexedDB' in window, 'caches' in window];
 
       return offlineFeatures.some(feature => feature);
     } catch (degradationError) {
@@ -380,7 +370,7 @@ export const offlineModeStrategy: ErrorRecoveryStrategy = {
   id: 'offline-mode',
   name: 'Offline Mode',
   description: 'Switch to offline mode with limited functionality',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
 
     return (
@@ -390,7 +380,7 @@ export const offlineModeStrategy: ErrorRecoveryStrategy = {
       errorMessage.includes('connection')
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     try {
       // Attempt to enable offline mode
       // Check if we have cached data available
@@ -421,7 +411,7 @@ export const reducedFunctionalityStrategy: ErrorRecoveryStrategy = {
   id: 'reduced-functionality',
   name: 'Reduced Functionality',
   description: 'Disable non-essential features to maintain core functionality',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
 
     return (
@@ -431,7 +421,7 @@ export const reducedFunctionalityStrategy: ErrorRecoveryStrategy = {
       (error.retryCount || 0) > 2
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     try {
       // Disable non-essential features
       document.documentElement.classList.add('reduced-functionality');
@@ -455,22 +445,23 @@ export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
   id: 'connection-aware-retry',
   name: 'Connection-Aware Retry',
   description: 'Extended retry for slow or unstable connections',
-  canRecover: (error) => {
+  canRecover: error => {
     const errorMessage = error.message?.toLowerCase() || '';
-    const connectionType = ('connection' in navigator) ? (navigator as { connection?: { effectiveType?: string } }).connection?.effectiveType : 'unknown';
+    const connectionType =
+      'connection' in navigator
+        ? (navigator as { connection?: { effectiveType?: string } }).connection?.effectiveType
+        : 'unknown';
     const retryCount = error.retryCount || 0;
 
     return (
       (connectionType === 'slow' || connectionType === '2g' || connectionType === '3g') &&
       retryCount < 2 &&
-      (
-        errorMessage.includes('timeout') ||
+      (errorMessage.includes('timeout') ||
         errorMessage.includes('network') ||
-        errorMessage.includes('slow')
-      )
+        errorMessage.includes('slow'))
     );
   },
-  recover: async (_error) => {
+  recover: async _error => {
     // Wait longer on slow connections
     const waitTime = 5000;
     await new Promise(resolve => setTimeout(resolve, waitTime));
@@ -495,7 +486,10 @@ export const connectionAwareRetryStrategy: ErrorRecoveryStrategy = {
 /**
  * Execute a recovery action
  */
-export async function executeRecovery(_errorId: string, action: RecoveryAction): Promise<RecoveryResult> {
+export async function executeRecovery(
+  _errorId: string,
+  action: RecoveryAction
+): Promise<RecoveryResult> {
   try {
     switch (action) {
       case RecoveryAction.RETRY:
@@ -602,7 +596,7 @@ function performReload(): RecoveryResult {
  * Perform redirect
  */
 function performRedirect(path: string): RecoveryResult {
-  setTimeout(() => window.location.href = path, 1000);
+  setTimeout(() => (window.location.href = path), 1000);
 
   return {
     success: true,

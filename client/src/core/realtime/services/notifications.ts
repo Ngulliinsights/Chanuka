@@ -1,16 +1,14 @@
 /**
  * Notification Service - Core Real-time Module
- * 
+ *
  * Handles real-time notifications through WebSocket connections,
  * including user notifications, system alerts, and push notifications.
  */
 
-import { UnifiedWebSocketManager } from '../manager';
-import { 
-  WebSocketNotification, 
-  WebSocketMessage 
-} from '../types';
 import { logger } from '@client/utils/logger';
+
+import { UnifiedWebSocketManager } from '../manager';
+import { WebSocketNotification, WebSocketMessage } from '../types';
 
 export class NotificationService {
   private wsManager: UnifiedWebSocketManager;
@@ -40,12 +38,16 @@ export class NotificationService {
       this.isInitialized = true;
 
       logger.info('NotificationService initialized', {
-        component: 'NotificationService'
+        component: 'NotificationService',
       });
     } catch (error) {
-      logger.error('Failed to initialize NotificationService', {
-        component: 'NotificationService'
-      }, error);
+      logger.error(
+        'Failed to initialize NotificationService',
+        {
+          component: 'NotificationService',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -63,12 +65,16 @@ export class NotificationService {
       this.isInitialized = false;
 
       logger.info('NotificationService shut down', {
-        component: 'NotificationService'
+        component: 'NotificationService',
       });
     } catch (error) {
-      logger.error('Error during NotificationService shutdown', {
-        component: 'NotificationService'
-      }, error);
+      logger.error(
+        'Error during NotificationService shutdown',
+        {
+          component: 'NotificationService',
+        },
+        error
+      );
     }
   }
 
@@ -79,21 +85,20 @@ export class NotificationService {
   subscribeToNotifications(): string {
     if (this.isSubscribed) {
       logger.debug('Already subscribed to notifications', {
-        component: 'NotificationService'
+        component: 'NotificationService',
       });
       return 'user_notifications';
     }
 
-    const subscriptionId = this.wsManager.subscribe(
-      'user_notifications',
-      (message) => this.handleNotificationMessage(message)
+    const subscriptionId = this.wsManager.subscribe('user_notifications', message =>
+      this.handleNotificationMessage(message)
     );
 
     this.isSubscribed = true;
 
     logger.info('Subscribed to user notifications', {
       component: 'NotificationService',
-      subscriptionId
+      subscriptionId,
     });
 
     return subscriptionId;
@@ -106,7 +111,7 @@ export class NotificationService {
     this.isSubscribed = false;
 
     logger.info('Unsubscribed from user notifications', {
-      component: 'NotificationService'
+      component: 'NotificationService',
     });
   }
 
@@ -128,17 +133,21 @@ export class NotificationService {
         this.handleNotificationClearMessage(message);
       }
     } catch (error) {
-      logger.error('Error handling notification message', {
-        component: 'NotificationService',
-        messageType: message.type
-      }, error);
+      logger.error(
+        'Error handling notification message',
+        {
+          component: 'NotificationService',
+          messageType: message.type,
+        },
+        error
+      );
     }
   }
 
   private handleNotificationMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
-      
+
       const notification: WebSocketNotification = {
         id: data.id || data.notification?.id || `notification_${Date.now()}`,
         type: data.type || data.notification?.type || 'info',
@@ -147,7 +156,7 @@ export class NotificationService {
         priority: data.priority || data.notification?.priority || 'normal',
         data: data.data || data.notification?.data,
         timestamp: data.timestamp || data.notification?.timestamp || new Date().toISOString(),
-        read: false
+        read: false,
       };
 
       this.addNotification(notification);
@@ -156,12 +165,16 @@ export class NotificationService {
         component: 'NotificationService',
         notificationId: notification.id,
         type: notification.type,
-        priority: notification.priority
+        priority: notification.priority,
       });
     } catch (error) {
-      logger.error('Error handling notification message', {
-        component: 'NotificationService'
-      }, error);
+      logger.error(
+        'Error handling notification message',
+        {
+          component: 'NotificationService',
+        },
+        error
+      );
     }
   }
 
@@ -169,30 +182,38 @@ export class NotificationService {
     try {
       const data = message as any;
       const notificationId = data.notification_id || data.notificationId || data.id;
-      
+
       if (notificationId) {
         this.markAsRead(notificationId);
       }
     } catch (error) {
-      logger.error('Error handling notification read message', {
-        component: 'NotificationService'
-      }, error);
+      logger.error(
+        'Error handling notification read message',
+        {
+          component: 'NotificationService',
+        },
+        error
+      );
     }
   }
 
   private handleNotificationClearMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
-      
+
       if (data.clear_all) {
         this.clearAllNotifications();
       } else if (data.notification_id || data.notificationId) {
         this.removeNotification(data.notification_id || data.notificationId);
       }
     } catch (error) {
-      logger.error('Error handling notification clear message', {
-        component: 'NotificationService'
-      }, error);
+      logger.error(
+        'Error handling notification clear message',
+        {
+          component: 'NotificationService',
+        },
+        error
+      );
     }
   }
 
@@ -212,30 +233,30 @@ export class NotificationService {
     logger.debug('Added notification', {
       component: 'NotificationService',
       notificationId: notification.id,
-      totalNotifications: this.notifications.length
+      totalNotifications: this.notifications.length,
     });
   }
 
   markAsRead(notificationId: string): boolean {
     const notification = this.notifications.find(n => n.id === notificationId);
-    
+
     if (notification && !notification.read) {
       notification.read = true;
-      
+
       logger.debug('Marked notification as read', {
         component: 'NotificationService',
-        notificationId
+        notificationId,
       });
-      
+
       return true;
     }
-    
+
     return false;
   }
 
   markAllAsRead(): number {
     let markedCount = 0;
-    
+
     this.notifications.forEach(notification => {
       if (!notification.read) {
         notification.read = true;
@@ -246,7 +267,7 @@ export class NotificationService {
     if (markedCount > 0) {
       logger.info('Marked all notifications as read', {
         component: 'NotificationService',
-        markedCount
+        markedCount,
       });
     }
 
@@ -256,42 +277,42 @@ export class NotificationService {
   removeNotification(notificationId: string): boolean {
     const initialLength = this.notifications.length;
     this.notifications = this.notifications.filter(n => n.id !== notificationId);
-    
+
     const removed = this.notifications.length < initialLength;
-    
+
     if (removed) {
       logger.debug('Removed notification', {
         component: 'NotificationService',
-        notificationId
+        notificationId,
       });
     }
-    
+
     return removed;
   }
 
   clearAllNotifications(): void {
     const clearedCount = this.notifications.length;
     this.notifications = [];
-    
+
     logger.info('Cleared all notifications', {
       component: 'NotificationService',
-      clearedCount
+      clearedCount,
     });
   }
 
   clearReadNotifications(): number {
     const initialLength = this.notifications.length;
     this.notifications = this.notifications.filter(n => !n.read);
-    
+
     const clearedCount = initialLength - this.notifications.length;
-    
+
     if (clearedCount > 0) {
       logger.info('Cleared read notifications', {
         component: 'NotificationService',
-        clearedCount
+        clearedCount,
       });
     }
-    
+
     return clearedCount;
   }
 
@@ -336,15 +357,15 @@ export class NotificationService {
       type: 'mark_notification_read',
       data: {
         notification_id: notificationId,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
 
     logger.debug('Sent mark as read update', {
       component: 'NotificationService',
-      notificationId
+      notificationId,
     });
   }
 
@@ -353,15 +374,15 @@ export class NotificationService {
       type: 'clear_notification',
       data: {
         notification_id: notificationId,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
 
     logger.debug('Sent clear notification update', {
       component: 'NotificationService',
-      notificationId
+      notificationId,
     });
   }
 
@@ -369,14 +390,14 @@ export class NotificationService {
     const message = {
       type: 'clear_all_notifications',
       data: {
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     this.wsManager.send(message);
 
     logger.debug('Sent clear all notifications update', {
-      component: 'NotificationService'
+      component: 'NotificationService',
     });
   }
 
@@ -393,13 +414,13 @@ export class NotificationService {
       }
 
       logger.info('Re-subscribed to notifications after reconnection', {
-        component: 'NotificationService'
+        component: 'NotificationService',
       });
     });
 
     this.wsManager.on('disconnected', () => {
       logger.warn('WebSocket disconnected, notifications paused', {
-        component: 'NotificationService'
+        component: 'NotificationService',
       });
     });
   }
@@ -420,7 +441,8 @@ export class NotificationService {
 
     this.notifications.forEach(notification => {
       notificationsByType[notification.type] = (notificationsByType[notification.type] || 0) + 1;
-      notificationsByPriority[notification.priority] = (notificationsByPriority[notification.priority] || 0) + 1;
+      notificationsByPriority[notification.priority] =
+        (notificationsByPriority[notification.priority] || 0) + 1;
     });
 
     return {
@@ -428,7 +450,7 @@ export class NotificationService {
       unreadNotifications: this.getUnreadCount(),
       notificationsByType,
       notificationsByPriority,
-      isSubscribed: this.isSubscribed
+      isSubscribed: this.isSubscribed,
     };
   }
 }

@@ -9,10 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { globalApiClient } from '../client';
 import type { UnifiedError } from '../types/common';
-import type {
-  ApiResponse,
-  RequestOptions
-} from '../types/request';
+import type { ApiResponse, RequestOptions } from '../types/request';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;
@@ -243,7 +240,8 @@ export function useApiWithFallback<T = unknown>(
 }
 
 // Hook for mutations (POST, PUT, DELETE)
-export interface UseMutationOptions<TData = unknown, TVariables = unknown> extends Omit<RequestOptions, 'method'> {
+export interface UseMutationOptions<TData = unknown, TVariables = unknown>
+  extends Omit<RequestOptions, 'method'> {
   onSuccess?: (data: TData, variables: TVariables) => void;
   onError?: (error: UnifiedError, variables: TVariables) => void;
   onSettled?: (data: TData | null, error: UnifiedError | null, variables: TVariables) => void;
@@ -296,73 +294,79 @@ export function useMutation<TData = unknown, TVariables = unknown>(
     };
   }, []);
 
-  const mutateAsync = useCallback(async (variables: TVariables): Promise<TData> => {
-    if (!isMountedRef.current) {
-      throw new Error('Cannot mutate: component is unmounted');
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    // Store references for the onSettled callback
-    let resultData: TData | null = null;
-    let resultError: UnifiedError | null = null;
-
-    try {
-      const response = await mutationFn(variables);
-
+  const mutateAsync = useCallback(
+    async (variables: TVariables): Promise<TData> => {
       if (!isMountedRef.current) {
-        throw new Error('Component unmounted during mutation');
+        throw new Error('Cannot mutate: component is unmounted');
       }
 
-      if (response.status >= 200 && response.status < 300) {
-        resultData = response.data;
-        setData(response.data);
-        onSuccessRef.current?.(response.data, variables);
-        return response.data;
-      } else {
-        // Create a unified error from the response
-        const safeError = handleError({
-          code: 'NETWORK_ERROR',
-          message: response.message || `Request failed with status ${response.status}`,
-          type: ErrorDomain.NETWORK,
-          severity: ErrorSeverity.MEDIUM,
-          recoverable: true,
-          retryable: true,
-        });
-        resultError = safeError;
-        setError(resultError || null);
-        onErrorRef.current?.(resultError, variables);
-        throw resultError;
-      }
-    } catch (err) {
-      const apiError = err as UnifiedError;
-      resultError = apiError;
+      setIsLoading(true);
+      setError(null);
 
-      if (isMountedRef.current) {
-        setError(apiError);
-      }
+      // Store references for the onSettled callback
+      let resultData: TData | null = null;
+      let resultError: UnifiedError | null = null;
 
-      onErrorRef.current?.(apiError, variables);
-      throw apiError;
-    } finally {
-      if (isMountedRef.current) {
-        setIsLoading(false);
-      }
-      // Always call onSettled, even if unmounted
-      onSettledRef.current?.(resultData, resultError, variables);
-    }
-  }, [mutationFn]);
+      try {
+        const response = await mutationFn(variables);
 
-  const mutate = useCallback(async (variables: TVariables): Promise<void> => {
-    try {
-      await mutateAsync(variables);
-    } catch {
-      // Error is already handled in mutateAsync and callbacks
-      // Silently catch to provide non-throwing mutation option
-      // The error state is available via the error property
-    }
-  }, [mutateAsync]);
+        if (!isMountedRef.current) {
+          throw new Error('Component unmounted during mutation');
+        }
+
+        if (response.status >= 200 && response.status < 300) {
+          resultData = response.data;
+          setData(response.data);
+          onSuccessRef.current?.(response.data, variables);
+          return response.data;
+        } else {
+          // Create a unified error from the response
+          const safeError = handleError({
+            code: 'NETWORK_ERROR',
+            message: response.message || `Request failed with status ${response.status}`,
+            type: ErrorDomain.NETWORK,
+            severity: ErrorSeverity.MEDIUM,
+            recoverable: true,
+            retryable: true,
+          });
+          resultError = safeError;
+          setError(resultError || null);
+          onErrorRef.current?.(resultError, variables);
+          throw resultError;
+        }
+      } catch (err) {
+        const apiError = err as UnifiedError;
+        resultError = apiError;
+
+        if (isMountedRef.current) {
+          setError(apiError);
+        }
+
+        onErrorRef.current?.(apiError, variables);
+        throw apiError;
+      } finally {
+        if (isMountedRef.current) {
+          setIsLoading(false);
+        }
+        // Always call onSettled, even if unmounted
+        onSettledRef.current?.(resultData, resultError, variables);
+      }
+    },
+    [mutationFn]
+  );
+
+  const mutate = useCallback(
+    async (variables: TVariables): Promise<void> => {
+      try {
+        await mutateAsync(variables);
+      } catch {
+        // Error is already handled in mutateAsync and callbacks
+        // Silently catch to provide non-throwing mutation option
+        // The error state is available via the error property
+      }
+    },
+    [mutateAsync]
+  );
 
   const reset = useCallback(() => {
     setData(null);
@@ -414,8 +418,5 @@ export function useApiDelete<TData = unknown>(
   endpoint: string,
   options: UseMutationOptions<TData, void> = {}
 ): UseMutationResult<TData, void> {
-  return useMutation<TData, void>(
-    () => globalApiClient.delete(endpoint),
-    options
-  );
+  return useMutation<TData, void>(() => globalApiClient.delete(endpoint), options);
 }

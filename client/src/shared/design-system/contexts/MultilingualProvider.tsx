@@ -149,9 +149,7 @@ export function MultilingualProvider({
   }
 
   return (
-    <MultilingualContext.Provider value={contextValue}>
-      {children}
-    </MultilingualContext.Provider>
+    <MultilingualContext.Provider value={contextValue}>{children}</MultilingualContext.Provider>
   );
 }
 
@@ -224,11 +222,7 @@ export interface FormattedCurrencyProps {
   className?: string;
 }
 
-export function FormattedCurrency({
-  value,
-  currency = 'USD',
-  className,
-}: FormattedCurrencyProps) {
+export function FormattedCurrency({ value, currency = 'USD', className }: FormattedCurrencyProps) {
   const { format } = useLanguage();
   return <span className={className}>{format.currency(value, currency)}</span>;
 }

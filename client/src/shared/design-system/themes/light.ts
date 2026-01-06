@@ -7,46 +7,46 @@ import { colorTokens } from '../tokens/colors';
 
 export const lightTheme = {
   name: 'light',
-  
+
   colors: {
     // Primary brand colors
     primary: colorTokens.primary[500],
     primaryForeground: '#ffffff',
     primaryHover: colorTokens.primary[600],
-    
+
     // Secondary colors
     secondary: colorTokens.secondary[500],
     secondaryForeground: '#ffffff',
     secondaryHover: colorTokens.secondary[600],
-    
+
     // Accent colors
     accent: colorTokens.accent[500],
     accentForeground: '#ffffff',
     accentHover: colorTokens.accent[600],
-    
+
     // Surface colors
     background: colorTokens.surface.background.light,
     foreground: colorTokens.neutral[900],
-    
+
     // Card colors
     card: colorTokens.surface.card.light,
     cardForeground: colorTokens.neutral[900],
-    
+
     // Muted colors
     muted: colorTokens.neutral[100],
     mutedForeground: colorTokens.neutral[600],
-    
+
     // Border colors
     border: colorTokens.border.light,
     borderSubtle: colorTokens.border.subtle,
-    
+
     // Input colors
     input: colorTokens.border.light,
     inputForeground: colorTokens.neutral[900],
-    
+
     // Ring/focus colors
     ring: colorTokens.accent[500],
-    
+
     // Semantic colors
     success: colorTokens.semantic.success[500],
     successForeground: '#ffffff',
@@ -57,7 +57,7 @@ export const lightTheme = {
     info: colorTokens.semantic.info[500],
     infoForeground: '#ffffff',
   },
-  
+
   // CSS custom properties - Updated to Chanuka brand palette
   cssVariables: {
     '--background': '0 0% 100%',
@@ -90,10 +90,10 @@ export const lightTheme = {
     '--danger': '0 84% 60%',
     '--info': '206 81% 26%',
     // Governance colors for political neutrality
-    '--governance-perspective1': '219 79% 46%',      // Perspective A (blue)
-    '--governance-perspective2': '261 80% 50%',      // Perspective B (purple)
-    '--governance-neutral': '142 71% 45%',            // Neutral/informational (green)
-    '--governance-amendment': '38 92% 50%',           // Amendment (amber)
-    '--governance-constitutional': '292 65% 47%',     // Constitutional (deep purple)
+    '--governance-perspective1': '219 79% 46%', // Perspective A (blue)
+    '--governance-perspective2': '261 80% 50%', // Perspective B (purple)
+    '--governance-neutral': '142 71% 45%', // Neutral/informational (green)
+    '--governance-amendment': '38 92% 50%', // Amendment (amber)
+    '--governance-constitutional': '292 65% 47%', // Constitutional (deep purple)
   },
 } as const;

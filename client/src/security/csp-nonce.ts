@@ -70,62 +70,47 @@ export class CSPNonceManager {
   public generateCSPHeader(): string {
     const nonce = this.getCurrentNonce();
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
+
     const directives = {
       'default-src': ["'self'"],
-      'script-src': isDevelopment ? [
-        "'self'",
-        `'nonce-${nonce}'`,
-        "'unsafe-eval'", // Required for Vite hot reload
-        "localhost:*",
-        "127.0.0.1:*"
-      ] : [
-        "'self'",
-        `'nonce-${nonce}'`,
-        "'strict-dynamic'"
-      ],
+      'script-src': isDevelopment
+        ? [
+            "'self'",
+            `'nonce-${nonce}'`,
+            "'unsafe-eval'", // Required for Vite hot reload
+            'localhost:*',
+            '127.0.0.1:*',
+          ]
+        : ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"],
       'style-src': [
         "'self'",
         "'unsafe-inline'", // Required for CSS-in-JS libraries and development
-        "https://fonts.googleapis.com"
+        'https://fonts.googleapis.com',
       ],
-      'font-src': [
-        "'self'",
-        "https://fonts.gstatic.com"
-      ],
-      'img-src': [
-        "'self'",
-        "data:",
-        "https:",
-        "blob:"
-      ],
-      'connect-src': isDevelopment ? [
-        "'self'",
-        "ws:",
-        "wss:",
-        "ws://localhost:*",
-        "ws://127.0.0.1:*",
-        "http://localhost:*",
-        "http://127.0.0.1:*",
-        "https://api.chanuka.ke"
-      ] : [
-        "'self'",
-        "ws:",
-        "wss:",
-        "https://api.chanuka.ke"
-      ],
+      'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      'img-src': ["'self'", 'data:', 'https:', 'blob:'],
+      'connect-src': isDevelopment
+        ? [
+            "'self'",
+            'ws:',
+            'wss:',
+            'ws://localhost:*',
+            'ws://127.0.0.1:*',
+            'http://localhost:*',
+            'http://127.0.0.1:*',
+            'https://api.chanuka.ke',
+          ]
+        : ["'self'", 'ws:', 'wss:', 'https://api.chanuka.ke'],
       'frame-src': ["'none'"],
       'object-src': ["'none'"],
       'base-uri': ["'self'"],
       'form-action': ["'self'"],
       // frame-ancestors cannot be set via meta tag - must use HTTP headers only
-      'upgrade-insecure-requests': []
+      'upgrade-insecure-requests': [],
     };
 
     return Object.entries(directives)
-      .map(([directive, sources]) => 
-        `${directive} ${sources.join(' ')}`
-      )
+      .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
       .join('; ');
   }
 }

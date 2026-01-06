@@ -1,12 +1,32 @@
 import { useQuery } from '@tanstack/react-query';
-import { Users, FileText, MessageSquare as MessageCircle, Shield, Settings, Database, Activity } from 'lucide-react';
+import {
+  Users,
+  FileText,
+  MessageSquare as MessageCircle,
+  Shield,
+  Settings,
+  Database,
+  Activity,
+} from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { globalApiClient } from '@client/core/api/client';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/shared/design-system';
 import { MonitoringDashboard } from '@client/shared/ui/dashboard/MonitoringDashboard';
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {
@@ -88,14 +108,12 @@ const AdminDashboard = () => {
   const { data: stats, isLoading, error: statsError } = useAdminStats();
   const { data: systemHealth, error: healthError } = useSystemHealth();
 
-
-
   // Utility function with better time formatting
   const formatUptime = (seconds: number): string => {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (days > 0) {
       return `${days}d ${hours}h ${minutes}m`;
     } else if (hours > 0) {
@@ -116,14 +134,10 @@ const AdminDashboard = () => {
               <span>Failed to load dashboard data. Please try refreshing the page.</span>
             </div>
             {statsError && (
-              <p className="text-sm text-red-600 mt-2">
-                Stats Error: {statsError.message}
-              </p>
+              <p className="text-sm text-red-600 mt-2">Stats Error: {statsError.message}</p>
             )}
             {healthError && (
-              <p className="text-sm text-red-600 mt-2">
-                Health Error: {healthError.message}
-              </p>
+              <p className="text-sm text-red-600 mt-2">Health Error: {healthError.message}</p>
             )}
           </CardContent>
         </Card>
@@ -151,14 +165,15 @@ const AdminDashboard = () => {
   }
 
   // Helper function to determine system health status
-  const getSystemHealthStatus = (): { variant: "default" | "destructive", text: string } => {
-    const isHealthy = systemHealth?.database && 
-                     (systemHealth?.memory || 0) < 90 && 
-                     (systemHealth?.diskSpace || 0) < 90;
-    
+  const getSystemHealthStatus = (): { variant: 'default' | 'destructive'; text: string } => {
+    const isHealthy =
+      systemHealth?.database &&
+      (systemHealth?.memory || 0) < 90 &&
+      (systemHealth?.diskSpace || 0) < 90;
+
     return {
       variant: isHealthy ? 'default' : 'destructive',
-      text: isHealthy ? 'System Healthy' : 'System Issues'
+      text: isHealthy ? 'System Healthy' : 'System Issues',
     };
   };
 
@@ -173,13 +188,9 @@ const AdminDashboard = () => {
           <p className="text-muted-foreground">System overview and management</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Badge variant={healthStatus.variant}>
-            {healthStatus.text}
-          </Badge>
+          <Badge variant={healthStatus.variant}>{healthStatus.text}</Badge>
           {systemHealth?.uptime && (
-            <Badge variant="outline">
-              Uptime: {formatUptime(systemHealth.uptime)}
-            </Badge>
+            <Badge variant="outline">Uptime: {formatUptime(systemHealth.uptime)}</Badge>
           )}
         </div>
       </div>
@@ -231,9 +242,7 @@ const AdminDashboard = () => {
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {systemHealth?.database ? '100%' : '0%'}
-            </div>
+            <div className="text-2xl font-bold">{systemHealth?.database ? '100%' : '0%'}</div>
             <p className="text-xs text-muted-foreground">
               Error rate: {((stats?.system.errorRate ?? 0) * 100).toFixed(2)}%
             </p>
@@ -260,14 +269,16 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(stats?.users.byRole ?? []).map((role) => {
+                  {(stats?.users.byRole ?? []).map(role => {
                     const total = stats?.users.total ?? 1;
                     const percentage = Math.round((role.count / total) * 100);
                     return (
                       <div key={role.role} className="space-y-1">
                         <div className="flex justify-between text-sm">
                           <span className="capitalize">{role.role}</span>
-                          <span>{role.count} ({percentage}%)</span>
+                          <span>
+                            {role.count} ({percentage}%)
+                          </span>
                         </div>
                         <Progress value={percentage} className="h-2" />
                       </div>
@@ -284,9 +295,10 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(stats?.bills.byStatus ?? []).map((status) => {
+                  {(stats?.bills.byStatus ?? []).map(status => {
                     const maxCount = Math.max(...(stats?.bills.byStatus ?? []).map(s => s.count));
-                    const percentage = maxCount > 0 ? Math.round((status.count / maxCount) * 100) : 0;
+                    const percentage =
+                      maxCount > 0 ? Math.round((status.count / maxCount) * 100) : 0;
                     return (
                       <div key={status.status} className="space-y-1">
                         <div className="flex justify-between text-sm">
@@ -322,7 +334,12 @@ const AdminDashboard = () => {
                   <span>New This Week</span>
                   <Badge variant="outline">{stats?.users.newThisWeek ?? 0}</Badge>
                 </div>
-                <Button className="w-full" onClick={() => logger.info('Navigate to user management', { component: 'Chanuka' }, )}>
+                <Button
+                  className="w-full"
+                  onClick={() =>
+                    logger.info('Navigate to user management', { component: 'Chanuka' })
+                  }
+                >
                   <Users className="h-4 w-4 mr-2" />
                   Manage Users
                 </Button>
@@ -358,11 +375,19 @@ const AdminDashboard = () => {
                 <CardTitle>Content Moderation</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full" onClick={() => console.log('Review flagged content')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => console.log('Review flagged content')}
+                >
                   <Shield className="h-4 w-4 mr-2" />
                   Review Flagged Content
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => console.log('Moderate comments')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => console.log('Moderate comments')}
+                >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Moderate Comments
                 </Button>
@@ -410,15 +435,27 @@ const AdminDashboard = () => {
                 <CardTitle>System Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full" onClick={() => console.log('Open system settings')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => console.log('Open system settings')}
+                >
                   <Settings className="h-4 w-4 mr-2" />
                   System Settings
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => console.log('Open database management')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => console.log('Open database management')}
+                >
                   <Database className="h-4 w-4 mr-2" />
                   Database Management
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => console.log('View system logs')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => console.log('View system logs')}
+                >
                   <Activity className="h-4 w-4 mr-2" />
                   View System Logs
                 </Button>
@@ -431,8 +468,8 @@ const AdminDashboard = () => {
           <MonitoringDashboard />
         </TabsContent>
       </Tabs>
-    </div>);
+    </div>
+  );
 };
 
 export default AdminDashboard;
-

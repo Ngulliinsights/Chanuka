@@ -5,18 +5,11 @@
  * and provides insights into how the classification was determined.
  */
 
+import { User, TrendingUp, Award, HelpCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { useState } from 'react';
 import React from 'react';
-import {
-  User,
-  TrendingUp,
-  Award,
-  HelpCircle,
-  ChevronDown,
-  ChevronUp,
-  Info
-} from 'lucide-react';
 
+import type { PersonaClassification } from '@client/core/personalization/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
@@ -27,7 +20,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@client/shared/design-system';
-import type { PersonaClassification } from '@client/core/personalization/types';
 
 interface PersonaIndicatorProps {
   classification: PersonaClassification;
@@ -40,7 +32,7 @@ export function PersonaIndicator({
   classification,
   showDetails = false,
   compact = false,
-  className = ''
+  className = '',
 }: PersonaIndicatorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -100,10 +92,7 @@ export function PersonaIndicator({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
-            <Badge
-              variant="outline"
-              className={`${getPersonaColor()} ${className}`}
-            >
+            <Badge variant="outline" className={`${getPersonaColor()} ${className}`}>
               {getPersonaIcon()}
               <span className="ml-1">{getPersonaLabel()}</span>
             </Badge>
@@ -138,16 +127,8 @@ export function PersonaIndicator({
             Your Experience Level
           </span>
           {showDetails && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
           )}
         </CardTitle>
@@ -156,10 +137,7 @@ export function PersonaIndicator({
         {/* Main Persona Display */}
         <div className="flex items-center justify-between">
           <div>
-            <Badge
-              variant="outline"
-              className={`${getPersonaColor()} text-base px-3 py-1`}
-            >
+            <Badge variant="outline" className={`${getPersonaColor()} text-base px-3 py-1`}>
               {getPersonaLabel()}
             </Badge>
             <p className="text-sm text-muted-foreground mt-1">
@@ -182,10 +160,7 @@ export function PersonaIndicator({
             <span>Classification Confidence</span>
             <span>{Math.round(classification.confidence * 100)}%</span>
           </div>
-          <Progress
-            value={classification.confidence * 100}
-            className="h-2"
-          />
+          <Progress value={classification.confidence * 100} className="h-2" />
         </div>
 
         {/* Expanded Details */}
@@ -200,7 +175,10 @@ export function PersonaIndicator({
                 </h4>
                 <ul className="space-y-1">
                   {classification.reasons.map((reason, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                    >
                       <div className="w-1.5 h-1.5 bg-current rounded-full mt-2 flex-shrink-0" />
                       {reason}
                     </li>
@@ -212,9 +190,7 @@ export function PersonaIndicator({
             {/* Suggested Features */}
             {classification.suggestedFeatures.length > 0 && (
               <div>
-                <h4 className="font-medium text-sm mb-2">
-                  Recommended features for you:
-                </h4>
+                <h4 className="font-medium text-sm mb-2">Recommended features for you:</h4>
                 <div className="flex flex-wrap gap-1">
                   {classification.suggestedFeatures.slice(0, 4).map((feature, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
@@ -226,21 +202,22 @@ export function PersonaIndicator({
             )}
 
             {/* Next Level Requirements */}
-            {classification.nextLevelRequirements && classification.nextLevelRequirements.length > 0 && (
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <h4 className="font-medium text-sm mb-2 text-blue-800">
-                  To reach the next level:
-                </h4>
-                <ul className="space-y-1">
-                  {classification.nextLevelRequirements.map((requirement, index) => (
-                    <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                      {requirement}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {classification.nextLevelRequirements &&
+              classification.nextLevelRequirements.length > 0 && (
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <h4 className="font-medium text-sm mb-2 text-blue-800">
+                    To reach the next level:
+                  </h4>
+                  <ul className="space-y-1">
+                    {classification.nextLevelRequirements.map((requirement, index) => (
+                      <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                        {requirement}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
             {/* Help Link */}
             <div className="pt-2 border-t">

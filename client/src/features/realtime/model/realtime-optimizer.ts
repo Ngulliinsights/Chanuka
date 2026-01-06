@@ -65,7 +65,7 @@ class RealtimeOptimizer {
       throttleInterval: 50,
       enableDeltaUpdates: true,
       connectionTimeout: 30000,
-      maxReconnectAttempts: 5
+      maxReconnectAttempts: 5,
     };
 
     this.metrics = {
@@ -75,13 +75,13 @@ class RealtimeOptimizer {
       bytesSent: 0,
       averageLatency: 0,
       connectionUptime: 0,
-      reconnections: 0
+      reconnections: 0,
     };
 
     this.messageBatch = {
       messages: [],
       timestamp: Date.now(),
-      size: 0
+      size: 0,
     };
   }
 
@@ -113,8 +113,11 @@ class RealtimeOptimizer {
     this.messageBatch.size += message.length;
 
     // Send batch if it reaches max size or interval
-    if (this.messageBatch.messages.length >= this.config.maxBatchSize ||
-        this.messageBatch.size > 1024 * 10) { // 10KB limit
+    if (
+      this.messageBatch.messages.length >= this.config.maxBatchSize ||
+      this.messageBatch.size > 1024 * 10
+    ) {
+      // 10KB limit
       this.flushBatch(callback);
     } else if (!this.batchTimer) {
       this.batchTimer = setTimeout(() => {
@@ -146,7 +149,7 @@ class RealtimeOptimizer {
         // First message, store as baseline
         this.deltaStates.set(channel, {
           lastSnapshot: data,
-          lastUpdateTime: Date.now()
+          lastUpdateTime: Date.now(),
         });
         return message;
       }
@@ -196,8 +199,7 @@ class RealtimeOptimizer {
     }
 
     if (latency !== undefined) {
-      this.metrics.averageLatency =
-        (this.metrics.averageLatency + latency) / 2;
+      this.metrics.averageLatency = (this.metrics.averageLatency + latency) / 2;
     }
   }
 
@@ -211,10 +213,12 @@ class RealtimeOptimizer {
     deltaEfficiency: number;
   } {
     return {
-      compressionRatio: this.metrics.bytesSent > 0 ?
-        1 - (this.metrics.bytesSent / (this.metrics.messagesSent * 100)) : 0,
+      compressionRatio:
+        this.metrics.bytesSent > 0
+          ? 1 - this.metrics.bytesSent / (this.metrics.messagesSent * 100)
+          : 0,
       batchEfficiency: this.messageBatch.messages.length / this.config.maxBatchSize,
-      deltaEfficiency: this.deltaStates.size > 0 ? 0.3 : 0 // Placeholder
+      deltaEfficiency: this.deltaStates.size > 0 ? 0.3 : 0, // Placeholder
     };
   }
 

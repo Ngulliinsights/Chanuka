@@ -1,6 +1,6 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
+import React from 'react';
 import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 
 import { useAuth } from '@client/core/auth';
@@ -8,10 +8,20 @@ import { personaDetector } from '@client/core/personalization';
 import type {
   PersonaType,
   PersonaClassification,
-  PersonaPreferences
+  PersonaPreferences,
 } from '@client/core/personalization/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
-import { Button, Card, CardContent, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/shared/design-system';
 import type { UserActivity } from '@client/shared/types/analytics';
 import { logger } from '@client/utils/logger';
 
@@ -47,7 +57,14 @@ interface DashboardState {
 type DashboardAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_PERSONA_DATA'; payload: { persona: PersonaType; classification: PersonaClassification; preferences: PersonaPreferences } }
+  | {
+      type: 'SET_PERSONA_DATA';
+      payload: {
+        persona: PersonaType;
+        classification: PersonaClassification;
+        preferences: PersonaPreferences;
+      };
+    }
   | { type: 'TOGGLE_CUSTOMIZATION' }
   | { type: 'TOGGLE_SECTION'; payload: string }
   | { type: 'TOGGLE_WIDGET'; payload: string }
@@ -62,7 +79,7 @@ const initialState: DashboardState = {
   expandedSections: new Set(['overview', 'quick-actions']),
   hiddenWidgets: new Set(),
   loading: true,
-  error: null
+  error: null,
 };
 
 function dashboardReducer(state: DashboardState, action: DashboardAction): DashboardState {
@@ -80,7 +97,7 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
         classification: action.payload.classification,
         preferences: action.payload.preferences,
         loading: false,
-        error: null
+        error: null,
       };
 
     case 'TOGGLE_CUSTOMIZATION':
@@ -109,7 +126,7 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
     case 'UPDATE_PREFERENCES':
       return {
         ...state,
-        preferences: state.preferences ? { ...state.preferences, ...action.payload } : null
+        preferences: state.preferences ? { ...state.preferences, ...action.payload } : null,
       };
 
     case 'RESET':
@@ -125,7 +142,7 @@ export function AdaptiveDashboard({
   variant = 'full-page',
   enableCustomization = true,
   showPersonaIndicator = true,
-  onPersonaChange
+  onPersonaChange,
 }: AdaptiveDashboardProps) {
   const { user } = useAuth();
   const { data: userProfile } = useUserProfile();
@@ -144,7 +161,7 @@ export function AdaptiveDashboard({
     },
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
   const { data: existingProfile } = useQuery({
@@ -157,7 +174,7 @@ export function AdaptiveDashboard({
     },
     enabled: !!user?.id,
     staleTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -189,8 +206,8 @@ export function AdaptiveDashboard({
           payload: {
             persona: classification.type,
             classification,
-            preferences
-          }
+            preferences,
+          },
         });
 
         // Trigger callback only when persona actually changes
@@ -204,14 +221,13 @@ export function AdaptiveDashboard({
           persona: classification.type,
           confidence: classification.confidence,
           reasons: classification.reasons,
-          loadTime: performanceMonitor.getMetrics().personaDetectionTime
+          loadTime: performanceMonitor.getMetrics().personaDetectionTime,
         });
-
       } catch (error) {
         logger.error('Failed to detect persona for dashboard', { error, userId: user.id });
         dispatch({
           type: 'SET_ERROR',
-          payload: 'Failed to personalize dashboard'
+          payload: 'Failed to personalize dashboard',
         });
       }
     };
@@ -331,10 +347,7 @@ export function AdaptiveDashboard({
           </div>
 
           {showPersonaIndicator && classification && (
-            <PersonaIndicator
-              classification={classification}
-              showDetails={true}
-            />
+            <PersonaIndicator classification={classification} showDetails={true} />
           )}
         </div>
 

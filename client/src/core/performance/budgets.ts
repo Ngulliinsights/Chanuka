@@ -1,6 +1,6 @@
 /**
  * Performance Budgets Module
- * 
+ *
  * Monitors performance metrics against defined budgets and provides
  * budget compliance checking with detailed reporting.
  */
@@ -37,85 +37,85 @@ export class PerformanceBudgetChecker {
   private setupDefaultBudgets(): void {
     this.budgets = [
       // Core Web Vitals budgets
-      { 
-        metric: 'LCP', 
-        budget: 2500, 
+      {
+        metric: 'LCP',
+        budget: 2500,
         warning: 2000,
         description: 'Largest Contentful Paint - measures loading performance',
-        category: 'loading'
+        category: 'loading',
       },
-      { 
-        metric: 'FID', 
-        budget: 100, 
+      {
+        metric: 'FID',
+        budget: 100,
         warning: 75,
         description: 'First Input Delay - measures interactivity',
-        category: 'interactivity'
+        category: 'interactivity',
       },
-      { 
-        metric: 'INP', 
-        budget: 200, 
+      {
+        metric: 'INP',
+        budget: 200,
         warning: 150,
         description: 'Interaction to Next Paint - measures responsiveness',
-        category: 'interactivity'
+        category: 'interactivity',
       },
-      { 
-        metric: 'CLS', 
-        budget: 0.1, 
+      {
+        metric: 'CLS',
+        budget: 0.1,
         warning: 0.05,
         description: 'Cumulative Layout Shift - measures visual stability',
-        category: 'visual-stability'
+        category: 'visual-stability',
       },
-      { 
-        metric: 'FCP', 
-        budget: 1800, 
+      {
+        metric: 'FCP',
+        budget: 1800,
         warning: 1500,
         description: 'First Contentful Paint - measures perceived loading',
-        category: 'loading'
+        category: 'loading',
       },
-      { 
-        metric: 'TTFB', 
-        budget: 800, 
+      {
+        metric: 'TTFB',
+        budget: 800,
         warning: 600,
         description: 'Time to First Byte - measures server response time',
-        category: 'network'
+        category: 'network',
       },
-      
+
       // Resource budgets
-      { 
-        metric: 'bundle-size', 
-        budget: 250000, 
+      {
+        metric: 'bundle-size',
+        budget: 250000,
         warning: 200000,
         description: 'JavaScript bundle size in bytes',
-        category: 'loading'
+        category: 'loading',
       },
-      { 
-        metric: 'memory-usage', 
-        budget: 50000000, 
+      {
+        metric: 'memory-usage',
+        budget: 50000000,
         warning: 40000000,
         description: 'Memory usage in bytes',
-        category: 'memory'
+        category: 'memory',
       },
-      { 
-        metric: 'dom-size', 
-        budget: 1500, 
+      {
+        metric: 'dom-size',
+        budget: 1500,
         warning: 1200,
         description: 'Number of DOM nodes',
-        category: 'loading'
+        category: 'loading',
       },
-      { 
-        metric: 'image-size', 
-        budget: 1000000, 
+      {
+        metric: 'image-size',
+        budget: 1000000,
         warning: 800000,
         description: 'Total image payload in bytes',
-        category: 'loading'
+        category: 'loading',
       },
-      { 
-        metric: 'font-size', 
-        budget: 100000, 
+      {
+        metric: 'font-size',
+        budget: 100000,
         warning: 80000,
         description: 'Total font payload in bytes',
-        category: 'loading'
-      }
+        category: 'loading',
+      },
     ];
   }
 
@@ -124,15 +124,15 @@ export class PerformanceBudgetChecker {
    */
   checkBudget(metric: PerformanceMetric): BudgetCheckResult {
     const budget = this.budgets.find(b => b.metric === metric.name);
-    
+
     // If no budget is defined, consider it a pass
     if (!budget) {
-      const result: BudgetCheckResult = { 
-        status: 'pass', 
+      const result: BudgetCheckResult = {
+        status: 'pass',
         message: `No budget defined for metric: ${metric.name}`,
-        recommendations: ['Consider setting a performance budget for this metric']
+        recommendations: ['Consider setting a performance budget for this metric'],
       };
-      
+
       this.recordCheck(metric, result);
       return result;
     }
@@ -150,7 +150,7 @@ export class PerformanceBudgetChecker {
         budget,
         message: `Budget exceeded by ${budgetExceedance.toFixed(1)}%: ${metric.value.toFixed(2)} > ${budget.budget}`,
         exceedancePercentage: budgetExceedance,
-        recommendations: this.generateRecommendations(metric, budget, 'fail')
+        recommendations: this.generateRecommendations(metric, budget, 'fail'),
       };
     }
     // Check for warning threshold
@@ -160,7 +160,7 @@ export class PerformanceBudgetChecker {
         budget,
         message: `Warning threshold exceeded by ${warningExceedance.toFixed(1)}%: ${metric.value.toFixed(2)} > ${budget.warning}`,
         exceedancePercentage: warningExceedance,
-        recommendations: this.generateRecommendations(metric, budget, 'warning')
+        recommendations: this.generateRecommendations(metric, budget, 'warning'),
       };
     }
     // Within acceptable limits
@@ -170,8 +170,10 @@ export class PerformanceBudgetChecker {
         status: 'pass',
         budget,
         message: `Within budget (${utilizationPercentage.toFixed(1)}% of warning threshold)`,
-        recommendations: utilizationPercentage > 80 ? 
-          ['Monitor closely as metric is approaching warning threshold'] : []
+        recommendations:
+          utilizationPercentage > 80
+            ? ['Monitor closely as metric is approaching warning threshold']
+            : [],
       };
     }
 
@@ -183,8 +185,8 @@ export class PerformanceBudgetChecker {
    * Generates specific recommendations based on metric and budget status
    */
   private generateRecommendations(
-    metric: PerformanceMetric, 
-    _budget: PerformanceBudget, 
+    metric: PerformanceMetric,
+    _budget: PerformanceBudget,
     status: 'warning' | 'fail'
   ): string[] {
     const recommendations: string[] = [];
@@ -288,7 +290,7 @@ export class PerformanceBudgetChecker {
     this.checkHistory.push({
       timestamp: new Date(),
       metric,
-      result
+      result,
     });
 
     // Maintain history size
@@ -301,27 +303,27 @@ export class PerformanceBudgetChecker {
    * Updates or creates a performance budget
    */
   setBudget(
-    metric: string, 
-    budget: number, 
-    warning: number, 
+    metric: string,
+    budget: number,
+    warning: number,
     description?: string,
     category?: string
   ): void {
     if (budget <= 0 || warning <= 0) {
       throw new Error('Budget values must be greater than zero');
     }
-    
+
     if (warning > budget) {
       throw new Error('Warning threshold must be less than or equal to budget');
     }
 
     const existingIndex = this.budgets.findIndex(b => b.metric === metric);
-    const newBudget: PerformanceBudget = { 
-      metric, 
-      budget, 
-      warning, 
+    const newBudget: PerformanceBudget = {
+      metric,
+      budget,
+      warning,
       description,
-      category
+      category,
     };
 
     if (existingIndex >= 0) {
@@ -376,7 +378,7 @@ export class PerformanceBudgetChecker {
   } {
     const recentChecks = this.checkHistory.slice(-100); // Last 100 checks
     const total = recentChecks.length;
-    
+
     if (total === 0) {
       return { total: 0, passing: 0, warning: 0, failing: 0, passRate: 0 };
     }
@@ -412,10 +414,10 @@ export class PerformanceBudgetChecker {
   }> {
     const recentChecks = this.checkHistory.slice(-100);
     const failingChecks = recentChecks.filter(c => c.result.status === 'fail');
-    
+
     // Group by metric and get the most recent failing check for each
-    const failingByMetric = new Map<string, typeof failingChecks[0]>();
-    
+    const failingByMetric = new Map<string, (typeof failingChecks)[0]>();
+
     failingChecks.forEach(check => {
       const existing = failingByMetric.get(check.metric.name);
       if (!existing || check.timestamp > existing.timestamp) {
@@ -428,7 +430,7 @@ export class PerformanceBudgetChecker {
       value: check.metric.value,
       budget: check.result.budget?.budget || 0,
       exceedancePercentage: check.result.exceedancePercentage || 0,
-      lastCheck: check.timestamp
+      lastCheck: check.timestamp,
     }));
   }
 
@@ -443,7 +445,7 @@ export class PerformanceBudgetChecker {
     return {
       timestamp: new Date(),
       budgets: this.getBudgets(),
-      stats: this.getComplianceStats()
+      stats: this.getComplianceStats(),
     };
   }
 
@@ -453,10 +455,9 @@ export class PerformanceBudgetChecker {
   importBudgets(budgets: PerformanceBudget[]): void {
     // Validate budgets before importing
     const validBudgets = budgets.filter(budget => {
-      return budget.metric && 
-             budget.budget > 0 && 
-             budget.warning > 0 && 
-             budget.warning <= budget.budget;
+      return (
+        budget.metric && budget.budget > 0 && budget.warning > 0 && budget.warning <= budget.budget
+      );
     });
 
     this.budgets = validBudgets;

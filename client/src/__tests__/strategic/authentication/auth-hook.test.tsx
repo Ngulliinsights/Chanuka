@@ -3,8 +3,9 @@
  * Tests for the authentication hook and related functionality
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import { useAuth } from '../../../core/auth/hooks/useAuth';
 
 // Mock the auth service
@@ -16,7 +17,7 @@ const mockAuthService = {
   isAuthenticated: vi.fn(),
   hasPermission: vi.fn(),
   getRoles: vi.fn(),
-  checkSession: vi.fn()
+  checkSession: vi.fn(),
 };
 
 // Mock the auth context
@@ -30,12 +31,12 @@ const mockAuthContext = {
   refreshToken: vi.fn(),
   clearError: vi.fn(),
   hasPermission: vi.fn(),
-  getRoles: vi.fn()
+  getRoles: vi.fn(),
 };
 
 // Mock the auth provider
 vi.mock('../../../core/auth/hooks/useAuth', () => ({
-  useAuth: () => mockAuthContext
+  useAuth: () => mockAuthContext,
 }));
 
 describe('useAuth Hook', () => {
@@ -63,7 +64,7 @@ describe('useAuth Hook', () => {
         id: 'user-123',
         email: 'test@example.com',
         username: 'testuser',
-        roles: ['user']
+        roles: ['user'],
       };
 
       mockAuthContext.user = mockUser;
@@ -99,7 +100,7 @@ describe('useAuth Hook', () => {
       const { result } = renderHook(() => useAuth());
       const credentials = {
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       };
 
       await act(async () => {
@@ -167,7 +168,7 @@ describe('useAuth Hook', () => {
         id: 'admin-123',
         email: 'admin@example.com',
         username: 'admin',
-        roles: ['admin']
+        roles: ['admin'],
       };
 
       const { result } = renderHook(() => useAuth());
@@ -230,7 +231,7 @@ describe('useAuth Hook', () => {
         id: 'user-123',
         email: 'updated@example.com',
         username: 'updateduser',
-        roles: ['user', 'editor']
+        roles: ['user', 'editor'],
       };
 
       mockAuthContext.user = updatedUser;
@@ -247,7 +248,7 @@ describe('useAuth Hook', () => {
       const updatedProfile = {
         firstName: 'John',
         lastName: 'Doe',
-        email: 'john.doe@example.com'
+        email: 'john.doe@example.com',
       };
 
       // This would typically trigger a state update
@@ -286,14 +287,14 @@ describe('useAuth Hook', () => {
     it('should handle complete authentication flow', async () => {
       const credentials = {
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       };
 
       const mockUser = {
         id: 'user-123',
         email: 'test@example.com',
         username: 'testuser',
-        roles: ['user']
+        roles: ['user'],
       };
 
       // Simulate login

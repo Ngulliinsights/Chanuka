@@ -14,7 +14,7 @@ export class NavigationStatePersistence {
         preferences: state.preferences,
         sidebarOpen: state.sidebarOpen,
         sidebarCollapsed: state.sidebarCollapsed,
-        user_role: state.user_role
+        user_role: state.user_role,
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persistableState));
     } catch (error) {
@@ -60,7 +60,7 @@ export class NavigationStatePersistence {
   }
 
   static updateRecentPages(
-    recentlyVisited: RecentPage[], 
+    recentlyVisited: RecentPage[],
     newPage: { path: string; title: string }
   ): RecentPage[] {
     // Ensure path and title are defined
@@ -68,10 +68,8 @@ export class NavigationStatePersistence {
       return recentlyVisited;
     }
 
-    const existingPageIndex = recentlyVisited.findIndex(
-      page => page.path === newPage.path
-    );
-    
+    const existingPageIndex = recentlyVisited.findIndex(page => page.path === newPage.path);
+
     if (existingPageIndex >= 0) {
       // Update existing page by moving it to the front and incrementing count
       const updatedRecentPages = [...recentlyVisited];
@@ -79,7 +77,7 @@ export class NavigationStatePersistence {
       if (!existingPage) {
         return recentlyVisited;
       }
-      
+
       updatedRecentPages.splice(existingPageIndex, 1);
       updatedRecentPages.unshift({
         ...existingPage,
@@ -99,4 +97,3 @@ export class NavigationStatePersistence {
     }
   }
 }
-

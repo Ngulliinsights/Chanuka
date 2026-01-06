@@ -9,7 +9,7 @@ export type {
   CommandSection,
   CommandPaletteState,
   CommandPaletteConfig,
-  CommandPaletteProps
+  CommandPaletteProps,
 } from './types';
 
 export {
@@ -18,7 +18,7 @@ export {
   createHelpCommands,
   createDefaultSections,
   filterCommands,
-  groupCommandsBySection
+  groupCommandsBySection,
 } from './commands';
 
 export { CommandPalette as default } from './CommandPalette';

@@ -12,7 +12,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandShortcut
+  CommandShortcut,
 } from '@/shared/design-system';
 import { Input } from '@/shared/design-system';
 
@@ -49,11 +49,8 @@ const navigationUtils = {
    * Returns only items with valid id, label, and href to prevent runtime errors.
    */
   validateNavigationItems(items: NavigationItem[]): NavigationItem[] {
-    return items.filter(item =>
-      item.id &&
-      item.label &&
-      item.href &&
-      typeof item.href === 'string'
+    return items.filter(
+      item => item.id && item.label && item.href && typeof item.href === 'string'
     );
   },
 
@@ -88,10 +85,11 @@ const navigationUtils = {
 
     if (!lowerQuery) return items;
 
-    return items.filter(item =>
-      item.label.toLowerCase().includes(lowerQuery) ||
-      item.href.toLowerCase().includes(lowerQuery) ||
-      (item.section && item.section.toLowerCase().includes(lowerQuery))
+    return items.filter(
+      item =>
+        item.label.toLowerCase().includes(lowerQuery) ||
+        item.href.toLowerCase().includes(lowerQuery) ||
+        (item.section && item.section.toLowerCase().includes(lowerQuery))
     );
   },
 
@@ -104,7 +102,7 @@ const navigationUtils = {
       console.log('Navigation Event:', eventName, data);
     }
     // In production, this would integrate with your analytics service
-  }
+  },
 };
 
 export const DesktopSidebar = React.memo(() => {
@@ -123,11 +121,7 @@ export const DesktopSidebar = React.memo(() => {
    */
   const validatedItems = useMemo(() => {
     const validated = navigationUtils.validateNavigationItems(items);
-    return navigationUtils.filterNavigationByAccess(
-      validated,
-      user_role,
-      isAuthenticated
-    );
+    return navigationUtils.filterNavigationByAccess(validated, user_role, isAuthenticated);
   }, [items, user_role, isAuthenticated]);
 
   /**
@@ -167,14 +161,17 @@ export const DesktopSidebar = React.memo(() => {
    * Handles navigation item clicks with tracking and routing.
    * useCallback prevents creating new function on every render.
    */
-  const handleItemClick = useCallback((item: NavigationItem) => {
-    navigationUtils.trackNavigationEvent('navigation_click', {
-      itemId: item.id,
-      itemLabel: item.label,
-      source: 'desktop_sidebar'
-    });
-    navigate(item.href);
-  }, [navigate]);
+  const handleItemClick = useCallback(
+    (item: NavigationItem) => {
+      navigationUtils.trackNavigationEvent('navigation_click', {
+        itemId: item.id,
+        itemLabel: item.label,
+        source: 'desktop_sidebar',
+      });
+      navigate(item.href);
+    },
+    [navigate]
+  );
 
   /**
    * Toggles sidebar collapse state.
@@ -197,10 +194,13 @@ export const DesktopSidebar = React.memo(() => {
    * Closes command palette and navigates to item.
    * Extracted for reuse in command palette items.
    */
-  const navigateAndClose = useCallback((href: string) => {
-    navigate(href);
-    setShowCommandPalette(false);
-  }, [navigate]);
+  const navigateAndClose = useCallback(
+    (href: string) => {
+      navigate(href);
+      setShowCommandPalette(false);
+    },
+    [navigate]
+  );
 
   return (
     <>
@@ -211,25 +211,22 @@ export const DesktopSidebar = React.memo(() => {
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="Navigation">
-            {validatedItems.map((item) => (
-              <CommandItem
-                key={item.id}
-                onSelect={() => navigateAndClose(item.href)}
-              >
+            {validatedItems.map(item => (
+              <CommandItem key={item.id} onSelect={() => navigateAndClose(item.href)}>
                 {item.icon}
                 <span className="ml-2">{item.label}</span>
-                {item.badge && (
-                  <CommandShortcut>{item.badge}</CommandShortcut>
-                )}
+                {item.badge && <CommandShortcut>{item.badge}</CommandShortcut>}
               </CommandItem>
             ))}
           </CommandGroup>
 
           <CommandGroup heading="Quick Actions">
-            <CommandItem onSelect={() => {
-              toggleCollapse();
-              setShowCommandPalette(false);
-            }}>
+            <CommandItem
+              onSelect={() => {
+                toggleCollapse();
+                setShowCommandPalette(false);
+              }}
+            >
               <PanelLeft className="h-4 w-4" />
               <span className="ml-2">Toggle Sidebar</span>
               <CommandShortcut>⌘B</CommandShortcut>
@@ -252,15 +249,13 @@ export const DesktopSidebar = React.memo(() => {
         {/* Header section with collapse toggle button */}
         <div className="p-4 border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
-            {!isCollapsed && (
-              <h2 className="text-lg font-semibold">Navigation</h2>
-            )}
+            {!isCollapsed && <h2 className="text-lg font-semibold">Navigation</h2>}
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleCollapse}
               className="h-8 w-8 p-0"
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {isCollapsed ? (
                 <ChevronRight className="h-4 w-4" />
@@ -281,7 +276,7 @@ export const DesktopSidebar = React.memo(() => {
                   type="text"
                   placeholder="Search navigation..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="pl-8 flex-1"
                   aria-label="Search navigation items"
                 />
@@ -310,7 +305,7 @@ export const DesktopSidebar = React.memo(() => {
                 {searchQuery ? 'No items match your search' : 'No navigation items available'}
               </div>
             ) : (
-              filteredItems.map((item) => {
+              filteredItems.map(item => {
                 const isActive = location.pathname === item.href;
 
                 return (
@@ -353,9 +348,7 @@ export const DesktopSidebar = React.memo(() => {
                     {user_role?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      User
-                    </p>
+                    <p className="text-sm font-medium truncate">User</p>
                     <p className="text-xs text-muted-foreground truncate">
                       {user_role || 'Member'}
                     </p>

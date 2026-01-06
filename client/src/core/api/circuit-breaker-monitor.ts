@@ -1,13 +1,14 @@
 /**
  * Circuit Breaker Monitoring and Error Correlation
- * 
+ *
  * Provides monitoring capabilities for circuit breaker states and integrates
  * with the error correlation system for comprehensive observability.
  */
 
-import { getCircuitBreakerStats } from './interceptors';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 import { logger } from '../../utils/logger';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+
+import { getCircuitBreakerStats } from './interceptors';
 
 export interface CircuitBreakerState {
   state: 'open' | 'closed' | 'half-open';
@@ -85,7 +86,7 @@ export class CircuitBreakerMonitor {
 
     logger.info('Circuit breaker monitoring started', {
       component: 'CircuitBreakerMonitor',
-      intervalMs
+      intervalMs,
     });
   }
 
@@ -100,7 +101,7 @@ export class CircuitBreakerMonitor {
     this.isMonitoring = false;
 
     logger.info('Circuit breaker monitoring stopped', {
-      component: 'CircuitBreakerMonitor'
+      component: 'CircuitBreakerMonitor',
     });
   }
 
@@ -113,7 +114,7 @@ export class CircuitBreakerMonitor {
       serviceName: event.serviceName,
       state: event.state,
       metrics: event.metrics,
-      correlationId: event.correlationId
+      correlationId: event.correlationId,
     });
 
     // Update service health cache
@@ -122,14 +123,14 @@ export class CircuitBreakerMonitor {
     // Notify listeners
     const listeners = this.eventListeners.get(event.serviceName) || [];
     const globalListeners = this.eventListeners.get('*') || [];
-    
+
     [...listeners, ...globalListeners].forEach(listener => {
       try {
         listener(event);
       } catch (error) {
         logger.error('Circuit breaker event listener error', {
           component: 'CircuitBreakerMonitor',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     });
@@ -148,7 +149,7 @@ export class CircuitBreakerMonitor {
     }
 
     let correlation = this.errorCorrelations.get(correlationId);
-    
+
     if (!correlation) {
       correlation = {
         correlationId,
@@ -156,13 +157,13 @@ export class CircuitBreakerMonitor {
         services: [],
         startTime: new Date(),
         resolved: false,
-        recoveryAttempts: 0
+        recoveryAttempts: 0,
       };
       this.errorCorrelations.set(correlationId, correlation);
     }
 
     correlation.errors.push(error);
-    
+
     // Extract service name from error context
     const serviceName = error.metadata.context?.serviceName as string;
     if (serviceName && !correlation.services.includes(serviceName)) {
@@ -174,7 +175,7 @@ export class CircuitBreakerMonitor {
       correlationId,
       errorCode: error.code,
       serviceName,
-      totalErrors: correlation.errors.length
+      totalErrors: correlation.errors.length,
     });
 
     // Auto-resolve old correlations
@@ -195,7 +196,7 @@ export class CircuitBreakerMonitor {
         correlationId,
         duration: correlation.endTime.getTime() - correlation.startTime.getTime(),
         totalErrors: correlation.errors.length,
-        services: correlation.services
+        services: correlation.services,
       });
     }
   }
@@ -207,7 +208,7 @@ export class CircuitBreakerMonitor {
     const correlation = this.errorCorrelations.get(correlationId);
     if (correlation) {
       correlation.recoveryAttempts++;
-      
+
       if (success) {
         this.resolveCorrelation(correlationId);
       }
@@ -216,7 +217,7 @@ export class CircuitBreakerMonitor {
         component: 'CircuitBreakerMonitor',
         correlationId,
         success,
-        totalAttempts: correlation.recoveryAttempts
+        totalAttempts: correlation.recoveryAttempts,
       });
     }
   }
@@ -238,11 +239,11 @@ export class CircuitBreakerMonitor {
    */
   getErrorCorrelations(resolved?: boolean): ErrorCorrelation[] {
     const correlations = Array.from(this.errorCorrelations.values());
-    
+
     if (resolved !== undefined) {
       return correlations.filter(c => c.resolved === resolved);
     }
-    
+
     return correlations;
   }
 
@@ -294,8 +295,9 @@ export class CircuitBreakerMonitor {
       servicesMonitored: this.serviceHealthCache.size,
       activeCorrelations: this.getErrorCorrelations(false).length,
       totalEvents: Array.from(this.eventListeners.values()).reduce(
-        (total, listeners) => total + listeners.length, 0
-      )
+        (total, listeners) => total + listeners.length,
+        0
+      ),
     };
   }
 
@@ -304,18 +306,21 @@ export class CircuitBreakerMonitor {
    */
   private updateServiceHealth(): void {
     const stats = getCircuitBreakerStats();
-    
+
     Object.entries(stats).forEach(([serviceName, state]) => {
       const health: ServiceHealthStatus = {
         serviceName,
         healthy: state.state === 'closed',
         state: state.state as 'open' | 'closed' | 'half-open',
         lastFailure: state.lastFailureTime ? new Date(state.lastFailureTime) : undefined,
-        lastSuccess: (state as CircuitBreakerState).lastSuccessTime ? new Date((state as CircuitBreakerState).lastSuccessTime!) : undefined,
+        lastSuccess: (state as CircuitBreakerState).lastSuccessTime
+          ? new Date((state as CircuitBreakerState).lastSuccessTime!)
+          : undefined,
         failureRate: state.failureRate || 0,
         averageResponseTime: state.averageResponseTime || 0,
         totalRequests: (state.failures || 0) + (state.successes || 0),
-        reason: state.state === 'open' ? `Circuit breaker open (${state.failures} failures)` : undefined
+        reason:
+          state.state === 'open' ? `Circuit breaker open (${state.failures} failures)` : undefined,
       };
 
       this.serviceHealthCache.set(serviceName, health);
@@ -330,7 +335,10 @@ export class CircuitBreakerMonitor {
       failureRate: event.metrics.failureRate,
       averageResponseTime: event.metrics.averageResponseTime,
       totalRequests: event.metrics.failures + event.metrics.successes,
-      reason: event.state === 'open' ? `Circuit breaker open (${event.metrics.failures} failures)` : undefined
+      reason:
+        event.state === 'open'
+          ? `Circuit breaker open (${event.metrics.failures} failures)`
+          : undefined,
     };
 
     this.serviceHealthCache.set(event.serviceName, health);
@@ -354,7 +362,7 @@ export class CircuitBreakerMonitor {
     logger.warn('Circuit breaker opened', {
       component: 'CircuitBreakerMonitor',
       serviceName: event.serviceName,
-      metrics: event.metrics
+      metrics: event.metrics,
     });
 
     // Create error for circuit breaker opening
@@ -366,9 +374,9 @@ export class CircuitBreakerMonitor {
       correlationId: event.correlationId,
       context: {
         serviceName: event.serviceName,
-        metrics: event.metrics
+        metrics: event.metrics,
       },
-      retryable: true
+      retryable: true,
     });
 
     if (event.correlationId) {
@@ -380,7 +388,7 @@ export class CircuitBreakerMonitor {
     logger.info('Circuit breaker half-open', {
       component: 'CircuitBreakerMonitor',
       serviceName: event.serviceName,
-      metrics: event.metrics
+      metrics: event.metrics,
     });
 
     if (event.correlationId) {
@@ -392,7 +400,7 @@ export class CircuitBreakerMonitor {
     logger.info('Circuit breaker closed', {
       component: 'CircuitBreakerMonitor',
       serviceName: event.serviceName,
-      metrics: event.metrics
+      metrics: event.metrics,
     });
 
     if (event.correlationId) {
@@ -406,7 +414,8 @@ export class CircuitBreakerMonitor {
 
     for (const [correlationId, correlation] of this.errorCorrelations.entries()) {
       const age = now - correlation.startTime.getTime();
-      if (age > maxAge || (correlation.resolved && age > 60 * 60 * 1000)) { // 1 hour for resolved
+      if (age > maxAge || (correlation.resolved && age > 60 * 60 * 1000)) {
+        // 1 hour for resolved
         this.errorCorrelations.delete(correlationId);
       }
     }

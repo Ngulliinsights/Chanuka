@@ -1,10 +1,10 @@
-import { MiddlewareProvider } from '../types';
-import { CacheService } from '../../caching/core/interfaces';
 import { Request, Response, NextFunction } from 'express';
 
 import { CacheService } from '../../caching/core/interfaces';
+import { CacheService } from '../../caching/core/interfaces';
 import { logger } from '../../observability/logging';
 import { MiddlewareProvider } from '../../types';
+import { MiddlewareProvider } from '../types';
 
 interface CacheOptions {
   ttl: number;

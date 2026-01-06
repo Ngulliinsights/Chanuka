@@ -1,9 +1,9 @@
 /**
  * Navigation Configuration
- * 
+ *
  * Single source of truth for navigation structure and menu items.
  * Used across all navigation components to ensure consistency.
- * 
+ *
  * @module config/navigation
  */
 
@@ -85,7 +85,7 @@ export function getNavigationItems(context: 'mobile' | 'desktop' | 'all'): Navig
   if (context === 'all') {
     return [...MAIN_NAVIGATION];
   }
-  
+
   // For mobile, you might want to subset navigation
   return MAIN_NAVIGATION;
 }

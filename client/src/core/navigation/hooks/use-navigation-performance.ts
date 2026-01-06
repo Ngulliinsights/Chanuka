@@ -15,9 +15,9 @@ export function useNavigationPerformance() {
   const [performanceMetrics, setPerformanceMetrics] = useState({
     transitionDuration: 0,
     layoutShifts: 0,
-    renderTime: 0
+    renderTime: 0,
   });
-  
+
   const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const performanceObserverRef = useRef<PerformanceObserver | null>(null);
   const layoutShiftObserverRef = useRef<PerformanceObserver | null>(null);
@@ -28,24 +28,24 @@ export function useNavigationPerformance() {
     // Monitor layout shifts
     if ('PerformanceObserver' in window) {
       try {
-        layoutShiftObserverRef.current = new PerformanceObserver((list) => {
+        layoutShiftObserverRef.current = new PerformanceObserver(list => {
           const entries = list.getEntries();
           let totalShift = 0;
-          
-          entries.forEach((entry) => {
+
+          entries.forEach(entry => {
             if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
               totalShift += (entry as any).value;
             }
           });
-          
+
           if (totalShift > 0) {
             setPerformanceMetrics(prev => ({
               ...prev,
-              layoutShifts: prev.layoutShifts + totalShift
+              layoutShifts: prev.layoutShifts + totalShift,
             }));
           }
         });
-        
+
         layoutShiftObserverRef.current.observe({ entryTypes: ['layout-shift'] });
       } catch (error) {
         console.warn('Layout shift monitoring not supported:', error);
@@ -68,21 +68,21 @@ export function useNavigationPerformance() {
   const startTransition = useCallback((duration: number = 250) => {
     renderStartRef.current = performance.now();
     setIsTransitioning(true);
-    
+
     // Clear any existing timeout
     if (transitionTimeoutRef.current) {
       clearTimeout(transitionTimeoutRef.current);
     }
-    
+
     // Set timeout to end transition
     transitionTimeoutRef.current = setTimeout(() => {
       setIsTransitioning(false);
       const renderTime = performance.now() - renderStartRef.current;
-      
+
       setPerformanceMetrics(prev => ({
         ...prev,
         transitionDuration: duration,
-        renderTime
+        renderTime,
       }));
     }, duration);
   }, []);
@@ -100,90 +100,102 @@ export function useNavigationPerformance() {
   /**
    * Optimized callback that prevents unnecessary re-renders
    */
-  const useOptimizedCallback = useCallback(<T extends (...args: unknown[]) => any>(
-    callback: T,
-    deps: React.DependencyList
-  ): T => {
-    const callbackRef = useRef(callback);
-    const depsRef = useRef(deps);
-    
-    // Update callback if dependencies changed
-    if (!depsRef.current || deps.some((dep, index) => dep !== depsRef.current![index])) {
-      callbackRef.current = callback;
-      depsRef.current = deps;
-    }
-    
-    return callbackRef.current;
-  }, []);
+  const useOptimizedCallback = useCallback(
+    <T extends (...args: unknown[]) => any>(callback: T, deps: React.DependencyList): T => {
+      const callbackRef = useRef(callback);
+      const depsRef = useRef(deps);
+
+      // Update callback if dependencies changed
+      if (!depsRef.current || deps.some((dep, index) => dep !== depsRef.current![index])) {
+        callbackRef.current = callback;
+        depsRef.current = deps;
+      }
+
+      return callbackRef.current;
+    },
+    []
+  );
 
   /**
    * Debounced function for performance-sensitive operations
    */
-  const useDebounced = useCallback(<T extends (...args: unknown[]) => any>(
-    func: T,
-    delay: number
-  ): T => {
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    
-    return useCallback((...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      
-      timeoutRef.current = setTimeout(() => {
-        func(...args);
-      }, delay);
-    }, [func, delay]) as T;
-  }, []);
+  const useDebounced = useCallback(
+    <T extends (...args: unknown[]) => any>(func: T, delay: number): T => {
+      const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+      return useCallback(
+        (...args: Parameters<T>) => {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+
+          timeoutRef.current = setTimeout(() => {
+            func(...args);
+          }, delay);
+        },
+        [func, delay]
+      ) as T;
+    },
+    []
+  );
 
   /**
    * Throttled function for high-frequency events
    */
-  const useThrottled = useCallback(<T extends (...args: unknown[]) => any>(
-    func: T,
-    delay: number
-  ): T => {
-    const lastCallRef = useRef<number>(0);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    
-    return useCallback((...args: Parameters<T>) => {
-      const now = Date.now();
-      
-      if (now - lastCallRef.current >= delay) {
-        lastCallRef.current = now;
-        func(...args);
-      } else if (!timeoutRef.current) {
-        timeoutRef.current = setTimeout(() => {
-          lastCallRef.current = Date.now();
-          func(...args);
-          timeoutRef.current = null;
-        }, delay - (now - lastCallRef.current));
-      }
-    }, [func, delay]) as T;
-  }, []);
+  const useThrottled = useCallback(
+    <T extends (...args: unknown[]) => any>(func: T, delay: number): T => {
+      const lastCallRef = useRef<number>(0);
+      const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+      return useCallback(
+        (...args: Parameters<T>) => {
+          const now = Date.now();
+
+          if (now - lastCallRef.current >= delay) {
+            lastCallRef.current = now;
+            func(...args);
+          } else if (!timeoutRef.current) {
+            timeoutRef.current = setTimeout(
+              () => {
+                lastCallRef.current = Date.now();
+                func(...args);
+                timeoutRef.current = null;
+              },
+              delay - (now - lastCallRef.current)
+            );
+          }
+        },
+        [func, delay]
+      ) as T;
+    },
+    []
+  );
 
   /**
    * Preload critical resources for better perceived performance
    */
-  const preloadResource = useCallback((url: string, type: 'script' | 'style' | 'image' = 'script') => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = url;
-    
-    switch (type) {
-      case 'script':
-        link.as = 'script';
-        break;
-      case 'style':
-        link.as = 'style';
-        break;
-      case 'image':
-        link.as = 'image';
-        break;
-    }
-    
-    document.head.appendChild(link);
-  }, []);
+  const preloadResource = useCallback(
+    (url: string, type: 'script' | 'style' | 'image' = 'script') => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = url;
+
+      switch (type) {
+        case 'script':
+          link.as = 'script';
+          break;
+        case 'style':
+          link.as = 'style';
+          break;
+        case 'image':
+          link.as = 'image';
+          break;
+      }
+
+      document.head.appendChild(link);
+    },
+    []
+  );
 
   /**
    * Force GPU acceleration for smooth animations
@@ -210,11 +222,12 @@ export function useNavigationPerformance() {
     const start = performance.now();
     renderFn();
     const end = performance.now();
-    
+
     console.debug(`${componentName} render time: ${(end - start).toFixed(2)}ms`);
-    
+
     // Log warning for slow renders
-    if (end - start > 16) { // 60fps threshold
+    if (end - start > 16) {
+      // 60fps threshold
       console.warn(`Slow render detected in ${componentName}: ${(end - start).toFixed(2)}ms`);
     }
   }, []);
@@ -226,7 +239,7 @@ export function useNavigationPerformance() {
     setPerformanceMetrics({
       transitionDuration: 0,
       layoutShifts: 0,
-      renderTime: 0
+      renderTime: 0,
     });
   }, []);
 
@@ -235,19 +248,23 @@ export function useNavigationPerformance() {
    */
   const getPerformanceRecommendations = useCallback(() => {
     const recommendations: string[] = [];
-    
+
     if (performanceMetrics.layoutShifts > 0.1) {
-      recommendations.push('Consider using CSS containment or fixed dimensions to reduce layout shifts');
+      recommendations.push(
+        'Consider using CSS containment or fixed dimensions to reduce layout shifts'
+      );
     }
-    
+
     if (performanceMetrics.renderTime > 50) {
       recommendations.push('Consider memoizing expensive components or using React.memo');
     }
-    
+
     if (performanceMetrics.transitionDuration > 300) {
-      recommendations.push('Consider reducing transition duration for better perceived performance');
+      recommendations.push(
+        'Consider reducing transition duration for better perceived performance'
+      );
     }
-    
+
     return recommendations;
   }, [performanceMetrics]);
 
@@ -255,11 +272,11 @@ export function useNavigationPerformance() {
     // State
     isTransitioning,
     performanceMetrics,
-    
+
     // Transition control
     startTransition,
     endTransition,
-    
+
     // Performance utilities
     useOptimizedCallback,
     useDebounced,
@@ -268,10 +285,10 @@ export function useNavigationPerformance() {
     enableGPUAcceleration,
     disableGPUAcceleration,
     measureRenderTime,
-    
+
     // Metrics
     resetMetrics,
-    getPerformanceRecommendations
+    getPerformanceRecommendations,
   };
 }
 
@@ -280,12 +297,12 @@ export function useNavigationPerformance() {
  */
 export function useLayoutStable() {
   const elementRef = useRef<HTMLElement | null>(null);
-  
+
   const stabilize = useCallback(() => {
     if (elementRef.current) {
       const element = elementRef.current;
       const rect = element.getBoundingClientRect();
-      
+
       // Set explicit dimensions to prevent layout shifts
       element.style.width = `${rect.width}px`;
       element.style.height = `${rect.height}px`;
@@ -293,7 +310,7 @@ export function useLayoutStable() {
       element.style.minHeight = `${rect.height}px`;
     }
   }, []);
-  
+
   const unstabilize = useCallback(() => {
     if (elementRef.current) {
       const element = elementRef.current;
@@ -303,50 +320,6 @@ export function useLayoutStable() {
       element.style.minHeight = '';
     }
   }, []);
-  
+
   return { elementRef, stabilize, unstabilize };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

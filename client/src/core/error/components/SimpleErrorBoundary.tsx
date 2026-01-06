@@ -81,4 +81,3 @@ export class SimpleErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-

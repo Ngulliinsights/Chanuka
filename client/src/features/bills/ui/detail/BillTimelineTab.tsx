@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Calendar,
   Clock,
@@ -8,15 +7,15 @@ import {
   Users,
   FileText,
   Gavel,
-  PenTool
+  PenTool,
 } from 'lucide-react';
+import React from 'react';
 
+import type { Bill } from '@client/features/bills/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { cn } from '@client/shared/design-system/utils/cn';
-
-import type { Bill } from '@client/features/bills/types';
 
 interface BillTimelineTabProps {
   bill: Bill;
@@ -38,14 +37,14 @@ const statusIcons = {
   completed: CheckCircle,
   current: Clock,
   upcoming: Calendar,
-  blocked: AlertCircle
+  blocked: AlertCircle,
 };
 
 const statusColors = {
   completed: 'text-green-600 bg-green-100',
   current: 'text-blue-600 bg-blue-100',
   upcoming: 'text-gray-600 bg-gray-100',
-  blocked: 'text-red-600 bg-red-100'
+  blocked: 'text-red-600 bg-red-100',
 };
 
 const typeIcons = {
@@ -54,7 +53,7 @@ const typeIcons = {
   debate: Gavel,
   vote: CheckCircle,
   signature: PenTool,
-  implementation: ArrowRight
+  implementation: ArrowRight,
 };
 
 /**
@@ -75,7 +74,7 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       status: 'completed',
       type: 'introduction',
       details: 'Introduced by Hon. Sarah Wanjiku with 12 co-sponsors',
-      stakeholders: ['Hon. Sarah Wanjiku', 'Environment Committee']
+      stakeholders: ['Hon. Sarah Wanjiku', 'Environment Committee'],
     },
     {
       id: '2',
@@ -85,7 +84,7 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       status: 'completed',
       type: 'committee',
       details: 'Referred to Environment and Natural Resources Committee',
-      stakeholders: ['Environment Committee', 'Committee Clerk']
+      stakeholders: ['Environment Committee', 'Committee Clerk'],
     },
     {
       id: '3',
@@ -95,7 +94,7 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       status: 'completed',
       type: 'committee',
       details: 'Public hearings conducted with 45 submissions received',
-      stakeholders: ['Environment Committee', 'Public Participants', 'Expert Witnesses']
+      stakeholders: ['Environment Committee', 'Public Participants', 'Expert Witnesses'],
     },
     {
       id: '4',
@@ -108,9 +107,9 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       nextSteps: [
         'Schedule second reading debate',
         'Address committee amendments',
-        'Prepare for floor debate'
+        'Prepare for floor debate',
       ],
-      stakeholders: ['Environment Committee', 'Parliamentary Clerk']
+      stakeholders: ['Environment Committee', 'Parliamentary Clerk'],
     },
     {
       id: '5',
@@ -123,9 +122,9 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       nextSteps: [
         'MPs debate bill principles',
         'Vote on second reading',
-        'Proceed to committee of the whole'
+        'Proceed to committee of the whole',
       ],
-      stakeholders: ['All MPs', 'Speaker of National Assembly']
+      stakeholders: ['All MPs', 'Speaker of National Assembly'],
     },
     {
       id: '6',
@@ -134,12 +133,8 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       description: 'Clause-by-clause examination and amendments',
       status: 'upcoming',
       type: 'debate',
-      nextSteps: [
-        'Examine each clause',
-        'Consider proposed amendments',
-        'Vote on amendments'
-      ],
-      stakeholders: ['All MPs', 'Parliamentary Counsel']
+      nextSteps: ['Examine each clause', 'Consider proposed amendments', 'Vote on amendments'],
+      stakeholders: ['All MPs', 'Parliamentary Counsel'],
     },
     {
       id: '7',
@@ -151,9 +146,9 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       nextSteps: [
         'Final debate on amended bill',
         'Vote on third reading',
-        'Send to Senate if passed'
+        'Send to Senate if passed',
       ],
-      stakeholders: ['All MPs', 'Speaker of National Assembly']
+      stakeholders: ['All MPs', 'Speaker of National Assembly'],
     },
     {
       id: '8',
@@ -165,16 +160,15 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
       nextSteps: [
         'Presidential review',
         'Sign into law or return with memorandum',
-        'Gazette as Act of Parliament'
+        'Gazette as Act of Parliament',
       ],
-      stakeholders: ['President', 'Attorney General']
-    }
+      stakeholders: ['President', 'Attorney General'],
+    },
   ];
 
   const currentEventIndex = timelineEvents.findIndex(event => event.status === 'current');
-  const progressPercentage = currentEventIndex >= 0
-    ? ((currentEventIndex + 0.5) / timelineEvents.length) * 100
-    : 0;
+  const progressPercentage =
+    currentEventIndex >= 0 ? ((currentEventIndex + 0.5) / timelineEvents.length) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -252,11 +246,13 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
                 return (
                   <div key={event.id} className="relative flex gap-4">
                     {/* Timeline Node */}
-                    <div className={cn(
-                      "relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2",
-                      statusColors[event.status],
-                      event.status === 'current' && "ring-2 ring-blue-200"
-                    )}>
+                    <div
+                      className={cn(
+                        'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2',
+                        statusColors[event.status],
+                        event.status === 'current' && 'ring-2 ring-blue-200'
+                      )}
+                    >
                       <StatusIcon className="h-5 w-5" />
                     </div>
 
@@ -269,8 +265,9 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
                             <h3 className="font-semibold">{event.title}</h3>
                           </div>
                           <div className="text-sm text-gray-500">
-                            {event.date === 'TBD' ? 'To Be Determined' :
-                             new Date(event.date).toLocaleDateString()}
+                            {event.date === 'TBD'
+                              ? 'To Be Determined'
+                              : new Date(event.date).toLocaleDateString()}
                           </div>
                         </div>
 

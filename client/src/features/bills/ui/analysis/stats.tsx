@@ -1,8 +1,8 @@
 import React from 'react';
-import { logger } from '@client/utils/logger';
 
 import { Card, CardContent, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 interface Bill {
   supportPercentage?: number;
@@ -24,7 +24,7 @@ export const BillStats = ({ bill }: BillStatsProps) => {
     <Card className="sticky top-6">
       <CardContent className="p-6">
         <CardTitle className="mb-4 text-xl font-semibold">Bill Statistics</CardTitle>
-        
+
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm mb-1">
@@ -32,26 +32,26 @@ export const BillStats = ({ bill }: BillStatsProps) => {
               <span>{supportPercentage}%</span>
             </div>
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div 
-                className="bg-green-500 h-full rounded-full" 
+              <div
+                className="bg-green-500 h-full rounded-full"
                 style={{ width: `${supportPercentage}%` }}
               ></div>
             </div>
           </div>
-          
+
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="font-medium">Opposition</span>
               <span>{oppositionPercentage}%</span>
             </div>
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div 
-                className="bg-red-500 h-full rounded-full" 
+              <div
+                className="bg-red-500 h-full rounded-full"
                 style={{ width: `${oppositionPercentage}%` }}
               ></div>
             </div>
           </div>
-          
+
           <div className="pt-4 border-t border-slate-200">
             <h3 className="font-medium mb-2">Engagement Metrics</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -73,16 +73,20 @@ export const BillStats = ({ bill }: BillStatsProps) => {
               </div>
             </div>
           </div>
-          
+
           <div className="pt-4 border-t border-slate-200">
             <h3 className="font-medium mb-2">Expert Verification</h3>
             <div className="flex justify-between items-center text-sm">
               <span>Constitutional Assessment</span>
-              <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">Verified</span>
+              <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">
+                Verified
+              </span>
             </div>
             <div className="flex justify-between items-center text-sm mt-2">
               <span>Economic Impact Analysis</span>
-              <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs">Pending</span>
+              <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs">
+                Pending
+              </span>
             </div>
           </div>
         </div>
@@ -90,4 +94,3 @@ export const BillStats = ({ bill }: BillStatsProps) => {
     </Card>
   );
 };
-

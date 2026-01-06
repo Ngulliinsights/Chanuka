@@ -49,16 +49,19 @@ interface MobileBottomSheetProps extends BottomSheetConfig {
  * A bottom sheet modal with drag and snap points support.
  */
 export const MobileBottomSheet = React.forwardRef<HTMLDivElement, MobileBottomSheetProps>(
-  ({
-    isOpen,
-    onClose,
-    snapPoints = [0.5, 1],
-    initialSnap = 0,
-    dismissOnBackdropPress = true,
-    dismissOnDrag = true,
-    title,
-    children
-  }, ref) => {
+  (
+    {
+      isOpen,
+      onClose,
+      snapPoints = [0.5, 1],
+      initialSnap = 0,
+      dismissOnBackdropPress = true,
+      dismissOnDrag = true,
+      title,
+      children,
+    },
+    ref
+  ) => {
     const sheetRef = useRef<HTMLDivElement>(null);
     const [currentPosition, setCurrentPosition] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -66,52 +69,64 @@ export const MobileBottomSheet = React.forwardRef<HTMLDivElement, MobileBottomSh
     const startPosition = useRef<number>(0);
 
     // Convert snap points to pixel values
-    const getSnapPosition = useCallback((index: number) => {
-      if (!sheetRef.current) return 0;
-      const sheetHeight = sheetRef.current.offsetHeight;
-      return sheetHeight * (1 - snapPoints[index]);
-    }, [snapPoints]);
+    const getSnapPosition = useCallback(
+      (index: number) => {
+        if (!sheetRef.current) return 0;
+        const sheetHeight = sheetRef.current.offsetHeight;
+        return sheetHeight * (1 - snapPoints[index]);
+      },
+      [snapPoints]
+    );
 
     // Snap to nearest point
-    const snapToPoint = useCallback((targetPosition: number) => {
-      if (!sheetRef.current) return;
+    const snapToPoint = useCallback(
+      (targetPosition: number) => {
+        if (!sheetRef.current) return;
 
-      const sheetHeight = sheetRef.current.offsetHeight;
-      let closestIndex = 0;
-      let minDistance = Math.abs(targetPosition - getSnapPosition(0));
+        const sheetHeight = sheetRef.current.offsetHeight;
+        let closestIndex = 0;
+        let minDistance = Math.abs(targetPosition - getSnapPosition(0));
 
-      snapPoints.forEach((_, index) => {
-        const distance = Math.abs(targetPosition - getSnapPosition(index));
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = index;
+        snapPoints.forEach((_, index) => {
+          const distance = Math.abs(targetPosition - getSnapPosition(index));
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        });
+
+        const snapPosition = getSnapPosition(closestIndex);
+        setCurrentPosition(snapPosition);
+
+        // If snapping to closed position (top), close the sheet
+        if (closestIndex === 0 && snapPosition >= sheetHeight * 0.9) {
+          onClose();
         }
-      });
-
-      const snapPosition = getSnapPosition(closestIndex);
-      setCurrentPosition(snapPosition);
-
-      // If snapping to closed position (top), close the sheet
-      if (closestIndex === 0 && snapPosition >= sheetHeight * 0.9) {
-        onClose();
-      }
-    }, [snapPoints, getSnapPosition, onClose]);
+      },
+      [snapPoints, getSnapPosition, onClose]
+    );
 
     // Handle touch start
-    const handleTouchStart = useCallback((e: React.TouchEvent) => {
-      setIsDragging(true);
-      startY.current = e.touches[0].clientY;
-      startPosition.current = currentPosition;
-    }, [currentPosition]);
+    const handleTouchStart = useCallback(
+      (e: React.TouchEvent) => {
+        setIsDragging(true);
+        startY.current = e.touches[0].clientY;
+        startPosition.current = currentPosition;
+      },
+      [currentPosition]
+    );
 
     // Handle touch move
-    const handleTouchMove = useCallback((e: React.TouchEvent) => {
-      if (!isDragging || !sheetRef.current) return;
+    const handleTouchMove = useCallback(
+      (e: React.TouchEvent) => {
+        if (!isDragging || !sheetRef.current) return;
 
-      const deltaY = e.touches[0].clientY - startY.current;
-      const newPosition = Math.max(0, startPosition.current + deltaY);
-      setCurrentPosition(newPosition);
-    }, [isDragging]);
+        const deltaY = e.touches[0].clientY - startY.current;
+        const newPosition = Math.max(0, startPosition.current + deltaY);
+        setCurrentPosition(newPosition);
+      },
+      [isDragging]
+    );
 
     // Handle touch end
     const handleTouchEnd = useCallback(() => {
@@ -125,7 +140,15 @@ export const MobileBottomSheet = React.forwardRef<HTMLDivElement, MobileBottomSh
       } else {
         snapToPoint(currentPosition);
       }
-    }, [isDragging, currentPosition, dismissOnDrag, getSnapPosition, snapPoints.length, onClose, snapToPoint]);
+    }, [
+      isDragging,
+      currentPosition,
+      dismissOnDrag,
+      getSnapPosition,
+      snapPoints.length,
+      onClose,
+      snapToPoint,
+    ]);
 
     // Initialize position when opened
     useEffect(() => {
@@ -146,10 +169,7 @@ export const MobileBottomSheet = React.forwardRef<HTMLDivElement, MobileBottomSh
       <div ref={ref} className={`mobile-bottom-sheet ${isOpen ? 'open' : ''}`}>
         {isOpen && (
           <>
-            <div
-              className="backdrop"
-              onClick={dismissOnBackdropPress ? onClose : undefined}
-            />
+            <div className="backdrop" onClick={dismissOnBackdropPress ? onClose : undefined} />
             <div
               ref={sheetRef}
               className="sheet-content"

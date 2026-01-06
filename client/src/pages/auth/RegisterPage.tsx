@@ -5,13 +5,19 @@
 
 import { Shield, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
-import React from 'react';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -19,7 +25,12 @@ export default function RegisterPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const handleRegisterSubmit = async (data: { email: string; password: string; first_name: string; last_name: string }) => {
+  const handleRegisterSubmit = async (data: {
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+  }) => {
     try {
       // The register API expects the minimal RegisterData shape. Privacy settings
       // and other preferences should be updated via a separate API call after
@@ -34,13 +45,13 @@ export default function RegisterPage() {
 
       if (result.success) {
         logger.info('Registration successful', {
-          component: 'RegisterPage'
+          component: 'RegisterPage',
         });
 
         if (result.requiresVerification) {
           navigate('/auth/verify-email', {
             state: { email: data.email },
-            replace: true
+            replace: true,
           });
         } else {
           navigate('/dashboard', { replace: true });
@@ -62,7 +73,7 @@ export default function RegisterPage() {
   const handleSocialLoginSuccess = (data: any) => {
     logger.info('Social registration successful', {
       component: 'RegisterPage',
-      provider: data.provider
+      provider: data.provider,
     });
     navigate('/dashboard', { replace: true });
   };
@@ -77,15 +88,10 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Create your account</h2>
           <p className="mt-2 text-sm text-gray-600">
             Already have an account?{' '}
-            <Link
-              to="/auth/login"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
+            <Link to="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
               Sign in
             </Link>
           </p>
@@ -96,7 +102,14 @@ export default function RegisterPage() {
           <div className="bg-white shadow rounded-lg p-4 text-center text-muted-foreground mb-4">
             <p>Social login integration not available in this build.</p>
             <div className="mt-3">
-              <button type="button" disabled={loading} onClick={() => handleSocialLoginSuccess({ provider: 'mock' })} className="px-3 py-1 border rounded">Simulate Social Login</button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => handleSocialLoginSuccess({ provider: 'mock' })}
+                className="px-3 py-1 border rounded"
+              >
+                Simulate Social Login
+              </button>
             </div>
           </div>
         </div>
@@ -105,9 +118,7 @@ export default function RegisterPage() {
         <Card>
           <CardHeader>
             <CardTitle>Create Account</CardTitle>
-            <CardDescription>
-              Fill in your information to create a new account
-            </CardDescription>
+            <CardDescription>Fill in your information to create a new account</CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -121,7 +132,21 @@ export default function RegisterPage() {
               <div className="bg-white shadow rounded-lg p-6 text-center text-muted-foreground">
                 <p>Registration form component is not available in this build.</p>
                 <div className="mt-3">
-                  <button type="button" disabled={loading} onClick={() => handleRegisterSubmit({ email: 'test@example.com', password: 'password', first_name: 'Test', last_name: 'User' })} className="px-3 py-1 bg-blue-600 text-white rounded">Simulate Register</button>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() =>
+                      handleRegisterSubmit({
+                        email: 'test@example.com',
+                        password: 'password',
+                        first_name: 'Test',
+                        last_name: 'User',
+                      })
+                    }
+                    className="px-3 py-1 bg-blue-600 text-white rounded"
+                  >
+                    Simulate Register
+                  </button>
                 </div>
               </div>
             </div>

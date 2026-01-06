@@ -4,8 +4,8 @@
 
 import React, { createContext, memo, useMemo } from 'react';
 
-import type { AssetLoadingIndicatorProps } from '../types';
 import { useAssetLoadingIndicatorState } from '../hooks/useAssetLoadingIndicatorState';
+import type { AssetLoadingIndicatorProps } from '../types';
 
 interface AssetLoadingContextType {
   showIndicator: (options?: Partial<AssetLoadingIndicatorProps>) => void;

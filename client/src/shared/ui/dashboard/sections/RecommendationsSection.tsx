@@ -3,7 +3,6 @@
  * * Displays ML-powered bill recommendations with relevance scoring and reasoning.
  */
 
-import React from 'react';
 import {
   X,
   ExternalLink,
@@ -16,8 +15,9 @@ import {
   CheckCircle,
   Sparkles,
   Zap,
-  Settings as Cpu // Using Settings as Cpu replacement
+  Settings as Cpu, // Using Settings as Cpu replacement
 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Progress } from '@/shared/design-system/feedback/Progress';
@@ -36,7 +36,7 @@ interface RecommendationsSectionProps {
 export function RecommendationsSection({
   recommendations,
   loading = false,
-  compact = false
+  compact = false,
 }: RecommendationsSectionProps) {
   // Mock store functions since userDashboardSlice doesn't exist yet
   const acceptRecommendation = (id: string) => {
@@ -77,11 +77,16 @@ export function RecommendationsSection({
 
   const getReasonClass = (type: string) => {
     switch (type) {
-      case 'interest_match': return styles.reasonInterestMatch;
-      case 'activity_pattern': return styles.reasonActivityPattern;
-      case 'expert_recommendation': return styles.reasonExpertRecommendation;
-      case 'trending': return styles.reasonTrending;
-      default: return styles.reasonInterestMatch;
+      case 'interest_match':
+        return styles.reasonInterestMatch;
+      case 'activity_pattern':
+        return styles.reasonActivityPattern;
+      case 'expert_recommendation':
+        return styles.reasonExpertRecommendation;
+      case 'trending':
+        return styles.reasonTrending;
+      default:
+        return styles.reasonInterestMatch;
     }
   };
 
@@ -119,7 +124,7 @@ export function RecommendationsSection({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="animate-pulse">
                 <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-muted rounded w-1/2 mb-2"></div>
@@ -148,11 +153,7 @@ export function RecommendationsSection({
             <p className="text-sm text-muted-foreground mb-4">
               Engage with more bills to get personalized recommendations.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefreshRecommendations}
-            >
+            <Button variant="outline" size="sm" onClick={handleRefreshRecommendations}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Generate Recommendations
             </Button>
@@ -172,11 +173,7 @@ export function RecommendationsSection({
             <Badge variant="secondary">{recommendations.length}</Badge>
           </CardTitle>
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRefreshRecommendations}
-            >
+            <Button variant="ghost" size="sm" onClick={handleRefreshRecommendations}>
               <RefreshCw className="h-4 w-4" />
             </Button>
             {!compact && (
@@ -190,7 +187,7 @@ export function RecommendationsSection({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {recommendations.map((recommendation) => (
+          {recommendations.map(recommendation => (
             <div
               key={recommendation.bill.id}
               className="chanuka-card p-4 hover:shadow-md transition-shadow"
@@ -199,9 +196,7 @@ export function RecommendationsSection({
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline">
-                      {recommendation.bill.billNumber}
-                    </Badge>
+                    <Badge variant="outline">{recommendation.bill.billNumber}</Badge>
                     <Badge
                       variant="outline"
                       className={getConfidenceClass(recommendation.confidence)}
@@ -220,7 +215,7 @@ export function RecommendationsSection({
 
               {/* Policy Areas */}
               <div className="flex flex-wrap gap-1 mb-3">
-                {recommendation.bill.policyAreas.map((area) => (
+                {recommendation.bill.policyAreas.map(area => (
                   <Badge key={area} variant="secondary" className="text-xs">
                     {area}
                   </Badge>
@@ -235,10 +230,7 @@ export function RecommendationsSection({
                     {Math.round(recommendation.relevanceScore * 100)}%
                   </span>
                 </div>
-                <Progress
-                  value={recommendation.relevanceScore * 100}
-                  className="h-2"
-                />
+                <Progress value={recommendation.relevanceScore * 100} className="h-2" />
               </div>
 
               {/* Recommendation Reasons */}
@@ -295,10 +287,7 @@ export function RecommendationsSection({
                   <X className="h-4 w-4" />
                 </Button>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                >
+                <Button variant="outline" size="sm">
                   <ExternalLink className="h-4 w-4" />
                 </Button>
               </div>
@@ -315,8 +304,8 @@ export function RecommendationsSection({
                 <p className="font-medium mb-1">How recommendations work:</p>
                 <p>
                   Our AI analyzes your engagement patterns, interests, and similar users&apos;
-                  behavior to suggest relevant legislation. Confidence scores reflect
-                  the algorithm&apos;s certainty in the match.
+                  behavior to suggest relevant legislation. Confidence scores reflect the
+                  algorithm&apos;s certainty in the match.
                 </p>
               </div>
             </div>

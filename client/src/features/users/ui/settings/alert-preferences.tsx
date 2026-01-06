@@ -1,31 +1,41 @@
-import { 
-  Bell, 
-  Mail, 
-  Smartphone, 
-  MessageSquare, 
-  Clock, 
-  Filter, 
-  Settings, 
+import {
+  Bell,
+  Mail,
+  Smartphone,
+  MessageSquare,
+  Clock,
+  Filter,
+  Settings,
   TestTube,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/shared/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
+import { logger } from '@client/utils/logger';
 
 interface NotificationChannel {
   type: 'inApp' | 'email' | 'push' | 'sms';
@@ -82,10 +92,11 @@ interface AlertPreferences {
   };
 }
 
-interface AlertPreferencesProps { user_id?: string;
- }
+interface AlertPreferencesProps {
+  user_id?: string;
+}
 
-export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
+export function AlertPreferences({ user_id }: AlertPreferencesProps) {
   const [preferences, setPreferences] = useState<AlertPreferences | null>(null);
   const [channels, setChannels] = useState<Record<string, NotificationChannel>>({});
   const [categories, setCategories] = useState<string[]>([]);
@@ -93,7 +104,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingNotification, setTestingNotification] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error' | 'info';
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     loadPreferences();
@@ -106,10 +120,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     try {
       const response = await fetch('/api/alert-preferences', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setPreferences(data.data.billTracking);
@@ -126,10 +140,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     try {
       const response = await fetch('/api/alert-preferences/channels', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setChannels(data.data);
@@ -143,10 +157,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     try {
       const response = await fetch('/api/alert-preferences/categories', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setCategories(data.data);
@@ -160,10 +174,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     try {
       const response = await fetch('/api/alert-preferences/sponsors', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setSponsors(data.data);
@@ -182,9 +196,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(preferences)
+        body: JSON.stringify(preferences),
       });
 
       if (response.ok) {
@@ -207,9 +221,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ type, priority })
+        body: JSON.stringify({ type, priority }),
       });
 
       if (response.ok) {
@@ -247,7 +261,10 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     setPreferences(newPreferences);
   };
 
-  const addFilter = (type: 'categoryFilters' | 'keywordFilters' | 'sponsorFilters', value: string) => {
+  const addFilter = (
+    type: 'categoryFilters' | 'keywordFilters' | 'sponsorFilters',
+    value: string
+  ) => {
     if (!preferences || !value.trim()) return;
 
     const currentFilters = preferences.smartFiltering[type];
@@ -256,11 +273,17 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     }
   };
 
-  const removeFilter = (type: 'categoryFilters' | 'keywordFilters' | 'sponsorFilters', value: string) => {
+  const removeFilter = (
+    type: 'categoryFilters' | 'keywordFilters' | 'sponsorFilters',
+    value: string
+  ) => {
     if (!preferences) return;
 
     const currentFilters = preferences.smartFiltering[type];
-    updatePreference(`smartFiltering.${type}`, currentFilters.filter(f => f !== value));
+    updatePreference(
+      `smartFiltering.${type}`,
+      currentFilters.filter(f => f !== value)
+    );
   };
 
   if (loading) {
@@ -285,12 +308,22 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
   return (
     <div className="space-y-6">
       {message && (
-        <Alert className={message.type === 'error' ? 'border-red-200 bg-red-50' : 
-                         message.type === 'success' ? 'border-green-200 bg-green-50' : 
-                         'border-blue-200 bg-blue-50'}>
-          {message.type === 'error' ? <AlertCircle className="h-4 w-4" /> :
-           message.type === 'success' ? <CheckCircle className="h-4 w-4" /> :
-           <Info className="h-4 w-4" />}
+        <Alert
+          className={
+            message.type === 'error'
+              ? 'border-red-200 bg-red-50'
+              : message.type === 'success'
+                ? 'border-green-200 bg-green-50'
+                : 'border-blue-200 bg-blue-50'
+          }
+        >
+          {message.type === 'error' ? (
+            <AlertCircle className="h-4 w-4" />
+          ) : message.type === 'success' ? (
+            <CheckCircle className="h-4 w-4" />
+          ) : (
+            <Info className="h-4 w-4" />
+          )}
           <AlertDescription>{message.text}</AlertDescription>
         </Alert>
       )}
@@ -298,7 +331,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Alert Preferences</h2>
-          <p className="text-gray-600">Customize how and when you receive legislative notifications</p>
+          <p className="text-gray-600">
+            Customize how and when you receive legislative notifications
+          </p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -330,56 +365,62 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                 <Bell className="h-5 w-5" />
                 Notification Types
               </CardTitle>
-              <CardDescription>
-                Choose which types of updates you want to receive
-              </CardDescription>
+              <CardDescription>Choose which types of updates you want to receive</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="status-changes">Bill Status Changes</Label>
-                  <p className="text-sm text-gray-500">When bills move through the legislative process</p>
+                  <p className="text-sm text-gray-500">
+                    When bills move through the legislative process
+                  </p>
                 </div>
                 <Switch
                   id="status-changes"
                   checked={preferences.statusChanges}
-                  onCheckedChange={(checked) => updatePreference('statusChanges', checked)}
+                  onCheckedChange={checked => updatePreference('statusChanges', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="new-comments">New Comments</Label>
-                  <p className="text-sm text-gray-500">When experts or citizens comment on bills you're tracking</p>
+                  <p className="text-sm text-gray-500">
+                    When experts or citizens comment on bills you're tracking
+                  </p>
                 </div>
                 <Switch
                   id="new-comments"
                   checked={preferences.newComments}
-                  onCheckedChange={(checked) => updatePreference('newComments', checked)}
+                  onCheckedChange={checked => updatePreference('newComments', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="voting-schedule">Voting Schedule</Label>
-                  <p className="text-sm text-gray-500">When votes are scheduled for bills you're tracking</p>
+                  <p className="text-sm text-gray-500">
+                    When votes are scheduled for bills you're tracking
+                  </p>
                 </div>
                 <Switch
                   id="voting-schedule"
                   checked={preferences.votingSchedule}
-                  onCheckedChange={(checked) => updatePreference('votingSchedule', checked)}
+                  onCheckedChange={checked => updatePreference('votingSchedule', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="amendments">Amendments</Label>
-                  <p className="text-sm text-gray-500">When amendments are proposed to bills you're tracking</p>
+                  <p className="text-sm text-gray-500">
+                    When amendments are proposed to bills you're tracking
+                  </p>
                 </div>
                 <Switch
                   id="amendments"
                   checked={preferences.amendments}
-                  onCheckedChange={(checked) => updatePreference('amendments', checked)}
+                  onCheckedChange={checked => updatePreference('amendments', checked)}
                 />
               </div>
             </CardContent>
@@ -391,14 +432,12 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                 <Clock className="h-5 w-5" />
                 Update Frequency
               </CardTitle>
-              <CardDescription>
-                How often you want to receive notifications
-              </CardDescription>
+              <CardDescription>How often you want to receive notifications</CardDescription>
             </CardHeader>
             <CardContent>
               <Select
                 value={preferences.updateFrequency}
-                onValueChange={(value) => updatePreference('updateFrequency', value)}
+                onValueChange={value => updatePreference('updateFrequency', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -426,7 +465,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                 <Switch
                   id="quiet-hours"
                   checked={preferences.quietHours.enabled}
-                  onCheckedChange={(checked) => updatePreference('quietHours.enabled', checked)}
+                  onCheckedChange={checked => updatePreference('quietHours.enabled', checked)}
                 />
               </div>
 
@@ -438,7 +477,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                       id="start-time"
                       type="time"
                       value={preferences.quietHours.startTime}
-                      onChange={(e) => updatePreference('quietHours.startTime', e.target.value)}
+                      onChange={e => updatePreference('quietHours.startTime', e.target.value)}
                     />
                   </div>
                   <div>
@@ -447,7 +486,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                       id="end-time"
                       type="time"
                       value={preferences.quietHours.endTime}
-                      onChange={(e) => updatePreference('quietHours.endTime', e.target.value)}
+                      onChange={e => updatePreference('quietHours.endTime', e.target.value)}
                     />
                   </div>
                 </div>
@@ -463,9 +502,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                 <MessageSquare className="h-5 w-5" />
                 Notification Channels
               </CardTitle>
-              <CardDescription>
-                Choose how you want to receive notifications
-              </CardDescription>
+              <CardDescription>Choose how you want to receive notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(channels).map(([key, channel]) => (
@@ -477,15 +514,23 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                     {key === 'sms' && <MessageSquare className="h-5 w-5" />}
                     <div>
                       <div className="flex items-center gap-2">
-                        <Label className="capitalize">{key === 'inApp' ? 'In-App' : key.toUpperCase()}</Label>
+                        <Label className="capitalize">
+                          {key === 'inApp' ? 'In-App' : key.toUpperCase()}
+                        </Label>
                         {!channel.available && <Badge variant="secondary">Coming Soon</Badge>}
                       </div>
                       <p className="text-sm text-gray-500">{channel.description}</p>
                     </div>
                   </div>
                   <Switch
-                    checked={preferences.notificationChannels[key as keyof typeof preferences.notificationChannels]}
-                    onCheckedChange={(checked) => updatePreference(`notificationChannels.${key}`, checked)}
+                    checked={
+                      preferences.notificationChannels[
+                        key as keyof typeof preferences.notificationChannels
+                      ]
+                    }
+                    onCheckedChange={checked =>
+                      updatePreference(`notificationChannels.${key}`, checked)
+                    }
                     disabled={!channel.available}
                   />
                 </div>
@@ -509,25 +554,31 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="smart-filtering">Enable Smart Filtering</Label>
-                  <p className="text-sm text-gray-500">Filter notifications based on your preferences below</p>
+                  <p className="text-sm text-gray-500">
+                    Filter notifications based on your preferences below
+                  </p>
                 </div>
                 <Switch
                   id="smart-filtering"
                   checked={preferences.smartFiltering.enabled}
-                  onCheckedChange={(checked) => updatePreference('smartFiltering.enabled', checked)}
+                  onCheckedChange={checked => updatePreference('smartFiltering.enabled', checked)}
                 />
               </div>
 
               {preferences.smartFiltering.enabled && (
                 <>
                   <Separator />
-                  
+
                   <div>
                     <Label>Priority Threshold</Label>
-                    <p className="text-sm text-gray-500 mb-2">Only show notifications above this priority level</p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Only show notifications above this priority level
+                    </p>
                     <Select
                       value={preferences.smartFiltering.priorityThreshold}
-                      onValueChange={(value) => updatePreference('smartFiltering.priorityThreshold', value)}
+                      onValueChange={value =>
+                        updatePreference('smartFiltering.priorityThreshold', value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -542,32 +593,50 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
 
                   <div>
                     <Label>Category Filters</Label>
-                    <p className="text-sm text-gray-500 mb-2">Only receive notifications for these categories</p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Only receive notifications for these categories
+                    </p>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {preferences.smartFiltering.categoryFilters.map((category) => (
-                        <Badge key={category} variant="secondary" className="cursor-pointer" onClick={() => removeFilter('categoryFilters', category)}>
+                      {preferences.smartFiltering.categoryFilters.map(category => (
+                        <Badge
+                          key={category}
+                          variant="secondary"
+                          className="cursor-pointer"
+                          onClick={() => removeFilter('categoryFilters', category)}
+                        >
                           {category} ×
                         </Badge>
                       ))}
                     </div>
-                    <Select onValueChange={(value) => addFilter('categoryFilters', value)}>
+                    <Select onValueChange={value => addFilter('categoryFilters', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Add category filter" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.filter(cat => !preferences.smartFiltering.categoryFilters.includes(cat)).map((category) => (
-                          <SelectItem key={category} value={category}>{category}</SelectItem>
-                        ))}
+                        {categories
+                          .filter(cat => !preferences.smartFiltering.categoryFilters.includes(cat))
+                          .map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
                     <Label htmlFor="keyword-input">Keyword Filters</Label>
-                    <p className="text-sm text-gray-500 mb-2">Only receive notifications containing these keywords</p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Only receive notifications containing these keywords
+                    </p>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {preferences.smartFiltering.keywordFilters.map((keyword) => (
-                        <Badge key={keyword} variant="secondary" className="cursor-pointer" onClick={() => removeFilter('keywordFilters', keyword)}>
+                      {preferences.smartFiltering.keywordFilters.map(keyword => (
+                        <Badge
+                          key={keyword}
+                          variant="secondary"
+                          className="cursor-pointer"
+                          onClick={() => removeFilter('keywordFilters', keyword)}
+                        >
                           {keyword} ×
                         </Badge>
                       ))}
@@ -576,7 +645,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                       <Input
                         id="keyword-input"
                         placeholder="Enter keyword and press Enter"
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (e.key === 'Enter') {
                             addFilter('keywordFilters', e.currentTarget.value);
                             e.currentTarget.value = '';
@@ -598,9 +667,7 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                 <Settings className="h-5 w-5" />
                 Advanced Settings
               </CardTitle>
-              <CardDescription>
-                Fine-tune your notification experience
-              </CardDescription>
+              <CardDescription>Fine-tune your notification experience</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
@@ -611,7 +678,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                     <Switch
                       id="digest-enabled"
                       checked={preferences.advancedSettings.digestSchedule.enabled}
-                      onCheckedChange={(checked) => updatePreference('advancedSettings.digestSchedule.enabled', checked)}
+                      onCheckedChange={checked =>
+                        updatePreference('advancedSettings.digestSchedule.enabled', checked)
+                      }
                     />
                   </div>
 
@@ -621,7 +690,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                         <Label>Frequency</Label>
                         <Select
                           value={preferences.advancedSettings.digestSchedule.frequency}
-                          onValueChange={(value) => updatePreference('advancedSettings.digestSchedule.frequency', value)}
+                          onValueChange={value =>
+                            updatePreference('advancedSettings.digestSchedule.frequency', value)
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -638,7 +709,12 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                         <Input
                           type="time"
                           value={preferences.advancedSettings.digestSchedule.timeOfDay}
-                          onChange={(e) => updatePreference('advancedSettings.digestSchedule.timeOfDay', e.target.value)}
+                          onChange={e =>
+                            updatePreference(
+                              'advancedSettings.digestSchedule.timeOfDay',
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
                     </div>
@@ -656,7 +732,9 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                     <Switch
                       id="escalation-enabled"
                       checked={preferences.advancedSettings.escalationRules.enabled}
-                      onCheckedChange={(checked) => updatePreference('advancedSettings.escalationRules.enabled', checked)}
+                      onCheckedChange={checked =>
+                        updatePreference('advancedSettings.escalationRules.enabled', checked)
+                      }
                     />
                   </div>
 
@@ -665,21 +743,39 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                       <div className="flex items-center justify-between">
                         <div>
                           <Label>Urgent Bills Immediate</Label>
-                          <p className="text-sm text-gray-500">Send urgent bill updates immediately</p>
+                          <p className="text-sm text-gray-500">
+                            Send urgent bill updates immediately
+                          </p>
                         </div>
                         <Switch
-                          checked={preferences.advancedSettings.escalationRules.urgentBillsImmediate}
-                          onCheckedChange={(checked) => updatePreference('advancedSettings.escalationRules.urgentBillsImmediate', checked)}
+                          checked={
+                            preferences.advancedSettings.escalationRules.urgentBillsImmediate
+                          }
+                          onCheckedChange={checked =>
+                            updatePreference(
+                              'advancedSettings.escalationRules.urgentBillsImmediate',
+                              checked
+                            )
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
                           <Label>Important Sponsors Immediate</Label>
-                          <p className="text-sm text-gray-500">Send updates from important sponsors immediately</p>
+                          <p className="text-sm text-gray-500">
+                            Send updates from important sponsors immediately
+                          </p>
                         </div>
                         <Switch
-                          checked={preferences.advancedSettings.escalationRules.importantSponsorsImmediate}
-                          onCheckedChange={(checked) => updatePreference('advancedSettings.escalationRules.importantSponsorsImmediate', checked)}
+                          checked={
+                            preferences.advancedSettings.escalationRules.importantSponsorsImmediate
+                          }
+                          onCheckedChange={checked =>
+                            updatePreference(
+                              'advancedSettings.escalationRules.importantSponsorsImmediate',
+                              checked
+                            )
+                          }
                         />
                       </div>
                     </div>
@@ -695,11 +791,18 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Group Similar Updates</Label>
-                      <p className="text-sm text-gray-500">Combine similar notifications into batches</p>
+                      <p className="text-sm text-gray-500">
+                        Combine similar notifications into batches
+                      </p>
                     </div>
                     <Switch
                       checked={preferences.advancedSettings.batchingRules.similarUpdatesGrouping}
-                      onCheckedChange={(checked) => updatePreference('advancedSettings.batchingRules.similarUpdatesGrouping', checked)}
+                      onCheckedChange={checked =>
+                        updatePreference(
+                          'advancedSettings.batchingRules.similarUpdatesGrouping',
+                          checked
+                        )
+                      }
                     />
                   </div>
 
@@ -711,7 +814,12 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                         min="1"
                         max="50"
                         value={preferences.advancedSettings.batchingRules.maxBatchSize}
-                        onChange={(e) => updatePreference('advancedSettings.batchingRules.maxBatchSize', parseInt(e.target.value))}
+                        onChange={e =>
+                          updatePreference(
+                            'advancedSettings.batchingRules.maxBatchSize',
+                            parseInt(e.target.value)
+                          )
+                        }
                       />
                     </div>
                     <div>
@@ -721,7 +829,12 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
                         min="5"
                         max="1440"
                         value={preferences.advancedSettings.batchingRules.batchTimeWindow}
-                        onChange={(e) => updatePreference('advancedSettings.batchingRules.batchTimeWindow', parseInt(e.target.value))}
+                        onChange={e =>
+                          updatePreference(
+                            'advancedSettings.batchingRules.batchTimeWindow',
+                            parseInt(e.target.value)
+                          )
+                        }
                       />
                     </div>
                   </div>
@@ -734,4 +847,3 @@ export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
     </div>
   );
 }
-

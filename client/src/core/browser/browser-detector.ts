@@ -1,6 +1,6 @@
 /**
  * Browser Detection Module
- * 
+ *
  * Singleton class for parsing user agents and detecting browser information.
  */
 
@@ -38,7 +38,7 @@ export class BrowserDetector {
     }
 
     const ua = navigator.userAgent;
-    
+
     // Internet Explorer: Check for MSIE or Trident (IE11 uses Trident without MSIE)
     if (ua.includes('MSIE') || ua.includes('Trident/')) {
       const match = ua.match(/(?:MSIE |rv:)(\d+)\.(\d+)/);
@@ -46,11 +46,11 @@ export class BrowserDetector {
         return {
           name: 'ie',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Edge Legacy: Pre-Chromium Edge (before version 79)
     if (ua.includes('Edge/')) {
       const match = ua.match(/Edge\/(\d+)\.(\d+)/);
@@ -58,11 +58,11 @@ export class BrowserDetector {
         return {
           name: 'edge-legacy',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Modern Edge: Chromium-based Edge uses "Edg/" identifier
     if (ua.includes('Edg/')) {
       const match = ua.match(/Edg\/(\d+)\.(\d+)/);
@@ -70,11 +70,11 @@ export class BrowserDetector {
         return {
           name: 'edge',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Chrome: Must check after Edge since Edge includes "Chrome" in UA
     if (ua.includes('Chrome') && !ua.includes('Edg')) {
       const match = ua.match(/Chrome\/(\d+)\.(\d+)/);
@@ -82,11 +82,11 @@ export class BrowserDetector {
         return {
           name: 'chrome',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Firefox: Straightforward detection
     if (ua.includes('Firefox')) {
       const match = ua.match(/Firefox\/(\d+)\.(\d+)/);
@@ -94,11 +94,11 @@ export class BrowserDetector {
         return {
           name: 'firefox',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Safari: Must check after Chrome since Chrome includes "Safari" in UA
     if (ua.includes('Safari') && !ua.includes('Chrome')) {
       const match = ua.match(/Version\/(\d+)\.(\d+)/);
@@ -106,11 +106,11 @@ export class BrowserDetector {
         return {
           name: 'safari',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Opera: Modern Opera uses "OPR/" identifier
     if (ua.includes('OPR/')) {
       const match = ua.match(/OPR\/(\d+)\.(\d+)/);
@@ -118,11 +118,11 @@ export class BrowserDetector {
         return {
           name: 'opera',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Samsung Internet: Popular mobile browser
     if (ua.includes('SamsungBrowser')) {
       const match = ua.match(/SamsungBrowser\/(\d+)\.(\d+)/);
@@ -130,11 +130,11 @@ export class BrowserDetector {
         return {
           name: 'samsung',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // iOS Safari: Uses iOS version rather than Safari version
     if (ua.includes('iPhone') || ua.includes('iPad')) {
       const match = ua.match(/OS (\d+)_(\d+)/);
@@ -142,11 +142,11 @@ export class BrowserDetector {
         return {
           name: 'ios',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1] || '0', 10)
+          majorVersion: parseInt(match[1] || '0', 10),
         };
       }
     }
-    
+
     // Android: Detect Chrome on Android devices
     if (ua.includes('Android')) {
       const chromeMatch = ua.match(/Chrome\/(\d+)\.(\d+)/);
@@ -154,11 +154,11 @@ export class BrowserDetector {
         return {
           name: 'android',
           version: `${chromeMatch[1]}.${chromeMatch[2]}`,
-          majorVersion: parseInt(chromeMatch[1] || '0', 10)
+          majorVersion: parseInt(chromeMatch[1] || '0', 10),
         };
       }
     }
-    
+
     return { name: 'unknown', version: '0.0', majorVersion: 0 };
   }
 
@@ -176,27 +176,27 @@ export class BrowserDetector {
    */
   private generateWarnings(features: FeatureSet, browserName: string): string[] {
     const warnings: string[] = [];
-    
+
     if (!features.es6) {
       warnings.push('ES6 support is missing. Core application features will not function.');
     }
-    
+
     if (!features.fetch) {
       warnings.push('Fetch API is unavailable. Network operations will fail.');
     }
-    
+
     if (!features.promises) {
       warnings.push('Promise support is missing. Asynchronous operations cannot execute.');
     }
-    
+
     if (!features.localStorage) {
       warnings.push('Local storage is unavailable. Settings and preferences cannot be saved.');
     }
-    
+
     if (browserName === 'ie') {
       warnings.push('Internet Explorer is no longer supported. Please switch to a modern browser.');
     }
-    
+
     return warnings;
   }
 
@@ -205,33 +205,37 @@ export class BrowserDetector {
    * These are softer suggestions for optional features or performance improvements.
    */
   private generateRecommendations(
-    features: FeatureSet, 
-    browserName: string, 
+    features: FeatureSet,
+    browserName: string,
     majorVersion: number
   ): string[] {
     const recommendations: string[] = [];
-    
+
     const minVersion = MINIMUM_VERSIONS[browserName as keyof typeof MINIMUM_VERSIONS];
     if (minVersion !== undefined && majorVersion < minVersion) {
       recommendations.push(
         `Please update ${this.formatBrowserName(browserName)} to version ${minVersion} or higher for optimal performance.`
       );
     }
-    
+
     if (!features.intersectionObserver) {
-      recommendations.push('Update your browser to enable improved lazy loading and scroll performance.');
+      recommendations.push(
+        'Update your browser to enable improved lazy loading and scroll performance.'
+      );
     }
-    
+
     if (!features.webGL) {
-      recommendations.push('WebGL support would significantly improve chart and visualization rendering.');
+      recommendations.push(
+        'WebGL support would significantly improve chart and visualization rendering.'
+      );
     }
-    
+
     if (browserName === 'unknown' || browserName === 'ie' || browserName === 'edge-legacy') {
       recommendations.push(
         'For the best experience, we recommend Chrome 70+, Firefox 65+, Safari 12+, or Edge 79+.'
       );
     }
-    
+
     return recommendations;
   }
 
@@ -265,7 +269,7 @@ export class BrowserDetector {
       isSupported,
       features,
       warnings,
-      recommendations
+      recommendations,
     };
 
     return this.cachedInfo;

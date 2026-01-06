@@ -5,7 +5,7 @@
 
 export enum LoadingErrorType {
   LOADING_ERROR = 'LOADING_ERROR',
-  LOADING_TIMEOUT = 'LOADING_TIMEOUT'
+  LOADING_TIMEOUT = 'LOADING_TIMEOUT',
 }
 
 export class LoadingError extends Error {
@@ -83,7 +83,7 @@ export function getErrorRecoveryStrategy(error: LoadingError): string[] {
       strategies.push('Check network connection');
       strategies.push('Retry the operation');
       break;
-    
+
     default:
       strategies.push('Retry the operation');
       strategies.push('Check console for detailed error information');
@@ -100,19 +100,16 @@ export function getErrorRecoveryStrategy(error: LoadingError): string[] {
 export function formatErrorMessage(error: LoadingError): string {
   const baseMessage = error.message;
   const details = error.details;
-  
+
   if (!details || Object.keys(details).length === 0) {
     return baseMessage;
   }
-  
+
   const relevantDetails = Object.entries(details)
-    .filter(([_key, value]) => 
-      value !== undefined && 
-      value !== null
-    )
+    .filter(([_key, value]) => value !== undefined && value !== null)
     .map(([key, value]) => `${key}: ${value}`)
     .join(', ');
-  
+
   return relevantDetails ? `${baseMessage} (${relevantDetails})` : baseMessage;
 }
 
@@ -120,12 +117,11 @@ export function getErrorDisplayMessage(error: LoadingError): string {
   switch (error.type) {
     case LoadingErrorType.LOADING_TIMEOUT:
       return 'The operation is taking longer than expected. Please try again.';
-    
+
     default:
       return 'An error occurred during loading. Please try again.';
   }
 }
-
 
 export class LoadingNetworkError extends LoadingError {
   constructor(message: string) {
@@ -143,24 +139,20 @@ export class LoadingValidationError extends LoadingError {
 
 export class LoadingOperationFailedError extends LoadingError {
   constructor(operationId: string, message: string, retryCount?: number) {
-    super(
-      `Operation failed: ${message}`,
-      LoadingErrorType.LOADING_ERROR,
-      500,
-      { operationId, retryCount }
-    );
+    super(`Operation failed: ${message}`, LoadingErrorType.LOADING_ERROR, 500, {
+      operationId,
+      retryCount,
+    });
     this.name = 'LoadingOperationFailedError';
   }
 }
 
 export class LoadingStageError extends LoadingError {
   constructor(stage: string, message: string, details?: Record<string, any>) {
-    super(
-      `Stage error in ${stage}: ${message}`,
-      LoadingErrorType.LOADING_ERROR,
-      400,
-      { stage, ...details }
-    );
+    super(`Stage error in ${stage}: ${message}`, LoadingErrorType.LOADING_ERROR, 400, {
+      stage,
+      ...details,
+    });
     this.name = 'LoadingStageError';
   }
 }

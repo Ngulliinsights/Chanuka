@@ -34,7 +34,7 @@ export type { MonitoringConfig } from '@client/shared/infrastructure/monitoring'
 export {
   initializeMonitoring,
   getMonitoringInstance,
-  default as MonitoringInitializer
+  default as MonitoringInitializer,
 } from './monitoring-init';
 
 /**
@@ -50,7 +50,7 @@ export const initializeCoreMonitoring = async (config?: {
     enableProfiler = process.env.NODE_ENV === 'development',
     enableRegressionTesting = process.env.NODE_ENV === 'development',
     enableContinuousMonitoring = process.env.NODE_ENV === 'development',
-    enableEnhancedMonitoring = process.env.NODE_ENV === 'development'
+    enableEnhancedMonitoring = process.env.NODE_ENV === 'development',
   } = config || {};
 
   if (enableRegressionTesting) {
@@ -72,7 +72,7 @@ export const initializeCoreMonitoring = async (config?: {
     profiler: enableProfiler,
     regressionTesting: enableRegressionTesting,
     continuousMonitoring: enableContinuousMonitoring,
-    enhancedMonitoring: enableEnhancedMonitoring
+    enhancedMonitoring: enableEnhancedMonitoring,
   };
 };
 
@@ -80,7 +80,9 @@ export const initializeCoreMonitoring = async (config?: {
  * Cleanup all monitoring systems
  */
 export const cleanupMonitoring = async () => {
-  const { performanceRegressionTester, continuousPerformanceMonitor } = await import('@client/features/monitoring');
+  const { performanceRegressionTester, continuousPerformanceMonitor } = await import(
+    '@client/features/monitoring'
+  );
 
   performanceRegressionTester.stopAutomatedTesting();
   continuousPerformanceMonitor.stop();

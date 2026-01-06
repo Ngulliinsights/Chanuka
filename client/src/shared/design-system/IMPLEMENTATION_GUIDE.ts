@@ -167,7 +167,10 @@ export const IMPLEMENTATION_GUIDE = {
           className={MultilingualTypographyScale.base}
         />
       `,
-      standards: ['BrandPersonality.MicrocopyLibrary', 'MultilingualSupport.MultilingualTypographyScale'],
+      standards: [
+        'BrandPersonality.MicrocopyLibrary',
+        'MultilingualSupport.MultilingualTypographyScale',
+      ],
     },
 
     ErrorMessage: {
@@ -205,7 +208,10 @@ export const IMPLEMENTATION_GUIDE = {
           <button>{getMicrocopy('emptyStates.noResults.action')}</button>
         </div>
       `,
-      standards: ['BrandPersonality.MicrocopyLibrary.emptyStates', 'BrandPersonality.ToneMatrix.empty'],
+      standards: [
+        'BrandPersonality.MicrocopyLibrary.emptyStates',
+        'BrandPersonality.ToneMatrix.empty',
+      ],
     },
 
     PerspectiveCard: {
@@ -228,7 +234,10 @@ export const IMPLEMENTATION_GUIDE = {
           <footer>{sources}</footer>
         </article>
       `,
-      standards: ['PoliticalNeutrality.components.perspectiveCard', 'PoliticalNeutrality.visualIndicators'],
+      standards: [
+        'PoliticalNeutrality.components.perspectiveCard',
+        'PoliticalNeutrality.visualIndicators',
+      ],
     },
 
     ImageComponent: {

@@ -174,4 +174,9 @@ export interface OnboardingStatus {
 
 export type ExpertVerificationType = 'official' | 'domain' | 'identity';
 export type ContributionType = 'analysis' | 'comment' | 'review' | 'amendment_suggestion';
-export type VerificationStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
+export type VerificationStatus =
+  | 'pending'
+  | 'in_review'
+  | 'approved'
+  | 'rejected'
+  | 'needs_revision';

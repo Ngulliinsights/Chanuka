@@ -1,6 +1,6 @@
 /**
  * Preferences Types
- * 
+ *
  * Type definitions for user preferences and settings
  */
 

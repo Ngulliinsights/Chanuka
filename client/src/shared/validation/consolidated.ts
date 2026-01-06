@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Shared Validation Module - Consolidated
- * 
+ *
  * Base validation utilities and schemas following navigation component patterns.
  * This module provides standardized validation patterns for all client components.
  */
@@ -57,7 +57,14 @@ export const CommonSchemas = {
 };
 
 // User role validation
-export const UserRoleSchema = z.enum(['public', 'citizen', 'expert', 'admin', 'journalist', 'advocate']);
+export const UserRoleSchema = z.enum([
+  'public',
+  'citizen',
+  'expert',
+  'admin',
+  'journalist',
+  'advocate',
+]);
 
 // Component configuration schema
 export const ComponentConfigSchema = z.object({
@@ -75,28 +82,34 @@ export const FormFieldSchema = z.object({
   required: z.boolean().default(false),
   placeholder: z.string().optional(),
   defaultValue: z.any().optional(),
-  validation: z.object({
-    min: z.number().optional(),
-    max: z.number().optional(),
-    pattern: z.string().optional(),
-    custom: z.function().optional(),
-  }).optional(),
+  validation: z
+    .object({
+      min: z.number().optional(),
+      max: z.number().optional(),
+      pattern: z.string().optional(),
+      custom: z.function().optional(),
+    })
+    .optional(),
 });
 
 // API response schemas
 export const ApiResponseSchema = z.object({
   success: z.boolean(),
   data: z.any().optional(),
-  error: z.object({
-    message: z.string(),
-    code: z.string().optional(),
-    details: z.record(z.any()).optional(),
-  }).optional(),
-  meta: z.object({
-    timestamp: z.string().datetime(),
-    requestId: z.string().optional(),
-    version: z.string().optional(),
-  }).optional(),
+  error: z
+    .object({
+      message: z.string(),
+      code: z.string().optional(),
+      details: z.record(z.any()).optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      timestamp: z.string().datetime(),
+      requestId: z.string().optional(),
+      version: z.string().optional(),
+    })
+    .optional(),
 });
 
 // Validation utility functions
@@ -222,7 +235,7 @@ export function validateWithWarnings<T>(
   warningChecks?: Array<(data: T) => string | null>
 ): ValidationResult<T> {
   const result = safeValidateWithSchema(schema, data, fieldName);
-  
+
   if (!result.success) {
     return { success: false, error: result.error };
   }

@@ -1,4 +1,10 @@
-export type { NavigationItem, NavigationSection, UserRole, AccessDenialReason, RelatedPage } from './types';
+export type {
+  NavigationItem,
+  NavigationSection,
+  UserRole,
+  AccessDenialReason,
+  RelatedPage,
+} from './types';
 export { useNav, useRouteAccess, useRelatedPages } from './hooks';
 export { NavLink, NavSection, DesktopSidebar } from './ui';
 export { canViewItem } from './core/roleGuard';
@@ -14,4 +20,3 @@ export { default as ProgressiveDisclosureSimple } from './ProgressiveDisclosureS
 export { default as ProgressiveDisclosureDemo } from './ProgressiveDisclosureDemo';
 export { default as QuickAccessNav } from './quick-access-nav';
 export { default as NavigationPreferencesDialog } from './navigation-preferences-dialog';
-

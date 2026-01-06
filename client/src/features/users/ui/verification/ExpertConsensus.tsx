@@ -1,27 +1,31 @@
-import { 
-  Users, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   BarChart3,
   Clock,
   ChevronDown,
   ChevronUp,
   Info,
-  Zap
+  Zap,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { cn } from '@client/lib/utils';
 import { ExpertConsensus as ExpertConsensusType } from '@client/features/users/types';
-
+import { cn } from '@client/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-
 
 interface ExpertConsensusProps {
   consensus: ExpertConsensusType;
@@ -32,7 +36,7 @@ interface ExpertConsensusProps {
 
 /**
  * ExpertConsensus - Displays expert consensus tracking and disagreement analysis
- * 
+ *
  * Features:
  * - Agreement level visualization with progress bars
  * - Majority and minority position breakdown
@@ -44,7 +48,7 @@ export function ExpertConsensus({
   consensus,
   showDetails = false,
   compact = false,
-  className
+  className,
 }: ExpertConsensusProps) {
   const [showPositionDetails, setShowPositionDetails] = useState(showDetails);
 
@@ -70,7 +74,7 @@ export function ExpertConsensus({
           label: 'Low Controversy',
           color: 'text-green-600',
           bgColor: 'bg-green-50',
-          description: 'Experts generally agree on this topic'
+          description: 'Experts generally agree on this topic',
         };
       case 'medium':
         return {
@@ -78,7 +82,7 @@ export function ExpertConsensus({
           label: 'Moderate Controversy',
           color: 'text-amber-600',
           bgColor: 'bg-amber-50',
-          description: 'Some disagreement among experts'
+          description: 'Some disagreement among experts',
         };
       case 'high':
         return {
@@ -86,7 +90,7 @@ export function ExpertConsensus({
           label: 'High Controversy',
           color: 'text-red-600',
           bgColor: 'bg-red-50',
-          description: 'Significant disagreement among experts'
+          description: 'Significant disagreement among experts',
         };
       default:
         return {
@@ -94,7 +98,7 @@ export function ExpertConsensus({
           label: 'Unknown',
           color: 'text-gray-600',
           bgColor: 'bg-gray-50',
-          description: 'Controversy level not determined'
+          description: 'Controversy level not determined',
         };
     }
   };
@@ -103,7 +107,7 @@ export function ExpertConsensus({
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -113,22 +117,22 @@ export function ExpertConsensus({
 
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-3", className)}>
+      <div className={cn('flex items-center gap-3', className)}>
         <div className="flex items-center gap-1">
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">{consensus.totalExperts}</span>
         </div>
-        
+
         <div className="flex items-center gap-1">
-          <TrendingUp className={cn("h-4 w-4", getAgreementColor(consensus.agreementLevel))} />
-          <span className={cn("text-sm font-medium", getAgreementColor(consensus.agreementLevel))}>
+          <TrendingUp className={cn('h-4 w-4', getAgreementColor(consensus.agreementLevel))} />
+          <span className={cn('text-sm font-medium', getAgreementColor(consensus.agreementLevel))}>
             {agreementPercentage}% agree
           </span>
         </div>
-        
-        <Badge 
-          variant="secondary" 
-          className={cn("text-xs", controversyConfig.color, controversyConfig.bgColor)}
+
+        <Badge
+          variant="secondary"
+          className={cn('text-xs', controversyConfig.color, controversyConfig.bgColor)}
         >
           <ControversyIcon className="h-3 w-3 mr-1" />
           {controversyConfig.label}
@@ -138,17 +142,17 @@ export function ExpertConsensus({
   }
 
   return (
-    <Card className={cn("transition-all duration-200", className)}>
+    <Card className={cn('transition-all duration-200', className)}>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
             Expert Consensus
           </CardTitle>
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className={cn(
-              "flex items-center gap-1 px-3 py-1",
+              'flex items-center gap-1 px-3 py-1',
               controversyConfig.color,
               controversyConfig.bgColor
             )}
@@ -158,8 +162,8 @@ export function ExpertConsensus({
           </Badge>
         </div>
         <CardDescription>
-          {consensus.topic} • {consensus.totalExperts} experts participating • 
-          Updated {formatDate(consensus.lastUpdated)}
+          {consensus.topic} • {consensus.totalExperts} experts participating • Updated{' '}
+          {formatDate(consensus.lastUpdated)}
         </CardDescription>
       </CardHeader>
 
@@ -172,7 +176,7 @@ export function ExpertConsensus({
               Agreement Level
             </h4>
             <div className="text-right">
-              <div className={cn("text-xl font-bold", getAgreementColor(consensus.agreementLevel))}>
+              <div className={cn('text-xl font-bold', getAgreementColor(consensus.agreementLevel))}>
                 {agreementPercentage}%
               </div>
               <div className="text-xs text-muted-foreground">
@@ -180,15 +184,10 @@ export function ExpertConsensus({
               </div>
             </div>
           </div>
-          
-          <Progress 
-            value={consensus.agreementLevel * 100} 
-            className="h-3"
-          />
-          
-          <p className="text-sm text-muted-foreground">
-            {controversyConfig.description}
-          </p>
+
+          <Progress value={consensus.agreementLevel * 100} className="h-3" />
+
+          <p className="text-sm text-muted-foreground">{controversyConfig.description}</p>
         </div>
 
         {/* Majority Position */}
@@ -199,12 +198,16 @@ export function ExpertConsensus({
               <CheckCircle className="h-4 w-4 text-green-600" />
               <span className="font-medium text-green-900">Primary Consensus</span>
               <Badge variant="secondary" className="text-xs">
-                {Math.round((consensus.totalExperts - consensus.minorityPositions.reduce((sum, pos) => sum + pos.expertCount, 0)) / consensus.totalExperts * 100)}% of experts
+                {Math.round(
+                  ((consensus.totalExperts -
+                    consensus.minorityPositions.reduce((sum, pos) => sum + pos.expertCount, 0)) /
+                    consensus.totalExperts) *
+                    100
+                )}
+                % of experts
               </Badge>
             </div>
-            <p className="text-sm text-green-800 leading-relaxed">
-              {consensus.majorityPosition}
-            </p>
+            <p className="text-sm text-green-800 leading-relaxed">{consensus.majorityPosition}</p>
           </div>
         </div>
 
@@ -235,8 +238,10 @@ export function ExpertConsensus({
 
             <div className="space-y-2">
               {consensus.minorityPositions.map((position, index) => {
-                const percentage = Math.round((position.expertCount / consensus.totalExperts) * 100);
-                
+                const percentage = Math.round(
+                  (position.expertCount / consensus.totalExperts) * 100
+                );
+
                 return (
                   <div key={index} className="p-3 bg-amber-50 border border-amber-200 rounded-md">
                     <div className="flex items-center gap-2 mb-2">
@@ -248,11 +253,11 @@ export function ExpertConsensus({
                         {position.expertCount} experts ({percentage}%)
                       </Badge>
                     </div>
-                    
+
                     <p className="text-sm text-amber-800 leading-relaxed mb-2">
                       {position.position}
                     </p>
-                    
+
                     {showPositionDetails && (
                       <div className="pt-2 border-t border-amber-200">
                         <div className="flex items-center gap-2 mb-2">
@@ -293,23 +298,23 @@ export function ExpertConsensus({
               </div>
               <div className="text-xs text-muted-foreground">Total Experts</div>
             </div>
-            
+
             <div>
-              <div className={cn("text-lg font-bold", getAgreementColor(consensus.agreementLevel))}>
+              <div className={cn('text-lg font-bold', getAgreementColor(consensus.agreementLevel))}>
                 {agreementPercentage}%
               </div>
               <div className="text-xs text-muted-foreground">Agreement</div>
             </div>
-            
+
             <div>
               <div className="text-lg font-bold text-muted-foreground">
                 {consensus.minorityPositions.length + 1}
               </div>
               <div className="text-xs text-muted-foreground">Positions</div>
             </div>
-            
+
             <div>
-              <div className={cn("text-lg font-bold", controversyConfig.color)}>
+              <div className={cn('text-lg font-bold', controversyConfig.color)}>
                 {consensus.controversyLevel.toUpperCase()}
               </div>
               <div className="text-xs text-muted-foreground">Controversy</div>
@@ -347,7 +352,7 @@ export function ConsensusIndicator({
   controversyLevel,
   size = 'md',
   showLabel = true,
-  className
+  className,
 }: ConsensusIndicatorProps) {
   const getSizeClasses = () => {
     switch (size) {
@@ -355,19 +360,19 @@ export function ConsensusIndicator({
         return {
           container: 'gap-1',
           icon: 'h-3 w-3',
-          text: 'text-xs'
+          text: 'text-xs',
         };
       case 'lg':
         return {
           container: 'gap-2',
           icon: 'h-5 w-5',
-          text: 'text-sm'
+          text: 'text-sm',
         };
       default:
         return {
           container: 'gap-1.5',
           icon: 'h-4 w-4',
-          text: 'text-sm'
+          text: 'text-sm',
         };
     }
   };
@@ -377,25 +382,23 @@ export function ConsensusIndicator({
   const ControversyIcon = controversyConfig.icon;
 
   return (
-    <div className={cn("flex items-center", sizeClasses.container, className)}>
+    <div className={cn('flex items-center', sizeClasses.container, className)}>
       <div className="flex items-center gap-1">
-        <Users className={cn(sizeClasses.icon, "text-muted-foreground")} />
-        <span className={cn(sizeClasses.text, "font-medium")}>
-          {totalExperts}
-        </span>
+        <Users className={cn(sizeClasses.icon, 'text-muted-foreground')} />
+        <span className={cn(sizeClasses.text, 'font-medium')}>{totalExperts}</span>
       </div>
-      
+
       <div className="flex items-center gap-1">
         <TrendingUp className={cn(sizeClasses.icon, getAgreementColor(agreementLevel))} />
-        <span className={cn(sizeClasses.text, "font-medium", getAgreementColor(agreementLevel))}>
+        <span className={cn(sizeClasses.text, 'font-medium', getAgreementColor(agreementLevel))}>
           {Math.round(agreementLevel * 100)}%
         </span>
       </div>
-      
+
       <ControversyIcon className={cn(sizeClasses.icon, controversyConfig.color)} />
-      
+
       {showLabel && (
-        <span className={cn(sizeClasses.text, "text-muted-foreground")}>
+        <span className={cn(sizeClasses.text, 'text-muted-foreground')}>
           {getAgreementLabel(agreementLevel)}
         </span>
       )}

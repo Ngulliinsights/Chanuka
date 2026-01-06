@@ -5,8 +5,9 @@
  * to help improve system reliability and user experience.
  */
 
-import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 import { ErrorAnalytics, ErrorDashboardData } from '@shared/core/src/caching/types.ts';
+
+import { BaseError, ErrorSeverity, ErrorDomain } from '../errors/base-error';
 // import { logger } from '../observability/logging'; // Unused import
 
 export interface ErrorAnalyticsConfig {

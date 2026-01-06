@@ -1,6 +1,6 @@
 /**
  * Authentication Configuration
- * 
+ *
  * Centralized configuration for all authentication-related settings
  */
 
@@ -221,7 +221,7 @@ export function createAuthConfig(
   customSettings: Partial<AuthSettings> = {}
 ): AuthSettings {
   const envOverrides = ENVIRONMENT_OVERRIDES[environment] || {};
-  
+
   return {
     ...DEFAULT_AUTH_SETTINGS,
     ...envOverrides,

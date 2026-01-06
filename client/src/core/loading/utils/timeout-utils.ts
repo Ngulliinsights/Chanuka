@@ -99,10 +99,7 @@ export function createTimeoutManager(options: TimeoutManagerOptions): TimeoutMan
 /**
  * Execute a function with timeout
  */
-export async function withTimeout<T>(
-  asyncFn: () => Promise<T>,
-  timeout: number
-): Promise<T> {
+export async function withTimeout<T>(asyncFn: () => Promise<T>, timeout: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     let timeoutId: NodeJS.Timeout;
 
@@ -116,11 +113,11 @@ export async function withTimeout<T>(
     }, timeout);
 
     asyncFn()
-      .then((result) => {
+      .then(result => {
         cleanup();
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         cleanup();
         reject(error);
       });
@@ -195,9 +192,6 @@ export class CancellableTimeout {
 /**
  * Create a cancellable timeout instance
  */
-export function createCancellableTimeout(
-  callback: () => void,
-  delay: number
-): CancellableTimeout {
+export function createCancellableTimeout(callback: () => void, delay: number): CancellableTimeout {
   return new CancellableTimeout(callback, delay);
 }

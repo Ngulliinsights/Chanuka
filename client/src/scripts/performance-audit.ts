@@ -69,7 +69,7 @@ class PerformanceAuditor {
       bundleSize,
       codeMetrics,
       loadingMetrics,
-      recommendations
+      recommendations,
     };
 
     this.printAuditResults(metrics);
@@ -81,7 +81,7 @@ class PerformanceAuditor {
 
     // CSS files
     const cssFiles = await glob(`${this.baseDir}/**/*.css`, {
-      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**']
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**'],
     });
 
     let cssTotal = 0;
@@ -92,7 +92,7 @@ class PerformanceAuditor {
         const content = fs.readFileSync(file, 'utf8');
         const size = Buffer.byteLength(content, 'utf8');
         const gzippedSize = gzipSync(content).length;
-        
+
         cssTotal += size;
         cssGzipped += gzippedSize;
       } catch (error) {
@@ -102,13 +102,7 @@ class PerformanceAuditor {
 
     // JS/TS files
     const jsFiles = await glob(`${this.baseDir}/**/*.{js,jsx,ts,tsx}`, {
-      ignore: [
-        '**/node_modules/**',
-        '**/dist/**',
-        '**/build/**',
-        '**/*.test.*',
-        '**/*.spec.*'
-      ]
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/*.test.*', '**/*.spec.*'],
     });
 
     let jsTotal = 0;
@@ -119,7 +113,7 @@ class PerformanceAuditor {
         const content = fs.readFileSync(file, 'utf8');
         const size = Buffer.byteLength(content, 'utf8');
         const gzippedSize = gzipSync(content).length;
-        
+
         jsTotal += size;
         jsGzipped += gzippedSize;
       } catch (error) {
@@ -131,13 +125,13 @@ class PerformanceAuditor {
       css: {
         total: cssTotal,
         gzipped: cssGzipped,
-        files: cssFiles.length
+        files: cssFiles.length,
       },
       js: {
         total: jsTotal,
         gzipped: jsGzipped,
-        files: jsFiles.length
-      }
+        files: jsFiles.length,
+      },
     };
   }
 
@@ -145,7 +139,7 @@ class PerformanceAuditor {
     console.log('📊 Analyzing code metrics...');
 
     const cssFiles = await glob(`${this.baseDir}/**/*.css`, {
-      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**']
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**'],
     });
 
     let totalLines = 0;
@@ -161,12 +155,12 @@ class PerformanceAuditor {
         // Simple duplicate detection
         const ruleRegex = /([^{}]+)\s*\{([^{}]*)\}/g;
         let match;
-        
+
         while ((match = ruleRegex.exec(content)) !== null) {
           const rule = match[1].trim() + '{' + match[2].trim() + '}';
           const count = seenRules.get(rule) || 0;
           seenRules.set(rule, count + 1);
-          
+
           if (count > 0) {
             duplicateRules++;
           }
@@ -177,15 +171,16 @@ class PerformanceAuditor {
     }
 
     // Calculate complexity score (0-100, lower is better)
-    const complexityScore = Math.min(100, Math.round(
-      (duplicateRules / Math.max(1, totalLines / 100)) * 10
-    ));
+    const complexityScore = Math.min(
+      100,
+      Math.round((duplicateRules / Math.max(1, totalLines / 100)) * 10)
+    );
 
     return {
       totalLines,
       duplicateRules,
       unusedSelectors: 0, // Would need more sophisticated analysis
-      complexityScore
+      complexityScore,
     };
   }
 
@@ -193,8 +188,10 @@ class PerformanceAuditor {
     console.log('⚡ Estimating loading performance...');
 
     // Find critical CSS (typically index.css and design-system files)
-    const criticalCSSFiles = await glob(`${this.baseDir}/src/{index,styles/design-tokens,styles/chanuka-design-system}.css`);
-    
+    const criticalCSSFiles = await glob(
+      `${this.baseDir}/src/{index,styles/design-tokens,styles/chanuka-design-system}.css`
+    );
+
     let criticalCSSSize = 0;
     for (const file of criticalCSSFiles) {
       try {
@@ -228,7 +225,7 @@ class PerformanceAuditor {
       criticalCSSSize,
       renderBlockingResources,
       estimatedFCP,
-      estimatedLCP
+      estimatedLCP,
     };
   }
 
@@ -236,21 +233,30 @@ class PerformanceAuditor {
     const recommendations: string[] = [];
 
     // Bundle size recommendations
-    if (bundleSize.css.total > 100000) { // 100KB
-      recommendations.push('🗜️  CSS bundle is large (>100KB). Consider code splitting or removing unused styles.');
+    if (bundleSize.css.total > 100000) {
+      // 100KB
+      recommendations.push(
+        '🗜️  CSS bundle is large (>100KB). Consider code splitting or removing unused styles.'
+      );
     }
 
     if (bundleSize.css.gzipped / bundleSize.css.total > 0.4) {
-      recommendations.push('📦 CSS compression ratio is low. Consider minification and optimization.');
+      recommendations.push(
+        '📦 CSS compression ratio is low. Consider minification and optimization.'
+      );
     }
 
     // Code quality recommendations
     if (codeMetrics.duplicateRules > 50) {
-      recommendations.push(`🔄 Found ${codeMetrics.duplicateRules} duplicate CSS rules. Consider consolidation.`);
+      recommendations.push(
+        `🔄 Found ${codeMetrics.duplicateRules} duplicate CSS rules. Consider consolidation.`
+      );
     }
 
     if (codeMetrics.complexityScore > 70) {
-      recommendations.push('🧹 High CSS complexity detected. Consider refactoring for maintainability.');
+      recommendations.push(
+        '🧹 High CSS complexity detected. Consider refactoring for maintainability.'
+      );
     }
 
     // Performance recommendations
@@ -273,21 +279,26 @@ class PerformanceAuditor {
     }
 
     console.log('📈 Comparing with baseline...');
-    
+
     const baseline: PerformanceMetrics = JSON.parse(fs.readFileSync(baselineFile, 'utf8'));
     const current = await this.auditPerformance();
 
     const bundleSizeReduction = baseline.bundleSize.css.total - current.bundleSize.css.total;
     const bundleSizeReductionPercent = (bundleSizeReduction / baseline.bundleSize.css.total) * 100;
-    const duplicateRulesReduction = baseline.codeMetrics.duplicateRules - current.codeMetrics.duplicateRules;
-    
+    const duplicateRulesReduction =
+      baseline.codeMetrics.duplicateRules - current.codeMetrics.duplicateRules;
+
     // Calculate overall performance score (0-100, higher is better)
-    const performanceScore = Math.max(0, Math.min(100, 
-      50 + // Base score
-      (bundleSizeReductionPercent * 2) + // Bundle size improvement
-      (duplicateRulesReduction / 10) + // Duplicate rules improvement
-      ((baseline.codeMetrics.complexityScore - current.codeMetrics.complexityScore) / 2) // Complexity improvement
-    ));
+    const performanceScore = Math.max(
+      0,
+      Math.min(
+        100,
+        50 + // Base score
+          bundleSizeReductionPercent * 2 + // Bundle size improvement
+          duplicateRulesReduction / 10 + // Duplicate rules improvement
+          (baseline.codeMetrics.complexityScore - current.codeMetrics.complexityScore) / 2 // Complexity improvement
+      )
+    );
 
     const comparison: ComparisonResult = {
       before: baseline,
@@ -296,8 +307,8 @@ class PerformanceAuditor {
         bundleSizeReduction,
         bundleSizeReductionPercent,
         duplicateRulesReduction,
-        performanceScore
-      }
+        performanceScore,
+      },
     };
 
     this.printComparison(comparison);
@@ -307,10 +318,14 @@ class PerformanceAuditor {
   private printAuditResults(metrics: PerformanceMetrics): void {
     console.log('\n📊 Performance Audit Results:');
     console.log('═══════════════════════════════');
-    
+
     console.log('\n📦 Bundle Sizes:');
-    console.log(`   CSS: ${this.formatBytes(metrics.bundleSize.css.total)} (${this.formatBytes(metrics.bundleSize.css.gzipped)} gzipped)`);
-    console.log(`   JS:  ${this.formatBytes(metrics.bundleSize.js.total)} (${this.formatBytes(metrics.bundleSize.js.gzipped)} gzipped)`);
+    console.log(
+      `   CSS: ${this.formatBytes(metrics.bundleSize.css.total)} (${this.formatBytes(metrics.bundleSize.css.gzipped)} gzipped)`
+    );
+    console.log(
+      `   JS:  ${this.formatBytes(metrics.bundleSize.js.total)} (${this.formatBytes(metrics.bundleSize.js.gzipped)} gzipped)`
+    );
     console.log(`   Files: ${metrics.bundleSize.css.files} CSS, ${metrics.bundleSize.js.files} JS`);
 
     console.log('\n📊 Code Metrics:');
@@ -338,9 +353,13 @@ class PerformanceAuditor {
 
     console.log(`\n📦 Bundle Size:`);
     if (improvements.bundleSizeReduction > 0) {
-      console.log(`   ✅ Reduced by ${this.formatBytes(improvements.bundleSizeReduction)} (${improvements.bundleSizeReductionPercent.toFixed(1)}%)`);
+      console.log(
+        `   ✅ Reduced by ${this.formatBytes(improvements.bundleSizeReduction)} (${improvements.bundleSizeReductionPercent.toFixed(1)}%)`
+      );
     } else if (improvements.bundleSizeReduction < 0) {
-      console.log(`   ⚠️  Increased by ${this.formatBytes(Math.abs(improvements.bundleSizeReduction))} (${Math.abs(improvements.bundleSizeReductionPercent).toFixed(1)}%)`);
+      console.log(
+        `   ⚠️  Increased by ${this.formatBytes(Math.abs(improvements.bundleSizeReduction))} (${Math.abs(improvements.bundleSizeReductionPercent).toFixed(1)}%)`
+      );
     } else {
       console.log(`   ➡️  No change`);
     }
@@ -355,7 +374,7 @@ class PerformanceAuditor {
     }
 
     console.log(`\n🎯 Overall Performance Score: ${improvements.performanceScore.toFixed(1)}/100`);
-    
+
     if (improvements.performanceScore >= 80) {
       console.log('   🎉 Excellent performance improvements!');
     } else if (improvements.performanceScore >= 60) {
@@ -383,10 +402,14 @@ class PerformanceAuditor {
       summary: {
         totalBundleSize: metrics.bundleSize.css.total + metrics.bundleSize.js.total,
         totalGzippedSize: metrics.bundleSize.css.gzipped + metrics.bundleSize.js.gzipped,
-        compressionRatio: ((metrics.bundleSize.css.gzipped + metrics.bundleSize.js.gzipped) / 
-                          (metrics.bundleSize.css.total + metrics.bundleSize.js.total) * 100).toFixed(1) + '%',
-        performanceGrade: this.calculateGrade(metrics)
-      }
+        compressionRatio:
+          (
+            ((metrics.bundleSize.css.gzipped + metrics.bundleSize.js.gzipped) /
+              (metrics.bundleSize.css.total + metrics.bundleSize.js.total)) *
+            100
+          ).toFixed(1) + '%',
+        performanceGrade: this.calculateGrade(metrics),
+      },
     };
 
     fs.writeFileSync(outputFile, JSON.stringify(report, null, 2));
@@ -395,17 +418,17 @@ class PerformanceAuditor {
 
   private calculateGrade(metrics: PerformanceMetrics): string {
     let score = 100;
-    
+
     // Deduct points for large bundle size
     if (metrics.bundleSize.css.total > 100000) score -= 20;
     else if (metrics.bundleSize.css.total > 50000) score -= 10;
-    
+
     // Deduct points for duplicate rules
     score -= Math.min(30, metrics.codeMetrics.duplicateRules / 2);
-    
+
     // Deduct points for complexity
     score -= metrics.codeMetrics.complexityScore / 5;
-    
+
     if (score >= 90) return 'A+';
     if (score >= 80) return 'A';
     if (score >= 70) return 'B';
@@ -420,7 +443,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
   const baseDir = args.find(arg => arg.startsWith('--dir='))?.split('=')[1] || 'client';
-  
+
   const auditor = new PerformanceAuditor(baseDir);
 
   switch (command) {
@@ -428,12 +451,12 @@ async function main() {
       const baselineFile = args[1] || 'performance-baseline.json';
       await auditor.compareWithBaseline(baselineFile);
       break;
-      
+
     case 'report':
       const outputFile = args[1] || 'performance-report.json';
       await auditor.generateReport(outputFile);
       break;
-      
+
     default:
       await auditor.auditPerformance();
       break;

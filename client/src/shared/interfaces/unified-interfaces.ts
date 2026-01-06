@@ -1,6 +1,6 @@
 /**
  * Unified Interfaces for Client Architecture Standardization
- * 
+ *
  * This file defines the unified interfaces that will serve as the foundation
  * for consolidating overlapping functionalities across the client architecture.
  */
@@ -98,7 +98,7 @@ export interface UnifiedLoadingSystem {
     retry: () => void;
     reset: () => void;
   };
-  
+
   // Specialized loading hooks
   usePageLoading: () => LoadingState;
   useComponentLoading: () => LoadingState;
@@ -108,12 +108,12 @@ export interface UnifiedLoadingSystem {
     completeCurrentStage: () => void;
     failCurrentStage: (error: Error) => void;
   };
-  
+
   // Loading components
   LoadingIndicator: ComponentType<LoadingIndicatorProps>;
   ProgressBar: ComponentType<ProgressBarProps>;
   SkeletonLoader: ComponentType<SkeletonProps>;
-  
+
   // Loading utilities
   createLoadingOperation: (config: LoadingOptions & { id: string }) => LoadingOperation;
   manageLoadingQueue: (operations: LoadingOperation[]) => {
@@ -136,14 +136,15 @@ export interface AppError extends Error {
   id: string;
 }
 
-export interface ErrorContext { component?: string;
+export interface ErrorContext {
+  component?: string;
   action?: string;
   user_id?: string;
   session_id?: string;
   url?: string;
   user_agent?: string;
   additionalData?: Record<string, any>;
- }
+}
 
 export interface RecoveryStrategy {
   id: string;
@@ -190,7 +191,7 @@ export interface UnifiedErrorSystem {
   // Error boundary components
   ErrorBoundary: ComponentType<ErrorBoundaryProps>;
   ComponentErrorBoundary: ComponentType<ErrorBoundaryProps>;
-  
+
   // Error handling hooks
   useErrorHandler: () => ErrorHandler;
   useErrorRecovery: () => ErrorRecovery;
@@ -200,12 +201,12 @@ export interface UnifiedErrorSystem {
     clearErrors: () => void;
     addError: (error: AppError) => void;
   };
-  
+
   // Error utilities
   createError: (type: ErrorType, message: string, context?: Partial<ErrorContext>) => AppError;
   handleError: (error: Error, context?: Partial<ErrorContext>) => void;
   isRecoverable: (error: AppError) => boolean;
-  
+
   // Recovery system
   RecoveryManager: {
     registerStrategy: (strategy: RecoveryStrategy) => void;
@@ -297,14 +298,20 @@ export interface UnifiedFormSystem {
   FormSelect: ComponentType<FormInputProps & { options: Array<{ value: string; label: string }> }>;
   FormCheckbox: ComponentType<FormInputProps>;
   FormRadio: ComponentType<FormInputProps & { options: Array<{ value: string; label: string }> }>;
-  
+
   // Validation system
-  createSchema: <T>(definition: z.ZodSchema<T>, options?: { errorMessages?: Record<string, string> }) => ValidationSchema<T>;
+  createSchema: <T>(
+    definition: z.ZodSchema<T>,
+    options?: { errorMessages?: Record<string, string> }
+  ) => ValidationSchema<T>;
   validateField: (value: any, schema: ValidationSchema) => ValidationResult;
   validateForm: <T>(values: Partial<T>, schema: ValidationSchema<T>) => ValidationResult;
-  
+
   // Form hooks
-  useForm: <T>(schema: ValidationSchema<T>, options?: { initialValues?: Partial<T> }) => FormState<T> & {
+  useForm: <T>(
+    schema: ValidationSchema<T>,
+    options?: { initialValues?: Partial<T> }
+  ) => FormState<T> & {
     setValue: (name: keyof T, value: any) => void;
     setError: (name: keyof T, error: string) => void;
     clearError: (name: keyof T) => void;
@@ -316,7 +323,7 @@ export interface UnifiedFormSystem {
     setTouched: (touched: boolean) => void;
     setFocused: (focused: boolean) => void;
   };
-  
+
   // Form utilities
   FormBuilder: {
     createField: (config: any) => ComponentType<any>;
@@ -389,7 +396,7 @@ export interface UnifiedNavigationSystem {
   Sidebar: ComponentType<SidebarProps>;
   MobileNav: ComponentType<MobileNavProps>;
   Breadcrumbs: ComponentType<{ items: NavigationItem[] }>;
-  
+
   // Navigation hooks
   useNavigation: () => NavigationState & {
     navigate: (path: string) => void;
@@ -398,7 +405,7 @@ export interface UnifiedNavigationSystem {
   };
   useRouteAccess: (requiredPermissions?: string[]) => RouteAccessState;
   useBreadcrumbs: () => NavigationItem[];
-  
+
   // Navigation utilities
   NavigationManager: {
     registerRoutes: (routes: NavigationItem[]) => void;
@@ -556,4 +563,3 @@ export interface AccessibilityFeatures {
 // ============================================================================
 
 // All types are already exported above, no need for duplicate export block
-

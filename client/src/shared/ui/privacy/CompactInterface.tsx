@@ -4,23 +4,16 @@
  */
 
 // Remove unused React import
+import { Shield, Settings, AlertTriangle, Info } from 'lucide-react';
 import React from 'react';
-import {
-  Shield,
-  Settings,
-  AlertTriangle,
-  Info
-} from 'lucide-react';
 
 import { useAuth } from '@/core/auth';
 import { PrivacySettings } from '@/core/auth';
-
 import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
 import { Button } from '@/shared/design-system/interactive/Button';
+import { Switch } from '@/shared/design-system/interactive/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Label } from '@/shared/design-system/typography/Label';
-import { Switch } from '@/shared/design-system/interactive/Switch';
-
 
 // import { ConsentControls } from './controls/ConsentControls';
 import { DataUsageControls } from './controls/DataUsageControls';
@@ -37,7 +30,7 @@ export function CompactInterface({
   settings,
   onSettingsChange,
   onOpenFullSettings,
-  className = ''
+  className = '',
 }: CompactInterfaceProps) {
   const auth = useAuth();
 
@@ -46,9 +39,7 @@ export function CompactInterface({
     return (
       <Alert>
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Please log in to manage your privacy settings.
-        </AlertDescription>
+        <AlertDescription>Please log in to manage your privacy settings.</AlertDescription>
       </Alert>
     );
   }
@@ -68,13 +59,10 @@ export function CompactInterface({
             <Info className="h-4 w-4" />
             <AlertDescription>
               Quick privacy controls. For comprehensive settings,
-              <Button
-                variant="ghost"
-                className="p-0 h-auto ml-1"
-                onClick={onOpenFullSettings}
-              >
+              <Button variant="ghost" className="p-0 h-auto ml-1" onClick={onOpenFullSettings}>
                 open full privacy panel
-              </Button>.
+              </Button>
+              .
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -104,7 +92,7 @@ export function CompactInterface({
             console.log('Consent change:', type, granted);
           }
         }}
-        onOpenConsentModal={(type) => {
+        onOpenConsentModal={type => {
           // Handle opening consent modal - this would need to be implemented
           // Handle opening consent modal - implementation would go here
           if (process.env.NODE_ENV === 'development') {
@@ -123,19 +111,17 @@ export function CompactInterface({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Email Notifications</Label>
-                <p className="text-sm text-gray-600">
-                  Receive notifications via email
-                </p>
+                <p className="text-sm text-gray-600">Receive notifications via email</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.email_notifications}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   const newSettings = {
                     ...settings,
                     notification_preferences: {
                       ...settings.notification_preferences,
-                      email_notifications: checked
-                    }
+                      email_notifications: checked,
+                    },
                   };
                   onSettingsChange(newSettings);
                 }}
@@ -146,19 +132,17 @@ export function CompactInterface({
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-base font-medium">Security Alerts</Label>
-                <p className="text-sm text-gray-600">
-                  Important security notifications
-                </p>
+                <p className="text-sm text-gray-600">Important security notifications</p>
               </div>
               <Switch
                 checked={settings.notification_preferences.security_alerts}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   const newSettings = {
                     ...settings,
                     notification_preferences: {
                       ...settings.notification_preferences,
-                      security_alerts: checked
-                    }
+                      security_alerts: checked,
+                    },
                   };
                   onSettingsChange(newSettings);
                 }}
@@ -173,11 +157,7 @@ export function CompactInterface({
       {onOpenFullSettings && (
         <Card>
           <CardContent className="pt-6">
-            <Button
-              variant="outline"
-              onClick={onOpenFullSettings}
-              className="w-full"
-            >
+            <Button variant="outline" onClick={onOpenFullSettings} className="w-full">
               <Settings className="h-4 w-4 mr-2" />
               Open Full Privacy Settings
             </Button>

@@ -15,7 +15,7 @@ import type {
   ConflictReport,
   AnalyticsResponse,
   UserActivity,
-  AnalyticsAlert
+  AnalyticsAlert,
 } from '../types';
 
 /**
@@ -92,7 +92,7 @@ export class AnalyticsService {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -128,8 +128,7 @@ export class AnalyticsService {
    * This allows targeted cache invalidation for related data.
    */
   public clearCacheByPrefix(prefix: string): void {
-    const keysToDelete = Array.from(this.cache.keys())
-      .filter(key => key.startsWith(prefix));
+    const keysToDelete = Array.from(this.cache.keys()).filter(key => key.startsWith(prefix));
 
     keysToDelete.forEach(key => this.cache.delete(key));
   }
@@ -161,15 +160,19 @@ export class AnalyticsService {
    * Retrieves analytics summary with calculated business metrics.
    * Includes growth rates and risk assessments derived from raw data.
    */
-  async getSummary(filters?: AnalyticsFilters): Promise<AnalyticsSummary & {
-    engagementGrowthRate: number;
-    riskScore: number;
-  }> {
-    const cacheKey = this.generateCacheKey('summary', filters);
-    const cached = this.getCached<AnalyticsSummary & {
+  async getSummary(filters?: AnalyticsFilters): Promise<
+    AnalyticsSummary & {
       engagementGrowthRate: number;
       riskScore: number;
-    }>(cacheKey);
+    }
+  > {
+    const cacheKey = this.generateCacheKey('summary', filters);
+    const cached = this.getCached<
+      AnalyticsSummary & {
+        engagementGrowthRate: number;
+        riskScore: number;
+      }
+    >(cacheKey);
 
     if (cached) {
       return cached;
@@ -184,7 +187,7 @@ export class AnalyticsService {
     } = {
       ...rawData,
       engagementGrowthRate: rawData.engagementGrowthRate ?? this.calculateEngagementGrowth(rawData),
-      riskScore: this.calculateRiskScore(rawData)
+      riskScore: this.calculateRiskScore(rawData),
     };
 
     this.setCached(cacheKey, enhancedData);
@@ -202,15 +205,19 @@ export class AnalyticsService {
   async getBillAnalytics(
     billId: string,
     filters?: AnalyticsFilters
-  ): Promise<BillAnalytics & {
-    conflicts: unknown[];
-    riskLevel: 'low' | 'medium' | 'high';
-  }> {
-    const cacheKey = this.generateCacheKey(`bill-${billId}`, filters);
-    const cached = this.getCached<BillAnalytics & {
+  ): Promise<
+    BillAnalytics & {
       conflicts: unknown[];
       riskLevel: 'low' | 'medium' | 'high';
-    }>(cacheKey);
+    }
+  > {
+    const cacheKey = this.generateCacheKey(`bill-${billId}`, filters);
+    const cached = this.getCached<
+      BillAnalytics & {
+        conflicts: unknown[];
+        riskLevel: 'low' | 'medium' | 'high';
+      }
+    >(cacheKey);
 
     if (cached) {
       return cached;
@@ -219,7 +226,7 @@ export class AnalyticsService {
     // Fetch analytics and conflicts in parallel for efficiency
     const [analytics, conflictReport] = await Promise.all([
       analyticsApiService.getBillAnalytics(billId, filters),
-      analyticsApiService.getConflictReport(billId)
+      analyticsApiService.getConflictReport(billId),
     ]);
 
     // Merge conflict data with analytics and calculate risk
@@ -229,7 +236,7 @@ export class AnalyticsService {
     } = {
       ...analytics,
       conflicts: conflictReport.conflicts,
-      riskLevel: analytics.riskLevel ?? this.calculateBillRiskLevel(conflictReport.conflicts)
+      riskLevel: analytics.riskLevel ?? this.calculateBillRiskLevel(conflictReport.conflicts),
     };
 
     this.setCached(cacheKey, enhancedData);
@@ -243,23 +250,27 @@ export class AnalyticsService {
   async getEngagementReport(
     billId: string,
     filters?: AnalyticsFilters
-  ): Promise<EngagementReport & {
-    trendAnalysis: {
-      direction: 'up' | 'down' | 'stable';
-      changePercent: number;
-      momentum: number;
-    };
-    engagementScore: number;
-  }> {
-    const cacheKey = this.generateCacheKey(`engagement-${billId}`, filters);
-    const cached = this.getCached<EngagementReport & {
+  ): Promise<
+    EngagementReport & {
       trendAnalysis: {
         direction: 'up' | 'down' | 'stable';
         changePercent: number;
         momentum: number;
       };
       engagementScore: number;
-    }>(cacheKey);
+    }
+  > {
+    const cacheKey = this.generateCacheKey(`engagement-${billId}`, filters);
+    const cached = this.getCached<
+      EngagementReport & {
+        trendAnalysis: {
+          direction: 'up' | 'down' | 'stable';
+          changePercent: number;
+          momentum: number;
+        };
+        engagementScore: number;
+      }
+    >(cacheKey);
 
     if (cached) {
       return cached;
@@ -277,8 +288,9 @@ export class AnalyticsService {
       engagementScore: number;
     } = {
       ...rawData,
-      trendAnalysis: rawData.trendAnalysis ?? this.analyzeEngagementTrends(rawData.breakdown?.byDay || []),
-      engagementScore: rawData.engagementScore ?? this.calculateEngagementScore(rawData.metrics)
+      trendAnalysis:
+        rawData.trendAnalysis ?? this.analyzeEngagementTrends(rawData.breakdown?.byDay || []),
+      engagementScore: rawData.engagementScore ?? this.calculateEngagementScore(rawData.metrics),
     };
 
     this.setCached(cacheKey, enhancedData);
@@ -289,15 +301,19 @@ export class AnalyticsService {
    * Retrieves conflict report with actionable recommendations.
    * Analyzes conflicts and provides prioritized guidance for resolution.
    */
-  async getConflictReport(billId: string): Promise<ConflictReport & {
-    recommendations: string[];
-    priorityScore: number;
-  }> {
-    const cacheKey = `conflicts-${billId}`;
-    const cached = this.getCached<ConflictReport & {
+  async getConflictReport(billId: string): Promise<
+    ConflictReport & {
       recommendations: string[];
       priorityScore: number;
-    }>(cacheKey);
+    }
+  > {
+    const cacheKey = `conflicts-${billId}`;
+    const cached = this.getCached<
+      ConflictReport & {
+        recommendations: string[];
+        priorityScore: number;
+      }
+    >(cacheKey);
 
     if (cached) {
       return cached;
@@ -312,7 +328,7 @@ export class AnalyticsService {
     } = {
       ...rawData,
       recommendations: this.generateConflictRecommendations(rawData.conflicts),
-      priorityScore: rawData.priorityScore ?? this.calculateConflictPriority(rawData.conflicts)
+      priorityScore: rawData.priorityScore ?? this.calculateConflictPriority(rawData.conflicts),
     };
 
     this.setCached(cacheKey, enhancedData);
@@ -330,22 +346,26 @@ export class AnalyticsService {
   async getUserActivity(
     userId?: string,
     filters?: AnalyticsFilters
-  ): Promise<AnalyticsResponse<(UserActivity & {
-    engagementScore: number;
-    activityLevel: 'low' | 'medium' | 'high';
-  })[]>> {
+  ): Promise<
+    AnalyticsResponse<
+      (UserActivity & {
+        engagementScore: number;
+        activityLevel: 'low' | 'medium' | 'high';
+      })[]
+    >
+  > {
     const rawData = await analyticsApiService.getUserActivity(userId, filters);
 
     // Enhance each activity record with business metrics
     const enhancedActivities = rawData.data.map(activity => ({
       ...activity,
       engagementScore: this.calculateUserEngagementScore(activity),
-      activityLevel: this.determineActivityLevel(activity.totalEngagement)
+      activityLevel: this.determineActivityLevel(activity.totalEngagement),
     }));
 
     return {
       ...rawData,
-      data: enhancedActivities
+      data: enhancedActivities,
     };
   }
 
@@ -353,10 +373,7 @@ export class AnalyticsService {
    * Retrieves top performing bills using custom ranking algorithm.
    * Bills are ranked based on engagement, conflicts, and business importance.
    */
-  async getTopBills(
-    limit = 10,
-    filters?: AnalyticsFilters
-  ): Promise<BillAnalytics[]> {
+  async getTopBills(limit = 10, filters?: AnalyticsFilters): Promise<BillAnalytics[]> {
     const cacheKey = this.generateCacheKey(`top-bills-${limit}`, filters);
     const cached = this.getCached<BillAnalytics[]>(cacheKey);
 
@@ -379,17 +396,19 @@ export class AnalyticsService {
    * Retrieves alerts with priority scoring and impact assessment.
    * Alerts are sorted by calculated priority to surface most critical items first.
    */
-  async getAlerts(acknowledged = false): Promise<(AnalyticsAlert & {
-    priority: number;
-    impact: 'low' | 'medium' | 'high';
-  })[]> {
+  async getAlerts(acknowledged = false): Promise<
+    (AnalyticsAlert & {
+      priority: number;
+      impact: 'low' | 'medium' | 'high';
+    })[]
+  > {
     const rawData = await analyticsApiService.getAlerts(acknowledged);
 
     // Enhance alerts with business logic and sort by priority
     const enhancedAlerts = rawData.map(alert => ({
       ...alert,
       priority: this.calculateAlertPriority(alert),
-      impact: this.assessAlertImpact(alert)
+      impact: this.assessAlertImpact(alert),
     }));
 
     // Sort descending by priority to show most critical alerts first
@@ -400,20 +419,22 @@ export class AnalyticsService {
    * Retrieves trending topics with sentiment analysis.
    * Identifies emerging themes and patterns in user engagement.
    */
-  async getTrendingTopics(limit = 20): Promise<Array<{
-    topic: string;
-    count: number;
-    trend: 'up' | 'down' | 'stable';
-    sentiment?: number;
-    velocity: number;
-  }>> {
+  async getTrendingTopics(limit = 20): Promise<
+    Array<{
+      topic: string;
+      count: number;
+      trend: 'up' | 'down' | 'stable';
+      sentiment?: number;
+      velocity: number;
+    }>
+  > {
     const rawData = await analyticsApiService.getTrendingTopics(limit);
 
     // Add sentiment and velocity metrics for each topic
     return rawData.map(topic => ({
       ...topic,
       sentiment: this.calculateTopicSentiment(topic),
-      velocity: this.calculateTrendVelocity(topic)
+      velocity: this.calculateTrendVelocity(topic),
     }));
   }
 
@@ -429,7 +450,7 @@ export class AnalyticsService {
 
     return stakeholders.map(stakeholder => ({
       ...stakeholder,
-      impactScore: this.calculateStakeholderImpact(stakeholder)
+      impactScore: this.calculateStakeholderImpact(stakeholder),
     }));
   }
 
@@ -465,7 +486,7 @@ export class AnalyticsService {
 
     return {
       ...rawData,
-      healthScore
+      healthScore,
     };
   }
 
@@ -491,8 +512,8 @@ export class AnalyticsService {
       summary: {
         ...data.summary,
         engagementGrowthRate: this.calculateEngagementGrowth(data.summary),
-        riskScore: this.calculateRiskScore(data.summary)
-      }
+        riskScore: this.calculateRiskScore(data.summary),
+      },
     };
   }
 
@@ -511,9 +532,7 @@ export class AnalyticsService {
     const positiveGrowth = 0.15;
     const negativeGrowth = -0.05;
 
-    return summary.averageEngagementRate > baselineThreshold
-      ? positiveGrowth
-      : negativeGrowth;
+    return summary.averageEngagementRate > baselineThreshold ? positiveGrowth : negativeGrowth;
   }
 
   /**
@@ -522,15 +541,12 @@ export class AnalyticsService {
    */
   private calculateRiskScore(summary: AnalyticsSummary): number {
     // Calculate conflict-based risk as ratio of conflicts to total bills
-    const conflictRisk = summary.totalBills > 0
-      ? summary.conflictsDetected / summary.totalBills
-      : 0;
+    const conflictRisk =
+      summary.totalBills > 0 ? summary.conflictsDetected / summary.totalBills : 0;
 
     // Add risk penalty for low engagement (below 30% threshold)
     const lowEngagementThreshold = 0.3;
-    const engagementRisk = summary.averageEngagementRate < lowEngagementThreshold
-      ? 0.3
-      : 0;
+    const engagementRisk = summary.averageEngagementRate < lowEngagementThreshold ? 0.3 : 0;
 
     // Combine risks and cap at 1.0
     return Math.min(conflictRisk + engagementRisk, 1);
@@ -541,13 +557,9 @@ export class AnalyticsService {
    * Uses weighted analysis of conflict levels to categorize risk.
    */
   private calculateBillRiskLevel(conflicts: unknown[]): 'low' | 'medium' | 'high' {
-    const highSeverityConflicts = conflicts.filter(
-      c => c.conflict_level === 'high'
-    ).length;
+    const highSeverityConflicts = conflicts.filter(c => c.conflict_level === 'high').length;
 
-    const mediumSeverityConflicts = conflicts.filter(
-      c => c.conflict_level === 'medium'
-    ).length;
+    const mediumSeverityConflicts = conflicts.filter(c => c.conflict_level === 'medium').length;
 
     // Risk thresholds based on conflict severity counts
     if (highSeverityConflicts > 2) return 'high';
@@ -573,7 +585,7 @@ export class AnalyticsService {
       return {
         direction: 'stable',
         changePercent: 0,
-        momentum: 0
+        momentum: 0,
       };
     }
 
@@ -590,7 +602,7 @@ export class AnalyticsService {
       return {
         direction: 'stable',
         changePercent: 0,
-        momentum: 0
+        momentum: 0,
       };
     }
 
@@ -599,11 +611,8 @@ export class AnalyticsService {
 
     // Determine direction based on threshold (5% change)
     const changeThreshold = 5;
-    const direction = changePercent > changeThreshold
-      ? 'up'
-      : changePercent < -changeThreshold
-        ? 'down'
-        : 'stable';
+    const direction =
+      changePercent > changeThreshold ? 'up' : changePercent < -changeThreshold ? 'down' : 'stable';
 
     // Calculate momentum as rate of acceleration
     const momentum = this.calculateMomentum(dailyData.slice(-14));
@@ -618,19 +627,18 @@ export class AnalyticsService {
   private calculateEngagementScore(metrics: unknown): number {
     // Define weights for different engagement types
     const weights = {
-      views: 0.3,      // Base engagement
-      comments: 0.4,   // High-value engagement (discussion)
-      shares: 0.2,     // Viral potential
-      bookmarks: 0.1   // Intent to revisit
+      views: 0.3, // Base engagement
+      comments: 0.4, // High-value engagement (discussion)
+      shares: 0.2, // Viral potential
+      bookmarks: 0.1, // Intent to revisit
     };
 
     // Calculate weighted sum
-    const weightedSum = (
+    const weightedSum =
       (metrics.views || 0) * weights.views +
       (metrics.comments || 0) * weights.comments +
       (metrics.shares || 0) * weights.shares +
-      (metrics.bookmarks || 0) * weights.bookmarks
-    );
+      (metrics.bookmarks || 0) * weights.bookmarks;
 
     // Normalize to 0-10 scale for easier interpretation
     return Math.min(weightedSum / 10, 10);
@@ -643,11 +651,11 @@ export class AnalyticsService {
   private calculateUserEngagementScore(activity: UserActivity): number {
     // Define value weights for different action types
     const actionWeights: Record<string, number> = {
-      view: 1,      // Passive engagement
-      comment: 3,   // Active discussion
-      share: 2,     // Content amplification
-      bookmark: 2,  // Future interest
-      vote: 4       // Strong opinion expression
+      view: 1, // Passive engagement
+      comment: 3, // Active discussion
+      share: 2, // Content amplification
+      bookmark: 2, // Future interest
+      vote: 4, // Strong opinion expression
     };
 
     if (!activity.actions || activity.actions.length === 0) {
@@ -695,9 +703,7 @@ export class AnalyticsService {
     }
 
     // Check for high-severity conflicts requiring immediate attention
-    const highSeverityConflicts = conflicts.filter(
-      c => c.conflict_level === 'high'
-    );
+    const highSeverityConflicts = conflicts.filter(c => c.conflict_level === 'high');
 
     if (highSeverityConflicts.length > 0) {
       recommendations.push(
@@ -714,9 +720,7 @@ export class AnalyticsService {
     }
 
     // Check for pattern of medium-severity conflicts
-    const mediumSeverityConflicts = conflicts.filter(
-      c => c.conflict_level === 'medium'
-    );
+    const mediumSeverityConflicts = conflicts.filter(c => c.conflict_level === 'medium');
 
     if (mediumSeverityConflicts.length > 3) {
       recommendations.push(
@@ -740,14 +744,14 @@ export class AnalyticsService {
     const severityScores: Record<string, number> = {
       low: 1,
       medium: 2,
-      high: 3
+      high: 3,
     };
 
     // Calculate weighted sum of conflicts
     const totalScore = conflicts.reduce((sum, conflict) => {
       const severityScore = severityScores[conflict.conflict_level] || 1;
       const confidence = conflict.confidence || 1;
-      return sum + (severityScore * confidence);
+      return sum + severityScore * confidence;
     }, 0);
 
     // Return average priority score
@@ -797,15 +801,15 @@ export class AnalyticsService {
     const severityScores: Record<string, number> = {
       low: 1,
       medium: 2,
-      high: 3
+      high: 3,
     };
 
     // Define type-specific multipliers based on business impact
     const typeMultipliers: Record<string, number> = {
-      conflict: 1.5,      // Conflicts require immediate attention
-      engagement: 1.2,    // Engagement issues affect growth
-      stakeholder: 1.3,   // Stakeholder concerns are strategic
-      trend: 1.0          // Trends are informational
+      conflict: 1.5, // Conflicts require immediate attention
+      engagement: 1.2, // Engagement issues affect growth
+      stakeholder: 1.3, // Stakeholder concerns are strategic
+      trend: 1.0, // Trends are informational
     };
 
     const severityScore = severityScores[alert.severity] || 1;
@@ -850,7 +854,7 @@ export class AnalyticsService {
     const impactValues: Record<string, number> = {
       positive: 1,
       negative: -1,
-      neutral: 0
+      neutral: 0,
     };
 
     const sentimentScore = impactValues[stakeholder.impact] || 0;
@@ -881,11 +885,12 @@ export class AnalyticsService {
     // Velocity based on count and trend direction
     const baseVelocity = topic.count || 0;
 
-    const trendMultiplier = {
-      up: 1.5,
-      stable: 1.0,
-      down: 0.5
-    }[topic.trend as 'up' | 'stable' | 'down'] || 1.0;
+    const trendMultiplier =
+      {
+        up: 1.5,
+        stable: 1.0,
+        down: 0.5,
+      }[topic.trend as 'up' | 'stable' | 'down'] || 1.0;
 
     return baseVelocity * trendMultiplier;
   }
@@ -935,9 +940,7 @@ export class AnalyticsService {
     const headerRow = headers.map(escapeCSVValue).join(',');
 
     // Create data rows
-    const dataRows = data.map(row =>
-      headers.map(header => escapeCSVValue(row[header])).join(',')
-    );
+    const dataRows = data.map(row => headers.map(header => escapeCSVValue(row[header])).join(','));
 
     // Combine header and data rows
     return [headerRow, ...dataRows].join('\n');
@@ -950,17 +953,11 @@ export class AnalyticsService {
   private calculateSystemHealthScore(metrics: unknown): number {
     // Normalize active users (assuming 100 is target healthy level)
     const targetActiveUsers = 100;
-    const userScore = Math.min(
-      (metrics.activeUsers || 0) / targetActiveUsers,
-      1
-    );
+    const userScore = Math.min((metrics.activeUsers || 0) / targetActiveUsers, 1);
 
     // Normalize engagement (assuming 100 is target healthy level)
     const targetEngagement = 100;
-    const engagementScore = Math.min(
-      (metrics.currentEngagement || 0) / targetEngagement,
-      1
-    );
+    const engagementScore = Math.min((metrics.currentEngagement || 0) / targetEngagement, 1);
 
     // Apply penalty for alerts (each alert reduces score by 10%)
     const alertPenalty = (metrics.recentAlerts || 0) * 0.1;
@@ -969,7 +966,7 @@ export class AnalyticsService {
     const healthMultipliers: Record<string, number> = {
       healthy: 1.0,
       warning: 0.7,
-      error: 0.3
+      error: 0.3,
     };
 
     const healthMultiplier = healthMultipliers[metrics.systemHealth] || 0.5;
@@ -1024,32 +1021,23 @@ export class AnalyticsService {
     const momentum = recentChanges.reduce((sum, change, idx) => {
       // Weight recent changes more heavily
       const weight = (idx + 1) / recentChanges.length;
-      return sum + (change * weight);
+      return sum + change * weight;
     }, 0);
 
     return momentum / recentChanges.length;
   }
 
-
   // ============================================================================
   // Batch Operations for Performance
   // ============================================================================
-
-
 
   // ============================================================================
   // Analytics Insights & Recommendations
   // ============================================================================
 
-
-
-
   // ============================================================================
   // Advanced Analytics Features
   // ============================================================================
-
-
-
 }
 
 /**

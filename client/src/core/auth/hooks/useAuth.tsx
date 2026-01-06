@@ -8,11 +8,11 @@
  */
 
 import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } from 'react';
+import React from 'react';
 
 import { useAppDispatch, useAppSelector } from '@client/shared/hooks/store';
 import { logger } from '@client/utils/logger';
 
-import React from 'react';
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
 import * as authActions from '../store/auth-slice';

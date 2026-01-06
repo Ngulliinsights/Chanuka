@@ -1,10 +1,16 @@
 import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import type { Bill } from '@client/shared/types';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import type { Bill } from '@client/shared/types';
 
 interface BillOverviewTabProps {
   bill: Bill;
@@ -24,22 +30,18 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <FileText className="h-5 w-5 text-primary" />
             Bill Summary
           </CardTitle>
-          <CardDescription>
-            Key provisions and purpose of {bill.billNumber}
-          </CardDescription>
+          <CardDescription>Key provisions and purpose of {bill.billNumber}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-foreground leading-relaxed mb-4">
-            {bill.summary}
-          </p>
-          
+          <p className="text-foreground leading-relaxed mb-4">{bill.summary}</p>
+
           {/* Reading Time and Complexity */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               {bill.readingTime || '5'} min read
             </span>
-            <Badge 
+            <Badge
               variant="outline"
               className={`
                 ${bill.complexity === 'high' ? 'border-red-300 text-red-700' : ''}
@@ -60,26 +62,22 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <AlertTriangle className="h-5 w-5 text-orange-500" />
             Current Status
           </CardTitle>
-          <CardDescription>
-            Legislative progress and next steps
-          </CardDescription>
+          <CardDescription>Legislative progress and next steps</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-medium">Status:</span>
-              <Badge variant="default">
-                {bill.status}
-              </Badge>
+              <Badge variant="default">{bill.status}</Badge>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="font-medium">Introduced:</span>
               <span className="text-muted-foreground">
                 {new Date(bill.introducedDate).toLocaleDateString()}
               </span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="font-medium">Last Updated:</span>
               <span className="text-muted-foreground">
@@ -97,14 +95,15 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <Users className="h-5 w-5 text-blue-500" />
             Sponsors
           </CardTitle>
-          <CardDescription>
-            Representatives supporting this legislation
-          </CardDescription>
+          <CardDescription>Representatives supporting this legislation</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {bill.sponsors?.map((sponsor, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+              >
                 <div>
                   <div className="font-medium">{sponsor.name}</div>
                   <div className="text-sm text-muted-foreground">
@@ -115,9 +114,7 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
                   {sponsor.type || 'Co-sponsor'}
                 </Badge>
               </div>
-            )) || (
-              <p className="text-muted-foreground">No sponsor information available</p>
-            )}
+            )) || <p className="text-muted-foreground">No sponsor information available</p>}
           </div>
         </CardContent>
       </Card>
@@ -127,9 +124,7 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
         <Card>
           <CardHeader>
             <CardTitle>Policy Areas</CardTitle>
-            <CardDescription>
-              Topics and areas this bill addresses
-            </CardDescription>
+            <CardDescription>Topics and areas this bill addresses</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">

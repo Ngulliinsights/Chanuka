@@ -1,22 +1,13 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 import { DEFAULT_LOADING_CONFIG } from '../constants';
-import { 
-  LoadingError, 
-  LoadingOperationFailedError,
-  LoadingTimeoutError 
-} from '../errors';
-import { 
-  LoadingOperation, 
-  LoadingConfig, 
-  LoadingStats, 
-  UseLoadingResult
-} from '../types';
-import { 
-  createLoadingOperation, 
+import { LoadingError, LoadingOperationFailedError, LoadingTimeoutError } from '../errors';
+import { LoadingOperation, LoadingConfig, LoadingStats, UseLoadingResult } from '../types';
+import {
+  createLoadingOperation,
   hasOperationTimedOut,
   canRetryOperation,
-  calculateRetryDelay 
+  calculateRetryDelay,
 } from '../utils/loading-utils';
 import { safeValidateLoadingOperation } from '../validation';
 
@@ -48,7 +39,8 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
   // Update online status
   useEffect(() => {
     const handleOnline = () => setStats(prev => ({ ...prev, isOnline: true }));
-    const handleOffline = () => setStats(prev => ({ ...prev, isOnline: false, connectionType: 'offline' }));
+    const handleOffline = () =>
+      setStats(prev => ({ ...prev, isOnline: false, connectionType: 'offline' }));
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -76,10 +68,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
           timedOutOperations.forEach(id => {
             const operation = newMap.get(id);
             if (operation) {
-              const timeoutError = new LoadingTimeoutError(
-                id,
-                operation.timeout || 30000
-              );
+              const timeoutError = new LoadingTimeoutError(id, operation.timeout || 30000);
               newMap.set(id, { ...operation, error: timeoutError.message });
             }
           });
@@ -109,87 +98,96 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     }));
   }, []);
 
-  const startOperation = useCallback((
-    operationData: Partial<LoadingOperation>
-  ): string => {
-    try {
-      const operation = createLoadingOperation(
-        operationData.type || 'component',
-        operationData.message || 'Loading...',
-        operationData
-      );
+  const startOperation = useCallback(
+    (operationData: Partial<LoadingOperation>): string => {
+      try {
+        const operation = createLoadingOperation(
+          operationData.type || 'component',
+          operationData.message || 'Loading...',
+          operationData
+        );
 
-      if (config.validation?.enabled) {
-        const validation = safeValidateLoadingOperation(operation);
-        if (!validation.success) {
-          if (config.validation?.strict) {
-            throw validation.error;
-          } else {
-            console.warn('Loading operation validation warning:', validation.error?.message);
+        if (config.validation?.enabled) {
+          const validation = safeValidateLoadingOperation(operation);
+          if (!validation.success) {
+            if (config.validation?.strict) {
+              throw validation.error;
+            } else {
+              console.warn('Loading operation validation warning:', validation.error?.message);
+            }
           }
         }
-      }
 
-      setOperations(prev => new Map(prev).set(operation.id, operation));
-      updateStats();
-
-      return operation.id;
-    } catch (error) {
-      const loadingError = error instanceof LoadingError ? 
-        error : 
-        new LoadingOperationFailedError(
-          operationData.id || 'unknown',
-          error instanceof Error ? error.message : 'Unknown error'
-        );
-      
-      options.onError?.(loadingError);
-      throw loadingError;
-    }
-  }, [config, options, updateStats]);
-
-  const completeOperation = useCallback((operationId: string) => {
-    setOperations(prev => {
-      const newMap = new Map(prev);
-      const operation = newMap.get(operationId);
-      
-      if (operation) {
-        newMap.delete(operationId);
+        setOperations(prev => new Map(prev).set(operation.id, operation));
         updateStats();
-        
-        if (newMap.size === 0) {
-          options.onSuccess?.();
-        }
-      }
-      
-      return newMap;
-    });
-  }, [options, updateStats]);
 
-  const failOperation = useCallback((operationId: string, error: Error) => {
-    setOperations(prev => {
-      const newMap = new Map(prev);
-      const operation = newMap.get(operationId);
-      
-      if (operation) {
-        const updatedOperation = {
-          ...operation,
-          error: error.message, // Store as string to match LoadingOperation type
-          retryCount: operation.retryCount + 1,
-        };
-        
-        newMap.set(operationId, updatedOperation);
-        updateStats();
-        
-        const loadingError = error instanceof LoadingError ? 
-          error : 
-          new LoadingOperationFailedError(operationId, error.message);
-        
+        return operation.id;
+      } catch (error) {
+        const loadingError =
+          error instanceof LoadingError
+            ? error
+            : new LoadingOperationFailedError(
+                operationData.id || 'unknown',
+                error instanceof Error ? error.message : 'Unknown error'
+              );
+
         options.onError?.(loadingError);
+        throw loadingError;
       }
-      
-      return newMap;
-    });
-  }, [options, updateStats]);
+    },
+    [config, options, updateStats]
+  );
+
+  const completeOperation = useCallback(
+    (operationId: string) => {
+      setOperations(prev => {
+        const newMap = new Map(prev);
+        const operation = newMap.get(operationId);
+
+        if (operation) {
+          newMap.delete(operationId);
+          updateStats();
+
+          if (newMap.size === 0) {
+            options.onSuccess?.();
+          }
+        }
+
+        return newMap;
+      });
+    },
+    [options, updateStats]
+  );
+
+  const failOperation = useCallback(
+    (operationId: string, error: Error) => {
+      setOperations(prev => {
+        const newMap = new Map(prev);
+        const operation = newMap.get(operationId);
+
+        if (operation) {
+          const updatedOperation = {
+            ...operation,
+            error: error.message, // Store as string to match LoadingOperation type
+            retryCount: operation.retryCount + 1,
+          };
+
+          newMap.set(operationId, updatedOperation);
+          updateStats();
+
+          const loadingError =
+            error instanceof LoadingError
+              ? error
+              : new LoadingOperationFailedError(operationId, error.message);
+
+          options.onError?.(loadingError);
+        }
+
+        return newMap;
+      });
+    },
+    [options, updateStats]
+  );
 
   const retryOperation = useCallback(async (operationId: string): Promise<void> => {
     const operation = operationsRef.current.get(operationId);
@@ -198,11 +196,11 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     }
 
     const delay = calculateRetryDelay(operation.retryCount);
-    
+
     setOperations(prev => {
       const newMap = new Map(prev);
       const op = newMap.get(operationId);
-      
+
       if (op) {
         newMap.set(operationId, {
           ...op,
@@ -210,7 +208,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
           retryCount: op.retryCount + 1,
         });
       }
-      
+
       return newMap;
     });
 
@@ -219,14 +217,17 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     }
   }, []);
 
-  const cancelOperation = useCallback((operationId: string) => {
-    setOperations(prev => {
-      const newMap = new Map(prev);
-      newMap.delete(operationId);
-      updateStats();
-      return newMap;
-    });
-  }, [updateStats]);
+  const cancelOperation = useCallback(
+    (operationId: string) => {
+      setOperations(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(operationId);
+        updateStats();
+        return newMap;
+      });
+    },
+    [updateStats]
+  );
 
   const reset = useCallback(() => {
     setOperations(new Map());
@@ -239,29 +240,34 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const isLoading = operations.size > 0;
   const hasErrors = Array.from(operations.values()).some(op => op.error);
-  const currentError = hasErrors ? 
-    new Error(Array.from(operations.values()).find(op => op.error)?.error || 'Unknown error') : 
-    null;
+  const currentError = hasErrors
+    ? new Error(Array.from(operations.values()).find(op => op.error)?.error || 'Unknown error')
+    : null;
 
   // Calculate overall progress
-  const progress = operations.size > 0 ? {
-    loaded: stats.loaded,
-    total: operations.size,
-    phase: hasErrors ? 'critical' as const : isLoading ? 'critical' as const : 'complete' as const,
-  } : null;
+  const progress =
+    operations.size > 0
+      ? {
+          loaded: stats.loaded,
+          total: operations.size,
+          phase: hasErrors
+            ? ('critical' as const)
+            : isLoading
+              ? ('critical' as const)
+              : ('complete' as const),
+        }
+      : null;
 
   // Fix: canRecover should be boolean, not boolean | null
   const canRecover = Boolean(currentError && hasErrors);
-  const suggestions = currentError ? 
-    ['Try refreshing the page', 'Check your connection'] : 
-    [];
+  const suggestions = currentError ? ['Try refreshing the page', 'Check your connection'] : [];
 
   const recover = useCallback(async (): Promise<boolean> => {
     if (!hasErrors) return false;
-    
+
     const failedOperations = Array.from(operations.values()).filter(op => op.error);
     let recoveredCount = 0;
-    
+
     for (const operation of failedOperations) {
       try {
         await retryOperation(operation.id);
@@ -270,7 +276,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
         // Continue with other operations
       }
     }
-    
+
     return recoveredCount > 0;
   }, [hasErrors, operations, retryOperation]);
 

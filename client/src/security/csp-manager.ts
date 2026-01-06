@@ -4,7 +4,6 @@
  */
 
 import { SecurityEvent, CSPViolation } from '@client/shared/types';
-
 import { logger } from '@client/utils/logger';
 
 export interface CSPConfig {
@@ -33,16 +32,16 @@ export class CSPManager {
     try {
       // Set up CSP policy
       this.setupCSP();
-      
+
       // Set up violation reporting
       this.setupViolationReporting();
-      
+
       // Apply security headers
       this.applySecurityHeaders();
 
       logger.info('CSP Manager initialized successfully', {
         reportOnly: this.config.reportOnly,
-        nonce: this.nonce.substring(0, 8) + '...'
+        nonce: this.nonce.substring(0, 8) + '...',
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -77,69 +76,42 @@ export class CSPManager {
         // Allow specific trusted domains
         'https://cdn.chanuka.ke',
         // Development allowances
-        ...(process.env.NODE_ENV === 'development' ? [
-          "'unsafe-eval'", // For HMR
-          'http://localhost:*',
-          'ws://localhost:*',
-          'wss://localhost:*'
-        ] : [])
+        ...(process.env.NODE_ENV === 'development'
+          ? [
+              "'unsafe-eval'", // For HMR
+              'http://localhost:*',
+              'ws://localhost:*',
+              'wss://localhost:*',
+            ]
+          : []),
       ],
       'style-src': [
         "'self'",
         "'unsafe-inline'", // Required for CSS-in-JS and Tailwind
         'https://fonts.googleapis.com',
-        'https://cdn.chanuka.ke'
+        'https://cdn.chanuka.ke',
       ],
-      'img-src': [
-        "'self'",
-        'data:',
-        'blob:',
-        'https:',
-        'https://cdn.chanuka.ke'
-      ],
-      'font-src': [
-        "'self'",
-        'data:',
-        'https://fonts.gstatic.com',
-        'https://cdn.chanuka.ke'
-      ],
+      'img-src': ["'self'", 'data:', 'blob:', 'https:', 'https://cdn.chanuka.ke'],
+      'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdn.chanuka.ke'],
       'connect-src': [
         "'self'",
         'https://api.chanuka.ke',
         'wss://ws.chanuka.ke',
         // Development allowances
-        ...(process.env.NODE_ENV === 'development' ? [
-          'http://localhost:*',
-          'ws://localhost:*',
-          'wss://localhost:*'
-        ] : [])
+        ...(process.env.NODE_ENV === 'development'
+          ? ['http://localhost:*', 'ws://localhost:*', 'wss://localhost:*']
+          : []),
       ],
-      'worker-src': [
-        "'self'",
-        'blob:'
-      ],
-      'child-src': [
-        "'self'",
-        'blob:'
-      ],
-      'frame-src': [
-        "'none'"
-      ],
-      'object-src': [
-        "'none'"
-      ],
-      'base-uri': [
-        "'self'"
-      ],
-      'form-action': [
-        "'self'"
-      ],
-      'frame-ancestors': [
-        "'none'"
-      ],
+      'worker-src': ["'self'", 'blob:'],
+      'child-src': ["'self'", 'blob:'],
+      'frame-src': ["'none'"],
+      'object-src': ["'none'"],
+      'base-uri': ["'self'"],
+      'form-action': ["'self'"],
+      'frame-ancestors': ["'none'"],
       'upgrade-insecure-requests': [],
       'block-all-mixed-content': [],
-      'report-uri': [this.config.reportUri]
+      'report-uri': [this.config.reportUri],
     };
 
     return Object.entries(directives)
@@ -154,7 +126,7 @@ export class CSPManager {
 
   private setupViolationReporting(): void {
     // Listen for CSP violations
-    document.addEventListener('securitypolicyviolation', (event) => {
+    document.addEventListener('securitypolicyviolation', event => {
       this.handleCSPViolation(event);
     });
 
@@ -168,7 +140,7 @@ export class CSPManager {
 
   private handleCSPViolation(event: SecurityPolicyViolationEvent | CSPViolation): void {
     let violation: CSPViolation;
-    
+
     if ('documentURI' in event) {
       // SecurityPolicyViolationEvent
       violation = {
@@ -182,7 +154,7 @@ export class CSPManager {
         lineNumber: event.lineNumber,
         columnNumber: event.columnNumber,
         sourceFile: event.sourceFile,
-        statusCode: event.statusCode
+        statusCode: event.statusCode,
       };
     } else {
       // Already a CSPViolation object
@@ -194,7 +166,7 @@ export class CSPManager {
     // Log violation
     logger.warn('CSP Violation detected', {
       component: 'CSPManager',
-      violation
+      violation,
     });
 
     // Create security event
@@ -202,7 +174,7 @@ export class CSPManager {
       type: 'csp_violation',
       severity: this.assessViolationSeverity(violation),
       source: 'CSPManager',
-      details: violation
+      details: violation,
     };
 
     // Report to security monitor
@@ -217,12 +189,16 @@ export class CSPManager {
     if (violation.violatedDirective.includes('script-src')) {
       return 'high'; // Script violations are serious
     }
-    if (violation.violatedDirective.includes('object-src') || 
-        violation.violatedDirective.includes('frame-src')) {
+    if (
+      violation.violatedDirective.includes('object-src') ||
+      violation.violatedDirective.includes('frame-src')
+    ) {
       return 'critical'; // Object/frame violations could indicate XSS
     }
-    if (violation.violatedDirective.includes('img-src') || 
-        violation.violatedDirective.includes('style-src')) {
+    if (
+      violation.violatedDirective.includes('img-src') ||
+      violation.violatedDirective.includes('style-src')
+    ) {
       return 'medium'; // Style/image violations are less critical
     }
     return 'low';
@@ -235,7 +211,7 @@ export class CSPManager {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(violation)
+        body: JSON.stringify(violation),
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -246,7 +222,7 @@ export class CSPManager {
   private reportSecurityEvent(event: Partial<SecurityEvent>): void {
     // Emit custom event for security monitor
     const customEvent = new CustomEvent('security-event', {
-      detail: event
+      detail: event,
     });
     document.dispatchEvent(customEvent);
   }
@@ -257,7 +233,7 @@ export class CSPManager {
       { name: 'X-Content-Type-Options', content: 'nosniff' },
       { name: 'X-Frame-Options', content: 'DENY' },
       { name: 'X-XSS-Protection', content: '1; mode=block' },
-      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
+      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
     ];
 
     headers.forEach(({ name, content }) => {

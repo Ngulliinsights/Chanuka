@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { MiddlewareProvider } from '../types';
+
 import { Services } from '../../types/services';
+import { MiddlewareProvider } from '../types';
 // import { logger } from '../observability/logging'; // Unused import
 
 export class AuthMiddlewareProvider implements MiddlewareProvider {
@@ -22,7 +23,7 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
 
         // Extract token from Authorization header
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        if (!authHeader?.startsWith('Bearer ')) {
           if (requireAuth) {
             return res.status(401).json({ 
               error: 'Authentication required',

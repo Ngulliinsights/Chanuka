@@ -5,7 +5,6 @@
  * and provides contextual guidance for their civic engagement journey.
  */
 
-import React, { useState } from 'react';
 import {
   TrendingUp,
   Target,
@@ -15,14 +14,15 @@ import {
   Users,
   Award,
   X,
-  Info
+  Info,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
+import type { PersonaType, PersonaClassification } from '@client/core/personalization/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import type { PersonaType, PersonaClassification } from '@client/core/personalization/types';
 
 interface ProgressiveDisclosureProps {
   currentPersona: PersonaType;
@@ -48,10 +48,10 @@ const NEXT_LEVEL_INFO: Record<PersonaType, NextLevelInfo | null> = {
       'Personalized bill recommendations',
       'Community discussion participation',
       'Bill tracking and notifications',
-      'Civic engagement analytics'
+      'Civic engagement analytics',
     ],
     icon: <Users className="h-5 w-5" />,
-    color: 'blue'
+    color: 'blue',
   },
   intermediate: {
     title: 'Civic Expert',
@@ -62,19 +62,19 @@ const NEXT_LEVEL_INFO: Record<PersonaType, NextLevelInfo | null> = {
       'Professional network access',
       'Advanced analytics dashboard',
       'API access for data export',
-      'Workaround detection system'
+      'Workaround detection system',
     ],
     icon: <Award className="h-5 w-5" />,
-    color: 'purple'
+    color: 'purple',
   },
-  expert: null // Already at the highest level
+  expert: null, // Already at the highest level
 };
 
 export function ProgressiveDisclosure({
   currentPersona,
   classification,
   className = '',
-  onDismiss
+  onDismiss,
 }: ProgressiveDisclosureProps) {
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -102,21 +102,21 @@ export function ProgressiveDisclosure({
           card: 'border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100',
           text: 'text-blue-800',
           badge: 'bg-blue-100 text-blue-800',
-          button: 'bg-blue-600 hover:bg-blue-700'
+          button: 'bg-blue-600 hover:bg-blue-700',
         };
       case 'purple':
         return {
           card: 'border-purple-200 bg-gradient-to-r from-purple-50 to-purple-100',
           text: 'text-purple-800',
           badge: 'bg-purple-100 text-purple-800',
-          button: 'bg-purple-600 hover:bg-purple-700'
+          button: 'bg-purple-600 hover:bg-purple-700',
         };
       default:
         return {
           card: 'border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100',
           text: 'text-gray-800',
           badge: 'bg-gray-100 text-gray-800',
-          button: 'bg-gray-600 hover:bg-gray-700'
+          button: 'bg-gray-600 hover:bg-gray-700',
         };
     }
   };
@@ -135,12 +135,7 @@ export function ProgressiveDisclosure({
             Ready for the Next Level?
           </CardTitle>
           {onDismiss && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-6 w-6 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={handleDismiss} className="h-6 w-6 p-0">
               <X className="h-4 w-4" />
             </Button>
           )}
@@ -149,25 +144,17 @@ export function ProgressiveDisclosure({
       <CardContent className="space-y-4">
         {/* Next Level Preview */}
         <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg ${colors.badge}`}>
-            {nextLevelInfo.icon}
-          </div>
+          <div className={`p-2 rounded-lg ${colors.badge}`}>{nextLevelInfo.icon}</div>
           <div className="flex-1">
-            <h4 className={`font-semibold ${colors.text}`}>
-              Become a {nextLevelInfo.title}
-            </h4>
-            <p className={`text-sm ${colors.text} opacity-90`}>
-              {nextLevelInfo.description}
-            </p>
+            <h4 className={`font-semibold ${colors.text}`}>Become a {nextLevelInfo.title}</h4>
+            <p className={`text-sm ${colors.text} opacity-90`}>{nextLevelInfo.description}</p>
           </div>
         </div>
 
         {/* Progress Indicator */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className={`text-sm font-medium ${colors.text}`}>
-              Progress to Next Level
-            </span>
+            <span className={`text-sm font-medium ${colors.text}`}>Progress to Next Level</span>
             <Badge variant="secondary" className={colors.badge}>
               {Math.round(progressPercentage)}%
             </Badge>
@@ -190,9 +177,7 @@ export function ProgressiveDisclosure({
                 <div className="w-5 h-5 rounded-full border-2 border-current opacity-50 flex items-center justify-center mt-0.5">
                   <div className="w-2 h-2 rounded-full bg-current opacity-0" />
                 </div>
-                <span className={`text-sm ${colors.text}`}>
-                  {requirement}
-                </span>
+                <span className={`text-sm ${colors.text}`}>{requirement}</span>
               </div>
             ))}
           </div>
@@ -221,10 +206,7 @@ export function ProgressiveDisclosure({
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-2 pt-2">
-          <Button
-            className={`flex-1 ${colors.button} text-white`}
-            asChild
-          >
+          <Button className={`flex-1 ${colors.button} text-white`} asChild>
             <a href={currentPersona === 'novice' ? '/bills' : '/expert/getting-started'}>
               Start Your Journey
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -242,9 +224,8 @@ export function ProgressiveDisclosure({
         <div className="bg-white/50 p-3 rounded-lg">
           <p className={`text-sm ${colors.text} text-center`}>
             {currentPersona === 'novice'
-              ? "Every expert was once a beginner. Your civic engagement journey starts with small steps!"
-              : "Your expertise can help thousands of citizens better understand complex legislation."
-            }
+              ? 'Every expert was once a beginner. Your civic engagement journey starts with small steps!'
+              : 'Your expertise can help thousands of citizens better understand complex legislation.'}
           </p>
         </div>
       </CardContent>

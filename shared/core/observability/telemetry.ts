@@ -1,5 +1,5 @@
-import type { ObservabilityMetrics, TelemetryData, BaseObservabilityConfig } from './common-types';
 import type { BaseObservabilityInterface, BaseTelemetryInterface, BaseMetricsInterface } from './base-interfaces';
+import type { ObservabilityMetrics, TelemetryData, BaseObservabilityConfig } from './common-types';
 
 // Forward declarations to resolve circular dependencies
 declare module './types' {
@@ -17,11 +17,12 @@ declare module './types' {
  */
 
 import { Result, ok, err } from '../primitives/types';
+
 import { BaseError } from './error-management';
 import { Logger, MetricsCollector, CorrelationManager } from './interfaces';
-import { Tracer, SpanContext as TracingSpanContext } from './tracing/types';
 import { LogLevel, LogContext } from './logging/types';
 import { Metric } from './metrics/types';
+import { Tracer, SpanContext as TracingSpanContext } from './tracing/types';
 import { SpanContext } from './tracing/types';
 
 // ==================== Telemetry Data Types ====================

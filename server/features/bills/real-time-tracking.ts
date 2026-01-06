@@ -9,13 +9,12 @@ import {
 } from '@shared/core/utils/api-utils';
 import type {
   BillUpdate,
+  ConnectionMetrics,
   ConnectionQuality,
   ConnectionState,
   NotificationData,
   Priority,
-  WebSocketStats as SharedWebSocketStats,
-  ConnectionMetrics
-} from '@shared/schema/websocket';
+  WebSocketStats as SharedWebSocketStats} from '@shared/schema/websocket';
 import { NextFunction, Request, Response, Router } from 'express';
 
 // ============================================================================

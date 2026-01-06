@@ -1,9 +1,5 @@
+import { TrendingUp, MessageSquare, Award } from 'lucide-react';
 import React from 'react';
-import {
-  TrendingUp,
-  MessageSquare,
-  Award
-} from 'lucide-react';
 
 import { Badge } from '@/shared/design-system';
 import { Card, CardContent } from '@/shared/design-system';
@@ -48,7 +44,9 @@ export function StatsSection({ stats, civicMetrics, variant = 'full' }: StatsSec
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Streak Days</p>
-                <p className="text-2xl font-bold">{civicMetrics?.monthlyTrend?.[0]?.activities || 0}</p>
+                <p className="text-2xl font-bold">
+                  {civicMetrics?.monthlyTrend?.[0]?.activities || 0}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-500" />
             </div>

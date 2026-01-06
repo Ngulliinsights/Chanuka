@@ -3,28 +3,37 @@
  * Displays security system status and metrics
  */
 
-import { 
-  Shield, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   Activity,
   Eye,
   Lock,
-  Zap
+  Zap,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { logger } from '@client/utils/logger';
-
+import {
+  SecurityMetrics,
+  SecurityAlert,
+  SecurityEvent,
+  VulnerabilityReport,
+} from '@client/features/analytics/types.ts';
 import { getSecuritySystem } from '@client/features/security/ui/dashboard/SecurityDashboard.tsx';
-import { SecurityMetrics, SecurityAlert, SecurityEvent, VulnerabilityReport } from '@client/features/analytics/types.ts';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
+import { logger } from '@client/utils/logger';
 
 interface SecurityDashboardProps {
   className?: string;
@@ -33,11 +42,11 @@ interface SecurityDashboardProps {
   refreshInterval?: number;
 }
 
-export function SecurityDashboard({ 
+export function SecurityDashboard({
   className = '',
   showDetails = true,
   autoRefresh = true,
-  refreshInterval = 30000
+  refreshInterval = 30000,
 }: SecurityDashboardProps) {
   const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
   const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
@@ -89,29 +98,42 @@ export function SecurityDashboard({
 
   const getHealthColor = (health: string) => {
     switch (health) {
-      case 'healthy': return 'text-green-600';
-      case 'warning': return 'text-yellow-600';
-      case 'critical': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'healthy':
+        return 'text-green-600';
+      case 'warning':
+        return 'text-yellow-600';
+      case 'critical':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const getHealthIcon = (health: string) => {
     switch (health) {
-      case 'healthy': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'critical': return <XCircle className="h-5 w-5 text-red-600" />;
-      default: return <Activity className="h-5 w-5 text-gray-600" />;
+      case 'healthy':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      case 'critical':
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      default:
+        return <Activity className="h-5 w-5 text-gray-600" />;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low': return 'bg-blue-100 text-blue-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'low':
+        return 'bg-blue-100 text-blue-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'high':
+        return 'bg-orange-100 text-orange-800';
+      case 'critical':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -162,9 +184,7 @@ export function SecurityDashboard({
           <Shield className="h-8 w-8 text-blue-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Security Dashboard</h1>
-            <p className="text-sm text-gray-500">
-              Last updated: {lastUpdate.toLocaleTimeString()}
-            </p>
+            <p className="text-sm text-gray-500">Last updated: {lastUpdate.toLocaleTimeString()}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -187,7 +207,9 @@ export function SecurityDashboard({
             {getHealthIcon(metrics?.systemHealth || 'unknown')}
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${getHealthColor(metrics?.systemHealth || 'unknown')}`}>
+            <div
+              className={`text-2xl font-bold ${getHealthColor(metrics?.systemHealth || 'unknown')}`}
+            >
               {metrics?.systemHealth || 'Unknown'}
             </div>
           </CardContent>
@@ -200,9 +222,7 @@ export function SecurityDashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics?.totalEvents || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Total events recorded
-            </p>
+            <p className="text-xs text-muted-foreground">Total events recorded</p>
           </CardContent>
         </Card>
 
@@ -215,9 +235,7 @@ export function SecurityDashboard({
             <div className="text-2xl font-bold text-red-600">
               {alerts.filter(a => !a.acknowledged).length}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Unacknowledged alerts
-            </p>
+            <p className="text-xs text-muted-foreground">Unacknowledged alerts</p>
           </CardContent>
         </Card>
 
@@ -230,9 +248,7 @@ export function SecurityDashboard({
             <div className="text-2xl font-bold text-orange-600">
               {vulnerabilities.filter(v => !v.fixed).length}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Unfixed vulnerabilities
-            </p>
+            <p className="text-xs text-muted-foreground">Unfixed vulnerabilities</p>
           </CardContent>
         </Card>
       </div>
@@ -251,16 +267,14 @@ export function SecurityDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Security Alerts</CardTitle>
-                <CardDescription>
-                  Active security alerts requiring attention
-                </CardDescription>
+                <CardDescription>Active security alerts requiring attention</CardDescription>
               </CardHeader>
               <CardContent>
                 {alerts.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No alerts</p>
                 ) : (
                   <div className="space-y-3">
-                    {alerts.slice(0, 10).map((alert) => (
+                    {alerts.slice(0, 10).map(alert => (
                       <Alert key={alert.id}>
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription className="flex items-center justify-between">
@@ -271,9 +285,7 @@ export function SecurityDashboard({
                               </Badge>
                               <span className="font-medium">{alert.type}</span>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {alert.message}
-                            </p>
+                            <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
                             <p className="text-xs text-gray-400">
                               {alert.timestamp.toLocaleString()}
                             </p>
@@ -300,38 +312,42 @@ export function SecurityDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Recent Security Events</CardTitle>
-                <CardDescription>
-                  Latest security events detected by the system
-                </CardDescription>
+                <CardDescription>Latest security events detected by the system</CardDescription>
               </CardHeader>
               <CardContent>
                 {events.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No events</p>
                 ) : (
                   <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {events.slice(-20).reverse().map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-3 border rounded">
-                        <div className="flex items-center space-x-3">
-                          <Badge className={getSeverityColor(event.severity)}>
-                            {event.severity}
-                          </Badge>
-                          <div>
-                            <p className="font-medium">{event.type}</p>
-                            <p className="text-sm text-gray-600">{event.source}</p>
+                    {events
+                      .slice(-20)
+                      .reverse()
+                      .map(event => (
+                        <div
+                          key={event.id}
+                          className="flex items-center justify-between p-3 border rounded"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Badge className={getSeverityColor(event.severity)}>
+                              {event.severity}
+                            </Badge>
+                            <div>
+                              <p className="font-medium">{event.type}</p>
+                              <p className="text-sm text-gray-600">{event.source}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-400">
+                              {event.timestamp.toLocaleString()}
+                            </p>
+                            {event.resolved && (
+                              <Badge variant="outline" className="text-green-600">
+                                Resolved
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-400">
-                            {event.timestamp.toLocaleString()}
-                          </p>
-                          {event.resolved && (
-                            <Badge variant="outline" className="text-green-600">
-                              Resolved
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </CardContent>
@@ -342,16 +358,14 @@ export function SecurityDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Vulnerability Report</CardTitle>
-                <CardDescription>
-                  Security vulnerabilities detected in the system
-                </CardDescription>
+                <CardDescription>Security vulnerabilities detected in the system</CardDescription>
               </CardHeader>
               <CardContent>
                 {vulnerabilities.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No vulnerabilities detected</p>
                 ) : (
                   <div className="space-y-3">
-                    {vulnerabilities.map((vuln) => (
+                    {vulnerabilities.map(vuln => (
                       <div key={vuln.id} className="border rounded p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -365,9 +379,7 @@ export function SecurityDashboard({
                               </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-gray-400">
-                            {vuln.timestamp.toLocaleString()}
-                          </p>
+                          <p className="text-xs text-gray-400">{vuln.timestamp.toLocaleString()}</p>
                         </div>
                         <p className="text-sm text-gray-700 mb-2">{vuln.description}</p>
                         {vuln.recommendations.length > 0 && (
@@ -419,9 +431,7 @@ export function SecurityDashboard({
                     <div className="space-y-2">
                       {Object.entries(metrics.eventsBySeverity).map(([severity, count]) => (
                         <div key={severity} className="flex justify-between">
-                          <Badge className={getSeverityColor(severity)}>
-                            {severity}
-                          </Badge>
+                          <Badge className={getSeverityColor(severity)}>{severity}</Badge>
                           <span className="font-medium">{count}</span>
                         </div>
                       ))}

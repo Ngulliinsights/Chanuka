@@ -33,28 +33,28 @@ const PRELOAD_CONFIG: RoutePreloadConfig[] = [
     route: '/bills',
     priority: 'high',
     preloadDelay: 1000,
-    dependencies: ['/search']
+    dependencies: ['/search'],
   },
   {
     route: '/search',
     priority: 'high',
-    preloadDelay: 1500
+    preloadDelay: 1500,
   },
   {
     route: '/dashboard',
     priority: 'medium',
-    preloadDelay: 2000
+    preloadDelay: 2000,
   },
   {
     route: '/community',
     priority: 'medium',
-    preloadDelay: 2500
+    preloadDelay: 2500,
   },
   {
     route: '/account',
     priority: 'low',
-    preloadDelay: 3000
-  }
+    preloadDelay: 3000,
+  },
 ];
 
 /**
@@ -67,7 +67,7 @@ const ROUTE_IMPORTS: Record<string, () => Promise<RouteModule>> = {
   '/dashboard': () => import('../../pages/UserAccountPage'),
   '/community': () => import('../../pages/community-input'),
   '/account': () => import('../../pages/UserAccountPage'),
-  '/auth': () => import('../../pages/auth/auth-page')
+  '/auth': () => import('../../pages/auth/auth-page'),
 };
 
 /**
@@ -121,8 +121,8 @@ class NavigationPerformanceManager {
     }
 
     this.intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             const link = entry.target as HTMLAnchorElement;
             const href = link.getAttribute('href');
@@ -134,7 +134,7 @@ class NavigationPerformanceManager {
         });
       },
       {
-        rootMargin: '50px'
+        rootMargin: '50px',
       }
     );
 
@@ -149,7 +149,7 @@ class NavigationPerformanceManager {
     if (!this.intersectionObserver) return;
 
     const links = document.querySelectorAll('a[href^="/"]');
-    links.forEach((link) => {
+    links.forEach(link => {
       this.intersectionObserver!.observe(link);
     });
   }
@@ -158,13 +158,13 @@ class NavigationPerformanceManager {
    * Setup automatic route preloading based on configuration
    */
   private setupRoutePreloading() {
-    PRELOAD_CONFIG.forEach((config) => {
+    PRELOAD_CONFIG.forEach(config => {
       setTimeout(() => {
         this.preloadRoute(config.route);
 
         // Preload dependencies
         if (config.dependencies) {
-          config.dependencies.forEach((dep) => {
+          config.dependencies.forEach(dep => {
             setTimeout(() => this.preloadRoute(dep), 500);
           });
         }
@@ -178,8 +178,8 @@ class NavigationPerformanceManager {
   private setupNavigationMetrics() {
     // Monitor navigation timing
     if ('performance' in window && 'getEntriesByType' in performance) {
-      this.performanceObserver = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      this.performanceObserver = new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
           if (entry.entryType === 'navigation') {
             const navEntry = entry as PerformanceNavigationTiming;
 
@@ -190,7 +190,7 @@ class NavigationPerformanceManager {
               routeLoadTime: loadTime,
               preloadSuccess: this.preloadedRoutes.has(window.location.pathname),
               cacheHit: navEntry.transferSize === 0,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
           }
         });
@@ -215,14 +215,14 @@ class NavigationPerformanceManager {
 
     const startTime = performance.now();
     const preloadPromise = importFn()
-      .then((module) => {
+      .then(module => {
         const endTime = performance.now();
         this.preloadedRoutes.add(route);
 
         logger.info('Route preloaded successfully', {
           component: 'NavigationPerformance',
           route,
-          loadTime: endTime - startTime
+          loadTime: endTime - startTime,
         });
 
         return module;
@@ -231,7 +231,7 @@ class NavigationPerformanceManager {
         logger.warn('Route preload failed', {
           component: 'NavigationPerformance',
           route,
-          error: error.message
+          error: error.message,
         });
 
         // Remove from promises map so it can be retried
@@ -257,7 +257,7 @@ class NavigationPerformanceManager {
     logger.info('Navigation metrics recorded', {
       component: 'NavigationPerformance',
       route,
-      metrics
+      metrics,
     });
   }
 
@@ -337,7 +337,7 @@ export const NavigationPerformance: React.FC<NavigationPerformanceProps> = ({ ch
     logger.info('Navigation performance check', {
       component: 'NavigationPerformance',
       route: currentRoute,
-      wasPreloaded
+      wasPreloaded,
     });
 
     // Preload likely next routes based on current route
@@ -367,34 +367,37 @@ export const NavigationPerformance: React.FC<NavigationPerformanceProps> = ({ ch
   /**
    * Enhanced navigation function with performance optimizations
    */
-  const optimizedNavigate = useCallback<OptimizedNavigateFunction>((to: string, options?: NavigateOptions) => {
-    const startTime = performance.now();
+  const optimizedNavigate = useCallback<OptimizedNavigateFunction>(
+    (to: string, options?: NavigateOptions) => {
+      const startTime = performance.now();
 
-    // Check if route is already preloaded
-    const isPreloaded = performanceManager.isPreloaded(to);
+      // Check if route is already preloaded
+      const isPreloaded = performanceManager.isPreloaded(to);
 
-    logger.info('Optimized navigation initiated', {
-      component: 'NavigationPerformance',
-      to,
-      isPreloaded,
-      from: location.pathname
-    });
-
-    // If not preloaded, try to preload before navigation
-    if (!isPreloaded && ROUTE_IMPORTS[to]) {
-      performanceManager.preloadRoute(to).finally(() => {
-        const endTime = performance.now();
-        logger.info('Navigation completed', {
-          component: 'NavigationPerformance',
-          to,
-          totalTime: endTime - startTime
-        });
+      logger.info('Optimized navigation initiated', {
+        component: 'NavigationPerformance',
+        to,
+        isPreloaded,
+        from: location.pathname,
       });
-    }
 
-    // Perform navigation
-    navigate(to, options);
-  }, [navigate, location.pathname]);
+      // If not preloaded, try to preload before navigation
+      if (!isPreloaded && ROUTE_IMPORTS[to]) {
+        performanceManager.preloadRoute(to).finally(() => {
+          const endTime = performance.now();
+          logger.info('Navigation completed', {
+            component: 'NavigationPerformance',
+            to,
+            totalTime: endTime - startTime,
+          });
+        });
+      }
+
+      // Perform navigation
+      navigate(to, options);
+    },
+    [navigate, location.pathname]
+  );
 
   /**
    * Expose optimized navigate function to child components
@@ -421,7 +424,7 @@ export const NavigationPerformance: React.FC<NavigationPerformanceProps> = ({ ch
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
 
     return () => observer.disconnect();

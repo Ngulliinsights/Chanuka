@@ -1,14 +1,15 @@
 import { promises as fs } from 'fs';
-import { BackupSystem } from './backup-system';
 import { join, dirname } from 'path';
-import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
+
+import { logger } from '../../observability/logging';
 import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../../types';
 // import { BackupSystem, BackupSystemConfig } from './backup-system';
  // Unused import
-import { logger } from '../../observability/logging';
 import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType, ValidationScope } from '../types';
 
 import { BackupSystem } from './backup-system';
+import { BackupSystem } from './backup-system';
+import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
 import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
 
 interface ScriptMergeOperation {

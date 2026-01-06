@@ -15,10 +15,7 @@ import {
  * Main reducer for managing loading state
  * Handles action types: retry, fallback, cancel, prioritize, delay, cache
  */
-export function loadingReducer(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+export function loadingReducer(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   switch (action.type) {
     case 'retry':
       return handleRetry(state, action);
@@ -50,10 +47,7 @@ export function loadingReducer(
 /**
  * Handles retry action - increments retry count for an operation
  */
-function handleRetry(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handleRetry(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -86,10 +80,7 @@ function handleRetry(
 /**
  * Handles fallback action - marks operation with fallback state
  */
-function handleFallback(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handleFallback(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -113,10 +104,7 @@ function handleFallback(
 /**
  * Handles cancel action - removes operation from state
  */
-function handleCancel(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handleCancel(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -140,10 +128,7 @@ function handleCancel(
 /**
  * Handles prioritize action - updates operation metadata to mark as prioritized
  */
-function handlePrioritize(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handlePrioritize(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -171,10 +156,7 @@ function handlePrioritize(
 /**
  * Handles delay action - updates operation metadata with delay information
  */
-function handleDelay(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handleDelay(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -205,10 +187,7 @@ function handleDelay(
 /**
  * Handles cache action - marks operation as cached
  */
-function handleCache(
-  state: LoadingStateData,
-  action: LoadingAction
-): LoadingStateData {
+function handleCache(state: LoadingStateData, action: LoadingAction): LoadingStateData {
   const operationId = extractOperationId(action);
   if (!operationId) return state;
 
@@ -313,11 +292,9 @@ export function hasExceededRetries(operation: LoadingOperation): boolean {
 /**
  * Gets all operations with dependencies
  */
-export function getOperationsWithDependencies(
-  state: LoadingStateData
-): LoadingOperation[] {
+export function getOperationsWithDependencies(state: LoadingStateData): LoadingOperation[] {
   return Object.values(state.operations).filter(
-    (op) => op.dependencies && op.dependencies.length > 0
+    op => op.dependencies && op.dependencies.length > 0
   );
 }
 
@@ -332,7 +309,7 @@ export function areDependenciesComplete(
     return true;
   }
 
-  return operation.dependencies.every((depId) => {
+  return operation.dependencies.every(depId => {
     const dep = state.operations[depId];
     // Dependency is complete if it doesn't exist (was completed and removed)
     return !dep;
@@ -351,11 +328,8 @@ export function getOperationsByAge(state: LoadingStateData): LoadingOperation[] 
 /**
  * Gets operations filtered by type
  */
-export function getOperationsByType(
-  state: LoadingStateData,
-  type: string
-): LoadingOperation[] {
-  return Object.values(state.operations).filter((op) => op.type === type);
+export function getOperationsByType(state: LoadingStateData, type: string): LoadingOperation[] {
+  return Object.values(state.operations).filter(op => op.type === type);
 }
 
 /**
@@ -368,13 +342,8 @@ export function hasActiveOperations(state: LoadingStateData): boolean {
 /**
  * Gets count of operations in specific state
  */
-export function getOperationCountByState(
-  state: LoadingStateData,
-  operationState: string
-): number {
-  return Object.values(state.operations).filter(
-    (op) => op.state === operationState
-  ).length;
+export function getOperationCountByState(state: LoadingStateData, operationState: string): number {
+  return Object.values(state.operations).filter(op => op.state === operationState).length;
 }
 
 /**
@@ -389,10 +358,7 @@ export function calculateSuccessRate(metrics: LoadingMetrics): number {
 /**
  * Calculates average operation duration
  */
-export function calculateAverageDuration(
-  totalDuration: number,
-  completedCount: number
-): number {
+export function calculateAverageDuration(totalDuration: number, completedCount: number): number {
   if (completedCount === 0) return 0;
   return totalDuration / completedCount;
 }
@@ -470,9 +436,7 @@ export type LoadingReducerState = LoadingStateData;
 /**
  * Helper type for operation updates
  */
-export type OperationUpdate = Partial<
-  Omit<LoadingOperation, 'id' | 'startTime'>
-> & {
+export type OperationUpdate = Partial<Omit<LoadingOperation, 'id' | 'startTime'>> & {
   id: string;
 };
 

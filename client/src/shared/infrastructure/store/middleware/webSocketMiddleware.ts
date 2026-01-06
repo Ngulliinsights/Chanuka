@@ -8,26 +8,19 @@
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 
-import { ConnectionState } from '../../../../../../shared/schema/websocket';
 import { realTimeService } from '@/core/realtime';
-import {
-  WebSocketSubscription
-} from '@/core/realtime/types';
+import { WebSocketSubscription } from '@/core/realtime/types';
 import {
   CivicWebSocketState,
   PollingFallbackConfig,
   RealTimeHandlers,
   BillRealTimeUpdate,
-  RealTimeNotification
+  RealTimeNotification,
 } from '@/core/realtime/types';
+
+import { ConnectionState } from '../../../../../../shared/schema/websocket';
 import { logger } from '../../../../utils/logger';
-
-import {
-  updateConnectionState,
-  addBillUpdate,
-  addNotification
-} from '../slices/realTimeSlice';
-
+import { updateConnectionState, addBillUpdate, addNotification } from '../slices/realTimeSlice';
 
 // WebSocket middleware configuration
 interface WebSocketConfig {
@@ -99,7 +92,7 @@ class PollingFallbackManager {
   }
 
   stopPolling() {
-    this.pollingTimers.forEach((timer) => {
+    this.pollingTimers.forEach(timer => {
       window.clearInterval(timer);
     });
     this.pollingTimers.clear();
@@ -126,11 +119,10 @@ class PollingFallbackManager {
 
       // Process updates through handlers
       // updates.forEach(update => this.handlers.onBillUpdate?.(update));
-
     } catch (error) {
       logger.error('Polling fallback error for bills', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -143,7 +135,7 @@ class PollingFallbackManager {
     } catch (error) {
       logger.error('Polling fallback error for engagement', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -156,7 +148,7 @@ class PollingFallbackManager {
     } catch (error) {
       logger.error('Polling fallback error for notifications', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -198,7 +190,7 @@ class WebSocketMiddlewareAdapter {
     } catch (error) {
       logger.error('Failed to connect WebSocket', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       // Start polling fallback on connection failure
       this.pollingFallback.startPolling();
@@ -220,7 +212,7 @@ class WebSocketMiddlewareAdapter {
       if (this.subscriptionIds.has(key)) {
         logger.debug('Already subscribed to', {
           component: 'WebSocketMiddleware',
-          key
+          key,
         });
         return;
       }
@@ -260,7 +252,7 @@ class WebSocketMiddlewareAdapter {
 
     realTimeService.on('disconnected', () => {
       logger.warn('WebSocket disconnected', {
-        component: 'WebSocketMiddleware'
+        component: 'WebSocketMiddleware',
       });
       this.pollingFallback.startPolling();
       this.handlers.onConnectionChange?.(false);
@@ -269,9 +261,13 @@ class WebSocketMiddlewareAdapter {
 
     realTimeService.on('error', (data: unknown) => {
       const error = data as Error;
-      logger.error('WebSocket error', {
-        component: 'WebSocketMiddleware'
-      }, error);
+      logger.error(
+        'WebSocket error',
+        {
+          component: 'WebSocketMiddleware',
+        },
+        error
+      );
       this.handlers.onError?.(error.message);
       this.updateConnectionState();
     });
@@ -312,7 +308,7 @@ class WebSocketMiddlewareAdapter {
         reconnectAttempts: 0,
         connection_quality: isConnected ? 'excellent' : 'disconnected',
         last_heartbeat: null,
-        message_count: 0
+        message_count: 0,
       };
 
       // Merge with any pending state updates
@@ -328,13 +324,14 @@ class WebSocketMiddlewareAdapter {
     }, 100); // 100ms debounce to prevent rapid updates
   }
 
-
   getConnectionMetrics() {
     // Return basic metrics since realTimeService doesn't expose detailed metrics
     return {
-      status: realTimeService.isConnected() ? ConnectionState.CONNECTED : ConnectionState.DISCONNECTED,
+      status: realTimeService.isConnected()
+        ? ConnectionState.CONNECTED
+        : ConnectionState.DISCONNECTED,
       reconnectAttempts: 0,
-      lastPong: null
+      lastPong: null,
     };
   }
 
@@ -363,7 +360,7 @@ class WebSocketMiddlewareAdapter {
         } catch (error) {
           logger.error('Subscription operation failed', {
             component: 'WebSocketMiddleware',
-            error: error instanceof Error ? error.message : String(error)
+            error: error instanceof Error ? error.message : String(error),
           });
         }
       }
@@ -382,7 +379,7 @@ class WebSocketMiddlewareAdapter {
 
     this.pollingFallback.updateSubscriptions({
       bills: currentBills,
-      notifications: this.subscriptionIds.has('user_notifications:user')
+      notifications: this.subscriptionIds.has('user_notifications:user'),
     });
   }
 
@@ -409,20 +406,20 @@ const wsConfig: WebSocketConfig = {
   pollingFallback: {
     enabled: true,
     intervals: {
-      bills: 30000,        // 30 seconds
-      engagement: 60000,   // 1 minute
+      bills: 30000, // 30 seconds
+      engagement: 60000, // 1 minute
       notifications: 15000, // 15 seconds
-      community: 45000     // 45 seconds
+      community: 45000, // 45 seconds
     },
     max_retries: 3,
-    backoff_multiplier: 1.5
-  }
+    backoff_multiplier: 1.5,
+  },
 };
 
 const wsAdapter = new WebSocketMiddlewareAdapter(wsConfig);
 
 // WebSocket middleware
-export const webSocketMiddleware: Middleware = (store) => (next) => (action: unknown) => {
+export const webSocketMiddleware: Middleware = store => next => (action: unknown) => {
   wsAdapter.setDispatch(store.dispatch);
 
   // Handle WebSocket-related actions
@@ -431,7 +428,7 @@ export const webSocketMiddleware: Middleware = (store) => (next) => (action: unk
     wsAdapter.connect().catch((error: Error) => {
       logger.error('Failed to connect WebSocket', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     });
   } else if (reduxAction.type === 'realTime/disconnect') {

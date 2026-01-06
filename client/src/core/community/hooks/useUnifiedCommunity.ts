@@ -1,6 +1,6 @@
 /**
  * Unified Community Hook
- * 
+ *
  * Consolidates community functionality with discussion features,
  * providing a comprehensive community management interface.
  */
@@ -9,9 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { globalApiClient } from '../../api/client';
-import { useUnifiedDiscussion } from './useUnifiedDiscussion';
-
 import type { UseCommunityReturn, UnifiedComment } from '../types';
+
+import { useUnifiedDiscussion } from './useUnifiedDiscussion';
 
 interface UseUnifiedCommunityOptions {
   billId: number;
@@ -26,7 +26,6 @@ export function useUnifiedCommunity({
   enableTypingIndicators = true,
   enableRealtime = true,
 }: UseUnifiedCommunityOptions): UseCommunityReturn {
-  
   // Get all discussion functionality
   const discussion = useUnifiedDiscussion({
     billId,
@@ -95,12 +94,20 @@ export function useUnifiedCommunity({
 
   // Computed stats with defaults
   const communityStats = useMemo(() => {
-    const statsData = stats as { totalComments?: number; totalThreads?: number; activeUsers?: number; expertComments?: number } | undefined;
+    const statsData = stats as
+      | {
+          totalComments?: number;
+          totalThreads?: number;
+          activeUsers?: number;
+          expertComments?: number;
+        }
+      | undefined;
     return {
       totalComments: statsData?.totalComments || discussion.comments.length,
       totalThreads: statsData?.totalThreads || discussion.threads.length,
       activeUsers: statsData?.activeUsers || discussion.activeUsers.length,
-      expertComments: statsData?.expertComments || discussion.comments.filter(c => c.isExpertVerified).length,
+      expertComments:
+        statsData?.expertComments || discussion.comments.filter(c => c.isExpertVerified).length,
     };
   }, [stats, discussion.comments, discussion.threads, discussion.activeUsers]);
 

@@ -10,5 +10,5 @@ export {
   sendMessageToServiceWorker,
   isServiceWorkerAvailable,
   getNetworkStatus,
-  onNetworkStatusChange
+  onNetworkStatusChange,
 } from './service-worker';

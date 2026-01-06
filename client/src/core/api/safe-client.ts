@@ -1,6 +1,6 @@
 /**
  * Safe API Client Module
- * 
+ *
  * Provides a wrapper around API clients that never throws errors,
  * instead returning result objects for type-safe error handling.
  */
@@ -13,7 +13,7 @@ import { ApiError } from './base-client';
 /**
  * Result type for safe API operations
  */
-export type SafeApiResult<T> = 
+export type SafeApiResult<T> =
   | { success: true; data: T; response: ApiResponse<T> }
   | { success: false; error: ApiError };
 
@@ -34,22 +34,22 @@ export class SafeApiClient {
   async safeRequest<T = unknown>(request: ApiRequest): Promise<SafeApiResult<T>> {
     try {
       const response = await this.client.request<T>(request);
-      return { 
-        success: true, 
-        data: response.data, 
-        response 
+      return {
+        success: true,
+        data: response.data,
+        response,
       };
     } catch (error) {
       const apiError = this.normalizeError(error);
-      
-      logger.error('Safe API request failed', { 
-        request, 
-        error: apiError 
+
+      logger.error('Safe API request failed', {
+        request,
+        error: apiError,
       });
-      
-      return { 
-        success: false, 
-        error: apiError 
+
+      return {
+        success: false,
+        error: apiError,
       };
     }
   }
@@ -58,7 +58,7 @@ export class SafeApiClient {
    * Safe GET request
    */
   async safeGet<T = unknown>(
-    url: string, 
+    url: string,
     headers?: Record<string, string>
   ): Promise<SafeApiResult<T>> {
     return this.safeRequest<T>({ url, method: 'GET', headers });
@@ -68,8 +68,8 @@ export class SafeApiClient {
    * Safe POST request
    */
   async safePost<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<SafeApiResult<T>> {
     return this.safeRequest<T>({ url, method: 'POST', body, headers });
@@ -79,8 +79,8 @@ export class SafeApiClient {
    * Safe PUT request
    */
   async safePut<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<SafeApiResult<T>> {
     return this.safeRequest<T>({ url, method: 'PUT', body, headers });
@@ -90,7 +90,7 @@ export class SafeApiClient {
    * Safe DELETE request
    */
   async safeDelete<T = unknown>(
-    url: string, 
+    url: string,
     headers?: Record<string, string>
   ): Promise<SafeApiResult<T>> {
     return this.safeRequest<T>({ url, method: 'DELETE', headers });
@@ -100,8 +100,8 @@ export class SafeApiClient {
    * Safe PATCH request
    */
   async safePatch<T = unknown>(
-    url: string, 
-    body?: RequestBody, 
+    url: string,
+    body?: RequestBody,
     headers?: Record<string, string>
   ): Promise<SafeApiResult<T>> {
     return this.safeRequest<T>({ url, method: 'PATCH', body, headers });
@@ -112,7 +112,7 @@ export class SafeApiClient {
    */
   async deduplicatedRequest<T = unknown>(request: ApiRequest): Promise<ApiResponse<T>> {
     const key = this.getRequestKey(request);
-    
+
     // If an identical request is already in flight, return its promise
     const existingRequest = this.requestQueue.get(key);
     if (existingRequest) {
@@ -120,7 +120,7 @@ export class SafeApiClient {
         component: 'SafeApiClient',
         key,
         url: request.url,
-        method: request.method
+        method: request.method,
       });
       return existingRequest as Promise<ApiResponse<T>>;
     }
@@ -146,16 +146,16 @@ export class SafeApiClient {
   async safeDeduplicatedRequest<T = unknown>(request: ApiRequest): Promise<SafeApiResult<T>> {
     try {
       const response = await this.deduplicatedRequest<T>(request);
-      return { 
-        success: true, 
-        data: response.data, 
-        response 
+      return {
+        success: true,
+        data: response.data,
+        response,
       };
     } catch (error) {
       const apiError = this.normalizeError(error);
-      return { 
-        success: false, 
-        error: apiError 
+      return {
+        success: false,
+        error: apiError,
       };
     }
   }
@@ -163,9 +163,7 @@ export class SafeApiClient {
   /**
    * Batch multiple requests and return results
    */
-  async batchRequests<T = unknown>(
-    requests: ApiRequest[]
-  ): Promise<SafeApiResult<T>[]> {
+  async batchRequests<T = unknown>(requests: ApiRequest[]): Promise<SafeApiResult<T>[]> {
     const promises = requests.map(request => this.safeRequest<T>(request));
     return Promise.all(promises);
   }
@@ -178,13 +176,13 @@ export class SafeApiClient {
     concurrencyLimit: number = 5
   ): Promise<SafeApiResult<T>[]> {
     const results: SafeApiResult<T>[] = [];
-    
+
     for (let i = 0; i < requests.length; i += concurrencyLimit) {
       const batch = requests.slice(i, i + concurrencyLimit);
       const batchResults = await this.batchRequests<T>(batch);
       results.push(...batchResults);
     }
-    
+
     return results;
   }
 
@@ -202,21 +200,18 @@ export class SafeApiClient {
     });
 
     try {
-      const response = await Promise.race([
-        this.client.request<T>(request),
-        timeoutPromise
-      ]);
-      
-      return { 
-        success: true, 
-        data: response.data, 
-        response 
+      const response = await Promise.race([this.client.request<T>(request), timeoutPromise]);
+
+      return {
+        success: true,
+        data: response.data,
+        response,
       };
     } catch (error) {
       const apiError = this.normalizeError(error);
-      return { 
-        success: false, 
-        error: apiError 
+      return {
+        success: false,
+        error: apiError,
       };
     }
   }
@@ -229,15 +224,15 @@ export class SafeApiClient {
     fallbackData: T
   ): Promise<SafeApiResult<T>> {
     const result = await this.safeRequest<T>(request);
-    
+
     if (!result.success) {
       logger.warn('Request failed, using fallback data', {
         component: 'SafeApiClient',
         url: request.url,
         method: request.method,
-        error: result.error
+        error: result.error,
       });
-      
+
       return {
         success: true,
         data: fallbackData,
@@ -246,11 +241,11 @@ export class SafeApiClient {
           status: 0,
           statusText: 'Fallback',
           headers: {},
-          cached: false
-        }
+          cached: false,
+        },
       };
     }
-    
+
     return result;
   }
 
@@ -263,50 +258,50 @@ export class SafeApiClient {
     baseDelay: number = 1000
   ): Promise<SafeApiResult<T>> {
     let lastError: ApiError | null = null;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       const result = await this.safeRequest<T>(request);
-      
+
       if (result.success) {
         if (attempt > 0) {
           logger.info('Request succeeded after retry', {
             component: 'SafeApiClient',
             url: request.url,
             method: request.method,
-            attempts: attempt + 1
+            attempts: attempt + 1,
           });
         }
         return result;
       }
-      
+
       lastError = result.error;
-      
+
       // Don't retry on the last attempt
       if (attempt === maxRetries) {
         break;
       }
-      
+
       // Check if error is retryable
       if (!this.isRetryableError(result.error)) {
         break;
       }
-      
+
       // Wait before retrying with exponential backoff
       const delay = baseDelay * Math.pow(2, attempt);
       await this.delay(delay);
-      
+
       logger.warn('Retrying request after failure', {
         component: 'SafeApiClient',
         url: request.url,
         method: request.method,
         attempt: attempt + 1,
-        delay
+        delay,
       });
     }
-    
-    return { 
-      success: false, 
-      error: lastError! 
+
+    return {
+      success: false,
+      error: lastError!,
     };
   }
 
@@ -330,7 +325,7 @@ export class SafeApiClient {
   getQueueStats() {
     return {
       queueSize: this.requestQueue.size,
-      activeRequests: Array.from(this.requestQueue.keys())
+      activeRequests: Array.from(this.requestQueue.keys()),
     };
   }
 
@@ -338,10 +333,10 @@ export class SafeApiClient {
    * Creates a unique key for request deduplication
    */
   private getRequestKey(request: ApiRequest): string {
-    const bodyKey = request.body 
-      ? (typeof request.body === 'string' 
-        ? request.body 
-        : JSON.stringify(request.body))
+    const bodyKey = request.body
+      ? typeof request.body === 'string'
+        ? request.body
+        : JSON.stringify(request.body)
       : '';
     return `${request.method}:${request.url}:${bodyKey}`;
   }
@@ -358,7 +353,7 @@ export class SafeApiClient {
     return {
       message: err.message || 'Request failed',
       retryable: true,
-      recoverable: false
+      recoverable: false,
     };
   }
 
@@ -370,7 +365,7 @@ export class SafeApiClient {
     if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
       return error.statusCode === 408 || error.statusCode === 429;
     }
-    
+
     // Retry server errors (5xx) and network errors
     return error.retryable !== false;
   }

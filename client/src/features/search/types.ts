@@ -10,7 +10,7 @@ export type {
   SavedSearch as SharedSavedSearch,
   SearchHistory as SharedSearchHistory,
   SearchSuggestion as SharedSearchSuggestion,
-  SearchAnalytics as SharedSearchAnalytics
+  SearchAnalytics as SharedSearchAnalytics,
 } from '@client/shared/types/search';
 
 // Feature-specific extensions and aliases
@@ -48,7 +48,8 @@ export interface SearchResult {
   highlights: SearchHighlight[];
 }
 
-export interface SearchMetadata { bill_id?: string;
+export interface SearchMetadata {
+  bill_id?: string;
   user_id?: string;
   comment_id?: string;
   threadId?: string;
@@ -62,7 +63,7 @@ export interface SearchMetadata { bill_id?: string;
   view_count?: number;
   comment_count?: number;
   vote_count?: number;
-  }
+}
 
 export interface SearchHighlight {
   field: string;
@@ -187,40 +188,3 @@ export interface LiveSearchResult {
   isLoading: boolean;
   error?: string;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

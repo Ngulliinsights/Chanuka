@@ -9,9 +9,9 @@
 
 import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import React from 'react';
 
 import { cn } from '@/shared/design-system/utils/cn';
-import React from 'react';
 
 interface OfflineStatusBannerProps {
   /**

@@ -3,9 +3,8 @@
  * Following navigation component patterns for core functionality
  */
 
-import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
 import { DEFAULT_LOADING_CONFIG } from '../constants';
-
+import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
 import { validateLoadingOperation } from '../validation';
 
 export class LoadingCore {
@@ -26,7 +25,7 @@ export class LoadingCore {
     if (this.config.validation?.enabled) {
       validateLoadingOperation(operation);
     }
-    
+
     this.operations.set(operation.id, operation);
     this.updateStats();
   }
@@ -61,4 +60,3 @@ export class LoadingCore {
     };
   }
 }
-

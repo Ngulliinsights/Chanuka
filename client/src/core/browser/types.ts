@@ -1,6 +1,6 @@
 /**
  * Browser Compatibility Types
- * 
+ *
  * Centralized type definitions for browser detection, feature testing,
  * and compatibility management.
  */
@@ -10,13 +10,13 @@
  * feature support matrix, and actionable recommendations for compatibility.
  */
 export interface BrowserInfo {
-  name: string;                    // Browser identifier (chrome, firefox, safari, etc.)
-  version: string;                 // Full version string (e.g., "120.0")
-  majorVersion: number;            // Major version number for comparison
-  isSupported: boolean;            // Whether browser meets minimum requirements
-  features: FeatureSet;            // Complete feature detection results
-  warnings: string[];              // Critical compatibility warnings
-  recommendations: string[];       // Suggestions for improving compatibility
+  name: string; // Browser identifier (chrome, firefox, safari, etc.)
+  version: string; // Full version string (e.g., "120.0")
+  majorVersion: number; // Major version number for comparison
+  isSupported: boolean; // Whether browser meets minimum requirements
+  features: FeatureSet; // Complete feature detection results
+  warnings: string[]; // Critical compatibility warnings
+  recommendations: string[]; // Suggestions for improving compatibility
 }
 
 /**
@@ -24,25 +24,25 @@ export interface BrowserInfo {
  * Each boolean indicates native support without polyfills.
  */
 export interface FeatureSet {
-  es6: boolean;                    // Modern JavaScript syntax (arrow functions, classes, etc.)
-  fetch: boolean;                  // Native fetch API for HTTP requests
-  promises: boolean;               // Promise support for async operations
-  localStorage: boolean;           // Persistent local storage
-  sessionStorage: boolean;         // Session-scoped storage
-  webWorkers: boolean;             // Background thread support
-  serviceWorkers: boolean;         // Offline functionality and caching
-  intersectionObserver: boolean;   // Efficient scroll-based visibility detection
-  resizeObserver: boolean;         // Element resize detection
-  customElements: boolean;         // Web components support
-  shadowDOM: boolean;              // Encapsulated DOM trees
-  modules: boolean;                // ES6 module support
-  asyncAwait: boolean;             // Async/await syntax
-  webGL: boolean;                  // 3D graphics rendering
-  webRTC: boolean;                 // Real-time communication
-  geolocation: boolean;            // Location services
-  notifications: boolean;          // System notifications
-  fullscreen: boolean;             // Fullscreen API
-  clipboard: boolean;              // Modern clipboard API
+  es6: boolean; // Modern JavaScript syntax (arrow functions, classes, etc.)
+  fetch: boolean; // Native fetch API for HTTP requests
+  promises: boolean; // Promise support for async operations
+  localStorage: boolean; // Persistent local storage
+  sessionStorage: boolean; // Session-scoped storage
+  webWorkers: boolean; // Background thread support
+  serviceWorkers: boolean; // Offline functionality and caching
+  intersectionObserver: boolean; // Efficient scroll-based visibility detection
+  resizeObserver: boolean; // Element resize detection
+  customElements: boolean; // Web components support
+  shadowDOM: boolean; // Encapsulated DOM trees
+  modules: boolean; // ES6 module support
+  asyncAwait: boolean; // Async/await syntax
+  webGL: boolean; // 3D graphics rendering
+  webRTC: boolean; // Real-time communication
+  geolocation: boolean; // Location services
+  notifications: boolean; // System notifications
+  fullscreen: boolean; // Fullscreen API
+  clipboard: boolean; // Modern clipboard API
 }
 
 /**
@@ -55,8 +55,8 @@ export interface CompatibilityStatus {
   polyfillsLoaded: boolean;
   polyfillsRequired: string[];
   recommendations: CompatibilityRecommendation[];
-  compatibilityScore: number;      // 0-100 score indicating overall compatibility
-  shouldBlock: boolean;            // Whether to block app access entirely
+  compatibilityScore: number; // 0-100 score indicating overall compatibility
+  shouldBlock: boolean; // Whether to block app access entirely
   timestamp: number;
 }
 
@@ -67,7 +67,7 @@ export interface CompatibilityRecommendation {
   message: string;
   severity: 'critical' | 'high' | 'medium' | 'low';
   category: 'browser-version' | 'feature-missing' | 'polyfill' | 'performance';
-  actionable: boolean;             // Whether user can take action
+  actionable: boolean; // Whether user can take action
 }
 
 // Internal types for polyfill management

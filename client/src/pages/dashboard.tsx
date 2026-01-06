@@ -9,12 +9,12 @@
 
 import React, { useState } from 'react';
 
+import type { PersonaType } from '@client/core/personalization/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 import { AdaptiveDashboard } from '@client/shared/ui/dashboard';
 import { RealTimeDashboard } from '@client/shared/ui/realtime';
 import { logger } from '@client/utils/logger';
-import type { PersonaType } from '@client/core/personalization/types';
 
 export default function Dashboard() {
   const { data: user } = useUserProfile();
@@ -26,7 +26,7 @@ export default function Dashboard() {
       component: 'AdaptiveDashboard',
       userId: user?.id || 'unknown',
       isMobile,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Performance monitoring - track dashboard load time
@@ -38,14 +38,14 @@ export default function Dashboard() {
         loadTimeMs: Math.round(loadTime),
         userId: user?.id,
         isMobile,
-        persona: currentPersona
+        persona: currentPersona,
       });
 
       // Ensure dashboard loads within 3 seconds requirement
       if (loadTime > 3000) {
         logger.warn('Dashboard load time exceeded 3 second requirement', {
           loadTimeMs: Math.round(loadTime),
-          userId: user?.id
+          userId: user?.id,
         });
       }
     };
@@ -60,7 +60,7 @@ export default function Dashboard() {
     logger.info('User persona changed', {
       userId: user?.id,
       newPersona: persona,
-      previousPersona: currentPersona
+      previousPersona: currentPersona,
     });
   };
 
@@ -97,4 +97,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

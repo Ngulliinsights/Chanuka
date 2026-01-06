@@ -8,7 +8,7 @@
  * backward compatibility with existing API code.
  */
 
-export type APIErrorCode = 
+export type APIErrorCode =
   | 'NETWORK_ERROR'
   | 'TIMEOUT'
   | 'VALIDATION_ERROR'
@@ -280,17 +280,24 @@ export const globalErrorHandler = (error: unknown, context?: Record<string, unkn
 };
 
 // Support calling as .handleError() for backward compatibility
-(globalErrorHandler as unknown as { handleError: typeof globalErrorHandler }).handleError = globalErrorHandler;
+(globalErrorHandler as unknown as { handleError: typeof globalErrorHandler }).handleError =
+  globalErrorHandler;
 
 /**
  * Factory for creating typed API errors
  */
 export const ErrorFactory = {
-  network: (message: string, details?: Record<string, unknown>) => new NetworkError(message, details),
-  timeout: (message: string, details?: Record<string, unknown>) => new TimeoutError(message, details),
-  validation: (message: string, details?: Record<string, unknown>) => new ValidationError(message, details),
-  unauthorized: (message: string, details?: Record<string, unknown>) => new UnauthorizedError(message, details),
-  forbidden: (message: string, details?: Record<string, unknown>) => new ForbiddenError(message, details),
-  notFound: (message: string, details?: Record<string, unknown>) => new NotFoundError(message, details),
+  network: (message: string, details?: Record<string, unknown>) =>
+    new NetworkError(message, details),
+  timeout: (message: string, details?: Record<string, unknown>) =>
+    new TimeoutError(message, details),
+  validation: (message: string, details?: Record<string, unknown>) =>
+    new ValidationError(message, details),
+  unauthorized: (message: string, details?: Record<string, unknown>) =>
+    new UnauthorizedError(message, details),
+  forbidden: (message: string, details?: Record<string, unknown>) =>
+    new ForbiddenError(message, details),
+  notFound: (message: string, details?: Record<string, unknown>) =>
+    new NotFoundError(message, details),
   server: (message: string, details?: Record<string, unknown>) => new ServerError(message, details),
 };

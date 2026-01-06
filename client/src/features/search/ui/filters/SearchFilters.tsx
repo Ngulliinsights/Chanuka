@@ -6,7 +6,6 @@
  */
 
 import { format } from 'date-fns';
-import React from 'react';
 import {
   Filter,
   X,
@@ -16,10 +15,12 @@ import {
   MessageSquare,
   RotateCcw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
+import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Calendar } from '@client/shared/design-system';
@@ -27,7 +28,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-
 import { Checkbox } from '@client/shared/design-system';
 import { Popover, PopoverContent, PopoverTrigger } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
-import { cn } from '@client/lib/utils';
 
 // Define SearchFilters type locally
 interface SearchFiltersType {
@@ -53,7 +53,7 @@ interface SearchFiltersProps {
 const RESULT_TYPES = [
   { id: 'bills', label: 'Bills', icon: FileText, count: 0 },
   { id: 'sponsors', label: 'Sponsors', icon: Users, count: 0 },
-  { id: 'comments', label: 'Comments', icon: MessageSquare, count: 0 }
+  { id: 'comments', label: 'Comments', icon: MessageSquare, count: 0 },
 ] as const;
 
 export function SearchFilters({
@@ -62,7 +62,7 @@ export function SearchFilters({
   availableCategories = [],
   availableStatuses = [],
   className = '',
-  compact = false
+  compact = false,
 }: SearchFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [dateRangeOpen, setDateRangeOpen] = useState(false);
@@ -102,15 +102,15 @@ export function SearchFilters({
       updateFilters({
         dateRange: {
           start: range.from.toISOString().split('T')[0],
-          end: range.to.toISOString().split('T')[0]
-        }
+          end: range.to.toISOString().split('T')[0],
+        },
       });
     } else if (range?.from) {
       updateFilters({
         dateRange: {
           start: range.from.toISOString().split('T')[0],
-          end: range.from.toISOString().split('T')[0]
-        }
+          end: range.from.toISOString().split('T')[0],
+        },
       });
     }
   };
@@ -155,12 +155,7 @@ export function SearchFilters({
         </Button>
 
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAllFilters}
-            className="h-8 px-2"
-          >
+          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-8 px-2">
             <RotateCcw className="h-3 w-3 mr-1" />
             Clear
           </Button>
@@ -176,19 +171,10 @@ export function SearchFilters({
           <CardTitle className="flex items-center space-x-2">
             <Filter className="h-5 w-5" />
             <span>Filters</span>
-            {hasActiveFilters && (
-              <Badge variant="secondary">
-                {getActiveFilterCount()} active
-              </Badge>
-            )}
+            {hasActiveFilters && <Badge variant="secondary">{getActiveFilterCount()} active</Badge>}
           </CardTitle>
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="h-8 px-2"
-            >
+            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-8 px-2">
               <RotateCcw className="h-3 w-3 mr-1" />
               Clear all
             </Button>
@@ -201,14 +187,14 @@ export function SearchFilters({
         <div>
           <h4 className="font-medium mb-3">Result Types</h4>
           <div className="space-y-2">
-            {RESULT_TYPES.map((type) => {
+            {RESULT_TYPES.map(type => {
               const Icon = type.icon;
               return (
                 <div key={type.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={`type-${type.id}`}
                     checked={true} // For now, all types are selected by default
-                    onCheckedChange={(checked) => handleTypeToggle(type.id, checked as boolean)}
+                    onCheckedChange={checked => handleTypeToggle(type.id, checked as boolean)}
                   />
                   <Icon className="h-4 w-4 text-muted-foreground" />
                   <label
@@ -236,12 +222,14 @@ export function SearchFilters({
             <div>
               <h4 className="font-medium mb-3">Categories</h4>
               <div className="space-y-2 max-h-32 overflow-y-auto">
-                {availableCategories.map((category) => (
+                {availableCategories.map(category => (
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox
                       id={`category-${category}`}
                       checked={filters.categories?.includes(category) || false}
-                      onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
+                      onCheckedChange={checked =>
+                        handleCategoryToggle(category, checked as boolean)
+                      }
                     />
                     <label
                       htmlFor={`category-${category}`}
@@ -263,12 +251,12 @@ export function SearchFilters({
             <div>
               <h4 className="font-medium mb-3">Status</h4>
               <div className="space-y-2">
-                {availableStatuses.map((status) => (
+                {availableStatuses.map(status => (
                   <div key={status} className="flex items-center space-x-2">
                     <Checkbox
                       id={`status-${status}`}
                       checked={filters.billStatus?.includes(status) || false}
-                      onCheckedChange={(checked) => handleStatusToggle(status, checked as boolean)}
+                      onCheckedChange={checked => handleStatusToggle(status, checked as boolean)}
                     />
                     <label
                       htmlFor={`status-${status}`}
@@ -297,24 +285,24 @@ export function SearchFilters({
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.dateRange ? (
-                  filters.dateRange.start === filters.dateRange.end ? (
-                    format(new Date(filters.dateRange.start), 'PPP')
-                  ) : (
-                    `${format(new Date(filters.dateRange.start), 'LLL dd')} - ${format(new Date(filters.dateRange.end), 'LLL dd')}`
-                  )
-                ) : (
-                  'Pick a date range'
-                )}
+                {filters.dateRange
+                  ? filters.dateRange.start === filters.dateRange.end
+                    ? format(new Date(filters.dateRange.start), 'PPP')
+                    : `${format(new Date(filters.dateRange.start), 'LLL dd')} - ${format(new Date(filters.dateRange.end), 'LLL dd')}`
+                  : 'Pick a date range'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
-                selected={filters.dateRange ? {
-                  from: new Date(filters.dateRange.start),
-                  to: new Date(filters.dateRange.end)
-                } : undefined}
+                selected={
+                  filters.dateRange
+                    ? {
+                        from: new Date(filters.dateRange.start),
+                        to: new Date(filters.dateRange.end),
+                      }
+                    : undefined
+                }
                 onSelect={handleDateRangeChange}
                 numberOfMonths={2}
               />
@@ -329,7 +317,7 @@ export function SearchFilters({
             <div>
               <h4 className="font-medium mb-3">Active Filters</h4>
               <div className="flex flex-wrap gap-2">
-                {filters.categories?.map((category) => (
+                {filters.categories?.map(category => (
                   <Badge key={category} variant="secondary" className="flex items-center space-x-1">
                     <span>{category}</span>
                     <Button
@@ -343,7 +331,7 @@ export function SearchFilters({
                   </Badge>
                 ))}
 
-                {filters.billStatus?.map((status) => (
+                {filters.billStatus?.map(status => (
                   <Badge key={status} variant="secondary" className="flex items-center space-x-1">
                     <span>{status}</span>
                     <Button
@@ -363,8 +351,7 @@ export function SearchFilters({
                     <span>
                       {filters.dateRange.start === filters.dateRange.end
                         ? format(new Date(filters.dateRange.start), 'MMM dd')
-                        : `${format(new Date(filters.dateRange.start), 'MMM dd')} - ${format(new Date(filters.dateRange.end), 'MMM dd')}`
-                      }
+                        : `${format(new Date(filters.dateRange.start), 'MMM dd')} - ${format(new Date(filters.dateRange.end), 'MMM dd')}`}
                     </span>
                     <Button
                       variant="ghost"

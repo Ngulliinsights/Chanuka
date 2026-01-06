@@ -1,24 +1,28 @@
-import { 
-  ThumbsUp, 
-  ThumbsDown, 
-  MessageCircle, 
-  Flag, 
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Flag,
   TrendingUp,
   Users,
   AlertTriangle,
   CheckCircle,
-  Clock
+  Clock,
 } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
-import { cn } from '@client/lib/utils';
 import { CommunityValidation as CommunityValidationType } from '@client/features/users/types';
-
+import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
-
 
 interface CommunityValidationProps {
   validation: CommunityValidationType;
@@ -33,7 +37,7 @@ interface CommunityValidationProps {
 
 /**
  * CommunityValidation - Community validation system with upvote/downvote functionality
- * 
+ *
  * Features:
  * - Upvote/downvote with visual feedback
  * - Comment system integration
@@ -49,29 +53,32 @@ export function CommunityValidation({
   onReport,
   showComments = true,
   compact = false,
-  className
+  className,
 }: CommunityValidationProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
-  const handleVote = useCallback(async (vote: 'up' | 'down') => {
-    if (!onVote || isVoting) return;
-    
-    setIsVoting(true);
-    try {
-      await onVote(contributionId, vote);
-    } catch (error) {
-      console.error('Error voting:', error);
-    } finally {
-      setIsVoting(false);
-    }
-  }, [onVote, contributionId, isVoting]);
+  const handleVote = useCallback(
+    async (vote: 'up' | 'down') => {
+      if (!onVote || isVoting) return;
+
+      setIsVoting(true);
+      try {
+        await onVote(contributionId, vote);
+      } catch (error) {
+        console.error('Error voting:', error);
+      } finally {
+        setIsVoting(false);
+      }
+    },
+    [onVote, contributionId, isVoting]
+  );
 
   const handleComment = useCallback(async () => {
     if (!onComment || !commentText.trim() || isSubmittingComment) return;
-    
+
     setIsSubmittingComment(true);
     try {
       await onComment(contributionId, commentText.trim());
@@ -101,49 +108,52 @@ export function CommunityValidation({
 
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-3", className)}>
+      <div className={cn('flex items-center gap-3', className)}>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => handleVote('up')}
           disabled={isVoting}
           className={cn(
-            "text-xs h-auto p-1 transition-colors",
-            validation.userVote === 'up' && "text-green-600 bg-green-50"
+            'text-xs h-auto p-1 transition-colors',
+            validation.userVote === 'up' && 'text-green-600 bg-green-50'
           )}
         >
           <ThumbsUp className="h-3 w-3 mr-1" />
           {validation.upvotes}
         </Button>
-        
+
         <Button
           variant="ghost"
           size="sm"
           onClick={() => handleVote('down')}
           disabled={isVoting}
           className={cn(
-            "text-xs h-auto p-1 transition-colors",
-            validation.userVote === 'down' && "text-red-600 bg-red-50"
+            'text-xs h-auto p-1 transition-colors',
+            validation.userVote === 'down' && 'text-red-600 bg-red-50'
           )}
         >
           <ThumbsDown className="h-3 w-3 mr-1" />
           {validation.downvotes}
         </Button>
-        
+
         {showComments && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs h-auto p-1"
-          >
+          <Button variant="ghost" size="sm" className="text-xs h-auto p-1">
             <MessageCircle className="h-3 w-3 mr-1" />
             {validation.comments}
           </Button>
         )}
-        
+
         <div className="flex items-center gap-1">
-          <TrendingUp className={cn("h-3 w-3", getValidationScoreColor(validation.validationScore))} />
-          <span className={cn("text-xs font-medium", getValidationScoreColor(validation.validationScore))}>
+          <TrendingUp
+            className={cn('h-3 w-3', getValidationScoreColor(validation.validationScore))}
+          />
+          <span
+            className={cn(
+              'text-xs font-medium',
+              getValidationScoreColor(validation.validationScore)
+            )}
+          >
             {Math.round(validation.validationScore * 100)}%
           </span>
         </div>
@@ -152,7 +162,7 @@ export function CommunityValidation({
   }
 
   return (
-    <Card className={cn("transition-all duration-200", className)}>
+    <Card className={cn('transition-all duration-200', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
@@ -160,8 +170,12 @@ export function CommunityValidation({
             Community Validation
           </CardTitle>
           <div className="flex items-center gap-2">
-            <TrendingUp className={cn("h-4 w-4", getValidationScoreColor(validation.validationScore))} />
-            <span className={cn("font-semibold", getValidationScoreColor(validation.validationScore))}>
+            <TrendingUp
+              className={cn('h-4 w-4', getValidationScoreColor(validation.validationScore))}
+            />
+            <span
+              className={cn('font-semibold', getValidationScoreColor(validation.validationScore))}
+            >
               {Math.round(validation.validationScore * 100)}%
             </span>
           </div>
@@ -177,34 +191,34 @@ export function CommunityValidation({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
-                variant={validation.userVote === 'up' ? "default" : "outline"}
+                variant={validation.userVote === 'up' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleVote('up')}
                 disabled={isVoting}
                 className={cn(
-                  "transition-all duration-200",
-                  validation.userVote === 'up' && "bg-green-600 hover:bg-green-700 text-white"
+                  'transition-all duration-200',
+                  validation.userVote === 'up' && 'bg-green-600 hover:bg-green-700 text-white'
                 )}
               >
                 <ThumbsUp className="h-4 w-4 mr-2" />
                 Helpful ({validation.upvotes})
               </Button>
-              
+
               <Button
-                variant={validation.userVote === 'down' ? "default" : "outline"}
+                variant={validation.userVote === 'down' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleVote('down')}
                 disabled={isVoting}
                 className={cn(
-                  "transition-all duration-200",
-                  validation.userVote === 'down' && "bg-red-600 hover:bg-red-700 text-white"
+                  'transition-all duration-200',
+                  validation.userVote === 'down' && 'bg-red-600 hover:bg-red-700 text-white'
                 )}
               >
                 <ThumbsDown className="h-4 w-4 mr-2" />
                 Not Helpful ({validation.downvotes})
               </Button>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {onReport && (
                 <Button
@@ -223,9 +237,7 @@ export function CommunityValidation({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Community Response</span>
-              <span className="font-medium">
-                {Math.round(upvotePercentage)}% positive
-              </span>
+              <span className="font-medium">{Math.round(upvotePercentage)}% positive</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
@@ -263,7 +275,7 @@ export function CommunityValidation({
                 <Textarea
                   placeholder="Share your thoughts on this analysis..."
                   value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
+                  onChange={e => setCommentText(e.target.value)}
                   className="min-h-[80px] text-sm"
                   maxLength={500}
                 />
@@ -346,7 +358,7 @@ export function ValidationSummary({
   validation,
   size = 'md',
   showScore = true,
-  className
+  className,
 }: ValidationSummaryProps) {
   const getSizeClasses = () => {
     switch (size) {
@@ -354,19 +366,19 @@ export function ValidationSummary({
         return {
           container: 'gap-2',
           icon: 'h-3 w-3',
-          text: 'text-xs'
+          text: 'text-xs',
         };
       case 'lg':
         return {
           container: 'gap-3',
           icon: 'h-5 w-5',
-          text: 'text-sm'
+          text: 'text-sm',
         };
       default:
         return {
           container: 'gap-2',
           icon: 'h-4 w-4',
-          text: 'text-sm'
+          text: 'text-sm',
         };
     }
   };
@@ -375,35 +387,26 @@ export function ValidationSummary({
   const totalVotes = validation.upvotes + validation.downvotes;
 
   return (
-    <div className={cn("flex items-center", sizeClasses.container, className)}>
+    <div className={cn('flex items-center', sizeClasses.container, className)}>
       <div className="flex items-center gap-1">
-        <ThumbsUp className={cn(sizeClasses.icon, "text-green-600")} />
-        <span className={cn(sizeClasses.text, "font-medium")}>
-          {validation.upvotes}
-        </span>
+        <ThumbsUp className={cn(sizeClasses.icon, 'text-green-600')} />
+        <span className={cn(sizeClasses.text, 'font-medium')}>{validation.upvotes}</span>
       </div>
-      
+
       <div className="flex items-center gap-1">
-        <ThumbsDown className={cn(sizeClasses.icon, "text-red-600")} />
-        <span className={cn(sizeClasses.text, "font-medium")}>
-          {validation.downvotes}
-        </span>
+        <ThumbsDown className={cn(sizeClasses.icon, 'text-red-600')} />
+        <span className={cn(sizeClasses.text, 'font-medium')}>{validation.downvotes}</span>
       </div>
-      
+
       <div className="flex items-center gap-1">
-        <MessageCircle className={cn(sizeClasses.icon, "text-blue-600")} />
-        <span className={cn(sizeClasses.text, "font-medium")}>
-          {validation.comments}
-        </span>
+        <MessageCircle className={cn(sizeClasses.icon, 'text-blue-600')} />
+        <span className={cn(sizeClasses.text, 'font-medium')}>{validation.comments}</span>
       </div>
-      
+
       {showScore && (
-        <Badge 
-          variant="secondary" 
-          className={cn(
-            sizeClasses.text,
-            getValidationScoreColor(validation.validationScore)
-          )}
+        <Badge
+          variant="secondary"
+          className={cn(sizeClasses.text, getValidationScoreColor(validation.validationScore))}
         >
           {Math.round(validation.validationScore * 100)}% validated
         </Badge>

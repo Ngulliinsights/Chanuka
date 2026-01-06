@@ -1,5 +1,4 @@
 import { formatDistanceToNow } from 'date-fns';
-import React from 'react';
 import {
   Settings,
   Download,
@@ -12,17 +11,12 @@ import {
   Award,
   Star,
 } from 'lucide-react';
+import React from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
 import { Progress } from '@/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
 import type {

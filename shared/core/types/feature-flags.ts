@@ -56,7 +56,7 @@ export class MockFeatureFlagsService implements FeatureFlagsService {
 
   async shouldUseMigration(flagName: string, user_id?: string): Promise<boolean> {
     const flag = this.flags.get(flagName);
-    if (!flag || !flag.enabled) {
+    if (!flag?.enabled) {
       return false;
     }
 

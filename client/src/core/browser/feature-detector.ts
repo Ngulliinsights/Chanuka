@@ -1,6 +1,6 @@
 /**
  * Feature Detection Module
- * 
+ *
  * Singleton class that performs feature detection for modern web APIs.
  * Results are cached to avoid redundant checks, which can be expensive.
  */
@@ -12,7 +12,7 @@ import type { FeatureSet } from './types';
 /**
  * Singleton class that performs feature detection for modern web APIs.
  * Results are cached to avoid redundant checks, which can be expensive.
- * 
+ *
  * The detection methods test actual functionality rather than just checking
  * for existence, ensuring that features are truly usable (e.g., localStorage
  * might exist but be disabled in private browsing mode).
@@ -41,24 +41,24 @@ export class FeatureDetector {
       // Test ES6 features using safer feature detection
       // Test arrow functions
       const testArrowFunction = () => true;
-      
+
       // Test let/const, destructuring, template literals, classes
       const testES6Features = (() => {
-        let x = 1;
+        const x = 1;
         const y = 2;
         const [a, b] = [1, 2];
-        const {c} = {c: 3};
+        const { c } = { c: 3 };
         const str = `template ${x} literal`;
         class Test {}
         return a + b + c + x + y + str.length;
       })();
-      
+
       // If we get here, all ES6 features work
       this.cache.es6 = testArrowFunction() && testES6Features > 0;
     } catch {
       this.cache.es6 = false;
     }
-    
+
     return this.cache.es6;
   }
 
@@ -69,12 +69,12 @@ export class FeatureDetector {
   detectFetchSupport(): boolean {
     if (this.cache.fetch !== undefined) return this.cache.fetch;
 
-    this.cache.fetch = 
-      typeof fetch === 'function' && 
-      typeof Request === 'function' && 
+    this.cache.fetch =
+      typeof fetch === 'function' &&
+      typeof Request === 'function' &&
       typeof Response === 'function' &&
       typeof Headers === 'function';
-    
+
     return this.cache.fetch;
   }
 
@@ -85,13 +85,13 @@ export class FeatureDetector {
   detectPromiseSupport(): boolean {
     if (this.cache.promises !== undefined) return this.cache.promises;
 
-    this.cache.promises = 
+    this.cache.promises =
       typeof Promise === 'function' &&
       typeof Promise.resolve === 'function' &&
       typeof Promise.reject === 'function' &&
       typeof Promise.all === 'function' &&
       typeof Promise.race === 'function';
-    
+
     return this.cache.promises;
   }
 
@@ -117,7 +117,7 @@ export class FeatureDetector {
     } catch {
       this.cache.localStorage = false;
     }
-    
+
     return this.cache.localStorage;
   }
 
@@ -142,20 +142,20 @@ export class FeatureDetector {
     } catch {
       this.cache.sessionStorage = false;
     }
-    
+
     return this.cache.sessionStorage;
   }
 
   detectWebWorkersSupport(): boolean {
     if (this.cache.webWorkers !== undefined) return this.cache.webWorkers;
-    
+
     this.cache.webWorkers = isBrowserEnv() && typeof Worker === 'function';
     return this.cache.webWorkers;
   }
 
   detectServiceWorkersSupport(): boolean {
     if (this.cache.serviceWorkers !== undefined) return this.cache.serviceWorkers;
-    
+
     this.cache.serviceWorkers = isBrowserEnv() && 'serviceWorker' in navigator;
     return this.cache.serviceWorkers;
   }
@@ -166,21 +166,21 @@ export class FeatureDetector {
    */
   detectIntersectionObserverSupport(): boolean {
     if (this.cache.intersectionObserver !== undefined) return this.cache.intersectionObserver;
-    
+
     this.cache.intersectionObserver = isBrowserEnv() && 'IntersectionObserver' in window;
     return this.cache.intersectionObserver;
   }
 
   detectResizeObserverSupport(): boolean {
     if (this.cache.resizeObserver !== undefined) return this.cache.resizeObserver;
-    
+
     this.cache.resizeObserver = isBrowserEnv() && 'ResizeObserver' in window;
     return this.cache.resizeObserver;
   }
 
   detectCustomElementsSupport(): boolean {
     if (this.cache.customElements !== undefined) return this.cache.customElements;
-    
+
     this.cache.customElements = isBrowserEnv() && 'customElements' in window;
     return this.cache.customElements;
   }
@@ -192,12 +192,12 @@ export class FeatureDetector {
   detectShadowDOMSupport(): boolean {
     if (this.cache.shadowDOM !== undefined) return this.cache.shadowDOM;
 
-    this.cache.shadowDOM = 
-      isBrowserEnv() && 
-      typeof Element !== 'undefined' && 
+    this.cache.shadowDOM =
+      isBrowserEnv() &&
+      typeof Element !== 'undefined' &&
       Element.prototype !== undefined &&
       'attachShadow' in Element.prototype;
-    
+
     return this.cache.shadowDOM;
   }
 
@@ -234,7 +234,7 @@ export class FeatureDetector {
     } catch {
       this.cache.asyncAwait = false;
     }
-    
+
     return this.cache.asyncAwait;
   }
 
@@ -254,7 +254,7 @@ export class FeatureDetector {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       this.cache.webGL = !!gl;
-      
+
       // Clean up the WebGL context to free GPU resources
       if (gl && typeof (gl as WebGLRenderingContext).getExtension === 'function') {
         const loseContext = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context');
@@ -263,7 +263,7 @@ export class FeatureDetector {
     } catch {
       this.cache.webGL = false;
     }
-    
+
     return this.cache.webGL;
   }
 
@@ -284,20 +284,20 @@ export class FeatureDetector {
       (window as unknown as Record<string, unknown>).webkitRTCPeerConnection ||
       (window as unknown as Record<string, unknown>).mozRTCPeerConnection
     );
-    
+
     return this.cache.webRTC;
   }
 
   detectGeolocationSupport(): boolean {
     if (this.cache.geolocation !== undefined) return this.cache.geolocation;
-    
+
     this.cache.geolocation = isBrowserEnv() && 'geolocation' in navigator;
     return this.cache.geolocation;
   }
 
   detectNotificationsSupport(): boolean {
     if (this.cache.notifications !== undefined) return this.cache.notifications;
-    
+
     this.cache.notifications = isBrowserEnv() && 'Notification' in window;
     return this.cache.notifications;
   }
@@ -320,7 +320,7 @@ export class FeatureDetector {
       (elem as unknown as Record<string, unknown>).mozRequestFullScreen ||
       (elem as unknown as Record<string, unknown>).msRequestFullscreen
     );
-    
+
     return this.cache.fullscreen;
   }
 
@@ -330,12 +330,12 @@ export class FeatureDetector {
   detectClipboardSupport(): boolean {
     if (this.cache.clipboard !== undefined) return this.cache.clipboard;
 
-    this.cache.clipboard = 
-      isBrowserEnv() && 
-      !!navigator.clipboard && 
+    this.cache.clipboard =
+      isBrowserEnv() &&
+      !!navigator.clipboard &&
       typeof navigator.clipboard.writeText === 'function' &&
       typeof navigator.clipboard.readText === 'function';
-    
+
     return this.cache.clipboard;
   }
 
@@ -363,7 +363,7 @@ export class FeatureDetector {
       geolocation: this.detectGeolocationSupport(),
       notifications: this.detectNotificationsSupport(),
       fullscreen: this.detectFullscreenSupport(),
-      clipboard: this.detectClipboardSupport()
+      clipboard: this.detectClipboardSupport(),
     };
   }
 
@@ -373,7 +373,8 @@ export class FeatureDetector {
    */
   hasCriticalFeatures(): boolean {
     return CRITICAL_FEATURES.every(feature => {
-      const methodName = `detect${feature.charAt(0).toUpperCase() + feature.slice(1)}Support` as keyof this;
+      const methodName =
+        `detect${feature.charAt(0).toUpperCase() + feature.slice(1)}Support` as keyof this;
       const method = this[methodName];
       return typeof method === 'function' ? (method as () => boolean).call(this) : false;
     });

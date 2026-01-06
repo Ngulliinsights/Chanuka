@@ -1,22 +1,22 @@
-import { 
-  MessageSquare, 
-  Users, 
-  Filter, 
+import {
+  MessageSquare,
+  Users,
+  Filter,
   Lock,
   AlertTriangle,
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
 } from 'lucide-react';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import { cn } from '@client/shared/design-system';
-import type { Comment } from '@client/shared/types';
 import type { CommunityComment } from '@client/features/community/types';
+import { cn } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
+import type { Comment } from '@client/shared/types';
 
 interface DiscussionThread {
   id: string;
@@ -52,7 +52,11 @@ interface DiscussionThreadProps {
   onUpdateComment: (commentId: string, content: string) => Promise<void>;
   onDeleteComment: (commentId: string) => Promise<void>;
   onVoteComment: (commentId: string, voteType: 'up' | 'down') => Promise<void>;
-  onReportComment: (commentId: string, violationType: ModerationViolationType, reason: string) => Promise<void>;
+  onReportComment: (
+    commentId: string,
+    violationType: ModerationViolationType,
+    reason: string
+  ) => Promise<void>;
   onModerateComment: (commentId: string, action: string, reason: string) => Promise<void>;
   onRefresh?: () => Promise<void>;
   className?: string;
@@ -73,7 +77,7 @@ export function DiscussionThread({
   onReportComment,
   onModerateComment,
   onRefresh,
-  className
+  className,
 }: DiscussionThreadProps) {
   const [sortBy, setSortBy] = useState<CommentSortOption>('newest');
   const [filterBy, setFilterBy] = useState<CommentFilterOption>('all');
@@ -118,7 +122,7 @@ export function DiscussionThread({
 
   const handleRefresh = useCallback(async () => {
     if (!onRefresh) return;
-    
+
     setIsRefreshing(true);
     try {
       await onRefresh();
@@ -127,24 +131,31 @@ export function DiscussionThread({
     }
   }, [onRefresh]);
 
-  const handleAddComment = useCallback(async (data: CommentFormData) => {
-    await onAddComment(data);
-    setReplyingTo(null);
-  }, [onAddComment]);
+  const handleAddComment = useCallback(
+    async (data: CommentFormData) => {
+      await onAddComment(data);
+      setReplyingTo(null);
+    },
+    [onAddComment]
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600';
-      case 'locked': return 'text-red-600';
-      case 'archived': return 'text-gray-600';
-      default: return 'text-gray-600';
+      case 'active':
+        return 'text-green-600';
+      case 'locked':
+        return 'text-red-600';
+      case 'archived':
+        return 'text-gray-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const isThreadLocked = thread.status === 'locked' || thread.status === 'archived';
 
   return (
-    <div className={cn("discussion-thread space-y-6", className)}>
+    <div className={cn('discussion-thread space-y-6', className)}>
       {/* Thread Header */}
       <Card>
         <CardHeader>
@@ -163,11 +174,11 @@ export function DiscussionThread({
                   </Badge>
                 )}
               </div>
-              
+
               {thread.description && (
                 <p className="text-muted-foreground mb-3">{thread.description}</p>
               )}
-              
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <MessageSquare className="h-4 w-4" />
@@ -179,7 +190,7 @@ export function DiscussionThread({
                 </div>
                 <span>Updated {new Date(thread.updatedAt).toLocaleDateString()}</span>
               </div>
-              
+
               {thread.tags && thread.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
                   {thread.tags.map((tag, index) => (
@@ -193,22 +204,13 @@ export function DiscussionThread({
 
             <div className="flex items-center gap-2">
               {canModerate && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowModerated(!showModerated)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setShowModerated(!showModerated)}>
                   {showModerated ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               )}
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-              >
-                <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+
+              <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+                <RefreshCw className={cn('h-4 w-4', isRefreshing && 'animate-spin')} />
               </Button>
             </div>
           </div>
@@ -237,7 +239,7 @@ export function DiscussionThread({
             <Filter className="h-4 w-4 text-muted-foreground" />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as CommentSortOption)}
+              onChange={e => setSortBy(e.target.value as CommentSortOption)}
               className="text-sm border rounded px-2 py-1"
             >
               <option value="newest">Newest First</option>
@@ -251,7 +253,7 @@ export function DiscussionThread({
             <span className="text-sm text-muted-foreground">Show:</span>
             <select
               value={filterBy}
-              onChange={(e) => setFilterBy(e.target.value as CommentFilterOption)}
+              onChange={e => setFilterBy(e.target.value as CommentFilterOption)}
               className="text-sm border rounded px-2 py-1"
             >
               <option value="all">All Comments</option>
@@ -306,15 +308,14 @@ export function DiscussionThread({
               <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No comments yet</h3>
               <p className="text-muted-foreground">
-                {isThreadLocked 
-                  ? "This discussion is closed for new comments."
-                  : "Be the first to share your thoughts on this topic."
-                }
+                {isThreadLocked
+                  ? 'This discussion is closed for new comments.'
+                  : 'Be the first to share your thoughts on this topic.'}
               </p>
             </CardContent>
           </Card>
         ) : (
-          processedComments.map((comment) => (
+          processedComments.map(comment => (
             <CommentItem
               key={comment.id}
               comment={comment}
@@ -326,7 +327,7 @@ export function DiscussionThread({
               onVote={onVoteComment}
               onReport={onReportComment}
               onModerate={onModerateComment}
-              onReply={(parentId) => setReplyingTo(parentId)}
+              onReply={parentId => setReplyingTo(parentId)}
               isReplying={replyingTo === comment.id}
               onCancelReply={() => setReplyingTo(null)}
             />
@@ -338,11 +339,11 @@ export function DiscussionThread({
 }
 
 // Simple CommentForm component for this example
-function CommentForm({ 
-  onSubmit, 
-  placeholder, 
-  submitLabel, 
-  allowAnonymous 
+function CommentForm({
+  onSubmit,
+  placeholder,
+  submitLabel,
+  allowAnonymous,
 }: {
   onSubmit: (data: CommentFormData) => Promise<void>;
   placeholder: string;
@@ -371,30 +372,27 @@ function CommentForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <textarea
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={e => setContent(e.target.value)}
         placeholder={placeholder}
         className="w-full p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
         rows={4}
         disabled={isSubmitting}
       />
-      
+
       <div className="flex items-center justify-between">
         {allowAnonymous && (
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
+              onChange={e => setIsAnonymous(e.target.checked)}
               disabled={isSubmitting}
             />
             Post anonymously
           </label>
         )}
-        
-        <Button
-          type="submit"
-          disabled={!content.trim() || isSubmitting}
-        >
+
+        <Button type="submit" disabled={!content.trim() || isSubmitting}>
           {isSubmitting ? 'Posting...' : submitLabel}
         </Button>
       </div>
@@ -403,19 +401,19 @@ function CommentForm({
 }
 
 // Simple CommentItem component for this example
-function CommentItem({ 
-  comment, 
-  currentUserId, 
-  canModerate, 
-  showModerated, 
-  onUpdate, 
-  onDelete, 
-  onVote, 
-  onReport, 
-  onModerate, 
-  onReply, 
-  isReplying, 
-  onCancelReply 
+function CommentItem({
+  comment,
+  currentUserId,
+  canModerate,
+  showModerated,
+  onUpdate,
+  onDelete,
+  onVote,
+  onReport,
+  onModerate,
+  onReply,
+  isReplying,
+  onCancelReply,
 }: {
   comment: CommunityComment;
   currentUserId?: string;
@@ -424,7 +422,11 @@ function CommentItem({
   onUpdate: (commentId: string, content: string) => Promise<void>;
   onDelete: (commentId: string) => Promise<void>;
   onVote: (commentId: string, voteType: 'up' | 'down') => Promise<void>;
-  onReport: (commentId: string, violationType: ModerationViolationType, reason: string) => Promise<void>;
+  onReport: (
+    commentId: string,
+    violationType: ModerationViolationType,
+    reason: string
+  ) => Promise<void>;
   onModerate: (commentId: string, action: string, reason: string) => Promise<void>;
   onReply: (parentId: string) => void;
   isReplying: boolean;
@@ -444,31 +446,30 @@ function CommentItem({
                 {new Date(comment.createdAt).toLocaleDateString()}
               </span>
               {comment.isModerated && (
-                <Badge variant="destructive" className="text-xs">Moderated</Badge>
+                <Badge variant="destructive" className="text-xs">
+                  Moderated
+                </Badge>
               )}
             </div>
             <p className="text-sm mb-3">{comment.content}</p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <button 
+              <button
                 onClick={() => onVote(comment.id, 'up')}
                 className="flex items-center gap-1 hover:text-foreground"
               >
                 👍 {comment.upvotes || 0}
               </button>
-              <button 
+              <button
                 onClick={() => onVote(comment.id, 'down')}
                 className="flex items-center gap-1 hover:text-foreground"
               >
                 👎 {comment.downvotes || 0}
               </button>
-              <button 
-                onClick={() => onReply(comment.id)}
-                className="hover:text-foreground"
-              >
+              <button onClick={() => onReply(comment.id)} className="hover:text-foreground">
                 Reply
               </button>
               {canModerate && (
-                <button 
+                <button
                   onClick={() => onModerate(comment.id, 'hide', 'Inappropriate content')}
                   className="hover:text-foreground"
                 >

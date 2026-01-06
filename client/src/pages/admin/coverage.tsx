@@ -12,4 +12,3 @@ export function CoveragePage() {
 }
 
 export default CoveragePage;
-

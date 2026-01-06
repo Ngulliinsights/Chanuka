@@ -22,14 +22,14 @@ export async function attemptUIRecovery(
     return {
       success: false,
       shouldRetry: true,
-      message: 'Retrying operation'
+      message: 'Retrying operation',
     };
   }
 
   return {
     success: false,
     shouldRetry: false,
-    message: 'Max retries exceeded'
+    message: 'Max retries exceeded',
   };
 }
 

@@ -1,12 +1,17 @@
-import React from 'react';
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
+import React from 'react';
 
-import { cn } from '@client/lib/utils';
 import { ExpertVerificationType } from '@client/features/users/types';
+import { cn } from '@client/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@client/shared/design-system';
+import { UnifiedBadge } from '@client/shared/design-system';
 
 import { GraduationCap } from '../icons/SimpleIcons';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';
-import { UnifiedBadge } from '@client/shared/design-system';
 
 interface ExpertBadgeProps {
   verificationType: ExpertVerificationType;

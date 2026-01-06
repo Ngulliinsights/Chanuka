@@ -1,6 +1,6 @@
 /**
  * Expert Verification and Credibility System Components
- * 
+ *
  * This module provides a comprehensive expert verification system with:
  * - Expert badge system with verification types
  * - Credibility scoring with transparent methodology
@@ -39,5 +39,5 @@ export type {
   CredibilityMetrics,
   ExpertVerificationType,
   ContributionType,
-  VerificationStatus
+  VerificationStatus,
 } from '@client/features/users/types';

@@ -1,12 +1,13 @@
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import React from 'react';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
+
 import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../../hooks/useSearch';
-import React from 'react';
 
 // Define SearchSuggestion type locally
 interface SearchSuggestion {
@@ -24,10 +25,10 @@ interface SearchBarProps {
 
 export function SearchBar({
   onSearch,
-  placeholder = "Search bills, users, comments...",
+  placeholder = 'Search bills, users, comments...',
   showSuggestions = true,
   showHistory = true,
-  className = ""
+  className = '',
 }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -44,7 +45,10 @@ export function SearchBar({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isFocused) return;
 
-      const totalItems = (suggestions?.length || 0) + (liveResults?.results?.length || 0) + (showHistory ? (history?.data?.length || 0) : 0);
+      const totalItems =
+        (suggestions?.length || 0) +
+        (liveResults?.results?.length || 0) +
+        (showHistory ? history?.data?.length || 0 : 0);
 
       switch (e.key) {
         case 'ArrowDown':
@@ -73,13 +77,26 @@ export function SearchBar({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isFocused, selectedIndex, suggestions, liveResults, history, showHistory, handleSelect, performSearch]);
+  }, [
+    isFocused,
+    selectedIndex,
+    suggestions,
+    liveResults,
+    history,
+    showHistory,
+    handleSelect,
+    performSearch,
+  ]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
-          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
         setIsFocused(false);
         setSelectedIndex(-1);
       }
@@ -142,7 +159,12 @@ export function SearchBar({
   };
 
   const renderDropdown = () => {
-    if (!isFocused || (!suggestions?.length && !liveResults?.results?.length && (!showHistory || !history?.data?.length))) {
+    if (
+      !isFocused ||
+      (!suggestions?.length &&
+        !liveResults?.results?.length &&
+        (!showHistory || !history?.data?.length))
+    ) {
       return null;
     }
 
@@ -215,7 +237,8 @@ export function SearchBar({
                   Recent Searches
                 </div>
                 {history.data.slice(0, 3).map((item: any, index: number) => {
-                  const actualIndex = (suggestions?.length || 0) + (liveResults?.results?.length || 0) + index;
+                  const actualIndex =
+                    (suggestions?.length || 0) + (liveResults?.results?.length || 0) + index;
                   return (
                     <button
                       key={`history-${index}`}
@@ -249,13 +272,13 @@ export function SearchBar({
           type="text"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => {
             // Delay to allow click events on dropdown
             setTimeout(() => setIsFocused(false), 150);
           }}
-          onKeyPress={(e) => {
+          onKeyPress={e => {
             if (e.key === 'Enter') {
               performSearch();
             }
@@ -275,9 +298,7 @@ export function SearchBar({
       </div>
 
       {/* Dropdown */}
-      <div ref={dropdownRef}>
-        {renderDropdown()}
-      </div>
+      <div ref={dropdownRef}>{renderDropdown()}</div>
     </div>
   );
 }

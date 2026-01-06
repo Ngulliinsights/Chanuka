@@ -33,7 +33,7 @@ function parseTSCError(line: string): TSError | null {
   // Example: shared/core/src/file.ts(123,45): error TS6133: 'variable' is declared but never used.
   // Or: shared/core/src/file.ts(21,1): error TS6192: All imports in import declaration are unused.
   const match = line.match(/^(.+?)\((\d+),(\d+)\):\s+error\s+(TS6133|TS6192):\s+(.+?)\r?$/);
-  if (match && match[1] && match[2] && match[3] && match[4] && match[5]) {
+  if (match?.[1] && match[2] && match[3] && match[4] && match[5]) {
     return {
       file: match[1],
       line: parseInt(match[2]),
@@ -48,7 +48,7 @@ function fixUnusedImport(content: string, line: number): string {
   const lines = content.split('\n');
   if (line - 1 >= lines.length) return content;
   const importLine = lines[line - 1];
-  if (importLine && importLine.trim().startsWith('import')) {
+  if (importLine?.trim().startsWith('import')) {
     // Comment out the import
     lines[line - 1] = `// ${importLine} // Unused import`;
     return lines.join('\n');
@@ -66,7 +66,7 @@ function fixUnusedVariable(content: string, line: number, column: number, _endCo
   const after = codeLine.substring(column - 1);
   // Simple regex to find variable name
   const varMatch = after.match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)/);
-  if (varMatch && varMatch[1]) {
+  if (varMatch?.[1]) {
     const varName = varMatch[1];
     if (!varName.startsWith('_')) {
       const replacement = `_${varName}`;
@@ -93,7 +93,7 @@ function main() {
     // Check if it's an import or variable
     const lines = content.split('\n');
     const errorLine = lines[error.line - 1];
-    if (errorLine && errorLine.trim().startsWith('import')) {
+    if (errorLine?.trim().startsWith('import')) {
       content = fixUnusedImport(content, error.line);
       modified = true;
       totalFixes++;

@@ -5,7 +5,6 @@
  */
 
 import { formatDistanceToNow, format } from 'date-fns';
-import React from 'react';
 import {
   Activity,
   Eye,
@@ -17,15 +16,11 @@ import {
   ExternalLink,
   Star,
 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/design-system/typography/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { EngagementHistoryItem } from '@/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';

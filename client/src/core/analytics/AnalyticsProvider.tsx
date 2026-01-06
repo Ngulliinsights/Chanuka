@@ -9,8 +9,9 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-import { ComprehensiveAnalyticsTracker } from './comprehensive-tracker';
 import { logger } from '@client/utils/logger';
+
+import { ComprehensiveAnalyticsTracker } from './comprehensive-tracker';
 
 /**
  * Analytics context interface
@@ -51,7 +52,7 @@ interface AnalyticsProviderProps {
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   children,
   enabled = true,
-  config = {}
+  config = {},
 }) => {
   const [tracker, setTracker] = useState<ComprehensiveAnalyticsTracker | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -81,9 +82,8 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 
       logger.info('Analytics Provider initialized successfully', {
         enabled: isEnabled,
-        config
+        config,
       });
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Failed to initialize analytics: ${errorMessage}`);
@@ -147,14 +147,10 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
     isEnabled,
     error,
     setEnabled,
-    reinitialize
+    reinitialize,
   };
 
-  return (
-    <AnalyticsContext.Provider value={contextValue}>
-      {children}
-    </AnalyticsContext.Provider>
-  );
+  return <AnalyticsContext.Provider value={contextValue}>{children}</AnalyticsContext.Provider>;
 };
 
 /**
@@ -184,16 +180,21 @@ export function withAnalytics<P extends object>(
       if (tracker && isInitialized) {
         const componentName = Component.displayName || Component.name || 'UnknownComponent';
 
-        tracker.trackEvent({
-          type: 'user_interaction',
-          data: {
-            action: 'component_mount',
-            component: componentName,
-            timestamp: new Date().toISOString()
-          }
-        }).catch(err => {
-          logger.warn('Failed to track component mount', { error: err, component: componentName });
-        });
+        tracker
+          .trackEvent({
+            type: 'user_interaction',
+            data: {
+              action: 'component_mount',
+              component: componentName,
+              timestamp: new Date().toISOString(),
+            },
+          })
+          .catch(err => {
+            logger.warn('Failed to track component mount', {
+              error: err,
+              component: componentName,
+            });
+          });
       }
     }, [tracker, isInitialized]);
 
@@ -215,7 +216,9 @@ export const AnalyticsStatus: React.FC = () => {
     return (
       <div className="analytics-status error">
         <p>Analytics Error: {error}</p>
-        <button type="button" onClick={reinitialize}>Retry</button>
+        <button type="button" onClick={reinitialize}>
+          Retry
+        </button>
       </div>
     );
   }

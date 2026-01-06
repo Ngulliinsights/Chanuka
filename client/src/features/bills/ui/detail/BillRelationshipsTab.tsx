@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   ArrowRight,
   ArrowLeft,
@@ -9,9 +8,11 @@ import {
   Calendar,
   ExternalLink,
   Filter,
-  Search
+  Search,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
+import type { Bill } from '@client/features/bills/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
@@ -22,11 +23,9 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@client/shared/design-system';
 import { cn } from '@client/shared/design-system/utils/cn';
-
-import type { Bill } from '@client/features/bills/types';
 
 interface BillRelationshipsTabProps {
   bill: Bill;
@@ -54,38 +53,38 @@ const relationshipTypes = {
     label: 'Amendment',
     icon: GitBranch,
     color: 'bg-blue-100 text-blue-800',
-    description: 'Bills that modify or amend this bill'
+    description: 'Bills that modify or amend this bill',
   },
   companion: {
     label: 'Companion',
     icon: Link2,
     color: 'bg-green-100 text-green-800',
-    description: 'Similar bills in other chambers or sessions'
+    description: 'Similar bills in other chambers or sessions',
   },
   predecessor: {
     label: 'Predecessor',
     icon: ArrowLeft,
     color: 'bg-purple-100 text-purple-800',
-    description: 'Earlier versions or related bills'
+    description: 'Earlier versions or related bills',
   },
   successor: {
     label: 'Successor',
     icon: ArrowRight,
     color: 'bg-orange-100 text-orange-800',
-    description: 'Follow-up or replacement bills'
+    description: 'Follow-up or replacement bills',
   },
   related: {
     label: 'Related',
     icon: FileText,
     color: 'bg-gray-100 text-gray-800',
-    description: 'Bills addressing similar policy areas'
+    description: 'Bills addressing similar policy areas',
   },
   conflicting: {
     label: 'Conflicting',
     icon: ExternalLink,
     color: 'bg-red-100 text-red-800',
-    description: 'Bills with opposing or conflicting provisions'
-  }
+    description: 'Bills with opposing or conflicting provisions',
+  },
 };
 
 /**
@@ -110,7 +109,7 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
       relationshipDescription: 'Proposes amendments to strengthen enforcement mechanisms',
       introduced_date: '2024-02-20',
       sponsor: 'Hon. James Mwangi',
-      similarity_score: 85
+      similarity_score: 85,
     },
     {
       id: 'SB-67',
@@ -120,7 +119,7 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
       relationshipDescription: 'Senate companion bill with similar provisions',
       introduced_date: '2024-01-30',
       sponsor: 'Sen. Mary Achieng',
-      similarity_score: 92
+      similarity_score: 92,
     },
     {
       id: 'HB-89',
@@ -130,7 +129,7 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
       relationshipDescription: 'Earlier legislation that this bill builds upon',
       introduced_date: '2023-11-15',
       sponsor: 'Hon. Peter Kimani',
-      similarity_score: 78
+      similarity_score: 78,
     },
     {
       id: 'HB-156',
@@ -140,7 +139,7 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
       relationshipDescription: 'Addresses complementary carbon pricing mechanisms',
       introduced_date: '2024-03-05',
       sponsor: 'Hon. Grace Wanjiru',
-      similarity_score: 71
+      similarity_score: 71,
     },
     {
       id: 'HB-178',
@@ -150,8 +149,8 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
       relationshipDescription: 'Contains provisions that may conflict with environmental standards',
       introduced_date: '2024-02-28',
       sponsor: 'Hon. David Ochieng',
-      similarity_score: 45
-    }
+      similarity_score: 45,
+    },
   ];
 
   // Mock policy areas data
@@ -159,28 +158,29 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
     {
       name: 'Environmental Protection',
       description: 'Bills related to environmental conservation and protection',
-      bills: relatedBills.filter(b => ['HB-124', 'SB-67', 'HB-89'].includes(b.id))
+      bills: relatedBills.filter(b => ['HB-124', 'SB-67', 'HB-89'].includes(b.id)),
     },
     {
       name: 'Climate Change',
       description: 'Legislation addressing climate change mitigation and adaptation',
-      bills: relatedBills.filter(b => ['HB-124', 'HB-156'].includes(b.id))
+      bills: relatedBills.filter(b => ['HB-124', 'HB-156'].includes(b.id)),
     },
     {
       name: 'Energy Policy',
       description: 'Bills governing energy production, distribution, and regulation',
-      bills: relatedBills.filter(b => ['HB-89', 'HB-156'].includes(b.id))
-    }
+      bills: relatedBills.filter(b => ['HB-89', 'HB-156'].includes(b.id)),
+    },
   ];
 
   // Filter related bills based on search and relationship type
   const filteredBills = relatedBills.filter(relatedBill => {
-    const matchesSearch = searchQuery === '' ||
+    const matchesSearch =
+      searchQuery === '' ||
       relatedBill.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       relatedBill.sponsor.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesFilter = relationshipFilter === 'all' ||
-      relatedBill.relationship === relationshipFilter;
+    const matchesFilter =
+      relationshipFilter === 'all' || relatedBill.relationship === relationshipFilter;
 
     return matchesSearch && matchesFilter;
   });
@@ -268,7 +268,7 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
           <Input
             placeholder="Search related bills..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -302,30 +302,24 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
                 <div className="text-center">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No related bills found</h3>
-                  <p className="text-gray-600">
-                    Try adjusting your search or filter criteria
-                  </p>
+                  <p className="text-gray-600">Try adjusting your search or filter criteria</p>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {filteredBills.map(renderRelatedBill)}
-            </div>
+            <div className="grid gap-4">{filteredBills.map(renderRelatedBill)}</div>
           )}
         </TabsContent>
 
         <TabsContent value="policy" className="space-y-4">
-          {policyAreas.map((area) => (
+          {policyAreas.map(area => (
             <Card key={area.name}>
               <CardHeader>
                 <CardTitle className="text-lg">{area.name}</CardTitle>
                 <p className="text-sm text-gray-600">{area.description}</p>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
-                  {area.bills.map(renderRelatedBill)}
-                </div>
+                <div className="grid gap-3">{area.bills.map(renderRelatedBill)}</div>
               </CardContent>
             </Card>
           ))}
@@ -346,7 +340,8 @@ export default function BillRelationshipsTab({ bill }: BillRelationshipsTabProps
                   <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">Network Visualization</h3>
                   <p className="text-gray-600 mb-4">
-                    Interactive network graph showing sponsor relationships and collaboration patterns
+                    Interactive network graph showing sponsor relationships and collaboration
+                    patterns
                   </p>
                   <Button variant="outline">
                     <ExternalLink className="h-4 w-4 mr-2" />

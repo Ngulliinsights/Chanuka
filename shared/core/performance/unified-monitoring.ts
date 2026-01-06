@@ -6,9 +6,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { PerformanceMonitoringService, PerformanceMetric, BudgetViolation } from './monitoring';
-import { MethodTimingService, MethodTimingData, MethodTimingStats } from './method-timing';
+
 import { logger } from '../observability/logging';
+
+import { MethodTimingService, MethodTimingData, MethodTimingStats } from './method-timing';
+import { PerformanceMonitoringService, PerformanceMetric, BudgetViolation } from './monitoring';
 
 export interface UnifiedPerformanceMetric extends PerformanceMetric {
   /** Source of the metric (client/server) */

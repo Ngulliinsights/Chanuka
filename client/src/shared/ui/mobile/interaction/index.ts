@@ -1,9 +1,9 @@
 /**
  * Mobile Interaction Components - Touch & Gesture Based
- * 
+ *
  * Components that handle user touch interactions, gestures, and scroll behaviors.
  * These components provide mobile-specific UX patterns.
- * 
+ *
  * @module components/mobile/interaction
  */
 

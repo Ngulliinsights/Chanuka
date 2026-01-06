@@ -1,22 +1,11 @@
+import { Trophy, TrendingUp, Target, Zap, Info, Star, Award, Calendar, Flame } from 'lucide-react';
 import React from 'react';
 /**
  * Civic Score Card Component
- * 
+ *
  * Displays personal civic engagement scoring with transparent methodology,
  * level progression, and achievement tracking.
  */
-
-import {
-  Trophy,
-  TrendingUp,
-  Target,
-  Zap,
-  Info,
-  Star,
-  Award,
-  Calendar,
-  Flame
-} from 'lucide-react';
 
 import { cn } from '@client/lib/utils';
 import { Badge } from '@client/shared/design-system';
@@ -54,11 +43,7 @@ interface CivicScoreCardProps {
   showMethodology?: boolean;
 }
 
-export function CivicScoreCard({ 
-  score, 
-  className,
-  showMethodology = false 
-}: CivicScoreCardProps) {
+export function CivicScoreCard({ score, className, showMethodology = false }: CivicScoreCardProps) {
   const getLevelColor = (level: string) => {
     switch (level) {
       case 'Civic Champion':
@@ -122,7 +107,7 @@ export function CivicScoreCard({
   const LevelIcon = getLevelIcon(score.level);
 
   return (
-    <Card className={cn("", className)}>
+    <Card className={cn('', className)}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
@@ -141,17 +126,13 @@ export function CivicScoreCard({
         {/* Main Score Display */}
         <div className="text-center space-y-4">
           <div className="relative">
-            <div className="text-4xl font-bold text-primary">
-              {score.totalScore}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              out of 100
-            </div>
+            <div className="text-4xl font-bold text-primary">{score.totalScore}</div>
+            <div className="text-sm text-muted-foreground">out of 100</div>
           </div>
-          
-          <Badge 
-            variant="outline" 
-            className={cn("px-3 py-1 text-sm font-medium", getLevelColor(score.level))}
+
+          <Badge
+            variant="outline"
+            className={cn('px-3 py-1 text-sm font-medium', getLevelColor(score.level))}
           >
             <LevelIcon className="h-4 w-4 mr-1" />
             {score.level}
@@ -166,10 +147,9 @@ export function CivicScoreCard({
           </div>
           <Progress value={score.nextLevelProgress} className="h-2" />
           <div className="text-xs text-muted-foreground text-center">
-            {score.nextLevelProgress < 100 
+            {score.nextLevelProgress < 100
               ? `${100 - score.nextLevelProgress}% more to reach the next level`
-              : 'Maximum level achieved!'
-            }
+              : 'Maximum level achieved!'}
           </div>
         </div>
 
@@ -183,15 +163,11 @@ export function CivicScoreCard({
                 <div key={category} className="space-y-2">
                   <div className="flex items-center gap-2">
                     <IconComponent className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium capitalize">
-                      {category}
-                    </span>
+                    <span className="text-sm font-medium capitalize">{category}</span>
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        {getScoreDescription(category)}
-                      </span>
+                      <span className="text-muted-foreground">{getScoreDescription(category)}</span>
                       <span className="font-medium">{value}%</span>
                     </div>
                     <Progress value={value} className="h-1.5" />
@@ -225,17 +201,15 @@ export function CivicScoreCard({
           <div className="space-y-3">
             <h4 className="text-sm font-medium">Recent Achievements</h4>
             <div className="space-y-2">
-              {score.achievements.slice(0, 3).map((achievement) => (
-                <div 
+              {score.achievements.slice(0, 3).map(achievement => (
+                <div
                   key={achievement.id}
                   className="flex items-center gap-3 p-2 bg-yellow-50 rounded-md border border-yellow-200"
                 >
                   <Award className="h-4 w-4 text-yellow-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium">{achievement.title}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {achievement.description}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{achievement.description}</div>
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(achievement.earnedAt).toLocaleDateString()}
@@ -263,16 +237,20 @@ export function CivicScoreCard({
                 <strong>Participation (25%):</strong> Comments, discussions, bill saves, and shares
               </p>
               <p>
-                <strong>Quality (25%):</strong> Expert interactions, community validation, and content depth
+                <strong>Quality (25%):</strong> Expert interactions, community validation, and
+                content depth
               </p>
               <p>
-                <strong>Consistency (25%):</strong> Regular engagement patterns and streak maintenance
+                <strong>Consistency (25%):</strong> Regular engagement patterns and streak
+                maintenance
               </p>
               <p>
-                <strong>Impact (25%):</strong> Influence on discussions, campaign participation, and community outcomes
+                <strong>Impact (25%):</strong> Influence on discussions, campaign participation, and
+                community outcomes
               </p>
               <p className="pt-2 border-t border-blue-300">
-                Scores are updated in real-time and reflect your civic engagement over the past 30 days.
+                Scores are updated in real-time and reflect your civic engagement over the past 30
+                days.
               </p>
             </div>
           </div>

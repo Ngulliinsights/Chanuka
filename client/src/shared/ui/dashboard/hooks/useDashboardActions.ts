@@ -30,124 +30,155 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<DashboardActionError | null>(null);
 
-  const addAction = useCallback(async (actionData: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
-    setLoading(true);
-    setError(null);
+  const addAction = useCallback(
+    async (actionData: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const newAction: ActionItem = {
-        id: `action-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        title: actionData.title,
-        description: actionData.description,
-        priority: actionData.priority,
-        due_date: actionData.due_date,
-        category: actionData.category,
-        bill_id: actionData.bill_id,
-        completed: actionData.completed ?? false,
-        created_at: new Date(),
-        updated_at: new Date()
-      };
+      try {
+        const newAction: ActionItem = {
+          id: `action-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          title: actionData.title,
+          description: actionData.description,
+          priority: actionData.priority,
+          due_date: actionData.due_date,
+          category: actionData.category,
+          bill_id: actionData.bill_id,
+          completed: actionData.completed ?? false,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
 
-      validateActionItem(newAction);
+        validateActionItem(newAction);
 
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-      setActions(prev => [...prev, newAction]);
-    } catch (actionError: unknown) {
-      const error = new DashboardActionError('add', actionError instanceof Error ? actionError.message : 'Add action failed');
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateAction = useCallback(async (actionId: string, updates: Partial<ActionItem>) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const actionIndex = actions.findIndex(action => action.id === actionId);
-      if (actionIndex === -1) {
-        throw new Error(`Action with ID ${actionId} not found`);
+        setActions(prev => [...prev, newAction]);
+      } catch (actionError: unknown) {
+        const error = new DashboardActionError(
+          'add',
+          actionError instanceof Error ? actionError.message : 'Add action failed'
+        );
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      const existingAction = actions[actionIndex];
-      if (!existingAction) {
-        throw new Error(`Action with ID ${actionId} not found`);
+  const updateAction = useCallback(
+    async (actionId: string, updates: Partial<ActionItem>) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const actionIndex = actions.findIndex(action => action.id === actionId);
+        if (actionIndex === -1) {
+          throw new Error(`Action with ID ${actionId} not found`);
+        }
+
+        const existingAction = actions[actionIndex];
+        if (!existingAction) {
+          throw new Error(`Action with ID ${actionId} not found`);
+        }
+
+        const updatedAction: ActionItem = {
+          id: existingAction.id,
+          title: updates.title ?? existingAction.title,
+          description: updates.description ?? existingAction.description,
+          priority: updates.priority ?? existingAction.priority,
+          due_date: updates.due_date ?? existingAction.due_date,
+          category: updates.category ?? existingAction.category,
+          bill_id: updates.bill_id ?? existingAction.bill_id,
+          completed: updates.completed ?? existingAction.completed,
+          created_at: existingAction.created_at,
+          updated_at: new Date(),
+        };
+
+        validateActionItem(updatedAction);
+
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        setActions(prev => prev.map(action => (action.id === actionId ? updatedAction : action)));
+      } catch (actionError: unknown) {
+        const error = new DashboardActionError(
+          'update',
+          actionError instanceof Error ? actionError.message : 'Update action failed',
+          { actionId }
+        );
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
+    },
+    [actions]
+  );
 
-      const updatedAction: ActionItem = {
-        id: existingAction.id,
-        title: updates.title ?? existingAction.title,
-        description: updates.description ?? existingAction.description,
-        priority: updates.priority ?? existingAction.priority,
-        due_date: updates.due_date ?? existingAction.due_date,
-        category: updates.category ?? existingAction.category,
-        bill_id: updates.bill_id ?? existingAction.bill_id,
-        completed: updates.completed ?? existingAction.completed,
-        created_at: existingAction.created_at,
-        updated_at: new Date()
-      };
-
-      validateActionItem(updatedAction);
-
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      setActions(prev => prev.map(action =>
-        action.id === actionId ? updatedAction : action
-      ));
-    } catch (actionError: unknown) {
-      const error = new DashboardActionError('update', actionError instanceof Error ? actionError.message : 'Update action failed', { actionId });
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [actions]);
-
-  const completeAction = useCallback(async (actionId: string) => {
-    try {
-      await updateAction(actionId, { completed: true });
-    } catch (actionError: unknown) {
-      const error = new DashboardActionError('complete', actionError instanceof Error ? actionError.message : 'Complete action failed', { actionId });
-      setError(error);
-      throw error;
-    }
-  }, [updateAction]);
-
-  const deleteAction = useCallback(async (actionId: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const actionExists = actions.some(action => action.id === actionId);
-      if (!actionExists) {
-        throw new Error(`Action with ID ${actionId} not found`);
+  const completeAction = useCallback(
+    async (actionId: string) => {
+      try {
+        await updateAction(actionId, { completed: true });
+      } catch (actionError: unknown) {
+        const error = new DashboardActionError(
+          'complete',
+          actionError instanceof Error ? actionError.message : 'Complete action failed',
+          { actionId }
+        );
+        setError(error);
+        throw error;
       }
+    },
+    [updateAction]
+  );
 
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 300));
+  const deleteAction = useCallback(
+    async (actionId: string) => {
+      setLoading(true);
+      setError(null);
 
-      setActions(prev => prev.filter(action => action.id !== actionId));
-    } catch (actionError: unknown) {
-      const error = new DashboardActionError('delete', actionError instanceof Error ? actionError.message : 'Delete action failed', { actionId });
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [actions]);
+      try {
+        const actionExists = actions.some(action => action.id === actionId);
+        if (!actionExists) {
+          throw new Error(`Action with ID ${actionId} not found`);
+        }
 
-  const filterByPriority = useCallback((priority: ActionPriority): ActionItem[] => {
-    return actions.filter(action => action.priority === priority);
-  }, [actions]);
+        // TODO: Replace with actual API call
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-  const filterByCompletion = useCallback((completed: boolean): ActionItem[] => {
-    return actions.filter(action => Boolean(action.completed) === completed);
-  }, [actions]);
+        setActions(prev => prev.filter(action => action.id !== actionId));
+      } catch (actionError: unknown) {
+        const error = new DashboardActionError(
+          'delete',
+          actionError instanceof Error ? actionError.message : 'Delete action failed',
+          { actionId }
+        );
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [actions]
+  );
+
+  const filterByPriority = useCallback(
+    (priority: ActionPriority): ActionItem[] => {
+      return actions.filter(action => action.priority === priority);
+    },
+    [actions]
+  );
+
+  const filterByCompletion = useCallback(
+    (completed: boolean): ActionItem[] => {
+      return actions.filter(action => Boolean(action.completed) === completed);
+    },
+    [actions]
+  );
 
   const sortByDueDate = useCallback((): ActionItem[] => {
     return [...actions].sort((a, b) => {
@@ -159,7 +190,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   }, [actions]);
 
   const sortByPriority = useCallback((): ActionItem[] => {
-    const priorityOrder: Record<ActionPriority, number> = { 'High': 0, 'Medium': 1, 'Low': 2 };
+    const priorityOrder: Record<ActionPriority, number> = { High: 0, Medium: 1, Low: 2 };
     return [...actions].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
   }, [actions]);
 
@@ -175,8 +206,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       filterByPriority,
       filterByCompletion,
       sortByDueDate,
-      sortByPriority
-    }
+      sortByPriority,
+    },
   };
 }
-

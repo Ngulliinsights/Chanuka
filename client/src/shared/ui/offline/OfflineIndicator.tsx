@@ -11,4 +11,3 @@ import { OfflineStatus } from '@/shared/ui/offline/offline-manager';
 export { OfflineStatus as OfflineIndicator };
 
 export default OfflineStatus;
-

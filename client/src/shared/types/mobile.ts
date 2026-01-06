@@ -224,13 +224,7 @@ export interface MobileAnimationOptions {
 /**
  * Haptic feedback pattern types
  */
-export type HapticFeedbackPattern =
-  | 'light'
-  | 'medium'
-  | 'heavy'
-  | 'success'
-  | 'warning'
-  | 'error';
+export type HapticFeedbackPattern = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error';
 
 /**
  * Haptic feedback configuration

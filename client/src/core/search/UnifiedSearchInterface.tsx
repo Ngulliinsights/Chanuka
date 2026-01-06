@@ -5,29 +5,26 @@
  * Requirements: 2.1, 2.2, 2.3
  */
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Search, Mic, X, Loader2 } from 'lucide-react';
-import { cn } from '../../shared/design-system/utils/cn';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
 // Import existing search components
-import IntelligentAutocomplete from '../../features/search/ui/interface/IntelligentAutocomplete';
 import { useIntelligentSearch } from '../../features/search/hooks/useIntelligentSearch';
 import { useStreamingSearch } from '../../features/search/hooks/useStreamingSearch';
 import { intelligentSearch } from '../../features/search/services/intelligent-search';
 import { streamingSearchService } from '../../features/search/services/streaming-search';
+import IntelligentAutocomplete from '../../features/search/ui/interface/IntelligentAutocomplete';
+import { cn } from '../../shared/design-system/utils/cn';
 import { searchApiClient } from '../api/search';
 
+import { SearchStrategySelector, DEFAULT_SEARCH_STRATEGY_CONFIG } from './search-strategy-selector';
 import type {
   UnifiedSearchInterfaceProps,
   UnifiedSearchQuery,
   UnifiedSearchResult,
   SearchProgress,
-  SearchDecisionMatrix
+  SearchDecisionMatrix,
 } from './types';
-import {
-  SearchStrategySelector,
-  DEFAULT_SEARCH_STRATEGY_CONFIG
-} from './search-strategy-selector';
 
 export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   variant = 'page',
@@ -41,7 +38,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   onSearch,
   onResults,
   onProgress,
-  onError
+  onError,
 }) => {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -58,94 +55,99 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   // Search hooks for different strategies
   const intelligentSearchHook = useIntelligentSearch({
     debounceMs: 300,
-    enableAutoSearch: false
+    enableAutoSearch: false,
   });
 
   const streamingSearchHook = useStreamingSearch({
-    onProgress: (progress) => {
+    onProgress: progress => {
       onProgress?.({
         loaded: progress.loaded,
         total: progress.total,
         percentage: progress.percentage,
         currentStrategy: 'streaming',
-        searchTime: progress.searchTime
+        searchTime: progress.searchTime,
       });
-    }
+    },
   });
 
   /**
    * Determine optimal search strategy based on query characteristics
    */
-  const determineSearchStrategy = useCallback((searchQuery: string): string => {
-    const matrix: SearchDecisionMatrix = {
-      query: searchQuery,
-      networkCondition: navigator.onLine ? 'fast' : 'offline',
-      deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop'
-    };
+  const determineSearchStrategy = useCallback(
+    (searchQuery: string): string => {
+      const matrix: SearchDecisionMatrix = {
+        query: searchQuery,
+        networkCondition: navigator.onLine ? 'fast' : 'offline',
+        deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop',
+      };
 
-    const decision = strategySelector.selectStrategy(matrix);
-    return decision.strategy;
-  }, [strategySelector]);
+      const decision = strategySelector.selectStrategy(matrix);
+      return decision.strategy;
+    },
+    [strategySelector]
+  );
 
   /**
    * Execute search using the selected strategy
    */
-  const executeSearch = useCallback(async (searchQuery: string, strategy?: string) => {
-    if (!searchQuery.trim()) return;
+  const executeSearch = useCallback(
+    async (searchQuery: string, strategy?: string) => {
+      if (!searchQuery.trim()) return;
 
-    setIsSearching(true);
-    const startTime = Date.now();
+      setIsSearching(true);
+      const startTime = Date.now();
 
-    try {
-      const selectedStrategy = strategy || determineSearchStrategy(searchQuery);
-      setCurrentStrategy(selectedStrategy);
+      try {
+        const selectedStrategy = strategy || determineSearchStrategy(searchQuery);
+        setCurrentStrategy(selectedStrategy);
 
-      const unifiedQuery: UnifiedSearchQuery = {
-        q: searchQuery,
-        strategy: selectedStrategy as any,
-        limit: strategySelector.getConfig().options.maxResults
-      };
+        const unifiedQuery: UnifiedSearchQuery = {
+          q: searchQuery,
+          strategy: selectedStrategy as any,
+          limit: strategySelector.getConfig().options.maxResults,
+        };
 
-      // Call external search handler
-      onSearch?.(unifiedQuery);
+        // Call external search handler
+        onSearch?.(unifiedQuery);
 
-      let results: UnifiedSearchResult;
+        let results: UnifiedSearchResult;
 
-      switch (selectedStrategy) {
-        case 'intelligent':
-          results = await executeIntelligentSearch(unifiedQuery, startTime);
-          break;
+        switch (selectedStrategy) {
+          case 'intelligent':
+            results = await executeIntelligentSearch(unifiedQuery, startTime);
+            break;
 
-        case 'streaming':
-          results = await executeStreamingSearch(unifiedQuery, startTime);
-          break;
+          case 'streaming':
+            results = await executeStreamingSearch(unifiedQuery, startTime);
+            break;
 
-        case 'api':
-        default:
-          results = await executeApiSearch(unifiedQuery, startTime);
-          break;
-      }
-
-      setSearchResults(results);
-      onResults?.(results);
-
-    } catch (error) {
-      console.error('Search failed:', error);
-      onError?.(error as Error);
-
-      // Try fallback strategy
-      const fallbackStrategy = strategySelector.getConfig().fallbackStrategy;
-      if (fallbackStrategy && fallbackStrategy !== currentStrategy) {
-        try {
-          await executeSearch(searchQuery, fallbackStrategy);
-        } catch (fallbackError) {
-          console.error('Fallback search also failed:', fallbackError);
+          case 'api':
+          default:
+            results = await executeApiSearch(unifiedQuery, startTime);
+            break;
         }
+
+        setSearchResults(results);
+        onResults?.(results);
+      } catch (error) {
+        console.error('Search failed:', error);
+        onError?.(error as Error);
+
+        // Try fallback strategy
+        const fallbackStrategy = strategySelector.getConfig().fallbackStrategy;
+        if (fallbackStrategy && fallbackStrategy !== currentStrategy) {
+          try {
+            await executeSearch(searchQuery, fallbackStrategy);
+          } catch (fallbackError) {
+            console.error('Fallback search also failed:', fallbackError);
+          }
+        }
+      } finally {
+        setIsSearching(false);
       }
-    } finally {
-      setIsSearching(false);
-    }
-  }, [determineSearchStrategy, strategySelector, onSearch, onResults, onError, currentStrategy]);
+    },
+    [determineSearchStrategy, strategySelector, onSearch, onResults, onError, currentStrategy]
+  );
 
   /**
    * Execute intelligent search
@@ -158,7 +160,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
       query: query.q,
       limit: query.limit,
       offset: query.offset,
-      filters: query.filters
+      filters: query.filters,
     });
 
     return {
@@ -168,10 +170,10 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
         strategy: 'intelligent',
         fallbackUsed: false,
         searchTime: Date.now() - startTime,
-        totalResults: response.results.length
+        totalResults: response.results.length,
       },
       suggestions: response.suggestions,
-      facets: response.facets
+      facets: response.facets,
     };
   };
 
@@ -185,31 +187,34 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
     return new Promise((resolve, reject) => {
       const results: any[] = [];
 
-      streamingSearchService.startStreamingSearch({
-        q: query.q,
-        limit: query.limit,
-        offset: query.offset,
-        filters: query.filters
-      }, {
-        onResult: (result) => {
-          results.push(result);
+      streamingSearchService.startStreamingSearch(
+        {
+          q: query.q,
+          limit: query.limit,
+          offset: query.offset,
+          filters: query.filters,
         },
-        onComplete: (finalResults, totalCount) => {
-          resolve({
-            results: finalResults,
-            metadata: {
-              strategy: 'streaming',
-              fallbackUsed: false,
-              searchTime: Date.now() - startTime,
-              totalResults: totalCount,
-              query: query.q,
-              executionTime: Date.now() - startTime
-            }
-          });
-        },
-        onError: reject,
-        maxResults: query.limit
-      });
+        {
+          onResult: result => {
+            results.push(result);
+          },
+          onComplete: (finalResults, totalCount) => {
+            resolve({
+              results: finalResults,
+              metadata: {
+                strategy: 'streaming',
+                fallbackUsed: false,
+                searchTime: Date.now() - startTime,
+                totalResults: totalCount,
+                query: query.q,
+                executionTime: Date.now() - startTime,
+              },
+            });
+          },
+          onError: reject,
+          maxResults: query.limit,
+        }
+      );
     });
   };
 
@@ -224,7 +229,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
       q: query.q,
       limit: query.limit,
       offset: query.offset,
-      filters: query.filters
+      filters: query.filters,
     });
 
     return {
@@ -234,38 +239,47 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
         strategy: 'api',
         fallbackUsed: false,
         searchTime: Date.now() - startTime,
-        totalResults: response.results.length
-      }
+        totalResults: response.results.length,
+      },
     };
   };
 
   /**
    * Handle search input changes
    */
-  const handleInputChange = useCallback((value: string) => {
-    setQuery(value);
-    setShowSuggestionsDropdown(value.length > 0 && showSuggestions);
-  }, [showSuggestions]);
+  const handleInputChange = useCallback(
+    (value: string) => {
+      setQuery(value);
+      setShowSuggestionsDropdown(value.length > 0 && showSuggestions);
+    },
+    [showSuggestions]
+  );
 
   /**
    * Handle search submission
    */
-  const handleSearch = useCallback((searchQuery?: string) => {
-    const finalQuery = searchQuery || query;
-    if (finalQuery.trim()) {
-      setShowSuggestionsDropdown(false);
-      executeSearch(finalQuery);
-    }
-  }, [query, executeSearch]);
+  const handleSearch = useCallback(
+    (searchQuery?: string) => {
+      const finalQuery = searchQuery || query;
+      if (finalQuery.trim()) {
+        setShowSuggestionsDropdown(false);
+        executeSearch(finalQuery);
+      }
+    },
+    [query, executeSearch]
+  );
 
   /**
    * Handle suggestion selection
    */
-  const handleSuggestionSelect = useCallback((suggestion: string) => {
-    setQuery(suggestion);
-    setShowSuggestionsDropdown(false);
-    executeSearch(suggestion);
-  }, [executeSearch]);
+  const handleSuggestionSelect = useCallback(
+    (suggestion: string) => {
+      setQuery(suggestion);
+      setShowSuggestionsDropdown(false);
+      executeSearch(suggestion);
+    },
+    [executeSearch]
+  );
 
   /**
    * Clear search
@@ -304,8 +318,8 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
         <input
           type="text"
           value={query}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => handleInputChange(e.target.value)}
+          onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault();
               handleSearch();
@@ -325,9 +339,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
           disabled={isSearching}
         />
 
-        {isSearching && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        )}
+        {isSearching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
 
         {query && !isSearching && (
           <button

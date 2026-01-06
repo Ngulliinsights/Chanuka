@@ -56,7 +56,7 @@
 }
 
 .high-contrast button,
-.high-contrast [role="button"] {
+.high-contrast [role='button'] {
   border: 2px solid hsl(var(--border)) !important;
 }
 
@@ -81,26 +81,62 @@
   font-size: 20px;
 }
 
-.font-small h1 { font-size: 1.75rem; }
-.font-small h2 { font-size: 1.5rem; }
-.font-small h3 { font-size: 1.25rem; }
-.font-small h4 { font-size: 1.125rem; }
-.font-small h5 { font-size: 1rem; }
-.font-small h6 { font-size: 0.875rem; }
+.font-small h1 {
+  font-size: 1.75rem;
+}
+.font-small h2 {
+  font-size: 1.5rem;
+}
+.font-small h3 {
+  font-size: 1.25rem;
+}
+.font-small h4 {
+  font-size: 1.125rem;
+}
+.font-small h5 {
+  font-size: 1rem;
+}
+.font-small h6 {
+  font-size: 0.875rem;
+}
 
-.font-large h1 { font-size: 2.5rem; }
-.font-large h2 { font-size: 2.25rem; }
-.font-large h3 { font-size: 2rem; }
-.font-large h4 { font-size: 1.75rem; }
-.font-large h5 { font-size: 1.5rem; }
-.font-large h6 { font-size: 1.25rem; }
+.font-large h1 {
+  font-size: 2.5rem;
+}
+.font-large h2 {
+  font-size: 2.25rem;
+}
+.font-large h3 {
+  font-size: 2rem;
+}
+.font-large h4 {
+  font-size: 1.75rem;
+}
+.font-large h5 {
+  font-size: 1.5rem;
+}
+.font-large h6 {
+  font-size: 1.25rem;
+}
 
-.font-extra-large h1 { font-size: 3rem; }
-.font-extra-large h2 { font-size: 2.75rem; }
-.font-extra-large h3 { font-size: 2.5rem; }
-.font-extra-large h4 { font-size: 2.25rem; }
-.font-extra-large h5 { font-size: 2rem; }
-.font-extra-large h6 { font-size: 1.75rem; }
+.font-extra-large h1 {
+  font-size: 3rem;
+}
+.font-extra-large h2 {
+  font-size: 2.75rem;
+}
+.font-extra-large h3 {
+  font-size: 2.5rem;
+}
+.font-extra-large h4 {
+  font-size: 2.25rem;
+}
+.font-extra-large h5 {
+  font-size: 2rem;
+}
+.font-extra-large h6 {
+  font-size: 1.75rem;
+}
 
 /* Reduced Motion */
 .reduced-motion *,
@@ -121,7 +157,7 @@
 }
 
 .enhanced-focus button:focus,
-.enhanced-focus [role="button"]:focus,
+.enhanced-focus [role='button']:focus,
 .enhanced-focus a:focus,
 .enhanced-focus input:focus,
 .enhanced-focus select:focus,
@@ -137,8 +173,8 @@
 }
 
 .screen-reader-optimized button::after,
-.screen-reader-optimized [role="button"]::after {
-  content: " (button)";
+.screen-reader-optimized [role='button']::after {
+  content: ' (button)';
   position: absolute;
   left: -10000px;
   width: 1px;
@@ -146,8 +182,8 @@
   overflow: hidden;
 }
 
-.screen-reader-optimized a[href^="http"]::after {
-  content: " (external link)";
+.screen-reader-optimized a[href^='http']::after {
+  content: ' (external link)';
   position: absolute;
   left: -10000px;
   width: 1px;
@@ -177,21 +213,21 @@
 /* Touch Target Sizes (WCAG 2.1 AA) */
 @media (hover: none) and (pointer: coarse) {
   button,
-  [role="button"],
+  [role='button'],
   a,
-  input[type="button"],
-  input[type="submit"],
-  input[type="reset"],
-  input[type="checkbox"],
-  input[type="radio"],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
+  input[type='checkbox'],
+  input[type='radio'],
   select {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Ensure touch targets don't overlap */
   button + button,
-  [role="button"] + [role="button"],
+  [role='button'] + [role='button'],
   a + a {
     margin-left: 8px;
   }
@@ -254,7 +290,7 @@
 }
 
 .keyboard-navigation-active *:focus::before {
-  content: "";
+  content: '';
   position: absolute;
   top: -4px;
   left: -4px;
@@ -335,7 +371,8 @@ caption {
 }
 
 /* List Accessibility */
-ul, ol {
+ul,
+ol {
   padding-left: 1.5rem;
 }
 
@@ -365,7 +402,8 @@ code {
   background-color: #f3f4f6;
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.875em;
 }
 
@@ -374,7 +412,8 @@ pre {
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 /* Print Accessibility */
@@ -385,15 +424,15 @@ pre {
   .tooltip {
     display: none !important;
   }
-  
-  a[href^="http"]:after {
-    content: " (" attr(href) ")";
+
+  a[href^='http']:after {
+    content: ' (' attr(href) ')';
     font-size: 0.8em;
     color: #666;
   }
-  
+
   abbr[title]:after {
-    content: " (" attr(title) ")";
+    content: ' (' attr(title) ')';
     font-size: 0.8em;
     color: #666;
   }
@@ -443,22 +482,22 @@ pre {
     --foreground: 0 0% 0%;
     --card: 0 0% 100%;
   }
-  
+
   button,
-  [role="button"],
+  [role='button'],
   input,
   select,
   textarea {
     border: 2px solid black !important;
   }
-  
+
   a {
     text-decoration: underline !important;
-    color: #0000EE !important;
+    color: #0000ee !important;
   }
-  
+
   a:visited {
-    color: #551A8B !important;
+    color: #551a8b !important;
   }
 }
 
@@ -473,17 +512,17 @@ pre {
 }
 
 /* Landmark Roles */
-[role="banner"],
-[role="navigation"],
-[role="main"],
-[role="complementary"],
-[role="contentinfo"] {
+[role='banner'],
+[role='navigation'],
+[role='main'],
+[role='complementary'],
+[role='contentinfo'] {
   /* Ensure landmarks are properly styled */
 }
 
 /* ARIA Live Regions */
-[aria-live="polite"],
-[aria-live="assertive"] {
+[aria-live='polite'],
+[aria-live='assertive'] {
   position: absolute;
   left: -10000px;
   width: 1px;
@@ -499,13 +538,13 @@ pre {
   font-weight: 500;
 }
 
-.status-message[role="status"] {
+.status-message[role='status'] {
   background-color: #dbeafe;
   border: 1px solid #3b82f6;
   color: #1e40af;
 }
 
-.status-message[role="alert"] {
+.status-message[role='alert'] {
   background-color: #fef2f2;
   border: 1px solid #ef4444;
   color: #dc2626;
@@ -524,7 +563,7 @@ pre {
   word-wrap: break-word;
 }
 
-.tooltip[role="tooltip"] {
+.tooltip[role='tooltip'] {
   /* Ensure tooltips are properly announced */
 }
 
@@ -584,11 +623,11 @@ pre {
   .responsive-text-sm {
     font-size: 0.875rem;
   }
-  
+
   .responsive-text-base {
     font-size: 1rem;
   }
-  
+
   .responsive-text-lg {
     font-size: 1.125rem;
   }
@@ -598,11 +637,11 @@ pre {
   .responsive-text-sm {
     font-size: 1rem;
   }
-  
+
   .responsive-text-base {
     font-size: 1.125rem;
   }
-  
+
   .responsive-text-lg {
     font-size: 1.25rem;
   }

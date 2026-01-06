@@ -232,43 +232,39 @@ export class PerformanceApiService {
    */
   async reportMetrics(payload: MetricsPayload): Promise<void> {
     if (!payload?.sessionId) {
-      throw ErrorFactory.createValidationError(
-        'Session ID is required to report metrics',
-        { payload, component: 'PerformanceApi', operation: 'reportMetrics' }
-      );
+      throw ErrorFactory.createValidationError('Session ID is required to report metrics', {
+        payload,
+        component: 'PerformanceApi',
+        operation: 'reportMetrics',
+      });
     }
 
     try {
-      await globalApiClient.post(
-        `${this.baseUrl}/performance/metrics`,
-        payload,
-        { skipCache: true }
-      );
+      await globalApiClient.post(`${this.baseUrl}/performance/metrics`, payload, {
+        skipCache: true,
+      });
 
       logger.debug('Performance metrics reported successfully', {
         component: 'PerformanceApi',
         sessionId: payload.sessionId,
         metricsCount: payload.metrics.length,
         customMetricsCount: payload.customMetrics.length,
-        resourceTimingsCount: payload.resourceTimings.length
+        resourceTimingsCount: payload.resourceTimings.length,
       });
     } catch (error) {
       logger.error('Failed to report performance metrics', {
         component: 'PerformanceApi',
         sessionId: payload.sessionId,
-        error
+        error,
       });
 
-      throw ErrorFactory.createNetworkError(
-        'Failed to send performance metrics to the server',
-        {
-          sessionId: payload.sessionId,
-          metricsCount: payload.metrics.length,
-          originalError: error,
-          component: 'PerformanceApi',
-          operation: 'reportMetrics'
-        }
-      );
+      throw ErrorFactory.createNetworkError('Failed to send performance metrics to the server', {
+        sessionId: payload.sessionId,
+        metricsCount: payload.metrics.length,
+        originalError: error,
+        component: 'PerformanceApi',
+        operation: 'reportMetrics',
+      });
     }
   }
 
@@ -308,17 +304,20 @@ export class PerformanceApiService {
     dateRange?: { start: string; end: string }
   ): Promise<PerformanceAnalytics> {
     if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        'User ID is required to retrieve analytics',
-        { userId, component: 'PerformanceApi', operation: 'getUserAnalytics' }
-      );
+      throw ErrorFactory.createValidationError('User ID is required to retrieve analytics', {
+        userId,
+        component: 'PerformanceApi',
+        operation: 'getUserAnalytics',
+      });
     }
 
     if (dateRange && (!dateRange.start || !dateRange.end)) {
-      throw ErrorFactory.createValidationError(
-        'Date range must include both start and end dates',
-        { userId, dateRange, component: 'PerformanceApi', operation: 'getUserAnalytics' }
-      );
+      throw ErrorFactory.createValidationError('Date range must include both start and end dates', {
+        userId,
+        dateRange,
+        component: 'PerformanceApi',
+        operation: 'getUserAnalytics',
+      });
     }
 
     try {
@@ -341,13 +340,16 @@ export class PerformanceApiService {
         component: 'PerformanceApi',
         userId,
         dateRange,
-        error
+        error,
       });
 
-      throw ErrorFactory.createNetworkError(
-        'Failed to retrieve user performance analytics',
-        { userId, dateRange, originalError: error, component: 'PerformanceApi', operation: 'getUserAnalytics' }
-      );
+      throw ErrorFactory.createNetworkError('Failed to retrieve user performance analytics', {
+        userId,
+        dateRange,
+        originalError: error,
+        component: 'PerformanceApi',
+        operation: 'getUserAnalytics',
+      });
     }
   }
 
@@ -381,13 +383,14 @@ export class PerformanceApiService {
     } catch (error) {
       logger.error('Failed to get performance benchmarks', {
         component: 'PerformanceApi',
-        error
+        error,
       });
 
-      throw ErrorFactory.createNetworkError(
-        'Failed to retrieve performance benchmarks',
-        { originalError: error, component: 'PerformanceApi', operation: 'getBenchmarks' }
-      );
+      throw ErrorFactory.createNetworkError('Failed to retrieve performance benchmarks', {
+        originalError: error,
+        component: 'PerformanceApi',
+        operation: 'getBenchmarks',
+      });
     }
   }
 
@@ -437,30 +440,28 @@ export class PerformanceApiService {
     }
 
     try {
-      await globalApiClient.post(
-        `${this.baseUrl}/performance/issues`,
-        issue,
-        { skipCache: true }
-      );
+      await globalApiClient.post(`${this.baseUrl}/performance/issues`, issue, { skipCache: true });
 
       logger.info('Performance issue reported', {
         component: 'PerformanceApi',
         type: issue.type,
         severity: issue.severity,
-        sessionId: issue.sessionId
+        sessionId: issue.sessionId,
       });
     } catch (error) {
       logger.error('Failed to report performance issue', {
         component: 'PerformanceApi',
         type: issue.type,
         severity: issue.severity,
-        error
+        error,
       });
 
-      throw ErrorFactory.createNetworkError(
-        'Failed to report performance issue',
-        { issue, originalError: error, component: 'PerformanceApi', operation: 'reportIssue' }
-      );
+      throw ErrorFactory.createNetworkError('Failed to report performance issue', {
+        issue,
+        originalError: error,
+        component: 'PerformanceApi',
+        operation: 'reportIssue',
+      });
     }
   }
 
@@ -509,13 +510,15 @@ export class PerformanceApiService {
       logger.error('Failed to get performance recommendations', {
         component: 'PerformanceApi',
         sessionId,
-        error
+        error,
       });
 
-      throw ErrorFactory.createNetworkError(
-        'Failed to retrieve performance recommendations',
-        { sessionId, originalError: error, component: 'PerformanceApi', operation: 'getRecommendations' }
-      );
+      throw ErrorFactory.createNetworkError('Failed to retrieve performance recommendations', {
+        sessionId,
+        originalError: error,
+        component: 'PerformanceApi',
+        operation: 'getRecommendations',
+      });
     }
   }
 }

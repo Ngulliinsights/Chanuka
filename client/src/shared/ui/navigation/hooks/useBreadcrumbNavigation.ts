@@ -14,7 +14,7 @@ import { generateBreadcrumbs } from '@/core/navigation/breadcrumbs';
 import {
   updateBreadcrumbs,
   selectBreadcrumbs,
-  selectNavigationPreferences
+  selectNavigationPreferences,
 } from '@/shared/infrastructure/store/slices/navigationSlice';
 import type { BreadcrumbItem } from '@/shared/types/navigation';
 
@@ -48,11 +48,7 @@ interface BreadcrumbNavigationReturn {
 export function useBreadcrumbNavigation(
   options: UseBreadcrumbNavigationOptions = {}
 ): BreadcrumbNavigationReturn {
-  const {
-    autoGenerate = true,
-    customGenerator,
-    updateOnRouteChange = true,
-  } = options;
+  const { autoGenerate = true, customGenerator, updateOnRouteChange = true } = options;
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -60,32 +56,41 @@ export function useBreadcrumbNavigation(
   const preferences = useSelector(selectNavigationPreferences);
 
   // Function to generate breadcrumbs for a given path
-  const generateBreadcrumbsForPath = useCallback((path: string): BreadcrumbItem[] => {
-    if (customGenerator) {
-      return customGenerator(path);
-    }
-    return generateBreadcrumbs(path, []);
-  }, [customGenerator]);
+  const generateBreadcrumbsForPath = useCallback(
+    (path: string): BreadcrumbItem[] => {
+      if (customGenerator) {
+        return customGenerator(path);
+      }
+      return generateBreadcrumbs(path, []);
+    },
+    [customGenerator]
+  );
 
   // Function to manually set breadcrumbs
-  const setBreadcrumbs = useCallback((newBreadcrumbs: BreadcrumbItem[]) => {
-    dispatch(updateBreadcrumbs(newBreadcrumbs));
-  }, [dispatch]);
+  const setBreadcrumbs = useCallback(
+    (newBreadcrumbs: BreadcrumbItem[]) => {
+      dispatch(updateBreadcrumbs(newBreadcrumbs));
+    },
+    [dispatch]
+  );
 
   // Function to add a breadcrumb item
-  const addBreadcrumb = useCallback((item: BreadcrumbItem) => {
-    const newBreadcrumbs = [...breadcrumbs];
+  const addBreadcrumb = useCallback(
+    (item: BreadcrumbItem) => {
+      const newBreadcrumbs = [...breadcrumbs];
 
-    // Mark previous items as not active
-    newBreadcrumbs.forEach(crumb => {
-      crumb.is_active = false;
-    });
+      // Mark previous items as not active
+      newBreadcrumbs.forEach(crumb => {
+        crumb.is_active = false;
+      });
 
-    // Add new item as active
-    newBreadcrumbs.push({ ...item, is_active: true });
+      // Add new item as active
+      newBreadcrumbs.push({ ...item, is_active: true });
 
-    dispatch(updateBreadcrumbs(newBreadcrumbs));
-  }, [breadcrumbs, dispatch]);
+      dispatch(updateBreadcrumbs(newBreadcrumbs));
+    },
+    [breadcrumbs, dispatch]
+  );
 
   // Function to remove the last breadcrumb
   const popBreadcrumb = useCallback(() => {
@@ -113,7 +118,7 @@ export function useBreadcrumbNavigation(
     updateOnRouteChange,
     preferences.showBreadcrumbs,
     generateBreadcrumbsForPath,
-    dispatch
+    dispatch,
   ]);
 
   return {
@@ -133,9 +138,12 @@ export function useBreadcrumbNavigation(
 export function useCustomBreadcrumbs() {
   const dispatch = useDispatch();
 
-  const updateBreadcrumbsForPage = useCallback((breadcrumbs: BreadcrumbItem[]) => {
-    dispatch(updateBreadcrumbs(breadcrumbs));
-  }, [dispatch]);
+  const updateBreadcrumbsForPage = useCallback(
+    (breadcrumbs: BreadcrumbItem[]) => {
+      dispatch(updateBreadcrumbs(breadcrumbs));
+    },
+    [dispatch]
+  );
 
   return { updateBreadcrumbs: updateBreadcrumbsForPage };
 }

@@ -1,19 +1,14 @@
 /**
  * Bill Tracking Service - Core Real-time Module
- * 
+ *
  * Consolidated bill tracking service that handles real-time bill updates,
  * subscriptions, and engagement metrics through WebSocket connections.
  */
 
 import { logger } from '@client/utils/logger';
 
-import { 
-  BillUpdate, 
-  BillRealTimeUpdate, 
-  BillEngagementUpdate,
-  WebSocketMessage 
-} from '../types';
 import { UnifiedWebSocketManager } from '../manager';
+import { BillUpdate, BillRealTimeUpdate, BillEngagementUpdate, WebSocketMessage } from '../types';
 
 // ============================================================================
 // Internal Type Definitions
@@ -85,24 +80,26 @@ interface ServiceStats {
  * Type guard to check if a message is a BillUpdateMessageData
  */
 function isBillUpdateMessage(data: unknown): data is BillUpdateMessageData {
-  return typeof data === 'object' && data !== null && 
-    ('bill_id' in data || 'billId' in data);
+  return typeof data === 'object' && data !== null && ('bill_id' in data || 'billId' in data);
 }
 
 /**
  * Type guard to check if a message is an EngagementMetricsMessageData
  */
 function isEngagementMetricsMessage(data: unknown): data is EngagementMetricsMessageData {
-  return typeof data === 'object' && data !== null && 
-    ('bill_id' in data || 'billId' in data);
+  return typeof data === 'object' && data !== null && ('bill_id' in data || 'billId' in data);
 }
 
 /**
  * Type guard to check if a message is a BatchedUpdatesMessageData
  */
 function isBatchedUpdatesMessage(data: unknown): data is BatchedUpdatesMessageData {
-  return typeof data === 'object' && data !== null && 
-    'updates' in data && Array.isArray((data as BatchedUpdatesMessageData).updates);
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'updates' in data &&
+    Array.isArray((data as BatchedUpdatesMessageData).updates)
+  );
 }
 
 // ============================================================================
@@ -137,7 +134,7 @@ export class BillTrackingService {
   async initialize(): Promise<void> {
     if (this.isInitialized) {
       logger.debug('BillTrackingService already initialized', {
-        component: 'BillTrackingService'
+        component: 'BillTrackingService',
       });
       return;
     }
@@ -152,12 +149,16 @@ export class BillTrackingService {
       this.isInitialized = true;
 
       logger.info('BillTrackingService initialized', {
-        component: 'BillTrackingService'
+        component: 'BillTrackingService',
       });
     } catch (error) {
-      logger.error('Failed to initialize BillTrackingService', {
-        component: 'BillTrackingService'
-      }, error);
+      logger.error(
+        'Failed to initialize BillTrackingService',
+        {
+          component: 'BillTrackingService',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -190,12 +191,16 @@ export class BillTrackingService {
       this.isInitialized = false;
 
       logger.info('BillTrackingService shut down', {
-        component: 'BillTrackingService'
+        component: 'BillTrackingService',
       });
     } catch (error) {
-      logger.error('Error during BillTrackingService shutdown', {
-        component: 'BillTrackingService'
-      }, error);
+      logger.error(
+        'Error during BillTrackingService shutdown',
+        {
+          component: 'BillTrackingService',
+        },
+        error
+      );
     }
   }
 
@@ -214,14 +219,13 @@ export class BillTrackingService {
       logger.debug('Already subscribed to bill', {
         component: 'BillTrackingService',
         billId,
-        subscriptionId: existingId
+        subscriptionId: existingId,
       });
       return existingId || `bill_${billId}`;
     }
 
-    const subscriptionId = this.wsManager.subscribe(
-      `bill:${billId}`,
-      (message) => this.handleBillMessage(billId, message)
+    const subscriptionId = this.wsManager.subscribe(`bill:${billId}`, message =>
+      this.handleBillMessage(billId, message)
     );
 
     this.subscribedBills.add(billId);
@@ -230,7 +234,7 @@ export class BillTrackingService {
     logger.info('Subscribed to bill updates', {
       component: 'BillTrackingService',
       billId,
-      subscriptionId
+      subscriptionId,
     });
 
     return subscriptionId;
@@ -259,7 +263,7 @@ export class BillTrackingService {
 
     logger.info('Unsubscribed from bill updates', {
       component: 'BillTrackingService',
-      billId
+      billId,
     });
   }
 
@@ -317,7 +321,7 @@ export class BillTrackingService {
   handleMessage(message: WebSocketMessage): void {
     try {
       const messageType = message.type;
-      
+
       if (messageType === 'bill_update' || messageType === 'billUpdate') {
         this.handleBillUpdateMessage(message);
       } else if (messageType === 'engagement_metrics' || messageType === 'engagementMetrics') {
@@ -326,10 +330,14 @@ export class BillTrackingService {
         this.handleBatchedUpdatesMessage(message);
       }
     } catch (error) {
-      logger.error('Error handling bill tracking message', {
-        component: 'BillTrackingService',
-        messageType: message.type
-      }, error);
+      logger.error(
+        'Error handling bill tracking message',
+        {
+          component: 'BillTrackingService',
+          messageType: message.type,
+        },
+        error
+      );
     }
   }
 
@@ -343,19 +351,23 @@ export class BillTrackingService {
           type: message.update?.type || 'update',
           data: {
             billId,
-            ...message.update?.data
+            ...message.update?.data,
           },
-          timestamp: message.timestamp || new Date().toISOString()
+          timestamp: message.timestamp || new Date().toISOString(),
         };
 
         this.addBillUpdate(billId, update);
       }
     } catch (error) {
-      logger.error('Error handling bill-specific message', {
-        component: 'BillTrackingService',
-        billId,
-        messageType: message.type
-      }, error);
+      logger.error(
+        'Error handling bill-specific message',
+        {
+          component: 'BillTrackingService',
+          billId,
+          messageType: message.type,
+        },
+        error
+      );
     }
   }
 
@@ -366,16 +378,16 @@ export class BillTrackingService {
     try {
       if (!isBillUpdateMessage(message)) {
         logger.warn('Invalid bill update message structure', {
-          component: 'BillTrackingService'
+          component: 'BillTrackingService',
         });
         return;
       }
 
       const billId = message.bill_id || message.billId;
-      
+
       if (!billId) {
         logger.warn('Bill update message missing bill ID', {
-          component: 'BillTrackingService'
+          component: 'BillTrackingService',
         });
         return;
       }
@@ -384,16 +396,20 @@ export class BillTrackingService {
         type: message.update?.type || message.type || 'update',
         data: {
           billId,
-          ...(message.update?.data || message.data || {})
+          ...(message.update?.data || message.data || {}),
         },
-        timestamp: message.timestamp || new Date().toISOString()
+        timestamp: message.timestamp || new Date().toISOString(),
       };
 
       this.addBillUpdate(billId, update);
     } catch (error) {
-      logger.error('Error handling bill update message', {
-        component: 'BillTrackingService'
-      }, error);
+      logger.error(
+        'Error handling bill update message',
+        {
+          component: 'BillTrackingService',
+        },
+        error
+      );
     }
   }
 
@@ -404,16 +420,16 @@ export class BillTrackingService {
     try {
       if (!isEngagementMetricsMessage(message)) {
         logger.warn('Invalid engagement metrics message structure', {
-          component: 'BillTrackingService'
+          component: 'BillTrackingService',
         });
         return;
       }
 
       const billId = message.bill_id || message.billId;
-      
+
       if (!billId) {
         logger.warn('Engagement metrics message missing bill ID', {
-          component: 'BillTrackingService'
+          component: 'BillTrackingService',
         });
         return;
       }
@@ -424,7 +440,7 @@ export class BillTrackingService {
         saveCount: message.metrics?.save_count || message.saveCount || 0,
         commentCount: message.metrics?.comment_count || message.commentCount || 0,
         shareCount: message.metrics?.share_count || message.shareCount || 0,
-        timestamp: message.timestamp || new Date().toISOString()
+        timestamp: message.timestamp || new Date().toISOString(),
       };
 
       this.engagementMetrics.set(billId, metrics);
@@ -432,12 +448,16 @@ export class BillTrackingService {
       logger.debug('Updated engagement metrics', {
         component: 'BillTrackingService',
         billId,
-        metrics
+        metrics,
       });
     } catch (error) {
-      logger.error('Error handling engagement metrics message', {
-        component: 'BillTrackingService'
-      }, error);
+      logger.error(
+        'Error handling engagement metrics message',
+        {
+          component: 'BillTrackingService',
+        },
+        error
+      );
     }
   }
 
@@ -448,7 +468,7 @@ export class BillTrackingService {
     try {
       if (!isBatchedUpdatesMessage(message)) {
         logger.warn('Invalid batched updates message structure', {
-          component: 'BillTrackingService'
+          component: 'BillTrackingService',
         });
         return;
       }
@@ -462,9 +482,9 @@ export class BillTrackingService {
             type: update.type || 'update',
             data: {
               billId,
-              ...(update.data || {})
+              ...(update.data || {}),
             },
-            timestamp: update.timestamp || new Date().toISOString()
+            timestamp: update.timestamp || new Date().toISOString(),
           };
 
           this.addBillUpdate(billId, billUpdate);
@@ -473,12 +493,16 @@ export class BillTrackingService {
 
       logger.debug('Processed batched updates', {
         component: 'BillTrackingService',
-        updateCount: updates.length
+        updateCount: updates.length,
       });
     } catch (error) {
-      logger.error('Error handling batched updates message', {
-        component: 'BillTrackingService'
-      }, error);
+      logger.error(
+        'Error handling batched updates message',
+        {
+          component: 'BillTrackingService',
+        },
+        error
+      );
     }
   }
 
@@ -499,7 +523,7 @@ export class BillTrackingService {
       component: 'BillTrackingService',
       billId,
       updateType: update.type,
-      totalUpdates: updates.length
+      totalUpdates: updates.length,
     });
   }
 
@@ -524,7 +548,7 @@ export class BillTrackingService {
 
     logger.debug('Started batch processing', {
       component: 'BillTrackingService',
-      interval: this.batchInterval
+      interval: this.batchInterval,
     });
   }
 
@@ -535,9 +559,9 @@ export class BillTrackingService {
     if (this.batchTimer) {
       clearInterval(this.batchTimer);
       this.batchTimer = null;
-      
+
       logger.debug('Stopped batch processing', {
-        component: 'BillTrackingService'
+        component: 'BillTrackingService',
       });
     }
   }
@@ -552,10 +576,10 @@ export class BillTrackingService {
     }
 
     const updates = this.updateQueue.splice(0, this.maxBatchSize);
-    
+
     // Group updates by bill ID for efficient processing
     const updatesByBill = new Map<number, BillRealTimeUpdate[]>();
-    
+
     for (const update of updates) {
       const billId = update.bill_id;
       if (!updatesByBill.has(billId)) {
@@ -571,9 +595,9 @@ export class BillTrackingService {
           type: this.getBillUpdateType(update),
           data: {
             billId: update.bill_id,
-            ...update
+            ...update,
           },
-          timestamp: update.timestamp || new Date().toISOString()
+          timestamp: update.timestamp || new Date().toISOString(),
         };
 
         this.addBillUpdate(billId, billUpdate);
@@ -584,7 +608,7 @@ export class BillTrackingService {
       component: 'BillTrackingService',
       processedCount: updates.length,
       billsAffected: updatesByBill.size,
-      remainingInQueue: this.updateQueue.length
+      remainingInQueue: this.updateQueue.length,
     });
   }
 
@@ -621,20 +645,20 @@ export class BillTrackingService {
       const billIds = Array.from(this.subscribedBills);
       this.subscribedBills.clear();
       this.subscriptionIds.clear();
-      
+
       for (const billId of billIds) {
         this.subscribeToBill(billId);
       }
 
       logger.info('Re-subscribed to bills after reconnection', {
         component: 'BillTrackingService',
-        billCount: billIds.length
+        billCount: billIds.length,
       });
     });
 
     this.wsManager.on('disconnected', () => {
       logger.warn('WebSocket disconnected, bill tracking paused', {
-        component: 'BillTrackingService'
+        component: 'BillTrackingService',
       });
     });
   }
@@ -648,14 +672,16 @@ export class BillTrackingService {
    * Provides insight into the state of the tracking service
    */
   getStats(): ServiceStats {
-    const totalUpdates = Array.from(this.billUpdates.values())
-      .reduce((sum, updates) => sum + updates.length, 0);
+    const totalUpdates = Array.from(this.billUpdates.values()).reduce(
+      (sum, updates) => sum + updates.length,
+      0
+    );
 
     return {
       subscribedBills: this.subscribedBills.size,
       totalUpdates,
       queuedUpdates: this.updateQueue.length,
-      engagementMetrics: this.engagementMetrics.size
+      engagementMetrics: this.engagementMetrics.size,
     };
   }
 }

@@ -5,8 +5,8 @@
  * and guided learning experiences.
  */
 
-import React from 'react';
 import { BookOpen, Target, Users, ArrowRight, HelpCircle } from 'lucide-react';
+import React from 'react';
 
 import type {
   PersonaType,
@@ -55,8 +55,8 @@ export function NoviceDashboardLayout({
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-green-700">
-              You&apos;re taking your first steps into understanding how legislation affects your daily
-              life. We&apos;ll guide you through the process step by step.
+              You&apos;re taking your first steps into understanding how legislation affects your
+              daily life. We&apos;ll guide you through the process step by step.
             </p>
 
             {classification?.nextLevelRequirements && (

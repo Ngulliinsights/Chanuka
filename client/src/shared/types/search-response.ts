@@ -1,6 +1,6 @@
 /**
  * Search Response Types
- * 
+ *
  * Type definitions for search API responses
  */
 

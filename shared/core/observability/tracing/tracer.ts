@@ -1,6 +1,9 @@
 // Removed unused import
 // Removed unused import
 import { BaseError } from '../error-management';
+
+import { traceContextManager, withTraceContext, withTraceContextAsync } from './context';
+import { Span, createSpan, generateSpanId, generateTraceId } from './span';
 import {
   Tracer as ITracer,
   Span as ISpan,
@@ -15,8 +18,6 @@ import {
   Resource,
   InstrumentationScope,
 } from './types';
-import { Span, createSpan, generateSpanId, generateTraceId } from './span';
-import { traceContextManager, withTraceContext, withTraceContextAsync } from './context';
 
 /**
  * Tracer implementation error
@@ -273,7 +274,7 @@ export class Tracer implements ITracer {
    */
   startSpan(name: string, options: SpanOptions = {}): ISpan {
     // Get parent context
-    let parentContext = this.getParentContext(options);
+    const parentContext = this.getParentContext(options);
 
     // Check sampling
     const samplingResult = this.sampler.shouldSample(

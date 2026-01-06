@@ -3,10 +3,10 @@
  * Loading state management and timeout handling
  */
 
-export { 
+export {
   useTimeoutAwareLoading,
   useSmartTimeoutRecovery,
-  useProgressiveTimeout
+  useProgressiveTimeout,
 } from './useTimeoutAwareLoading';
 
 export { useOnlineStatus } from './useOnlineStatus';

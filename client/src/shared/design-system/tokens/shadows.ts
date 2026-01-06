@@ -40,4 +40,3 @@ export const shadowTokens = {
     },
   },
 } as const;
-

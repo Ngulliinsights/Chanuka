@@ -1,6 +1,6 @@
 /**
  * useIntelligentSearch Hook
- * 
+ *
  * Enhanced search hook that uses the dual-engine intelligent search service
  * with caching, error handling, and performance optimization.
  */
@@ -11,11 +11,12 @@ import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@client/hooks/use-toast';
 import { useDebounce } from '@client/hooks/useDebounce';
 import { logger } from '@client/utils/logger';
+
 import { intelligentSearch } from '../services/intelligent-search';
-import type { 
-  DualSearchRequest, 
+import type {
+  DualSearchRequest,
   CombinedSearchResult,
-  SearchEngineResult 
+  SearchEngineResult,
 } from '../services/intelligent-search';
 
 // Define types locally
@@ -58,8 +59,8 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
     debounceMs = 300,
     enableAutoSearch = false,
     cacheTime = 10 * 60 * 1000, // 10 minutes
-    staleTime = 5 * 60 * 1000,  // 5 minutes
-    maxRetries = 2
+    staleTime = 5 * 60 * 1000, // 5 minutes
+    maxRetries = 2,
   } = options;
 
   const [searchState, setSearchState] = useState<SearchState>({
@@ -67,7 +68,7 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
     hasSearched: false,
     lastQuery: '',
     searchTime: 0,
-    enginePerformance: []
+    enginePerformance: [],
   });
 
   const [currentQuery, setCurrentQuery] = useState<DualSearchRequest | null>(null);
@@ -91,11 +92,11 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
       }
 
       abortControllerRef.current = new AbortController();
-      
+
       setSearchState(prev => ({
         ...prev,
         isSearching: true,
-        lastQuery: debouncedQuery.q
+        lastQuery: debouncedQuery.q,
       }));
 
       try {
@@ -108,21 +109,21 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
           isSearching: false,
           hasSearched: true,
           searchTime,
-          enginePerformance: result.engines
+          enginePerformance: result.engines,
         }));
 
         logger.info('Intelligent search completed', {
           query: debouncedQuery.q,
           totalResults: result.totalCount,
           searchTime,
-          engines: result.engines.map(e => e.engine)
+          engines: result.engines.map(e => e.engine),
         });
 
         return result;
       } catch (error) {
         setSearchState(prev => ({
           ...prev,
-          isSearching: false
+          isSearching: false,
         }));
 
         if (error instanceof Error && error.name === 'AbortError') {
@@ -132,7 +133,7 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
 
         logger.error('Intelligent search failed', {
           query: debouncedQuery.q,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
 
         throw error;
@@ -142,23 +143,23 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
     staleTime,
     gcTime: cacheTime,
     retry: maxRetries,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Manual search mutation for explicit search triggers
   const searchMutation = useMutation({
     mutationFn: async (request: DualSearchRequest): Promise<CombinedSearchResult> => {
       setCurrentQuery(request);
-      
+
       // If auto-search is disabled, we need to trigger the query manually
       if (!enableAutoSearch) {
         setSearchState(prev => ({ ...prev, hasSearched: true }));
-        
+
         // Invalidate and refetch the query
         await queryClient.invalidateQueries({
-          queryKey: ['intelligent-search', request]
+          queryKey: ['intelligent-search', request],
         });
-        
+
         const result = await queryClient.fetchQuery({
           queryKey: ['intelligent-search', request],
           queryFn: async () => {
@@ -169,20 +170,20 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
             setSearchState(prev => ({
               ...prev,
               searchTime,
-              enginePerformance: searchResult.engines
+              enginePerformance: searchResult.engines,
             }));
 
             return searchResult;
           },
-          staleTime: 0 // Force fresh fetch for manual searches
+          staleTime: 0, // Force fresh fetch for manual searches
         });
 
         return result;
       }
 
       // For auto-search, just set the query and let the query handle it
-      return new Promise((resolve) => {
-        const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      return new Promise(resolve => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(event => {
           if (
             event.type === 'updated' &&
             event.query.queryKey[0] === 'intelligent-search' &&
@@ -196,11 +197,11 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
     },
     onError: (error: Error) => {
       toast({
-        title: "Search Failed",
-        description: error.message || "An error occurred while searching.",
-        variant: "destructive"
+        title: 'Search Failed',
+        description: error.message || 'An error occurred while searching.',
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   // Autocomplete functionality
@@ -212,7 +213,7 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
           suggestions: [],
           facets: { categories: [], sponsors: [], tags: [], statuses: [] },
           query: currentQuery?.q || '',
-          totalSuggestions: 0
+          totalSuggestions: 0,
         });
       }
 
@@ -220,18 +221,21 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
         limit: 10,
         includeRecent: true,
         includePopular: true,
-        includeBillTitles: true
+        includeBillTitles: true,
       });
     },
     enabled: !!currentQuery?.q && currentQuery.q.length >= 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000     // 5 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Search function
-  const search = useCallback((request: DualSearchRequest) => {
-    return searchMutation.mutateAsync(request);
-  }, [searchMutation]);
+  const search = useCallback(
+    (request: DualSearchRequest) => {
+      return searchMutation.mutateAsync(request);
+    },
+    [searchMutation]
+  );
 
   // Set query for auto-search
   const setQuery = useCallback((request: DualSearchRequest | null) => {
@@ -246,14 +250,14 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
       hasSearched: false,
       lastQuery: '',
       searchTime: 0,
-      enginePerformance: []
+      enginePerformance: [],
     });
-    
+
     // Clear cache
     queryClient.removeQueries({
-      queryKey: ['intelligent-search']
+      queryKey: ['intelligent-search'],
     });
-    
+
     intelligentSearch.clearCache();
   }, [queryClient]);
 
@@ -264,13 +268,13 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
         limit: 5,
         includeRecent: true,
         includePopular: true,
-        includeBillTitles: false
+        includeBillTitles: false,
       });
       return result.suggestions;
     } catch (error) {
       logger.error('Failed to get search suggestions', {
         query,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return [];
     }
@@ -307,7 +311,7 @@ export function useIntelligentSearch(options: UseIntelligentSearchOptions = {}) 
 
     // Current query
     currentQuery,
-    lastQuery: searchState.lastQuery
+    lastQuery: searchState.lastQuery,
   };
 }
 

@@ -7,12 +7,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
+import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
 import {
   BarChart3,
   Users,
@@ -24,12 +19,23 @@ import {
   Settings,
   Eye,
   Clock,
-  Zap
+  Zap,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
 import { useComprehensiveAnalytics } from '@client/core/analytics/comprehensive-tracker';
-import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
+import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
 import { logger } from '@client/utils/logger';
 
 /**
@@ -40,14 +46,8 @@ export const AnalyticsDashboardPage: React.FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [journeyAnalytics, setJourneyAnalytics] = useState<any>(null);
 
-  const {
-    getDashboardData,
-    getMetrics,
-    exportData,
-    clearData,
-    isEnabled,
-    setEnabled
-  } = useComprehensiveAnalytics();
+  const { getDashboardData, getMetrics, exportData, clearData, isEnabled, setEnabled } =
+    useComprehensiveAnalytics();
 
   const journeyTracker = UserJourneyTracker.getInstance();
 
@@ -77,7 +77,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
         analytics: analyticsData,
         journeys: format === 'json' ? JSON.parse(journeyData) : journeyData,
         exportedAt: new Date().toISOString(),
-        format
+        format,
       };
 
       const blob = new Blob(
@@ -119,7 +119,11 @@ export const AnalyticsDashboardPage: React.FC = () => {
    * Handle clear data
    */
   const handleClearData = () => {
-    if (window.confirm('Are you sure you want to clear all analytics data? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to clear all analytics data? This action cannot be undone.'
+      )
+    ) {
       clearData();
       journeyTracker.clearOldJourneys(0); // Clear all journeys
       setJourneyAnalytics(null);
@@ -151,22 +155,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Badge variant={isEnabled ? "default" : "secondary"}>
-            {isEnabled ? "Tracking Enabled" : "Tracking Disabled"}
+          <Badge variant={isEnabled ? 'default' : 'secondary'}>
+            {isEnabled ? 'Tracking Enabled' : 'Tracking Disabled'}
           </Badge>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setEnabled(!isEnabled)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setEnabled(!isEnabled)}>
             <Settings className="h-4 w-4 mr-1" />
-            {isEnabled ? "Disable" : "Enable"}
+            {isEnabled ? 'Disable' : 'Enable'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
           </Button>
@@ -197,7 +193,8 @@ export const AnalyticsDashboardPage: React.FC = () => {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Analytics Tracking Disabled</AlertTitle>
           <AlertDescription>
-            Analytics tracking is currently disabled. Enable it to start collecting user journey and performance data.
+            Analytics tracking is currently disabled. Enable it to start collecting user journey and
+            performance data.
           </AlertDescription>
         </Alert>
       )}
@@ -211,9 +208,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{currentMetrics.eventCount.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Events tracked in current session
-            </p>
+            <p className="text-xs text-muted-foreground">Events tracked in current session</p>
           </CardContent>
         </Card>
 
@@ -223,10 +218,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{currentMetrics.userEngagementCount.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Active user sessions
-            </p>
+            <div className="text-2xl font-bold">
+              {currentMetrics.userEngagementCount.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Active user sessions</p>
           </CardContent>
         </Card>
 
@@ -236,10 +231,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{currentMetrics.pageMetricsCount.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Pages with performance data
-            </p>
+            <div className="text-2xl font-bold">
+              {currentMetrics.pageMetricsCount.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Pages with performance data</p>
           </CardContent>
         </Card>
 
@@ -249,10 +244,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{journeyTracker.getActiveJourneyCount().toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently active user journeys
-            </p>
+            <div className="text-2xl font-bold">
+              {journeyTracker.getActiveJourneyCount().toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Currently active user journeys</p>
           </CardContent>
         </Card>
       </div>
@@ -313,9 +308,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>User Journey Analysis</CardTitle>
-              <CardDescription>
-                Detailed analysis of user paths and drop-off points
-              </CardDescription>
+              <CardDescription>Detailed analysis of user paths and drop-off points</CardDescription>
             </CardHeader>
             <CardContent>
               {journeyAnalytics ? (
@@ -325,13 +318,15 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-3">Popular User Paths</h3>
                     <div className="space-y-2">
                       {journeyAnalytics.popularPaths.slice(0, 5).map((path: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                        >
                           <div className="flex-1">
-                            <div className="font-medium">
-                              {path.path.join(' → ')}
-                            </div>
+                            <div className="font-medium">{path.path.join(' → ')}</div>
                             <div className="text-sm text-muted-foreground">
-                              {path.frequency} users • {(path.completionRate * 100).toFixed(1)}% completion
+                              {path.frequency} users • {(path.completionRate * 100).toFixed(1)}%
+                              completion
                             </div>
                           </div>
                           <Badge variant="outline">
@@ -346,24 +341,27 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Drop-off Points</h3>
                     <div className="space-y-2">
-                      {journeyAnalytics.dropOffPoints.slice(0, 5).map((dropOff: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded">
-                          <div className="flex-1">
-                            <div className="font-medium">{dropOff.pageId}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {(dropOff.dropOffRate * 100).toFixed(1)}% drop-off rate
+                      {journeyAnalytics.dropOffPoints
+                        .slice(0, 5)
+                        .map((dropOff: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-red-50 rounded"
+                          >
+                            <div className="flex-1">
+                              <div className="font-medium">{dropOff.pageId}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {(dropOff.dropOffRate * 100).toFixed(1)}% drop-off rate
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-medium">
+                                {Math.round(dropOff.averageTimeBeforeExit / 1000)}s avg time
+                              </div>
+                              <div className="text-xs text-muted-foreground">before exit</div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-sm font-medium">
-                              {Math.round(dropOff.averageTimeBeforeExit / 1000)}s avg time
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              before exit
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
 
@@ -388,7 +386,9 @@ export const AnalyticsDashboardPage: React.FC = () => {
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
                                       <div
                                         className="bg-blue-600 h-2 rounded-full"
-                                        style={{ width: `${(funnel.conversionRates[stepIndex] || 0) * 100}%` }}
+                                        style={{
+                                          width: `${(funnel.conversionRates[stepIndex] || 0) * 100}%`,
+                                        }}
                                       ></div>
                                     </div>
                                     <span className="text-sm font-medium">
@@ -421,9 +421,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Analytics Settings</CardTitle>
-              <CardDescription>
-                Configure analytics tracking and data management
-              </CardDescription>
+              <CardDescription>Configure analytics tracking and data management</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -434,10 +432,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   </p>
                 </div>
                 <Button
-                  variant={isEnabled ? "default" : "outline"}
+                  variant={isEnabled ? 'default' : 'outline'}
                   onClick={() => setEnabled(!isEnabled)}
                 >
-                  {isEnabled ? "Enabled" : "Disabled"}
+                  {isEnabled ? 'Enabled' : 'Disabled'}
                 </Button>
               </div>
 
@@ -445,9 +443,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Data Management</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Export or clear analytics data
-                    </p>
+                    <p className="text-sm text-muted-foreground">Export or clear analytics data</p>
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -457,10 +453,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     >
                       Export Data
                     </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleClearData}
-                    >
+                    <Button variant="destructive" onClick={handleClearData}>
                       Clear Data
                     </Button>
                   </div>
@@ -469,9 +462,15 @@ export const AnalyticsDashboardPage: React.FC = () => {
 
               <div className="border-t pt-4">
                 <div className="text-sm text-muted-foreground">
-                  <p><strong>Last Refresh:</strong> {lastRefresh.toLocaleString()}</p>
-                  <p><strong>Current Session:</strong> {currentMetrics.eventCount} events tracked</p>
-                  <p><strong>Status:</strong> {isEnabled ? "Active tracking" : "Tracking disabled"}</p>
+                  <p>
+                    <strong>Last Refresh:</strong> {lastRefresh.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Current Session:</strong> {currentMetrics.eventCount} events tracked
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {isEnabled ? 'Active tracking' : 'Tracking disabled'}
+                  </p>
                 </div>
               </div>
             </CardContent>

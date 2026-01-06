@@ -11,23 +11,16 @@
 
 import * as Lucide from 'lucide-react';
 import React, { useState } from 'react';
-const {
-  Target,
-  Users,
-  CheckCircle,
-  Shield,
-  ArrowLeft,
-  Sparkles,
-  ArrowRight,
-} = (Lucide as any) as Record<string, React.ComponentType<any>>;
+const { Target, Users, CheckCircle, Shield, ArrowLeft, Sparkles, ArrowRight } =
+  Lucide as any as Record<string, React.ComponentType<any>>;
 
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  Button, 
-  Badge 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
 } from '@client/shared/design-system';
 
 // --- Types ---
@@ -58,10 +51,10 @@ const USER_PERSONAS: UserPersona[] = [
     primaryGoals: [
       'Track bills relevant to my interests',
       'Understand policy impacts',
-      'Get notified about important votes'
+      'Get notified about important votes',
     ],
     recommendedFeatures: ['Bill Tracking', 'Notifications', 'Simple Analysis'],
-    complexity: 'beginner'
+    complexity: 'beginner',
   },
   {
     id: 'civic-advocate',
@@ -71,10 +64,10 @@ const USER_PERSONAS: UserPersona[] = [
     primaryGoals: [
       'Analyze bill implications',
       'Engage in community discussions',
-      'Track voting patterns'
+      'Track voting patterns',
     ],
     recommendedFeatures: ['Advanced Analysis', 'Community Forums', 'Voting Records'],
-    complexity: 'intermediate'
+    complexity: 'intermediate',
   },
   {
     id: 'policy-expert',
@@ -84,11 +77,11 @@ const USER_PERSONAS: UserPersona[] = [
     primaryGoals: [
       'Detect implementation workarounds',
       'Perform constitutional analysis',
-      'Export detailed reports'
+      'Export detailed reports',
     ],
     recommendedFeatures: ['Workaround Detection', 'Expert Verification', 'Data Export'],
-    complexity: 'advanced'
-  }
+    complexity: 'advanced',
+  },
 ];
 
 // --- Sub-Components ---
@@ -97,13 +90,11 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
   const steps: Step[] = ['persona', 'goals', 'features'];
   return (
     <div className="flex justify-center items-center gap-3 mb-8">
-      {steps.map((step) => (
+      {steps.map(step => (
         <div
           key={step}
           className={`transition-all duration-300 rounded-full ${
-            currentStep === step 
-              ? 'w-4 h-4 bg-primary' 
-              : 'w-2 h-2 bg-muted'
+            currentStep === step ? 'w-4 h-4 bg-primary' : 'w-2 h-2 bg-muted'
           }`}
           aria-hidden="true"
         />
@@ -120,7 +111,7 @@ interface PersonaSelectionCardProps {
 
 const PersonaSelectionCard = ({ persona, isSelected, onSelect }: PersonaSelectionCardProps) => {
   const Icon = persona.icon;
-  
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -129,7 +120,7 @@ const PersonaSelectionCard = ({ persona, isSelected, onSelect }: PersonaSelectio
   };
 
   return (
-    <Card 
+    <Card
       className={`cursor-pointer transition-all duration-200 h-full hover:shadow-lg hover:-translate-y-1 ${
         isSelected ? 'ring-2 ring-primary border-primary' : 'border-border'
       }`}
@@ -140,20 +131,22 @@ const PersonaSelectionCard = ({ persona, isSelected, onSelect }: PersonaSelectio
       aria-checked={isSelected}
     >
       <CardHeader className="text-center pb-4">
-        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors ${
-           isSelected ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-        }`}>
+        <div
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors ${
+            isSelected
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-secondary text-secondary-foreground'
+          }`}
+        >
           <Icon className="w-8 h-8" />
         </div>
         <CardTitle className="text-xl">{persona.title}</CardTitle>
-        <Badge variant={isSelected ? "default" : "outline"} className="mx-auto mt-2">
+        <Badge variant={isSelected ? 'default' : 'outline'} className="mx-auto mt-2">
           {persona.complexity}
         </Badge>
       </CardHeader>
       <CardContent className="text-center">
-        <p className="text-muted-foreground leading-relaxed text-sm">
-          {persona.description}
-        </p>
+        <p className="text-muted-foreground leading-relaxed text-sm">{persona.description}</p>
       </CardContent>
     </Card>
   );
@@ -196,9 +189,7 @@ export function UserJourneyOptimizer({ onPersonaSelected, onSkip }: UserJourneyO
     <div className="max-w-5xl mx-auto p-6">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-3 tracking-tight">
-          Welcome to Chanuka Platform
-        </h1>
+        <h1 className="text-3xl font-bold mb-3 tracking-tight">Welcome to Chanuka Platform</h1>
         <p className="text-lg text-muted-foreground mb-6">
           Let&apos;s personalize your civic engagement experience
         </p>
@@ -215,12 +206,8 @@ export function UserJourneyOptimizer({ onPersonaSelected, onSkip }: UserJourneyO
             </p>
           </div>
 
-          <div 
-            className="grid md:grid-cols-3 gap-6" 
-            role="radiogroup" 
-            aria-label="User Personas"
-          >
-            {USER_PERSONAS.map((persona) => (
+          <div className="grid md:grid-cols-3 gap-6" role="radiogroup" aria-label="User Personas">
+            {USER_PERSONAS.map(persona => (
               <PersonaSelectionCard
                 key={persona.id}
                 persona={persona}
@@ -244,7 +231,8 @@ export function UserJourneyOptimizer({ onPersonaSelected, onSkip }: UserJourneyO
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold mb-2">Your Goals</h2>
             <p className="text-muted-foreground">
-              Here is what you can accomplish as a <span className="font-medium text-foreground">{selectedPersona.title}</span>
+              Here is what you can accomplish as a{' '}
+              <span className="font-medium text-foreground">{selectedPersona.title}</span>
             </p>
           </div>
 
@@ -268,7 +256,10 @@ export function UserJourneyOptimizer({ onPersonaSelected, onSkip }: UserJourneyO
               </h3>
               <div className="space-y-3">
                 {selectedPersona.primaryGoals.map((goal, index) => (
-                  <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                     <span className="text-sm">{goal}</span>
                   </div>

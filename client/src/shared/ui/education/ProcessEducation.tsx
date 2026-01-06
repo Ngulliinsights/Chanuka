@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Clock,
   Users,
@@ -9,6 +8,7 @@ import {
   Calendar,
   Scale,
 } from 'lucide-react';
+import React from 'react';
 
 import { Progress } from '@/shared/design-system/feedback/Progress';
 import { Button } from '@/shared/design-system/interactive/Button';

@@ -2,7 +2,6 @@
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 
-
 interface LoadingStateManagerProps {
   type: 'page' | 'component' | 'data';
   state: 'loading' | 'timeout' | 'error' | 'success' | 'idle';
@@ -41,9 +40,7 @@ export function LoadingStateManager({
         {showDetails && error && (
           <details className="mt-4 text-xs text-gray-500">
             <summary>Error Details</summary>
-            <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">
-              {error.stack}
-            </pre>
+            <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">{error.stack}</pre>
           </details>
         )}
       </div>
@@ -65,9 +62,7 @@ export function LoadingStateManager({
           Try Again
         </button>
         {showDetails && timeout && (
-          <p className="text-xs text-gray-500 mt-2">
-            Timeout after {timeout}ms
-          </p>
+          <p className="text-xs text-gray-500 mt-2">Timeout after {timeout}ms</p>
         )}
       </div>
     );
@@ -78,9 +73,7 @@ export function LoadingStateManager({
       <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
         <div className="text-green-500 text-xl mb-4">✅</div>
         <h3 className="text-lg font-semibold text-green-600 mb-2">Success</h3>
-        <p className="text-gray-600 text-center">
-          {message || 'Content loaded successfully'}
-        </p>
+        <p className="text-gray-600 text-center">{message || 'Content loaded successfully'}</p>
       </div>
     );
   }
@@ -89,9 +82,7 @@ export function LoadingStateManager({
     return (
       <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
         <div className="text-gray-400 text-xl mb-4">⏸️</div>
-        <p className="text-gray-500 text-center">
-          {message || 'Ready to load'}
-        </p>
+        <p className="text-gray-500 text-center">{message || 'Ready to load'}</p>
       </div>
     );
   }
@@ -101,42 +92,58 @@ export function LoadingStateManager({
     <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
       <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
       <p className="text-gray-600">{message}</p>
-      {showDetails && (
-        <p className="text-xs text-gray-400 mt-2">
-          Loading {type} content...
-        </p>
-      )}
+      {showDetails && <p className="text-xs text-gray-400 mt-2">Loading {type} content...</p>}
     </div>
   );
 }
 
-export function PageLoader({ isLoading = true, message = 'Loading page...' }: { isLoading?: boolean, message?: string }) {
+export function PageLoader({
+  isLoading = true,
+  message = 'Loading page...',
+}: {
+  isLoading?: boolean;
+  message?: string;
+}) {
   return (
     <LoadingStateManager
       type="page"
-      state={isLoading ? "loading" : "idle"}
+      state={isLoading ? 'loading' : 'idle'}
       message={message}
       className="min-h-screen"
     />
   );
 }
 
-export function ComponentLoader({ isLoading = true, message = 'Loading component...' }: { isLoading?: boolean, message?: string }) {
+export function ComponentLoader({
+  isLoading = true,
+  message = 'Loading component...',
+}: {
+  isLoading?: boolean;
+  message?: string;
+}) {
   return (
     <LoadingStateManager
       type="component"
-      state={isLoading ? "loading" : "idle"}
+      state={isLoading ? 'loading' : 'idle'}
       message={message}
       className="min-h-[200px]"
     />
   );
 }
 
-export function ConnectionAwareLoader({ isLoading = true, message = 'Connecting...', showMessage = true }: { isLoading: boolean, message?: string, showMessage?: boolean }) {
+export function ConnectionAwareLoader({
+  isLoading = true,
+  message = 'Connecting...',
+  showMessage = true,
+}: {
+  isLoading: boolean;
+  message?: string;
+  showMessage?: boolean;
+}) {
   return (
     <LoadingStateManager
       type="data"
-      state={isLoading ? "loading" : "idle"}
+      state={isLoading ? 'loading' : 'idle'}
       message={showMessage ? message : undefined}
       className="min-h-[100px]"
     />
@@ -155,4 +162,3 @@ export function LazyLoadPlaceholder() {
 export const LoadingStates = {
   PageLoading: PageLoader,
 };
-

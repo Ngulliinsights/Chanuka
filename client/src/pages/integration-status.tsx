@@ -1,27 +1,32 @@
+import {
+  CheckCircle,
+  AlertTriangle,
+  Clock,
+  RefreshCw,
+  Shield,
+  Lock,
+  Smartphone,
+  Monitor,
+  Activity,
+  BarChart3,
+} from 'lucide-react';
 import React from 'react';
 /**
  * Integration Status Dashboard
- * 
+ *
  * Development-only page to monitor the integration of orphaned modules
  * Shows real-time status of Tier 1 integrations and system health
  */
 
-import { 
-  CheckCircle, 
-  AlertTriangle, 
-  Clock, 
-  RefreshCw, 
-  Shield, 
-  Lock, 
-  Smartphone, 
-  Monitor,
-  Activity,
-  BarChart3
-} from 'lucide-react';
-
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 import { useIntegratedServices } from '@client/hooks/useIntegratedServices';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
@@ -52,23 +57,32 @@ export default function IntegrationStatusPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'success': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'error': return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'loading': return <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />;
-      default: return <Clock className="h-4 w-4 text-gray-600" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'error':
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      case 'loading':
+        return <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return 'bg-green-50 border-green-200 text-green-800';
-      case 'error': return 'bg-red-50 border-red-200 text-red-800';
-      case 'loading': return 'bg-blue-50 border-blue-200 text-blue-800';
-      default: return 'bg-gray-50 border-gray-200 text-gray-800';
+      case 'success':
+        return 'bg-green-50 border-green-200 text-green-800';
+      case 'error':
+        return 'bg-red-50 border-red-200 text-red-800';
+      case 'loading':
+        return 'bg-blue-50 border-blue-200 text-blue-800';
+      default:
+        return 'bg-gray-50 border-gray-200 text-gray-800';
     }
   };
 
-  const overallProgress = Object.values(status).filter(s => s === 'success').length / Object.keys(status).length * 100;
+  const overallProgress =
+    (Object.values(status).filter(s => s === 'success').length / Object.keys(status).length) * 100;
 
   return (
     <>
@@ -86,7 +100,7 @@ export default function IntegrationStatusPage() {
                   Monitor Tier 1 orphaned module integration progress
                 </p>
               </div>
-              <Badge variant={isReady ? "default" : error ? "destructive" : "secondary"}>
+              <Badge variant={isReady ? 'default' : error ? 'destructive' : 'secondary'}>
                 {isReady ? 'All Systems Ready' : error ? 'Integration Error' : 'Integrating...'}
               </Badge>
             </div>
@@ -254,16 +268,19 @@ export default function IntegrationStatusPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Integrated Services</CardTitle>
-                    <CardDescription>
-                      Status of individual service integrations
-                    </CardDescription>
+                    <CardDescription>Status of individual service integrations</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       {Object.entries(services).map(([key, service]) => (
-                        <div key={key} className="flex items-center justify-between p-3 border rounded">
-                          <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                          <Badge variant={service ? "default" : "secondary"}>
+                        <div
+                          key={key}
+                          className="flex items-center justify-between p-3 border rounded"
+                        >
+                          <span className="font-medium capitalize">
+                            {key.replace(/([A-Z])/g, ' $1')}
+                          </span>
+                          <Badge variant={service ? 'default' : 'secondary'}>
                             {service ? 'Available' : 'Not Available'}
                           </Badge>
                         </div>
@@ -277,9 +294,7 @@ export default function IntegrationStatusPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>New Pages Added</CardTitle>
-                    <CardDescription>
-                      Pages created as part of the integration
-                    </CardDescription>
+                    <CardDescription>Pages created as part of the integration</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -313,9 +328,7 @@ export default function IntegrationStatusPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Navigation Updates</CardTitle>
-                    <CardDescription>
-                      New navigation items added to the sidebar
-                    </CardDescription>
+                    <CardDescription>New navigation items added to the sidebar</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">

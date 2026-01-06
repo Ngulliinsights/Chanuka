@@ -9,7 +9,7 @@ const baseTouchTargets = {
   minimum: {
     width: '44px',
     height: '44px',
-    spacing: '8px',     // Minimum space between targets
+    spacing: '8px', // Minimum space between targets
   },
 
   // Comfortable sizes (recommended)
@@ -29,7 +29,7 @@ const baseTouchTargets = {
 
 export const touchTargets = {
   ...baseTouchTargets,
-  
+
   // Context-specific sizes
   context: {
     button: {
@@ -62,7 +62,7 @@ export const touchUtils = {
     const requirements = touchTargets[level];
     const minWidth = parseFloat(requirements.width);
     const minHeight = parseFloat(requirements.height);
-    
+
     return width >= minWidth && height >= minHeight;
   },
 
@@ -80,20 +80,20 @@ export const touchUtils = {
   /**
    * Calculate required spacing between touch targets
    */
-  getRequiredSpacing: (
-    level: 'minimum' | 'comfortable' | 'large' = 'minimum'
-  ): string => {
+  getRequiredSpacing: (level: 'minimum' | 'comfortable' | 'large' = 'minimum'): string => {
     return touchTargets[level].spacing;
   },
 
   /**
    * Apply touch-friendly styles to element
    */
-  applyTouchStyles: (element: HTMLElement, level: 'minimum' | 'comfortable' | 'large' = 'comfortable'): void => {
+  applyTouchStyles: (
+    element: HTMLElement,
+    level: 'minimum' | 'comfortable' | 'large' = 'comfortable'
+  ): void => {
     const target = touchTargets[level];
     element.style.minWidth = target.width;
     element.style.minHeight = target.height;
     element.style.touchAction = 'manipulation'; // Prevents double-tap zoom
   },
 } as const;
-

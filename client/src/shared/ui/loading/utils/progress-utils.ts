@@ -17,14 +17,14 @@ export function calculateStageProgress(
 ): number {
   if (stages.length === 0) return 0;
   if (currentStageIndex >= stages.length) return 100;
-  
+
   const completedStages = currentStageIndex;
   const totalStages = stages.length;
   const stageWeight = 100 / totalStages;
-  
+
   const completedProgress = completedStages * stageWeight;
   const currentProgress = (currentStageProgress / 100) * stageWeight;
-  
+
   return Math.min(100, completedProgress + currentProgress);
 }
 
@@ -32,20 +32,20 @@ export function calculateWeightedProgress(
   items: Array<{ weight: number; progress: number }>
 ): number {
   if (items.length === 0) return 0;
-  
+
   const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
   if (totalWeight === 0) return 0;
-  
+
   const weightedSum = items.reduce((sum, item) => {
-    return sum + (item.progress * item.weight);
+    return sum + item.progress * item.weight;
   }, 0);
-  
+
   return Math.min(100, weightedSum / totalWeight);
 }
 
 export function calculateAverageProgress(progresses: number[]): number {
   if (progresses.length === 0) return 0;
-  
+
   const sum = progresses.reduce((acc, progress) => acc + progress, 0);
   return sum / progresses.length;
 }
@@ -60,13 +60,13 @@ export function smoothProgress(
   smoothingFactor: number = 0.1
 ): number {
   const difference = targetProgress - currentProgress;
-  return currentProgress + (difference * smoothingFactor);
+  return currentProgress + difference * smoothingFactor;
 }
 
 export function createProgressAnimator(
   onUpdate: (progress: number) => void,
   duration: number = 1000,
-  easing: (t: number) => number = (t) => t
+  easing: (t: number) => number = t => t
 ) {
   let startTime: number;
   let startProgress: number;
@@ -81,7 +81,7 @@ export function createProgressAnimator(
     const elapsed = timestamp - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const easedProgress = easing(progress);
-    
+
     const currentProgress = startProgress + (targetProgress - startProgress) * easedProgress;
     onUpdate(currentProgress);
 
@@ -101,7 +101,7 @@ export function createProgressAnimator(
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
-    }
+    },
   };
 }
 
@@ -113,7 +113,11 @@ export function normalizeProgress(progress: number): number {
   return Math.min(100, Math.max(0, progress));
 }
 
-export function validateProgressRange(progress: number, min: number = 0, max: number = 100): boolean {
+export function validateProgressRange(
+  progress: number,
+  min: number = 0,
+  max: number = 100
+): boolean {
   return progress >= min && progress <= max;
 }
 
@@ -152,7 +156,7 @@ export function formatProgressTime(
 } {
   const elapsed = Date.now() - startTime;
   const elapsedSeconds = Math.floor(elapsed / 1000);
-  
+
   const formatTime = (seconds: number): string => {
     if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
@@ -171,7 +175,7 @@ export function formatProgressTime(
   if (estimateTotal && progress > 0 && progress < 100) {
     const estimatedTotal = (elapsed / progress) * 100;
     const remaining = estimatedTotal - elapsed;
-    
+
     result.remaining = formatTime(Math.floor(remaining / 1000));
     result.estimated = formatTime(Math.floor(estimatedTotal / 1000));
   }
@@ -287,7 +291,7 @@ export class MultiProgressTracker {
   public addTracker(id: string, tracker: ProgressTracker, weight: number = 1): void {
     this.trackers.set(id, tracker);
     this.weights.set(id, weight);
-    
+
     tracker.addListener(() => this.updateAggregateProgress());
   }
 
@@ -326,30 +330,24 @@ export class MultiProgressTracker {
  * Progress estimation utilities
  */
 
-export function estimateRemainingTime(
-  progress: number,
-  startTime: number
-): number | null {
+export function estimateRemainingTime(progress: number, startTime: number): number | null {
   if (progress <= 0 || progress >= 100) return null;
-  
+
   const elapsed = Date.now() - startTime;
   const rate = progress / elapsed; // progress per millisecond
   const remaining = (100 - progress) / rate;
-  
+
   return remaining;
 }
 
-export function estimateCompletionTime(
-  progress: number,
-  startTime: number
-): number | null {
+export function estimateCompletionTime(progress: number, startTime: number): number | null {
   const remaining = estimateRemainingTime(progress, startTime);
   return remaining ? Date.now() + remaining : null;
 }
 
 export function createProgressEstimator(windowSize: number = 10) {
   const samples: Array<{ time: number; progress: number }> = [];
-  
+
   return {
     addSample: (progress: number) => {
       samples.push({ time: Date.now(), progress });
@@ -357,40 +355,39 @@ export function createProgressEstimator(windowSize: number = 10) {
         samples.shift();
       }
     },
-    
+
     estimateRemainingTime: (): number | null => {
       if (samples.length < 2) return null;
-      
+
       const recent = samples.slice(-Math.min(5, samples.length));
       const oldest = recent[0];
       const newest = recent[recent.length - 1];
-      
+
       if (!oldest || !newest) return null;
-      
+
       const timeDiff = newest.time - oldest.time;
       const progressDiff = newest.progress - oldest.progress;
-      
+
       if (progressDiff <= 0 || newest.progress >= 100) return null;
-      
+
       const rate = progressDiff / timeDiff;
       const remaining = (100 - newest.progress) / rate;
-      
+
       return remaining;
     },
-    
+
     getAverageRate: (): number | null => {
       if (samples.length < 2) return null;
-      
+
       const first = samples[0];
       const last = samples[samples.length - 1];
-      
+
       if (!first || !last) return null;
-      
+
       const timeDiff = last.time - first.time;
       const progressDiff = last.progress - first.progress;
-      
+
       return timeDiff > 0 ? progressDiff / timeDiff : null;
-    }
+    },
   };
 }
-

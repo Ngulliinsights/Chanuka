@@ -29,6 +29,10 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { copySystem } from '@client/content/copy-system';
+import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/hooks/use-toast';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
@@ -39,14 +43,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/shared/design-system';
-import { copySystem } from '@client/content/copy-system';
-import { useBills } from '../hooks';
-import type { Bill, BillsQueryParams } from '../model/types';
-import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { useToast } from '@client/hooks/use-toast';
 import { cn } from '@client/shared/design-system/utils/cn';
 import { logger } from '@client/utils/logger';
+
+import { useBills } from '../hooks';
+import type { Bill, BillsQueryParams } from '../model/types';
 
 import { FilterPanel } from './filter-panel';
 import { StatsOverview } from './stats-overview';
@@ -159,7 +160,7 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
         urgentCount: 0,
         constitutionalFlags: 0,
         trendingCount: 0,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
 
@@ -184,9 +185,11 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
     // ideally be a tagged field in the database for more accurate classification.
     const constitutionalFlags = bills.filter(bill => {
       const titleLower = bill.title?.toLowerCase() || '';
-      return titleLower.includes('constitutional') ||
-             titleLower.includes('amendment') ||
-             titleLower.includes('rights');
+      return (
+        titleLower.includes('constitutional') ||
+        titleLower.includes('amendment') ||
+        titleLower.includes('rights')
+      );
     }).length;
 
     // Calculate trending bills. In a real system, this would be based on actual
@@ -199,7 +202,7 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
       urgentCount,
       constitutionalFlags,
       trendingCount,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }, [bills, totalItems]);
 }
@@ -220,22 +223,22 @@ function useExportBills(bills: ExtendedBill[]) {
       // First, validate that we have data to export
       if (bills.length === 0) {
         toast({
-          title: "No bills to export",
-          description: "Apply filters to see bills available for export.",
-          variant: "destructive",
+          title: 'No bills to export',
+          description: 'Apply filters to see bills available for export.',
+          variant: 'destructive',
         });
         return;
       }
 
       // Transform bills into a flat structure suitable for CSV. We select only
       // the most important fields that would be useful in a spreadsheet format.
-      const csvData = bills.map((bill) => ({
+      const csvData = bills.map(bill => ({
         'Bill ID': bill.id ?? '',
-        'Title': bill.title ?? '',
-        'Status': bill.status ?? '',
+        Title: bill.title ?? '',
+        Status: bill.status ?? '',
         'Introduced Date': bill.introduced_date ?? '',
-        'Description': bill.description ?? '',
-        'Sponsor': bill.sponsor_name ?? '',
+        Description: bill.description ?? '',
+        Sponsor: bill.sponsor_name ?? '',
       }));
 
       // Build the CSV string with proper escaping. CSV format requires that we:
@@ -245,18 +248,19 @@ function useExportBills(bills: ExtendedBill[]) {
       const headers = Object.keys(csvData[0]);
       const csvContent = [
         headers.join(','),
-        ...csvData.map((row) =>
-          headers.map(header => {
-            const value = String(row[header as keyof typeof row]);
-            const needsQuotes = value.includes(',') ||
-                               value.includes('\n') ||
-                               value.includes('"');
+        ...csvData.map(row =>
+          headers
+            .map(header => {
+              const value = String(row[header as keyof typeof row]);
+              const needsQuotes =
+                value.includes(',') || value.includes('\n') || value.includes('"');
 
-            if (needsQuotes) {
-              return `"${value.replace(/"/g, '""')}"`;
-            }
-            return value;
-          }).join(',')
+              if (needsQuotes) {
+                return `"${value.replace(/"/g, '""')}"`;
+              }
+              return value;
+            })
+            .join(',')
         ),
       ].join('\n');
 
@@ -280,7 +284,7 @@ function useExportBills(bills: ExtendedBill[]) {
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Export successful",
+        title: 'Export successful',
         description: `Exported ${csvData.length} bills to CSV`,
       });
 
@@ -295,9 +299,9 @@ function useExportBills(bills: ExtendedBill[]) {
       });
 
       toast({
-        title: "Export failed",
-        description: "Unable to export bills. Please try again.",
-        variant: "destructive",
+        title: 'Export failed',
+        description: 'Unable to export bills. Please try again.',
+        variant: 'destructive',
       });
     }
   }, [bills, toast]);
@@ -307,10 +311,7 @@ function useExportBills(bills: ExtendedBill[]) {
 // Main Component
 // ============================================================================
 
-export function BillsDashboard({
-  className,
-  initialFilters = {}
-}: BillsDashboardProps) {
+export function BillsDashboard({ className, initialFilters = {} }: BillsDashboardProps) {
   const { isMobile } = useDeviceInfo();
   const { toast } = useToast();
 
@@ -350,19 +351,13 @@ export function BillsDashboard({
   // React Query hook that handles data fetching, caching, and background updates.
   // It provides loading states, error handling, and automatic refetching when
   // filters change, making our component much simpler than manual fetch logic.
-  const {
-    data: billsResponse,
-    isLoading,
-    isFetching,
-    error,
-    refetch,
-  } = useBills(filters);
+  const { data: billsResponse, isLoading, isFetching, error, refetch } = useBills(filters);
 
   // Extract bills array from the response, with a safe fallback to empty array.
   // Using useMemo here prevents unnecessary re-renders when billsResponse object
   // reference changes but the actual bills array hasn't changed.
-  const bills = useMemo(() =>
-    (billsResponse?.bills || []) as ExtendedBill[],
+  const bills = useMemo(
+    () => (billsResponse?.bills || []) as ExtendedBill[],
     [billsResponse?.bills]
   );
 
@@ -406,11 +401,14 @@ export function BillsDashboard({
    * filters means we're looking at a new subset of data.
    */
   const handleFiltersChange = useCallback((newFilters: Partial<BillsQueryParams>) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      page: 1,
-    } as ExtendedFilters));
+    setFilters(
+      prev =>
+        ({
+          ...prev,
+          ...newFilters,
+          page: 1,
+        }) as ExtendedFilters
+    );
   }, []);
 
   /**
@@ -418,98 +416,104 @@ export function BillsDashboard({
    * implementation, this would use a React Query mutation to update the
    * server and automatically invalidate cached queries that include this bill.
    */
-  const handleSave = useCallback(async (billId: string) => {
-    try {
-      // TODO: Implement with useSaveBill mutation hook
-      // await saveBillMutation.mutateAsync(billId);
+  const handleSave = useCallback(
+    async (billId: string) => {
+      try {
+        // TODO: Implement with useSaveBill mutation hook
+        // await saveBillMutation.mutateAsync(billId);
 
-      toast({
-        title: "Bill saved",
-        description: "This bill has been added to your saved list.",
-      });
+        toast({
+          title: 'Bill saved',
+          description: 'This bill has been added to your saved list.',
+        });
 
-      logger.info('Bill saved', {
-        component: 'BillsDashboard',
-        billId,
-      });
-    } catch (error) {
-      logger.error('Failed to save bill', {
-        component: 'BillsDashboard',
-        billId,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+        logger.info('Bill saved', {
+          component: 'BillsDashboard',
+          billId,
+        });
+      } catch (error) {
+        logger.error('Failed to save bill', {
+          component: 'BillsDashboard',
+          billId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
 
-      toast({
-        title: "Save failed",
-        description: "Unable to save bill. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
+        toast({
+          title: 'Save failed',
+          description: 'Unable to save bill. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    },
+    [toast]
+  );
 
   /**
    * Handle sharing a bill using the Web Share API when available (primarily on
    * mobile devices), with a clipboard fallback for desktop browsers. This provides
    * a native, platform-appropriate sharing experience for users.
    */
-  const handleShare = useCallback(async (billId: string) => {
-    try {
-      const bill = bills.find((b) => b.id === billId);
-      if (!bill) {
-        toast({
-          title: "Bill not found",
-          description: "Unable to share this bill.",
-          variant: "destructive",
-        });
-        return;
-      }
+  const handleShare = useCallback(
+    async (billId: string) => {
+      try {
+        const bill = bills.find(b => b.id === billId);
+        if (!bill) {
+          toast({
+            title: 'Bill not found',
+            description: 'Unable to share this bill.',
+            variant: 'destructive',
+          });
+          return;
+        }
 
-      const shareData = {
-        title: bill.title || 'Legislative Bill',
-        text: bill.description || 'Check out this legislative bill',
-        url: `${window.location.origin}/bills/${billId}`,
-      };
+        const shareData = {
+          title: bill.title || 'Legislative Bill',
+          text: bill.description || 'Check out this legislative bill',
+          url: `${window.location.origin}/bills/${billId}`,
+        };
 
-      // Try to use native share API first (better UX on mobile)
-      if (navigator.share) {
-        await navigator.share(shareData);
+        // Try to use native share API first (better UX on mobile)
+        if (navigator.share) {
+          await navigator.share(shareData);
 
-        toast({
-          title: "Bill shared",
-          description: "Thank you for sharing this bill!",
-        });
-      } else {
-        // Fallback to clipboard for desktop browsers
-        await navigator.clipboard.writeText(shareData.url);
+          toast({
+            title: 'Bill shared',
+            description: 'Thank you for sharing this bill!',
+          });
+        } else {
+          // Fallback to clipboard for desktop browsers
+          await navigator.clipboard.writeText(shareData.url);
 
-        toast({
-          title: "Link copied",
-          description: "Bill link copied to clipboard!",
-        });
-      }
+          toast({
+            title: 'Link copied',
+            description: 'Bill link copied to clipboard!',
+          });
+        }
 
-      logger.info('Bill shared', {
-        component: 'BillsDashboard',
-        billId,
-        method: typeof navigator.share === 'function' ? 'native' : 'clipboard',
-      });
-    } catch (error) {
-      // Only show error if it's not a user cancellation (which is expected behavior)
-      if (error instanceof Error && error.name !== 'AbortError') {
-        logger.error('Failed to share bill', {
+        logger.info('Bill shared', {
           component: 'BillsDashboard',
           billId,
-          error: error.message,
+          method: typeof navigator.share === 'function' ? 'native' : 'clipboard',
         });
+      } catch (error) {
+        // Only show error if it's not a user cancellation (which is expected behavior)
+        if (error instanceof Error && error.name !== 'AbortError') {
+          logger.error('Failed to share bill', {
+            component: 'BillsDashboard',
+            billId,
+            error: error.message,
+          });
 
-        toast({
-          title: "Share failed",
-          description: "Unable to share bill. Please try again.",
-          variant: "destructive",
-        });
+          toast({
+            title: 'Share failed',
+            description: 'Unable to share bill. Please try again.',
+            variant: 'destructive',
+          });
+        }
       }
-    }
-  }, [bills, toast]);
+    },
+    [bills, toast]
+  );
 
   /**
    * Navigate to the bill detail page with the comments section focused. This
@@ -529,8 +533,8 @@ export function BillsDashboard({
     try {
       await refetch();
       toast({
-        title: "Dashboard refreshed",
-        description: "Latest bills data loaded successfully.",
+        title: 'Dashboard refreshed',
+        description: 'Latest bills data loaded successfully.',
       });
     } catch (error) {
       logger.error('Failed to refresh dashboard', {
@@ -539,9 +543,9 @@ export function BillsDashboard({
       });
 
       toast({
-        title: "Refresh failed",
-        description: "Unable to refresh data. Please try again.",
-        variant: "destructive",
+        title: 'Refresh failed',
+        description: 'Unable to refresh data. Please try again.',
+        variant: 'destructive',
       });
     }
   }, [refetch, toast]);
@@ -558,7 +562,7 @@ export function BillsDashboard({
    * way for users to reverse the current sort without going through the dropdown.
    */
   const toggleSortOrder = useCallback(() => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
 
   /**
@@ -581,13 +585,11 @@ export function BillsDashboard({
     <Card
       key={bill.id}
       className="cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.98] touch-manipulation"
-      onClick={() => window.location.href = `/bills/${bill.id}`}
+      onClick={() => (window.location.href = `/bills/${bill.id}`)}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base leading-tight line-clamp-2">
-            {bill.title}
-          </CardTitle>
+          <CardTitle className="text-base leading-tight line-clamp-2">{bill.title}</CardTitle>
           <div className="flex flex-col gap-1 flex-shrink-0">
             <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-800">
               {bill.status}
@@ -622,7 +624,7 @@ export function BillsDashboard({
         {/* Policy areas */}
         {bill.policyAreas && bill.policyAreas.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
-            {bill.policyAreas.slice(0, 2).map((area) => (
+            {bill.policyAreas.slice(0, 2).map(area => (
               <span key={area} className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
                 {area}
               </span>
@@ -641,7 +643,7 @@ export function BillsDashboard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleSave(bill.id || '');
               }}
@@ -653,7 +655,7 @@ export function BillsDashboard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleComment(bill.id || '');
               }}
@@ -666,7 +668,7 @@ export function BillsDashboard({
           <Button
             variant="ghost"
             size="sm"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleShare(bill.id || '');
             }}
@@ -697,9 +699,7 @@ export function BillsDashboard({
             <div className="text-center space-y-4 max-w-md">
               <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
               <div>
-                <p className="text-lg font-semibold text-destructive mb-2">
-                  Error loading bills
-                </p>
+                <p className="text-lg font-semibold text-destructive mb-2">Error loading bills</p>
                 <p className="text-sm text-muted-foreground">
                   {error instanceof Error
                     ? error.message
@@ -726,7 +726,7 @@ export function BillsDashboard({
     userLevel: userLevel as 'novice' | 'intermediate' | 'expert',
     pageType: 'feature',
     emotionalTone: 'empowering',
-    contentComplexity: userLevel === 'expert' ? 'technical' : 'simple'
+    contentComplexity: userLevel === 'expert' ? 'technical' : 'simple',
   });
 
   // ============================================================================
@@ -739,12 +739,8 @@ export function BillsDashboard({
       <div className="space-y-4 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold tracking-tight mb-2">
-              {billTrackingCopy.headline}
-            </h1>
-            <p className="text-muted-foreground">
-              {billTrackingCopy.description}
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">{billTrackingCopy.headline}</h1>
+            <p className="text-muted-foreground">{billTrackingCopy.description}</p>
 
             {/* Personalized help prompt for novice users */}
             {isNoviceUser && !showPersonalizedHelp && (
@@ -772,10 +768,7 @@ export function BillsDashboard({
               aria-label="Refresh bills data"
             >
               <RefreshCw
-                className={cn(
-                  'h-4 w-4 mr-2',
-                  (isLoading || isFetching) && 'animate-spin'
-                )}
+                className={cn('h-4 w-4 mr-2', (isLoading || isFetching) && 'animate-spin')}
               />
               Refresh
             </Button>
@@ -816,19 +809,19 @@ export function BillsDashboard({
             <CardContent>
               <div className="space-y-3 text-blue-700">
                 <p className="text-sm">
-                  Start by searching for topics you care about, like healthcare,
-                  education, or environmental protection. The search looks through
-                  bill titles and content to find what matters to you.
+                  Start by searching for topics you care about, like healthcare, education, or
+                  environmental protection. The search looks through bill titles and content to find
+                  what matters to you.
                 </p>
                 <p className="text-sm">
-                  Save bills that interest you to get updates when their status
-                  changes. You&apos;ll be notified about important developments so you
-                  can stay engaged without constant checking.
+                  Save bills that interest you to get updates when their status changes. You&apos;ll
+                  be notified about important developments so you can stay engaged without constant
+                  checking.
                 </p>
                 <p className="text-sm">
                   Use filters to narrow your search by status (like &quot;active&quot; or
-                  &quot;passed&quot;), urgency level, or policy area. This helps you focus
-                  on the bills most relevant to your interests.
+                  &quot;passed&quot;), urgency level, or policy area. This helps you focus on the
+                  bills most relevant to your interests.
                 </p>
                 <div className="pt-2">
                   <Button
@@ -910,10 +903,7 @@ export function BillsDashboard({
       </div>
 
       {/* Main content area with filter panel and bills grid */}
-      <div className={cn(
-        'grid gap-6',
-        isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-5'
-      )}>
+      <div className={cn('grid gap-6', isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-5')}>
         {/* Desktop filter panel - only shown on larger screens */}
         {!isMobile && (
           <div className="lg:col-span-1">
@@ -938,7 +928,7 @@ export function BillsDashboard({
                   <Input
                     placeholder="Search bills by title, number, or content..."
                     value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
+                    onChange={e => setSearchInput(e.target.value)}
                     className="pl-10"
                     aria-label="Search bills"
                     disabled={isLoading}
@@ -956,7 +946,9 @@ export function BillsDashboard({
                     {/* Mobile filter panel trigger */}
                     {isMobile && (
                       <FilterPanel
-                        filters={filters as { status?: string; urgency?: string; policyArea?: string }}
+                        filters={
+                          filters as { status?: string; urgency?: string; policyArea?: string }
+                        }
                         onFiltersChange={handleFiltersChange}
                         isMobile={true}
                         resultCount={bills.length}
@@ -967,7 +959,7 @@ export function BillsDashboard({
                     {/* Sort selector */}
                     <Select
                       value={sortBy}
-                      onChange={(e) => handleSortChange(e.target.value)}
+                      onChange={e => handleSortChange(e.target.value)}
                       disabled={isLoading || bills.length === 0}
                     >
                       <SelectTrigger className="w-[140px]" aria-label="Sort by">
@@ -1000,7 +992,11 @@ export function BillsDashboard({
                   </div>
 
                   {/* View mode toggle */}
-                  <div className="flex items-center gap-1 border rounded-md p-1" role="group" aria-label="View mode">
+                  <div
+                    className="flex items-center gap-1 border rounded-md p-1"
+                    role="group"
+                    aria-label="View mode"
+                  >
                     <Button
                       variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                       size="sm"
@@ -1049,9 +1045,13 @@ export function BillsDashboard({
                       ? `No bills match "${searchInput}". Try different search terms or adjust your filters.`
                       : 'Try adjusting your search criteria or filters to see available bills.'}
                   </p>
-                  {(searchInput || Object.keys(filters).some(key =>
-                    key !== 'page' && key !== 'pageSize' && filters[key as keyof ExtendedFilters]
-                  )) && (
+                  {(searchInput ||
+                    Object.keys(filters).some(
+                      key =>
+                        key !== 'page' &&
+                        key !== 'pageSize' &&
+                        filters[key as keyof ExtendedFilters]
+                    )) && (
                     <Button
                       variant="outline"
                       onClick={() => {

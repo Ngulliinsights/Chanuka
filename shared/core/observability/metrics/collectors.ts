@@ -1,3 +1,5 @@
+import { Result, Ok, Err } from '../../primitives/types/result';
+
 import {
   Counter,
   Gauge,
@@ -8,7 +10,6 @@ import {
   DEFAULT_CONFIG,
   MetricType,
 } from './types';
-import { Result, Ok, Err } from '../../primitives/types/result';
 // import { AsyncCorrelationManager } from '../correlation.js';
  // Unused import
 

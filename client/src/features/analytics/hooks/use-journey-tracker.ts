@@ -1,8 +1,12 @@
+import {
+  UserJourneyTracker,
+  JourneyAnalytics,
+  JourneyOptimization,
+} from '@client/services/UserJourneyTracker';
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useNavigation } from '@client/core/navigation/context';
-import { UserJourneyTracker, JourneyAnalytics, JourneyOptimization } from '@client/services/UserJourneyTracker';
 import { UserRole, NavigationSection } from '@client/shared/types/navigation';
 
 /**
@@ -26,26 +30,22 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   /**
    * Start tracking the user journey
    */
-  const startJourney = useCallback((user_role: UserRole = 'public') => { tracker.current.startJourney(sessionIdRef.current, user_id, user_role);
-   }, [user_id]);
+  const startJourney = useCallback(
+    (user_role: UserRole = 'public') => {
+      tracker.current.startJourney(sessionIdRef.current, user_id, user_role);
+    },
+    [user_id]
+  );
 
   /**
    * Track a page visit
    */
-  const trackPageVisit = useCallback((
-    pageId: string,
-    section: NavigationSection,
-    referrer?: string,
-    interactionCount?: number
-  ) => {
-    tracker.current.trackStep(
-      sessionIdRef.current,
-      pageId,
-      section,
-      referrer,
-      interactionCount
-    );
-  }, []);
+  const trackPageVisit = useCallback(
+    (pageId: string, section: NavigationSection, referrer?: string, interactionCount?: number) => {
+      tracker.current.trackStep(sessionIdRef.current, pageId, section, referrer, interactionCount);
+    },
+    []
+  );
 
   /**
    * Track a conversion event
@@ -71,23 +71,22 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   /**
    * Get journey analytics
    */
-  const getAnalytics = useCallback((
-    start_date?: Date,
-    end_date?: Date,
-    user_role?: UserRole
-  ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
-  }, []);
+  const getAnalytics = useCallback(
+    (start_date?: Date, end_date?: Date, user_role?: UserRole): JourneyAnalytics => {
+      return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
+    },
+    []
+  );
 
   /**
    * Get optimization recommendations
    */
-  const getOptimizations = useCallback((
-    start_date?: Date,
-    end_date?: Date
-  ): JourneyOptimization[] => {
-    return tracker.current.getOptimizationRecommendations(start_date, end_date);
-  }, []);
+  const getOptimizations = useCallback(
+    (start_date?: Date, end_date?: Date): JourneyOptimization[] => {
+      return tracker.current.getOptimizationRecommendations(start_date, end_date);
+    },
+    []
+  );
 
   /**
    * Get goal completion rate
@@ -99,7 +98,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   // Auto-track page visits when location changes
   useEffect(() => {
     const currentPage = location.pathname;
-    
+
     // Skip if same page
     if (currentPage === lastPageRef.current) {
       return;
@@ -119,7 +118,13 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
 
     lastPageRef.current = currentPage;
     pageStartTimeRef.current = new Date();
-  }, [location.pathname, navigation.currentSection, navigation.user_role, startJourney, trackPageVisit]);
+  }, [
+    location.pathname,
+    navigation.currentSection,
+    navigation.user_role,
+    startJourney,
+    trackPageVisit,
+  ]);
 
   // Track user role changes
   useEffect(() => {
@@ -159,7 +164,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -172,7 +177,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
@@ -188,7 +193,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
     getAnalytics,
     getOptimizations,
     getGoalCompletionRate,
-    
+
     // Convenience methods for common conversion events
     trackBillAnalysisViewed: () => trackConversion('bill_analysis_viewed'),
     trackCommentPosted: () => trackConversion('comment_posted'),
@@ -206,20 +211,19 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
 export function useJourneyAnalytics() {
   const tracker = useRef(UserJourneyTracker.getInstance());
 
-  const getAnalytics = useCallback((
-    start_date?: Date,
-    end_date?: Date,
-    user_role?: UserRole
-  ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
-  }, []);
+  const getAnalytics = useCallback(
+    (start_date?: Date, end_date?: Date, user_role?: UserRole): JourneyAnalytics => {
+      return tracker.current.getJourneyAnalytics(start_date, end_date, user_role);
+    },
+    []
+  );
 
-  const getOptimizations = useCallback((
-    start_date?: Date,
-    end_date?: Date
-  ): JourneyOptimization[] => {
-    return tracker.current.getOptimizationRecommendations(start_date, end_date);
-  }, []);
+  const getOptimizations = useCallback(
+    (start_date?: Date, end_date?: Date): JourneyOptimization[] => {
+      return tracker.current.getOptimizationRecommendations(start_date, end_date);
+    },
+    []
+  );
 
   const getGoalCompletionRate = useCallback((goalName: string): number => {
     return tracker.current.getGoalCompletionRate(goalName);
@@ -236,47 +240,3 @@ export function useJourneyAnalytics() {
     exportData,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

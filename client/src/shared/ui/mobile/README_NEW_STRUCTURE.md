@@ -87,30 +87,30 @@ src/
 
 These files are moved to `__archive__/` for reference:
 
-| Source File | Reason | Archive Location |
-|-------------|--------|------------------|
+| Source File                          | Reason                     | Archive Location                                 |
+| ------------------------------------ | -------------------------- | ------------------------------------------------ |
 | `mobile-navigation-enhancements.tsx` | Junk drawer, duplicate nav | `__archive__/mobile-navigation-enhancements.tsx` |
-| `MobileOptimizedLayout.tsx` | Thin wrapper, redundant | `__archive__/MobileOptimizedLayout.tsx` |
-| `mobile-test-suite.tsx` | Legacy test utils | `__archive__/mobile-test-suite.tsx` |
-| `responsive-layout-manager.tsx` | Logic integrated elsewhere | `__archive__/responsive-layout-manager.tsx` |
+| `MobileOptimizedLayout.tsx`          | Thin wrapper, redundant    | `__archive__/MobileOptimizedLayout.tsx`          |
+| `mobile-test-suite.tsx`              | Legacy test utils          | `__archive__/mobile-test-suite.tsx`              |
+| `responsive-layout-manager.tsx`      | Logic integrated elsewhere | `__archive__/responsive-layout-manager.tsx`      |
 
 ### Phase 2: Files to Extract Hooks From
 
-| Component | Extracted Hooks | New Location |
-|-----------|-----------------|--------------|
-| `MobileLayout.tsx` | `useSwipeGesture`, `useScrollManager` | `hooks/mobile/` |
-| `PullToRefresh.tsx` | `usePullToRefresh` | `hooks/mobile/` |
-| `MobileBottomSheet.tsx` | `useBottomSheet` | `hooks/mobile/` |
-| `MobileTabSelector.tsx` | `useMobileTabs` | `hooks/mobile/` |
-| `InfiniteScroll.tsx` | `useInfiniteScroll` | `hooks/mobile/` |
+| Component               | Extracted Hooks                       | New Location    |
+| ----------------------- | ------------------------------------- | --------------- |
+| `MobileLayout.tsx`      | `useSwipeGesture`, `useScrollManager` | `hooks/mobile/` |
+| `PullToRefresh.tsx`     | `usePullToRefresh`                    | `hooks/mobile/` |
+| `MobileBottomSheet.tsx` | `useBottomSheet`                      | `hooks/mobile/` |
+| `MobileTabSelector.tsx` | `useMobileTabs`                       | `hooks/mobile/` |
+| `InfiniteScroll.tsx`    | `useInfiniteScroll`                   | `hooks/mobile/` |
 
 ### Phase 3: Files to Consolidate
 
-| Old Files | Consolidated To | Status |
-|-----------|-----------------|--------|
-| `MobileNavigationDrawer.tsx` (mobile/) + layout drawer | `mobile/layout/NavigationDrawer.tsx` | Merge & enhance |
-| `SwipeGestures.tsx` (component) | Keep component, extract config | `config/gestures.ts` |
-| `mobile-performance-optimizations.tsx` | Move logic to `core/performance/` | Relocate |
+| Old Files                                              | Consolidated To                      | Status               |
+| ------------------------------------------------------ | ------------------------------------ | -------------------- |
+| `MobileNavigationDrawer.tsx` (mobile/) + layout drawer | `mobile/layout/NavigationDrawer.tsx` | Merge & enhance      |
+| `SwipeGestures.tsx` (component)                        | Keep component, extract config       | `config/gestures.ts` |
+| `mobile-performance-optimizations.tsx`                 | Move logic to `core/performance/`    | Relocate             |
 
 ---
 
@@ -158,19 +158,19 @@ export { useInfiniteScroll } from './useInfiniteScroll';
 ```typescript
 // Single source of truth for gesture thresholds
 export const GESTURE_CONFIG = {
-  SWIPE_THRESHOLD: 50,           // pixels
+  SWIPE_THRESHOLD: 50, // pixels
   SWIPE_VELOCITY_THRESHOLD: 0.5, // px/ms
   PULL_TO_REFRESH_THRESHOLD: 60, // pixels
-  PULL_TO_REFRESH_MAX: 120,      // max pull distance
-  SCROLL_SNAP_THRESHOLD: 30,     // % of container
-  LONG_PRESS_DURATION: 500,      // ms
-  TAP_DURATION_MAX: 200,         // ms
+  PULL_TO_REFRESH_MAX: 120, // max pull distance
+  SCROLL_SNAP_THRESHOLD: 30, // % of container
+  LONG_PRESS_DURATION: 500, // ms
+  TAP_DURATION_MAX: 200, // ms
 } as const;
 
 export const MOBILE_CONFIG = {
-  TOUCH_TARGET_SIZE: 44,         // WCAG minimum
-  VIEWPORT_HEIGHT_SAFE: 0.85,    // Account for address bar
-  MOMENTUM_DECAY: 0.95,          // Scroll momentum
+  TOUCH_TARGET_SIZE: 44, // WCAG minimum
+  VIEWPORT_HEIGHT_SAFE: 0.85, // Account for address bar
+  MOMENTUM_DECAY: 0.95, // Scroll momentum
 } as const;
 ```
 
@@ -250,13 +250,13 @@ MobileLayout
 
 ## ✨ Key Improvements
 
-| Metric | Before | After | Impact |
-|--------|--------|-------|--------|
-| Mobile Components | 15 files | 8 files | 46% reduction |
-| Duplicate Implementations | 3+ | 1 | Single source of truth |
-| Hook Export Clarity | Ambiguous | Crystal clear | Faster developer iteration |
-| Configuration Fragmentation | 5+ places | `config/gestures.ts` | Maintenance overhead ↓ |
-| Test Colocation | Scattered | Feature-based | Better organization |
+| Metric                      | Before    | After                | Impact                     |
+| --------------------------- | --------- | -------------------- | -------------------------- |
+| Mobile Components           | 15 files  | 8 files              | 46% reduction              |
+| Duplicate Implementations   | 3+        | 1                    | Single source of truth     |
+| Hook Export Clarity         | Ambiguous | Crystal clear        | Faster developer iteration |
+| Configuration Fragmentation | 5+ places | `config/gestures.ts` | Maintenance overhead ↓     |
+| Test Colocation             | Scattered | Feature-based        | Better organization        |
 
 ---
 
@@ -292,4 +292,3 @@ MobileLayout
 - See `ARCHIVE_README.md` for archived file details
 - See `../../PHASE2_IMPLEMENTATION_GUIDE.md` for broader context
 - See `../../docs/MOBILE_DEVELOPMENT_GUIDE.md` (to be created)
-

@@ -36,12 +36,11 @@ class HomePageValidator {
 
       // Check for proper ARIA labels
       results.push(this.checkAriaLabels(content));
-
     } catch (error) {
       results.push({
         passed: false,
         message: 'Failed to read home page file',
-        details: [error instanceof Error ? error.message : String(error)]
+        details: [error instanceof Error ? error.message : String(error)],
       });
     }
 
@@ -49,13 +48,7 @@ class HomePageValidator {
   }
 
   private checkPerformanceOptimizations(content: string): ValidationResult {
-    const optimizations = [
-      'useCallback',
-      'useMemo',
-      'React.memo',
-      'Suspense',
-      'lazy'
-    ];
+    const optimizations = ['useCallback', 'useMemo', 'React.memo', 'Suspense', 'lazy'];
 
     const found = optimizations.filter(opt => content.includes(opt));
     const missing = optimizations.filter(opt => !content.includes(opt));
@@ -65,58 +58,44 @@ class HomePageValidator {
       message: 'Performance optimizations check',
       details: [
         `Found: ${found.join(', ')}`,
-        ...(missing.length > 0 ? [`Missing: ${missing.join(', ')}`] : [])
-      ]
+        ...(missing.length > 0 ? [`Missing: ${missing.join(', ')}`] : []),
+      ],
     };
   }
 
   private checkAccessibilityFeatures(content: string): ValidationResult {
-    const features = [
-      'aria-label',
-      'aria-describedby',
-      'role=',
-      'data-testid',
-      'aria-hidden'
-    ];
+    const features = ['aria-label', 'aria-describedby', 'role=', 'data-testid', 'aria-hidden'];
 
     const found = features.filter(feature => content.includes(feature));
 
     return {
       passed: found.length >= 4, // At least 4 out of 5 features
       message: 'Accessibility features check',
-      details: [`Found: ${found.join(', ')}`]
+      details: [`Found: ${found.join(', ')}`],
     };
   }
 
   private checkLazyLoading(content: string): ValidationResult {
-    const lazyFeatures = [
-      'lazy(',
-      'Suspense',
-      'import('
-    ];
+    const lazyFeatures = ['lazy(', 'Suspense', 'import('];
 
     const found = lazyFeatures.filter(feature => content.includes(feature));
 
     return {
       passed: found.length >= 2, // At least 2 lazy loading features
       message: 'Lazy loading implementation check',
-      details: [`Found: ${found.join(', ')}`]
+      details: [`Found: ${found.join(', ')}`],
     };
   }
 
   private checkMemoization(content: string): ValidationResult {
-    const memoFeatures = [
-      'React.memo',
-      'useCallback',
-      'useMemo'
-    ];
+    const memoFeatures = ['React.memo', 'useCallback', 'useMemo'];
 
     const found = memoFeatures.filter(feature => content.includes(feature));
 
     return {
       passed: found.length >= 2, // At least 2 memoization techniques
       message: 'Memoization implementation check',
-      details: [`Found: ${found.join(', ')}`]
+      details: [`Found: ${found.join(', ')}`],
     };
   }
 
@@ -127,10 +106,7 @@ class HomePageValidator {
     return {
       passed: ariaCount >= 3 && roleCount >= 2,
       message: 'ARIA labels and roles check',
-      details: [
-        `ARIA labels found: ${ariaCount}`,
-        `Roles found: ${roleCount}`
-      ]
+      details: [`ARIA labels found: ${ariaCount}`, `Roles found: ${roleCount}`],
     };
   }
 }

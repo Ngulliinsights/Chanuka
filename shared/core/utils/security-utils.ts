@@ -10,6 +10,7 @@
  */
 
 import * as crypto from 'crypto';
+
 import { logger } from '../observability/logging';
 
 // ==================== Type Definitions ====================
@@ -80,7 +81,7 @@ export function sanitizeHtml(input: string, options: SanitizationOptions = {}): 
           /(\w+)=["']([^"']*)["']/g,
           (attrMatch: string, attrName: string, attrValue: string) => {
             const allowedAttrs = options.allowedAttributes?.[attrName.toLowerCase()];
-            if (allowedAttrs && allowedAttrs.includes(attrValue)) {
+            if (allowedAttrs?.includes(attrValue)) {
               return attrMatch;
             }
             return '';

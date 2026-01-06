@@ -43,7 +43,7 @@ class CSSAnalyzer {
 
     // Find all CSS files
     this.cssFiles = await glob(`${directory}/**/*.css`, {
-      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**']
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**'],
     });
 
     console.log(`📁 Found ${this.cssFiles.length} CSS files`);
@@ -87,7 +87,7 @@ class CSSAnalyzer {
           selector,
           properties,
           file: filePath,
-          line: lineNumber
+          line: lineNumber,
         });
       }
 
@@ -108,7 +108,7 @@ class CSSAnalyzer {
       gzippedSize,
       files: fileAnalysis,
       duplicateRules,
-      recommendations
+      recommendations,
     };
   }
 
@@ -133,7 +133,7 @@ class CSSAnalyzer {
 
     this.rules.forEach(rule => {
       const ruleKey = `${rule.selector}:${rule.properties.sort().join(';')}`;
-      
+
       if (!ruleMap.has(ruleKey)) {
         ruleMap.set(ruleKey, { count: 0, files: new Set() });
       }
@@ -148,16 +148,21 @@ class CSSAnalyzer {
       .map(([rule, data]) => ({
         rule: rule.split(':')[0], // Just the selector part
         count: data.count,
-        files: Array.from(data.files)
+        files: Array.from(data.files),
       }))
       .sort((a, b) => b.count - a.count);
   }
 
-  private analyzeFiles(): { path: string; size: number; duplicateRules: number; unusedSelectors: number }[] {
+  private analyzeFiles(): {
+    path: string;
+    size: number;
+    duplicateRules: number;
+    unusedSelectors: number;
+  }[] {
     return this.cssFiles.map(file => {
       const stats = fs.statSync(file);
       const fileRules = this.rules.filter(rule => rule.file === file);
-      
+
       // Count duplicate rules within this file
       const selectorCounts = new Map<string, number>();
       fileRules.forEach(rule => {
@@ -173,7 +178,7 @@ class CSSAnalyzer {
         path: file,
         size: stats.size,
         duplicateRules,
-        unusedSelectors: 0 // Would need more sophisticated analysis
+        unusedSelectors: 0, // Would need more sophisticated analysis
       };
     });
   }
@@ -238,7 +243,9 @@ class CSSAnalyzer {
       .slice(0, 10)
       .forEach(file => {
         const fileName = path.basename(file.path);
-        console.log(`   ${fileName}: ${this.formatBytes(file.size)} (${file.duplicateRules} duplicates)`);
+        console.log(
+          `   ${fileName}: ${this.formatBytes(file.size)} (${file.duplicateRules} duplicates)`
+        );
       });
 
     console.log('\n💡 Recommendations:');
@@ -278,7 +285,7 @@ class PerformanceComparator {
     console.log('\n📈 Performance Comparison:');
     console.log(`   📏 Size change: ${this.formatBytes(Math.abs(sizeDiff))} (${sizeDiffPercent}%)`);
     console.log(`   🔄 Duplicate rules change: ${duplicatesDiff}`);
-    
+
     if (sizeDiff < 0) {
       console.log('   ✅ Bundle size reduced! 🎉');
     } else if (sizeDiff > 0) {
@@ -307,7 +314,7 @@ class PerformanceComparator {
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
-  
+
   if (command === 'compare') {
     const beforeDir = args[1] || 'client/src';
     const afterDir = args[2] || 'client/src';

@@ -25,64 +25,58 @@ export const typographyTokens = {
       '"Courier New"',
       'monospace',
     ],
-    display: [
-      '"Segoe UI"',
-      'system-ui',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      'sans-serif',
-    ],
+    display: ['"Segoe UI"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
   },
 
   // Font Sizes - T-shirt sizing with rem units for accessibility
   fontSize: {
     xs: {
-      size: '0.75rem',    // 12px
+      size: '0.75rem', // 12px
       lineHeight: '1rem', // 16px
       letterSpacing: '0.05em',
     },
     sm: {
-      size: '0.875rem',   // 14px
+      size: '0.875rem', // 14px
       lineHeight: '1.25rem', // 20px
       letterSpacing: '0.025em',
     },
     base: {
-      size: '1rem',       // 16px
+      size: '1rem', // 16px
       lineHeight: '1.5rem', // 24px
       letterSpacing: '0',
     },
     lg: {
-      size: '1.125rem',   // 18px
+      size: '1.125rem', // 18px
       lineHeight: '1.75rem', // 28px
       letterSpacing: '-0.025em',
     },
     xl: {
-      size: '1.25rem',    // 20px
+      size: '1.25rem', // 20px
       lineHeight: '1.75rem', // 28px
       letterSpacing: '-0.025em',
     },
     '2xl': {
-      size: '1.5rem',     // 24px
+      size: '1.5rem', // 24px
       lineHeight: '2rem', // 32px
       letterSpacing: '-0.025em',
     },
     '3xl': {
-      size: '1.875rem',   // 30px
+      size: '1.875rem', // 30px
       lineHeight: '2.25rem', // 36px
       letterSpacing: '-0.025em',
     },
     '4xl': {
-      size: '2.25rem',    // 36px
+      size: '2.25rem', // 36px
       lineHeight: '2.5rem', // 40px
       letterSpacing: '-0.025em',
     },
     '5xl': {
-      size: '3rem',       // 48px
+      size: '3rem', // 48px
       lineHeight: '1',
       letterSpacing: '-0.025em',
     },
     '6xl': {
-      size: '3.75rem',    // 60px
+      size: '3.75rem', // 60px
       lineHeight: '1',
       letterSpacing: '-0.025em',
     },
@@ -308,16 +302,16 @@ export const responsiveTypography = {
 export const accessibilityTypography = {
   // Font size scaling for accessibility preferences
   fontSizeScale: {
-    small: 0.875,   // 87.5% of base size
-    normal: 1,      // 100% of base size
-    large: 1.125,   // 112.5% of base size
+    small: 0.875, // 87.5% of base size
+    normal: 1, // 100% of base size
+    large: 1.125, // 112.5% of base size
     extraLarge: 1.25, // 125% of base size
   },
 
   // High contrast typography adjustments
   highContrast: {
     fontWeight: {
-      normal: '500',    // Slightly bolder for better visibility
+      normal: '500', // Slightly bolder for better visibility
       medium: '600',
       semibold: '700',
       bold: '800',
@@ -331,9 +325,9 @@ export const accessibilityTypography = {
 
   // Minimum font sizes for accessibility compliance
   minimumSizes: {
-    body: '14px',     // Minimum readable size
-    label: '12px',    // Minimum for UI labels
-    caption: '11px',  // Minimum for captions
+    body: '14px', // Minimum readable size
+    label: '12px', // Minimum for UI labels
+    caption: '11px', // Minimum for captions
   },
 } as const;
 
@@ -353,7 +347,10 @@ export const typographyUtils = {
   /**
    * Apply accessibility font scaling
    */
-  applyFontScaling: (baseSize: string, scale: keyof typeof accessibilityTypography.fontSizeScale): string => {
+  applyFontScaling: (
+    baseSize: string,
+    scale: keyof typeof accessibilityTypography.fontSizeScale
+  ): string => {
     const scaleValue = accessibilityTypography.fontSizeScale[scale];
     const numericSize = parseFloat(baseSize);
     const unit = baseSize.replace(numericSize.toString(), '');
@@ -390,4 +387,3 @@ export const typographyUtils = {
 export type TypographyToken = typeof typographyTokens;
 export type TypographyScale = typeof typographyScale;
 export type ResponsiveTypography = typeof responsiveTypography;
-

@@ -52,14 +52,19 @@ export const useDashboardLayout = (
 
   // Responsive state
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>(
+    'desktop'
+  );
 
   // Determine current breakpoint
-  const getBreakpoint = useCallback((width: number): 'mobile' | 'tablet' | 'desktop' => {
-    if (width < breakpoints.mobile) return 'mobile';
-    if (width < breakpoints.tablet) return 'tablet';
-    return 'desktop';
-  }, [breakpoints]);
+  const getBreakpoint = useCallback(
+    (width: number): 'mobile' | 'tablet' | 'desktop' => {
+      if (width < breakpoints.mobile) return 'mobile';
+      if (width < breakpoints.tablet) return 'tablet';
+      return 'desktop';
+    },
+    [breakpoints]
+  );
 
   // Update responsive state
   useEffect(() => {

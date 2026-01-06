@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+
 import { cn } from '../../shared/design-system/utils/cn';
 
 interface ModalProps {
@@ -25,7 +26,7 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   overlayClassName,
   closeOnOverlayClick = true,
-  closeOnEscape = true
+  closeOnEscape = true,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -113,10 +114,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
-        overlayClassName
-      )}
+      className={cn('fixed inset-0 z-50 flex items-center justify-center', overlayClassName)}
       onClick={handleOverlayClick}
     >
       {/* Backdrop */}

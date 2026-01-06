@@ -4,8 +4,6 @@
  * Shows recent platform activity for anonymous users
  */
 
-import React from 'react';
-import { Link } from 'react-router-dom';
 import {
   FileText,
   AlertTriangle,
@@ -13,8 +11,11 @@ import {
   Clock,
   Eye,
   Activity,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 import { Badge, Button, Card, CardContent } from '@client/shared/design-system';
 
 const RecentActivity: React.FC = () => {
@@ -31,7 +32,7 @@ const RecentActivity: React.FC = () => {
       bgColor: 'from-blue-50 to-blue-100',
       iconColor: 'from-blue-500 to-blue-600',
       icon: FileText,
-      href: '/bills'
+      href: '/bills',
     },
     {
       id: 2,
@@ -45,7 +46,7 @@ const RecentActivity: React.FC = () => {
       bgColor: 'from-orange-50 to-orange-100',
       iconColor: 'from-orange-500 to-orange-600',
       icon: AlertTriangle,
-      href: '/search'
+      href: '/search',
     },
     {
       id: 3,
@@ -59,28 +60,32 @@ const RecentActivity: React.FC = () => {
       bgColor: 'from-green-50 to-green-100',
       iconColor: 'from-green-500 to-green-600',
       icon: MessageSquare,
-      href: '/community'
-    }
+      href: '/community',
+    },
   ];
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
         <h2 className="text-4xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-        <p className="text-xl text-gray-600">Stay updated with the latest legislative developments</p>
+        <p className="text-xl text-gray-600">
+          Stay updated with the latest legislative developments
+        </p>
       </div>
 
       <Card className="border-0 shadow-xl">
         <CardContent className="p-8">
           <div className="space-y-6">
-            {activities.map((activity) => {
+            {activities.map(activity => {
               const Icon = activity.icon;
               return (
                 <div
                   key={activity.id}
                   className={`flex items-start gap-4 p-6 bg-gradient-to-r ${activity.bgColor} rounded-xl hover:shadow-md transition-all duration-300`}
                 >
-                  <div className={`w-12 h-12 bg-gradient-to-br ${activity.iconColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                  <div
+                    className={`w-12 h-12 bg-gradient-to-br ${activity.iconColor} rounded-xl flex items-center justify-center flex-shrink-0`}
+                  >
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">

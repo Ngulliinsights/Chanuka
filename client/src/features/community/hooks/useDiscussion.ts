@@ -3,7 +3,7 @@
  *
  * This hook now uses the unified community system from core/community
  * while maintaining backward compatibility with existing components.
- * 
+ *
  * MIGRATION STATUS: ✅ COMPLETED
  * - Resolves mock thread creation (lines 82-96)
  * - Implements complete moderation workflow (lines 217-240)
@@ -20,7 +20,7 @@ import type {
   DiscussionThread,
   CommentFormData,
   ModerationViolationType,
-  TypingIndicator
+  TypingIndicator,
 } from '@client/features/community/types';
 interface UseDiscussionOptions {
   billId: number;
@@ -43,7 +43,12 @@ interface UseDiscussionReturn {
   updateComment: (commentId: string, content: string) => Promise<void>;
   deleteComment: (commentId: string) => Promise<void>;
   voteComment: (commentId: string, voteType: 'up' | 'down') => Promise<void>;
-  reportComment: (commentId: string, violationType: ModerationViolationType, reason: string, description?: string) => Promise<void>;
+  reportComment: (
+    commentId: string,
+    violationType: ModerationViolationType,
+    reason: string,
+    description?: string
+  ) => Promise<void>;
   moderateComment: (commentId: string, action: string, reason: string) => Promise<void>;
 
   // Real-time features
@@ -59,9 +64,8 @@ interface UseDiscussionReturn {
 export function useDiscussion({
   billId,
   autoSubscribe = true,
-  enableTypingIndicators = true
+  enableTypingIndicators = true,
 }: UseDiscussionOptions): UseDiscussionReturn {
-  
   // Use the new unified discussion system
   const unifiedDiscussion = useUnifiedDiscussion({
     billId,
@@ -85,9 +89,15 @@ export function useDiscussion({
         totalComments: unifiedDiscussion.currentThread.commentCount,
         participantCount: unifiedDiscussion.currentThread.participantCount,
         isLocked: unifiedDiscussion.currentThread.isLocked,
-        engagementScore: unifiedDiscussion.comments.reduce((sum, c) => sum + c.upvotes + c.downvotes, 0),
+        engagementScore: unifiedDiscussion.comments.reduce(
+          (sum, c) => sum + c.upvotes + c.downvotes,
+          0
+        ),
         qualityScore: unifiedDiscussion.currentThread.qualityScore,
-        expertParticipation: (unifiedDiscussion.comments.filter(c => c.isExpertVerified).length / unifiedDiscussion.comments.length) * 100 || 0,
+        expertParticipation:
+          (unifiedDiscussion.comments.filter(c => c.isExpertVerified).length /
+            unifiedDiscussion.comments.length) *
+            100 || 0,
         lastActivity: unifiedDiscussion.currentThread.lastActivityAt,
         activeUsers: unifiedDiscussion.activeUsers,
         createdAt: unifiedDiscussion.currentThread.createdAt,
@@ -103,24 +113,38 @@ export function useDiscussion({
       totalComments: unifiedDiscussion.comments.length,
       participantCount: new Set(unifiedDiscussion.comments.map(c => c.authorId)).size,
       isLocked: false,
-      engagementScore: unifiedDiscussion.comments.reduce((sum, c) => sum + c.upvotes + c.downvotes, 0),
-      qualityScore: unifiedDiscussion.comments.reduce((sum, c) => sum + c.qualityScore, 0) / unifiedDiscussion.comments.length || 0,
-      expertParticipation: (unifiedDiscussion.comments.filter(c => c.isExpertVerified).length / unifiedDiscussion.comments.length) * 100 || 0,
+      engagementScore: unifiedDiscussion.comments.reduce(
+        (sum, c) => sum + c.upvotes + c.downvotes,
+        0
+      ),
+      qualityScore:
+        unifiedDiscussion.comments.reduce((sum, c) => sum + c.qualityScore, 0) /
+          unifiedDiscussion.comments.length || 0,
+      expertParticipation:
+        (unifiedDiscussion.comments.filter(c => c.isExpertVerified).length /
+          unifiedDiscussion.comments.length) *
+          100 || 0,
       lastActivity: unifiedDiscussion.comments[0]?.updatedAt || new Date().toISOString(),
       activeUsers: unifiedDiscussion.activeUsers,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-  }, [unifiedDiscussion.currentThread, unifiedDiscussion.comments, unifiedDiscussion.activeUsers, billId]);
+  }, [
+    unifiedDiscussion.currentThread,
+    unifiedDiscussion.comments,
+    unifiedDiscussion.activeUsers,
+    billId,
+  ]);
 
   // Transform typing users to legacy format
-  const typingIndicators: TypingIndicator[] = useMemo(() => 
-    unifiedDiscussion.typingUsers.map(userId => ({
-      userId,
-      userName: `User ${userId}`, // Would need to be enriched with actual user data
-      parentId: undefined,
-      timestamp: Date.now(),
-    })), 
+  const typingIndicators: TypingIndicator[] = useMemo(
+    () =>
+      unifiedDiscussion.typingUsers.map(userId => ({
+        userId,
+        userName: `User ${userId}`, // Would need to be enriched with actual user data
+        parentId: undefined,
+        timestamp: Date.now(),
+      })),
     [unifiedDiscussion.typingUsers]
   );
 

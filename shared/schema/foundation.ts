@@ -19,10 +19,9 @@ import {
   userRoleEnum,
   anonymityLevelEnum,
 } from "./enum";
-
 import { participation_quality_audits } from "./participation_oversight";
-import { trojan_bill_analysis } from "./trojan_bill_detection";
 import { political_appointments } from "./political_economy";
+import { trojan_bill_analysis } from "./trojan_bill_detection";
 
 // ============================================================================
 // CORE USER TABLES - Kenya-Optimized Authentication & Profiles

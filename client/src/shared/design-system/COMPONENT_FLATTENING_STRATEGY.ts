@@ -1,44 +1,44 @@
 /**
  * DESIGN SYSTEM COMPONENTS FLATTENING STRATEGY
  * ════════════════════════════════════════════════════════════════════
- * 
+ *
  * OBJECTIVE: Remove redundant /components directory and place all
  * components in strategic categories: /interactive, /feedback, /media, /typography
- * 
+ *
  * CURRENT STATE:
  *   - /components: 13 files (redundant flat structure)
  *   - /interactive: 13 files (existing category)
  *   - /feedback: 10 files (existing category)
  *   - /typography: 4 files (existing category)
  *   - /media: 3 files (existing category)
- * 
+ *
  * STRATEGY: Distribute /components into existing categories by function
  */
 
 /**
  * COMPONENT CATEGORIZATION
  * ════════════════════════════════════════════════════════════════════
- * 
+ *
  * INTERACTIVE (Form controls, selection, navigation interaction)
  *   Current:  Button, Input, Select, Checkbox, Switch, Textarea, Tabs, Dialog
  *   Existing: Calendar, Command, ContextMenu, DropdownMenu, form, NavigationMenu,
  *             Popover, Sheet, Sidebar, ThemeToggle, Collapsible, scroll-area
  *   Value:    User interaction controls, form handling
  *   Why:      All enable user input/interaction
- * 
+ *
  * FEEDBACK (Status, state, messaging, notifications)
  *   Current:  Alert, Badge, Progress
  *   Existing: ErrorMessage, LoadingSpinner, Toast, Toaster, Tooltip,
  *             separator, skeleton, table
  *   Value:    Visual feedback, status indication, messaging
  *   Why:      All communicate status, feedback, errors to user
- * 
+ *
  * TYPOGRAPHY (Text display, content presentation)
  *   Current:  Card (structural container for content)
  *   Existing: heading, Label, text
  *   Value:    Text and content organization
  *   Why:      Card is a structural wrapper like heading, label, text
- * 
+ *
  * MEDIA (Images, avatars, visual content)
  *   Current:  Avatar
  *   Existing: Logo, OptimizedImage
@@ -60,8 +60,8 @@ export const COMPONENT_VALIDATION = {
       hasAccessibility: true,
       usesTokens: true,
       hasFocus: true,
-      docstring: true
-    }
+      docstring: true,
+    },
   },
 
   feedback: {
@@ -72,8 +72,8 @@ export const COMPONENT_VALIDATION = {
       supportsSemanticColors: true,
       hasIcon: true,
       hasAccessibility: true,
-      usesTokens: true
-    }
+      usesTokens: true,
+    },
   },
 
   typography: {
@@ -83,8 +83,8 @@ export const COMPONENT_VALIDATION = {
       hasScales: true,
       followsTokens: true,
       hasAccessibility: true,
-      docstring: true
-    }
+      docstring: true,
+    },
   },
 
   media: {
@@ -94,9 +94,9 @@ export const COMPONENT_VALIDATION = {
       hasVariants: true,
       supportsFallback: true,
       hasAccessibility: true,
-      optimized: true
-    }
-  }
+      optimized: true,
+    },
+  },
 } as const;
 
 /**
@@ -115,8 +115,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Has focus ring (ring-2 ring-offset-2)',
       '✓ Disabled state handled',
       '✓ Loading state supported',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Input: {
@@ -128,8 +128,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Focus ring visible',
       '✓ Placeholder uses token color',
       '✓ Accessible aria-attributes',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Select: {
@@ -140,8 +140,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Uses design tokens',
       '✓ Has focus states',
       '✓ Supports disabled state',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Checkbox: {
@@ -152,8 +152,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Focus visible',
       '✓ Accessible via label',
       '✓ Disabled state handled',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Switch: {
@@ -164,8 +164,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Keyboard accessible',
       '✓ Focus visible',
       '✓ Disabled state handled',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Textarea: {
@@ -176,8 +176,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Has variants and states',
       '✓ Resizable (optional)',
       '✓ Focus ring visible',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Tabs: {
@@ -188,8 +188,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Uses design tokens',
       '✓ Has active indicator',
       '✓ Accessible (role=tab)',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Dialog: {
@@ -200,8 +200,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Focus management',
       '✓ Backdrop click closes',
       '✓ Uses design tokens',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   // FEEDBACK COMPONENTS
@@ -213,8 +213,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Icon support with proper spacing',
       '✓ Uses design tokens for backgrounds/borders',
       '✓ Accessible (role=alert for important)',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Badge: {
@@ -225,8 +225,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Uses semantic colors',
       '✓ Uses design tokens',
       '✓ Small, focused component',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   Progress: {
@@ -237,8 +237,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Supports different sizes',
       '✓ Value and max attributes',
       '✓ Accessible (aria-valuenow, etc)',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   // TYPOGRAPHY COMPONENTS
@@ -250,8 +250,8 @@ export const COMPONENT_CHECKLIST = {
       '✓ Uses design tokens for spacing/borders',
       '✓ Semantic HTML',
       '✓ Flexible layout support',
-      '✓ JSDoc documented'
-    ]
+      '✓ JSDoc documented',
+    ],
   },
 
   // MEDIA COMPONENTS
@@ -263,27 +263,27 @@ export const COMPONENT_CHECKLIST = {
       '✓ Uses design tokens',
       '✓ Fallback initials support',
       '✓ Accessible (alt text)',
-      '✓ JSDoc documented'
-    ]
-  }
+      '✓ JSDoc documented',
+    ],
+  },
 } as const;
 
 /**
  * VALIDATION RESULTS
  * ════════════════════════════════════════════════════════════════════
- * 
+ *
  * All 13 components in /components are valid and properly implemented:
  * - 8 INTERACTIVE: Button, Input, Select, Checkbox, Switch, Textarea, Tabs, Dialog
  * - 3 FEEDBACK: Alert, Badge, Progress
  * - 1 TYPOGRAPHY: Card
  * - 1 MEDIA: Avatar
- * 
+ *
  * REDUNDANCY ANALYSIS:
  * - /components directory is REDUNDANT (simple flat list)
  * - Components have clear categorical purposes
  * - Existing categories (/interactive, /feedback, etc.) are strategic
  * - Migration will improve discoverability and maintainability
- * 
+ *
  * MIGRATION RESULT:
  * ✓ Eliminates /components directory
  * ✓ Better organization by function

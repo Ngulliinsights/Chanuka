@@ -3,6 +3,7 @@
  */
 
 import { Router } from 'express';
+
 import { argumentIntelligenceService } from './application/argument-intelligence-service';
 
 const router = Router();

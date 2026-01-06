@@ -7,13 +7,20 @@
  * Requirements: 9.1, 9.2
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
-
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
-import { performanceMonitor } from '@client/utils/performance-monitor';
 import { usePerformanceBenchmarking } from '@client/utils/performance-benchmarking';
+import { performanceMonitor } from '@client/utils/performance-monitor';
+import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 // Temporarily unused - TODO: Implement performance benchmarking
 // const performanceBenchmarking = usePerformanceBenchmarking();
@@ -24,9 +31,9 @@ interface PerformanceMetrics {
   interactionTime: number;
   memoryUsage: number;
   coreWebVitals: {
-    lcp: number;  // Largest Contentful Paint
-    fid: number;  // First Input Delay
-    cls: number;  // Cumulative Layout Shift
+    lcp: number; // Largest Contentful Paint
+    fid: number; // First Input Delay
+    cls: number; // Cumulative Layout Shift
   };
 }
 
@@ -47,29 +54,29 @@ interface PerformanceMonitorProps {
 
 const DEFAULT_THRESHOLDS: Record<string, PerformanceThresholds> = {
   home: {
-    loadTime: 2000,  // 2 seconds
+    loadTime: 2000, // 2 seconds
     lcp: 2500,
     fid: 100,
-    cls: 0.1
+    cls: 0.1,
   },
   search: {
-    loadTime: 500,   // 500ms for search results
+    loadTime: 500, // 500ms for search results
     lcp: 1000,
     fid: 50,
-    cls: 0.05
+    cls: 0.05,
   },
   dashboard: {
-    loadTime: 3000,  // 3 seconds with full data
+    loadTime: 3000, // 3 seconds with full data
     lcp: 3000,
     fid: 100,
-    cls: 0.1
+    cls: 0.1,
   },
   default: {
     loadTime: 2000,
     lcp: 2500,
     fid: 100,
-    cls: 0.1
-  }
+    cls: 0.1,
+  },
 };
 
 export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
@@ -77,18 +84,21 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   thresholds: customThresholds,
   showRealTime = true,
   showOptimizations = true,
-  onOptimizationNeeded
+  onOptimizationNeeded,
 }) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [issues, setIssues] = useState<string[]>([]);
 
   const thresholds = {
-    ...DEFAULT_THRESHOLDS[pageName] || DEFAULT_THRESHOLDS.default,
-    ...customThresholds
+    ...(DEFAULT_THRESHOLDS[pageName] || DEFAULT_THRESHOLDS.default),
+    ...customThresholds,
   };
 
-  const { benchmark, isRunning, runBenchmark, optimize } = usePerformanceBenchmarking(pageName, false);
+  const { benchmark, isRunning, runBenchmark, optimize } = usePerformanceBenchmarking(
+    pageName,
+    false
+  );
 
   /**
    * Start performance monitoring
@@ -98,15 +108,19 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     performanceMonitor.startMonitoring(pageName);
 
     // Monitor Core Web Vitals
-    performanceMonitor.monitorWebVitals((vitals) => {
-      setMetrics(prev => prev ? {
-        ...prev,
-        coreWebVitals: {
-          lcp: vitals.lcp || prev.coreWebVitals.lcp,
-          fid: vitals.fid || prev.coreWebVitals.fid,
-          cls: vitals.cls || prev.coreWebVitals.cls
-        }
-      } : null);
+    performanceMonitor.monitorWebVitals(vitals => {
+      setMetrics(prev =>
+        prev
+          ? {
+              ...prev,
+              coreWebVitals: {
+                lcp: vitals.lcp || prev.coreWebVitals.lcp,
+                fid: vitals.fid || prev.coreWebVitals.fid,
+                cls: vitals.cls || prev.coreWebVitals.cls,
+              },
+            }
+          : null
+      );
     });
 
     logger.info(`Performance monitoring started for ${pageName}`);
@@ -119,7 +133,8 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     if (!isMonitoring) return;
 
     const performanceMetrics = performanceMonitor.endMonitoring(pageName);
-    const memoryUsage = 'memory' in performance ? (performance as any).memory?.usedJSHeapSize || 0 : 0;
+    const memoryUsage =
+      'memory' in performance ? (performance as any).memory?.usedJSHeapSize || 0 : 0;
 
     const collectedMetrics: PerformanceMetrics = {
       loadTime: Math.round(performanceMetrics.loadTime),
@@ -129,8 +144,8 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       coreWebVitals: {
         lcp: 0,
         fid: 0,
-        cls: 0
-      }
+        cls: 0,
+      },
     };
 
     setMetrics(collectedMetrics);
@@ -146,7 +161,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
     logger.info(`Performance monitoring completed for ${pageName}`, {
       metrics: collectedMetrics,
-      issues: detectedIssues
+      issues: detectedIssues,
     });
   }, [pageName, isMonitoring, thresholds, onOptimizationNeeded]);
 
@@ -175,7 +190,8 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       issues.push(`CLS (${metrics.coreWebVitals.cls}) exceeds threshold (${thresholds.cls})`);
     }
 
-    if (metrics.memoryUsage > 100) { // 100MB threshold
+    if (metrics.memoryUsage > 100) {
+      // 100MB threshold
       issues.push(`Memory usage (${metrics.memoryUsage}MB) is high`);
     }
 
@@ -273,15 +289,11 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
                 <StatusIcon className={`h-5 w-5 ${statusColor}`} />
                 Performance Monitor
               </CardTitle>
-              <CardDescription>
-                Real-time performance metrics for {pageName} page
-              </CardDescription>
+              <CardDescription>Real-time performance metrics for {pageName} page</CardDescription>
             </div>
             {metrics && (
               <div className="text-right">
-                <div className={`text-2xl font-bold ${statusColor}`}>
-                  {performanceScore}
-                </div>
+                <div className={`text-2xl font-bold ${statusColor}`}>{performanceScore}</div>
                 <div className="text-sm text-muted-foreground">Score</div>
               </div>
             )}
@@ -300,54 +312,54 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {/* Load Time */}
               <div className="text-center">
-                <div className={`text-xl font-semibold ${
-                  metrics.loadTime <= thresholds.loadTime ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <div
+                  className={`text-xl font-semibold ${
+                    metrics.loadTime <= thresholds.loadTime ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {metrics.loadTime}ms
                 </div>
                 <div className="text-sm text-muted-foreground">Load Time</div>
-                <div className="text-xs text-muted-foreground">
-                  Target: {thresholds.loadTime}ms
-                </div>
+                <div className="text-xs text-muted-foreground">Target: {thresholds.loadTime}ms</div>
               </div>
 
               {/* LCP */}
               <div className="text-center">
-                <div className={`text-xl font-semibold ${
-                  metrics.coreWebVitals.lcp <= thresholds.lcp ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <div
+                  className={`text-xl font-semibold ${
+                    metrics.coreWebVitals.lcp <= thresholds.lcp ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {Math.round(metrics.coreWebVitals.lcp)}ms
                 </div>
                 <div className="text-sm text-muted-foreground">LCP</div>
-                <div className="text-xs text-muted-foreground">
-                  Target: {thresholds.lcp}ms
-                </div>
+                <div className="text-xs text-muted-foreground">Target: {thresholds.lcp}ms</div>
               </div>
 
               {/* FID */}
               <div className="text-center">
-                <div className={`text-xl font-semibold ${
-                  metrics.coreWebVitals.fid <= thresholds.fid ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <div
+                  className={`text-xl font-semibold ${
+                    metrics.coreWebVitals.fid <= thresholds.fid ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {Math.round(metrics.coreWebVitals.fid)}ms
                 </div>
                 <div className="text-sm text-muted-foreground">FID</div>
-                <div className="text-xs text-muted-foreground">
-                  Target: {thresholds.fid}ms
-                </div>
+                <div className="text-xs text-muted-foreground">Target: {thresholds.fid}ms</div>
               </div>
 
               {/* Memory */}
               <div className="text-center">
-                <div className={`text-xl font-semibold ${
-                  metrics.memoryUsage <= 100 ? 'text-green-600' : 'text-yellow-600'
-                }`}>
+                <div
+                  className={`text-xl font-semibold ${
+                    metrics.memoryUsage <= 100 ? 'text-green-600' : 'text-yellow-600'
+                  }`}
+                >
                   {metrics.memoryUsage}MB
                 </div>
                 <div className="text-sm text-muted-foreground">Memory</div>
-                <div className="text-xs text-muted-foreground">
-                  Target: &lt;100MB
-                </div>
+                <div className="text-xs text-muted-foreground">Target: &lt;100MB</div>
               </div>
             </div>
           )}
@@ -362,9 +374,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
               <AlertTriangle className="h-5 w-5 text-yellow-600" />
               Performance Issues
             </CardTitle>
-            <CardDescription>
-              Detected performance issues that need attention
-            </CardDescription>
+            <CardDescription>Detected performance issues that need attention</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -407,9 +417,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
               <TrendingUp className="h-5 w-5 text-blue-600" />
               Latest Benchmark
             </CardTitle>
-            <CardDescription>
-              Comprehensive performance benchmark results
-            </CardDescription>
+            <CardDescription>Comprehensive performance benchmark results</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -418,14 +426,10 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
                 <Badge variant={benchmark.passed ? 'default' : 'destructive'}>
                   {benchmark.passed ? 'PASSED' : 'FAILED'}
                 </Badge>
-                <span className="ml-2 text-sm text-muted-foreground">
-                  {benchmark.timestamp}
-                </span>
+                <span className="ml-2 text-sm text-muted-foreground">{benchmark.timestamp}</span>
               </div>
               <div className="text-right">
-                <div className="text-lg font-semibold">
-                  {benchmark.loadTime}ms
-                </div>
+                <div className="text-lg font-semibold">{benchmark.loadTime}ms</div>
                 <div className="text-sm text-muted-foreground">
                   Load Time: {benchmark.loadTime}ms
                 </div>

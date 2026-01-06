@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BookOpen,
   ChevronDown,
@@ -9,14 +8,25 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/design-system/interactive/Collapsible';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/shared/design-system/interactive/Collapsible';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/design-system/typography/Card';
 
 interface PlainLanguageSection {
   id: string;
@@ -45,10 +55,7 @@ interface PlainLanguageSummaryProps {
  * PlainLanguageSummary - Converts complex legal content into accessible language
  * Features: Section-by-section breakdown, impact analysis, complexity indicators
  */
-export function PlainLanguageSummary({
-  sections,
-  className = ""
-}: PlainLanguageSummaryProps) {
+export function PlainLanguageSummary({ sections, className = '' }: PlainLanguageSummaryProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [showLegalText, setShowLegalText] = useState<Set<string>>(new Set());
 
@@ -74,20 +81,29 @@ export function PlainLanguageSummary({
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'low': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'high':
+        return 'text-red-600 bg-red-50 border-red-200';
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'low':
+        return 'text-green-600 bg-green-50 border-green-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getImportanceIcon = (importance: string) => {
     switch (importance) {
-      case 'critical': return <AlertCircle className="h-4 w-4 text-red-600" />;
-      case 'high': return <AlertCircle className="h-4 w-4 text-orange-600" />;
-      case 'medium': return <Info className="h-4 w-4 text-blue-600" />;
-      case 'low': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      default: return <Info className="h-4 w-4 text-gray-600" />;
+      case 'critical':
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
+      case 'high':
+        return <AlertCircle className="h-4 w-4 text-orange-600" />;
+      case 'medium':
+        return <Info className="h-4 w-4 text-blue-600" />;
+      case 'low':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      default:
+        return <Info className="h-4 w-4 text-gray-600" />;
     }
   };
 
@@ -107,20 +123,27 @@ export function PlainLanguageSummary({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-3 rounded-lg bg-blue-50">
-              <div className="text-2xl font-bold text-blue-600">
-                {sections.length}
-              </div>
+              <div className="text-2xl font-bold text-blue-600">{sections.length}</div>
               <div className="text-sm text-muted-foreground">Sections Explained</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-blue-50">
               <div className="text-2xl font-bold text-blue-600">
-                {sections.filter(s => s.importance === 'critical' || s.importance === 'high').length}
+                {
+                  sections.filter(s => s.importance === 'critical' || s.importance === 'high')
+                    .length
+                }
               </div>
               <div className="text-sm text-muted-foreground">High Priority</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-blue-50">
               <div className="text-2xl font-bold text-blue-600">
-                {Math.round(sections.reduce((acc, s) => acc + (s.complexity === 'high' ? 3 : s.complexity === 'medium' ? 2 : 1), 0) / sections.length)}
+                {Math.round(
+                  sections.reduce(
+                    (acc, s) =>
+                      acc + (s.complexity === 'high' ? 3 : s.complexity === 'medium' ? 2 : 1),
+                    0
+                  ) / sections.length
+                )}
               </div>
               <div className="text-sm text-muted-foreground">Avg. Complexity</div>
             </div>
@@ -130,7 +153,7 @@ export function PlainLanguageSummary({
 
       {/* Section Summaries */}
       <div className="space-y-4">
-        {sections.map((section) => (
+        {sections.map(section => (
           <Collapsible
             key={section.id}
             open={expandedSections.has(section.id)}
@@ -153,7 +176,9 @@ export function PlainLanguageSummary({
                               {section.complexity} complexity
                             </Badge>
                             <Badge
-                              variant={section.importance === 'critical' ? 'destructive' : 'secondary'}
+                              variant={
+                                section.importance === 'critical' ? 'destructive' : 'secondary'
+                              }
                               className="text-xs"
                             >
                               {section.importance} priority
@@ -162,10 +187,11 @@ export function PlainLanguageSummary({
                         </div>
                       </div>
                     </div>
-                    {expandedSections.has(section.id) ?
-                      <ChevronDown className="h-4 w-4" /> :
+                    {expandedSections.has(section.id) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
                       <ChevronRight className="h-4 w-4" />
-                    }
+                    )}
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -223,7 +249,10 @@ export function PlainLanguageSummary({
                           <h5 className="font-medium text-sm mb-1">What changes?</h5>
                           <ul className="space-y-1">
                             {section.impact.what.map((change, index) => (
-                              <li key={index} className="text-xs text-muted-foreground flex items-start gap-1">
+                              <li
+                                key={index}
+                                className="text-xs text-muted-foreground flex items-start gap-1"
+                              >
                                 <span className="w-1 h-1 rounded-full bg-muted-foreground mt-2 flex-shrink-0"></span>
                                 {change}
                               </li>

@@ -2,7 +2,7 @@
  * Design System Feedback Components
  *
  * Visual feedback, status indication, messaging, and notification components.
- * 
+ *
  * STRATEGIC CATEGORIES:
  * - State Indication: Alert, Badge, Progress
  * - User Notifications: Toast, Toaster, Tooltip
@@ -46,5 +46,5 @@ export {
   TableHead,
   TableRow,
   TableCell,
-  TableCaption
+  TableCaption,
 } from './table';

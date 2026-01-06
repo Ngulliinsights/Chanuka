@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ConflictOfInterestAnalysis } from '@client/features/bills/ui/analysis/conflict-of-interest';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import type { Bill } from '@client/shared/types';
@@ -16,8 +17,12 @@ interface AnalysisDashboardProps {
 export function AnalysisDashboard({ bill }: AnalysisDashboardProps) {
   const sponsorId = bill.sponsors?.[0]?.id;
   const primarySponsorId = typeof sponsorId === 'string' ? parseInt(sponsorId, 10) : sponsorId || 0;
-  
-  const { data: conflictAnalysis, loading, error } = useConflictAnalysis(
+
+  const {
+    data: conflictAnalysis,
+    loading,
+    error,
+  } = useConflictAnalysis(
     typeof bill.id === 'string' ? parseInt(bill.id, 10) : bill.id,
     primarySponsorId
   );
@@ -36,9 +41,7 @@ export function AnalysisDashboard({ bill }: AnalysisDashboardProps) {
     return (
       <div className="space-y-4">
         <Alert className="bg-blue-50 border-blue-200">
-          <AlertDescription className="text-blue-800">
-            Loading analysis...
-          </AlertDescription>
+          <AlertDescription className="text-blue-800">Loading analysis...</AlertDescription>
         </Alert>
         <div className="h-96 bg-gray-100 rounded animate-pulse" />
       </div>
@@ -60,8 +63,8 @@ export function AnalysisDashboard({ bill }: AnalysisDashboardProps) {
       {/* Informational alert */}
       <Alert className="bg-blue-50 border-blue-200">
         <AlertDescription className="text-blue-800">
-          Advanced analysis of potential conflicts of interest, financial exposure, and voting patterns.
-          This analysis uses publicly available data sources and algorithmic scoring.
+          Advanced analysis of potential conflicts of interest, financial exposure, and voting
+          patterns. This analysis uses publicly available data sources and algorithmic scoring.
         </AlertDescription>
       </Alert>
 

@@ -1,25 +1,30 @@
-import { 
-  AlertTriangle, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  Network, 
+import {
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Network,
   DollarSign,
   Users,
   FileText,
   Eye,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-
-import { logger } from '@client/utils/logger';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { logger } from '@client/utils/logger';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];
@@ -69,12 +74,13 @@ interface DashboardData {
     decreasingRisk: number;
     stableRisk: number;
   };
-  predictions: Array<{ bill_id: number;
+  predictions: Array<{
+    bill_id: number;
     billTitle: string;
     predictedConflictType: string;
     probability: number;
     riskFactors: string[];
-   }>;
+  }>;
 }
 
 const ConflictAnalysisDashboard: React.FC = () => {
@@ -90,7 +96,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
       setRefreshing(true);
       const [dashboardResponse, conflictsResponse] = await Promise.all([
         fetch('/api/sponsor-conflict-analysis/dashboard'),
-        fetch('/api/sponsor-conflict-analysis/detect')
+        fetch('/api/sponsor-conflict-analysis/detect'),
       ]);
 
       if (!dashboardResponse.ok || !conflictsResponse.ok) {
@@ -120,7 +126,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
       low: 'bg-green-100 text-green-800 border-green-200',
       medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       high: 'bg-orange-100 text-orange-800 border-orange-200',
-      critical: 'bg-red-100 text-red-800 border-red-200'
+      critical: 'bg-red-100 text-red-800 border-red-200',
     };
     return colors[severity as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
@@ -141,7 +147,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -153,7 +159,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
       family_business: 'Family/Business',
       voting_pattern: 'Voting Pattern',
       timing_suspicious: 'Suspicious Timing',
-      disclosure_incomplete: 'Incomplete Disclosure'
+      disclosure_incomplete: 'Incomplete Disclosure',
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -173,12 +179,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
           Error loading conflict analysis: {error}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="ml-2"
-            onClick={fetchDashboardData}
-          >
+          <Button variant="outline" size="sm" className="ml-2" onClick={fetchDashboardData}>
             Retry
           </Button>
         </AlertDescription>
@@ -190,9 +191,10 @@ const ConflictAnalysisDashboard: React.FC = () => {
     return <div>No data available</div>;
   }
 
-  const filteredConflicts = selectedSeverity === 'all' 
-    ? conflictData.conflicts 
-    : conflictData.conflicts.filter(c => c.severity === selectedSeverity);
+  const filteredConflicts =
+    selectedSeverity === 'all'
+      ? conflictData.conflicts
+      : conflictData.conflicts.filter(c => c.severity === selectedSeverity);
 
   return (
     <div className="space-y-6 p-6">
@@ -203,11 +205,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
             Advanced conflict detection and transparency monitoring
           </p>
         </div>
-        <Button 
-          onClick={fetchDashboardData} 
-          disabled={refreshing}
-          variant="outline"
-        >
+        <Button onClick={fetchDashboardData} disabled={refreshing} variant="outline">
           {refreshing ? (
             <RefreshCw className="h-4 w-4 animate-spin mr-2" />
           ) : (
@@ -241,9 +239,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <div className="text-2xl font-bold">
               {formatCurrency(dashboardData.overview.totalFinancialImpact)}
             </div>
-            <p className="text-xs text-gray-600">
-              Potential conflict value
-            </p>
+            <p className="text-xs text-gray-600">Potential conflict value</p>
           </CardContent>
         </Card>
 
@@ -257,7 +253,8 @@ const ConflictAnalysisDashboard: React.FC = () => {
               {Math.round(dashboardData.networkMetrics.density * 100)}%
             </div>
             <p className="text-xs text-gray-600">
-              {dashboardData.networkMetrics.totalNodes} nodes, {dashboardData.networkMetrics.totalEdges} connections
+              {dashboardData.networkMetrics.totalNodes} nodes,{' '}
+              {dashboardData.networkMetrics.totalEdges} connections
             </p>
           </CardContent>
         </Card>
@@ -271,9 +268,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <div className="text-2xl font-bold">
               {Math.round(dashboardData.overview.averageRiskScore)}
             </div>
-            <p className="text-xs text-gray-600">
-              Out of 100 points
-            </p>
+            <p className="text-xs text-gray-600">Out of 100 points</p>
           </CardContent>
         </Card>
       </div>
@@ -290,14 +285,16 @@ const ConflictAnalysisDashboard: React.FC = () => {
           <div className="flex items-center space-x-4 mb-4">
             <span className="text-sm font-medium">Filter by severity:</span>
             <div className="flex space-x-2">
-              {['all', 'critical', 'high', 'medium', 'low'].map((severity) => (
+              {['all', 'critical', 'high', 'medium', 'low'].map(severity => (
                 <Button
                   key={severity}
                   variant={selectedSeverity === severity ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedSeverity(severity)}
                 >
-                  {severity === 'all' ? 'All' : severity.charAt(0).toUpperCase() + severity.slice(1)}
+                  {severity === 'all'
+                    ? 'All'
+                    : severity.charAt(0).toUpperCase() + severity.slice(1)}
                   {severity !== 'all' && (
                     <Badge variant="secondary" className="ml-1">
                       {dashboardData.severityDistribution[severity] || 0}
@@ -309,20 +306,16 @@ const ConflictAnalysisDashboard: React.FC = () => {
           </div>
 
           <div className="grid gap-4">
-            {filteredConflicts.map((conflict) => (
+            {filteredConflicts.map(conflict => (
               <Card key={conflict.conflictId}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      Sponsor ID: {conflict.sponsor_id}
-                    </CardTitle>
+                    <CardTitle className="text-lg">Sponsor ID: {conflict.sponsor_id}</CardTitle>
                     <div className="flex items-center space-x-2">
                       <Badge className={getSeverityColor(conflict.severity)}>
                         {conflict.severity.toUpperCase()}
                       </Badge>
-                      <Badge variant="outline">
-                        {getConflictTypeLabel(conflict.conflictType)}
-                      </Badge>
+                      <Badge variant="outline">{getConflictTypeLabel(conflict.conflictType)}</Badge>
                     </div>
                   </div>
                   <CardDescription>
@@ -330,19 +323,11 @@ const ConflictAnalysisDashboard: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-700 mb-3">
-                    {conflict.description}
-                  </p>
+                  <p className="text-sm text-gray-700 mb-3">{conflict.description}</p>
                   <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>
-                      Financial Impact: {formatCurrency(conflict.financialImpact)}
-                    </span>
-                    <span>
-                      Affects {conflict.affectedBills.length} bill(s)
-                    </span>
-                    <span>
-                      Detected: {new Date(conflict.detectedAt).toLocaleDateString()}
-                    </span>
+                    <span>Financial Impact: {formatCurrency(conflict.financialImpact)}</span>
+                    <span>Affects {conflict.affectedBills.length} bill(s)</span>
+                    <span>Detected: {new Date(conflict.detectedAt).toLocaleDateString()}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -355,9 +340,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Risk Trend Distribution</CardTitle>
-                <CardDescription>
-                  How sponsor risk levels are changing over time
-                </CardDescription>
+                <CardDescription>How sponsor risk levels are changing over time</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -366,12 +349,18 @@ const ConflictAnalysisDashboard: React.FC = () => {
                     <span>Increasing Risk</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold">{dashboardData.recentTrends.increasingRisk}</span>
+                    <span className="font-semibold">
+                      {dashboardData.recentTrends.increasingRisk}
+                    </span>
                     <span className="text-sm text-gray-600">sponsors</span>
                   </div>
                 </div>
-                <Progress 
-                  value={(dashboardData.recentTrends.increasingRisk / dashboardData.overview.totalSponsors) * 100} 
+                <Progress
+                  value={
+                    (dashboardData.recentTrends.increasingRisk /
+                      dashboardData.overview.totalSponsors) *
+                    100
+                  }
                   className="h-2"
                 />
 
@@ -381,12 +370,18 @@ const ConflictAnalysisDashboard: React.FC = () => {
                     <span>Decreasing Risk</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold">{dashboardData.recentTrends.decreasingRisk}</span>
+                    <span className="font-semibold">
+                      {dashboardData.recentTrends.decreasingRisk}
+                    </span>
                     <span className="text-sm text-gray-600">sponsors</span>
                   </div>
                 </div>
-                <Progress 
-                  value={(dashboardData.recentTrends.decreasingRisk / dashboardData.overview.totalSponsors) * 100} 
+                <Progress
+                  value={
+                    (dashboardData.recentTrends.decreasingRisk /
+                      dashboardData.overview.totalSponsors) *
+                    100
+                  }
                   className="h-2"
                 />
 
@@ -400,8 +395,11 @@ const ConflictAnalysisDashboard: React.FC = () => {
                     <span className="text-sm text-gray-600">sponsors</span>
                   </div>
                 </div>
-                <Progress 
-                  value={(dashboardData.recentTrends.stableRisk / dashboardData.overview.totalSponsors) * 100} 
+                <Progress
+                  value={
+                    (dashboardData.recentTrends.stableRisk / dashboardData.overview.totalSponsors) *
+                    100
+                  }
                   className="h-2"
                 />
               </CardContent>
@@ -410,14 +408,15 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Top Risk Sponsors</CardTitle>
-                <CardDescription>
-                  Sponsors with highest conflict risk scores
-                </CardDescription>
+                <CardDescription>Sponsors with highest conflict risk scores</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {dashboardData.topRiskSponsors.slice(0, 5).map((sponsor, index) => (
-                    <div key={sponsor.sponsor_id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={sponsor.sponsor_id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-semibold">
                           #{index + 1}
@@ -451,28 +450,28 @@ const ConflictAnalysisDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                { dashboardData.predictions.map((prediction, index) => (
-                  <div key={prediction.bill_id } className="border rounded-lg p-4">
+                {dashboardData.predictions.map((prediction, index) => (
+                  <div key={prediction.bill_id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold">{prediction.billTitle}</h4>
                       <div className="flex items-center space-x-2">
                         <Badge variant="outline">
                           {getConflictTypeLabel(prediction.predictedConflictType)}
                         </Badge>
-                        <Badge 
+                        <Badge
                           className={
-                            prediction.probability > 0.7 ? 'bg-red-100 text-red-800' :
-                            prediction.probability > 0.5 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
+                            prediction.probability > 0.7
+                              ? 'bg-red-100 text-red-800'
+                              : prediction.probability > 0.5
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-green-100 text-green-800'
                           }
                         >
                           {Math.round(prediction.probability * 100)}% probability
                         </Badge>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-600 mb-2">
-                      Bill ID: { prediction.bill_id }
-                    </div>
+                    <div className="text-sm text-gray-600 mb-2">Bill ID: {prediction.bill_id}</div>
                     <div className="text-sm">
                       <span className="font-medium">Risk Factors:</span>
                       <ul className="list-disc list-inside mt-1 text-gray-700">
@@ -493,9 +492,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Network Metrics</CardTitle>
-                <CardDescription>
-                  Analysis of conflict relationship networks
-                </CardDescription>
+                <CardDescription>Analysis of conflict relationship networks</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
@@ -524,23 +521,21 @@ const ConflictAnalysisDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Conflict Type Distribution</CardTitle>
-                <CardDescription>
-                  Breakdown of detected conflict types
-                </CardDescription>
+                <CardDescription>Breakdown of detected conflict types</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {Object.entries(dashboardData.conflictTypeDistribution)
-                    .sort(([,a], [,b]) => b - a)
+                    .sort(([, a], [, b]) => b - a)
                     .map(([type, count]) => (
                       <div key={type} className="flex items-center justify-between">
                         <span className="text-sm">{getConflictTypeLabel(type)}</span>
                         <div className="flex items-center space-x-2">
                           <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ 
-                                width: `${(count / Math.max(...Object.values(dashboardData.conflictTypeDistribution))) * 100}%` 
+                            <div
+                              className="bg-blue-600 h-2 rounded-full"
+                              style={{
+                                width: `${(count / Math.max(...Object.values(dashboardData.conflictTypeDistribution))) * 100}%`,
                               }}
                             />
                           </div>
@@ -559,4 +554,3 @@ const ConflictAnalysisDashboard: React.FC = () => {
 };
 
 export default ConflictAnalysisDashboard;
-

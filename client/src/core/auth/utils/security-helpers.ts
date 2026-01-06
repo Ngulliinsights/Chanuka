@@ -9,8 +9,16 @@ export function sanitizeInput(input: string): string {
 
 export function isCommonPassword(password: string): boolean {
   const commonPasswords = [
-    'password', '123456', 'qwerty', 'abc123', 'letmein',
-    'welcome', 'monkey', '1q2w3e4r', 'master', 'sunshine'
+    'password',
+    '123456',
+    'qwerty',
+    'abc123',
+    'letmein',
+    'welcome',
+    'monkey',
+    '1q2w3e4r',
+    'master',
+    'sunshine',
   ];
   return commonPasswords.includes(password.toLowerCase());
 }

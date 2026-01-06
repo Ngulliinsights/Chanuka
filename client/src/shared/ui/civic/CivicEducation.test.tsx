@@ -5,14 +5,15 @@
  * Requirements: 10.4, 10.5
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+import { KenyanContextProvider } from '../context/KenyanContextProvider';
 
 import { CivicEducationHub } from './CivicEducationHub';
 import { KenyanLegislativeProcess } from './KenyanLegislativeProcess';
 import { LegislativeProcessGuide } from './LegislativeProcessGuide';
-import { KenyanContextProvider } from '../context/KenyanContextProvider';
 
 // Mock the i18n hook
 const mockUseI18n = vi.fn(() => ({
@@ -23,19 +24,17 @@ const mockUseI18n = vi.fn(() => ({
     currency: 'KES',
     dateFormat: 'dd/MM/yyyy',
     numberFormat: 'en-KE',
-    governmentLevels: ['national', 'county', 'ward'] as const
-  }
+    governmentLevels: ['national', 'county', 'ward'] as const,
+  },
 }));
 
 vi.mock('@client/shared/hooks/use-i18n', () => ({
-  useI18n: mockUseI18n
+  useI18n: mockUseI18n,
 }));
 
 // Test wrapper with context
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <KenyanContextProvider>
-    {children}
-  </KenyanContextProvider>
+  <KenyanContextProvider>{children}</KenyanContextProvider>
 );
 
 describe('CivicEducationHub', () => {
@@ -48,8 +47,8 @@ describe('CivicEducationHub', () => {
         currency: 'KES',
         dateFormat: 'dd/MM/yyyy',
         numberFormat: 'en-KE',
-        governmentLevels: ['national', 'county', 'ward'] as const
-      }
+        governmentLevels: ['national', 'county', 'ward'] as const,
+      },
     });
   });
 
@@ -104,8 +103,8 @@ describe('CivicEducationHub', () => {
         currency: 'KES',
         dateFormat: 'dd/MM/yyyy',
         numberFormat: 'sw-KE',
-        governmentLevels: ['national', 'county', 'ward'] as const
-      }
+        governmentLevels: ['national', 'county', 'ward'] as const,
+      },
     });
 
     render(
@@ -127,7 +126,7 @@ describe('KenyanLegislativeProcess', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('Kenya\'s Law-Making Process')).toBeInTheDocument();
+    expect(screen.getByText("Kenya's Law-Making Process")).toBeInTheDocument();
     expect(screen.getByText('Process')).toBeInTheDocument();
     expect(screen.getByText('Bill Types')).toBeInTheDocument();
     expect(screen.getByText('Public Participation')).toBeInTheDocument();
@@ -304,8 +303,8 @@ describe('Performance', () => {
         currency: 'KES',
         dateFormat: 'dd/MM/yyyy',
         numberFormat: 'sw-KE',
-        governmentLevels: ['national', 'county', 'ward'] as const
-      }
+        governmentLevels: ['national', 'county', 'ward'] as const,
+      },
     });
 
     rerender(

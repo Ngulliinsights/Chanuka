@@ -30,13 +30,13 @@ export interface UseProgressiveLoadingResult {
   stageProgress: number;
   state: LoadingState;
   error: LoadingError | null;
-  
+
   // Stage information
   stages: LoadingStage[];
   completedStages: string[];
   failedStages: string[];
   skippedStages: string[];
-  
+
   // Actions
   start: () => void;
   nextStage: () => void;
@@ -48,7 +48,7 @@ export interface UseProgressiveLoadingResult {
   skipCurrentStage: (reason?: string) => void;
   retryCurrentStage: () => void;
   reset: () => void;
-  
+
   // Utilities
   canGoNext: boolean;
   canGoPrevious: boolean;
@@ -64,7 +64,9 @@ interface TimeoutManager {
   stop: () => void;
 }
 
-export function useProgressiveLoading(options: UseProgressiveLoadingOptions): UseProgressiveLoadingResult {
+export function useProgressiveLoading(
+  options: UseProgressiveLoadingOptions
+): UseProgressiveLoadingResult {
   const {
     stages,
     autoAdvance = true,
@@ -97,39 +99,50 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     try {
       stages.forEach(stage => validateLoadingStage(stage));
     } catch (err) {
-      const validationError = err instanceof LoadingError ? err : new LoadingStageError(
-        'unknown',
-        err instanceof Error ? err.message : 'Invalid stage configuration'
-      );
+      const validationError =
+        err instanceof LoadingError
+          ? err
+          : new LoadingStageError(
+              'unknown',
+              err instanceof Error ? err.message : 'Invalid stage configuration'
+            );
       setError(validationError);
       onError?.(validationError);
     }
   }, [stages, onError]);
 
-  const failCurrentStage = useCallback((errorInput: Error | string) => {
-    const currentStage = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
-      stages[currentStageIndex] : null;
+  const failCurrentStage = useCallback(
+    (errorInput: Error | string) => {
+      const currentStage =
+        currentStageIndex >= 0 && currentStageIndex < stages.length
+          ? stages[currentStageIndex]
+          : null;
 
-    if (!currentStage) return;
+      if (!currentStage) return;
 
-    const stageError = errorInput instanceof LoadingError ? errorInput : new LoadingStageError(
-      currentStage.id,
-      typeof errorInput === 'string' ? errorInput : errorInput.message
-    );
+      const stageError =
+        errorInput instanceof LoadingError
+          ? errorInput
+          : new LoadingStageError(
+              currentStage.id,
+              typeof errorInput === 'string' ? errorInput : errorInput.message
+            );
 
-    setFailedStages(prev => [...prev, currentStage.id]);
-    setError(stageError);
-    setState('error');
-    onStageError?.(currentStage.id, stageError);
-    onError?.(stageError);
-  }, [currentStageIndex, stages, onStageError, onError]);
+      setFailedStages(prev => [...prev, currentStage.id]);
+      setError(stageError);
+      setState('error');
+      onStageError?.(currentStage.id, stageError);
+      onError?.(stageError);
+    },
+    [currentStageIndex, stages, onStageError, onError]
+  );
 
   // Setup timeout for current stage
   useEffect(() => {
     if (currentStageIndex >= 0 && currentStageIndex < stages.length) {
       const currentStage = stages[currentStageIndex];
       if (!currentStage) return;
-      
+
       const stageTimeout = currentStage.duration || timeout;
 
       if (stageTimeout && timeoutManagerRef.current) {
@@ -158,11 +171,14 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     };
   }, [currentStageIndex, stages, timeout, failCurrentStage]);
 
-  const currentStage: LoadingStage | null = currentStageIndex >= 0 && currentStageIndex < stages.length ? 
-    (stages[currentStageIndex] || null) : null;
+  const currentStage: LoadingStage | null =
+    currentStageIndex >= 0 && currentStageIndex < stages.length
+      ? stages[currentStageIndex] || null
+      : null;
 
-  const progress = progressTrackerRef.current ? 
-    calculateStageProgress(stages, currentStageIndex, stageProgress) : 0;
+  const progress = progressTrackerRef.current
+    ? calculateStageProgress(stages, currentStageIndex, stageProgress)
+    : 0;
 
   const start = useCallback(() => {
     if (stages.length === 0) {
@@ -198,7 +214,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     if (currentStageIndex > 0) {
       setCurrentStageIndex(prev => prev - 1);
       setStageProgressState(0);
-      
+
       // Remove from completed/failed/skipped if going back
       if (currentStage) {
         setCompletedStages(prev => prev.filter(id => id !== currentStage.id));
@@ -208,14 +224,17 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     }
   }, [currentStageIndex, currentStage]);
 
-  const goToStage = useCallback((stageIndex: number) => {
-    if (stageIndex >= 0 && stageIndex < stages.length) {
-      setCurrentStageIndex(stageIndex);
-      setStageProgressState(0);
-      setState('loading');
-      setError(null);
-    }
-  }, [stages.length]);
+  const goToStage = useCallback(
+    (stageIndex: number) => {
+      if (stageIndex >= 0 && stageIndex < stages.length) {
+        setCurrentStageIndex(stageIndex);
+        setStageProgressState(0);
+        setState('loading');
+        setError(null);
+      }
+    },
+    [stages.length]
+  );
 
   const completeCurrentStage = useCallback(() => {
     if (!currentStage) return;
@@ -231,28 +250,34 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     }
   }, [currentStage, currentStageIndex, stages.length, onStageComplete, nextStage, onComplete]);
 
-  const setStageProgress = useCallback((progress: number) => {
-    const clampedProgress = Math.min(100, Math.max(0, progress));
-    setStageProgressState(clampedProgress);
-    progressTrackerRef.current?.setStageProgress(clampedProgress);
+  const setStageProgress = useCallback(
+    (progress: number) => {
+      const clampedProgress = Math.min(100, Math.max(0, progress));
+      setStageProgressState(clampedProgress);
+      progressTrackerRef.current?.setStageProgress(clampedProgress);
 
-    if (autoAdvance && clampedProgress >= 100 && currentStage) {
-      completeCurrentStage();
-    }
-  }, [autoAdvance, currentStage, completeCurrentStage]);
+      if (autoAdvance && clampedProgress >= 100 && currentStage) {
+        completeCurrentStage();
+      }
+    },
+    [autoAdvance, currentStage, completeCurrentStage]
+  );
 
-  const skipCurrentStage = useCallback((_reason?: string) => {
-    if (!currentStage) return;
+  const skipCurrentStage = useCallback(
+    (_reason?: string) => {
+      if (!currentStage) return;
 
-    setSkippedStages(prev => [...prev, currentStage.id]);
-    
-    if (currentStageIndex < stages.length - 1) {
-      nextStage();
-    } else {
-      setState('success');
-      onComplete?.();
-    }
-  }, [currentStage, currentStageIndex, stages.length, nextStage, onComplete]);
+      setSkippedStages(prev => [...prev, currentStage.id]);
+
+      if (currentStageIndex < stages.length - 1) {
+        nextStage();
+      } else {
+        setState('success');
+        onComplete?.();
+      }
+    },
+    [currentStage, currentStageIndex, stages.length, nextStage, onComplete]
+  );
 
   const retryCurrentStage = useCallback(() => {
     if (!currentStage) return;
@@ -260,10 +285,10 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     setStageProgressState(0);
     setState('loading');
     setError(null);
-    
+
     // Remove from failed stages
     setFailedStages(prev => prev.filter(id => id !== currentStage.id));
-    
+
     progressTrackerRef.current?.setStageProgress(0);
   }, [currentStage]);
 
@@ -276,7 +301,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     setFailedStages([]);
     setSkippedStages([]);
     progressTrackerRef.current?.reset();
-    
+
     if (timeoutManagerRef.current) {
       timeoutManagerRef.current.stop();
     }
@@ -297,12 +322,12 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     stageProgress,
     state,
     error,
-    
+
     stages,
     completedStages,
     failedStages,
     skippedStages,
-    
+
     start,
     nextStage,
     previousStage,
@@ -313,7 +338,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
     skipCurrentStage,
     retryCurrentStage,
     reset,
-    
+
     canGoNext,
     canGoPrevious,
     canRetry,
@@ -326,7 +351,7 @@ export function useProgressiveLoading(options: UseProgressiveLoadingOptions): Us
 
 /**
  * Multi-operation management utilities
- * 
+ *
  * NOTE: Due to React's Rules of Hooks, we cannot dynamically create hooks in loops.
  * Instead, use the combineProgressiveLoadings helper to combine multiple hook instances.
  */
@@ -337,7 +362,7 @@ export interface MultiProgressiveLoadingResult {
   isAnyLoading: boolean;
   isAllComplete: boolean;
   hasAnyError: boolean;
-  
+
   startAll: () => void;
   resetAll: () => void;
 }
@@ -345,7 +370,7 @@ export interface MultiProgressiveLoadingResult {
 /**
  * Helper function to create multiple progressive loading instances
  * Usage: Call this at the component level for each operation you need
- * 
+ *
  * Example:
  * ```tsx
  * const operation1 = useProgressiveLoading(config1);
@@ -356,9 +381,11 @@ export interface MultiProgressiveLoadingResult {
 export function combineProgressiveLoadings(
   operations: Record<string, UseProgressiveLoadingResult>
 ): MultiProgressiveLoadingResult {
-  const overallProgress = Object.values(operations).length > 0 ?
-    Object.values(operations).reduce((sum, op) => sum + op.progress, 0) / Object.values(operations).length :
-    0;
+  const overallProgress =
+    Object.values(operations).length > 0
+      ? Object.values(operations).reduce((sum, op) => sum + op.progress, 0) /
+        Object.values(operations).length
+      : 0;
 
   const isAnyLoading = Object.values(operations).some(op => op.state === 'loading');
   const isAllComplete = Object.values(operations).every(op => op.isComplete);

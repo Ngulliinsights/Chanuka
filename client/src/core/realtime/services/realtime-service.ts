@@ -1,6 +1,6 @@
 /**
  * Real-time Service
- * 
+ *
  * Main service orchestrating all real-time functionality.
  * Provides a unified interface for WebSocket connections, subscriptions, and real-time updates.
  */
@@ -9,12 +9,12 @@ import { logger } from '@client/utils/logger';
 
 import { getRealTimeConfig } from '../config';
 import { UnifiedWebSocketManager } from '../manager';
-import { 
-  RealTimeConfig, 
-  ConnectionState, 
+import {
+  RealTimeConfig,
+  ConnectionState,
   WebSocketSubscription,
   RealTimeHandlers,
-  WebSocketMessage
+  WebSocketMessage,
 } from '../types';
 
 import { BillTrackingService } from './bill-tracking';
@@ -59,7 +59,7 @@ export class RealTimeService {
   async initialize(token?: string): Promise<void> {
     if (this.isInitialized) {
       logger.debug('RealTimeService already initialized', {
-        component: 'RealTimeService'
+        component: 'RealTimeService',
       });
       return;
     }
@@ -79,12 +79,16 @@ export class RealTimeService {
       this.isInitialized = true;
 
       logger.info('RealTimeService initialized successfully', {
-        component: 'RealTimeService'
+        component: 'RealTimeService',
       });
     } catch (error) {
-      logger.error('Failed to initialize RealTimeService', {
-        component: 'RealTimeService'
-      }, error);
+      logger.error(
+        'Failed to initialize RealTimeService',
+        {
+          component: 'RealTimeService',
+        },
+        error
+      );
       throw error;
     }
   }
@@ -104,12 +108,16 @@ export class RealTimeService {
       this.isInitialized = false;
 
       logger.info('RealTimeService shut down successfully', {
-        component: 'RealTimeService'
+        component: 'RealTimeService',
       });
     } catch (error) {
-      logger.error('Error during RealTimeService shutdown', {
-        component: 'RealTimeService'
-      }, error);
+      logger.error(
+        'Error during RealTimeService shutdown',
+        {
+          component: 'RealTimeService',
+        },
+        error
+      );
     }
   }
 
@@ -139,7 +147,7 @@ export class RealTimeService {
 
   subscribe(subscription: WebSocketSubscription): string {
     const topic = `${subscription.type}:${subscription.id}`;
-    
+
     return this.wsManager.subscribe(topic, (message: WebSocketMessage) => {
       this.handleMessage(subscription, message);
     });
@@ -199,7 +207,7 @@ export class RealTimeService {
       subscriptionCount: this.wsManager.getSubscriptionCount(),
       billSubscriptions: this.billTrackingService.getSubscriptionCount(),
       communitySubscriptions: this.communityService.getSubscriptionCount(),
-      notificationSubscriptions: this.notificationService.getSubscriptionCount()
+      notificationSubscriptions: this.notificationService.getSubscriptionCount(),
     };
   }
 
@@ -212,14 +220,14 @@ export class RealTimeService {
     this.wsManager.on('connected', () => {
       this.handlers.onConnectionChange?.(true);
       logger.info('WebSocket connected', {
-        component: 'RealTimeService'
+        component: 'RealTimeService',
       });
     });
 
     this.wsManager.on('disconnected', () => {
       this.handlers.onConnectionChange?.(false);
       logger.warn('WebSocket disconnected', {
-        component: 'RealTimeService'
+        component: 'RealTimeService',
       });
     });
 
@@ -228,9 +236,13 @@ export class RealTimeService {
       // Convert unknown data to Error type for the handler
       const error = data instanceof Error ? data : new Error(String(data));
       this.handlers.onError?.(error);
-      logger.error('WebSocket error', {
-        component: 'RealTimeService'
-      }, error);
+      logger.error(
+        'WebSocket error',
+        {
+          component: 'RealTimeService',
+        },
+        error
+      );
     });
   }
 
@@ -249,14 +261,18 @@ export class RealTimeService {
         default:
           logger.warn('Unknown subscription type', {
             component: 'RealTimeService',
-            type: subscription.type
+            type: subscription.type,
           });
       }
     } catch (error) {
-      logger.error('Error handling real-time message', {
-        component: 'RealTimeService',
-        subscription
-      }, error);
+      logger.error(
+        'Error handling real-time message',
+        {
+          component: 'RealTimeService',
+          subscription,
+        },
+        error
+      );
     }
   }
 }

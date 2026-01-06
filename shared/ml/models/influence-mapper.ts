@@ -4,6 +4,7 @@
 // Maps and analyzes influence networks, power relationships, and lobbying patterns
 
 import { z } from 'zod';
+
 import { GraphAnalyzer, Statistics, Cache } from './shared_utils';
 
 export const InfluenceInputSchema = z.object({
@@ -257,7 +258,7 @@ export class InfluenceMapper {
       for (let i = 0; i < neighbors.length; i++) {
         for (let j = i + 1; j < neighbors.length; j++) {
           const adj1 = network.adjacencyMap.get(neighbors[i] as string);
-          if (adj1 && adj1.has(neighbors[j] as string)) {
+          if (adj1?.has(neighbors[j] as string)) {
             triangles++;
           }
         }

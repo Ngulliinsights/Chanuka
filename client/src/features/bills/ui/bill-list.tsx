@@ -1,12 +1,24 @@
 import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import React from 'react';
 import { Link } from 'wouter';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@client/shared/design-system';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@client/shared/design-system';
-import React from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@client/shared/design-system';
 
 interface Bill {
   id: number;
@@ -29,20 +41,20 @@ interface BillListProps {
   title?: string;
 }
 
-export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListProps) => {
+export const BillList = ({ bills, isLoading, error, title = 'Bills' }: BillListProps) => {
   const [filter, setFilter] = useState<'active' | 'upcoming' | 'passed'>('active');
   const [page, setPage] = useState(1);
   const BILLS_PER_PAGE = 5;
 
   // Memoize filtered bills to prevent unnecessary recalculations on every render
-  const filteredBills = useMemo(() => 
-    bills.filter(bill => bill.status.toLowerCase() === filter.toLowerCase()),
+  const filteredBills = useMemo(
+    () => bills.filter(bill => bill.status.toLowerCase() === filter.toLowerCase()),
     [bills, filter]
   );
 
   // Memoize paginated bills as well since it depends on filteredBills and page
-  const paginatedBills = useMemo(() => 
-    filteredBills.slice(0, page * BILLS_PER_PAGE),
+  const paginatedBills = useMemo(
+    () => filteredBills.slice(0, page * BILLS_PER_PAGE),
     [filteredBills, page]
   );
 
@@ -62,9 +74,9 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
           <h3 className="font-semibold">Error Loading Bills</h3>
         </div>
         <p className="text-sm pl-7">{error.message}</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="mt-2 ml-7 border-red-300 text-red-700 hover:bg-red-100"
           onClick={() => window.location.reload()}
         >
@@ -77,7 +89,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
   // Memoize status styles to avoid recreating the object on every render
   const getStatusStyle = useMemo(() => {
     return (status: string) => {
-      switch(status.toLowerCase()) {
+      switch (status.toLowerCase()) {
         case 'active':
           return 'bg-green-100 text-green-800 border-green-300';
         case 'upcoming':
@@ -97,11 +109,15 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
 
   // Helper function to get alternative filter for empty state
   const getAlternativeFilter = (currentFilter: string) => {
-    switch(currentFilter) {
-      case 'active': return 'upcoming';
-      case 'upcoming': return 'passed';
-      case 'passed': return 'active';
-      default: return 'active';
+    switch (currentFilter) {
+      case 'active':
+        return 'upcoming';
+      case 'upcoming':
+        return 'passed';
+      case 'passed':
+        return 'active';
+      default:
+        return 'active';
     }
   };
 
@@ -111,13 +127,18 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
         <div>
           <h2 className="text-2xl font-semibold">{title}</h2>
           <p className="text-muted-foreground text-sm mt-1">
-            Displaying {formatCount(paginatedBills.length, 'bill')} of {formatCount(filteredBills.length, `${filter} bill`)}
+            Displaying {formatCount(paginatedBills.length, 'bill')} of{' '}
+            {formatCount(filteredBills.length, `${filter} bill`)}
           </p>
         </div>
 
         <div className="flex items-center space-x-2 self-end">
           {/* Desktop filter buttons with improved accessibility */}
-          <div className="hidden md:flex rounded-md shadow-sm" role="group" aria-label="Filter bills by status">
+          <div
+            className="hidden md:flex rounded-md shadow-sm"
+            role="group"
+            aria-label="Filter bills by status"
+          >
             <Button
               variant={filter === 'active' ? 'primary' : 'outline'}
               size="sm"
@@ -179,63 +200,61 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
         ) : paginatedBills.length > 0 ? (
           <>
             <div className="space-y-4">
-                {paginatedBills.map(bill => (
-                  <Link key={bill.id} href={`/bills/${bill.id}`}>
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <Badge className={`${getStatusStyle(bill.status)} capitalize`}>
-                            {bill.status}
-                          </Badge>
-                          <div className="text-sm text-muted-foreground">
-                            {new Date(bill.introduced_date).toLocaleDateString()}
-                          </div>
+              {paginatedBills.map(bill => (
+                <Link key={bill.id} href={`/bills/${bill.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer group">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <Badge className={`${getStatusStyle(bill.status)} capitalize`}>
+                          {bill.status}
+                        </Badge>
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(bill.introduced_date).toLocaleDateString()}
                         </div>
-                        <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
-                          {bill.title}
-                        </CardTitle>
-                        <CardDescription className="line-clamp-2">
-                          {bill.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="pb-4">
-                        <div className="text-sm">
-                          <span className="font-medium">Sponsor:</span> {bill.sponsor}
-                          {bill.cosponsors > 0 && (
-                            <span className="ml-1 text-muted-foreground">
-                              +{formatCount(bill.cosponsors, 'cosponsor')}
-                            </span>
-                          )}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="pt-0 border-t flex justify-between text-sm text-muted-foreground">
-                        <div className="flex gap-4">
-                          <div className="flex items-center">
-                            <span className="mr-1">🔍</span>
-                            <span>{formatCount(bill.views, 'view')}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="mr-1">📊</span>
-                            <span>{formatCount(bill.analyses, 'analysis', 'analyses')}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="mr-1">👍</span>
-                            <span>{formatCount(bill.endorsements, 'endorsement')}</span>
-                          </div>
+                      </div>
+                      <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
+                        {bill.title}
+                      </CardTitle>
+                      <CardDescription className="line-clamp-2">{bill.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                      <div className="text-sm">
+                        <span className="font-medium">Sponsor:</span> {bill.sponsor}
+                        {bill.cosponsors > 0 && (
+                          <span className="ml-1 text-muted-foreground">
+                            +{formatCount(bill.cosponsors, 'cosponsor')}
+                          </span>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="pt-0 border-t flex justify-between text-sm text-muted-foreground">
+                      <div className="flex gap-4">
+                        <div className="flex items-center">
+                          <span className="mr-1">🔍</span>
+                          <span>{formatCount(bill.views, 'view')}</span>
                         </div>
                         <div className="flex items-center">
-                          <span 
-                            className={`mr-2 inline-block w-2 h-2 rounded-full ${
-                              bill.supportPercentage > 50 ? 'bg-green-500' : 'bg-amber-500'
-                            }`}
-                            aria-label={`${bill.supportPercentage}% support`}
-                          ></span>
-                          <span className="font-medium">{bill.supportPercentage}% support</span>
+                          <span className="mr-1">📊</span>
+                          <span>{formatCount(bill.analyses, 'analysis', 'analyses')}</span>
                         </div>
-                      </CardFooter>
-                    </Card>
-                  </Link>
-                ))}
+                        <div className="flex items-center">
+                          <span className="mr-1">👍</span>
+                          <span>{formatCount(bill.endorsements, 'endorsement')}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span
+                          className={`mr-2 inline-block w-2 h-2 rounded-full ${
+                            bill.supportPercentage > 50 ? 'bg-green-500' : 'bg-amber-500'
+                          }`}
+                          aria-label={`${bill.supportPercentage}% support`}
+                        ></span>
+                        <span className="font-medium">{bill.supportPercentage}% support</span>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </Link>
+              ))}
             </div>
 
             {hasMore && (
@@ -252,13 +271,13 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
           </>
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-gray-500 mb-2">
-              No {filter} bills found
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => handleFilterChange(getAlternativeFilter(filter) as 'active' | 'upcoming' | 'passed')}
+            <div className="text-gray-500 mb-2">No {filter} bills found</div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                handleFilterChange(getAlternativeFilter(filter) as 'active' | 'upcoming' | 'passed')
+              }
             >
               Show {getAlternativeFilter(filter)} bills instead
             </Button>
@@ -268,4 +287,3 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
     </div>
   );
 };
-

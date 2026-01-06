@@ -4,10 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import { PerformanceAlertsManager } from '../../../core/performance/alerts';
 import { PerformanceBudgetChecker } from '../../../core/performance/budgets';
-import { WebVitalsMonitor } from '../../../core/performance/web-vitals';
 import { PerformanceMonitor } from '../../../core/performance/monitor';
+import { WebVitalsMonitor } from '../../../core/performance/web-vitals';
 
 // Mock dependencies
 vi.mock('../../../core/performance/budgets', () => ({
@@ -15,9 +16,9 @@ vi.mock('../../../core/performance/budgets', () => ({
     getInstance: vi.fn(() => ({
       checkBudget: vi.fn(() => ({ status: 'pass' })),
       getComplianceStats: vi.fn(() => ({ passing: 10, warning: 2, failing: 1 })),
-      resetHistory: vi.fn()
-    }))
-  }
+      resetHistory: vi.fn(),
+    })),
+  },
 }));
 
 vi.mock('../../../core/performance/alerts', () => ({
@@ -27,9 +28,9 @@ vi.mock('../../../core/performance/alerts', () => ({
       getAlertStats: vi.fn(() => ({ total: 0, critical: 0, warning: 0 })),
       getActiveAlerts: vi.fn(() => []),
       clearAlerts: vi.fn(),
-      updateConfig: vi.fn()
-    }))
-  }
+      updateConfig: vi.fn(),
+    })),
+  },
 }));
 
 vi.mock('../../../core/performance/web-vitals', () => ({
@@ -41,9 +42,9 @@ vi.mock('../../../core/performance/web-vitals', () => ({
       disconnect: vi.fn(),
       reset: vi.fn(),
       updateConfig: vi.fn(),
-      addListener: vi.fn()
-    }))
-  }
+      addListener: vi.fn(),
+    })),
+  },
 }));
 
 describe('PerformanceMonitor', () => {
@@ -60,7 +61,7 @@ describe('PerformanceMonitor', () => {
     mockBudgetChecker = {
       checkBudget: vi.fn(() => ({ status: 'pass' })),
       getComplianceStats: vi.fn(() => ({ passing: 10, warning: 2, failing: 1 })),
-      resetHistory: vi.fn()
+      resetHistory: vi.fn(),
     };
 
     mockAlertsManager = {
@@ -68,7 +69,7 @@ describe('PerformanceMonitor', () => {
       getAlertStats: vi.fn(() => ({ total: 0, critical: 0, warning: 0 })),
       getActiveAlerts: vi.fn(() => []),
       clearAlerts: vi.fn(),
-      updateConfig: vi.fn()
+      updateConfig: vi.fn(),
     };
 
     mockWebVitalsMonitor = {
@@ -78,7 +79,7 @@ describe('PerformanceMonitor', () => {
       disconnect: vi.fn(),
       reset: vi.fn(),
       updateConfig: vi.fn(),
-      addListener: vi.fn()
+      addListener: vi.fn(),
     };
 
     // Mock the getInstance methods
@@ -91,7 +92,7 @@ describe('PerformanceMonitor', () => {
       enabled: true,
       budgets: { enabled: true, checkInterval: 1000 },
       alerts: { enabled: true, maxAlerts: 10, retentionMs: 3600000, externalReporting: true },
-      webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 }
+      webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 },
     });
   });
 
@@ -124,7 +125,7 @@ describe('PerformanceMonitor', () => {
           enabled: true,
           budgets: { enabled: true, checkInterval: 500 }, // Too low
           alerts: { enabled: true, maxAlerts: 10, retentionMs: 3600000, externalReporting: true },
-          webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 }
+          webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 },
         });
       }).not.toThrow(); // Should adjust to minimum interval
     });
@@ -138,7 +139,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: { source: 'test' }
+        metadata: { source: 'test' },
       };
 
       await monitor.recordCustomMetric(metric);
@@ -156,7 +157,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: {}
+        metadata: {},
       };
 
       await monitor.recordCustomMetric(metric);
@@ -171,7 +172,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'interactivity' as const,
-        metadata: {}
+        metadata: {},
       };
 
       await monitor.recordCustomMetric(metric);
@@ -188,7 +189,7 @@ describe('PerformanceMonitor', () => {
           timestamp: new Date(),
           url: 'https://example.com',
           category: 'loading' as const,
-          metadata: {}
+          metadata: {},
         });
       }
 
@@ -253,30 +254,23 @@ describe('PerformanceMonitor', () => {
 
   describe('Configuration Management', () => {
     it('should update configuration dynamically', () => {
-      const newConfig = {
-        enabled: false,
-        budgets: { enabled: false, checkInterval: 2000 },
-        alerts: { enabled: false, thresholds: {} },
-        webVitals: { enabled: false }
-      };
-
       monitor.updateConfig({
         enabled: false,
         budgets: { enabled: false, checkInterval: 2000 },
         alerts: { enabled: false, maxAlerts: 10, retentionMs: 3600000, externalReporting: false },
-        webVitals: { enabled: false, reportingThreshold: 0.1, sampleRate: 0.5 }
+        webVitals: { enabled: false, reportingThreshold: 0.1, sampleRate: 0.5 },
       });
 
       expect(mockWebVitalsMonitor.updateConfig).toHaveBeenCalledWith({
         enabled: false,
         reportingThreshold: 0.1,
-        sampleRate: 0.5
+        sampleRate: 0.5,
       });
       expect(mockAlertsManager.updateConfig).toHaveBeenCalledWith({
         enabled: false,
         maxAlerts: 10,
         retentionMs: 3600000,
-        externalReporting: false
+        externalReporting: false,
       });
     });
 
@@ -286,7 +280,7 @@ describe('PerformanceMonitor', () => {
         enabled: true,
         budgets: { enabled: true, checkInterval: 1000 },
         alerts: { enabled: true, maxAlerts: 10, retentionMs: 3600000, externalReporting: true },
-        webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 }
+        webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 },
       });
 
       // Stop monitoring
@@ -294,7 +288,7 @@ describe('PerformanceMonitor', () => {
         enabled: false,
         budgets: { enabled: true, checkInterval: 1000 },
         alerts: { enabled: true, maxAlerts: 10, retentionMs: 3600000, externalReporting: true },
-        webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 }
+        webVitals: { enabled: true, reportingThreshold: 0.1, sampleRate: 1.0 },
       });
 
       expect(mockWebVitalsMonitor.disconnect).toHaveBeenCalled();
@@ -310,7 +304,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: {}
+        metadata: {},
       });
 
       monitor.reset();
@@ -341,7 +335,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: {}
+        metadata: {},
       };
 
       // Should not throw
@@ -360,7 +354,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'interactivity' as const,
-        metadata: {}
+        metadata: {},
       };
 
       // Should not throw
@@ -379,7 +373,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: {}
+        metadata: {},
       }));
 
       await Promise.all(metrics.map(metric => monitor.recordCustomMetric(metric)));
@@ -398,7 +392,7 @@ describe('PerformanceMonitor', () => {
         timestamp: new Date(),
         url: 'https://example.com',
         category: 'loading' as const,
-        metadata: {}
+        metadata: {},
       }));
 
       // Record metrics concurrently

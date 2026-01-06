@@ -41,26 +41,26 @@ export const CommonSchemas = {
   nonEmptyString: z.string().min(1, 'Field cannot be empty'),
   email: z.string().email('Invalid email format'),
   url: z.string().url('Invalid URL format'),
-  
+
   // ID validations
   id: z.string().min(1, 'ID cannot be empty'),
   uuid: z.string().uuid('Invalid UUID format'),
-  
+
   // Number validations
   positiveNumber: z.number().positive('Must be a positive number'),
   nonNegativeNumber: z.number().min(0, 'Must be non-negative'),
   percentage: z.number().min(0).max(100, 'Must be between 0 and 100'),
-  
+
   // Date validations
   dateString: z.string().datetime('Invalid date format'),
   futureDate: z.date().refine(date => date > new Date(), 'Date must be in the future'),
-  
+
   // Array validations
   nonEmptyArray: z.array(z.any()).min(1, 'Array cannot be empty'),
-  
+
   // Boolean validations
   boolean: z.boolean(),
-  
+
   // Optional fields
   optionalString: z.string().optional(),
   optionalNumber: z.number().optional(),
@@ -68,7 +68,14 @@ export const CommonSchemas = {
 };
 
 // User role validation (following navigation patterns)
-export const UserRoleSchema = z.enum(['public', 'citizen', 'expert', 'admin', 'journalist', 'advocate']);
+export const UserRoleSchema = z.enum([
+  'public',
+  'citizen',
+  'expert',
+  'admin',
+  'journalist',
+  'advocate',
+]);
 
 // Component configuration base schema
 export const ComponentConfigSchema = z.object({
@@ -86,28 +93,34 @@ export const FormFieldSchema = z.object({
   required: z.boolean().default(false),
   placeholder: z.string().optional(),
   defaultValue: z.any().optional(),
-  validation: z.object({
-    min: z.number().optional(),
-    max: z.number().optional(),
-    pattern: z.string().optional(),
-    custom: z.function().optional(),
-  }).optional(),
+  validation: z
+    .object({
+      min: z.number().optional(),
+      max: z.number().optional(),
+      pattern: z.string().optional(),
+      custom: z.function().optional(),
+    })
+    .optional(),
 });
 
 // API response schemas
 export const ApiResponseSchema = z.object({
   success: z.boolean(),
   data: z.any().optional(),
-  error: z.object({
-    message: z.string(),
-    code: z.string().optional(),
-    details: z.record(z.any()).optional(),
-  }).optional(),
-  meta: z.object({
-    timestamp: z.string().datetime(),
-    requestId: z.string().optional(),
-    version: z.string().optional(),
-  }).optional(),
+  error: z
+    .object({
+      message: z.string(),
+      code: z.string().optional(),
+      details: z.record(z.any()).optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      timestamp: z.string().datetime(),
+      requestId: z.string().optional(),
+      version: z.string().optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -120,13 +133,7 @@ export function createValidationError(
   value: any,
   zodError?: z.ZodError
 ): BaseValidationError {
-  return new BaseValidationError(
-    message,
-    field,
-    value,
-    'VALIDATION_ERROR',
-    { zodError }
-  );
+  return new BaseValidationError(message, field, value, 'VALIDATION_ERROR', { zodError });
 }
 
 export function validateWithSchema<T>(
@@ -245,7 +252,7 @@ export function validateWithWarnings<T>(
   warningChecks?: Array<(data: T) => string | null>
 ): ValidationResult<T> {
   const result = safeValidateWithSchema(schema, data, fieldName);
-  
+
   if (!result.success) {
     return { success: false, error: result.error };
   }

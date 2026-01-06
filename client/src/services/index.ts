@@ -31,8 +31,15 @@
 // ============================================================================
 
 // Re-export migrated services from their new FSD locations
-export { dataRetentionService, retentionUtils } from '@client/core/analytics/data-retention-service';
-export { navigationService, BrowserNavigationService, type NavigationService } from '@client/core/navigation/navigation-service';
+export {
+  dataRetentionService,
+  retentionUtils,
+} from '@client/core/analytics/data-retention-service';
+export {
+  navigationService,
+  BrowserNavigationService,
+  type NavigationService,
+} from '@client/core/navigation/navigation-service';
 export { userService } from '@client/features/users/model/user-service';
 export { PageRelationshipService } from '@/core/navigation/page-relationship-service';
 
@@ -121,11 +128,14 @@ export const errorAnalyticsRepository = {
       criticalErrors: 15,
       resolvedErrors: 1180,
       averageResolutionTime: 45,
-      uptime: 99.7
+      uptime: 99.7,
     };
   },
 
-  async getTrendData(_params?: { period: string; filters: DashboardFilters }): Promise<TrendDataPoint[]> {
+  async getTrendData(_params?: {
+    period: string;
+    filters: DashboardFilters;
+  }): Promise<TrendDataPoint[]> {
     return [
       { timestamp: '2024-01-01', errorCount: 45, errorRate: 2.1, severity: 'medium' },
       { timestamp: '2024-01-02', errorCount: 52, errorRate: 2.4, severity: 'high' },
@@ -144,7 +154,7 @@ export const errorAnalyticsRepository = {
       averageRecoveryTime: 45,
       successRate: 94.5,
       commonRecoveryActions: ['Restart service', 'Clear cache', 'Rollback deployment'],
-      failureReasons: ['Network timeout', 'Resource exhaustion', 'Configuration error']
+      failureReasons: ['Network timeout', 'Resource exhaustion', 'Configuration error'],
     };
   },
 
@@ -156,9 +166,9 @@ export const errorAnalyticsRepository = {
       lastUpdated: new Date().toISOString(),
       liveStream: [],
       currentErrorRate: 0,
-      activeAlerts: []
+      activeAlerts: [],
     };
-  }
+  },
 };
 
 // Mock community repository
@@ -174,7 +184,7 @@ export const communityRepository = {
   },
   async deleteDiscussion() {
     return true;
-  }
+  },
 };
 
 // Mock bills repository
@@ -188,5 +198,5 @@ export const billsRepository = {
   },
   async searchBills() {
     return [];
-  }
+  },
 };

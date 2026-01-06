@@ -1,7 +1,3 @@
-import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
-import ConnectionStatus from '@client/shared/ui/status/connection-status';
-import DatabaseStatus from '@client/shared/ui/status/database-status';
-import React from 'react';
 import {
   Users,
   FileText,
@@ -23,16 +19,25 @@ import {
   Plus,
   MoreHorizontal,
   Bell,
-  Zap
+  Zap,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-
+import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
+import ConnectionStatus from '@client/shared/ui/status/connection-status';
+import DatabaseStatus from '@client/shared/ui/status/database-status';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -46,7 +51,7 @@ export default function AdminPage() {
     pendingVerifications: 23,
     workaroundsDetected: 127,
     systemHealth: 98.5,
-    dailyActiveUsers: 3421
+    dailyActiveUsers: 3421,
   };
 
   const handleRefresh = async () => {
@@ -57,33 +62,83 @@ export default function AdminPage() {
   };
 
   const recentActivity = [
-    { id: 1, type: 'user_registration', description: 'New user registered: john.doe@email.com', timestamp: '2 minutes ago', status: 'success' },
-    { id: 2, type: 'bill_analysis', description: 'Workaround detected in Bill #2847', timestamp: '15 minutes ago', status: 'warning' },
-    { id: 3, type: 'expert_verification', description: 'Expert verification completed for Constitutional Analysis', timestamp: '1 hour ago', status: 'success' },
-    { id: 4, type: 'system_alert', description: 'High traffic detected - auto-scaling triggered', timestamp: '2 hours ago', status: 'info' },
+    {
+      id: 1,
+      type: 'user_registration',
+      description: 'New user registered: john.doe@email.com',
+      timestamp: '2 minutes ago',
+      status: 'success',
+    },
+    {
+      id: 2,
+      type: 'bill_analysis',
+      description: 'Workaround detected in Bill #2847',
+      timestamp: '15 minutes ago',
+      status: 'warning',
+    },
+    {
+      id: 3,
+      type: 'expert_verification',
+      description: 'Expert verification completed for Constitutional Analysis',
+      timestamp: '1 hour ago',
+      status: 'success',
+    },
+    {
+      id: 4,
+      type: 'system_alert',
+      description: 'High traffic detected - auto-scaling triggered',
+      timestamp: '2 hours ago',
+      status: 'info',
+    },
   ];
 
   const pendingVerifications = [
-    { id: 1, type: 'Expert Application', name: 'Dr. Sarah Johnson', field: 'Constitutional Law', submitted: '2 days ago' },
-    { id: 2, type: 'Bill Analysis', name: 'Climate Action Framework', analyst: 'Prof. Michael Chen', submitted: '1 day ago' },
-    { id: 3, type: 'Workaround Report', name: 'Tax Reform Implementation', reporter: 'Community User', submitted: '3 hours ago' },
+    {
+      id: 1,
+      type: 'Expert Application',
+      name: 'Dr. Sarah Johnson',
+      field: 'Constitutional Law',
+      submitted: '2 days ago',
+    },
+    {
+      id: 2,
+      type: 'Bill Analysis',
+      name: 'Climate Action Framework',
+      analyst: 'Prof. Michael Chen',
+      submitted: '1 day ago',
+    },
+    {
+      id: 3,
+      type: 'Workaround Report',
+      name: 'Tax Reform Implementation',
+      reporter: 'Community User',
+      submitted: '3 hours ago',
+    },
   ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'success': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
-      case 'error': return <Circle className="w-4 h-4 text-red-500" />;
-      default: return <Clock className="w-4 h-4 text-blue-500" />;
+      case 'success':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-orange-500" />;
+      case 'error':
+        return <Circle className="w-4 h-4 text-red-500" />;
+      default:
+        return <Clock className="w-4 h-4 text-blue-500" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return 'bg-green-100 text-green-800';
-      case 'warning': return 'bg-orange-100 text-orange-800';
-      case 'error': return 'bg-red-100 text-red-800';
-      default: return 'bg-blue-100 text-blue-800';
+      case 'success':
+        return 'bg-green-100 text-green-800';
+      case 'warning':
+        return 'bg-orange-100 text-orange-800';
+      case 'error':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-blue-100 text-blue-800';
     }
   };
 
@@ -96,7 +151,9 @@ export default function AdminPage() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Admin Dashboard
             </h1>
-            <p className="text-gray-600 mt-2 text-lg">System administration and platform management</p>
+            <p className="text-gray-600 mt-2 text-lg">
+              System administration and platform management
+            </p>
             <p className="text-sm text-gray-500 mt-1">
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
@@ -119,7 +176,10 @@ export default function AdminPage() {
               Refresh
             </Button>
 
-            <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
               <Bell className="w-4 h-4 mr-2" />
               Alerts
             </Button>
@@ -133,7 +193,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{systemStats.totalUsers.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {systemStats.totalUsers.toLocaleString()}
+                  </p>
                   <div className="flex items-center mt-1">
                     <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
                     <span className="text-xs text-green-600">+12%</span>
@@ -151,7 +213,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Bills</p>
-                  <p className="text-2xl font-bold text-gray-900">{systemStats.activeBills.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {systemStats.activeBills.toLocaleString()}
+                  </p>
                   <div className="flex items-center mt-1">
                     <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
                     <span className="text-xs text-green-600">+8%</span>
@@ -169,7 +233,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Pending Reviews</p>
-                  <p className="text-2xl font-bold text-gray-900">{systemStats.pendingVerifications}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {systemStats.pendingVerifications}
+                  </p>
                   <div className="flex items-center mt-1">
                     <Clock className="w-3 h-3 text-orange-500 mr-1" />
                     <span className="text-xs text-orange-600">Urgent</span>
@@ -187,7 +253,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Workarounds</p>
-                  <p className="text-2xl font-bold text-gray-900">{systemStats.workaroundsDetected}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {systemStats.workaroundsDetected}
+                  </p>
                   <div className="flex items-center mt-1">
                     <AlertTriangle className="w-3 h-3 text-red-500 mr-1" />
                     <span className="text-xs text-red-600">+3 today</span>
@@ -223,7 +291,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Daily Active</p>
-                  <p className="text-2xl font-bold text-gray-900">{systemStats.dailyActiveUsers.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {systemStats.dailyActiveUsers.toLocaleString()}
+                  </p>
                   <div className="flex items-center mt-1">
                     <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
                     <span className="text-xs text-green-600">+15%</span>
@@ -241,19 +311,34 @@ export default function AdminPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <TabsList className="grid w-full lg:w-auto grid-cols-5 bg-white shadow-md border-0">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="overview"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="users"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Users
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="content"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Content
               </TabsTrigger>
-              <TabsTrigger value="verification" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="verification"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Verification
               </TabsTrigger>
-              <TabsTrigger value="system" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="system"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 System
               </TabsTrigger>
             </TabsList>
@@ -289,13 +374,16 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    {recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-start gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300">
-                        <div className="flex-shrink-0">
-                          {getStatusIcon(activity.status)}
-                        </div>
+                    {recentActivity.map(activity => (
+                      <div
+                        key={activity.id}
+                        className="flex items-start gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300"
+                      >
+                        <div className="flex-shrink-0">{getStatusIcon(activity.status)}</div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 mb-1">{activity.description}</p>
+                          <p className="text-sm font-medium text-gray-900 mb-1">
+                            {activity.description}
+                          </p>
                           <p className="text-xs text-gray-500">{activity.timestamp}</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -333,8 +421,11 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    {pendingVerifications.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300">
+                    {pendingVerifications.map(item => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300"
+                      >
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="text-sm font-medium text-gray-900">{item.name}</p>
@@ -342,9 +433,7 @@ export default function AdminPage() {
                               {item.type}
                             </Badge>
                           </div>
-                          <p className="text-xs text-gray-500">
-                            Submitted {item.submitted}
-                          </p>
+                          <p className="text-xs text-gray-500">Submitted {item.submitted}</p>
                         </div>
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline" className="hover:bg-green-50">
@@ -403,7 +492,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-blue-50"
+                  >
                     <Link to="/admin/roles">
                       <Shield className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -413,7 +506,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-purple-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-purple-50"
+                  >
                     <Link to="/admin/user-settings">
                       <Settings className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -480,7 +577,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-orange-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-orange-50"
+                  >
                     <Link to="/admin/workarounds">
                       <AlertTriangle className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -490,7 +591,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-blue-50"
+                  >
                     <Link to="/admin/analytics">
                       <BarChart3 className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -553,7 +658,9 @@ export default function AdminPage() {
                       </div>
                       Verification System
                     </CardTitle>
-                    <CardDescription>Manage expert verifications and content review</CardDescription>
+                    <CardDescription>
+                      Manage expert verifications and content review
+                    </CardDescription>
                   </div>
                   <Button className="bg-gradient-to-r from-purple-600 to-pink-600">
                     <Zap className="w-4 h-4 mr-2" />
@@ -573,7 +680,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-green-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-green-50"
+                  >
                     <Link to="/admin/pending-reviews">
                       <CheckCircle className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -583,7 +694,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-blue-50"
+                  >
                     <Link to="/admin/verification-history">
                       <Eye className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -599,11 +714,17 @@ export default function AdminPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
-                        <p className="font-medium text-sm">Dr. Sarah Johnson - Constitutional Law Expert</p>
+                        <p className="font-medium text-sm">
+                          Dr. Sarah Johnson - Constitutional Law Expert
+                        </p>
                         <p className="text-xs text-gray-500">Applied 2 days ago</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-600 hover:bg-green-50"
+                        >
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Approve
                         </Button>
@@ -662,7 +783,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-blue-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-blue-50"
+                  >
                     <Link to="/admin/database">
                       <Database className="w-5 h-5 mr-3" />
                       <div className="text-left">
@@ -672,7 +797,11 @@ export default function AdminPage() {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" className="h-auto p-4 justify-start hover:bg-green-50">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto p-4 justify-start hover:bg-green-50"
+                  >
                     <Link to="/admin/performance">
                       <BarChart3 className="w-5 h-5 mr-3" />
                       <div className="text-left">

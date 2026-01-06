@@ -4,10 +4,10 @@ import { fileURLToPath } from 'url'
 
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
+import type { MinifyOptions } from 'terser'
 import { defineConfig, loadEnv, type ConfigEnv, type Plugin } from 'vite'
 import viteCompression from 'vite-plugin-compression'
 
-import type { MinifyOptions } from 'terser'
 
 // Environment variable validation function
 function validateEnvironmentVariables(env: Record<string, string>, mode: string) {

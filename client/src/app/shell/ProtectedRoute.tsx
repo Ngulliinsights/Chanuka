@@ -30,7 +30,11 @@ interface UnauthorizedAccessProps {
  * Default unauthorized access component
  * Provides user-friendly messaging for different access denial reasons
  */
-function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: UnauthorizedAccessProps) {
+function DefaultUnauthorizedAccess({
+  reason,
+  requiredRoles,
+  currentPath,
+}: UnauthorizedAccessProps) {
   const getIcon = () => {
     switch (reason) {
       case 'unauthenticated':
@@ -66,7 +70,7 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
       case 'unverified':
         return 'Your account needs to be verified before you can access this feature. Please check your email for verification instructions.';
       default:
-        return 'You don\'t have permission to access this page.';
+        return "You don't have permission to access this page.";
     }
   };
 
@@ -74,34 +78,29 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
     switch (reason) {
       case 'unauthenticated':
         return (
-          <a href={`/auth?redirect=${encodeURIComponent(currentPath)}`} className="mt-4 inline-block">
-            <Button>
-              Sign In
-            </Button>
+          <a
+            href={`/auth?redirect=${encodeURIComponent(currentPath)}`}
+            className="mt-4 inline-block"
+          >
+            <Button>Sign In</Button>
           </a>
         );
       case 'insufficient_role':
         return (
           <a href="/contact" className="mt-4 inline-block">
-            <Button variant="outline">
-              Request Access
-            </Button>
+            <Button variant="outline">Request Access</Button>
           </a>
         );
       case 'unverified':
         return (
           <a href="/auth/verify" className="mt-4 inline-block">
-            <Button>
-              Verify Account
-            </Button>
+            <Button>Verify Account</Button>
           </a>
         );
       default:
         return (
           <a href="/" className="mt-4 inline-block">
-            <Button variant="outline">
-              Go Home
-            </Button>
+            <Button variant="outline">Go Home</Button>
           </a>
         );
     }
@@ -111,25 +110,17 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="flex justify-center mb-4">
-            {getIcon()}
-          </div>
-          
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {getTitle()}
-          </h1>
-          
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            {getMessage()}
-          </p>
+          <div className="flex justify-center mb-4">{getIcon()}</div>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{getTitle()}</h1>
+
+          <p className="text-gray-600 mb-6 leading-relaxed">{getMessage()}</p>
 
           <div className="flex flex-col space-y-3">
             {getActionButton()}
-            
+
             <a href="/">
-              <Button variant="ghost">
-                Return to Home
-              </Button>
+              <Button variant="ghost">Return to Home</Button>
             </a>
           </div>
         </div>
@@ -148,7 +139,7 @@ function DefaultUnauthorizedAccess({ reason, requiredRoles, currentPath }: Unaut
 
 /**
  * ProtectedRoute component handles authentication and authorization for routes
- * 
+ *
  * Features:
  * - Authentication checking
  * - Role-based access control
@@ -165,7 +156,7 @@ export function ProtectedRoute({
   requireVerification = false,
   fallbackPath = '/auth',
   showLoadingState = true,
-  customUnauthorizedComponent: CustomUnauthorizedComponent
+  customUnauthorizedComponent: CustomUnauthorizedComponent,
 }: ProtectedRouteProps) {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -189,7 +180,7 @@ export function ProtectedRoute({
         requireVerification,
         isAuthenticated,
         userRole: user?.role,
-        userVerified: user?.verification_status === 'verified'
+        userVerified: user?.verification_status === 'verified',
       });
     }
   }, [
@@ -200,7 +191,7 @@ export function ProtectedRoute({
     requireVerification,
     isAuthenticated,
     user?.role,
-    user?.verification_status
+    user?.verification_status,
   ]);
 
   // Show loading state while auth is being checked
@@ -220,7 +211,7 @@ export function ProtectedRoute({
   if (requireAuth && !isAuthenticated) {
     logger.warn('Unauthenticated access attempt to protected route', {
       component: 'ProtectedRoute',
-      path: location.pathname
+      path: location.pathname,
     });
 
     if (CustomUnauthorizedComponent) {
@@ -235,9 +226,10 @@ export function ProtectedRoute({
   // Check role requirements
   if (requireRoles.length > 0 && user) {
     const userRole = user.role?.toLowerCase();
-    const hasRequiredRole = requireRoles.some(role => 
-      role.toLowerCase() === userRole || 
-      (userRole === 'admin' && role.toLowerCase() !== 'super_admin') // Admin can access most roles except super_admin
+    const hasRequiredRole = requireRoles.some(
+      role =>
+        role.toLowerCase() === userRole ||
+        (userRole === 'admin' && role.toLowerCase() !== 'super_admin') // Admin can access most roles except super_admin
     );
 
     if (!hasRequiredRole) {
@@ -245,11 +237,13 @@ export function ProtectedRoute({
         component: 'ProtectedRoute',
         path: location.pathname,
         userRole,
-        requiredRoles: requireRoles
+        requiredRoles: requireRoles,
       });
 
       if (CustomUnauthorizedComponent) {
-        return <CustomUnauthorizedComponent reason="insufficient_role" requiredRoles={requireRoles} />;
+        return (
+          <CustomUnauthorizedComponent reason="insufficient_role" requiredRoles={requireRoles} />
+        );
       }
 
       return (
@@ -267,19 +261,14 @@ export function ProtectedRoute({
     logger.warn('Unverified account access attempt', {
       component: 'ProtectedRoute',
       path: location.pathname,
-      verificationStatus: user.verification_status
+      verificationStatus: user.verification_status,
     });
 
     if (CustomUnauthorizedComponent) {
       return <CustomUnauthorizedComponent reason="unverified" />;
     }
 
-    return (
-      <DefaultUnauthorizedAccess
-        reason="unverified"
-        currentPath={location.pathname}
-      />
-    );
+    return <DefaultUnauthorizedAccess reason="unverified" currentPath={location.pathname} />;
   }
 
   // All checks passed, render the protected content
@@ -302,23 +291,23 @@ export function createProtectedRoute(defaultProps: Partial<ProtectedRouteProps>)
 export const AdminRoute = createProtectedRoute({
   requireAuth: true,
   requireRoles: ['admin', 'super_admin'],
-  requireVerification: true
+  requireVerification: true,
 });
 
 export const ModeratorRoute = createProtectedRoute({
   requireAuth: true,
   requireRoles: ['moderator', 'admin', 'super_admin'],
-  requireVerification: true
+  requireVerification: true,
 });
 
 export const VerifiedUserRoute = createProtectedRoute({
   requireAuth: true,
-  requireVerification: true
+  requireVerification: true,
 });
 
 export const AuthenticatedRoute = createProtectedRoute({
   requireAuth: true,
-  requireVerification: false
+  requireVerification: false,
 });
 
 export default ProtectedRoute;

@@ -21,7 +21,7 @@ export function useSafeMutation<TData = unknown, TError = Error, TVariables = un
 
 /**
  * A hook for performing POST requests with a simplified API.
- * 
+ *
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
@@ -30,14 +30,15 @@ export function useSafePost<TData = unknown, TVariables = unknown>(
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
   return useSafeMutation<TData, Error, TVariables>(
-    (variables: TVariables) => globalApiClient.post(endpoint, variables).then(res => res.data as TData),
+    (variables: TVariables) =>
+      globalApiClient.post(endpoint, variables).then(res => res.data as TData),
     options
   );
 }
 
 /**
  * A hook for performing PUT requests with a simplified API.
- * 
+ *
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
@@ -46,7 +47,8 @@ export function useSafePut<TData = unknown, TVariables = unknown>(
   options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
 ) {
   return useSafeMutation<TData, Error, TVariables>(
-    (variables: TVariables) => globalApiClient.put(endpoint, variables).then(res => res.data as TData),
+    (variables: TVariables) =>
+      globalApiClient.put(endpoint, variables).then(res => res.data as TData),
     options
   );
 }
@@ -66,48 +68,3 @@ export function useSafeDelete<TData = unknown>(
     options
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

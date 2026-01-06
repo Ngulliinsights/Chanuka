@@ -7,24 +7,17 @@
  * Requirements: 10.4, 10.5
  */
 
+import { Users, Scale, MapPin, Award, MessageCircle, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
-import {
-  Users,
-  Scale,
-  MapPin,
-  Award,
-  MessageCircle,
-  ChevronRight
-} from 'lucide-react';
 
-import { useI18n } from '@client/shared/hooks/use-i18n';
 import { useKenyanContext } from '@client/shared/context/KenyanContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
+import { useI18n } from '@client/shared/hooks/use-i18n';
 
-import { LegislativeProcessGuide } from './LegislativeProcessGuide';
 import { KenyanLegislativeProcess } from './KenyanLegislativeProcess';
+import { LegislativeProcessGuide } from './LegislativeProcessGuide';
 
 /**
  * Civic Education Topic Card
@@ -44,20 +37,20 @@ const TopicCard: React.FC<TopicCardProps> = ({
   icon: Icon,
   difficulty,
   estimatedTime,
-  onClick
+  onClick,
 }) => {
   const { language } = useI18n();
 
   const difficultyColors = {
     beginner: 'bg-green-100 text-green-800',
     intermediate: 'bg-yellow-100 text-yellow-800',
-    advanced: 'bg-red-100 text-red-800'
+    advanced: 'bg-red-100 text-red-800',
   };
 
   const difficultyLabels = {
     beginner: language === 'sw' ? 'Mwanzo' : 'Beginner',
     intermediate: language === 'sw' ? 'Wastani' : 'Intermediate',
-    advanced: language === 'sw' ? 'Juu' : 'Advanced'
+    advanced: language === 'sw' ? 'Juu' : 'Advanced',
   };
 
   return (
@@ -99,55 +92,55 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
   const educationTopics = [
     {
       title: language === 'sw' ? 'Mchakato wa Kutunga Sheria' : 'Law-Making Process',
-      description: language === 'sw'
-        ? 'Jifunze jinsi miswada inavyogeuzwa kuwa sheria'
-        : 'Learn how bills become laws in Kenya',
+      description:
+        language === 'sw'
+          ? 'Jifunze jinsi miswada inavyogeuzwa kuwa sheria'
+          : 'Learn how bills become laws in Kenya',
       icon: Scale,
       difficulty: 'beginner' as const,
       estimatedTime: language === 'sw' ? 'Dakika 10' : '10 minutes',
-      action: () => setActiveView('guide')
+      action: () => setActiveView('guide'),
     },
     {
       title: language === 'sw' ? 'Muundo wa Serikali' : 'Government Structure',
-      description: language === 'sw'
-        ? 'Uelewa wa ngazi za serikali na majukumu yao'
-        : 'Understanding government levels and their roles',
+      description:
+        language === 'sw'
+          ? 'Uelewa wa ngazi za serikali na majukumu yao'
+          : 'Understanding government levels and their roles',
       icon: MapPin,
       difficulty: 'intermediate' as const,
       estimatedTime: language === 'sw' ? 'Dakika 15' : '15 minutes',
-      action: () => setActiveView('detailed')
+      action: () => setActiveView('detailed'),
     },
     {
       title: language === 'sw' ? 'Ushiriki wa Kiraia' : 'Civic Participation',
-      description: language === 'sw'
-        ? 'Njia za kushiriki katika mchakato wa kidemokrasia'
-        : 'Ways to participate in democratic processes',
+      description:
+        language === 'sw'
+          ? 'Njia za kushiriki katika mchakato wa kidemokrasia'
+          : 'Ways to participate in democratic processes',
       icon: Users,
       difficulty: 'intermediate' as const,
       estimatedTime: language === 'sw' ? 'Dakika 12' : '12 minutes',
-      action: () => setActiveView('detailed')
+      action: () => setActiveView('detailed'),
     },
     {
       title: language === 'sw' ? 'Haki za Kiraia' : 'Citizen Rights',
-      description: language === 'sw'
-        ? 'Haki na wajibu wa raia chini ya katiba'
-        : 'Rights and responsibilities under the constitution',
+      description:
+        language === 'sw'
+          ? 'Haki na wajibu wa raia chini ya katiba'
+          : 'Rights and responsibilities under the constitution',
       icon: Award,
       difficulty: 'advanced' as const,
       estimatedTime: language === 'sw' ? 'Dakika 20' : '20 minutes',
-      action: () => setActiveView('detailed')
-    }
+      action: () => setActiveView('detailed'),
+    },
   ];
 
   if (activeView === 'guide') {
     return (
       <div className={className}>
         <div className="mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setActiveView('overview')}
-            className="mb-4"
-          >
+          <Button variant="outline" onClick={() => setActiveView('overview')} className="mb-4">
             ← {language === 'sw' ? 'Rudi Nyuma' : 'Back to Overview'}
           </Button>
         </div>
@@ -160,11 +153,7 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
     return (
       <div className={className}>
         <div className="mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setActiveView('overview')}
-            className="mb-4"
-          >
+          <Button variant="outline" onClick={() => setActiveView('overview')} className="mb-4">
             ← {language === 'sw' ? 'Rudi Nyuma' : 'Back to Overview'}
           </Button>
         </div>
@@ -183,8 +172,7 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           {language === 'sw'
             ? 'Jifunze kuhusu mfumo wa kisiasa wa Kenya na jinsi ya kushiriki katika demokrasia'
-            : 'Learn about Kenya\'s political system and how to participate in democracy'
-          }
+            : "Learn about Kenya's political system and how to participate in democracy"}
         </p>
       </div>
 
@@ -193,17 +181,13 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-600">47</div>
-            <div className="text-sm text-gray-600">
-              {language === 'sw' ? 'Kaunti' : 'Counties'}
-            </div>
+            <div className="text-sm text-gray-600">{language === 'sw' ? 'Kaunti' : 'Counties'}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600">349</div>
-            <div className="text-sm text-gray-600">
-              {language === 'sw' ? 'Wabunge' : 'MPs'}
-            </div>
+            <div className="text-sm text-gray-600">{language === 'sw' ? 'Wabunge' : 'MPs'}</div>
           </CardContent>
         </Card>
         <Card>
@@ -249,9 +233,7 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <MessageCircle className="h-5 w-5" />
-            <span>
-              {language === 'sw' ? 'Muktadha wa Kitamaduni' : 'Cultural Context'}
-            </span>
+            <span>{language === 'sw' ? 'Muktadha wa Kitamaduni' : 'Cultural Context'}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -291,13 +273,14 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-6 text-center">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            {language === 'sw' ? 'Anza Safari Yako ya Elimu ya Kiraia' : 'Start Your Civic Education Journey'}
+            {language === 'sw'
+              ? 'Anza Safari Yako ya Elimu ya Kiraia'
+              : 'Start Your Civic Education Journey'}
           </h3>
           <p className="text-blue-700 mb-4">
             {language === 'sw'
               ? 'Chagua mada yoyote hapo juu ili kuanza kujifunza kuhusu mfumo wa kisiasa wa Kenya'
-              : 'Choose any topic above to start learning about Kenya\'s political system'
-            }
+              : "Choose any topic above to start learning about Kenya's political system"}
           </p>
           <div className="flex justify-center space-x-3">
             <Button onClick={() => setActiveView('guide')}>

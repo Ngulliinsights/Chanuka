@@ -7,21 +7,15 @@ import React from 'react';
  * ✅ Consistent animation
  */
 
-import { cn } from "@/shared/design-system/utils/cn"
+import { cn } from '@/shared/design-system/utils/cn';
 
-function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        "animate-pulse rounded-md bg-[hsl(var(--color-muted))]",
-        className
-      )}
+      className={cn('animate-pulse rounded-md bg-[hsl(var(--color-muted))]', className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Skeleton }
+export { Skeleton };

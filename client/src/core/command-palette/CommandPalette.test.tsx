@@ -4,9 +4,10 @@
  * Tests for command palette functionality
  */
 
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
 import { CommandPalette } from './CommandPalette';
 import type { Command } from './types';
 
@@ -17,7 +18,7 @@ vi.mock('./Modal', () => ({
       <div data-testid="modal" onClick={onClose}>
         {children}
       </div>
-    ) : null
+    ) : null,
 }));
 
 // Mock the design system components
@@ -32,15 +33,11 @@ vi.mock('../../shared/design-system/interactive/Command', () => ({
       data-testid="command-input"
       placeholder={placeholder}
       value={value}
-      onChange={(e) => onValueChange?.(e.target.value)}
+      onChange={e => onValueChange?.(e.target.value)}
     />
   ),
-  CommandList: ({ children }: any) => (
-    <div data-testid="command-list">{children}</div>
-  ),
-  CommandEmpty: ({ children }: any) => (
-    <div data-testid="command-empty">{children}</div>
-  ),
+  CommandList: ({ children }: any) => <div data-testid="command-list">{children}</div>,
+  CommandEmpty: ({ children }: any) => <div data-testid="command-empty">{children}</div>,
   CommandGroup: ({ heading, children }: any) => (
     <div data-testid="command-group">
       {heading && <div data-testid="group-heading">{heading}</div>}
@@ -48,23 +45,17 @@ vi.mock('../../shared/design-system/interactive/Command', () => ({
     </div>
   ),
   CommandItem: ({ children, onSelect, disabled }: any) => (
-    <button
-      data-testid="command-item"
-      onClick={onSelect}
-      disabled={disabled}
-    >
+    <button data-testid="command-item" onClick={onSelect} disabled={disabled}>
       {children}
     </button>
   ),
-  CommandShortcut: ({ children }: any) => (
-    <span data-testid="command-shortcut">{children}</span>
-  ),
-  CommandSeparator: () => <hr data-testid="command-separator" />
+  CommandShortcut: ({ children }: any) => <span data-testid="command-shortcut">{children}</span>,
+  CommandSeparator: () => <hr data-testid="command-separator" />,
 }));
 
 // Mock the cn utility
 vi.mock('../../shared/design-system/utils/cn', () => ({
-  cn: (...classes: any[]) => classes.filter(Boolean).join(' ')
+  cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 
 describe('CommandPalette', () => {
@@ -74,7 +65,7 @@ describe('CommandPalette', () => {
   const defaultProps = {
     isOpen: true,
     onOpenChange: mockOnOpenChange,
-    onCommandExecute: mockOnCommandExecute
+    onCommandExecute: mockOnCommandExecute,
   };
 
   beforeEach(() => {
@@ -82,7 +73,7 @@ describe('CommandPalette', () => {
     // Mock window.location
     Object.defineProperty(window, 'location', {
       value: { href: '' },
-      writable: true
+      writable: true,
     });
   });
 
@@ -108,7 +99,7 @@ describe('CommandPalette', () => {
 
   it('displays custom placeholder text', () => {
     const customConfig = {
-      placeholder: 'Custom placeholder'
+      placeholder: 'Custom placeholder',
     };
 
     render(<CommandPalette {...defaultProps} config={customConfig} />);
@@ -132,8 +123,8 @@ describe('CommandPalette', () => {
         description: 'A custom command',
         action: vi.fn(),
         keywords: ['custom'],
-        section: 'custom'
-      }
+        section: 'custom',
+      },
     ];
 
     render(<CommandPalette {...defaultProps} customCommands={customCommands} />);
@@ -173,8 +164,8 @@ describe('CommandPalette', () => {
         label: 'Test Command',
         action: mockAction,
         keywords: ['test'],
-        section: 'test'
-      }
+        section: 'test',
+      },
     ];
 
     render(<CommandPalette {...defaultProps} customCommands={customCommands} />);
@@ -198,8 +189,8 @@ describe('CommandPalette', () => {
         action: mockAction,
         keywords: ['disabled'],
         section: 'test',
-        disabled: true
-      }
+        disabled: true,
+      },
     ];
 
     render(<CommandPalette {...defaultProps} customCommands={customCommands} />);

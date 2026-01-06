@@ -16,7 +16,7 @@ export interface SecurityEvent {
   resolved: boolean;
 }
 
-export type SecurityEventType = 
+export type SecurityEventType =
   | 'csp_violation'
   | 'csrf_attack'
   | 'xss_attempt'

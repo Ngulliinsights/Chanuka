@@ -7,9 +7,9 @@ declare const window: Window & typeof globalThis;
  * messages and fallbacks for unsupported browsers.
  */
 
-import { loadPolyfills } from '@client/core';
 import React, { useEffect, useState } from 'react';
 
+import { loadPolyfills } from '@client/core';
 import { getBrowserInfo, type BrowserInfo } from '@client/core';
 import { logger } from '@client/utils/logger';
 
@@ -30,14 +30,14 @@ interface CompatibilityState {
 const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = ({
   children,
   showWarnings = true,
-  blockUnsupported = false
+  blockUnsupported = false,
 }) => {
   const [state, setState] = useState<CompatibilityState>({
     isChecking: true,
     browserInfo: null,
     polyfillsLoaded: false,
     polyfillErrors: [],
-    showCompatibilityInfo: false
+    showCompatibilityInfo: false,
   });
 
   useEffect(() => {
@@ -48,18 +48,18 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
     try {
       // Get browser information
       const browserInfo = getBrowserInfo();
-      
+
       setState(prev => ({
         ...prev,
         browserInfo,
-        isChecking: true
+        isChecking: true,
       }));
 
       // Load polyfills if needed
       const polyfillErrors: string[] = [];
       try {
         await loadPolyfills();
-        
+
         // Check polyfill status - mock implementation for now
         const polyfillStatus = new Map();
         polyfillStatus.forEach((status: any, feature: string) => {
@@ -75,16 +75,15 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
         ...prev,
         isChecking: false,
         polyfillsLoaded: true,
-        polyfillErrors
+        polyfillErrors,
       }));
-
     } catch (error) {
       logger.error('Browser compatibility check failed:', { component: 'Chanuka' }, error);
       setState(prev => ({
         ...prev,
         isChecking: false,
         polyfillsLoaded: false,
-        polyfillErrors: [`Compatibility check failed: ${(error as Error).message}`]
+        polyfillErrors: [`Compatibility check failed: ${(error as Error).message}`],
       }));
     }
   };
@@ -92,14 +91,14 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
   const handleDismissWarning = () => {
     setState(prev => ({
       ...prev,
-      showCompatibilityInfo: false
+      showCompatibilityInfo: false,
     }));
   };
 
   const handleShowCompatibilityInfo = () => {
     setState(prev => ({
       ...prev,
-      showCompatibilityInfo: true
+      showCompatibilityInfo: true,
     }));
   };
 
@@ -113,9 +112,12 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
       sessionStorage.clear();
       // Clear caches if available
       if (typeof caches !== 'undefined') {
-        caches.keys().then((names: readonly string[]) => {
-          names.forEach(name => caches.delete(name));
-        }).finally(() => window.location.reload());
+        caches
+          .keys()
+          .then((names: readonly string[]) => {
+            names.forEach(name => caches.delete(name));
+          })
+          .finally(() => window.location.reload());
       } else {
         window.location.reload();
       }
@@ -134,9 +136,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
             Checking Browser Compatibility
           </h2>
-          <p className="text-gray-600">
-            Preparing the application for your browser...
-          </p>
+          <p className="text-gray-600">Preparing the application for your browser...</p>
         </div>
       </div>
     );
@@ -148,9 +148,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md mx-auto text-center bg-white p-8 rounded-lg shadow-lg">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Browser Detection Failed
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Browser Detection Failed</h1>
           <p className="text-gray-600 mb-6">
             We couldn't determine your browser information. The application may not work correctly.
           </p>
@@ -181,7 +179,8 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
   }
 
   // Show compatibility warnings if enabled
-  const shouldShowWarning = showWarnings && 
+  const shouldShowWarning =
+    showWarnings &&
     (state.browserInfo.warnings.length > 0 || state.polyfillErrors.length > 0) &&
     !state.showCompatibilityInfo;
 
@@ -218,28 +217,28 @@ const UnsupportedBrowserScreen: React.FC<{ browserInfo: BrowserInfo }> = ({ brow
     { name: 'Chrome', version: '70+', url: 'https://www.google.com/chrome/' },
     { name: 'Firefox', version: '65+', url: 'https://www.mozilla.org/firefox/' },
     { name: 'Safari', version: '12+', url: 'https://www.apple.com/safari/' },
-    { name: 'Edge', version: '79+', url: 'https://www.microsoft.com/edge' }
+    { name: 'Edge', version: '79+', url: 'https://www.microsoft.com/edge' },
   ];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-2xl mx-auto text-center bg-white p-8 rounded-lg shadow-lg">
         <div className="text-red-500 text-6xl mb-6">🚫</div>
-        
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Browser Not Supported
-        </h1>
-        
+
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Browser Not Supported</h1>
+
         <div className="text-left bg-gray-50 p-4 rounded-md mb-6">
           <h3 className="font-semibold text-gray-900 mb-2">Your Browser:</h3>
           <p className="text-gray-700">
-            {browserInfo.name.charAt(0).toUpperCase() + browserInfo.name.slice(1)} {browserInfo.version}
+            {browserInfo.name.charAt(0).toUpperCase() + browserInfo.name.slice(1)}{' '}
+            {browserInfo.version}
           </p>
         </div>
 
         <p className="text-gray-600 mb-6">
-          The Chanuka Legislative Transparency Platform requires a modern browser to function properly. 
-          Your current browser doesn't support the necessary features for the best experience.
+          The Chanuka Legislative Transparency Platform requires a modern browser to function
+          properly. Your current browser doesn't support the necessary features for the best
+          experience.
         </p>
 
         <div className="mb-6">
@@ -247,7 +246,7 @@ const UnsupportedBrowserScreen: React.FC<{ browserInfo: BrowserInfo }> = ({ brow
             Please update to one of these supported browsers:
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {supportedBrowsers.map((browser) => (
+            {supportedBrowsers.map(browser => (
               <a
                 key={browser.name}
                 href={browser.url}
@@ -287,7 +286,7 @@ const UnsupportedBrowserScreen: React.FC<{ browserInfo: BrowserInfo }> = ({ brow
           >
             Try Again
           </button>
-          
+
           <p className="text-sm text-gray-500">
             If you believe this is an error, please contact support.
           </p>
@@ -363,9 +362,7 @@ const CompatibilityInfoModal: React.FC<{
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Browser Compatibility Information
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Browser Compatibility Information</h2>
             <button
               type="button"
               onClick={onClose}
@@ -393,9 +390,11 @@ const CompatibilityInfoModal: React.FC<{
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Supported:</span>
-                  <span className={`ml-2 font-medium ${
-                    browserInfo.isSupported ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <span
+                    className={`ml-2 font-medium ${
+                      browserInfo.isSupported ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
                     {browserInfo.isSupported ? 'Yes' : 'No'}
                   </span>
                 </div>
@@ -412,9 +411,7 @@ const CompatibilityInfoModal: React.FC<{
                   <span className="text-gray-700 capitalize">
                     {feature.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
-                  <span className={`font-medium ${
-                    supported ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <span className={`font-medium ${supported ? 'text-green-600' : 'text-red-600'}`}>
                     {supported ? '✓' : '✗'}
                   </span>
                 </div>
@@ -497,4 +494,3 @@ const CompatibilityInfoModal: React.FC<{
 };
 
 export default BrowserCompatibilityChecker;
-

@@ -1,6 +1,6 @@
 /**
  * Navigation Search Module
- * 
+ *
  * Handles navigation item searching with fuzzy matching
  */
 

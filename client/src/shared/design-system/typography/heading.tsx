@@ -6,15 +6,13 @@
  * ✅ Semantic heading elements
  */
 
-import * as React from 'react';
-import { cn } from '@/shared/design-system/utils/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
+
+import { cn } from '@/shared/design-system/utils/cn';
 
 const headingVariants = cva(
-  [
-    'font-semibold tracking-tight',
-    'text-[hsl(var(--color-foreground))]',
-  ].join(' '),
+  ['font-semibold tracking-tight', 'text-[hsl(var(--color-foreground))]'].join(' '),
   {
     variants: {
       level: {

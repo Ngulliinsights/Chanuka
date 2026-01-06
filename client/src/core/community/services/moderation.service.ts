@@ -1,17 +1,12 @@
 /**
  * Moderation Service
- * 
+ *
  * Complete moderation workflow implementation, resolving the incomplete
  * moderation implementations identified in the analysis (lines 217-240).
  */
 
 import { globalApiClient } from '../../api/client';
-
-import type { 
-  ModerationRequest,
-  UnifiedModeration,
-  ViolationType,
-} from '../types';
+import type { ModerationRequest, UnifiedModeration, ViolationType } from '../types';
 
 export class ModerationService {
   private static instance: ModerationService;
@@ -94,7 +89,11 @@ export class ModerationService {
       const response = await globalApiClient.post('/api/moderation/auto-check', {
         content,
       });
-      return response.data as { shouldModerate: boolean; violations: ViolationType[]; confidence: number };
+      return response.data as {
+        shouldModerate: boolean;
+        violations: ViolationType[];
+        confidence: number;
+      };
     } catch (error) {
       console.error('Auto-moderation check failed:', error);
       return {
@@ -117,7 +116,13 @@ export class ModerationService {
   }> {
     try {
       const response = await globalApiClient.get('/api/moderation/stats');
-      return response.data as { totalReports: number; pendingReports: number; resolvedReports: number; reportsByType: Record<ViolationType, number>; reportsByStatus: Record<string, number> };
+      return response.data as {
+        totalReports: number;
+        pendingReports: number;
+        resolvedReports: number;
+        reportsByType: Record<ViolationType, number>;
+        reportsByStatus: Record<string, number>;
+      };
     } catch (error) {
       console.error('Failed to fetch moderation stats:', error);
       return {
@@ -229,7 +234,12 @@ export class ModerationService {
   }> {
     try {
       const response = await globalApiClient.get(`/api/moderation/user-history/${userId}`);
-      return response.data as { reports: UnifiedModeration[]; warnings: number; suspensions: number; lastAction?: Date };
+      return response.data as {
+        reports: UnifiedModeration[];
+        warnings: number;
+        suspensions: number;
+        lastAction?: Date;
+      };
     } catch (error) {
       console.error('Failed to fetch user moderation history:', error);
       return {

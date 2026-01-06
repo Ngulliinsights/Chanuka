@@ -1,18 +1,22 @@
 /**
  * Credibility Scoring Components
- * 
+ *
  * Components for displaying and managing expert credibility scores
  * with transparent methodology and community validation.
  */
 
 import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
+import React from 'react';
 
 import { cn } from '@client/lib/utils';
-
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/shared/design-system';
-import React from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@client/shared/design-system';
 
 interface CredibilityIndicatorProps {
   score: number;
@@ -25,7 +29,7 @@ export function CredibilityIndicator({
   score,
   size = 'md',
   showDetails = false,
-  className
+  className,
 }: CredibilityIndicatorProps) {
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'text-green-600';
@@ -54,19 +58,19 @@ export function CredibilityIndicator({
         return {
           container: 'text-xs',
           progress: 'h-1',
-          icon: 'h-3 w-3'
+          icon: 'h-3 w-3',
         };
       case 'lg':
         return {
           container: 'text-base',
           progress: 'h-3',
-          icon: 'h-5 w-5'
+          icon: 'h-5 w-5',
         };
       default: // md
         return {
           container: 'text-sm',
           progress: 'h-2',
-          icon: 'h-4 w-4'
+          icon: 'h-4 w-4',
         };
     }
   };
@@ -77,27 +81,20 @@ export function CredibilityIndicator({
     return (
       <div className={cn('space-y-2', className)}>
         <div className="flex items-center justify-between">
-          <span className={cn('font-medium', sizeClasses.container)}>
-            Credibility Score
-          </span>
-          <Badge 
-            variant="secondary" 
-            className={cn(
-              sizeClasses.container,
-              getScoreColor(score),
-              getScoreBgColor(score)
-            )}
+          <span className={cn('font-medium', sizeClasses.container)}>Credibility Score</span>
+          <Badge
+            variant="secondary"
+            className={cn(sizeClasses.container, getScoreColor(score), getScoreBgColor(score))}
           >
             {Math.round(score * 100)}%
           </Badge>
         </div>
-        
-        <Progress 
-          value={score * 100} 
-          className={cn(sizeClasses.progress, 'w-full')}
-        />
-        
-        <div className={cn('flex items-center gap-1', sizeClasses.container, 'text-muted-foreground')}>
+
+        <Progress value={score * 100} className={cn(sizeClasses.progress, 'w-full')} />
+
+        <div
+          className={cn('flex items-center gap-1', sizeClasses.container, 'text-muted-foreground')}
+        >
           <Star className={cn(sizeClasses.icon, getScoreColor(score))} />
           <span>{getScoreLabel(score)}</span>
         </div>
@@ -109,12 +106,14 @@ export function CredibilityIndicator({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className={cn(
-            'inline-flex items-center gap-1 px-2 py-1 rounded-full',
-            sizeClasses.container,
-            getScoreBgColor(score),
-            className
-          )}>
+          <div
+            className={cn(
+              'inline-flex items-center gap-1 px-2 py-1 rounded-full',
+              sizeClasses.container,
+              getScoreBgColor(score),
+              className
+            )}
+          >
             <Star className={cn(sizeClasses.icon, getScoreColor(score))} />
             <span className={cn('font-medium', getScoreColor(score))}>
               {Math.round(score * 100)}%
@@ -156,39 +155,39 @@ interface CredibilityBreakdownProps {
 export function CredibilityBreakdown({
   components,
   methodology,
-  className
+  className,
 }: CredibilityBreakdownProps) {
   const componentItems = [
     {
       name: 'Credentials',
       score: components.credentialScore,
       icon: Award,
-      description: 'Educational background and professional certifications'
+      description: 'Educational background and professional certifications',
     },
     {
       name: 'Affiliations',
       score: components.affiliationScore,
       icon: Users,
-      description: 'Professional and institutional associations'
+      description: 'Professional and institutional associations',
     },
     {
       name: 'Community',
       score: components.communityScore,
       icon: TrendingUp,
-      description: 'Community validation and peer recognition'
+      description: 'Community validation and peer recognition',
     },
     {
       name: 'Contribution Quality',
       score: components.contributionQuality,
       icon: Star,
-      description: 'Quality and accuracy of past contributions'
+      description: 'Quality and accuracy of past contributions',
     },
     {
       name: 'Consensus Alignment',
       score: components.consensusAlignment,
       icon: Users,
-      description: 'Alignment with expert consensus on topics'
-    }
+      description: 'Alignment with expert consensus on topics',
+    },
   ];
 
   return (
@@ -199,9 +198,9 @@ export function CredibilityBreakdown({
       </div>
 
       <div className="space-y-3">
-        {componentItems.map((item) => {
+        {componentItems.map(item => {
           const IconComponent = item.icon;
-          
+
           return (
             <TooltipProvider key={item.name}>
               <Tooltip>
@@ -211,12 +210,9 @@ export function CredibilityBreakdown({
                       <IconComponent className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">{item.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
-                      <Progress 
-                        value={item.score * 100} 
-                        className="w-16 h-2"
-                      />
+                      <Progress value={item.score * 100} className="w-16 h-2" />
                       <span className="text-sm font-medium w-8 text-right">
                         {Math.round(item.score * 100)}%
                       </span>
@@ -226,9 +222,7 @@ export function CredibilityBreakdown({
                 <TooltipContent>
                   <div className="max-w-xs">
                     <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {item.description}
-                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">{item.description}</div>
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -240,10 +234,8 @@ export function CredibilityBreakdown({
       {methodology && (
         <div className="pt-3 border-t border-border/50">
           <h5 className="font-medium text-sm mb-2">Methodology</h5>
-          <p className="text-xs text-muted-foreground mb-3">
-            {methodology.description}
-          </p>
-          
+          <p className="text-xs text-muted-foreground mb-3">{methodology.description}</p>
+
           <div className="space-y-2">
             {methodology.factors.map((factor, index) => (
               <div key={index} className="flex items-center justify-between text-xs">

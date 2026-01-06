@@ -43,13 +43,12 @@ import {
   selectIsAnyMenuOpen,
   selectNavigationUIState,
 } from '../infrastructure/store/slices/navigationSlice';
-
 import type {
   BreadcrumbItem,
   RelatedPage,
   NavigationSection,
   UserRole,
-  NavigationPreferences
+  NavigationPreferences,
 } from '../types/navigation';
 
 /**
@@ -77,65 +76,104 @@ export function useNavigationSlice() {
 
   // Action creators
   const actions = {
-    setCurrentPath: useCallback((path: string) => {
-      dispatch(setCurrentPath(path));
-    }, [dispatch]),
+    setCurrentPath: useCallback(
+      (path: string) => {
+        dispatch(setCurrentPath(path));
+      },
+      [dispatch]
+    ),
 
-    updateBreadcrumbs: useCallback((breadcrumbs: BreadcrumbItem[]) => {
-      dispatch(updateBreadcrumbs(breadcrumbs));
-    }, [dispatch]),
+    updateBreadcrumbs: useCallback(
+      (breadcrumbs: BreadcrumbItem[]) => {
+        dispatch(updateBreadcrumbs(breadcrumbs));
+      },
+      [dispatch]
+    ),
 
-    updateRelatedPages: useCallback((pages: RelatedPage[]) => {
-      dispatch(updateRelatedPages(pages));
-    }, [dispatch]),
+    updateRelatedPages: useCallback(
+      (pages: RelatedPage[]) => {
+        dispatch(updateRelatedPages(pages));
+      },
+      [dispatch]
+    ),
 
-    setCurrentSection: useCallback((section: NavigationSection) => {
-      dispatch(setCurrentSection(section));
-    }, [dispatch]),
+    setCurrentSection: useCallback(
+      (section: NavigationSection) => {
+        dispatch(setCurrentSection(section));
+      },
+      [dispatch]
+    ),
 
     toggleSidebar: useCallback(() => {
       dispatch(toggleSidebar());
     }, [dispatch]),
 
-    setSidebarOpen: useCallback((open: boolean) => {
-      dispatch(setSidebarOpen(open));
-    }, [dispatch]),
+    setSidebarOpen: useCallback(
+      (open: boolean) => {
+        dispatch(setSidebarOpen(open));
+      },
+      [dispatch]
+    ),
 
     toggleMobileMenu: useCallback(() => {
       dispatch(toggleMobileMenu());
     }, [dispatch]),
 
-    setMobileMenuOpen: useCallback((open: boolean) => {
-      dispatch(setMobileMenuOpen(open));
-    }, [dispatch]),
+    setMobileMenuOpen: useCallback(
+      (open: boolean) => {
+        dispatch(setMobileMenuOpen(open));
+      },
+      [dispatch]
+    ),
 
-    setMobile: useCallback((mobile: boolean) => {
-      dispatch(setMobile(mobile));
-    }, [dispatch]),
+    setMobile: useCallback(
+      (mobile: boolean) => {
+        dispatch(setMobile(mobile));
+      },
+      [dispatch]
+    ),
 
-    setSidebarCollapsed: useCallback((collapsed: boolean) => {
-      dispatch(setSidebarCollapsed(collapsed));
-    }, [dispatch]),
+    setSidebarCollapsed: useCallback(
+      (collapsed: boolean) => {
+        dispatch(setSidebarCollapsed(collapsed));
+      },
+      [dispatch]
+    ),
 
-    setUserRole: useCallback((role: UserRole) => {
-      dispatch(setUserRole(role));
-    }, [dispatch]),
+    setUserRole: useCallback(
+      (role: UserRole) => {
+        dispatch(setUserRole(role));
+      },
+      [dispatch]
+    ),
 
-    updatePreferences: useCallback((preferences: Partial<NavigationPreferences>) => {
-      dispatch(updatePreferences(preferences));
-    }, [dispatch]),
+    updatePreferences: useCallback(
+      (preferences: Partial<NavigationPreferences>) => {
+        dispatch(updatePreferences(preferences));
+      },
+      [dispatch]
+    ),
 
-    addToRecentPages: useCallback((page: { path: string; title: string }) => {
-      dispatch(addToRecentPages(page));
-    }, [dispatch]),
+    addToRecentPages: useCallback(
+      (page: { path: string; title: string }) => {
+        dispatch(addToRecentPages(page));
+      },
+      [dispatch]
+    ),
 
-    addFavoritePage: useCallback((path: string) => {
-      dispatch(addFavoritePage(path));
-    }, [dispatch]),
+    addFavoritePage: useCallback(
+      (path: string) => {
+        dispatch(addFavoritePage(path));
+      },
+      [dispatch]
+    ),
 
-    removeFavoritePage: useCallback((path: string) => {
-      dispatch(removeFavoritePage(path));
-    }, [dispatch]),
+    removeFavoritePage: useCallback(
+      (path: string) => {
+        dispatch(removeFavoritePage(path));
+      },
+      [dispatch]
+    ),
   };
 
   return {
@@ -176,7 +214,10 @@ export function useSidebar() {
     isMobile,
     toggleSidebar: useCallback(() => dispatch(toggleSidebar()), [dispatch]),
     setSidebarOpen: useCallback((open: boolean) => dispatch(setSidebarOpen(open)), [dispatch]),
-    setSidebarCollapsed: useCallback((collapsed: boolean) => dispatch(setSidebarCollapsed(collapsed)), [dispatch]),
+    setSidebarCollapsed: useCallback(
+      (collapsed: boolean) => dispatch(setSidebarCollapsed(collapsed)),
+      [dispatch]
+    ),
   };
 }
 
@@ -192,7 +233,10 @@ export function useMobileMenu() {
     mobileMenuOpen,
     isMobile,
     toggleMobileMenu: useCallback(() => dispatch(toggleMobileMenu()), [dispatch]),
-    setMobileMenuOpen: useCallback((open: boolean) => dispatch(setMobileMenuOpen(open)), [dispatch]),
+    setMobileMenuOpen: useCallback(
+      (open: boolean) => dispatch(setMobileMenuOpen(open)),
+      [dispatch]
+    ),
   };
 }
 
@@ -209,11 +253,14 @@ export function useNavigationPreferences() {
     preferences,
     isCurrentPageFavorited,
     mostVisitedPages,
-    updatePreferences: useCallback((prefs: Partial<NavigationPreferences>) =>
-      dispatch(updatePreferences(prefs)), [dispatch]),
-    addFavoritePage: useCallback((path: string) =>
-      dispatch(addFavoritePage(path)), [dispatch]),
-    removeFavoritePage: useCallback((path: string) =>
-      dispatch(removeFavoritePage(path)), [dispatch]),
+    updatePreferences: useCallback(
+      (prefs: Partial<NavigationPreferences>) => dispatch(updatePreferences(prefs)),
+      [dispatch]
+    ),
+    addFavoritePage: useCallback((path: string) => dispatch(addFavoritePage(path)), [dispatch]),
+    removeFavoritePage: useCallback(
+      (path: string) => dispatch(removeFavoritePage(path)),
+      [dispatch]
+    ),
   };
 }

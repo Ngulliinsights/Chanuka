@@ -37,7 +37,7 @@ export class ApiReporter implements ErrorReporter {
       retryDelay: 1000,
       timeout: 10000,
       headers: {},
-      transformPayload: (errors) => ({ errors }),
+      transformPayload: errors => ({ errors }),
       onSuccess: () => {},
       onError: () => {},
       ...config,
@@ -109,9 +109,11 @@ export class ApiReporter implements ErrorReporter {
         count: errors.length,
         endpoint: this.config.endpoint,
       });
-
     } catch (error) {
-      console.error(`Failed to send error batch (attempt ${attempt}/${this.config.retryAttempts}):`, error);
+      console.error(
+        `Failed to send error batch (attempt ${attempt}/${this.config.retryAttempts}):`,
+        error
+      );
 
       // Retry logic
       if (attempt < this.config.retryAttempts) {

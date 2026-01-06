@@ -256,7 +256,7 @@ class PerformanceMonitoring {
 
     // Resource timing observer - tracks loading of all page resources
     try {
-      const resourceObserver = new PerformanceObserver((list) => {
+      const resourceObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.processResourceTiming(entry as PerformanceResourceTiming);
         }
@@ -269,7 +269,7 @@ class PerformanceMonitoring {
 
     // Navigation timing observer - tracks overall page navigation performance
     try {
-      const navigationObserver = new PerformanceObserver((list) => {
+      const navigationObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.processNavigationTiming(entry as PerformanceNavigationTiming);
         }
@@ -282,7 +282,7 @@ class PerformanceMonitoring {
 
     // User timing observer - tracks custom performance marks and measures
     try {
-      const userTimingObserver = new PerformanceObserver((list) => {
+      const userTimingObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.processUserTiming(entry);
         }
@@ -295,7 +295,7 @@ class PerformanceMonitoring {
 
     // Long task observer - identifies JavaScript tasks that block the main thread
     try {
-      const longTaskObserver = new PerformanceObserver((list) => {
+      const longTaskObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.processLongTask(entry);
         }
@@ -308,7 +308,7 @@ class PerformanceMonitoring {
 
     // Layout shift observer - tracks unexpected visual changes on the page
     try {
-      const layoutShiftObserver = new PerformanceObserver((list) => {
+      const layoutShiftObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.processLayoutShift(entry as LayoutShiftEntry);
         }
@@ -403,7 +403,8 @@ class PerformanceMonitoring {
 
       if (lastLongTask) {
         // TTI is after the last long task completes
-        this.metrics.customMetrics.timeToInteractive = lastLongTask.startTime + lastLongTask.duration;
+        this.metrics.customMetrics.timeToInteractive =
+          lastLongTask.startTime + lastLongTask.duration;
       } else {
         // No long tasks means the page became interactive quickly
         this.metrics.customMetrics.timeToInteractive = performance.now();
@@ -516,7 +517,8 @@ class PerformanceMonitoring {
 
   private reportMetric(name: string, value: number, threshold: number): void {
     // Classify metrics based on thresholds (good, needs improvement, poor)
-    const status = value <= threshold ? 'good' : value <= threshold * 2 ? 'needs-improvement' : 'poor';
+    const status =
+      value <= threshold ? 'good' : value <= threshold * 2 ? 'needs-improvement' : 'poor';
 
     console.log(`${name}: ${value}ms (${status})`);
 

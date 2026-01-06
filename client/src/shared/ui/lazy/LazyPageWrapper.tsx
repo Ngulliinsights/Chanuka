@@ -1,7 +1,7 @@
 import { Suspense, ReactElement } from 'react';
+import React from 'react';
 
 import { LoadingStates } from '@/shared/ui/loading/LoadingStates';
-import React from 'react';
 
 interface LazyPageWrapperProps {
   children: React.ComponentType;
@@ -17,7 +17,7 @@ interface LazyPageWrapperProps {
  */
 export function LazyPageWrapper({
   children,
-  fallback = <LoadingStates.PageLoading />
+  fallback = <LoadingStates.PageLoading />,
 }: LazyPageWrapperProps) {
   const Component = children;
   return (

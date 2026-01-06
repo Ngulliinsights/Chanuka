@@ -5,7 +5,6 @@
  * and provides a comprehensive validation of the implementation
  */
 
-import React from 'react';
 import {
   CheckCircle,
   AlertCircle,
@@ -15,8 +14,9 @@ import {
   Users,
   Zap,
   Earth,
-  Eye
+  Eye,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -40,8 +40,12 @@ export function IntegrationTest() {
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const preferences = useSelector((state: unknown) => (state as { ui: { preferences: Record<string, unknown> } }).ui.preferences);
-  const isOnline = useSelector((state: unknown) => (state as { ui: { isOnline: boolean } }).ui.isOnline);
+  const preferences = useSelector(
+    (state: unknown) => (state as { ui: { preferences: Record<string, unknown> } }).ui.preferences
+  );
+  const isOnline = useSelector(
+    (state: unknown) => (state as { ui: { isOnline: boolean } }).ui.isOnline
+  );
   const { isMobile } = useDeviceInfo();
 
   const tests: Array<{
@@ -57,16 +61,16 @@ export function IntegrationTest() {
           return {
             success: true,
             message: 'State management working correctly (TODO: implement with React Query)',
-            details: 'Mock implementation - needs React Query mutation'
+            details: 'Mock implementation - needs React Query mutation',
           };
         } catch (error) {
           return {
             success: false,
             message: 'State management error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
+      },
     },
     {
       name: 'Copy System Adaptation',
@@ -77,29 +81,29 @@ export function IntegrationTest() {
             userLevel: userLevel as 'novice' | 'intermediate' | 'expert',
             pageType: 'feature',
             emotionalTone: 'empowering',
-            contentComplexity: 'simple'
+            contentComplexity: 'simple',
           });
 
           if (copy.headline && copy.description && copy.cta) {
             return {
               success: true,
               message: `Copy system adapted for ${userLevel} user`,
-              details: `Headline: "${copy.headline.substring(0, 50)}..."`
+              details: `Headline: "${copy.headline.substring(0, 50)}..."`,
             };
           } else {
             return {
               success: false,
-              message: 'Copy system missing required fields'
+              message: 'Copy system missing required fields',
             };
           }
         } catch (error) {
           return {
             success: false,
             message: 'Copy system error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
+      },
     },
     {
       name: 'Mobile Responsiveness',
@@ -108,7 +112,7 @@ export function IntegrationTest() {
           const viewport = {
             width: window.innerWidth,
             height: window.innerHeight,
-            isMobile: isMobile
+            isMobile: isMobile,
           };
 
           // Test touch targets (should be at least 44px)
@@ -126,23 +130,23 @@ export function IntegrationTest() {
             return {
               success: true,
               message: `Mobile optimization verified (${viewport.width}x${viewport.height})`,
-              details: `${buttons.length} buttons tested, all meet 44px minimum`
+              details: `${buttons.length} buttons tested, all meet 44px minimum`,
             };
           } else {
             return {
               success: false,
               message: `${smallButtons} buttons below 44px minimum`,
-              details: `Viewport: ${viewport.width}x${viewport.height}`
+              details: `Viewport: ${viewport.width}x${viewport.height}`,
             };
           }
         } catch (error) {
           return {
             success: false,
             message: 'Mobile responsiveness test error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
+      },
     },
     {
       name: 'Accessibility Features',
@@ -161,52 +165,58 @@ export function IntegrationTest() {
             return {
               success: true,
               message: 'Accessibility features implemented',
-              details: `Skip links: ${skipLinks.length}, ARIA elements: ${ariaElements.length}`
+              details: `Skip links: ${skipLinks.length}, ARIA elements: ${ariaElements.length}`,
             };
           } else {
             return {
               success: false,
               message: 'Missing accessibility features',
-              details: `Announcements: ${!!announcements}, Skip links: ${skipLinks.length}, ARIA: ${ariaElements.length}`
+              details: `Announcements: ${!!announcements}, Skip links: ${skipLinks.length}, ARIA: ${ariaElements.length}`,
             };
           }
         } catch (error) {
           return {
             success: false,
             message: 'Accessibility test error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
+      },
     },
     {
       name: 'User Preferences',
       test: async () => {
         try {
           // Test preferences structure
-          const requiredPreferences = ['theme', 'language', 'notifications', 'dashboard', 'accessibility'];
+          const requiredPreferences = [
+            'theme',
+            'language',
+            'notifications',
+            'dashboard',
+            'accessibility',
+          ];
           const missingPreferences = requiredPreferences.filter(pref => !(pref in preferences));
 
           if (missingPreferences.length === 0) {
             return {
               success: true,
               message: 'User preferences complete',
-              details: `Theme: ${(preferences as Record<string, unknown>).theme}, Language: ${(preferences as Record<string, unknown>).language}`
+              details: `Theme: ${(preferences as Record<string, unknown>).theme}, Language: ${(preferences as Record<string, unknown>).language}`,
             };
           } else {
             return {
               success: false,
-              message: `Missing preferences: ${missingPreferences.join(', ')}`
+              message: `Missing preferences: ${missingPreferences.join(', ')}`,
             };
           }
         } catch (error) {
           return {
             success: false,
             message: 'User preferences test error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
+      },
     },
     {
       name: 'Offline Capability',
@@ -221,17 +231,17 @@ export function IntegrationTest() {
           return {
             success: true,
             message: `Offline capability: ${offlineCapable ? 'Supported' : 'Limited'}`,
-            details: `Online: ${isOnline}, Pending actions: ${pendingActions.length}`
+            details: `Online: ${isOnline}, Pending actions: ${pendingActions.length}`,
           };
         } catch (error) {
           return {
             success: false,
             message: 'Offline capability test error',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error instanceof Error ? error.message : 'Unknown error',
           };
         }
-      }
-    }
+      },
+    },
   ];
 
   const runTests = async () => {
@@ -248,7 +258,7 @@ export function IntegrationTest() {
       const pendingResult: TestResult = {
         name: test.name,
         status: 'pending',
-        message: 'Running test...'
+        message: 'Running test...',
       };
 
       results.push(pendingResult);
@@ -264,7 +274,7 @@ export function IntegrationTest() {
           name: test.name,
           status: result.success ? 'success' : 'error',
           message: result.message,
-          details: result.details
+          details: result.details,
         };
 
         setTestResults([...results]);
@@ -272,13 +282,12 @@ export function IntegrationTest() {
 
         // Small delay for visual feedback
         await new Promise(resolve => setTimeout(resolve, 500));
-
       } catch (error) {
         results[i] = {
           name: test.name,
           status: 'error',
           message: 'Test execution failed',
-          details: error instanceof Error ? error.message : 'Unknown error'
+          details: error instanceof Error ? error.message : 'Unknown error',
         };
         setTestResults([...results]);
       }
@@ -293,7 +302,7 @@ export function IntegrationTest() {
       totalTests: tests.length,
       successCount,
       failureCount: tests.length - successCount,
-      results: results.map(r => ({ name: r.name, status: r.status }))
+      results: results.map(r => ({ name: r.name, status: r.status })),
     });
   };
 
@@ -352,11 +361,7 @@ export function IntegrationTest() {
               </Badge>
             </div>
 
-            <Button
-              onClick={runTests}
-              disabled={isRunning}
-              className="flex items-center gap-2"
-            >
+            <Button onClick={runTests} disabled={isRunning} className="flex items-center gap-2">
               {isRunning ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -433,7 +438,8 @@ export function IntegrationTest() {
             <Earth className="w-12 h-12 text-blue-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Ready to Test Enhanced UX</h3>
             <p className="text-muted-foreground mb-4">
-              Click &quot;Run Integration Tests&quot; to validate all enhanced UX features including:
+              Click &quot;Run Integration Tests&quot; to validate all enhanced UX features
+              including:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-left max-w-2xl mx-auto">
               <div>• Unified State Management</div>

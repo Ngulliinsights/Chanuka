@@ -1,6 +1,6 @@
 /**
  * Navigation Analytics Module
- * 
+ *
  * Handles navigation event tracking and analytics
  */
 
@@ -29,24 +29,21 @@ export interface NavigationEventData {
 /**
  * Tracks navigation events for analytics
  */
-export function trackNavigationEvent(
-  event: NavigationEvent,
-  data: NavigationEventData
-): void {
+export function trackNavigationEvent(event: NavigationEvent, data: NavigationEventData): void {
   try {
     const eventData = {
       event,
       ...data,
       timestamp: data.timestamp || new Date().toISOString(),
       userAgent: data.userAgent || navigator.userAgent,
-      referrer: data.referrer || document.referrer
+      referrer: data.referrer || document.referrer,
     };
 
     logger.info('Navigation event', eventData);
 
     // Here you could integrate with analytics services
     // Example: analytics.track(event, eventData);
-    
+
     // Store in session for analytics aggregation
     storeNavigationEvent(eventData);
   } catch (error) {
@@ -62,14 +59,14 @@ function storeNavigationEvent(eventData: NavigationEventData & { event: Navigati
     const sessionKey = 'navigation-analytics';
     const existing = sessionStorage.getItem(sessionKey);
     const events = existing ? JSON.parse(existing) : [];
-    
+
     events.push(eventData);
-    
+
     // Keep only last 100 events to prevent storage bloat
     if (events.length > 100) {
       events.splice(0, events.length - 100);
     }
-    
+
     sessionStorage.setItem(sessionKey, JSON.stringify(events));
   } catch (error) {
     logger.warn('Failed to store navigation event', { error, eventData });

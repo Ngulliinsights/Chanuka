@@ -120,18 +120,18 @@ export function useSavedSearches() {
 
   const saveSearch = useMutation({
     mutationFn: (request: SaveSearchRequest) => searchApi.saveSearch(request),
-    onSuccess: (savedSearch) => {
+    onSuccess: savedSearch => {
       queryClient.invalidateQueries({ queryKey: ['search', 'saved'] });
       toast({
-        title: "Search saved",
+        title: 'Search saved',
         description: `"${savedSearch.name}" has been saved for future use.`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to save search",
+        title: 'Failed to save search',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -141,15 +141,15 @@ export function useSavedSearches() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['search', 'saved'] });
       toast({
-        title: "Search deleted",
-        description: "Saved search has been removed.",
+        title: 'Search deleted',
+        description: 'Saved search has been removed.',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to delete search",
+        title: 'Failed to delete search',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -242,7 +242,7 @@ export function useSearchExport() {
     onSuccess: (data, { format }) => {
       // Create download link (assuming data is blob or similar)
       const blob = new Blob([data], {
-        type: format === 'csv' ? 'text/csv' : 'application/json'
+        type: format === 'csv' ? 'text/csv' : 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -254,15 +254,15 @@ export function useSearchExport() {
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Export successful",
+        title: 'Export successful',
         description: `Search results exported as ${format?.toUpperCase()}`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Export failed",
+        title: 'Export failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -278,40 +278,3 @@ export function useSearchAnalytics() {
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

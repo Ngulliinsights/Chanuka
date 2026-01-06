@@ -7,11 +7,11 @@
  * ✅ Semantic color variants
  */
 
-import { cva, type VariantProps } from "class-variance-authority"
-import { HTMLAttributes } from "react"
-
-import { cn } from '@/shared/design-system/utils/cn'
+import { cva, type VariantProps } from 'class-variance-authority';
+import { HTMLAttributes } from 'react';
 import React from 'react';
+
+import { cn } from '@/shared/design-system/utils/cn';
 
 const badgeVariants = cva(
   [
@@ -86,17 +86,14 @@ const badgeVariants = cva(
       size: 'md',
     },
   }
-)
+);
 
 export interface BadgeProps
   extends HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, size, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant, size }), className)} {...props} />
-  )
+  return <div className={cn(badgeVariants({ variant, size }), className)} {...props} />;
 }
 
-export { Badge, badgeVariants }
-
+export { Badge, badgeVariants };

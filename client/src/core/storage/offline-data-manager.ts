@@ -54,7 +54,7 @@ class OfflineDataManager {
         resolve();
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Create offline actions store
@@ -88,7 +88,7 @@ class OfflineDataManager {
       ...action,
       id: `action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
-      retryCount: 0
+      retryCount: 0,
     };
 
     const transaction = this.db.transaction([this.actionsStore], 'readwrite');
@@ -191,7 +191,7 @@ class OfflineDataManager {
       data,
       timestamp: Date.now(),
       ttl,
-      version: '1.0'
+      version: '1.0',
     };
 
     const transaction = this.db.transaction([this.cacheStore], 'readwrite');
@@ -280,7 +280,7 @@ class OfflineDataManager {
     return new Promise((resolve, reject) => {
       const request = store.openCursor();
 
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         const cursor = (event.target as IDBRequest).result;
 
         if (cursor) {
@@ -305,13 +305,12 @@ class OfflineDataManager {
 
   async getSyncStatus(): Promise<SyncStatus> {
     const actions = await this.getQueuedActions();
-    const lastSyncTime = actions.length > 0 ?
-      Math.max(...actions.map(a => a.timestamp)) : null;
+    const lastSyncTime = actions.length > 0 ? Math.max(...actions.map(a => a.timestamp)) : null;
 
     return {
       queueLength: actions.length,
       lastSyncTime,
-      pendingActions: actions
+      pendingActions: actions,
     };
   }
 
@@ -320,12 +319,15 @@ class OfflineDataManager {
       throw new Error('Database not initialized');
     }
 
-    const transaction = this.db.transaction([this.actionsStore, this.cacheStore, this.analyticsStore], 'readwrite');
+    const transaction = this.db.transaction(
+      [this.actionsStore, this.cacheStore, this.analyticsStore],
+      'readwrite'
+    );
 
     const promises = [
       this.clearStore(transaction.objectStore(this.actionsStore)),
       this.clearStore(transaction.objectStore(this.cacheStore)),
-      this.clearStore(transaction.objectStore(this.analyticsStore))
+      this.clearStore(transaction.objectStore(this.analyticsStore)),
     ];
 
     await Promise.all(promises);

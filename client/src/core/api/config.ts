@@ -1,13 +1,13 @@
 /**
  * Centralized Configuration Management System
- * 
+ *
  * This module provides a robust configuration management system with support for:
  * - Environment-based configuration loading
  * - Runtime configuration updates with validation
  * - Configuration observers for reactive updates
  * - Type-safe nested configuration access
  * - Multiple validators for different configuration domains
- * 
+ *
  * The configuration system ensures that all parts of the application have access
  * to consistent, validated configuration values that can be updated at runtime
  * while maintaining system integrity.
@@ -15,12 +15,7 @@
 
 import { logger } from '../../utils/logger';
 
-import {
-  ServiceConfig,
-  ConfigValidator,
-  ConfigObserver,
-  LogLevel
-} from './types';
+import { ServiceConfig, ConfigValidator, ConfigObserver, LogLevel } from './types';
 
 // ============================================================================
 // Configuration Service Implementation
@@ -30,7 +25,7 @@ import {
  * ConfigurationService is the central hub for managing application configuration.
  * It provides type-safe access to configuration values, validates changes,
  * and notifies observers when configuration is updated.
- * 
+ *
  * The service merges environment variables with default values and ensures
  * that all configuration changes pass validation before being applied.
  */
@@ -49,7 +44,7 @@ export class ConfigurationService {
     logger.info('Configuration service initialized', {
       component: 'ConfigurationService',
       baseUrl: this.config.api.baseUrl,
-      logLevel: this.config.monitoring.logLevel
+      logLevel: this.config.monitoring.logLevel,
     });
   }
 
@@ -64,7 +59,7 @@ export class ConfigurationService {
   /**
    * Gets a nested configuration value using dot notation.
    * For example: getNested<number>('api.timeout') returns the API timeout value.
-   * 
+   *
    * This is useful when you need to access deeply nested configuration
    * without traversing the entire object structure.
    */
@@ -98,7 +93,7 @@ export class ConfigurationService {
       logger.debug('Configuration updated', {
         component: 'ConfigurationService',
         key,
-        hasOldValue: oldValue !== undefined
+        hasOldValue: oldValue !== undefined,
       });
     } catch (error) {
       // Rollback on validation failure
@@ -123,7 +118,7 @@ export class ConfigurationService {
 
       logger.info('Configuration bulk update completed', {
         component: 'ConfigurationService',
-        updatedKeys: Object.keys(updates).length
+        updatedKeys: Object.keys(updates).length,
       });
     } catch (error) {
       // Rollback entire update on failure
@@ -136,17 +131,17 @@ export class ConfigurationService {
    * Loads configuration from environment variables.
    * This is typically called during application startup to override default
    * configuration with environment-specific values.
-   * 
+   *
    * Environment variables are prefixed with REACT_APP_ for Create React App
    * compatibility, but this can be adapted for other build systems.
    */
   loadFromEnvironment(): void {
     const envConfig = EnvironmentConfigLoader.load();
-    
+
     logger.info('Loading configuration from environment', {
       component: 'ConfigurationService',
       hasApiUrl: !!envConfig.api?.baseUrl,
-      hasWsUrl: !!envConfig.websocket?.url
+      hasWsUrl: !!envConfig.websocket?.url,
     });
 
     this.update(envConfig);
@@ -168,7 +163,7 @@ export class ConfigurationService {
     this.configValidators.push(validator);
     logger.debug('Configuration validator registered', {
       component: 'ConfigurationService',
-      validatorCount: this.configValidators.length
+      validatorCount: this.configValidators.length,
     });
   }
 
@@ -180,7 +175,7 @@ export class ConfigurationService {
     this.configObservers.push(observer);
     logger.debug('Configuration observer registered', {
       component: 'ConfigurationService',
-      observerCount: this.configObservers.length
+      observerCount: this.configObservers.length,
     });
   }
 
@@ -198,7 +193,7 @@ export class ConfigurationService {
    */
   resetToDefaults(): void {
     logger.warn('Resetting configuration to defaults', {
-      component: 'ConfigurationService'
+      component: 'ConfigurationService',
     });
 
     const defaultConfig = this.mergeWithDefaults({});
@@ -224,7 +219,7 @@ export class ConfigurationService {
           maxDelay: 10000,
           backoffMultiplier: 2,
           retryableStatusCodes: [408, 429, 500, 502, 503, 504],
-          retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND']
+          retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND'],
         },
         cache: {
           defaultTTL: 5 * 60 * 1000, // 5 minutes
@@ -232,13 +227,13 @@ export class ConfigurationService {
           storage: 'memory',
           compression: false,
           encryption: false,
-          evictionPolicy: 'lru'
+          evictionPolicy: 'lru',
         },
         rateLimit: {
           maxRequests: 100,
           windowMs: 60000, // 1 minute
-          strategy: 'sliding'
-        }
+          strategy: 'sliding',
+        },
       },
       websocket: {
         url: this.getDefaultWebSocketUrl(),
@@ -248,23 +243,23 @@ export class ConfigurationService {
           maxAttempts: 5,
           baseDelay: 1000,
           maxDelay: 30000,
-          backoffMultiplier: 2
+          backoffMultiplier: 2,
         },
         heartbeat: {
           enabled: true,
           interval: 30000,
-          timeout: 5000
+          timeout: 5000,
         },
         message: {
           compression: false,
           batching: true,
           batchSize: 10,
           batchInterval: 1000,
-          maxMessageSize: 1024 * 1024 // 1MB
+          maxMessageSize: 1024 * 1024, // 1MB
         },
         authentication: {
-          type: 'session'
-        }
+          type: 'session',
+        },
       },
       features: {
         offlineMode: true,
@@ -272,20 +267,20 @@ export class ConfigurationService {
         analytics: true,
         errorReporting: true,
         performanceMonitoring: true,
-        experimentalFeatures: false
+        experimentalFeatures: false,
       },
       limits: {
         maxConcurrentRequests: 10,
         maxCacheSize: 100,
         maxWebSocketSubscriptions: 50,
-        maxRetryAttempts: 3
+        maxRetryAttempts: 3,
       },
       monitoring: {
         enableMetrics: true,
         enableTracing: false,
         logLevel: 'info',
-        sampleRate: 1.0
-      }
+        sampleRate: 1.0,
+      },
     };
 
     return this.deepMerge(defaults, partialConfig);
@@ -300,11 +295,11 @@ export class ConfigurationService {
       return 'http://localhost:3000';
     }
 
-    const isDevelopment = window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-    
-    return isDevelopment 
-      ? 'http://localhost:3000' 
+    const isDevelopment =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    return isDevelopment
+      ? 'http://localhost:3000'
       : `${window.location.protocol}//${window.location.host}/api`;
   }
 
@@ -317,12 +312,10 @@ export class ConfigurationService {
     }
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const isDevelopment = window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-    
-    return isDevelopment 
-      ? 'ws://localhost:8080' 
-      : `${protocol}//${window.location.host}/ws`;
+    const isDevelopment =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    return isDevelopment ? 'ws://localhost:8080' : `${protocol}//${window.location.host}/ws`;
   }
 
   /**
@@ -330,24 +323,17 @@ export class ConfigurationService {
    * This preserves nested objects and arrays while allowing selective overrides.
    * Builds the result object immutably to avoid readonly property assignment errors.
    */
-  private deepMerge(
-    target: ServiceConfig,
-    source: Partial<ServiceConfig>
-  ): ServiceConfig {
+  private deepMerge(target: ServiceConfig, source: Partial<ServiceConfig>): ServiceConfig {
     // Build api config by merging nested properties
-    const apiConfig = source.api 
+    const apiConfig = source.api
       ? {
           ...target.api,
           ...source.api,
-          cache: source.api.cache 
-            ? { ...target.api.cache, ...source.api.cache }
-            : target.api.cache,
-          retry: source.api.retry 
-            ? { ...target.api.retry, ...source.api.retry }
-            : target.api.retry,
-          rateLimit: source.api.rateLimit 
+          cache: source.api.cache ? { ...target.api.cache, ...source.api.cache } : target.api.cache,
+          retry: source.api.retry ? { ...target.api.retry, ...source.api.retry } : target.api.retry,
+          rateLimit: source.api.rateLimit
             ? { ...target.api.rateLimit, ...source.api.rateLimit }
-            : target.api.rateLimit
+            : target.api.rateLimit,
         }
       : target.api;
 
@@ -367,7 +353,7 @@ export class ConfigurationService {
             : target.websocket.message,
           authentication: source.websocket.authentication
             ? { ...target.websocket.authentication, ...source.websocket.authentication }
-            : target.websocket.authentication
+            : target.websocket.authentication,
         }
       : target.websocket;
 
@@ -375,15 +361,11 @@ export class ConfigurationService {
     const result: ServiceConfig = {
       api: apiConfig,
       websocket: websocketConfig,
-      features: source.features 
-        ? { ...target.features, ...source.features }
-        : target.features,
-      limits: source.limits
-        ? { ...target.limits, ...source.limits }
-        : target.limits,
+      features: source.features ? { ...target.features, ...source.features } : target.features,
+      limits: source.limits ? { ...target.limits, ...source.limits } : target.limits,
       monitoring: source.monitoring
         ? { ...target.monitoring, ...source.monitoring }
-        : target.monitoring
+        : target.monitoring,
     };
 
     return result;
@@ -403,10 +385,10 @@ export class ConfigurationService {
 
     if (allErrors.length > 0) {
       const errorMessage = `Configuration validation failed:\n${allErrors.join('\n')}`;
-      
+
       logger.error('Configuration validation failed', {
         component: 'ConfigurationService',
-        errors: allErrors
+        errors: allErrors,
       });
 
       throw new Error(errorMessage);
@@ -426,7 +408,7 @@ export class ConfigurationService {
         logger.error('Configuration observer error', {
           component: 'ConfigurationService',
           key,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -439,7 +421,7 @@ export class ConfigurationService {
     const snapshot: ConfigSnapshot = {
       config: JSON.parse(JSON.stringify(this.config)),
       timestamp: new Date(),
-      reason
+      reason,
     };
 
     this.configHistory.push(snapshot);
@@ -488,7 +470,8 @@ export class ApiConfigValidator implements ConfigValidator {
     if (config.api.timeout <= 0) {
       errors.push('API timeout must be positive');
     }
-    if (config.api.timeout > 300000) { // 5 minutes max
+    if (config.api.timeout > 300000) {
+      // 5 minutes max
       errors.push('API timeout exceeds maximum (300000ms)');
     }
 
@@ -689,7 +672,7 @@ interface CacheConfig {
 }
 
 /**
- * Type guard for WebSocket configuration  
+ * Type guard for WebSocket configuration
  */
 interface WebSocketConfig {
   url: string;
@@ -716,7 +699,7 @@ export class CacheConfigObserver implements ConfigObserver {
         logger.info('Cache configuration updated', {
           component: 'CacheConfigObserver',
           newTTL: newCacheConfig.defaultTTL,
-          newStorage: newCacheConfig.storage
+          newStorage: newCacheConfig.storage,
         });
 
         // In a real implementation, reconfigure the cache manager here
@@ -745,11 +728,7 @@ export class CacheConfigObserver implements ConfigObserver {
   }
 
   private isServiceConfig(value: unknown): value is { api?: { cache: CacheConfig } } {
-    return (
-      value !== null &&
-      typeof value === 'object' &&
-      'api' in value
-    );
+    return value !== null && typeof value === 'object' && 'api' in value;
   }
 
   private hasChanged(newConfig: CacheConfig, oldConfig: CacheConfig | null): boolean {
@@ -772,7 +751,7 @@ export class WebSocketConfigObserver implements ConfigObserver {
       if (newWsConfig && this.hasChanged(newWsConfig, oldWsConfig)) {
         logger.info('WebSocket configuration updated', {
           component: 'WebSocketConfigObserver',
-          urlChanged: newWsConfig.url !== oldWsConfig?.url
+          urlChanged: newWsConfig.url !== oldWsConfig?.url,
         });
 
         // In a real implementation, handle reconnection here
@@ -795,19 +774,12 @@ export class WebSocketConfigObserver implements ConfigObserver {
 
   private isWebSocketConfig(value: unknown): value is WebSocketConfig {
     return (
-      value !== null &&
-      typeof value === 'object' &&
-      'url' in value &&
-      typeof value.url === 'string'
+      value !== null && typeof value === 'object' && 'url' in value && typeof value.url === 'string'
     );
   }
 
   private isServiceConfig(value: unknown): value is { websocket: WebSocketConfig } {
-    return (
-      value !== null &&
-      typeof value === 'object' &&
-      'websocket' in value
-    );
+    return value !== null && typeof value === 'object' && 'websocket' in value;
   }
 
   private hasChanged(newConfig: WebSocketConfig, oldConfig: WebSocketConfig | null): boolean {
@@ -846,7 +818,7 @@ export class EnvironmentConfigLoader {
           maxDelay: this.getEnvNumber('VITE_API_RETRY_MAX_DELAY') || 10000,
           backoffMultiplier: this.getEnvNumber('VITE_API_RETRY_BACKOFF') || 2,
           retryableStatusCodes: [408, 429, 500, 502, 503, 504],
-          retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND']
+          retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND'],
         },
         cache: {
           defaultTTL: this.getEnvNumber('VITE_CACHE_TTL') || 5 * 60 * 1000,
@@ -854,8 +826,8 @@ export class EnvironmentConfigLoader {
           storage: this.getCacheStorage(),
           compression: this.getEnvBoolean('REACT_APP_CACHE_COMPRESSION', false),
           encryption: this.getEnvBoolean('REACT_APP_CACHE_ENCRYPTION', false),
-          evictionPolicy: this.getEvictionPolicy()
-        }
+          evictionPolicy: this.getEvictionPolicy(),
+        },
       },
       websocket: {
         url: this.getEnvString('REACT_APP_WS_URL') || 'ws://localhost:8080',
@@ -864,23 +836,23 @@ export class EnvironmentConfigLoader {
           maxAttempts: this.getEnvNumber('REACT_APP_WS_RECONNECT_MAX_ATTEMPTS') || 5,
           baseDelay: this.getEnvNumber('REACT_APP_WS_RECONNECT_BASE_DELAY') || 1000,
           maxDelay: this.getEnvNumber('REACT_APP_WS_RECONNECT_MAX_DELAY') || 30000,
-          backoffMultiplier: this.getEnvNumber('REACT_APP_WS_RECONNECT_BACKOFF') || 2
+          backoffMultiplier: this.getEnvNumber('REACT_APP_WS_RECONNECT_BACKOFF') || 2,
         },
         heartbeat: {
           enabled: this.getEnvBoolean('REACT_APP_WS_HEARTBEAT_ENABLED', true),
           interval: this.getEnvNumber('REACT_APP_WS_HEARTBEAT_INTERVAL') || 30000,
-          timeout: this.getEnvNumber('REACT_APP_WS_HEARTBEAT_TIMEOUT') || 5000
+          timeout: this.getEnvNumber('REACT_APP_WS_HEARTBEAT_TIMEOUT') || 5000,
         },
         message: {
           compression: this.getEnvBoolean('REACT_APP_WS_MESSAGE_COMPRESSION', false),
           batching: this.getEnvBoolean('REACT_APP_WS_MESSAGE_BATCHING', true),
           batchSize: this.getEnvNumber('REACT_APP_WS_MESSAGE_BATCH_SIZE') || 10,
           batchInterval: this.getEnvNumber('REACT_APP_WS_MESSAGE_BATCH_INTERVAL') || 1000,
-          maxMessageSize: this.getEnvNumber('REACT_APP_WS_MESSAGE_MAX_SIZE') || 1024 * 1024
+          maxMessageSize: this.getEnvNumber('REACT_APP_WS_MESSAGE_MAX_SIZE') || 1024 * 1024,
         },
         authentication: {
-          type: 'session'
-        }
+          type: 'session',
+        },
       },
       features: {
         offlineMode: this.getEnvBoolean('REACT_APP_OFFLINE_MODE', true),
@@ -888,20 +860,20 @@ export class EnvironmentConfigLoader {
         analytics: this.getEnvBoolean('REACT_APP_ANALYTICS', true),
         errorReporting: this.getEnvBoolean('REACT_APP_ERROR_REPORTING', true),
         performanceMonitoring: this.getEnvBoolean('REACT_APP_PERFORMANCE_MONITORING', true),
-        experimentalFeatures: this.getEnvBoolean('REACT_APP_EXPERIMENTAL_FEATURES', false)
+        experimentalFeatures: this.getEnvBoolean('REACT_APP_EXPERIMENTAL_FEATURES', false),
       },
       limits: {
         maxConcurrentRequests: this.getEnvNumber('REACT_APP_MAX_CONCURRENT_REQUESTS') || 10,
         maxCacheSize: this.getEnvNumber('REACT_APP_MAX_CACHE_SIZE') || 100,
         maxWebSocketSubscriptions: this.getEnvNumber('REACT_APP_MAX_WS_SUBSCRIPTIONS') || 50,
-        maxRetryAttempts: this.getEnvNumber('REACT_APP_MAX_RETRY_ATTEMPTS') || 3
+        maxRetryAttempts: this.getEnvNumber('REACT_APP_MAX_RETRY_ATTEMPTS') || 3,
       },
       monitoring: {
         enableMetrics: this.getEnvBoolean('REACT_APP_ENABLE_METRICS', true),
         enableTracing: this.getEnvBoolean('REACT_APP_ENABLE_TRACING', false),
         logLevel: this.getLogLevel(),
-        sampleRate: this.getEnvNumber('REACT_APP_SAMPLE_RATE') || 1.0
-      }
+        sampleRate: this.getEnvNumber('REACT_APP_SAMPLE_RATE') || 1.0,
+      },
     };
   }
 

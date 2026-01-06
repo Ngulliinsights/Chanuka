@@ -43,16 +43,16 @@ export interface RecoveryResult {
  * This data travels with the error through the entire handling pipeline.
  */
 export interface ErrorContext {
-  component?: string;      // Component where error originated
-  operation?: string;      // Operation being performed
-  userId?: string;         // User context
-  sessionId?: string;      // Session identifier
-  requestId?: string;      // Request tracking ID
-  url?: string;           // Current URL
-  userAgent?: string;     // Browser information
-  retryCount?: number;    // Number of retry attempts
-  route?: string;         // Current route
-  timestamp?: number;     // Error timestamp
+  component?: string; // Component where error originated
+  operation?: string; // Operation being performed
+  userId?: string; // User context
+  sessionId?: string; // Session identifier
+  requestId?: string; // Request tracking ID
+  url?: string; // Current URL
+  userAgent?: string; // Browser information
+  retryCount?: number; // Number of retry attempts
+  route?: string; // Current route
+  timestamp?: number; // Error timestamp
   [key: string]: unknown; // Additional custom context
 }
 
@@ -154,7 +154,7 @@ export class AppError extends Error {
         id: s.id,
         type: s.type,
         name: s.name,
-        priority: s.priority
+        priority: s.priority,
       })),
       retryCount: this.retryCount,
       recovered: this.recovered,
@@ -183,16 +183,10 @@ export class AppError extends Error {
    * Create a new error with incremented retry count
    */
   withRetry(): AppError {
-    return new AppError(
-      this.message,
-      this.code,
-      this.type,
-      this.severity,
-      {
-        ...this,
-        retryCount: this.retryCount + 1,
-      }
-    );
+    return new AppError(this.message, this.code, this.type, this.severity, {
+      ...this,
+      retryCount: this.retryCount + 1,
+    });
   }
 }
 
@@ -293,7 +287,6 @@ export interface ErrorFallbackProps {
   showTechnicalDetails?: boolean;
 }
 
-
 // ============================================================================
 // Analytics and Reporting Interfaces (from utils/errors.ts)
 // ============================================================================
@@ -334,7 +327,7 @@ export enum NavigationErrorType {
   INVALID_NAVIGATION_PATH = 'INVALID_NAVIGATION_PATH',
   NAVIGATION_ACCESS_DENIED = 'NAVIGATION_ACCESS_DENIED',
   NAVIGATION_VALIDATION_ERROR = 'NAVIGATION_VALIDATION_ERROR',
-  NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR'
+  NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR',
 }
 
 // ============================================================================
@@ -342,4 +335,3 @@ export enum NavigationErrorType {
 // ============================================================================
 
 export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
-

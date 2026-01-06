@@ -1,12 +1,11 @@
 /**
  * Engagement Analytics Dashboard Component
- * 
+ *
  * Provides comprehensive real-time engagement analytics with live metrics display,
  * personal civic engagement scoring, community sentiment tracking, temporal analytics,
  * and gamification elements.
  */
 
-import React from 'react';
 import {
   Activity,
   Users,
@@ -15,8 +14,9 @@ import {
   Target,
   Eye,
   ThumbsUp,
-  FileText
+  FileText,
 } from 'lucide-react';
+import React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 
 import { cn } from '@client/lib/utils';
@@ -86,7 +86,7 @@ export function EngagementAnalyticsDashboard({
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState<'hour' | 'day' | 'week' | 'month'>('day');
   const [isConnected] = useState(true);
-  
+
   // Mock data for demonstration
   const [liveMetrics, setLiveMetrics] = useState<LiveMetrics>({
     activeUsers: 1247,
@@ -96,7 +96,7 @@ export function EngagementAnalyticsDashboard({
     expertContributions: 23,
     communityScore: 78,
     sentimentScore: 72,
-    trendingTopics: 8
+    trendingTopics: 8,
   });
 
   const [personalScore] = useState<PersonalCivicScore>({
@@ -107,7 +107,7 @@ export function EngagementAnalyticsDashboard({
       participation: 75,
       quality: 82,
       consistency: 45,
-      impact: 70
+      impact: 70,
     },
     achievements: [
       {
@@ -115,21 +115,21 @@ export function EngagementAnalyticsDashboard({
         title: 'Voice Heard',
         description: 'Made your first 10 comments',
         icon: 'MessageSquare',
-        earnedAt: new Date().toISOString()
+        earnedAt: new Date().toISOString(),
       },
       {
         id: 'expert_contributor',
         title: 'Expert Contributor',
         description: 'Provided 5 expert insights',
         icon: 'Award',
-        earnedAt: new Date().toISOString()
-      }
+        earnedAt: new Date().toISOString(),
+      },
     ],
     streaks: {
       current: 7,
       longest: 14,
-      type: 'daily'
-    }
+      type: 'daily',
+    },
   });
 
   const [recentActivity] = useState<ActivityItem[]>([
@@ -137,20 +137,20 @@ export function EngagementAnalyticsDashboard({
       id: '1',
       type: 'new_comment',
       timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
-      bill_id: 'HB-2024-001'
+      bill_id: 'HB-2024-001',
     },
     {
       id: '2',
       type: 'bill_view',
       timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
-      bill_id: 'SB-2024-045'
+      bill_id: 'SB-2024-045',
     },
     {
       id: '3',
       type: 'expert_analysis',
       timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
-      bill_id: 'HB-2024-012'
-    }
+      bill_id: 'HB-2024-012',
+    },
   ]);
 
   // Simulate real-time updates
@@ -160,7 +160,7 @@ export function EngagementAnalyticsDashboard({
         ...prev,
         activeUsers: prev.activeUsers + Math.floor(Math.random() * 10 - 5),
         commentsToday: prev.commentsToday + Math.floor(Math.random() * 3),
-        billsViewed: prev.billsViewed + Math.floor(Math.random() * 5)
+        billsViewed: prev.billsViewed + Math.floor(Math.random() * 5),
       }));
     }, 5000);
 
@@ -168,40 +168,43 @@ export function EngagementAnalyticsDashboard({
   }, []);
 
   // Memoized metric cards for optimal performance
-  const metricCards = useMemo(() => [
-    {
-      title: 'Active Users',
-      value: liveMetrics.activeUsers.toLocaleString(),
-      change: '+12%',
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    },
-    {
-      title: 'Comments Today',
-      value: liveMetrics.commentsToday.toLocaleString(),
-      change: '+8%',
-      icon: MessageSquare,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    {
-      title: 'Bills Viewed',
-      value: liveMetrics.billsViewed.toLocaleString(),
-      change: '+15%',
-      icon: Eye,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
-    },
-    {
-      title: 'Expert Insights',
-      value: liveMetrics.expertContributions.toLocaleString(),
-      change: '+5%',
-      icon: Award,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    }
-  ], [liveMetrics]);
+  const metricCards = useMemo(
+    () => [
+      {
+        title: 'Active Users',
+        value: liveMetrics.activeUsers.toLocaleString(),
+        change: '+12%',
+        icon: Users,
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+      },
+      {
+        title: 'Comments Today',
+        value: liveMetrics.commentsToday.toLocaleString(),
+        change: '+8%',
+        icon: MessageSquare,
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+      },
+      {
+        title: 'Bills Viewed',
+        value: liveMetrics.billsViewed.toLocaleString(),
+        change: '+15%',
+        icon: Eye,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+      },
+      {
+        title: 'Expert Insights',
+        value: liveMetrics.expertContributions.toLocaleString(),
+        change: '+5%',
+        icon: Award,
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+      },
+    ],
+    [liveMetrics]
+  );
 
   // Helper function to format timestamps in a human-readable way
   const formatTimestamp = (timestamp: string) => {
@@ -209,7 +212,7 @@ export function EngagementAnalyticsDashboard({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
@@ -217,7 +220,7 @@ export function EngagementAnalyticsDashboard({
   };
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header with status indicator and time range selector */}
       <div className="flex items-center justify-between">
         <div>
@@ -227,13 +230,13 @@ export function EngagementAnalyticsDashboard({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={isConnected ? "default" : "secondary"} className="gap-1">
-            <Activity className={cn("h-3 w-3", isConnected && "animate-pulse")} />
+          <Badge variant={isConnected ? 'default' : 'secondary'} className="gap-1">
+            <Activity className={cn('h-3 w-3', isConnected && 'animate-pulse')} />
             {isConnected ? 'Live' : 'Offline'}
           </Badge>
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as typeof timeRange)}
+            onChange={e => setTimeRange(e.target.value as typeof timeRange)}
             className="px-3 py-1 text-sm border rounded-md"
             aria-label="Time range selection"
           >
@@ -252,14 +255,12 @@ export function EngagementAnalyticsDashboard({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {metric.title}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
                   <p className="text-2xl font-bold">{metric.value}</p>
                   <p className="text-xs text-green-600">{metric.change}</p>
                 </div>
-                <div className={cn("p-2 rounded-md", metric.bgColor)}>
-                  <metric.icon className={cn("h-5 w-5", metric.color)} />
+                <div className={cn('p-2 rounded-md', metric.bgColor)}>
+                  <metric.icon className={cn('h-5 w-5', metric.color)} />
                 </div>
               </div>
             </CardContent>
@@ -291,9 +292,12 @@ export function EngagementAnalyticsDashboard({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Overall Sentiment</span>
-                    <Badge variant={liveMetrics.sentimentScore >= 70 ? "default" : "secondary"}>
-                      {liveMetrics.sentimentScore >= 70 ? 'Positive' : 
-                       liveMetrics.sentimentScore >= 40 ? 'Neutral' : 'Negative'}
+                    <Badge variant={liveMetrics.sentimentScore >= 70 ? 'default' : 'secondary'}>
+                      {liveMetrics.sentimentScore >= 70
+                        ? 'Positive'
+                        : liveMetrics.sentimentScore >= 40
+                          ? 'Neutral'
+                          : 'Negative'}
                     </Badge>
                   </div>
                   <Progress value={liveMetrics.sentimentScore} className="h-2" />
@@ -350,10 +354,9 @@ export function EngagementAnalyticsDashboard({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">
-                        {activity.bill_id 
+                        {activity.bill_id
                           ? `Bill ${activity.bill_id} updated`
-                          : 'Community discussion'
-                        }
+                          : 'Community discussion'}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {activity.type.replace('_', ' ')} • {formatTimestamp(activity.timestamp)}
@@ -368,9 +371,7 @@ export function EngagementAnalyticsDashboard({
 
         {/* Personal Score Tab - Individual user metrics and achievements */}
         <TabsContent value="personal" className="space-y-4">
-          {showPersonalMetrics && (
-            <CivicScoreCard score={personalScore} showMethodology={true} />
-          )}
+          {showPersonalMetrics && <CivicScoreCard score={personalScore} showMethodology={true} />}
         </TabsContent>
 
         {/* Community Tab - Community-wide metrics */}

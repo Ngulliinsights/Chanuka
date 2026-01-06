@@ -1,9 +1,9 @@
+import { securityAuditService } from '@server/feature/security/security-audit-service.js';
 import { votingPatternAnalysisService } from '@server/features/bills/voting-pattern-analysis-router.ts';
 import type { AuthenticatedRequest } from '@server/middleware/auth.js';
 import { authenticateToken } from '@server/middleware/auth.js';
 import { logger   } from '@shared/core';
 import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
-import { securityAuditService } from '@server/feature/security/security-audit-service.js';
 import { NextFunction,Request, Response, Router } from 'express';
 
 const router = Router();

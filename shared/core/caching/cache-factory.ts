@@ -6,12 +6,21 @@
  */
 
 import { EventEmitter } from 'events';
-import { Result, ok, err } from '../primitives/types/result';
+
 import type {
   CacheAdapter,
   CacheMetrics,
   CacheHealthStatus
 } from '../cache';
+import { Result, ok, err } from '../primitives/types/result';
+
+import { BrowserAdapter } from './adapters/browser-adapter';
+import { MemoryAdapter } from './adapters/memory-adapter';
+import { MultiTierAdapter } from './adapters/multi-tier-adapter';
+import { CacheClusterManager, ClusterNode } from './clustering/cluster-manager';
+import { CacheCompressor } from './compression/cache-compressor';
+import { CacheMetricsCollector } from './monitoring/metrics-collector';
+import { CacheTagManager } from './tagging/tag-manager';
 import type {
   EvictionOptions,
   CompressionOptions,
@@ -19,17 +28,9 @@ import type {
 } from './types';
 
 // Import adapters
-import { MemoryAdapter } from './adapters/memory-adapter';
-import { RedisAdapter } from './adapters/redis-adapter';
-import { MultiTierAdapter } from './adapters/multi-tier-adapter';
-import { BrowserAdapter } from './adapters/browser-adapter';
 
 // Import utilities
-import { CacheMetricsCollector } from './monitoring/metrics-collector';
 import { CacheWarmer, WarmingStrategy } from './warming/cache-warmer';
-import { CacheCompressor } from './compression/cache-compressor';
-import { CacheTagManager } from './tagging/tag-manager';
-import { CacheClusterManager, ClusterNode } from './clustering/cluster-manager';
 
 export interface UnifiedCacheConfig {
   // Base config properties
@@ -40,7 +41,7 @@ export interface UnifiedCacheConfig {
   enableMetrics?: boolean;
   enableCompression?: boolean;
   compressionThreshold?: number;
-  
+
   // Extended properties
   // Adapter configurations
   memoryConfig?: MemoryAdapterConfig;
@@ -750,11 +751,11 @@ class MetricsCacheAdapter implements CacheAdapter {
     try {
       const result = await this.adapter.get<T>(key);
       const duration = Date.now() - start;
-      
+
       if (this.metricsCollector?.recordOperation) {
         this.metricsCollector.recordOperation(this.cacheName, 'get', true, duration);
       }
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - start;
@@ -770,7 +771,7 @@ class MetricsCacheAdapter implements CacheAdapter {
     try {
       await this.adapter.set(key, value, ttlSeconds);
       const duration = Date.now() - start;
-      
+
       if (this.metricsCollector?.recordOperation) {
         this.metricsCollector.recordOperation(this.cacheName, 'set', true, duration);
       }
@@ -788,11 +789,11 @@ class MetricsCacheAdapter implements CacheAdapter {
     try {
       const result = await this.adapter.del(key);
       const duration = Date.now() - start;
-      
+
       if (this.metricsCollector?.recordOperation) {
         this.metricsCollector.recordOperation(this.cacheName, 'delete', true, duration);
       }
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - start;
@@ -862,7 +863,7 @@ class MetricsCacheAdapter implements CacheAdapter {
       maxLatency: 0,
       minLatency: 0
     };
-    
+
     // Add avgResponseTime if missing
     return {
       ...baseMetrics,
@@ -875,7 +876,7 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
   readonly name: string;
   readonly version: string;
   readonly config: any;
-  
+
   private failures = 0;
   private lastFailure = 0;
   private state: 'closed' | 'open' | 'half-open' = 'closed';
@@ -904,12 +905,12 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
 
     try {
       const result = await this.adapter.get<T>(key);
-      
+
       if (this.state === 'half-open') {
         this.state = 'closed';
         this.failures = 0;
       }
-      
+
       return result;
     } catch (error) {
       this.recordFailure();
@@ -924,7 +925,7 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
 
     try {
       await this.adapter.set(key, value, ttlSeconds);
-      
+
       if (this.state === 'half-open') {
         this.state = 'closed';
         this.failures = 0;
@@ -1015,7 +1016,7 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
       maxLatency: 0,
       minLatency: 0
     };
-    
+
     return {
       ...baseMetrics,
       avgResponseTime: baseMetrics.avgLatency || 0

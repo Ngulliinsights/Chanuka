@@ -1,6 +1,6 @@
 /**
  * Authenticated API Client Module
- * 
+ *
  * Extends the base API client with authentication capabilities including
  * automatic token injection, token refresh, and authentication error handling.
  */
@@ -8,7 +8,11 @@
 import { logger } from '../../utils/logger';
 import { tokenManager } from '../auth';
 
-import { /* AuthenticationInterceptor, */ TokenRefreshInterceptor, DEFAULT_AUTH_CONFIG, AuthConfig } from './authentication';
+import {
+  /* AuthenticationInterceptor, */ TokenRefreshInterceptor,
+  DEFAULT_AUTH_CONFIG,
+  AuthConfig,
+} from './authentication';
 import { BaseApiClient, ApiClientConfig, ApiRequest, RequestBody } from './base-client';
 
 /**
@@ -31,7 +35,8 @@ export class AuthenticatedApiClient extends BaseApiClient {
     this.authConfig = {
       ...DEFAULT_AUTH_CONFIG,
       ...config.auth,
-      tokenRefreshEndpoint: config.auth?.tokenRefreshEndpoint || `${this.config.baseURL}/auth/refresh`
+      tokenRefreshEndpoint:
+        config.auth?.tokenRefreshEndpoint || `${this.config.baseURL}/auth/refresh`,
     };
 
     this.setupAuthInterceptors();
@@ -46,26 +51,28 @@ export class AuthenticatedApiClient extends BaseApiClient {
     this.tokenRefreshInterceptor = new TokenRefreshInterceptor(this.authConfig);
 
     // Add request interceptor for token injection
-    this.addRequestInterceptor(async (request) => {
+    this.addRequestInterceptor(async request => {
       const token = await tokenManager.getAccessToken();
       if (token) {
         return {
           ...request,
           headers: {
             ...request.headers,
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         };
       }
       return request;
     });
 
     // Add error interceptor for token refresh
-    this.addErrorInterceptor(this.tokenRefreshInterceptor.intercept.bind(this.tokenRefreshInterceptor));
+    this.addErrorInterceptor(
+      this.tokenRefreshInterceptor.intercept.bind(this.tokenRefreshInterceptor)
+    );
 
     logger.debug('Authentication interceptors configured', {
       component: 'AuthenticatedApiClient',
-      tokenRefreshEndpoint: this.authConfig.tokenRefreshEndpoint
+      tokenRefreshEndpoint: this.authConfig.tokenRefreshEndpoint,
     });
   }
 
@@ -80,7 +87,7 @@ export class AuthenticatedApiClient extends BaseApiClient {
 
     logger.info('Authentication configuration updated', {
       component: 'AuthenticatedApiClient',
-      config: this.authConfig
+      config: this.authConfig,
     });
   }
 
@@ -101,42 +108,28 @@ export class AuthenticatedApiClient extends BaseApiClient {
   /**
    * Authenticated GET request
    */
-  async secureGet<T = unknown>(
-    url: string,
-    headers?: Record<string, string>
-  ) {
+  async secureGet<T = unknown>(url: string, headers?: Record<string, string>) {
     return this.get<T>(url, headers);
   }
 
   /**
    * Authenticated POST request
    */
-  async securePost<T = unknown>(
-    url: string,
-    body?: RequestBody,
-    headers?: Record<string, string>
-  ) {
+  async securePost<T = unknown>(url: string, body?: RequestBody, headers?: Record<string, string>) {
     return this.post<T>(url, body, headers);
   }
 
   /**
    * Authenticated PUT request
    */
-  async securePut<T = unknown>(
-    url: string,
-    body?: RequestBody,
-    headers?: Record<string, string>
-  ) {
+  async securePut<T = unknown>(url: string, body?: RequestBody, headers?: Record<string, string>) {
     return this.put<T>(url, body, headers);
   }
 
   /**
    * Authenticated DELETE request
    */
-  async secureDelete<T = unknown>(
-    url: string,
-    headers?: Record<string, string>
-  ) {
+  async secureDelete<T = unknown>(url: string, headers?: Record<string, string>) {
     return this.delete<T>(url, headers);
   }
 

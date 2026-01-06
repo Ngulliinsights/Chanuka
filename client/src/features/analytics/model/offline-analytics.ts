@@ -6,7 +6,16 @@
 
 export interface OfflineEvent {
   id: string;
-  type: 'page_view' | 'user_action' | 'api_error' | 'sync_error' | 'connection_change' | 'cache_hit' | 'cache_miss' | 'performance_metric' | 'visibility_change';
+  type:
+    | 'page_view'
+    | 'user_action'
+    | 'api_error'
+    | 'sync_error'
+    | 'connection_change'
+    | 'cache_hit'
+    | 'cache_miss'
+    | 'performance_metric'
+    | 'visibility_change';
   timestamp: number;
   data: Record<string, unknown>;
   userAgent: string;
@@ -71,7 +80,7 @@ class OfflineAnalyticsManager {
     document.addEventListener('visibilitychange', () => {
       this.trackEvent('visibility_change', {
         hidden: document.hidden,
-        visibilityState: document.visibilityState
+        visibilityState: document.visibilityState,
       });
     });
 
@@ -88,7 +97,7 @@ class OfflineAnalyticsManager {
       url: window.location.href,
       session_id: this.session_id,
       connectionType: (navigator as any).connection?.effectiveType,
-      isOffline: !navigator.onLine
+      isOffline: !navigator.onLine,
     };
 
     this.events.push(event);
@@ -127,7 +136,7 @@ class OfflineAnalyticsManager {
       period: { start, end },
       events: filteredEvents,
       summary,
-      userJourney
+      userJourney,
     };
   }
 
@@ -140,7 +149,7 @@ class OfflineAnalyticsManager {
       cacheMisses: events.filter(e => e.type === 'cache_miss').length,
       syncAttempts: events.filter(e => e.type === 'sync_error').length,
       syncSuccesses: 0, // Would need to track successful syncs
-      errors: events.filter(e => e.type === 'api_error' || e.type === 'sync_error').length
+      errors: events.filter(e => e.type === 'api_error' || e.type === 'sync_error').length,
     };
   }
 
@@ -152,8 +161,11 @@ class OfflineAnalyticsManager {
     return {
       pagesViewed: [...new Set(pageViews.map(e => e.url))],
       actionsPerformed: actions.map(e => e.data.action as string).filter(Boolean),
-      timeSpentOffline: offlineEvents.length > 0 ?
-        Math.max(...offlineEvents.map(e => e.timestamp)) - Math.min(...offlineEvents.map(e => e.timestamp)) : 0
+      timeSpentOffline:
+        offlineEvents.length > 0
+          ? Math.max(...offlineEvents.map(e => e.timestamp)) -
+            Math.min(...offlineEvents.map(e => e.timestamp))
+          : 0,
     };
   }
 

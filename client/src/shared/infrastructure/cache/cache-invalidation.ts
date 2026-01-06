@@ -73,7 +73,7 @@ class CacheInvalidationManager<T = unknown> {
       invalidationTriggers: ['user_action', 'data_update', 'route_change'],
       enableStats: true,
       cleanupInterval: 60000, // 1 minute
-      ...config
+      ...config,
     };
 
     if (this.config.cleanupInterval > 0) {
@@ -109,7 +109,7 @@ class CacheInvalidationManager<T = unknown> {
       tags: options.tags ?? [],
       dependencies: options.dependencies ?? [],
       accessCount: 0,
-      lastAccessed: now
+      lastAccessed: now,
     };
 
     const isUpdate = this.cache.has(key);
@@ -431,7 +431,7 @@ class CacheInvalidationManager<T = unknown> {
       const event: CacheEvent = {
         type,
         key,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       listeners.forEach(callback => callback(event));
     }

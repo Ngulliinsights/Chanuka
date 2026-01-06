@@ -1,11 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useToast } from '../.././use-toast';
-
+import { useToast } from '../../hooks/use-toast';
 import { analyticsService } from '../services/analytics';
-import type {
-  AnalyticsFilters
-} from '../types';
+import type { AnalyticsFilters } from '../types';
 
 /**
  * Hook for analytics dashboard data
@@ -163,7 +160,7 @@ export function useAnalyticsExport() {
     onSuccess: (data, { format }) => {
       // Create download link
       const blob = new Blob([data as string], {
-        type: format === 'csv' ? 'text/csv' : 'application/json'
+        type: format === 'csv' ? 'text/csv' : 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -175,54 +172,16 @@ export function useAnalyticsExport() {
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Export successful",
+        title: 'Export successful',
         description: `Analytics data exported as ${format?.toUpperCase()}`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Export failed",
+        title: 'Export failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

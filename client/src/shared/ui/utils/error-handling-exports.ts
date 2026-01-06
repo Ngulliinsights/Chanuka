@@ -8,7 +8,12 @@
 
 // Re-export types
 export type { AppError, ErrorDomain, ErrorSeverity, ErrorContext } from '@/core/error';
-export type { UIErrorInfo, UIErrorHandler, UIErrorType, UseUIErrorHandlerResult } from './error-handling-utils';
+export type {
+  UIErrorInfo,
+  UIErrorHandler,
+  UIErrorType,
+  UseUIErrorHandlerResult,
+} from './error-handling-utils';
 
 // Re-export functions and components from core
 export {

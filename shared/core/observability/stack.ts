@@ -9,6 +9,8 @@
 // import { AsyncLocalStorage } from 'async_hooks';
  // Unused import
 import { Result, Ok, Err } from '../primitives/types';
+
+import { AsyncCorrelationManager } from './correlation';
 import { BaseError } from './error-management';
 import {
   Logger,
@@ -24,7 +26,6 @@ import {
   HealthConfig
 } from './interfaces';
 import { TelemetryIntegration, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
-import { AsyncCorrelationManager } from './correlation';
 
 // ==================== Correlation Manager Implementation ====================
 

@@ -116,7 +116,8 @@ export const typographyDesignStandards = {
       fontSize: '0.875rem', // 14px
       fontWeight: '400',
       lineHeight: '1.4',
-      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+      fontFamily:
+        'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
       color: colorTokens.accent[700],
       backgroundColor: colorTokens.neutral[100],
       padding: '0.125rem 0.25rem',
@@ -310,4 +311,3 @@ export const typographyUtils = {
     `;
   },
 } as const;
-

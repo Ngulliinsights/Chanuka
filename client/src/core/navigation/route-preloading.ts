@@ -34,26 +34,26 @@ export const CRITICAL_ROUTES: RoutePreloadConfig[] = [
     path: '/',
     component: null,
     priority: 'high',
-    preloadConditions: { immediate: true }
+    preloadConditions: { immediate: true },
   },
   {
     path: '/bills',
     component: null,
     priority: 'high',
-    preloadConditions: { onHover: true, onIdle: true }
+    preloadConditions: { onHover: true, onIdle: true },
   },
   {
     path: '/dashboard',
     component: null,
     priority: 'medium',
-    preloadConditions: { onHover: true }
+    preloadConditions: { onHover: true },
   },
   {
     path: '/community',
     component: null,
     priority: 'medium',
-    preloadConditions: { onIdle: true }
-  }
+    preloadConditions: { onIdle: true },
+  },
 ];
 
 class RoutePreloader {
@@ -75,9 +75,9 @@ class RoutePreloader {
 
   private initializePreloading(): void {
     // Preload critical routes immediately
-    CRITICAL_ROUTES
-      .filter(route => route.preloadConditions?.immediate)
-      .forEach(route => this.preloadRoute(route.path));
+    CRITICAL_ROUTES.filter(route => route.preloadConditions?.immediate).forEach(route =>
+      this.preloadRoute(route.path)
+    );
   }
 
   preloadRoute(path: string): void {
@@ -96,12 +96,13 @@ class RoutePreloader {
   private shouldSkipPreload(): boolean {
     // Skip on slow connections or data saver mode
     if (this.connection?.saveData) return true;
-    if (this.connection?.effectiveType === 'slow-2g' || this.connection?.effectiveType === '2g') return true;
+    if (this.connection?.effectiveType === 'slow-2g' || this.connection?.effectiveType === '2g')
+      return true;
     return false;
   }
 
   setupHoverPreloading(): void {
-    document.addEventListener('mouseover', (event) => {
+    document.addEventListener('mouseover', event => {
       const target = event.target as HTMLElement;
       const link = target.closest('a[href]') as HTMLAnchorElement;
 

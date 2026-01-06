@@ -14,7 +14,7 @@ import {
   Database,
   Search,
   Target,
-  Zap
+  Zap,
 } from 'lucide-react';
 import React from 'react';
 
@@ -96,7 +96,7 @@ export function SearchProgressIndicator({
 
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-2 p-2 bg-muted/50 rounded-md", className)}>
+      <div className={cn('flex items-center gap-2 p-2 bg-muted/50 rounded-md', className)}>
         {getStatusIcon(progress.status)}
         <div className="flex-1">
           <Progress value={progress.percentage} className="h-1" />
@@ -118,7 +118,7 @@ export function SearchProgressIndicator({
   }
 
   return (
-    <Card className={cn("border-l-4 border-l-blue-500", className)}>
+    <Card className={cn('border-l-4 border-l-blue-500', className)}>
       <CardContent className="p-4">
         <div className="space-y-4">
           {/* Header */}
@@ -132,7 +132,7 @@ export function SearchProgressIndicator({
                 {progress.status === 'cancelled' && 'Search Cancelled'}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-xs">
                 {formatTime(progress.searchTime)}
@@ -165,13 +165,13 @@ export function SearchProgressIndicator({
                 <Database className="h-4 w-4" />
                 Search Engines
               </h4>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {progress.engines.map((engine, index) => (
                   <div
                     key={index}
                     className={cn(
-                      "flex items-center justify-between p-2 rounded border text-xs",
+                      'flex items-center justify-between p-2 rounded border text-xs',
                       getStatusColor(engine.status)
                     )}
                   >
@@ -179,7 +179,7 @@ export function SearchProgressIndicator({
                       {getStatusIcon(engine.status)}
                       <span className="font-medium">{engine.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-xs">
                       {engine.status === 'complete' && (
                         <>
@@ -208,7 +208,7 @@ export function SearchProgressIndicator({
                   <span>Avg: {formatTime(progress.searchTime / progress.engines.length)}</span>
                 </div>
               </div>
-              
+
               <Badge variant="secondary" className="text-xs">
                 {progress.engines.filter(e => e.status === 'complete').length} successful
               </Badge>
@@ -223,7 +223,8 @@ export function SearchProgressIndicator({
                 <span className="font-medium">Search encountered errors</span>
               </div>
               <div className="mt-1 text-red-700">
-                {progress.engines.filter(e => e.status === 'error').length} of {progress.engines.length} engines failed
+                {progress.engines.filter(e => e.status === 'error').length} of{' '}
+                {progress.engines.length} engines failed
               </div>
             </div>
           )}
@@ -234,12 +235,19 @@ export function SearchProgressIndicator({
               <div className="flex items-center gap-1">
                 <Search className="h-3 w-3" />
                 <span>
-                  Search completed in {formatTime(progress.searchTime)} • 
-                  Best engine: {progress.engines.reduce((best, engine) => 
-                    engine.responseTime < best.responseTime ? engine : best
-                  ).name} ({formatTime(progress.engines.reduce((best, engine) => 
-                    engine.responseTime < best.responseTime ? engine : best
-                  ).responseTime)})
+                  Search completed in {formatTime(progress.searchTime)} • Best engine:{' '}
+                  {
+                    progress.engines.reduce((best, engine) =>
+                      engine.responseTime < best.responseTime ? engine : best
+                    ).name
+                  }{' '}
+                  (
+                  {formatTime(
+                    progress.engines.reduce((best, engine) =>
+                      engine.responseTime < best.responseTime ? engine : best
+                    ).responseTime
+                  )}
+                  )
                 </span>
               </div>
             </div>

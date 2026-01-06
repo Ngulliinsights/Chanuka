@@ -1,6 +1,6 @@
 /**
  * Privacy Center Page
- * 
+ *
  * Comprehensive privacy management including:
  * - GDPR compliance dashboard
  * - Data usage reports
@@ -15,7 +15,13 @@ import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
 import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Alert, AlertDescription } from '@client/shared/design-system';
@@ -49,7 +55,8 @@ export default function PrivacyCenterPage() {
             <Alert className="border-blue-200 bg-blue-50">
               <Shield className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
-                Your privacy is protected. All data processing follows GDPR guidelines and your consent preferences.
+                Your privacy is protected. All data processing follows GDPR guidelines and your
+                consent preferences.
               </AlertDescription>
             </Alert>
 
@@ -140,7 +147,11 @@ export default function PrivacyCenterPage() {
                         <FileText className="h-4 w-4 mr-2" />
                         View Data Report
                       </Button>
-                      <Button variant="outline" size="sm" className="w-full justify-start text-red-600 hover:text-red-700">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start text-red-600 hover:text-red-700"
+                      >
                         <Shield className="h-4 w-4 mr-2" />
                         Delete My Data
                       </Button>

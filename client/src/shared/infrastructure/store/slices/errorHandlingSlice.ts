@@ -14,6 +14,7 @@ import {
   coreErrorHandler,
   createError,
 } from '@/core/error';
+
 import { logger } from '../../../../utils/logger';
 
 // ============================================================================
@@ -73,14 +74,20 @@ export interface ErrorHandlingState {
 
 const initialStats: ErrorStats = {
   totalErrors: 0,
-  errorsByDomain: Object.values(ErrorDomain).reduce((acc, domain) => {
-    acc[domain] = 0;
-    return acc;
-  }, {} as Record<ErrorDomain, number>),
-  errorsBySeverity: Object.values(ErrorSeverity).reduce((acc, severity) => {
-    acc[severity] = 0;
-    return acc;
-  }, {} as Record<ErrorSeverity, number>),
+  errorsByDomain: Object.values(ErrorDomain).reduce(
+    (acc, domain) => {
+      acc[domain] = 0;
+      return acc;
+    },
+    {} as Record<ErrorDomain, number>
+  ),
+  errorsBySeverity: Object.values(ErrorSeverity).reduce(
+    (acc, severity) => {
+      acc[severity] = 0;
+      return acc;
+    },
+    {} as Record<ErrorSeverity, number>
+  ),
   errorsBySource: {
     bills: 0,
     loading: 0,
@@ -111,15 +118,18 @@ const initialState: ErrorHandlingState = {
 
 export const reportError = createAsyncThunk(
   'errorHandling/reportError',
-  async (errorDetails: {
-    message: string;
-    code?: string;
-    domain?: ErrorDomain;
-    severity?: ErrorSeverity;
-    source: ErrorSource;
-    context?: ErrorContext;
-    details?: Record<string, unknown>;
-  }, { rejectWithValue }) => {
+  async (
+    errorDetails: {
+      message: string;
+      code?: string;
+      domain?: ErrorDomain;
+      severity?: ErrorSeverity;
+      source: ErrorSource;
+      context?: ErrorContext;
+      details?: Record<string, unknown>;
+    },
+    { rejectWithValue }
+  ) => {
     try {
       // Create error through core system
       const coreError = createError(
@@ -175,7 +185,10 @@ export const reportError = createAsyncThunk(
 
 export const attemptRecovery = createAsyncThunk(
   'errorHandling/attemptRecovery',
-  async ({ errorId, strategy }: { errorId: string; strategy: string }, { getState, rejectWithValue }) => {
+  async (
+    { errorId, strategy }: { errorId: string; strategy: string },
+    { getState, rejectWithValue }
+  ) => {
     try {
       const state = getState() as { errorHandling: ErrorHandlingState };
       const error = state.errorHandling.activeErrors[errorId];
@@ -254,7 +267,10 @@ const errorHandlingSlice = createSlice({
       updateErrorPatterns(state, error);
     },
 
-    updateError: (state, action: PayloadAction<{ id: string; updates: Partial<ReduxErrorDetails> }>) => {
+    updateError: (
+      state,
+      action: PayloadAction<{ id: string; updates: Partial<ReduxErrorDetails> }>
+    ) => {
       const { id, updates } = action.payload;
       if (state.activeErrors[id]) {
         state.activeErrors[id] = { ...state.activeErrors[id], ...updates };
@@ -275,9 +291,11 @@ const errorHandlingSlice = createSlice({
         // Update stats on removal
         if (error.isRecovered) {
           const resolutionTime = error.recoveryTimestamp! - error.timestamp;
-          const totalResolved = state.errorStats.totalErrors - Object.keys(state.activeErrors).length + 1;
+          const totalResolved =
+            state.errorStats.totalErrors - Object.keys(state.activeErrors).length + 1;
           state.errorStats.averageResolutionTime =
-            (state.errorStats.averageResolutionTime * (totalResolved - 1) + resolutionTime) / totalResolved;
+            (state.errorStats.averageResolutionTime * (totalResolved - 1) + resolutionTime) /
+            totalResolved;
           state.errorStats.recoveryRate = totalResolved / state.errorStats.totalErrors;
         }
 
@@ -296,7 +314,7 @@ const errorHandlingSlice = createSlice({
       state.globalError = action.payload;
     },
 
-    clearGlobalError: (state) => {
+    clearGlobalError: state => {
       state.globalError = null;
     },
 
@@ -310,7 +328,7 @@ const errorHandlingSlice = createSlice({
     },
 
     // Bulk operations
-    clearAllErrors: (state) => {
+    clearAllErrors: state => {
       state.errors = [];
       state.activeErrors = {};
       state.globalError = null;
@@ -352,18 +370,21 @@ const errorHandlingSlice = createSlice({
     },
 
     // Error pattern analysis
-    analyzeErrorPatterns: (state) => {
+    analyzeErrorPatterns: state => {
       const recentErrors = state.errors.slice(0, 100);
       const patterns: typeof state.errorPatterns = [];
 
-      const messageGroups = recentErrors.reduce((groups, error) => {
-        const key = error.message.split(' ').slice(0, 3).join(' ');
-        if (!groups[key]) {
-          groups[key] = [];
-        }
-        groups[key].push(error);
-        return groups;
-      }, {} as Record<string, ReduxErrorDetails[]>);
+      const messageGroups = recentErrors.reduce(
+        (groups, error) => {
+          const key = error.message.split(' ').slice(0, 3).join(' ');
+          if (!groups[key]) {
+            groups[key] = [];
+          }
+          groups[key].push(error);
+          return groups;
+        },
+        {} as Record<string, ReduxErrorDetails[]>
+      );
 
       Object.entries(messageGroups).forEach(([pattern, errors]) => {
         if (errors.length >= 3) {
@@ -381,7 +402,7 @@ const errorHandlingSlice = createSlice({
     },
 
     // Sync with core error system
-    syncWithCoreSystem: (state) => {
+    syncWithCoreSystem: state => {
       const coreStats = coreErrorHandler.getErrorStats();
 
       // Update stats from core system
@@ -389,11 +410,14 @@ const errorHandlingSlice = createSlice({
       state.errorStats.lastUpdated = Date.now();
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Report error
     builder
       .addCase(reportError.fulfilled, (state, action) => {
-        errorHandlingSlice.caseReducers.addError(state, { payload: action.payload, type: 'addError' });
+        errorHandlingSlice.caseReducers.addError(state, {
+          payload: action.payload,
+          type: 'addError',
+        });
       })
       .addCase(reportError.rejected, (_state, action) => {
         logger.error('Failed to report error through Redux', { error: action.payload });
@@ -411,9 +435,9 @@ const errorHandlingSlice = createSlice({
               updates: {
                 isRecovered: true,
                 recoveryTimestamp: timestamp,
-              }
+              },
             },
-            type: 'updateError'
+            type: 'updateError',
           });
 
           logger.info('Error recovery successful through Redux', { errorId });
@@ -426,11 +450,10 @@ const errorHandlingSlice = createSlice({
       });
 
     // Clear error
-    builder
-      .addCase(clearError.fulfilled, (state, action) => {
-        const { errorId } = action.payload;
-        errorHandlingSlice.caseReducers.removeError(state, { payload: errorId, type: 'removeError' });
-      });
+    builder.addCase(clearError.fulfilled, (state, action) => {
+      const { errorId } = action.payload;
+      errorHandlingSlice.caseReducers.removeError(state, { payload: errorId, type: 'removeError' });
+    });
   },
 });
 
@@ -477,8 +500,10 @@ function recalculateStats(state: ErrorHandlingState) {
   // Calculate average resolution time
   const resolvedErrors = state.errors.filter(e => e.isRecovered && e.recoveryTimestamp);
   if (resolvedErrors.length > 0) {
-    const totalResolutionTime = resolvedErrors.reduce((sum, e) =>
-      sum + (e.recoveryTimestamp! - e.timestamp), 0);
+    const totalResolutionTime = resolvedErrors.reduce(
+      (sum, e) => sum + (e.recoveryTimestamp! - e.timestamp),
+      0
+    );
     stats.averageResolutionTime = totalResolutionTime / resolvedErrors.length;
   }
 
@@ -523,16 +548,16 @@ export const selectErrorPatterns = (state: { errorHandling: ErrorHandlingState }
 export const selectIsRecoveryMode = (state: { errorHandling: ErrorHandlingState }) =>
   state.errorHandling.isRecoveryMode;
 
-export const selectErrorsBySource = (source: ErrorSource) =>
-  (state: { errorHandling: ErrorHandlingState }) =>
+export const selectErrorsBySource =
+  (source: ErrorSource) => (state: { errorHandling: ErrorHandlingState }) =>
     Object.values(state.errorHandling.activeErrors).filter(error => error.source === source);
 
-export const selectErrorsByDomain = (domain: ErrorDomain) =>
-  (state: { errorHandling: ErrorHandlingState }) =>
+export const selectErrorsByDomain =
+  (domain: ErrorDomain) => (state: { errorHandling: ErrorHandlingState }) =>
     Object.values(state.errorHandling.activeErrors).filter(error => error.type === domain);
 
-export const selectErrorsBySeverity = (severity: ErrorSeverity) =>
-  (state: { errorHandling: ErrorHandlingState }) =>
+export const selectErrorsBySeverity =
+  (severity: ErrorSeverity) => (state: { errorHandling: ErrorHandlingState }) =>
     Object.values(state.errorHandling.activeErrors).filter(error => error.severity === severity);
 
 export default errorHandlingSlice.reducer;

@@ -1,14 +1,14 @@
 /**
  * System API Service
  * Core API communication layer for system functionality
- * 
+ *
  * Provides comprehensive system monitoring including:
  * - Health checks across all system components
  * - Real-time statistics and metrics
  * - Activity monitoring and event tracking
  * - Database schema introspection
  * - Environment configuration details
- * 
+ *
  * @module api/system
  */
 
@@ -100,11 +100,11 @@ export interface SystemStats {
 /**
  * Event types tracked in system activity logs
  */
-export type SystemEventType = 
-  | 'user_login' 
-  | 'bill_created' 
-  | 'comment_added' 
-  | 'vote_cast' 
+export type SystemEventType =
+  | 'user_login'
+  | 'bill_created'
+  | 'comment_added'
+  | 'vote_cast'
   | 'system_alert';
 
 /**
@@ -239,17 +239,17 @@ export interface SystemEnvironment {
 
 /**
  * Centralized service for all system-related API operations.
- * 
+ *
  * This service provides a unified interface for:
  * - Monitoring system health and component status
  * - Retrieving aggregated statistics and metrics
  * - Tracking real-time system activity
  * - Inspecting database schema information
  * - Accessing environment configuration
- * 
+ *
  * All methods include comprehensive error handling, structured logging,
  * and type-safe response contracts.
- * 
+ *
  * @example
  * ```typescript
  * // Check system health
@@ -257,7 +257,7 @@ export interface SystemEnvironment {
  * if (health.status === 'unhealthy') {
  *   console.error('System is experiencing issues');
  * }
- * 
+ *
  * // Get current statistics
  * const stats = await systemApiService.getStats();
  * console.log(`Active users: ${stats.users.active_today}`);
@@ -268,16 +268,16 @@ export class SystemApiService {
 
   /**
    * Creates a new SystemApiService instance
-   * 
+   *
    * @param baseUrl - Base API URL, defaults to '/api'
    */
   constructor(baseUrl: string = '/api') {
     this.systemEndpoint = `${baseUrl}/system`;
-    
+
     logger.debug('SystemApiService initialized', {
       component: 'SystemApiService',
       baseUrl,
-      systemEndpoint: this.systemEndpoint
+      systemEndpoint: this.systemEndpoint,
     });
   }
 
@@ -287,19 +287,19 @@ export class SystemApiService {
 
   /**
    * Retrieves comprehensive system health status.
-   * 
+   *
    * Performs health checks across all system components including:
    * - Database connectivity and performance
    * - Cache layer responsiveness
    * - WebSocket server status
    * - External API availability
-   * 
+   *
    * The overall status is determined by aggregating individual service
    * statuses using the worst-case-wins principle.
    *
    * @returns Promise resolving to detailed health information
    * @throws Error if health check fails or service is unreachable
-   * 
+   *
    * @example
    * ```typescript
    * try {
@@ -313,21 +313,19 @@ export class SystemApiService {
    */
   async getHealth(): Promise<SystemHealth> {
     const operation = 'getHealth';
-    
+
     try {
       logger.debug('Fetching system health', {
         component: 'SystemApiService',
-        operation
+        operation,
       });
 
-      const response = await globalApiClient.get<SystemHealth>(
-        `${this.systemEndpoint}/health`
-      );
+      const response = await globalApiClient.get<SystemHealth>(`${this.systemEndpoint}/health`);
 
       logger.info('System health retrieved successfully', {
         component: 'SystemApiService',
         operation,
-        status: response.data.status
+        status: response.data.status,
       });
 
       return response.data;
@@ -335,7 +333,7 @@ export class SystemApiService {
       logger.error('Failed to fetch system health', {
         component: 'SystemApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleSystemError(error, 'Failed to retrieve system health');
     }
@@ -347,20 +345,20 @@ export class SystemApiService {
 
   /**
    * Retrieves comprehensive system-wide statistics.
-   * 
+   *
    * Aggregates metrics across all application domains including:
    * - User engagement and growth metrics
    * - Legislative bill tracking counts
    * - Discussion participation rates
    * - API performance indicators
    * - Storage utilization data
-   * 
+   *
    * Statistics are calculated in real-time or from recent cache
    * depending on the metric type.
    *
    * @returns Promise resolving to detailed system statistics
    * @throws Error if statistics cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const stats = await systemApiService.getStats();
@@ -370,22 +368,20 @@ export class SystemApiService {
    */
   async getStats(): Promise<SystemStats> {
     const operation = 'getStats';
-    
+
     try {
       logger.debug('Fetching system statistics', {
         component: 'SystemApiService',
-        operation
+        operation,
       });
 
-      const response = await globalApiClient.get<SystemStats>(
-        `${this.systemEndpoint}/stats`
-      );
+      const response = await globalApiClient.get<SystemStats>(`${this.systemEndpoint}/stats`);
 
       logger.info('System statistics retrieved successfully', {
         component: 'SystemApiService',
         operation,
         totalUsers: response.data.users.total,
-        totalBills: response.data.bills.total
+        totalBills: response.data.bills.total,
       });
 
       return response.data;
@@ -393,7 +389,7 @@ export class SystemApiService {
       logger.error('Failed to fetch system statistics', {
         component: 'SystemApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleSystemError(error, 'Failed to retrieve system statistics');
     }
@@ -405,18 +401,18 @@ export class SystemApiService {
 
   /**
    * Retrieves recent system activity and current sessions.
-   * 
+   *
    * Provides real-time insights into:
    * - Recent system events (logins, bill creations, votes, etc.)
    * - Currently active user sessions
    * - System resource utilization (CPU, memory, disk)
-   * 
+   *
    * Activity data is useful for monitoring system usage patterns,
    * detecting anomalies, and capacity planning.
    *
    * @returns Promise resolving to comprehensive activity information
    * @throws Error if activity data cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const activity = await systemApiService.getActivity();
@@ -426,22 +422,20 @@ export class SystemApiService {
    */
   async getActivity(): Promise<SystemActivity> {
     const operation = 'getActivity';
-    
+
     try {
       logger.debug('Fetching system activity', {
         component: 'SystemApiService',
-        operation
+        operation,
       });
 
-      const response = await globalApiClient.get<SystemActivity>(
-        `${this.systemEndpoint}/activity`
-      );
+      const response = await globalApiClient.get<SystemActivity>(`${this.systemEndpoint}/activity`);
 
       logger.info('System activity retrieved successfully', {
         component: 'SystemApiService',
         operation,
         eventCount: response.data.recent_events.length,
-        activeUserCount: response.data.active_users.length
+        activeUserCount: response.data.active_users.length,
       });
 
       return response.data;
@@ -449,7 +443,7 @@ export class SystemApiService {
       logger.error('Failed to fetch system activity', {
         component: 'SystemApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleSystemError(error, 'Failed to retrieve system activity');
     }
@@ -461,19 +455,19 @@ export class SystemApiService {
 
   /**
    * Retrieves complete database schema information.
-   * 
+   *
    * Provides introspection into:
    * - All database tables and their structures
    * - Column definitions with types and constraints
    * - Current row counts per table
    * - Migration history and version
-   * 
+   *
    * Schema information is useful for debugging, documentation,
    * and understanding data relationships.
    *
    * @returns Promise resolving to complete database schema metadata
    * @throws Error if schema information cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const schema = await systemApiService.getSchema();
@@ -483,22 +477,20 @@ export class SystemApiService {
    */
   async getSchema(): Promise<SystemSchema> {
     const operation = 'getSchema';
-    
+
     try {
       logger.debug('Fetching system schema', {
         component: 'SystemApiService',
-        operation
+        operation,
       });
 
-      const response = await globalApiClient.get<SystemSchema>(
-        `${this.systemEndpoint}/schema`
-      );
+      const response = await globalApiClient.get<SystemSchema>(`${this.systemEndpoint}/schema`);
 
       logger.info('System schema retrieved successfully', {
         component: 'SystemApiService',
         operation,
         version: response.data.version,
-        tableCount: response.data.tables.length
+        tableCount: response.data.tables.length,
       });
 
       return response.data;
@@ -506,7 +498,7 @@ export class SystemApiService {
       logger.error('Failed to fetch system schema', {
         component: 'SystemApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleSystemError(error, 'Failed to retrieve database schema');
     }
@@ -518,19 +510,19 @@ export class SystemApiService {
 
   /**
    * Retrieves system environment configuration.
-   * 
+   *
    * Provides access to:
    * - Runtime environment details (Node version, environment type)
    * - Service connection URLs (database, Redis, WebSocket, API)
    * - Feature flag statuses
    * - Application configuration values
-   * 
+   *
    * Note: Sensitive information like passwords and tokens are
    * automatically redacted from the response.
    *
    * @returns Promise resolving to detailed environment information
    * @throws Error if environment data cannot be retrieved
-   * 
+   *
    * @example
    * ```typescript
    * const env = await systemApiService.getEnvironment();
@@ -543,11 +535,11 @@ export class SystemApiService {
    */
   async getEnvironment(): Promise<SystemEnvironment> {
     const operation = 'getEnvironment';
-    
+
     try {
       logger.debug('Fetching system environment', {
         component: 'SystemApiService',
-        operation
+        operation,
       });
 
       const response = await globalApiClient.get<SystemEnvironment>(
@@ -557,7 +549,7 @@ export class SystemApiService {
       logger.info('System environment retrieved successfully', {
         component: 'SystemApiService',
         operation,
-        environment: response.data.environment
+        environment: response.data.environment,
       });
 
       return response.data;
@@ -565,7 +557,7 @@ export class SystemApiService {
       logger.error('Failed to fetch system environment', {
         component: 'SystemApiService',
         operation,
-        error
+        error,
       });
       throw await this.handleSystemError(error, 'Failed to retrieve environment information');
     }
@@ -577,20 +569,20 @@ export class SystemApiService {
 
   /**
    * Centralized error handling for system operations.
-   * 
+   *
    * This method:
    * 1. Extracts meaningful error messages from various error structures
    * 2. Creates a standardized Error object
    * 3. Reports the error to the global error handler
    * 4. Returns the processed error for throwing
-   * 
+   *
    * @param error - Raw error object from API call
    * @param defaultMessage - Fallback message if error details unavailable
    * @returns Processed Error object with user-friendly message
    */
   private async handleSystemError(error: unknown, defaultMessage: string): Promise<Error> {
     const errorResponse = error as UnknownError;
-    
+
     // Extract error message from various possible structures
     // Priority: response.data.message > response.data.error > error.message > default
     const errorMessage =
@@ -606,7 +598,7 @@ export class SystemApiService {
       component: 'SystemApiService',
       operation: 'system_operation',
       status: (errorResponse as AxiosErrorResponse)?.response?.status,
-      endpoint: (error as any)?.config?.url || 'unknown'
+      endpoint: (error as any)?.config?.url || 'unknown',
     });
 
     return systemError;
@@ -619,14 +611,14 @@ export class SystemApiService {
 
 /**
  * Pre-configured global instance of the system API service.
- * 
+ *
  * Use this singleton instance throughout the application for consistency
  * and to avoid creating multiple service instances.
- * 
+ *
  * @example
  * ```typescript
  * import { systemApiService } from './api/system';
- * 
+ *
  * const health = await systemApiService.getHealth();
  * ```
  */

@@ -17,17 +17,17 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
-  Search
+  Search,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
+import { useToast } from '@client/hooks/use-toast.ts';
 import { Badge } from '@client/shared/design-system';
 import { Tooltip } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
-import { useToast } from '@client/hooks/use-toast.ts';
-import type { SearchResult, SearchHighlight } from '@client/shared/types';
 import { cn } from '@client/shared/design-system';
+import type { SearchResult, SearchHighlight } from '@client/shared/types';
 
 interface SearchResultCardProps {
   result: SearchResult;
@@ -52,7 +52,7 @@ export function SearchResultCard({
   className = '',
   compact = false,
   showActions = true,
-  highlightMatches = true
+  highlightMatches = true,
 }: SearchResultCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -67,14 +67,14 @@ export function SearchResultCard({
     try {
       await onSave?.(result);
       toast({
-        title: "Result Saved",
-        description: `"${result.title}" has been saved.`
+        title: 'Result Saved',
+        description: `"${result.title}" has been saved.`,
       });
     } catch (error) {
       toast({
-        title: "Save Failed",
-        description: "Failed to save result.",
-        variant: "destructive"
+        title: 'Save Failed',
+        description: 'Failed to save result.',
+        variant: 'destructive',
       });
     }
   };
@@ -86,23 +86,23 @@ export function SearchResultCard({
         await navigator.share({
           title: result.title,
           text: result.excerpt || result.content,
-          url: window.location.origin + getResultUrl()
+          url: window.location.origin + getResultUrl(),
         });
       } else {
         await navigator.clipboard.writeText(
           `${result.title}\n${window.location.origin}${getResultUrl()}`
         );
         toast({
-          title: "Link Copied",
-          description: "Result link copied to clipboard."
+          title: 'Link Copied',
+          description: 'Result link copied to clipboard.',
         });
       }
       onShare?.(result);
     } catch (error) {
       toast({
-        title: "Share Failed",
-        description: "Failed to share result.",
-        variant: "destructive"
+        title: 'Share Failed',
+        description: 'Failed to share result.',
+        variant: 'destructive',
       });
     }
   };
@@ -112,10 +112,10 @@ export function SearchResultCard({
     setIsBookmarked(!isBookmarked);
     onBookmark?.(result);
     toast({
-      title: isBookmarked ? "Bookmark Removed" : "Bookmarked",
+      title: isBookmarked ? 'Bookmark Removed' : 'Bookmarked',
       description: isBookmarked
         ? `"${result.title}" removed from bookmarks.`
-        : `"${result.title}" added to bookmarks.`
+        : `"${result.title}" added to bookmarks.`,
     });
   };
 
@@ -126,7 +126,9 @@ export function SearchResultCard({
       case 'sponsor':
         return `/sponsors/${result.id}`;
       case 'comment':
-        return result.metadata?.bill_id ? `/bills/${result.metadata.bill_id}#comment-${result.id}` : '#';
+        return result.metadata?.bill_id
+          ? `/bills/${result.metadata.bill_id}#comment-${result.id}`
+          : '#';
       default:
         return '#';
     }
@@ -164,7 +166,10 @@ export function SearchResultCard({
     }
 
     // Simple highlighting - in a real implementation, you'd use the highlight positions
-    const queryWords = query.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+    const queryWords = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word => word.length > 2);
     if (!queryWords.length) {
       return text;
     }
@@ -206,9 +211,7 @@ export function SearchResultCard({
       >
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 mt-1">
-              {getTypeIcon()}
-            </div>
+            <div className="flex-shrink-0 mt-1">{getTypeIcon()}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
                 <h3 className="font-medium text-sm truncate">{result.title}</h3>
@@ -220,7 +223,9 @@ export function SearchResultCard({
                 {highlightText(result.excerpt || result.content)}
               </p>
               <div className="flex items-center space-x-2 mt-2">
-                <span className={cn('text-xs font-medium', getRelevanceColor(result.relevanceScore))}>
+                <span
+                  className={cn('text-xs font-medium', getRelevanceColor(result.relevanceScore))}
+                >
                   {result.relevanceScore}% match
                 </span>
                 {result.metadata?.created_at && (
@@ -247,16 +252,15 @@ export function SearchResultCard({
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-3 flex-1 min-w-0">
-                <div className="flex-shrink-0 mt-1">
-                  {getTypeIcon()}
-                </div>
+                <div className="flex-shrink-0 mt-1">{getTypeIcon()}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-2">
                     <h3 className="font-semibold text-lg truncate">{result.title}</h3>
-                    <Badge className={getTypeColor()}>
-                      {result.type}
-                    </Badge>
-                    <Badge variant="outline" className={cn('text-xs', getRelevanceColor(result.relevanceScore))}>
+                    <Badge className={getTypeColor()}>{result.type}</Badge>
+                    <Badge
+                      variant="outline"
+                      className={cn('text-xs', getRelevanceColor(result.relevanceScore))}
+                    >
                       {result.relevanceScore}% match
                     </Badge>
                   </div>
@@ -273,23 +277,25 @@ export function SearchResultCard({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             setIsExpanded(!isExpanded);
                           }}
                           className="h-6 px-2 text-xs"
                         >
                           {isExpanded ? (
-                            <>Show less <ChevronUp className="h-3 w-3 ml-1" /></>
+                            <>
+                              Show less <ChevronUp className="h-3 w-3 ml-1" />
+                            </>
                           ) : (
-                            <>Show more <ChevronDown className="h-3 w-3 ml-1" /></>
+                            <>
+                              Show more <ChevronDown className="h-3 w-3 ml-1" />
+                            </>
                           )}
                         </Button>
                         {isExpanded && (
                           <div className="mt-2 p-3 bg-muted rounded-md">
-                            <p className="text-sm">
-                              {highlightText(result.content)}
-                            </p>
+                            <p className="text-sm">{highlightText(result.content)}</p>
                           </div>
                         )}
                       </div>
@@ -309,12 +315,15 @@ export function SearchResultCard({
                         onClick={handleBookmark}
                         className="h-8 w-8 p-0"
                       >
-                        <Star className={cn('h-4 w-4', isBookmarked && 'fill-yellow-400 text-yellow-400')} />
+                        <Star
+                          className={cn(
+                            'h-4 w-4',
+                            isBookmarked && 'fill-yellow-400 text-yellow-400'
+                          )}
+                        />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      {isBookmarked ? 'Remove bookmark' : 'Bookmark'}
-                    </TooltipContent>
+                    <TooltipContent>{isBookmarked ? 'Remove bookmark' : 'Bookmark'}</TooltipContent>
                   </Tooltip>
 
                   <Tooltip>

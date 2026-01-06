@@ -9,6 +9,7 @@ The Chanuka design system is now fully integrated into your application. All fou
 ## What's Now Active
 
 ### 1. **BrandVoiceProvider** - Microcopy & Tone
+
 Automatically provides all UI text with brand personality.
 
 ```typescript
@@ -16,15 +17,16 @@ import { useBrandVoice } from '@shared/design-system';
 
 function MyButton() {
   const { getMicrocopy, getTone } = useBrandVoice();
-  
+
   const label = getMicrocopy('buttons.primary.submit'); // "Add Your Voice"
   const tone = getTone('success'); // Gets appropriate tone matrix
-  
+
   return <button>{label}</button>;
 }
 ```
 
 **Available Tone Contexts:**
+
 - `success` - Celebratory, empowering
 - `error` - Clear, actionable, not punitive
 - `warning` - Urgent but informed
@@ -33,6 +35,7 @@ function MyButton() {
 - `complex` - Breaking down difficult concepts
 
 **Common Microcopy Patterns:**
+
 - `buttons.primary.*` - Primary actions
 - `buttons.secondary.*` - Secondary actions
 - `empty_states.*` - When sections have no content
@@ -41,6 +44,7 @@ function MyButton() {
 - `form_help_text.*` - Supporting text
 
 ### 2. **MultilingualProvider** - Localization
+
 Handles language detection, switching, and locale-aware formatting.
 
 ```typescript
@@ -48,21 +52,21 @@ import { useLanguage, FormattedNumber, FormattedDate } from '@shared/design-syst
 
 function DashboardMetrics() {
   const { language, setLanguage, format } = useLanguage();
-  
+
   // Language switching
   const handleLanguageChange = (lang: 'en' | 'sw') => {
     setLanguage(lang);
   };
-  
+
   // Locale-aware formatting
   return (
     <>
       <p>Budget: <FormattedNumber value={1234567} /></p>
       {/* Renders: "Budget: 1,234,567" in en, "Budget: 1 234 567" in sw */}
-      
+
       <p>Date: <FormattedDate date={new Date()} /></p>
       {/* Renders: "December 17, 2025" in en, "17 Disemba 2025" in sw */}
-      
+
       <p>Votes: {format.pluralize(42, 'vote')}</p>
       {/* Renders: "42 votes" correctly for each language */}
     </>
@@ -71,16 +75,19 @@ function DashboardMetrics() {
 ```
 
 **Supported Languages:**
+
 - `en` - English (default)
 - `sw` - Swahili (Kenyan)
 
 **Format Methods:**
+
 - `format.number(1234567)` - Locale-aware number formatting
 - `format.currency(100)` - Currency formatting
 - `format.date(date)` - Date formatting
 - `format.pluralize(count, word)` - Correct pluralization
 
 ### 3. **LowBandwidthProvider** - Network-Aware Rendering
+
 Automatically detects network speed and optimizes rendering.
 
 ```typescript
@@ -88,12 +95,12 @@ import { useLowBandwidth, ConditionalBandwidth } from '@shared/design-system';
 
 function ImageGallery() {
   const { isLowBandwidth, networkSpeed, dataSaverEnabled } = useLowBandwidth();
-  
+
   // Conditional rendering based on network
   if (isLowBandwidth) {
     return <SimplifiedGallery />; // Load lightweight version
   }
-  
+
   return <FullGallery />;
 }
 
@@ -109,12 +116,14 @@ function SmartImage() {
 ```
 
 **Available States:**
+
 - `isLowBandwidth: boolean` - True if 2G/3G or data saver enabled
 - `networkSpeed: '2g' | '3g' | '4g' | 'unknown'` - Detected network speed
 - `dataSaverEnabled: boolean` - User has enabled data saver mode
 - `isOffline: boolean` - No internet connection detected
 
 **Optimization Targets:**
+
 - Bundle size: < 200 KB gzipped
 - Images: WebP with fallback, lazy-loading by default
 - API requests: Prioritize essential data
@@ -122,6 +131,7 @@ function SmartImage() {
 - Heavy components: Graceful degradation
 
 ### 4. **PoliticalNeutralityProvider** (Implicit)
+
 Available through design standards for balanced layout patterns.
 
 ```typescript
@@ -154,6 +164,7 @@ App
 ```
 
 **Key Point:** ChanukaProviders are positioned after error boundaries but before most other providers. This ensures:
+
 - Design system is available throughout the app
 - Errors can be caught and displayed using brand voice
 - Performance optimizations apply across all features
@@ -165,35 +176,41 @@ App
 Use this to gradually migrate components to the design system:
 
 ### Phase 1: Core Navigation & Headers (Week 1)
+
 - [ ] Main navigation labels (use microcopy library)
 - [ ] Page headers (use getTone() for consistency)
 - [ ] Error messages (use error tone + messaging)
 
 ### Phase 2: Forms & Input (Week 1-2)
-- [ ] Form labels (use form_labels.* microcopy)
-- [ ] Placeholder text (use form_help_text.*)
+
+- [ ] Form labels (use form_labels.\* microcopy)
+- [ ] Placeholder text (use form_help_text.\*)
 - [ ] Validation messages (use error tone)
 - [ ] Success confirmations (use success tone)
 
 ### Phase 3: Empty States & Loading (Week 2)
-- [ ] Empty state messages (use empty_states.*)
+
+- [ ] Empty state messages (use empty_states.\*)
 - [ ] Loading indicators (use loading tone)
 - [ ] No results states (use empty tone)
 - [ ] Skeleton screens (low-bandwidth detection)
 
 ### Phase 4: Data Display (Week 2-3)
+
 - [ ] Numbers → `<FormattedNumber />`
 - [ ] Dates → `<FormattedDate />`
 - [ ] Currency → Use `format.currency()`
 - [ ] Lists → Use `format.pluralize()`
 
 ### Phase 5: Network Optimization (Week 3)
+
 - [ ] Images → Wrap with `<ConditionalBandwidth />`
 - [ ] Heavy components → Use `useLowBandwidth()` check
 - [ ] API calls → Prioritize by `networkSpeed`
 - [ ] Animations → Disable on low-bandwidth
 
 ### Phase 6: Localization (Week 3-4)
+
 - [ ] Language switcher → Use `setLanguage()`
 - [ ] Test with Swahili content
 - [ ] Verify RTL-aware layouts
@@ -206,6 +223,7 @@ Use this to gradually migrate components to the design system:
 ### Pattern 1: Consistent Button Text
 
 **Before:**
+
 ```typescript
 <button>Save</button>
 <button>Submit</button>
@@ -213,6 +231,7 @@ Use this to gradually migrate components to the design system:
 ```
 
 **After:**
+
 ```typescript
 const { getMicrocopy } = useBrandVoice();
 
@@ -228,16 +247,18 @@ const { getMicrocopy } = useBrandVoice();
 ### Pattern 2: Bandwidth-Aware Image Loading
 
 **Before:**
+
 ```typescript
 <img src="high-res.jpg" alt="Chart" />
 ```
 
 **After:**
+
 ```typescript
 const { isLowBandwidth } = useLowBandwidth();
 
-<img 
-  src={isLowBandwidth ? "chart-thumbnail.jpg" : "high-res.jpg"} 
+<img
+  src={isLowBandwidth ? "chart-thumbnail.jpg" : "high-res.jpg"}
   alt="Chart"
   loading="lazy"
 />
@@ -250,6 +271,7 @@ const { isLowBandwidth } = useLowBandwidth();
 ### Pattern 3: Locale-Aware Metrics
 
 **Before:**
+
 ```typescript
 <p>Budget: ${budget.toLocaleString()}</p>
 <p>Last updated: {date.toLocaleDateString()}</p>
@@ -257,6 +279,7 @@ const { isLowBandwidth } = useLowBandwidth();
 ```
 
 **After:**
+
 ```typescript
 <p>Budget: <FormattedCurrency value={budget} /></p>
 <p>Last updated: <FormattedDate date={date} /></p>
@@ -270,11 +293,13 @@ const { isLowBandwidth } = useLowBandwidth();
 ### Pattern 4: Error Communication with Tone
 
 **Before:**
+
 ```typescript
-throw new Error("Invalid input");
+throw new Error('Invalid input');
 ```
 
 **After:**
+
 ```typescript
 const { getMicrocopy, getTone } = useBrandVoice();
 const errorTone = getTone('error');
@@ -283,7 +308,7 @@ const errorTone = getTone('error');
 showError({
   message: getMicrocopy('error_messages.validation.email'),
   tone: errorTone,
-  action: 'Try another email or contact support'
+  action: 'Try another email or contact support',
 });
 ```
 
@@ -294,23 +319,28 @@ showError({
 ## Performance Notes
 
 ### Bundle Size Impact
+
 - Design system standards: ~15 KB (gzipped)
 - Context providers: ~8 KB (gzipped)
 - Total addition: ~23 KB
 
 This is offset by:
+
 - Reduced redundant code (centralized microcopy)
 - Automatic image optimization (low-bandwidth detection)
 - Efficient context API (no extra re-renders)
 
 ### Re-render Behavior
+
 Each context is optimized to minimize unnecessary re-renders:
+
 - **BrandVoiceProvider:** Static exports, re-renders only when theme changes
 - **MultilingualProvider:** Re-renders only when language changes
 - **LowBandwidthProvider:** Re-renders only when network status changes
 - **ChanukaProviders:** Composition prevents cascading updates
 
 ### Recommended Optimizations
+
 1. Memoize components that use brand voice hooks
 2. Use `useMemo()` for derived tone/microcopy
 3. Lazy-load locale-specific formatting only when needed
@@ -321,6 +351,7 @@ Each context is optimized to minimize unnecessary re-renders:
 ## Testing Strategy
 
 ### Unit Tests (Per Component)
+
 ```typescript
 describe('useBrandVoice', () => {
   it('returns correct microcopy for button label', () => {
@@ -331,13 +362,14 @@ describe('useBrandVoice', () => {
 ```
 
 ### Integration Tests (Across Providers)
+
 ```typescript
 describe('Design System Integration', () => {
   it('switches language and updates all formatted text', async () => {
     const { language, setLanguage } = useLanguage();
-    
+
     expect(language).toBe('en');
-    
+
     setLanguage('sw');
     await waitFor(() => {
       expect(screen.getByText(/Novemba/)).toBeInTheDocument();
@@ -347,12 +379,13 @@ describe('Design System Integration', () => {
 ```
 
 ### E2E Tests (User Workflows)
+
 ```typescript
 describe('Civic Engagement Flow', () => {
   it('displays all UI text in selected language', () => {
     cy.visit('/');
-    cy.contains('Democracy doesn\'t pause between elections');
-    
+    cy.contains("Democracy doesn't pause between elections");
+
     cy.get('[data-testid="language-switcher"]').select('Swahili');
     cy.contains('Demokrasia haisimi kati ya uchaguzi');
   });

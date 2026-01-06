@@ -1,6 +1,6 @@
 /**
  * Mock Real-time Data
- * 
+ *
  * Simulates real-time updates for WebSocket integration, live metrics,
  * and dynamic content updates.
  */
@@ -18,7 +18,7 @@ faker.seed(12345);
 /**
  * Real-time update event types
  */
-export type RealTimeEventType = 
+export type RealTimeEventType =
   | 'bill_status_change'
   | 'bill_engagement_update'
   | 'new_comment'
@@ -47,8 +47,14 @@ export interface RealTimeEvent {
  */
 export const generateBillStatusChangeEvent = (): RealTimeEvent => {
   const bill = faker.helpers.arrayElement(mockBills);
-  const newStatus = faker.helpers.arrayElement(['committee', 'passed', 'failed', 'signed', 'vetoed']);
-  
+  const newStatus = faker.helpers.arrayElement([
+    'committee',
+    'passed',
+    'failed',
+    'signed',
+    'vetoed',
+  ]);
+
   return {
     id: generateId('event'),
     type: 'bill_status_change',
@@ -66,9 +72,9 @@ export const generateBillStatusChangeEvent = (): RealTimeEvent => {
         'Floor vote scheduled',
         'Amendment approved',
         'Signed by Governor',
-        'Veto override attempt'
-      ])
-    }
+        'Veto override attempt',
+      ]),
+    },
   };
 };
 
@@ -78,13 +84,13 @@ export const generateBillStatusChangeEvent = (): RealTimeEvent => {
 export const generateBillEngagementUpdateEvent = (): RealTimeEvent => {
   const bill = faker.helpers.arrayElement(mockBills);
   const engagementType = faker.helpers.arrayElement(['view', 'save', 'comment', 'share']);
-  
+
   const updates: any = {
     bill_id: bill.id,
     billNumber: bill.billNumber,
-    billTitle: bill.title
+    billTitle: bill.title,
   };
-  
+
   switch (engagementType) {
     case 'view':
       updates.viewCount = bill.viewCount + faker.number.int({ min: 1, max: 10 });
@@ -99,14 +105,14 @@ export const generateBillEngagementUpdateEvent = (): RealTimeEvent => {
       updates.shareCount = bill.shareCount + faker.number.int({ min: 1, max: 2 });
       break;
   }
-  
+
   return {
     id: generateId('event'),
     type: 'bill_engagement_update',
     timestamp: new Date().toISOString(),
     billId: bill.id,
     priority: 'medium',
-    data: updates
+    data: updates,
   };
 };
 
@@ -116,8 +122,9 @@ export const generateBillEngagementUpdateEvent = (): RealTimeEvent => {
 export const generateNewCommentEvent = (): RealTimeEvent => {
   const bill = faker.helpers.arrayElement(mockBills);
   const user = faker.helpers.arrayElement([...mockUsers, ...mockExperts, ...mockOfficialExperts]);
-  const isExpert = mockExperts.some(e => e.id === user.id) || mockOfficialExperts.some(e => e.id === user.id);
-  
+  const isExpert =
+    mockExperts.some(e => e.id === user.id) || mockOfficialExperts.some(e => e.id === user.id);
+
   return {
     id: generateId('event'),
     type: 'new_comment',
@@ -134,8 +141,8 @@ export const generateNewCommentEvent = (): RealTimeEvent => {
       authorAvatar: (user as any).avatar,
       isExpert,
       content: faker.lorem.paragraph(2),
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   };
 };
 
@@ -145,7 +152,7 @@ export const generateNewCommentEvent = (): RealTimeEvent => {
 export const generateCommentVoteEvent = (): RealTimeEvent => {
   const user = faker.helpers.arrayElement(mockUsers);
   const voteType = faker.helpers.arrayElement(['up', 'down']);
-  
+
   return {
     id: generateId('event'),
     type: 'comment_vote',
@@ -157,8 +164,8 @@ export const generateCommentVoteEvent = (): RealTimeEvent => {
       userId: user.id,
       voteType,
       newUpvotes: faker.number.int({ min: 0, max: 100 }),
-      newDownvotes: faker.number.int({ min: 0, max: 20 })
-    }
+      newDownvotes: faker.number.int({ min: 0, max: 20 }),
+    },
   };
 };
 
@@ -168,8 +175,12 @@ export const generateCommentVoteEvent = (): RealTimeEvent => {
 export const generateExpertContributionEvent = (): RealTimeEvent => {
   const expert = faker.helpers.arrayElement([...mockExperts, ...mockOfficialExperts]);
   const bill = faker.helpers.arrayElement(mockBills);
-  const contributionType = faker.helpers.arrayElement(['analysis', 'review', 'amendment_suggestion']);
-  
+  const contributionType = faker.helpers.arrayElement([
+    'analysis',
+    'review',
+    'amendment_suggestion',
+  ]);
+
   return {
     id: generateId('event'),
     type: 'expert_contribution',
@@ -190,11 +201,11 @@ export const generateExpertContributionEvent = (): RealTimeEvent => {
         'Constitutional Analysis',
         'Policy Impact Assessment',
         'Implementation Review',
-        'Amendment Recommendation'
+        'Amendment Recommendation',
       ]),
       summary: faker.lorem.paragraph(1),
-      confidence: faker.number.float({ min: 0.7, max: 1.0, fractionDigits: 2 })
-    }
+      confidence: faker.number.float({ min: 0.7, max: 1.0, fractionDigits: 2 }),
+    },
   };
 };
 
@@ -206,11 +217,11 @@ export const generateTrendingUpdateEvent = (): RealTimeEvent => {
     { type: 'bill', title: 'Healthcare Reform Bill Gains Support' },
     { type: 'topic', title: 'Environmental Policy Discussion' },
     { type: 'campaign', title: 'Education Funding Initiative' },
-    { type: 'expert_insight', title: 'Constitutional Analysis Trending' }
+    { type: 'expert_insight', title: 'Constitutional Analysis Trending' },
   ];
-  
+
   const item = faker.helpers.arrayElement(trendingItems);
-  
+
   return {
     id: generateId('event'),
     type: 'trending_update',
@@ -222,8 +233,8 @@ export const generateTrendingUpdateEvent = (): RealTimeEvent => {
       trendingScore: faker.number.float({ min: 0.7, max: 1.0, fractionDigits: 2 }),
       velocity: faker.number.float({ min: 0.5, max: 1.0, fractionDigits: 2 }),
       participantCount: faker.number.int({ min: 50, max: 500 }),
-      timeWindow: '1h'
-    }
+      timeWindow: '1h',
+    },
   };
 };
 
@@ -234,7 +245,7 @@ export const generateUserActivityEvent = (): RealTimeEvent => {
   const user = faker.helpers.arrayElement(mockUsers);
   const activities = ['login', 'bill_view', 'comment_post', 'vote_cast', 'share_action'];
   const activity = faker.helpers.arrayElement(activities);
-  
+
   return {
     id: generateId('event'),
     type: 'user_activity',
@@ -246,11 +257,14 @@ export const generateUserActivityEvent = (): RealTimeEvent => {
       userName: user.name || `${user.first_name} ${user.last_name}`,
       activity,
       details: {
-        billId: activity.includes('bill') || activity.includes('comment') || activity.includes('vote') ? 
-          faker.number.int({ min: 1, max: 75 }) : undefined,
-        sessionDuration: activity === 'login' ? faker.number.int({ min: 300, max: 3600 }) : undefined
-      }
-    }
+        billId:
+          activity.includes('bill') || activity.includes('comment') || activity.includes('vote')
+            ? faker.number.int({ min: 1, max: 75 })
+            : undefined,
+        sessionDuration:
+          activity === 'login' ? faker.number.int({ min: 300, max: 3600 }) : undefined,
+      },
+    },
   };
 };
 
@@ -261,7 +275,7 @@ export const generateModerationActionEvent = (): RealTimeEvent => {
   const moderator = faker.helpers.arrayElement(mockUsers);
   const actions = ['comment_hidden', 'comment_removed', 'user_warned', 'report_resolved'];
   const action = faker.helpers.arrayElement(actions);
-  
+
   return {
     id: generateId('event'),
     type: 'moderation_action',
@@ -277,10 +291,10 @@ export const generateModerationActionEvent = (): RealTimeEvent => {
         'Violation of community guidelines',
         'Spam content',
         'Inappropriate language',
-        'Off-topic discussion'
+        'Off-topic discussion',
       ]),
-      automated: faker.datatype.boolean({ probability: 0.3 })
-    }
+      automated: faker.datatype.boolean({ probability: 0.3 }),
+    },
   };
 };
 
@@ -293,19 +307,19 @@ export const generateSystemNotificationEvent = (): RealTimeEvent => {
     'feature_update',
     'policy_change',
     'security_alert',
-    'performance_improvement'
+    'performance_improvement',
   ];
-  
+
   const type = faker.helpers.arrayElement(notificationTypes);
-  
+
   const messages = {
     maintenance_scheduled: 'Scheduled maintenance tonight from 2-4 AM EST',
     feature_update: 'New expert verification features now available',
     policy_change: 'Updated community guidelines effective immediately',
     security_alert: 'Security enhancement: Two-factor authentication recommended',
-    performance_improvement: 'Faster loading times and improved search functionality'
+    performance_improvement: 'Faster loading times and improved search functionality',
   };
-  
+
   return {
     id: generateId('event'),
     type: 'system_notification',
@@ -317,12 +331,12 @@ export const generateSystemNotificationEvent = (): RealTimeEvent => {
         'System Update',
         'Important Notice',
         'Platform Enhancement',
-        'Security Notice'
+        'Security Notice',
       ]),
       message: messages[type as keyof typeof messages],
       actionRequired: type === 'security_alert' || type === 'policy_change',
-      dismissible: type !== 'security_alert'
-    }
+      dismissible: type !== 'security_alert',
+    },
   };
 };
 
@@ -339,12 +353,12 @@ export const generateRandomRealTimeEvent = (): RealTimeEvent => {
     generateTrendingUpdateEvent,
     generateUserActivityEvent,
     generateModerationActionEvent,
-    generateSystemNotificationEvent
+    generateSystemNotificationEvent,
   ];
-  
+
   // Weight the events based on realistic frequency
   const weights = [5, 20, 25, 30, 8, 10, 35, 7, 3];
-  
+
   const generator = weightedRandom(eventGenerators, weights);
   return generator();
 };
@@ -372,13 +386,13 @@ export class RealTimeEventSimulator {
    */
   start(): void {
     if (this.isRunning) return;
-    
+
     this.isRunning = true;
     this.intervalId = setInterval(() => {
       const event = generateRandomRealTimeEvent();
       this.events.push(event);
       this.notifyListeners(event);
-      
+
       // Keep only last 100 events
       if (this.events.length > 100) {
         this.events = this.events.slice(-100);
@@ -433,7 +447,7 @@ export class RealTimeEventSimulator {
    */
   triggerEvent(eventType: RealTimeEventType): void {
     let event: RealTimeEvent;
-    
+
     switch (eventType) {
       case 'bill_status_change':
         event = generateBillStatusChangeEvent();
@@ -450,7 +464,7 @@ export class RealTimeEventSimulator {
       default:
         event = generateRandomRealTimeEvent();
     }
-    
+
     this.events.push(event);
     this.notifyListeners(event);
   }
@@ -483,18 +497,18 @@ export interface ConnectionStatus {
 export const generateConnectionStatus = (): ConnectionStatus => {
   const connected = faker.datatype.boolean({ probability: 0.95 });
   const latency = connected ? faker.number.int({ min: 20, max: 200 }) : 0;
-  
+
   let quality: ConnectionStatus['quality'] = 'excellent';
   if (latency > 150) quality = 'poor';
   else if (latency > 100) quality = 'fair';
   else if (latency > 50) quality = 'good';
-  
+
   return {
     connected,
     lastPing: new Date().toISOString(),
     latency,
     reconnectAttempts: connected ? 0 : faker.number.int({ min: 1, max: 5 }),
-    quality
+    quality,
   };
 };
 

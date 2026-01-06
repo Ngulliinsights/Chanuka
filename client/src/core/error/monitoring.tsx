@@ -1,14 +1,14 @@
 /**
  * Error Monitoring Service - Core Infrastructure
- * 
+ *
  * Migrated from client/src/services/error-monitoring.tsx
  * Comprehensive error monitoring with Sentry integration, performance tracking,
  * and React error boundaries for production error handling.
  */
 
 import * as Sentry from '@sentry/browser';
-import { Replay } from '@sentry/replay';
 import { browserTracingIntegration } from '@sentry/browser';
+import { Replay } from '@sentry/replay';
 import * as React from 'react';
 
 interface ErrorContext {
@@ -56,14 +56,14 @@ class ErrorMonitoringService {
         dsn: config.dsn,
         environment: config.environment,
         release: config.release || process.env.BUILD_VERSION || 'unknown',
-        
+
         // Performance monitoring
         integrations: [
           // Use modern browser tracing integration
           browserTracingIntegration({
             // Remove tracePropagationTargets as it's not supported in this version
           }),
-          
+
           // Session replay for debugging
           new Replay({
             sessionSampleRate: config.replaysSessionSampleRate || 0.1,
@@ -76,17 +76,17 @@ class ErrorMonitoringService {
 
         tracesSampleRate: config.tracesSampleRate || 0.1,
 
-        beforeBreadcrumb: (breadcrumb) => {
+        beforeBreadcrumb: breadcrumb => {
           return this.filterBreadcrumb(breadcrumb);
         },
 
         initialScope: {
           tags: {
             component: 'chanuka-client',
-            version: config.release || 'unknown'
+            version: config.release || 'unknown',
           },
-          level: 'info'
-        }
+          level: 'info',
+        },
       });
 
       this.setupUnhandledRejectionTracking();
@@ -94,7 +94,6 @@ class ErrorMonitoringService {
 
       this.initialized = true;
       console.log('✅ Error monitoring initialized successfully');
-
     } catch (error) {
       console.error('❌ Failed to initialize error monitoring:', error);
     }
@@ -103,19 +102,14 @@ class ErrorMonitoringService {
   /**
    * Set user context for error tracking
    */
-  setUserContext(user: {
-    id?: string;
-    email?: string;
-    role?: string;
-    sessionId?: string;
-  }) {
+  setUserContext(user: { id?: string; email?: string; role?: string; sessionId?: string }) {
     this.context = { ...this.context, ...user };
-    
+
     Sentry.setUser({
       id: user.id,
       email: user.email,
       username: user.email,
-      segment: user.role
+      segment: user.role,
     });
 
     Sentry.setTag('userRole', user.role || 'anonymous');
@@ -138,7 +132,7 @@ class ErrorMonitoringService {
     Sentry.setContext('feature', {
       name: feature,
       action,
-      metadata
+      metadata,
     });
   }
 
@@ -147,8 +141,8 @@ class ErrorMonitoringService {
    */
   captureError(error: Error | CustomError, context?: Partial<ErrorContext>) {
     const enhancedError = this.enhanceError(error, context);
-    
-    Sentry.withScope((scope) => {
+
+    Sentry.withScope(scope => {
       if (context) {
         Object.entries(context).forEach(([key, value]) => {
           scope.setTag(key, String(value));
@@ -175,13 +169,13 @@ class ErrorMonitoringService {
    * Capture a custom message with context
    */
   captureMessage(
-    message: string, 
+    message: string,
     level: 'debug' | 'info' | 'warning' | 'error' | 'fatal' = 'info',
     context?: Record<string, any>
   ) {
-    Sentry.withScope((scope) => {
+    Sentry.withScope(scope => {
       scope.setLevel(level);
-      
+
       if (context) {
         Object.entries(context).forEach(([key, value]) => {
           scope.setTag(key, String(value));
@@ -207,70 +201,65 @@ class ErrorMonitoringService {
       category,
       level,
       data,
-      timestamp: Date.now() / 1000
+      timestamp: Date.now() / 1000,
     });
   }
 
   /**
    * Track user interactions for debugging
    */
-  trackUserInteraction(
-    action: string,
-    element?: string,
-    metadata?: Record<string, unknown>
-  ) {
-    this.addBreadcrumb(
-      `User ${action}${element ? ` on ${element}` : ''}`,
-      'user',
-      'info',
-      { action, element, ...metadata }
-    );
+  trackUserInteraction(action: string, element?: string, metadata?: Record<string, unknown>) {
+    this.addBreadcrumb(`User ${action}${element ? ` on ${element}` : ''}`, 'user', 'info', {
+      action,
+      element,
+      ...metadata,
+    });
 
     // Use modern Sentry API for transactions
-    Sentry.startSpan({
-      name: `User Interaction: ${action}`,
-      op: 'user.interaction',
-      attributes: {
-        action,
-        element: element || 'unknown'
+    Sentry.startSpan(
+      {
+        name: `User Interaction: ${action}`,
+        op: 'user.interaction',
+        attributes: {
+          action,
+          element: element || 'unknown',
+        },
+      },
+      () => {
+        // Interaction tracking logic here
+        setTimeout(() => {
+          // Span automatically finishes when callback completes
+        }, 100);
       }
-    }, () => {
-      // Interaction tracking logic here
-      setTimeout(() => {
-        // Span automatically finishes when callback completes
-      }, 100);
-    });
+    );
   }
 
   /**
    * Track API calls and responses
    */
-  trackAPICall(
-    method: string,
-    url: string,
-    status: number,
-    duration: number,
-    error?: Error
-  ) {
+  trackAPICall(method: string, url: string, status: number, duration: number, error?: Error) {
     // Use modern Sentry API for spans
-    Sentry.startSpan({
-      name: `${method} ${url}`,
-      op: 'http.client',
-      attributes: {
-        'http.method': method,
-        'http.status_code': status,
-        'http.url': url,
-        duration
+    Sentry.startSpan(
+      {
+        name: `${method} ${url}`,
+        op: 'http.client',
+        attributes: {
+          'http.method': method,
+          'http.status_code': status,
+          'http.url': url,
+          duration,
+        },
+      },
+      () => {
+        if (error) {
+          this.captureError(error, {
+            feature: 'api',
+            action: `${method} ${url}`,
+            metadata: { status, duration },
+          });
+        }
       }
-    }, () => {
-      if (error) {
-        this.captureError(error, {
-          feature: 'api',
-          action: `${method} ${url}`,
-          metadata: { status, duration }
-        });
-      }
-    });
+    );
 
     this.addBreadcrumb(
       `API ${method} ${url} - ${status} (${duration}ms)`,
@@ -284,17 +273,14 @@ class ErrorMonitoringService {
    * Set up unhandled promise rejection tracking
    */
   private setupUnhandledRejectionTracking() {
-    window.addEventListener('unhandledrejection', (event) => {
-      this.captureError(
-        new Error(`Unhandled Promise Rejection: ${event.reason}`),
-        {
-          feature: 'promise-rejection',
-          metadata: {
-            reason: event.reason,
-            promise: event.promise
-          }
-        }
-      );
+    window.addEventListener('unhandledrejection', event => {
+      this.captureError(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
+        feature: 'promise-rejection',
+        metadata: {
+          reason: event.reason,
+          promise: event.promise,
+        },
+      });
     });
   }
 
@@ -302,14 +288,14 @@ class ErrorMonitoringService {
    * Set up custom error boundaries
    */
   private setupCustomErrorBoundaries() {
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.captureError(event.error || new Error(event.message), {
         feature: 'global-error',
         metadata: {
           filename: event.filename,
           lineno: event.lineno,
-          colno: event.colno
-        }
+          colno: event.colno,
+        },
       });
     });
   }
@@ -322,7 +308,7 @@ class ErrorMonitoringService {
       'ResizeObserver loop limit exceeded',
       'Non-Error promise rejection captured',
       'Network request failed',
-      'Loading chunk'
+      'Loading chunk',
     ];
 
     if (event.exception?.values?.[0]?.value) {
@@ -342,7 +328,7 @@ class ErrorMonitoringService {
     event.tags = {
       ...event.tags,
       buildVersion: process.env.BUILD_VERSION || 'unknown',
-      buildTime: process.env.BUILD_TIME || 'unknown'
+      buildTime: process.env.BUILD_TIME || 'unknown',
     };
 
     return event;
@@ -370,13 +356,13 @@ class ErrorMonitoringService {
    */
   private enhanceError(error: Error | CustomError, context?: Partial<ErrorContext>): Error {
     const enhanced = error as Error & { context?: unknown };
-    
+
     enhanced.context = {
       ...this.context,
       ...context,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     };
 
     return enhanced;
@@ -387,11 +373,16 @@ class ErrorMonitoringService {
    */
   private mapSeverityToSentryLevel(severity: string): Sentry.SeverityLevel {
     switch (severity) {
-      case 'low': return 'info';
-      case 'medium': return 'warning';
-      case 'high': return 'error';
-      case 'critical': return 'fatal';
-      default: return 'error';
+      case 'low':
+        return 'info';
+      case 'medium':
+        return 'warning';
+      case 'high':
+        return 'error';
+      case 'critical':
+        return 'fatal';
+      default:
+        return 'error';
     }
   }
 }
@@ -404,7 +395,10 @@ export class ErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback?: React.ComponentType<{ error: Error }> },
   { hasError: boolean; error?: Error }
 > {
-  constructor(props: { children: React.ReactNode; fallback?: React.ComponentType<{ error: Error }> }) {
+  constructor(props: {
+    children: React.ReactNode;
+    fallback?: React.ComponentType<{ error: Error }>;
+  }) {
     super(props);
     this.state = { hasError: false };
   }
@@ -418,8 +412,8 @@ export class ErrorBoundary extends React.Component<
       feature: 'react-error-boundary',
       metadata: {
         componentStack: errorInfo.componentStack,
-        errorBoundary: this.constructor.name
-      }
+        errorBoundary: this.constructor.name,
+      },
     });
   }
 
@@ -471,7 +465,7 @@ export const errorUtils = {
     error.code = code;
     error.severity = severity;
     return error;
-  }
+  },
 };
 
 export default errorMonitoring;

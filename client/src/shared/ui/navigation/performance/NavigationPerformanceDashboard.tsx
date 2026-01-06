@@ -5,17 +5,18 @@
  * Implements Phase 2 recommendations for navigation monitoring.
  */
 
+import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
 import { Progress } from '@/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
+
 // Remove unused import
 import { logger } from '../../../../utils/logger';
-import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
-import React from 'react';
 
 interface PerformanceMetrics {
   averageNavigationTime: number;
@@ -36,7 +37,7 @@ interface NavigationPerformanceDashboardProps {
 
 export function NavigationPerformanceDashboard({
   refreshInterval = 5000,
-  showRealTime = true
+  showRealTime = true,
 }: NavigationPerformanceDashboardProps) {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     averageNavigationTime: 0,
@@ -47,7 +48,7 @@ export function NavigationPerformanceDashboard({
     cacheHitRate: 0,
     mostVisitedPages: [],
     slowestPages: [],
-    searchTerms: []
+    searchTerms: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -72,22 +73,22 @@ export function NavigationPerformanceDashboard({
           { path: '/bills', views: 980 },
           { path: '/community', views: 750 },
           { path: '/search', views: 620 },
-          { path: '/profile', views: 450 }
+          { path: '/profile', views: 450 },
         ],
         slowestPages: [
           { path: '/analytics', loadTime: 2400 },
           { path: '/reports', loadTime: 1800 },
           { path: '/dashboard', loadTime: 1200 },
           { path: '/bills/detail', loadTime: 900 },
-          { path: '/community/feed', loadTime: 700 }
+          { path: '/community/feed', loadTime: 700 },
         ],
         searchTerms: [
           { term: 'healthcare', count: 45 },
           { term: 'education', count: 38 },
           { term: 'budget', count: 32 },
           { term: 'infrastructure', count: 28 },
-          { term: 'environment', count: 24 }
-        ]
+          { term: 'environment', count: 24 },
+        ],
       };
 
       setMetrics(mockMetrics);
@@ -152,11 +153,9 @@ export function NavigationPerformanceDashboard({
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics.averageNavigationTime.toFixed(0)}ms
-            </div>
+            <div className="text-2xl font-bold">{metrics.averageNavigationTime.toFixed(0)}ms</div>
             <Progress
-              value={Math.max(0, 100 - (metrics.averageNavigationTime / 10))}
+              value={Math.max(0, 100 - metrics.averageNavigationTime / 10)}
               className="mt-2"
             />
           </CardContent>
@@ -168,12 +167,8 @@ export function NavigationPerformanceDashboard({
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics.totalPageViews.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              +12% from last hour
-            </p>
+            <div className="text-2xl font-bold">{metrics.totalPageViews.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">+12% from last hour</p>
           </CardContent>
         </Card>
 
@@ -183,9 +178,7 @@ export function NavigationPerformanceDashboard({
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics.cacheHitRate.toFixed(1)}%
-            </div>
+            <div className="text-2xl font-bold">{metrics.cacheHitRate.toFixed(1)}%</div>
             <Progress value={metrics.cacheHitRate} className="mt-2" />
           </CardContent>
         </Card>
@@ -196,13 +189,8 @@ export function NavigationPerformanceDashboard({
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics.errorRate.toFixed(2)}%
-            </div>
-            <Progress
-              value={Math.max(0, 100 - (metrics.errorRate * 20))}
-              className="mt-2"
-            />
+            <div className="text-2xl font-bold">{metrics.errorRate.toFixed(2)}%</div>
+            <Progress value={Math.max(0, 100 - metrics.errorRate * 20)} className="mt-2" />
           </CardContent>
         </Card>
       </div>
@@ -253,9 +241,7 @@ export function NavigationPerformanceDashboard({
                       </Badge>
                       <span className="font-medium">{page.path}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {page.loadTime}ms
-                    </div>
+                    <div className="text-sm text-muted-foreground">{page.loadTime}ms</div>
                   </div>
                 ))}
               </div>
@@ -276,9 +262,7 @@ export function NavigationPerformanceDashboard({
                       <Badge variant="outline">{index + 1}</Badge>
                       <span className="font-medium">{term.term}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {term.count} searches
-                    </div>
+                    <div className="text-sm text-muted-foreground">{term.count} searches</div>
                   </div>
                 ))}
               </div>

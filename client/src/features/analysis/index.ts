@@ -21,7 +21,7 @@ export {
   MockConflictDetectionService,
   RealConflictDetectionService,
   createConflictDetectionService,
-  type ConflictDetectionService
+  type ConflictDetectionService,
 } from './model/services';
 
 // Re-export types for convenience
@@ -33,5 +33,5 @@ export type {
   NetworkNode,
   NetworkLink,
   ImplementationWorkaround,
-  ConflictOfInterestAnalysisProps
+  ConflictOfInterestAnalysisProps,
 } from '@client/features/analysis/types';

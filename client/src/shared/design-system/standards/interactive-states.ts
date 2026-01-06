@@ -170,13 +170,13 @@ export const interactiveStateUtils = {
     } = {}
   ): string => {
     const classes = [`chanuka-interactive-${component}`];
-    
+
     if (states.hover) classes.push(`chanuka-${component}-hover`);
     if (states.focus) classes.push(`chanuka-${component}-focus`);
     if (states.active) classes.push(`chanuka-${component}-active`);
     if (states.disabled) classes.push(`chanuka-${component}-disabled`);
     if (states.loading) classes.push(`chanuka-${component}-loading`);
-    
+
     return classes.join(' ');
   },
 
@@ -188,11 +188,12 @@ export const interactiveStateUtils = {
     state: 'hover' | 'focus' | 'active' | 'disabled' | 'loading' | 'default' = 'default'
   ) => {
     const baseStyles = interactiveStates.base;
-    
+
     if (state === 'default') return baseStyles;
-    
-    const stateStyles = (interactiveStates[state] as any)?.[component] || (interactiveStates[state] as any)?.default;
-    
+
+    const stateStyles =
+      (interactiveStates[state] as any)?.[component] || (interactiveStates[state] as any)?.default;
+
     return {
       ...baseStyles,
       ...stateStyles,
@@ -211,32 +212,47 @@ export const interactiveStateUtils = {
       }
 
       ${baseSelector}:hover:not(:disabled):not([aria-disabled="true"]) {
-        ${Object.entries(interactiveStates.hover[component as keyof typeof interactiveStates.hover] || interactiveStates.hover.default)
+        ${Object.entries(
+          interactiveStates.hover[component as keyof typeof interactiveStates.hover] ||
+            interactiveStates.hover.default
+        )
           .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
           .join('\n        ')}
       }
 
       ${baseSelector}:focus-visible {
-        ${Object.entries(interactiveStates.focus[component as keyof typeof interactiveStates.focus] || interactiveStates.focus.default)
+        ${Object.entries(
+          interactiveStates.focus[component as keyof typeof interactiveStates.focus] ||
+            interactiveStates.focus.default
+        )
           .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
           .join('\n        ')}
       }
 
       ${baseSelector}:active:not(:disabled):not([aria-disabled="true"]) {
-        ${Object.entries(interactiveStates.active[component as keyof typeof interactiveStates.active] || interactiveStates.active.default)
+        ${Object.entries(
+          interactiveStates.active[component as keyof typeof interactiveStates.active] ||
+            interactiveStates.active.default
+        )
           .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
           .join('\n        ')}
       }
 
       ${baseSelector}:disabled,
       ${baseSelector}[aria-disabled="true"] {
-        ${Object.entries(interactiveStates.disabled[component as keyof typeof interactiveStates.disabled] || interactiveStates.disabled.default)
+        ${Object.entries(
+          interactiveStates.disabled[component as keyof typeof interactiveStates.disabled] ||
+            interactiveStates.disabled.default
+        )
           .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
           .join('\n        ')}
       }
 
       ${baseSelector}[data-loading="true"] {
-        ${Object.entries(interactiveStates.loading[component as keyof typeof interactiveStates.loading] || interactiveStates.loading.default)
+        ${Object.entries(
+          interactiveStates.loading[component as keyof typeof interactiveStates.loading] ||
+            interactiveStates.loading.default
+        )
           .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
           .join('\n        ')}
       }
@@ -253,23 +269,23 @@ export const interactiveStateUtils = {
     meetsContrastRequirements: boolean;
   }): { isValid: boolean; issues: string[] } => {
     const issues: string[] = [];
-    
+
     if (!element.hasVisibleFocus) {
       issues.push('Element must have visible focus indicator');
     }
-    
+
     if (!element.hasKeyboardSupport) {
       issues.push('Element must support keyboard navigation');
     }
-    
+
     if (!element.hasAriaStates) {
       issues.push('Element must have appropriate ARIA states');
     }
-    
+
     if (!element.meetsContrastRequirements) {
       issues.push('Element must meet WCAG contrast requirements');
     }
-    
+
     return {
       isValid: issues.length === 0,
       issues,
@@ -279,4 +295,3 @@ export const interactiveStateUtils = {
 
 export type InteractiveComponent = 'button' | 'card' | 'input' | 'link' | 'default';
 export type InteractiveState = 'hover' | 'focus' | 'active' | 'disabled' | 'loading' | 'default';
-

@@ -14,21 +14,21 @@ export enum BillStatus {
   FAILED = 'failed',
   SIGNED = 'signed',
   VETOED = 'vetoed',
-  OVERRIDE_ATTEMPT = 'override_attempt'
+  OVERRIDE_ATTEMPT = 'override_attempt',
 }
 
 export enum UrgencyLevel {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum ComplexityLevel {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  EXPERT = 'expert'
+  EXPERT = 'expert',
 }
 
 // ============================================================================
@@ -57,12 +57,12 @@ export interface Bill {
   sponsors: Sponsor[];
   tags: string[];
   policyAreas: string[];
-  
+
   // Engagement Metrics
   trackingCount?: number;
   viewCount?: number;
   commentCount?: number;
-  
+
   // Analysis
   constitutionalIssues?: string[];
   financialImpact?: string;

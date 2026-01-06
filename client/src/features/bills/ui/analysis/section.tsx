@@ -1,12 +1,10 @@
 import { ReactNode } from 'react';
 import { Suspense } from 'react';
+import React from 'react';
 
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 import { Button } from '@client/shared/design-system';
 import { LoadingSpinner } from '@client/shared/design-system';
-import React from 'react';
-
-
 
 export interface SectionProps {
   title: string;
@@ -17,13 +15,13 @@ export interface SectionProps {
   extraHeaderContent?: ReactNode;
 }
 
-export const AnalysisSection = ({ 
-  title, 
-  id, 
-  isExpanded, 
-  onToggle, 
+export const AnalysisSection = ({
+  title,
+  id,
+  isExpanded,
+  onToggle,
   children,
-  extraHeaderContent 
+  extraHeaderContent,
 }: SectionProps) => {
   return (
     <section
@@ -50,13 +48,10 @@ export const AnalysisSection = ({
       {isExpanded && (
         <div id={`section-content-${id}`} role="region" aria-labelledby={`section-heading-${id}`}>
           <Suspense fallback={<LoadingSpinner />}>
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
+            <ErrorBoundary>{children}</ErrorBoundary>
           </Suspense>
         </div>
       )}
     </section>
   );
 };
-

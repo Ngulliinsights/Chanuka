@@ -1,7 +1,8 @@
-import { injectable } from 'inversify';
 import { db } from '@shared/database';
-import { market_signals, market_commodities } from '@shared/schema/market_intelligence';
-import { eq, desc, sql, and, gte } from 'drizzle-orm';
+import { market_commodities,market_signals } from '@shared/schema/market_intelligence';
+import { and, desc, eq, gte,sql } from 'drizzle-orm';
+import { injectable } from 'inversify';
+
 import { calculateMarketMetrics, validateMarketData } from './market.utils';
 
 @injectable()

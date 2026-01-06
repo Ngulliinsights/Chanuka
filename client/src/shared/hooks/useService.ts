@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 
 import { globalServiceLocator } from '@/core/api/registry';
 import type { ApiService } from '@/core/api/types/service';
+
 import { logger } from '../../utils/logger';
 
 /**
@@ -40,7 +41,7 @@ export function useService<T extends ApiService>(serviceName: string): T | null 
         logger.error('Failed to load service', {
           component: 'useService',
           serviceName,
-          error: error.message
+          error: error.message,
         });
       }
     };
@@ -73,12 +74,10 @@ export function useServices<T extends Record<string, ApiService>>(
 
     const loadServices = async () => {
       try {
-        const servicePromises = Object.entries(serviceNames).map(
-          async ([key, serviceName]) => {
-            const service = await globalServiceLocator.getService(serviceName as string);
-            return [key, service];
-          }
-        );
+        const servicePromises = Object.entries(serviceNames).map(async ([key, serviceName]) => {
+          const service = await globalServiceLocator.getService(serviceName as string);
+          return [key, service];
+        });
 
         const serviceEntries = await Promise.all(servicePromises);
         const loadedServices = Object.fromEntries(serviceEntries) as T;
@@ -98,7 +97,7 @@ export function useServices<T extends Record<string, ApiService>>(
         logger.error('Failed to load services', {
           component: 'useServices',
           serviceNames: Object.values(serviceNames),
-          error: error.message
+          error: error.message,
         });
       }
     };
@@ -138,7 +137,7 @@ export function useServiceHealth() {
       } catch (error) {
         logger.error('Failed to check service health', {
           component: 'useServiceHealth',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     };

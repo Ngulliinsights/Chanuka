@@ -1,7 +1,6 @@
 import type { Bill } from '../../types';
 import { logger } from '../../utils/logger';
 
-
 import { globalApiClient } from './client';
 
 // ============================================================================
@@ -196,10 +195,9 @@ export class BillsApiService {
         queryParams.status = params.status.join(',');
       }
 
-      const response = await globalApiClient.get<PaginatedBillsResponse>(
-        this.endpoint,
-        { params: queryParams }
-      );
+      const response = await globalApiClient.get<PaginatedBillsResponse>(this.endpoint, {
+        params: queryParams,
+      });
 
       return response.data;
     } catch (error) {
@@ -250,9 +248,7 @@ export class BillsApiService {
    */
   async getBillComments(billId: number | string): Promise<Comment[]> {
     try {
-      const response = await globalApiClient.get<Comment[]>(
-        `${this.endpoint}/${billId}/comments`
-      );
+      const response = await globalApiClient.get<Comment[]>(`${this.endpoint}/${billId}/comments`);
       return response.data;
     } catch (error) {
       logger.error(`Failed to fetch comments for bill ${billId}`, { error });
@@ -266,10 +262,7 @@ export class BillsApiService {
    * @param data - Comment content and optional parent ID
    * @returns Created comment
    */
-  async addBillComment(
-    billId: number | string,
-    data: CommentPayload
-  ): Promise<Comment> {
+  async addBillComment(billId: number | string, data: CommentPayload): Promise<Comment> {
     try {
       const response = await globalApiClient.post<Comment>(
         `${this.endpoint}/${billId}/comments`,
@@ -289,15 +282,9 @@ export class BillsApiService {
    * @param type - Vote type ('up' or 'down')
    * @returns Updated comment
    */
-  async voteOnComment(
-    commentId: number | string,
-    type: 'up' | 'down'
-  ): Promise<Comment> {
+  async voteOnComment(commentId: number | string, type: 'up' | 'down'): Promise<Comment> {
     try {
-      const response = await globalApiClient.post<Comment>(
-        `/comments/${commentId}/vote`,
-        { type }
-      );
+      const response = await globalApiClient.post<Comment>(`/comments/${commentId}/vote`, { type });
       return response.data;
     } catch (error) {
       logger.error(`Failed to vote on comment ${commentId}`, { error });
@@ -312,9 +299,7 @@ export class BillsApiService {
    */
   async endorseComment(commentId: number | string): Promise<Comment> {
     try {
-      const response = await globalApiClient.post<Comment>(
-        `/comments/${commentId}/endorse`
-      );
+      const response = await globalApiClient.post<Comment>(`/comments/${commentId}/endorse`);
       logger.info(`Comment ${commentId} endorsed`);
       return response.data;
     } catch (error) {
@@ -328,10 +313,7 @@ export class BillsApiService {
    * @param billId - Bill ID
    * @param data - Engagement type and optional metadata
    */
-  async recordEngagement(
-    billId: number | string,
-    data: EngagementPayload
-  ): Promise<void> {
+  async recordEngagement(billId: number | string, data: EngagementPayload): Promise<void> {
     try {
       await globalApiClient.post(`${this.endpoint}/${billId}/engagement`, data);
       logger.info(`Engagement recorded for bill ${billId}: ${data.type}`);
@@ -351,15 +333,9 @@ export class BillsApiService {
    * @param data - Poll question and options
    * @returns Created poll
    */
-  async createBillPoll(
-    billId: number | string,
-    data: CreatePollPayload
-  ): Promise<Poll> {
+  async createBillPoll(billId: number | string, data: CreatePollPayload): Promise<Poll> {
     try {
-      const response = await globalApiClient.post<Poll>(
-        `${this.endpoint}/${billId}/polls`,
-        data
-      );
+      const response = await globalApiClient.post<Poll>(`${this.endpoint}/${billId}/polls`, data);
       logger.info(`Poll created for bill ${billId}`);
       return response.data;
     } catch (error) {
@@ -375,9 +351,7 @@ export class BillsApiService {
    */
   async getBillPolls(billId: number | string): Promise<Poll[]> {
     try {
-      const response = await globalApiClient.get<Poll[]>(
-        `${this.endpoint}/${billId}/polls`
-      );
+      const response = await globalApiClient.get<Poll[]>(`${this.endpoint}/${billId}/polls`);
       return response.data;
     } catch (error) {
       logger.error(`Failed to fetch polls for bill ${billId}`, { error });
@@ -396,9 +370,7 @@ export class BillsApiService {
    */
   async getBillSponsors(billId: number | string): Promise<Sponsor[]> {
     try {
-      const response = await globalApiClient.get<Sponsor[]>(
-        `${this.endpoint}/${billId}/sponsors`
-      );
+      const response = await globalApiClient.get<Sponsor[]>(`${this.endpoint}/${billId}/sponsors`);
       return response.data;
     } catch (error) {
       logger.error(`Failed to fetch sponsors for bill ${billId}`, { error });
@@ -428,9 +400,7 @@ export class BillsApiService {
    * @param billId - Bill ID
    * @returns Sponsorship analysis data
    */
-  async getBillSponsorshipAnalysis(
-    billId: number | string
-  ): Promise<SponsorshipAnalysis> {
+  async getBillSponsorshipAnalysis(billId: number | string): Promise<SponsorshipAnalysis> {
     try {
       const response = await globalApiClient.get<SponsorshipAnalysis>(
         `${this.endpoint}/${billId}/analysis/sponsorship`
@@ -447,9 +417,7 @@ export class BillsApiService {
    * @param billId - Bill ID
    * @returns Primary sponsor analysis
    */
-  async getBillPrimarySponsorAnalysis(
-    billId: number | string
-  ): Promise<SponsorAnalysis> {
+  async getBillPrimarySponsorAnalysis(billId: number | string): Promise<SponsorAnalysis> {
     try {
       const response = await globalApiClient.get<SponsorAnalysis>(
         `${this.endpoint}/${billId}/analysis/sponsor/primary`
@@ -466,9 +434,7 @@ export class BillsApiService {
    * @param billId - Bill ID
    * @returns Co-sponsors network data
    */
-  async getBillCoSponsorsAnalysis(
-    billId: number | string
-  ): Promise<SponsorAnalysis[]> {
+  async getBillCoSponsorsAnalysis(billId: number | string): Promise<SponsorAnalysis[]> {
     try {
       const response = await globalApiClient.get<SponsorAnalysis[]>(
         `${this.endpoint}/${billId}/analysis/sponsor/co`
@@ -525,9 +491,7 @@ export class BillsApiService {
    */
   async getBillStatuses(): Promise<BillStatus[]> {
     try {
-      const response = await globalApiClient.get<BillStatus[]>(
-        `${this.endpoint}/meta/statuses`
-      );
+      const response = await globalApiClient.get<BillStatus[]>(`${this.endpoint}/meta/statuses`);
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch bill statuses', { error });

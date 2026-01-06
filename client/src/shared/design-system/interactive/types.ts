@@ -31,4 +31,4 @@ export interface ValidationState {
   isValid: boolean;
   touched: boolean;
   error?: string;
-};
+}

@@ -200,21 +200,20 @@ class SentryMonitoring {
     return event;
   }
 
-  private filterTransaction(
-    event: Sentry.Event,
-    _hint: Sentry.EventHint
-  ): Sentry.Event | null {
+  private filterTransaction(event: Sentry.Event, _hint: Sentry.EventHint): Sentry.Event | null {
     // Filter out very short transactions (likely measurement errors)
     if (event.timestamp && event.start_timestamp) {
       const duration = event.timestamp - event.start_timestamp;
-      if (duration < 0.01) { // Less than 10ms - probably a measurement artifact
+      if (duration < 0.01) {
+        // Less than 10ms - probably a measurement artifact
         return null;
       }
     }
 
     // Filter out health check and monitoring endpoints
     // These create noise without providing useful performance data
-    const transactionName = event.transaction_info?.source === 'route' ? event.transaction : event.transaction;
+    const transactionName =
+      event.transaction_info?.source === 'route' ? event.transaction : event.transaction;
     if (transactionName && typeof transactionName === 'string') {
       const healthCheckPatterns = ['/health', '/ping', '/metrics'];
       if (healthCheckPatterns.some(pattern => transactionName.includes(pattern))) {
@@ -228,7 +227,7 @@ class SentryMonitoring {
   private setupGlobalErrorHandlers(): void {
     // Catch unhandled promise rejections that would otherwise be silent
     // These often indicate async code that didn't properly handle errors
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       Sentry.captureException(event.reason, {
         tags: {
           errorType: 'unhandledRejection',
@@ -241,13 +240,13 @@ class SentryMonitoring {
 
     // Catch resource loading errors (failed scripts, images, stylesheets)
     // The 'true' parameter captures events during the capture phase
-    window.addEventListener('error', (event) => {
-      // Only process resource errors, not general window errors
-      if (event.target !== window) {
-        const target = event.target as LoadableElement;
-        Sentry.captureException(
-          new Error(`Resource loading error: ${target}`),
-          {
+    window.addEventListener(
+      'error',
+      event => {
+        // Only process resource errors, not general window errors
+        if (event.target !== window) {
+          const target = event.target as LoadableElement;
+          Sentry.captureException(new Error(`Resource loading error: ${target}`), {
             tags: {
               errorType: 'resourceError',
             },
@@ -255,10 +254,11 @@ class SentryMonitoring {
               element: event.target,
               source: target.src || target.href,
             },
-          }
-        );
-      }
-    }, true);
+          });
+        }
+      },
+      true
+    );
   }
 
   private setupPerformanceMonitoring(): void {
@@ -475,7 +475,12 @@ class SentryMonitoring {
   private getDeviceType(): string {
     const userAgent = navigator.userAgent;
     if (/tablet|ipad|playbook|silk/i.test(userAgent)) return 'tablet';
-    if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(userAgent)) return 'mobile';
+    if (
+      /mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(
+        userAgent
+      )
+    )
+      return 'mobile';
     return 'desktop';
   }
 }

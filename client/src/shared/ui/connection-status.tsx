@@ -1,9 +1,10 @@
 import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
+
+import { useApiConnection } from '@/core/api/hooks/useApiConnection';
 
 import { logger } from '../../utils/logger';
-import { useApiConnection } from '@/core/api/hooks/useApiConnection';
-import React from 'react';
 
 interface ConnectionStatusProps {
   showDetails?: boolean;
@@ -20,7 +21,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
     error,
     checkConnection,
     checkHealth,
-    diagnose
+    diagnose,
   } = useApiConnection();
 
   const [showDiagnostics, setShowDiagnostics] = useState(false);
@@ -80,9 +81,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         {getStatusIcon()}
-        <span className={`text-sm ${getStatusColor()}`}>
-          {getStatusText()}
-        </span>
+        <span className={`text-sm ${getStatusColor()}`}>{getStatusText()}</span>
       </div>
     );
   }
@@ -140,7 +139,9 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
             ) : (
               <AlertCircle className="w-4 h-4 text-red-500" />
             )}
-            <span className={`text-sm ${connectionStatus?.apiReachable ? 'text-green-600' : 'text-red-600'}`}>
+            <span
+              className={`text-sm ${connectionStatus?.apiReachable ? 'text-green-600' : 'text-red-600'}`}
+            >
               {connectionStatus?.apiReachable ? 'Reachable' : 'Unreachable'}
             </span>
           </div>
@@ -155,7 +156,9 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
             ) : (
               <AlertCircle className="w-4 h-4 text-red-500" />
             )}
-            <span className={`text-sm ${connectionStatus?.corsEnabled ? 'text-green-600' : 'text-red-600'}`}>
+            <span
+              className={`text-sm ${connectionStatus?.corsEnabled ? 'text-green-600' : 'text-red-600'}`}
+            >
               {connectionStatus?.corsEnabled ? 'Enabled' : 'Disabled'}
             </span>
           </div>
@@ -171,7 +174,9 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
               ) : (
                 <AlertCircle className="w-4 h-4 text-yellow-500" />
               )}
-              <span className={`text-sm ${healthStatus.database ? 'text-green-600' : 'text-yellow-600'}`}>
+              <span
+                className={`text-sm ${healthStatus.database ? 'text-green-600' : 'text-yellow-600'}`}
+              >
                 {healthStatus.database ? 'Connected' : 'Fallback Mode'}
               </span>
             </div>
@@ -182,10 +187,15 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
         {healthStatus?.latency && (
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Response Time</span>
-            <span className={`text-sm ${
-              healthStatus.latency < 1000 ? 'text-green-600' :
-              healthStatus.latency < 3000 ? 'text-yellow-600' : 'text-red-600'
-            }`}>
+            <span
+              className={`text-sm ${
+                healthStatus.latency < 1000
+                  ? 'text-green-600'
+                  : healthStatus.latency < 3000
+                    ? 'text-yellow-600'
+                    : 'text-red-600'
+              }`}
+            >
               {healthStatus.latency}ms
             </span>
           </div>
@@ -219,7 +229,10 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
       {connectionStatus?.errors && connectionStatus.errors.length > 0 && (
         <div className="mt-4 space-y-2">
           {connectionStatus.errors.map((err, index) => (
-            <div key={index} className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+            <div
+              key={index}
+              className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800"
+            >
               {err}
             </div>
           ))}
@@ -233,10 +246,15 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Status:</span>
-              <span className={`text-sm font-medium ${
-                diagnostics.status === 'healthy' ? 'text-green-600' :
-                diagnostics.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'
-              }`}>
+              <span
+                className={`text-sm font-medium ${
+                  diagnostics.status === 'healthy'
+                    ? 'text-green-600'
+                    : diagnostics.status === 'degraded'
+                      ? 'text-yellow-600'
+                      : 'text-red-600'
+                }`}
+              >
                 {diagnostics.status.toUpperCase()}
               </span>
             </div>
@@ -276,4 +294,3 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
 }
 
 export default ConnectionStatus;
-

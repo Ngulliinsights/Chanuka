@@ -10,11 +10,7 @@ export interface TooltipProps {
 }
 
 export const TooltipProvider = React.memo<{ children: React.ReactNode }>(({ children }) => {
-  return (
-    <TooltipPrimitive.Provider delayDuration={200}>
-      {children}
-    </TooltipPrimitive.Provider>
-  );
+  return <TooltipPrimitive.Provider delayDuration={200}>{children}</TooltipPrimitive.Provider>;
 });
 
 TooltipProvider.displayName = 'TooltipProvider';
@@ -25,13 +21,11 @@ export const Tooltip = React.memo<{ children: React.ReactNode }>(({ children }) 
 
 Tooltip.displayName = 'Tooltip';
 
-export const TooltipTrigger = React.memo<{ children: React.ReactNode; asChild?: boolean }>(({ children, asChild = false }) => {
-  return (
-    <TooltipPrimitive.Trigger asChild={asChild}>
-      {children}
-    </TooltipPrimitive.Trigger>
-  );
-});
+export const TooltipTrigger = React.memo<{ children: React.ReactNode; asChild?: boolean }>(
+  ({ children, asChild = false }) => {
+    return <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>;
+  }
+);
 
 TooltipTrigger.displayName = 'TooltipTrigger';
 

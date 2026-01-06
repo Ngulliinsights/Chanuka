@@ -6,9 +6,9 @@
  * for bills using the injected repository.
  */
 
+import type { Bill, NewBill } from '../../../../schema/foundation';
 import { err } from '../../primitives';
 import type { Result, Maybe } from '../../primitives';
-import type { Bill, NewBill } from '../../../../schema/foundation';
 import type { IBillRepository } from '../../repositories/interfaces/bill-repository.interface';
 import type { IBillService } from '../interfaces/bill-service.interface';
 

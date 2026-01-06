@@ -50,29 +50,29 @@ export function getSeverityStyles(severity: ErrorDisplayConfig['severity']) {
       icon: 'text-yellow-500',
       title: 'text-yellow-800',
       desc: 'text-yellow-700',
-      button: 'text-yellow-800 hover:bg-yellow-100'
+      button: 'text-yellow-800 hover:bg-yellow-100',
     },
     medium: {
       container: 'bg-orange-50 border border-orange-200',
       icon: 'text-orange-500',
       title: 'text-orange-800',
       desc: 'text-orange-700',
-      button: 'text-orange-800 hover:bg-orange-100'
+      button: 'text-orange-800 hover:bg-orange-100',
     },
     high: {
       container: 'bg-red-50 border border-red-200',
       icon: 'text-red-500',
       title: 'text-red-800',
       desc: 'text-red-700',
-      button: 'text-red-800 hover:bg-red-100'
+      button: 'text-red-800 hover:bg-red-100',
     },
     critical: {
       container: 'bg-red-50 border border-red-200',
       icon: 'text-red-500',
       title: 'text-red-900',
       desc: 'text-red-700',
-      button: 'text-red-800 hover:bg-red-100'
-    }
+      button: 'text-red-800 hover:bg-red-100',
+    },
   };
 
   return styles[severity];
@@ -87,8 +87,11 @@ export function ErrorActions({
   onReport,
   onGoHome,
   retryCount = 0,
-  maxRetries = 3
-}: Pick<ErrorDisplayProps, 'config' | 'onRetry' | 'onReport' | 'onGoHome' | 'retryCount' | 'maxRetries'>) {
+  maxRetries = 3,
+}: Pick<
+  ErrorDisplayProps,
+  'config' | 'onRetry' | 'onReport' | 'onGoHome' | 'retryCount' | 'maxRetries'
+>) {
   return (
     <div className="space-y-2">
       {config.showRetry && onRetry && (
@@ -99,23 +102,14 @@ export function ErrorActions({
       )}
 
       {config.showGoHome && onGoHome && config.variant !== 'page' && (
-        <Button
-          onClick={onGoHome}
-          className="w-full"
-          variant="outline"
-        >
+        <Button onClick={onGoHome} className="w-full" variant="outline">
           <Building className="h-4 w-4 mr-2" />
           Go to Homepage
         </Button>
       )}
 
       {config.showReport && onReport && (
-        <Button
-          onClick={onReport}
-          className="w-full"
-          variant="ghost"
-          size="sm"
-        >
+        <Button onClick={onReport} className="w-full" variant="ghost" size="sm">
           <AlertTriangle className="h-4 w-4 mr-2" />
           Report this issue
         </Button>
@@ -137,22 +131,20 @@ export function SharedErrorDisplay({
   onGoHome,
   context,
   retryCount = 0,
-  maxRetries = 3
+  maxRetries = 3,
 }: ErrorDisplayProps) {
   const styles = getSeverityStyles(config.severity);
   const isPageVariant = config.variant === 'page';
 
   const containerClasses = isPageVariant
-    ? "min-h-screen bg-gray-50 flex items-center justify-center p-4"
+    ? 'min-h-screen bg-gray-50 flex items-center justify-center p-4'
     : `${styles.container} rounded-md p-4 m-4`;
 
   const contentClasses = isPageVariant
-    ? "w-full max-w-md bg-white rounded-lg shadow-lg"
-    : "flex items-start";
+    ? 'w-full max-w-md bg-white rounded-lg shadow-lg'
+    : 'flex items-start';
 
-  const textClasses = isPageVariant
-    ? "text-center p-6"
-    : "flex-1";
+  const textClasses = isPageVariant ? 'text-center p-6' : 'flex-1';
 
   return (
     <div className={containerClasses}>
@@ -170,7 +162,9 @@ export function SharedErrorDisplay({
             <AlertTriangle className={`h-5 w-5 ${styles.icon} mt-0.5 mr-3 flex-shrink-0`} />
           )}
 
-          <h3 className={`text-sm font-medium ${styles.title} ${isPageVariant ? 'text-2xl mb-2' : 'mb-1'}`}>
+          <h3
+            className={`text-sm font-medium ${styles.title} ${isPageVariant ? 'text-2xl mb-2' : 'mb-1'}`}
+          >
             {config.customMessage || 'Something went wrong'}
           </h3>
 
@@ -179,14 +173,12 @@ export function SharedErrorDisplay({
           </p>
 
           {context && isPageVariant && (
-            <p className="text-xs text-gray-500 mb-4">
-              Context: {context}
-            </p>
+            <p className="text-xs text-gray-500 mb-4">Context: {context}</p>
           )}
         </div>
 
         {(config.showRetry || config.showReport || config.showGoHome || config.customActions) && (
-          <div className={isPageVariant ? "space-y-4 p-6" : "flex space-x-2 ml-2"}>
+          <div className={isPageVariant ? 'space-y-4 p-6' : 'flex space-x-2 ml-2'}>
             <ErrorActions
               config={config}
               onRetry={onRetry}

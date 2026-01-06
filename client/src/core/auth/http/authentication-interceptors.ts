@@ -40,7 +40,10 @@ export class AuthenticationInterceptor {
 }
 
 export class TokenRefreshInterceptor {
-  intercept(response: { status: number; [key: string]: unknown }): { status: number; [key: string]: unknown } | Promise<Record<string, unknown>> {
+  intercept(response: {
+    status: number;
+    [key: string]: unknown;
+  }): { status: number; [key: string]: unknown } | Promise<Record<string, unknown>> {
     // Handle 401 responses by attempting token refresh
     if (response.status === 401) {
       // Trigger token refresh logic

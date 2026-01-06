@@ -23,7 +23,15 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { copySystem } from '@client/content/copy-system';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 
 /**
  * Extended UserProfile interface to include persona and onboarding status
@@ -60,11 +68,7 @@ interface SearchInputProps {
  * A self-contained search input with submit functionality
  * Handles both button clicks and Enter key presses for submission
  */
-const SearchInput: React.FC<SearchInputProps> = ({ 
-  onSearch, 
-  placeholder, 
-  className = '' 
-}) => {
+const SearchInput: React.FC<SearchInputProps> = ({ onSearch, placeholder, className = '' }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +84,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(e.target.value)}
           placeholder={placeholder}
           className="w-full px-6 py-4 pr-12 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-300"
         />
@@ -138,7 +142,7 @@ const SimplePretextPanel: React.FC<{ billId: string }> = ({ billId }) => {
                 No critical implementation workarounds detected in this bill.
               </p>
             </div>
-            
+
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <h4 className="font-semibold text-blue-900 mb-2">Analysis Summary</h4>
               <ul className="text-sm text-blue-800 space-y-1">
@@ -162,13 +166,13 @@ const SimplePretextPanel: React.FC<{ billId: string }> = ({ billId }) => {
 export default function HomePage() {
   const navigate = useNavigate();
   const { data: user } = useUserProfile() as { data: ExtendedUserProfile | undefined };
-  
+
   const [currentStat, setCurrentStat] = useState<number>(0);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [showPretextAnalysis, setShowPretextAnalysis] = useState<boolean>(false);
   const [selectedBillId, setSelectedBillId] = useState<string>('');
   const [showPersonalizedFeatures, setShowPersonalizedFeatures] = useState<boolean>(false);
-  
+
   const userLevel = user?.persona || 'novice';
 
   /**
@@ -177,9 +181,9 @@ export default function HomePage() {
    */
   useEffect(() => {
     setIsVisible(true);
-    
+
     const interval = setInterval(() => {
-      setCurrentStat((prev) => (prev + 1) % 4);
+      setCurrentStat(prev => (prev + 1) % 4);
     }, 3000);
 
     if (user?.onboardingCompleted) {
@@ -205,7 +209,7 @@ export default function HomePage() {
     { label: 'Bills Tracked', value: '1,247', icon: FileText, color: 'text-blue-600' },
     { label: 'Active Citizens', value: '3,892', icon: Users, color: 'text-green-600' },
     { label: 'Issues Flagged', value: '47', icon: AlertTriangle, color: 'text-orange-600' },
-    { label: 'Expert Reviews', value: '156', icon: CheckCircle, color: 'text-purple-600' }
+    { label: 'Expert Reviews', value: '156', icon: CheckCircle, color: 'text-purple-600' },
   ];
 
   return (
@@ -213,9 +217,11 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
-        
+
         <div className="container mx-auto px-4 py-20">
-          <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div
+            className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          >
             <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span>Platform Active • Real-time Updates</span>
@@ -227,12 +233,11 @@ export default function HomePage() {
                   Welcome back, {user.name?.split(' ')[0]}!
                 </h1>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6 leading-relaxed">
-                  {userLevel === 'novice' 
-                    ? "Ready to continue exploring how legislation affects your community?"
+                  {userLevel === 'novice'
+                    ? 'Ready to continue exploring how legislation affects your community?'
                     : userLevel === 'intermediate'
-                    ? "Your civic engagement dashboard is ready with today's key developments."
-                    : "Your professional legislative intelligence briefing is ready."
-                  }
+                      ? "Your civic engagement dashboard is ready with today's key developments."
+                      : 'Your professional legislative intelligence briefing is ready.'}
                 </p>
                 <div className="flex items-center justify-center gap-4 mb-8">
                   <Badge variant="secondary" className="text-sm flex items-center gap-1">
@@ -254,7 +259,7 @@ export default function HomePage() {
                   <br />
                   <span className="text-gray-900">in Your Hands</span>
                 </h1>
-                
+
                 <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 leading-relaxed">
                   {copySystem.platformMission.short}
                 </p>
@@ -266,15 +271,22 @@ export default function HomePage() {
               {user && showPersonalizedFeatures ? (
                 <>
                   <Link to="/dashboard" className="inline-block">
-                    <Button size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Button
+                      size="lg"
+                      className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
                       <BarChart3 className="mr-2 h-5 w-5" />
                       View Dashboard
                       <ChevronRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  
+
                   <Link to="/bills" className="inline-block">
-                    <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                    >
                       <FileText className="mr-2 h-5 w-5" />
                       {userLevel === 'expert' ? 'Professional Tools' : 'Explore Bills'}
                     </Button>
@@ -283,7 +295,10 @@ export default function HomePage() {
               ) : (
                 <>
                   <Link to="/bills" className="inline-block">
-                    <Button size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Button
+                      size="lg"
+                      className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
                       <FileText className="mr-2 h-5 w-5" />
                       Explore Bills
                       <ChevronRight className="ml-2 h-5 w-5" />
@@ -291,7 +306,11 @@ export default function HomePage() {
                   </Link>
 
                   <Link to="/community" className="inline-block">
-                    <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                    >
                       <Users className="mr-2 h-5 w-5" />
                       Join Community
                     </Button>
@@ -305,7 +324,9 @@ export default function HomePage() {
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                 <div className="text-center mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Legislation</h3>
-                  <p className="text-gray-600 text-sm">Find bills, analyze policy impacts, and detect implementation workarounds</p>
+                  <p className="text-gray-600 text-sm">
+                    Find bills, analyze policy impacts, and detect implementation workarounds
+                  </p>
                 </div>
                 <SearchInput
                   onSearch={handleSearch}
@@ -320,13 +341,15 @@ export default function HomePage() {
               {stats.map((stat, index) => {
                 const Icon = stat.icon;
                 return (
-                  <div 
+                  <div
                     key={stat.label}
                     className={`text-center transition-all duration-500 ${
                       currentStat === index ? 'scale-110 opacity-100' : 'scale-100 opacity-70'
                     }`}
                   >
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg mb-2 ${stat.color}`}>
+                    <div
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg mb-2 ${stat.color}`}
+                    >
                       <Icon className="h-6 w-6" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
@@ -358,14 +381,20 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Legislative Tracking</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Legislative Tracking
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  Real-time monitoring of bills, amendments, and voting patterns. Get alerts on legislation that matters to you.
+                  Real-time monitoring of bills, amendments, and voting patterns. Get alerts on
+                  legislation that matters to you.
                 </CardDescription>
                 <Link to="/bills">
-                  <Button variant="ghost" className="group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
+                  >
                     Track Bills
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -378,14 +407,20 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <AlertTriangle className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Workaround Detection</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Workaround Detection
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  AI-powered detection of implementation workarounds and constitutional bypass tactics in legislation.
+                  AI-powered detection of implementation workarounds and constitutional bypass
+                  tactics in legislation.
                 </CardDescription>
                 <Link to="/bill-sponsorship-analysis">
-                  <Button variant="ghost" className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300"
+                  >
                     View Analysis
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -402,10 +437,14 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  Connect with citizens, share insights, and participate in informed discussions about policy impacts.
+                  Connect with citizens, share insights, and participate in informed discussions
+                  about policy impacts.
                 </CardDescription>
                 <Link to="/community">
-                  <Button variant="ghost" className="group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-green-600 group-hover:text-white transition-all duration-300"
+                  >
                     Join Discussion
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -418,14 +457,20 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Expert Verification</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Expert Verification
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  Verified expert analysis and constitutional review to ensure accuracy and credibility of information.
+                  Verified expert analysis and constitutional review to ensure accuracy and
+                  credibility of information.
                 </CardDescription>
                 <Link to="/expert-verification">
-                  <Button variant="ghost" className="group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-purple-600 group-hover:text-white transition-all duration-300"
+                  >
                     View Experts
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -438,14 +483,20 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Search className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Intelligent Search</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Intelligent Search
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  AI-powered search across bills, debates, and analysis. Find relevant legislation with natural language queries.
+                  AI-powered search across bills, debates, and analysis. Find relevant legislation
+                  with natural language queries.
                 </CardDescription>
                 <Link to="/search">
-                  <Button variant="ghost" className="group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300"
+                  >
                     Search Now
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -458,14 +509,20 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Personal Dashboard</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Personal Dashboard
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                  Customized tracking of your interests, saved bills, and personalized insights based on your engagement.
+                  Customized tracking of your interests, saved bills, and personalized insights
+                  based on your engagement.
                 </CardDescription>
                 <Link to="/dashboard">
-                  <Button variant="ghost" className="group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                  <Button
+                    variant="ghost"
+                    className="group-hover:bg-teal-600 group-hover:text-white transition-all duration-300"
+                  >
                     View Dashboard
                     <ChevronRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -488,7 +545,8 @@ export default function HomePage() {
               Detect Implementation Workarounds
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Analyze legislation for potential pretexts and bypass tactics. Enter a bill ID to start analysis.
+              Analyze legislation for potential pretexts and bypass tactics. Enter a bill ID to
+              start analysis.
             </p>
             <div className="max-w-md mx-auto">
               <div className="flex gap-2">
@@ -497,15 +555,17 @@ export default function HomePage() {
                   placeholder="Enter bill ID (e.g., B001)"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   value={selectedBillId}
-                  onChange={(e) => setSelectedBillId(e.target.value)}
-                  onKeyPress={(e) => {
+                  onChange={e => setSelectedBillId(e.target.value)}
+                  onKeyPress={e => {
                     if (e.key === 'Enter' && selectedBillId.trim()) {
                       handlePretextAnalysis(selectedBillId.trim());
                     }
                   }}
                 />
                 <Button
-                  onClick={() => selectedBillId.trim() && handlePretextAnalysis(selectedBillId.trim())}
+                  onClick={() =>
+                    selectedBillId.trim() && handlePretextAnalysis(selectedBillId.trim())
+                  }
                   disabled={!selectedBillId.trim()}
                   className="px-6 py-3 bg-red-600 hover:bg-red-700"
                 >
@@ -529,7 +589,9 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur">
             <CardHeader className="text-center pb-8">
-              <CardTitle className="text-4xl font-bold text-gray-900 mb-4">Platform Impact</CardTitle>
+              <CardTitle className="text-4xl font-bold text-gray-900 mb-4">
+                Platform Impact
+              </CardTitle>
               <CardDescription className="text-xl text-gray-600">
                 Real numbers from our growing community of engaged citizens
               </CardDescription>
@@ -541,12 +603,17 @@ export default function HomePage() {
                   return (
                     <div key={stat.label} className="text-center group">
                       <div className="relative mb-4">
-                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${
-                          index === 0 ? 'from-blue-500 to-blue-600' :
-                          index === 1 ? 'from-green-500 to-green-600' :
-                          index === 2 ? 'from-orange-500 to-orange-600' :
-                          'from-purple-500 to-purple-600'
-                        } shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                        <div
+                          className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${
+                            index === 0
+                              ? 'from-blue-500 to-blue-600'
+                              : index === 1
+                                ? 'from-green-500 to-green-600'
+                                : index === 2
+                                  ? 'from-orange-500 to-orange-600'
+                                  : 'from-purple-500 to-purple-600'
+                          } shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        >
                           <Icon className="w-8 h-8 text-white" />
                         </div>
                         <div className="absolute -top-2 -right-2">
@@ -573,7 +640,9 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-              <p className="text-xl text-gray-600">Stay updated with the latest legislative developments</p>
+              <p className="text-xl text-gray-600">
+                Stay updated with the latest legislative developments
+              </p>
             </div>
 
             <Card className="border-0 shadow-xl">
@@ -585,14 +654,19 @@ export default function HomePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-gray-900">New Bill: Climate Action Framework</h4>
-                        <Badge variant="secondary" className="text-xs">New</Badge>
+                        <h4 className="font-semibold text-gray-900">
+                          New Bill: Climate Action Framework
+                        </h4>
+                        <Badge variant="secondary" className="text-xs">
+                          New
+                        </Badge>
                       </div>
-                      <p className="text-gray-600 text-sm mb-2">Comprehensive climate legislation introduced for public review</p>
+                      <p className="text-gray-600 text-sm mb-2">
+                        Comprehensive climate legislation introduced for public review
+                      </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          2 hours ago
+                          <Clock className="w-3 h-3" />2 hours ago
                         </span>
                         <span className="flex items-center gap-1">
                           <Eye className="w-3 h-3" />
@@ -606,21 +680,26 @@ export default function HomePage() {
                       </Button>
                     </Link>
                   </div>
-                  
+
                   <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl hover:shadow-md transition-all duration-300">
                     <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
                       <AlertTriangle className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-gray-900">Workaround Alert: Tax Reform Implementation</h4>
-                        <Badge variant="destructive" className="text-xs">Alert</Badge>
+                        <h4 className="font-semibold text-gray-900">
+                          Workaround Alert: Tax Reform Implementation
+                        </h4>
+                        <Badge variant="destructive" className="text-xs">
+                          Alert
+                        </Badge>
                       </div>
-                      <p className="text-gray-600 text-sm mb-2">Potential bypass mechanism detected in regulatory implementation</p>
+                      <p className="text-gray-600 text-sm mb-2">
+                        Potential bypass mechanism detected in regulatory implementation
+                      </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          4 hours ago
+                          <Clock className="w-3 h-3" />4 hours ago
                         </span>
                         <span className="flex items-center gap-1">
                           <Activity className="w-3 h-3" />
@@ -634,21 +713,24 @@ export default function HomePage() {
                       </Button>
                     </Link>
                   </div>
-                  
+
                   <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl hover:shadow-md transition-all duration-300">
                     <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
                       <MessageSquare className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-gray-900">Community Discussion: Healthcare Access</h4>
+                        <h4 className="font-semibold text-gray-900">
+                          Community Discussion: Healthcare Access
+                        </h4>
                         <Badge className="text-xs bg-green-100 text-green-800">Active</Badge>
                       </div>
-                      <p className="text-gray-600 text-sm mb-2">Active discussion on proposed healthcare legislation changes</p>
+                      <p className="text-gray-600 text-sm mb-2">
+                        Active discussion on proposed healthcare legislation changes
+                      </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          6 hours ago
+                          <Clock className="w-3 h-3" />6 hours ago
                         </span>
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" />
@@ -681,7 +763,7 @@ export default function HomePage() {
       {/* Final Call-to-Action */}
       <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]"></div>
-        
+
         <div className="container mx-auto px-4 relative">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
@@ -689,24 +771,29 @@ export default function HomePage() {
               <span>Join 15,000+ engaged citizens</span>
             </div>
 
-            <h2 className="text-5xl font-bold text-white mb-6">
-              Ready to Make a Difference?
-            </h2>
+            <h2 className="text-5xl font-bold text-white mb-6">Ready to Make a Difference?</h2>
             <p className="text-xl text-white/90 mb-10 leading-relaxed">
-              Join thousands of engaged citizens working towards transparent and accountable governance. 
-              Your voice matters in shaping the future of democracy.
+              Join thousands of engaged citizens working towards transparent and accountable
+              governance. Your voice matters in shaping the future of democracy.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link to="/auth">
-                <Button size="lg" className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <Button
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                >
                   <Zap className="mr-2 h-5 w-5" />
                   Get Started Free
                 </Button>
               </Link>
-              
+
               <Link to="/bills">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 transition-all duration-300">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 transition-all duration-300"
+                >
                   <Earth className="mr-2 h-5 w-5" />
                   Explore Platform
                 </Button>

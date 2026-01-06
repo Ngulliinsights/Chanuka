@@ -1,8 +1,6 @@
 module.exports = {
   extends: [
     '../.eslintrc.cjs',
-    '@typescript-eslint/recommended',
-    '@typescript-eslint/recommended-requiring-type-checking'
   ],
   env: {
     node: true,
@@ -29,7 +27,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',
-    
+
     // Import rules
     'import/no-unresolved': 'error',
     'import/order': ['error', {
@@ -47,13 +45,13 @@ module.exports = {
         'caseInsensitive': true
       }
     }],
-    
+
     // Security rules
     'no-eval': 'error',
     'no-implied-eval': 'error',
     'no-new-func': 'error',
     'no-script-url': 'error',
-    
+
     // Code quality rules
     'complexity': ['warn', 10],
     'max-depth': ['warn', 4],
@@ -61,7 +59,7 @@ module.exports = {
     'no-console': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
-    
+
     // Naming conventions
     '@typescript-eslint/naming-convention': [
       'error',

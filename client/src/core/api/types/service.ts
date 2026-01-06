@@ -1,6 +1,6 @@
 /**
  * Service Interface Types
- * 
+ *
  * Type definitions for service layer interfaces
  */
 
@@ -35,8 +35,14 @@ export interface ApiService {
  */
 export interface BillsService extends ApiService {
   getBill(id: number, options?: RequestOptions): Promise<unknown>;
-  getBills(params?: BillsQueryParams, options?: RequestOptions): Promise<PaginatedResponse<unknown>>;
-  searchBills(query: BillsSearchParams, options?: RequestOptions): Promise<PaginatedResponse<unknown>>;
+  getBills(
+    params?: BillsQueryParams,
+    options?: RequestOptions
+  ): Promise<PaginatedResponse<unknown>>;
+  searchBills(
+    query: BillsSearchParams,
+    options?: RequestOptions
+  ): Promise<PaginatedResponse<unknown>>;
   recordEngagement(billId: number, type: EngagementType): Promise<void>;
   subscribeToBill(billId: number): Promise<void>;
   unsubscribeFromBill(billId: number): Promise<void>;

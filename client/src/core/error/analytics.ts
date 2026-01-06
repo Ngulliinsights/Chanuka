@@ -323,7 +323,7 @@ export class ErrorAnalyticsService {
     if (config.sentry) {
       this.addProvider('sentry', {
         name: 'Sentry',
-        track: async (error) => {
+        track: async error => {
           // Sentry tracking would go here
           console.log('Tracking error with Sentry:', error);
         },
@@ -334,7 +334,7 @@ export class ErrorAnalyticsService {
     if (config.datadog) {
       this.addProvider('datadog', {
         name: 'DataDog',
-        track: async (error) => {
+        track: async error => {
           // DataDog tracking would go here
           console.log('Tracking error with DataDog:', error);
         },
@@ -345,7 +345,7 @@ export class ErrorAnalyticsService {
     if (config.custom) {
       this.addProvider('custom', {
         name: 'Custom Analytics',
-        track: async (error) => {
+        track: async error => {
           // Custom analytics tracking would go here
           console.log('Tracking error with Custom Analytics:', error);
         },
@@ -402,7 +402,9 @@ export class ErrorAnalyticsService {
 
     // Check rate limiting
     if (this.monitoringConfig.enableRateLimiting) {
-      const rateLimit = this.rateLimiter.check(error.context?.userId || error.context?.sessionId || 'anonymous');
+      const rateLimit = this.rateLimiter.check(
+        error.context?.userId || error.context?.sessionId || 'anonymous'
+      );
       if (!rateLimit.allowed) {
         console.warn('Error rate limit exceeded, skipping error recording');
         return false;
@@ -447,7 +449,9 @@ export class ErrorAnalyticsService {
     const errorsByDomain = this.aggregateByDomain(filteredErrors);
     const errorsByCode = this.aggregateByCode(filteredErrors);
     const topErrors = this.getTopErrors(filteredErrors);
-    const errorTrends = this.monitoringConfig.enableTrendAnalysis ? this.calculateTrends(filteredErrors, range) : [];
+    const errorTrends = this.monitoringConfig.enableTrendAnalysis
+      ? this.calculateTrends(filteredErrors, range)
+      : [];
 
     return {
       totalErrors: filteredErrors.length,
@@ -466,7 +470,9 @@ export class ErrorAnalyticsService {
    */
   exportData(): ErrorAggregation {
     const now = new Date();
-    const start = new Date(now.getTime() - this.monitoringConfig.retentionPeriodHours * 60 * 60 * 1000);
+    const start = new Date(
+      now.getTime() - this.monitoringConfig.retentionPeriodHours * 60 * 60 * 1000
+    );
 
     return {
       timeWindow: { start, end: now },
@@ -560,14 +566,18 @@ export class ErrorAnalyticsService {
 
     for (const domain of domains) {
       const domainErrors = this.errorHistory.filter(
-        error => error.type === domain &&
-        error.timestamp >= range.start.getTime() &&
-        error.timestamp <= range.end.getTime()
+        error =>
+          error.type === domain &&
+          error.timestamp >= range.start.getTime() &&
+          error.timestamp <= range.end.getTime()
       );
 
       if (domainErrors.length < this.anomalyConfig.minDataPoints) continue;
 
-      const result = this.detectAnomalyInSeries(domainErrors.map(e => e.timestamp), domain);
+      const result = this.detectAnomalyInSeries(
+        domainErrors.map(e => e.timestamp),
+        domain
+      );
       if (result) {
         anomalies.push(result);
       }
@@ -658,7 +668,10 @@ export class ErrorAnalyticsService {
 
       // Check cooldown
       const lastTriggered = this.alertCooldowns.get(rule.id);
-      if (lastTriggered && (now.getTime() - lastTriggered.getTime()) < rule.cooldownPeriod * 60 * 1000) {
+      if (
+        lastTriggered &&
+        now.getTime() - lastTriggered.getTime() < rule.cooldownPeriod * 60 * 1000
+      ) {
         continue;
       }
 
@@ -759,7 +772,10 @@ export class ErrorAnalyticsService {
       [ErrorSeverity.CRITICAL]: 5,
     };
 
-    const totalImpact = matches.reduce((sum, error) => sum + (severityWeights[error.severity] || 1), 0);
+    const totalImpact = matches.reduce(
+      (sum, error) => sum + (severityWeights[error.severity] || 1),
+      0
+    );
     return totalImpact / matches.length;
   }
 
@@ -963,7 +979,8 @@ export class ErrorAnalyticsService {
     this.metrics.countByDomain[error.type] = (this.metrics.countByDomain[error.type] || 0) + 1;
 
     // Update severity counts
-    this.metrics.countBySeverity[error.severity] = (this.metrics.countBySeverity[error.severity] || 0) + 1;
+    this.metrics.countBySeverity[error.severity] =
+      (this.metrics.countBySeverity[error.severity] || 0) + 1;
 
     // Update code counts
     this.metrics.countByCode[error.id] = (this.metrics.countByCode[error.id] || 0) + 1;
@@ -994,7 +1011,10 @@ export class ErrorAnalyticsService {
   }
 
   private getTopErrors(errors: AppError[]): ErrorFrequency[] {
-    const codeMap = new Map<string, { count: number; lastOccurred: number; domain: ErrorDomain; users: Set<string> }>();
+    const codeMap = new Map<
+      string,
+      { count: number; lastOccurred: number; domain: ErrorDomain; users: Set<string> }
+    >();
 
     errors.forEach(error => {
       const key = error.id;
@@ -1046,7 +1066,9 @@ export class ErrorAnalyticsService {
       );
 
       const domainCounts = this.aggregateByDomain(hourErrors);
-      const primaryDomain = (Object.entries(domainCounts).sort(([, a], [, b]) => b - a)[0]?.[0] as ErrorDomain) || ErrorDomain.UNKNOWN;
+      const primaryDomain =
+        (Object.entries(domainCounts).sort(([, a], [, b]) => b - a)[0]?.[0] as ErrorDomain) ||
+        ErrorDomain.UNKNOWN;
 
       counts.push(hourErrors.length);
 

@@ -1,6 +1,6 @@
 /**
  * Dashboard Types
- * 
+ *
  * Core types for dashboard functionality including actions, topics, and configuration
  */
 
@@ -30,7 +30,15 @@ export interface TrackedTopic {
   created_at: Date;
 }
 
-export type TopicCategory = 'healthcare' | 'education' | 'environment' | 'economy' | 'security' | 'infrastructure' | 'social' | 'other';
+export type TopicCategory =
+  | 'healthcare'
+  | 'education'
+  | 'environment'
+  | 'economy'
+  | 'security'
+  | 'infrastructure'
+  | 'social'
+  | 'other';
 
 export interface DashboardData {
   summary: {

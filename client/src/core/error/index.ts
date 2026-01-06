@@ -39,11 +39,7 @@ export type {
   UseErrorBoundaryReturn,
 } from './components/types';
 
-export {
-  ErrorDomain,
-  ErrorSeverity,
-  RecoveryAction,
-} from './constants';
+export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
 
 // ============================================================================
 // Error Classes
@@ -78,11 +74,7 @@ export {
 // ============================================================================
 
 export { coreErrorHandler } from './handler';
-export {
-  createNetworkError,
-  createValidationError,
-  createAuthError,
-} from './handler';
+export { createNetworkError, createValidationError, createAuthError } from './handler';
 
 // ============================================================================
 // Reporter Integration Methods
@@ -153,17 +145,10 @@ export { ErrorFactory } from './factory';
 // Error Boundary Components
 // ============================================================================
 
-export {
-  ErrorBoundary,
-  ErrorFallback,
-  RecoveryUI,
-} from './components';
+export { ErrorBoundary, ErrorFallback, RecoveryUI } from './components';
 
 // Legacy exports for backward compatibility
-export {
-  ErrorBoundary as EnhancedErrorBoundary,
-} from './components';
-
+export { ErrorBoundary as EnhancedErrorBoundary } from './components';
 
 // ============================================================================
 // Recovery Strategies
@@ -197,7 +182,16 @@ import { useCallback } from 'react';
 
 import { coreErrorHandler } from './handler';
 import { registerDefaultRecoveryStrategies } from './recovery';
-import type { AppError, ErrorContext, ErrorDomain, ErrorSeverity, ErrorListener, ErrorStats, ErrorHandlerConfig, ErrorReporter } from './types';
+import type {
+  AppError,
+  ErrorContext,
+  ErrorDomain,
+  ErrorSeverity,
+  ErrorListener,
+  ErrorStats,
+  ErrorHandlerConfig,
+  ErrorReporter,
+} from './types';
 
 /**
  * Initialize the core error management system
@@ -257,19 +251,24 @@ export function handleError(errorData: Partial<AppError>): AppError {
 // React Hooks for Error Management
 // ============================================================================
 
-
 /**
  * Hook for error handling in React components
  */
 export function useCoreErrorHandler() {
   return {
-    handleError: useCallback((errorData: Partial<AppError>) =>
-      coreErrorHandler.handleError(errorData), []),
+    handleError: useCallback(
+      (errorData: Partial<AppError>) => coreErrorHandler.handleError(errorData),
+      []
+    ),
     getErrorStats: useCallback(() => coreErrorHandler.getErrorStats(), []),
-    addErrorListener: useCallback((listener: ErrorListener) =>
-      coreErrorHandler.addErrorListener(listener), []),
-    removeErrorListener: useCallback((listener: ErrorListener) =>
-      coreErrorHandler.removeErrorListener(listener), []),
+    addErrorListener: useCallback(
+      (listener: ErrorListener) => coreErrorHandler.addErrorListener(listener),
+      []
+    ),
+    removeErrorListener: useCallback(
+      (listener: ErrorListener) => coreErrorHandler.removeErrorListener(listener),
+      []
+    ),
   };
 }
 

@@ -28,7 +28,7 @@ export class RenderTrackingIntegration {
       renderCount: newCount,
       timestamp: Date.now(),
       trigger,
-      props: additionalData
+      props: additionalData,
     });
   }
 
@@ -44,7 +44,7 @@ export class RenderTrackingIntegration {
       component: componentName,
       action,
       timestamp: Date.now(),
-      props: additionalData
+      props: additionalData,
     });
   }
 
@@ -60,7 +60,7 @@ export class RenderTrackingIntegration {
       component: componentName,
       renderDuration,
       timestamp: Date.now(),
-      memoryUsage
+      memoryUsage,
     });
   }
 

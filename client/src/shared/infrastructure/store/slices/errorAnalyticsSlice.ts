@@ -17,7 +17,7 @@ import {
   RealTimeMetrics,
   Alert,
   CoreError as ErrorEntry,
-  errorAnalyticsBridge
+  errorAnalyticsBridge,
 } from '@/services/errorAnalyticsBridge';
 
 interface ErrorAnalyticsState {
@@ -112,7 +112,7 @@ const errorAnalyticsSlice = createSlice({
       state.filters = { ...state.filters, ...action.payload };
     },
 
-    resetFilters: (state) => {
+    resetFilters: state => {
       state.filters = initialFilters;
     },
 
@@ -134,15 +134,18 @@ const errorAnalyticsSlice = createSlice({
       state.isRealTimeEnabled = action.payload;
     },
 
-    updateConnectionStatus: (state, action: PayloadAction<ErrorAnalyticsState['connectionStatus']>) => {
+    updateConnectionStatus: (
+      state,
+      action: PayloadAction<ErrorAnalyticsState['connectionStatus']>
+    ) => {
       state.connectionStatus = action.payload;
     },
 
-    incrementReconnectAttempts: (state) => {
+    incrementReconnectAttempts: state => {
       state.reconnectAttempts += 1;
     },
 
-    resetReconnectAttempts: (state) => {
+    resetReconnectAttempts: state => {
       state.reconnectAttempts = 0;
     },
 
@@ -161,7 +164,7 @@ const errorAnalyticsSlice = createSlice({
         // Add to live stream, keeping only last 20
         state.realTimeMetrics.liveStream = [
           action.payload,
-          ...state.realTimeMetrics.liveStream.slice(0, 19)
+          ...state.realTimeMetrics.liveStream.slice(0, 19),
         ];
 
         // Update error rate (simple calculation)
@@ -174,18 +177,18 @@ const errorAnalyticsSlice = createSlice({
       if (state.realTimeMetrics) {
         state.realTimeMetrics.activeAlerts = [
           action.payload,
-          ...state.realTimeMetrics.activeAlerts.filter((alert) => alert.id !== action.payload.id)
+          ...state.realTimeMetrics.activeAlerts.filter(alert => alert.id !== action.payload.id),
         ].slice(0, 10); // Keep only last 10 alerts
       }
     },
 
     // Refresh all data
-    refreshData: (state) => {
+    refreshData: state => {
       state.lastRefresh = Date.now();
     },
 
     // Clear all data
-    clearData: (state) => {
+    clearData: state => {
       state.overviewMetrics = null;
       state.trendData = null;
       state.patterns = [];
@@ -194,10 +197,10 @@ const errorAnalyticsSlice = createSlice({
       state.lastRefresh = Date.now();
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Overview metrics
     builder
-      .addCase(fetchOverviewMetrics.pending, (state) => {
+      .addCase(fetchOverviewMetrics.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -212,7 +215,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Trend data
-      .addCase(fetchTrendData.pending, (state) => {
+      .addCase(fetchTrendData.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -227,7 +230,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Patterns
-      .addCase(fetchPatterns.pending, (state) => {
+      .addCase(fetchPatterns.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -242,7 +245,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Recovery analytics
-      .addCase(fetchRecoveryAnalytics.pending, (state) => {
+      .addCase(fetchRecoveryAnalytics.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -257,7 +260,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Real-time metrics
-      .addCase(fetchRealTimeMetrics.pending, (state) => {
+      .addCase(fetchRealTimeMetrics.pending, state => {
         state.error = null;
       })
       .addCase(fetchRealTimeMetrics.fulfilled, (state, action) => {

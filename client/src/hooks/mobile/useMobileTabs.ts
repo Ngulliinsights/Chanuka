@@ -1,18 +1,18 @@
 /**
  * useMobileTabs Hook
- * 
+ *
  * Manages mobile tab selection state.
  * Extracted from MobileTabSelector component.
- * 
+ *
  * @hook
  * @example
  * ```tsx
  * import { useMobileTabs } from '@/hooks/mobile';
  * import { MobileTabSelector } from '@client/shared/ui/mobile/data-display';
- * 
+ *
  * export function MyTabbedContent() {
  *   const { activeTab, setActiveTab } = useMobileTabs('overview');
- *   
+ *
  *   return (
  *     <MobileTabSelector
  *       tabs={tabs}
@@ -33,7 +33,7 @@ interface UseMobileTabsReturn {
 
 /**
  * Hook for managing mobile tab selection.
- * 
+ *
  * @param initialTab - Initial active tab ID
  * @returns Object with tab state and setter
  */

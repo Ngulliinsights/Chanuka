@@ -73,9 +73,7 @@ export class ShadowLedgerDashboard {
   getMetrics(timeRange?: { startDate: Date; endDate: Date }): DashboardMetrics {
     const filteredEntries = timeRange
       ? this.entries.filter(
-          e =>
-            e.timestamp >= timeRange.startDate &&
-            e.timestamp <= timeRange.endDate
+          e => e.timestamp >= timeRange.startDate && e.timestamp <= timeRange.endDate
         )
       : this.entries;
 
@@ -109,10 +107,7 @@ export class ShadowLedgerDashboard {
    * Get actor activity summary
    */
   getActorActivitySummary(): Record<string, { actions: number; success: number; failure: number }> {
-    const summary: Record<
-      string,
-      { actions: number; success: number; failure: number }
-    > = {};
+    const summary: Record<string, { actions: number; success: number; failure: number }> = {};
 
     for (const entry of this.entries) {
       if (!summary[entry.actor]) {
@@ -156,14 +151,7 @@ export class ShadowLedgerDashboard {
     const rows = [
       headers.join(','),
       ...this.entries.map(e =>
-        [
-          e.id,
-          e.timestamp.toISOString(),
-          e.actor,
-          e.action,
-          e.resource,
-          e.status,
-        ].join(',')
+        [e.id, e.timestamp.toISOString(), e.actor, e.action, e.resource, e.status].join(',')
       ),
     ];
 

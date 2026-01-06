@@ -1,6 +1,6 @@
 /**
  * Mock Users and Authentication Data
- * 
+ *
  * Comprehensive mock data for users, authentication, privacy settings,
  * and security events.
  */
@@ -36,16 +36,21 @@ const generatePrivacySettings = (): PrivacySettings => ({
     expert_insights: faker.datatype.boolean(),
     security_alerts: true, // Always true for security
     privacy_updates: true, // Always true for privacy
-  }
+  },
 });
 
 /**
  * Generate consent records for a user
  */
 const generateConsentRecords = (): ConsentRecord[] => {
-  const consentTypes: Array<'analytics' | 'marketing' | 'data_sharing' | 'cookies' | 'location'> = 
-    ['analytics', 'marketing', 'data_sharing', 'cookies', 'location'];
-  
+  const consentTypes: Array<'analytics' | 'marketing' | 'data_sharing' | 'cookies' | 'location'> = [
+    'analytics',
+    'marketing',
+    'data_sharing',
+    'cookies',
+    'location',
+  ];
+
   return consentTypes.map(type => ({
     id: generateId('consent'),
     consent_type: type,
@@ -54,7 +59,7 @@ const generateConsentRecords = (): ConsentRecord[] => {
     withdrawn_at: faker.datatype.boolean() ? generateDateInRange(30, 0) : null,
     version: '1.0',
     ip_address: faker.internet.ip(),
-    user_agent: faker.internet.userAgent()
+    user_agent: faker.internet.userAgent(),
   }));
 };
 
@@ -66,13 +71,22 @@ export const generateMockUser = (id?: string): User => {
   const lastName = faker.person.lastName();
   const username = faker.internet.username({ firstName, lastName });
   const email = faker.internet.email({ firstName, lastName });
-  
+
   const roles = ['citizen', 'expert', 'moderator', 'admin'];
   const verificationStatuses = ['unverified', 'pending', 'verified'];
   const expertiseAreas = [
-    'Constitutional Law', 'Healthcare Policy', 'Environmental Law', 'Economic Policy',
-    'Education Policy', 'Criminal Justice', 'Immigration Law', 'Technology Policy',
-    'Energy Policy', 'Civil Rights', 'Labor Law', 'Tax Policy'
+    'Constitutional Law',
+    'Healthcare Policy',
+    'Environmental Law',
+    'Economic Policy',
+    'Education Policy',
+    'Criminal Justice',
+    'Immigration Law',
+    'Technology Policy',
+    'Energy Policy',
+    'Civil Rights',
+    'Labor Law',
+    'Tax Policy',
   ];
 
   return {
@@ -99,8 +113,8 @@ export const generateMockUser = (id?: string): User => {
     data_retention_preference: {
       retention_period: faker.helpers.arrayElement(['1year', '2years', '5years', 'indefinite']),
       auto_delete_inactive: faker.datatype.boolean(),
-      export_before_delete: faker.datatype.boolean()
-    }
+      export_before_delete: faker.datatype.boolean(),
+    },
   };
 };
 
@@ -108,15 +122,30 @@ export const generateMockUser = (id?: string): User => {
  * Generate security events for a user
  */
 export const generateSecurityEvents = (userId: string, count: number = 10): SecurityEvent[] => {
-  const eventTypes: Array<'login' | 'logout' | 'password_change' | 'failed_login' | 'suspicious_activity' | 'account_locked' | 'two_factor_enabled' | 'two_factor_disabled'> = [
-    'login', 'logout', 'password_change', 'failed_login', 'suspicious_activity', 
-    'account_locked', 'two_factor_enabled', 'two_factor_disabled'
+  const eventTypes: Array<
+    | 'login'
+    | 'logout'
+    | 'password_change'
+    | 'failed_login'
+    | 'suspicious_activity'
+    | 'account_locked'
+    | 'two_factor_enabled'
+    | 'two_factor_disabled'
+  > = [
+    'login',
+    'logout',
+    'password_change',
+    'failed_login',
+    'suspicious_activity',
+    'account_locked',
+    'two_factor_enabled',
+    'two_factor_disabled',
   ];
 
   return Array.from({ length: count }, () => {
     const eventType = faker.helpers.arrayElement(eventTypes);
     const location = generateLocation();
-    
+
     return {
       id: generateId('event'),
       user_id: userId,
@@ -130,10 +159,14 @@ export const generateSecurityEvents = (userId: string, count: number = 10): Secu
         success: eventType !== 'failed_login' && eventType !== 'suspicious_activity',
         device: faker.helpers.arrayElement(['Desktop', 'Mobile', 'Tablet']),
         browser: faker.helpers.arrayElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
-        ...(eventType === 'failed_login' && { 
-          reason: faker.helpers.arrayElement(['Invalid password', 'Account locked', 'Invalid email']) 
-        })
-      }
+        ...(eventType === 'failed_login' && {
+          reason: faker.helpers.arrayElement([
+            'Invalid password',
+            'Account locked',
+            'Invalid email',
+          ]),
+        }),
+      },
     };
   });
 };
@@ -143,11 +176,11 @@ export const generateSecurityEvents = (userId: string, count: number = 10): Secu
  */
 export const generateMockUsers = (count: number = 25): User[] => {
   const users: User[] = [];
-  
+
   for (let i = 0; i < count; i++) {
     users.push(generateMockUser());
   }
-  
+
   return users;
 };
 
@@ -166,8 +199,8 @@ export const generateMockExpertUsers = (count: number = 10): User[] => {
       privacy_settings: {
         ...user.privacy_settings,
         profile_visibility: 'public',
-        analytics_consent: true
-      }
+        analytics_consent: true,
+      },
     };
   });
 };
@@ -187,8 +220,8 @@ export const generateMockModeratorUsers = (count: number = 3): User[] => {
       account_locked: false,
       privacy_settings: {
         ...user.privacy_settings,
-        profile_visibility: 'public'
-      }
+        profile_visibility: 'public',
+      },
     };
   });
 };
@@ -230,8 +263,8 @@ export const generateCurrentUser = (): User => {
         expert_insights: true,
         security_alerts: true,
         privacy_updates: true,
-      }
-    }
+      },
+    },
   };
 };
 

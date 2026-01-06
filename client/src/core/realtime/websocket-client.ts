@@ -9,7 +9,7 @@ import {
   WebSocketConfig,
   ConnectionState,
   WebSocketMessage,
-  WebSocketError
+  WebSocketError,
 } from '../../../../shared/schema/websocket';
 import { logger } from '../../utils/logger';
 
@@ -28,7 +28,10 @@ export class WebSocketClient {
   private ws: WebSocket | null = null;
   private config: WebSocketConfig; // ✅ Uses shared config type
   private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
-  private eventHandlers = new Map<keyof WebSocketClientEvents, Set<EventHandler<keyof WebSocketClientEvents>>>();
+  private eventHandlers = new Map<
+    keyof WebSocketClientEvents,
+    Set<EventHandler<keyof WebSocketClientEvents>>
+  >();
 
   // Cross-platform timer handles (browser-compatible)
   private reconnectTimerRef: number | null = null;
@@ -43,7 +46,10 @@ export class WebSocketClient {
    * Connect to the WebSocket server
    */
   public connect(): void {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
 
@@ -93,7 +99,7 @@ export class WebSocketClient {
       this.emit('connected');
     };
 
-    this.ws.onclose = (event) => {
+    this.ws.onclose = event => {
       this.connectionState = ConnectionState.DISCONNECTED;
       this.stopHeartbeat();
       this.emit('disconnected', event.code, event.reason);
@@ -104,7 +110,7 @@ export class WebSocketClient {
       }
     };
 
-    this.ws.onmessage = (event) => {
+    this.ws.onmessage = event => {
       try {
         const message = JSON.parse(event.data) as WebSocketMessage;
         this.emit('message', message);
@@ -119,21 +125,27 @@ export class WebSocketClient {
         message: 'WebSocket connection error',
         code: 0,
         wasClean: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       this.emit('error', error);
     };
   }
 
   // Event Emitter Logic
-  public on<K extends keyof WebSocketClientEvents>(event: K, handler: WebSocketClientEvents[K]): void {
+  public on<K extends keyof WebSocketClientEvents>(
+    event: K,
+    handler: WebSocketClientEvents[K]
+  ): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler as EventHandler<keyof WebSocketClientEvents>);
   }
 
-  public off<K extends keyof WebSocketClientEvents>(event: K, handler: WebSocketClientEvents[K]): void {
+  public off<K extends keyof WebSocketClientEvents>(
+    event: K,
+    handler: WebSocketClientEvents[K]
+  ): void {
     this.eventHandlers.get(event)?.delete(handler as EventHandler<keyof WebSocketClientEvents>);
   }
 
@@ -167,7 +179,7 @@ export class WebSocketClient {
         if (this.ws?.readyState === WebSocket.OPEN) {
           this.send({
             type: 'heartbeat',
-            data: { type: 'ping', timestamp: Date.now() }
+            data: { type: 'ping', timestamp: Date.now() },
           });
         }
       }, this.config.heartbeat.interval);
@@ -198,7 +210,7 @@ export class WebSocketClient {
   private handleConnectionError(error: unknown) {
     this.connectionState = ConnectionState.FAILED;
     logger.error('WebSocket connection failed', {
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 }

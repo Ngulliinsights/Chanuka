@@ -1,8 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
-
-import { languages, detectLanguage, saveLanguagePreference, getKenyanContext, type SupportedLanguage } from '../../utils/i18n';
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import React from 'react';
+
+import {
+  languages,
+  detectLanguage,
+  saveLanguagePreference,
+  getKenyanContext,
+  type SupportedLanguage,
+} from '../../utils/i18n';
 
 type Translations = typeof languages.en;
 
@@ -45,41 +59,48 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     loadTranslations();
   }, [language]);
 
-  const t = useCallback((key: string, values?: Record<string, unknown>): string => {
-    const keys = key.split('.');
+  const t = useCallback(
+    (key: string, values?: Record<string, unknown>): string => {
+      const keys = key.split('.');
 
-    let value: unknown = translations as unknown;
-    for (const k of keys) {
-      if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
-        value = (value as Record<string, unknown>)[k];
-      } else {
-        // Fallback to English if key not found
-        let fallbackValue: unknown = languages.en as unknown;
-        for (const fallbackKey of keys) {
-          if (fallbackValue && typeof fallbackValue === 'object' && Object.prototype.hasOwnProperty.call(fallbackValue, fallbackKey)) {
-            fallbackValue = (fallbackValue as Record<string, unknown>)[fallbackKey];
-          } else {
-            return key; // Return key if not found in fallback either
+      let value: unknown = translations as unknown;
+      for (const k of keys) {
+        if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
+          value = (value as Record<string, unknown>)[k];
+        } else {
+          // Fallback to English if key not found
+          let fallbackValue: unknown = languages.en as unknown;
+          for (const fallbackKey of keys) {
+            if (
+              fallbackValue &&
+              typeof fallbackValue === 'object' &&
+              Object.prototype.hasOwnProperty.call(fallbackValue, fallbackKey)
+            ) {
+              fallbackValue = (fallbackValue as Record<string, unknown>)[fallbackKey];
+            } else {
+              return key; // Return key if not found in fallback either
+            }
           }
+          value = fallbackValue;
+          break;
         }
-        value = fallbackValue;
-        break;
       }
-    }
 
-    if (typeof value !== 'string') {
-      return key;
-    }
+      if (typeof value !== 'string') {
+        return key;
+      }
 
-    // Replace parameters in translation
-    if (values) {
-      return Object.entries(values).reduce((acc, [k, v]) => {
-        return acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
-      }, value as string);
-    }
+      // Replace parameters in translation
+      if (values) {
+        return Object.entries(values).reduce((acc, [k, v]) => {
+          return acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
+        }, value as string);
+      }
 
-    return value as string;
-  }, [translations]);
+      return value as string;
+    },
+    [translations]
+  );
 
   const changeLanguage = useCallback((lang: SupportedLanguage) => {
     if (lang in languages) {
@@ -96,20 +117,19 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     return false;
   }, [language]);
 
-  const contextValue = useMemo(() => ({
-    t,
-    changeLanguage,
-    language,
-    availableLanguages,
-    kenyanContext,
-    isRTL,
-  }), [t, changeLanguage, language, availableLanguages, kenyanContext, isRTL]);
-
-  return (
-    <I18nContext.Provider value={contextValue}>
-      {children}
-    </I18nContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      t,
+      changeLanguage,
+      language,
+      availableLanguages,
+      kenyanContext,
+      isRTL,
+    }),
+    [t, changeLanguage, language, availableLanguages, kenyanContext, isRTL]
   );
+
+  return <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>;
 };
 
 export const useI18n = () => {

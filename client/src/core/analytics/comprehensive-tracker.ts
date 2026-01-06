@@ -10,14 +10,15 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { useCallback } from 'react';
 import { UserJourneyTracker, JourneyAnalytics } from '@client/services/UserJourneyTracker';
-import { PerformanceMonitor } from '@client/core/performance/monitor';
-import { ErrorAnalyticsService } from '@client/core/error/analytics';
+import { useCallback } from 'react';
+
 import { analyticsApiService } from '@client/core/api/analytics';
-import { logger } from '@client/utils/logger';
-import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
+import { ErrorAnalyticsService } from '@client/core/error/analytics';
+import { PerformanceMonitor } from '@client/core/performance/monitor';
 import type { PerformanceMetric, WebVitalsMetric } from '@client/core/performance/types';
+import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
+import { logger } from '@client/utils/logger';
 
 /**
  * Persona-specific analytics configuration
@@ -117,12 +118,15 @@ export interface AnalyticsDashboardData {
     bounceRate: number;
     conversionRate: number;
   };
-  personaBreakdown: Record<UserRole, {
-    userCount: number;
-    averageEngagement: number;
-    topPages: string[];
-    conversionRate: number;
-  }>;
+  personaBreakdown: Record<
+    UserRole,
+    {
+      userCount: number;
+      averageEngagement: number;
+      topPages: string[];
+      conversionRate: number;
+    }
+  >;
   performanceMetrics: {
     averageLoadTime: number;
     coreWebVitalsScore: number;
@@ -160,7 +164,7 @@ export class ComprehensiveAnalyticsTracker {
   private userEngagement: Map<string, UserEngagementMetrics> = new Map();
 
   private personaConfigs: Record<UserRole, PersonaAnalyticsConfig> = {
-    'public': {
+    public: {
       trackingEnabled: true,
       detailedMetrics: false,
       realTimeUpdates: false,
@@ -168,32 +172,45 @@ export class ComprehensiveAnalyticsTracker {
       performanceThresholds: {
         pageLoadTime: 3000,
         interactionDelay: 300,
-        errorRate: 0.05
-      }
+        errorRate: 0.05,
+      },
     },
-    'citizen': {
+    citizen: {
       trackingEnabled: true,
       detailedMetrics: true,
       realTimeUpdates: true,
-      customEvents: ['page_view', 'search_performed', 'bill_viewed', 'bill_analyzed', 'comment_posted'],
+      customEvents: [
+        'page_view',
+        'search_performed',
+        'bill_viewed',
+        'bill_analyzed',
+        'comment_posted',
+      ],
       performanceThresholds: {
         pageLoadTime: 2500,
         interactionDelay: 200,
-        errorRate: 0.03
-      }
+        errorRate: 0.03,
+      },
     },
-    'expert': {
+    expert: {
       trackingEnabled: true,
       detailedMetrics: true,
       realTimeUpdates: true,
-      customEvents: ['page_view', 'search_performed', 'bill_viewed', 'bill_analyzed', 'expert_verification', 'dashboard_accessed'],
+      customEvents: [
+        'page_view',
+        'search_performed',
+        'bill_viewed',
+        'bill_analyzed',
+        'expert_verification',
+        'dashboard_accessed',
+      ],
       performanceThresholds: {
         pageLoadTime: 2000,
         interactionDelay: 150,
-        errorRate: 0.02
-      }
+        errorRate: 0.02,
+      },
     },
-    'admin': {
+    admin: {
       trackingEnabled: true,
       detailedMetrics: true,
       realTimeUpdates: true,
@@ -201,9 +218,9 @@ export class ComprehensiveAnalyticsTracker {
       performanceThresholds: {
         pageLoadTime: 1500,
         interactionDelay: 100,
-        errorRate: 0.01
-      }
-    }
+        errorRate: 0.01,
+      },
+    },
   };
 
   private isEnabled: boolean = true;
@@ -260,7 +277,7 @@ export class ComprehensiveAnalyticsTracker {
   private setupErrorTracking(): void {
     this.errorAnalytics.addProvider('comprehensive-tracker', {
       name: 'Comprehensive Tracker',
-      track: async (error) => {
+      track: async error => {
         await this.trackEvent({
           type: 'error_occurred',
           data: {
@@ -268,11 +285,11 @@ export class ComprehensiveAnalyticsTracker {
             errorType: error.type,
             errorMessage: error.message,
             errorSeverity: error.severity,
-            errorContext: error.context
-          }
+            errorContext: error.context,
+          },
         });
       },
-      isEnabled: () => this.isEnabled
+      isEnabled: () => this.isEnabled,
     });
   }
 
@@ -290,8 +307,8 @@ export class ComprehensiveAnalyticsTracker {
   private trackPageLoadPerformance(): void {
     if (typeof window === 'undefined') return;
 
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    const observer = new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         if (entry.entryType === 'navigation') {
           const navEntry = entry as PerformanceNavigationTiming;
           this.recordPagePerformance(navEntry);
@@ -319,7 +336,7 @@ export class ComprehensiveAnalyticsTracker {
       timeToInteractive: navEntry.domInteractive - navEntry.fetchStart,
       resourceCount: performance.getEntriesByType('resource').length,
       errorCount: 0, // Will be updated by error tracking
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     // Add memory usage if available
@@ -347,7 +364,10 @@ export class ComprehensiveAnalyticsTracker {
   /**
    * Get latest metric value from Web Vitals
    */
-  private getLatestMetricValue(metrics: readonly WebVitalsMetric[], name: string): number | undefined {
+  private getLatestMetricValue(
+    metrics: readonly WebVitalsMetric[],
+    name: string
+  ): number | undefined {
     const metric = metrics.filter(m => m.name === name).pop();
     return metric?.value;
   }
@@ -359,13 +379,18 @@ export class ComprehensiveAnalyticsTracker {
     const currentUserRole = this.getCurrentUserRole();
     const config = this.personaConfigs[currentUserRole];
 
-    const alerts: Array<{ type: string; message: string; severity: 'low' | 'medium' | 'high' | 'critical' }> = [];
+    const alerts: Array<{
+      type: string;
+      message: string;
+      severity: 'low' | 'medium' | 'high' | 'critical';
+    }> = [];
 
     if (metrics.loadTime > config.performanceThresholds.pageLoadTime) {
       alerts.push({
         type: 'performance',
         message: `Page load time (${metrics.loadTime}ms) exceeds threshold (${config.performanceThresholds.pageLoadTime}ms) for ${currentUserRole}`,
-        severity: metrics.loadTime > config.performanceThresholds.pageLoadTime * 2 ? 'critical' : 'high'
+        severity:
+          metrics.loadTime > config.performanceThresholds.pageLoadTime * 2 ? 'critical' : 'high',
       });
     }
 
@@ -373,7 +398,7 @@ export class ComprehensiveAnalyticsTracker {
       alerts.push({
         type: 'performance',
         message: `First Input Delay (${metrics.firstInputDelay}ms) exceeds threshold (${config.performanceThresholds.interactionDelay}ms)`,
-        severity: 'medium'
+        severity: 'medium',
       });
     }
 
@@ -381,7 +406,7 @@ export class ComprehensiveAnalyticsTracker {
       alerts.push({
         type: 'performance',
         message: `Cumulative Layout Shift (${metrics.cumulativeLayoutShift}) indicates poor visual stability`,
-        severity: 'medium'
+        severity: 'medium',
       });
     }
 
@@ -393,8 +418,8 @@ export class ComprehensiveAnalyticsTracker {
           alertType: alert.type,
           message: alert.message,
           severity: alert.severity,
-          metrics: metrics
-        }
+          metrics: metrics,
+        },
       });
     });
   }
@@ -423,13 +448,13 @@ export class ComprehensiveAnalyticsTracker {
         userAgent: navigator.userAgent,
         viewport: {
           width: window.innerWidth,
-          height: window.innerHeight
+          height: window.innerHeight,
         },
         deviceType: this.getDeviceType(),
         referrer: document.referrer,
-        connectionType: this.getConnectionType()
+        connectionType: this.getConnectionType(),
       },
-      ...eventData
+      ...eventData,
     };
 
     // Check if this event type is tracked for current persona
@@ -465,8 +490,8 @@ export class ComprehensiveAnalyticsTracker {
         metricName: metric.name,
         metricValue: metric.value,
         metricRating: metric.rating,
-        metricUrl: metric.url
-      }
+        metricUrl: metric.url,
+      },
     });
   }
 
@@ -488,7 +513,7 @@ export class ComprehensiveAnalyticsTracker {
         conversions: 0,
         bounceRate: 0,
         engagementScore: 0,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
       this.userEngagement.set(key, engagement);
     }
@@ -518,7 +543,7 @@ export class ComprehensiveAnalyticsTracker {
     const weights = {
       pageViews: 0.3,
       interactions: 0.4,
-      conversions: 0.3
+      conversions: 0.3,
     };
 
     const normalizedPageViews = Math.min(engagement.pageViews / 10, 1);
@@ -526,10 +551,11 @@ export class ComprehensiveAnalyticsTracker {
     const normalizedConversions = Math.min(engagement.conversions / 5, 1);
 
     return (
-      normalizedPageViews * weights.pageViews +
-      normalizedInteractions * weights.interactions +
-      normalizedConversions * weights.conversions
-    ) * 100;
+      (normalizedPageViews * weights.pageViews +
+        normalizedInteractions * weights.interactions +
+        normalizedConversions * weights.conversions) *
+      100
+    );
   }
 
   /**
@@ -542,7 +568,11 @@ export class ComprehensiveAnalyticsTracker {
 
     // Calculate overview metrics
     const totalSessions = this.userEngagement.size;
-    const totalUsers = new Set(Array.from(this.userEngagement.values()).map(e => e.userId).filter(Boolean)).size;
+    const totalUsers = new Set(
+      Array.from(this.userEngagement.values())
+        .map(e => e.userId)
+        .filter(Boolean)
+    ).size;
     const activeUsers = this.getActiveUsersCount();
 
     const averageSessionDuration = this.calculateAverageSessionDuration();
@@ -557,7 +587,7 @@ export class ComprehensiveAnalyticsTracker {
       currentUsers: activeUsers,
       recentEvents: this.events.slice(-10),
       activePages: this.getActivePages(),
-      systemHealth: this.getSystemHealth()
+      systemHealth: this.getSystemHealth(),
     };
 
     // Get alerts
@@ -570,17 +600,17 @@ export class ComprehensiveAnalyticsTracker {
         totalSessions,
         averageSessionDuration,
         bounceRate,
-        conversionRate
+        conversionRate,
       },
       personaBreakdown,
       performanceMetrics: {
         averageLoadTime: performanceStats.averageLoadTime,
         coreWebVitalsScore: this.performanceMonitor.getOverallScore(),
         errorRate: errorStats.totalErrors / Math.max(totalSessions, 1),
-        performanceIssues: this.countPerformanceIssues()
+        performanceIssues: this.countPerformanceIssues(),
       },
       realTimeData,
-      alerts
+      alerts,
     };
   }
 
@@ -589,13 +619,16 @@ export class ComprehensiveAnalyticsTracker {
    */
   private calculatePersonaBreakdown(): Record<UserRole, any> {
     const breakdown: Record<UserRole, any> = {
-      'public': { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
-      'citizen': { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
-      'expert': { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
-      'admin': { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 }
+      public: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      citizen: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      expert: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      admin: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
     };
 
-    const personaMetrics = new Map<UserRole, { engagements: number[], pages: string[], conversions: number }>();
+    const personaMetrics = new Map<
+      UserRole,
+      { engagements: number[]; pages: string[]; conversions: number }
+    >();
 
     this.userEngagement.forEach(engagement => {
       if (!personaMetrics.has(engagement.userRole)) {
@@ -621,12 +654,12 @@ export class ComprehensiveAnalyticsTracker {
 
     personaMetrics.forEach((metrics, role) => {
       breakdown[role].userCount = metrics.engagements.length;
-      breakdown[role].averageEngagement = metrics.engagements.length > 0
-        ? metrics.engagements.reduce((a, b) => a + b, 0) / metrics.engagements.length
-        : 0;
-      breakdown[role].conversionRate = metrics.engagements.length > 0
-        ? metrics.conversions / metrics.engagements.length
-        : 0;
+      breakdown[role].averageEngagement =
+        metrics.engagements.length > 0
+          ? metrics.engagements.reduce((a, b) => a + b, 0) / metrics.engagements.length
+          : 0;
+      breakdown[role].conversionRate =
+        metrics.engagements.length > 0 ? metrics.conversions / metrics.engagements.length : 0;
 
       // Get top pages for this persona
       const pages = pagesByPersona.get(role);
@@ -670,7 +703,10 @@ export class ComprehensiveAnalyticsTracker {
    */
   private calculateConversionRate(): number {
     const totalSessions = this.userEngagement.size;
-    const conversions = Array.from(this.userEngagement.values()).reduce((sum, e) => sum + e.conversions, 0);
+    const conversions = Array.from(this.userEngagement.values()).reduce(
+      (sum, e) => sum + e.conversions,
+      0
+    );
     return totalSessions > 0 ? conversions / totalSessions : 0;
   }
 
@@ -722,9 +758,8 @@ export class ComprehensiveAnalyticsTracker {
    */
   private countPerformanceIssues(): number {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    return this.events.filter(e =>
-      e.type === 'performance_issue' && e.timestamp > oneHourAgo
-    ).length;
+    return this.events.filter(e => e.type === 'performance_issue' && e.timestamp > oneHourAgo)
+      .length;
   }
 
   /**
@@ -734,9 +769,8 @@ export class ComprehensiveAnalyticsTracker {
     const alerts: AnalyticsDashboardData['alerts'] = [];
 
     // Performance alerts
-    const performanceIssues = this.events.filter(e =>
-      e.type === 'performance_issue' &&
-      e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
+    const performanceIssues = this.events.filter(
+      e => e.type === 'performance_issue' && e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
     );
 
     performanceIssues.forEach(issue => {
@@ -746,14 +780,13 @@ export class ComprehensiveAnalyticsTracker {
         severity: (issue.data.severity as any) || 'medium',
         message: (issue.data.message as string) || 'Performance issue detected',
         timestamp: issue.timestamp,
-        acknowledged: false
+        acknowledged: false,
       });
     });
 
     // Error alerts
-    const errorEvents = this.events.filter(e =>
-      e.type === 'error_occurred' &&
-      e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
+    const errorEvents = this.events.filter(
+      e => e.type === 'error_occurred' && e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
     );
 
     errorEvents.forEach(error => {
@@ -763,7 +796,7 @@ export class ComprehensiveAnalyticsTracker {
         severity: (error.data.errorSeverity as any) || 'medium',
         message: (error.data.errorMessage as string) || 'Error occurred',
         timestamp: error.timestamp,
-        acknowledged: false
+        acknowledged: false,
       });
     });
 
@@ -779,9 +812,9 @@ export class ComprehensiveAnalyticsTracker {
       await fetch('/api/analytics/events', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(event)
+        body: JSON.stringify(event),
       });
     } catch (error) {
       logger.error('Failed to send analytics event', { error, eventId: event.id });
@@ -808,20 +841,20 @@ export class ComprehensiveAnalyticsTracker {
       const engagementToFlush = Array.from(this.userEngagement.values());
       const metricsToFlush = Array.from(this.pageMetrics.entries()).map(([pageId, metrics]) => ({
         pageId,
-        metrics: metrics.slice(-5) // Send last 5 metrics per page
+        metrics: metrics.slice(-5), // Send last 5 metrics per page
       }));
 
       await fetch('/api/analytics/batch', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           events: eventsToFlush,
           engagement: engagementToFlush,
           pageMetrics: metricsToFlush,
-          timestamp: new Date()
-        })
+          timestamp: new Date(),
+        }),
       });
 
       // Clear flushed data
@@ -830,7 +863,7 @@ export class ComprehensiveAnalyticsTracker {
       logger.info('Analytics data flushed successfully', {
         eventCount: eventsToFlush.length,
         engagementCount: engagementToFlush.length,
-        metricsCount: metricsToFlush.length
+        metricsCount: metricsToFlush.length,
       });
     } catch (error) {
       logger.error('Failed to flush analytics data', { error });
@@ -915,7 +948,7 @@ export class ComprehensiveAnalyticsTracker {
       eventCount: this.events.length,
       userEngagementCount: this.userEngagement.size,
       pageMetricsCount: this.pageMetrics.size,
-      isEnabled: this.isEnabled
+      isEnabled: this.isEnabled,
     };
   }
 
@@ -933,9 +966,9 @@ export class ComprehensiveAnalyticsTracker {
       engagement: Array.from(this.userEngagement.values()),
       pageMetrics: Array.from(this.pageMetrics.entries()).map(([pageId, metrics]) => ({
         pageId,
-        metrics: [...metrics]
+        metrics: [...metrics],
       })),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -969,9 +1002,12 @@ export class ComprehensiveAnalyticsTracker {
 export const useComprehensiveAnalytics = () => {
   const tracker = ComprehensiveAnalyticsTracker.getInstance();
 
-  const trackEvent = useCallback(async (eventData: Partial<AnalyticsEvent>) => {
-    await tracker.trackEvent(eventData);
-  }, [tracker]);
+  const trackEvent = useCallback(
+    async (eventData: Partial<AnalyticsEvent>) => {
+      await tracker.trackEvent(eventData);
+    },
+    [tracker]
+  );
 
   const getAnalyticsDashboard = useCallback(async () => {
     return await tracker.getAnalyticsDashboard();
@@ -981,13 +1017,19 @@ export const useComprehensiveAnalytics = () => {
     return tracker.getMetrics();
   }, [tracker]);
 
-  const setEnabled = useCallback((enabled: boolean) => {
-    tracker.setEnabled(enabled);
-  }, [tracker]);
+  const setEnabled = useCallback(
+    (enabled: boolean) => {
+      tracker.setEnabled(enabled);
+    },
+    [tracker]
+  );
 
-  const updatePersonaConfig = useCallback((role: UserRole, config: Partial<PersonaAnalyticsConfig>) => {
-    tracker.updatePersonaConfig(role, config);
-  }, [tracker]);
+  const updatePersonaConfig = useCallback(
+    (role: UserRole, config: Partial<PersonaAnalyticsConfig>) => {
+      tracker.updatePersonaConfig(role, config);
+    },
+    [tracker]
+  );
 
   const exportData = useCallback(() => {
     return tracker.exportData();
@@ -1005,7 +1047,7 @@ export const useComprehensiveAnalytics = () => {
     updatePersonaConfig,
     exportData,
     clearData,
-    tracker
+    tracker,
   };
 };
 

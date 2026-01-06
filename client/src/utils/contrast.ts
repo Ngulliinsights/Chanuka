@@ -15,11 +15,11 @@ export function validateThemeContrast(colors: Record<string, string>): boolean {
  */
 export function generateContrastCSS(theme: Record<string, string>): string {
   let css = ':root {\n';
-  
+
   for (const [key, value] of Object.entries(theme)) {
     css += `  --${key}: ${value};\n`;
   }
-  
+
   css += '}\n';
   return css;
 }

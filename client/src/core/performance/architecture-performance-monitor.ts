@@ -5,8 +5,8 @@
  * Tracks metrics related to route transitions, component loading, and user journeys.
  */
 
-import { logger } from '../../utils/logger';
 import { isFeatureEnabledForUser, getCurrentUserGroup } from '../../config/feature-flags';
+import { logger } from '../../utils/logger';
 
 export interface ArchitectureMetrics {
   routeTransitions: RouteTransitionMetric[];
@@ -80,10 +80,10 @@ export interface NavigationMetric {
 
 export interface PerformanceThresholds {
   routeTransition: number; // 200ms
-  componentLoad: number;   // 100ms
-  searchResponse: number;  // 500ms
-  dashboardLoad: number;   // 3000ms
-  homePageLoad: number;    // 2000ms
+  componentLoad: number; // 100ms
+  searchResponse: number; // 500ms
+  dashboardLoad: number; // 3000ms
+  homePageLoad: number; // 2000ms
 }
 
 class ArchitecturePerformanceMonitor {
@@ -108,7 +108,7 @@ class ArchitecturePerformanceMonitor {
       userJourneyMetrics: [],
       searchPerformance: [],
       dashboardMetrics: [],
-      navigationMetrics: []
+      navigationMetrics: [],
     };
 
     this.thresholds = {
@@ -116,7 +116,7 @@ class ArchitecturePerformanceMonitor {
       componentLoad: 100,
       searchResponse: 500,
       dashboardLoad: 3000,
-      homePageLoad: 2000
+      homePageLoad: 2000,
     };
 
     this.initializeMonitoring();
@@ -166,7 +166,7 @@ class ArchitecturePerformanceMonitor {
 
   private setupPerformanceObserver(): void {
     if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'measure') {
             this.processPerformanceMeasure(entry);
@@ -193,13 +193,13 @@ class ArchitecturePerformanceMonitor {
 
   private setupInteractionMonitoring(): void {
     // Monitor clicks and navigation patterns
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
       this.trackNavigation(target);
     });
 
     // Monitor keyboard shortcuts (for command palette)
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', event => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         this.trackCommandPaletteUsage();
       }
@@ -232,7 +232,7 @@ class ArchitecturePerformanceMonitor {
       duration,
       timestamp: Date.now(),
       userGroup: getCurrentUserGroup(),
-      featureFlags: this.getCurrentFeatureFlags()
+      featureFlags: this.getCurrentFeatureFlags(),
     };
 
     this.metrics.routeTransitions.push(metric);
@@ -243,7 +243,7 @@ class ArchitecturePerformanceMonitor {
         fromRoute,
         toRoute,
         duration,
-        threshold: this.thresholds.routeTransition
+        threshold: this.thresholds.routeTransition,
       });
     }
 
@@ -265,7 +265,7 @@ class ArchitecturePerformanceMonitor {
       loadTime,
       renderTime: renderTime || 0,
       timestamp: Date.now(),
-      route: window.location.pathname
+      route: window.location.pathname,
     };
 
     this.metrics.componentLoadTimes.push(metric);
@@ -275,7 +275,7 @@ class ArchitecturePerformanceMonitor {
       logger.warn('Slow component load detected', {
         componentName,
         loadTime,
-        threshold: this.thresholds.componentLoad
+        threshold: this.thresholds.componentLoad,
       });
     }
 
@@ -294,7 +294,7 @@ class ArchitecturePerformanceMonitor {
       steps: [],
       totalTime: 0,
       completionRate: 0,
-      userPersona
+      userPersona,
     };
   }
 
@@ -313,7 +313,7 @@ class ArchitecturePerformanceMonitor {
       route: window.location.pathname,
       timestamp: now,
       duration,
-      success
+      success,
     };
 
     this.currentJourney.steps.push(step);
@@ -361,7 +361,7 @@ class ArchitecturePerformanceMonitor {
       resultCount,
       searchType,
       timestamp: Date.now(),
-      userPersona
+      userPersona,
     };
 
     this.metrics.searchPerformance.push(metric);
@@ -371,7 +371,7 @@ class ArchitecturePerformanceMonitor {
       logger.warn('Slow search response detected', {
         query,
         responseTime,
-        threshold: this.thresholds.searchResponse
+        threshold: this.thresholds.searchResponse,
       });
     }
 
@@ -397,7 +397,7 @@ class ArchitecturePerformanceMonitor {
       widgetCount,
       personaDetected,
       customizationLevel,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.metrics.dashboardMetrics.push(metric);
@@ -407,7 +407,7 @@ class ArchitecturePerformanceMonitor {
       logger.warn('Slow dashboard load detected', {
         dashboardType,
         loadTime,
-        threshold: this.thresholds.dashboardLoad
+        threshold: this.thresholds.dashboardLoad,
       });
     }
 
@@ -429,9 +429,9 @@ class ArchitecturePerformanceMonitor {
     const metric: NavigationMetric = {
       navigationType,
       clicksToDestination: 1, // Would need journey tracking
-      timeToDestination: 0,   // Would need journey tracking
+      timeToDestination: 0, // Would need journey tracking
       destinationReached: true,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.metrics.navigationMetrics.push(metric);
@@ -456,7 +456,7 @@ class ArchitecturePerformanceMonitor {
       clicksToDestination: 0, // Keyboard shortcut
       timeToDestination: 0,
       destinationReached: true,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.metrics.navigationMetrics.push(metric);
@@ -471,7 +471,7 @@ class ArchitecturePerformanceMonitor {
       commandPalette: isFeatureEnabledForUser('COMMAND_PALETTE_ENABLED', userGroup),
       strategicHome: isFeatureEnabledForUser('STRATEGIC_HOME_ENABLED', userGroup),
       personaDetection: isFeatureEnabledForUser('PERSONA_DETECTION_ENABLED', userGroup),
-      routeConsolidation: isFeatureEnabledForUser('ROUTE_CONSOLIDATION_ENABLED', userGroup)
+      routeConsolidation: isFeatureEnabledForUser('ROUTE_CONSOLIDATION_ENABLED', userGroup),
     };
   }
 
@@ -496,11 +496,15 @@ class ArchitecturePerformanceMonitor {
       averageComponentLoad: this.calculateAverage(componentLoads.map(c => c.loadTime)),
       averageSearchResponse: this.calculateAverage(searches.map(s => s.responseTime)),
       averageDashboardLoad: this.calculateAverage(dashboards.map(d => d.loadTime)),
-      slowRouteTransitions: routeTransitions.filter(r => r.duration > this.thresholds.routeTransition).length,
-      slowComponentLoads: componentLoads.filter(c => c.loadTime > this.thresholds.componentLoad).length,
+      slowRouteTransitions: routeTransitions.filter(
+        r => r.duration > this.thresholds.routeTransition
+      ).length,
+      slowComponentLoads: componentLoads.filter(c => c.loadTime > this.thresholds.componentLoad)
+        .length,
       slowSearches: searches.filter(s => s.responseTime > this.thresholds.searchResponse).length,
       slowDashboards: dashboards.filter(d => d.loadTime > this.thresholds.dashboardLoad).length,
-      totalMetrics: routeTransitions.length + componentLoads.length + searches.length + dashboards.length
+      totalMetrics:
+        routeTransitions.length + componentLoads.length + searches.length + dashboards.length,
     };
   }
 
@@ -520,7 +524,7 @@ class ArchitecturePerformanceMonitor {
       userGroup: getCurrentUserGroup(),
       featureFlags: this.getCurrentFeatureFlags(),
       metrics: this.metrics,
-      summary: this.getPerformanceSummary()
+      summary: this.getPerformanceSummary(),
     };
 
     // Send to analytics service
@@ -531,7 +535,7 @@ class ArchitecturePerformanceMonitor {
         method: 'POST',
         body: JSON.stringify(metricsPayload),
         headers: { 'Content-Type': 'application/json' },
-        keepalive: true
+        keepalive: true,
       }).catch(error => {
         logger.warn('Failed to send architecture metrics', { error });
       });
@@ -554,7 +558,11 @@ class ArchitecturePerformanceMonitor {
     if (startTime) {
       const loadTime = performance.now() - startTime;
       performance.mark(`component-${componentName}-end`);
-      performance.measure(`component-${componentName}`, `component-${componentName}-start`, `component-${componentName}-end`);
+      performance.measure(
+        `component-${componentName}`,
+        `component-${componentName}-start`,
+        `component-${componentName}-end`
+      );
 
       this.recordComponentLoad(componentName, loadTime);
       this.componentLoadTimes.delete(componentName);
@@ -572,7 +580,7 @@ class ArchitecturePerformanceMonitor {
       userJourneyMetrics: [],
       searchPerformance: [],
       dashboardMetrics: [],
-      navigationMetrics: []
+      navigationMetrics: [],
     };
 
     this.componentLoadTimes.clear();

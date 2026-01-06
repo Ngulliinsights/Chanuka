@@ -3,12 +3,8 @@ import React, { useState } from 'react';
 
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+
 import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
 
 import { CivicActionToolbox } from './CivicActionToolbox';

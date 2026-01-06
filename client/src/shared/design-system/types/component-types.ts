@@ -14,13 +14,7 @@ export type ButtonVariant =
   | 'outline'
   | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
-export type ButtonState =
-  | 'default'
-  | 'hover'
-  | 'active'
-  | 'disabled'
-  | 'focus'
-  | 'loading';
+export type ButtonState = 'default' | 'hover' | 'active' | 'disabled' | 'focus' | 'loading';
 
 export interface ButtonConfig {
   variant: ButtonVariant;
@@ -41,13 +35,7 @@ export interface CardConfig {
 
 // Valid input variants
 export type InputVariant = 'default' | 'filled' | 'outlined';
-export type InputState =
-  | 'default'
-  | 'hover'
-  | 'focus'
-  | 'error'
-  | 'success'
-  | 'disabled';
+export type InputState = 'default' | 'hover' | 'focus' | 'error' | 'success' | 'disabled';
 
 export interface InputConfig {
   variant?: InputVariant;

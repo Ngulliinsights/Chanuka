@@ -4,8 +4,8 @@
  * Tests for navigation performance optimizations
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { NavigationPerformance } from './NavigationPerformance';
@@ -15,64 +15,62 @@ vi.mock('../../utils/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
-    error: vi.fn()
-  }
+    error: vi.fn(),
+  },
 }));
 
 // Mock dynamic imports
 vi.mock('../../pages/StrategicHomePage', () => ({
-  default: () => <div>Home Page</div>
+  default: () => <div>Home Page</div>,
 }));
 
 vi.mock('../../pages/bills/bills-dashboard-page', () => ({
-  default: () => <div>Bills Dashboard</div>
+  default: () => <div>Bills Dashboard</div>,
 }));
 
 vi.mock('../../pages/UniversalSearchPage', () => ({
-  default: () => <div>Search Page</div>
+  default: () => <div>Search Page</div>,
 }));
 
 // Mock browser APIs
 const mockIntersectionObserver = vi.fn(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
-  disconnect: vi.fn()
+  disconnect: vi.fn(),
 }));
 
 const mockPerformanceObserver = vi.fn(() => ({
   observe: vi.fn(),
-  disconnect: vi.fn()
+  disconnect: vi.fn(),
 }));
 
 const mockMutationObserver = vi.fn(() => ({
   observe: vi.fn(),
-  disconnect: vi.fn()
+  disconnect: vi.fn(),
 }));
 
 Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,
-  value: mockIntersectionObserver
+  value: mockIntersectionObserver,
 });
 
 Object.defineProperty(window, 'PerformanceObserver', {
   writable: true,
-  value: mockPerformanceObserver
+  value: mockPerformanceObserver,
 });
 
 Object.defineProperty(window, 'MutationObserver', {
   writable: true,
-  value: mockMutationObserver
+  value: mockMutationObserver,
 });
 
 const TestWrapper: React.FC<{ children: React.ReactNode; route?: string }> = ({
   children,
-  route = '/'
+  route = '/',
 }) => {
   return (
     <MemoryRouter initialEntries={[route]}>
-      <NavigationPerformance>
-        {children}
-      </NavigationPerformance>
+      <NavigationPerformance>{children}</NavigationPerformance>
     </MemoryRouter>
   );
 };
@@ -169,10 +167,9 @@ describe('NavigationPerformance', () => {
       );
 
       // Verify that IntersectionObserver was set up
-      expect(mockIntersectionObserver).toHaveBeenCalledWith(
-        expect.any(Function),
-        { rootMargin: '50px' }
-      );
+      expect(mockIntersectionObserver).toHaveBeenCalledWith(expect.any(Function), {
+        rootMargin: '50px',
+      });
     });
 
     it('should handle DOM mutations for new links', () => {
@@ -227,11 +224,11 @@ describe('NavigationPerformance', () => {
         entryType: 'navigation',
         navigationStart: 0,
         loadEventEnd: 1000,
-        transferSize: 0
+        transferSize: 0,
       };
 
       const mockList = {
-        getEntries: () => [mockEntry]
+        getEntries: () => [mockEntry],
       };
 
       // Simulate performance entry
@@ -275,7 +272,7 @@ describe('NavigationPerformance', () => {
       mockIntersectionObserver.mockReturnValueOnce({
         observe: vi.fn(),
         unobserve: vi.fn(),
-        disconnect: mockDisconnect
+        disconnect: mockDisconnect,
       });
 
       const { unmount } = render(

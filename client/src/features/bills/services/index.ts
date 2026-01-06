@@ -1,6 +1,6 @@
 /**
  * Bills Feature Services
- * 
+ *
  * Re-export from consolidated services file
  */
 

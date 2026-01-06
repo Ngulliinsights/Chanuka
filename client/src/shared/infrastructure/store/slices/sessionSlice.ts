@@ -135,7 +135,7 @@ const setSecureCookie = (name: string, value: string, maxAge: number): void => {
     'Path=/',
     'Secure',
     'SameSite=Strict', // Added for CSRF protection
-    `Max-Age=${maxAge}`
+    `Max-Age=${maxAge}`,
   ].join('; ');
 
   document.cookie = cookieString;
@@ -282,13 +282,15 @@ export const createSession = createAsyncThunk(
 
       // Update Redux state
       dispatch(setSessionData(sessionData));
-      dispatch(recordActivity({
-        type: 'api',
-        details: {
-          action: 'session_start',
-          userId: sessionData.userId
-        }
-      }));
+      dispatch(
+        recordActivity({
+          type: 'api',
+          details: {
+            action: 'session_start',
+            userId: sessionData.userId,
+          },
+        })
+      );
 
       logger.info('Session created successfully', {
         component: 'SessionSlice',
@@ -340,7 +342,7 @@ export const validateSession = createAsyncThunk(
       // Update activity timestamp
       const updatedSessionData = {
         ...sessionData,
-        lastActivity: now.toISOString()
+        lastActivity: now.toISOString(),
       };
 
       storeSessionData(updatedSessionData);
@@ -426,7 +428,7 @@ export const checkConcurrentSessions = createAsyncThunk(
           type: 'concurrent_session',
           message: `You have ${otherSessions.length} other active session(s). If this wasn't you, please secure your account.`,
           severity: otherSessions.length > 2 ? 'high' : 'medium',
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
         dispatch(addWarning(warning));
         logger.warn('Concurrent sessions detected', { count: otherSessions.length });
@@ -439,7 +441,8 @@ export const checkConcurrentSessions = createAsyncThunk(
         return rejectWithValue('Request cancelled');
       }
 
-      const message = error instanceof Error ? error.message : 'Failed to check concurrent sessions';
+      const message =
+        error instanceof Error ? error.message : 'Failed to check concurrent sessions';
       logger.error('Failed to check concurrent sessions', { error });
       return rejectWithValue(message);
     }
@@ -506,21 +509,21 @@ const sessionSlice = createSlice({
     /**
      * Updates the last activity timestamp
      */
-    updateLastActivity: (state) => {
+    updateLastActivity: state => {
       state.lastActivity = Date.now();
     },
 
     /**
      * Clears any session error
      */
-    clearSessionError: (state) => {
+    clearSessionError: state => {
       state.error = null;
     },
 
     /**
      * Resets the entire session state to initial values
      */
-    resetSessionState: (state) => {
+    resetSessionState: state => {
       // Preserve config but reset everything else
       const config = state.config;
       Object.assign(state, initialState, { config });
@@ -529,10 +532,13 @@ const sessionSlice = createSlice({
     /**
      * Records user activity with timestamp and details
      */
-    recordActivity: (state, action: PayloadAction<{
-      type: ActivityType;
-      details?: Record<string, unknown>
-    }>) => {
+    recordActivity: (
+      state,
+      action: PayloadAction<{
+        type: ActivityType;
+        details?: Record<string, unknown>;
+      }>
+    ) => {
       const now = Date.now();
       state.lastActivity = now;
 
@@ -540,7 +546,7 @@ const sessionSlice = createSlice({
         const activity: SessionActivity = {
           timestamp: now,
           type: action.payload.type,
-          details: action.payload.details
+          details: action.payload.details,
         };
 
         state.activityLog.push(activity);
@@ -553,7 +559,7 @@ const sessionSlice = createSlice({
         logger.debug('Activity recorded', {
           component: 'SessionSlice',
           type: action.payload.type,
-          totalActivities: state.activityLog.length
+          totalActivities: state.activityLog.length,
         });
       }
     },
@@ -565,7 +571,7 @@ const sessionSlice = createSlice({
       state.config = { ...state.config, ...action.payload };
       logger.info('Session config updated', {
         component: 'SessionSlice',
-        config: state.config
+        config: state.config,
       });
     },
 
@@ -584,7 +590,7 @@ const sessionSlice = createSlice({
     /**
      * Clears all warnings
      */
-    clearWarnings: (state) => {
+    clearWarnings: state => {
       state.warnings = [];
     },
 
@@ -595,10 +601,10 @@ const sessionSlice = createSlice({
       state.warnings = state.warnings.filter(w => w.timestamp !== action.payload);
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Fetch active sessions
-      .addCase(fetchActiveSessions.pending, (state) => {
+      .addCase(fetchActiveSessions.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -612,7 +618,7 @@ const sessionSlice = createSlice({
       })
 
       // Terminate session
-      .addCase(terminateSession.pending, (state) => {
+      .addCase(terminateSession.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -628,11 +634,11 @@ const sessionSlice = createSlice({
       })
 
       // Terminate all sessions
-      .addCase(terminateAllSessions.pending, (state) => {
+      .addCase(terminateAllSessions.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(terminateAllSessions.fulfilled, (state) => {
+      .addCase(terminateAllSessions.fulfilled, state => {
         state.activeSessions = [];
         state.isLoading = false;
       })
@@ -664,7 +670,7 @@ export const {
   updateSessionConfig,
   addWarning,
   clearWarnings,
-  removeWarning
+  removeWarning,
 } = sessionSlice.actions;
 
 // ============================================================================
@@ -677,85 +683,72 @@ const selectSessionState = (state: { session: SessionState }) => state.session;
 // Basic selectors with memoization
 export const selectCurrentSession = createSelector(
   [selectSessionState],
-  (session) => session.currentSession
+  session => session.currentSession
 );
 
 export const selectActiveSessions = createSelector(
   [selectSessionState],
-  (session) => session.activeSessions
+  session => session.activeSessions
 );
 
 export const selectSessionData = createSelector(
   [selectSessionState],
-  (session) => session.sessionData
+  session => session.sessionData
 );
 
 export const selectSessionIsActive = createSelector(
   [selectSessionState],
-  (session) => session.isActive
+  session => session.isActive
 );
 
-export const selectSessionId = createSelector(
-  [selectSessionState],
-  (session) => session.sessionId
-);
+export const selectSessionId = createSelector([selectSessionState], session => session.sessionId);
 
 export const selectSessionLastActivity = createSelector(
   [selectSessionState],
-  (session) => session.lastActivity
+  session => session.lastActivity
 );
 
-export const selectSessionConfig = createSelector(
-  [selectSessionState],
-  (session) => session.config
-);
+export const selectSessionConfig = createSelector([selectSessionState], session => session.config);
 
 export const selectActivityLog = createSelector(
   [selectSessionState],
-  (session) => session.activityLog
+  session => session.activityLog
 );
 
 export const selectSessionWarnings = createSelector(
   [selectSessionState],
-  (session) => session.warnings
+  session => session.warnings
 );
 
 export const selectSessionIsLoading = createSelector(
   [selectSessionState],
-  (session) => session.isLoading
+  session => session.isLoading
 );
 
-export const selectSessionError = createSelector(
-  [selectSessionState],
-  (session) => session.error
-);
+export const selectSessionError = createSelector([selectSessionState], session => session.error);
 
 // Computed selectors
-export const selectSessionInfo = createSelector(
-  [selectSessionState],
-  (session) => {
-    const now = Date.now();
-    const idleTime = now - session.lastActivity;
-    const timeUntilExpiry = Math.max(0, session.config.maxIdleTime - idleTime);
+export const selectSessionInfo = createSelector([selectSessionState], session => {
+  const now = Date.now();
+  const idleTime = now - session.lastActivity;
+  const timeUntilExpiry = Math.max(0, session.config.maxIdleTime - idleTime);
 
-    return {
-      sessionId: session.sessionId,
-      isActive: session.isActive,
-      lastActivity: session.lastActivity,
-      idleTime,
-      timeUntilExpiry,
-      isExpiringSoon: timeUntilExpiry <= session.config.warningTime
-    };
-  }
-);
+  return {
+    sessionId: session.sessionId,
+    isActive: session.isActive,
+    lastActivity: session.lastActivity,
+    idleTime,
+    timeUntilExpiry,
+    isExpiringSoon: timeUntilExpiry <= session.config.warningTime,
+  };
+});
 
 /**
  * Creates a selector for activity summary over a given time window
  */
-export const selectActivitySummary = (minutes: number = 10) => createSelector(
-  [selectSessionState],
-  (session) => {
-    const cutoff = Date.now() - (minutes * 60 * 1000);
+export const selectActivitySummary = (minutes: number = 10) =>
+  createSelector([selectSessionState], session => {
+    const cutoff = Date.now() - minutes * 60 * 1000;
     const recentActivities = session.activityLog.filter(a => a.timestamp > cutoff);
 
     const activityTypes = recentActivities.reduce<Record<string, number>>((acc, activity) => {
@@ -767,27 +760,20 @@ export const selectActivitySummary = (minutes: number = 10) => createSelector(
       totalActivities: recentActivities.length,
       activityTypes,
       lastActivity: session.lastActivity,
-      timeWindow: minutes
+      timeWindow: minutes,
     };
-  }
-);
+  });
 
-export const selectIsSessionActive = createSelector(
-  [selectSessionState],
-  (session) => {
-    if (!session.isActive) return false;
-    const idleTime = Date.now() - session.lastActivity;
-    return idleTime < session.config.maxIdleTime;
-  }
-);
+export const selectIsSessionActive = createSelector([selectSessionState], session => {
+  if (!session.isActive) return false;
+  const idleTime = Date.now() - session.lastActivity;
+  return idleTime < session.config.maxIdleTime;
+});
 
-export const selectTimeUntilExpiry = createSelector(
-  [selectSessionState],
-  (session) => {
-    const idleTime = Date.now() - session.lastActivity;
-    return Math.max(0, session.config.maxIdleTime - idleTime);
-  }
-);
+export const selectTimeUntilExpiry = createSelector([selectSessionState], session => {
+  const idleTime = Date.now() - session.lastActivity;
+  return Math.max(0, session.config.maxIdleTime - idleTime);
+});
 
 export const selectSessionStatus = createSelector(
   [selectSessionIsActive, selectSessionIsLoading, selectSessionWarnings],
@@ -796,47 +782,40 @@ export const selectSessionStatus = createSelector(
     isLoading,
     hasWarnings: warnings.length > 0,
     warningCount: warnings.length,
-    criticalWarnings: warnings.filter(w => w.severity === 'critical').length
+    criticalWarnings: warnings.filter(w => w.severity === 'critical').length,
   })
 );
 
-export const selectRecentActivity = createSelector(
-  [selectActivityLog],
-  (activityLog) => activityLog.slice(-10)
+export const selectRecentActivity = createSelector([selectActivityLog], activityLog =>
+  activityLog.slice(-10)
 );
 
 /**
  * Selects warnings sorted by severity and timestamp
  */
-export const selectSortedWarnings = createSelector(
-  [selectSessionWarnings],
-  (warnings) => {
-    const severityOrder: Record<WarningSeverity, number> = {
-      critical: 0,
-      high: 1,
-      medium: 2,
-      low: 3
-    };
+export const selectSortedWarnings = createSelector([selectSessionWarnings], warnings => {
+  const severityOrder: Record<WarningSeverity, number> = {
+    critical: 0,
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
 
-    return [...warnings].sort((a, b) => {
-      const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
-      if (severityDiff !== 0) return severityDiff;
-      return b.timestamp - a.timestamp; // Most recent first
-    });
-  }
-);
+  return [...warnings].sort((a, b) => {
+    const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
+    if (severityDiff !== 0) return severityDiff;
+    return b.timestamp - a.timestamp; // Most recent first
+  });
+});
 
 /**
  * Checks if session should show idle warning
  */
-export const selectShouldShowIdleWarning = createSelector(
-  [selectSessionState],
-  (session) => {
-    if (!session.isActive) return false;
-    const idleTime = Date.now() - session.lastActivity;
-    const timeUntilExpiry = session.config.maxIdleTime - idleTime;
-    return timeUntilExpiry > 0 && timeUntilExpiry <= session.config.warningTime;
-  }
-);
+export const selectShouldShowIdleWarning = createSelector([selectSessionState], session => {
+  if (!session.isActive) return false;
+  const idleTime = Date.now() - session.lastActivity;
+  const timeUntilExpiry = session.config.maxIdleTime - idleTime;
+  return timeUntilExpiry > 0 && timeUntilExpiry <= session.config.warningTime;
+});
 
 export default sessionSlice.reducer;

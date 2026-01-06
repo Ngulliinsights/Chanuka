@@ -7,6 +7,7 @@
  */
 
 import { Result, err } from '../primitives/types/result';
+
 import { CorrelationContext } from './interfaces';
 
 /**

@@ -4,9 +4,16 @@
  * Displays platform impact metrics with animations and trends
  */
 
-import React from 'react';
 import { TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import React from 'react';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 
 interface StatItem {
   label: string;
@@ -36,12 +43,17 @@ const PlatformStats: React.FC<PlatformStatsProps> = ({ stats }) => {
             return (
               <div key={stat.label} className="text-center group">
                 <div className="relative mb-4">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${
-                    index === 0 ? 'from-blue-500 to-blue-600' :
-                    index === 1 ? 'from-green-500 to-green-600' :
-                    index === 2 ? 'from-orange-500 to-orange-600' :
-                    'from-purple-500 to-purple-600'
-                  } shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${
+                      index === 0
+                        ? 'from-blue-500 to-blue-600'
+                        : index === 1
+                          ? 'from-green-500 to-green-600'
+                          : index === 2
+                            ? 'from-orange-500 to-orange-600'
+                            : 'from-purple-500 to-purple-600'
+                    } shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
                     <Icon className="w-8 h-8 text-white" />
                   </div>
                   <div className="absolute -top-2 -right-2">

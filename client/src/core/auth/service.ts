@@ -1,10 +1,13 @@
 /**
  * Auth Service - Core Business Logic
- * 
+ *
  * Migrated from client/src/services/auth-service.ts
- * Comprehensive authentication service with security monitoring, 
+ * Comprehensive authentication service with security monitoring,
  * session management, and business logic orchestration.
  */
+
+import { rbacManager } from '@client/utils/rbac';
+import { securityMonitor, validatePassword } from '@client/utils/security';
 
 import { authApiService } from '@client/core/api/auth';
 import type { AuthUser } from '@client/core/api/auth';
@@ -13,8 +16,6 @@ import type { AuthTokens as JWTTokens, SessionInfo } from '@client/core/auth';
 import { getStore } from '@client/shared/infrastructure/store';
 import { setCurrentSession } from '@client/shared/infrastructure/store/slices/sessionSlice';
 import { logger } from '@client/utils/logger';
-import { rbacManager } from '@client/utils/rbac';
-import { securityMonitor, validatePassword } from '@client/utils/security';
 
 import type { AuthResponse, RegisterData, User } from './types';
 
@@ -71,25 +72,30 @@ export class AuthService {
   private currentUser: User | null = null;
   private tokenRefreshTimer: NodeJS.Timeout | null = null;
 
-  constructor(config: AuthServiceConfig = {
-    tokenRefresh: {
-      bufferMinutes: 5,
-      maxRetries: 3
+  constructor(
+    config: AuthServiceConfig = {
+      tokenRefresh: {
+        bufferMinutes: 5,
+        maxRetries: 3,
+      },
     }
-  }) {
+  ) {
     this.config = config;
   }
 
   /**
    * Authenticates a user with email/password credentials
    */
-  async login(credentials: ExtendedLoginCredentials): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
+  async login(
+    credentials: ExtendedLoginCredentials
+  ): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
     const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
     const currentIP = '0.0.0.0'; // In production, obtain from request headers
 
     // Check if account should be locked due to failed attempts
     if (securityMonitor.shouldLockAccount(currentIP)) {
-      const errorMsg = 'Account temporarily locked due to multiple failed attempts. Please try again later.';
+      const errorMsg =
+        'Account temporarily locked due to multiple failed attempts. Please try again later.';
       return { success: false, error: errorMsg };
     }
 
@@ -136,7 +142,9 @@ export class AuthService {
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
       const expiresAt = new Date(Date.now() + session.tokens.expiresIn * 1000);
-      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime());
+      this.scheduleTokenRefresh(
+        session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime()
+      );
 
       const sessionExpiry = session.expiresAt
         ? new Date(session.expiresAt).toISOString()
@@ -158,15 +166,15 @@ export class AuthService {
         deviceInfo: {
           userAgent: navigator.userAgent,
           platform: navigator.platform,
-          language: navigator.language
+          language: navigator.language,
         },
         metadata: {
           ipAddress: currentIP,
           deviceInfo: navigator.userAgent,
-          current: true
-        }
+          current: true,
+        },
       };
-      
+
       getStore().dispatch(setCurrentSession(sessionInfo));
       rbacManager.clearUserCache(session.user.id);
 
@@ -190,7 +198,9 @@ export class AuthService {
   /**
    * Registers a new user with comprehensive password validation
    */
-  async register(data: RegisterData): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
+  async register(
+    data: RegisterData
+  ): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
     try {
       // Validate password strength
       const passwordValidation = validatePassword(data.password);
@@ -237,7 +247,9 @@ export class AuthService {
       const user = convertAuthUserToUser(session.user);
       this.currentUser = user;
       const expiresAt = new Date(Date.now() + session.tokens.expiresIn * 1000);
-      this.scheduleTokenRefresh(session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime());
+      this.scheduleTokenRefresh(
+        session.expiresAt ? new Date(session.expiresAt).getTime() : expiresAt.getTime()
+      );
 
       const sessionExpiry = session.expiresAt
         ? new Date(session.expiresAt).toISOString()
@@ -259,13 +271,13 @@ export class AuthService {
         deviceInfo: {
           userAgent: navigator.userAgent,
           platform: navigator.platform,
-          language: navigator.language
+          language: navigator.language,
         },
         metadata: {
           deviceInfo: navigator.userAgent,
           ipAddress: '0.0.0.0', // Would be provided by server in production
-          current: true
-        }
+          current: true,
+        },
       };
       getStore().dispatch(setCurrentSession(sessionInfo));
 
@@ -294,10 +306,12 @@ export class AuthService {
         securityMonitor.logSecurityEvent(securityEvent);
 
         // Clear session from store
-        const { resetSessionState } = await import('@client/shared/infrastructure/store/slices/sessionSlice');
+        const { resetSessionState } = await import(
+          '@client/shared/infrastructure/store/slices/sessionSlice'
+        );
         getStore().dispatch(resetSessionState());
         rbacManager.clearUserCache(user.id);
-        
+
         // Call API logout endpoint
         await authApiService.logout();
       }
@@ -314,7 +328,9 @@ export class AuthService {
   /**
    * Manually refreshes authentication tokens
    */
-  async refreshTokens(): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
+  async refreshTokens(): Promise<
+    AuthResponse & { user?: User; sessionExpiry?: string | undefined }
+  > {
     try {
       // Request new tokens from API
       const tokens = await authApiService.refreshTokens();
@@ -338,15 +354,15 @@ export class AuthService {
 
       const sessionExpiry = expiresAt.toISOString();
 
-      return { 
-        success: true, 
-        data: { user: convertedUser, tokens: jwtTokens }, 
-        user: convertedUser, 
-        sessionExpiry 
+      return {
+        success: true,
+        data: { user: convertedUser, tokens: jwtTokens },
+        user: convertedUser,
+        sessionExpiry,
       };
     } catch (error) {
       logger.error('Token refresh failed:', { component: 'AuthService' }, error);
-      
+
       // Clean up on refresh failure
       this.clearTokenRefreshTimer();
       this.currentUser = null;
@@ -388,7 +404,7 @@ export class AuthService {
    */
   private scheduleTokenRefresh(expiresAt: number): void {
     this.clearTokenRefreshTimer();
-    
+
     // Calculate when to refresh (buffer time before actual expiration)
     const bufferMs = this.config.tokenRefresh.bufferMinutes * 60 * 1000;
     const refreshAt = expiresAt - bufferMs;

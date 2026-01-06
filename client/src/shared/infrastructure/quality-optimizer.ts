@@ -1,7 +1,7 @@
 /**
  * QUALITY & PERFORMANCE OPTIMIZER
  * PERSONA 4 - The Strategist (Purpose, Vision & Sustainability)
- * 
+ *
  * Provides strategic guidance on:
  * - Code quality metrics
  * - Performance optimization opportunities
@@ -44,7 +44,7 @@ export interface QualityStandards {
     target: number;
     unit: '%';
   };
-  
+
   // Performance
   firstContentfulPaint: {
     target: number;
@@ -58,11 +58,11 @@ export interface QualityStandards {
     target: number;
     unit: '';
   };
-  
+
   // Accessibility
   wcagLevel: 'A' | 'AA' | 'AAA';
   colorContrastRatio: number;
-  
+
   // Maintainability
   maxCyclomaticComplexity: number;
   maxLinesPerFunction: number;
@@ -83,7 +83,7 @@ export class QualityOptimizer {
     colorContrastRatio: 4.5,
     maxCyclomaticComplexity: 10,
     maxLinesPerFunction: 50,
-    docstringCoverage: 70
+    docstringCoverage: 70,
   };
 
   /**
@@ -99,7 +99,7 @@ export class QualityOptimizer {
         impact: 'high',
         effort: 'medium',
         estimatedImprovement: '30-40% initial bundle reduction',
-        implementation: 'Use dynamic imports and React.lazy for feature routes'
+        implementation: 'Use dynamic imports and React.lazy for feature routes',
       },
       {
         priority: 'high',
@@ -109,7 +109,7 @@ export class QualityOptimizer {
         impact: 'high',
         effort: 'medium',
         estimatedImprovement: '15-20% design system size reduction',
-        implementation: 'Implement theme CSS variables dynamically'
+        implementation: 'Implement theme CSS variables dynamically',
       },
       {
         priority: 'high',
@@ -119,7 +119,7 @@ export class QualityOptimizer {
         impact: 'high',
         effort: 'high',
         estimatedImprovement: 'Reduced regression bugs by 40%',
-        implementation: 'Focus on error, performance, and api modules'
+        implementation: 'Focus on error, performance, and api modules',
       },
       {
         priority: 'high',
@@ -129,7 +129,7 @@ export class QualityOptimizer {
         impact: 'high',
         effort: 'high',
         estimatedImprovement: 'Reach 100% accessibility score',
-        implementation: 'Review color contrast, keyboard navigation, ARIA labels'
+        implementation: 'Review color contrast, keyboard navigation, ARIA labels',
       },
       {
         priority: 'medium',
@@ -139,7 +139,7 @@ export class QualityOptimizer {
         impact: 'medium',
         effort: 'medium',
         estimatedImprovement: 'Improve maintainability score by 20%',
-        implementation: 'Extract complex logic into smaller functions'
+        implementation: 'Extract complex logic into smaller functions',
       },
       {
         priority: 'medium',
@@ -149,7 +149,7 @@ export class QualityOptimizer {
         impact: 'medium',
         effort: 'low',
         estimatedImprovement: 'Reduce onboarding time by 30%',
-        implementation: 'Use TSDoc comments with usage examples'
+        implementation: 'Use TSDoc comments with usage examples',
       },
       {
         priority: 'medium',
@@ -159,7 +159,7 @@ export class QualityOptimizer {
         impact: 'medium',
         effort: 'medium',
         estimatedImprovement: '5-10% performance improvement',
-        implementation: 'Use RequestIdleCallback for non-critical monitoring'
+        implementation: 'Use RequestIdleCallback for non-critical monitoring',
       },
       {
         priority: 'low',
@@ -169,8 +169,8 @@ export class QualityOptimizer {
         impact: 'medium',
         effort: 'low',
         estimatedImprovement: 'Reduce bugs by 15%',
-        implementation: 'Document error handling patterns in core/error module'
-      }
+        implementation: 'Document error handling patterns in core/error module',
+      },
     ];
   }
 
@@ -191,29 +191,29 @@ export class QualityOptimizer {
         'Implement proper error boundaries and recovery',
         'Export consistent interfaces from each module',
         'Use strict typing (non-null assertions)',
-        'Document public APIs with examples'
+        'Document public APIs with examples',
       ],
       features: [
         'Follow Feature-Sliced Design (FSD) structure',
         'Keep features self-contained with model/ui/api layers',
         'Use hooks for all component logic',
         'Implement lazy loading at feature boundaries',
-        'Document feature dependencies'
+        'Document feature dependencies',
       ],
       shared: [
         'Design tokens should be immutable',
         'Components should be framework-agnostic where possible',
         'Accessibility is non-negotiable',
         'Document component variants with Storybook',
-        'Use semantic HTML'
+        'Use semantic HTML',
       ],
       performance: [
         'Monitor Web Vitals in all environments',
         'Use performance budgets for all resources',
         'Implement resource hints (preload, prefetch)',
         'Optimize images with modern formats',
-        'Use compression for text assets'
-      ]
+        'Use compression for text assets',
+      ],
     };
   }
 
@@ -247,7 +247,7 @@ export class QualityOptimizer {
       '  • Performance Score: 90+',
       '  • Initial Bundle: < 200kb (gzip)',
       '',
-      '═══════════════════════════════════════════════════════════'
+      '═══════════════════════════════════════════════════════════',
     ];
 
     return lines.join('\n');

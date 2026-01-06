@@ -11,6 +11,7 @@ All WebSocket and real-time functionality has been consolidated into a single mo
 ### 1. Identify Files to Replace
 
 Look for files containing WebSocket or real-time logic in these locations:
+
 - `src/hooks/use-websocket.ts`
 - `src/hooks/use-realtime-engagement.ts`
 - `src/services/webSocketService.ts`
@@ -72,7 +73,7 @@ Replace any custom WebSocket configuration:
 // ❌ Old way
 const wsConfig = {
   url: 'ws://localhost:3001',
-  reconnect: true
+  reconnect: true,
 };
 
 // ✅ New way
@@ -121,12 +122,12 @@ import React, { useEffect } from 'react';
 import { useBillTracking, useCommunityRealTime } from '@client/core/realtime';
 
 function BillTracker({ billId }) {
-  const { 
-    isConnected, 
-    subscribeToBill, 
+  const {
+    isConnected,
+    subscribeToBill,
     unsubscribeFromBill,
-    getBillUpdates, 
-    getEngagementMetrics 
+    getBillUpdates,
+    getEngagementMetrics
   } = useBillTracking();
 
   const { typingIndicators, sendTypingIndicator } = useCommunityRealTime();
@@ -175,16 +176,16 @@ function BillTracker({ billId }) {
 ```typescript
 // ❌ Old mock
 jest.mock('../hooks/use-websocket', () => ({
-  useWebSocket: jest.fn(() => ({ isConnected: true }))
+  useWebSocket: jest.fn(() => ({ isConnected: true })),
 }));
 
 // ✅ New mock
 jest.mock('@client/core/realtime', () => ({
-  useBillTracking: jest.fn(() => ({ 
+  useBillTracking: jest.fn(() => ({
     isConnected: true,
     subscribeToBill: jest.fn(),
-    getBillUpdates: jest.fn(() => [])
-  }))
+    getBillUpdates: jest.fn(() => []),
+  })),
 }));
 ```
 
@@ -250,6 +251,7 @@ If migration fails:
 ## Support
 
 For migration assistance:
+
 1. Review the consolidated module's README
 2. Check existing GitHub issues
 3. Consult the development team

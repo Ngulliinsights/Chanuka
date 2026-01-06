@@ -15,11 +15,16 @@ export type {
   AnalyticsEventType,
   AnalyticsDashboardData,
   PagePerformanceMetrics,
-  UserEngagementMetrics
+  UserEngagementMetrics,
 } from './comprehensive-tracker';
 
 // Analytics provider
-export { AnalyticsProvider, useAnalyticsContext, withAnalytics, AnalyticsStatus } from './AnalyticsProvider';
+export {
+  AnalyticsProvider,
+  useAnalyticsContext,
+  withAnalytics,
+  AnalyticsStatus,
+} from './AnalyticsProvider';
 
 // Re-export existing analytics infrastructure
 export { analyticsApiService } from '@client/core/api/analytics';
@@ -32,7 +37,7 @@ export {
   useComprehensiveAnalytics,
   useInteractionTracking,
   useFormTracking,
-  useSearchTracking
+  useSearchTracking,
 } from '@client/features/analytics/hooks/use-comprehensive-analytics';
 
 export {
@@ -47,18 +52,18 @@ export {
   useTrendingTopics,
   useStakeholderAnalysis,
   useRealtimeAnalytics,
-  useAnalyticsExport
+  useAnalyticsExport,
 } from '@client/features/analytics/hooks/useAnalytics';
 
 export {
   useJourneyTracker,
-  useJourneyAnalytics
+  useJourneyAnalytics,
 } from '@client/features/analytics/hooks/use-journey-tracker';
 
 export {
   useWebVitals,
   getPerformanceRating,
-  usePerformanceBudget
+  usePerformanceBudget,
 } from '@client/features/analytics/hooks/use-web-vitals';
 
 // Analytics UI components
@@ -73,7 +78,7 @@ export type {
   EngagementReport,
   ConflictReport,
   UserActivity,
-  AnalyticsAlert
+  AnalyticsAlert,
 } from '@client/features/analytics/types';
 
 export type {
@@ -83,12 +88,12 @@ export type {
   PathAnalytics,
   DropOffPoint,
   ConversionFunnel,
-  JourneyOptimization
+  JourneyOptimization,
 } from '@client/services/UserJourneyTracker';
 
 export type {
   WebVitalsMetrics,
-  WebVitalsHookOptions
+  WebVitalsHookOptions,
 } from '@client/features/analytics/hooks/use-web-vitals';
 
 export type {
@@ -96,7 +101,7 @@ export type {
   WebVitalsMetric,
   PerformanceStats,
   PerformanceAlert,
-  PerformanceConfig
+  PerformanceConfig,
 } from '@client/core/performance/types';
 
 /**
@@ -134,28 +139,28 @@ export const ANALYTICS_CONFIG = {
     FIRST_CONTENTFUL_PAINT: 1800, // 1.8 seconds
     LARGEST_CONTENTFUL_PAINT: 2500, // 2.5 seconds
     FIRST_INPUT_DELAY: 100, // 100ms
-    CUMULATIVE_LAYOUT_SHIFT: 0.1
+    CUMULATIVE_LAYOUT_SHIFT: 0.1,
   },
   PERSONA_CONFIGS: {
     PUBLIC: {
       trackingEnabled: true,
       detailedMetrics: false,
-      realTimeUpdates: false
+      realTimeUpdates: false,
     },
     CITIZEN: {
       trackingEnabled: true,
       detailedMetrics: true,
-      realTimeUpdates: true
+      realTimeUpdates: true,
     },
     EXPERT: {
       trackingEnabled: true,
       detailedMetrics: true,
-      realTimeUpdates: true
+      realTimeUpdates: true,
     },
     ADMIN: {
       trackingEnabled: true,
       detailedMetrics: true,
-      realTimeUpdates: true
-    }
-  }
+      realTimeUpdates: true,
+    },
+  },
 } as const;

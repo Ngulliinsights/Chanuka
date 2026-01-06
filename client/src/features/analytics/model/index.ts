@@ -31,10 +31,7 @@ export type {
   DeleteResult,
 } from './privacy-analytics';
 
-export type {
-  OfflineEvent,
-  OfflineAnalyticsReport,
-} from './offline-analytics';
+export type { OfflineEvent, OfflineAnalyticsReport } from './offline-analytics';
 
 export type {
   UserRole,

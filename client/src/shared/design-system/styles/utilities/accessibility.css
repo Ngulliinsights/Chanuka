@@ -97,7 +97,8 @@
   will-change: width, transform;
   transform: translateZ(0); /* Force GPU layer */
   backface-visibility: hidden;
-  transition: width var(--timing-base) var(--easing-in-out),
+  transition:
+    width var(--timing-base) var(--easing-in-out),
     transform var(--timing-base) var(--easing-in-out);
 }
 
@@ -106,7 +107,8 @@
   will-change: margin-left, padding;
   transform: translateZ(0); /* Force GPU layer */
   backface-visibility: hidden;
-  transition: margin-left var(--timing-base) var(--easing-in-out),
+  transition:
+    margin-left var(--timing-base) var(--easing-in-out),
     padding var(--timing-base) var(--easing-in-out);
 }
 
@@ -127,14 +129,16 @@
 .chanuka-mobile-nav-enter-active {
   transform: translateY(0);
   opacity: 1;
-  transition: transform var(--timing-base) var(--easing-out),
+  transition:
+    transform var(--timing-base) var(--easing-out),
     opacity var(--timing-base) var(--easing-out);
 }
 
 .chanuka-mobile-nav-exit-active {
   transform: translateY(-100%);
   opacity: 0;
-  transition: transform var(--timing-base) var(--easing-in),
+  transition:
+    transform var(--timing-base) var(--easing-in),
     opacity var(--timing-base) var(--easing-in);
 }
 
@@ -161,7 +165,7 @@
   /* Enhanced touch targets */
   .chanuka-btn,
   button,
-  [role="button"] {
+  [role='button'] {
     min-height: 44px;
     min-width: 44px;
     touch-action: manipulation;
@@ -273,14 +277,16 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chanuka-nav-tooltip-enhanced::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: -4px;
@@ -303,7 +309,7 @@
 }
 
 .chanuka-nav-loading::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -343,7 +349,7 @@
     color: ButtonText;
   }
 
-  .chanuka-nav-item[aria-current="page"] {
+  .chanuka-nav-item[aria-current='page'] {
     background-color: Highlight;
     color: HighlightText;
     border-color: HighlightText;

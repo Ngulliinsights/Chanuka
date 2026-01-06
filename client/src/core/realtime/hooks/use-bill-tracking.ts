@@ -1,24 +1,24 @@
 /**
  * Bill Tracking Hook - Core Real-time Module
- * 
+ *
  * Consolidated hook for managing bill tracking subscriptions and real-time updates.
  * Replaces scattered bill tracking hooks with a unified implementation.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { realTimeService } from '../services/realtime-service';
-import { 
-  BillTrackingHookReturn, 
-  BillUpdate, 
-  BillEngagementUpdate 
-} from '../types';
+
 import { logger } from '@client/utils/logger';
+
+import { realTimeService } from '../services/realtime-service';
+import { BillTrackingHookReturn, BillUpdate, BillEngagementUpdate } from '../types';
 
 export function useBillTracking(): BillTrackingHookReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [subscribedBills, setSubscribedBills] = useState<Set<number>>(new Set());
   const [billUpdates, setBillUpdates] = useState<Map<number, BillUpdate[]>>(new Map());
-  const [engagementMetrics, setEngagementMetrics] = useState<Map<number, BillEngagementUpdate>>(new Map());
+  const [engagementMetrics, setEngagementMetrics] = useState<Map<number, BillEngagementUpdate>>(
+    new Map()
+  );
 
   const billTrackingService = useRef(realTimeService.getBillTrackingService());
   const subscriptionIds = useRef<Map<number, string>>(new Map());
@@ -47,85 +47,107 @@ export function useBillTracking(): BillTrackingHookReturn {
   // Bill Subscription Management
   // ============================================================================
 
-  const subscribeToBill = useCallback((billId: number) => {
-    if (subscribedBills.has(billId)) {
-      logger.debug('Already subscribed to bill', {
-        component: 'useBillTracking',
-        billId
-      });
-      return;
-    }
+  const subscribeToBill = useCallback(
+    (billId: number) => {
+      if (subscribedBills.has(billId)) {
+        logger.debug('Already subscribed to bill', {
+          component: 'useBillTracking',
+          billId,
+        });
+        return;
+      }
 
-    try {
-      const subscriptionId = billTrackingService.current.subscribeToBill(billId);
-      subscriptionIds.current.set(billId, subscriptionId);
-      
-      setSubscribedBills(prev => new Set([...prev, billId]));
+      try {
+        const subscriptionId = billTrackingService.current.subscribeToBill(billId);
+        subscriptionIds.current.set(billId, subscriptionId);
 
-      logger.info('Subscribed to bill tracking', {
-        component: 'useBillTracking',
-        billId,
-        subscriptionId
-      });
-    } catch (error) {
-      logger.error('Failed to subscribe to bill', {
-        component: 'useBillTracking',
-        billId
-      }, error);
-    }
-  }, [subscribedBills]);
+        setSubscribedBills(prev => new Set([...prev, billId]));
 
-  const unsubscribeFromBill = useCallback((billId: number) => {
-    if (!subscribedBills.has(billId)) {
-      return;
-    }
+        logger.info('Subscribed to bill tracking', {
+          component: 'useBillTracking',
+          billId,
+          subscriptionId,
+        });
+      } catch (error) {
+        logger.error(
+          'Failed to subscribe to bill',
+          {
+            component: 'useBillTracking',
+            billId,
+          },
+          error
+        );
+      }
+    },
+    [subscribedBills]
+  );
 
-    try {
-      billTrackingService.current.unsubscribeFromBill(billId);
-      subscriptionIds.current.delete(billId);
-      
-      setSubscribedBills(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(billId);
-        return newSet;
-      });
+  const unsubscribeFromBill = useCallback(
+    (billId: number) => {
+      if (!subscribedBills.has(billId)) {
+        return;
+      }
 
-      // Clear cached data for this bill
-      setBillUpdates(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(billId);
-        return newMap;
-      });
+      try {
+        billTrackingService.current.unsubscribeFromBill(billId);
+        subscriptionIds.current.delete(billId);
 
-      setEngagementMetrics(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(billId);
-        return newMap;
-      });
+        setSubscribedBills(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(billId);
+          return newSet;
+        });
 
-      logger.info('Unsubscribed from bill tracking', {
-        component: 'useBillTracking',
-        billId
-      });
-    } catch (error) {
-      logger.error('Failed to unsubscribe from bill', {
-        component: 'useBillTracking',
-        billId
-      }, error);
-    }
-  }, [subscribedBills]);
+        // Clear cached data for this bill
+        setBillUpdates(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(billId);
+          return newMap;
+        });
+
+        setEngagementMetrics(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(billId);
+          return newMap;
+        });
+
+        logger.info('Unsubscribed from bill tracking', {
+          component: 'useBillTracking',
+          billId,
+        });
+      } catch (error) {
+        logger.error(
+          'Failed to unsubscribe from bill',
+          {
+            component: 'useBillTracking',
+            billId,
+          },
+          error
+        );
+      }
+    },
+    [subscribedBills]
+  );
 
   // ============================================================================
   // Data Access
   // ============================================================================
 
-  const getBillUpdates = useCallback((billId: number): BillUpdate[] => {
-    return billUpdates.get(billId) || billTrackingService.current.getBillUpdates(billId);
-  }, [billUpdates]);
+  const getBillUpdates = useCallback(
+    (billId: number): BillUpdate[] => {
+      return billUpdates.get(billId) || billTrackingService.current.getBillUpdates(billId);
+    },
+    [billUpdates]
+  );
 
-  const getEngagementMetrics = useCallback((billId: number): BillEngagementUpdate | null => {
-    return engagementMetrics.get(billId) || billTrackingService.current.getEngagementMetrics(billId);
-  }, [engagementMetrics]);
+  const getEngagementMetrics = useCallback(
+    (billId: number): BillEngagementUpdate | null => {
+      return (
+        engagementMetrics.get(billId) || billTrackingService.current.getEngagementMetrics(billId)
+      );
+    },
+    [engagementMetrics]
+  );
 
   // ============================================================================
   // Real-time Updates
@@ -135,7 +157,7 @@ export function useBillTracking(): BillTrackingHookReturn {
     // Set up listeners for bill updates
     const handleBillUpdate = (update: BillUpdate) => {
       const billId = update.data.billId;
-      
+
       setBillUpdates(prev => {
         const newMap = new Map(prev);
         const existing = newMap.get(billId) || [];
@@ -147,7 +169,7 @@ export function useBillTracking(): BillTrackingHookReturn {
 
     const handleEngagementUpdate = (metrics: BillEngagementUpdate) => {
       const billId = metrics.bill_id;
-      
+
       setEngagementMetrics(prev => {
         const newMap = new Map(prev);
         newMap.set(billId, metrics);
@@ -157,7 +179,10 @@ export function useBillTracking(): BillTrackingHookReturn {
 
     // Subscribe to real-time updates
     const unsubscribeBillUpdate = realTimeService.on('billUpdate', handleBillUpdate);
-    const unsubscribeEngagementUpdate = realTimeService.on('engagementUpdate', handleEngagementUpdate);
+    const unsubscribeEngagementUpdate = realTimeService.on(
+      'engagementUpdate',
+      handleEngagementUpdate
+    );
 
     return () => {
       unsubscribeBillUpdate();
@@ -176,10 +201,14 @@ export function useBillTracking(): BillTrackingHookReturn {
         try {
           billTrackingService.current.unsubscribeFromBill(billId);
         } catch (error) {
-          logger.error('Error unsubscribing from bill on unmount', {
-            component: 'useBillTracking',
-            billId
-          }, error);
+          logger.error(
+            'Error unsubscribing from bill on unmount',
+            {
+              component: 'useBillTracking',
+              billId,
+            },
+            error
+          );
         }
       }
     };
@@ -195,7 +224,7 @@ export function useBillTracking(): BillTrackingHookReturn {
       try {
         const serviceStats = billTrackingService.current.getStats();
         const serviceBills = billTrackingService.current.getSubscribedBills();
-        
+
         // Update subscribed bills if they differ
         const currentBills = Array.from(subscribedBills);
         if (JSON.stringify(currentBills.sort()) !== JSON.stringify(serviceBills.sort())) {
@@ -218,9 +247,13 @@ export function useBillTracking(): BillTrackingHookReturn {
           }
         });
       } catch (error) {
-        logger.error('Error syncing with bill tracking service', {
-          component: 'useBillTracking'
-        }, error);
+        logger.error(
+          'Error syncing with bill tracking service',
+          {
+            component: 'useBillTracking',
+          },
+          error
+        );
       }
     }, 5000); // Sync every 5 seconds
 
@@ -237,6 +270,6 @@ export function useBillTracking(): BillTrackingHookReturn {
     subscribeToBill,
     unsubscribeFromBill,
     getBillUpdates,
-    getEngagementMetrics
+    getEngagementMetrics,
   };
 }

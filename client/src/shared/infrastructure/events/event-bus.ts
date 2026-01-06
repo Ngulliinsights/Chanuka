@@ -28,7 +28,9 @@ class EventBus {
     const listeners = this.events.get(event)!;
 
     if (listeners.size >= this.maxListeners) {
-      console.warn(`EventBus: Maximum listeners (${this.maxListeners}) reached for event '${event}'`);
+      console.warn(
+        `EventBus: Maximum listeners (${this.maxListeners}) reached for event '${event}'`
+      );
       return { unsubscribe: () => {} };
     }
 
@@ -36,7 +38,7 @@ class EventBus {
 
     // Return unsubscribe function
     return {
-      unsubscribe: () => this.off(event, handler)
+      unsubscribe: () => this.off(event, handler),
     };
   }
 
@@ -44,7 +46,7 @@ class EventBus {
    * Subscribe to an event (one-time only)
    */
   once(event: string, handler: EventHandler): EventSubscription {
-    const onceHandler: EventHandler = (data) => {
+    const onceHandler: EventHandler = data => {
       handler(data);
       this.off(event, onceHandler);
     };

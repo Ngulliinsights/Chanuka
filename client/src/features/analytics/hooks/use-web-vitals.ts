@@ -17,12 +17,7 @@ export interface WebVitalsHookOptions {
 }
 
 export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
-  const {
-    enabled = true,
-    onMetric,
-    onAllMetrics,
-    reportTo
-  } = options;
+  const { enabled = true, onMetric, onAllMetrics, reportTo } = options;
 
   const metricsRef = useRef<WebVitalsMetrics>({});
   const hasReportedRef = useRef(false);
@@ -40,8 +35,13 @@ export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
 
       // Check if all metrics are collected
       const { cls, fcp, lcp, ttfb } = metricsRef.current;
-      if (cls !== undefined && fcp !== undefined &&
-          lcp !== undefined && ttfb !== undefined && !hasReportedRef.current) {
+      if (
+        cls !== undefined &&
+        fcp !== undefined &&
+        lcp !== undefined &&
+        ttfb !== undefined &&
+        !hasReportedRef.current
+      ) {
         hasReportedRef.current = true;
         onAllMetrics?.(metricsRef.current);
 
@@ -70,7 +70,6 @@ export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
     onFCP(reportMetric);
     onLCP(reportMetric);
     onTTFB(reportMetric);
-
   }, [enabled, onMetric, onAllMetrics, reportTo]);
 
   return {
@@ -106,15 +105,17 @@ export const usePerformanceBudget = (budgets?: {
   fcp?: number;
   ttfb?: number;
 }) => {
-  const [violations, setViolations] = useState<Array<{
-    metric: string;
-    value: number;
-    budget: number;
-    severity: 'warning' | 'error';
-  }>>([]);
+  const [violations, setViolations] = useState<
+    Array<{
+      metric: string;
+      value: number;
+      budget: number;
+      severity: 'warning' | 'error';
+    }>
+  >([]);
 
   const { metrics } = useWebVitals({
-    onAllMetrics: (metrics) => {
+    onAllMetrics: metrics => {
       const newViolations: typeof violations = [];
 
       if (budgets?.lcp && metrics.lcp && metrics.lcp > budgets.lcp) {
@@ -125,7 +126,6 @@ export const usePerformanceBudget = (budgets?: {
           severity: metrics.lcp > budgets.lcp * 1.5 ? 'error' : 'warning',
         });
       }
-
 
       if (budgets?.cls && metrics.cls && metrics.cls > budgets.cls) {
         newViolations.push({

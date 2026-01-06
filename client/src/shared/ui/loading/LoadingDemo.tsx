@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 
-import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
-
 import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
 
-import {
-  LoadingStateManager,
-  PageLoader,
-  ComponentLoader,
-  ConnectionAwareLoader,
-} from './ui';
+import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
+import { LoadingStateManager, PageLoader, ComponentLoader, ConnectionAwareLoader } from './ui';
 
 export const LoadingDemo: React.FC = () => {
-  const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');
+  const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>(
+    'idle'
+  );
   const [selectedDemo, setSelectedDemo] = useState('basic');
 
   // Progressive loading stages configuration
@@ -28,7 +24,10 @@ export const LoadingDemo: React.FC = () => {
   const progressiveLoading = useProgressiveLoading(progressiveStages);
 
   // Timeout-aware operation
-  const timeoutOperation = useTimeoutAwareLoading(() => new Promise(resolve => setTimeout(resolve, 5000)), 5000);
+  const timeoutOperation = useTimeoutAwareLoading(
+    () => new Promise(resolve => setTimeout(resolve, 5000)),
+    5000
+  );
 
   // Loading context hooks with required IDs
   // const loadingHook = useLoading(); // Commented out as it's not used
@@ -86,7 +85,8 @@ export const LoadingDemo: React.FC = () => {
         <CardHeader>
           <CardTitle>Comprehensive Loading States Demo</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Demonstration of various loading states, connection awareness, timeout handling, and progressive loading.
+            Demonstration of various loading states, connection awareness, timeout handling, and
+            progressive loading.
           </p>
         </CardHeader>
         <CardContent>
@@ -151,9 +151,7 @@ export const LoadingDemo: React.FC = () => {
                   </div>
 
                   <div className="h-48 border rounded">
-                    <LoadingStateManager>
-                      Loading demo content...
-                    </LoadingStateManager>
+                    <LoadingStateManager>Loading demo content...</LoadingStateManager>
                   </div>
                 </CardContent>
               </Card>
@@ -168,9 +166,7 @@ export const LoadingDemo: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-32 border rounded">
-                      <ConnectionAwareLoader
-                        isLoading={true}
-                      />
+                      <ConnectionAwareLoader isLoading={true} />
                     </div>
                   </CardContent>
                 </Card>
@@ -209,9 +205,7 @@ export const LoadingDemo: React.FC = () => {
 
                   <div className="h-48 border rounded">
                     {timeoutOperation.isLoading ? (
-                      <LoadingStateManager>
-                        Operation in progress...
-                      </LoadingStateManager>
+                      <LoadingStateManager>Operation in progress...</LoadingStateManager>
                     ) : (
                       <div className="flex items-center justify-center h-full text-muted-foreground">
                         Click "Start Timeout Demo" to begin
@@ -249,7 +243,7 @@ export const LoadingDemo: React.FC = () => {
                     {!progressiveLoading.isComplete ? (
                       <div className="p-4">
                         <LoadingStateManager>
-                          {progressiveLoading.currentStage?.message || "Loading..."}
+                          {progressiveLoading.currentStage?.message || 'Loading...'}
                         </LoadingStateManager>
                         <div className="mt-4 text-sm text-muted-foreground text-center">
                           Stage 1 of {progressiveStages.length}
@@ -273,30 +267,28 @@ export const LoadingDemo: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex space-x-2">
-                    <Button onClick={simulateContextLoading}>
-                      Start Multiple Operations
-                    </Button>
+                    <Button onClick={simulateContextLoading}>Start Multiple Operations</Button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h4 className="font-medium mb-2">Active Operations</h4>
                       <div className="text-sm space-y-1">
-                            <div>Total: 0</div>
-                            <div>High Priority: 0</div>
-                            <div>Global Loading: No</div>
-                            <div>Connection: Online</div>
-                          </div>
-                        </div>
+                        <div>Total: 0</div>
+                        <div>High Priority: 0</div>
+                        <div>Global Loading: No</div>
+                        <div>Connection: Online</div>
+                      </div>
+                    </div>
 
-                        <div>
-                          <h4 className="font-medium mb-2">Adaptive Settings</h4>
-                          <div className="text-sm space-y-1">
-                                <div>Max Concurrent: 4</div>
-                                <div>Animations: On</div>
-                                <div>Default Timeout: 30s</div>
-                              </div>
-                        </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Adaptive Settings</h4>
+                      <div className="text-sm space-y-1">
+                        <div>Max Concurrent: 4</div>
+                        <div>Animations: On</div>
+                        <div>Default Timeout: 30s</div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

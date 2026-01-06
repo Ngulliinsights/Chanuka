@@ -7,41 +7,45 @@
  * Requirements: 10.1, 10.2, 10.3
  */
 
+import { Globe, Check, ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
+
 import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@client/shared/design-system';
-import { Globe, Check, ChevronDown } from 'lucide-react';
-
 import { useI18n } from '@client/shared/hooks/use-i18n';
+
 import type { SupportedLanguage } from '../../../utils/i18n';
 
 /**
  * Language information with display names and flags
  */
-const LANGUAGE_INFO: Record<SupportedLanguage, {
-  name: string;
-  nativeName: string;
-  flag: string;
-  region: string;
-}> = {
+const LANGUAGE_INFO: Record<
+  SupportedLanguage,
+  {
+    name: string;
+    nativeName: string;
+    flag: string;
+    region: string;
+  }
+> = {
   en: {
     name: 'English',
     nativeName: 'English',
     flag: '🇬🇧',
-    region: 'International'
+    region: 'International',
   },
   sw: {
     name: 'Swahili',
     nativeName: 'Kiswahili',
     flag: '🇰🇪',
-    region: 'Kenya'
-  }
+    region: 'Kenya',
+  },
 };
 
 /**
@@ -61,7 +65,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   variant = 'default',
   showFlag = true,
   showRegion = false,
-  className = ''
+  className = '',
 }) => {
   const { language, changeLanguage, availableLanguages, t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
@@ -76,7 +80,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     setIsOpen(false);
 
     // Announce language change for accessibility
-    const announcement = t('common.changeLanguage', { current: LANGUAGE_INFO[newLanguage].nativeName });
+    const announcement = t('common.changeLanguage', {
+      current: LANGUAGE_INFO[newLanguage].nativeName,
+    });
 
     // Create temporary announcement element for screen readers
     const announcer = document.createElement('div');
@@ -105,14 +111,12 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
             aria-label={t('common.selectLanguage')}
           >
             {showFlag && <span className="mr-1">{currentLanguageInfo.flag}</span>}
-            <span className="text-xs font-medium">
-              {language.toUpperCase()}
-            </span>
+            <span className="text-xs font-medium">{language.toUpperCase()}</span>
             <ChevronDown className="ml-1 h-3 w-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          {availableLanguages.map((lang) => {
+          {availableLanguages.map(lang => {
             const langInfo = LANGUAGE_INFO[lang];
             return (
               <DropdownMenuItem
@@ -150,7 +154,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          {availableLanguages.map((lang) => {
+          {availableLanguages.map(lang => {
             const langInfo = LANGUAGE_INFO[lang];
             return (
               <DropdownMenuItem
@@ -198,11 +202,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <div className="px-3 py-2 border-b border-gray-200">
-          <h4 className="text-sm font-semibold text-gray-900">
-            {t('common.selectLanguage')}
-          </h4>
+          <h4 className="text-sm font-semibold text-gray-900">{t('common.selectLanguage')}</h4>
         </div>
-        {availableLanguages.map((lang) => {
+        {availableLanguages.map(lang => {
           const langInfo = LANGUAGE_INFO[lang];
           return (
             <DropdownMenuItem
@@ -213,9 +215,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
               <div className="flex items-center space-x-3">
                 <span className="text-lg">{langInfo.flag}</span>
                 <div>
-                  <div className="text-sm font-medium text-gray-900">
-                    {langInfo.nativeName}
-                  </div>
+                  <div className="text-sm font-medium text-gray-900">{langInfo.nativeName}</div>
                   <div className="text-xs text-gray-500">
                     {langInfo.name} • {langInfo.region}
                   </div>

@@ -14,5 +14,5 @@ export { createNavigationProvider } from '../core/navigation/context';
 // Deprecated warning for old imports
 console.warn(
   'Importing from contexts/NavigationContext is deprecated. ' +
-  'Please import from core/navigation/context instead.'
+    'Please import from core/navigation/context instead.'
 );

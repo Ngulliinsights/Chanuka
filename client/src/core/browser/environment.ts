@@ -1,6 +1,6 @@
 /**
  * Environment Detection Utilities
- * 
+ *
  * Detects runtime environment to safely access browser APIs.
  */
 

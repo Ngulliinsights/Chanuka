@@ -3,24 +3,30 @@
  * Password reset completion page
  */
 
+import { validatePassword } from '@client/utils/security';
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 import { Label } from '@client/shared/design-system';
-import { validatePassword } from '@client/utils/security';
-import React from 'react';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { resetPassword } = useAuth();
-  
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +60,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
       setError('Invalid reset token');
       return;
@@ -75,13 +81,13 @@ export default function ResetPasswordPage() {
 
     try {
       const result = await resetPassword(token, password);
-      
+
       if (result.success) {
         setSuccess(true);
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate('/auth/login', { 
-            state: { message: 'Password reset successful. Please sign in with your new password.' }
+          navigate('/auth/login', {
+            state: { message: 'Password reset successful. Please sign in with your new password.' },
           });
         }, 3000);
       } else {
@@ -96,13 +102,18 @@ export default function ResetPasswordPage() {
 
   const getPasswordStrengthColor = () => {
     if (!passwordValidation) return 'bg-gray-200';
-    
+
     switch (passwordValidation.strength) {
-      case 'weak': return 'bg-red-500';
-      case 'fair': return 'bg-yellow-500';
-      case 'good': return 'bg-blue-500';
-      case 'strong': return 'bg-green-500';
-      default: return 'bg-gray-200';
+      case 'weak':
+        return 'bg-red-500';
+      case 'fair':
+        return 'bg-yellow-500';
+      case 'good':
+        return 'bg-blue-500';
+      case 'strong':
+        return 'bg-green-500';
+      default:
+        return 'bg-gray-200';
     }
   };
 
@@ -112,24 +123,19 @@ export default function ResetPasswordPage() {
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              Password Reset Complete
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Your password has been successfully reset
-            </p>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Password Reset Complete</h2>
+            <p className="mt-2 text-sm text-gray-600">Your password has been successfully reset</p>
           </div>
 
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <p className="text-sm text-gray-600">
-                  You will be redirected to the sign-in page shortly, or you can click the button below.
+                  You will be redirected to the sign-in page shortly, or you can click the button
+                  below.
                 </p>
                 <Link to="/auth/login">
-                  <Button className="w-full">
-                    Continue to Sign In
-                  </Button>
+                  <Button className="w-full">Continue to Sign In</Button>
                 </Link>
               </div>
             </CardContent>
@@ -144,20 +150,14 @@ export default function ResetPasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Set new password
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Choose a strong password for your account
-          </p>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Set new password</h2>
+          <p className="mt-2 text-sm text-gray-600">Choose a strong password for your account</p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>New Password</CardTitle>
-            <CardDescription>
-              Enter your new password below
-            </CardDescription>
+            <CardDescription>Enter your new password below</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -175,7 +175,7 @@ export default function ResetPasswordPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     required
                     autoComplete="new-password"
                     placeholder="Enter your new password"
@@ -189,14 +189,10 @@ export default function ResetPasswordPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
-                
+
                 {/* Password strength indicator */}
                 {passwordValidation && (
                   <div className="space-y-1">
@@ -228,7 +224,7 @@ export default function ResetPasswordPage() {
                     id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     required
                     autoComplete="new-password"
                     placeholder="Confirm your new password"
@@ -249,7 +245,7 @@ export default function ResetPasswordPage() {
                     )}
                   </Button>
                 </div>
-                
+
                 {confirmPassword && password !== confirmPassword && (
                   <p className="text-xs text-red-600">Passwords do not match</p>
                 )}
@@ -259,9 +255,9 @@ export default function ResetPasswordPage() {
                 type="submit"
                 className="w-full"
                 disabled={
-                  loading || 
-                  !password || 
-                  !confirmPassword || 
+                  loading ||
+                  !password ||
+                  !confirmPassword ||
                   password !== confirmPassword ||
                   (passwordValidation && !passwordValidation.isValid) ||
                   !token

@@ -4,24 +4,25 @@
  * Tests for search service switching and integration
  */
 
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { UnifiedSearchInterface } from './UnifiedSearchInterface';
+
 import type { UnifiedSearchQuery, UnifiedSearchResult } from './types';
+import { UnifiedSearchInterface } from './UnifiedSearchInterface';
 
 // Mock the search services
 vi.mock('../../features/search/services/intelligent-search', () => ({
   intelligentSearch: {
     search: vi.fn().mockResolvedValue({
       results: [
-        { id: '1', title: 'Test Bill 1', type: 'bill', content: 'Test content', score: 0.9 }
+        { id: '1', title: 'Test Bill 1', type: 'bill', content: 'Test content', score: 0.9 },
       ],
       metadata: { query: 'test', executionTime: 100 },
       suggestions: ['test suggestion'],
-      facets: { categories: ['category1'], sponsors: [], tags: [], statuses: [] }
-    })
-  }
+      facets: { categories: ['category1'], sponsors: [], tags: [], statuses: [] },
+    }),
+  },
 }));
 
 vi.mock('../../features/search/services/streaming-search', () => ({
@@ -29,24 +30,37 @@ vi.mock('../../features/search/services/streaming-search', () => ({
     search: vi.fn().mockImplementation((query, options) => {
       // Simulate streaming behavior
       setTimeout(() => {
-        options.onResult?.({ id: '2', title: 'Streaming Result', type: 'bill', content: 'Streaming content', score: 0.8 });
-        options.onComplete?.([
-          { id: '2', title: 'Streaming Result', type: 'bill', content: 'Streaming content', score: 0.8 }
-        ], 1);
+        options.onResult?.({
+          id: '2',
+          title: 'Streaming Result',
+          type: 'bill',
+          content: 'Streaming content',
+          score: 0.8,
+        });
+        options.onComplete?.(
+          [
+            {
+              id: '2',
+              title: 'Streaming Result',
+              type: 'bill',
+              content: 'Streaming content',
+              score: 0.8,
+            },
+          ],
+          1
+        );
       }, 100);
-    })
-  }
+    }),
+  },
 }));
 
 vi.mock('../api/search', () => ({
   searchApiClient: {
     search: vi.fn().mockResolvedValue({
-      results: [
-        { id: '3', title: 'API Result', type: 'bill', content: 'API content', score: 0.7 }
-      ],
-      metadata: { query: 'test', executionTime: 50 }
-    })
-  }
+      results: [{ id: '3', title: 'API Result', type: 'bill', content: 'API content', score: 0.7 }],
+      metadata: { query: 'test', executionTime: 50 },
+    }),
+  },
 }));
 
 // Mock the hooks
@@ -55,8 +69,8 @@ vi.mock('../../features/search/hooks/useIntelligentSearch', () => ({
     search: vi.fn(),
     results: [],
     isLoading: false,
-    error: null
-  }))
+    error: null,
+  })),
 }));
 
 vi.mock('../../features/search/hooks/useStreamingSearch', () => ({
@@ -65,8 +79,8 @@ vi.mock('../../features/search/hooks/useStreamingSearch', () => ({
     results: [],
     isLoading: false,
     error: null,
-    progress: { loaded: 0, total: 0, percentage: 0 }
-  }))
+    progress: { loaded: 0, total: 0, percentage: 0 },
+  })),
 }));
 
 // Mock the IntelligentAutocomplete component
@@ -74,15 +88,19 @@ vi.mock('../../features/search/ui/interface/IntelligentAutocomplete', () => ({
   default: ({ query, onSelect, onSearch }: any) => (
     <div data-testid="autocomplete">
       <div>Query: {query}</div>
-      <button type="button" onClick={() => onSelect('suggestion 1')}>Suggestion 1</button>
-      <button type="button" onClick={() => onSearch('test search')}>Search</button>
+      <button type="button" onClick={() => onSelect('suggestion 1')}>
+        Suggestion 1
+      </button>
+      <button type="button" onClick={() => onSearch('test search')}>
+        Search
+      </button>
     </div>
-  )
+  ),
 }));
 
 // Mock the cn utility
 vi.mock('../../shared/design-system/utils/cn', () => ({
-  cn: (...classes: any[]) => classes.filter(Boolean).join(' ')
+  cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 
 describe('UnifiedSearchInterface', () => {
@@ -95,7 +113,7 @@ describe('UnifiedSearchInterface', () => {
     onSearch: mockOnSearch,
     onResults: mockOnResults,
     onProgress: mockOnProgress,
-    onError: mockOnError
+    onError: mockOnError,
   };
 
   beforeEach(() => {
@@ -103,12 +121,12 @@ describe('UnifiedSearchInterface', () => {
     // Mock navigator.onLine
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
-      value: true
+      value: true,
     });
     // Mock window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
-      value: 1024
+      value: 1024,
     });
   });
 
@@ -116,24 +134,19 @@ describe('UnifiedSearchInterface', () => {
     it('renders search input with default placeholder', () => {
       render(<UnifiedSearchInterface {...defaultProps} />);
 
-      expect(screen.getByPlaceholderText('Search bills, sponsors, or topics...')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('Search bills, sponsors, or topics...')
+      ).toBeInTheDocument();
     });
 
     it('renders with custom placeholder', () => {
-      render(
-        <UnifiedSearchInterface
-          {...defaultProps}
-          placeholder="Custom search placeholder"
-        />
-      );
+      render(<UnifiedSearchInterface {...defaultProps} placeholder="Custom search placeholder" />);
 
       expect(screen.getByPlaceholderText('Custom search placeholder')).toBeInTheDocument();
     });
 
     it('renders different variants correctly', () => {
-      const { rerender } = render(
-        <UnifiedSearchInterface {...defaultProps} variant="header" />
-      );
+      const { rerender } = render(<UnifiedSearchInterface {...defaultProps} variant="header" />);
 
       let input = screen.getByRole('textbox');
       expect(input.parentElement).toHaveClass('h-9');
@@ -184,7 +197,7 @@ describe('UnifiedSearchInterface', () => {
         expect(mockOnSearch).toHaveBeenCalledWith(
           expect.objectContaining({
             q: 'test query',
-            strategy: expect.any(String)
+            strategy: expect.any(String),
           })
         );
       });
@@ -214,7 +227,7 @@ describe('UnifiedSearchInterface', () => {
       await waitFor(() => {
         expect(mockOnSearch).toHaveBeenCalledWith(
           expect.objectContaining({
-            strategy: 'intelligent'
+            strategy: 'intelligent',
           })
         );
       });
@@ -226,16 +239,11 @@ describe('UnifiedSearchInterface', () => {
         thresholds: {
           resultCountForStreaming: 500,
           queryLengthForIntelligent: 10,
-          timeoutMs: 3000
-        }
+          timeoutMs: 3000,
+        },
       };
 
-      render(
-        <UnifiedSearchInterface
-          {...defaultProps}
-          config={customConfig}
-        />
-      );
+      render(<UnifiedSearchInterface {...defaultProps} config={customConfig} />);
 
       const input = screen.getByRole('textbox');
       fireEvent.change(input, { target: { value: 'short' } });
@@ -260,7 +268,7 @@ describe('UnifiedSearchInterface', () => {
       await waitFor(() => {
         expect(mockOnSearch).toHaveBeenCalledWith(
           expect.objectContaining({
-            q: 'suggestion 1'
+            q: 'suggestion 1',
           })
         );
       });
@@ -283,7 +291,9 @@ describe('UnifiedSearchInterface', () => {
   describe('Loading States', () => {
     it('shows loading indicator during search', async () => {
       // Mock a delayed search
-      const { intelligentSearch } = await import('../../features/search/services/intelligent-search');
+      const { intelligentSearch } = await import(
+        '../../features/search/services/intelligent-search'
+      );
       vi.mocked(intelligentSearch.search).mockImplementation(
         () => new Promise(resolve => setTimeout(resolve, 1000))
       );
@@ -299,7 +309,9 @@ describe('UnifiedSearchInterface', () => {
     });
 
     it('disables input during search', async () => {
-      const { intelligentSearch } = await import('../../features/search/services/intelligent-search');
+      const { intelligentSearch } = await import(
+        '../../features/search/services/intelligent-search'
+      );
       vi.mocked(intelligentSearch.search).mockImplementation(
         () => new Promise(resolve => setTimeout(resolve, 1000))
       );
@@ -316,7 +328,9 @@ describe('UnifiedSearchInterface', () => {
 
   describe('Error Handling', () => {
     it('calls onError when search fails', async () => {
-      const { intelligentSearch } = await import('../../features/search/services/intelligent-search');
+      const { intelligentSearch } = await import(
+        '../../features/search/services/intelligent-search'
+      );
       const searchError = new Error('Search failed');
       vi.mocked(intelligentSearch.search).mockRejectedValue(searchError);
 

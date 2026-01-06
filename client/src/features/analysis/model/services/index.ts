@@ -2,5 +2,5 @@ export {
   MockConflictDetectionService,
   RealConflictDetectionService,
   createConflictDetectionService,
-  type ConflictDetectionService
+  type ConflictDetectionService,
 } from './conflict-detection';

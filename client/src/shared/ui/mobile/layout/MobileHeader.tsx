@@ -84,20 +84,23 @@ export interface MobileHeaderProps {
  * Flexible header supporting both simple and complex configurations.
  */
 export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
-  ({
-    title = "Chanuka",
-    showLogo = false,
-    logo,
-    showSearch = false,
-    onSearchClick,
-    showMenu = false,
-    onMenuToggle,
-    leftActions = [],
-    rightActions = [],
-    navigationItems = [],
-    className,
-    variant = 'bordered',
-  }, ref) => {
+  (
+    {
+      title = 'Chanuka',
+      showLogo = false,
+      logo,
+      showSearch = false,
+      onSearchClick,
+      showMenu = false,
+      onMenuToggle,
+      leftActions = [],
+      rightActions = [],
+      navigationItems = [],
+      className,
+      variant = 'bordered',
+    },
+    ref
+  ) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -122,8 +125,8 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
     );
 
     const headerClassName = cn(
-      "flex items-center justify-between px-4 py-3 bg-background",
-      variant === 'bordered' && "border-b border-border",
+      'flex items-center justify-between px-4 py-3 bg-background',
+      variant === 'bordered' && 'border-b border-border',
       className
     );
 
@@ -144,19 +147,17 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
             )}
 
             {/* Title */}
-            {title && !showLogo && (
-              <h1 className="text-lg font-bold text-foreground">{title}</h1>
-            )}
+            {title && !showLogo && <h1 className="text-lg font-bold text-foreground">{title}</h1>}
 
             {/* Left actions */}
-            {leftActions.map((action) => (
+            {leftActions.map(action => (
               <Button
                 key={action.id}
                 variant="ghost"
                 size="sm"
                 onClick={action.onClick}
                 disabled={action.disabled}
-                className={cn("h-8 w-8 p-0", action.className)}
+                className={cn('h-8 w-8 p-0', action.className)}
                 aria-label={action.label}
               >
                 {action.icon}
@@ -174,14 +175,14 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
 
           <div className="flex items-center gap-2">
             {/* Right actions */}
-            {rightActions.map((action) => (
+            {rightActions.map(action => (
               <Button
                 key={action.id}
                 variant="ghost"
                 size="sm"
                 onClick={action.onClick}
                 disabled={action.disabled}
-                className={cn("h-8 w-8 p-0 relative", action.className)}
+                className={cn('h-8 w-8 p-0 relative', action.className)}
                 aria-label={action.label}
               >
                 {action.icon}
@@ -216,13 +217,9 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
                 size="sm"
                 onClick={handleMenuToggle}
                 className="h-8 w-8 p-0"
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               >
-                {isMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <BarChart3 className="h-5 w-5" />
-                )}
+                {isMenuOpen ? <X className="h-5 w-5" /> : <BarChart3 className="h-5 w-5" />}
               </Button>
             )}
           </div>
@@ -232,7 +229,7 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
         {isMenuOpen && navigationItems.length > 0 && (
           <div className="bg-background border-b border-border">
             <nav className="px-4 py-2 space-y-1" role="navigation" aria-label="Mobile navigation">
-              {navigationItems.map((item) => {
+              {navigationItems.map(item => {
                 const isActive = isActivePath(item.href);
 
                 return (

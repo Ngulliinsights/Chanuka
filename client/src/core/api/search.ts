@@ -1,7 +1,4 @@
-import type {
-  SearchRequest,
-  SaveSearchRequest
-} from '@client/shared/types/search';
+import type { SearchRequest, SaveSearchRequest } from '@client/shared/types/search';
 import type {
   SearchResponse,
   SearchSuggestion,
@@ -10,14 +7,14 @@ import type {
   SearchMetadata,
   SearchResult,
   SavedSearch,
-  SearchExportResponse
+  SearchExportResponse,
 } from '@client/shared/types/search-response';
 
 import { globalApiClient as api } from './client';
 
 /**
  * Search API Client - Core API wrapper for search endpoints
- * 
+ *
  * Provides direct access to search API endpoints without business logic.
  * This is a pure API client that should be used by higher-level services.
  */
@@ -68,10 +65,12 @@ export const searchApiClient = {
   /**
    * Perform PostgreSQL full-text search
    */
-  async searchPostgreSQL(params: Record<string, string | number | boolean>): Promise<SearchResponse> {
+  async searchPostgreSQL(
+    params: Record<string, string | number | boolean>
+  ): Promise<SearchResponse> {
     const response = await api.get<SearchResponse>('/api/search/postgresql', {
       params,
-      timeout: 10000
+      timeout: 10000,
     });
     return response.data;
   },
@@ -82,7 +81,7 @@ export const searchApiClient = {
   async streamSearch(params: Record<string, string | number | boolean>): Promise<SearchResponse> {
     const response = await api.get<SearchResponse>('/api/search/stream', {
       params,
-      timeout: 30000
+      timeout: 30000,
     });
     return response.data;
   },
@@ -101,7 +100,7 @@ export const searchApiClient = {
   async getSearchData(type?: string): Promise<SearchResult[]> {
     const response = await api.get<SearchResult[]>('/api/search/data', {
       params: { type: type || 'bills' },
-      timeout: 5000
+      timeout: 5000,
     });
     return response.data;
   },
@@ -243,7 +242,7 @@ export const searchApiClient = {
       `/api/search/related?q=${encodeURIComponent(query)}`
     );
     return response.data;
-  }
+  },
 };
 
 // Export individual methods for backward compatibility
@@ -267,7 +266,7 @@ export const {
   liveSearch,
   getSearchResult,
   exportSearchResults,
-  getRelatedSearches
+  getRelatedSearches,
 } = searchApiClient;
 
 // Default export for convenience

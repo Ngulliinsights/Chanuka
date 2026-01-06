@@ -15,8 +15,9 @@ import {
   NavigationSection,
   UserRole,
   NavigationPreferences,
-  RecentPage
+  RecentPage,
 } from '@/shared/types/navigation';
+
 import { logger } from '../../../../utils/logger';
 
 // Constants for better maintainability
@@ -65,7 +66,7 @@ const navigationSlice = createSlice({
         state.currentPath = action.payload;
         logger.debug('Navigation path updated', {
           from: state.previousPath,
-          to: action.payload
+          to: action.payload,
         });
       }
     },
@@ -100,7 +101,7 @@ const navigationSlice = createSlice({
     /**
      * Toggles sidebar visibility. Useful for hamburger menu buttons.
      */
-    toggleSidebar: (state) => {
+    toggleSidebar: state => {
       state.sidebarOpen = !state.sidebarOpen;
     },
 
@@ -116,7 +117,7 @@ const navigationSlice = createSlice({
      * Toggles mobile menu visibility. Mobile menu is separate from sidebar
      * to handle different responsive behaviors.
      */
-    toggleMobileMenu: (state) => {
+    toggleMobileMenu: state => {
       state.mobileMenuOpen = !state.mobileMenuOpen;
     },
 
@@ -175,7 +176,7 @@ const navigationSlice = createSlice({
     updatePreferences: (state, action: PayloadAction<Partial<NavigationPreferences>>) => {
       state.preferences = { ...state.preferences, ...action.payload };
       logger.debug('Navigation preferences updated', {
-        updated: Object.keys(action.payload)
+        updated: Object.keys(action.payload),
       });
     },
 
@@ -244,7 +245,7 @@ const navigationSlice = createSlice({
      * Resets navigation state to initial values while preserving
      * device-specific flags that should persist.
      */
-    resetNavigationState: (state) => {
+    resetNavigationState: state => {
       const { isMobile, mounted } = state;
 
       Object.assign(state, {
@@ -304,7 +305,7 @@ const navigationSlice = createSlice({
      * Clears all persisted state and resets to defaults. This is useful
      * for "reset preferences" features or when logging out.
      */
-    clearPersistedState: (state) => {
+    clearPersistedState: state => {
       state.preferences = { ...initialState.preferences };
       state.sidebarOpen = false;
       state.sidebarCollapsed = false;
@@ -370,14 +371,12 @@ export const selectSidebarOpen = (state: { navigation: NavigationState }) =>
 export const selectMobileMenuOpen = (state: { navigation: NavigationState }) =>
   state.navigation.mobileMenuOpen;
 
-export const selectIsMobile = (state: { navigation: NavigationState }) =>
-  state.navigation.isMobile;
+export const selectIsMobile = (state: { navigation: NavigationState }) => state.navigation.isMobile;
 
 export const selectSidebarCollapsed = (state: { navigation: NavigationState }) =>
   state.navigation.sidebarCollapsed;
 
-export const selectMounted = (state: { navigation: NavigationState }) =>
-  state.navigation.mounted;
+export const selectMounted = (state: { navigation: NavigationState }) => state.navigation.mounted;
 
 export const selectUserRole = (state: { navigation: NavigationState }) =>
   state.navigation.user_role;
@@ -397,11 +396,8 @@ export const selectIsCurrentPageFavorited = createSelector(
 );
 
 // Gets recent pages sorted by visit count for "most visited" features
-export const selectMostVisitedPages = createSelector(
-  [selectNavigationPreferences],
-  (preferences) => [...preferences.recentlyVisited]
-    .sort((a, b) => b.visitCount - a.visitCount)
-    .slice(0, 5)
+export const selectMostVisitedPages = createSelector([selectNavigationPreferences], preferences =>
+  [...preferences.recentlyVisited].sort((a, b) => b.visitCount - a.visitCount).slice(0, 5)
 );
 
 // Checks if any menu is open (useful for overlay logic)

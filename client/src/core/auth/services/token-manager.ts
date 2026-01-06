@@ -1,6 +1,6 @@
 /**
  * Consolidated Token Manager
- * 
+ *
  * Unified implementation that consolidates:
  * - TokenManager from utils/storage.ts
  * - tokenManager references in authentication.ts
@@ -51,7 +51,7 @@ export class TokenManager {
       await this.storage.setItem(this.tokenKey, tokens, {
         encrypt: true,
         namespace: this.authNamespace,
-        ttl: ttl > 0 ? ttl : undefined
+        ttl: ttl > 0 ? ttl : undefined,
       });
 
       this.currentTokens = tokens;
@@ -60,7 +60,7 @@ export class TokenManager {
         tokenType: tokens.tokenType,
         expiresAt: tokens.expiresAt.toISOString(),
         hasRefreshToken: !!tokens.refreshToken,
-        scope: tokens.scope
+        scope: tokens.scope,
       });
     } catch (error) {
       logger.error('Failed to store tokens', { error });
@@ -85,7 +85,7 @@ export class TokenManager {
 
       const tokens = await this.storage.getItem<TokenInfo>(this.tokenKey, {
         encrypt: true,
-        namespace: this.authNamespace
+        namespace: this.authNamespace,
       });
 
       if (!tokens) {
@@ -141,7 +141,7 @@ export class TokenManager {
   async clearTokens(): Promise<void> {
     try {
       this.storage.removeItem(this.tokenKey, {
-        namespace: this.authNamespace
+        namespace: this.authNamespace,
       });
 
       this.currentTokens = null;
@@ -178,9 +178,9 @@ export class TokenManager {
     }
 
     const expiresIn = tokens.expiresAt.getTime() - Date.now();
-    return { 
+    return {
       isValid: expiresIn > 0,
-      expiresIn: Math.max(0, expiresIn)
+      expiresIn: Math.max(0, expiresIn),
     };
   }
 
@@ -202,16 +202,12 @@ export class TokenManager {
    */
   async updateTokenExpiration(newExpiresAt: Date): Promise<void> {
     if (!this.currentTokens) {
-      throw createError(
-        ErrorDomain.AUTHENTICATION,
-        ErrorSeverity.MEDIUM,
-        'No tokens to update'
-      );
+      throw createError(ErrorDomain.AUTHENTICATION, ErrorSeverity.MEDIUM, 'No tokens to update');
     }
 
     const updatedTokens = {
       ...this.currentTokens,
-      expiresAt: newExpiresAt
+      expiresAt: newExpiresAt,
     };
 
     await this.storeTokens(updatedTokens);
@@ -229,7 +225,7 @@ export class TokenManager {
     scope: string[] | null;
   }> {
     const tokens = await this.getTokens();
-    
+
     if (!tokens) {
       return {
         hasTokens: false,
@@ -237,7 +233,7 @@ export class TokenManager {
         expiresIn: null,
         tokenType: null,
         hasRefreshToken: false,
-        scope: null
+        scope: null,
       };
     }
 
@@ -249,7 +245,7 @@ export class TokenManager {
       expiresIn,
       tokenType: tokens.tokenType,
       hasRefreshToken: !!tokens.refreshToken,
-      scope: tokens.scope || null
+      scope: tokens.scope || null,
     };
   }
 
@@ -269,7 +265,7 @@ export class TokenManager {
         refreshToken: authTokens.refreshToken,
         expiresAt: new Date(Date.now() + authTokens.expiresIn * 1000),
         tokenType: (authTokens.tokenType as 'Bearer' | 'Basic') || 'Bearer',
-        scope: []
+        scope: [],
       };
     }
 
@@ -278,7 +274,7 @@ export class TokenManager {
     return {
       ...tokens,
       expiresAt: new Date(tokens.expiresAt),
-      tokenType: tokens.tokenType || 'Bearer'
+      tokenType: tokens.tokenType || 'Bearer',
     };
   }
 }

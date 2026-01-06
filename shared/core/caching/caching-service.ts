@@ -5,8 +5,10 @@
  * cache infrastructure and provides a unified API for client and server modules.
  */
 
-import { Result, ok, err } from '../primitives/types/result';
 import { BaseError } from '../observability/error-management/errors/base-error';
+import { Result, ok, err } from '../primitives/types/result';
+
+import { createCacheService } from './factory';
 import {
   ICachingService,
   CachingServiceRegistry
@@ -24,7 +26,6 @@ import { // Unused import
   CacheAdapterConfig
 } from './core/interfaces';
 */
-import { createCacheService } from './factory';
 
 /**
  * Cache operation error

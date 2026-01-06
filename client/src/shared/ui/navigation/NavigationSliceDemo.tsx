@@ -6,8 +6,14 @@
  */
 
 import React from 'react';
+
 import { Button } from '@/shared/design-system';
-import { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from '@/shared/hooks/useNavigationSlice';
+import {
+  useNavigationSlice,
+  useSidebar,
+  useMobileMenu,
+  useNavigationPreferences,
+} from '@/shared/hooks/useNavigationSlice';
 
 export function NavigationSliceDemo() {
   const navigation = useNavigationSlice();
@@ -24,23 +30,45 @@ export function NavigationSliceDemo() {
         <div className="p-4 bg-gray-50 rounded">
           <h3 className="font-semibold mb-2">Current State</h3>
           <div className="space-y-1 text-sm">
-            <p><strong>Current Path:</strong> {navigation.currentPath}</p>
-            <p><strong>Previous Path:</strong> {navigation.previousPath}</p>
-            <p><strong>Current Section:</strong> {navigation.currentSection}</p>
-            <p><strong>User Role:</strong> {navigation.userRole}</p>
-            <p><strong>Is Mobile:</strong> {navigation.isMobile ? 'Yes' : 'No'}</p>
-            <p><strong>Breadcrumbs:</strong> {navigation.breadcrumbs.length} items</p>
+            <p>
+              <strong>Current Path:</strong> {navigation.currentPath}
+            </p>
+            <p>
+              <strong>Previous Path:</strong> {navigation.previousPath}
+            </p>
+            <p>
+              <strong>Current Section:</strong> {navigation.currentSection}
+            </p>
+            <p>
+              <strong>User Role:</strong> {navigation.userRole}
+            </p>
+            <p>
+              <strong>Is Mobile:</strong> {navigation.isMobile ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Breadcrumbs:</strong> {navigation.breadcrumbs.length} items
+            </p>
           </div>
         </div>
 
         <div className="p-4 bg-gray-50 rounded">
           <h3 className="font-semibold mb-2">UI State</h3>
           <div className="space-y-1 text-sm">
-            <p><strong>Sidebar Open:</strong> {sidebar.sidebarOpen ? 'Yes' : 'No'}</p>
-            <p><strong>Sidebar Collapsed:</strong> {sidebar.sidebarCollapsed ? 'Yes' : 'No'}</p>
-            <p><strong>Mobile Menu Open:</strong> {mobileMenu.mobileMenuOpen ? 'Yes' : 'No'}</p>
-            <p><strong>Any Menu Open:</strong> {navigation.isAnyMenuOpen ? 'Yes' : 'No'}</p>
-            <p><strong>Page Favorited:</strong> {preferences.isCurrentPageFavorited ? 'Yes' : 'No'}</p>
+            <p>
+              <strong>Sidebar Open:</strong> {sidebar.sidebarOpen ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Sidebar Collapsed:</strong> {sidebar.sidebarCollapsed ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Mobile Menu Open:</strong> {mobileMenu.mobileMenuOpen ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Any Menu Open:</strong> {navigation.isAnyMenuOpen ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Page Favorited:</strong> {preferences.isCurrentPageFavorited ? 'Yes' : 'No'}
+            </p>
           </div>
         </div>
       </div>
@@ -59,7 +87,11 @@ export function NavigationSliceDemo() {
             <Button onClick={() => sidebar.setSidebarOpen(false)} variant="outline" size="sm">
               Close Sidebar
             </Button>
-            <Button onClick={() => sidebar.setSidebarCollapsed(!sidebar.sidebarCollapsed)} variant="outline" size="sm">
+            <Button
+              onClick={() => sidebar.setSidebarCollapsed(!sidebar.sidebarCollapsed)}
+              variant="outline"
+              size="sm"
+            >
               {sidebar.sidebarCollapsed ? 'Expand' : 'Collapse'} Sidebar
             </Button>
           </div>
@@ -97,18 +129,10 @@ export function NavigationSliceDemo() {
             >
               Set Admin Section
             </Button>
-            <Button
-              onClick={() => navigation.setUserRole('admin')}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={() => navigation.setUserRole('admin')} variant="outline" size="sm">
               Set Admin Role
             </Button>
-            <Button
-              onClick={() => navigation.setUserRole('public')}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={() => navigation.setUserRole('public')} variant="outline" size="sm">
               Set Public Role
             </Button>
           </div>
@@ -140,18 +164,22 @@ export function NavigationSliceDemo() {
           <h3 className="font-semibold mb-2">Preferences</h3>
           <div className="flex gap-2 flex-wrap">
             <Button
-              onClick={() => preferences.updatePreferences({
-                showBreadcrumbs: !preferences.preferences.showBreadcrumbs
-              })}
+              onClick={() =>
+                preferences.updatePreferences({
+                  showBreadcrumbs: !preferences.preferences.showBreadcrumbs,
+                })
+              }
               variant="outline"
               size="sm"
             >
               Toggle Breadcrumbs: {preferences.preferences.showBreadcrumbs ? 'Hide' : 'Show'}
             </Button>
             <Button
-              onClick={() => preferences.updatePreferences({
-                compactMode: !preferences.preferences.compactMode
-              })}
+              onClick={() =>
+                preferences.updatePreferences({
+                  compactMode: !preferences.preferences.compactMode,
+                })
+              }
               variant="outline"
               size="sm"
             >
@@ -167,8 +195,13 @@ export function NavigationSliceDemo() {
           <h3 className="font-semibold mb-2">Most Visited Pages</h3>
           <div className="space-y-1">
             {preferences.mostVisitedPages.map((page, _index) => (
-              <div key={page.path} className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
-                <span>{page.title} ({page.path})</span>
+              <div
+                key={page.path}
+                className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm"
+              >
+                <span>
+                  {page.title} ({page.path})
+                </span>
                 <span className="text-gray-500">{page.visitCount} visits</span>
               </div>
             ))}

@@ -6,11 +6,14 @@
  */
 
 import { EventEmitter } from 'events';
+
 // import * as chokidar from 'chokidar';
 // Unused import
-import { config as dotenvConfig } from 'dotenv';
 import { existsSync, watchFile } from 'fs';
 import { resolve } from 'path';
+
+import { config as dotenvConfig } from 'dotenv';
+
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 // import { logger } from '../observability/logging'; // Unused import
 import type {

@@ -6,10 +6,10 @@
  * ✅ Proper icon spacing and accessibility
  */
 
-import { cva, type VariantProps } from "class-variance-authority"
-import * as React from "react"
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
-import { cn } from "@/shared/design-system/utils/cn"
+import { cn } from '@/shared/design-system/utils/cn';
 
 const alertVariants = cva(
   [
@@ -54,36 +54,30 @@ const alertVariants = cva(
       variant: 'default',
     },
   }
-)
+);
 
 const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
 >(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-))
-Alert.displayName = "Alert"
+  <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} {...props} />
+));
+Alert.displayName = 'Alert';
 
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h5
-    ref={ref}
-    className={cn(
-      'mb-1 font-medium leading-none tracking-tight',
-      'text-[hsl(var(--color-foreground))]',
-      className
-    )}
-    {...props}
-  />
-))
-AlertTitle.displayName = "AlertTitle"
+const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h5
+      ref={ref}
+      className={cn(
+        'mb-1 font-medium leading-none tracking-tight',
+        'text-[hsl(var(--color-foreground))]',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+AlertTitle.displayName = 'AlertTitle';
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -98,7 +92,7 @@ const AlertDescription = React.forwardRef<
     )}
     {...props}
   />
-))
-AlertDescription.displayName = "AlertDescription"
+));
+AlertDescription.displayName = 'AlertDescription';
 
-export { Alert, AlertTitle, AlertDescription, alertVariants }
+export { Alert, AlertTitle, AlertDescription, alertVariants };

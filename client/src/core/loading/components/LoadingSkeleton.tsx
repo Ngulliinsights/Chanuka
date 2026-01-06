@@ -33,10 +33,7 @@ export function LoadingSkeleton({
     wave: 'animate-pulse', // Could be enhanced with wave animation
   };
 
-  const skeletonClasses = [
-    baseClasses,
-    animationClasses[variant],
-  ].join(' ');
+  const skeletonClasses = [baseClasses, animationClasses[variant]].join(' ');
 
   const sizeClasses = {
     sm: {
@@ -83,9 +80,7 @@ export function LoadingSkeleton({
         </div>
       )}
 
-      {!showAvatar && showTitle && (
-        <div className={`${skeletonClasses} ${currentSize.title}`} />
-      )}
+      {!showAvatar && showTitle && <div className={`${skeletonClasses} ${currentSize.title}`} />}
 
       {Array.from({ length: lines }, (_, i) => (
         <div
@@ -100,7 +95,11 @@ export function LoadingSkeleton({
 }
 
 // Specialized skeleton components
-export function TextSkeleton({ lines = 3, className = '', ...props }: Omit<LoadingSkeletonProps, 'showAvatar' | 'showTitle' | 'showSubtitle'>) {
+export function TextSkeleton({
+  lines = 3,
+  className = '',
+  ...props
+}: Omit<LoadingSkeletonProps, 'showAvatar' | 'showTitle' | 'showSubtitle'>) {
   return (
     <LoadingSkeleton
       {...props}
@@ -113,7 +112,10 @@ export function TextSkeleton({ lines = 3, className = '', ...props }: Omit<Loadi
   );
 }
 
-export function CardSkeleton({ className = '', ...props }: Omit<LoadingSkeletonProps, 'showAvatar' | 'showTitle' | 'showSubtitle'>) {
+export function CardSkeleton({
+  className = '',
+  ...props
+}: Omit<LoadingSkeletonProps, 'showAvatar' | 'showTitle' | 'showSubtitle'>) {
   return (
     <div className={`border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${className}`}>
       <LoadingSkeleton
@@ -127,7 +129,13 @@ export function CardSkeleton({ className = '', ...props }: Omit<LoadingSkeletonP
   );
 }
 
-export function ListSkeleton({ items = 5, className = '', ...props }: Omit<LoadingSkeletonProps, 'lines' | 'showAvatar' | 'showTitle' | 'showSubtitle'> & { items?: number }) {
+export function ListSkeleton({
+  items = 5,
+  className = '',
+  ...props
+}: Omit<LoadingSkeletonProps, 'lines' | 'showAvatar' | 'showTitle' | 'showSubtitle'> & {
+  items?: number;
+}) {
   return (
     <div className={`space-y-4 ${className}`}>
       {Array.from({ length: items }, (_, i) => (

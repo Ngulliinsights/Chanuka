@@ -27,7 +27,8 @@ export const animationTokens = {
   // Common transitions
   transition: {
     all: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
-    colors: 'color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1)',
+    colors:
+      'color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1)',
     opacity: 'opacity 150ms cubic-bezier(0, 0, 0.2, 1)',
     shadow: 'box-shadow 150ms cubic-bezier(0, 0, 0.2, 1)',
     transform: 'transform 150ms cubic-bezier(0, 0, 0.2, 1)',
@@ -68,7 +69,8 @@ export const animationTokens = {
       press: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
     },
     card: {
-      hover: 'transform 250ms cubic-bezier(0, 0, 0.2, 1), box-shadow 250ms cubic-bezier(0, 0, 0.2, 1)',
+      hover:
+        'transform 250ms cubic-bezier(0, 0, 0.2, 1), box-shadow 250ms cubic-bezier(0, 0, 0.2, 1)',
     },
     modal: {
       enter: 'opacity 250ms cubic-bezier(0, 0, 0.2, 1), transform 250ms cubic-bezier(0, 0, 0.2, 1)',
@@ -76,4 +78,3 @@ export const animationTokens = {
     },
   },
 } as const;
-

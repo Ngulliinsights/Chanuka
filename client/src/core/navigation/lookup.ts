@@ -1,6 +1,6 @@
 /**
  * Navigation Lookup Module
- * 
+ *
  * Handles navigation item lookup and path utilities
  */
 
@@ -82,10 +82,7 @@ export function determineCurrentSection(
 /**
  * Gets the page title for a given path
  */
-export function getPageTitle(
-  path: string,
-  navigationItems: NavigationItem[]
-): string {
+export function getPageTitle(path: string, navigationItems: NavigationItem[]): string {
   try {
     const item = findNavigationItemByPath(path, navigationItems);
     return item?.label || 'Page';
@@ -132,10 +129,10 @@ export function isNavigationPathActive(currentPath: string, targetPath: string):
  */
 export function normalizePath(path: string): string {
   if (!path) return '/';
-  
+
   // Remove trailing slash except for root
   const normalized = path === '/' ? '/' : path.replace(/\/$/, '');
-  
+
   // Ensure leading slash
   return normalized.startsWith('/') ? normalized : `/${normalized}`;
 }
@@ -146,7 +143,7 @@ export function normalizePath(path: string): string {
 export function extractPageTitle(path: string): string {
   const segments = path.split('/').filter(Boolean);
   if (segments.length === 0) return 'Home';
-  
+
   const lastSegment = segments[segments.length - 1];
   return lastSegment
     .split('-')

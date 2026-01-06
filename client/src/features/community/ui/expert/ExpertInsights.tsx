@@ -1,6 +1,6 @@
 /**
  * Expert Insights - Displays expert contributions with verification
- * 
+ *
  * Features:
  * - Expert verification badges and credibility scoring
  * - Community validation (upvotes/downvotes)
@@ -10,11 +10,10 @@
  */
 
 import { formatDistanceToNow } from 'date-fns';
-import React from 'react';
 import {
-  ThumbsUp, 
-  ThumbsDown, 
-  MessageSquare, 
+  ThumbsUp,
+  ThumbsDown,
+  MessageSquare,
   Share2,
   ExternalLink,
   Book,
@@ -23,17 +22,18 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 
+import { ExpertInsight } from '@client/features/community/types';
 import { cn } from '@client/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { ExpertInsight } from '@client/features/community/types';
 
 interface ExpertInsightsProps {
   insights: ExpertInsight[];
@@ -41,11 +41,7 @@ interface ExpertInsightsProps {
   className?: string;
 }
 
-export function ExpertInsights({
-  insights,
-  compact = false,
-  className
-}: ExpertInsightsProps) {
+export function ExpertInsights({ insights, compact = false, className }: ExpertInsightsProps) {
   const [expandedInsights, setExpandedInsights] = useState<Set<string>>(() => new Set());
   const [votedInsights, setVotedInsights] = useState<Map<string, 'up' | 'down'>>(() => new Map());
 
@@ -143,7 +139,7 @@ export function ExpertInsights({
   if (compact) {
     return (
       <div className={cn('space-y-3', className)}>
-        {insights.map((insight) => (
+        {insights.map(insight => (
           <div
             key={insight.id}
             className="p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
@@ -169,9 +165,7 @@ export function ExpertInsights({
                   {insight.title}
                 </h4>
 
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                  {insight.summary}
-                </p>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{insight.summary}</p>
 
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
@@ -182,7 +176,12 @@ export function ExpertInsights({
                     <MessageSquare className="h-3 w-3" />
                     <span>{insight.comments ?? 0}</span>
                   </div>
-                  <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence ?? 0))}>
+                  <div
+                    className={cn(
+                      'flex items-center gap-1',
+                      getConfidenceColor(insight.confidence ?? 0)
+                    )}
+                  >
                     <Award className="h-3 w-3" />
                     <span>{Math.round((insight.confidence ?? 0) * 100)}%</span>
                   </div>
@@ -197,14 +196,13 @@ export function ExpertInsights({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {insights.map((insight) => {
+      {insights.map(insight => {
         const isExpanded = expandedInsights.has(insight.id);
         const userVote = votedInsights.get(insight.id);
         const content = insight.content ?? '';
         const shouldTruncate = content.length > 300;
-        const displayContent = shouldTruncate && !isExpanded 
-          ? content.slice(0, 300) + '...' 
-          : content;
+        const displayContent =
+          shouldTruncate && !isExpanded ? content.slice(0, 300) + '...' : content;
 
         return (
           <Card key={insight.id} className="chanuka-card">
@@ -245,9 +243,14 @@ export function ExpertInsights({
                         <span>{formatTimeAgo(insight.timestamp)}</span>
                       </div>
                     )}
-                    
+
                     {insight.confidence !== undefined && (
-                      <div className={cn('flex items-center gap-1', getConfidenceColor(insight.confidence))}>
+                      <div
+                        className={cn(
+                          'flex items-center gap-1',
+                          getConfidenceColor(insight.confidence)
+                        )}
+                      >
                         <Award className="h-4 w-4" />
                         <span>{getConfidenceLabel(insight.confidence)}</span>
                       </div>
@@ -272,9 +275,7 @@ export function ExpertInsights({
               {/* Content */}
               {content && (
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {displayContent}
-                  </p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{displayContent}</p>
                   {shouldTruncate && (
                     <Button
                       variant="ghost"
@@ -305,7 +306,12 @@ export function ExpertInsights({
                     <h5 className="font-medium text-sm mb-2">Confidence Level</h5>
                     <div className="flex items-center gap-2">
                       <Progress value={insight.confidence * 100} className="flex-1" />
-                      <span className={cn('text-sm font-medium', getConfidenceColor(insight.confidence))}>
+                      <span
+                        className={cn(
+                          'text-sm font-medium',
+                          getConfidenceColor(insight.confidence)
+                        )}
+                      >
                         {Math.round(insight.confidence * 100)}%
                       </span>
                     </div>
@@ -316,14 +322,16 @@ export function ExpertInsights({
                   <div>
                     <h5 className="font-medium text-sm mb-2">Community Validation</h5>
                     <div className="flex items-center gap-2">
-                      <Progress 
-                        value={insight.communityValidation.validationScore * 100} 
-                        className="flex-1" 
+                      <Progress
+                        value={insight.communityValidation.validationScore * 100}
+                        className="flex-1"
                       />
-                      <span className={cn(
-                        'text-sm font-medium', 
-                        getValidationColor(insight.communityValidation.validationScore)
-                      )}>
+                      <span
+                        className={cn(
+                          'text-sm font-medium',
+                          getValidationColor(insight.communityValidation.validationScore)
+                        )}
+                      >
                         {Math.round(insight.communityValidation.validationScore * 100)}%
                       </span>
                     </div>
@@ -355,9 +363,9 @@ export function ExpertInsights({
                     {insight.sources.map((source: string, index: number) => (
                       <div key={index} className="flex items-center gap-2 text-sm">
                         <FileText className="h-4 w-4 text-muted-foreground" />
-                        <a 
-                          href={source} 
-                          target="_blank" 
+                        <a
+                          href={source}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 underline truncate"
                         >
@@ -393,10 +401,10 @@ export function ExpertInsights({
                       <p className="text-sm text-muted-foreground">{insight.billTitle}</p>
                     </div>
                     {insight.billId && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => window.location.href = `/bills/${insight.billId}`}
+                        onClick={() => (window.location.href = `/bills/${insight.billId}`)}
                       >
                         View Bill
                         <ExternalLink className="h-4 w-4 ml-2" />
@@ -419,10 +427,7 @@ export function ExpertInsights({
                       userVote === 'up' && 'text-green-600 bg-green-50'
                     )}
                   >
-                    <ThumbsUp className={cn(
-                      'h-4 w-4',
-                      userVote === 'up' && 'fill-current'
-                    )} />
+                    <ThumbsUp className={cn('h-4 w-4', userVote === 'up' && 'fill-current')} />
                     <span>{insight.communityValidation?.upvotes ?? 0}</span>
                   </Button>
 
@@ -436,10 +441,7 @@ export function ExpertInsights({
                       userVote === 'down' && 'text-red-600 bg-red-50'
                     )}
                   >
-                    <ThumbsDown className={cn(
-                      'h-4 w-4',
-                      userVote === 'down' && 'fill-current'
-                    )} />
+                    <ThumbsDown className={cn('h-4 w-4', userVote === 'down' && 'fill-current')} />
                     <span>{insight.communityValidation?.downvotes ?? 0}</span>
                   </Button>
 

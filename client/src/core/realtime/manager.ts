@@ -7,6 +7,8 @@
 
 import { logger } from '@client/utils/logger';
 
+import { EventEmitter } from '../utils/event-emitter';
+
 import {
   WebSocketConfig,
   ConnectionState,
@@ -16,9 +18,8 @@ import {
   EventListener,
   HeartbeatMessage,
   SubscriptionMessage,
-  BatchMessage
+  BatchMessage,
 } from './types';
-import { EventEmitter } from '../utils/event-emitter';
 
 export class UnifiedWebSocketManager {
   private static instance: UnifiedWebSocketManager | null = null;
@@ -55,16 +56,20 @@ export class UnifiedWebSocketManager {
 
   async connect(token?: string): Promise<void> {
     // Return existing connection promise if already connecting with same token
-    if (this.connectionPromise &&
-        this.connectionState === ConnectionState.CONNECTING &&
-        this.currentToken === token) {
+    if (
+      this.connectionPromise &&
+      this.connectionState === ConnectionState.CONNECTING &&
+      this.currentToken === token
+    ) {
       return this.connectionPromise;
     }
 
     // Already connected with same token, return immediately
-    if (this.connectionState === ConnectionState.CONNECTED &&
-        this.isConnected() &&
-        this.currentToken === token) {
+    if (
+      this.connectionState === ConnectionState.CONNECTED &&
+      this.isConnected() &&
+      this.currentToken === token
+    ) {
       return Promise.resolve();
     }
 
@@ -96,9 +101,9 @@ export class UnifiedWebSocketManager {
           resolve();
         };
 
-        this.ws.onmessage = (event) => this.onMessage(event);
-        this.ws.onclose = (event) => this.onDisconnected(event);
-        this.ws.onerror = (error) => {
+        this.ws.onmessage = event => this.onMessage(event);
+        this.ws.onclose = event => this.onDisconnected(event);
+        this.ws.onerror = error => {
           clearTimeout(connectionTimeout);
           this.onError(error);
 
@@ -135,10 +140,14 @@ export class UnifiedWebSocketManager {
   // Subscription Management
   // ============================================================================
 
-  subscribe(topic: string, callback: MessageHandler, options?: {
-    filters?: Record<string, unknown>;
-    priority?: 'high' | 'medium' | 'low';
-  }): string {
+  subscribe(
+    topic: string,
+    callback: MessageHandler,
+    options?: {
+      filters?: Record<string, unknown>;
+      priority?: 'high' | 'medium' | 'low';
+    }
+  ): string {
     const subscriptionId = this.generateSubscriptionId();
 
     const subscription: Subscription = {
@@ -146,7 +155,7 @@ export class UnifiedWebSocketManager {
       topic,
       filters: options?.filters,
       callback,
-      priority: options?.priority || 'medium'
+      priority: options?.priority || 'medium',
     };
 
     this.subscriptions.set(subscriptionId, subscription);
@@ -159,7 +168,7 @@ export class UnifiedWebSocketManager {
     logger.debug('WebSocket subscription created', {
       component: 'UnifiedWebSocketManager',
       subscriptionId,
-      topic
+      topic,
     });
 
     return subscriptionId;
@@ -179,7 +188,7 @@ export class UnifiedWebSocketManager {
     logger.debug('WebSocket subscription removed', {
       component: 'UnifiedWebSocketManager',
       subscriptionId,
-      topic: subscription.topic
+      topic: subscription.topic,
     });
   }
 
@@ -196,14 +205,19 @@ export class UnifiedWebSocketManager {
       try {
         const payload = JSON.stringify(message);
         // Message size check to prevent issues
-        if (payload.length > 1024 * 1024) { // 1MB limit
+        if (payload.length > 1024 * 1024) {
+          // 1MB limit
           throw new Error('Message too large');
         }
         this.ws!.send(payload);
       } catch (error) {
-        logger.error('Failed to send WebSocket message', {
-          component: 'UnifiedWebSocketManager'
-        }, error);
+        logger.error(
+          'Failed to send WebSocket message',
+          {
+            component: 'UnifiedWebSocketManager',
+          },
+          error
+        );
         this.emit('error', { message: 'Failed to send message', error });
         throw error;
       }
@@ -259,7 +273,7 @@ export class UnifiedWebSocketManager {
 
     logger.info('WebSocket connected successfully', {
       component: 'UnifiedWebSocketManager',
-      subscriptions: this.subscriptions.size
+      subscriptions: this.subscriptions.size,
     });
   }
 
@@ -276,30 +290,37 @@ export class UnifiedWebSocketManager {
       // Route message to subscribers
       this.routeMessage(message);
     } catch (error) {
-      logger.error('Failed to process WebSocket message', {
-        component: 'UnifiedWebSocketManager'
-      }, error);
+      logger.error(
+        'Failed to process WebSocket message',
+        {
+          component: 'UnifiedWebSocketManager',
+        },
+        error
+      );
     }
   }
 
   private onDisconnected(event: CloseEvent): void {
     const wasConnected = this.connectionState === ConnectionState.CONNECTED;
-    this.connectionState = event.code === 1000 ? ConnectionState.DISCONNECTED : ConnectionState.RECONNECTING;
+    this.connectionState =
+      event.code === 1000 ? ConnectionState.DISCONNECTED : ConnectionState.RECONNECTING;
 
     this.stopHeartbeat();
     this.stopBatchProcessing();
     this.ws = null;
 
     // Attempt reconnection if enabled and not a clean close
-    if (this.config.reconnect.enabled &&
-        event.code !== 1000 &&
-        wasConnected &&
-        this.reconnectAttempts < this.config.reconnect.maxAttempts) {
+    if (
+      this.config.reconnect.enabled &&
+      event.code !== 1000 &&
+      wasConnected &&
+      this.reconnectAttempts < this.config.reconnect.maxAttempts
+    ) {
       this.scheduleReconnect();
     } else if (this.reconnectAttempts >= this.config.reconnect.maxAttempts) {
       this.connectionState = ConnectionState.FAILED;
       logger.error('Max reconnection attempts reached', {
-        component: 'UnifiedWebSocketManager'
+        component: 'UnifiedWebSocketManager',
       });
     }
 
@@ -308,7 +329,7 @@ export class UnifiedWebSocketManager {
     logger.warn('WebSocket disconnected', {
       component: 'UnifiedWebSocketManager',
       code: event.code,
-      reason: event.reason
+      reason: event.reason,
     });
   }
 
@@ -317,25 +338,34 @@ export class UnifiedWebSocketManager {
 
     const errorObj = error instanceof Error ? error : new Error('WebSocket connection error');
 
-    logger.error('WebSocket error', {
-      component: 'UnifiedWebSocketManager'
-    }, errorObj);
+    logger.error(
+      'WebSocket error',
+      {
+        component: 'UnifiedWebSocketManager',
+      },
+      errorObj
+    );
 
     this.eventEmitter.emit('error', errorObj);
   }
 
   private routeMessage(message: WebSocketMessage): void {
-    const matchingSubscriptions = Array.from(this.subscriptions.values())
-      .filter(sub => this.matchesSubscription(sub, message));
+    const matchingSubscriptions = Array.from(this.subscriptions.values()).filter(sub =>
+      this.matchesSubscription(sub, message)
+    );
 
     matchingSubscriptions.forEach(sub => {
       try {
         sub.callback(message);
       } catch (error) {
-        logger.error('Error in subscription callback', {
-          component: 'UnifiedWebSocketManager',
-          subscriptionId: sub.id
-        }, error);
+        logger.error(
+          'Error in subscription callback',
+          {
+            component: 'UnifiedWebSocketManager',
+            subscriptionId: sub.id,
+          },
+          error
+        );
       }
     });
 
@@ -378,7 +408,7 @@ export class UnifiedWebSocketManager {
       type: 'subscribe',
       topic: subscription.topic,
       filters: subscription.filters,
-      subscriptionId: subscription.id
+      subscriptionId: subscription.id,
     };
     this.send(message);
   }
@@ -387,7 +417,7 @@ export class UnifiedWebSocketManager {
     const message: SubscriptionMessage = {
       type: 'unsubscribe',
       topic: subscription.topic,
-      subscriptionId: subscription.id
+      subscriptionId: subscription.id,
     };
     this.send(message);
   }
@@ -399,7 +429,7 @@ export class UnifiedWebSocketManager {
 
     logger.debug('Re-subscribed to all topics', {
       component: 'UnifiedWebSocketManager',
-      count: this.subscriptions.size
+      count: this.subscriptions.size,
     });
   }
 
@@ -408,7 +438,7 @@ export class UnifiedWebSocketManager {
       // Remove oldest message to prevent unbounded growth
       this.messageQueue.shift();
       logger.warn('Message queue full, removing oldest message', {
-        component: 'UnifiedWebSocketManager'
+        component: 'UnifiedWebSocketManager',
       });
     }
     this.messageQueue.push(message);
@@ -419,7 +449,7 @@ export class UnifiedWebSocketManager {
 
     logger.debug('Flushing message queue', {
       component: 'UnifiedWebSocketManager',
-      count: this.messageQueue.length
+      count: this.messageQueue.length,
     });
 
     const queue = [...this.messageQueue];
@@ -429,9 +459,13 @@ export class UnifiedWebSocketManager {
       try {
         this.send(message);
       } catch (error) {
-        logger.error('Error sending queued message', {
-          component: 'UnifiedWebSocketManager'
-        }, error);
+        logger.error(
+          'Error sending queued message',
+          {
+            component: 'UnifiedWebSocketManager',
+          },
+          error
+        );
         // Re-queue failed messages
         this.queueMessage(message);
       }
@@ -448,9 +482,12 @@ export class UnifiedWebSocketManager {
       }
 
       // Check if connection is stale
-      if (this.lastPongTime && Date.now() - this.lastPongTime > this.config.heartbeat.timeout + 15000) {
+      if (
+        this.lastPongTime &&
+        Date.now() - this.lastPongTime > this.config.heartbeat.timeout + 15000
+      ) {
         logger.warn('No pong received, connection appears dead', {
-          component: 'UnifiedWebSocketManager'
+          component: 'UnifiedWebSocketManager',
         });
         this.ws?.close(4000, 'Heartbeat timeout');
         return;
@@ -493,7 +530,7 @@ export class UnifiedWebSocketManager {
       const batchMessage: BatchMessage = {
         type: 'batch',
         messages: batch,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       this.send(batchMessage);
     }
@@ -505,21 +542,26 @@ export class UnifiedWebSocketManager {
     }
 
     this.reconnectAttempts++;
-    const delay = this.config.reconnect.backoff === 'exponential'
-      ? this.config.reconnect.delay * Math.pow(2, this.reconnectAttempts - 1)
-      : this.config.reconnect.delay * this.reconnectAttempts;
+    const delay =
+      this.config.reconnect.backoff === 'exponential'
+        ? this.config.reconnect.delay * Math.pow(2, this.reconnectAttempts - 1)
+        : this.config.reconnect.delay * this.reconnectAttempts;
 
     logger.info('Scheduling WebSocket reconnection', {
       component: 'UnifiedWebSocketManager',
       attempt: this.reconnectAttempts,
-      delay
+      delay,
     });
 
     this.reconnectTimer = setTimeout(() => {
       this.connect(this.currentToken || undefined).catch(error => {
-        logger.error('WebSocket reconnection failed', {
-          component: 'UnifiedWebSocketManager'
-        }, error);
+        logger.error(
+          'WebSocket reconnection failed',
+          {
+            component: 'UnifiedWebSocketManager',
+          },
+          error
+        );
       });
     }, delay);
   }

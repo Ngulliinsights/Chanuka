@@ -27,5 +27,5 @@ export type {
   SavedBillsResponse,
   EngagementHistoryResponse,
   ValidationError,
-  AuthenticationError
+  AuthenticationError,
 } from './user-service';

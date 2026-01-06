@@ -1,11 +1,10 @@
 import { EventEmitter } from 'events';
+
 import { UnifiedLogger } from '../observability/logging';
 
 import { AnalysisEngine } from './analysis';
 import { BackupManager } from './backup';
 import { ProgressTracker } from './progress';
-import { ValidationFramework } from './validation';
-
 import { 
   ModernizationTask,
   ModernizationPhase,
@@ -18,6 +17,8 @@ import {
   BackupResult,
   AnalysisResult
 } from './types';
+import { ValidationFramework } from './validation';
+
 // Lightweight logger interface matching project's meta-first logging usage
 type LoggerLike = {
   info: (meta: unknown, message?: string) => void;

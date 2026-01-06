@@ -5,7 +5,6 @@
  * loading states, error handling, and customization options.
  */
 
-import React, { useState } from 'react';
 import {
   Eye,
   EyeOff,
@@ -14,8 +13,9 @@ import {
   Maximize2,
   X as Minimize2, // Using X as Minimize2 replacement
   MoreHorizontal,
-  X
+  X,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
@@ -83,7 +83,7 @@ export function DashboardWidget({
   onToggleCollapse,
   onToggleExpand,
   badge,
-  badgeVariant = 'secondary'
+  badgeVariant = 'secondary',
 }: DashboardWidgetProps) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
@@ -136,9 +136,7 @@ export function DashboardWidget({
                 )}
               </CardTitle>
               {description && (
-                <p className="text-sm text-muted-foreground truncate">
-                  {description}
-                </p>
+                <p className="text-sm text-muted-foreground truncate">{description}</p>
               )}
             </div>
           </div>
@@ -165,11 +163,7 @@ export function DashboardWidget({
                   onClick={handleToggleCollapse}
                   className="h-8 w-8 p-0"
                 >
-                  {isCollapsed ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {isCollapsed ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </Button>
               )}
 
@@ -276,7 +270,7 @@ export function useWidgetState(_widgetId: string) {
     loading: false,
     error: null as string | null,
     data: null as any,
-    lastRefresh: null as Date | null
+    lastRefresh: null as Date | null,
   });
 
   const setLoading = (loading: boolean) => {
@@ -293,7 +287,7 @@ export function useWidgetState(_widgetId: string) {
       data,
       error: null,
       loading: false,
-      lastRefresh: new Date()
+      lastRefresh: new Date(),
     }));
   };
 
@@ -312,6 +306,6 @@ export function useWidgetState(_widgetId: string) {
     setLoading,
     setError,
     setData,
-    refresh
+    refresh,
   };
 }

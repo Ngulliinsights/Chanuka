@@ -46,9 +46,21 @@ export const TrackedTopicSchema = z.object({
 });
 
 export const DashboardConfigSchema = z.object({
-  refreshInterval: z.number().int().min(1000, 'Refresh interval must be at least 1 second').max(3600000, 'Refresh interval too long'),
-  maxActionItems: z.number().int().min(1, 'Must show at least 1 action item').max(100, 'Too many action items'),
-  maxTrackedTopics: z.number().int().min(1, 'Must show at least 1 topic').max(50, 'Too many topics'),
+  refreshInterval: z
+    .number()
+    .int()
+    .min(1000, 'Refresh interval must be at least 1 second')
+    .max(3600000, 'Refresh interval too long'),
+  maxActionItems: z
+    .number()
+    .int()
+    .min(1, 'Must show at least 1 action item')
+    .max(100, 'Too many action items'),
+  maxTrackedTopics: z
+    .number()
+    .int()
+    .min(1, 'Must show at least 1 topic')
+    .max(50, 'Too many topics'),
   enableAutoRefresh: z.boolean(),
   showCompletedActions: z.boolean(),
   defaultView: DashboardSectionSchema,
@@ -125,7 +137,11 @@ export function validateDashboardConfig(config: unknown): DashboardConfig {
       const message = error.errors[0]?.message || 'Invalid dashboard configuration';
       throw new DashboardValidationError(message, field, config, { zodError: error });
     }
-    throw new DashboardValidationError('Dashboard configuration validation failed', 'config', config);
+    throw new DashboardValidationError(
+      'Dashboard configuration validation failed',
+      'config',
+      config
+    );
   }
 }
 
@@ -146,7 +162,11 @@ export function validateDashboardData(data: unknown): DashboardData {
  * Safe validation functions that return validation results
  */
 
-export function safeValidateActionItem(item: unknown): { success: boolean; data?: ActionItem; error?: DashboardValidationError } {
+export function safeValidateActionItem(item: unknown): {
+  success: boolean;
+  data?: ActionItem;
+  error?: DashboardValidationError;
+} {
   try {
     const data = validateActionItem(item);
     return { success: true, data };
@@ -155,7 +175,11 @@ export function safeValidateActionItem(item: unknown): { success: boolean; data?
   }
 }
 
-export function safeValidateTrackedTopic(topic: unknown): { success: boolean; data?: TrackedTopic; error?: DashboardValidationError } {
+export function safeValidateTrackedTopic(topic: unknown): {
+  success: boolean;
+  data?: TrackedTopic;
+  error?: DashboardValidationError;
+} {
   try {
     const data = validateTrackedTopic(topic);
     return { success: true, data };
@@ -164,7 +188,11 @@ export function safeValidateTrackedTopic(topic: unknown): { success: boolean; da
   }
 }
 
-export function safeValidateDashboardConfig(config: unknown): { success: boolean; data?: DashboardConfig; error?: DashboardValidationError } {
+export function safeValidateDashboardConfig(config: unknown): {
+  success: boolean;
+  data?: DashboardConfig;
+  error?: DashboardValidationError;
+} {
   try {
     const data = validateDashboardConfig(config);
     return { success: true, data };
@@ -172,4 +200,3 @@ export function safeValidateDashboardConfig(config: unknown): { success: boolean
     return { success: false, error: error as DashboardValidationError };
   }
 }
-
