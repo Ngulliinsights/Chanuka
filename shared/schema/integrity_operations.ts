@@ -10,9 +10,9 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { primaryKeyUuid, auditFields } from "./base-types";
-import { moderationStatusEnum, verificationLevelEnum } from "./enum";
-import { users } from "./foundation";
 import { comments } from "./citizen_participation";
+import { moderationStatusEnum, verificationLevelEnum, severityEnum } from "./enum";
+import { users } from "./foundation";
 
 // CONTENT REPORTS - User reports of problematic content
 // ============================================================================

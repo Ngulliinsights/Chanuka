@@ -7,16 +7,13 @@
 
 import { sql, relations } from "drizzle-orm";
 import {
-  pgTable, text, integer, jsonb, numeric, uuid, varchar, index, unique, date, check
-    index, unique, date, smallint, check, foreignKey
+  pgTable, text, integer, boolean, jsonb, numeric, uuid, varchar,
+  index, unique, date, smallint, check, foreignKey
 } from "drizzle-orm/pg-core";
 
-import {
-    kenyanCountyEnum
-} from "./enum";
 import { primaryKeyUuid, auditFields } from "./base-types";
-import { commodityCategoryEnum, reliabilityScoreEnum } from "./enum";
-import { bills } from "./foundation";
+import { kenyanCountyEnum } from "./enum";
+import { bills, users } from "./foundation";
 // ============================================================================
 // MARKET SECTORS - Economic sector classification and tracking
 // ============================================================================
