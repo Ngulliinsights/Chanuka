@@ -10,13 +10,11 @@
 
 import { sql, relations } from "drizzle-orm";
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, date,
+  pgTable, text, integer, boolean, jsonb, numeric, uuid, varchar, date,
   index, check
 } from "drizzle-orm/pg-core";
-
-import { bills, users } from "./foundation";
-
 import { primaryKeyUuid, auditFields } from "./base-types";
+import { bills, users } from "./foundation";
 // ============================================================================
 // TROJAN BILL ANALYSIS - Real-Time Detection Results
 // ============================================================================
@@ -28,7 +26,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
   }),
 
   bill_name: varchar("bill_name", { length: 500 }),
-  
+
   // Risk Assessment (0-100 scale)
   trojan_risk_score: numeric("trojan_risk_score", { precision: 5, scale: 2 }),
   // 0-100: How likely this bill has hidden agendas
@@ -39,7 +37,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
 
   // What the bill CLAIMS to do
   stated_purpose: text("stated_purpose"),
-  
+
   // What it ACTUALLY does (hidden provisions)
   hidden_provisions: jsonb("hidden_provisions").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
@@ -56,21 +54,21 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
   // Detection metadata
   detection_method: varchar("detection_method", { length: 50 }),
   // Values: 'automated', 'expert', 'crowdsourced', 'hybrid', 'ai_analysis'
-  
+
   detection_date: date("detection_date"),
-  
+
   detection_confidence: numeric("detection_confidence", { precision: 3, scale: 2 }),
   // 0.00-1.00: AI/expert confidence in detection
 
   // Analysis details
   analysis_summary: text("analysis_summary"),
   // Brief explanation of what was found
-  
+
   detailed_analysis: text("detailed_analysis"),
   // Full analysis with evidence
-  
+
   red_flags: varchar("red_flags", { length: 100 }).array(),
-  // Values: ["rushed_process", "buried_provisions", "vague_language", 
+  // Values: ["rushed_process", "buried_provisions", "vague_language",
   //          "excessive_powers", "weak_oversight", "undefined_terms"]
 
   // Public alerting
@@ -78,30 +76,30 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
   alert_issued_date: date("alert_issued_date"),
   alert_channels: varchar("alert_channels", { length: 50 }).array(),
   // Values: ["website", "social_media", "sms", "email", "press_release", "public_hearing"]
-  
+
   alert_reach: integer("alert_reach"),
   // How many people were alerted
 
   // Impact tracking
   media_coverage: boolean("media_coverage").notNull().default(false),
   media_mentions: integer("media_mentions").default(0),
-  
+
   parliamentary_awareness: boolean("parliamentary_awareness").notNull().default(false),
   // Did MPs become aware of the hidden provisions?
-  
+
   amendments_proposed: boolean("amendments_proposed").notNull().default(false),
   // Were amendments proposed to fix the issues?
 
   // Outcome tracking
   outcome: varchar("outcome", { length: 50 }),
-  // Values: 'passed_as_is' (detection failed), 
+  // Values: 'passed_as_is' (detection failed),
   //         'amended' (provisions removed/modified),
   //         'defeated' (bill rejected),
   //         'withdrawn' (sponsor withdrew),
   //         'pending' (still in process)
-  
+
   outcome_date: date("outcome_date"),
-  
+
   detection_impact_score: numeric("detection_impact_score", { precision: 5, scale: 2 }),
   // 0-100: How much did the detection change the outcome?
 
@@ -200,7 +198,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   // What it claims vs what it does
   stated_purpose: text("stated_purpose"),
   // What the provision SAYS it does
-  
+
   hidden_agenda: text("hidden_agenda"),
   // What it ACTUALLY does
 
@@ -216,7 +214,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   // Constitutional implications
   affected_rights: jsonb("affected_rights").notNull().default(sql`'{}'::jsonb`),
   // Constitutional articles affected: ["Article 31 (Privacy)", "Article 33 (Expression)"]
-  
+
   affected_institutions: jsonb("affected_institutions").notNull().default(sql`'{}'::jsonb`),
   // Which institutions get new powers/lose oversight
 
@@ -226,7 +224,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   // Severity assessment
   severity: varchar("severity", { length: 20 }),
   // Values: 'low', 'medium', 'high', 'critical'
-  
+
   urgency: varchar("urgency", { length: 20 }),
   // Values: 'routine', 'concerning', 'urgent', 'emergency'
   // How quickly must this be addressed?
@@ -234,17 +232,17 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   // Detection details
   detected_by: varchar("detected_by", { length: 100 }),
   // Who/what detected this provision
-  
+
   detection_confidence: numeric("detection_confidence", { precision: 3, scale: 2 }),
   // 0.00-1.00 confidence
-  
+
   evidence: text("evidence"),
   // Supporting evidence for the hidden agenda claim
 
   // Public education
   plain_language_explanation: text("plain_language_explanation"),
   // Explain in simple terms for citizens
-  
+
   comparable_provisions: text("comparable_provisions").array(),
   // Similar provisions in other bills/laws for context
 
@@ -274,7 +272,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   // GIN indexes for JSONB arrays
   affectedRightsIdx: index("idx_hidden_provisions_affected_rights")
     .using("gin", table.affected_rights),
-  
+
   affectedInstitutionsIdx: index("idx_hidden_provisions_affected_institutions")
     .using("gin", table.affected_institutions),
 
@@ -309,7 +307,7 @@ export const trojan_techniques = pgTable("trojan_techniques", {
 
   // Technique classification
   technique_type: varchar("technique_type", { length: 50 }),
-  // Values: 'burying' (hide in 100+ pages), 
+  // Values: 'burying' (hide in 100+ pages),
   //         'technical_language' (obscure with jargon),
   //         'definitions' (redefine terms),
   //         'schedules' (hide in schedules),
@@ -335,7 +333,7 @@ export const trojan_techniques = pgTable("trojan_techniques", {
   // Countermeasures
   detection_method: text("detection_method"),
   // How to spot this technique
-  
+
   countermeasure: text("countermeasure"),
   // How to counter this technique (for citizens/MPs)
 
@@ -400,7 +398,7 @@ export const detection_signals = pgTable("detection_signals", {
   // Threshold comparison
   threshold_value: numeric("threshold_value", { precision: 10, scale: 4 }),
   // What's the normal/acceptable value?
-  
+
   threshold_exceeded: boolean("threshold_exceeded").notNull().default(false),
   // Did this signal exceed the threshold?
 

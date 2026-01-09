@@ -480,7 +480,7 @@ export const conflictDetectionsRelations = relations(conflictDetections, ({ one 
   })
 }));
 
-export const influenceNetworksRelations = relations(influenceNetworks, ({}) => ({
+export const influenceNetworksRelations = relations(influenceNetworks, () => ({
   // Polymorphic relations handled at application level
 }));
 

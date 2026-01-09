@@ -9,10 +9,9 @@ import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, check
 } from "drizzle-orm/pg-core";
-
+import { auditFields, primaryKeyUuid } from "./base-types";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
-import { auditFields, primaryKeyUuid } from "./base-types";
 
 // ============================================================================
 // AMBASSADORS - Community facilitators for offline engagement
