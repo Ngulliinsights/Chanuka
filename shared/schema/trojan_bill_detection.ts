@@ -13,6 +13,7 @@ import {
   pgTable, text, integer, boolean, jsonb, numeric, uuid, varchar, date,
   index, check
 } from "drizzle-orm/pg-core";
+
 import { primaryKeyUuid, auditFields } from "./base-types";
 import { bills, users } from "./foundation";
 // ============================================================================
@@ -126,11 +127,13 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
 
   // Detection method analysis
   detectionMethodIdx: index("idx_trojan_bill_analysis_detection_method")
-    .on(table.detection_method, table.detection_confidence.desc()),
+    .on(table.detection_method, table.detection_confidence.desc())
+    .where(sql`${table.detection_method} IS NOT NULL AND ${table.detection_confidence} IS NOT NULL`),
 
   // Outcome tracking
   outcomeIdx: index("idx_trojan_bill_analysis_outcome")
-    .on(table.outcome, table.outcome_date.desc()),
+    .on(table.outcome, table.outcome_date.desc())
+    .where(sql`${table.outcome} IS NOT NULL`),
 
   // Success stories (amendments/defeats)
   successIdx: index("idx_trojan_bill_analysis_success")
@@ -139,7 +142,8 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
 
   // Timeline queries
   detectionDateIdx: index("idx_trojan_bill_analysis_detection_date")
-    .on(table.detection_date.desc()),
+    .on(table.detection_date.desc())
+    .where(sql`${table.detection_date} IS NOT NULL`),
 
   // GIN index for hidden provisions JSONB queries
   hiddenProvisionsIdx: index("idx_trojan_bill_analysis_hidden_provisions")
@@ -184,7 +188,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
 // Each row is one hidden provision within a bill
 
 export const hidden_provisions = pgTable("hidden_provisions", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -250,7 +254,8 @@ export const hidden_provisions = pgTable("hidden_provisions", {
 }, (table) => ({
   // Hot path: Bill provisions by severity
   billSeverityIdx: index("idx_hidden_provisions_bill_severity")
-    .on(table.bill_id, table.severity, table.urgency),
+    .on(table.bill_id, table.severity, table.urgency)
+    .where(sql`${table.severity} IS NOT NULL`),
 
   // High severity provisions
   highSeverityIdx: index("idx_hidden_provisions_high_severity")
@@ -259,26 +264,32 @@ export const hidden_provisions = pgTable("hidden_provisions", {
 
   // Power type analysis
   powerTypeIdx: index("idx_hidden_provisions_power_type")
-    .on(table.power_type, table.severity),
+    .on(table.power_type, table.severity)
+    .where(sql`${table.power_type} IS NOT NULL`),
 
   // Deception technique tracking
   techniqueIdx: index("idx_hidden_provisions_technique")
-    .on(table.deception_technique),
+    .on(table.deception_technique)
+    .where(sql`${table.deception_technique} IS NOT NULL`),
 
   // Constitutional violations
   violationsIdx: index("idx_hidden_provisions_violations")
-    .using("gin", table.constitutional_articles_violated),
+    .using("gin", table.constitutional_articles_violated)
+    .where(sql`${table.constitutional_articles_violated} IS NOT NULL`),
 
   // GIN indexes for JSONB arrays
   affectedRightsIdx: index("idx_hidden_provisions_affected_rights")
-    .using("gin", table.affected_rights),
+    .using("gin", table.affected_rights)
+    .where(sql`${table.affected_rights} IS NOT NULL`),
 
   affectedInstitutionsIdx: index("idx_hidden_provisions_affected_institutions")
-    .using("gin", table.affected_institutions),
+    .using("gin", table.affected_institutions)
+    .where(sql`${table.affected_institutions} IS NOT NULL`),
 
   // Full-text search on provision text
   provisionTextIdx: index("idx_hidden_provisions_text")
-    .on(table.provision_text),
+    .on(table.provision_text)
+    .where(sql`${table.provision_text} IS NOT NULL`),
 
   // Validation: Severity enumeration
   severityCheck: check("hidden_provisions_severity_check",
@@ -299,7 +310,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
 // Tracks HOW bills hide their true intent
 
 export const trojan_techniques = pgTable("trojan_techniques", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -341,19 +352,23 @@ export const trojan_techniques = pgTable("trojan_techniques", {
 }, (table) => ({
   // Technique type analysis
   techniqueTypeIdx: index("idx_trojan_techniques_type")
-    .on(table.technique_type, table.effectiveness_rating.desc()),
+    .on(table.technique_type, table.effectiveness_rating.desc())
+    .where(sql`${table.technique_type} IS NOT NULL AND ${table.effectiveness_rating} IS NOT NULL`),
 
   // Effectiveness analysis
   effectivenessIdx: index("idx_trojan_techniques_effectiveness")
-    .on(table.effectiveness_rating.desc()),
+    .on(table.effectiveness_rating.desc())
+    .where(sql`${table.effectiveness_rating} IS NOT NULL`),
 
   // Detection difficulty
   difficultyIdx: index("idx_trojan_techniques_difficulty")
-    .on(table.detection_difficulty),
+    .on(table.detection_difficulty)
+    .where(sql`${table.detection_difficulty} IS NOT NULL`),
 
   // Composite index for bill-based technique queries
   billTechniqueIdx: index("idx_trojan_techniques_bill_type")
-    .on(table.bill_id, table.technique_type),
+    .on(table.bill_id, table.technique_type)
+    .where(sql`${table.technique_type} IS NOT NULL`),
 
   // Validation: Effectiveness rating 1-10
   effectivenessCheck: check("trojan_techniques_effectiveness_check",
@@ -366,7 +381,7 @@ export const trojan_techniques = pgTable("trojan_techniques", {
 // Individual risk signals that contribute to overall trojan_risk_score
 
 export const detection_signals = pgTable("detection_signals", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -406,7 +421,8 @@ export const detection_signals = pgTable("detection_signals", {
 }, (table) => ({
   // Composite index for signal type queries
   billSignalTypeIdx: index("idx_detection_signals_bill_type")
-    .on(table.bill_id, table.signal_type),
+    .on(table.bill_id, table.signal_type)
+    .where(sql`${table.signal_type} IS NOT NULL`),
 
   // High-risk signals
   highRiskSignalsIdx: index("idx_detection_signals_high_risk")
@@ -415,15 +431,18 @@ export const detection_signals = pgTable("detection_signals", {
 
   // Signal value analysis
   signalValueIdx: index("idx_detection_signals_value")
-    .on(table.signal_type, table.signal_value),
+    .on(table.signal_type, table.signal_value)
+    .where(sql`${table.signal_type} IS NOT NULL AND ${table.signal_value} IS NOT NULL`),
 
   // Risk contribution analysis
   contributesIdx: index("idx_detection_signals_contributes")
-    .on(table.contributes_to_risk, table.risk_weight.desc()),
+    .on(table.contributes_to_risk, table.risk_weight.desc())
+    .where(sql`${table.risk_weight} IS NOT NULL`),
 
   // Full-text search on signal description
   descriptionIdx: index("idx_detection_signals_description")
-    .on(table.signal_description),
+    .on(table.signal_description)
+    .where(sql`${table.signal_description} IS NOT NULL`),
 
   // Validation: Risk weight 0-100
   riskWeightCheck: check("detection_signals_risk_weight_check",
@@ -451,21 +470,21 @@ export const trojanBillAnalysisRelations = relations(trojan_bill_analysis, ({ on
 export const hiddenProvisionsRelations = relations(hidden_provisions, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [hidden_provisions.bill_id],
-    references: [trojan_bill_analysis.bill_id],
+    references: [trojan_bill_analysis.bill_id] as any,
   }),
 }));
 
 export const trojanTechniquesRelations = relations(trojan_techniques, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [trojan_techniques.bill_id],
-    references: [trojan_bill_analysis.bill_id],
+    references: [trojan_bill_analysis.bill_id] as any,
   }),
 }));
 
 export const detectionSignalsRelations = relations(detection_signals, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [detection_signals.bill_id],
-    references: [trojan_bill_analysis.bill_id],
+    references: [trojan_bill_analysis.bill_id] as any,
   }),
 }));
 
