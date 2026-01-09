@@ -470,21 +470,21 @@ export const trojanBillAnalysisRelations = relations(trojan_bill_analysis, ({ on
 export const hiddenProvisionsRelations = relations(hidden_provisions, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [hidden_provisions.bill_id],
-    references: [trojan_bill_analysis.bill_id] as any,
+    references: [trojan_bill_analysis.bill_id],
   }),
 }));
 
 export const trojanTechniquesRelations = relations(trojan_techniques, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [trojan_techniques.bill_id],
-    references: [trojan_bill_analysis.bill_id] as any,
+    references: [trojan_bill_analysis.bill_id],
   }),
 }));
 
 export const detectionSignalsRelations = relations(detection_signals, ({ one }) => ({
   analysis: one(trojan_bill_analysis, {
     fields: [detection_signals.bill_id],
-    references: [trojan_bill_analysis.bill_id] as any,
+    references: [trojan_bill_analysis.bill_id],
   }),
 }));
 
