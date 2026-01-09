@@ -9,6 +9,7 @@ import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, check
 } from "drizzle-orm/pg-core";
+
 import { auditFields, primaryKeyUuid } from "./base-types";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
@@ -18,7 +19,7 @@ import { bills, users } from "./foundation";
 // ============================================================================
 
 export const ambassadors = pgTable("ambassadors", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
   // Ambassador identification
@@ -76,11 +77,13 @@ export const ambassadors = pgTable("ambassadors", {
 
   // Performance tracking
   activityPerformanceIdx: index("idx_ambassadors_activity_performance")
-    .on(table.last_activity_date, table.sessions_conducted, table.people_reached),
+    .on(table.last_activity_date, table.sessions_conducted, table.people_reached)
+    .where(sql`${table.last_activity_date} IS NOT NULL`),
 
   // Training status
   trainingStatusIdx: index("idx_ambassadors_training_status")
-    .on(table.training_completed, table.certification_level),
+    .on(table.training_completed, table.certification_level)
+    .where(sql`${table.certification_level} IS NOT NULL`),
 
   // Contact method validation
   contactMethodCheck: check("ambassadors_contact_method_check",
@@ -88,7 +91,8 @@ export const ambassadors = pgTable("ambassadors", {
 
   // Foreign key indexes
   userIdIdx: index("idx_ambassadors_user_id").on(table.user_id),
-  recruitedByIdx: index("idx_ambassadors_recruited_by").on(table.recruited_by_id),
+  recruitedByIdx: index("idx_ambassadors_recruited_by").on(table.recruited_by_id)
+    .where(sql`${table.recruited_by_id} IS NOT NULL`),
 
   // Status indexes
   verificationStatusIdx: index("idx_ambassadors_verification_status").on(table.verification_status),
@@ -99,7 +103,7 @@ export const ambassadors = pgTable("ambassadors", {
 // ============================================================================
 
 export const communities = pgTable("communities", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Community identification
   name: varchar("name", { length: 300 }).notNull(),
@@ -151,7 +155,8 @@ export const communities = pgTable("communities", {
 
   // Community characteristics
   accessCharacteristicsIdx: index("idx_communities_access_characteristics")
-    .on(table.internet_penetration, table.smartphone_penetration),
+    .on(table.internet_penetration, table.smartphone_penetration)
+    .where(sql`${table.internet_penetration} IS NOT NULL OR ${table.smartphone_penetration} IS NOT NULL`),
 
   // Engagement tracking
   lastEngagementIdx: index("idx_communities_last_engagement")
@@ -164,7 +169,7 @@ export const communities = pgTable("communities", {
 // ============================================================================
 
 export const facilitation_sessions = pgTable("facilitation_sessions", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Session identification
   session_code: varchar("session_code", { length: 30 }).notNull().unique(),
@@ -225,7 +230,8 @@ export const facilitation_sessions = pgTable("facilitation_sessions", {
 
   // Bill discussion tracking
   billDiscussionIdx: index("idx_facilitation_sessions_bill_discussion")
-    .using("gin", table.bills_discussed),
+    .using("gin", table.bills_discussed)
+    .where(sql`${table.bills_discussed} IS NOT NULL`),
 
   // Sync queue management
   syncStatusIdx: index("idx_facilitation_sessions_sync_status")
@@ -238,7 +244,7 @@ export const facilitation_sessions = pgTable("facilitation_sessions", {
 // ============================================================================
 
 export const offline_submissions = pgTable("offline_submissions", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Submission context
   session_id: uuid("session_id").references(() => facilitation_sessions.id, { onDelete: "set null" }),
@@ -293,11 +299,13 @@ export const offline_submissions = pgTable("offline_submissions", {
 
   // Bill submissions
   billPositionIdx: index("idx_offline_submissions_bill_position")
-    .on(table.bill_id, table.position, table.collected_at),
+    .on(table.bill_id, table.position, table.collected_at)
+    .where(sql`${table.position} IS NOT NULL`),
 
   // Processing queue
   processingStatusIdx: index("idx_offline_submissions_processing_status")
-    .on(table.processing_status, table.needs_translation, table.collected_at),
+    .on(table.processing_status, table.needs_translation, table.collected_at)
+    .where(sql`${table.needs_translation} = true OR ${table.processing_status} = 'processing'`),
 
   // Sync queue
   syncStatusIdx: index("idx_offline_submissions_sync_status")
