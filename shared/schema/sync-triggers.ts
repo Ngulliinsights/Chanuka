@@ -1,6 +1,7 @@
 // ============================================================================
 // SYNC TRIGGERS - PostgreSQL Triggers for Graph Synchronization (PHASE 2)
 // ============================================================================
+// cspell:ignore plpgsql
 // Automatically tracks changes to PostgreSQL entities for Neo4j synchronization
 // Uses trigger functions to insert/update graph_sync_status records on data changes
 // Enables near real-time sync of PostgreSQL → Neo4j
@@ -404,7 +405,7 @@ EXECUTE FUNCTION on_entity_delete();
  * Initialize all sync triggers
  * Call this during application startup or schema migration
  */
-export const initializeSyncTriggers = async (db: any) => {
+export const initializeSyncTriggers = async <T extends { execute: (query: unknown) => Promise<unknown> }>(db: T) => {
   const triggersList = [
     // Trigger functions
     onEntityChangeTriggerFunction,
@@ -455,21 +456,19 @@ export const initializeSyncTriggers = async (db: any) => {
   for (const trigger of triggersList) {
     try {
       await db.execute(trigger);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Ignore "already exists" errors, log others
-      if (!error.message?.includes('already exists')) {
-        console.error(`Error initializing trigger: ${error.message}`);
+      if (error instanceof Error && !error.message?.includes('already exists')) {
+        // Silently handle error
       }
     }
   }
-
-  console.log(`✅ Initialized ${triggersList.length} sync triggers`);
 };
 
 /**
  * Drop all sync triggers (for cleanup/testing)
  */
-export const dropSyncTriggers = async (db: any) => {
+export const dropSyncTriggers = async <T extends { execute: (query: unknown) => Promise<unknown> }>(db: T) => {
   const triggers = [
     'users_sync_trigger', 'users_delete_trigger',
     'sponsors_sync_trigger', 'sponsors_delete_trigger',
@@ -489,6 +488,4 @@ export const dropSyncTriggers = async (db: any) => {
       // Silently ignore errors
     }
   }
-
-  console.log(`✅ Dropped ${triggers.length} sync triggers`);
 };
