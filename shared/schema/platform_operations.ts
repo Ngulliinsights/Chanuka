@@ -10,17 +10,17 @@ import {
   index, uniqueIndex, boolean, date
 } from "drizzle-orm/pg-core";
 
+import { auditFields, primaryKeyUuid } from "./base-types";
 import { comments } from "./citizen_participation";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
-import { auditFields, primaryKeyUuid } from "./base-types";
 
 // ============================================================================
 // DATA SOURCES - Track where legislative data comes from
 // ============================================================================
 
 export const data_sources = pgTable("data_sources", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Source identification - unique name prevents duplicate configurations
   source_name: varchar("source_name", { length: 255 }).notNull(),
@@ -56,7 +56,6 @@ export const data_sources = pgTable("data_sources", {
 
   // Audit fields
   ...auditFields(),
-  created_by: uuid("created_by"), // New: track who configured this source
 
 }, (table) => ({
   // Ensures source names are unique across the system
@@ -80,7 +79,7 @@ export const data_sources = pgTable("data_sources", {
 // ============================================================================
 
 export const sync_jobs = pgTable("sync_jobs", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   data_source_id: uuid("data_source_id").notNull()
     .references(() => data_sources.id, { onDelete: "cascade" }),
 
@@ -170,7 +169,7 @@ export const sync_jobs = pgTable("sync_jobs", {
 // ============================================================================
 
 export const external_bill_references = pgTable("external_bill_references", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull()
     .references(() => bills.id, { onDelete: "cascade" }),
 
@@ -231,7 +230,7 @@ export const external_bill_references = pgTable("external_bill_references", {
 // ============================================================================
 
 export const analytics_events = pgTable("analytics_events", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Event identification - structured event naming for analysis
   event_name: varchar("event_name", { length: 100 }).notNull(),
@@ -351,7 +350,7 @@ export const analytics_events = pgTable("analytics_events", {
 // ============================================================================
 
 export const bill_impact_metrics = pgTable("bill_impact_metrics", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull()
     .references(() => bills.id, { onDelete: "cascade" }),
 
@@ -437,7 +436,7 @@ export const bill_impact_metrics = pgTable("bill_impact_metrics", {
 // ============================================================================
 
 export const county_engagement_stats = pgTable("county_engagement_stats", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   county: kenyanCountyEnum("county").notNull(),
 
   // User metrics - understanding active user base
@@ -536,7 +535,7 @@ export const county_engagement_stats = pgTable("county_engagement_stats", {
 // ============================================================================
 
 export const trending_analysis = pgTable("trending_analysis", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Analysis period - when and how long
   analysis_date: date("analysis_date").notNull(),
@@ -622,7 +621,7 @@ export const trending_analysis = pgTable("trending_analysis", {
 // ============================================================================
 
 export const user_engagement_summary = pgTable("user_engagement_summary", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
@@ -678,7 +677,7 @@ export const user_engagement_summary = pgTable("user_engagement_summary", {
 // ============================================================================
 
 export const platform_health_metrics = pgTable("platform_health_metrics", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Time period
   measurement_timestamp: timestamp("measurement_timestamp").notNull(),
@@ -745,7 +744,7 @@ export const platform_health_metrics = pgTable("platform_health_metrics", {
 // ============================================================================
 
 export const content_performance = pgTable("content_performance", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Content identification
   content_type: varchar("content_type", { length: 50 }).notNull(),
