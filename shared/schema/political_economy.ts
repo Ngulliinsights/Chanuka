@@ -7,23 +7,19 @@
 
 import { sql, relations } from "drizzle-orm";
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, date,
+  pgTable, text, integer, boolean, jsonb, numeric, uuid, varchar, date,
   index, smallint, check
 } from "drizzle-orm/pg-core";
 
-import {
-  kenyanCountyEnum,
-  partyEnum
-} from "./enum";
-import { sponsors } from "./foundation";
-
 import { primaryKeyUuid, auditFields } from "./base-types";
+import { kenyanCountyEnum, partyEnum } from "./enum";
+import { sponsors } from "./foundation";
 // ============================================================================
 // POLITICAL APPOINTMENTS - Patronage vs Competence Analysis
 // ============================================================================
 
 export const political_appointments = pgTable("political_appointments", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Person identification
   person_name: varchar("person_name", { length: 255 }).notNull(),
@@ -38,11 +34,11 @@ export const political_appointments = pgTable("political_appointments", {
   // Demographics (CRITICAL for political economy analysis)
   ethnicity: varchar("ethnicity", { length: 50 }),
   // Kenya's 44+ ethnic communities: Kikuyu, Luo, Luhya, Kalenjin, Kamba, etc.
-  
+
   home_county: kenyanCountyEnum("home_county"),
   gender: varchar("gender", { length: 20 }),
   // Values: 'male', 'female', 'non_binary', 'prefer_not_to_say'
-  
+
   date_of_birth: date("date_of_birth"),
   age_at_appointment: smallint("age_at_appointment"),
   // Calculated field for analysis
@@ -50,7 +46,7 @@ export const political_appointments = pgTable("political_appointments", {
   // Appointment context
   appointing_government: varchar("appointing_government", { length: 100 }).notNull(),
   // Example: "Uhuru Kenyatta (2013-2022)", "William Ruto (2022-present)"
-  
+
   appointing_president: varchar("appointing_president", { length: 100 }),
   // Example: "Uhuru Kenyatta", "William Ruto"
 
@@ -58,21 +54,21 @@ export const political_appointments = pgTable("political_appointments", {
   departure_date: date("departure_date"),
   tenure_days: integer("tenure_days"),
   // Calculated: departure_date - appointment_date
-  
+
   departure_reason: varchar("departure_reason", { length: 100 }),
   // Values: 'term_ended', 'resigned', 'dismissed', 'deceased', 'rotated', 'retired'
 
   // Competence metrics
   education_level: varchar("education_level", { length: 100 }),
   // Values: 'phd', 'masters', 'bachelors', 'diploma', 'certificate', 'secondary', 'other'
-  
+
   relevant_experience_years: smallint("relevant_experience_years"),
   previous_positions: jsonb("previous_positions").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"position": "CEO", "organization": "Kenya Power", "years": 5},
     {"position": "Director", "organization": "Treasury", "years": 3}
   ] */
-  
+
   professional_qualifications: jsonb("professional_qualifications").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"type": "CPA", "body": "ICPAK", "year": 2015},
@@ -82,10 +78,10 @@ export const political_appointments = pgTable("political_appointments", {
   // Competence vs Loyalty Classification
   appointment_type: varchar("appointment_type", { length: 50 }),
   // Values: 'competent_loyalist', 'pure_patron', 'technocrat', 'compromise', 'career_professional'
-  
+
   competence_score: numeric("competence_score", { precision: 3, scale: 2 }),
   // 0.00-1.00 scale based on education + experience
-  
+
   loyalty_indicator: varchar("loyalty_indicator", { length: 100 }),
   // Values: 'high_political_loyalty', 'moderate', 'technical_appointment', 'independent'
 
@@ -99,7 +95,7 @@ export const political_appointments = pgTable("political_appointments", {
   performance_contract_exists: boolean("performance_contract_exists").notNull().default(false),
   performance_rating: numeric("performance_rating", { precision: 3, scale: 2 }),
   // 0.00-1.00 scale
-  
+
   achievements: jsonb("achievements").notNull().default(sql`'{}'::jsonb`),
   failures: jsonb("failures").notNull().default(sql`'{}'::jsonb`),
 
@@ -107,7 +103,7 @@ export const political_appointments = pgTable("political_appointments", {
   removed_for_non_performance: boolean("removed_for_non_performance").notNull().default(false),
   corruption_allegations: boolean("corruption_allegations").notNull().default(false),
   corruption_allegations_details: text("corruption_allegations_details"),
-  
+
   court_cases: jsonb("court_cases").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"case": "ACC v. John Doe", "year": 2023, "status": "ongoing", "outcome": null}
@@ -122,7 +118,7 @@ export const political_appointments = pgTable("political_appointments", {
 
   // Institution analysis
   institutionTypeIdx: index("idx_appointments_institution_type")
-    .on(table.institution_type, table.appointment_date.desc()),
+    .on(table.institution_type, table.appointment_date),
 
   // Ethnicity and county analysis
   ethnicityCountyIdx: index("idx_appointments_ethnicity_county")
@@ -131,11 +127,11 @@ export const political_appointments = pgTable("political_appointments", {
 
   // Appointment type (patronage vs merit)
   typeCompetenceIdx: index("idx_appointments_type_competence")
-    .on(table.appointment_type, table.competence_score.desc()),
+    .on(table.appointment_type, table.competence_score),
 
   // Performance tracking
   performanceIdx: index("idx_appointments_performance")
-    .on(table.performance_rating.desc())
+    .on(table.performance_rating)
     .where(sql`${table.performance_rating} IS NOT NULL`),
 
   // Corruption tracking
@@ -150,8 +146,8 @@ export const political_appointments = pgTable("political_appointments", {
 
   // Timeline queries
   appointmentDateIdx: index("idx_appointments_appointment_date")
-    .on(table.appointment_date.desc()),
-  
+    .on(table.appointment_date),
+
   // GIN indexes for JSONB
   previousPositionsIdx: index("idx_appointments_previous_positions")
     .using("gin", table.previous_positions),
@@ -181,7 +177,7 @@ export const political_appointments = pgTable("political_appointments", {
 // ============================================================================
 
 export const infrastructure_tenders = pgTable("infrastructure_tenders", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Project identification
   project_name: varchar("project_name", { length: 255 }).notNull(),
@@ -201,7 +197,7 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
   // Winner details
   winning_company: varchar("winning_company", { length: 255 }).notNull(),
   company_registration_number: varchar("company_registration_number", { length: 100 }),
-  
+
   company_owners: jsonb("company_owners").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
@@ -212,7 +208,7 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
       "political_connection_type": "family"
     }
   ] */
-  
+
   beneficial_owners_disclosed: boolean("beneficial_owners_disclosed").notNull().default(false),
 
   // Political context
@@ -234,24 +230,24 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
   // Performance
   project_status: varchar("project_status", { length: 50 }),
   // Values: 'planning', 'ongoing', 'completed', 'stalled', 'abandoned', 'delayed'
-  
+
   completion_percentage: numeric("completion_percentage", { precision: 5, scale: 2 }),
   // 0-100 scale
-  
+
   delay_days: integer("delay_days"),
   // Actual vs planned completion
 
   // Procurement integrity
   procurement_process: varchar("procurement_process", { length: 50 }),
   // Values: 'open_tender', 'restricted_tender', 'direct_procurement', 'emergency_procurement'
-  
+
   corruption_allegations: boolean("corruption_allegations").notNull().default(false),
   allegations_description: text("allegations_description"),
-  
+
   investigated: boolean("investigated").notNull().default(false),
   investigating_body: varchar("investigating_body", { length: 100 }),
   // Values: 'EACC', 'DCI', 'Auditor General', 'Parliament', 'PPRA'
-  
+
   investigation_outcome: varchar("investigation_outcome", { length: 100 }),
   // Values: 'ongoing', 'cleared', 'charges_filed', 'conviction', 'acquittal'
 
@@ -268,7 +264,7 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
 
   // Status tracking
   statusDateIdx: index("idx_tenders_status_date")
-    .on(table.project_status, table.tender_date.desc()),
+    .on(table.project_status, table.tender_date),
 
   // Corruption tracking
   corruptionInvestigatedIdx: index("idx_tenders_corruption_investigated")
@@ -277,11 +273,11 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
 
   // Value analysis
   valueDescIdx: index("idx_tenders_value_desc")
-    .on(table.tender_value.desc()),
+    .on(table.tender_value),
 
   // Timeline tracking
   tenderDateIdx: index("idx_tenders_tender_date")
-    .on(table.tender_date.desc()),
+    .on(table.tender_date),
 
   // GIN index for company owners (ethnicity analysis)
   ownersIdx: index("idx_tenders_owners")
@@ -323,7 +319,7 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
   // Historical scores (0-100 scale, higher = more advantage received)
   colonial_era_score: numeric("colonial_era_score", { precision: 5, scale: 2 }),
   // 1900-1963: Railway employment, White Highlands, missionary schools, colonial administration
-  
+
   colonial_education_score: numeric("colonial_education_score", { precision: 5, scale: 2 }),
   colonial_land_score: numeric("colonial_land_score", { precision: 5, scale: 2 }),
   colonial_administration_score: numeric("colonial_administration_score", { precision: 5, scale: 2 }),
@@ -339,26 +335,26 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
   // Current status indicators (2024)
   education_level_current: numeric("education_level_current", { precision: 5, scale: 2 }),
   // Average years of schooling
-  
+
   median_income_current: numeric("median_income_current", { precision: 15, scale: 2 }),
   // Monthly median income in KES
-  
+
   poverty_rate: numeric("poverty_rate", { precision: 5, scale: 2 }),
   // Percentage living below poverty line
-  
+
   land_ownership_hectares: numeric("land_ownership_hectares", { precision: 15, scale: 2 }),
   // Average land ownership per household
-  
+
   infrastructure_access: numeric("infrastructure_access", { precision: 5, scale: 2 }),
   // 0-100: Roads, electricity, water, healthcare, schools
-  
+
   employment_in_government: numeric("employment_in_government", { precision: 5, scale: 2 }),
   // Percentage employed in government vs population percentage
 
   // Composite scores
   cumulative_advantage_score: numeric("cumulative_advantage_score", { precision: 5, scale: 2 }).notNull(),
   // 0-100: Total historical benefits received (weighted average of era scores)
-  
+
   current_status_score: numeric("current_status_score", { precision: 5, scale: 2 }),
   // 0-100: Current wellbeing indicators
 
@@ -366,21 +362,21 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
   // Negative = disadvantaged, Positive = advantaged
   // Example: Kikuyu = +32.0 (received 32% more than fair share)
   //          Turkana = -29.5 (received 29.5% less than fair share)
-  
+
   fairness_gap: numeric("fairness_gap", { precision: 6, scale: 2 }),
   // How much would need to be redistributed to achieve parity?
 
   // Methodology and transparency
   last_updated: date("last_updated").notNull().defaultNow(),
   methodology_version: varchar("methodology_version", { length: 20 }),
-  
+
   data_sources: jsonb("data_sources").notNull().default(sql`'{}'::jsonb`),
   /* Structure: {
     "census": "Kenya National Bureau of Statistics 2019",
     "education": "Ministry of Education 2023",
     "poverty": "World Bank 2022"
   } */
-  
+
   calculation_methodology: text("calculation_methodology"),
   notes: text("notes"),
 
@@ -388,19 +384,19 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
 }, (table) => ({
   // Hot path: Deficit score (most advantaged/disadvantaged)
   deficitScoreIdx: index("idx_advantage_deficit_score")
-    .on(table.deficit_score.desc()),
+    .on(table.deficit_score),
 
   // Cumulative advantage ranking
   cumulativeIdx: index("idx_advantage_cumulative")
-    .on(table.cumulative_advantage_score.desc()),
+    .on(table.cumulative_advantage_score),
 
   // Current status
   currentStatusIdx: index("idx_advantage_current_status")
-    .on(table.current_status_score.desc()),
+    .on(table.current_status_score),
 
   // Population analysis
   populationIdx: index("idx_advantage_population")
-    .on(table.population_2024.desc())
+    .on(table.population_2024)
     .where(sql`${table.population_2024} IS NOT NULL`),
 
   // GIN index for data sources
@@ -442,13 +438,13 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
 // ============================================================================
 
 export const strategic_infrastructure_projects = pgTable("strategic_infrastructure_projects", {
-  ...primaryKeyUuid(),
+  id: primaryKeyUuid(),
 
   // Project identification
   project_name: varchar("project_name", { length: 255 }).notNull().unique(),
   project_code: varchar("project_code", { length: 50 }).notNull().unique(),
   project_type: varchar("project_type", { length: 50 }).notNull(),
-  // Values: 'electricity_generation', 'electricity_transmission', 'railway', 
+  // Values: 'electricity_generation', 'electricity_transmission', 'railway',
   //         'dam', 'port', 'highway', 'airport', 'digital_infrastructure'
 
   // Government tracking
@@ -458,7 +454,7 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
 
   continued_by_successor: boolean("continued_by_successor"),
   // Did the next government continue this project?
-  
+
   governments_spanned: smallint("governments_spanned").notNull().default(1),
   // How many governments has this project spanned?
 
@@ -470,7 +466,7 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
 
   // Status
   project_status: varchar("project_status", { length: 50 }).notNull(),
-  // Values: 'planned', 'design', 'procurement', 'construction', 'ongoing', 
+  // Values: 'planned', 'design', 'procurement', 'construction', 'ongoing',
   //         'completed', 'stalled', 'abandoned', 'suspended'
 
   completion_percentage: numeric("completion_percentage", { precision: 5, scale: 2 }),
@@ -490,12 +486,12 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
   // Continuity protection mechanisms
   legal_protection: boolean("legal_protection").notNull().default(false),
   protection_mechanism: text("protection_mechanism"),
-  // Example: "PPP contract", "International treaty", "Strategic Infrastructure Act", 
+  // Example: "PPP contract", "International treaty", "Strategic Infrastructure Act",
   //          "Vision 2030 flagship project"
 
   ppp_structure: boolean("ppp_structure").notNull().default(false),
   // Public-Private Partnership provides continuity protection
-  
+
   international_financing: boolean("international_financing").notNull().default(false),
   financing_partners: varchar("financing_partners", { length: 100 }).array(),
   // Example: ["World Bank", "China Exim Bank", "AfDB"]
@@ -508,7 +504,7 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
 
   // Abandoned projects
   abandonedIdx: index("idx_infra_abandoned")
-    .on(table.abandoned, table.abandonment_date.desc())
+    .on(table.abandoned, table.abandonment_date)
     .where(sql`${table.abandoned} = true`),
 
   // Project type analysis
@@ -517,7 +513,7 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
 
   // Government continuity
   govtsSpannedIdx: index("idx_infra_govts_spanned")
-    .on(table.governments_spanned.desc()),
+    .on(table.governments_spanned),
 
   // Protection mechanisms
   protectionIdx: index("idx_infra_protection")
@@ -558,15 +554,15 @@ export const politicalAppointmentsRelations = relations(political_appointments, 
   }),
 }));
 
-export const infrastructureTendersRelations = relations(infrastructure_tenders, ({}) => ({
+export const infrastructureTendersRelations = relations(infrastructure_tenders, () => ({
   // No direct relations - analysis done via JSONB queries
 }));
 
-export const ethnicAdvantageScoresRelations = relations(ethnic_advantage_scores, ({}) => ({
+export const ethnicAdvantageScoresRelations = relations(ethnic_advantage_scores, () => ({
   // Standalone reference table
 }));
 
-export const strategicInfrastructureProjectsRelations = relations(strategic_infrastructure_projects, ({}) => ({
+export const strategicInfrastructureProjectsRelations = relations(strategic_infrastructure_projects, () => ({
   // Standalone tracking table
 }));
 
