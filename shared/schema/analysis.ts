@@ -6,6 +6,7 @@ import { pgTable, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, va
 
 import { bills, users } from "./foundation";
 
+import { auditFields } from "./base-types";
 export const analysis = pgTable("analysis", {
   id: uuidType("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuidType("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
@@ -16,8 +17,7 @@ export const analysis = pgTable("analysis", {
   metadata: jsonb("metadata").default(sql`'{}'::jsonb`),
   is_approved: boolean("is_approved").notNull().default(false),
   approved_by: uuidType("approved_by").references(() => users.id, { onDelete: "set null" }),
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Performance indexes for common queries
   billIdIdx: index("idx_analysis_bill_id").on(table.bill_id),

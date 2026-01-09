@@ -2,6 +2,14 @@
 // MAIN SCHEMA INDEX - Enhanced Multi-Database Architecture
 // ============================================================================
 // Exports all schemas organized by domain with multi-database support
+//
+// PERFORMANCE OPTIMIZATION:
+// - Use granular domain imports for faster builds:
+//   import { users, bills } from '@/shared/schema/domains/foundation'
+// - Use this main index for full schema access (slower):
+//   import * from '@/shared/schema'
+//
+// See /domains/ folder for domain-specific exports
 
 // ============================================================================
 // CORE INFRASTRUCTURE - Database connections and utilities
@@ -15,12 +23,111 @@ export {
   closeDatabaseConnections
 } from "../database/connection";
 
-// Base types are now defined inline in each schema file
+// ============================================================================
+// BASE TYPES - Centralized shared type patterns
+// ============================================================================
+export {
+  // Helpers
+  auditFields,
+  softDeleteField,
+  fullAuditFields,
+  primaryKeyUuid,
+  foreignKeyUuid,
+  metadataField,
+  descriptionField,
+  statusField,
+  auditedFlagField,
+  emailField,
+  nameField,
+  displayNameField,
+  codeField,
+  BaseTypeHelpers,
+  // Interfaces
+  type BaseEntity,
+  type SoftDeletable,
+  type FullAuditEntity,
+  type VersionedEntity,
+  type UserTrackableEntity,
+  type MetadataEntity,
+  type SearchableEntity,
+  // Patterns & constants
+  EMAIL_PATTERN,
+  PHONE_PATTERN,
+  SLUG_PATTERN,
+  UUID_PATTERN,
+  BASE_TYPES_VERSION,
+  BASE_TYPES_CHANGELOG,
+} from "./base-types";
 
 // ============================================================================
 // ENUMS - Shared across all domains
 // ============================================================================
 export * from "./enum";
+
+// ============================================================================
+// ENUM VALIDATION - Runtime type-safe validation layer
+// ============================================================================
+export {
+  ENUM_REGISTRY,
+  ENUM_SCHEMA_VERSION,
+  ENUM_CHANGELOG,
+  isValidEnum,
+  assertEnum,
+  getEnumValues,
+  validateEnums,
+  generateEnumReport,
+  VALID_PARTIES,
+  VALID_ROLES,
+  VALID_BILL_STATUSES,
+} from "./enum-validator";
+
+// ============================================================================
+// RUNTIME SCHEMA VALIDATION - Zod-based payload validation (consolidated)
+// ============================================================================
+// Validators have been consolidated into shared/core/validation/schemas/
+// to centralize all validation logic and avoid duplication
+
+export {
+  SCHEMA_VERSION,
+  SCHEMA_CHANGELOG,
+  SchemaMigrations,
+  applyMigration,
+  getLatestVersion,
+  isVersionSupported,
+  // Entity validators
+  UserCreateSchema,
+  UserUpdateSchema,
+  UserProfileCreateSchema,
+  UserProfileUpdateSchema,
+  CommentCreateSchema,
+  CommentUpdateSchema,
+  BillVoteCreateSchema,
+  BillVoteUpdateSchema,
+  BillEngagementCreateSchema,
+  BillEngagementUpdateSchema,
+  // Validation functions
+  validateUserCreate,
+  validateUserCreateSafe,
+  validateUserProfileCreate,
+  validateCommentCreate,
+  validateBillVoteCreate,
+  validateBillEngagementCreate,
+  validateBatch,
+  getEntitySchema,
+  validateByEntitySchema,
+  entitySchemas,
+  // Types
+  type UserCreate,
+  type UserUpdate,
+  type UserProfileCreate,
+  type UserProfileUpdate,
+  type CommentCreate,
+  type CommentUpdate,
+  type BillVoteCreate,
+  type BillVoteUpdate,
+  type BillEngagementCreate,
+  type BillEngagementUpdate,
+} from "../core/validation/schemas";
 
 // ============================================================================
 // WEBSOCKET TYPES - Unified WebSocket type system
@@ -114,22 +221,26 @@ export {
   users,
   user_profiles,
   sponsors,
+  governors,
   committees,
   committee_members,
   parliamentary_sessions,
   parliamentary_sittings,
   bills,
+  county_bill_assents,
   oauth_providers,
   oauth_tokens,
   user_sessions,
   usersRelations,
   userProfilesRelations,
   sponsorsRelations,
+  governorsRelations,
   committeesRelations,
   committeeMembersRelations,
   parliamentarySessionsRelations,
   parliamentarySittingsRelations,
   billsRelations,
+  countyBillAssentsRelations,
   oauthProvidersRelations,
   oauthTokensRelations,
   userSessionsRelations
@@ -400,6 +511,65 @@ export {
 } from "./integrity_operations";
 
 // ============================================================================
+// SAFEGUARDS SCHEMA - Platform Protection & Integrity
+// ============================================================================
+export {
+  // Rate limiting
+  rateLimits,
+  rateLimitConfig,
+  rateLimitsRelations,
+
+  // Content moderation
+  contentFlags,
+  contentFlagsRelations,
+
+  // Moderation queue & decisions
+  moderationQueue,
+  moderationDecisions,
+  moderationAppeals,
+  moderationQueueRelations,
+  moderationDecisionsRelations,
+  moderationAppealsRelations,
+
+  // Expert moderator tracking
+  expertModeratorEligibility,
+  expertModeratorEligibilityRelations,
+
+  // CIB detection
+  cibDetections,
+  cibDetectionsRelations,
+
+  // Behavioral anomalies
+  behavioralAnomalies,
+  behavioralAnomaliesRelations,
+
+  // Activity logging
+  suspiciousActivityLogs,
+  suspiciousActivityLogsRelations,
+
+  // Reputation system
+  reputationScores,
+  reputationHistory,
+  reputationScoresRelations,
+  reputationHistoryRelations,
+
+  // Identity verification
+  identityVerification,
+  deviceFingerprints,
+  identityVerificationRelations,
+  deviceFingerprintsRelations,
+
+  // Enums
+  rateLimitActionEnum,
+  moderationActionEnum,
+  flagReasonEnum,
+  cibPatternEnum,
+  reputationSourceEnum,
+  verificationMethodEnum,
+  iprsVerificationStatusEnum
+} from "./safeguards";
+
+// ============================================================================
 // PLATFORM OPERATIONS SCHEMA
 // ============================================================================
 export {
@@ -638,6 +808,38 @@ export type {
 
 // Analysis types
 export type { Analysis, NewAnalysis } from "./analysis";
+
+// Safeguards types
+export type {
+  RateLimit,
+  NewRateLimit,
+  RateLimitConfig,
+  NewRateLimitConfig,
+  ContentFlag,
+  NewContentFlag,
+  ModerationQueueItem,
+  NewModerationQueueItem,
+  ModerationDecision,
+  NewModerationDecision,
+  ModerationAppeal,
+  NewModerationAppeal,
+  ExpertModeratorEligibility,
+  NewExpertModeratorEligibility,
+  CIBDetection,
+  NewCIBDetection,
+  BehavioralAnomaly,
+  NewBehavioralAnomaly,
+  SuspiciousActivityLog,
+  NewSuspiciousActivityLog,
+  ReputationScore,
+  NewReputationScore,
+  ReputationHistoryEntry,
+  NewReputationHistoryEntry,
+  IdentityVerification,
+  NewIdentityVerification,
+  DeviceFingerprint,
+  NewDeviceFingerprint
+} from "./safeguards";
 
 // Transparency Intelligence types
 export type {
@@ -889,7 +1091,7 @@ CURRENT PHASE: Phase One - Enhanced Single Database
 - Existing domain files and tests remain unchanged
 - New core infrastructure supports future multi-database evolution
 
-FUTURE PHASE: Phase Two - True Multi-Database Architecture  
+FUTURE PHASE: Phase Two - True Multi-Database Architecture
 - Analytics tables move to separate analyticsDb instance
 - Security tables move to separate securityDb instance
 - Data synchronization between databases

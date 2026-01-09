@@ -4,6 +4,22 @@
  * Safely resets the database schema and applies clean migrations
  */
 
+/**
+ * @deprecated Use reset.ts instead
+ *
+ * This script has been consolidated into reset.ts which provides:
+ * - Backup capability
+ * - Better error handling
+ * - Seeding support
+ * - Validation
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/reset-database.ts
+ *   New: npm run db:reset
+ *
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ */
+
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -27,11 +43,11 @@ const db = drizzle(client);
 
 async function resetDatabase() {
   console.log('🔄 Starting database reset...');
-  
+
   try {
     // Step 1: Drop all existing tables
     console.log('📋 Dropping existing tables...');
-    
+
     const dropTablesQuery = `
       DO $$ DECLARE
         r RECORD;
@@ -40,42 +56,42 @@ async function resetDatabase() {
         FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
           EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
         END LOOP;
-        
+
         -- Drop all sequences
         FOR r IN (SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public') LOOP
           EXECUTE 'DROP SEQUENCE IF EXISTS ' || quote_ident(r.sequence_name) || ' CASCADE';
         END LOOP;
-        
+
         -- Drop all functions
         FOR r IN (SELECT proname FROM pg_proc WHERE pronamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')) LOOP
           EXECUTE 'DROP FUNCTION IF EXISTS ' || quote_ident(r.proname) || ' CASCADE';
         END LOOP;
       END $$;
     `;
-    
+
     await db.execute(sql.raw(dropTablesQuery));
     console.log('✅ All existing tables dropped');
-    
+
     // Step 2: Drop migration tracking table
     console.log('🗑️ Dropping migration tracking...');
     await db.execute(sql`DROP TABLE IF EXISTS "__drizzle_migrations" CASCADE`);
     console.log('✅ Migration tracking cleared');
-    
+
     // Step 3: Clean up migration files (keep only the latest comprehensive one)
     console.log('🧹 Cleaning up migration files...');
     await cleanupMigrationFiles();
-    
+
     // Step 4: Run fresh migrations
     console.log('🚀 Running fresh migrations...');
     await migrate(db, { migrationsFolder: './drizzle' });
     console.log('✅ Fresh migrations applied');
-    
+
     // Step 5: Verify schema
     console.log('🔍 Verifying schema...');
     await verifySchema();
-    
+
     console.log('🎉 Database reset completed successfully!');
-    
+
   } catch (error) {
     console.error('❌ Database reset failed:', error);
     throw error;
@@ -87,14 +103,14 @@ async function resetDatabase() {
 async function cleanupMigrationFiles() {
   const drizzleDir = path.join(process.cwd(), 'drizzle');
   const files = fs.readdirSync(drizzleDir);
-  
+
   // Keep only the latest comprehensive migration and meta files
   const filesToKeep = [
     '0020_comprehensive_schema_normalization.sql',
     'README.md',
     'meta'
   ];
-  
+
   for (const file of files) {
     if (!filesToKeep.includes(file) && file.endsWith('.sql')) {
       const filePath = path.join(drizzleDir, file);
@@ -102,7 +118,7 @@ async function cleanupMigrationFiles() {
       fs.unlinkSync(filePath);
     }
   }
-  
+
   // Update meta journal to reflect clean state
   const metaDir = path.join(drizzleDir, 'meta');
   if (fs.existsSync(metaDir)) {
@@ -129,7 +145,7 @@ async function verifySchema() {
     // Check that essential tables exist
     const essentialTables = [
       'users',
-      'sessions', 
+      'sessions',
       'bills',
       'sponsors',
       'comments',
@@ -137,16 +153,16 @@ async function verifySchema() {
       'bill_engagement',
       'compliance_checks'
     ];
-    
+
     for (const table of essentialTables) {
       const result = await db.execute(sql`
         SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
           AND table_name = ${table}
         );
       `);
-      
+
       const exists = result[0]?.exists;
       if (exists) {
         console.log(`  ✅ Table '${table}' exists`);
@@ -154,10 +170,10 @@ async function verifySchema() {
         console.log(`  ⚠️  Table '${table}' missing`);
       }
     }
-    
+
     // Check for proper constraints
     const constraintCheck = await db.execute(sql`
-      SELECT 
+      SELECT
         tc.table_name,
         tc.constraint_name,
         tc.constraint_type
@@ -166,9 +182,9 @@ async function verifySchema() {
       AND tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE', 'FOREIGN KEY')
       ORDER BY tc.table_name, tc.constraint_type;
     `);
-    
+
     console.log(`  📊 Found ${constraintCheck.length} constraints`);
-    
+
   } catch (error) {
     console.error('Schema verification failed:', error);
     throw error;

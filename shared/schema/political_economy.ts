@@ -17,12 +17,13 @@ import {
 } from "./enum";
 import { sponsors } from "./foundation";
 
+import { primaryKeyUuid, auditFields } from "./base-types";
 // ============================================================================
 // POLITICAL APPOINTMENTS - Patronage vs Competence Analysis
 // ============================================================================
 
 export const political_appointments = pgTable("political_appointments", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Person identification
   person_name: varchar("person_name", { length: 255 }).notNull(),
@@ -112,8 +113,7 @@ export const political_appointments = pgTable("political_appointments", {
     {"case": "ACC v. John Doe", "year": 2023, "status": "ongoing", "outcome": null}
   ] */
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Appointments by government and ethnicity
   govtEthnicityIdx: index("idx_appointments_govt_ethnicity")
@@ -181,7 +181,7 @@ export const political_appointments = pgTable("political_appointments", {
 // ============================================================================
 
 export const infrastructure_tenders = pgTable("infrastructure_tenders", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Project identification
   project_name: varchar("project_name", { length: 255 }).notNull(),
@@ -255,8 +255,7 @@ export const infrastructure_tenders = pgTable("infrastructure_tenders", {
   investigation_outcome: varchar("investigation_outcome", { length: 100 }),
   // Values: 'ongoing', 'cleared', 'charges_filed', 'conviction', 'acquittal'
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Government and county analysis
   govtCountyIdx: index("idx_tenders_govt_county")
@@ -385,8 +384,7 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
   calculation_methodology: text("calculation_methodology"),
   notes: text("notes"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Deficit score (most advantaged/disadvantaged)
   deficitScoreIdx: index("idx_advantage_deficit_score")
@@ -444,7 +442,7 @@ export const ethnic_advantage_scores = pgTable("ethnic_advantage_scores", {
 // ============================================================================
 
 export const strategic_infrastructure_projects = pgTable("strategic_infrastructure_projects", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Project identification
   project_name: varchar("project_name", { length: 255 }).notNull().unique(),
@@ -502,8 +500,7 @@ export const strategic_infrastructure_projects = pgTable("strategic_infrastructu
   financing_partners: varchar("financing_partners", { length: 100 }).array(),
   // Example: ["World Bank", "China Exim Bank", "AfDB"]
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Status and continuation
   statusContinuedIdx: index("idx_infra_status_continued")

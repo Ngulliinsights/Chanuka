@@ -8,7 +8,7 @@ import { Middleware, Action } from '@reduxjs/toolkit';
 
 import { ErrorDomain, ErrorSeverity, coreErrorHandler, createError } from '@/core/error';
 
-import { logger } from '../../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 export const errorHandlingMiddleware: Middleware = store => next => (action: unknown) => {
   const reduxAction = action as Action & { type: string };

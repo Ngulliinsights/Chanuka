@@ -28,7 +28,7 @@ export {
 
 // Re-export existing analytics infrastructure
 export { analyticsApiService } from '@client/core/api/analytics';
-export { UserJourneyTracker } from '@client/services/UserJourneyTracker';
+export { UserJourneyTracker } from '@client/';
 export { PerformanceMonitor } from '@client/core/performance/monitor';
 export { ErrorAnalyticsService } from '@client/core/error/analytics';
 
@@ -89,7 +89,7 @@ export type {
   DropOffPoint,
   ConversionFunnel,
   JourneyOptimization,
-} from '@client/services/UserJourneyTracker';
+} from '@client/features/analytics/model/user-journey-tracker';
 
 export type {
   WebVitalsMetrics,

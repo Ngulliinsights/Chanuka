@@ -3,7 +3,7 @@ import { useId } from 'react';
 import React from 'react';
 
 import { Button } from '@/shared/design-system';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface AutoHideHeaderProps {
   visible: boolean;

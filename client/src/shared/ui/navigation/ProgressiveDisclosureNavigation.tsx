@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/design-system/interactive/DropdownMenu';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 // Types for progressive disclosure navigation
 export interface NavigationSection {

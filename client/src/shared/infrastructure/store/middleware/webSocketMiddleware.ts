@@ -18,8 +18,8 @@ import {
   RealTimeNotification,
 } from '@/core/realtime/types';
 
-import { ConnectionState } from '../../../../../../shared/schema/websocket';
-import { logger } from '../../../../utils/logger';
+import { ConnectionState } from '@shared/schema/websocket';
+import { logger } from '@client/utils/logger';
 import { updateConnectionState, addBillUpdate, addNotification } from '../slices/realTimeSlice';
 
 // WebSocket middleware configuration

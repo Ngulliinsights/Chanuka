@@ -7,21 +7,22 @@
 
 import { sql, relations } from "drizzle-orm";
 import {
-    pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
+  pgTable, text, integer, jsonb, numeric, uuid, varchar, index, unique, date, check
     index, unique, date, smallint, check, foreignKey
 } from "drizzle-orm/pg-core";
 
 import {
     kenyanCountyEnum
 } from "./enum";
-import { bills, users } from "./foundation";
-
+import { primaryKeyUuid, auditFields } from "./base-types";
+import { commodityCategoryEnum, reliabilityScoreEnum } from "./enum";
+import { bills } from "./foundation";
 // ============================================================================
 // MARKET SECTORS - Economic sector classification and tracking
 // ============================================================================
 
 export const market_sectors = pgTable("market_sectors", {
-    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    id: primaryKeyUuid(),
 
     // Sector identification
     sector_name: varchar("sector_name", { length: 200 }).notNull().unique(),
@@ -75,8 +76,7 @@ export const market_sectors = pgTable("market_sectors", {
       }
     ] */
 
-    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditFields(),
 }, (table) => ({
     // Self-referencing foreign key for hierarchical sectors
     parentSectorFk: foreignKey({
@@ -124,7 +124,7 @@ export const market_sectors = pgTable("market_sectors", {
 // ============================================================================
 
 export const economic_impact_assessments = pgTable("economic_impact_assessments", {
-    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    id: primaryKeyUuid(),
     bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
     sector_id: uuid("sector_id").notNull().references(() => market_sectors.id, { onDelete: "cascade" }),
 
@@ -174,8 +174,7 @@ export const economic_impact_assessments = pgTable("economic_impact_assessments"
     assessed_by: uuid("assessed_by").references(() => users.id, { onDelete: "set null" }),
     assessment_date: date("assessment_date").notNull().default(sql`CURRENT_DATE`),
 
-    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditFields(),
 }, (table) => ({
     // Hot path: Bill impact analysis
     billSectorIdx: index("idx_economic_impact_bill_sector")
@@ -212,7 +211,7 @@ export const economic_impact_assessments = pgTable("economic_impact_assessments"
 // ============================================================================
 
 export const market_stakeholders = pgTable("market_stakeholders", {
-    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    id: primaryKeyUuid(),
 
     // Stakeholder identification
     stakeholder_name: varchar("stakeholder_name", { length: 300 }).notNull(),
@@ -268,8 +267,7 @@ export const market_stakeholders = pgTable("market_stakeholders", {
     financial_disclosure_quality: varchar("financial_disclosure_quality", { length: 20 }),
     // Values: 'excellent', 'good', 'adequate', 'poor', 'none'
 
-    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditFields(),
 }, (table) => ({
     // Stakeholder type analysis
     typeIdx: index("idx_market_stakeholders_type")
@@ -326,7 +324,7 @@ export const market_stakeholders = pgTable("market_stakeholders", {
 // ============================================================================
 
 export const stakeholder_positions = pgTable("stakeholder_positions", {
-    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    id: primaryKeyUuid(),
     stakeholder_id: uuid("stakeholder_id").notNull().references(() => market_stakeholders.id, { onDelete: "cascade" }),
     bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
@@ -381,8 +379,7 @@ export const stakeholder_positions = pgTable("stakeholder_positions", {
     position_first_stated: date("position_first_stated"),
     position_last_updated: date("position_last_updated"),
 
-    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditFields(),
 }, (table) => ({
     // Unique position per stakeholder per bill
     stakeholderBillUnique: unique("stakeholder_positions_stakeholder_bill_unique")
@@ -426,7 +423,7 @@ export const stakeholder_positions = pgTable("stakeholder_positions", {
 // ============================================================================
 
 export const market_trends = pgTable("market_trends", {
-    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    id: primaryKeyUuid(),
 
     // Trend identification
     trend_name: varchar("trend_name", { length: 200 }).notNull(),
@@ -467,8 +464,7 @@ export const market_trends = pgTable("market_trends", {
     first_identified: date("first_identified").notNull(),
     last_updated: date("last_updated").notNull().default(sql`CURRENT_DATE`),
 
-    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditFields(),
 }, (table) => ({
     // Trend category analysis
     categoryDirectionIdx: index("idx_market_trends_category_direction")

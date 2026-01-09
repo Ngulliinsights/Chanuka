@@ -22,7 +22,8 @@
     "noImplicitThis": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "ignoreDeprecations": "6.0",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
 
     // Emit
     "noEmit": true,
@@ -43,6 +44,11 @@
       "@/*": ["./*"],
       "@client": ["."],
       "@client/*": ["./*"],
+      "@client/@types": ["./@types"],
+      "@client/@types/*": ["./@types/*"],
+      "@client/utils/*": ["./utils/*"],
+      "@client/test-utils": ["./test-utils"],
+      "@client/test-utils/*": ["./test-utils/*"],
       "@shared": ["../../shared"],
       "@shared/*": ["../../shared/*"],
       "@shared/core": ["../../shared/core/src"],

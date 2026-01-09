@@ -28,7 +28,7 @@ import React, { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Badge, Button } from '@/shared/design-system';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 // Navigation item interface
 export interface NavigationItem {

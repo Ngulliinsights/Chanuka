@@ -1,3 +1,20 @@
+/**
+ * @deprecated Use migrate.ts instead
+ *
+ * This script has been consolidated into migrate.ts which provides:
+ * - Better validation
+ * - Dry-run capability
+ * - Rollback support
+ * - Comprehensive testing
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/run-migrations.ts
+ *   New: npm run db:migrate
+ *
+ * This file is kept for backward compatibility but will be removed.
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ */
+
 import * as dotenv from 'dotenv';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import ws from "ws";
@@ -78,7 +95,7 @@ async function runMigrations() {
       try {
         await pool.query('BEGIN');
         await pool.query(sql);
-        
+
         // Record the migration (try to use hash column if it exists)
         try {
           await pool.query(
@@ -90,7 +107,7 @@ async function runMigrations() {
           // Just continue - the table structure will be set up by the migration itself
           console.log(`Note: Could not record migration in tracking table: ${insertError.message}`);
         }
-        
+
         await pool.query('COMMIT');
         console.log(`✅ Successfully executed ${filename}`);
       } catch (error) {

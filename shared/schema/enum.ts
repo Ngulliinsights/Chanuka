@@ -26,9 +26,11 @@ export const chamberEnum = pgEnum('chamber', [
 ]);
 
 // Political Parties (major parties + coalition logic)
+// NOTE: Abbreviations standardized to lowercase with underscores for consistency
+// PRODUCTION RULE: Never edit this list without versioning. Enum changes require migration.
 export const partyEnum = pgEnum('political_party', [
   'uda', 'odm', 'jubilee', 'wiper', 'anc', 'ford_kenya', 'kanu',
-  'independent', 'other', 'safina', 'nark_kenya', 'dap_k', 'paa', 'mcc',
+  'independent', 'other', 'safina', 'nark_kenya', 'dap_ke', 'paa', 'mcc',  // dap_k → dap_ke (Democratic Alliance Party of Kenya)
   'udp', 'kdu', 'cck', 'kupa', 'gdcp', 'tsp'
 ]);
 

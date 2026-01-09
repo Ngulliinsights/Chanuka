@@ -2,7 +2,7 @@ import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-re
 import { useMemo, useState, useEffect, memo } from 'react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 import { logger } from '../../../utils/logger';
 

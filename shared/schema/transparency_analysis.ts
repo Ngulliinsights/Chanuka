@@ -12,12 +12,13 @@ import {
 
 import { bills, sponsors } from "./foundation";
 
+import { primaryKeyUuid, auditFields } from "./base-types";
 // ============================================================================
 // CORPORATE ENTITIES - Companies, organizations, and institutions
 // ============================================================================
 
 export const corporate_entities = pgTable("corporate_entities", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   
   // Entity identification
   name: varchar("name", { length: 500 }).notNull(),
@@ -63,8 +64,7 @@ export const corporate_entities = pgTable("corporate_entities", {
   verification_status: varchar("verification_status", { length: 30 }).notNull().default("unverified"), // "unverified", "verified", "disputed"
   last_updated: date("last_updated").notNull().default(sql`CURRENT_DATE`),
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Entity lookup and search
   nameIdx: index("idx_corporate_entities_name").on(table.name),
@@ -96,7 +96,7 @@ export const corporate_entities = pgTable("corporate_entities", {
 // ============================================================================
 
 export const financial_interests = pgTable("financial_interests", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   
   // Interest holder
   holder_type: varchar("holder_type", { length: 30 }).notNull(), // "sponsor", "family_member", "associate"
@@ -128,8 +128,7 @@ export const financial_interests = pgTable("financial_interests", {
   potential_conflict: boolean("potential_conflict").notNull().default(false),
   conflict_description: text("conflict_description"),
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Sponsor interest tracking
   sponsorEntityIdx: index("idx_financial_interests_sponsor_entity")
@@ -155,7 +154,7 @@ export const financial_interests = pgTable("financial_interests", {
 // ============================================================================
 
 export const lobbying_activities = pgTable("lobbying_activities", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   
   // Lobbying identification
   activity_type: varchar("activity_type", { length: 50 }).notNull(), // "meeting", "communication", "event", "campaign", "gift"
@@ -188,8 +187,7 @@ export const lobbying_activities = pgTable("lobbying_activities", {
   information_source: varchar("information_source", { length: 100 }), // "official_register", "media_report", "whistleblower", "investigation"
   source_reliability: varchar("source_reliability", { length: 20 }), // "high", "medium", "low", "unverified"
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Lobbyist activity tracking
   lobbyistDateIdx: index("idx_lobbying_activities_lobbyist_date")
@@ -215,7 +213,7 @@ export const lobbying_activities = pgTable("lobbying_activities", {
 // ============================================================================
 
 export const bill_financial_conflicts = pgTable("bill_financial_conflicts", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   
   // Conflict parties
@@ -244,8 +242,7 @@ export const bill_financial_conflicts = pgTable("bill_financial_conflicts", {
   is_public: boolean("is_public").notNull().default(false),
   media_coverage: jsonb("media_coverage").notNull().default(sql`'{}'::jsonb`),
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Bill conflict analysis
   billConflictIdx: index("idx_bill_financial_conflicts_bill_conflict")
@@ -271,7 +268,7 @@ export const bill_financial_conflicts = pgTable("bill_financial_conflicts", {
 // ============================================================================
 
 export const cross_sector_ownership = pgTable("cross_sector_ownership", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   
   // Ownership relationship
   owner_entity_id: uuid("owner_entity_id").notNull().references(() => corporate_entities.id, { onDelete: "cascade" }),
@@ -295,8 +292,7 @@ export const cross_sector_ownership = pgTable("cross_sector_ownership", {
   data_source: varchar("data_source", { length: 100 }),
   verification_status: varchar("verification_status", { length: 30 }).notNull().default("unverified"),
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Ownership network analysis
   ownerOwnedIdx: index("idx_cross_sector_ownership_owner_owned")
@@ -321,7 +317,7 @@ export const cross_sector_ownership = pgTable("cross_sector_ownership", {
 // ============================================================================
 
 export const regulatory_capture_indicators = pgTable("regulatory_capture_indicators", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   
   // Indicator identification
   indicator_type: varchar("indicator_type", { length: 50 }).notNull(), // "revolving_door", "concentrated_lobbying", "regulatory_favoritism", "policy_alignment"
@@ -355,8 +351,7 @@ export const regulatory_capture_indicators = pgTable("regulatory_capture_indicat
   // Status and follow-up
   investigation_status: varchar("investigation_status", { length: 30 }).notNull().default("identified"), // "identified", "under_investigation", "confirmed", "disputed", "resolved"
   
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Indicator type analysis
   typeStrengthIdx: index("idx_regulatory_capture_indicators_type_strength")

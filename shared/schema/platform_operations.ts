@@ -13,13 +13,14 @@ import {
 import { comments } from "./citizen_participation";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
+import { auditFields, primaryKeyUuid } from "./base-types";
 
 // ============================================================================
 // DATA SOURCES - Track where legislative data comes from
 // ============================================================================
 
 export const data_sources = pgTable("data_sources", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Source identification - unique name prevents duplicate configurations
   source_name: varchar("source_name", { length: 255 }).notNull(),
@@ -54,8 +55,7 @@ export const data_sources = pgTable("data_sources", {
   // New: detailed health metrics and issues
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
   created_by: uuid("created_by"), // New: track who configured this source
 
 }, (table) => ({
@@ -80,7 +80,7 @@ export const data_sources = pgTable("data_sources", {
 // ============================================================================
 
 export const sync_jobs = pgTable("sync_jobs", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   data_source_id: uuid("data_source_id").notNull()
     .references(() => data_sources.id, { onDelete: "cascade" }),
 
@@ -138,8 +138,7 @@ export const sync_jobs = pgTable("sync_jobs", {
   // New: for job chains and dependencies
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   // Find all jobs for a specific data source
@@ -171,7 +170,7 @@ export const sync_jobs = pgTable("sync_jobs", {
 // ============================================================================
 
 export const external_bill_references = pgTable("external_bill_references", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull()
     .references(() => bills.id, { onDelete: "cascade" }),
 
@@ -205,8 +204,7 @@ export const external_bill_references = pgTable("external_bill_references", {
   // New: when users last clicked this reference
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   // Prevents duplicate references from same source for same bill
@@ -233,7 +231,7 @@ export const external_bill_references = pgTable("external_bill_references", {
 // ============================================================================
 
 export const analytics_events = pgTable("analytics_events", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Event identification - structured event naming for analysis
   event_name: varchar("event_name", { length: 100 }).notNull(),
@@ -353,7 +351,7 @@ export const analytics_events = pgTable("analytics_events", {
 // ============================================================================
 
 export const bill_impact_metrics = pgTable("bill_impact_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull()
     .references(() => bills.id, { onDelete: "cascade" }),
 
@@ -406,8 +404,7 @@ export const bill_impact_metrics = pgTable("bill_impact_metrics", {
   // New: for estimated metrics
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   // Prevents duplicate metrics for same bill/type/period
@@ -440,7 +437,7 @@ export const bill_impact_metrics = pgTable("bill_impact_metrics", {
 // ============================================================================
 
 export const county_engagement_stats = pgTable("county_engagement_stats", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   county: kenyanCountyEnum("county").notNull(),
 
   // User metrics - understanding active user base
@@ -508,8 +505,7 @@ export const county_engagement_stats = pgTable("county_engagement_stats", {
   // New: how county compares to national average
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   // Prevents duplicate stats for same county/date
@@ -540,7 +536,7 @@ export const county_engagement_stats = pgTable("county_engagement_stats", {
 // ============================================================================
 
 export const trending_analysis = pgTable("trending_analysis", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Analysis period - when and how long
   analysis_date: date("analysis_date").notNull(),
@@ -599,8 +595,7 @@ export const trending_analysis = pgTable("trending_analysis", {
   // New: age of data when analyzed
 
   // Audit fields
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   // Prevents duplicate analysis for same date/window
@@ -627,7 +622,7 @@ export const trending_analysis = pgTable("trending_analysis", {
 // ============================================================================
 
 export const user_engagement_summary = pgTable("user_engagement_summary", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   user_id: uuid("user_id").notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
@@ -667,8 +662,7 @@ export const user_engagement_summary = pgTable("user_engagement_summary", {
   topic_interests: jsonb("topic_interests").default(sql`'{}'::jsonb`),
   engagement_distribution: jsonb("engagement_distribution").default(sql`'{}'::jsonb`),
 
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   userDateUnique: uniqueIndex("user_engagement_summary_user_date_unique")
@@ -684,7 +678,7 @@ export const user_engagement_summary = pgTable("user_engagement_summary", {
 // ============================================================================
 
 export const platform_health_metrics = pgTable("platform_health_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Time period
   measurement_timestamp: timestamp("measurement_timestamp").notNull(),
@@ -751,7 +745,7 @@ export const platform_health_metrics = pgTable("platform_health_metrics", {
 // ============================================================================
 
 export const content_performance = pgTable("content_performance", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Content identification
   content_type: varchar("content_type", { length: 50 }).notNull(),
@@ -791,8 +785,7 @@ export const content_performance = pgTable("content_performance", {
   virality_score: numeric("virality_score", { precision: 10, scale: 2 }),
   quality_score: numeric("quality_score", { precision: 5, scale: 2 }),
 
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  ...auditFields(),
 
 }, (table) => ({
   contentUnique: uniqueIndex("content_performance_content_date_unique")

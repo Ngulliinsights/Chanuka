@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { Badge } from '@/shared/design-system/feedback/Badge';
 
-import { cn } from '../../design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface NavigationItem {
   id: string;

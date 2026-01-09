@@ -9,7 +9,7 @@ import type { NavigationItem } from '@/config/navigation';
 import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
 import { useMobileNavigation } from '@/hooks/mobile/useMobileNavigation';
 import { useScrollManager } from '@/hooks/mobile/useScrollManager';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 import { OfflineStatusBanner } from '@/shared/ui/mobile/feedback/OfflineStatusBanner';
 import { PullToRefresh } from '@/shared/ui/mobile/interaction/PullToRefresh';
 import { ScrollToTopButton } from '@/shared/ui/mobile/interaction/ScrollToTopButton';

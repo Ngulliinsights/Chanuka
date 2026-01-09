@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "import/no-restricted-paths": ["error", {
+      "zones": [
+        {
+          "target": "./client/src/core",
+          "from": "./client/src/features",
+          "message": "Core cannot import from features - violates architectural boundaries"
+        },
+        {
+          "target": "./client/src/shared",
+          "from": "./client/src/core",
+          "message": "Shared cannot import from core - creates circular dependencies"
+        },
+        {
+          "target": "./client/src/shared",
+          "from": "./client/src/features",
+          "message": "Shared cannot import from features - violates architectural boundaries"
+        },
+        {
+          "target": "./client/src/features",
+          "from": "./client/src/features",
+          "message": "Features cannot import from other features - creates tight coupling"
+        }
+      ]
+    }],
+    "import/order": ["error", {
+      "groups": [
+        "builtin",
+        "external",
+        "internal",
+        "parent",
+        "sibling",
+        "index"
+      ],
+      "pathGroups": [
+        {
+          "pattern": "@/shared/**",
+          "group": "internal",
+          "position": "before"
+        },
+        {
+          "pattern": "@/core/**",
+          "group": "internal",
+          "position": "before"
+        },
+        {
+          "pattern": "@/features/**",
+          "group": "internal",
+          "position": "before"
+        }
+      ],
+      "pathGroupsExcludedImportTypes": ["builtin"],
+      "newlines-between": "always",
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": true
+      }
+    }],
+    "import/no-unresolved": ["error", { "ignore": ["^@/"] }],
+    "import/no-absolute-path": ["error", { "ignore": ["^@/"] }]
+  }

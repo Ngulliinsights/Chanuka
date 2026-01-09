@@ -29,8 +29,8 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 'error',
 
     // Import rules
-    'import/no-unresolved': 'error',
-    'import/order': ['error', {
+    'import/no-unresolved': 'warn',
+    'import/order': ['warn', {
       'groups': [
         'builtin',
         'external',

@@ -22,6 +22,7 @@ import {
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
 
+import { primaryKeyUuid, auditFields } from "./base-types";
 // ============================================================================
 // PARTICIPATION QUALITY AUDITS - Constitutional compliance assessment
 // ============================================================================
@@ -30,7 +31,7 @@ import { bills, users } from "./foundation";
 // participation), and 232 (values and principles of public service)
 
 export const participation_quality_audits = pgTable("participation_quality_audits", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // =========================================================================
@@ -326,8 +327,7 @@ export const participation_quality_audits = pgTable("participation_quality_audit
   // =========================================================================
   // METADATA
   // =========================================================================
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
   created_by: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
   updated_by: uuid("updated_by").references(() => users.id, { onDelete: "set null" }),
   

@@ -12,13 +12,14 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { bills, users, sponsors } from "./foundation";
+import { auditFields, primaryKeyUuid } from "./base-types";
 
 // ============================================================================
 // CONSTITUTIONAL PROVISIONS - Kenya's Constitution 2010 Structure
 // ============================================================================
 
 export const constitutional_provisions = pgTable("constitutional_provisions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Constitutional hierarchy: Chapter > Article > Section > Clause
   chapter_number: smallint("chapter_number").notNull(),
@@ -45,8 +46,7 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
   related_provisions: uuid("related_provisions").array(),
   keywords: varchar("keywords", { length: 100 }).array(),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Unique constitutional reference (one row per article/section/clause)
   constitutionalRefUnique: unique("constitutional_provisions_ref_unique")
@@ -82,7 +82,7 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 // ============================================================================
 
 export const constitutional_analyses = pgTable("constitutional_analyses", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Analysis metadata
@@ -127,8 +127,7 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
   is_published: boolean("is_published").notNull().default(false),
   published_at: timestamp("published_at", { withTimezone: true }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Self-referencing foreign key for version control
   supersededByFk: foreignKey({
@@ -173,9 +172,8 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
 // ============================================================================
 // LEGAL PRECEDENTS - Kenyan Case Law and Judicial Decisions
 // ============================================================================
-
 export const legal_precedents = pgTable("legal_precedents", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Case identification
   case_name: varchar("case_name", { length: 500 }).notNull(),
@@ -208,8 +206,7 @@ export const legal_precedents = pgTable("legal_precedents", {
   overruled_by: uuid("overruled_by"),
   // If this precedent was overruled by a higher court
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Self-referencing foreign key for overruling
   overruledByFk: foreignKey({
@@ -250,7 +247,7 @@ export const legal_precedents = pgTable("legal_precedents", {
 // ============================================================================
 
 export const expert_review_queue = pgTable("expert_review_queue", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Review target
   analysis_id: uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
@@ -285,8 +282,7 @@ export const expert_review_queue = pgTable("expert_review_queue", {
   review_outcome: varchar("review_outcome", { length: 50 }),
   // Values: 'approved', 'approved_with_changes', 'rejected', 'needs_revision'
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Pending queue (oldest first, high priority first)
   pendingQueueIdx: index("idx_expert_review_queue_pending")
@@ -321,7 +317,7 @@ export const expert_review_queue = pgTable("expert_review_queue", {
 // ============================================================================
 
 export const analysis_audit_trail = pgTable("analysis_audit_trail", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Audit target
   analysis_id: uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
@@ -374,7 +370,7 @@ export const analysis_audit_trail = pgTable("analysis_audit_trail", {
 // ============================================================================
 
 export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabilities", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Vulnerability identification
   vulnerability_name: varchar("vulnerability_name", { length: 200 }).notNull().unique(),
@@ -422,8 +418,7 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
   last_exploitation_date: date("last_exploitation_date"),
   times_exploited: integer("times_exploited").notNull().default(0),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Active vulnerabilities by severity
   severityStatusIdx: index("idx_constitutional_vulnerabilities_severity_status")
@@ -461,7 +456,7 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
 // ============================================================================
 
 export const underutilized_provisions = pgTable("underutilized_provisions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Provision identification
   provision_reference: varchar("provision_reference", { length: 50 }).notNull().unique(),
@@ -497,8 +492,7 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
   related_provisions: uuid("related_provisions").array(),
   research_questions: varchar("research_questions", { length: 500 }).array(),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: High-impact underutilized provisions
   impactUseRateIdx: index("idx_underutilized_provisions_impact_use")
@@ -533,7 +527,7 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
 // ============================================================================
 
 export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Assessment target
   target_group: varchar("target_group", { length: 50 }).notNull(),
@@ -575,8 +569,7 @@ export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
   // Question status
   is_active: boolean("is_active").notNull().default(true),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Get questions by target group and difficulty
   targetGroupDifficultyIdx: index("idx_elite_literacy_assessment_target_difficulty")
@@ -609,7 +602,7 @@ export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
 // ============================================================================
 
 export const constitutional_loopholes = pgTable("constitutional_loopholes", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Loophole identification
   loophole_name: varchar("loophole_name", { length: 200 }).notNull().unique(),
@@ -645,8 +638,7 @@ export const constitutional_loopholes = pgTable("constitutional_loopholes", {
   times_exploited: integer("times_exploited").notNull().default(0),
   last_exploitation_date: date("last_exploitation_date"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: High-risk open loopholes
   riskStatusIdx: index("idx_constitutional_loopholes_risk_status")
@@ -684,7 +676,7 @@ export const constitutional_loopholes = pgTable("constitutional_loopholes", {
 // This table stores WHO took assessments and THEIR results
 
 export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Link to legislator
   sponsor_id: uuid("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
@@ -742,8 +734,7 @@ export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
   assessed_by: uuid("assessed_by").references(() => users.id, { onDelete: "set null" }),
   // If expert-administered assessment
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Sponsor's assessment history
   sponsorDateIdx: index("idx_knowledge_scores_sponsor_date")

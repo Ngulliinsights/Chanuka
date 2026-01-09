@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
 import { Badge } from '@/shared/design-system';
 import { Button } from '@/shared/design-system';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/design-system';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 // Navigation modes
 export type NavigationMode = 'drawer' | 'bottom' | 'both';

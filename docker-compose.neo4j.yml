@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  # Neo4j Graph Database for relationship analysis
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: chanuka-neo4j
+    ports:
+      - "${NEO4J_PORT:-7687}:7687"
+      - "${NEO4J_BROWSER_PORT:-7474}:7474"
+    environment:
+      # Basic configuration
+      - NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-neo4j_password}
+      - NEO4J_server_default__listen__address=0.0.0.0:7687
+      - NEO4J_server_bolt_listen__address=0.0.0.0:7687
+
+      # Memory settings (adjust based on your system)
+      - NEO4J_server_memory_heap_initial__size=512m
+      - NEO4J_server_memory_heap_max__size=1g
+      - NEO4J_server_memory_pagecache_size=512m
+
+      # APOC plugin
+      - NEO4J_PLUGINS='["apoc"]'
+
+      # Query timeout (30 seconds)
+      - NEO4J_server_transaction_timeout=30s
+
+      # Query logging
+      - NEO4J_server_logs_query_enabled=true
+      - NEO4J_server_logs_query_parameter__logging__enabled=true
+
+      # Database settings
+      - NEO4J_initial_dbms_default__database=neo4j
+      - NEO4J_initial_dbms_databases_default__to__read__replicas=0
+    volumes:
+      # Persistent data storage
+      - neo4j_data:/var/lib/neo4j/data
+      # Configuration files
+      - neo4j_logs:/var/lib/neo4j/logs
+      # Import directory for bulk data
+      - ./neo4j-import:/var/lib/neo4j/import
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "cypher-shell",
+          "-u",
+          "${NEO4J_USERNAME:-neo4j}",
+          "-p",
+          "${NEO4J_PASSWORD:-neo4j_password}",
+          "RETURN 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - app-network
+    labels:
+      - "com.chanuka.service=neo4j"
+      - "com.chanuka.component=graph-database"
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

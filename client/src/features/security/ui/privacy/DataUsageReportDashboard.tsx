@@ -17,7 +17,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@client/shared/ui/dashboard/hooks';
 
 import { useAuth } from '@client/core/auth';
 import { dataRetentionService, retentionUtils } from '@client/services/dataRetentionService';
@@ -63,12 +64,12 @@ interface DataCategory {
 
 export function DataUsageReportDashboard() {
   const auth = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<DataUsageStats | null>(null);
-  const [categories, setCategories] = useState<DataCategory[]>([]);
-  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-  const [refreshing, setRefreshing] = useState(false);
+  const { loading, setLoading } = useDashboardLoading(true);
+  const { error, setError, handleError } = useDashboardError(null);
+  const { refreshing, runRefresh } = useDashboardRefresh();
+  const [stats, setStats] = React.useState<DataUsageStats | null>(null);
+  const [categories, setCategories] = React.useState<DataCategory[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = React.useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   useEffect(() => {
     loadDataUsageReport();
@@ -143,22 +144,13 @@ export function DataUsageReportDashboard() {
       setStats(usageStats);
       setCategories(transformedCategories);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load data usage report';
-      setError(errorMessage);
-      logger.error('Failed to load data usage report', {
-        component: 'DataUsageReportDashboard',
-        error: err,
-      });
+      handleError(err, { component: 'DataUsageReportDashboard' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await loadDataUsageReport();
-    setRefreshing(false);
-  };
+  const handleRefresh = async () => runRefresh(loadDataUsageReport);
 
   const handleExportData = async (categoryId?: string) => {
     if (!auth.user) return;

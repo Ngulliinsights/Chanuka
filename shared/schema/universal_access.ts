@@ -12,13 +12,14 @@ import {
 
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
+import { auditFields, primaryKeyUuid } from "./base-types";
 
 // ============================================================================
 // AMBASSADORS - Community facilitators for offline engagement
 // ============================================================================
 
 export const ambassadors = pgTable("ambassadors", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
   // Ambassador identification
@@ -63,8 +64,7 @@ export const ambassadors = pgTable("ambassadors", {
   recruited_by_id: uuid("recruited_by_id").references(() => users.id, { onDelete: "set null" }),
   onboarding_date: date("onboarding_date").notNull().default(sql`CURRENT_DATE`),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Ambassador lookup and management
   statusCountyIdx: index("idx_ambassadors_status_county")
@@ -100,7 +100,7 @@ export const ambassadors = pgTable("ambassadors", {
 // ============================================================================
 
 export const communities = pgTable("communities", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Community identification
   name: varchar("name", { length: 300 }).notNull(),
@@ -138,8 +138,7 @@ export const communities = pgTable("communities", {
   is_active: boolean("is_active").notNull().default(true),
   last_engagement_date: date("last_engagement_date"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Geographic community queries
   countyConstituencyIdx: index("idx_communities_county_constituency")
@@ -166,7 +165,7 @@ export const communities = pgTable("communities", {
 // ============================================================================
 
 export const facilitation_sessions = pgTable("facilitation_sessions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Session identification
   session_code: varchar("session_code", { length: 30 }).notNull().unique(),
@@ -214,8 +213,7 @@ export const facilitation_sessions = pgTable("facilitation_sessions", {
   sync_status: varchar("sync_status", { length: 20 }).notNull().default("synced"), // "pending", "synced", "conflict"
   last_synced_at: timestamp("last_synced_at", { withTimezone: true }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Ambassador session tracking
   ambassadorDateIdx: index("idx_facilitation_sessions_ambassador_date")
@@ -241,7 +239,7 @@ export const facilitation_sessions = pgTable("facilitation_sessions", {
 // ============================================================================
 
 export const offline_submissions = pgTable("offline_submissions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   // Submission context
   session_id: uuid("session_id").references(() => facilitation_sessions.id, { onDelete: "set null" }),

@@ -10,7 +10,7 @@ import {
   ConnectionState,
   WebSocketMessage,
   WebSocketError,
-} from '../../../../shared/schema/websocket';
+} from '@shared/schema/websocket';
 import { logger } from '../../utils/logger';
 
 // Define events specific to the client implementation

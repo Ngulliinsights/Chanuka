@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 // import { logger } from '../../../utils/logger';
 

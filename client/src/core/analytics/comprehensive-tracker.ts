@@ -10,7 +10,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { UserJourneyTracker, JourneyAnalytics } from '@client/services/UserJourneyTracker';
+import { userJourneyTracker, JourneyAnalytics } from '@client/features/analytics/model/user-journey-tracker';
 import { useCallback } from 'react';
 
 import { analyticsApiService } from '@client/core/api/analytics';
@@ -163,7 +163,8 @@ export class ComprehensiveAnalyticsTracker {
   private pageMetrics: Map<string, PagePerformanceMetrics[]> = new Map();
   private userEngagement: Map<string, UserEngagementMetrics> = new Map();
 
-  private personaConfigs: Record<UserRole, PersonaAnalyticsConfig> = {
+  // Use a relaxed index type to avoid requiring every possible UserRole literal here
+  private personaConfigs: Record<string, PersonaAnalyticsConfig> = {
     public: {
       trackingEnabled: true,
       detailedMetrics: false,
@@ -229,7 +230,7 @@ export class ComprehensiveAnalyticsTracker {
   private readonly FLUSH_INTERVAL = 30000; // 30 seconds
 
   private constructor() {
-    this.journeyTracker = UserJourneyTracker.getInstance();
+    this.journeyTracker = userJourneyTracker;
     this.performanceMonitor = PerformanceMonitor.getInstance();
     this.errorAnalytics = ErrorAnalyticsService.getInstance();
 
@@ -888,18 +889,18 @@ export class ComprehensiveAnalyticsTracker {
   private getCurrentUserRole(): UserRole {
     // This should be integrated with your auth system
     // For now, return a default role
-    return 'public';
+    return 'guest';
   }
 
   private getCurrentSection(): NavigationSection {
     // This should be integrated with your navigation system
     // For now, determine from current path
     const path = window.location.pathname;
-    if (path.includes('/bills')) return 'bills';
-    if (path.includes('/community')) return 'community';
-    if (path.includes('/dashboard')) return 'dashboard';
-    if (path.includes('/admin')) return 'admin';
-    return 'home';
+    if (path.includes('/bills')) return 'legislative' as NavigationSection;
+    if (path.includes('/community')) return 'community' as NavigationSection;
+    if (path.includes('/dashboard')) return 'user' as NavigationSection;
+    if (path.includes('/admin')) return 'admin' as NavigationSection;
+    return 'tools' as NavigationSection;
   }
 
   private getDeviceType(): 'mobile' | 'tablet' | 'desktop' {

@@ -1,71 +1,29 @@
 /**
- * Shared Library Exports
+ * Shared Library Module
  *
- * Central export point for shared utilities and helpers
- * Used across features and core modules
+ * Main index file for all shared libraries with FSD structure
  */
 
-// Form utilities
-export { useFormBuilder, withFormBuilder, createFormBuilder } from './form-builder';
-export type {} from './form-builder'; // Export types implicitly
+// Form Builder
+export * from './form-builder';
 
-// Route protection
-export { default as ProtectedRoute } from './protected-route';
+// Validation
+export * from './validation';
 
-// React Query configuration
-export {
-  queryClient,
-  queryKeys,
-  invalidateQueries,
-  prefetchQueries,
-  cacheUtils,
-  configureOfflineSupport,
-  setupGlobalErrorHandler,
-  devUtils,
-} from './react-query-config';
-export { apiRequest, getQueryFn } from './queryClient';
+// Query Client
+export * from './query-client';
 
-// Validation schemas
-export {
-  validationPatterns,
-  billValidationSchemas,
-  userValidationSchemas,
-  formValidationSchemas,
-  allValidationSchemas,
-} from './validation-schemas';
+// Utilities
+export * from './utils';
 
-// Type exports from validation-schemas
-export type {
-  BillSearchQuery,
-  BillFilter,
-  CreateBillData,
-  UpdateBillData,
-  BillCommentData,
-  UserRegisterData,
-  UserLoginData,
-  UserProfileData,
-  UserPreferencesData,
-  ContactFormData,
-  FeedbackFormData,
-  PaymentFormData,
-} from './validation-schemas';
+// Legacy exports for backward compatibility
+export * from './form-builder';
+export * from './validation';
+export * from './query-client';
+export * from './utils';
 
-// Utility functions
-export {
-  cn,
-  formatDate,
-  formatRelativeTime,
-  formatNumber,
-  formatCurrency,
-  truncateText,
-  debounce,
-  isValidEmail,
-  isValidKenyaPhoneNumber,
-  generateId,
-  capitalize,
-  slugify,
-} from './utils';
-
-// Default export for convenience
-import * as utils from './utils';
-export default utils;
+// Re-export from legacy location for compatibility
+export * from './form-builder';
+export * from './validation';
+export * from './query-client';
+export * from './utils';

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useDashboardLoading, useDashboardError, useDashboardRefresh } from './hooks';
 
 import { Alert, AlertDescription, AlertTitle } from '../../design-system';
 import { Badge } from '../../design-system';
@@ -105,9 +106,10 @@ interface DashboardData {
 
 export function MonitoringDashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { loading, setLoading } = useDashboardLoading(true);
+  const { error, setError, handleError } = useDashboardError(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const { refreshing, runRefresh } = useDashboardRefresh();
 
   const fetchDashboardData = async () => {
     try {
@@ -123,7 +125,7 @@ export function MonitoringDashboard() {
         throw new Error(result.error?.message || 'Unknown error');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      handleError(err, { component: 'MonitoringDashboard' });
     } finally {
       setLoading(false);
     }
@@ -223,7 +225,7 @@ export function MonitoringDashboard() {
             <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
             Auto Refresh: {autoRefresh ? 'On' : 'Off'}
           </Button>
-          <Button variant="outline" size="sm" onClick={fetchDashboardData}>
+          <Button variant="outline" size="sm" onClick={() => runRefresh(fetchDashboardData)}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh Now
           </Button>

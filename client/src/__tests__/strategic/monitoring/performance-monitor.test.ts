@@ -5,10 +5,10 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { PerformanceAlertsManager } from '../../../core/performance/alerts';
-import { PerformanceBudgetChecker } from '../../../core/performance/budgets';
-import { PerformanceMonitor } from '../../../core/performance/monitor';
-import { WebVitalsMonitor } from '../../../core/performance/web-vitals';
+import { PerformanceAlertsManager } from '@client/core/performance/alerts';
+import { PerformanceBudgetChecker } from '@client/core/performance/budgets';
+import { PerformanceMonitor } from '@client/core/performance/monitor';
+import { WebVitalsMonitor } from '@client/core/performance/web-vitals';
 
 // Mock dependencies
 vi.mock('../../../core/performance/budgets', () => ({

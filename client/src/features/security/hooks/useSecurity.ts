@@ -7,8 +7,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import { securityService, SecurityStatus } from '@client/security/security-service';
 
-import { clientRateLimiter, RateLimitConfigs } from '../../../security/rate-limiter';
-import { SecurityThreat } from '../../../security/vulnerability-scanner';
+import { clientRateLimiter, RateLimitConfigs } from '@client/security/rate-limiter';
+import { SecurityThreat } from '@client/security/vulnerability-scanner';
 
 // Constants extracted to module level for better performance
 const DEFAULT_SCAN_INTERVAL = 300000; // 5 minutes

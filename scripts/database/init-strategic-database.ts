@@ -1,7 +1,16 @@
 #!/usr/bin/env tsx
 /**
+ * @deprecated Use initialize-database-integration.ts instead
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/init-strategic-database.ts
+ *   New: npm run db:init
+ *
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ */
+/**
  * Strategic Database Initialization Script
- * 
+ *
  * Complete database setup for the Chanuka platform
  * Orchestrates all database operations in the correct order
  */
@@ -19,7 +28,7 @@ interface InitOptions {
 export async function initializeStrategicDatabase(options: InitOptions = {}): Promise<void> {
   const { environment = 'development' } = options;
   const startTime = Date.now();
-  
+
   logger.info('🚀 Initializing Chanuka Strategic Database System...', { environment, options });
 
   try {
@@ -62,14 +71,14 @@ export async function initializeStrategicDatabase(options: InitOptions = {}): Pr
 
     const duration = Date.now() - startTime;
     logger.info(`✅ Strategic database initialization completed in ${duration}ms`);
-    
+
     // Show success summary
     showSuccessSummary(environment, healthReport, duration);
 
   } catch (error) {
     const duration = Date.now() - startTime;
     logger.error(`❌ Strategic database initialization failed after ${duration}ms:`, error);
-    
+
     // Show troubleshooting guide
     showTroubleshootingGuide(error, environment);
     throw error;
@@ -88,7 +97,7 @@ async function validateProductionPerformance(): Promise<void> {
     // Test connection pool performance
     const startTime = Date.now();
     const pool = connectionManager.getPool();
-    
+
     // Run performance test queries
     await pool.query('SELECT 1');
     const simpleQueryTime = Date.now() - startTime;
@@ -116,7 +125,7 @@ async function validateDatabaseSecurity(): Promise<void> {
     // Check SSL configuration
     const sslResult = await pool.query('SHOW ssl');
     const sslEnabled = sslResult.rows[0]?.ssl === 'on';
-    
+
     if (!sslEnabled) {
       logger.warn('⚠️  SSL not enabled - consider enabling for production');
     } else {
@@ -142,7 +151,7 @@ function showSuccessSummary(environment: string, healthReport: any, duration: nu
   console.log(`Duration: ${duration}ms`);
   console.log(`Overall Health: ${healthReport.overall.toUpperCase()}`);
   console.log('');
-  
+
   console.log('✅ Components Initialized:');
   console.log('   • Unified Connection Manager');
   console.log('   • Migration System');
@@ -150,20 +159,20 @@ function showSuccessSummary(environment: string, healthReport: any, duration: nu
   console.log('   • Performance Optimization');
   console.log('   • Backup & Recovery');
   console.log('');
-  
+
   console.log('🚀 Ready for Development:');
   console.log('   • Database connections: Optimized');
   console.log('   • Schema: Up to date');
   console.log('   • Performance: Validated');
   console.log('   • Health monitoring: Active');
   console.log('');
-  
+
   console.log('📝 Next Steps:');
   console.log('   1. Start your application: npm run dev');
   console.log('   2. Monitor health: npm run db:health:continuous');
   console.log('   3. Run tests: npm run test:database');
   console.log('');
-  
+
   console.log('🔧 Available Commands:');
   console.log('   • npm run db:migrate --help');
   console.log('   • npm run db:reset --help');
@@ -175,7 +184,7 @@ function showTroubleshootingGuide(error: any, environment: string): void {
   console.log('===============================================');
   console.log(`Error: ${error.message}`);
   console.log('');
-  
+
   console.log('🔍 Common Solutions:');
   console.log('   1. Check database connection:');
   console.log('      npx tsx scripts/database/test-connection.ts');
@@ -189,7 +198,7 @@ function showTroubleshootingGuide(error: any, environment: string): void {
   console.log('   4. Reset and retry:');
   console.log('      npm run db:reset:force');
   console.log('');
-  
+
   if (environment === 'production') {
     console.log('🚨 PRODUCTION TROUBLESHOOTING:');
     console.log('   • Check SSL certificates');
@@ -197,7 +206,7 @@ function showTroubleshootingGuide(error: any, environment: string): void {
     console.log('   • Check connection limits');
     console.log('   • Review security groups');
   }
-  
+
   console.log('');
   console.log('📞 Need Help?');
   console.log('   • Check docs/database-consolidation-final-plan.md');
@@ -208,11 +217,11 @@ function showTroubleshootingGuide(error: any, environment: string): void {
 // CLI interface
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
-  
+
   let environment: 'development' | 'production' | 'test' = 'development';
   if (args.includes('--production')) environment = 'production';
   if (args.includes('--test')) environment = 'test';
-  
+
   const options: InitOptions = {
     environment,
     skipMigrations: args.includes('--skip-migrations'),

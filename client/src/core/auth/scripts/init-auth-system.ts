@@ -388,7 +388,7 @@ export const store = configureStore({
   testing: `
 // In your test setup
 import { setupAuthForTesting } from '@/core/auth/scripts/init-auth-system';
-import { mockApiClient } from '../../../test-utils';
+import { mockApiClient } from '@client/test-utils';
 
 beforeAll(async () => {
   await setupAuthForTesting(mockApiClient);

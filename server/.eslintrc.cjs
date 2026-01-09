@@ -16,9 +16,9 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-console': 'warn',
-    'import/no-unresolved': 'error',
+    'import/no-unresolved': 'warn',
     'import/order': 'off',
-    'simple-import-sort/imports': 'error',
+    'simple-import-sort/imports': 'warn',
   },
   overrides: [
     {

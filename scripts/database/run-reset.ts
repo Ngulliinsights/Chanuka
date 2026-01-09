@@ -4,6 +4,18 @@
  * Safely resets the database with proper environment variable loading
  */
 
+/**
+ * @deprecated Use reset.ts instead
+ *
+ * This was a wrapper for reset-database.ts. Use reset.ts directly via npm scripts.
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/run-reset.ts
+ *   New: npm run db:reset
+ *
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ */
+
 import * as readline from 'readline';
 import { config } from 'dotenv';
 import { resetDatabase } from './reset-database';
@@ -36,7 +48,7 @@ async function runInteractiveReset() {
     console.error('Please ensure DATABASE_URL is set in your .env file');
     console.error('Current working directory:', process.cwd());
     console.error('Looking for .env file at:', `${process.cwd()}/.env`);
-    
+
     try {
       const fs = await import('fs');
       if (fs.existsSync('.env')) {
@@ -55,7 +67,7 @@ async function runInteractiveReset() {
     } catch (error) {
       console.error('Error checking .env file:', error);
     }
-    
+
     process.exit(1);
   }
 
@@ -66,10 +78,10 @@ async function runInteractiveReset() {
   console.log('⚠️  WARNING: This will completely reset your database!');
   console.log('All existing data will be lost.');
   console.log('');
-  
+
   // Ask for confirmation
   const answer = await askQuestion('Are you sure you want to continue? (y/N): ');
-  
+
   if (!answer.toLowerCase().startsWith('y')) {
     console.log('❌ Database reset cancelled');
     rl.close();
@@ -90,7 +102,7 @@ async function runInteractiveReset() {
     console.log('📋 Step 2: Running health check...');
     const healthResults = await runHealthCheck();
     const healthPassed = await displayResults(healthResults);
-    
+
     if (healthPassed) {
       console.log('✅ Health check passed');
     } else {
@@ -115,7 +127,7 @@ async function runInteractiveReset() {
     console.log('4. Try running the individual scripts manually:');
     console.log('   - npx tsx scripts/database/reset-database.ts');
     console.log('   - npx tsx scripts/database/health-check.ts');
-    
+
     process.exit(1);
   } finally {
     rl.close();

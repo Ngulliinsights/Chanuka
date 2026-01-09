@@ -7,13 +7,12 @@ import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
 import { authApiService as authService } from '@/core/api';
 import { logout, tokenManager, clearError } from '@/core/auth';
-
-import { logger } from '../../../../utils/logger';
-import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
-
-import { rbacManager } from '@/utils/rbac';
-import { tokenRefreshDeduplicator } from '@/utils/request-deduplicator';
+import { rbacManager } from '@/core/auth/rbac';
+import { requestDeduplicator } from '@/shared/infrastructure/http/request-deduplicator';
 import { securityMonitor } from '@/utils/security';
+
+import { logger } from '@client/utils/logger';
+import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
 
 interface AuthMiddlewareConfig {
   enableAutoRefresh: boolean;
@@ -162,7 +161,7 @@ function handleLoginSuccess(
 
     // Clear any cached permissions for fresh start
     if (payload.user) {
-      rbacManager.clearUserCache(payload.user.id);
+      rbacManager.clearCache();
     }
   } catch (error) {
     logger.error('Error handling login success:', { component: 'AuthMiddleware' }, error);
@@ -227,7 +226,7 @@ function handleUserUpdate(user: UserUpdatePayload, _config: AuthMiddlewareConfig
 
     // Clear permission cache when user data changes
     if (user?.id) {
-      rbacManager.clearUserCache(user.id);
+      rbacManager.clearCache();
     }
   } catch (error) {
     logger.error('Error handling user update:', { component: 'AuthMiddleware' }, error);
@@ -264,7 +263,7 @@ function checkTokenRefresh(
  * Perform token refresh with deduplication to prevent race conditions
  */
 async function performTokenRefresh(store: { dispatch: Dispatch }): Promise<void> {
-  return tokenRefreshDeduplicator.deduplicate('token-refresh', async () => {
+  return requestDeduplicator.deduplicate('token-refresh', async () => {
     try {
       logger.debug('Attempting token refresh', { component: 'AuthMiddleware' });
 

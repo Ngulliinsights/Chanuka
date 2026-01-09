@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 1/7/2026, 12:17:48 AM
+**Generated:** 1/8/2026, 1:14:11 PM
 **Max Depth:** 7 levels
 
 ```
@@ -88,7 +88,6 @@
 │   │   │   ├── index.ts
 │   │   │   ├── integration.ts
 │   │   │   ├── mobile.ts
-│   │   │   ├── navigation.ts
 │   │   │   └── onboarding.ts
 │   │   ├── constants/
 │   │   │   └── index.ts
@@ -255,6 +254,18 @@
 │   │   │   │   │   ├── SimpleErrorBoundary.tsx
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── UnifiedErrorBoundary.tsx
+│   │   │   │   ├── messages/
+│   │   │   │   │   ├── error-message-formatter.ts
+│   │   │   │   │   ├── error-recovery-suggestions.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── use-error-messages.ts
+│   │   │   │   ├── middleware/
+│   │   │   │   │   ├── hooks-middleware.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── library-middleware.ts
+│   │   │   │   │   ├── security-middleware.ts
+│   │   │   │   │   └── service-middleware.ts
 │   │   │   │   ├── reporters/
 │   │   │   │   │   ├── ApiReporter.ts
 │   │   │   │   │   ├── CompositeReporter.ts
@@ -394,6 +405,7 @@
 │   │   │   │   ├── dashboard-validation.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
+│   │   │   ├── core-monitoring.ts
 │   │   │   ├── index.ts
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   └── test-consolidated-realtime.ts
@@ -655,8 +667,15 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── user-service.ts
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── achievements-service.ts
+│   │   │   │   │   ├── auth-service.ts
+│   │   │   │   │   ├── dashboard-service.ts
+│   │   │   │   │   ├── engagement-service.ts
+│   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── onboarding-service.ts
-│   │   │   │   │   └── user-api.ts
+│   │   │   │   │   ├── profile-service.ts
+│   │   │   │   │   ├── user-api.ts
+│   │   │   │   │   └── user-service-legacy.ts
 │   │   │   │   ├── types/
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
@@ -698,13 +717,32 @@
 │   │   │   │   ├── usePullToRefresh.ts
 │   │   │   │   ├── useScrollManager.ts
 │   │   │   │   └── useSwipeGesture.ts
+│   │   │   ├── patterns/
+│   │   │   ├── utils/
+│   │   │   │   ├── error-handling.ts
+│   │   │   │   ├── migration-compatibility.ts
+│   │   │   │   └── performance.ts
+│   │   │   ├── BACKWARD_COMPATIBILITY_PLAN.md
+│   │   │   ├── ERROR_HANDLING_UNIFICATION.md
+│   │   │   ├── HOOKS_ARCHITECTURE_MIGRATION_PLAN.md
+│   │   │   ├── hooks-monitoring.ts
+│   │   │   ├── IMPLEMENTATION_COMPLETE.md
+│   │   │   ├── IMPLEMENTATION_ROADMAP.md
 │   │   │   ├── index.ts
+│   │   │   ├── MIGRATION_SUMMARY.md
+│   │   │   ├── README.md
+│   │   │   ├── STANDARDIZATION_GUIDELINES.md
 │   │   │   ├── store.ts
+│   │   │   ├── TESTING_STRATEGY.md
 │   │   │   ├── use-architecture-performance.ts
+│   │   │   ├── use-cleanup.ts
 │   │   │   ├── use-keyboard-focus.ts
+│   │   │   ├── use-mobile.ts
 │   │   │   ├── use-mobile.tsx
+│   │   │   ├── use-offline-detection.ts
 │   │   │   ├── use-performance-monitor.ts
 │   │   │   ├── use-safe-query.ts
+│   │   │   ├── use-system.ts
 │   │   │   ├── use-system.tsx
 │   │   │   ├── use-toast.ts
 │   │   │   ├── useCleanup.tsx
@@ -793,16 +831,36 @@
 │   │   │   │   └── security-config.ts
 │   │   │   ├── headers/
 │   │   │   │   └── SecurityHeaders.ts
+│   │   │   ├── migration/
+│   │   │   │   ├── compatibility-layer.ts
+│   │   │   │   └── migration-utils.ts
 │   │   │   ├── types/
 │   │   │   │   └── security-types.ts
+│   │   │   ├── unified/
+│   │   │   │   ├── csp-config.ts
+│   │   │   │   ├── csp-manager.ts
+│   │   │   │   ├── error-handler.ts
+│   │   │   │   ├── error-middleware.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── input-sanitizer.ts
+│   │   │   │   └── security-interface.ts
+│   │   │   ├── API.md
+│   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── csp-manager.ts
 │   │   │   ├── csp-nonce.ts
 │   │   │   ├── csrf-protection.ts
+│   │   │   ├── DOCUMENTATION_IMPROVEMENTS.md
+│   │   │   ├── GUIDELINES.md
+│   │   │   ├── IMPLEMENTATION_PLAN.md
+│   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
 │   │   │   ├── input-sanitizer.ts
+│   │   │   ├── MIGRATION_STEPS.md
 │   │   │   ├── rate-limiter.ts
 │   │   │   ├── security-monitor.ts
+│   │   │   ├── security-monitoring.ts
 │   │   │   ├── security-service.ts
+│   │   │   ├── TESTING_STRATEGY.md
 │   │   │   ├── types.ts
 │   │   │   └── vulnerability-scanner.ts
 │   │   ├── services/
@@ -813,9 +871,13 @@
 │   │   │   ├── mockUserData.ts
 │   │   │   ├── navigation.ts
 │   │   │   ├── notification-system-integration-summary.md
+│   │   │   ├── privacyAnalyticsService.ts
 │   │   │   ├── realistic-demo-data.ts
+│   │   │   ├── services-monitoring.ts
 │   │   │   └── userService.ts
 │   │   ├── shared/
+│   │   │   ├── config/
+│   │   │   │   └── navigation.ts
 │   │   │   ├── context/
 │   │   │   │   └── KenyanContextProvider.tsx
 │   │   │   ├── design-system/
@@ -968,6 +1030,12 @@
 │   │   │   │   ├── responsive.css
 │   │   │   │   ├── responsive.ts
 │   │   │   │   └── strategy.ts
+│   │   │   ├── error-handling/
+│   │   │   │   ├── constants.ts
+│   │   │   │   ├── framework.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── recovery.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── hooks/
 │   │   │   │   ├── mobile/
 │   │   │   │   │   └── index.ts
@@ -992,11 +1060,16 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── request-deduplicator.ts
 │   │   │   │   ├── monitoring/
+│   │   │   │   │   ├── cross-system-error-analytics.ts
 │   │   │   │   │   ├── development-dashboard.tsx
+│   │   │   │   │   ├── error-aggregation-service.ts
 │   │   │   │   │   ├── error-monitor.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── monitoring-integration.ts
-│   │   │   │   │   └── performance-monitor.ts
+│   │   │   │   │   ├── performance-impact-monitor.ts
+│   │   │   │   │   ├── performance-monitor.ts
+│   │   │   │   │   ├── trend-analysis-service.ts
+│   │   │   │   │   └── unified-error-monitoring-interface.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   ├── middleware/
 │   │   │   │   │   │   ├── apiMiddleware.ts
@@ -1032,14 +1105,52 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-interfaces.ts
 │   │   │   ├── lib/
+│   │   │   │   ├── migration/
+│   │   │   │   │   └── compatibility-layer.ts
+│   │   │   │   ├── query-client/
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   └── query-client.service.ts
+│   │   │   │   │   ├── types/
+│   │   │   │   │   │   └── query-client.types.ts
+│   │   │   │   │   ├── utils/
+│   │   │   │   │   │   └── query-client-utils.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── common/
+│   │   │   │   │   │   └── common-utils.ts
+│   │   │   │   │   ├── formatters/
+│   │   │   │   │   │   └── formatters.ts
+│   │   │   │   │   ├── helpers/
+│   │   │   │   │   │   └── helpers.ts
+│   │   │   │   │   ├── validators/
+│   │   │   │   │   │   └── validators.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── validation/
+│   │   │   │   │   ├── schemas/
+│   │   │   │   │   │   ├── bill-schemas.ts
+│   │   │   │   │   │   ├── form-schemas.ts
+│   │   │   │   │   │   └── user-schemas.ts
+│   │   │   │   │   ├── types/
+│   │   │   │   │   │   └── validation.types.ts
+│   │   │   │   │   ├── utils/
+│   │   │   │   │   │   └── validation-utils.ts
+│   │   │   │   │   ├── fsd-validation.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── FSD_BEST_PRACTICES.md
+│   │   │   │   ├── FSD_MIGRATION_COMPLETE.md
+│   │   │   │   ├── FSD_MIGRATION_GUIDE.md
+│   │   │   │   ├── FSD_MIGRATION_IMPLEMENTATION_PLAN.md
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── queryClient.ts
 │   │   │   │   ├── react-query-config.ts
 │   │   │   │   ├── utils.ts
 │   │   │   │   └── validation-schemas.ts
 │   │   │   ├── services/
-│   │   │   │   ├── data-retention.ts
+│   │   │   │   ├── cache.ts
+│   │   │   │   ├── errors.ts
+│   │   │   │   ├── factory.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── interfaces.ts
 │   │   │   │   └── navigation.ts
 │   │   │   ├── testing/
 │   │   │   │   ├── index.ts
@@ -1079,6 +1190,9 @@
 │   │   │   │   │   │   ├── useDashboard.ts
 │   │   │   │   │   │   ├── useDashboardActions.ts
 │   │   │   │   │   │   ├── useDashboardConfig.ts
+│   │   │   │   │   │   ├── useDashboardError.ts
+│   │   │   │   │   │   ├── useDashboardLoading.ts
+│   │   │   │   │   │   ├── useDashboardRefresh.ts
 │   │   │   │   │   │   └── useDashboardTopics.ts
 │   │   │   │   │   ├── modals/
 │   │   │   │   │   │   ├── DashboardPreferencesModal.tsx
@@ -1354,6 +1468,7 @@
 │   │   │   ├── privacy-compliance.ts
 │   │   │   ├── react-helpers.ts
 │   │   │   ├── safe-lazy-loading.tsx
+│   │   │   ├── security.ts
 │   │   │   ├── service-recovery.ts
 │   │   │   └── tracing.ts
 │   │   ├── validation/
@@ -1375,6 +1490,7 @@
 │   ├── playwright.visual.config.ts
 │   ├── postcss.config.js
 │   ├── project.json
+│   ├── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   ├── tailwind.config.ts
 │   ├── test-lucide-imports.ts
 │   ├── tsconfig.json
@@ -1422,29 +1538,6 @@
 │   │   ├── schema-domain-relationships.md
 │   │   └── SHARED_INTEGRATION_STATUS.md
 │   ├── archive/
-│   │   ├── CHANGE_LOG.md
-│   │   ├── CONSOLIDATION_PLAN.md
-│   │   ├── CONSOLIDATION_SUMMARY.md
-│   │   ├── DESIGN_SYSTEM_DELIVERY.md
-│   │   ├── DESIGN_SYSTEM_INDEX.md
-│   │   ├── DOCUMENTATION_AUDIT_REPORT.md
-│   │   ├── IMPLEMENTATION_MERGE_SUMMARY.md
-│   │   ├── import-export-report.md
-│   │   ├── QUICK_REFERENCE.md
-│   │   ├── README_ERRORS.md
-│   │   ├── README_USSD_FIXES.md
-│   │   ├── REALTIME_INTEGRATION_SUMMARY.md
-│   │   ├── START_HERE.md
-│   │   ├── STORE_MIGRATION_ASSESSMENT.md
-│   │   ├── SYSTEMATIC_FIX_GUIDE.md
-│   │   ├── TASK_10_3_IMPLEMENTATION_SUMMARY.md
-│   │   ├── USSD_DEPLOYMENT_GUIDE.md
-│   │   ├── USSD_INTEGRATION_ANALYSIS.md
-│   │   ├── USSD_INTEGRATION_FINAL_SUMMARY.md
-│   │   ├── USSD_INTEGRATION_STATUS.md
-│   │   ├── USSD_INTEGRATION_SUMMARY.md
-│   │   ├── websocket-type-analysis-report.md
-│   │   └── websocket-type-consolidation-plan.md
 │   ├── chanuka/
 │   │   ├── # Chanuka Platform Consolidation Impleme.md
 │   │   ├── api_strategy_doc.md
@@ -1476,35 +1569,25 @@
 │   │   ├── strategic_additions_poems.md
 │   │   ├── strategic-ui-features-analysis.md
 │   ├── consolidated/
-│   │   ├── chanuka-platform-guide.md
-│   │   ├── client-optimization-guide.md
-│   │   ├── database-consolidation-guide.md
-│   │   ├── project-timeline.md
-│   │   ├── testing-implementation.md
-│   │   ├── testing-reference.md
-│   │   ├── testing-strategy.md
-│   │   └── ui-ux-guide.md
 │   ├── guides/
-│   │   ├── functional-validator-guide.md
-│   │   ├── IMPORT_MAPPING_GUIDE.md
-│   │   ├── MVP-DATABASE-INTEGRATION-GUIDE.md
-│   │   ├── phase1-quick-reference.md
-│   │   ├── quick-reference-guide.md
-│   │   ├── research-implementation-guide.md
-│   │   └── testing-strategy.md
 │   ├── reference/
+│   │   ├── Adversarial Validation of 'Chanuka' as Democratic Infrastructure in Kenya.md
 │   │   ├── api-consumer-guide.md
 │   │   ├── API.md
 │   │   ├── brand-roadmap.md
+│   │   ├── Chanuka Validation_ A Rigorous Plan.md
+│   │   ├── chanuka_funder_table (1).md
 │   │   ├── Chanuka_Funding_Pitch.md
 │   │   ├── chanuka_implementation_guide.md
 │   │   ├── chanuka_requirements.txt
 │   │   ├── chanuka_serpent_dove.md
+│   │   ├── chanuka_timeline_gantt.md
 │   │   ├── chanuka_webapp_copy.md
 │   │   ├── civic_engagement_framework.md
 │   │   ├── Constitutional Normalization in Kenya_ The CDF Paradigm and the Erosion of Democratic Memory.md
 │   │   ├── constitutional_analysis_framework.md
 │   │   ├── constitutional-normalization-study.md
+│   │   ├── Data Strategy for Chanuka Launch.md
 │   │   ├── database-research-prompt.md
 │   │   ├── Detecting Legislative Pretext_ A Framework.md
 │   │   ├── DIGITAL LAW 2018.pdf
@@ -1514,12 +1597,15 @@
 │   │   ├── ezra-nehemiah-chanuka (1).md
 │   │   ├── global_implications.md
 │   │   ├── Grounding Constitutional Analysis in Pragmatism.md
+│   │   ├── index.md
+│   │   ├── kba_pitch_deck.md
 │   │   ├── Kenyan Civic Tech Data Research Plan.md
 │   │   ├── Kenyan Constitutionalism Research Synthesis.md
 │   │   ├── Kenyan Legislative Challenges and Judicial Outcomes Database - Table 1.csv
 │   │   ├── Kenyan Legislative Data Generation Plan.md
 │   │   ├── Kenyan Legislative Intelligence Database Project.md
 │   │   ├── Kenyan_constitution_2010.md
+│   │   ├── leg_intel_scraper.js
 │   │   ├── Legislative Relationship Mapping Framework.md
 │   │   ├── legislative_framework.md
 │   │   ├── maintenance-process.md
@@ -1527,6 +1613,7 @@
 │   │   ├── Operationalizing Academic Research for Impact.md
 │   │   ├── philosophical_threshold_poems.md
 │   │   ├── problem-statement.md
+│   │   ├── project-structure-comparison.md
 │   │   ├── project-structure.md
 │   │   ├── prompt-1-constitutional-vulnerabilities.md
 │   │   ├── prompt-2-underutilized-strengths.md
@@ -1537,66 +1624,15 @@
 │   │   ├── README.md
 │   │   ├── relationship-mapping-framework.md
 │   │   ├── Research Strategy for Kenyan Constitutionalism.md
+│   │   ├── schema_analysis.md
+│   │   ├── Strategic Funding and Networking Plan.md
 │   │   ├── sustainable_uprising.md
-│   │   └── user-manual.md
+│   │   ├── user-manual.md
+│   │   ├── Validating Legislative Intelligence Market.md
+│   │   └── Validating Parliamentary Compliance Infrastructure.md
 │   ├── reports/
-│   │   ├── CLIENT_DEEP_DIVE_ANALYSIS.md
-│   │   ├── CLIENT_FIXES_FINAL_SUMMARY.md
-│   │   ├── CLIENT_VALIDATION_COMPLETE.md
-│   │   ├── COLLECTION-SUMMARY.md
-│   │   ├── COMPLETED_ISSUES_ARCHIVE_README.md
-│   │   ├── CRITICAL_FIXES_SUMMARY.md
-│   │   ├── DESIGN_SYSTEM_COMPLETE.md
-│   │   ├── DOCUMENTATION_ORGANIZATION_COMPLETE.md
-│   │   ├── DOCUMENTATION_ORGANIZATION_INDEX.md
-│   │   ├── DOCUMENTATION_ORGANIZATION_SUMMARY.md
-│   │   ├── ERROR_HANDLING_INTEGRATION_SUMMARY.md
-│   │   ├── export-analysis-updated.md
-│   │   ├── export-analysis.md
-│   │   ├── FEATURE_COMPLETENESS_ANALYSIS.md
-│   │   ├── fix-implementation-phase1.md
-│   │   ├── Framework Deployment Ready_ Final Steps.md
-│   │   ├── Framework Progress and Next Steps.md
-│   │   ├── functional-validation.md
-│   │   ├── IMPORT_FIX_EXECUTION_PLAN.md
-│   │   ├── import-analysis.md
-│   │   ├── import-export-analysis.md
-│   │   ├── import-resolution-report.md
-│   │   ├── MASTER-SUMMARY.md
-│   │   ├── race-condition-analysis.md
-│   │   ├── RECOVERY_UI_FIX_SUMMARY.md
-│   │   ├── RESOLUTION_STATUS_REPORT.md
-│   │   ├── RESOLVED_ISSUES_INDEX.md
-│   │   ├── runtime-diagnostics.md
-│   │   ├── SHARED_UI_BUG_ANALYSIS.md
-│   │   ├── SHARED_UI_FIX_PLAN.md
-│   │   ├── SHARED_UI_FIXES_IMPLEMENTED.md
-│   │   ├── SHARED_UI_GUIDELINES.md
-│   │   ├── SHARED_UI_IMPLEMENTATION_COMPLETE.md
-│   │   ├── SHARED_UI_IMPLEMENTATION_SUMMARY.md
-│   │   ├── THREE-PROMPTS-SUMMARY.md
-│   │   ├── TYPE_SYSTEM_AUDIT_REPORT.md
-│   │   ├── TYPE_SYSTEM_COMPLETION_SUMMARY.md
-│   │   ├── TYPE_SYSTEM_FIXES_PHASE1.md
-│   │   ├── TYPE_SYSTEM_MIGRATION.md
-│   │   ├── TYPE_SYSTEM_QUICK_REFERENCE.md
-│   │   ├── TYPE_SYSTEM_REMEDIATION_COMPLETE.md
-│   │   ├── TYPESCRIPT_ERROR_ANALYSIS.md
-│   │   └── TYPESCRIPT_FIXES_APPLIED.md
-│   ├── Adversarial Validation of 'Chanuka' as Democratic Infrastructure in Kenya.md
-│   ├── Chanuka Validation_ A Rigorous Plan.md
-│   ├── chanuka_funder_table (1).md
-│   ├── chanuka_timeline_gantt.md
-│   ├── Data Strategy for Chanuka Launch.md
-│   ├── index.md
-│   ├── kba_pitch_deck.md
-│   ├── leg_intel_scraper.js
-│   ├── project-structure-comparison.md
-│   ├── project-structure.md
-│   ├── schema_analysis.md
-│   ├── Strategic Funding and Networking Plan.md
-│   ├── Validating Legislative Intelligence Market.md
-│   └── Validating Parliamentary Compliance Infrastructure.md
+│   ├── BOUNDARY_DEFINITIONS.md
+│   └── IMPORT_PATH_GOVERNANCE.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -1711,6 +1747,7 @@
 │   ├── bulk-migrate-types.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
+│   ├── CHANUKA_MIGRATION_PLAN.md
 │   ├── check-table-structure.ts
 │   ├── check-tables.ts
 │   ├── check-thresholds.js
@@ -1727,6 +1764,7 @@
 │   ├── consolidate-redundant-implementations.ts
 │   ├── consolidate-sprawl.ts
 │   ├── demo-repository-deployment.ts
+│   ├── dependency-cruiser.js
 │   ├── deploy-error-handling.ts
 │   ├── deploy-phase1-utilities.ts
 │   ├── deploy-production.js
@@ -1782,6 +1820,8 @@
 │   ├── immediate-memory-cleanup.cjs
 │   ├── import-resolution-monitor.js
 │   ├── integrate-error-management.ts
+│   ├── jscpd.json
+│   ├── knip.json
 │   ├── migrate_types.py
 │   ├── migrate-api-imports.js
 │   ├── migrate-codebase-utilities.ts
@@ -1794,7 +1834,9 @@
 │   ├── migrate-to-unified-websocket.ts
 │   ├── migrate-types.js
 │   ├── ml-service-demo.ts
+│   ├── modern-project-analyzer.ts
 │   ├── optimize-memory.js
+│   ├── package.json
 │   ├── performance-budget-enforcer.cjs
 │   ├── performance-regression-detector.js
 │   ├── performance-trend-analyzer.cjs
@@ -1802,6 +1844,7 @@
 │   ├── phase2-migration-generator.sh
 │   ├── prepare-module-deletion.ts
 │   ├── race-condition-analyzer.js
+│   ├── README.md
 │   ├── rollback-cleanup.ts
 │   ├── run-adapter-cleanup.js
 │   ├── runtime_diagnostics.js
@@ -3066,6 +3109,8 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
+├── ANALYTICS_BUGS_REPORT.md
+├── ARCHITECTURAL_GOVERNANCE_GUIDE.md
 ├── ARGUMENT_INTELLIGENCE_SETUP_COMPLETE.md
 ├── CHANGELOG.md
 ├── chanuka_error_extractor.py
@@ -3075,8 +3120,11 @@
 ├── client-fix-report-20251220-180156.md
 ├── codebase_errors.json
 ├── combined_analysis.json
+├── CONSOLIDATION_IMPLEMENTATION_COMPLETE.md
 ├── count-websocket-fields.mjs
+├── CROSS_SYSTEM_CONSISTENCY_STANDARDS.md
 ├── cspell.config.yaml
+├── DASHBOARD_COMPREHENSIVE_ANALYSIS.md
 ├── database-consolidation-analysis.md
 ├── docker-compose.yml
 ├── Dockerfile

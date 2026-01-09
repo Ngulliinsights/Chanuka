@@ -10,16 +10,17 @@ import {
   index, date, smallint, real
 } from "drizzle-orm/pg-core";
 
-import { campaigns } from "./advocacy_coordination";
+import { primaryKeyUuid, auditFields } from "./base-types";
 import { kenyanCountyEnum } from "./enum";
-import { bills, users } from "./foundation";
+import { bills } from "./foundation";
+import { campaigns } from "./advocacy_coordination";
 
 // ============================================================================
 // PARTICIPATION COHORTS - Track user groups for equity analysis
 // ============================================================================
 
 export const participation_cohorts = pgTable("participation_cohorts", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Cohort identification
   cohort_name: varchar("cohort_name", { length: 200 }).notNull(),
@@ -56,8 +57,7 @@ export const participation_cohorts = pgTable("participation_cohorts", {
   is_active: boolean("is_active").notNull().default(true),
   analysis_frequency: varchar("analysis_frequency", { length: 20 }).notNull().default("monthly"), // "daily", "weekly", "monthly", "quarterly"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Cohort type analysis
   typeActiveIdx: index("idx_participation_cohorts_type_active")
@@ -84,7 +84,7 @@ export const participation_cohorts = pgTable("participation_cohorts", {
 // ============================================================================
 
 export const legislative_outcomes = pgTable("legislative_outcomes", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Outcome tracking
@@ -116,8 +116,7 @@ export const legislative_outcomes = pgTable("legislative_outcomes", {
   implementation_status: varchar("implementation_status", { length: 30 }), // "not_applicable", "pending", "partial", "full", "delayed"
   implementation_date: date("implementation_date"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Outcome analysis
   finalStatusIdx: index("idx_legislative_outcomes_final_status")
@@ -138,7 +137,7 @@ export const legislative_outcomes = pgTable("legislative_outcomes", {
 // ============================================================================
 
 export const bill_implementation = pgTable("bill_implementation", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Implementation timeline
@@ -163,394 +162,279 @@ export const bill_implementation = pgTable("bill_implementation", {
   citizen_reports_count: integer("citizen_reports_count").notNull().default(0),
   media_coverage_count: integer("media_coverage_count").notNull().default(0),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Implementation timeline analysis
-  implementationTimelineIdx: index("idx_bill_implementation_implementation_timeline")
-    .on(table.expected_implementation_date, table.actual_implementation_date, table.implementation_delay_days),
+  expectedDateIdx: index("idx_bill_implementation_expected_date")
+    .on(table.expected_implementation_date),
 
-  // Budget utilization analysis
-  budgetUtilizationIdx: index("idx_bill_implementation_budget_utilization")
-    .on(table.budget_allocated, table.budget_utilized, table.implementation_percentage),
+  // Delayed implementation tracking
+  delayIdx: index("idx_bill_implementation_delay")
+    .on(table.implementation_delay_days)
+    .where(sql`${table.implementation_delay_days} IS NOT NULL AND ${table.implementation_delay_days} > 0`),
 
-  // Public monitoring
-  publicMonitoringIdx: index("idx_bill_implementation_public_monitoring")
-    .on(table.citizen_reports_count, table.media_coverage_count),
+  // Progress monitoring
+  progressIdx: index("idx_bill_implementation_progress")
+    .on(table.implementation_percentage),
 }));
 
 // ============================================================================
-// ATTRIBUTION ASSESSMENTS - Measure platform's causal impact
+// ATTRIBUTION ASSESSMENTS - Impact attribution analysis
 // ============================================================================
 
 export const attribution_assessments = pgTable("attribution_assessments", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
-  // Assessment scope
-  assessment_type: varchar("assessment_type", { length: 50 }).notNull(), // "bill_outcome", "amendment_influence", "participation_increase", "awareness_change"
-  target_bill_id: uuid("target_bill_id").references(() => bills.id, { onDelete: "cascade" }),
-  target_campaign_id: uuid("target_campaign_id").references(() => campaigns.id, { onDelete: "cascade" }),
+  // Assessment type and scope
+  assessment_type: varchar("assessment_type", { length: 50 }).notNull(), // "bill_amendment", "policy_change", "legislative_outcome"
+  assessment_date: date("assessment_date").notNull(),
 
-  // Assessment period
-  assessment_start_date: date("assessment_start_date").notNull(),
-  assessment_end_date: date("assessment_end_date").notNull(),
+  // Linked entities
+  bill_id: uuid("bill_id").references(() => bills.id, { onDelete: "set null" }),
+  campaign_id: uuid("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
 
-  // Methodology
-  assessment_methodology: varchar("assessment_methodology", { length: 100 }).notNull(), // "before_after", "control_group", "regression_analysis", "expert_judgment"
-  control_group_description: text("control_group_description"),
+  // Attribution metrics
+  platform_influence_score: real("platform_influence_score"), // 0-1 scale
+  confidence_level: varchar("confidence_level", { length: 20 }), // "low", "medium", "high", "very_high"
 
-  // Attribution analysis
-  platform_contribution_percentage: numeric("platform_contribution_percentage", { precision: 5, scale: 2 }), // 0-100
-  confidence_level: numeric("confidence_level", { precision: 3, scale: 2 }), // 0.00-1.00
+  // Evidence of influence
+  direct_evidence: jsonb("direct_evidence").notNull().default(sql`'[]'::jsonb`),
+  // Examples: "sponsor cited public feedback", "amendment matches campaign demand"
+  indirect_indicators: jsonb("indirect_indicators").notNull().default(sql`'[]'::jsonb`),
+  // Examples: "timing correlation", "similar language used"
 
-  // Evidence and metrics
-  quantitative_evidence: jsonb("quantitative_evidence").notNull().default(sql`'{}'::jsonb`),
-  qualitative_evidence: text("qualitative_evidence"),
+  // Causal analysis
+  alternative_factors: jsonb("alternative_factors").notNull().default(sql`'[]'::jsonb`),
+  // Other factors that might have influenced the outcome
+  causal_mechanism: text("causal_mechanism"),
+  // How the platform likely influenced the outcome
 
-  // Alternative explanations
-  confounding_factors: text("confounding_factors"),
-  alternative_explanations: text("alternative_explanations"),
+  // Outcome description
+  outcome_description: text("outcome_description"),
+  impact_magnitude: varchar("impact_magnitude", { length: 20 }), // "minor", "moderate", "significant", "major"
 
   // Assessment quality
-  assessor_id: uuid("assessor_id").references(() => users.id, { onDelete: "set null" }),
-  peer_reviewed: boolean("peer_reviewed").notNull().default(false),
-  methodology_validated: boolean("methodology_validated").notNull().default(false),
+  assessment_methodology: text("assessment_methodology"),
+  limitations: text("limitations"),
+  assessor_notes: text("assessor_notes"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
-  // Assessment type analysis
-  typeConfidenceIdx: index("idx_attribution_assessments_type_confidence")
-    .on(table.assessment_type, table.confidence_level, table.platform_contribution_percentage),
+  // Assessment type and date
+  typeDate: index("idx_attribution_assessments_type_date")
+    .on(table.assessment_type, table.assessment_date.desc()),
 
-  // Bill attribution tracking
-  billAttributionIdx: index("idx_attribution_assessments_bill_attribution")
-    .on(table.target_bill_id, table.platform_contribution_percentage)
-    .where(sql`${table.target_bill_id} IS NOT NULL`),
+  // High-confidence attributions
+  highConfidenceIdx: index("idx_attribution_assessments_high_confidence")
+    .on(table.confidence_level, table.platform_influence_score.desc())
+    .where(sql`${table.confidence_level} IN ('high', 'very_high')`),
 
-  // Quality assurance
-  qualityAssuranceIdx: index("idx_attribution_assessments_quality_assurance")
-    .on(table.peer_reviewed, table.methodology_validated, table.confidence_level),
+  // Entity-specific assessments
+  billIdx: index("idx_attribution_assessments_bill")
+    .on(table.bill_id)
+    .where(sql`${table.bill_id} IS NOT NULL`),
+
+  campaignIdx: index("idx_attribution_assessments_campaign")
+    .on(table.campaign_id)
+    .where(sql`${table.campaign_id} IS NOT NULL`),
 }));
 
 // ============================================================================
-// SUCCESS STORIES - Document positive outcomes and impact
+// SUCCESS STORIES - Documented impact cases
 // ============================================================================
 
 export const success_stories = pgTable("success_stories", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
-  // Story identification
-  title: varchar("title", { length: 500 }).notNull(),
-  story_type: varchar("story_type", { length: 50 }).notNull(), // "bill_improvement", "increased_participation", "transparency_win", "community_mobilization"
-
-  // Story context
-  related_bill_id: uuid("related_bill_id").references(() => bills.id, { onDelete: "set null" }),
-  related_campaign_id: uuid("related_campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
-  geographic_scope: varchar("geographic_scope", { length: 50 }), // "national", "county", "constituency", "community"
+  // Story metadata
+  title: varchar("title", { length: 300 }).notNull(),
+  story_type: varchar("story_type", { length: 50 }).notNull(), // "bill_amendment", "policy_influence", "community_mobilization"
+  publication_date: date("publication_date"),
+  is_published: boolean("is_published").notNull().default(false),
 
   // Story content
-  story_summary: text("story_summary").notNull(),
-  detailed_narrative: text("detailed_narrative"),
-  key_actors: jsonb("key_actors").notNull().default(sql`'{}'::jsonb`),
+  summary: text("summary"),
+  full_story: text("full_story"),
+  key_takeaways: varchar("key_takeaways", { length: 200 }).array(),
+
+  // Linked entities
+  bill_id: uuid("bill_id").references(() => bills.id, { onDelete: "set null" }),
+  campaign_id: uuid("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  attribution_assessment_id: uuid("attribution_assessment_id")
+    .references(() => attribution_assessments.id, { onDelete: "set null" }),
+
+  // Participants
+  featured_users: uuid("featured_users").array(), // User IDs
+  participant_count: integer("participant_count"),
 
   // Impact metrics
-  quantified_impact: jsonb("quantified_impact").notNull().default(sql`'{}'::jsonb`),
-  people_affected: integer("people_affected"),
+  engagement_count: integer("engagement_count").notNull().default(0),
+  reach_count: integer("reach_count").notNull().default(0),
+  share_count: integer("share_count").notNull().default(0),
 
-  // Evidence and verification
-  evidence_sources: jsonb("evidence_sources").notNull().default(sql`'{}'::jsonb`),
-  verification_status: varchar("verification_status", { length: 30 }).notNull().default("unverified"), // "unverified", "verified", "disputed"
+  // Media
+  hero_image_url: varchar("hero_image_url", { length: 500 }),
+  media_urls: varchar("media_urls", { length: 500 }).array(),
+  video_url: varchar("video_url", { length: 500 }),
 
-  // Story lifecycle
-  story_date: date("story_date").notNull(),
-  is_featured: boolean("is_featured").notNull().default(false),
-  is_public: boolean("is_public").notNull().default(true),
+  // Tags and categorization
+  tags: varchar("tags", { length: 50 }).array(),
+  primary_impact_area: varchar("primary_impact_area", { length: 100 }),
+  affected_counties: kenyanCountyEnum("affected_counties").array(),
 
-  // Attribution
-  documented_by_id: uuid("documented_by_id").references(() => users.id, { onDelete: "set null" }),
-
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
-  // Story discovery
-  typePublicIdx: index("idx_success_stories_type_public")
-    .on(table.story_type, table.is_public, table.story_date)
-    .where(sql`${table.is_public} = true`),
+  // Published stories
+  publishedIdx: index("idx_success_stories_published")
+    .on(table.is_published, table.publication_date.desc())
+    .where(sql`${table.is_published} = true`),
 
-  // Featured stories
-  featuredIdx: index("idx_success_stories_featured")
-    .on(table.is_featured, table.story_date)
-    .where(sql`${table.is_featured} = true`),
+  // Story type
+  typeIdx: index("idx_success_stories_type")
+    .on(table.story_type, table.is_published),
 
-  // Geographic impact
-  geographicScopeIdx: index("idx_success_stories_geographic_scope")
-    .on(table.geographic_scope, table.people_affected),
+  // Related entities
+  billIdx: index("idx_success_stories_bill")
+    .on(table.bill_id)
+    .where(sql`${table.bill_id} IS NOT NULL`),
+
+  campaignIdx: index("idx_success_stories_campaign")
+    .on(table.campaign_id)
+    .where(sql`${table.campaign_id} IS NOT NULL`),
+
+  // Geographic spread
+  countiesIdx: index("idx_success_stories_counties")
+    .using("gin", table.affected_counties),
+
+  // Tags for discovery
+  tagsIdx: index("idx_success_stories_tags")
+    .using("gin", table.tags),
 }));
 
 // ============================================================================
-// GEOGRAPHIC EQUITY METRICS - Track participation across regions
+// EQUITY METRICS - Track participation equity across cohorts
 // ============================================================================
 
-export const geographic_equity_metrics = pgTable("geographic_equity_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-
-  // Geographic scope
-  county: kenyanCountyEnum("county").notNull(),
-  constituency: varchar("constituency", { length: 100 }),
+export const equity_metrics = pgTable("equity_metrics", {
+  id: primaryKeyUuid(),
 
   // Measurement period
   measurement_date: date("measurement_date").notNull(),
   measurement_period: varchar("measurement_period", { length: 20 }).notNull(), // "daily", "weekly", "monthly", "quarterly"
 
-  // Population context
-  total_population: integer("total_population"),
-  eligible_population: integer("eligible_population"), // Adults eligible to participate
-  internet_penetration_rate: real("internet_penetration_rate"), // 0.0 to 1.0
+  // Cohort reference
+  cohort_id: uuid("cohort_id").notNull().references(() => participation_cohorts.id, {
+    onDelete: "cascade"
+  }),
 
-  // Platform participation
+  // Participation metrics
   registered_users: integer("registered_users").notNull().default(0),
   active_users: integer("active_users").notNull().default(0),
-  new_registrations: integer("new_registrations").notNull().default(0),
+  engagement_rate: real("engagement_rate"), // Percentage
+  average_actions_per_user: real("average_actions_per_user"),
 
-  // Engagement metrics
-  comments_posted: integer("comments_posted").notNull().default(0),
+  // Content engagement
   bills_viewed: integer("bills_viewed").notNull().default(0),
+  comments_posted: integer("comments_posted").notNull().default(0),
   votes_cast: integer("votes_cast").notNull().default(0),
   campaigns_joined: integer("campaigns_joined").notNull().default(0),
 
-  // Offline engagement
-  facilitation_sessions_held: integer("facilitation_sessions_held").notNull().default(0),
-  offline_participants: integer("offline_participants").notNull().default(0),
+  // Quality indicators
+  high_quality_comments: integer("high_quality_comments").notNull().default(0),
+  repeat_engagement_count: integer("repeat_engagement_count").notNull().default(0),
 
-  // Equity calculations
-  participation_rate: real("participation_rate"), // active_users / eligible_population
-  engagement_intensity: real("engagement_intensity"), // Average actions per active user
-  digital_divide_index: real("digital_divide_index"), // Measure of digital access inequality
+  // Comparison metrics (vs. overall platform average)
+  participation_gap_percentage: real("participation_gap_percentage"),
+  // Positive = cohort above average, Negative = cohort below average
+  engagement_quality_gap: real("engagement_quality_gap"),
+
+  // Trend indicators
+  trend_direction: varchar("trend_direction", { length: 20 }), // "improving", "declining", "stable"
+  period_over_period_change: real("period_over_period_change"),
 
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Geographic time series
-  countyDateIdx: index("idx_geographic_equity_metrics_county_date")
-    .on(table.county, table.measurement_date),
+  // Time series analysis
+  cohortDateIdx: index("idx_equity_metrics_cohort_date")
+    .on(table.cohort_id, table.measurement_date.desc()),
 
-  // Equity analysis
-  participationRateIdx: index("idx_geographic_equity_metrics_participation_rate")
-    .on(table.participation_rate, table.digital_divide_index),
+  // Equity gap analysis
+  gapIdx: index("idx_equity_metrics_gap")
+    .on(table.participation_gap_percentage, table.measurement_date)
+    .where(sql`${table.participation_gap_percentage} IS NOT NULL`),
 
-  // Constituency comparison
-  constituencyParticipationIdx: index("idx_geographic_equity_metrics_constituency_participation")
-    .on(table.constituency, table.participation_rate)
-    .where(sql`${table.constituency} IS NOT NULL`),
+  // Trend tracking
+  trendIdx: index("idx_equity_metrics_trend")
+    .on(table.trend_direction, table.measurement_date),
 }));
 
 // ============================================================================
-// DEMOGRAPHIC EQUITY METRICS - Track participation across demographics
+// DEMOGRAPHIC IMPACT ANALYSIS - Track outcomes by demographics
 // ============================================================================
 
-export const demographic_equity_metrics = pgTable("demographic_equity_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+export const demographic_impact_analysis = pgTable("demographic_impact_analysis", {
+  id: primaryKeyUuid(),
 
-  // Demographic categories
-  age_range: varchar("age_range", { length: 30 }),
-  gender: varchar("gender", { length: 20 }),
-  education_level: varchar("education_level", { length: 50 }),
-  income_bracket: varchar("income_bracket", { length: 50 }),
+  // Analysis period
+  analysis_date: date("analysis_date").notNull(),
+  analysis_period: varchar("analysis_period", { length: 20 }).notNull(),
 
-  // Measurement period
-  measurement_date: date("measurement_date").notNull(),
-  measurement_period: varchar("measurement_period", { length: 20 }).notNull(),
+  // Demographic segment
+  demographic_dimension: varchar("demographic_dimension", { length: 50 }).notNull(),
+  // "age", "gender", "county", "urban_rural", "education", "income", "digital_access"
+  demographic_value: varchar("demographic_value", { length: 100 }).notNull(),
+  // Specific value: "18-25", "female", "Nairobi", "urban", etc.
 
-  // Population estimates
-  estimated_population: integer("estimated_population"),
-
-  // Platform participation
-  registered_users: integer("registered_users").notNull().default(0),
-  active_users: integer("active_users").notNull().default(0),
+  // Population metrics
+  segment_size: integer("segment_size").notNull().default(0),
+  platform_users_count: integer("platform_users_count").notNull().default(0),
+  representation_rate: real("representation_rate"), // % of segment on platform
 
   // Engagement patterns
-  average_session_duration: real("average_session_duration"), // Minutes
-  average_actions_per_session: real("average_actions_per_session"),
-  preferred_engagement_types: varchar("preferred_engagement_types", { length: 50 }).array(),
+  average_monthly_sessions: real("average_monthly_sessions"),
+  average_session_duration_minutes: real("average_session_duration_minutes"),
+  feature_usage_patterns: jsonb("feature_usage_patterns").notNull().default(sql`'{}'::jsonb`),
 
-  // Barriers and challenges
-  reported_barriers: jsonb("reported_barriers").notNull().default(sql`'{}'::jsonb`),
-  support_needs: jsonb("support_needs").notNull().default(sql`'{}'::jsonb`),
+  // Impact on bills
+  bills_engaged_with: integer("bills_engaged_with").notNull().default(0),
+  bills_influenced: integer("bills_influenced").notNull().default(0),
+  average_influence_score: real("average_influence_score"),
 
-  // Equity indicators
-  participation_rate: real("participation_rate"),
-  engagement_quality_score: real("engagement_quality_score"), // Composite measure of meaningful participation
+  // Barrier analysis
+  identified_barriers: jsonb("identified_barriers").notNull().default(sql`'[]'::jsonb`),
+  barrier_severity: varchar("barrier_severity", { length: 20 }), // "low", "medium", "high", "critical"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  // Demographic analysis
-  ageGenderDateIdx: index("idx_demographic_equity_metrics_age_gender_date")
-    .on(table.age_range, table.gender, table.measurement_date),
-
-  // Participation equity
-  participationEquityIdx: index("idx_demographic_equity_metrics_participation_equity")
-    .on(table.participation_rate, table.engagement_quality_score),
-
-  // Education and income analysis
-  educationIncomeIdx: index("idx_demographic_equity_metrics_education_income")
-    .on(table.education_level, table.income_bracket, table.participation_rate),
-}));
-
-// ============================================================================
-// DIGITAL INCLUSION METRICS - Track digital divide impact
-// ============================================================================
-
-export const digital_inclusion_metrics = pgTable("digital_inclusion_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-
-  // Measurement context
-  measurement_date: date("measurement_date").notNull(),
-  geographic_scope: varchar("geographic_scope", { length: 50 }), // "national", "county", "constituency"
-  county: kenyanCountyEnum("county"),
-
-  // Device access patterns
-  smartphone_users: integer("smartphone_users").notNull().default(0),
-  feature_phone_users: integer("feature_phone_users").notNull().default(0),
-  computer_users: integer("computer_users").notNull().default(0),
-  shared_device_users: integer("shared_device_users").notNull().default(0),
-
-  // Connectivity patterns
-  high_speed_users: integer("high_speed_users").notNull().default(0),
-  mobile_data_users: integer("mobile_data_users").notNull().default(0),
-  intermittent_connectivity_users: integer("intermittent_connectivity_users").notNull().default(0),
-  offline_only_users: integer("offline_only_users").notNull().default(0),
-
-  // Access method usage
-  web_platform_usage: integer("web_platform_usage").notNull().default(0),
-  mobile_app_usage: integer("mobile_app_usage").notNull().default(0),
-  ussd_usage: integer("ussd_usage").notNull().default(0),
-  ambassador_facilitated_usage: integer("ambassador_facilitated_usage").notNull().default(0),
-
-  // Engagement quality by access method
-  mobile_vs_desktop_access: jsonb("mobile_vs_desktop_access").notNull().default(sql`'{}'::jsonb`),
-  mobile_only_users_percentage: real("mobile_only_users_percentage"),
-  smartphone_vs_feature_phone: jsonb("smartphone_vs_feature_phone").default(sql`'{}'::jsonb`),
-
-  // Digital literacy indicators
-  device_diversity_index: real("device_diversity_index"),
-  platform_switching_rate: real("platform_switching_rate"), // Users who use multiple access methods
+  // Recommendations
+  recommendations: jsonb("recommendations").notNull().default(sql`'[]'::jsonb`),
 
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Geographic digital divide
-  countyDigitalDivideIdx: index("idx_digital_inclusion_metrics_county_digital_divide")
-    .on(table.county, table.measurement_date)
-    .where(sql`${table.county} IS NOT NULL`),
+  // Demographic dimension analysis
+  dimensionDateIdx: index("idx_demographic_impact_analysis_dimension_date")
+    .on(table.demographic_dimension, table.analysis_date.desc()),
 
-  // Device access analysis
-  deviceAccessIdx: index("idx_digital_inclusion_metrics_device_access")
-    .on(table.smartphone_users, table.feature_phone_users, table.offline_only_users),
+  // Representation gaps
+  representationIdx: index("idx_demographic_impact_analysis_representation")
+    .on(table.representation_rate, table.demographic_dimension)
+    .where(sql`${table.representation_rate} IS NOT NULL`),
 
-  // Platform usage patterns
-  platformUsageIdx: index("idx_digital_inclusion_metrics_platform_usage")
-    .on(table.web_platform_usage, table.ussd_usage, table.ambassador_facilitated_usage),
+  // High-barrier segments
+  barrierIdx: index("idx_demographic_impact_analysis_barrier")
+    .on(table.barrier_severity, table.demographic_dimension)
+    .where(sql`${table.barrier_severity} IN ('high', 'critical')`),
 }));
 
 // ============================================================================
-// RELATIONSHIPS
-// ============================================================================
-
-export const participationCohortsRelations = relations(participation_cohorts, ({ many }) => ({
-  geographicMetrics: many(geographic_equity_metrics),
-  demographicMetrics: many(demographic_equity_metrics),
-}));
-
-export const legislativeOutcomesRelations = relations(legislative_outcomes, ({ one, many }) => ({
-  bill: one(bills, {
-    fields: [legislative_outcomes.bill_id],
-    references: [bills.id],
-  }),
-  implementation: many(bill_implementation),
-  attributionAssessments: many(attribution_assessments),
-}));
-
-export const billImplementationRelations = relations(bill_implementation, ({ one }) => ({
-  bill: one(bills, {
-    fields: [bill_implementation.bill_id],
-    references: [bills.id],
-  }),
-  outcome: one(legislative_outcomes, {
-    fields: [bill_implementation.bill_id],
-    references: [legislative_outcomes.bill_id],
-  }),
-}));
-
-export const attributionAssessmentsRelations = relations(attribution_assessments, ({ one }) => ({
-  targetBill: one(bills, {
-    fields: [attribution_assessments.target_bill_id],
-    references: [bills.id],
-  }),
-  targetCampaign: one(campaigns, {
-    fields: [attribution_assessments.target_campaign_id],
-    references: [campaigns.id],
-  }),
-  assessor: one(users, {
-    fields: [attribution_assessments.assessor_id],
-    references: [users.id],
-  }),
-}));
-
-export const successStoriesRelations = relations(success_stories, ({ one }) => ({
-  relatedBill: one(bills, {
-    fields: [success_stories.related_bill_id],
-    references: [bills.id],
-  }),
-  relatedCampaign: one(campaigns, {
-    fields: [success_stories.related_campaign_id],
-    references: [campaigns.id],
-  }),
-  documentedBy: one(users, {
-    fields: [success_stories.documented_by_id],
-    references: [users.id],
-  }),
-}));
-
-// ============================================================================
-// TYPE EXPORTS
-// ============================================================================
-
-export type ParticipationCohort = typeof participation_cohorts.$inferSelect;
-export type NewParticipationCohort = typeof participation_cohorts.$inferInsert;
-
-export type LegislativeOutcome = typeof legislative_outcomes.$inferSelect;
-export type NewLegislativeOutcome = typeof legislative_outcomes.$inferInsert;
-
-export type BillImplementation = typeof bill_implementation.$inferSelect;
-export type NewBillImplementation = typeof bill_implementation.$inferInsert;
-
-export type AttributionAssessment = typeof attribution_assessments.$inferSelect;
-export type NewAttributionAssessment = typeof attribution_assessments.$inferInsert;
-
-export type SuccessStory = typeof success_stories.$inferSelect;
-export type NewSuccessStory = typeof success_stories.$inferInsert;
-
-export type GeographicEquityMetric = typeof geographic_equity_metrics.$inferSelect;
-export type NewGeographicEquityMetric = typeof geographic_equity_metrics.$inferInsert;
-
-export type DemographicEquityMetric = typeof demographic_equity_metrics.$inferSelect;
-export type NewDemographicEquityMetric = typeof demographic_equity_metrics.$inferInsert;
-
-export type DigitalInclusionMetric = typeof digital_inclusion_metrics.$inferSelect;
-export type NewDigitalInclusionMetric = typeof digital_inclusion_metrics.$inferInsert;
-
-// Legacy export alias for backward compatibility
-export const equity_metrics = geographic_equity_metrics;
-
-// ============================================================================
-// PLATFORM PERFORMANCE INDICATORS - High-level KPIs
+// PLATFORM PERFORMANCE INDICATORS - Overall platform health metrics
 // ============================================================================
 
 export const platform_performance_indicators = pgTable("platform_performance_indicators", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Indicator identification
-  indicator_name: varchar("indicator_name", { length: 200 }).notNull(),
-  indicator_category: varchar("indicator_category", { length: 50 }).notNull(), // "reach", "engagement", "impact", "equity"
+  indicator_name: varchar("indicator_name", { length: 100 }).notNull(),
+  indicator_category: varchar("indicator_category", { length: 50 }).notNull(),
+  // Categories: "engagement", "reach", "impact", "technical", "financial"
 
   // Measurement
   measurement_date: date("measurement_date").notNull(),
@@ -586,7 +470,7 @@ export const platform_performance_indicators = pgTable("platform_performance_ind
 // ============================================================================
 
 export const legislative_impact_indicators = pgTable("legislative_impact_indicators", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Measurement period
   measurement_date: date("measurement_date").notNull(),
@@ -628,7 +512,7 @@ export const legislative_impact_indicators = pgTable("legislative_impact_indicat
 // ============================================================================
 
 export const civic_engagement_indicators = pgTable("civic_engagement_indicators", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Measurement period
   measurement_date: date("measurement_date").notNull(),
@@ -672,7 +556,7 @@ export const civic_engagement_indicators = pgTable("civic_engagement_indicators"
 // ============================================================================
 
 export const financial_sustainability_indicators = pgTable("financial_sustainability_indicators", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Measurement period
   measurement_date: date("measurement_date").notNull(),
@@ -710,7 +594,87 @@ export const financial_sustainability_indicators = pgTable("financial_sustainabi
     .on(table.funding_runway_months, table.revenue_growth_rate, table.cost_efficiency_trend),
 }));
 
-// Additional type exports for new tables
+// ============================================================================
+// RELATIONS - Type-safe Drizzle ORM Relations
+// ============================================================================
+
+export const participationCohortsRelations = relations(participation_cohorts, ({ many }) => ({
+  equityMetrics: many(equity_metrics),
+}));
+
+export const legislativeOutcomesRelations = relations(legislative_outcomes, ({ one }) => ({
+  bill: one(bills, {
+    fields: [legislative_outcomes.bill_id],
+    references: [bills.id],
+  }),
+}));
+
+export const billImplementationRelations = relations(bill_implementation, ({ one }) => ({
+  bill: one(bills, {
+    fields: [bill_implementation.bill_id],
+    references: [bills.id],
+  }),
+}));
+
+export const attributionAssessmentsRelations = relations(attribution_assessments, ({ one, many }) => ({
+  bill: one(bills, {
+    fields: [attribution_assessments.bill_id],
+    references: [bills.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [attribution_assessments.campaign_id],
+    references: [campaigns.id],
+  }),
+  successStories: many(success_stories),
+}));
+
+export const successStoriesRelations = relations(success_stories, ({ one }) => ({
+  bill: one(bills, {
+    fields: [success_stories.bill_id],
+    references: [bills.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [success_stories.campaign_id],
+    references: [campaigns.id],
+  }),
+  attributionAssessment: one(attribution_assessments, {
+    fields: [success_stories.attribution_assessment_id],
+    references: [attribution_assessments.id],
+  }),
+}));
+
+export const equityMetricsRelations = relations(equity_metrics, ({ one }) => ({
+  cohort: one(participation_cohorts, {
+    fields: [equity_metrics.cohort_id],
+    references: [participation_cohorts.id],
+  }),
+}));
+
+// ============================================================================
+// TYPE EXPORTS - TypeScript Type Safety
+// ============================================================================
+
+export type ParticipationCohort = typeof participation_cohorts.$inferSelect;
+export type NewParticipationCohort = typeof participation_cohorts.$inferInsert;
+
+export type LegislativeOutcome = typeof legislative_outcomes.$inferSelect;
+export type NewLegislativeOutcome = typeof legislative_outcomes.$inferInsert;
+
+export type BillImplementation = typeof bill_implementation.$inferSelect;
+export type NewBillImplementation = typeof bill_implementation.$inferInsert;
+
+export type AttributionAssessment = typeof attribution_assessments.$inferSelect;
+export type NewAttributionAssessment = typeof attribution_assessments.$inferInsert;
+
+export type SuccessStory = typeof success_stories.$inferSelect;
+export type NewSuccessStory = typeof success_stories.$inferInsert;
+
+export type EquityMetric = typeof equity_metrics.$inferSelect;
+export type NewEquityMetric = typeof equity_metrics.$inferInsert;
+
+export type DemographicImpactAnalysis = typeof demographic_impact_analysis.$inferSelect;
+export type NewDemographicImpactAnalysis = typeof demographic_impact_analysis.$inferInsert;
+
 export type PlatformPerformanceIndicator = typeof platform_performance_indicators.$inferSelect;
 export type NewPlatformPerformanceIndicator = typeof platform_performance_indicators.$inferInsert;
 
@@ -722,5 +686,3 @@ export type NewCivicEngagementIndicator = typeof civic_engagement_indicators.$in
 
 export type FinancialSustainabilityIndicator = typeof financial_sustainability_indicators.$inferSelect;
 export type NewFinancialSustainabilityIndicator = typeof financial_sustainability_indicators.$inferInsert;
-
-

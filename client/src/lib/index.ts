@@ -36,61 +36,11 @@ if (process.env.NODE_ENV === 'development') {
   console.warn(message);
 }
 
-// For backwards compatibility during migration
-export { useFormBuilder, withFormBuilder, createFormBuilder } from '../lib/form-builder';
+// Import from the new FSD structure
+import * as fsdLib from '@client/shared/lib/migration/compatibility-layer';
 
-export { default as ProtectedRoute } from '../lib/protected-route';
+// Re-export everything from the FSD structure
+export * from '@client/shared/lib/migration/compatibility-layer';
 
-export {
-  queryClient,
-  queryKeys,
-  invalidateQueries,
-  prefetchQueries,
-  cacheUtils,
-  configureOfflineSupport,
-  setupGlobalErrorHandler,
-  devUtils,
-} from '../shared/lib/react-query-config';
-
-export { apiRequest, getQueryFn } from '../lib/queryClient';
-
-export {
-  validationPatterns,
-  billValidationSchemas,
-  userValidationSchemas,
-  formValidationSchemas,
-  allValidationSchemas,
-} from '../lib/validation-schemas';
-
-export type {
-  BillSearchQuery,
-  BillFilter,
-  CreateBillData,
-  UpdateBillData,
-  BillCommentData,
-  UserRegisterData,
-  UserLoginData,
-  UserProfileData,
-  UserPreferencesData,
-  ContactFormData,
-  FeedbackFormData,
-  PaymentFormData,
-} from '../lib/validation-schemas';
-
-export {
-  cn,
-  formatDate,
-  formatRelativeTime,
-  formatNumber,
-  formatCurrency,
-  truncateText,
-  debounce,
-  isValidEmail,
-  isValidKenyaPhoneNumber,
-  generateId,
-  capitalize,
-  slugify,
-} from '../lib/utils';
-
-import * as utils from '../lib/utils';
-export default utils;
+// Export default for legacy compatibility
+export default fsdLib;

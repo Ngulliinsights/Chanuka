@@ -21,6 +21,7 @@ import {
     index, unique, check, foreignKey
 } from "drizzle-orm/pg-core";
 
+import { auditFields, primaryKeyUuid, metadataField } from "./base-types";
 import {
   kenyanCountyEnum,
   moderationStatusEnum,
@@ -50,7 +51,7 @@ import { users, bills } from "./foundation";
 // - Foundation for smart notification filtering
 
 export const user_interests = pgTable("user_interests", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   interest: varchar("interest", { length: 100 }).notNull(),
 
@@ -59,8 +60,7 @@ export const user_interests = pgTable("user_interests", {
   interest_source: varchar("interest_source", { length: 50 }).notNull().default("user_selected"),
   // Values: "user_selected", "inferred", "imported"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Prevent duplicate interests per user
   userInterestUnique: unique("user_interests_user_interest_unique").on(table.user_id, table.interest),
@@ -85,13 +85,12 @@ export const sessions = pgTable("sessions", {
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
 
   // Session metadata: IP, user agent, device info, geolocation
-  metadata: jsonb("metadata").default(sql`'{}'::jsonb`).notNull(),
+  ...metadataField(),
 
   // Security tracking - enables session timeout detection
   last_activity_at: timestamp("last_activity_at", { withTimezone: true }).notNull().defaultNow(),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Find active sessions for user (most common query)
   userExpiresIdx: index("idx_sessions_user_expires").on(table.user_id, table.expires_at.desc()),
@@ -109,7 +108,7 @@ export const sessions = pgTable("sessions", {
 // ============================================================================
 
 export const comments = pgTable("comments", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
@@ -153,8 +152,7 @@ export const comments = pgTable("comments", {
   is_deleted: boolean("is_deleted").notNull().default(false),
   deleted_at: timestamp("deleted_at", { withTimezone: true }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Self-referencing foreign key for threaded comments
   parentCommentFk: foreignKey({
@@ -212,7 +210,7 @@ export const comments = pgTable("comments", {
 // ============================================================================
 
 export const comment_votes = pgTable("comment_votes", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   comment_id: uuid("comment_id").notNull().references(() => comments.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
@@ -224,8 +222,7 @@ export const comment_votes = pgTable("comment_votes", {
   // Reputation-weighted voting (future enhancement)
   vote_weight: integer("vote_weight").notNull().default(1),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Enforce one vote per user per comment
   commentUserUnique: unique("comment_votes_comment_user_unique").on(table.comment_id, table.user_id),
@@ -245,7 +242,7 @@ export const comment_votes = pgTable("comment_votes", {
 // ============================================================================
 
 export const bill_votes = pgTable("bill_votes", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
@@ -261,8 +258,7 @@ export const bill_votes = pgTable("bill_votes", {
   user_county: kenyanCountyEnum("user_county"),
   user_constituency: varchar("user_constituency", { length: 100 }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Enforce one vote per user per bill
   billUserUnique: unique("bill_votes_bill_user_unique").on(table.bill_id, table.user_id),
@@ -294,7 +290,7 @@ export const bill_votes = pgTable("bill_votes", {
 // ============================================================================
 
 export const bill_engagement = pgTable("bill_engagement", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
@@ -346,7 +342,7 @@ export const bill_engagement = pgTable("bill_engagement", {
 // ============================================================================
 
 export const bill_tracking_preferences = pgTable("bill_tracking_preferences", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
@@ -368,8 +364,7 @@ export const bill_tracking_preferences = pgTable("bill_tracking_preferences", {
   // Active tracking flag (user can pause)
   is_active: boolean("is_active").notNull().default(true),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Enforce one tracking preference per user per bill
   userBillUnique: unique("bill_tracking_preferences_user_bill_unique").on(table.user_id, table.bill_id),
@@ -394,7 +389,7 @@ export const bill_tracking_preferences = pgTable("bill_tracking_preferences", {
 // ============================================================================
 
 export const notifications = pgTable("notifications", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
   // Notification content
@@ -436,8 +431,7 @@ export const notifications = pgTable("notifications", {
   // Expiration support (auto-dismiss old notifications)
   expires_at: timestamp("expires_at", { withTimezone: true }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: User inbox (unread first, then by priority and date)
   userReadPriorityIdx: index("idx_notifications_user_read_priority")
@@ -472,7 +466,7 @@ export const notifications = pgTable("notifications", {
 // ============================================================================
 
 export const alert_preferences = pgTable("alert_preferences", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
 
   // Category-level toggles
@@ -513,8 +507,7 @@ export const alert_preferences = pgTable("alert_preferences", {
   accessibility_format: accessibilityFormatEnum("accessibility_format"),
   // Values: "standard", "plain_text", "high_contrast", "screen_reader"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Delivery queries: Active verified channels
   emailActiveIdx: index("idx_alert_preferences_email_active")
@@ -536,7 +529,7 @@ export const alert_preferences = pgTable("alert_preferences", {
 // ============================================================================
 
 export const user_contact_methods = pgTable("user_contact_methods", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
   // Contact details
@@ -565,8 +558,7 @@ export const user_contact_methods = pgTable("user_contact_methods", {
   bounce_detected: boolean("bounce_detected").notNull().default(false),
   bounce_detected_at: timestamp("bounce_detected_at", { withTimezone: true }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Enforce unique contact value per user
   userContactUnique: unique("user_contact_methods_user_contact_unique")

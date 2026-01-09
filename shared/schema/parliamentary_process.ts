@@ -10,14 +10,42 @@ import {
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
 
-import { bills, sponsors, committees, parliamentary_sessions } from "./foundation";
+import { primaryKeyUuid, auditFields } from "./base-types";
+import { bills, sponsors } from "./foundation";
+
+// ============================================================================
+// COMMITTEES - Parliamentary committees
+// ============================================================================
+
+export const committees = pgTable("committees", {
+  id: primaryKeyUuid(),
+  name: varchar("name", { length: 200 }).notNull(),
+  chamber: varchar("chamber", { length: 50 }).notNull(), // "national_assembly", "senate", "joint"
+  committee_type: varchar("committee_type", { length: 100 }).notNull(),
+  description: text("description"),
+  ...auditFields(),
+});
+
+// ============================================================================
+// PARLIAMENTARY SESSIONS - Legislative sessions
+// ============================================================================
+
+export const parliamentary_sessions = pgTable("parliamentary_sessions", {
+  id: primaryKeyUuid(),
+  session_number: integer("session_number").notNull(),
+  session_name: varchar("session_name", { length: 200 }).notNull(),
+  start_date: date("start_date").notNull(),
+  end_date: date("end_date"),
+  status: varchar("status", { length: 50 }).notNull().default("active"),
+  ...auditFields(),
+});
 
 // ============================================================================
 // BILL COMMITTEE ASSIGNMENTS - Track committee responsibility for bills
 // ============================================================================
 
 export const bill_committee_assignments = pgTable("bill_committee_assignments", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   committee_id: uuid("committee_id").notNull().references(() => committees.id, { onDelete: "cascade" }),
 
@@ -36,8 +64,7 @@ export const bill_committee_assignments = pgTable("bill_committee_assignments", 
   report_summary: text("report_summary"),
   committee_recommendation: varchar("committee_recommendation", { length: 50 }), // "approve", "reject", "amend"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // One primary assignment per bill - using partial unique index instead
   billAssignmentIdx: index("idx_bill_committee_assignments_bill_assignment")
@@ -53,7 +80,7 @@ export const bill_committee_assignments = pgTable("bill_committee_assignments", 
 // ============================================================================
 
 export const bill_amendments = pgTable("bill_amendments", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Amendment identification
@@ -83,8 +110,7 @@ export const bill_amendments = pgTable("bill_amendments", {
   constitutional_implications: text("constitutional_implications"),
   financial_implications: text("financial_implications"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Unique amendment number per bill
   billAmendmentNumberUnique: unique("bill_amendments_bill_amendment_number_unique")
@@ -105,7 +131,7 @@ export const bill_amendments = pgTable("bill_amendments", {
 // ============================================================================
 
 export const bill_versions = pgTable("bill_versions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Version identification
@@ -145,7 +171,7 @@ export const bill_versions = pgTable("bill_versions", {
 // ============================================================================
 
 export const bill_readings = pgTable("bill_readings", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   session_id: uuid("session_id").references(() => parliamentary_sessions.id, { onDelete: "set null" }),
 
@@ -168,8 +194,7 @@ export const bill_readings = pgTable("bill_readings", {
   // Next steps
   next_reading_scheduled: date("next_reading_scheduled"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // One reading per number per bill
   billReadingNumberUnique: unique("bill_readings_bill_reading_number_unique")
@@ -194,7 +219,7 @@ export const bill_readings = pgTable("bill_readings", {
 // ============================================================================
 
 export const parliamentary_votes = pgTable("parliamentary_votes", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   sponsor_id: uuid("sponsor_id").notNull().references(() => sponsors.id, { onDelete: "cascade" }),
 
@@ -231,7 +256,7 @@ export const parliamentary_votes = pgTable("parliamentary_votes", {
 // ============================================================================
 
 export const bill_cosponsors = pgTable("bill_cosponsors", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   sponsor_id: uuid("sponsor_id").notNull().references(() => sponsors.id, { onDelete: "cascade" }),
 
@@ -263,7 +288,7 @@ export const bill_cosponsors = pgTable("bill_cosponsors", {
 // ============================================================================
 
 export const public_participation_events = pgTable("public_participation_events", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Event details
@@ -294,8 +319,7 @@ export const public_participation_events = pgTable("public_participation_events"
   contact_email: varchar("contact_email", { length: 320 }),
   contact_phone: varchar("contact_phone", { length: 20 }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Event scheduling queries
   eventDateStatusIdx: index("idx_public_participation_events_event_date_status")
@@ -316,7 +340,7 @@ export const public_participation_events = pgTable("public_participation_events"
 // ============================================================================
 
 export const public_submissions = pgTable("public_submissions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   event_id: uuid("event_id").references(() => public_participation_events.id, { onDelete: "set null" }),
 
@@ -346,8 +370,7 @@ export const public_submissions = pgTable("public_submissions", {
   // Document attachments
   supporting_documents: varchar("supporting_documents", { length: 500 }).array(),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Bill submission tracking
   billSubmissionIdx: index("idx_public_submissions_bill_submission")
@@ -368,7 +391,7 @@ export const public_submissions = pgTable("public_submissions", {
 // ============================================================================
 
 export const public_hearings = pgTable("public_hearings", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   event_id: uuid("event_id").references(() => public_participation_events.id, { onDelete: "set null" }),
 
@@ -393,8 +416,7 @@ export const public_hearings = pgTable("public_hearings", {
   video_url: varchar("video_url", { length: 500 }),
   summary_report: text("summary_report"),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hearing scheduling
   hearingDateStatusIdx: index("idx_public_hearings_hearing_date_status")
@@ -562,5 +584,3 @@ export type NewPublicSubmission = typeof public_submissions.$inferInsert;
 
 export type PublicHearing = typeof public_hearings.$inferSelect;
 export type NewPublicHearing = typeof public_hearings.$inferInsert;
-
-

@@ -24,8 +24,8 @@ const config: KnipConfig = {
     'shared/index.ts',
   ],
 
-  // Exclude common library exports that are meant to be re-exported
-  exclude: [
+  // Ignore common library exports that are meant to be re-exported
+  ignoreExports: [
     'default',
     '__esModule',
   ],

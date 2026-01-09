@@ -22,7 +22,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/shared/design-system/feedback/Badge';
 import { Button } from '@/shared/design-system/interactive/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface RealTimeDashboardProps {
   className?: string;

@@ -7,7 +7,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
+import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -43,7 +43,7 @@ export function useAnalyticsIntegration() {
     autoTrackErrors: true,
   });
 
-  const journeyTracker = useRef(UserJourneyTracker.getInstance());
+  const journeyTracker = useRef(userJourneyTracker);
   const sessionId = useRef<string>();
   const pageStartTime = useRef<Date>(new Date());
   const interactionCount = useRef<number>(0);
@@ -53,11 +53,10 @@ export function useAnalyticsIntegration() {
    */
   useEffect(() => {
     if (!sessionId.current) {
-      sessionId.current = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
       const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
 
-      journeyTracker.current.startJourney(sessionId.current, user?.id, userRole);
+      // Start journey using the centralized tracker; it returns a session id
+      sessionId.current = journeyTracker.current.startJourney(user?.id, userRole);
 
       logger.info('Analytics session started', {
         sessionId: sessionId.current,
@@ -77,13 +76,7 @@ export function useAnalyticsIntegration() {
     const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
 
     // Track journey step
-    journeyTracker.current.trackStep(
-      sessionId.current,
-      location.pathname,
-      currentSection,
-      document.referrer,
-      interactionCount.current
-    );
+    journeyTracker.current.trackPageVisit(location.pathname, currentSection, document.referrer);
 
     // Track page view event
     trackPageView(location.pathname, {
@@ -122,6 +115,9 @@ export function useAnalyticsIntegration() {
         timestamp: new Date().toISOString(),
         interactionCount: interactionCount.current,
       });
+
+      // Also update journey tracker state
+      journeyTracker.current.trackInteraction(event.type);
     };
 
     const handleFormSubmit = (event: Event) => {
@@ -134,10 +130,8 @@ export function useAnalyticsIntegration() {
         timestamp: new Date().toISOString(),
       });
 
-      // Track journey conversion event
-      if (sessionId.current) {
-        journeyTracker.current.trackConversionEvent(sessionId.current, 'form_submission');
-      }
+      // Track journey conversion event in the centralized tracker
+      journeyTracker.current.trackInteraction('form_submission');
     };
 
     const handleSearchSubmit = (event: Event) => {
@@ -152,10 +146,8 @@ export function useAnalyticsIntegration() {
           timestamp: new Date().toISOString(),
         });
 
-        // Track journey conversion event
-        if (sessionId.current) {
-          journeyTracker.current.trackConversionEvent(sessionId.current, 'search_performed');
-        }
+        // Track journey conversion event in the centralized tracker
+        journeyTracker.current.trackInteraction('search_performed');
       }
     };
 
@@ -252,7 +244,7 @@ export function useAnalyticsIntegration() {
   useEffect(() => {
     return () => {
       if (sessionId.current) {
-        journeyTracker.current.endJourney(sessionId.current);
+        journeyTracker.current.endJourney();
         logger.info('Analytics session ended', { sessionId: sessionId.current });
       }
     };

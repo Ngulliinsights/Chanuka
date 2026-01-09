@@ -59,7 +59,7 @@ import {
   getMonitoringInstance,
   destroyMonitoring,
   autoInitializeMonitoring,
-} from '../../../core/monitoring/monitoring-init';
+} from '@client/core/monitoring/monitoring-init';
 
 describe('Monitoring Initialization', () => {
   beforeEach(() => {

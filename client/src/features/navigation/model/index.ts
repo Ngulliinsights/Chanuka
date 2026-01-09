@@ -4,4 +4,4 @@
  * Navigation-specific business logic and services
  */
 
-export { PageRelationshipService } from '../../../core/navigation/page-relationship-service';
+export { PageRelationshipService } from '@client/core/navigation/page-relationship-service';

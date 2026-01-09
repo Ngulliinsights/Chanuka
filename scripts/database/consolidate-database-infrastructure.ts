@@ -1,7 +1,19 @@
 #!/usr/bin/env tsx
 /**
+ * @deprecated Use initialize-database-integration.ts instead
+ *
+ * This specialized consolidation script is now part of the standard initialization.
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/consolidate-database-infrastructure.ts
+ *   New: npm run db:init
+ *
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ *
+ * ------- Original Documentation Below -------
+ *
  * Database Infrastructure Consolidation Script
- * 
+ *
  * This script implements the refined database consolidation strategy by:
  * 1. Auditing current usage patterns
  * 2. Creating compatibility layers
@@ -39,21 +51,21 @@ class DatabaseConsolidator {
 
     try {
       await this.auditCurrentUsage();
-      
+
       // Phase 2: Identify redundancies
       await this.identifyRedundancies();
-      
+
       // Phase 3: Create compatibility layer
       await this.createCompatibilityLayer();
-      
+
       // Phase 4: Consolidate scripts
       await this.consolidateScripts();
-      
+
       // Phase 5: Generate report
       await this.generateReport();
-      
+
       console.log('✅ Database consolidation completed successfully!\n');
-      
+
     } catch (error) {
       console.error('❌ Consolidation failed:', error);
       throw error;
@@ -172,14 +184,14 @@ class DatabaseConsolidator {
 
     const compatibilityLayer = `/**
  * Database Infrastructure Compatibility Layer
- * 
+ *
  * Provides backward compatibility during the consolidation transition.
  * This file will be removed after all imports are updated.
- * 
+ *
  * @deprecated Use @shared/database/core instead
  */
 
-import { 
+import {
   UnifiedConnectionManager,
   createConnectionManager,
   getConnectionManager,
@@ -190,7 +202,7 @@ import {
 } from '@shared/database/core';
 
 // Legacy exports for backward compatibility
-export { 
+export {
   UnifiedConnectionManager as DatabaseConnectionPool,
   createConnectionManager as createConnectionPool,
   getConnectionManager as getConnectionPool,
@@ -229,7 +241,7 @@ export function initializeLegacyCompatibility(connectionManager: UnifiedConnecti
 
     const compatibilityPath = join(projectRoot, 'server/infrastructure/database/legacy-compatibility.ts');
     await fs.writeFile(compatibilityPath, compatibilityLayer);
-    
+
     console.log('   ✅ Created compatibility layer at server/infrastructure/database/legacy-compatibility.ts\n');
   }
 
@@ -240,7 +252,7 @@ export function initializeLegacyCompatibility(connectionManager: UnifiedConnecti
     const consolidatedMigrate = `#!/usr/bin/env tsx
 /**
  * Consolidated Database Migration Script
- * 
+ *
  * Replaces: simple-migrate.ts, run-migrations.ts, migration-testing.ts
  * Provides unified interface for all migration operations
  */
@@ -316,7 +328,7 @@ export async function runMigrations(options: MigrationOptions = {}): Promise<voi
     // Run pending migrations
     logger.info('📦 Running pending migrations...');
     const results = await migrationManager.runMigrations();
-    
+
     if (results.length === 0) {
       logger.info('✅ No pending migrations - database is up to date');
     } else {
@@ -328,7 +340,7 @@ export async function runMigrations(options: MigrationOptions = {}): Promise<voi
 
     // Close connections
     await connectionManager.close();
-    
+
   } catch (error) {
     logger.error('❌ Migration failed:', error);
     throw error;
@@ -367,7 +379,7 @@ if (import.meta.url === \`file://\${process.argv[1]}\`) {
     const consolidatedReset = `#!/usr/bin/env tsx
 /**
  * Consolidated Database Reset Script
- * 
+ *
  * Replaces: simple-reset.ts, reset-database.ts, reset-and-migrate.ts
  * Provides safe database reset with confirmation
  */

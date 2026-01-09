@@ -9,7 +9,7 @@
 import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@/core/api/types';
 import { logger } from '@client/utils/logger';
 
-import { Bill } from '../../../../shared/schema/foundation';
+import { Bill } from '@shared/schema/foundation';
 
 export class BillTrackingService {
   private preferences: BillTrackingPreferences = {

@@ -6,13 +6,14 @@
  * session management, and business logic orchestration.
  */
 
-import { rbacManager } from '@client/utils/rbac';
+import { rbacManager } from '@client/core/auth/rbac';
 import { securityMonitor, validatePassword } from '@client/utils/security';
 
 import { authApiService } from '@client/core/api/auth';
 import type { AuthUser } from '@client/core/api/auth';
 import { tokenManager } from '@client/core/auth';
-import type { AuthTokens as JWTTokens, SessionInfo } from '@client/core/auth';
+import type { AuthTokens as JWTTokens } from '@client/core/auth';
+import type { SessionInfo } from '@client/shared/infrastructure/store/slices/sessionSlice';
 import { getStore } from '@client/shared/infrastructure/store';
 import { setCurrentSession } from '@client/shared/infrastructure/store/slices/sessionSlice';
 import { logger } from '@client/utils/logger';
@@ -154,29 +155,15 @@ export class AuthService {
       const sessionInfo: SessionInfo = {
         id: crypto.randomUUID(),
         userId: session.user.id,
-        sessionId: crypto.randomUUID(),
-        token: session.tokens.accessToken,
-        refreshToken: session.tokens.refreshToken,
+        deviceInfo: navigator.userAgent,
+        ipAddress: currentIP,
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
-        lastAccessedAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
-        permissions: [],
-        roles: [],
-        deviceInfo: {
-          userAgent: navigator.userAgent,
-          platform: navigator.platform,
-          language: navigator.language,
-        },
-        metadata: {
-          ipAddress: currentIP,
-          deviceInfo: navigator.userAgent,
-          current: true,
-        },
+        current: true,
       };
 
       getStore().dispatch(setCurrentSession(sessionInfo));
-      rbacManager.clearUserCache(session.user.id);
+      rbacManager.clearCache();
 
       return {
         success: true,
@@ -259,25 +246,11 @@ export class AuthService {
       const sessionInfo: SessionInfo = {
         id: crypto.randomUUID(),
         userId: session.user.id,
-        sessionId: crypto.randomUUID(),
-        token: session.tokens.accessToken,
-        refreshToken: session.tokens.refreshToken,
+        deviceInfo: navigator.userAgent,
+        ipAddress: '0.0.0.0', // Would be provided by server in production
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + session.tokens.expiresIn * 1000).toISOString(),
-        lastAccessedAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
-        permissions: [],
-        roles: [],
-        deviceInfo: {
-          userAgent: navigator.userAgent,
-          platform: navigator.platform,
-          language: navigator.language,
-        },
-        metadata: {
-          deviceInfo: navigator.userAgent,
-          ipAddress: '0.0.0.0', // Would be provided by server in production
-          current: true,
-        },
+        current: true,
       };
       getStore().dispatch(setCurrentSession(sessionInfo));
 
@@ -310,7 +283,7 @@ export class AuthService {
           '@client/shared/infrastructure/store/slices/sessionSlice'
         );
         getStore().dispatch(resetSessionState());
-        rbacManager.clearUserCache(user.id);
+        rbacManager.clearCache();
 
         // Call API logout endpoint
         await authApiService.logout();

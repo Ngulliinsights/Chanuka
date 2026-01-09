@@ -8,7 +8,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { logger } from '../../../../utils/logger';
+import { logger } from '@client/utils/logger';
 
 // ============================================================================
 // Types and Interfaces

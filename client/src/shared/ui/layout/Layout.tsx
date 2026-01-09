@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '../../design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface LayoutProps {
   children: React.ReactNode;

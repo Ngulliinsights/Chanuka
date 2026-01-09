@@ -16,6 +16,7 @@ import {
 
 import { bills, users } from "./foundation";
 
+import { primaryKeyUuid, auditFields } from "./base-types";
 // ============================================================================
 // TROJAN BILL ANALYSIS - Real-Time Detection Results
 // ============================================================================
@@ -108,8 +109,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
   analyzed_by: uuid("analyzed_by").references(() => users.id, { onDelete: "set null" }),
   analysis_version: integer("analysis_version").notNull().default(1),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: High-risk bills (alert queue)
   highRiskIdx: index("idx_trojan_bill_analysis_high_risk")
@@ -186,7 +186,7 @@ export const trojan_bill_analysis = pgTable("trojan_bill_analysis", {
 // Each row is one hidden provision within a bill
 
 export const hidden_provisions = pgTable("hidden_provisions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -248,8 +248,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
   comparable_provisions: text("comparable_provisions").array(),
   // Similar provisions in other bills/laws for context
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Hot path: Bill provisions by severity
   billSeverityIdx: index("idx_hidden_provisions_bill_severity")
@@ -302,7 +301,7 @@ export const hidden_provisions = pgTable("hidden_provisions", {
 // Tracks HOW bills hide their true intent
 
 export const trojan_techniques = pgTable("trojan_techniques", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -340,8 +339,7 @@ export const trojan_techniques = pgTable("trojan_techniques", {
   countermeasure: text("countermeasure"),
   // How to counter this technique (for citizens/MPs)
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Technique type analysis
   techniqueTypeIdx: index("idx_trojan_techniques_type")
@@ -370,7 +368,7 @@ export const trojan_techniques = pgTable("trojan_techniques", {
 // Individual risk signals that contribute to overall trojan_risk_score
 
 export const detection_signals = pgTable("detection_signals", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ...primaryKeyUuid(),
 
   bill_id: uuid("bill_id").notNull().references(() => trojan_bill_analysis.bill_id, {
     onDelete: "cascade"
@@ -406,8 +404,7 @@ export const detection_signals = pgTable("detection_signals", {
   threshold_exceeded: boolean("threshold_exceeded").notNull().default(false),
   // Did this signal exceed the threshold?
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Composite index for signal type queries
   billSignalTypeIdx: index("idx_detection_signals_bill_type")

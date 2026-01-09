@@ -414,7 +414,7 @@ class SafeApiService {
 // Main Service Class
 // ============================================================================
 
-class PrivacyAnalyticsService {
+export class PrivacyAnalyticsService {
   private config: AnalyticsConfig;
   private eventQueue: AnalyticsEvent[] = [];
   private userConsent: UserConsent | null = null;

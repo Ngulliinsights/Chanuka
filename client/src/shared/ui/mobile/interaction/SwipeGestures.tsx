@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
 import { GESTURE_CONFIG } from '@/config/gestures';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 import type { SwipeGestureData } from '@/shared/types/mobile';
 
 type SwipeDirection = 'up' | 'down' | 'left' | 'right';

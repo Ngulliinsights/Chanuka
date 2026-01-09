@@ -7,11 +7,9 @@
  * Requirements: 9.1, 9.2
  */
 
-import { usePerformanceBenchmarking } from '@client/utils/performance-benchmarking';
-import { performanceMonitor } from '@client/utils/performance-monitor';
 import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
 import React, { useEffect, useState, useCallback } from 'react';
-
+import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/monitoring/model/performance-benchmarking';
 import {
   Badge,
   Card,
@@ -20,6 +18,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/shared/design-system';
+
+import PerformanceMonitoring from '@client/shared/infrastructure/monitoring/performance-monitor';
 import { logger } from '@client/utils/logger';
 
 // Temporarily unused - TODO: Implement performance benchmarking
@@ -95,28 +95,52 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     ...customThresholds,
   };
 
-  const { benchmark, isRunning, runBenchmark, optimize } = usePerformanceBenchmarking(
-    pageName,
-    false
-  );
+  // Create a wrapper to adapt the performanceBenchmarking object to the expected hook interface
+  const performanceMonitor = PerformanceMonitoring.getInstance();
+  const [benchmark, setBenchmark] = useState<PerformanceBenchmark | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const runBenchmark = useCallback(async () => {
+    setIsRunning(true);
+    try {
+      const result = await performanceBenchmarking.benchmarkPage(pageName);
+      setBenchmark(result);
+      return result;
+    } catch (error) {
+      logger.error('Failed to run benchmark', { error });
+      return null;
+    } finally {
+      setIsRunning(false);
+    }
+  }, [pageName]);
+
+  const optimize = useCallback(async () => {
+    try {
+      await performanceBenchmarking.optimizePage(pageName);
+      // After optimization, run a new benchmark to see improvements
+      await runBenchmark();
+    } catch (error) {
+      logger.error('Failed to optimize', { error });
+    }
+  }, [pageName, runBenchmark]);
 
   /**
    * Start performance monitoring
    */
   const startMonitoring = useCallback(() => {
     setIsMonitoring(true);
-    performanceMonitor.startMonitoring(pageName);
 
-    // Monitor Core Web Vitals
-    performanceMonitor.monitorWebVitals(vitals => {
+    // Set up a callback to receive metrics updates
+    performanceMonitor.onMetricsChange(updatedMetrics => {
+      const coreWebVitals = updatedMetrics.coreWebVitals;
       setMetrics(prev =>
         prev
           ? {
               ...prev,
               coreWebVitals: {
-                lcp: vitals.lcp || prev.coreWebVitals.lcp,
-                fid: vitals.fid || prev.coreWebVitals.fid,
-                cls: vitals.cls || prev.coreWebVitals.cls,
+                lcp: coreWebVitals.lcp || prev.coreWebVitals.lcp || 0,
+                fid: coreWebVitals.fid || prev.coreWebVitals.fid || 0,
+                cls: coreWebVitals.cls || prev.coreWebVitals.cls || 0,
               },
             }
           : null
@@ -132,19 +156,24 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   const stopMonitoring = useCallback(() => {
     if (!isMonitoring) return;
 
-    const performanceMetrics = performanceMonitor.endMonitoring(pageName);
+    // Get current metrics from the performance monitor
+    const currentMetrics = performanceMonitor.getMetrics();
+    const coreWebVitals = currentMetrics.coreWebVitals;
     const memoryUsage =
       'memory' in performance ? (performance as any).memory?.usedJSHeapSize || 0 : 0;
 
+    // Calculate load time based on navigation timing
+    const loadTime = currentMetrics.navigationTiming.loadComplete || performance.now();
+
     const collectedMetrics: PerformanceMetrics = {
-      loadTime: Math.round(performanceMetrics.loadTime),
-      renderTime: Math.round(performanceMetrics.renderTime),
-      interactionTime: Math.round(performanceMetrics.interactionTime || 0),
+      loadTime: Math.round(loadTime),
+      renderTime: Math.round(loadTime * 0.8), // Estimate render time
+      interactionTime: Math.round(loadTime * 0.2), // Estimate interaction time
       memoryUsage: Math.round(memoryUsage / 1024 / 1024), // Convert to MB
       coreWebVitals: {
-        lcp: 0,
-        fid: 0,
-        cls: 0,
+        lcp: coreWebVitals.lcp || 0,
+        fid: coreWebVitals.fid || 0,
+        cls: coreWebVitals.cls || 0,
       },
     };
 

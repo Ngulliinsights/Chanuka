@@ -12,7 +12,7 @@ import { type ReactNode } from 'react';
 import React from 'react';
 
 import { useScrollManager } from '@/hooks/mobile';
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface ScrollToTopButtonProps {
   /**

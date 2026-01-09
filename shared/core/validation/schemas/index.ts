@@ -1,8 +1,58 @@
 /**
  * Validation Schemas - Main Exports
- * 
+ *
  * Centralized export of all validation schemas and utilities
  */
+
+// ============================================================================
+// SCHEMA VERSIONING & CHANGELOG
+// ============================================================================
+
+export const SCHEMA_VERSION = "2.0.0";
+
+export const SCHEMA_CHANGELOG = {
+  "1.0.0": "Initial schema: Foundation, Citizen Participation, Parliamentary Process",
+  "2.0.0":
+    "Consolidated validators from runtime-validator.ts; Added base-types helpers; Static validation; Entity validators",
+} as const;
+
+export interface SchemaMigration {
+  fromVersion: string;
+  toVersion: string;
+  transform: (data: unknown) => unknown;
+  description: string;
+}
+
+export const SchemaMigrations: SchemaMigration[] = [
+  {
+    fromVersion: "1.0.0",
+    toVersion: "2.0.0",
+    transform: (data: any) => data, // No migrations needed yet
+    description: "Consolidated validation schemas",
+  },
+];
+
+export function getLatestVersion(): string {
+  return SCHEMA_VERSION;
+}
+
+export function isVersionSupported(version: string): boolean {
+  return version === SCHEMA_VERSION || SchemaMigrations.some((m) => m.fromVersion === version);
+}
+
+export function applyMigration(data: unknown, fromVersion: string, toVersion: string): unknown {
+  let result = data;
+  for (const migration of SchemaMigrations) {
+    if (migration.fromVersion === fromVersion && migration.toVersion === toVersion) {
+      result = migration.transform(result);
+    }
+  }
+  return result;
+}
+
+// ============================================================================
+// SCHEMA EXPORTS - Organized by domain
+// ============================================================================
 
 // Common schemas
 export * from './common';
@@ -15,6 +65,10 @@ export { authSchemas } from './auth';
 // Property schemas
 export * from './property';
 export { propertySchemas } from './property';
+
+// Entity schemas (consolidated from runtime-validator.ts)
+export * from './entities';
+export { entitySchemas } from './entities';
 
 // Schema composition utilities
 export {
@@ -29,6 +83,7 @@ export const allSchemas = {
   common: () => import('./common').then(m => m.commonSchemas),
   auth: () => import('./auth').then(m => m.authSchemas),
   property: () => import('./property').then(m => m.propertySchemas),
+  entities: () => import('./entities').then(m => m.entitySchemas),
 } as const;
 
 /**

@@ -7,7 +7,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { UserJourneyTracker } from '@client/services/UserJourneyTracker';
+import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
 import {
   BarChart3,
   Users,
@@ -46,10 +46,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [journeyAnalytics, setJourneyAnalytics] = useState<any>(null);
 
-  const { getDashboardData, getMetrics, exportData, clearData, isEnabled, setEnabled } =
+  const { getAnalyticsDashboard, getMetrics, exportData, clearData, setEnabled, tracker } =
     useComprehensiveAnalytics();
 
-  const journeyTracker = UserJourneyTracker.getInstance();
+  const journeyTracker = userJourneyTracker;
 
   /**
    * Load journey analytics data
@@ -139,6 +139,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
   }, []);
 
   const currentMetrics = getMetrics();
+  const isTrackingEnabled = currentMetrics.isEnabled;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
@@ -155,12 +156,12 @@ export const AnalyticsDashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Badge variant={isEnabled ? 'default' : 'secondary'}>
-            {isEnabled ? 'Tracking Enabled' : 'Tracking Disabled'}
+          <Badge variant={isTrackingEnabled ? 'primary' : 'secondary'}>
+            {isTrackingEnabled ? 'Tracking Enabled' : 'Tracking Disabled'}
           </Badge>
-          <Button variant="outline" size="sm" onClick={() => setEnabled(!isEnabled)}>
+          <Button variant="outline" size="sm" onClick={() => setEnabled(!isTrackingEnabled)}>
             <Settings className="h-4 w-4 mr-1" />
-            {isEnabled ? 'Disable' : 'Enable'}
+            {isTrackingEnabled ? 'Disable' : 'Enable'}
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-1" />
@@ -432,10 +433,10 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   </p>
                 </div>
                 <Button
-                  variant={isEnabled ? 'default' : 'outline'}
-                  onClick={() => setEnabled(!isEnabled)}
+                  variant={isTrackingEnabled ? 'primary' : 'outline'}
+                  onClick={() => setEnabled(!isTrackingEnabled)}
                 >
-                  {isEnabled ? 'Enabled' : 'Disabled'}
+                  {isTrackingEnabled ? 'Enabled' : 'Disabled'}
                 </Button>
               </div>
 

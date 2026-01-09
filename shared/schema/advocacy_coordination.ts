@@ -10,15 +10,15 @@ import {
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
 
+import { primaryKeyUuid, auditFields } from "./base-types";
 import { kenyanCountyEnum } from "./enum";
 import { bills, users } from "./foundation";
-
 // ============================================================================
 // CAMPAIGNS - Organized advocacy efforts around bills
 // ============================================================================
 
 export const campaigns = pgTable("campaigns", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Campaign identification
   title: varchar("title", { length: 500 }).notNull(),
@@ -64,8 +64,7 @@ export const campaigns = pgTable("campaigns", {
   requires_approval: boolean("requires_approval").notNull().default(false),
   moderation_status: varchar("moderation_status", { length: 30 }).notNull().default("approved"), // "pending", "approved", "rejected"
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Campaign discovery
   statusPublicIdx: index("idx_campaigns_status_public")
@@ -96,7 +95,7 @@ export const campaigns = pgTable("campaigns", {
 // ============================================================================
 
 export const action_items = pgTable("action_items", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   campaign_id: uuid("campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
 
   // Action identification
@@ -151,8 +150,7 @@ export const action_items = pgTable("action_items", {
   display_order: smallint("display_order").notNull().default(1),
   prerequisite_actions: uuid("prerequisite_actions").array(),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Campaign actions
   campaignActiveOrderIdx: index("idx_action_items_campaign_active_order")
@@ -173,7 +171,7 @@ export const action_items = pgTable("action_items", {
 // ============================================================================
 
 export const campaign_participants = pgTable("campaign_participants", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   campaign_id: uuid("campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 
@@ -201,8 +199,7 @@ export const campaign_participants = pgTable("campaign_participants", {
   participant_county: kenyanCountyEnum("participant_county"),
   participant_constituency: varchar("participant_constituency", { length: 100 }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // One participation per user per campaign
   campaignUserUnique: unique("campaign_participants_campaign_user_unique")
@@ -227,7 +224,7 @@ export const campaign_participants = pgTable("campaign_participants", {
 // ============================================================================
 
 export const action_completions = pgTable("action_completions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   action_item_id: uuid("action_item_id").notNull().references(() => action_items.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   campaign_id: uuid("campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
@@ -274,7 +271,7 @@ export const action_completions = pgTable("action_completions", {
 // ============================================================================
 
 export const campaign_impact_metrics = pgTable("campaign_impact_metrics", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
   campaign_id: uuid("campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
 
   // Metric identification
@@ -327,7 +324,7 @@ export const campaign_impact_metrics = pgTable("campaign_impact_metrics", {
 // ============================================================================
 
 export const coalition_relationships = pgTable("coalition_relationships", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: primaryKeyUuid(),
 
   // Coalition participants
   primary_campaign_id: uuid("primary_campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
@@ -351,8 +348,7 @@ export const coalition_relationships = pgTable("coalition_relationships", {
   collaboration_notes: text("collaboration_notes"),
   success_metrics: jsonb("success_metrics").notNull().default(sql`'{}'::jsonb`),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditFields(),
 }, (table) => ({
   // Prevent duplicate relationships
   primaryPartnerUnique: unique("coalition_relationships_primary_partner_unique")
@@ -467,5 +463,3 @@ export type NewCampaignImpactMetrics = typeof campaign_impact_metrics.$inferInse
 
 export type CoalitionRelationship = typeof coalition_relationships.$inferSelect;
 export type NewCoalitionRelationship = typeof coalition_relationships.$inferInsert;
-
-

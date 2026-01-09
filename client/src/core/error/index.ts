@@ -147,6 +147,53 @@ export { ErrorFactory } from './factory';
 
 export { ErrorBoundary, ErrorFallback, RecoveryUI } from './components';
 
+// ============================================================================
+// User-Friendly Error Message System
+// ============================================================================
+
+export type {
+  ErrorMessageTemplate,
+  LocalizedErrorMessage,
+  FormattedErrorMessage,
+  FormatOptions,
+  RecoverySuggestion,
+  SuggestionAnalytics,
+  EnhancedErrorMessage,
+} from './messages';
+
+export {
+  getTemplateById,
+  getTemplatesByDomain,
+  getTemplatesBySeverity,
+  getBestMatchTemplate,
+  getLocalizedMessage,
+  addLocalizedMessages,
+  formatErrorMessage,
+  formatMessageWithContext,
+  createAppErrorFromError,
+  formatMemoryUsage,
+  formatErrorForDisplay,
+  formatErrorForHTML,
+  escapeHtml,
+  getErrorSeverityClass,
+  getErrorIconClass,
+  RECOVERY_SUGGESTIONS,
+  getRecoverySuggestions,
+  isSuggestionApplicable,
+  convertSuggestionsToRecoveryStrategies,
+  enhanceSuggestionsWithContext,
+  trackSuggestionUsage,
+  getSuggestionAnalytics,
+  clearSuggestionAnalytics,
+  getBestRecoverySuggestion,
+  getSuggestionById,
+  addCustomRecoverySuggestion,
+  removeRecoverySuggestion,
+  createEnhancedErrorMessage,
+  ErrorMessageService,
+  errorMessageService,
+} from './messages';
+
 // Legacy exports for backward compatibility
 export { ErrorBoundary as EnhancedErrorBoundary } from './components';
 

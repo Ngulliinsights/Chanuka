@@ -59,9 +59,9 @@ export type {
   // FormFieldError, // Not available in @types
   // FormValidationError, // Not available in @types
   // FormSubmissionError // Not available in @types
-} from '../../../../@types';
+} from '@client/@types';
 
-// export { isBill, isComment, isUser } from '../../../../@types'; // Functions not available
+// export { isBill, isComment, isUser } from '@client/@types'; // Functions not available
 
 // Dashboard types
 export * from './dashboard';
@@ -101,7 +101,7 @@ export type {
   // PrivacySettings, // Not available in @types
   // NotificationPreferences, // Not available in @types
   // ConsentRecord // Not available in @types
-} from '../../../../@types';
+} from '@client/@types';
 
 // Planned: After migration, specific type exports will be organized here
 // - Analytics types (from features/analytics/model/types)

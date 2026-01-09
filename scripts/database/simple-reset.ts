@@ -4,6 +4,22 @@
 // ============================================================================
 // Drops all tables and runs migrations without complex imports
 
+/**
+ * @deprecated Use reset.ts instead
+ *
+ * This is the basic reset runner. Use reset.ts for:
+ * - Backup capability
+ * - Confirmation prompts
+ * - Seeding support
+ * - Validation
+ *
+ * Migration path:
+ *   Old: tsx scripts/database/simple-reset.ts
+ *   New: npm run db:reset
+ *
+ * See: scripts/database/DEPRECATION_NOTICE.md
+ */
+
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
@@ -16,13 +32,13 @@ const { Pool } = pg;
 
 async function resetDatabase() {
   let pool: pg.Pool | undefined;
-  
+
   try {
     console.log('🔄 Starting database reset...');
 
     // Create connection pool
-    const poolConfig = process.env.DATABASE_URL 
-      ? { 
+    const poolConfig = process.env.DATABASE_URL
+      ? {
           connectionString: process.env.DATABASE_URL,
           ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
         }
@@ -40,12 +56,12 @@ async function resetDatabase() {
 
     // Step 1: Drop all extensions first
     console.log('🔄 Dropping all extensions...');
-    
+
     // Get all extensions and drop them
     const extensionsResult = await pool.query(`
       SELECT extname FROM pg_extension WHERE extname NOT IN ('plpgsql');
     `);
-    
+
     for (const ext of extensionsResult.rows) {
       try {
         await pool.query(`DROP EXTENSION IF EXISTS "${ext.extname}" CASCADE;`);
@@ -59,31 +75,31 @@ async function resetDatabase() {
 
     // Step 2: Drop all existing tables and objects
     console.log('🗑️ Dropping all existing tables...');
-    
+
     await pool.query(`
       -- Drop all tables in the public schema
-      DO $$ 
+      DO $$
       DECLARE
           r RECORD;
       BEGIN
           -- Drop all tables
-          FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') 
+          FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public')
           LOOP
               EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
           END LOOP;
-          
+
           -- Drop all sequences
           FOR r IN (SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public')
           LOOP
               EXECUTE 'DROP SEQUENCE IF EXISTS ' || quote_ident(r.sequence_name) || ' CASCADE';
           END LOOP;
-          
+
           -- Drop all functions (now safe since extensions are gone)
           FOR r IN (SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public' AND routine_type = 'FUNCTION')
           LOOP
               EXECUTE 'DROP FUNCTION IF EXISTS ' || quote_ident(r.routine_name) || ' CASCADE';
           END LOOP;
-          
+
           -- Drop all types
           FOR r IN (SELECT typname FROM pg_type WHERE typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public'))
           LOOP
@@ -96,14 +112,14 @@ async function resetDatabase() {
 
     // Step 3: Run migrations
     console.log('📦 Running migrations...');
-    
+
     await migrate(db, { migrationsFolder: './drizzle' });
-    
+
     console.log('✅ Migrations completed successfully');
 
     // Step 4: Apply full-text search enhancements
     console.log('🔍 Applying full-text search enhancements...');
-    
+
     await pool.query(`
       -- Enable required extensions
       CREATE EXTENSION IF NOT EXISTS pg_trgm;
@@ -116,9 +132,9 @@ async function resetDatabase() {
 
     // Check which tables exist before creating indexes
     const tablesCheck = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
       AND table_name IN ('bills', 'sponsors', 'comments');
     `);
 
@@ -128,13 +144,13 @@ async function resetDatabase() {
     // Create indexes only for existing tables
     if (existingTables.includes('bills')) {
       await pool.query(`
-        CREATE INDEX IF NOT EXISTS "idx_bills_fulltext_gin" 
+        CREATE INDEX IF NOT EXISTS "idx_bills_fulltext_gin"
         ON "bills" USING gin(to_tsvector('english', title || ' ' || COALESCE(summary, '') || ' ' || COALESCE(full_text, '')));
-        
-        CREATE INDEX IF NOT EXISTS "idx_bills_title_trgm" 
+
+        CREATE INDEX IF NOT EXISTS "idx_bills_title_trgm"
         ON "bills" USING gin(title gin_trgm_ops);
-        
-        CREATE INDEX IF NOT EXISTS "idx_bills_summary_trgm" 
+
+        CREATE INDEX IF NOT EXISTS "idx_bills_summary_trgm"
         ON "bills" USING gin(summary gin_trgm_ops);
       `);
       console.log('   Created bills indexes');
@@ -142,10 +158,10 @@ async function resetDatabase() {
 
     if (existingTables.includes('sponsors')) {
       await pool.query(`
-        CREATE INDEX IF NOT EXISTS "idx_sponsors_fulltext_gin" 
+        CREATE INDEX IF NOT EXISTS "idx_sponsors_fulltext_gin"
         ON "sponsors" USING gin(to_tsvector('english', name || ' ' || COALESCE(bio, '')));
-        
-        CREATE INDEX IF NOT EXISTS "idx_sponsors_name_trgm" 
+
+        CREATE INDEX IF NOT EXISTS "idx_sponsors_name_trgm"
         ON "sponsors" USING gin(name gin_trgm_ops);
       `);
       console.log('   Created sponsors indexes');
@@ -153,7 +169,7 @@ async function resetDatabase() {
 
     if (existingTables.includes('comments')) {
       await pool.query(`
-        CREATE INDEX IF NOT EXISTS "idx_comments_fulltext_gin" 
+        CREATE INDEX IF NOT EXISTS "idx_comments_fulltext_gin"
         ON "comments" USING gin(to_tsvector('english', content));
       `);
       console.log('   Created comments indexes');
@@ -161,7 +177,7 @@ async function resetDatabase() {
 
     // Step 5: Create search support tables
     console.log('📊 Creating search support tables...');
-    
+
     await pool.query(`
       -- Create table for storing synonyms and related terms for query expansion
       CREATE TABLE IF NOT EXISTS "search_synonyms" (
@@ -173,7 +189,7 @@ async function resetDatabase() {
           "created_at" timestamp DEFAULT now() NOT NULL,
           "updated_at" timestamp DEFAULT now() NOT NULL
       );
-      
+
       -- Create table for storing common search patterns and their expansions
       CREATE TABLE IF NOT EXISTS "search_expansions" (
           "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -185,7 +201,7 @@ async function resetDatabase() {
           "created_at" timestamp DEFAULT now() NOT NULL,
           "updated_at" timestamp DEFAULT now() NOT NULL
       );
-      
+
       -- Create table for tracking search performance and analytics
       CREATE TABLE IF NOT EXISTS "search_analytics" (
           "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -200,7 +216,7 @@ async function resetDatabase() {
           "search_timestamp" timestamp DEFAULT now() NOT NULL,
           "metadata" jsonb DEFAULT '{}'::jsonb
       );
-      
+
       -- Create indexes for search support tables
       CREATE INDEX IF NOT EXISTS "idx_search_synonyms_term" ON "search_synonyms" ("term");
       CREATE INDEX IF NOT EXISTS "idx_search_synonyms_category" ON "search_synonyms" ("category");
@@ -214,7 +230,7 @@ async function resetDatabase() {
 
     // Step 6: Create search functions
     console.log('⚙️ Creating search functions...');
-    
+
     await pool.query(`
       -- Function to expand query with synonyms
       CREATE OR REPLACE FUNCTION expand_query_with_synonyms(
@@ -231,13 +247,13 @@ async function resetDatabase() {
       BEGIN
           -- Split query into words
           query_words := string_to_array(lower(trim(p_query)), ' ');
-          
+
           -- Process each word
           FOREACH word IN ARRAY query_words
           LOOP
               -- Add original word
               expanded_terms := array_append(expanded_terms, word);
-              
+
               -- Find synonyms
               SELECT s.synonyms INTO synonyms
               FROM search_synonyms s
@@ -245,7 +261,7 @@ async function resetDatabase() {
               AND (p_category IS NULL OR s.category = p_category)
               ORDER BY s.weight DESC
               LIMIT 1;
-              
+
               -- Add synonyms with OR operator
               IF synonyms IS NOT NULL THEN
                   FOREACH synonym IN ARRAY synonyms
@@ -254,14 +270,14 @@ async function resetDatabase() {
                   END LOOP;
               END IF;
           END LOOP;
-          
+
           -- Join terms with OR for each group, AND between groups
           final_query := array_to_string(expanded_terms, ' | ');
-          
+
           RETURN final_query;
       END;
       $$ LANGUAGE plpgsql;
-      
+
       -- Function to log search performance
       CREATE OR REPLACE FUNCTION log_search_performance(
           p_query varchar(500),
@@ -274,7 +290,7 @@ async function resetDatabase() {
       ) RETURNS void AS $$
       BEGIN
           INSERT INTO search_analytics (
-              query, search_type, results_count, execution_time_ms, 
+              query, search_type, results_count, execution_time_ms,
               user_id, session_id, metadata
           ) VALUES (
               p_query, p_search_type, p_results_count, p_execution_time_ms,
@@ -282,7 +298,7 @@ async function resetDatabase() {
           );
       END;
       $$ LANGUAGE plpgsql;
-      
+
       -- Function to get search performance statistics
       CREATE OR REPLACE FUNCTION get_search_performance_stats(
           p_hours_back integer DEFAULT 24
@@ -295,7 +311,7 @@ async function resetDatabase() {
       ) AS $$
       BEGIN
           RETURN QUERY
-          SELECT 
+          SELECT
               sa.search_type,
               AVG(sa.execution_time_ms)::numeric AS avg_execution_time_ms,
               PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY sa.execution_time_ms)::numeric AS p95_execution_time_ms,
@@ -311,7 +327,7 @@ async function resetDatabase() {
 
     // Step 7: Insert initial synonym data
     console.log('📝 Inserting initial synonym data...');
-    
+
     await pool.query(`
       INSERT INTO "search_synonyms" ("term", "synonyms", "category", "weight") VALUES
       ('bill', ARRAY['legislation', 'act', 'law', 'statute', 'proposal'], 'legal', 1.0),
@@ -334,18 +350,18 @@ async function resetDatabase() {
 
     // Step 8: Verify the schema
     console.log('🔍 Verifying schema...');
-    
+
     const tablesResult = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
       ORDER BY table_name;
     `);
 
     const indexesResult = await pool.query(`
-      SELECT indexname 
-      FROM pg_indexes 
-      WHERE schemaname = 'public' 
+      SELECT indexname
+      FROM pg_indexes
+      WHERE schemaname = 'public'
       AND (indexname LIKE '%fulltext%' OR indexname LIKE '%trgm%')
       ORDER BY indexname;
     `);
@@ -353,16 +369,16 @@ async function resetDatabase() {
     console.log('📊 Schema verification complete:');
     console.log(`   Tables created: ${tablesResult.rows.length}`);
     console.log(`   Full-text indexes: ${indexesResult.rows.length}`);
-    
+
     // Log some key tables
     const keyTables = tablesResult.rows
       .map(row => row.table_name)
       .filter(name => ['bills', 'sponsors', 'comments', 'users', 'search_synonyms', 'search_analytics'].includes(name));
-    
+
     console.log(`   Key tables: ${keyTables.join(', ')}`);
 
     console.log('🎉 Database reset and migration completed successfully!');
-    
+
   } catch (error) {
     console.error('❌ Database reset and migration failed:', error);
     throw error;

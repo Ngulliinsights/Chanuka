@@ -1,305 +1,439 @@
 /**
- * Monitoring Integration Module
- * Centralizes all monitoring services for the Chanuka Client
+ * Monitoring Integration Service
+ * Central integration point for all error monitoring and analytics across client systems
  */
 
-import SentryMonitoring from '@client/core/monitoring/sentry-config';
+import {
+  ClientSystem,
+  ErrorContext,
+  PerformanceMetrics
+} from './unified-error-monitoring-interface';
 
-import { ErrorMonitor } from './error-monitor';
-import { PerformanceMonitor } from './performance-monitor';
+// Import all monitoring services
+import { ErrorAggregationService } from './error-aggregation-service';
+import { CrossSystemErrorAnalytics } from './cross-system-error-analytics';
+import { TrendAnalysisService } from './trend-analysis-service';
+import PerformanceImpactMonitor from './performance-impact-monitor';
 
-interface MonitoringConfig {
-  environment: string;
-  version: string;
-  enableSentry: boolean;
-  enablePerformanceMonitoring: boolean;
-  enableErrorMonitoring: boolean;
-  sentryDsn?: string;
-  sampleRates: {
-    sentry: number;
-    traces: number;
-    replays: number;
-  };
+// System-specific monitoring will be accessed through their singleton instances
+// when available, but the integration service provides the unified API
+
+interface MonitoringSystemStatus {
+  system: ClientSystem;
+  monitoringActive: boolean;
+  lastActivity: number;
+  errorCount: number;
+  performanceScore: number;
 }
 
-class MonitoringIntegration {
-  private static instance: MonitoringIntegration;
-  private sentry: SentryMonitoring;
-  private performance: PerformanceMonitor;
-  private errorMonitoring: ErrorMonitor;
-  private initialized = false;
+class MonitoringIntegrationService {
+  private static instance: MonitoringIntegrationService;
+  private aggregationService: ErrorAggregationService;
+  private analyticsService: CrossSystemErrorAnalytics;
+  private trendService: TrendAnalysisService;
+  private performanceMonitor: PerformanceImpactMonitor;
+  private systemStatus: Map<ClientSystem, MonitoringSystemStatus> = new Map();
+  private integrationInterval: NodeJS.Timeout | null = null;
 
-  static getInstance(): MonitoringIntegration {
-    if (!MonitoringIntegration.instance) {
-      MonitoringIntegration.instance = new MonitoringIntegration();
+  static getInstance(): MonitoringIntegrationService {
+    if (!MonitoringIntegrationService.instance) {
+      MonitoringIntegrationService.instance = new MonitoringIntegrationService();
     }
-    return MonitoringIntegration.instance;
+    return MonitoringIntegrationService.instance;
   }
 
   constructor() {
-    this.sentry = SentryMonitoring.getInstance();
-    this.performance = PerformanceMonitor.getInstance();
-    this.errorMonitoring = ErrorMonitor.getInstance();
+    this.aggregationService = ErrorAggregationService.getInstance();
+    this.analyticsService = CrossSystemErrorAnalytics.getInstance();
+    this.trendService = TrendAnalysisService.getInstance();
+    this.performanceMonitor = PerformanceImpactMonitor.getInstance();
+
+    this.initializeSystemStatus();
+    this.startIntegrationMonitoring();
   }
 
-  async initialize(config: MonitoringConfig): Promise<void> {
-    if (this.initialized) {
-      console.warn('Monitoring already initialized');
-      return;
+  private initializeSystemStatus(): void {
+    const systems = Object.values(ClientSystem);
+    const now = Date.now();
+
+    systems.forEach(system => {
+      this.systemStatus.set(system, {
+        system,
+        monitoringActive: true,
+        lastActivity: now,
+        errorCount: 0,
+        performanceScore: 100
+      });
+    });
+  }
+
+  private startIntegrationMonitoring(): void {
+    this.integrationInterval = setInterval(() => {
+      this.updateSystemStatus();
+      this.performCrossSystemHealthCheck();
+    }, 30000); // Update every 30 seconds
+  }
+
+  private async updateSystemStatus(): Promise<void> {
+    const now = Date.now();
+
+    for (const system of Object.values(ClientSystem)) {
+      const status = this.systemStatus.get(system)!;
+
+      // Get recent errors for this system
+      const recentErrors = this.aggregationService.getSystemErrors(system, {
+        start: now - 300000, // Last 5 minutes
+        end: now
+      });
+
+      status.errorCount = recentErrors.length;
+      status.lastActivity = now;
+
+      // Get performance score from analytics
+      try {
+        const analytics = await this.analyticsService.getCrossSystemAnalytics();
+        const systemHealth = analytics.systems.find((s: any) => s.system === system);
+        if (systemHealth) {
+          status.performanceScore = systemHealth.performanceScore;
+        }
+      } catch (error) {
+        console.warn(`Failed to get analytics for ${system}:`, error);
+      }
+
+      this.systemStatus.set(system, status);
     }
+  }
 
-    console.log('🔧 Initializing monitoring services...');
-
+  private async performCrossSystemHealthCheck(): Promise<void> {
     try {
-      // Initialize Sentry if enabled
-      if (config.enableSentry && config.sentryDsn) {
-        this.sentry.initialize({
-          dsn: config.sentryDsn,
-          environment: config.environment,
-          release: config.version,
-          sampleRate: config.sampleRates.sentry,
-          tracesSampleRate: config.sampleRates.traces,
-          replaysSessionSampleRate: config.sampleRates.replays,
-          replaysOnErrorSampleRate: 1.0,
-        });
-        console.log('✅ Sentry monitoring initialized');
+      const analytics = await this.analyticsService.getCrossSystemAnalytics();
+
+      if (analytics.overallHealth === 'critical') {
+        console.error('🚨 CRITICAL: Overall system health is critical');
+        this.triggerEmergencyProtocols();
+      } else if (analytics.overallHealth === 'degraded') {
+        console.warn('⚠️ WARNING: Overall system health is degraded');
+        this.triggerDegradedModeProtocols();
       }
-
-      // Initialize performance monitoring if enabled
-      if (config.enablePerformanceMonitoring) {
-        // Performance monitoring is automatically initialized
-        this.setupPerformanceIntegration();
-        console.log('✅ Performance monitoring initialized');
-      }
-
-      // Initialize error monitoring if enabled
-      if (config.enableErrorMonitoring) {
-        // Error monitoring is automatically initialized
-        this.setupErrorIntegration();
-        console.log('✅ Error monitoring initialized');
-      }
-
-      // Set up cross-service integrations
-      this.setupIntegrations();
-
-      this.initialized = true;
-      console.log('🎉 All monitoring services initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize monitoring:', error);
-      throw error;
+      console.warn('Failed to perform cross-system health check:', error);
     }
   }
 
-  private setupPerformanceIntegration(): void {
-    // Integrate performance monitoring with Sentry
-    this.performance.onMetricsChange(metrics => {
-      // Report Core Web Vitals to Sentry
-      if (metrics.coreWebVitals.lcp) {
-        this.sentry.setContext('performance', {
-          lcp: metrics.coreWebVitals.lcp,
-          fid: metrics.coreWebVitals.fid,
-          cls: metrics.coreWebVitals.cls,
-          fcp: metrics.coreWebVitals.fcp,
-          ttfb: metrics.coreWebVitals.ttfb,
-        });
-      }
+  private triggerEmergencyProtocols(): void {
+    // Implement emergency protocols
+    // - Increase monitoring frequency
+    // - Enable additional logging
+    // - Send alerts to on-call engineers
+    // - Consider graceful degradation
 
-      // Alert on poor performance
-      if (metrics.coreWebVitals.lcp && metrics.coreWebVitals.lcp > 4000) {
-        this.sentry.captureMessage(`Poor LCP detected: ${metrics.coreWebVitals.lcp}ms`, 'warning');
-      }
-
-      if (metrics.coreWebVitals.cls && metrics.coreWebVitals.cls > 0.25) {
-        this.sentry.captureMessage(`High CLS detected: ${metrics.coreWebVitals.cls}`, 'warning');
-      }
-    });
+    console.error('Emergency protocols activated');
   }
 
-  private setupErrorIntegration(): void {
-    // Error monitoring is already integrated with Sentry
-    // Additional custom integrations can be added here
+  private triggerDegradedModeProtocols(): void {
+    // Implement degraded mode protocols
+    // - Optimize performance
+    // - Reduce non-essential operations
+    // - Increase caching
+
+    console.warn('Degraded mode protocols activated');
   }
 
-  private setupIntegrations(): void {
-    // Set up breadcrumbs for user actions
-    this.setupUserActionTracking();
+  // ============================================================================
+  // Unified API Methods
+  // ============================================================================
 
-    // Set up navigation tracking
-    this.setupNavigationTracking();
+  /**
+   * Report an error to all relevant monitoring systems
+   */
+  async reportError(error: any, context: ErrorContext): Promise<void> {
+    const system = context.system;
 
-    // Set up feature usage tracking
-    this.setupFeatureTracking();
+    // Update system activity
+    const status = this.systemStatus.get(system);
+    if (status) {
+      status.lastActivity = Date.now();
+      this.systemStatus.set(system, status);
+    }
+
+    // Send to aggregation service (which handles cross-system routing)
+    this.aggregationService.addError(system, error, context);
+
+    // Also send to performance monitor for correlation analysis
+    this.performanceMonitor.recordPerformanceMetrics(
+      system,
+      context.operation || 'unknown',
+      0, // Duration not available for errors
+      false // Not successful
+    );
   }
 
-  private setupUserActionTracking(): void {
-    // Track clicks on important elements
-    document.addEventListener('click', event => {
-      const target = event.target as HTMLElement;
+  /**
+   * Track performance metrics across systems
+   */
+  async trackPerformance(metrics: PerformanceMetrics): Promise<void> {
+    const system = metrics.context?.system || ClientSystem.SERVICE_ARCHITECTURE;
 
-      // Track button clicks
-      if (target.tagName === 'BUTTON' || target.closest('button')) {
-        const button = target.tagName === 'BUTTON' ? target : target.closest('button');
-        const buttonText = button?.textContent?.trim() || 'Unknown';
+    // Update system activity
+    const status = this.systemStatus.get(system);
+    if (status) {
+      status.lastActivity = Date.now();
+      this.systemStatus.set(system, status);
+    }
 
-        this.sentry.addBreadcrumb(`Button clicked: ${buttonText}`, 'user', {
-          element: button?.className,
-          text: buttonText,
-        });
-      }
-
-      // Track link clicks
-      if (target.tagName === 'A' || target.closest('a')) {
-        const link = target.tagName === 'A' ? target : target.closest('a');
-        const href = (link as HTMLAnchorElement)?.href;
-
-        this.sentry.addBreadcrumb(`Link clicked: ${href}`, 'navigation', { href });
-      }
-    });
-
-    // Track form submissions
-    document.addEventListener('submit', event => {
-      const form = event.target as HTMLFormElement;
-      const formId = form.id || form.className || 'unknown';
-
-      this.sentry.addBreadcrumb(`Form submitted: ${formId}`, 'user', { formId });
-    });
+    // Send to performance impact monitor
+    this.performanceMonitor.recordPerformanceMetrics(
+      system,
+      metrics.operation,
+      metrics.duration,
+      metrics.success
+    );
   }
 
-  private setupNavigationTracking(): void {
-    // Track route changes (for SPA)
-    let currentPath = window.location.pathname;
-
-    const trackNavigation = () => {
-      const newPath = window.location.pathname;
-      if (newPath !== currentPath) {
-        this.sentry.addBreadcrumb(`Navigation: ${currentPath} → ${newPath}`, 'navigation', {
-          from: currentPath,
-          to: newPath,
-        });
-
-        // Mark performance measurement
-        this.performance.mark(`navigation-${Date.now()}`);
-
-        currentPath = newPath;
-      }
+  /**
+   * Get comprehensive system health overview
+   */
+  async getSystemHealthOverview(): Promise<{
+    overallHealth: 'healthy' | 'degraded' | 'critical';
+    systems: MonitoringSystemStatus[];
+    crossSystemInsights: {
+      correlations: any[];
+      patterns: any[];
+      bottlenecks: any[];
     };
+    recommendations: any[];
+  }> {
+    const analytics = await this.analyticsService.getCrossSystemAnalytics();
+    const bottlenecks = this.performanceMonitor.identifyPerformanceBottlenecks();
+    const recommendations = this.performanceMonitor.getPerformanceOptimizationRecommendations();
 
-    // Listen for navigation events
-    window.addEventListener('popstate', trackNavigation);
-
-    // Override pushState and replaceState to track programmatic navigation
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-      originalPushState.apply(this, args);
-      trackNavigation();
-    };
-
-    history.replaceState = function (...args) {
-      originalReplaceState.apply(this, args);
-      trackNavigation();
+    return {
+      overallHealth: analytics.overallHealth,
+      systems: Array.from(this.systemStatus.values()),
+      crossSystemInsights: {
+        correlations: analytics.correlations,
+        patterns: await this.analyticsService.identifyCrossSystemPatterns(),
+        bottlenecks
+      },
+      recommendations
     };
   }
 
-  private setupFeatureTracking(): void {
-    // Track feature usage based on data attributes
-    document.addEventListener('click', event => {
-      const target = event.target as HTMLElement;
-      const feature =
-        target.dataset.feature || target.closest('[data-feature]')?.getAttribute('data-feature');
-
-      if (feature) {
-        this.sentry.addBreadcrumb(`Feature used: ${feature}`, 'user', { feature });
-
-        // Track feature adoption metrics
-        this.sentry.setTag('last_feature_used', feature);
-      }
+  /**
+   * Get error analytics across all systems
+   */
+  async getCrossSystemErrorAnalytics(timeRange?: { start: number; end: number }): Promise<{
+    totalErrors: number;
+    bySystem: Record<ClientSystem, number>;
+    trends: any[];
+    predictions: any[];
+  }> {
+    const aggregation = await this.aggregationService.aggregateErrors();
+    const trends = await this.trendService.analyzeTrends(timeRange || {
+      start: Date.now() - 24 * 60 * 60 * 1000,
+      end: Date.now()
     });
+    const predictions = await this.trendService.predictIssues(7 * 24 * 60 * 60 * 1000); // 7 days
+
+    return {
+      totalErrors: aggregation.totalErrors,
+      bySystem: aggregation.bySystem as Record<ClientSystem, number>,
+      trends: trends.trends,
+      predictions
+    };
   }
 
-  // Public API methods
-  reportError(error: Error, context?: Record<string, unknown>): void {
-    this.errorMonitoring.reportError(error, context);
+  /**
+   * Get performance impact analysis
+   */
+  getPerformanceImpactAnalysis(timeRange?: { start: number; end: number }): {
+    systemImpacts: any;
+    trends: any[];
+    bottlenecks: any[];
+    recommendations: any[];
+  } {
+    const impacts = this.performanceMonitor.getSystemPerformanceImpacts(timeRange);
+    const trends = this.performanceMonitor.getPerformanceDegradationTrends();
+    const bottlenecks = this.performanceMonitor.identifyPerformanceBottlenecks();
+    const recommendations = this.performanceMonitor.getPerformanceOptimizationRecommendations();
+
+    return {
+      systemImpacts: impacts.systemImpacts,
+      trends,
+      bottlenecks,
+      recommendations
+    };
   }
 
-  reportUserAction(action: string, context?: Record<string, unknown>): void {
-    this.errorMonitoring.reportUserAction(action, context);
+  /**
+   * Configure monitoring settings for a specific system
+   */
+  configureSystemMonitoring(
+    system: ClientSystem,
+    config: {
+      enabled?: boolean;
+      errorThreshold?: number;
+      performanceThreshold?: number;
+      alertPatterns?: string[];
+    }
+  ): void {
+    const monitoring = this.getSystemMonitoring(system);
+    if (monitoring) {
+      if (config.enabled !== undefined) {
+        monitoring.setMonitoringEnabled(config.enabled);
+      }
+
+      if (config.alertPatterns) {
+        config.alertPatterns.forEach(pattern => {
+          monitoring.registerErrorPattern(pattern, config.errorThreshold || 5);
+        });
+      }
+    }
   }
 
-  reportPerformanceIssue(metric: string, value: number, threshold: number): void {
-    this.errorMonitoring.reportPerformanceIssue(metric, value, threshold);
+  /**
+   * Get monitoring instance for a specific system
+   * Note: System-specific monitoring should be accessed through their singleton instances
+   */
+  getSystemMonitoring(system: ClientSystem): any {
+    // This would need to be implemented with dynamic imports or registry
+    // For now, return null as systems should use their own monitoring
+    console.warn(`System monitoring for ${system} should be accessed through its singleton instance`);
+    return null;
   }
 
-  setUserContext(user: { id: string; email?: string; username?: string }): void {
-    this.sentry.setUserContext(user);
-    this.errorMonitoring.setUserContext(user);
+  /**
+   * Get real-time monitoring stream
+   */
+  getRealTimeMonitoringStream(): AsyncIterable<{
+    type: 'error' | 'performance' | 'alert';
+    system: ClientSystem;
+    data: any;
+    timestamp: number;
+  }> {
+    // This would combine streams from all monitoring services
+    // For now, return a simple implementation
+    return this.createMonitoringStream();
   }
 
-  clearUserContext(): void {
-    this.sentry.clearUserContext();
-    this.errorMonitoring.clearUserContext();
+  private async* createMonitoringStream(): AsyncIterable<{
+    type: 'error' | 'performance' | 'alert';
+    system: ClientSystem;
+    data: any;
+    timestamp: number;
+  }> {
+    // Implementation would combine streams from all services
+    // This is a placeholder for the actual stream implementation
+    yield {
+      type: 'alert',
+      system: ClientSystem.SERVICE_ARCHITECTURE,
+      data: { message: 'Monitoring stream initialized' },
+      timestamp: Date.now()
+    };
   }
 
-  markPerformance(name: string): void {
-    this.performance.mark(name);
+  /**
+   * Export monitoring data for analysis or backup
+   */
+  exportMonitoringData(timeRange?: { start: number; end: number }): {
+    metadata: {
+      exportTime: number;
+      timeRange: { start: number; end: number };
+      version: string;
+    };
+    systemStatus: MonitoringSystemStatus[];
+    errorData: any[];
+    performanceData: any[];
+    analytics: any;
+  } {
+    const range = timeRange || {
+      start: Date.now() - 24 * 60 * 60 * 1000,
+      end: Date.now()
+    };
+
+    return {
+      metadata: {
+        exportTime: Date.now(),
+        timeRange: range,
+        version: '1.0.0'
+      },
+      systemStatus: Array.from(this.systemStatus.values()),
+      errorData: this.aggregationService.getSystemErrors(ClientSystem.SERVICE_ARCHITECTURE, range),
+      performanceData: this.performanceMonitor.getPerformanceData(undefined, undefined, range),
+      analytics: {
+        crossSystem: this.analyticsService.getCrossSystemAnalytics(),
+        trends: this.trendService.analyzeTrends(range),
+        impacts: this.performanceMonitor.getSystemPerformanceImpacts(range)
+      }
+    };
   }
 
-  measurePerformance(name: string, startMark?: string, endMark?: string): void {
-    this.performance.measure(name, startMark, endMark);
+  /**
+   * Reset monitoring data (useful for testing or maintenance)
+   */
+  resetMonitoringData(): void {
+    // Reset all services
+    this.systemStatus.clear();
+    this.initializeSystemStatus();
+
+    // Note: Individual services would need their own reset methods
+    console.warn('Monitoring data reset - individual services may need manual reset');
   }
 
-  getPerformanceMetrics() {
-    return this.performance.getMetrics();
-  }
+  /**
+   * Get monitoring system diagnostics
+   */
+  getDiagnostics(): {
+    services: {
+      aggregation: boolean;
+      analytics: boolean;
+      trends: boolean;
+      performance: boolean;
+    };
+    systems: Record<ClientSystem, boolean>;
+    memoryUsage: number;
+    uptime: number;
+  } {
+    const startTime = Date.now() - (24 * 60 * 60 * 1000); // Assume service started recently
 
-  getCoreWebVitals() {
-    return this.performance.getCoreWebVitals();
+    return {
+      services: {
+        aggregation: true, // Assume running
+        analytics: true,
+        trends: true,
+        performance: true
+      },
+      systems: Object.values(ClientSystem).reduce((acc, system) => {
+        acc[system] = this.systemStatus.get(system)?.monitoringActive || false;
+        return acc;
+      }, {} as Record<ClientSystem, boolean>),
+      memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
+      uptime: Date.now() - startTime
+    };
   }
 
   destroy(): void {
-    if (this.performance) {
-      this.performance.destroy();
+    if (this.integrationInterval) {
+      clearInterval(this.integrationInterval);
+      this.integrationInterval = null;
     }
-    if (this.errorMonitoring) {
-      this.errorMonitoring.destroy();
-    }
-    this.initialized = false;
+
+    // Destroy individual services
+    this.trendService.destroy();
+    this.performanceMonitor.destroy();
   }
 }
 
-// Auto-initialize based on environment variables
-const autoInitialize = () => {
-  const config: MonitoringConfig = {
-    environment: process.env.REACT_APP_ENV || 'development',
-    version: process.env.REACT_APP_VERSION || '1.0.0',
-    enableSentry: process.env.REACT_APP_ENABLE_ERROR_REPORTING === 'true',
-    enablePerformanceMonitoring: process.env.REACT_APP_ENABLE_PERFORMANCE_MONITORING === 'true',
-    enableErrorMonitoring: process.env.REACT_APP_ENABLE_ERROR_REPORTING === 'true',
-    sentryDsn: process.env.REACT_APP_SENTRY_DSN,
-    sampleRates: {
-      sentry: parseFloat(process.env.REACT_APP_SENTRY_SAMPLE_RATE || '0.1'),
-      traces: parseFloat(process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE || '0.1'),
-      replays: parseFloat(process.env.REACT_APP_SENTRY_REPLAYS_SAMPLE_RATE || '0.01'),
-    },
-  };
+// Export singleton instance
+export const monitoringIntegration = MonitoringIntegrationService.getInstance();
+export { MonitoringIntegrationService };
 
-  const monitoring = MonitoringIntegration.getInstance();
-  monitoring.initialize(config).catch(error => {
-    console.error('Failed to auto-initialize monitoring:', error);
-  });
-};
+// Export convenience functions
+export const reportError = (error: any, context: ErrorContext) =>
+  monitoringIntegration.reportError(error, context);
 
-// Auto-initialize in browser environment
-if (typeof window !== 'undefined') {
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoInitialize);
-  } else {
-    autoInitialize();
-  }
-}
+export const trackPerformance = (metrics: PerformanceMetrics) =>
+  monitoringIntegration.trackPerformance(metrics);
 
-export { MonitoringIntegration };
-export type { MonitoringConfig };
-export default MonitoringIntegration;
+export const getSystemHealth = () =>
+  monitoringIntegration.getSystemHealthOverview();

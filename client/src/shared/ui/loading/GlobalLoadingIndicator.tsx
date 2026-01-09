@@ -3,7 +3,7 @@
 import { Loader2, Network } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 import { useGlobalLoading } from './GlobalLoadingProvider';
 import { LoadingOperation, LoadingPriority } from './types';

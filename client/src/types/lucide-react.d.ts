@@ -70,6 +70,17 @@ declare module 'lucide-react' {
   export const ArrowUp: LucideIcon;
   export const ArrowDown: LucideIcon;
 
+  // Additional icons (compat)
+  export const ThumbsDown: LucideIcon;
+  export const Reply: LucideIcon;
+  export const Flag: LucideIcon;
+  export const HardDrive: LucideIcon;
+  export const Monitor: LucideIcon;
+  export const Vote: LucideIcon;
+  export const Cpu: LucideIcon;
+  export const XCircle: LucideIcon;
+  export const Book: LucideIcon;
+
   // Missing icons - provide fallback types
   export const Info: LucideIcon;
   export const Globe: LucideIcon;

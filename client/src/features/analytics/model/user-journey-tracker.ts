@@ -382,6 +382,53 @@ class UserJourneyTracker {
       };
     });
   }
+
+  // Return a serialized export of journey history
+  exportJourneyData(format: 'json' | 'csv' = 'json'): string {
+    if (format === 'json') {
+      return JSON.stringify(this.journeyHistory.map(j => ({ ...j })), null, 2);
+    }
+
+    // Minimal CSV: session_id,user_id,user_role,startTime,endTime,totalTimeSpent,completed,conversionEvents
+    const rows = [
+      'session_id,user_id,user_role,startTime,endTime,totalTimeSpent,completed,conversionEvents',
+    ];
+    this.journeyHistory.forEach(j => {
+      rows.push(
+        [
+          j.session_id,
+          j.user_id || '',
+          j.user_role,
+          j.startTime.toISOString(),
+          j.endTime ? j.endTime.toISOString() : '',
+          j.totalTimeSpent,
+          String(Boolean(j.completed)),
+          `"${(j.conversionEvents || []).join(';')}"`,
+        ].join(',')
+      );
+    });
+    return rows.join('\n');
+  }
+
+  getActiveJourneyCount(): number {
+    // Active journeys are those without an endTime or recently ended (last 30 minutes)
+    const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
+    return this.journeyHistory.filter(j => !j.endTime || (j.endTime && j.endTime.getTime() > thirtyMinutesAgo)).length;
+  }
+
+  getJourney(session_id: string): UserJourney | null {
+    if (this.currentJourney && this.currentJourney.session_id === session_id) return this.currentJourney;
+    return this.journeyHistory.find(j => j.session_id === session_id) || null;
+  }
+
+  clearOldJourneys(olderThanMs: number): void {
+    if (olderThanMs <= 0) {
+      this.journeyHistory = [];
+      return;
+    }
+    const cutoff = Date.now() - olderThanMs;
+    this.journeyHistory = this.journeyHistory.filter(j => (j.endTime ? j.endTime.getTime() > cutoff : true));
+  }
 }
 
 export const userJourneyTracker = new UserJourneyTracker();

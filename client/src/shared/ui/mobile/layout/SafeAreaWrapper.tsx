@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@/utils/cn';
 
 interface SafeAreaWrapperProps {
   children: React.ReactNode;
