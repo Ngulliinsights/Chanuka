@@ -79,7 +79,7 @@ const vector = (dimensions: number) =>
 export const contentEmbeddings = pgTable(
   "content_embeddings",
   {
-    ...primaryKeyUuid(),
+    id: primaryKeyUuid(),
 
     // Content identification
     content_type: contentTypeEnum("content_type").notNull(),
@@ -179,7 +179,7 @@ export const contentEmbeddings = pgTable(
 export const searchQueries = pgTable(
   "search_queries",
   {
-    ...primaryKeyUuid(),
+    id: primaryKeyUuid(),
     user_id: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
     session_id: varchar("session_id", { length: 100 }), // Track multi-query sessions
 
@@ -280,7 +280,7 @@ export const searchQueries = pgTable(
 export const searchAnalytics = pgTable(
   "search_analytics",
   {
-    ...primaryKeyUuid(),
+    id: primaryKeyUuid(),
     analytics_date: date("analytics_date").notNull(),
     analytics_hour: integer("analytics_hour"), // 0-23 for hourly breakdown
 
