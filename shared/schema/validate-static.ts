@@ -106,7 +106,9 @@ function extractColumns(tableContent: string): ColumnDef[] {
   let match;
 
   while ((match = columnRegex.exec(tableContent)) !== null) {
-    const [, name, type, , modifiers] = match;
+    const name = match[1] ?? "";
+    const type = match[2] ?? "";
+    const modifiers = match[4] ?? "";
     columns.push({
       name,
       type: type.replace(/^(text|integer|timestamp|uuid|varchar|boolean).*/, "$1"),
@@ -129,7 +131,9 @@ function extractForeignKeys(tableContent: string): ForeignKeyDef[] {
   let match;
 
   while ((match = fkRegex.exec(tableContent)) !== null) {
-    const [, column, referencedTable, referencedColumn] = match;
+    const column = match[1] ?? "";
+    const referencedTable = match[2] ?? "";
+    const referencedColumn = match[3] ?? "";
     foreignKeys.push({
       column,
       referencedTable,
@@ -149,7 +153,9 @@ function extractIndexes(content: string): string[] {
   let match;
 
   while ((match = indexRegex.exec(content)) !== null) {
-    indexes.push(match[1]);
+    if (match[1]) {
+      indexes.push(match[1]);
+    }
   }
 
   return indexes;
@@ -179,6 +185,7 @@ function hasPrimaryKey(tableBody: string, columns: ColumnDef[]): boolean {
 /**
  * Scans a directory for schema files and extracts table/enum definitions
  */
+// eslint-disable-next-line complexity
 function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } {
   const tables: TableDef[] = [];
   const enums: EnumDef[] = [];
@@ -194,7 +201,10 @@ function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } 
     let match;
 
     while ((match = tableRegex.exec(content)) !== null) {
-      const [fullMatch, varName, tableName, tableBody] = match;
+      const fullMatch = match[0] ?? "";
+      const varName = match[1] ?? "";
+      const tableName = match[2] ?? "";
+      const tableBody = match[3] ?? "";
       const columns = extractColumns(tableBody);
       const foreignKeys = extractForeignKeys(tableBody);
       const indexes = extractIndexes(fullMatch);
@@ -215,7 +225,9 @@ function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } 
     const enumRegex = /export\s+const\s+(\w+)\s*=\s*pgEnum\s*\(\s*["'](\w+)["']\s*,\s*\[([\s\S]*?)\]\s*\)/g;
 
     while ((match = enumRegex.exec(content)) !== null) {
-      const [, varName, enumName, valuesStr] = match;
+      const varName = match[1] ?? "";
+      const enumName = match[2] ?? "";
+      const valuesStr = match[3] ?? "";
       const values = valuesStr
         .split(",")
         .map((v) => v.trim().replace(/^['"]|['"]$/g, ""))
@@ -236,6 +248,7 @@ function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } 
 /**
  * Scans for relation definitions
  */
+// eslint-disable-next-line complexity
 function findRelations(dir: string): RelationDef[] {
   const relations: RelationDef[] = [];
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".ts") && !f.startsWith("."));
@@ -249,7 +262,8 @@ function findRelations(dir: string): RelationDef[] {
     let match;
 
     while ((match = relRegex.exec(content)) !== null) {
-      const [, varName, baseTable] = match;
+      const varName = match[1] ?? "";
+      const baseTable = match[2] ?? "";
 
       // Extract individual relations within the definition
       const relationTypes: string[] = [];
@@ -258,10 +272,14 @@ function findRelations(dir: string): RelationDef[] {
 
       let relMatch;
       while ((relMatch = oneRegex.exec(content)) !== null) {
-        relationTypes.push(`one:${relMatch[1]}`);
+        if (relMatch[1]) {
+          relationTypes.push(`one:${relMatch[1]}`);
+        }
       }
       while ((relMatch = manyRegex.exec(content)) !== null) {
-        relationTypes.push(`many:${relMatch[1]}`);
+        if (relMatch[1]) {
+          relationTypes.push(`many:${relMatch[1]}`);
+        }
       }
 
       relations.push({
@@ -387,8 +405,9 @@ function validateNamingConventions(
 function validateEnumValues(enumDef: EnumDef): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  if (STANDARD_ENUM_VALUES[enumDef.name]) {
-    const expectedValues = STANDARD_ENUM_VALUES[enumDef.name];
+  const enumValues = STANDARD_ENUM_VALUES[enumDef.name];
+  if (enumValues) {
+    const expectedValues = enumValues;
     const missingValues = expectedValues.filter((v) => !enumDef.values.includes(v));
 
     if (missingValues.length > 0) {
