@@ -3,10 +3,10 @@
  * IMPROVEMENTS: Added LIMIT clauses to all queries, pagination support
  */
 import type { Driver } from 'neo4j-driver';
-import { executeCypherSafely } from '../utils/session-manager';
-import { withPagination, PaginationOptions } from '../utils/query-builder';
+
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
-import { QUERY_CONFIG } from '../config/graph-config';
+import { executeCypherSafely } from '../utils/session-manager';
+import { withPagination, type PaginationOptions } from '../utils/query-builder';
 
 const errorHandler = new GraphErrorHandler();
 
@@ -45,7 +45,7 @@ export async function findRelatedBills(driver: Driver, billId: string, limit: nu
       { billId, limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: any) => ({
       id: r.get('id'),
       title: r.get('title'),
       shared_topics: Number(r.get('shared_topics'))
@@ -69,7 +69,7 @@ export async function getNodeDegrees(driver: Driver, nodeType: string, options: 
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r: any) => ({
       id: r.get('id'),
       name: r.get('name'),
       degree: Number(r.get('degree'))

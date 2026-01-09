@@ -2,10 +2,11 @@
  * Network Queries (REFACTORED)
  * IMPROVEMENTS: Added LIMIT clauses, pagination, proper error handling
  */
-import { Driver } from 'neo4j-driver';
-import { executeCypherSafely } from '../utils/session-manager';
-import { withPagination, PaginationOptions } from '../utils/query-builder';
+import type { Driver } from 'neo4j-driver';
+
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
+import { executeCypherSafely } from '../utils/session-manager';
+import { withPagination, type PaginationOptions } from '../utils/query-builder';
 
 const errorHandler = new GraphErrorHandler();
 
@@ -22,7 +23,7 @@ export async function getConnectedNodes(driver: Driver, nodeId: string, options:
 
   try {
     const result = await executeCypherSafely(driver, query, { ...params, nodeId }, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r: any) => ({
       id: r.get('id'),
       relationship_type: r.get('relationship_type'),
       node_type: r.get('node_type')

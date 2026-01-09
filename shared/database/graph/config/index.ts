@@ -11,11 +11,9 @@ export {
   resetGraphConfig,
   createDriverConfig,
   validateConnectionUri,
-  type Neo4jConnectionConfig,
-  type GraphFeatureFlags,
-  type GraphEnvironment,
-} from './graph-config';
-
-export default {
-  graphConfig: () => import('./graph-config'),
-};
+  NEO4J_CONFIG,
+  SYNC_CONFIG,
+  QUERY_CONFIG,
+  CACHE_CONFIG,
+  ENGAGEMENT_CONFIG,
+  validateConfig,

@@ -90,8 +90,9 @@ export const descriptionField = () =>
 /**
  * Standard status field for state machines
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const statusField = (enumType: any, defaultValue: string) => {
-  const enumNameOrStatus = enumType.name || "status";
+  const enumNameOrStatus = enumType.name ?? "status";
   return enumType(enumNameOrStatus).notNull().default(defaultValue);
 };
 
@@ -186,6 +187,7 @@ export interface MetadataEntity extends BaseEntity {
 
 /**
  * Searchable entity with full-text index fields
+ * cspell:ignore tsvector
  */
 export interface SearchableEntity extends BaseEntity {
   title: string;

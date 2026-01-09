@@ -123,7 +123,7 @@ export function assertEnum(
 ): asserts value is string {
   if (!isValidEnum(enumName, value)) {
     const validValues = ENUM_REGISTRY[enumName];
-    const suggestion = findClosestMatch(String(value), validValues);
+    const suggestion = findClosestMatch(String(value ?? ''), validValues);
     const message = suggestion
       ? `"${value}" is invalid for ${enumName}. Did you mean: "${suggestion}"?`
       : `"${value}" is not a valid value for ${enumName}. Valid values: ${validValues.join(', ')}`;
@@ -138,50 +138,49 @@ export function assertEnum(
 function findClosestMatch(input: string, validValues: readonly string[]): string | null {
   if (validValues.length === 0) return null;
 
-  let closest = validValues[0];
-  let minDistance = levenshteinDistance(input, closest);
+  let closest: string | null = null;
+  let minDistance = Infinity;
 
   for (const value of validValues) {
     const distance = levenshteinDistance(input, value);
-    if (distance < minDistance && distance <= 3) {  // Max 3 character changes
+    if (distance < minDistance) {
       minDistance = distance;
       closest = value;
     }
   }
 
-  return minDistance <= 3 ? closest : null;
+  return minDistance <= 3 && closest !== null ? closest : null;
 }
 
 /**
  * Calculates Levenshtein distance between two strings
  * Used for typo correction suggestions
+ * Uses optimized space-efficient algorithm
  */
 function levenshteinDistance(a: string, b: string): number {
-  const matrix: number[][] = [];
+  const aLen = a.length;
+  const bLen = b.length;
 
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
+  if (aLen === 0) return bLen;
+  if (bLen === 0) return aLen;
 
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
+  let prev: number[] = Array.from({ length: bLen + 1 }, (_, i) => i);
+  let curr: number[] = Array(bLen + 1);
 
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,  // substitution
-          matrix[i][j - 1] + 1,      // insertion
-          matrix[i - 1][j] + 1       // deletion
-        );
-      }
+  for (let i = 1; i <= aLen; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= bLen; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(
+        (prev[j] ?? 0) + 1,      // deletion
+        (curr[j - 1] ?? 0) + 1,  // insertion
+        (prev[j - 1] ?? 0) + cost // substitution
+      );
     }
+    [prev, curr] = [curr, prev];
   }
 
-  return matrix[b.length][a.length];
+  return prev[bLen] ?? 0;
 }
 
 /**

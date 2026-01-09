@@ -47,7 +47,6 @@ export {
 
   // Activity & anomaly logging
   suspiciousActivityLogs,
-  suspiciousActivityLogsRelations,
 
   // Reputation system
   reputationScores,
@@ -71,12 +70,4 @@ export {
   iprsVerificationStatusEnum,
 } from "../safeguards";
 
-export type {
-  RateLimitAction,
-  ModerationAction,
-  FlagReason,
-  CibPattern,
-  ReputationSource,
-  VerificationMethod,
-  IprsVerificationStatus,
-} from "../safeguards";
+// TypeScript types are inferred from the enum definitions above

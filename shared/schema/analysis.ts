@@ -2,11 +2,10 @@
 // ANALYSIS SCHEMA - Drizzle table for analysis records
 // ============================================================================
 import { sql } from "drizzle-orm";
-import { pgTable, numeric, text, jsonb, boolean, timestamp, uuid as uuidType, varchar, index } from "drizzle-orm/pg-core";
-
-import { bills, users } from "./foundation";
+import { pgTable, numeric, text, jsonb, boolean, uuid as uuidType, varchar, index } from "drizzle-orm/pg-core";
 
 import { auditFields } from "./base-types";
+import { bills, users } from "./foundation";
 export const analysis = pgTable("analysis", {
   id: uuidType("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuidType("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),

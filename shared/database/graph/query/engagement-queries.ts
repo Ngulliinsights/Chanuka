@@ -3,10 +3,11 @@
  * IMPROVEMENTS: Fixed missing LIMIT clauses, added pagination, error handling
  */
 import type { Driver } from 'neo4j-driver';
-import { executeCypherSafely } from '../utils/session-manager';
-import { withPagination, PaginationOptions } from '../utils/query-builder';
+
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
 import { QUERY_CONFIG } from '../config/graph-config';
+import { executeCypherSafely } from '../utils/session-manager';
+import { withPagination, type PaginationOptions } from '../utils/query-builder';
 
 const errorHandler = new GraphErrorHandler();
 
@@ -22,7 +23,7 @@ export async function getMostEngagedUsers(driver: Driver, options: PaginationOpt
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r: any) => ({
       id: r.get('id'),
       email: r.get('email'),
       engagement_score: Number(r.get('engagement_score'))
@@ -65,11 +66,11 @@ export async function getUserActivity(driver: Driver, userId: string): Promise<a
     const result = await executeCypherSafely(
       driver,
       `MATCH (u:User {id: $userId})
-       OPTIONAL MATCH (u)-[v:VOTED_ON]->()
+       OPTIONAL MATCH (u)-[v:VOTED_ON]-()
        WITH u, count(v) as votes
        OPTIONAL MATCH (u)-[:AUTHORED]->(c:Comment)
        WITH u, votes, count(c) as comments
-       OPTIONAL MATCH (u)-[b:BOOKMARKED]->()
+       OPTIONAL MATCH (u)-[b:BOOKMARKED]-()
        RETURN votes, comments, count(b) as bookmarks,
               coalesce(u.total_engagement_score, 0) as total_score`,
       { userId },
@@ -78,7 +79,7 @@ export async function getUserActivity(driver: Driver, userId: string): Promise<a
 
     if (result.records.length === 0) return null;
 
-    const r = result.records[0];
+    const r: any = result.records[0];
     return {
       votes: Number(r.get('votes')),
       comments: Number(r.get('comments')),

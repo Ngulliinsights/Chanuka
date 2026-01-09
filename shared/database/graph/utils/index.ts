@@ -20,11 +20,7 @@ export {
   CypherQueryBuilder,
   createQueryBuilder,
   buildFromTemplate,
+  withPagination,
   type CypherClause,
   type QueryBuilderOptions,
-} from './query-builder';
-
-export default {
-  sessionManager: () => import('./session-manager'),
-  queryBuilder: () => import('./query-builder'),
-};
+  type PaginationOptions,

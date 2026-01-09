@@ -85,7 +85,7 @@ export const sessions = pgTable("sessions", {
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
 
   // Session metadata: IP, user agent, device info, geolocation
-  ...metadataField(),
+  metadata: metadataField(),
 
   // Security tracking - enables session timeout detection
   last_activity_at: timestamp("last_activity_at", { withTimezone: true }).notNull().defaultNow(),
@@ -93,11 +93,10 @@ export const sessions = pgTable("sessions", {
   ...auditFields(),
 }, (table) => ({
   // Hot path: Find active sessions for user (most common query)
-  userExpiresIdx: index("idx_sessions_user_expires").on(table.user_id, table.expires_at.desc()),
+  userExpiresIdx: index("idx_sessions_user_expires").on(table.user_id),
 
   // Cleanup query: Delete expired sessions
-  expiresAtIdx: index("idx_sessions_expires_at").on(table.expires_at)
-    .where(sql`${table.expires_at} < NOW()`),
+  expiresAtIdx: index("idx_sessions_expires_at").on(table.expires_at),
 
   // Security audit: Track inactive sessions
   lastActivityIdx: index("idx_sessions_last_activity").on(table.last_activity_at),
