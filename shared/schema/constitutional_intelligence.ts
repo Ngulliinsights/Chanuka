@@ -1,5 +1,5 @@
 // ============================================================================
-// CONSTITUTIONAL INTELLIGENCE SCHEMA - PRODUCTION OPTIMIZED v2.0
+// CONSTITUTIONAL INTELLIGENCE SCHEMA - PRODUCTION OPTIMIZED v2.2
 // ============================================================================
 // Constitutional analysis, legal precedents, and expert review infrastructure
 // Enables the platform's core value proposition: constitutional analysis
@@ -7,47 +7,46 @@
 
 import { sql, relations } from "drizzle-orm";
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, unique, date, smallint, check, foreignKey
+  pgTable, index, unique, check, foreignKey
 } from "drizzle-orm/pg-core";
 
-import { bills, users, sponsors } from "./foundation";
 import { auditFields, primaryKeyUuid } from "./base-types";
+import { bills, users, sponsors } from "./foundation";
 
 // ============================================================================
 // CONSTITUTIONAL PROVISIONS - Kenya's Constitution 2010 Structure
 // ============================================================================
 
-export const constitutional_provisions = pgTable("constitutional_provisions", {
-  ...primaryKeyUuid(),
+export const constitutional_provisions = pgTable("constitutional_provisions", (t) => ({
+  id: primaryKeyUuid(),
 
   // Constitutional hierarchy: Chapter > Article > Section > Clause
-  chapter_number: smallint("chapter_number").notNull(),
-  article_number: smallint("article_number"),
-  section_number: smallint("section_number"),
-  clause_number: smallint("clause_number"),
+  chapter_number: t.smallint("chapter_number").notNull(),
+  article_number: t.smallint("article_number"),
+  section_number: t.smallint("section_number"),
+  clause_number: t.smallint("clause_number"),
 
   // Content
-  title: varchar("title", { length: 500 }).notNull(),
-  full_text: text("full_text").notNull(),
-  summary: text("summary"),
+  title: t.varchar("title", { length: 500 }).notNull(),
+  full_text: t.text("full_text").notNull(),
+  summary: t.text("summary"),
 
   // Legal metadata
-  is_fundamental_right: boolean("is_fundamental_right").notNull().default(false),
+  is_fundamental_right: t.boolean("is_fundamental_right").notNull().default(false),
   // Bill of Rights: Articles 19-59
 
-  is_directive_principle: boolean("is_directive_principle").notNull().default(false),
+  is_directive_principle: t.boolean("is_directive_principle").notNull().default(false),
   // National Values and Principles: Article 10
 
-  enforcement_mechanism: varchar("enforcement_mechanism", { length: 100 }),
+  enforcement_mechanism: t.varchar("enforcement_mechanism", { length: 100 }),
   // Values: 'judicial_review', 'legislative_action', 'administrative_action', 'automatic'
 
   // Cross-references and relationships
-  related_provisions: uuid("related_provisions").array(),
-  keywords: varchar("keywords", { length: 100 }).array(),
+  related_provisions: t.uuid("related_provisions").array(),
+  keywords: t.varchar("keywords", { length: 100 }).array(),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Unique constitutional reference (one row per article/section/clause)
   constitutionalRefUnique: unique("constitutional_provisions_ref_unique")
     .on(table.chapter_number, table.article_number, table.section_number, table.clause_number),
@@ -58,7 +57,7 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 
   // Partial index: Fundamental rights (Bill of Rights)
   fundamentalRightsIdx: index("idx_constitutional_provisions_fundamental_rights")
-    .on(table.chapter_number, table.article_number)
+    .on(table.chapter_number)
     .where(sql`${table.is_fundamental_right} = true`),
 
   // Directive principles lookup
@@ -81,20 +80,20 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 // CONSTITUTIONAL ANALYSES - AI + Expert Analysis of Bills
 // ============================================================================
 
-export const constitutional_analyses = pgTable("constitutional_analyses", {
-  ...primaryKeyUuid(),
-  bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
+export const constitutional_analyses = pgTable("constitutional_analyses", (t) => ({
+  id: primaryKeyUuid(),
+  bill_id: t.uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Analysis metadata
-  analysis_type: varchar("analysis_type", { length: 50 }).notNull(),
+  analysis_type: t.varchar("analysis_type", { length: 50 }).notNull(),
   // Values: 'automated', 'expert', 'hybrid', 'crowd_sourced'
 
-  confidence_score: numeric("confidence_score", { precision: 3, scale: 2 }),
+  confidence_score: t.numeric("confidence_score", { precision: 3, scale: 2 }),
   // 0.00 to 1.00 scale
 
   // Constitutional implications
-  constitutional_provisions_cited: uuid("constitutional_provisions_cited").array(),
-  potential_violations: jsonb("potential_violations").notNull().default(sql`'{}'::jsonb`),
+  constitutional_provisions_cited: t.uuid("constitutional_provisions_cited").array(),
+  potential_violations: t.jsonb("potential_violations").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "provision": "Article 47",
@@ -104,31 +103,31 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
     }
   ] */
 
-  constitutional_alignment: varchar("constitutional_alignment", { length: 20 }),
+  constitutional_alignment: t.varchar("constitutional_alignment", { length: 20 }),
   // Values: 'aligned', 'concerning', 'violates', 'neutral'
 
   // Analysis content
-  executive_summary: text("executive_summary").notNull(),
-  detailed_analysis: text("detailed_analysis"),
-  recommendations: text("recommendations"),
+  executive_summary: t.text("executive_summary").notNull(),
+  detailed_analysis: t.text("detailed_analysis"),
+  recommendations: t.text("recommendations"),
 
   // Expert review workflow
-  requires_expert_review: boolean("requires_expert_review").notNull().default(false),
-  expert_reviewed: boolean("expert_reviewed").notNull().default(false),
-  expert_reviewer_id: uuid("expert_reviewer_id").references(() => users.id, { onDelete: "set null" }),
-  expert_notes: text("expert_notes"),
-  expert_reviewed_at: timestamp("expert_reviewed_at", { withTimezone: true }),
+  requires_expert_review: t.boolean("requires_expert_review").notNull().default(false),
+  expert_reviewed: t.boolean("expert_reviewed").notNull().default(false),
+  expert_reviewer_id: t.uuid("expert_reviewer_id").references(() => users.id, { onDelete: "set null" }),
+  expert_notes: t.text("expert_notes"),
+  expert_reviewed_at: t.timestamp("expert_reviewed_at", { withTimezone: true }),
 
   // Version control and audit trail
-  analysis_version: integer("analysis_version").notNull().default(1),
-  superseded_by: uuid("superseded_by"),
+  analysis_version: t.integer("analysis_version").notNull().default(1),
+  superseded_by: t.uuid("superseded_by"),
 
   // Publication status
-  is_published: boolean("is_published").notNull().default(false),
-  published_at: timestamp("published_at", { withTimezone: true }),
+  is_published: t.boolean("is_published").notNull().default(false),
+  published_at: t.timestamp("published_at", { withTimezone: true }),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Self-referencing foreign key for version control
   supersededByFk: foreignKey({
     columns: [table.superseded_by],
@@ -137,7 +136,7 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
 
   // Hot path: Get current analysis for bill
   billCurrentAnalysisIdx: index("idx_constitutional_analyses_bill_current")
-    .on(table.bill_id, table.analysis_version.desc())
+    .on(table.bill_id, table.analysis_version)
     .where(sql`${table.superseded_by} IS NULL AND ${table.is_published} = true`),
 
   // Expert review queue (most common query)
@@ -147,7 +146,7 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
 
   // Alignment and confidence queries
   alignmentConfidenceIdx: index("idx_constitutional_analyses_alignment_confidence")
-    .on(table.constitutional_alignment, table.confidence_score.desc()),
+    .on(table.constitutional_alignment),
 
   // Violations analysis
   alignmentViolationsIdx: index("idx_constitutional_analyses_violations")
@@ -172,42 +171,42 @@ export const constitutional_analyses = pgTable("constitutional_analyses", {
 // ============================================================================
 // LEGAL PRECEDENTS - Kenyan Case Law and Judicial Decisions
 // ============================================================================
-export const legal_precedents = pgTable("legal_precedents", {
-  ...primaryKeyUuid(),
+export const legal_precedents = pgTable("legal_precedents", (t) => ({
+  id: primaryKeyUuid(),
 
   // Case identification
-  case_name: varchar("case_name", { length: 500 }).notNull(),
-  case_number: varchar("case_number", { length: 100 }),
-  court_level: varchar("court_level", { length: 50 }).notNull(),
+  case_name: t.varchar("case_name", { length: 500 }).notNull(),
+  case_number: t.varchar("case_number", { length: 100 }),
+  court_level: t.varchar("court_level", { length: 50 }).notNull(),
   // Values: 'Supreme Court', 'Court of Appeal', 'High Court', 'Magistrates Court',
   //         'Environment and Land Court', 'Employment and Labour Relations Court'
 
   // Case details
-  judgment_date: date("judgment_date"),
-  judges: varchar("judges", { length: 100 }).array(),
-  case_summary: text("case_summary"),
-  legal_principle: text("legal_principle"),
+  judgment_date: t.date("judgment_date"),
+  judges: t.varchar("judges", { length: 100 }).array(),
+  case_summary: t.text("case_summary"),
+  legal_principle: t.text("legal_principle"),
   // The ratio decidendi - binding legal principle established
 
   // Constitutional relevance
-  constitutional_provisions_involved: uuid("constitutional_provisions_involved").array(),
-  precedent_strength: varchar("precedent_strength", { length: 20 }),
+  constitutional_provisions_involved: t.uuid("constitutional_provisions_involved").array(),
+  precedent_strength: t.varchar("precedent_strength", { length: 20 }),
   // Values: 'binding', 'persuasive', 'distinguishable', 'overruled'
 
   // Document references
-  judgment_url: varchar("judgment_url", { length: 500 }),
-  citation: varchar("citation", { length: 200 }),
+  judgment_url: t.varchar("judgment_url", { length: 500 }),
+  citation: t.varchar("citation", { length: 200 }),
   // Kenya Law Reports format: [2020] eKLR
 
   // Impact assessment
-  cited_by_count: integer("cited_by_count").notNull().default(0),
+  cited_by_count: t.integer("cited_by_count").notNull().default(0),
   // How many times this precedent has been cited
 
-  overruled_by: uuid("overruled_by"),
+  overruled_by: t.uuid("overruled_by"),
   // If this precedent was overruled by a higher court
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Self-referencing foreign key for overruling
   overruledByFk: foreignKey({
     columns: [table.overruled_by],
@@ -219,16 +218,16 @@ export const legal_precedents = pgTable("legal_precedents", {
 
   // Court hierarchy queries (recent judgments first)
   courtLevelDateIdx: index("idx_legal_precedents_court_level_date")
-    .on(table.court_level, table.judgment_date.desc()),
+    .on(table.court_level, table.judgment_date),
 
   // Binding precedents (Supreme Court)
   bindingPrecedentsIdx: index("idx_legal_precedents_binding")
-    .on(table.court_level, table.precedent_strength, table.judgment_date.desc())
+    .on(table.court_level, table.precedent_strength)
     .where(sql`${table.precedent_strength} = 'binding'`),
 
   // Citation impact
   citedByIdx: index("idx_legal_precedents_cited_by")
-    .on(table.cited_by_count.desc())
+    .on(table.cited_by_count)
     .where(sql`${table.cited_by_count} > 0`),
 
   // GIN indexes for arrays
@@ -246,44 +245,44 @@ export const legal_precedents = pgTable("legal_precedents", {
 // EXPERT REVIEW QUEUE - Human Expert Oversight Workflow
 // ============================================================================
 
-export const expert_review_queue = pgTable("expert_review_queue", {
-  ...primaryKeyUuid(),
+export const expert_review_queue = pgTable("expert_review_queue", (t) => ({
+  id: primaryKeyUuid(),
 
   // Review target
-  analysis_id: uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
-  bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
+  analysis_id: t.uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
+  bill_id: t.uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
 
   // Review priority and reason
-  priority_level: varchar("priority_level", { length: 20 }).notNull().default("medium"),
+  priority_level: t.varchar("priority_level", { length: 20 }).notNull().default("medium"),
   // Values: 'low', 'medium', 'high', 'urgent'
 
-  review_reason: varchar("review_reason", { length: 100 }).notNull(),
+  review_reason: t.varchar("review_reason", { length: 100 }).notNull(),
   // Values: 'low_confidence', 'complex_issue', 'public_interest',
   //         'controversial', 'constitutional_violation', 'precedent_conflict'
 
   // Expert assignment
-  assigned_expert_id: uuid("assigned_expert_id").references(() => users.id, { onDelete: "set null" }),
-  assigned_at: timestamp("assigned_at", { withTimezone: true }),
+  assigned_expert_id: t.uuid("assigned_expert_id").references(() => users.id, { onDelete: "set null" }),
+  assigned_at: t.timestamp("assigned_at", { withTimezone: true }),
 
   // Auto-assignment fields
-  required_expertise: varchar("required_expertise", { length: 100 }).array(),
+  required_expertise: t.varchar("required_expertise", { length: 100 }).array(),
   // Values: ['constitutional_law', 'administrative_law', 'human_rights', etc.]
 
   // Review workflow
-  status: varchar("status", { length: 20 }).notNull().default("pending"),
+  status: t.varchar("status", { length: 20 }).notNull().default("pending"),
   // Values: 'pending', 'assigned', 'in_review', 'completed', 'escalated', 'cancelled'
 
   // Completion tracking
-  started_at: timestamp("started_at", { withTimezone: true }),
-  completed_at: timestamp("completed_at", { withTimezone: true }),
-  review_duration_hours: numeric("review_duration_hours", { precision: 6, scale: 2 }),
+  started_at: t.timestamp("started_at", { withTimezone: true }),
+  completed_at: t.timestamp("completed_at", { withTimezone: true }),
+  review_duration_hours: t.numeric("review_duration_hours", { precision: 6, scale: 2 }),
 
-  review_notes: text("review_notes"),
-  review_outcome: varchar("review_outcome", { length: 50 }),
+  review_notes: t.text("review_notes"),
+  review_outcome: t.varchar("review_outcome", { length: 50 }),
   // Values: 'approved', 'approved_with_changes', 'rejected', 'needs_revision'
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: Pending queue (oldest first, high priority first)
   pendingQueueIdx: index("idx_expert_review_queue_pending")
     .on(table.status, table.priority_level, table.created_at)
@@ -300,7 +299,7 @@ export const expert_review_queue = pgTable("expert_review_queue", {
 
   // Performance analytics
   completedReviewsIdx: index("idx_expert_review_queue_completed")
-    .on(table.completed_at.desc(), table.review_duration_hours)
+    .on(table.completed_at)
     .where(sql`${table.status} = 'completed'`),
 
   // GIN index for expertise matching
@@ -316,22 +315,22 @@ export const expert_review_queue = pgTable("expert_review_queue", {
 // ANALYSIS AUDIT TRAIL - Complete Change History
 // ============================================================================
 
-export const analysis_audit_trail = pgTable("analysis_audit_trail", {
-  ...primaryKeyUuid(),
+export const analysis_audit_trail = pgTable("analysis_audit_trail", (t) => ({
+  id: primaryKeyUuid(),
 
   // Audit target
-  analysis_id: uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
+  analysis_id: t.uuid("analysis_id").notNull().references(() => constitutional_analyses.id, { onDelete: "cascade" }),
 
   // Action details
-  action_type: varchar("action_type", { length: 50 }).notNull(),
+  action_type: t.varchar("action_type", { length: 50 }).notNull(),
   // Values: 'created', 'updated', 'reviewed', 'superseded', 'published', 'unpublished'
 
-  actor_id: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
-  actor_type: varchar("actor_type", { length: 20 }).notNull(),
+  actor_id: t.uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+  actor_type: t.varchar("actor_type", { length: 20 }).notNull(),
   // Values: 'system', 'expert', 'admin', 'ai_model'
 
   // Change content
-  changes_made: jsonb("changes_made").notNull().default(sql`'{}'::jsonb`),
+  changes_made: t.jsonb("changes_made").notNull().default(sql`'{}'::jsonb`),
   /* Structure: {
     "field": "constitutional_alignment",
     "old_value": "concerning",
@@ -339,26 +338,26 @@ export const analysis_audit_trail = pgTable("analysis_audit_trail", {
     "confidence_change": 0.15
   } */
 
-  reason: text("reason"),
+  reason: t.text("reason"),
 
   // Security and tracking
-  ip_address: varchar("ip_address", { length: 45 }),
-  user_agent: text("user_agent"),
-  session_id: varchar("session_id", { length: 255 }),
+  ip_address: t.varchar("ip_address", { length: 45 }),
+  user_agent: t.text("user_agent"),
+  session_id: t.varchar("session_id", { length: 255 }),
 
-  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
+  created_at: t.timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}), (table) => ({
   // Hot path: Audit trail by analysis (recent first)
   analysisCreatedIdx: index("idx_analysis_audit_trail_analysis_created")
-    .on(table.analysis_id, table.created_at.desc()),
+    .on(table.analysis_id, table.created_at),
 
   // Action type tracking
   actionTypeCreatedIdx: index("idx_analysis_audit_trail_action_type")
-    .on(table.action_type, table.created_at.desc()),
+    .on(table.action_type, table.created_at),
 
   // Actor tracking
   actorTypeCreatedIdx: index("idx_analysis_audit_trail_actor_type")
-    .on(table.actor_type, table.actor_id, table.created_at.desc()),
+    .on(table.actor_type, table.actor_id, table.created_at),
 
   // GIN index for change content search
   changesIdx: index("idx_analysis_audit_trail_changes")
@@ -369,28 +368,28 @@ export const analysis_audit_trail = pgTable("analysis_audit_trail", {
 // CONSTITUTIONAL VULNERABILITIES - Systematic Weakness Tracking
 // ============================================================================
 
-export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabilities", {
-  ...primaryKeyUuid(),
+export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabilities", (t) => ({
+  id: primaryKeyUuid(),
 
   // Vulnerability identification
-  vulnerability_name: varchar("vulnerability_name", { length: 200 }).notNull().unique(),
-  source: varchar("source", { length: 20 }).notNull(),
+  vulnerability_name: t.varchar("vulnerability_name", { length: 200 }).notNull().unique(),
+  source: t.varchar("source", { length: 20 }).notNull(),
   // Values: 'UK', 'US', 'Kenyan', 'hybrid'
 
   // Risk assessment
-  severity: varchar("severity", { length: 20 }).notNull(),
+  severity: t.varchar("severity", { length: 20 }).notNull(),
   // Values: 'critical', 'high', 'medium', 'low'
 
-  exploitation_status: varchar("exploitation_status", { length: 30 }).notNull(),
+  exploitation_status: t.varchar("exploitation_status", { length: 30 }).notNull(),
   // Values: 'not_exploited', 'attempted', 'currently_exploited', 'fully_exploited', 'closed'
 
-  probability: numeric("probability", { precision: 3, scale: 2 }),
+  probability: t.numeric("probability", { precision: 3, scale: 2 }),
   // 0.00 to 1.00 (likelihood of exploitation)
 
   // Content
-  description: text("description").notNull(),
-  evidence: text("evidence"),
-  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
+  description: t.text("description").notNull(),
+  evidence: t.text("evidence"),
+  exploitation_examples: t.jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "date": "2023-05-15",
@@ -401,28 +400,28 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
   ] */
 
   // Research and analysis
-  research_questions: varchar("research_questions", { length: 500 }).array(),
+  research_questions: t.varchar("research_questions", { length: 500 }).array(),
 
   // Prevention and remediation
-  prevention_measures: text("prevention_measures"),
-  closure_strategy: text("closure_strategy"),
-  closure_difficulty: varchar("closure_difficulty", { length: 20 }),
+  prevention_measures: t.text("prevention_measures"),
+  closure_strategy: t.text("closure_strategy"),
+  closure_difficulty: t.varchar("closure_difficulty", { length: 20 }),
   // Values: 'easy', 'moderate', 'hard', 'requires_amendment'
 
   // Relationships
-  related_provisions: uuid("related_provisions").array(),
-  related_bills: uuid("related_bills").array(),
+  related_provisions: t.uuid("related_provisions").array(),
+  related_bills: t.uuid("related_bills").array(),
 
   // Tracking
-  first_identified_date: date("first_identified_date"),
-  last_exploitation_date: date("last_exploitation_date"),
-  times_exploited: integer("times_exploited").notNull().default(0),
+  first_identified_date: t.date("first_identified_date"),
+  last_exploitation_date: t.date("last_exploitation_date"),
+  times_exploited: t.integer("times_exploited").notNull().default(0),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: Active vulnerabilities by severity
   severityStatusIdx: index("idx_constitutional_vulnerabilities_severity_status")
-    .on(table.severity, table.exploitation_status, table.probability.desc())
+    .on(table.severity, table.exploitation_status, table.probability)
     .where(sql`${table.exploitation_status} != 'closed'`),
 
   // Source analysis
@@ -431,7 +430,7 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
 
   // Exploitation tracking
   exploitedIdx: index("idx_constitutional_vulnerabilities_exploited")
-    .on(table.exploitation_status, table.times_exploited.desc())
+    .on(table.exploitation_status, table.times_exploited)
     .where(sql`${table.times_exploited} > 0`),
 
   // GIN indexes for arrays
@@ -455,31 +454,31 @@ export const constitutional_vulnerabilities = pgTable("constitutional_vulnerabil
 // UNDERUTILIZED PROVISIONS - Dormant Constitutional Powers
 // ============================================================================
 
-export const underutilized_provisions = pgTable("underutilized_provisions", {
-  ...primaryKeyUuid(),
+export const underutilized_provisions = pgTable("underutilized_provisions", (t) => ({
+  id: primaryKeyUuid(),
 
   // Provision identification
-  provision_reference: varchar("provision_reference", { length: 50 }).notNull().unique(),
+  provision_reference: t.varchar("provision_reference", { length: 50 }).notNull().unique(),
   // Example: "Article 35", "Article 258"
 
-  provision_title: varchar("provision_title", { length: 200 }).notNull(),
+  provision_title: t.varchar("provision_title", { length: 200 }).notNull(),
 
   // Power assessment
-  power_granted: text("power_granted").notNull(),
-  current_use_rate: varchar("current_use_rate", { length: 20 }),
+  power_granted: t.text("power_granted").notNull(),
+  current_use_rate: t.varchar("current_use_rate", { length: 20 }),
   // Values: 'never_used', '<5%', '<10%', 'low', 'medium'
 
-  potential_impact: varchar("potential_impact", { length: 20 }).notNull(),
+  potential_impact: t.varchar("potential_impact", { length: 20 }).notNull(),
   // Values: 'very_high', 'high', 'medium', 'low'
 
   // Usage tracking
-  times_invoked: integer("times_invoked").notNull().default(0),
-  last_invoked_date: date("last_invoked_date"),
-  invocation_examples: jsonb("invocation_examples").notNull().default(sql`'{}'::jsonb`),
+  times_invoked: t.integer("times_invoked").notNull().default(0),
+  last_invoked_date: t.date("last_invoked_date"),
+  invocation_examples: t.jsonb("invocation_examples").notNull().default(sql`'{}'::jsonb`),
 
   // Activation strategy
-  activation_strategy: text("activation_strategy"),
-  barriers_to_use: jsonb("barriers_to_use").notNull().default(sql`'{}'::jsonb`),
+  activation_strategy: t.text("activation_strategy"),
+  barriers_to_use: t.jsonb("barriers_to_use").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {
       "barrier": "Lack of awareness",
@@ -489,11 +488,11 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
   ] */
 
   // Relationships
-  related_provisions: uuid("related_provisions").array(),
-  research_questions: varchar("research_questions", { length: 500 }).array(),
+  related_provisions: t.uuid("related_provisions").array(),
+  research_questions: t.varchar("research_questions", { length: 500 }).array(),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: High-impact underutilized provisions
   impactUseRateIdx: index("idx_underutilized_provisions_impact_use")
     .on(table.potential_impact, table.current_use_rate),
@@ -504,7 +503,7 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
 
   // Tracking invocations
   invokedIdx: index("idx_underutilized_provisions_invoked")
-    .on(table.times_invoked.desc(), table.last_invoked_date.desc())
+    .on(table.times_invoked, table.last_invoked_date)
     .where(sql`${table.times_invoked} > 0`),
 
   // GIN indexes for arrays and JSONB
@@ -526,51 +525,51 @@ export const underutilized_provisions = pgTable("underutilized_provisions", {
 // ELITE LITERACY ASSESSMENT - Constitutional Knowledge Test Questions
 // ============================================================================
 
-export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
-  ...primaryKeyUuid(),
+export const elite_literacy_assessment = pgTable("elite_literacy_assessment", (t) => ({
+  id: primaryKeyUuid(),
 
   // Assessment target
-  target_group: varchar("target_group", { length: 50 }).notNull(),
+  target_group: t.varchar("target_group", { length: 50 }).notNull(),
   // Values: 'MPs', 'Senators', 'Governors', 'Judges', 'Cabinet Secretaries', 'PSs'
 
   // Question categorization
-  question_category: varchar("question_category", { length: 50 }).notNull(),
+  question_category: t.varchar("question_category", { length: 50 }).notNull(),
   // Values: 'constitutional_knowledge', 'institutional_powers', 'legislative_procedure',
   //         'public_finance', 'rights_jurisprudence'
 
-  difficulty_level: varchar("difficulty_level", { length: 20 }).notNull().default('basic'),
+  difficulty_level: t.varchar("difficulty_level", { length: 20 }).notNull().default('basic'),
   // Values: 'basic', 'intermediate', 'advanced', 'expert'
 
   // Question content
-  question: text("question").notNull(),
-  correct_answer: text("correct_answer").notNull(),
+  question: t.text("question").notNull(),
+  correct_answer: t.text("correct_answer").notNull(),
 
   // Multiple choice options (if applicable)
-  answer_options: jsonb("answer_options").notNull().default(sql`'{}'::jsonb`),
+  answer_options: t.jsonb("answer_options").notNull().default(sql`'{}'::jsonb`),
   /* Structure: [
     {"option": "A", "text": "Senate has equal power to US Senate"},
     {"option": "B", "text": "Senate limited to county matters (Article 96)"}
   ] */
 
   // Explanation
-  explanation: text("explanation"),
-  relevant_articles: varchar("relevant_articles", { length: 50 }).array(),
+  explanation: t.text("explanation"),
+  relevant_articles: t.varchar("relevant_articles", { length: 50 }).array(),
   // Example: ["Article 96", "Article 109", "Article 110"]
 
   // Expected performance
-  expected_performance: varchar("expected_performance", { length: 20 }),
+  expected_performance: t.varchar("expected_performance", { length: 20 }),
   // Values: '100%', '>90%', '>70%', '>50%', 'poor', 'mixed'
 
   // Usage statistics
-  times_asked: integer("times_asked").notNull().default(0),
-  times_correct: integer("times_correct").notNull().default(0),
-  average_score: numeric("average_score", { precision: 5, scale: 2 }),
+  times_asked: t.integer("times_asked").notNull().default(0),
+  times_correct: t.integer("times_correct").notNull().default(0),
+  average_score: t.numeric("average_score", { precision: 5, scale: 2 }),
 
   // Question status
-  is_active: boolean("is_active").notNull().default(true),
+  is_active: t.boolean("is_active").notNull().default(true),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: Get questions by target group and difficulty
   targetGroupDifficultyIdx: index("idx_elite_literacy_assessment_target_difficulty")
     .on(table.target_group, table.difficulty_level, table.is_active)
@@ -582,7 +581,7 @@ export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
 
   // Performance analysis
   performanceIdx: index("idx_elite_literacy_assessment_performance")
-    .on(table.expected_performance, table.average_score.desc()),
+    .on(table.expected_performance, table.average_score),
 
   // GIN indexes
   articlesIdx: index("idx_elite_literacy_assessment_articles")
@@ -601,45 +600,45 @@ export const elite_literacy_assessment = pgTable("elite_literacy_assessment", {
 // CONSTITUTIONAL LOOPHOLES - Exploitable Gaps in the Constitution
 // ============================================================================
 
-export const constitutional_loopholes = pgTable("constitutional_loopholes", {
-  ...primaryKeyUuid(),
+export const constitutional_loopholes = pgTable("constitutional_loopholes", (t) => ({
+  id: primaryKeyUuid(),
 
   // Loophole identification
-  loophole_name: varchar("loophole_name", { length: 200 }).notNull().unique(),
-  category: varchar("category", { length: 50 }).notNull(),
+  loophole_name: t.varchar("loophole_name", { length: 200 }).notNull().unique(),
+  category: t.varchar("category", { length: 50 }).notNull(),
   // Values: 'ambiguous_language', 'missing_provisions', 'contradictory_provisions',
   //         'weak_enforcement', 'discretionary_power', 'undefined_term'
 
   // Constitutional context
-  constitutional_provision: varchar("constitutional_provision", { length: 100 }).notNull(),
-  problematic_text: text("problematic_text"),
+  constitutional_provision: t.varchar("constitutional_provision", { length: 100 }).notNull(),
+  problematic_text: t.text("problematic_text"),
 
   // Risk assessment
-  exploitation_risk: varchar("exploitation_risk", { length: 20 }).notNull(),
+  exploitation_risk: t.varchar("exploitation_risk", { length: 20 }).notNull(),
   // Values: 'critical', 'high', 'medium', 'low'
 
-  priority: varchar("priority", { length: 20 }).notNull(),
+  priority: t.varchar("priority", { length: 20 }).notNull(),
   // Values: 'urgent', 'high', 'medium', 'low'
 
   // Content
-  description: text("description").notNull(),
-  exploitation_scenario: text("exploitation_scenario"),
-  exploitation_examples: jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
+  description: t.text("description").notNull(),
+  exploitation_scenario: t.text("exploitation_scenario"),
+  exploitation_examples: t.jsonb("exploitation_examples").notNull().default(sql`'{}'::jsonb`),
 
   // Prevention and closure
-  prevention_strategy: text("prevention_strategy"),
-  proposed_amendment: text("proposed_amendment"),
-  alternative_interpretations: jsonb("alternative_interpretations").notNull().default(sql`'{}'::jsonb`),
+  prevention_strategy: t.text("prevention_strategy"),
+  proposed_amendment: t.text("proposed_amendment"),
+  alternative_interpretations: t.jsonb("alternative_interpretations").notNull().default(sql`'{}'::jsonb`),
 
   // Status tracking
-  status: varchar("status", { length: 20 }).notNull().default('open'),
+  status: t.varchar("status", { length: 20 }).notNull().default('open'),
   // Values: 'open', 'partially_closed', 'closed', 'worsening'
 
-  times_exploited: integer("times_exploited").notNull().default(0),
-  last_exploitation_date: date("last_exploitation_date"),
+  times_exploited: t.integer("times_exploited").notNull().default(0),
+  last_exploitation_date: t.date("last_exploitation_date"),
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: High-risk open loopholes
   riskStatusIdx: index("idx_constitutional_loopholes_risk_status")
     .on(table.exploitation_risk, table.status, table.priority)
@@ -655,7 +654,7 @@ export const constitutional_loopholes = pgTable("constitutional_loopholes", {
 
   // Exploitation tracking
   exploitedIdx: index("idx_constitutional_loopholes_exploited")
-    .on(table.times_exploited.desc(), table.last_exploitation_date.desc())
+    .on(table.times_exploited, table.last_exploitation_date)
     .where(sql`${table.times_exploited} > 0`),
 
   // GIN indexes for JSONB
@@ -675,38 +674,38 @@ export const constitutional_loopholes = pgTable("constitutional_loopholes", {
 // Complements elite_literacy_assessment (which stores questions)
 // This table stores WHO took assessments and THEIR results
 
-export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
-  ...primaryKeyUuid(),
+export const elite_knowledge_scores = pgTable("elite_knowledge_scores", (t) => ({
+  id: primaryKeyUuid(),
 
   // Link to legislator
-  sponsor_id: uuid("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
+  sponsor_id: t.uuid("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
 
   // For non-sponsor officials (governors, cabinet secretaries)
-  official_name: varchar("official_name", { length: 255 }),
-  official_type: varchar("official_type", { length: 50 }),
+  official_name: t.varchar("official_name", { length: 255 }),
+  official_type: t.varchar("official_type", { length: 50 }),
   // Values: 'mp', 'senator', 'governor', 'cabinet_secretary', 'principal_secretary',
   //         'commissioner', 'judge'
 
   // Assessment metadata
-  assessment_date: date("assessment_date").notNull(),
-  assessment_version: varchar("assessment_version", { length: 20 }),
-  assessment_type: varchar("assessment_type", { length: 50 }).notNull().default('written_test'),
+  assessment_date: t.date("assessment_date").notNull(),
+  assessment_version: t.varchar("assessment_version", { length: 20 }),
+  assessment_type: t.varchar("assessment_type", { length: 50 }).notNull().default('written_test'),
   // Values: 'written_test', 'interview', 'performance_observation', 'speech_analysis'
 
   // Overall scores
-  total_questions: integer("total_questions").notNull(),
-  correct_answers: integer("correct_answers").notNull(),
-  percentage_score: numeric("percentage_score", { precision: 5, scale: 2 }).notNull(),
+  total_questions: t.integer("total_questions").notNull(),
+  correct_answers: t.integer("correct_answers").notNull(),
+  percentage_score: t.numeric("percentage_score", { precision: 5, scale: 2 }).notNull(),
 
   // Category breakdown (matches elite_literacy_assessment categories)
-  constitutional_knowledge: numeric("constitutional_knowledge", { precision: 5, scale: 2 }),
-  institutional_powers: numeric("institutional_powers", { precision: 5, scale: 2 }),
-  legislative_procedure: numeric("legislative_procedure", { precision: 5, scale: 2 }),
-  public_finance: numeric("public_finance", { precision: 5, scale: 2 }),
-  rights_jurisprudence: numeric("rights_jurisprudence", { precision: 5, scale: 2 }),
+  constitutional_knowledge: t.numeric("constitutional_knowledge", { precision: 5, scale: 2 }),
+  institutional_powers: t.numeric("institutional_powers", { precision: 5, scale: 2 }),
+  legislative_procedure: t.numeric("legislative_procedure", { precision: 5, scale: 2 }),
+  public_finance: t.numeric("public_finance", { precision: 5, scale: 2 }),
+  rights_jurisprudence: t.numeric("rights_jurisprudence", { precision: 5, scale: 2 }),
 
   // Critical errors - YOUR SENATOR EXAMPLE DOCUMENTED HERE
-  critical_errors: jsonb("critical_errors").notNull().default(sql`'{}'::jsonb`),
+  critical_errors: t.jsonb("critical_errors").notNull().default(sql`'{}'::jsonb`),
   /* Example structure:
   [
     {
@@ -720,30 +719,30 @@ export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
   ] */
 
   // Knowledge gaps
-  weak_areas: varchar("weak_areas", { length: 100 }).array(),
+  weak_areas: t.varchar("weak_areas", { length: 100 }).array(),
   // Example: ["institutional_powers", "public_finance"]
 
   // Recommendations
-  training_recommended: boolean("training_recommended").notNull().default(false),
-  training_priority: varchar("training_priority", { length: 20 }),
+  training_recommended: t.boolean("training_recommended").notNull().default(false),
+  training_priority: t.varchar("training_priority", { length: 20 }),
   // Values: 'low', 'medium', 'high', 'urgent'
 
-  recommended_topics: varchar("recommended_topics", { length: 100 }).array(),
+  recommended_topics: t.varchar("recommended_topics", { length: 100 }).array(),
 
   // Audit trail
-  assessed_by: uuid("assessed_by").references(() => users.id, { onDelete: "set null" }),
+  assessed_by: t.uuid("assessed_by").references(() => users.id, { onDelete: "set null" }),
   // If expert-administered assessment
 
   ...auditFields(),
-}, (table) => ({
+}), (table) => ({
   // Hot path: Sponsor's assessment history
   sponsorDateIdx: index("idx_knowledge_scores_sponsor_date")
-    .on(table.sponsor_id, table.assessment_date.desc())
+    .on(table.sponsor_id, table.assessment_date)
     .where(sql`${table.sponsor_id} IS NOT NULL`),
 
   // Performance analysis
   scoreIdx: index("idx_knowledge_scores_percentage")
-    .on(table.percentage_score.desc(), table.assessment_date.desc()),
+    .on(table.percentage_score, table.assessment_date),
 
   // Low performers (need training)
   lowPerformersIdx: index("idx_knowledge_scores_low_performers")
@@ -752,7 +751,7 @@ export const elite_knowledge_scores = pgTable("elite_knowledge_scores", {
 
   // Official type tracking
   typeScoreIdx: index("idx_knowledge_scores_type_score")
-    .on(table.official_type, table.percentage_score.desc()),
+    .on(table.official_type, table.percentage_score),
 
   // Training recommendations
   trainingIdx: index("idx_knowledge_scores_training")
@@ -858,13 +857,9 @@ export const underutilizedProvisionsRelations = relations(underutilized_provisio
   relatedConstitutionalProvisions: many(constitutional_provisions),
 }));
 
-export const eliteLiteracyAssessmentRelations = relations(elite_literacy_assessment, ({ }) => ({
-  // No direct relations - questions are standalone
-}));
+export const eliteLiteracyAssessmentRelations = relations(elite_literacy_assessment, () => ({}));
 
-export const constitutionalLoopholesRelations = relations(constitutional_loopholes, ({ }) => ({
-  // No direct relations - loopholes reference provisions via varchar
-}));
+export const constitutionalLoopholesRelations = relations(constitutional_loopholes, () => ({}));
 
 export const eliteKnowledgeScoresRelations = relations(elite_knowledge_scores, ({ one }) => ({
   sponsor: one(sponsors, {
