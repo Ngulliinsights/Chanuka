@@ -2,20 +2,20 @@ import { ChevronDown, ChevronRight, Clock, MapPin, ArrowRight, Menu } from 'luci
 import React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { Progress } from '@/shared/design-system/feedback/Progress';
-import { Button } from '@/shared/design-system/interactive/Button';
+import { Progress } from '@client/shared/design-system/feedback/Progress';
+import { Button } from '@client/shared/design-system/interactive/Button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/design-system/interactive/Collapsible';
+} from '@client/shared/design-system/interactive/Collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/design-system/interactive/DropdownMenu';
-import { cn } from '@/utils/cn';
+} from '@client/shared/design-system/interactive/DropdownMenu';
+import { cn } from '@client/shared/utils/cn';
 
 // Types for progressive disclosure navigation
 export interface NavigationSection {

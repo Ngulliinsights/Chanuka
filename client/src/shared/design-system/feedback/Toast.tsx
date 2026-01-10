@@ -4,9 +4,9 @@ import { X } from 'lucide-react';
 import { forwardRef, ElementRef, ComponentPropsWithoutRef, ReactElement } from 'react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
-// import { logger } from '../../../utils/logger'; // Unused
+// import { logger } from '@client/shared/utils/logger'; // Unused
 
 const ToastProvider = Provider;
 

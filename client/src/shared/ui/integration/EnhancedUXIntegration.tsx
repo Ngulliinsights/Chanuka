@@ -12,10 +12,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
-import { useUserProfile } from '@/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
+import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
+import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface EnhancedUXIntegrationProps {
   children: React.ReactNode;

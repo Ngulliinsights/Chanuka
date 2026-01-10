@@ -8,7 +8,7 @@
 import React, { useEffect, useCallback, createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { logger } from '../../../../utils/logger';
+import { logger } from '../@client/shared/utils/logger';
 
 // ============================================================================
 // Types

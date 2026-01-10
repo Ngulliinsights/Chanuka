@@ -1,9 +1,9 @@
 import { Settings, Download, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 import { ActivitySection } from '../sections/ActivitySection';
 import { BillsSection } from '../sections/BillsSection';

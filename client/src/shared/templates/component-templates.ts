@@ -891,7 +891,7 @@ export * from './${pascalName}UI';
 
     const content = `import React from 'react';
 import { ${pascalName}Props } from '@client/shared/types';
-${this.config.hasHooks ? `import { use${pascalName} } from '@client/hooks';` : ''}
+${this.config.hasHooks ? `import { use${pascalName} } from '@client/shared/hooks';` : ''}
 
 /**
  * ${pascalName} UI component
@@ -1232,7 +1232,7 @@ describe('${pascalName}UI Component', () => {
     const pascalName = this.toPascalCase(componentName);
 
     const content = `import { renderHook, act } from '@testing-library/react';
-import { use${pascalName} } from '@client/hooks/use${pascalName}';
+import { use${pascalName} } from '@client/shared/hooks/use${pascalName}';
 
 describe('use${pascalName} Hook', () => {
   it('should initialize with default state', () => {

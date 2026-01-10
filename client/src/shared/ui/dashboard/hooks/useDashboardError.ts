@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 export function useDashboardError(initialError: string | null = null) {
   const [error, setError] = useState<string | null>(initialError);

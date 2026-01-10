@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 interface LogoProps {
   className?: string;

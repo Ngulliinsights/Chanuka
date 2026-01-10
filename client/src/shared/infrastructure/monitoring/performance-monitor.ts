@@ -1,5 +1,5 @@
 // Modern web-vitals v3+ uses 'on' prefix instead of 'get' prefix
-import { onCLS, onFID, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
+import { onCLS, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 
 interface PerformanceMetrics {
   coreWebVitals: CoreWebVitals;

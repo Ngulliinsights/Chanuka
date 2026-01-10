@@ -29,6 +29,7 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
   const [warnings] = useState(() => getCompatibilityWarnings());
   const [showTester, setShowTester] = useState(false);
   const [isLoading, _setIsLoading] = useState(false);
+  const [testResults, setTestResults] = useState<any>(null);
 
   useEffect(() => {
     // Check for issues on mount
@@ -139,7 +140,7 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
             <div className="bg-blue-50 rounded-md p-3">
               <h4 className="text-sm font-medium text-blue-800 mb-1">Quick Recommendations:</h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                {testResults.recommendations.slice(0, 2).map((rec, index) => (
+                {testResults.recommendations.slice(0, 2).map((rec: string, index: number) => (
                   <li key={index}>• {rec}</li>
                 ))}
                 {testResults.recommendations.length > 2 && (

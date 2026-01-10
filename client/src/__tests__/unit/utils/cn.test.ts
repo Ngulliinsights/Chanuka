@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn'
+import { cn } from '@client/shared/utils/cn'
 
 describe('cn utility', () => {
   it('joins class names and dedups correctly', () => {

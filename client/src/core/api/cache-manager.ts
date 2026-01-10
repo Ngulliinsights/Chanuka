@@ -5,7 +5,7 @@
  * and storage management capabilities.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import type { CacheEntry } from '../storage/types';
 
 // Re-export CacheEntry type

@@ -2,9 +2,9 @@ import { Search, PanelLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Badge } from '@/shared/design-system';
-import { Button } from '@/shared/design-system';
-import { Card, CardContent } from '@/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
 import {
   CommandDialog,
   CommandInput,
@@ -13,8 +13,8 @@ import {
   CommandGroup,
   CommandItem,
   CommandShortcut,
-} from '@/shared/design-system';
-import { Input } from '@/shared/design-system';
+} from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
 
 import { useNav } from '../hooks/useNav';
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 
 interface SkipLinkProps {
   href: string;

@@ -6,8 +6,8 @@
  * real-time updates, and user preferences.
  */
 
-import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@/core/api/types';
-import { logger } from '@client/utils/logger';
+import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/core/api/types';
+import { logger } from '@client/shared/utils/logger';
 
 import { Bill } from '@shared/schema/foundation';
 

@@ -4,7 +4,7 @@
  * Handles validation of navigation items and structures
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { NavigationItem } from './types';
 

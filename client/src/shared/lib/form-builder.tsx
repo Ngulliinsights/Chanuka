@@ -21,7 +21,7 @@ import {
 } from 'react-hook-form';
 import { ZodSchema, ZodError } from 'zod';
 
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 /**
  * Configuration options for the form builder.
@@ -438,7 +438,7 @@ export function useFormBuilder<T extends FieldValues>({
  *   ({ form }) => (
  *     <form onSubmit={form.onSubmit(handleRegister)}>
  *       <input {...form.register('email')} />
- *       <input {...form.register('password')} type="password" aria-label="Password input" />
+ *       <input {...form.register('password')} type="password" aria-label="Password input" aria-label="Password input" />
  *       <button disabled={form.isSubmitting}>Register</button>
  *     </form>
  *   ),

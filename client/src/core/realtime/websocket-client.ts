@@ -11,7 +11,7 @@ import {
   WebSocketMessage,
   WebSocketError,
 } from '@shared/schema/websocket';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Define events specific to the client implementation
 export interface WebSocketClientEvents {

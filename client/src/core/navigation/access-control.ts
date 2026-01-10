@@ -4,7 +4,7 @@
  * Handles route access permissions and user authorization
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { NavigationItem, UserRole } from './types';
 

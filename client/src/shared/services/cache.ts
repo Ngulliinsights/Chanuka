@@ -11,7 +11,7 @@
  */
 
 import { CacheError, CacheMissError, CacheCorruptionError, ServiceErrorFactory } from './errors';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // ============================================================================
 // CACHE CONFIGURATION INTERFACES

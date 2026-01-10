@@ -16,7 +16,7 @@ import { createNavigationProvider } from './context';
 import { NavigationConsistency } from './NavigationConsistency';
 
 // Mock logger
-vi.mock('../../utils/logger', () => ({
+vi.mock('@client/shared/utils/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),

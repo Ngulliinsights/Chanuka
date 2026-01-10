@@ -11,7 +11,7 @@ import type { DiscussionThreadMetadata } from '@client/core/api/community';
 import type { CommentFormData } from '@client/core/api/types/community';
 import { realTimeService } from '@client/core/realtime';
 import type { Comment } from '@client/features/community/types';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // ============================================================================
 // Type Definitions

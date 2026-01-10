@@ -131,7 +131,9 @@ class CoreErrorHandler {
     // Maintain error limit
     if (this.errors.size > this.config.maxErrors) {
       const oldestKey = this.errors.keys().next().value;
-      this.errors.delete(oldestKey);
+      if (oldestKey) {
+        this.errors.delete(oldestKey);
+      }
     }
 
     // Log error if enabled

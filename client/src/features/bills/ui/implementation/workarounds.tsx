@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';

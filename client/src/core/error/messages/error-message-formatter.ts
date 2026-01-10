@@ -320,6 +320,16 @@ export function getErrorIconClass(domain: ErrorDomain): string {
     [ErrorDomain.SESSION]: 'log-out',
     [ErrorDomain.RESOURCE]: 'file-off',
     [ErrorDomain.RATE_LIMITING]: 'timer-off',
+    [ErrorDomain.UI]: 'monitor-off',
+    [ErrorDomain.HOOKS]: 'hook',
+    [ErrorDomain.LIBRARY_SERVICES]: 'library',
+    [ErrorDomain.SERVICE_ARCHITECTURE]: 'settings',
+    [ErrorDomain.CROSS_SYSTEM]: 'link',
+    [ErrorDomain.USER_INPUT]: 'user-x',
+    [ErrorDomain.CONFIGURATION]: 'settings',
+    [ErrorDomain.INTEGRATION]: 'plug',
+    [ErrorDomain.PERFORMANCE]: 'zap',
+    [ErrorDomain.FILE_SYSTEM]: 'folder-off',
   };
 
   return iconMap[domain] || 'alert-circle';

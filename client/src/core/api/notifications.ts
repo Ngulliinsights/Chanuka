@@ -12,7 +12,7 @@
  * @module api/notifications
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
@@ -27,9 +27,12 @@ import { globalErrorHandler } from './errors';
  */
 export type {
   Notification,
-  NotificationPreferences,
   NotificationType,
-} from '@client/services/notification-service';
+} from '@client/shared/services/notification-service';
+
+export type {
+  NotificationPreferences,
+} from '@client/features/notifications/model/notification-service';
 
 // ============================================================================
 // API-Specific Types

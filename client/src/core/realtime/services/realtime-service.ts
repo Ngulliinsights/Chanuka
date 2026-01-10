@@ -5,7 +5,7 @@
  * Provides a unified interface for WebSocket connections, subscriptions, and real-time updates.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { getRealTimeConfig } from '../config';
 import { UnifiedWebSocketManager } from '../manager';

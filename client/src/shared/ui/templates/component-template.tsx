@@ -80,7 +80,7 @@ export default ComponentName;
 // ============================================================================
 
 /*
-import { ComponentName } from '@/shared/ui/components';
+import { ComponentName } from '@client/shared/ui/components';
 
 function MyPage() {
   return (

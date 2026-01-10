@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 
-import { WidgetConfig } from '@client/shared/types';
+import { WidgetConfig } from './context';
 
 import { useDashboard } from './context';
 

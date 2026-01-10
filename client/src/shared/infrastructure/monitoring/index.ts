@@ -5,8 +5,8 @@
  */
 
 export { ErrorMonitor } from './error-monitor';
-export { PerformanceMonitor } from './performance-monitor';
-export { MonitoringIntegration } from './monitoring-integration';
+export { default as PerformanceMonitor } from './performance-monitor';
+export { MonitoringIntegrationService as MonitoringIntegration, monitoringIntegration } from './monitoring-integration';
 export { DevelopmentMonitoringDashboard } from './development-dashboard';
 
 export type { MonitoringConfig } from './monitoring-integration';

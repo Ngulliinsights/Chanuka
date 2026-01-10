@@ -7,8 +7,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
-import { cn } from '@/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { cn } from '@client/shared/design-system';
 
 import { DashboardConfig } from '../types';
 

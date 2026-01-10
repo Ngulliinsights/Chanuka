@@ -6,16 +6,16 @@
 import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState, useCallback, Suspense } from 'react';
 
-import { useAuth } from '@/core/auth';
-import { PrivacySettings, ConsentRecord } from '@/core/auth';
+import { useAuth } from '@client/core/auth';
+import { PrivacySettings, ConsentRecord } from '@client/core/auth';
 
 // import { ConsentModal } from '../../auth/ConsentModal';
-import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 const VisibilityControls = React.lazy(() =>
   import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls }))
 );

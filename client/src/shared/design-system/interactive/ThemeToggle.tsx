@@ -6,7 +6,7 @@
 import { Settings as Moon, Settings as Sun, Settings as Monitor } from 'lucide-react';
 import React from 'react';
 
-import { useTheme } from '../../../contexts/ThemeContext';
+import { useTheme } from '../@client/shared/contexts/ThemeContext';
 
 import { Button } from './Button';
 import {

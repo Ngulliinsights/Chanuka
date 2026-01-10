@@ -13,6 +13,7 @@ import {
   recordError,
 } from '../circuit-breaker-monitor';
 import { retryOperation, createRetryHandler } from '../retry-handler';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/core/error';
 
 // ============================================================================
 // Basic Usage Examples

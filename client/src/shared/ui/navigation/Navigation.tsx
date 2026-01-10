@@ -2,9 +2,9 @@ import { Home, FileText, Search, Users, BarChart3, Shield, Settings } from 'luci
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@client/shared/utils/cn';
 
 interface NavigationItem {
   id: string;

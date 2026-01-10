@@ -115,8 +115,8 @@ export {
 // ============================================================================
 
 export {
-  // Main auth module
-  default as auth,
+  // Main auth module - no default export available
+  // default as auth,
 
   // Services
   AuthApiService,
@@ -181,7 +181,28 @@ export {
 // Performance Monitoring
 // ============================================================================
 
-export * from './performance';
+// Explicit exports to avoid duplicate export conflicts
+export {
+  WebVitalsMonitor,
+  PerformanceBudgetChecker,
+  PerformanceAlertsManager,
+  PerformanceMonitor,
+  checkBudget,
+  exportPerformanceReport,
+  DEFAULT_PERFORMANCE_CONFIG,
+} from './performance';
+export type {
+  PerformanceMetric,
+  WebVitalsMetric,
+  PerformanceBudget,
+  PerformanceAlert,
+  BudgetCheckResult,
+  PerformanceConfig,
+  PerformanceStats,
+  OptimizationSuggestion,
+  ResourceTiming,
+  PerformanceReport,
+} from './performance';
 
 // ============================================================================
 // Loading States
@@ -225,7 +246,7 @@ export * from './navigation';
 // ============================================================================
 
 // Export core domain types from consolidated locations
-export type { Bill, Comment, User, CommentStatus, Sponsor, BillAnalysis } from '../shared/types';
+export type { Bill, Comment, User, BillAnalysis } from '../shared/types';
 export type {
   UserProfile,
   UserPreferences as FeatureUserPreferences,
@@ -242,7 +263,7 @@ export type {
 // Client Architecture Foundation
 // ============================================================================
 
-export * from './architecture';
+// export * from './architecture'; // Module does not exist
 
 // ============================================================================
 // Default Export

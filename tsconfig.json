@@ -24,23 +24,20 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": true,
-    
+
     /* Modules */
     "module": "ES2022",
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
       "@shared": ["shared"],
       "@shared/*": ["shared/*"],
       "@shared/core": ["shared/core"],
       "@shared/core/*": ["shared/core/*"],
-      "@shared/database": ["shared/database"],
-      "@shared/database/*": ["shared/database/*"],
       "@shared/schema": ["shared/schema"],
       "@shared/schema/*": ["shared/schema/*"],
-      "@shared/utils": ["shared/utils"],
-      "@shared/utils/*": ["shared/utils/*"],
+      "@shared/platform": ["shared/platform"],
+      "@shared/i18n": ["shared/i18n"],
       "@server": ["server"],
       "@server/*": ["server/*"],
       "@client": ["client/src"],
@@ -52,7 +49,7 @@
     "allowImportingTsExtensions": false,
     "allowJs": true,
     "checkJs": false,
-    
+
     /* Emit */
     "declaration": true,
     "removeComments": true,
@@ -60,13 +57,13 @@
     "downlevelIteration": true,
     "sourceMap": true,
     "verbatimModuleSyntax": false,
-    
+
     /* Interop Constraints */
     "isolatedModules": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     /* Type Checking - Strict Mode */
     "strict": true,
     "noImplicitAny": true,
@@ -75,7 +72,7 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
     "exactOptionalPropertyTypes": true,
-    
+
     /* Type Checking - Additional Checks */
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -85,20 +82,20 @@
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    
+
     /* Completeness */
     "skipLibCheck": true,
-    
+
     /* Performance */
     "incremental": true,
-    
+
     /* Type Definitions */
     "types": [
       "node",
       "vite/client",
       "vitest/globals"
     ],
-    
+
     /* Composite project setup for monorepo */
     "composite": false
   }

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Card, CardContent, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface Bill {
   supportPercentage?: number;

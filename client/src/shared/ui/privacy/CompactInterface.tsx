@@ -7,13 +7,13 @@
 import { Shield, Settings, AlertTriangle, Info } from 'lucide-react';
 import React from 'react';
 
-import { useAuth } from '@/core/auth';
-import { PrivacySettings } from '@/core/auth';
-import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Switch } from '@/shared/design-system/interactive/Switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import { Label } from '@/shared/design-system/typography/Label';
+import { useAuth } from '@client/core/auth';
+import { PrivacySettings } from '@client/core/auth';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Switch } from '@client/shared/design-system/interactive/Switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
+import { Label } from '@client/shared/design-system/typography/Label';
 
 // import { ConsentControls } from './controls/ConsentControls';
 import { DataUsageControls } from './controls/DataUsageControls';

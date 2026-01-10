@@ -6,7 +6,7 @@ import { AppShell } from '@client/app/shell/AppShell';
 import { ErrorBoundary } from '@client/core/error/components';
 import { Toaster } from '@client/shared/design-system';
 import { LoadingStates } from '@client/shared/ui/loading/LoadingStates';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 function App() {
   useEffect(() => {

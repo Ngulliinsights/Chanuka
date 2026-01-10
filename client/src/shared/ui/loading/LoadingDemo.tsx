@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
 
 import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
 import { LoadingStateManager, PageLoader, ComponentLoader, ConnectionAwareLoader } from './ui';

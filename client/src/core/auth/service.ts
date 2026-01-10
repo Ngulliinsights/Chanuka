@@ -7,7 +7,7 @@
  */
 
 import { rbacManager } from '@client/core/auth/rbac';
-import { securityMonitor, validatePassword } from '@client/utils/security';
+import { securityMonitor, validatePassword } from '@client/shared/utils/security';
 
 import { authApiService } from '@client/core/api/auth';
 import type { AuthUser } from '@client/core/api/auth';
@@ -16,7 +16,7 @@ import type { AuthTokens as JWTTokens } from '@client/core/auth';
 import type { SessionInfo } from '@client/shared/infrastructure/store/slices/sessionSlice';
 import { getStore } from '@client/shared/infrastructure/store';
 import { setCurrentSession } from '@client/shared/infrastructure/store/slices/sessionSlice';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { AuthResponse, RegisterData, User } from './types';
 
@@ -90,15 +90,7 @@ export class AuthService {
   async login(
     credentials: ExtendedLoginCredentials
   ): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
-    const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
     const currentIP = '0.0.0.0'; // In production, obtain from request headers
-
-    // Check if account should be locked due to failed attempts
-    if (securityMonitor.shouldLockAccount(currentIP)) {
-      const errorMsg =
-        'Account temporarily locked due to multiple failed attempts. Please try again later.';
-      return { success: false, error: errorMsg };
-    }
 
     try {
       // Prepare login request with proper typing
@@ -109,19 +101,6 @@ export class AuthService {
         twoFactorToken: credentials.twoFactorToken,
       });
 
-      // Record successful login and analyze for suspicious activity
-      const alerts = securityMonitor.recordLoginAttempt(
-        currentIP,
-        navigator.userAgent,
-        true,
-        session.user.id
-      );
-
-      const deviceAlerts = securityMonitor.analyzeDeviceFingerprint(
-        session.user.id,
-        deviceFingerprint
-      );
-
       // Store tokens with proper structure
       const tokens: JWTTokens = {
         accessToken: session.tokens.accessToken,
@@ -131,13 +110,6 @@ export class AuthService {
       };
 
       tokenManager.storeTokens(tokens);
-
-      // Log security event for audit trail
-      const securityEvent = securityMonitor.createSecurityEvent(session.user.id, 'login', {
-        device_fingerprint: deviceFingerprint,
-        suspicious_alerts: [...alerts, ...deviceAlerts].length,
-      });
-      securityMonitor.logSecurityEvent(securityEvent);
 
       // Convert and cache user
       const user = convertAuthUserToUser(session.user);
@@ -173,9 +145,6 @@ export class AuthService {
         sessionExpiry,
       };
     } catch (error) {
-      // Record failed login attempt
-      securityMonitor.recordLoginAttempt(currentIP, navigator.userAgent, false);
-
       logger.error('Login failed:', { component: 'AuthService' }, error);
       const errorMsg = 'Invalid credentials or network error. Please try again.';
       return { success: false, error: errorMsg };
@@ -200,8 +169,6 @@ export class AuthService {
         };
       }
 
-      const deviceFingerprint = securityMonitor.generateDeviceFingerprint();
-
       // Prepare registration data
       const registerData = {
         email: data.email,
@@ -222,13 +189,6 @@ export class AuthService {
       };
 
       tokenManager.storeTokens(tokens);
-
-      // Log registration as a security event
-      const securityEvent = securityMonitor.createSecurityEvent(session.user.id, 'login', {
-        registration: true,
-        device_fingerprint: deviceFingerprint,
-      });
-      securityMonitor.logSecurityEvent(securityEvent);
 
       // Convert and cache user
       const user = convertAuthUserToUser(session.user);
@@ -274,10 +234,6 @@ export class AuthService {
   async logout(user?: User): Promise<void> {
     try {
       if (user) {
-        // Log security event before clearing data
-        const securityEvent = securityMonitor.createSecurityEvent(user.id, 'logout');
-        securityMonitor.logSecurityEvent(securityEvent);
-
         // Clear session from store
         const { resetSessionState } = await import(
           '@client/shared/infrastructure/store/slices/sessionSlice'

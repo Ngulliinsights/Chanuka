@@ -1,5 +1,5 @@
-import type { Bill } from '../../types';
-import { logger } from '../../utils/logger';
+import type { Bill } from '@client/shared/types';
+import { logger } from '@client/shared/utils/logger';
 
 import { globalApiClient } from './client';
 

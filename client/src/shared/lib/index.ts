@@ -1,29 +1,46 @@
 /**
- * Shared Library Module
+ * DEPRECATED - This directory has been migrated
  *
- * Main index file for all shared libraries with FSD structure
+ * All files have been moved to: client/src/shared/lib/
+ *
+ * Update your imports:
+ * OLD: import { cn } from '@client/shared/lib/utils';
+ * NEW: import { cn } from '@client/shared/lib/utils';
+ *  OR:  import { cn } from '@client/shared/lib';
+ *
+ * This file provides backward compatibility during migration.
+ * Remove this after all imports have been updated.
+ *
+ * Timeline:
+ * - Phase 1 (NOW): Both old and new locations work
+ * - Phase 2 (1 week): Emit warnings on old imports
+ * - Phase 3 (2 weeks): Remove deprecated exports
+ *
+ * @deprecated Use @client/shared/lib instead
  */
 
-// Form Builder
-export * from './form-builder';
+'use strict';
 
-// Validation
-export * from './validation';
+const message = `
+DEPRECATED MODULE IMPORT
 
-// Query Client
-export * from './query-client';
+Your code is importing from the deprecated @client/shared/lib module.
+Update your imports to:
+  import { ... } from '@client/shared/lib';
 
-// Utilities
-export * from './utils';
+This will be removed in 2 weeks. See
+DIRECTORY_ALIGNMENT_ANALYSIS.md for migration details.
+`;
 
-// Legacy exports for backward compatibility
-export * from './form-builder';
-export * from './validation';
-export * from './query-client';
-export * from './utils';
+if (process.env.NODE_ENV === 'development') {
+  console.warn(message);
+}
 
-// Re-export from legacy location for compatibility
-export * from './form-builder';
-export * from './validation';
-export * from './query-client';
-export * from './utils';
+// Import from the new FSD structure
+import * as fsdLib from '@client/shared/lib/migration/compatibility-layer';
+
+// Re-export everything from the FSD structure
+export * from '@client/shared/lib/migration/compatibility-layer';
+
+// Export default for legacy compatibility
+export default fsdLib;

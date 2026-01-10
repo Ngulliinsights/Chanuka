@@ -16,7 +16,7 @@ import {
   VerificationWorkflow as VerificationWorkflowType,
   VerificationStatus,
 } from '@client/features/users/types';
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Avatar, AvatarFallback } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

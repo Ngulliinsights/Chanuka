@@ -1,9 +1,9 @@
 import { TrendingUp, MessageSquare, Award } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system';
-import { Card, CardContent } from '@/shared/design-system';
-import { UserDashboardData } from '@/shared/types/user-dashboard';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/shared/design-system';
+import { UserDashboardData } from '@client/shared/types/user-dashboard';
 
 interface StatsSectionProps {
   stats: UserDashboardData['stats'] | undefined;

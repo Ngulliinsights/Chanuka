@@ -5,7 +5,7 @@
  * automatic token injection, token refresh, and authentication error handling.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import { tokenManager } from '../auth';
 
 import {

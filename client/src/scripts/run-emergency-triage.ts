@@ -13,8 +13,8 @@ import {
   emergencyTriage,
   type TriageReport,
   type CircuitBreakerConfig,
-} from '@client/utils/emergency-triage';
-import { logger } from '@client/utils/logger';
+} from '@client/shared/utils/emergency-triage';
+import { logger } from '@client/shared/utils/logger';
 
 interface TriageConfig {
   duration: number; // milliseconds

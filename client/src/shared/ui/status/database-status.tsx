@@ -8,7 +8,7 @@ import { Database, AlertCircle, CheckCircle, X as XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system';
+import { Badge } from '@client/shared/design-system';
 
 interface DatabaseStatusProps {
   className?: string;

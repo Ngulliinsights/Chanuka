@@ -8,9 +8,9 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
-import { EngagementHistoryItem } from '@/shared/types/user-dashboard';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { EngagementHistoryItem } from '@client/shared/types/user-dashboard';
 
 interface ActivitySectionProps {
   activities: EngagementHistoryItem[];

@@ -14,8 +14,8 @@
  */
 
 import { privacyAnalyticsApiService } from '@client/core/api/privacy';
-import { logger } from '@client/utils/logger';
-import { privacyUtils, privacyCompliance } from '@client/utils/privacy-compliance';
+import { logger } from '@client/shared/utils/logger';
+import { privacyUtils, privacyCompliance } from '@client/shared/utils/privacy-compliance';
 
 // ============================================================================
 // Types & Interfaces

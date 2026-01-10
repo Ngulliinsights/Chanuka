@@ -6,7 +6,7 @@
  * for the civic engagement platform.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface AuthConfig {
   apiBaseUrl: string;
@@ -246,7 +246,7 @@ class AuthServiceInitializer {
 
       logger.info('Existing session restored', {
         component: 'AuthServiceInitializer',
-        userId: tokenData?.user?.id || 'unknown',
+        userId: (tokenData?.user as any)?.id || 'unknown',
         expiresAt: new Date(this.state.expiresAt!),
       });
     } catch (error) {

@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import type { ErrorPattern } from '@client/services';
+import type { ErrorPattern } from '@client/shared/services';
 import type { AppDispatch } from '@client/shared/infrastructure/store';
 import {
   fetchOverviewMetrics,
@@ -495,7 +495,7 @@ export function useErrorAnalyticsExport() {
   const exportCSV = useCallback(() => {
     if (!patterns.length) return;
 
-    // CSV export based on actual ErrorPattern interface from @client/services
+    // CSV export based on actual ErrorPattern interface from @client/shared/services
     // Adjust headers and mapping based on the actual properties available
     const headers = ['Pattern', 'Frequency', 'Impact', 'Trend'];
 

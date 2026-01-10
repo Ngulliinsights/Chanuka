@@ -7,7 +7,7 @@
  */
 
 import { globalApiClient } from '@client/core/api/client';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Core interfaces for bill analysis system

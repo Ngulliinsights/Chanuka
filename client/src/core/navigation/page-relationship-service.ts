@@ -1,5 +1,5 @@
 import { RelatedPage, PageRelationship, UserRole } from '@client/shared/types/navigation';
-// import { logger } from '@client/utils/logger'; // Unused
+// import { logger } from '@client/shared/utils/logger'; // Unused
 
 /**
  * Configuration for page relationships

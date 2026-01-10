@@ -4,8 +4,8 @@ import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { globalApiClient } from '@client/core/api/client';
-import { useSafeQuery } from '@client/hooks/use-safe-query';
-import { useToast } from '@client/hooks/use-toast';
+import { useSafeQuery } from '@client/shared/hooks/use-safe-query';
+import { useToast } from '@client/shared/hooks/use-toast';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';

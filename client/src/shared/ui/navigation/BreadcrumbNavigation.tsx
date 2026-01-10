@@ -9,7 +9,7 @@ import { ChevronRight, Home } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import type { BreadcrumbItem } from '@/shared/types/navigation';
+import type { BreadcrumbItem } from '@client/shared/types/navigation';
 
 import { useBreadcrumbNavigation } from './hooks/useBreadcrumbNavigation';
 

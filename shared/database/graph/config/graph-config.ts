@@ -14,18 +14,18 @@ import { AuthToken, Config } from 'neo4j-driver';
 // ============================================================================
 
 export const NEO4J_CONFIG = {
-  URI: process.env.NEO4J_URI || 'neo4j://localhost:7687',
-  USER: process.env.NEO4J_USER || 'neo4j',
-  PASSWORD: process.env.NEO4J_PASSWORD || 'password',
-  MAX_CONNECTION_POOL_SIZE: parseInt(process.env.NEO4J_MAX_POOL || '100'),
-  CONNECTION_TIMEOUT_MS: parseInt(process.env.NEO4J_TIMEOUT || '5000'),
-  MAX_CONNECTION_LIFETIME_MS: parseInt(process.env.NEO4J_LIFETIME || '3600000'),
+  URI: process.env.NEO4J_URI ?? 'neo4j://localhost:7687',
+  USER: process.env.NEO4J_USER ?? 'neo4j',
+  PASSWORD: process.env.NEO4J_PASSWORD ?? 'password',
+  MAX_CONNECTION_POOL_SIZE: parseInt(process.env.NEO4J_MAX_POOL ?? '100'),
+  CONNECTION_TIMEOUT_MS: parseInt(process.env.NEO4J_TIMEOUT ?? '5000'),
+  MAX_CONNECTION_LIFETIME_MS: parseInt(process.env.NEO4J_LIFETIME ?? '3600000'),
 };
 
 export const SYNC_CONFIG = {
-  INTERVAL_MS: parseInt(process.env.SYNC_INTERVAL || '60000'),
-  BATCH_SIZE: parseInt(process.env.SYNC_BATCH_SIZE || '1000'),
-  TIMEOUT_MS: parseInt(process.env.SYNC_TIMEOUT || '30000'),
+  INTERVAL_MS: parseInt(process.env.SYNC_INTERVAL ?? '60000'),
+  BATCH_SIZE: parseInt(process.env.SYNC_BATCH_SIZE ?? '1000'),
+  TIMEOUT_MS: parseInt(process.env.SYNC_TIMEOUT ?? '30000'),
   ENABLE_AUTO_SYNC: process.env.ENABLE_AUTO_SYNC !== 'false',
   DEFAULT_LIMIT: 100,
 };
@@ -204,7 +204,7 @@ export class GraphConfigManager {
    * @param env - Environment name (defaults to process.env.NODE_ENV)
    */
   constructor(env?: string) {
-    const nodeEnv = env || process.env.NODE_ENV || 'development';
+    const nodeEnv = env ?? process.env.NODE_ENV ?? 'development';
     this.environment = this.loadConfig(nodeEnv);
   }
 

@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { cn } from '@/shared/design-system';
+import { cn } from '@client/shared/design-system';
 
 // Re-ordered imports to fix linting issues
 import { useDashboard } from './hooks/useDashboard';

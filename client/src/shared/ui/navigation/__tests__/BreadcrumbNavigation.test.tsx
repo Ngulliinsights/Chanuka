@@ -10,8 +10,8 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import navigationReducer from '@/shared/infrastructure/store/slices/navigationSlice';
-import type { BreadcrumbItem } from '@/shared/types/navigation';
+import navigationReducer from '@client/shared/infrastructure/store/slices/navigationSlice';
+import type { BreadcrumbItem } from '@client/shared/types/navigation';
 
 import { BreadcrumbNavigation, generateBreadcrumbs } from '../BreadcrumbNavigation';
 

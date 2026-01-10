@@ -13,20 +13,20 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/design-system/interactive/Collapsible';
+} from '@client/shared/design-system/interactive/Collapsible';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/design-system/typography/Card';
+} from '@client/shared/design-system/typography/Card';
 
 interface ConstitutionalProvision {
   id: string;

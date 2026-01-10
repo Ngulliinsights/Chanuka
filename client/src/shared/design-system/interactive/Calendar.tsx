@@ -2,9 +2,9 @@ import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import * as React from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { buttonVariants } from './Button';
 import { UIDateError } from './errors';

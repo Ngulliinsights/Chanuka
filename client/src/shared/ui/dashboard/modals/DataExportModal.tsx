@@ -16,25 +16,25 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/shared/design-system/interactive/Dialog';
-import { Input } from '@/shared/design-system/interactive/Input';
+} from '@client/shared/design-system/interactive/Dialog';
+import { Input } from '@client/shared/design-system/interactive/Input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/design-system/interactive/Select';
-import { Label } from '@/shared/design-system/typography/Label';
-import { DataExportRequest } from '@/shared/types/user-dashboard';
+} from '@client/shared/design-system/interactive/Select';
+import { Label } from '@client/shared/design-system/typography/Label';
+import { DataExportRequest } from '@client/shared/types/user-dashboard';
 
 interface DataExportModalProps {
   open: boolean;

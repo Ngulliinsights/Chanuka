@@ -1,14 +1,17 @@
-/**
- * Mobile Hooks
- *
- * Mobile-specific UI patterns and device utilities
- */
+// Gesture hooks
+export { useSwipeGesture } from './useSwipeGesture';
 
-export { useBottomSheet } from '@/hooks/mobile/useBottomSheet';
-export { useDeviceInfo } from '@/hooks/mobile/useDeviceInfo';
-export { useInfiniteScroll } from '@/hooks/mobile/useInfiniteScroll';
-export { useMobileNavigation } from '@/hooks/mobile/useMobileNavigation';
-export { useMobileTabs } from '@/hooks/mobile/useMobileTabs';
-export { usePullToRefresh } from '@/hooks/mobile/usePullToRefresh';
-export { useScrollManager } from '@/hooks/mobile/useScrollManager';
-export { useSwipeGesture } from '@/hooks/mobile/useSwipeGesture';
+// Scroll hooks
+export { useInfiniteScroll } from './useInfiniteScroll';
+export { useScrollManager } from './useScrollManager';
+export { usePullToRefresh } from './usePullToRefresh';
+
+// Modal hooks
+export { useBottomSheet } from './useBottomSheet';
+
+// Navigation hooks
+export { useMobileNavigation } from './useMobileNavigation';
+export { useMobileTabs } from './useMobileTabs';
+
+// Device hooks
+export { useDeviceInfo } from './useDeviceInfo';

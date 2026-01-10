@@ -7,7 +7,7 @@
 
 import { AppError, ErrorContext, ErrorRecoveryStrategy } from '../types';
 import { ErrorDomain, ErrorSeverity } from '../constants';
-import { RecoveryStrategy } from '@client/hooks/useErrorRecovery';
+import { RecoveryStrategy } from '@client/shared/hooks/useErrorRecovery';
 
 // ============================================================================
 // Recovery Suggestion Types
@@ -30,7 +30,7 @@ export interface RecoverySuggestion {
 // Core Recovery Suggestions
 // ============================================================================
 
-export const RECOVERY_SUGGESTIONS: RecoverySuggestion[] = [
+export let RECOVERY_SUGGESTIONS: RecoverySuggestion[] = [
   // Network Recovery Suggestions
   {
     id: 'retry-network-request',
@@ -138,7 +138,7 @@ export const RECOVERY_SUGGESTIONS: RecoverySuggestion[] = [
     title: 'Restart Browser',
     description: 'Close and restart your browser',
     priority: 3,
-    applicableDomains: [ErrorDomain.SYSTEM, ErrorDomain.MEMORY],
+    applicableDomains: [ErrorDomain.SYSTEM, ErrorDomain.RESOURCE],
     applicableSeverities: [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL],
     estimatedSuccessRate: 0.5,
   },

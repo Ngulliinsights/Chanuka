@@ -6,10 +6,10 @@
 import { Eye } from 'lucide-react';
 import React from 'react';
 
-import { PrivacySettings } from '@/core/auth';
-import { Switch } from '@/shared/design-system/interactive/Switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import { Label } from '@/shared/design-system/typography/Label';
+import { PrivacySettings } from '@client/core/auth';
+import { Switch } from '@client/shared/design-system/interactive/Switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
+import { Label } from '@client/shared/design-system/typography/Label';
 
 interface VisibilityControlsProps {
   settings: PrivacySettings;

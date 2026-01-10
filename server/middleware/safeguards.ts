@@ -49,7 +49,7 @@ export const safeguardsMiddleware = async (
     // Extract geo location from headers if available
     const geoLocation = extractGeoLocation(req);
 
-    // 1. RATE LIMITING CHECK
+    // 1. ATOMIC RATE LIMITING CHECK
     const actionResource = extractActionResource(req);
     const actionType = determineActionType(req);
 
@@ -65,7 +65,8 @@ export const safeguardsMiddleware = async (
       ...(actionResource && { actionResource })
     };
 
-    const rateLimitResult = await rateLimitService.checkRateLimit(rateLimitContext);
+    // Use atomic rate limit check that prevents race conditions
+    const rateLimitResult = await rateLimitService.checkAndRecordRateLimit(rateLimitContext);
 
     if (!rateLimitResult.allowed) {
       logger.warn('Rate limit exceeded', {
@@ -74,9 +75,6 @@ export const safeguardsMiddleware = async (
         action: actionType,
         blockReason: rateLimitResult.blockReason
       });
-
-      // Record the failed attempt
-      await rateLimitService.recordAttempt(rateLimitContext, false);
 
       res.status(429).json({
         success: false,
@@ -90,10 +88,7 @@ export const safeguardsMiddleware = async (
       return;
     }
 
-    // Record successful attempt
-    await rateLimitService.recordAttempt(rateLimitContext, true);
-
-    // 2. CONTENT MODERATION CHECK (for content creation)
+    // 2. ATOMIC CONTENT MODERATION CHECK (for content creation)
     if (shouldCheckModeration(req)) {
       const billId = extractBillId(req);
       const contentType = determineContentType(req);
@@ -112,8 +107,8 @@ export const safeguardsMiddleware = async (
         ...(billId && { billId })
       };
 
-      // Queue for moderation if content seems suspicious
-      const moderationResult = await moderationService.queueForModeration(moderationContext);
+      // Use atomic moderation queue operation to prevent duplicates
+      const moderationResult = await moderationService.queueForModerationAtomic(moderationContext);
 
       if (!moderationResult.success) {
         logger.warn('Content moderation queue failed', {

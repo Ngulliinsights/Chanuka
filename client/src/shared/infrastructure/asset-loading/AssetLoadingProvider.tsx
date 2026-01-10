@@ -1,7 +1,7 @@
 // Asset loading functionality will be implemented separately
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
-import { useOfflineDetection, OfflineDetectionState } from '@client/hooks/useOfflineDetection';
+import { useOfflineDetection, OfflineDetectionState } from '@client/shared/hooks/useOfflineDetection';
 
 // Mock AssetLoadingManager class for now
 class AssetLoadingManager {

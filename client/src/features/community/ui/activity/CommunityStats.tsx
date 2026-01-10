@@ -22,7 +22,7 @@ import {
 import React from 'react';
 import { useEffect, useMemo, memo } from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 

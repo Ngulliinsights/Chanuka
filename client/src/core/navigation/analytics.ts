@@ -4,7 +4,7 @@
  * Handles navigation event tracking and analytics
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { NavigationItem } from './types';
 

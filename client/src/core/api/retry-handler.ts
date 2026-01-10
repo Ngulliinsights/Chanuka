@@ -5,7 +5,7 @@
  * and integrates with the error correlation system.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 export interface RetryConfig {

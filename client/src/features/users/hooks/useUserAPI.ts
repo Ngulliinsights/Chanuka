@@ -9,8 +9,8 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { useCallback, useEffect } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { userService as userBackendService } from '@client/services/userService';
-import type { UserProfile, NotificationPreferences } from '@client/services/userService';
+import { userService as userBackendService } from '@client/shared/services/userService';
+import type { UserProfile, NotificationPreferences } from '@client/shared/services/userService';
 import { useUserDashboardStore } from '@client/shared/infrastructure/store/slices/userDashboardSlice';
 import type {
   PrivacyControls,
@@ -18,7 +18,7 @@ import type {
   DashboardPreferences,
   UserDashboardData,
 } from '@client/shared/types/user-dashboard';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Types for engagement and activity tracking - matching service expectations
 type ActionType = 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';

@@ -12,7 +12,7 @@
  * @module api/system
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';

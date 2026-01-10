@@ -8,7 +8,7 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate, NavigateOptions } from 'react-router-dom';
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface NavigationPerformanceProps {
   children: React.ReactNode;

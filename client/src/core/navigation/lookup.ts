@@ -4,7 +4,7 @@
  * Handles navigation item lookup and path utilities
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { NavigationItem, NavigationSection } from './types';
 

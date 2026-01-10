@@ -1,11 +1,12 @@
-import { AlertTriangle, Network, Server, Database, Shield } from 'lucide-react';
+import { AlertTriangle, Network, Database, Shield, AlertCircle } from 'lucide-react';
 import React from 'react';
 /**
  * Error Icon Utility
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@client/utils/logger';
+import { BaseError } from '../../classes';
+import { ErrorDomain, ErrorSeverity } from '../../constants';
 
 export function getErrorIcon(error: BaseError): JSX.Element {
   const domain = (error.metadata?.domain as ErrorDomain | undefined) || ErrorDomain.UNKNOWN;
@@ -20,7 +21,7 @@ export function getErrorIcon(error: BaseError): JSX.Element {
       return <Network className="h-12 w-12 text-orange-500" />;
 
     case ErrorDomain.EXTERNAL_SERVICE:
-      return <Server className="h-12 w-12 text-orange-500" />;
+      return <AlertCircle className="h-12 w-12 text-orange-500" />;
 
     case ErrorDomain.DATABASE:
     case ErrorDomain.CACHE:

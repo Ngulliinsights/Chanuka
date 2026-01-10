@@ -18,7 +18,7 @@ import {
   FileText,
   Heart,
   LayoutGrid,
-  LayoutList,
+  List,
   Lightbulb,
   MessageCircle,
   RefreshCw,
@@ -29,10 +29,10 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { copySystem } from '@client/content/copy-system';
+import { copySystem } from '@client/shared/content/copy-system';
 import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { useToast } from '@client/hooks/use-toast';
+import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/shared/hooks/use-toast';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
@@ -44,7 +44,7 @@ import {
   SelectValue,
 } from '@client/shared/design-system';
 import { cn } from '@client/shared/design-system/utils/cn';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { useBills } from '../hooks';
 import type { Bill, BillsQueryParams } from '../model/types';

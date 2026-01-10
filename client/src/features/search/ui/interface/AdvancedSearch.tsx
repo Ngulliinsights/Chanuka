@@ -20,7 +20,7 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { useToast } from '@client/hooks/use-toast.ts';
+import { useToast } from '@client/shared/hooks/use-toast.ts';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';

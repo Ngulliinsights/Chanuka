@@ -3,23 +3,28 @@
  * Validates loading operations and configurations
  */
 
-import { LoadingOperation, ProgressiveStage, LoadingError } from '@client/shared/types';
+import { LoadingOperation, ProgressiveStage } from '@client/shared/types';
 
-export class LoadingValidationError extends LoadingError {
+export class LoadingValidationError extends Error {
+  public readonly field?: string;
+  public readonly metadata?: Record<string, any>;
+
   constructor(
     message: string,
-    public field?: string,
+    field?: string,
     metadata?: Record<string, any>
   ) {
-    super('validation', message, 'VALIDATION_ERROR', { field, ...metadata });
+    super(message);
     this.name = 'LoadingValidationError';
+    this.field = field;
+    this.metadata = metadata;
   }
 }
 
 /**
  * Validate loading operation
  */
-export function validateLoadingOperation(operation: LoadingOperation): void {
+export function validateLoadingOperation(operation: any): void {
   if (!operation.id || typeof operation.id !== 'string') {
     throw new LoadingValidationError('Operation ID is required and must be a string', 'id');
   }
@@ -33,15 +38,15 @@ export function validateLoadingOperation(operation: LoadingOperation): void {
     throw new LoadingValidationError('Invalid operation type', 'type');
   }
 
-  if (!operation.priority || !['high', 'medium', 'low'].includes(operation.priority)) {
+  if (operation.priority && !['high', 'medium', 'low'].includes(operation.priority)) {
     throw new LoadingValidationError('Invalid priority level', 'priority');
   }
 
-  if (operation.retryCount < 0) {
+  if (operation.retryCount !== undefined && operation.retryCount < 0) {
     throw new LoadingValidationError('Retry count cannot be negative', 'retryCount');
   }
 
-  if (operation.maxRetries < 0) {
+  if (operation.maxRetries !== undefined && operation.maxRetries < 0) {
     throw new LoadingValidationError('Max retries cannot be negative', 'maxRetries');
   }
 
@@ -57,7 +62,7 @@ export function validateLoadingOperation(operation: LoadingOperation): void {
 /**
  * Safe validation that returns result instead of throwing
  */
-export function safeValidateLoadingOperation(operation: LoadingOperation): {
+export function safeValidateLoadingOperation(operation: any): {
   success: boolean;
   error?: LoadingValidationError;
 } {
@@ -78,7 +83,7 @@ export function safeValidateLoadingOperation(operation: LoadingOperation): {
 /**
  * Validate loading scenario
  */
-export function validateLoadingScenario(scenario: LoadingScenario): void {
+export function validateLoadingScenario(scenario: any): void {
   if (!scenario.id || typeof scenario.id !== 'string') {
     throw new LoadingValidationError('Scenario ID is required and must be a string', 'id');
   }
@@ -87,27 +92,27 @@ export function validateLoadingScenario(scenario: LoadingScenario): void {
     throw new LoadingValidationError('Scenario name is required and must be a string', 'name');
   }
 
-  if (!scenario.priority || !['high', 'medium', 'low'].includes(scenario.priority)) {
+  if (scenario.priority && !['high', 'medium', 'low'].includes(scenario.priority)) {
     throw new LoadingValidationError('Invalid priority level', 'priority');
   }
 
-  if (scenario.maxRetries < 0) {
+  if (scenario.maxRetries !== undefined && scenario.maxRetries < 0) {
     throw new LoadingValidationError('Max retries cannot be negative', 'maxRetries');
   }
 
-  if (scenario.defaultTimeout <= 0) {
+  if (scenario.defaultTimeout !== undefined && scenario.defaultTimeout <= 0) {
     throw new LoadingValidationError('Default timeout must be positive', 'defaultTimeout');
   }
 
   if (
-    !scenario.retryStrategy ||
+    scenario.retryStrategy &&
     !['exponential', 'linear', 'none'].includes(scenario.retryStrategy)
   ) {
     throw new LoadingValidationError('Invalid retry strategy', 'retryStrategy');
   }
 
-  if (scenario.stages) {
-    scenario.stages.forEach((stage, index) => {
+  if (scenario.stages && Array.isArray(scenario.stages)) {
+    scenario.stages.forEach((stage: any, index: number) => {
       try {
         validateProgressiveStage(stage);
       } catch (error) {
@@ -172,7 +177,7 @@ export function validateLoadingConfig(config: any): void {
  * Validate operation compatibility with connection
  */
 export function validateOperationConnectionCompatibility(
-  operation: LoadingOperation,
+  operation: any,
   connectionType: string,
   isOnline: boolean
 ): { compatible: boolean; reason?: string } {

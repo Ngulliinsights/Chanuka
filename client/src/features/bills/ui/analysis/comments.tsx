@@ -28,7 +28,7 @@ import {
 import { Input } from '@client/shared/design-system';
 import { Separator } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 // Using a simple date formatting function instead of date-fns
 const formatDistanceToNow = (date: Date) => {
   const now = new Date();

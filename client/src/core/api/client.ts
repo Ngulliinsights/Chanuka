@@ -1,7 +1,7 @@
 // Main API Client with HTTP Methods, Retry Logic, and Caching
 // Optimized implementation with enhanced error handling and performance
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import { createAuthApiService } from '../auth';
 import { ErrorFactory, ErrorDomain } from '../error';
 import globalErrorHandler from '../error';
@@ -9,7 +9,7 @@ import globalErrorHandler from '../error';
 import { globalCache, CacheKeyGenerator } from './cache-manager';
 import { globalConfig } from './config';
 import { ApiRequest, ApiResponse, RequestOptions, ClientConfig, UnifiedApiClient } from './types';
-import type { RequestInterceptor, ResponseInterceptor } from './types/common';
+import type { RequestInterceptor, ResponseInterceptor, BaseApiRequest, BaseApiResponse } from './types/common';
 
 // Circuit Breaker State
 enum CircuitState {
@@ -365,9 +365,11 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   // Apply all response interceptors
   private async applyResponseInterceptors<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
     // Convert to BaseApiResponse for interceptors
-    let baseResponse = {
+    let baseResponse: BaseApiResponse<T> = {
       data: response.data,
       status: response.status,
+      statusText: response.statusText || 'OK',
+      headers: response.headers || {},
     };
 
     // Apply response interceptors
@@ -903,24 +905,24 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
 // Helper function to create request interceptor
 export const createAuthRequestInterceptor = (getToken: () => string | null): RequestInterceptor => {
-  return async (config: FetchConfig): Promise<FetchConfig> => {
+  return async (request: BaseApiRequest): Promise<BaseApiRequest> => {
     const token = getToken();
     if (token) {
       return {
-        ...config,
+        ...request,
         headers: {
-          ...config.headers,
+          ...request.headers,
           Authorization: `Bearer ${token}`,
         },
       };
     }
-    return config;
+    return request;
   };
 };
 
 // Helper function to create logging response interceptor
 export const createLoggingResponseInterceptor = (): ResponseInterceptor => {
-  return async (response: Response): Promise<Response> => {
+  return async (response: BaseApiResponse): Promise<BaseApiResponse> => {
     const logLevel = response.status >= 400 ? 'warn' : 'debug';
     logger[logLevel]('API Response received', {
       component: 'ApiClient',

@@ -6,7 +6,7 @@
  * with enhanced modular architecture.
  */
 
-import { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
+import { ErrorDomain, ErrorSeverity, RecoveryAction, RecoveryConditionOperator, ErrorRecoveryStrategyType } from './constants';
 
 // ============================================================================
 // Recovery Strategy Types
@@ -35,6 +35,78 @@ export interface RecoveryResult {
 }
 
 // ============================================================================
+// Advanced Error Recovery Types
+// ============================================================================
+
+/**
+ * Error recovery action types
+ */
+export enum ErrorRecoveryAction {
+  RETRY = 'retry',
+  FALLBACK = 'fallback',
+  CIRCUIT_BREAKER = 'circuit_breaker',
+  FAIL_FAST = 'fail_fast',
+  IGNORE = 'ignore',
+  ESCALATE = 'escalate',
+  RECOVER = 'recover',
+  NOTIFY = 'notify',
+}
+
+/**
+ * Error recovery strategy configuration
+ */
+export interface ErrorRecoveryStrategyConfig {
+  id: string;
+  type: ErrorRecoveryStrategyType;
+  name: string;
+  description: string;
+  enabled: boolean;
+  priority: number;
+  conditions: RecoveryCondition[];
+  parameters: Record<string, unknown>;
+  fallbackStrategies?: string[]; // Fallback strategies if this fails
+  timeout?: number; // Strategy timeout in milliseconds
+  maxRetries?: number; // Maximum retry attempts
+  retryDelay?: number; // Delay between retries in milliseconds
+  exponentialBackoff?: boolean; // Whether to use exponential backoff
+  circuitBreakerThreshold?: number; // Circuit breaker failure threshold
+  circuitBreakerTimeout?: number; // Circuit breaker timeout in milliseconds
+}
+
+/**
+ * Recovery condition for strategy selection
+ */
+export interface RecoveryCondition {
+  field: string; // Field to check (e.g., 'type', 'severity', 'context.system')
+  operator: RecoveryConditionOperator;
+  value: unknown; // Value to compare against
+}
+
+/**
+ * Cross-system error with enhanced context
+ */
+export interface CrossSystemError extends Error {
+  id: string;
+  type: ErrorDomain;
+  severity: ErrorSeverity;
+  code: string;
+  statusCode?: number;
+  timestamp: number;
+  context: ErrorContext;
+  metadata: ErrorMetadata;
+  system: string; // Originating system
+  propagated: boolean; // Whether error has been propagated
+  propagationPath: string[]; // Path the error took through systems
+  recoveryAttempts: number; // Number of recovery attempts
+  lastRecoveryStrategy?: string; // Last recovery strategy attempted
+  userMessage?: string; // User-friendly error message
+  technicalDetails?: string; // Technical error details
+  suggestedActions?: string[]; // Suggested recovery actions
+  stack?: string; // Stack trace
+  cause?: Error; // Original error cause
+}
+
+// ============================================================================
 // Core Error Types (Consolidated from multiple sources)
 // ============================================================================
 
@@ -53,6 +125,10 @@ export interface ErrorContext {
   retryCount?: number; // Number of retry attempts
   route?: string; // Current route
   timestamp?: number; // Error timestamp
+  system?: string; // System identifier
+  subsystem?: string; // Subsystem identifier
+  correlationId?: string; // Cross-system correlation ID
+  parentErrorId?: string; // Parent error for error chains
   [key: string]: unknown; // Additional custom context
 }
 
@@ -69,6 +145,9 @@ export interface ErrorMetadata {
   correlationId?: string;
   cause?: Error | unknown;
   code: string;
+  system?: string; // System identifier
+  version?: string; // System version
+  environment?: string; // Environment (dev, staging, prod)
 }
 
 /**

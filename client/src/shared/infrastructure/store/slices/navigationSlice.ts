@@ -16,9 +16,9 @@ import {
   UserRole,
   NavigationPreferences,
   RecentPage,
-} from '@/shared/types/navigation';
+} from '@client/shared/types/navigation';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Constants for better maintainability
 const MAX_RECENT_PAGES = 10;

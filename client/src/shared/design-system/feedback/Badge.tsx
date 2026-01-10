@@ -11,7 +11,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { HTMLAttributes } from 'react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 const badgeVariants = cva(
   [

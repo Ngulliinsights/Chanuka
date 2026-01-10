@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useToast } from '@client/hooks/use-toast.ts';
+import { useToast } from '@client/shared/hooks/use-toast.ts';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger.ts';
+import { logger } from '@client/shared/utils/logger.ts';
 
 interface SearchAnalyticsData {
   overview: {

@@ -20,13 +20,13 @@ import React from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { copySystem } from '@client/content/copy-system';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { copySystem } from '@client/shared/content/copy-system';
+import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface TestResult {
   name: string;

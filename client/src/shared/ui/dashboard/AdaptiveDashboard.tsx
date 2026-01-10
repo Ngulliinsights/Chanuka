@@ -23,7 +23,7 @@ import {
   TabsTrigger,
 } from '@client/shared/design-system';
 import type { UserActivity } from '@client/shared/types/analytics';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { ExpertDashboardLayout } from './layouts/ExpertDashboardLayout';
 import { IntermediateDashboardLayout } from './layouts/IntermediateDashboardLayout';

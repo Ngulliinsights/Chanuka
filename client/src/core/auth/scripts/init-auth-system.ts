@@ -7,7 +7,7 @@
  * @module init-auth-system
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
 import { initializeAuth, getAuthSystemStatus, type AuthInitOptions } from '../config/auth-init';
@@ -353,14 +353,14 @@ export function isAuthSystemReady(): boolean {
 export const USAGE_EXAMPLES = {
   react: `
 // In your main App.tsx or index.tsx
-import { initAuthSystem } from '@/core/auth/scripts/init-auth-system';
-import { globalApiClient } from '@/core/api';
+import { initAuthSystem } from '@client/core/auth/scripts/init-auth-system';
+import { globalApiClient } from '@client/core/api';
 
 // Initialize auth system
 await initAuthSystem(globalApiClient);
 
 // Wrap your app with AuthProvider
-import { AuthProvider } from '@/core/auth';
+import { AuthProvider } from '@client/core/auth';
 
 function App() {
   return (
@@ -373,7 +373,7 @@ function App() {
 
   redux: `
 // In your store configuration
-import { authReducer, authMiddleware } from '@/core/auth';
+import { authReducer, authMiddleware } from '@client/core/auth';
 
 export const store = configureStore({
   reducer: {
@@ -387,7 +387,7 @@ export const store = configureStore({
 
   testing: `
 // In your test setup
-import { setupAuthForTesting } from '@/core/auth/scripts/init-auth-system';
+import { setupAuthForTesting } from '@client/core/auth/scripts/init-auth-system';
 import { mockApiClient } from '@client/test-utils';
 
 beforeAll(async () => {
@@ -397,8 +397,8 @@ beforeAll(async () => {
 
   nextjs: `
 // In your _app.tsx
-import { initAuthSystem } from '@/core/auth/scripts/init-auth-system';
-import { apiClient } from '@/core/api';
+import { initAuthSystem } from '@client/core/auth/scripts/init-auth-system';
+import { apiClient } from '@client/core/api';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {

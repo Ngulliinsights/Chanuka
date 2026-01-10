@@ -27,7 +27,7 @@ import {
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';

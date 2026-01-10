@@ -17,7 +17,7 @@ import type {
   StakeholderAnalysis,
   AnalyticsExport,
 } from '@client/shared/types/analytics';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { globalErrorHandler } from './errors';
 import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';

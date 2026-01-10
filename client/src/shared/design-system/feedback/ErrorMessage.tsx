@@ -7,7 +7,7 @@
 import { AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 // Note: Button and Card components not available in current design system structure
 // This component is disabled and needs to be refactored to use available components

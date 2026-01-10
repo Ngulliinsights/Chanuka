@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@client/shared/utils/cn';
 
 interface LayoutProps {
   children: React.ReactNode;

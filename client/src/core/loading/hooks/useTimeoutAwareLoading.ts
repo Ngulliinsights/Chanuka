@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 import { useLoading } from '@client/core/loading';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 export interface TimeoutConfig {
   timeout: number;

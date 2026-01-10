@@ -8,11 +8,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { X, TrendingUp, MessageSquare, Award, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import React from 'react';
 
-import { User } from '@/core/auth/types';
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent } from '@/shared/design-system/typography/Card';
-import { UserDashboardData } from '@/shared/types/user-dashboard';
+import { User } from '@client/core/auth/types';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Card, CardContent } from '@client/shared/design-system/typography/Card';
+import { UserDashboardData } from '@client/shared/types/user-dashboard';
 
 interface WelcomeMessageProps {
   user: User;

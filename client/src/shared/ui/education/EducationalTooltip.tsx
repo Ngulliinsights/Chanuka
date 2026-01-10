@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/shared/design-system/feedback/Tooltip';
+} from '@client/shared/design-system/feedback/Tooltip';
 
 interface EducationalTooltipProps {
   term: string;

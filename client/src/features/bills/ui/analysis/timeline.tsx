@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
 import React from 'react';
 
-import { cn } from '@client/lib/utils';
-import { logger } from '@client/utils/logger';
+import { cn } from '@client/shared/lib/utils';
+import { logger } from '@client/shared/utils/logger';
 
 interface Action {
   title: string;

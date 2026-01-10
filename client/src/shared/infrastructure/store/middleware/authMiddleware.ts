@@ -5,13 +5,13 @@
 
 import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
-import { authApiService as authService } from '@/core/api';
-import { logout, tokenManager, clearError } from '@/core/auth';
-import { rbacManager } from '@/core/auth/rbac';
-import { requestDeduplicator } from '@/shared/infrastructure/http/request-deduplicator';
-import { securityMonitor } from '@/utils/security';
+import { authApiService as authService } from '@client/core/api';
+import { logout, tokenManager, clearError } from '@client/core/auth';
+import { rbacManager } from '@client/core/auth/rbac';
+import { requestDeduplicator } from '@client/shared/infrastructure/http/request-deduplicator';
+import { securityMonitor } from '@client/utils/security';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import { setCurrentSession, recordActivity } from '../slices/sessionSlice';
 
 interface AuthMiddlewareConfig {

@@ -14,24 +14,24 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Alert, AlertDescription } from '@/shared/design-system';
-import { Badge } from '@/shared/design-system';
-import { Button } from '@/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
-import { Input } from '@/shared/design-system';
-import { Label } from '@/shared/design-system';
+import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Input } from '@client/shared/design-system';
+import { Label } from '@client/shared/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/design-system';
-import { Separator } from '@/shared/design-system';
-import { Switch } from '@/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
+} from '@client/shared/design-system';
+import { Separator } from '@client/shared/design-system';
+import { Switch } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
-import { useToast } from '../../../hooks/use-toast';
+import { useToast } from '../@client/shared/hooks/use-toast';
 
 // --- TYPES ---
 

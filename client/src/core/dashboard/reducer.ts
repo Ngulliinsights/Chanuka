@@ -5,7 +5,12 @@
  * in the DashboardProvider. It's kept here for reference and potential future use.
  */
 
-import { DashboardState, DashboardAction } from '@client/shared/types';
+import { DashboardState } from './types';
+
+export interface DashboardAction {
+  type: string;
+  payload?: any;
+}
 
 /**
  * Reducer for dashboard state transitions

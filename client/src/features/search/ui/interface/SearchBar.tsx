@@ -7,7 +7,7 @@ import { Button } from '@client/shared/design-system';
 import { Card, CardContent } from '@client/shared/design-system';
 import { Input } from '@client/shared/design-system';
 
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../../hooks/useSearch';
+import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/shared/hooks/useSearch';
 
 // Define SearchSuggestion type locally
 interface SearchSuggestion {

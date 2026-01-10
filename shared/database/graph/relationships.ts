@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Core Relationship Models (FULLY REFACTORED & OPTIMIZED)
  *

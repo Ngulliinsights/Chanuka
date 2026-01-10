@@ -7,13 +7,13 @@
 
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
+import { Button } from '@client/shared/design-system';
 import {
   useNavigationSlice,
   useSidebar,
   useMobileMenu,
   useNavigationPreferences,
-} from '@/shared/hooks/useNavigationSlice';
+} from '@client/shared/hooks/useNavigationSlice';
 
 export function NavigationSliceDemo() {
   const navigation = useNavigationSlice();

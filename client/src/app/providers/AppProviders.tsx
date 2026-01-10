@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Provider as ReduxProvider } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ThemeProvider } from '@client/contexts/ThemeContext';
+import { ThemeProvider } from '@client/shared/contexts/ThemeContext';
 import { AnalyticsProvider } from '@client/core/analytics/AnalyticsProvider';
 import { useConnectionAware } from '@client/core/api/hooks/useConnectionAware';
 import { useAuth } from '@client/core/auth';
@@ -13,15 +13,15 @@ import { LoadingProvider } from '@client/core/loading';
 import { createNavigationProvider } from '@client/core/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
 import { AuthProvider } from '@client/features/users/hooks';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { useOfflineDetection } from '@client/hooks/useOfflineDetection';
+import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
+import { useOfflineDetection } from '@client/shared/hooks/useOfflineDetection';
 import { KenyanContextProvider } from '@client/shared/context/KenyanContextProvider';
 import { ChanukaProviders } from '@client/shared/design-system';
 import { I18nProvider } from '@client/shared/hooks/use-i18n';
 import { initializeStore } from '@client/shared/infrastructure/store';
 import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
 import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
-import { assetLoadingManager } from '@client/utils/assets';
+import { assetLoadingManager } from '@client/shared/utils/assets';
 
 import { defaultQueryClient } from './queryClient';
 

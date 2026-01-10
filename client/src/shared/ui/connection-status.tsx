@@ -2,9 +2,9 @@ import { AlertCircle, CheckCircle, Network, RefreshCw, Settings } from 'lucide-r
 import { useState } from 'react';
 import React from 'react';
 
-import { useApiConnection } from '@/core/api/hooks/useApiConnection';
+import { useApiConnection } from '@client/core/api/hooks/useApiConnection';
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface ConnectionStatusProps {
   showDetails?: boolean;

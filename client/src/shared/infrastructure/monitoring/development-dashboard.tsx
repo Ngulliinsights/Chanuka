@@ -50,7 +50,7 @@ import { Button } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Simplified development dashboard for shared infrastructure
 export const DevelopmentMonitoringDashboard: React.FC = () => {

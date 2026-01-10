@@ -1,4 +1,4 @@
-import type { NavigationItem, UserRole } from '@/shared/types';
+import type { NavigationItem, UserRole } from '@client/shared/types';
 
 export const canViewItem = (
   item: NavigationItem,

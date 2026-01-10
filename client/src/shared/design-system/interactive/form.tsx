@@ -11,7 +11,7 @@ import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 import { FormProvider, useFormContext } from 'react-hook-form';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 const Form = FormProvider;
 

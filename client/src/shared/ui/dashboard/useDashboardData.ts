@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useAuth } from '@/core/auth';
-import type { DataExportRequest } from '@/shared/types/user-dashboard';
+import { useAuth } from '@client/core/auth';
+import type { DataExportRequest } from '@client/shared/types/user-dashboard';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import {
   useUserDashboardSelectors,
   useUserDashboardStore,

@@ -2,10 +2,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { BarChart3, Target, Award, Star } from 'lucide-react';
 import React from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/design-system';
-import { Badge } from '@/shared/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
+import { Badge } from '@client/shared/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 
 import { ActivitySection } from '../sections/ActivitySection';
 import { BillsSection } from '../sections/BillsSection';

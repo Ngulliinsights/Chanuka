@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useToast } from '@client/hooks/use-toast.ts';
+import { useToast } from '@client/shared/hooks/use-toast.ts';
 import { Badge } from '@client/shared/design-system';
 import { Tooltip } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

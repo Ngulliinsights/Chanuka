@@ -4,7 +4,7 @@
  * Provides type-safe, consistent interface for all auth operations
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
 import type {

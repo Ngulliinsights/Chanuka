@@ -420,8 +420,8 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
       error.message.toLowerCase().includes('api') ||
       error.message.toLowerCase().includes('service') ||
       error.message.toLowerCase().includes('http') ||
-      error.context?.serviceName ||
-      error.context?.endpoint
+      !!error.context?.serviceName ||
+      !!error.context?.endpoint
     );
   }
 

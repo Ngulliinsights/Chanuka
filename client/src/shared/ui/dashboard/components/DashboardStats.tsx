@@ -8,9 +8,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { BookOpen, MessageSquare, TrendingUp, Calendar, Award, Target } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Card, CardContent } from '@/shared/design-system/typography/Card';
-import { UserDashboardData, CivicImpactMetrics } from '@/shared/types/user-dashboard';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Card, CardContent } from '@client/shared/design-system/typography/Card';
+import { UserDashboardData, CivicImpactMetrics } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardStats.module.css';
 

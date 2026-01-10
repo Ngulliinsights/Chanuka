@@ -10,7 +10,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import type { LoginCredentials, User, RegisterData, PrivacySettings } from '../types';

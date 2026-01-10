@@ -11,7 +11,7 @@ import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } 
 import React from 'react';
 
 import { useAppDispatch, useAppSelector } from '@client/shared/hooks/store';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';

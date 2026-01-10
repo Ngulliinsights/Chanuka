@@ -311,10 +311,10 @@ export class FSDPatternValidator {
 
     // Validate that legacy imports still work
     const legacyImports = [
-      '@client/lib/form-builder',
-      '@client/lib/validation-schemas',
-      '@client/lib/queryClient',
-      '@client/lib/utils',
+      '@client/shared/lib/form-builder',
+      '@client/shared/lib/validation-schemas',
+      '@client/shared/lib/queryClient',
+      '@client/shared/lib/utils',
     ];
 
     legacyImports.forEach(legacyImport => {

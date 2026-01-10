@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { realTimeService } from '../services/realtime-service';
 import { CommunityRealTimeHookReturn, TypingIndicator, CommentUpdate } from '../types';

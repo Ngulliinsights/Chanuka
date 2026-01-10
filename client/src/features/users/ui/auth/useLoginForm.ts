@@ -3,12 +3,12 @@
  * Manages login form state, validation, and submission
  */
 
-import { validatePassword } from '@client/utils/password-validation';
+import { validatePassword } from '@client/shared/utils/password-validation';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { validateEmail } from '@client/utils/input-validation';
-import { logger } from '@client/utils/logger';
+import { validateEmail } from '@client/shared/utils/input-validation';
+import { logger } from '@client/shared/utils/logger';
 
 export interface LoginFormData {
   email: string;

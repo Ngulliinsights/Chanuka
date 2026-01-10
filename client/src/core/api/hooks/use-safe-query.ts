@@ -12,7 +12,7 @@ import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from '@tanstack
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 
 import { globalApiClient } from '../index';
-// import { logger } from '@client/utils/logger';
+// import { logger } from '@client/shared/utils/logger';
 
 export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'> {
   endpoint?: string;
@@ -288,7 +288,7 @@ export function useCoordinatedQueries<T extends Record<string, unknown>>(
     queries.forEach((queryConfig, index) => {
       const queryResult = results[index];
       if (queryResult?.data) {
-        result[queryConfig.key as keyof T] = queryResult.data;
+        result[queryConfig.key as keyof T] = queryResult.data as T[keyof T];
       }
     });
     return result;

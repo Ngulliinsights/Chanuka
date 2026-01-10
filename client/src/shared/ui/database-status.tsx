@@ -1,17 +1,17 @@
 import { Search, AlertCircle, AlertTriangle, Info, Settings, ArrowLeft } from 'lucide-react';
 import React from 'react';
 
-import { Alert, AlertDescription } from '@/shared/design-system/feedback/Alert';
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
+import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/design-system/typography/Card';
-import { Skeleton } from '@/shared/ui/loading/ui/Skeleton';
+} from '@client/shared/design-system/typography/Card';
+import { Skeleton } from '@client/shared/ui/loading/ui/Skeleton';
 
 interface HealthStatus {
   status: string;

@@ -9,7 +9,7 @@
 import { forwardRef, HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes } from 'react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (

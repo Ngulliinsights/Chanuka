@@ -770,6 +770,7 @@ export class ErrorAnalyticsService {
       [ErrorSeverity.MEDIUM]: 2,
       [ErrorSeverity.HIGH]: 3,
       [ErrorSeverity.CRITICAL]: 5,
+      [ErrorSeverity.BLOCKER]: 6,
     };
 
     const totalImpact = matches.reduce(

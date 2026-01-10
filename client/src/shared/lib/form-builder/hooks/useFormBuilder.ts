@@ -1,6 +1,6 @@
 /**
  * Form Builder Hook
- * 
+ *
  * Core hook for building forms with integrated validation and error handling.
  * This hook wraps react-hook-form and provides additional features like
  * automatic Zod validation, enhanced error handling, loading states,
@@ -10,9 +10,9 @@
 import { useCallback, useState, useRef } from 'react';
 import { useForm, UseFormReturn, SubmitHandler, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema, ZodError, z } from 'zod';
 
-import { logger } from '@client/shared/lib/utils/logger';
+import { logger } from '../utils/logger';
 import type {
   FormBuilderOptions,
   FormBuilderReturn,

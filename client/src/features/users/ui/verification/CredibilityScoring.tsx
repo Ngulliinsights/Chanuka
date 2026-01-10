@@ -8,7 +8,7 @@
 import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import {

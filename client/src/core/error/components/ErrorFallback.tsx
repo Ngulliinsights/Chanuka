@@ -25,7 +25,7 @@ interface ErrorFallbackProps {
 
 interface ErrorDisplayConfig {
   variant: 'page' | 'inline';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'critical' | 'blocker';
   showIcon: boolean;
   showRetry: boolean;
   showReport: boolean;
@@ -111,6 +111,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
     [ErrorSeverity.MEDIUM]: 'medium' as const,
     [ErrorSeverity.HIGH]: 'high' as const,
     [ErrorSeverity.CRITICAL]: 'critical' as const,
+    [ErrorSeverity.BLOCKER]: 'blocker' as const,
   };
 
   const displaySeverity = severityMap[severity] || 'high';

@@ -1,21 +1,10 @@
-/**
- * Neo4j Client Wrapper (REFACTORED)
- *
- * High-level Neo4j client with automatic session management,
- * connection pooling, and error handling.
- *
- * IMPROVEMENTS:
- * - ✅ Automatic session cleanup
- * - ✅ Connection pooling
- * - ✅ Retry logic built-in
- * - ✅ Comprehensive error handling
- * - ✅ Transaction support
- */
 
-import { Driver, Session, Transaction, Result, SessionConfig } from 'neo4j-driver';
+import { Driver, Transaction, Result, SessionConfig } from 'neo4j-driver';
+
+import { logger } from '../../../core/observability';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
 import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
-import { logger } from '@/core/observability';
+
 
 const errorHandler = new GraphErrorHandler();
 
@@ -41,9 +30,9 @@ export class Neo4jClient {
   /**
    * Execute a read query with automatic session management.
    */
-  async executeRead<T = any>(
+  async executeRead<T = unknown>(
     cypher: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<Result<T>> {
     return this.execute(cypher, params, 'READ');
   }
@@ -51,9 +40,9 @@ export class Neo4jClient {
   /**
    * Execute a write query with automatic session management and retry.
    */
-  async executeWrite<T = any>(
+  async executeWrite<T = unknown>(
     cypher: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<Result<T>> {
     return this.execute(cypher, params, 'WRITE');
   }
@@ -61,9 +50,9 @@ export class Neo4jClient {
   /**
    * Execute a query with automatic session management.
    */
-  private async execute<T = any>(
+  private async execute<T = unknown>(
     cypher: string,
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     mode: 'READ' | 'WRITE'
   ): Promise<Result<T>> {
     const sessionConfig: SessionConfig = {
@@ -92,7 +81,7 @@ export class Neo4jClient {
       if (mode === 'WRITE') {
         return await retryWithBackoff(executeQuery, {
           ...RETRY_PRESETS.DATABASE_OPERATION,
-          maxRetries: this.config.maxRetries,
+          ...(this.config.maxRetries !== undefined && { maxRetries: this.config.maxRetries }),
         });
       } else {
         return await executeQuery();
@@ -152,7 +141,7 @@ export class Neo4jClient {
       const result = await this.executeRead('RETURN 1 as health');
       return result.records.length > 0;
     } catch (error) {
-      logger.error('Health check failed', { error: error.message });
+      logger.error('Health check failed', { error: error instanceof Error ? error.message : String(error) });
       return false;
     }
   }
@@ -170,7 +159,7 @@ export class Neo4jClient {
         relationshipCount: Number(relResult.records[0]?.get('count')) || 0,
       };
     } catch (error) {
-      logger.error('Failed to get stats', { error: error.message });
+      logger.error('Failed to get stats', { error: error instanceof Error ? error.message : String(error) });
       return { nodeCount: 0, relationshipCount: 0 };
     }
   }

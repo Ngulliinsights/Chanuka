@@ -10,7 +10,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 import { BillRealTimeUpdate } from '@client/core/realtime/types';
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Badge } from '@client/shared/design-system';
 
 // Mock implementation until WebSocket hook is ready

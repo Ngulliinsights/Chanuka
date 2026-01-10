@@ -9,12 +9,12 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import React from 'react';
 
-import { browserDetector } from '@/core/browser/browser-detector';
-import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@/core/error';
-import { getPerformanceMonitor } from '@/core/performance';
-import { startTrace, finishTrace } from '@/utils/tracing';
+import { browserDetector } from '@client/core/browser/browser-detector';
+import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@client/core/error';
+import { getPerformanceMonitor } from '@client/core/performance';
+// import { startTrace, finishTrace } from '@client/shared/utils/tracing';
 
-import { logger } from '../../../utils/logger';
+// import { logger } from '@client/shared/utils/logger';
 
 /**
  * Represents a recovery option for error handling
@@ -180,10 +180,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    */
   override async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Start a trace for this error handling flow
-    const trace = startTrace('ErrorBoundary.componentDidCatch', {
-      component: this.props.context || 'ErrorBoundary',
-      url: typeof window !== 'undefined' ? window.location.href : undefined,
-    });
+    // const trace = startTrace('ErrorBoundary.componentDidCatch', {
+    //   component: this.props.context || 'ErrorBoundary',
+    //   url: typeof window !== 'undefined' ? window.location.href : undefined,
+    // });
 
     // Use unified error handler for comprehensive error processing
     const appError = coreErrorHandler.handleError({
@@ -264,16 +264,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.errorMetrics.push(metrics);
 
     // Process through error handler chain (log comprehensive error)
-    logger.error('Enhanced error boundary caught error', {
-      component: 'ErrorBoundary',
-      errorId,
-      componentStack: errorInfo.componentStack,
-      context: this.props.context,
-      browserInfo: browserDetector.getBrowserInfo(),
-      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
-      recoveryAttempts: this.recoveryAttempts,
-      hasRecoveryOptions: true,
-    });
+    // logger.error('Enhanced error boundary caught error', {
+    //   component: 'ErrorBoundary',
+    //   errorId,
+    //   componentStack: errorInfo.componentStack,
+    //   context: this.props.context,
+    //   browserInfo: browserDetector.getBrowserInfo(),
+    //   performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
+    //   recoveryAttempts: this.recoveryAttempts,
+    //   hasRecoveryOptions: true,
+    // });
 
     // Attempt automatic recovery if enabled
     if (this.props.enableRecovery) {
@@ -289,14 +289,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.props.onMetricsCollected) {
       this.props.onMetricsCollected(metrics);
     }
+// Finish trace with outcome
+// try {
+//   const result = this.recoveryAttempts > 0 ? 'success' : 'error';
+//   finishTrace(trace, result);
+// } catch (e) {
+//   logger.debug('Trace finish failed in ErrorBoundary', { error: e });
+// }
 
-    // Finish trace with outcome
-    try {
-      const result = this.recoveryAttempts > 0 ? 'success' : 'error';
-      finishTrace(trace, result);
-    } catch (e) {
-      logger.debug('Trace finish failed in ErrorBoundary', { error: e });
-    }
   }
 
   /**
@@ -351,7 +351,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             try {
               localStorage.clear();
             } catch (e) {
-              logger.warn('Failed to clear localStorage', { error: e });
+              // logger.warn('Failed to clear localStorage', { error: e });
             }
           }
           this.handleRetry();
@@ -378,12 +378,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       try {
         this.recoveryAttempts++;
-        logger.info('Attempting automatic recovery', {
-          component: 'ErrorBoundary',
-          errorId: this.state.errorId,
-          recoveryOption: option.id,
-          attemptNumber: this.recoveryAttempts,
-        });
+        // logger.info('Attempting automatic recovery', {
+        //   component: 'ErrorBoundary',
+        //   errorId: this.state.errorId,
+        //   recoveryOption: option.id,
+        //   attemptNumber: this.recoveryAttempts,
+        // });
 
         // Apply timeout to recovery action
         const timeout = this.props.recoveryTimeout || 5000;
@@ -410,22 +410,22 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           latestMetric.recoveryAttempts = this.recoveryAttempts;
         }
 
-        logger.info('Automatic error recovery successful', {
-          component: 'ErrorBoundary',
-          errorId: this.state.errorId,
-          recoveryOption: option.id,
-          attemptNumber: this.recoveryAttempts,
-        });
+        // logger.info('Automatic error recovery successful', {
+        //   component: 'ErrorBoundary',
+        //   errorId: this.state.errorId,
+        //   recoveryOption: option.id,
+        //   attemptNumber: this.recoveryAttempts,
+        // });
 
         return;
       } catch (recoveryError) {
-        logger.warn('Automatic recovery attempt failed', {
-          component: 'ErrorBoundary',
-          errorId: this.state.errorId,
-          recoveryOption: option.id,
-          attemptNumber: this.recoveryAttempts,
-          error: recoveryError,
-        });
+        // logger.warn('Automatic recovery attempt failed', {
+        //   component: 'ErrorBoundary',
+        //   errorId: this.state.errorId,
+        //   recoveryOption: option.id,
+        //   attemptNumber: this.recoveryAttempts,
+        //   error: recoveryError,
+        // });
       }
     }
 
@@ -450,10 +450,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoverySuccessful: false,
     });
 
-    logger.info('Manual retry attempted', {
-      component: 'ErrorBoundary',
-      attemptNumber: this.recoveryAttempts,
-    });
+    // logger.info('Manual retry attempted', {
+    //   component: 'ErrorBoundary',
+    //   attemptNumber: this.recoveryAttempts,
+    // });
   };
 
   private handleFeedback = async (feedback: UserFeedback) => {
@@ -469,11 +469,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       };
 
       // Log feedback for now (could be sent to analytics service)
-      logger.info('User feedback submitted', {
-        component: 'ErrorBoundary',
-        errorId: this.state.errorId,
-        feedback: enhancedFeedback,
-      });
+      // logger.info('User feedback submitted', {
+      //   component: 'ErrorBoundary',
+      //   errorId: this.state.errorId,
+      //   feedback: enhancedFeedback,
+      // });
 
       this.setState({ userFeedbackSubmitted: true });
 
@@ -483,11 +483,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         latestMetric.userFeedbackProvided = true;
       }
     } catch (error) {
-      logger.error('Failed to submit user feedback', {
-        component: 'ErrorBoundary',
-        errorId: this.state.errorId,
-        error,
-      });
+      // logger.error('Failed to submit user feedback', {
+      //   component: 'ErrorBoundary',
+      //   errorId: this.state.errorId,
+      //   error,
+      // });
     }
   };
 
@@ -498,10 +498,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   private handleContactSupport = () => {
-    logger.info('User requested support contact', {
-      component: 'ErrorBoundary',
-      errorId: this.state.errorId,
-    });
+    // logger.info('User requested support contact', {
+    //   component: 'ErrorBoundary',
+    //   errorId: this.state.errorId,
+    // });
 
     // In a real implementation, this would open a support modal/chat
     // For now, show an alert

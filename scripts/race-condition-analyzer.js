@@ -2,7 +2,7 @@
 
 /**
  * Race Condition Static Analysis Tool
- * 
+ *
  * Analyzes your codebase for potential race conditions without requiring
  * browser automation. Focuses on Redux state management, async operations,
  * WebSocket handling, and security operations.
@@ -10,6 +10,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+
 import chalk from 'chalk';
 
 class RaceConditionAnalyzer {
@@ -47,10 +48,10 @@ class RaceConditionAnalyzer {
   async analyzeReduxFiles() {
     console.log(chalk.yellow('📊 Analyzing Redux State Management...'));
 
+    // Updated file paths based on actual codebase structure
     const reduxFiles = [
-      'client/src/store/slices/loadingSlice.ts',
-      'client/src/store/slices/authSlice.ts',
-      'client/src/store/slices/realTimeSlice.ts'
+      'client/src/shared/infrastructure/store/slices/errorAnalyticsSlice.ts',
+      'client/src/core/loading/reducer.ts'
     ];
 
     for (const file of reduxFiles) {
@@ -71,9 +72,9 @@ class RaceConditionAnalyzer {
     if (filePath.includes('loadingSlice')) {
       // Check for operation ID conflicts
       if (content.includes('startLoadingOperation') && content.includes('operations[')) {
-        const hasProtection = content.includes('if (state.operations[id])') || 
+        const hasProtection = content.includes('if (state.operations[id])') ||
                              content.includes('operation existence check');
-        
+
         if (!hasProtection) {
           issues.push({
             type: 'CONCURRENT_OPERATIONS',
@@ -90,7 +91,7 @@ class RaceConditionAnalyzer {
       // Check for stats calculation races
       if (content.includes('averageLoadTime') && content.includes('completedOperations')) {
         const hasAtomicUpdate = content.includes('atomic') || content.includes('mutex');
-        
+
         if (!hasAtomicUpdate) {
           issues.push({
             type: 'STATS_RACE_CONDITION',
@@ -109,7 +110,7 @@ class RaceConditionAnalyzer {
     if (filePath.includes('authSlice')) {
       if (content.includes('login') && content.includes('logout')) {
         const hasStateLocking = content.includes('pending') || content.includes('loading');
-        
+
         if (!hasStateLocking) {
           issues.push({
             type: 'AUTH_STATE_RACE',
@@ -138,9 +139,9 @@ class RaceConditionAnalyzer {
     console.log(chalk.yellow('🔌 Analyzing Middleware Files...'));
 
     const middlewareFiles = [
-      'client/src/store/middleware/authMiddleware.ts',
-      'client/src/store/middleware/webSocketMiddleware.ts',
-      'client/src/store/middleware/navigationPersistenceMiddleware.ts'
+      'server/middleware/safeguards.ts',
+      'server/features/safeguards/application/moderation-service.ts',
+      'server/features/safeguards/infrastructure/safeguard-jobs.ts'
     ];
 
     for (const file of middlewareFiles) {
@@ -157,96 +158,105 @@ class RaceConditionAnalyzer {
   async analyzeMiddleware(filePath, content) {
     const issues = [];
 
-    // Check auth middleware for token refresh races
-    if (filePath.includes('authMiddleware')) {
-      const hasRefreshProtection = content.includes('refreshPromise') && 
-                                  content.includes('if (refreshPromise)');
-      
-      if (content.includes('refreshToken') && !hasRefreshProtection) {
+    // Check safeguards middleware for race conditions
+    if (filePath.includes('safeguards.ts')) {
+      // Check for concurrent moderation queue operations
+      if (content.includes('queueForModeration') && !content.includes('mutex')) {
         issues.push({
-          type: 'TOKEN_REFRESH_RACE',
+          type: 'MODERATION_QUEUE_RACE',
           severity: 'HIGH',
           file: filePath,
-          issue: 'Multiple token refresh attempts can execute concurrently',
-          line: this.findLineNumber(content, 'refreshToken'),
-          description: 'Token refresh operations lack proper synchronization',
-          mitigation: 'Implement promise caching or mutex for token refresh'
+          issue: 'Concurrent moderation queue operations can create duplicate entries',
+          line: this.findLineNumber(content, 'queueForModeration'),
+          description: 'Multiple requests can queue the same content simultaneously',
+          mitigation: 'Add mutex or check for existing queue items atomically'
         });
       }
 
-      // Check for permission cache races
-      if (content.includes('clearUserCache') || content.includes('clearCache')) {
-        const hasSynchronization = content.includes('await') || content.includes('mutex');
-        
-        if (!hasSynchronization) {
+      // Check for rate limit race conditions
+      if (content.includes('checkRateLimit') && content.includes('recordAttempt')) {
+        const hasAtomicCheck = content.includes('atomic') || content.includes('transaction');
+
+        if (!hasAtomicCheck) {
           issues.push({
-            type: 'CACHE_RACE_CONDITION',
-            severity: 'MEDIUM',
+            type: 'RATE_LIMIT_CHECK_RACE',
+            severity: 'CRITICAL',
             file: filePath,
-            issue: 'Cache clearing operations can interfere with each other',
-            line: this.findLineNumber(content, 'clearCache'),
-            description: 'Multiple cache operations can execute concurrently',
-            mitigation: 'Synchronize cache operations or use atomic cache management'
+            issue: 'Rate limit check and record operations can race',
+            line: this.findLineNumber(content, 'checkRateLimit'),
+            description: 'Check and record operations are not atomic, allowing rate limit bypass',
+            mitigation: 'Use atomic operations or database transactions for rate limit checks'
           });
         }
       }
     }
 
-    // Check WebSocket middleware
-    if (filePath.includes('webSocketMiddleware')) {
-      // Check connection state races
-      if (content.includes('updateConnectionState')) {
-        const hasDebouncing = content.includes('debounce') || content.includes('throttle');
-        
-        if (!hasDebouncing) {
+    // Check moderation service for singleton race conditions
+    if (filePath.includes('moderation-service.ts')) {
+      if (content.includes('getInstance') && !content.includes('initialized')) {
+        issues.push({
+          type: 'SINGLETON_INITIALIZATION_RACE',
+          severity: 'MEDIUM',
+          file: filePath,
+          issue: 'Singleton initialization can race during concurrent access',
+          line: this.findLineNumber(content, 'getInstance'),
+          description: 'Multiple threads can create multiple instances during initialization',
+          mitigation: 'Add initialization lock or use lazy initialization pattern'
+        });
+      }
+
+      // Check for concurrent queue item processing
+      if (content.includes('assignModerator') && content.includes('getPendingQueueItems')) {
+        const hasLocking = content.includes('lock') || content.includes('FOR UPDATE');
+
+        if (!hasLocking) {
           issues.push({
-            type: 'CONNECTION_STATE_RACE',
+            type: 'QUEUE_ASSIGNMENT_RACE',
             severity: 'HIGH',
             file: filePath,
-            issue: 'Connection state updates can race with each other',
-            line: this.findLineNumber(content, 'updateConnectionState'),
-            description: 'Rapid connect/disconnect cycles can cause state inconsistency',
-            mitigation: 'Debounce connection state updates or use state machine'
+            issue: 'Multiple moderators can be assigned to the same queue item',
+            line: this.findLineNumber(content, 'assignModerator'),
+            description: 'Queue item assignment lacks proper locking mechanism',
+            mitigation: 'Use SELECT FOR UPDATE or implement queue item locking'
           });
         }
       }
+    }
 
-      // Check subscription management
-      if (content.includes('subscribe') && content.includes('unsubscribe')) {
-        const hasQueueing = content.includes('queue') || content.includes('atomic');
-        
-        if (!hasQueueing) {
+    // Check safeguard jobs for batch processing races
+    if (filePath.includes('safeguard-jobs.ts')) {
+      if (content.includes('processBatch') && content.includes('offset')) {
+        const hasOffsetProtection = content.includes('LIMIT') && content.includes('OFFSET');
+
+        if (hasOffsetProtection && !content.includes('ORDER BY')) {
           issues.push({
-            type: 'SUBSCRIPTION_RACE',
+            type: 'BATCH_PROCESSING_RACE',
             severity: 'MEDIUM',
             file: filePath,
-            issue: 'Subscribe/unsubscribe operations can interfere',
-            line: this.findLineNumber(content, 'subscribe'),
-            description: 'Subscription map modifications are not synchronized',
-            mitigation: 'Queue subscription operations or use atomic operations'
+            issue: 'Batch processing without consistent ordering can miss or duplicate items',
+            line: this.findLineNumber(content, 'processBatch'),
+            description: 'Pagination without consistent ordering can cause data inconsistency',
+            mitigation: 'Add consistent ORDER BY clause to batch queries'
           });
         }
+      }
+
+      // Check for job execution overlap
+      if (content.includes('Cron') && !content.includes('overlap')) {
+        issues.push({
+          type: 'JOB_EXECUTION_OVERLAP',
+          severity: 'MEDIUM',
+          file: filePath,
+          issue: 'Scheduled jobs can overlap if previous execution is still running',
+          line: this.findLineNumber(content, 'Cron'),
+          description: 'Long-running jobs can overlap with next scheduled execution',
+          mitigation: 'Add job execution locks or overlap prevention mechanism'
+        });
       }
     }
 
-    // Check navigation persistence middleware
-    if (filePath.includes('navigationPersistenceMiddleware')) {
-      if (content.includes('saveTimeout') && content.includes('clearTimeout')) {
-        const hasProperCleanup = content.includes('if (saveTimeout)');
-        
-        if (!hasProperCleanup) {
-          issues.push({
-            type: 'DEBOUNCE_RACE_CONDITION',
-            severity: 'LOW',
-            file: filePath,
-            issue: 'Debounced save operations can race',
-            line: this.findLineNumber(content, 'saveTimeout'),
-            description: 'setTimeout/clearTimeout operations not properly synchronized',
-            mitigation: 'Use proper debouncing library or add synchronization'
-          });
-        }
-      }
-    }
+    this.results.potentialRaceConditions.push(...issues);
+    this.stats.issuesFound += issues.length;
 
     this.results.potentialRaceConditions.push(...issues);
     this.stats.issuesFound += issues.length;
@@ -262,8 +272,8 @@ class RaceConditionAnalyzer {
     console.log(chalk.yellow('🛡️ Analyzing Security Files...'));
 
     const securityFiles = [
-      'client/src/security/security-service.ts',
-      'client/src/security/csrf-protection.ts'
+      'shared/database/connection.ts',
+      'server/index.ts'
     ];
 
     for (const file of securityFiles) {
@@ -285,7 +295,7 @@ class RaceConditionAnalyzer {
       // Check token refresh races
       if (content.includes('refreshToken') && !content.includes('refreshing')) {
         const hasProtection = content.includes('mutex') || content.includes('promise');
-        
+
         if (!hasProtection) {
           issues.push({
             type: 'CSRF_TOKEN_RACE',
@@ -302,7 +312,7 @@ class RaceConditionAnalyzer {
       // Check token storage races
       if (content.includes('storeToken')) {
         const hasSynchronization = content.includes('await') || content.includes('atomic');
-        
+
         if (!hasSynchronization) {
           issues.push({
             type: 'TOKEN_STORAGE_RACE',
@@ -322,7 +332,7 @@ class RaceConditionAnalyzer {
       // Check singleton initialization
       if (content.includes('getInstance') && content.includes('new SecurityService')) {
         const hasInitLock = content.includes('initializing') || content.includes('initialized');
-        
+
         if (!hasInitLock) {
           issues.push({
             type: 'SINGLETON_INIT_RACE',
@@ -388,7 +398,7 @@ class RaceConditionAnalyzer {
     console.log(chalk.blue('\n📋 Generating analysis report...'));
 
     const report = this.buildMarkdownReport();
-    
+
     try {
       await fs.mkdir('docs', { recursive: true });
       await fs.writeFile('docs/race-condition-analysis.md', report);
@@ -409,9 +419,9 @@ class RaceConditionAnalyzer {
 
     return `# Race Condition Analysis Report
 
-**Generated:** ${new Date().toISOString()}  
-**Files Analyzed:** ${this.stats.filesAnalyzed}  
-**Total Issues:** ${this.stats.issuesFound}  
+**Generated:** ${new Date().toISOString()}
+**Files Analyzed:** ${this.stats.filesAnalyzed}
+**Total Issues:** ${this.stats.issuesFound}
 **Analysis Duration:** ${Math.round((Date.now() - this.stats.startTime) / 1000)}s
 
 ## Executive Summary
@@ -419,11 +429,11 @@ class RaceConditionAnalyzer {
 This static analysis identified ${this.stats.issuesFound} potential race conditions in your codebase:
 
 - 🔴 **Critical:** ${criticalIssues.length}
-- 🟠 **High:** ${highIssues.length}  
+- 🟠 **High:** ${highIssues.length}
 - 🟡 **Medium:** ${mediumIssues.length}
 - 🟢 **Low:** ${lowIssues.length}
 
-${this.stats.issuesFound === 0 ? 
+${this.stats.issuesFound === 0 ?
   '✅ **No critical race conditions detected!** Your codebase shows good synchronization practices.' :
   '⚠️ **Action Required:** Review and address the identified issues, prioritizing critical and high-severity items.'
 }
@@ -433,8 +443,8 @@ ${this.stats.issuesFound === 0 ?
 ${this.results.potentialRaceConditions.map(issue => `
 ### ${issue.type} (${issue.severity})
 
-**File:** \`${issue.file}\`  
-**Line:** ${issue.line}  
+**File:** \`${issue.file}\`
+**Line:** ${issue.line}
 **Issue:** ${issue.issue}
 
 **Description:** ${issue.description}
@@ -453,17 +463,17 @@ The following test scenarios should be implemented to verify race condition fixe
 // Test multiple operations with same ID
 const testConcurrentOperations = async () => {
   const store = configureStore({ reducer: { loading: loadingReducer } });
-  
-  const promises = Array(10).fill().map(() => 
+
+  const promises = Array(10).fill().map(() =>
     store.dispatch(startLoadingOperation({
       id: 'test-operation',
       type: 'api',
       priority: 'medium'
     }))
   );
-  
+
   await Promise.all(promises);
-  
+
   const state = store.getState();
   expect(Object.keys(state.loading.operations)).toHaveLength(1);
 };
@@ -473,13 +483,13 @@ const testConcurrentOperations = async () => {
 \`\`\`javascript
 // Test concurrent token refresh attempts
 const testTokenRefreshRace = async () => {
-  const promises = Array(5).fill().map(() => 
+  const promises = Array(5).fill().map(() =>
     authService.refreshToken()
   );
-  
+
   const results = await Promise.allSettled(promises);
   const successful = results.filter(r => r.status === 'fulfilled');
-  
+
   // Only one should succeed, others should be cached
   expect(successful.length).toBe(1);
 };
@@ -490,15 +500,15 @@ const testTokenRefreshRace = async () => {
 // Test rapid connect/disconnect cycles
 const testWebSocketRace = async () => {
   const ws = new WebSocketManager();
-  
+
   // Rapid operations
   for (let i = 0; i < 10; i++) {
     ws.connect();
     ws.disconnect();
   }
-  
+
   await new Promise(resolve => setTimeout(resolve, 100));
-  
+
   // State should be consistent
   expect(ws.getConnectionState()).toBeDefined();
 };
@@ -508,7 +518,7 @@ const testWebSocketRace = async () => {
 
 ### Immediate Actions (Critical/High Priority)
 
-${criticalIssues.concat(highIssues).map(issue => 
+${criticalIssues.concat(highIssues).map(issue =>
   `- **${issue.file}:** ${issue.mitigation}`
 ).join('\n')}
 
@@ -576,10 +586,10 @@ describe('Race Condition Tests', () => {
 
     console.log(`📁 Files Analyzed: ${chalk.blue(this.stats.filesAnalyzed)}`);
     console.log(`🔍 Issues Found: ${this.stats.issuesFound > 0 ? chalk.red(this.stats.issuesFound) : chalk.green('0')}`);
-    
+
     const criticalCount = this.results.potentialRaceConditions.filter(i => i.severity === 'CRITICAL').length;
     const highCount = this.results.potentialRaceConditions.filter(i => i.severity === 'HIGH').length;
-    
+
     if (criticalCount > 0) {
       console.log(`🔴 Critical Issues: ${chalk.red(criticalCount)}`);
     }

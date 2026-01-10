@@ -13,7 +13,7 @@
 import React, { Component, ReactNode } from 'react';
 
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/core/error';
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 
 import { SharedErrorDisplay, ErrorDisplayConfig } from './utils/shared-error-display';
 

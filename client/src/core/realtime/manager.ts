@@ -5,7 +5,7 @@
  * Replaces scattered WebSocket implementations with a single, optimized manager.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { EventEmitter } from '../utils/event-emitter';
 

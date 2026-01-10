@@ -57,7 +57,7 @@ class ErrorAggregationService implements IErrorAggregationService {
     this.aggregatedErrors.push(aggregatedError);
 
     // Notify analytics service
-    this.analyticsService.registerSystemError(system, error, context);
+    this.analyticsService.registerSystemError(system, error, context as Record<string, unknown>);
 
     // Notify stream subscribers
     this.errorStreamSubscribers.forEach(subscriber => {
@@ -133,12 +133,19 @@ class ErrorAggregationService implements IErrorAggregationService {
     const byDomain: Record<ErrorDomain, number> = {
       [ErrorDomain.SYSTEM]: 0,
       [ErrorDomain.NETWORK]: 0,
-      [ErrorDomain.AUTH]: 0,
+      [ErrorDomain.AUTHENTICATION]: 0,
+      [ErrorDomain.AUTHORIZATION]: 0,
+      [ErrorDomain.PERMISSION]: 0,
       [ErrorDomain.VALIDATION]: 0,
-      [ErrorDomain.BUSINESS]: 0,
+      [ErrorDomain.DATABASE]: 0,
+      [ErrorDomain.EXTERNAL_SERVICE]: 0,
+      [ErrorDomain.CACHE]: 0,
+      [ErrorDomain.BUSINESS_LOGIC]: 0,
       [ErrorDomain.SECURITY]: 0,
-      [ErrorDomain.PERFORMANCE]: 0,
-      [ErrorDomain.INTEGRATION]: 0
+      [ErrorDomain.SESSION]: 0,
+      [ErrorDomain.RESOURCE]: 0,
+      [ErrorDomain.RATE_LIMITING]: 0,
+      [ErrorDomain.UNKNOWN]: 0
     };
 
     recentErrors.forEach(err => {
@@ -342,12 +349,19 @@ class ErrorAggregationService implements IErrorAggregationService {
     const typeCounts: Record<ErrorDomain, number> = {
       [ErrorDomain.SYSTEM]: 0,
       [ErrorDomain.NETWORK]: 0,
-      [ErrorDomain.AUTH]: 0,
+      [ErrorDomain.AUTHENTICATION]: 0,
+      [ErrorDomain.AUTHORIZATION]: 0,
+      [ErrorDomain.PERMISSION]: 0,
       [ErrorDomain.VALIDATION]: 0,
-      [ErrorDomain.BUSINESS]: 0,
+      [ErrorDomain.DATABASE]: 0,
+      [ErrorDomain.EXTERNAL_SERVICE]: 0,
+      [ErrorDomain.CACHE]: 0,
+      [ErrorDomain.BUSINESS_LOGIC]: 0,
       [ErrorDomain.SECURITY]: 0,
-      [ErrorDomain.PERFORMANCE]: 0,
-      [ErrorDomain.INTEGRATION]: 0
+      [ErrorDomain.SESSION]: 0,
+      [ErrorDomain.RESOURCE]: 0,
+      [ErrorDomain.RATE_LIMITING]: 0,
+      [ErrorDomain.UNKNOWN]: 0
     };
 
     this.aggregatedErrors.forEach(err => {

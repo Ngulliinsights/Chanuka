@@ -5,9 +5,9 @@
 
 import { useState, useCallback } from 'react';
 
-import { DashboardActionError } from '@/core/error';
-import { validateActionItem } from '@/core/validation';
-import type { ActionItem, ActionPriority } from '@/shared/types';
+import { DashboardActionError } from '@client/core/error';
+import { validateActionItem } from '@client/core/validation';
+import type { ActionItem, ActionPriority } from '@client/shared/types';
 
 export interface UseDashboardActionsResult {
   actions: ActionItem[];

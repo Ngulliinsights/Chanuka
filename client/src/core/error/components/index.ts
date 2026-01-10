@@ -30,7 +30,7 @@ export { default as RecoveryUI } from './RecoveryUI';
 // Error Recovery Manager - Recovery strategies and management
 export { ErrorRecoveryManager } from './ErrorRecoveryManager';
 
-// Re-export error types from core error (excluding BaseError which comes from logger)
+// Re-export error types from core error module
 export type {
   AppError,
   ErrorContext,
@@ -42,9 +42,9 @@ export type {
   ErrorBoundaryProps as CoreErrorBoundaryProps,
   ErrorFallbackProps as CoreErrorFallbackProps,
   RecoveryResult,
-} from '@client/core/error/types';
+} from '../types';
 
-export { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/core/error/constants';
+export { ErrorDomain, ErrorSeverity, RecoveryAction } from '../constants';
 
 // Re-export all error classes from core/error where they are actually defined
 export {
@@ -54,13 +54,10 @@ export {
   UnauthorizedError,
   NotFoundError,
   CacheError,
-} from '@client/core/error/classes';
+} from '../classes';
 
 // Export utility functions
 export { createErrorReporter } from './utils/error-reporter';
 export { normalizeError } from './utils/error-normalizer';
 export { getContextualMessage } from './utils/contextual-messages';
 export { getErrorIcon } from './utils/error-icons';
-
-// Lightweight tracing utilities (uses existing logger under the hood)
-export { startTrace, finishTrace, getActiveTracesCount } from '@client/utils/tracing';

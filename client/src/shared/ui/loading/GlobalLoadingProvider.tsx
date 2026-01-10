@@ -18,8 +18,8 @@ import {
   selectShouldShowGlobalLoader,
   type LoadingStateData,
   type ExtendedLoadingOperation,
-} from '@/shared/infrastructure/store/slices/loadingSlice';
-import { LoadingOperation, LoadingPriority } from '@/shared/ui/loading/types';
+} from '@client/shared/infrastructure/store/slices/loadingSlice';
+import { LoadingOperation, LoadingPriority } from '@client/shared/ui/loading/types';
 
 // ============================================================================
 // Utility Functions

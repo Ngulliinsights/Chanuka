@@ -7,9 +7,9 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@/shared/ui/loading';
+import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@client/shared/ui/loading';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Extended type definitions
 interface ConnectionInfo {

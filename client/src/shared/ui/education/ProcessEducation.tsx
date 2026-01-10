@@ -10,15 +10,15 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Progress } from '@/shared/design-system/feedback/Progress';
-import { Button } from '@/shared/design-system/interactive/Button';
+import { Progress } from '@client/shared/design-system/feedback/Progress';
+import { Button } from '@client/shared/design-system/interactive/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/design-system/typography/Card';
+} from '@client/shared/design-system/typography/Card';
 
 interface LegislativeStep {
   id: string;

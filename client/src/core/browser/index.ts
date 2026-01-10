@@ -12,7 +12,7 @@
  * - Handles graceful degradation for unsupported browsers
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { BrowserDetector, browserDetector } from './browser-detector';
 import { BrowserCompatibilityManager, browserCompatibilityManager } from './compatibility-manager';

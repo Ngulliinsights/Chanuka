@@ -5,45 +5,45 @@
  * to the new consolidated auth system.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Import mapping from old to new locations
  */
 export const IMPORT_MAPPINGS = {
   // Hooks
-  "import { useAuth } from '@client/core/auth'": "import { useAuth } from '@/core/auth'",
-  "from '@client/core/auth'": "from '@/core/auth'",
+  "import { useAuth } from '@client/core/auth'": "import { useAuth } from '@client/core/auth'",
+  "from '@client/core/auth'": "from '@client/core/auth'",
 
   // Redux
-  "import { authSlice } from '@/store/slices/authSlice'":
-    "import { authReducer } from '@/core/auth'",
-  "import authSlice from '@/store/slices/authSlice'": "import { authReducer } from '@/core/auth'",
-  "from '@/store/slices/authSlice'": "from '@/core/auth'",
+  "import { authSlice } from '@client/store/slices/authSlice'":
+    "import { authReducer } from '@client/core/auth'",
+  "import authSlice from '@client/store/slices/authSlice'": "import { authReducer } from '@client/core/auth'",
+  "from '@client/store/slices/authSlice'": "from '@client/core/auth'",
   'authSlice.reducer': 'authReducer',
 
   // Middleware
-  "import { authMiddleware } from '@/store/middleware/authMiddleware'":
-    "import { authMiddleware } from '@/core/auth'",
-  "from '@/store/middleware/authMiddleware'": "from '@/core/auth'",
+  "import { authMiddleware } from '@client/store/middleware/authMiddleware'":
+    "import { authMiddleware } from '@client/core/auth'",
+  "from '@client/store/middleware/authMiddleware'": "from '@client/core/auth'",
 
   // API Service
-  "import { authService } from '@/services/auth-service-init'":
-    "import { authApiService } from '@/core/auth'",
-  "import { AuthApiService } from '@/core/api/auth'":
-    "import { AuthApiService } from '@/core/auth'",
-  "from '@/core/api/auth'": "from '@/core/auth'",
+  "import { authService } from '@client/services/auth-service-init'":
+    "import { authApiService } from '@client/core/auth'",
+  "import { AuthApiService } from '@client/core/api/auth'":
+    "import { AuthApiService } from '@client/core/auth'",
+  "from '@client/core/api/auth'": "from '@client/core/auth'",
   authService: 'authApiService.instance',
 
   // Storage
-  "import { tokenManager } from '@/utils/storage'": "import { tokenManager } from '@/core/auth'",
-  "import { sessionManager } from '@/utils/storage'":
-    "import { sessionManager } from '@/core/auth'",
+  "import { tokenManager } from '@client/utils/storage'": "import { tokenManager } from '@client/core/auth'",
+  "import { sessionManager } from '@client/utils/storage'":
+    "import { sessionManager } from '@client/core/auth'",
 
   // Validation
   "import { validatePasswordComprehensive } from '@client/shared/ui/auth/utils/auth-validation'":
-    "import { validatePasswordComprehensive } from '@/core/auth'",
-  "from '@client/shared/ui/auth/utils/auth-validation'": "from '@/core/auth'",
+    "import { validatePasswordComprehensive } from '@client/core/auth'",
+  "from '@client/shared/ui/auth/utils/auth-validation'": "from '@client/core/auth'",
 };
 
 /**
@@ -237,25 +237,25 @@ export function generateMigrationChecklist(): Array<{
     {
       category: 'Import Updates',
       items: [
-        { task: 'All useAuth imports updated to @/core/auth', completed: false, critical: true },
-        { task: 'All authSlice imports updated to @/core/auth', completed: false, critical: true },
+        { task: 'All useAuth imports updated to @client/core/auth', completed: false, critical: true },
+        { task: 'All authSlice imports updated to @client/core/auth', completed: false, critical: true },
         {
-          task: 'All authMiddleware imports updated to @/core/auth',
+          task: 'All authMiddleware imports updated to @client/core/auth',
           completed: false,
           critical: true,
         },
         {
-          task: 'All authService imports updated to @/core/auth',
+          task: 'All authService imports updated to @client/core/auth',
           completed: false,
           critical: true,
         },
         {
-          task: 'All tokenManager imports updated to @/core/auth',
+          task: 'All tokenManager imports updated to @client/core/auth',
           completed: false,
           critical: true,
         },
         {
-          task: 'All sessionManager imports updated to @/core/auth',
+          task: 'All sessionManager imports updated to @client/core/auth',
           completed: false,
           critical: true,
         },

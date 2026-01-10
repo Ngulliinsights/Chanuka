@@ -409,7 +409,7 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
       Object.values(LibraryErrorCode).includes(error.code as LibraryErrorCode) ||
       error.message.toLowerCase().includes('service') ||
       error.message.toLowerCase().includes('api') ||
-      error.context?.serviceName
+      !!error.context?.serviceName
     );
   }
 

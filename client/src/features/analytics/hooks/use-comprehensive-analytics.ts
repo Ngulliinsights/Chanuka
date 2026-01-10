@@ -19,7 +19,7 @@ import {
   UserEngagementMetrics,
 } from '@client/core/analytics/comprehensive-tracker';
 import { useNavigation } from '@client/core/navigation/context';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Hook options for customizing analytics behavior

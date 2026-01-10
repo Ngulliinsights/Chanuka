@@ -3,7 +3,7 @@
 import { Loader2, Network } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@client/shared/utils/cn';
 
 import { useGlobalLoading } from './GlobalLoadingProvider';
 import { LoadingOperation, LoadingPriority } from './types';
@@ -206,7 +206,6 @@ export const GlobalLoadingIndicator = React.memo<GlobalLoadingIndicatorProps>(
             <Network
               className="h-4 w-4 text-red-500 flex-shrink-0"
               aria-label="Offline"
-              title="No network connection"
             />
           )}
         </div>

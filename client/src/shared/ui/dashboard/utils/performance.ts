@@ -5,7 +5,7 @@
  * to meet the 3-second load requirement.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 export interface PerformanceMetrics {
   loadTime: number;

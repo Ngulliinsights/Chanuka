@@ -2,7 +2,7 @@ import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
 import React from 'react';
 
 import { ExpertVerificationType } from '@client/features/users/types';
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import {
   Tooltip,
   TooltipContent,

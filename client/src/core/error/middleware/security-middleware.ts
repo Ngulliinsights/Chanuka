@@ -230,7 +230,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
       case SecurityErrorCode.SESSION_EXPIRED:
         strategies.push({
           id: 'security-session-restore',
-          type: RecoveryAction.NAVIGATE,
+          type: RecoveryAction.REDIRECT,
           name: 'Restore Session',
           description: 'Redirect to login to restore session',
           automatic: false,
@@ -241,7 +241,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
       case SecurityErrorCode.MFA_REQUIRED:
         strategies.push({
           id: 'security-mfa-prompt',
-          type: RecoveryAction.CUSTOM,
+          type: RecoveryAction.MANUAL_RECOVERY,
           name: 'Complete MFA',
           description: 'Prompt user to complete multi-factor authentication',
           automatic: false,
@@ -351,15 +351,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
     error: AppError,
     context: SecurityErrorContext
   ): Promise<void> {
-    await this.analyticsService.track(error, {
-      security: {
-        level: context.securityLevel,
-        eventType: error.code,
-        userId: context.userId,
-        resource: context.resource,
-        action: context.action,
-      },
-    });
+    await this.analyticsService.track(error);
   }
 
   /**

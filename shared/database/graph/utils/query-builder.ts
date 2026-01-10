@@ -14,7 +14,7 @@
 export interface CypherClause {
   keyword: string;
   content: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 export interface QueryBuilderOptions {
@@ -44,7 +44,7 @@ export interface QueryBuilderOptions {
  */
 export class CypherQueryBuilder {
   private clauses: CypherClause[] = [];
-  private params: Record<string, any> = {};
+  private params: Record<string, unknown> = {};
   private options: QueryBuilderOptions;
 
   constructor(options: QueryBuilderOptions = {}) {
@@ -62,7 +62,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters for this clause
    * @returns This builder instance for chaining
    */
-  match(pattern: string, params: Record<string, any> = {}): this {
+  match(pattern: string, params: Record<string, unknown> = {}): this {
     this.addClause('MATCH', pattern, params);
     return this;
   }
@@ -74,7 +74,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  optionalMatch(pattern: string, params: Record<string, any> = {}): this {
+  optionalMatch(pattern: string, params: Record<string, unknown> = {}): this {
     this.addClause('OPTIONAL MATCH', pattern, params);
     return this;
   }
@@ -86,7 +86,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  where(condition: string, params: Record<string, any> = {}): this {
+  where(condition: string, params: Record<string, unknown> = {}): this {
     this.addClause('WHERE', condition, params);
     return this;
   }
@@ -98,14 +98,16 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  and(condition: string, params: Record<string, any> = {}): this {
-    if (this.clauses.length === 0 || this.clauses[this.clauses.length - 1].keyword !== 'WHERE') {
+  and(condition: string, params: Record<string, unknown> = {}): this {
+    if (this.clauses.length === 0 || this.clauses[this.clauses.length - 1]?.keyword !== 'WHERE') {
       this.where(condition, params);
     } else {
       const last = this.clauses[this.clauses.length - 1];
-      last.content = `${last.content} AND ${condition}`;
-      Object.assign(last.parameters, params);
-      Object.assign(this.params, params);
+      if (last) {
+        last.content = `${last.content} AND ${condition}`;
+        Object.assign(last.parameters, params);
+        Object.assign(this.params, params);
+      }
     }
     return this;
   }
@@ -117,14 +119,16 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  or(condition: string, params: Record<string, any> = {}): this {
-    if (this.clauses.length === 0 || this.clauses[this.clauses.length - 1].keyword !== 'WHERE') {
+  or(condition: string, params: Record<string, unknown> = {}): this {
+    if (this.clauses.length === 0 || this.clauses[this.clauses.length - 1]?.keyword !== 'WHERE') {
       this.where(condition, params);
     } else {
       const last = this.clauses[this.clauses.length - 1];
-      last.content = `${last.content} OR ${condition}`;
-      Object.assign(last.parameters, params);
-      Object.assign(this.params, params);
+      if (last) {
+        last.content = `${last.content} OR ${condition}`;
+        Object.assign(last.parameters, params);
+        Object.assign(this.params, params);
+      }
     }
     return this;
   }
@@ -136,7 +140,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  create(pattern: string, params: Record<string, any> = {}): this {
+  create(pattern: string, params: Record<string, unknown> = {}): this {
     this.addClause('CREATE', pattern, params);
     return this;
   }
@@ -148,7 +152,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  merge(pattern: string, params: Record<string, any> = {}): this {
+  merge(pattern: string, params: Record<string, unknown> = {}): this {
     this.addClause('MERGE', pattern, params);
     return this;
   }
@@ -160,7 +164,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  onCreateSet(assignments: string, params: Record<string, any> = {}): this {
+  onCreateSet(assignments: string, params: Record<string, unknown> = {}): this {
     this.addClause('ON CREATE SET', assignments, params);
     return this;
   }
@@ -172,7 +176,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  onMatchSet(assignments: string, params: Record<string, any> = {}): this {
+  onMatchSet(assignments: string, params: Record<string, unknown> = {}): this {
     this.addClause('ON MATCH SET', assignments, params);
     return this;
   }
@@ -184,7 +188,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  set(assignments: string, params: Record<string, any> = {}): this {
+  set(assignments: string, params: Record<string, unknown> = {}): this {
     this.addClause('SET', assignments, params);
     return this;
   }
@@ -218,7 +222,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  return(items: string, params: Record<string, any> = {}): this {
+  return(items: string, params: Record<string, unknown> = {}): this {
     this.addClause('RETURN', items, params);
     return this;
   }
@@ -263,7 +267,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  with(items: string, params: Record<string, any> = {}): this {
+  with(items: string, params: Record<string, unknown> = {}): this {
     this.addClause('WITH', items, params);
     return this;
   }
@@ -275,7 +279,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  unwind(expression: string, params: Record<string, any> = {}): this {
+  unwind(expression: string, params: Record<string, unknown> = {}): this {
     this.addClause('UNWIND', expression, params);
     return this;
   }
@@ -288,7 +292,7 @@ export class CypherQueryBuilder {
    * @param params - Parameters
    * @returns This builder instance
    */
-  custom(keyword: string, content: string, params: Record<string, any> = {}): this {
+  custom(keyword: string, content: string, params: Record<string, unknown> = {}): this {
     this.addClause(keyword, content, params);
     return this;
   }
@@ -304,7 +308,7 @@ export class CypherQueryBuilder {
    * await session.run(cypher, params);
    * ```
    */
-  build(): { cypher: string; params: Record<string, any> } {
+  build(): { cypher: string; params: Record<string, unknown> } {
     if (this.options.validate) {
       this.validate();
     }
@@ -333,7 +337,7 @@ export class CypherQueryBuilder {
    *
    * @returns Parameters object
    */
-  buildParams(): Record<string, any> {
+  buildParams(): Record<string, unknown> {
     return this.build().params;
   }
 
@@ -375,7 +379,7 @@ export class CypherQueryBuilder {
   private addClause(
     keyword: string,
     content: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): void {
     this.clauses.push({
       keyword,
@@ -397,11 +401,12 @@ export class CypherQueryBuilder {
     // Ensure RETURN is present
     const hasReturn = this.clauses.some(c => c.keyword === 'RETURN');
     if (!hasReturn) {
+      // eslint-disable-next-line no-console
       console.warn('Warning: Query does not have a RETURN clause');
     }
 
     // Validate clause order
-    const clauseOrder = this.clauses.map(c => c.keyword.split(' ')[0]);
+    const clauseOrder = this.clauses.map(c => c.keyword.split(' ')[0]).filter((k): k is string => k !== undefined);
     this.validateClauseOrder(clauseOrder);
   }
 
@@ -429,8 +434,9 @@ export class CypherQueryBuilder {
 
     let lastRank = 0;
     for (const clause of clauses) {
-      const rank = clauseRanks[clause] || 0;
+      const rank = clauseRanks[clause] ?? 0;
       if (rank < lastRank) {
+        // eslint-disable-next-line no-console
         console.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);
       }
       lastRank = Math.max(lastRank, rank);
@@ -477,8 +483,8 @@ export function createQueryBuilder(options?: QueryBuilderOptions): CypherQueryBu
  */
 export function buildFromTemplate(
   template: string,
-  params: Record<string, any> = {}
-): { cypher: string; params: Record<string, any> } {
+  params: Record<string, unknown> = {}
+): { cypher: string; params: Record<string, unknown> } {
   return {
     cypher: template,
     params,
@@ -517,7 +523,7 @@ export interface PaginationOptions {
 export function withPagination(
   query: string,
   options: PaginationOptions = {}
-): { query: string; params: Record<string, any> } {
+): { query: string; params: Record<string, unknown> } {
   const { skip = 0, limit = 100 } = options;
 
   const paginatedQuery = `${query} SKIP $skip LIMIT $limit`;

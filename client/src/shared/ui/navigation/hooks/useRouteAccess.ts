@@ -1,9 +1,9 @@
-import { useAuth } from '@/core/auth';
-import { NavigationValidationError, NavigationAccessDeniedError } from '@/core/error';
-import { useUnifiedNavigation } from '@/core/navigation/hooks/use-unified-navigation';
-import { getRecoverySuggestions } from '@/recovery';
-import type { UserRole } from '@/shared/types';
-import { validateNavigationPath, validateUserRole } from '@/validation';
+import { useAuth } from '@client/core/auth';
+import { NavigationValidationError, NavigationAccessDeniedError } from '@client/core/error';
+import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
+import { getRecoverySuggestions } from '@client/core/recovery';
+import type { UserRole } from '@client/shared/types';
+import { validateNavigationPath, validateUserRole } from '@client/core/validation';
 
 import type { AccessDenialReason } from '../types';
 import { checkRouteAccess } from '../utils/route-access';

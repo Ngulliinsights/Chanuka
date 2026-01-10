@@ -5,14 +5,14 @@
 
 import React from 'react';
 
-import { PrivacySettings } from '@/core/auth';
+import { PrivacySettings } from '@client/core/auth';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/shared/design-system/interactive/Dialog';
+} from '@client/shared/design-system/interactive/Dialog';
 
 import { FullInterface } from './FullInterface';
 

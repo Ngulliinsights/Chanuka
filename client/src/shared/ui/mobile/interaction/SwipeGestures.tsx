@@ -5,9 +5,9 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { GESTURE_CONFIG } from '@/config/gestures';
-import { cn } from '@/utils/cn';
-import type { SwipeGestureData } from '@/shared/types/mobile';
+import { GESTURE_CONFIG } from '@client/config/gestures';
+import { cn } from '@client/shared/utils/cn';
+import type { SwipeGestureData } from '@client/shared/types/mobile';
 
 type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 

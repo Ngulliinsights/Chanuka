@@ -7,15 +7,15 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
+import { userJourneyTracker, type NavigationSection } from '@client/features/analytics/model/user-journey-tracker';
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
 import { useNavigation } from '@client/core/navigation/context';
 import { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
-import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
-import { logger } from '@client/utils/logger';
+import type { UserRole } from '@client/shared/types/navigation';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Analytics Integration Hook
@@ -56,7 +56,7 @@ export function useAnalyticsIntegration() {
       const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
 
       // Start journey using the centralized tracker; it returns a session id
-      sessionId.current = journeyTracker.current.startJourney(user?.id, userRole);
+      sessionId.current = journeyTracker.current.startJourney(user?.id, userRole as any);
 
       logger.info('Analytics session started', {
         sessionId: sessionId.current,
@@ -276,13 +276,11 @@ export const AnalyticsIntegration: React.FC<{ children?: React.ReactNode }> = ({
  * Utility function to determine current navigation section
  */
 function getCurrentSection(pathname: string): NavigationSection {
-  if (pathname.includes('/bills')) return 'bills';
+  if (pathname.includes('/bills') || pathname.includes('/legislative')) return 'legislative';
   if (pathname.includes('/community')) return 'community';
-  if (pathname.includes('/dashboard')) return 'dashboard';
   if (pathname.includes('/admin')) return 'admin';
-  if (pathname.includes('/search')) return 'search';
-  if (pathname.includes('/profile') || pathname.includes('/account')) return 'profile';
-  return 'home';
+  if (pathname.includes('/search') || pathname.includes('/profile') || pathname.includes('/account') || pathname.includes('/dashboard')) return 'user';
+  return 'tools';
 }
 
 /**

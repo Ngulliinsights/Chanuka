@@ -11,11 +11,11 @@
 import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useAppSelector } from '@/shared/hooks/store';
-import { selectNavigationUIState } from '@/shared/infrastructure/store/slices/navigationSlice';
-import { navigationUtils } from '@/shared/services/navigation';
+import { useAppSelector } from '@client/shared/hooks/store';
+import { selectNavigationUIState } from '@client/shared/infrastructure/store/slices/navigationSlice';
+import { navigationUtils } from '@client/shared/services/navigation';
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface OptimizedNavigationOptions {
   enableAnalytics?: boolean;

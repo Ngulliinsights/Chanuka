@@ -1,8 +1,15 @@
 /**
- * Security Utilities - Core Security Functions
+ * Core Security System - Comprehensive Security Infrastructure
  *
- * Comprehensive security utilities including CSP, sanitization, and validation
+ * Consolidated security utilities, CSP management, input sanitization,
+ * CSRF protection, rate limiting, and security monitoring
  */
+
+import { logger } from '@client/shared/utils/logger';
+
+// ============================================================================
+// Core Security Types
+// ============================================================================
 
 export interface CSPDirectives {
   'default-src': string[];
@@ -25,6 +32,73 @@ export interface SecurityConfig {
   enableCSRFProtection: boolean;
   enableClickjackingProtection: boolean;
   enableContentTypeSniffing: boolean;
+  enableRateLimit: boolean;
+  enableVulnerabilityScanning: boolean;
+  enableInputSanitization: boolean;
+  scanInterval: number;
+}
+
+export type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export type SecurityEventType =
+  | 'csp_violation'
+  | 'csrf_attack'
+  | 'xss_attempt'
+  | 'rate_limit_exceeded'
+  | 'suspicious_activity'
+  | 'vulnerability_detected'
+  | 'unauthorized_access'
+  | 'input_validation_failed'
+  | 'session_hijack_attempt'
+  | 'brute_force_attack'
+  | 'script_injection'
+  | 'iframe_injection';
+
+export interface SecurityEvent {
+  id: string;
+  timestamp: Date;
+  type: SecurityEventType;
+  severity: SecuritySeverity;
+  source: string;
+  userId?: string;
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  details: Record<string, any>;
+  resolved: boolean;
+}
+
+export interface SecurityAlert {
+  id: string;
+  timestamp: Date;
+  type: SecurityEventType;
+  severity: SecuritySeverity;
+  message: string;
+  details: Record<string, any>;
+  acknowledged: boolean;
+  resolvedAt?: Date;
+}
+
+export interface CSPViolation {
+  documentUri: string;
+  referrer: string;
+  violatedDirective: string;
+  effectiveDirective: string;
+  originalPolicy: string;
+  disposition: 'enforce' | 'report';
+  blockedUri: string;
+  lineNumber?: number;
+  columnNumber?: number;
+  sourceFile?: string;
+  statusCode: number;
+}
+
+export interface RateLimitInfo {
+  windowMs: number;
+  maxRequests: number;
+  currentRequests: number;
+  resetTime: Date;
+  blocked: boolean;
 }
 
 // Default CSP configuration

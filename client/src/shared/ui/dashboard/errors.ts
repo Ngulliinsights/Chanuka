@@ -10,7 +10,7 @@ import {
   ErrorContext,
   createError,
   BaseError,
-} from '@/core/error';
+} from '@client/core/error';
 
 // ============================================================================
 // Dashboard Error Types (extending core)

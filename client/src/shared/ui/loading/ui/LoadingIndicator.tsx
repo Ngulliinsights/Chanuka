@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { cn } from '@/shared/design-system/lib/utils';
+import { cn } from '@client/shared/design-system/lib/utils';
 
 import { DEFAULT_LOADING_SIZE, LOADING_SIZES } from '../constants';
 import { LoadingStateProps } from '../types';

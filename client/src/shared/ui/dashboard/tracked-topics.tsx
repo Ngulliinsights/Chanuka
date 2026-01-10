@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Edit, RefreshCw, Search, Star as Tag, X } from 'lucide-react';
 import React from 'react';
 
-import type { TopicCategory } from '@/shared/types/dashboard';
+import type { TopicCategory } from '@client/shared/types/dashboard';
 
 import { Button, Card, CardContent, CardHeader, Input } from '../../design-system';
 

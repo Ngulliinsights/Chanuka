@@ -1,4 +1,4 @@
-import { useWebSocket } from '@client/hooks/use-websocket';
+import { useWebSocket } from '@client/shared/hooks/use-websocket';
 import {
   Select,
   SelectContent,
@@ -12,11 +12,11 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { toast } from 'sonner';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
 import type { BillTrackingPreferences } from '@client/core/api/types';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface RealTimeBillTrackerProps {
   billId?: number;

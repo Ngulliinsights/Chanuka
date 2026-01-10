@@ -18,7 +18,7 @@ import {
   Alert,
   CoreError as ErrorEntry,
   errorAnalyticsBridge,
-} from '@/services/errorAnalyticsBridge';
+} from '../../../../services/errorAnalyticsBridge';
 
 interface ErrorAnalyticsState {
   // Data states

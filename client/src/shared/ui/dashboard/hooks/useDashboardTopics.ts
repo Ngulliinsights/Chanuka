@@ -5,9 +5,9 @@
 
 import { useState, useCallback } from 'react';
 
-import { DashboardTopicError } from '@/core/error';
-import { validateTrackedTopic } from '@/core/validation';
-import type { TrackedTopic, TopicCategory } from '@/shared/types';
+import { DashboardTopicError } from '@client/core/error';
+import { validateTrackedTopic } from '@client/core/validation';
+import type { TrackedTopic, TopicCategory } from '@client/shared/types';
 
 export interface UseDashboardTopicsResult {
   topics: TrackedTopic[];

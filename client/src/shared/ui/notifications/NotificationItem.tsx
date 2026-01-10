@@ -19,11 +19,11 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox';
 
-import { Notification, NotificationType } from '@/services/notification-service';
+import { Notification, NotificationType } from '@client/services/notification-service';
 
 interface NotificationItemProps {
   notification: Notification;

@@ -8,7 +8,7 @@
  * @module core/mobile/device-detector
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { DeviceInfo } from './types';
 

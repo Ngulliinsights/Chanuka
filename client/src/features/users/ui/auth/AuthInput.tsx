@@ -3,13 +3,13 @@
  * Following navigation component patterns for UI components
  */
 
-import { Label } from '@client/../../Label';
+import { Label } from '@client/shared/design-system/typography/Label';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import React from 'react';
 
-import { usePasswordVisibility } from '@/features/users/hooks/usePasswordUtils';
-import { Input } from '@/shared/design-system/interactive/Input';
-import { cn } from '@/shared/design-system/utils/cn';
+import { usePasswordVisibility } from '@client/features/users/hooks/usePasswordUtils';
+import { Input } from '@client/shared/design-system/interactive/Input';
+import { cn } from '@client/shared/design-system/utils/cn';
 
 export interface AuthInputProps {
   name: string;

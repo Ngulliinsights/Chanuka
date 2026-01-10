@@ -16,19 +16,19 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Checkbox } from '@/shared/design-system/interactive/Checkbox';
-import { Input } from '@/shared/design-system/interactive/Input';
-import { Switch } from '@/shared/design-system/interactive/Switch';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Checkbox } from '@client/shared/design-system/interactive/Checkbox';
+import { Input } from '@client/shared/design-system/interactive/Input';
+import { Switch } from '@client/shared/design-system/interactive/Switch';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/design-system/typography/Card';
-import { Label } from '@/shared/design-system/typography/Label';
-import { DashboardPreferences } from '@/shared/types/user-dashboard';
+} from '@client/shared/design-system/typography/Card';
+import { Label } from '@client/shared/design-system/typography/Label';
+import { DashboardPreferences } from '@client/shared/types/user-dashboard';
 
 interface DashboardPreferencesModalProps {
   open: boolean;

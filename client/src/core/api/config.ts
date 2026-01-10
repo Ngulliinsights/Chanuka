@@ -13,7 +13,7 @@
  * while maintaining system integrity.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { ServiceConfig, ConfigValidator, ConfigObserver, LogLevel } from './types';
 

@@ -5,7 +5,7 @@
  * subscriptions, and engagement metrics through WebSocket connections.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { UnifiedWebSocketManager } from '../manager';
 import { BillUpdate, BillRealTimeUpdate, BillEngagementUpdate, WebSocketMessage } from '../types';

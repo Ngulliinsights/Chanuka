@@ -18,7 +18,7 @@ import { ErrorAnalyticsService } from '@client/core/error/analytics';
 import { PerformanceMonitor } from '@client/core/performance/monitor';
 import type { PerformanceMetric, WebVitalsMetric } from '@client/core/performance/types';
 import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Persona-specific analytics configuration
@@ -155,7 +155,7 @@ export interface AnalyticsDashboardData {
 export class ComprehensiveAnalyticsTracker {
   private static instance: ComprehensiveAnalyticsTracker;
 
-  private journeyTracker: UserJourneyTracker;
+  private journeyTracker: typeof userJourneyTracker;
   private performanceMonitor: PerformanceMonitor;
   private errorAnalytics: ErrorAnalyticsService;
 
@@ -622,8 +622,13 @@ export class ComprehensiveAnalyticsTracker {
     const breakdown: Record<UserRole, any> = {
       public: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
       citizen: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      user: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
       expert: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
       admin: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      official: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      moderator: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      journalist: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
+      advocate: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
     };
 
     const personaMetrics = new Map<
@@ -889,7 +894,7 @@ export class ComprehensiveAnalyticsTracker {
   private getCurrentUserRole(): UserRole {
     // This should be integrated with your auth system
     // For now, return a default role
-    return 'guest';
+    return 'public';
   }
 
   private getCurrentSection(): NavigationSection {

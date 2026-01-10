@@ -1,5 +1,5 @@
-import type { UserRole, RelatedPage } from '@/shared/types';
-import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@/validation';
+import type { UserRole, RelatedPage } from '@client/shared/types';
+import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/core/validation';
 
 import type { UserRole as SharedUserRole } from '../types';
 

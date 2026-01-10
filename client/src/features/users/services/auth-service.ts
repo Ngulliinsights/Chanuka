@@ -29,7 +29,7 @@ import {
 } from '@client/shared/services/errors';
 import { CacheService } from '@client/shared/services/cache';
 import { ServiceLifecycleInterface } from '@client/shared/services/factory';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // ============================================================================
 // AUTH SERVICE IMPLEMENTATION

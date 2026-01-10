@@ -22,14 +22,14 @@ import {
   Users,
   FileText,
   Megaphone,
-  PenTool,
+  Pen,
   Bookmark,
 } from 'lucide-react';
 import React from 'react';
 import { useState, useCallback, memo } from 'react';
 
 import { ActivityItem } from '@client/features/community/types';
-import { cn } from '@client/lib/utils';
+import { cn } from '@client/shared/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

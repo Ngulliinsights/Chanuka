@@ -11,7 +11,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { NavigationPerformance } from './NavigationPerformance';
 
 // Mock logger
-vi.mock('../../utils/logger', () => ({
+vi.mock('@client/shared/utils/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),

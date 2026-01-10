@@ -15,9 +15,9 @@ import {
 } from 'react';
 import React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
-import { useIsMobile } from '../../../hooks/use-mobile';
+import { useIsMobile } from '../@client/shared/hooks/use-mobile';
 
 import { Button } from './Button';
 import { Input } from './Input';

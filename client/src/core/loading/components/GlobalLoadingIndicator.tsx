@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { useLoading } from '@client/context';
+import { useLoading } from '@client/shared/contexts';
 
 import { LoadingProgress } from './LoadingProgress';
 import { LoadingSpinner } from './LoadingSpinner';

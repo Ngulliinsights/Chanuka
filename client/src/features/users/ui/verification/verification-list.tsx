@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface VerificationItem {
   id: number;

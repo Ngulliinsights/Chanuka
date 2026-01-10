@@ -10,7 +10,7 @@ import { Bell, Filter, Settings, Check, X, Trash } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 
-import { useNotifications, useNotificationHistory } from '@/hooks/useNotifications';
+import { useNotifications, useNotificationHistory } from '@client/hooks/useNotifications';
 import {
   Badge,
   Button,
@@ -20,8 +20,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '@/shared/design-system';
-import { LoadingSpinner } from '@/shared/ui/loading';
+} from '@client/shared/design-system';
+import { LoadingSpinner } from '@client/shared/ui/loading';
 
 import { NotificationItem } from './NotificationItem';
 import NotificationPreferences from './NotificationPreferences';

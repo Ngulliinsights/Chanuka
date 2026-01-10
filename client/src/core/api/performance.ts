@@ -14,7 +14,7 @@
  *
  * @module PerformanceApiService
  */
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { ErrorFactory } from '../error';
 

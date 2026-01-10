@@ -3,9 +3,11 @@
  * IMPROVEMENTS: Automatic rollback, retry logic, error handling
  */
 import { Driver, Transaction } from 'neo4j-driver';
-import { withTransaction } from '../utils/session-manager';
+
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
 import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
+import { withTransaction } from '../utils/session-manager';
+
 import { logger } from '@/core/observability';
 
 const errorHandler = new GraphErrorHandler();

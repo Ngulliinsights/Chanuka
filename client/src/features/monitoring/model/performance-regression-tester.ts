@@ -7,7 +7,7 @@
  * Requirements: 11.4, 11.5
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Performance baseline for a route

@@ -1,19 +1,15 @@
-import { and, asc, desc, eq, gte, lte, or, sql } from 'drizzle-orm';
-
 import { logger } from '@shared/core';
-import { readDatabase, withTransaction, writeDatabase } from '@shared/database/connection';
+import { type DatabaseTransaction,withTransaction } from '@shared/database/connection';
+import { readDb as readDatabase } from '@shared/database/pool';
 import {
-  moderation_appeals,
-  moderation_decisions,
-  moderation_queue,
-  moderator_performance,
   type ModerationAppeal,
+  moderationAppeals,
+  type ModerationDecision,
+  moderationDecisions,
+  moderationQueue,
   type ModerationQueueItem,
-  type NewModerationAppeal,
-  type NewModerationDecision,
-  type NewModerationQueueItem,
-  type NewModeratorPerformance,
 } from '@shared/schema/safeguards';
+import { and, asc, desc, eq, gte, inArray,lte, or, sql } from 'drizzle-orm';
 
 // ==================== Type Definitions ====================
 
@@ -28,7 +24,7 @@ export interface ModerationContext {
   flagReasons?: string[];
   flaggedBy?: string[];
   flagCount?: number;
-  priority?: string;
+  priority?: number;
   tribalIncitementDetected?: boolean;
   hateSpeechLanguage?: string;
   targetsProtectedGroup?: boolean;
@@ -41,7 +37,7 @@ export interface ModerationDecisionContext {
   decision: string;
   decisionReason: string;
   violatedPolicies?: string[];
-  actionTaken: string;
+  actionTaken: 'approve' | 'reject' | 'flag_for_review' | 'remove' | 'warn_user' | 'suspend_user' | 'ban_user' | 'require_edit' | 'escalate' | 'dismiss';
   confidenceLevel?: string;
   userNotified?: boolean;
   reputationPenalty?: number;
@@ -52,8 +48,8 @@ export interface ModerationDecisionContext {
 
 export interface ModerationAppealContext {
   decisionId: string;
-  appellantId: string;
-  appealReason: string;
+  appellantUserId: string;
+  appealReasoning: string;
   appealGrounds?: string[];
   supportingEvidence?: Record<string, unknown>;
 }
@@ -74,6 +70,17 @@ export interface ModerationAppealResult {
   success: boolean;
   appealId?: string;
   error?: string;
+}
+
+export interface ModeratorPerformanceMetrics {
+  moderatorId: string;
+  periodStart: Date;
+  periodEnd: Date;
+  decisionsMade: number;
+  appealsOverturned: number;
+  overturnRate: number;
+  averageReviewTimeMinutes: number;
+  overallRating: string;
 }
 
 // ==================== Helper Functions ====================
@@ -100,11 +107,75 @@ function getErrorMessage(error: unknown): string {
   return String(error);
 }
 
+/**
+ * Validate moderation context
+ */
+function validateModerationContext(context: ModerationContext): void {
+  if (!context.contentType) {
+    throw new Error('Content type is required');
+  }
+  if (!context.contentId) {
+    throw new Error('Content ID is required');
+  }
+  if (!context.authorId) {
+    throw new Error('Author ID is required');
+  }
+  if (!context.triggerType) {
+    throw new Error('Trigger type is required');
+  }
+  if (context.priority !== undefined && (context.priority < 1 || context.priority > 5)) {
+    throw new Error('Priority must be between 1 and 5');
+  }
+}
+
+/**
+ * Validate decision context
+ */
+function validateDecisionContext(context: ModerationDecisionContext): void {
+  if (!context.queueItemId) {
+    throw new Error('Queue item ID is required');
+  }
+  if (!context.moderatorId) {
+    throw new Error('Moderator ID is required');
+  }
+  if (!context.decision) {
+    throw new Error('Decision is required');
+  }
+  if (!context.decisionReason) {
+    throw new Error('Decision reason is required');
+  }
+  if (!context.actionTaken) {
+    throw new Error('Action taken is required');
+  }
+}
+
+/**
+ * Validate appeal context
+ */
+function validateAppealContext(context: ModerationAppealContext): void {
+  if (!context.decisionId) {
+    throw new Error('Decision ID is required');
+  }
+  if (!context.appellantUserId) {
+    throw new Error('Appellant user ID is required');
+  }
+  if (!context.appealReasoning) {
+    throw new Error('Appeal reasoning is required');
+  }
+}
+
 // ==================== Service Class ====================
 
 /**
  * Service for managing content moderation workflows
  * Handles moderation queue, decisions, appeals, and moderator performance tracking
+ *
+ * SECURITY & CONCURRENCY:
+ * - Uses transactions with row-level locking (FOR UPDATE) to prevent race conditions
+ * - Validates all inputs before processing
+ * - Prevents duplicate queue entries atomically
+ * - Ensures moderator assignment is atomic and doesn't allow double-assignment
+ * - Tracks all state transitions with timestamps for auditing
  */
 export class ModerationService {
   private static instance: ModerationService;
@@ -122,59 +193,75 @@ export class ModerationService {
   // ==================== Queue Management ====================
 
   /**
-   * Add content to moderation queue
-   * Checks for existing items and calculates priority automatically
+   * Add content to moderation queue with race condition prevention
+   * Uses transaction with explicit locking to prevent duplicate entries
    * @param context - Moderation context with content details and flags
    * @returns Result with queue item ID
    */
   async queueForModeration(context: ModerationContext): Promise<ModerationQueueResult> {
     try {
-      // Check if content is already in queue
-      const existing = await this.findExistingQueueItem(context.contentType, context.contentId);
-      if (existing) {
+      // Validate input
+      validateModerationContext(context);
+
+      return await withTransaction(async (tx: DatabaseTransaction) => {
+        // Check for existing queue item with FOR UPDATE lock
+        const existingQuery = `
+          SELECT * FROM moderation_queue
+          WHERE content_type = $1
+          AND content_id = $2
+          AND status IN ('pending', 'in_review')
+          FOR UPDATE
+        `;
+
+        const existing = await tx.query(existingQuery, [context.contentType, context.contentId]);
+
+        if (existing && Array.isArray(existing) && existing.length > 0) {
+          return {
+            success: false,
+            error: 'Content already in moderation queue',
+          };
+        }
+
+        // Calculate priority based on context
+        const priority = this.calculatePriority(context);
+
+        // Calculate expected review time based on priority
+        const slaDeadline = this.calculateSLADeadline(priority);
+
+        // Insert new queue item using raw SQL
+        const insertQuery = `
+          INSERT INTO moderation_queue (
+            id, content_type, content_id, content_snapshot, trigger_reason,
+            flag_count, ai_confidence_score, detected_violations, priority,
+            sla_deadline, status, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', NOW(), NOW()
+          ) RETURNING *
+        `;
+
+        const result = await tx.query<ModerationQueueItem[]>(insertQuery, [
+          context.contentType,
+          context.contentId,
+          JSON.stringify(context.automatedSignals || {}),
+          context.triggerType,
+          context.flagCount || 1,
+          context.triggerConfidence?.toString() || null,
+          JSON.stringify(context.flagReasons || []),
+          priority,
+          slaDeadline
+        ]);
+
+        logger.info('Content queued for moderation', {
+          queueItemId: result[0]?.id,
+          contentType: context.contentType,
+          priority,
+        });
+
         return {
-          success: false,
-          error: 'Content already in moderation queue',
+          success: true,
+          queueItemId: result[0]?.id,
         };
-      }
-
-      // Calculate priority based on context
-      const priority = this.calculatePriority(context);
-
-      // Calculate expected review time based on priority
-      const expectedReviewBy = this.calculateExpectedReviewTime(priority);
-
-      const queueItem: NewModerationQueueItem = {
-        content_type: context.contentType,
-        content_id: context.contentId,
-        author_id: context.authorId,
-        bill_id: context.billId,
-        trigger_type: context.triggerType,
-        trigger_confidence: context.triggerConfidence?.toString(),
-        automated_signals: context.automatedSignals,
-        flag_reasons: context.flagReasons,
-        flagged_by: context.flaggedBy,
-        flag_count: context.flagCount || 1,
-        priority,
-        expected_review_by: expectedReviewBy,
-        tribal_incitement_detected: context.tribalIncitementDetected,
-        hate_speech_language: context.hateSpeechLanguage,
-        targets_protected_group: context.targetsProtectedGroup,
-        violence_threat_level: context.violenceThreatLevel,
-      };
-
-      const result = await writeDatabase.insert(moderation_queue).values(queueItem).returning();
-
-      logger.info('Content queued for moderation', {
-        queueItemId: result[0].id,
-        contentType: context.contentType,
-        priority,
       });
-
-      return {
-        success: true,
-        queueItemId: result[0].id,
-      };
     } catch (error) {
       logger.error('Failed to queue content for moderation', {
         error: getErrorMessage(error),
@@ -182,34 +269,55 @@ export class ModerationService {
       });
       return {
         success: false,
-        error: 'Failed to queue content for moderation',
+        error: getErrorMessage(error),
       };
     }
   }
 
   /**
-   * Assign moderator to queue item
-   * Updates item status and assignment timestamp
+   * Assign moderator to queue item with race condition prevention
+   * Prevents double-assignment using row-level locking
    * @param queueItemId - Queue item identifier
    * @param moderatorId - Moderator identifier
    * @returns Success boolean
    */
   async assignModerator(queueItemId: string, moderatorId: string): Promise<boolean> {
     try {
-      await withTransaction(async (tx) => {
-        await tx
-          .update(moderation_queue)
-          .set({
-            assigned_to: moderatorId,
-            assigned_at: new Date(),
-            status: 'assigned',
-            updated_at: new Date(),
-          })
-          .where(eq(moderation_queue.id, queueItemId));
-      });
+      if (!queueItemId || !moderatorId) {
+        throw new Error('Queue item ID and moderator ID are required');
+      }
 
-      logger.info('Moderator assigned to queue item', { queueItemId, moderatorId });
-      return true;
+      return await withTransaction(async (tx: DatabaseTransaction) => {
+        // Lock the row and check if it's available for assignment
+        const lockQuery = `
+          SELECT * FROM moderation_queue
+          WHERE id = $1
+          AND status = 'pending'
+          AND assigned_to IS NULL
+          FOR UPDATE
+        `;
+
+        const locked = await tx.query(lockQuery, [queueItemId]);
+
+        if (!locked || !Array.isArray(locked) || locked.length === 0) {
+          throw new Error('Queue item not available for assignment');
+        }
+
+        // Assign moderator using raw SQL
+        const updateQuery = `
+          UPDATE moderation_queue
+          SET assigned_to = $1,
+              assigned_at = NOW(),
+              status = 'in_review',
+              updated_at = NOW()
+          WHERE id = $2
+        `;
+
+        await tx.query(updateQuery, [moderatorId, queueItemId]);
+
+        logger.info('Moderator assigned to queue item', { queueItemId, moderatorId });
+        return true;
+      });
     } catch (error) {
       logger.error('Failed to assign moderator', {
         error: getErrorMessage(error),
@@ -228,20 +336,25 @@ export class ModerationService {
    */
   async getPendingQueueItems(limit = 50): Promise<ModerationQueueItem[]> {
     try {
-      const items = await readDatabase
+      if (limit < 1 || limit > 500) {
+        throw new Error('Limit must be between 1 and 500');
+      }
+
+      const items = (await readDatabase
         .select()
-        .from(moderation_queue)
+        .from(moderationQueue)
         .where(
           and(
-            eq(moderation_queue.status, 'pending'),
+            eq(moderationQueue.status, 'pending'),
             or(
-              sql`${moderation_queue.expected_review_by} IS NULL`,
-              gte(moderation_queue.expected_review_by, new Date())
+              eq(moderationQueue.assigned_to, null),
+              // Allow reassignment if assigned over 1 hour ago
+              lte(moderationQueue.assigned_at, new Date(Date.now() - 60 * 60 * 1000))
             )
           )
         )
-        .orderBy(desc(moderation_queue.priority), asc(moderation_queue.created_at))
-        .limit(limit);
+        .orderBy(desc(moderationQueue.priority), asc(moderationQueue.created_at))
+        .limit(limit)) as ModerationQueueItem[];
 
       return items;
     } catch (error) {
@@ -259,16 +372,20 @@ export class ModerationService {
    */
   async getAssignedItems(moderatorId: string): Promise<ModerationQueueItem[]> {
     try {
-      const items = await readDatabase
+      if (!moderatorId) {
+        throw new Error('Moderator ID is required');
+      }
+
+      const items = (await readDatabase
         .select()
-        .from(moderation_queue)
+        .from(moderationQueue)
         .where(
           and(
-            eq(moderation_queue.assigned_to, moderatorId),
-            or(eq(moderation_queue.status, 'assigned'), eq(moderation_queue.status, 'in_review'))
+            eq(moderationQueue.assigned_to, moderatorId),
+            or(eq(moderationQueue.status, 'in_review'), eq(moderationQueue.status, 'pending'))
           )
         )
-        .orderBy(desc(moderation_queue.priority), asc(moderation_queue.assigned_at));
+        .orderBy(desc(moderationQueue.priority), asc(moderationQueue.assigned_at))) as ModerationQueueItem[];
 
       return items;
     } catch (error) {
@@ -280,158 +397,208 @@ export class ModerationService {
     }
   }
 
-  /**
-   * Get overdue moderation items
-   * Returns items that have exceeded their expected review time
-   * @returns Array of overdue queue items
-   */
-  async getOverdueItems(): Promise<ModerationQueueItem[]> {
-    try {
-      const items = await readDatabase
-        .select()
-        .from(moderation_queue)
-        .where(
-          and(
-            eq(moderation_queue.is_overdue, true),
-            or(
-              eq(moderation_queue.status, 'pending'),
-              eq(moderation_queue.status, 'assigned'),
-              eq(moderation_queue.status, 'in_review')
-            )
-          )
-        )
-        .orderBy(desc(moderation_queue.priority), asc(moderation_queue.expected_review_by));
-
-      return items;
-    } catch (error) {
-      logger.error('Failed to get overdue items', {
-        error: getErrorMessage(error),
-      });
-      return [];
-    }
-  }
-
   // ==================== Decision Management ====================
 
   /**
-   * Make moderation decision
-   * Records decision and updates queue item status
-   * @param context - Decision context with moderator action details
+   * Record moderation decision with transactional consistency
+   * Ensures queue item status is updated atomically with decision creation
+   * @param context - Decision context with details
    * @returns Result with decision ID
    */
-  async makeDecision(context: ModerationDecisionContext): Promise<ModerationDecisionResult> {
+  async recordDecision(context: ModerationDecisionContext): Promise<ModerationDecisionResult> {
     try {
-      const decision: NewModerationDecision = {
-        queue_item_id: context.queueItemId,
-        decision: context.decision,
-        decision_reason: context.decisionReason,
-        moderator_id: context.moderatorId,
-        confidence_level: context.confidenceLevel,
-        violated_policies: context.violatedPolicies,
-        action_taken: context.actionTaken,
-        user_notified: context.userNotified,
-        reputation_penalty: context.reputationPenalty,
-        suspension_duration_hours: context.suspensionDurationHours,
-        is_permanent_ban: context.isPermanentBan,
-        review_notes: context.reviewNotes,
-      };
+      // Validate input
+      validateDecisionContext(context);
 
-      const result = await withTransaction(async (tx) => {
-        // Insert decision
-        const decisionResult = await tx.insert(moderation_decisions).values(decision).returning();
+      return await withTransaction(async (tx: DatabaseTransaction) => {
+        // Verify queue item exists and is assigned to this moderator using raw SQL
+        const queueQuery = `
+          SELECT * FROM moderation_queue
+          WHERE id = $1
+          LIMIT 1
+        `;
 
-        // Update queue item
-        await tx
-          .update(moderation_queue)
-          .set({
-            status: 'reviewed',
-            reviewed_at: new Date(),
-            reviewed_by: context.moderatorId,
-            decision: context.decision,
-            decision_reason: context.decisionReason,
-            violated_policies: context.violatedPolicies,
-            updated_at: new Date(),
-          })
-          .where(eq(moderation_queue.id, context.queueItemId));
+        const queueItem = await tx.query<ModerationQueueItem[]>(queueQuery, [context.queueItemId]);
 
-        return decisionResult[0];
+        if (!queueItem || queueItem.length === 0) {
+          throw new Error('Queue item not found');
+        }
+
+        if (!queueItem[0]) {
+          throw new Error('Queue item not found');
+        }
+
+        if (queueItem[0].assigned_to !== context.moderatorId) {
+          throw new Error('Queue item not assigned to this moderator');
+        }
+
+        if (queueItem[0].status === 'resolved') {
+          throw new Error('Queue item already resolved');
+        }
+
+        // Create decision record using raw SQL
+        const insertDecisionQuery = `
+          INSERT INTO moderation_decisions (
+            id, queue_item_id, moderator_id, action_taken, reasoning,
+            user_affected, penalty_duration_hours, reputation_impact,
+            required_peer_review, peer_review_count, is_appealable,
+            is_public, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW()
+          ) RETURNING *
+        `;
+
+        const result = await tx.query<ModerationDecision[]>(insertDecisionQuery, [
+          context.queueItemId,
+          context.moderatorId,
+          context.actionTaken,
+          context.decisionReason,
+          null, // user_affected
+          context.suspensionDurationHours || null,
+          context.reputationPenalty || null,
+          false,
+          0,
+          true,
+          true
+        ]);
+
+        // Update queue item status using raw SQL
+        const updateQueueQuery = `
+          UPDATE moderation_queue
+          SET status = 'resolved',
+              resolved_at = NOW(),
+              updated_at = NOW()
+          WHERE id = $1
+        `;
+
+        await tx.query(updateQueueQuery, [context.queueItemId]);
+
+        logger.info('Moderation decision recorded', {
+          decisionId: result[0].id,
+          queueItemId: context.queueItemId,
+          action: context.actionTaken,
+        });
+
+        return {
+          success: true,
+          decisionId: result[0].id,
+        };
       });
-
-      if (!result) {
-        throw new Error('Failed to create decision record');
-      }
-
-      logger.info('Moderation decision made', {
-        decisionId: result.id,
-        queueItemId: context.queueItemId,
-        decision: context.decision,
-      });
-
-      return {
-        success: true,
-        decisionId: result.id,
-      };
     } catch (error) {
-      logger.error('Failed to make moderation decision', {
+      logger.error('Failed to record moderation decision', {
         error: getErrorMessage(error),
         context,
       });
       return {
         success: false,
-        error: 'Failed to make moderation decision',
+        error: getErrorMessage(error),
       };
+    }
+  }
+
+  /**
+   * Get decision by ID
+   * @param decisionId - Decision identifier
+   * @returns Decision or null
+   */
+  async getDecision(decisionId: string): Promise<ModerationDecision | null> {
+    try {
+      if (!decisionId) {
+        throw new Error('Decision ID is required');
+      }
+
+      const result = (await readDatabase
+        .select()
+        .from(moderationDecisions)
+        .where(eq(moderationDecisions.id, decisionId))
+        .limit(1)) as ModerationDecision[];
+
+      return result[0] || null;
+    } catch (error) {
+      logger.error('Failed to get decision', {
+        error: getErrorMessage(error),
+        decisionId,
+      });
+      return null;
     }
   }
 
   // ==================== Appeal Management ====================
 
   /**
-   * File appeal against moderation decision
-   * Creates appeal record and updates queue item status
-   * @param context - Appeal context with appellant details and reasoning
+   * File appeal against moderation decision with validation
+   * Prevents duplicate appeals for the same decision
+   * @param context - Appeal context with reasoning
    * @returns Result with appeal ID
    */
   async fileAppeal(context: ModerationAppealContext): Promise<ModerationAppealResult> {
     try {
-      const appeal: NewModerationAppeal = {
-        decision_id: context.decisionId,
-        appellant_id: context.appellantId,
-        appeal_reason: context.appealReason,
-        appeal_decision_reason: '', // Will be filled when appeal is reviewed
-        appeal_grounds: context.appealGrounds,
-        supporting_evidence: context.supportingEvidence,
-      };
+      // Validate input
+      validateAppealContext(context);
 
-      const result = await writeDatabase.insert(moderation_appeals).values(appeal).returning();
+      return await withTransaction(async (tx: DatabaseTransaction) => {
+        // Verify decision exists and is appealable using raw SQL
+        const decisionQuery = `
+          SELECT * FROM moderation_decisions
+          WHERE id = $1
+          LIMIT 1
+        `;
 
-      // Get the queue item ID from the decision
-      const decision = await readDatabase
-        .select()
-        .from(moderation_decisions)
-        .where(eq(moderation_decisions.id, context.decisionId))
-        .limit(1);
+        const decision = await tx.query<ModerationDecision[]>(decisionQuery, [context.decisionId]);
 
-      if (decision[0]?.queue_item_id) {
-        await withTransaction(async (tx) => {
-          await tx
-            .update(moderation_queue)
-            .set({
-              status: 'appealed',
-              updated_at: new Date(),
-            })
-            .where(eq(moderation_queue.id, decision[0].queue_item_id));
+        if (!decision || decision.length === 0) {
+          throw new Error('Decision not found');
+        }
+
+        if (!decision[0]) {
+          throw new Error('Decision not found');
+        }
+
+        if (decision[0].is_appealable === false) {
+          throw new Error('Appeals not allowed for this decision');
+        }
+
+        // Check for existing pending appeal using raw SQL
+        const existingAppealQuery = `
+          SELECT * FROM moderation_appeals
+          WHERE decision_id = $1
+            AND status = 'pending'
+          LIMIT 1
+        `;
+
+        const existingAppeal = await tx.query<ModerationAppeal[]>(existingAppealQuery, [context.decisionId]);
+
+        if (existingAppeal && existingAppeal.length > 0) {
+          throw new Error('Appeal already pending for this decision');
+        }
+
+        // Create appeal record using raw SQL
+        const insertAppealQuery = `
+          INSERT INTO moderation_appeals (
+            id, decision_id, appellant_user_id, appeal_reasoning,
+            supporting_evidence, status, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, $4, 'pending', NOW(), NOW()
+          ) RETURNING *
+        `;
+
+        const result = await tx.query<ModerationAppeal[]>(insertAppealQuery, [
+          context.decisionId,
+          context.appellantUserId,
+          context.appealReasoning,
+          JSON.stringify(context.supportingEvidence || [])
+        ]);
+
+        logger.info('Moderation appeal filed', {
+          appealId: result[0]?.id,
+          decisionId: context.decisionId,
         });
-      }
 
-      logger.info('Moderation appeal filed', {
-        appealId: result[0].id,
-        decisionId: context.decisionId,
+        return {
+          success: true,
+          appealId: result[0]?.id,
+        };
       });
-
-      return {
-        success: true,
-        appealId: result[0].id,
-      };
     } catch (error) {
       logger.error('Failed to file moderation appeal', {
         error: getErrorMessage(error),
@@ -439,86 +606,150 @@ export class ModerationService {
       });
       return {
         success: false,
-        error: 'Failed to file moderation appeal',
+        error: getErrorMessage(error),
       };
+    }
+  }
+
+  /**
+   * Get pending appeals for review
+   * @param limit - Maximum number of appeals to return
+   * @returns Array of pending appeals
+   */
+  async getPendingAppeals(limit = 50): Promise<ModerationAppeal[]> {
+    try {
+      if (limit < 1 || limit > 500) {
+        throw new Error('Limit must be between 1 and 500');
+      }
+
+      const appeals = (await readDatabase
+        .select()
+        .from(moderationAppeals)
+        .where(eq(moderationAppeals.status, 'pending'))
+        .orderBy(asc(moderationAppeals.created_at))
+        .limit(limit)) as ModerationAppeal[];
+
+      return appeals;
+    } catch (error) {
+      logger.error('Failed to get pending appeals', {
+        error: getErrorMessage(error),
+      });
+      return [];
     }
   }
 
   // ==================== Performance Tracking ====================
 
   /**
-   * Update moderator performance metrics for a given period
-   * Calculates decisions made, appeal overturn rate, and overall rating
+   * Calculate moderator performance metrics for a given period
    * @param moderatorId - Moderator identifier
    * @param periodStart - Start of performance period
    * @param periodEnd - End of performance period
+   * @returns Performance metrics
    */
-  async updateModeratorPerformance(
+  async calculateModeratorPerformance(
     moderatorId: string,
     periodStart: Date,
     periodEnd: Date
-  ): Promise<void> {
+  ): Promise<ModeratorPerformanceMetrics | null> {
     try {
-      // Calculate performance metrics
-      const decisions = await readDatabase
+      if (!moderatorId) {
+        throw new Error('Moderator ID is required');
+      }
+
+      if (periodStart >= periodEnd) {
+        throw new Error('Period start must be before period end');
+      }
+
+      // Get all decisions made by moderator in period
+      const decisions = (await readDatabase
         .select()
-        .from(moderation_decisions)
+        .from(moderationDecisions)
         .where(
           and(
-            eq(moderation_decisions.moderator_id, moderatorId),
-            gte(moderation_decisions.created_at, periodStart),
-            lte(moderation_decisions.created_at, periodEnd)
+            eq(moderationDecisions.moderator_id, moderatorId),
+            gte(moderationDecisions.created_at, periodStart),
+            lte(moderationDecisions.created_at, periodEnd)
           )
-        );
+        )) as ModerationDecision[];
 
-      const appeals = await readDatabase
+      if (decisions.length === 0) {
+        return {
+          moderatorId,
+          periodStart,
+          periodEnd,
+          decisionsMade: 0,
+          appealsOverturned: 0,
+          overturnRate: 0,
+          averageReviewTimeMinutes: 0,
+          overallRating: 'insufficient_data',
+        };
+      }
+
+      // Get appeals related to these decisions
+      const decisionIds = decisions.map((d: ModerationDecision) => d.id);
+      const appeals = (await readDatabase
         .select()
-        .from(moderation_appeals)
+        .from(moderationAppeals)
         .where(
-          sql`EXISTS (
-            SELECT 1 FROM ${moderation_decisions} md
-            WHERE md.id = ${moderation_appeals.decision_id}
-            AND md.moderator_id = ${moderatorId}
-            AND md.created_at >= ${periodStart}
-            AND md.created_at <= ${periodEnd}
-          )`
-        );
+          and(
+            inArray(moderationAppeals.decision_id, decisionIds),
+            eq(moderationAppeals.status, 'resolved')
+          )
+        )) as ModerationAppeal[];
 
       const decisionsMade = decisions.length;
       const appealsOverturned = appeals.filter(
-        (appeal: ModerationAppeal) => appeal.appeal_decision === 'overturned'
+        (appeal: ModerationAppeal) => appeal.original_penalty_reversed === true
       ).length;
       const overturnRate = decisionsMade > 0 ? (appealsOverturned / decisionsMade) * 100 : 0;
 
-      const performance: NewModeratorPerformance = {
-        moderator_id: moderatorId,
-        period_start: periodStart,
-        period_end: periodEnd,
-        decisions_made: decisionsMade,
-        appeals_overturned: appealsOverturned,
-        overturn_rate: overturnRate.toString(),
-        overall_rating: this.calculateOverallRating(overturnRate, decisionsMade),
+      // Calculate average review time from queue items
+      const queueItemIds = decisions.map((d: ModerationDecision) => d.queue_item_id);
+      const queueItems = (await readDatabase
+        .select()
+        .from(moderationQueue)
+        .where(
+          inArray(moderationQueue.id, queueItemIds)
+        )) as ModerationQueueItem[];
+
+      const reviewTimes = queueItems
+        .filter((item: ModerationQueueItem) => item.resolved_at && item.assigned_at)
+        .map((item: ModerationQueueItem) => {
+          const assignedTime = new Date(item.assigned_at!).getTime();
+          const resolvedTime = new Date(item.resolved_at!).getTime();
+          return Math.round((resolvedTime - assignedTime) / (1000 * 60)); // Convert to minutes
+        });
+
+      const averageReviewTimeMinutes = reviewTimes.length > 0
+        ? reviewTimes.reduce((sum: number, time: number) => sum + time, 0) / reviewTimes.length
+        : 0;
+
+      const metrics: ModeratorPerformanceMetrics = {
+        moderatorId,
+        periodStart,
+        periodEnd,
+        decisionsMade,
+        appealsOverturned,
+        overturnRate,
+        averageReviewTimeMinutes,
+        overallRating: this.calculateOverallRating(overturnRate, decisionsMade),
       };
 
-      await writeDatabase.insert(moderator_performance).values(performance).onConflictDoUpdate({
-        target: [
-          moderator_performance.moderator_id,
-          moderator_performance.period_start,
-          moderator_performance.period_end,
-        ],
-        set: performance,
-      });
-
-      logger.info('Moderator performance updated', {
+      logger.info('Moderator performance calculated', {
         moderatorId,
         decisionsMade,
         overturnRate: overturnRate.toFixed(2),
+        averageReviewTime: averageReviewTimeMinutes.toFixed(2),
       });
+
+      return metrics;
     } catch (error) {
-      logger.error('Failed to update moderator performance', {
+      logger.error('Failed to calculate moderator performance', {
         error: getErrorMessage(error),
         moderatorId,
       });
+      return null;
     }
   }
 
@@ -526,33 +757,25 @@ export class ModerationService {
 
   /**
    * Mark SLA violations for overdue items
-   * Identifies items past their expected review time and increments violation counter
+   * Identifies items past their SLA deadline and marks them
    * @returns Number of items marked as overdue
    */
   async markSlaViolations(): Promise<number> {
     try {
-      const result = await withTransaction(async (tx) => {
-        const overdueItems = await tx
-          .update(moderation_queue)
-          .set({
-            is_overdue: true,
-            sla_violations: sql`${moderation_queue.sla_violations} + 1`,
-            updated_at: new Date(),
-          })
-          .where(
-            and(
-              eq(moderation_queue.is_overdue, false),
-              lte(moderation_queue.expected_review_by, new Date()),
-              or(
-                eq(moderation_queue.status, 'pending'),
-                eq(moderation_queue.status, 'assigned'),
-                eq(moderation_queue.status, 'in_review')
-              )
-            )
-          )
-          .returning({ id: moderation_queue.id });
+      const result = await withTransaction(async (tx: DatabaseTransaction) => {
+        const updateSlaQuery = `
+          UPDATE moderation_queue
+          SET is_sla_violated = true,
+              updated_at = NOW()
+          WHERE is_sla_violated = false
+            AND sla_deadline <= NOW()
+            AND status IN ('pending', 'in_review')
+        `;
 
-        return overdueItems.length;
+        const overdueItems = await tx.query(updateSlaQuery);
+
+        // Return the number of affected rows (PostgreSQL returns rowCount in result)
+        return (overdueItems as any)?.rowCount || 0;
       });
 
       logger.info('Marked SLA violations', { count: result });
@@ -568,79 +791,64 @@ export class ModerationService {
   // ==================== Private Helper Methods ====================
 
   /**
-   * Check if content is already in moderation queue
-   */
-  private async findExistingQueueItem(
-    contentType: string,
-    contentId: string
-  ): Promise<ModerationQueueItem | null> {
-    try {
-      const result = await readDatabase
-        .select()
-        .from(moderation_queue)
-        .where(
-          and(
-            eq(moderation_queue.content_type, contentType),
-            eq(moderation_queue.content_id, contentId),
-            or(
-              eq(moderation_queue.status, 'pending'),
-              eq(moderation_queue.status, 'assigned'),
-              eq(moderation_queue.status, 'in_review')
-            )
-          )
-        )
-        .limit(1);
-
-      return result[0] || null;
-    } catch (error) {
-      logger.error('Failed to find existing queue item', {
-        error: getErrorMessage(error),
-        contentType,
-        contentId,
-      });
-      return null;
-    }
-  }
-
-  /**
    * Calculate priority based on context signals
+   * Returns numeric priority (1-5, where 5 is highest)
    */
-  private calculatePriority(context: ModerationContext): string {
+  private calculatePriority(context: ModerationContext): number {
+    // Return explicit priority if provided and valid
+    if (context.priority && context.priority >= 1 && context.priority <= 5) {
+      return context.priority;
+    }
+
+    // Critical priority (5)
     if (context.tribalIncitementDetected || context.violenceThreatLevel === 'imminent') {
-      return 'critical';
+      return 5;
     }
+
+    // High priority (4)
     if (context.targetsProtectedGroup || context.violenceThreatLevel === 'high') {
-      return 'high';
+      return 4;
     }
+
+    // Medium-high priority (3)
     if (context.triggerConfidence && context.triggerConfidence > 0.8) {
-      return 'high';
+      return 3;
     }
+
+    // Medium priority (2)
     if (context.flagCount && context.flagCount >= 5) {
-      return 'medium';
+      return 2;
     }
-    return context.priority || 'low';
+
+    // Default low priority (1)
+    return 1;
   }
 
   /**
-   * Calculate expected review time based on priority level
+   * Calculate SLA deadline based on priority level
    */
-  private calculateExpectedReviewTime(priority: string): Date {
+  private calculateSLADeadline(priority: number): Date {
     const now = new Date();
-    let hours = 24; // default low priority
+    let hours = 24; // default for priority 1
 
     switch (priority) {
-      case 'critical':
+      case 5: // Critical
         hours = 0.25; // 15 minutes
         break;
-      case 'high':
+      case 4: // High
         hours = 1;
         break;
-      case 'medium':
+      case 3: // Medium-high
         hours = 6;
         break;
-      case 'low':
+      case 2: // Medium
+        hours = 12;
+        break;
+      case 1: // Low
         hours = 24;
         break;
+      default:
+        hours = 24;
     }
 
     return new Date(now.getTime() + hours * 60 * 60 * 1000);

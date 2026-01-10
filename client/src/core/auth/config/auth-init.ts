@@ -4,7 +4,7 @@
  * Centralized initialization for the entire authentication system
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
 import { createError } from '../../error';

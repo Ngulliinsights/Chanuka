@@ -5,7 +5,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@client/core/auth';
 import { Alert, AlertDescription, Button } from '@client/shared/design-system';
 import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

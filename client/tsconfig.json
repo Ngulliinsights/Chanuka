@@ -39,30 +39,36 @@
     // Project Structure
     "baseUrl": "./src",
 
-    // Path Mappings
+    // Path Mappings - Client-specific aliases only
     "paths": {
+      "@": ["."],
       "@/*": ["./*"],
       "@client": ["."],
       "@client/*": ["./*"],
       "@client/@types": ["./@types"],
       "@client/@types/*": ["./@types/*"],
-      "@client/utils/*": ["./utils/*"],
       "@client/test-utils": ["./test-utils"],
       "@client/test-utils/*": ["./test-utils/*"],
+      // Hooks moved to shared
+      "@client/hooks": ["./shared/hooks"],
+      "@client/hooks/*": ["./shared/hooks/*"],
+      // Shared module paths - consistent with Vite config
       "@shared": ["../../shared"],
-      "@shared/*": ["../../shared/*"],
-      "@shared/core": ["../../shared/core/src"],
-      "@shared/core/*": ["../../shared/core/src/*"],
-      "@shared/database": ["../../shared/database"],
-      "@shared/database/*": ["../../shared/database/*"],
+      "@shared/core": ["../../shared/core"],
       "@shared/schema": ["../../shared/schema"],
-      "@shared/schema/*": ["../../shared/schema/*"],
-      "@shared/utils": ["../../shared/core/src/utils"],
-      "@shared/utils/*": ["../../shared/core/src/utils/*"],
-      "@server": ["../../server"],
-      "@server/*": ["../../server/*"],
-      "@tests": ["../../tests"],
-      "@tests/*": ["../../tests/*"]
+      "@shared/platform": ["../../shared/platform"],
+      "@shared/i18n": ["../../shared/i18n"],
+      // Client-safe shared module paths
+      "@shared/core/utils": ["../../shared/core/utils"],
+      // Exclude server-only modules (redirect to stubs)
+      "@shared/database": ["./src/stubs/database-stub.ts"],
+      "@shared/core/middleware": ["./src/stubs/middleware-stub.ts"],
+      // Security fixes - redirect to secure implementations
+      "@client/shared/utils/authenticated-api": ["./src/shared/utils/secure-authenticated-api.ts"],
+      "@client/shared/utils/secure-token-manager": ["./src/shared/utils/secure-token-manager.ts"],
+      // Logger consolidation - redirect all logger imports to unified implementation
+      "@client/shared/utils/logger": ["./shared/utils/logger.ts"],
+      "@client/utils/logger-simple": ["./shared/utils/logger.ts"]
     },
 
     // Type Definitions

@@ -13,8 +13,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/design-system/interactive/Select';
-import { TemporalFilter } from '@/shared/types/user-dashboard';
+} from '@client/shared/design-system/interactive/Select';
+import { TemporalFilter } from '@client/shared/types/user-dashboard';
 
 interface TimeFilterSelectorProps {
   value: TemporalFilter;

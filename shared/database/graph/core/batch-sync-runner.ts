@@ -2,11 +2,9 @@
  * Batch Sync Runner (REFACTORED)
  * IMPROVEMENTS: Fixed session leaks, added retry logic, proper error handling
  */
-import { Driver } from 'neo4j-driver';
-import { withSession } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
-import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
 import { SYNC_CONFIG } from '../config/graph-config';
+
 import { logger } from '@/core/observability';
 
 const errorHandler = new GraphErrorHandler();
@@ -28,8 +26,7 @@ export interface BatchSyncStats {
 }
 
 export async function runBatchSync(
-  batchSize: number = SYNC_CONFIG.BATCH_SIZE,
-  timeoutMs: number = SYNC_CONFIG.TIMEOUT_MS
+  batchSize: number = SYNC_CONFIG.BATCH_SIZE
 ): Promise<SyncResult> {
   const batchId = `batch_${Date.now()}`;
   const startTime = Date.now();

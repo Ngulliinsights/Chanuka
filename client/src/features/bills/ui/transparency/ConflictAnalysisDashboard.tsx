@@ -24,7 +24,7 @@ import {
 } from '@client/shared/design-system';
 import { Progress } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];

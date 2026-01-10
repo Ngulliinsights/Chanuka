@@ -5,7 +5,7 @@
  * after migrating to the consolidated auth system.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface CleanupTask {
   name: string;
@@ -112,7 +112,7 @@ export function generateCleanupReport(): {
 
   const nextSteps = [
     '1. Review and test the consolidated auth system',
-    '2. Update any remaining components to use @/core/auth imports',
+    '2. Update any remaining components to use @client/core/auth imports',
     '3. Remove old auth implementation files (marked for removal)',
     '4. Update tests to use the new consolidated APIs',
     '5. Update documentation to reflect the new auth system',

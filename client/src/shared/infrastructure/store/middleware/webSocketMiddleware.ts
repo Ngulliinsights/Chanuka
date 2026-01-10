@@ -8,18 +8,18 @@
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 
-import { realTimeService } from '@/core/realtime';
-import { WebSocketSubscription } from '@/core/realtime/types';
+import { realTimeService } from '@client/core/realtime';
+import { WebSocketSubscription } from '@client/core/realtime/types';
 import {
   CivicWebSocketState,
   PollingFallbackConfig,
   RealTimeHandlers,
   BillRealTimeUpdate,
   RealTimeNotification,
-} from '@/core/realtime/types';
+} from '@client/core/realtime/types';
 
 import { ConnectionState } from '@shared/schema/websocket';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 import { updateConnectionState, addBillUpdate, addNotification } from '../slices/realTimeSlice';
 
 // WebSocket middleware configuration

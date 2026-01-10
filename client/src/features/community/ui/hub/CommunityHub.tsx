@@ -23,7 +23,7 @@ import {
 import React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
+import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
 import { cn } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

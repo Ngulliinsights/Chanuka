@@ -6,7 +6,7 @@
 import { Network } from 'lucide-react';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface OfflineData {
   bills: Array<{

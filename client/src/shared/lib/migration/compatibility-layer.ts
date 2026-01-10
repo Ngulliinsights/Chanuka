@@ -15,7 +15,7 @@ import {
   billValidationSchemas,
   userValidationSchemas,
   formValidationSchemas,
-  allValidationSchemas,
+  billValidationSchemas as allValidationSchemas,
 } from '@client/shared/lib/validation';
 
 import {
@@ -113,14 +113,6 @@ export type {
   DevUtilsConfig,
 } from '@client/shared/lib/query-client';
 
-export type {
-  QueryKeyFactory,
-  QueryCacheUtils,
-  OfflineSupportConfig,
-  ErrorHandlingConfig,
-  DevUtilsConfig,
-} from '@client/shared/lib/query-client';
-
 // Migration utilities
 export const migrationUtils = {
   /**
@@ -158,11 +150,11 @@ This component is using legacy imports. Please update to use the new FSD structu
    */
   getMigrationPath: (oldPath: string) => {
     const migrationMap: Record<string, string> = {
-      '@client/lib/form-builder': '@client/shared/lib/form-builder',
-      '@client/lib/validation-schemas': '@client/shared/lib/validation',
-      '@client/lib/queryClient': '@client/shared/lib/query-client',
-      '@client/lib/utils': '@client/shared/lib/utils',
-      '@client/lib': '@client/shared/lib',
+      '@client/shared/lib/form-builder': '@client/shared/lib/form-builder',
+      '@client/shared/lib/validation-schemas': '@client/shared/lib/validation',
+      '@client/shared/lib/queryClient': '@client/shared/lib/query-client',
+      '@client/shared/lib/utils': '@client/shared/lib/utils',
+      '@client/shared/lib': '@client/shared/lib',
     };
 
     return migrationMap[oldPath] || `Please check the migration guide for ${oldPath}`;

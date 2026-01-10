@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from '@client/shared/design-system';
 import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

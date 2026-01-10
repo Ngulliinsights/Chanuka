@@ -8,8 +8,8 @@
  */
 
 // Main analytics tracker
-export { ComprehensiveAnalyticsTracker } from './comprehensive-tracker';
-export { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
+import { ComprehensiveAnalyticsTracker } from './comprehensive-tracker';
+export { ComprehensiveAnalyticsTracker };
 export type {
   AnalyticsEvent,
   AnalyticsEventType,
@@ -28,7 +28,6 @@ export {
 
 // Re-export existing analytics infrastructure
 export { analyticsApiService } from '@client/core/api/analytics';
-export { UserJourneyTracker } from '@client/';
 export { PerformanceMonitor } from '@client/core/performance/monitor';
 export { ErrorAnalyticsService } from '@client/core/error/analytics';
 
@@ -88,7 +87,6 @@ export type {
   PathAnalytics,
   DropOffPoint,
   ConversionFunnel,
-  JourneyOptimization,
 } from '@client/features/analytics/model/user-journey-tracker';
 
 export type {

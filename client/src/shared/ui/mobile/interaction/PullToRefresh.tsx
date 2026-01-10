@@ -5,9 +5,9 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GESTURE_CONFIG } from '@/config/gestures';
-import { cn } from '@/utils/cn';
-import type { PullToRefreshConfig } from '@/shared/types/mobile';
+import { GESTURE_CONFIG } from '@client/config/gestures';
+import { cn } from '@client/shared/utils/cn';
+import type { PullToRefreshConfig } from '@client/shared/types/mobile';
 
 type RefreshState = 'idle' | 'pulling' | 'ready' | 'refreshing';
 

@@ -168,18 +168,15 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     resolve: {
       // Path aliases let you use cleaner imports like '@/components' instead of '../../../components'
       alias: {
-        '@': path.resolve(rootDir, './src'),
         '@client': path.resolve(rootDir, './src'),
-        '@client/*': path.resolve(rootDir, './src/*'),
         '@shared': path.resolve(rootDir, '../shared'),
-        '@shared/*': path.resolve(rootDir, '../shared/*'),
-
-        // Client-safe shared module paths
-        '@shared/core/utils': path.resolve(rootDir, '../shared/core/src/utils'),
         '@shared/core': path.resolve(rootDir, '../shared/core/src'),
         '@shared/schema': path.resolve(rootDir, '../shared/schema'),
         '@shared/platform': path.resolve(rootDir, '../shared/platform'),
         '@shared/i18n': path.resolve(rootDir, '../shared/i18n'),
+
+        // Client-safe shared module paths
+        '@shared/core/utils': path.resolve(rootDir, '../shared/core/src/utils'),
 
         // Exclude server-only modules (redirect to stubs)
         '@shared/database': path.resolve(rootDir, './src/stubs/database-stub.ts'),
@@ -268,7 +265,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
       // Source maps help debug production issues
       // 'hidden' creates maps but doesn't reference them in bundles for security
-      sourcemap: isDevelopment ? true : 'hidden',
+      sourcemap: isDevelopment ? true : 'hidden' as const,
 
       rollupOptions: {
         output: {
@@ -378,7 +375,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         treeshake: {
           // Don't assume external packages have side effects unless specified
           // This allows more aggressive optimization of library code
-          moduleSideEffects: 'no-external',
+          moduleSideEffects: 'no-external' as const,
           // Reading properties doesn't cause side effects in most cases
           // This enables removal of unused property accesses
           propertyReadSideEffects: false,
@@ -403,7 +400,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
       // Terser minification produces smaller bundles than esbuild
       // The tradeoff is slightly slower builds, but worth it for production
-      minify: isProduction ? 'terser' : false,
+      minify: isProduction ? 'terser' as const : false,
 
       ...(isProduction ? {
         terserOptions: {
@@ -477,7 +474,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // ============================================================================
     // Info level in development helps with debugging
     // Warn level in production keeps CI logs clean
-    logLevel: isDevelopment ? 'info' : 'warn',
+    logLevel: isDevelopment ? 'info' as const : 'warn' as const,
 
     // ============================================================================
     // TESTING - Vitest configuration

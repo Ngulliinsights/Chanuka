@@ -1,6 +1,6 @@
 // import React from 'react'; // Unused
-import { useToast } from '../../../hooks/use-toast';
-// import { logger } from '../../../utils/logger'; // Unused
+import { useToast } from '../@client/shared/hooks/use-toast';
+// import { logger } from '@client/shared/utils/logger'; // Unused
 
 import {
   Toast,

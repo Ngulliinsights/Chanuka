@@ -197,21 +197,21 @@ const IMPORT_MAPPINGS = {
   '@client/shared/design-system/alert': '@client/shared/design-system/feedback/Alert',
 
   // Shared UI imports
-  '@client/components/layout': '@client/shared/ui/layout',
-  '@client/components/navigation': '@client/shared/ui/navigation',
-  '@client/components/loading': '@client/shared/ui/loading',
-  '@client/components/error-handling': '@client/shared/ui/error',
-  '@client/components/mobile': '@client/shared/ui/mobile',
+  '@client/shared/components/layout': '@client/shared/ui/layout',
+  '@client/shared/components/navigation': '@client/shared/ui/navigation',
+  '@client/shared/components/loading': '@client/shared/ui/loading',
+  '@client/shared/components/error-handling': '@client/shared/ui/error',
+  '@client/shared/components/mobile': '@client/shared/ui/mobile',
 
   // Feature-specific imports
-  '@client/components/bill-detail': '@client/features/bills/ui/detail',
-  '@client/components/bill-tracking': '@client/features/bills/ui/tracking',
-  '@client/components/community': '@client/features/community/ui',
-  '@client/components/discussion': '@client/features/community/ui/discussion',
-  '@client/components/search': '@client/features/search/ui',
-  '@client/components/auth': '@client/features/users/ui/auth',
-  '@client/components/user': '@client/features/users/ui/profile',
-  '@client/components/analytics': '@client/features/analytics/ui',
+  '@client/shared/components/bill-detail': '@client/features/bills/ui/detail',
+  '@client/shared/components/bill-tracking': '@client/features/bills/ui/tracking',
+  '@client/shared/components/community': '@client/features/community/ui',
+  '@client/shared/components/discussion': '@client/features/community/ui/discussion',
+  '@client/shared/components/search': '@client/features/search/ui',
+  '@client/shared/components/auth': '@client/features/users/ui/auth',
+  '@client/shared/components/user': '@client/features/users/ui/profile',
+  '@client/shared/components/analytics': '@client/features/analytics/ui',
 };
 
 /**

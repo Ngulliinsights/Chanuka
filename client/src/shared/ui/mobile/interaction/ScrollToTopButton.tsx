@@ -11,8 +11,8 @@ import { ChevronUp } from 'lucide-react';
 import { type ReactNode } from 'react';
 import React from 'react';
 
-import { useScrollManager } from '@/hooks/mobile';
-import { cn } from '@/utils/cn';
+import { useScrollManager } from '@client/hooks/mobile';
+import { cn } from '@client/shared/utils/cn';
 
 interface ScrollToTopButtonProps {
   /**

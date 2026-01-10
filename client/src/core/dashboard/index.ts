@@ -3,8 +3,8 @@
  * Moved to shared/core for cross-platform reusability
  */
 
-export * from './types';
 export * from './context';
 export * from './hooks';
 export * from './widgets';
-export * from './utils';
+// Note: utils re-exports only ChartData, types are imported from './types'
+export type { ChartData } from './utils';

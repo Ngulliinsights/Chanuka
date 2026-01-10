@@ -4,6 +4,9 @@
  * Common utility functions for the application
  */
 
+// Re-export validation utilities
+export { isValidEmail, isValidKenyaPhoneNumber, isValidUrl, isValidPostalCode } from './validation-utils';
+
 /**
  * Combines class names using clsx and tailwind-merge
  */

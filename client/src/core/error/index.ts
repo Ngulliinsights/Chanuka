@@ -1,8 +1,7 @@
 /**
  * Core Error Management Module
  *
- * Comprehensive error handling system with full feature parity from utils/errors.ts
- * but with enhanced modular architecture for better maintainability.
+ * Comprehensive error handling system with full feature parity
  */
 
 // ============================================================================
@@ -10,9 +9,9 @@
 // ============================================================================
 
 export type {
-  AppError,
   ErrorContext,
   ErrorRecoveryStrategy,
+  RecoveryStrategy,
   ErrorHandlerConfig,
   ErrorListener,
   ErrorStats,
@@ -44,6 +43,8 @@ export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
 // ============================================================================
 // Error Classes
 // ============================================================================
+
+export { AppError } from './types';
 
 export {
   BaseError,
@@ -104,14 +105,6 @@ export function getErrorReporters(): ErrorReporter[] {
 export { ErrorAnalyticsService } from './analytics';
 export { ErrorReportingService } from './reporting';
 
-// Comprehensive Error Monitoring with Sentry Integration
-// TODO: Re-enable when Sentry packages are installed
-// export {
-//   errorMonitoring,
-//   ErrorBoundary as SentryErrorBoundary,
-//   errorUtils,
-// } from './monitoring';
-
 // ============================================================================
 // Reporter Classes
 // ============================================================================
@@ -122,7 +115,7 @@ export { ApiReporter } from './reporters/ApiReporter';
 export { CompositeReporter } from './reporters/CompositeReporter';
 
 // ============================================================================
-// Advanced Analytics Types and Interfaces
+// Advanced Analytics
 // ============================================================================
 
 export type {
@@ -222,11 +215,10 @@ export {
 } from './recovery';
 
 // ============================================================================
-// Integration with Existing Unified Error Handler
+// Initialization and Utilities
 // ============================================================================
 
 import { useCallback } from 'react';
-
 import { coreErrorHandler } from './handler';
 import { registerDefaultRecoveryStrategies } from './recovery';
 import type {
@@ -242,61 +234,53 @@ import type {
 
 /**
  * Initialize the core error management system
- * This should be called during application startup
  */
 export function initializeCoreErrorHandling(config?: ErrorHandlerConfig): void {
   coreErrorHandler.initialize(config);
   registerDefaultRecoveryStrategies();
-
-  // Bridge core recovery strategies to unified handler
-  // Note: addUnifiedRecoveryStrategy method not available in current implementation
 }
 
 /**
- * Get error statistics (from unified handler)
+ * Get error statistics
  */
 export function getErrorStats(): ErrorStats {
   return coreErrorHandler.getErrorStats();
 }
 
 /**
- * Get recent errors (bridged from unified handler)
+ * Get recent errors
  */
 export function getRecentErrors(limit = 10): AppError[] {
   return coreErrorHandler.getRecentErrors(limit);
 }
 
 /**
- * Get errors by type (bridged from unified handler)
+ * Get errors by type
  */
 export function getErrorsByType(type: ErrorDomain, limit = 10): AppError[] {
   return coreErrorHandler.getErrorsByType(type, limit);
 }
 
 /**
- * Get errors by severity (bridged from unified handler)
+ * Get errors by severity
  */
 export function getErrorsBySeverity(severity: ErrorSeverity, limit = 10): AppError[] {
   return coreErrorHandler.getErrorsBySeverity(severity, limit);
 }
 
 /**
- * Clear all errors (bridged to unified handler)
+ * Clear all errors
  */
 export function clearErrors(): void {
   coreErrorHandler.clearErrors();
 }
 
 /**
- * Handle an error through the core system (with unified integration)
+ * Handle an error through the core system
  */
 export function handleError(errorData: Partial<AppError>): AppError {
   return coreErrorHandler.handleError(errorData);
 }
-
-// ============================================================================
-// React Hooks for Error Management
-// ============================================================================
 
 /**
  * Hook for error handling in React components
@@ -318,10 +302,6 @@ export function useCoreErrorHandler() {
     ),
   };
 }
-
-// ============================================================================
-// Convenience Functions
-// ============================================================================
 
 /**
  * Create a standardized error object
@@ -370,81 +350,11 @@ export function logError(
 }
 
 // ============================================================================
-// Unified Error Handler Bridge
-// ============================================================================
-
-/**
- * Bridge function to ensure unified error handler uses core recovery strategies
- */
-export function bridgeToUnifiedHandler(): void {
-  // This function can be called to establish deeper integration
-  // between core error handler and unified error handler
-  if (typeof window !== 'undefined') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const windowAny = window as any;
-    if (windowAny.unifiedErrorHandler) {
-      const unified = windowAny.unifiedErrorHandler;
-
-      // Add core recovery strategies to unified handler
-      if (unified.addRecoveryStrategy) {
-        const coreStrategies = [
-          {
-            id: 'core-network-retry-bridge',
-            name: 'Core Network Retry (Bridged)',
-            description: 'Network retry bridged from core error system',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            canRecover: (error: any) => error.type === 'network' && error.retryable,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            recover: async (error: any) => {
-              try {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const result = await (coreErrorHandler as any)['attemptRecovery'](error);
-                return result.success;
-              } catch {
-                return false;
-              }
-            },
-            priority: 1,
-          },
-          {
-            id: 'core-cache-clear-bridge',
-            name: 'Core Cache Clear (Bridged)',
-            description: 'Cache clearing bridged from core error system',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            canRecover: (error: any) => error.severity === 'critical',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            recover: async (error: any) => {
-              try {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const result = await (coreErrorHandler as any)['attemptRecovery'](error);
-                return result.success;
-              } catch {
-                return false;
-              }
-            },
-            priority: 2,
-          },
-        ];
-
-        coreStrategies.forEach(strategy => {
-          try {
-            unified.addRecoveryStrategy(strategy);
-          } catch (e) {
-            console.warn('Failed to bridge recovery strategy to unified handler:', e);
-          }
-        });
-      }
-    }
-  }
-}
-
-// ============================================================================
 // Default Export
 // ============================================================================
 
 export default {
   initialize: initializeCoreErrorHandling,
-  bridge: bridgeToUnifiedHandler,
   handler: coreErrorHandler,
   handleError,
   getErrorStats,
@@ -455,10 +365,4 @@ export default {
   createError,
   logError,
   useErrorHandler: useCoreErrorHandler,
-  // ErrorBoundary: EnhancedErrorBoundary,
-  // recovery: {
-  //   executeRecovery,
-  //   useRecovery,
-  //   isRecoverable,
-  // },
 };

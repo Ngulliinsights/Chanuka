@@ -4,7 +4,7 @@
  * data transformation, and caching capabilities
  */
 
-import { analyticsApiService } from '@/core/api';
+import { analyticsApiService } from '@client/core/api';
 
 import type {
   BillAnalytics,
@@ -16,7 +16,53 @@ import type {
   AnalyticsResponse,
   UserActivity,
   AnalyticsAlert,
-} from '../types';
+} from '@client/shared/types/analytics';
+
+// Extended types for additional properties used in features
+type ExtendedAnalyticsSummary = AnalyticsSummary & {
+  engagementGrowthRate: number;
+  riskScore: number;
+};
+
+type ExtendedDashboardData = DashboardData & {
+  summary: ExtendedAnalyticsSummary;
+};
+
+type ExtendedEngagementReport = EngagementReport & {
+  trendAnalysis: {
+    direction: 'up' | 'down' | 'stable';
+    changePercent: number;
+    momentum: number;
+  };
+  engagementScore: number;
+  breakdown: {
+    views: number;
+    comments: number;
+    votes: number;
+    shares: number;
+    bookmarks: number;
+  };
+  metrics: {
+    averageEngagement: number;
+    peakEngagement: number;
+    engagementTrend: number;
+  };
+};
+
+type ExtendedConflictReport = ConflictReport & {
+  recommendations: string[];
+  priorityScore: number;
+};
+
+type ExtendedUserActivity = UserActivity & {
+  engagementScore: number;
+  activityLevel: 'low' | 'medium' | 'high';
+};
+
+type ExtendedAnalyticsAlert = AnalyticsAlert & {
+  priority: number;
+  impact: 'low' | 'medium' | 'high';
+};
 
 /**
  * Configuration interface for cache behavior
@@ -181,12 +227,9 @@ export class AnalyticsService {
     const rawData = await analyticsApiService.getSummary(filters);
 
     // Apply business logic calculations
-    const enhancedData: AnalyticsSummary & {
-      engagementGrowthRate: number;
-      riskScore: number;
-    } = {
+    const enhancedData: ExtendedAnalyticsSummary = {
       ...rawData,
-      engagementGrowthRate: rawData.engagementGrowthRate ?? this.calculateEngagementGrowth(rawData),
+      engagementGrowthRate: this.calculateEngagementGrowth(rawData),
       riskScore: this.calculateRiskScore(rawData),
     };
 
@@ -207,14 +250,26 @@ export class AnalyticsService {
     filters?: AnalyticsFilters
   ): Promise<
     BillAnalytics & {
-      conflicts: unknown[];
+      conflicts: Array<{
+        type: 'financial' | 'political' | 'ideological';
+        severity: 'low' | 'medium' | 'high';
+        description: string;
+        entities: string[];
+        evidence: string[];
+      }>;
       riskLevel: 'low' | 'medium' | 'high';
     }
   > {
     const cacheKey = this.generateCacheKey(`bill-${billId}`, filters);
     const cached = this.getCached<
       BillAnalytics & {
-        conflicts: unknown[];
+        conflicts: Array<{
+          type: 'financial' | 'political' | 'ideological';
+          severity: 'low' | 'medium' | 'high';
+          description: string;
+          entities: string[];
+          evidence: string[];
+        }>;
         riskLevel: 'low' | 'medium' | 'high';
       }
     >(cacheKey);
@@ -231,12 +286,18 @@ export class AnalyticsService {
 
     // Merge conflict data with analytics and calculate risk
     const enhancedData: BillAnalytics & {
-      conflicts: unknown[];
+      conflicts: Array<{
+        type: 'financial' | 'political' | 'ideological';
+        severity: 'low' | 'medium' | 'high';
+        description: string;
+        entities: string[];
+        evidence: string[];
+      }>;
       riskLevel: 'low' | 'medium' | 'high';
     } = {
       ...analytics,
       conflicts: conflictReport.conflicts,
-      riskLevel: analytics.riskLevel ?? this.calculateBillRiskLevel(conflictReport.conflicts),
+      riskLevel: this.calculateBillRiskLevel(conflictReport.conflicts),
     };
 
     this.setCached(cacheKey, enhancedData);
@@ -250,27 +311,9 @@ export class AnalyticsService {
   async getEngagementReport(
     billId: string,
     filters?: AnalyticsFilters
-  ): Promise<
-    EngagementReport & {
-      trendAnalysis: {
-        direction: 'up' | 'down' | 'stable';
-        changePercent: number;
-        momentum: number;
-      };
-      engagementScore: number;
-    }
-  > {
+  ): Promise<ExtendedEngagementReport> {
     const cacheKey = this.generateCacheKey(`engagement-${billId}`, filters);
-    const cached = this.getCached<
-      EngagementReport & {
-        trendAnalysis: {
-          direction: 'up' | 'down' | 'stable';
-          changePercent: number;
-          momentum: number;
-        };
-        engagementScore: number;
-      }
-    >(cacheKey);
+    const cached = this.getCached<ExtendedEngagementReport>(cacheKey);
 
     if (cached) {
       return cached;
@@ -506,7 +549,7 @@ export class AnalyticsService {
    * Enhances dashboard data with derived business metrics.
    * Adds calculated fields that provide additional insights beyond raw data.
    */
-  private enhanceDashboardData(data: DashboardData): DashboardData {
+  private enhanceDashboardData(data: DashboardData): ExtendedDashboardData {
     return {
       ...data,
       summary: {
@@ -528,11 +571,11 @@ export class AnalyticsService {
   private calculateEngagementGrowth(summary: AnalyticsSummary): number {
     // Current implementation uses threshold-based estimation
     // TODO: Replace with time-series comparison against historical data
-    const baselineThreshold = 0.5;
+    const baselineThreshold = 300; // 5 minutes in seconds
     const positiveGrowth = 0.15;
     const negativeGrowth = -0.05;
 
-    return summary.averageEngagementRate > baselineThreshold ? positiveGrowth : negativeGrowth;
+    return summary.average_time_spent > baselineThreshold ? positiveGrowth : negativeGrowth;
   }
 
   /**
@@ -540,16 +583,12 @@ export class AnalyticsService {
    * Combines multiple risk factors into a normalized 0-1 score.
    */
   private calculateRiskScore(summary: AnalyticsSummary): number {
-    // Calculate conflict-based risk as ratio of conflicts to total bills
-    const conflictRisk =
-      summary.totalBills > 0 ? summary.conflictsDetected / summary.totalBills : 0;
-
-    // Add risk penalty for low engagement (below 30% threshold)
-    const lowEngagementThreshold = 0.3;
-    const engagementRisk = summary.averageEngagementRate < lowEngagementThreshold ? 0.3 : 0;
+    // Add risk penalty for low engagement (below 5 minutes threshold)
+    const lowEngagementThreshold = 300;
+    const engagementRisk = summary.average_time_spent < lowEngagementThreshold ? 0.3 : 0;
 
     // Combine risks and cap at 1.0
-    return Math.min(conflictRisk + engagementRisk, 1);
+    return engagementRisk;
   }
 
   /**

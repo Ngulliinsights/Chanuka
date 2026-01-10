@@ -16,11 +16,11 @@
  * Single source of truth for all UI components, tokens, and design patterns.
  *
  * Usage Examples:
- *   import { Button, Input, Dialog } from '@/shared/design-system';
- *   import { Alert, Badge, Progress } from '@/shared/design-system';
- *   import { Card, Text, Heading } from '@/shared/design-system';
- *   import { Avatar, OptimizedImage } from '@/shared/design-system';
- *   import { designTokens, themeProvider } from '@/shared/design-system';
+ *   import { Button, Input, Dialog } from '@client/shared/design-system';
+ *   import { Alert, Badge, Progress } from '@client/shared/design-system';
+ *   import { Card, Text, Heading } from '@client/shared/design-system';
+ *   import { Avatar, OptimizedImage } from '@client/shared/design-system';
+ *   import { designTokens, themeProvider } from '@client/shared/design-system';
  */
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -73,7 +73,7 @@ export * from './tokens/validation';
 // Themes - Multiple Theme Support
 // ════════════════════════════════════════════════════════════════════════════
 export * from './themes';
-export { useTheme, type ThemeContextType } from '@/contexts/ThemeContext';
+export { useTheme, type ThemeContextType } from '@client/contexts/ThemeContext';
 
 // ════════════════════════════════════════════════════════════════════════════
 // UTILITY FUNCTIONS

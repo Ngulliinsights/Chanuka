@@ -1,5 +1,5 @@
 import { globalApiClient } from '@client/core/api/client';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Define types locally since they're not available in the types directory
 interface User {

@@ -8,7 +8,7 @@
  * - Form validation helpers
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Import base validation functions (assuming they exist in a validation module)
 // These would need to be implemented or imported from the existing validation system

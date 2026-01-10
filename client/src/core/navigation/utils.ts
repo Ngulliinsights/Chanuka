@@ -5,7 +5,7 @@
  * navigation management with validation, access control, and search capabilities.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { NavigationItem, BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from './types';
 

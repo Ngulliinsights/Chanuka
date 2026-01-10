@@ -113,10 +113,10 @@ class WebSocketConsolidationValidator {
 
         // Check for legacy imports that should be updated
         const legacyImports = [
-          '@client/services/webSocketService',
-          '@client/services/CommunityWebSocketManager',
-          '@client/hooks/use-websocket',
-          '@client/utils/realtime-optimizer',
+          '@client/shared/services/webSocketService',
+          '@client/shared/services/CommunityWebSocketManager',
+          '@client/shared/hooks/use-websocket',
+          '@client/shared/utils/realtime-optimizer',
         ];
 
         for (const legacyImport of legacyImports) {

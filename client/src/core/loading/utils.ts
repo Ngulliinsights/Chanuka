@@ -3,26 +3,19 @@
  */
 
 import { LoadingType, LoadingPriority, LoadingOperation } from '@client/shared/types';
-import {
-  getAdjustedTimeout,
-  calculateRetryDelay as coreCalculateRetryDelay,
-  sortOperationsByPriority,
-  filterOperationsByConnection,
-  analyzeLoadingPerformance,
-  createOperationFromScenario,
-} from '@client/utils/comprehensiveLoading';
 
 // Re-export cross-cutting utilities
 export const calculateEstimatedTime = (operation: LoadingOperation) =>
   operation.estimatedTime || 5000;
 export const getConnectionMultiplier = (connectionType: string) =>
   connectionType === 'slow' ? 2 : 1;
-export const calculateRetryDelay = coreCalculateRetryDelay;
+export const calculateRetryDelay = (attempt: number, baseDelay: number = 1000) =>
+  Math.min(baseDelay * Math.pow(2, attempt), 30000);
 export const formatLoadingTime = (ms: number) => `${Math.round(ms / 1000)}s`;
 export const hasOperationTimedOut = (operation: LoadingOperation, currentTime: number) =>
-  currentTime - operation.startTime > (operation.timeout || 10000);
+  currentTime - operation.startTime > (operation.timeout ?? 10000);
 export const shouldShowTimeoutWarning = (operation: LoadingOperation, currentTime: number) =>
-  currentTime - operation.startTime > (operation.timeout || 10000) * 0.8;
+  currentTime - operation.startTime > (operation.timeout ?? 10000) * 0.8;
 
 /**
  * Determine if operation should be skipped based on connection and priority

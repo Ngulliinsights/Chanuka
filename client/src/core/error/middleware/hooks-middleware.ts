@@ -12,6 +12,7 @@ import {
   ErrorSeverity,
   ErrorReporter,
   ErrorTransformer,
+  ErrorRecoveryStrategy,
   RecoveryStrategy,
   RecoveryAction,
   coreErrorHandler,
@@ -123,7 +124,7 @@ export class HookErrorBoundary extends React.Component<
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     const hookContext: HookErrorContext = {
       hookName: this.props.hookName,
-      componentName: errorInfo.componentStack.split('\n')[1]?.trim(),
+      componentName: errorInfo.componentStack?.split('\n')[1]?.trim(),
     };
 
     this.setState({
@@ -167,14 +168,12 @@ export class HookErrorBoundary extends React.Component<
     if (this.state.hasError && this.state.error) {
       const FallbackComponent = this.props.fallback || DefaultHookErrorFallback;
 
-      return (
-        <FallbackComponent
-          error={this.state.error}
-          hookContext={this.state.hookContext || {}}
-          resetError={this.resetError}
-          retryCount={this.state.retryCount}
-        />
-      );
+      return React.createElement(FallbackComponent, {
+        error: this.state.error,
+        hookContext: this.state.hookContext || {},
+        resetError: this.resetError,
+        retryCount: this.state.retryCount,
+      });
     }
 
     return this.props.children;
@@ -189,19 +188,23 @@ const DefaultHookErrorFallback: React.FC<HookErrorFallbackProps> = ({
   hookContext,
   resetError,
   retryCount,
-}) => (
-  <div className="hook-error-fallback" role="alert">
-    <h3>Hook Error Occurred</h3>
-    <p>
-      An error occurred in the {hookContext.hookName || 'hook'}.
-      {retryCount > 0 && ` (Retry attempt: ${retryCount})`}
-    </p>
-    <details>
-      <summary>Error Details</summary>
-      <pre>{error.message}</pre>
-    </details>
-    <button onClick={resetError}>Try Again</button>
-  </div>
+}) => React.createElement(
+  'div',
+  { className: 'hook-error-fallback', role: 'alert' },
+  React.createElement('h3', null, 'Hook Error Occurred'),
+  React.createElement(
+    'p',
+    null,
+    `An error occurred in the ${hookContext.hookName || 'hook'}.`,
+    retryCount > 0 && ` (Retry attempt: ${retryCount})`
+  ),
+  React.createElement(
+    'details',
+    null,
+    React.createElement('summary', null, 'Error Details'),
+    React.createElement('pre', null, error.message)
+  ),
+  React.createElement('button', { onClick: resetError }, 'Try Again')
 );
 
 /**
@@ -285,7 +288,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const hookContext = this.extractHookContext(error);
     const recoveryStrategies = this.getHookRecoveryStrategies(error, hookContext);
 
-    return new AppError(
+    return new (AppError as any)(
       error.message,
       error.code,
       error.type,
@@ -312,8 +315,8 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
       Object.values(HookErrorCode).includes(error.code as HookErrorCode) ||
       error.message.toLowerCase().includes('hook') ||
       error.message.toLowerCase().includes('use') ||
-      error.context?.hookName ||
-      error.context?.componentName
+      !!error.context?.hookName ||
+      !!error.context?.componentName
     );
   }
 
@@ -343,7 +346,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const errorCode = this.determineHookErrorCode(error, hookContext);
     const severity = this.determineHookErrorSeverity(errorCode, hookContext);
 
-    return new AppError(
+    return new (AppError as any)(
       error.message,
       errorCode,
       ErrorDomain.UI,
@@ -520,7 +523,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
 
     // Check for performance degradation
     if (context.performanceMetrics.renderTime && context.performanceMetrics.renderTime > this.config.performanceThreshold * 2) {
-      const perfError = new AppError(
+      const perfError = new (AppError as any)(
         `Hook performance degradation detected: ${context.hookName}`,
         HookErrorCode.HOOK_PERFORMANCE_DEGRADATION,
         ErrorDomain.UI,
@@ -545,7 +548,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
       return;
     }
 
-    const memoryError = new AppError(
+    const memoryError = new (AppError as any)(
       `Potential memory leak detected in hook: ${context.hookName}`,
       HookErrorCode.HOOK_MEMORY_LEAK,
       ErrorDomain.UI,
@@ -569,7 +572,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
       return;
     }
 
-    const concurrentError = new AppError(
+    const concurrentError = new (AppError as any)(
       `Concurrent state updates detected in hook: ${context.hookName}`,
       HookErrorCode.HOOK_CONCURRENT_UPDATE,
       ErrorDomain.UI,
@@ -589,16 +592,7 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
     error: AppError,
     context: HookErrorContext
   ): Promise<void> {
-    await this.analyticsService.track(error, {
-      hook: {
-        name: context.hookName,
-        type: context.hookType,
-        component: context.componentName,
-        renderCount: context.renderCount,
-        errorFrequency: this.hookErrorCounts.get(`${context.hookName}:${context.componentName}`),
-        performanceMetrics: context.performanceMetrics,
-      },
-    });
+    await this.analyticsService.track(error);
   }
 
   /**

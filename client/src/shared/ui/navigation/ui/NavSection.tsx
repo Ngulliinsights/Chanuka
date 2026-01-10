@@ -1,7 +1,7 @@
 import { Building, FileText, Users, Shield, Search, User, Settings, BarChart3 } from 'lucide-react';
 import React from 'react';
 
-import type { NavigationItem, NavigationSection } from '@/shared/types';
+import type { NavigationItem, NavigationSection } from '@client/shared/types';
 
 import { SECTION_TITLES } from '../constants';
 

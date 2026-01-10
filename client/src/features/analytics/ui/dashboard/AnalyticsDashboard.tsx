@@ -53,9 +53,9 @@ import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
 import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
-import { useAnalyticsDashboard } from '../../hooks/useAnalytics';
+import { useAnalyticsDashboard } from '@client/shared/hooks/useAnalytics';
 
 /**
  * Color scheme for charts and visualizations

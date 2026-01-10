@@ -8,7 +8,7 @@
  */
 
 import { MOBILE_BREAKPOINTS } from '../../config';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { ResponsiveBreakpoints } from './types';
 

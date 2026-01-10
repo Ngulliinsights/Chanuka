@@ -6,10 +6,10 @@
  * intelligent cache invalidation, and background synchronization.
  */
 
-import { BillsStats } from '@/core/api/bills';
+import { BillsStats } from '@client/core/api/bills';
 
 import { Bill } from '@shared/schema/foundation';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // ============================================================================
 // Type Definitions

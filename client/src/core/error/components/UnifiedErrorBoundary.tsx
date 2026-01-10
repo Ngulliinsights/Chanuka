@@ -11,7 +11,7 @@ import React from 'react';
 
 import { getCircuitBreakerStats } from '@client/core/api/interceptors';
 import { BaseError, ErrorDomain, ErrorSeverity } from '@client/core/error';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 export interface UnifiedErrorBoundaryProps {
   children: ReactNode;

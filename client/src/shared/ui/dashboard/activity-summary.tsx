@@ -1,7 +1,7 @@
 import { AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
 import React from 'react';
 
-import { handleError, measureAsync, recordMetric } from '@/core';
+import { handleError, measureAsync, recordMetric } from '@client/core';
 
 import { Button, Card, CardContent, CardHeader } from '../../design-system';
 

@@ -5,7 +5,7 @@
  * typing indicators, and expert activities through WebSocket connections.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { UnifiedWebSocketManager } from '../manager';
 import {

@@ -1,10 +1,10 @@
 import React, { Suspense, lazy, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import { ErrorBoundary } from '@/core/error/components';
-import { LoadingStateManager } from '@/shared/ui/loading/LoadingStates';
+import { ErrorBoundary } from '@client/core/error/components';
+import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 
@@ -47,57 +47,57 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 
 // Lazy-loaded page components with enhanced error handling
 const HomePage = createLazyComponent(
-  () => import('@client/pages/StrategicHomePage'),
+  () => import('@client/features/home/pages/StrategicHomePage'),
   'Strategic Home Page'
 );
 const BillsPortal = createLazyComponent(
-  () => import('@client/pages/bills/BillsPortalPage'),
+  () => import('@client/features/bills/pages/BillsPortalPage'),
   'Bills Portal'
 );
 const BillsDashboard = createLazyComponent(
-  () => import('@client/pages/bills/bills-dashboard-page'),
+  () => import('@client/features/bills/pages/bills-dashboard-page'),
   'Bills Dashboard'
 );
 const BillDetail = createLazyComponent(
-  () => import('@client/pages/bills/bill-detail'),
+  () => import('@client/features/bills/pages/bill-detail'),
   'Bill Detail'
 );
 const BillAnalysis = createLazyComponent(
-  () => import('@client/pages/bills/bill-analysis'),
+  () => import('@client/features/bills/pages/bill-analysis'),
   'Bill Analysis'
 );
 const CommunityHub = createLazyComponent(
-  () => import('@client/pages/community-input'),
+  () => import('@client/features/community/pages/community-input'),
   'Community Hub'
 );
 const UniversalSearchPage = createLazyComponent(
-  () => import('@client/pages/UniversalSearchPage'),
+  () => import('@client/features/search/pages/UniversalSearchPage'),
   'Universal Search'
 );
 const AuthPage = createLazyComponent(
-  () => import('@client/pages/auth/auth-page'),
+  () => import('@client/features/auth/pages/auth-page'),
   'Authentication'
 );
-const Onboarding = createLazyComponent(() => import('@client/pages/onboarding'), 'Onboarding');
-const TermsPage = createLazyComponent(() => import('@client/pages/legal/terms'), 'Terms');
-const PrivacyPage = createLazyComponent(() => import('@client/pages/legal/privacy'), 'Privacy');
+const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
+const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
+const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
 const UserProfile = createLazyComponent(
-  () => import('@client/pages/UserAccountPage'),
+  () => import('@client/features/users/pages/UserAccountPage'),
   'User Account'
 );
 const UserDashboard = createLazyComponent(
-  () => import('@client/pages/UserAccountPage'),
+  () => import('@client/features/users/pages/UserAccountPage'),
   'User Dashboard'
 );
 const AdminDashboard = createLazyComponent(
-  () => import('@client/pages/admin/admin'),
+  () => import('@client/features/admin/pages/admin'),
   'Admin Dashboard'
 );
 const AnalyticsDashboard = createLazyComponent(
-  () => import('@client/pages/admin/AnalyticsDashboardPage'),
+  () => import('@client/features/admin/pages/AnalyticsDashboardPage'),
   'Analytics Dashboard'
 );
-const NotFoundPage = createLazyComponent(() => import('@client/pages/not-found'), 'Not Found');
+const NotFoundPage = createLazyComponent(() => import('@client/shared/pages/not-found'), 'Not Found');
 
 interface RouteConfig {
   path: string;
@@ -380,9 +380,9 @@ const routes: RouteConfig[] = [
  */
 type PreloadMapEntry = () => Promise<{ default: React.ComponentType<unknown> }>;
 const preloadMap: Record<string, PreloadMapEntry> = {
-  home: () => import('@client/pages/StrategicHomePage'),
-  'bills-portal': () => import('@client/pages/bills/BillsPortalPage'),
-  search: () => import('@client/pages/UniversalSearchPage'),
+  home: () => import('@client/features/home/pages/StrategicHomePage'),
+  'bills-portal': () => import('@client/features/bills/pages/BillsPortalPage'),
+  search: () => import('@client/features/search/pages/UniversalSearchPage'),
 };
 
 /**

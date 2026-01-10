@@ -6,7 +6,7 @@
 
 import React from 'react';
 
-import { Button, cn } from '@/shared/design-system';
+import { Button, cn } from '@client/shared/design-system';
 
 import { DashboardConfig } from '../types';
 

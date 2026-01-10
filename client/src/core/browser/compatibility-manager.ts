@@ -5,7 +5,7 @@
  * polyfill loading, and compatibility scoring.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { BrowserDetector } from './browser-detector';
 import { CRITICAL_FEATURES } from './constants';

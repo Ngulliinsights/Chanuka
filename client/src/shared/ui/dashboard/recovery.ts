@@ -3,7 +3,7 @@
  * Following navigation component recovery patterns
  */
 
-import type { DashboardData, DashboardConfig } from '@/shared/types/dashboard';
+import type { DashboardData, DashboardConfig } from '@client/shared/types/dashboard';
 
 import { DashboardError, DashboardErrorType } from './errors';
 

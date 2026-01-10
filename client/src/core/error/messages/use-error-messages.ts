@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { AppError } from '../types';
 import {
   formatErrorMessage,
@@ -22,8 +22,8 @@ import {
 // ============================================================================
 
 export function useErrorMessages() {
-  const { i18n } = useTranslation();
-  const currentLocale = i18n.language || 'en-US';
+  // const { i18n } = useTranslation();
+  const currentLocale = 'en-US'; // i18n.language || 'en-US';
 
   // Format error message with current locale
   const formatError = useCallback((error: AppError | Error, options = {}) => {
@@ -187,10 +187,10 @@ export function ErrorMessageProvider({ children }: { children: React.ReactNode }
     currentLocale,
   }), [formatError, getSuggestions, getMessage, currentLocale]);
 
-  return (
-    <ErrorMessageContext.Provider value={contextValue}>
-      {children}
-    </ErrorMessageContext.Provider>
+  return React.createElement(
+    ErrorMessageContext.Provider,
+    { value: contextValue },
+    children
   );
 }
 

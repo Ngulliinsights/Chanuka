@@ -15,7 +15,7 @@ import React, {
 } from 'react';
 
 // Removed circular dependency - error analytics should be injected via props
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { loadingReducer } from './reducer';
 import {

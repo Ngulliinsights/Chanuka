@@ -8,7 +8,7 @@
 
 import React, { useCallback, useState, useMemo } from 'react';
 
-import { handleError as coreHandleError } from '@/core/error';
+import { handleError as coreHandleError } from '@client/core/error';
 
 import {
   UIErrorHandler,

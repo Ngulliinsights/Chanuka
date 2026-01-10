@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system/typography/Card';
-import { TrackedBill } from '@/shared/types/user-dashboard';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
+import { TrackedBill } from '@client/shared/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';
 

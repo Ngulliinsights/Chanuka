@@ -2,16 +2,16 @@ import { BookOpen, Scale, Clock, Zap, Users, HelpCircle, ExternalLink } from 'lu
 import React from 'react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/design-system/interactive/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/design-system/interactive/Tabs';
+import { Button } from '@client/shared/design-system/interactive/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system/interactive/Tabs';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/design-system/typography/Card';
-import type { Bill } from '@/shared/types';
+} from '@client/shared/design-system/typography/Card';
+import type { Bill } from '@client/shared/types';
 
 import { ConstitutionalContext } from './ConstitutionalContext';
 import { EducationalTooltip } from './EducationalTooltip';

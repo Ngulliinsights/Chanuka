@@ -5,13 +5,58 @@
 
 import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 
-import {
-  DashboardState,
-  WidgetConfig,
-  DashboardLayout,
-  DashboardSettings,
-} from '@client/shared/types';
-import { logger } from '@client/utils/logger';
+import { DashboardData, DashboardConfig, DashboardSection } from '@client/shared/types';
+import { logger } from '@client/shared/utils/logger';
+
+// Define minimal types for dashboard state management
+export interface LayoutConfig {
+  type: 'grid' | 'flex';
+  columns: number;
+  gap: number;
+  responsive: boolean[];
+  breakpoints: number[];
+}
+
+export interface WidgetConfig {
+  id: string;
+  type: string;
+  title: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  settings?: Record<string, unknown>;
+  visible?: boolean;
+  collapsible?: boolean;
+  removable?: boolean;
+  resizable?: boolean;
+  draggable?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+interface WidgetSize {
+  width: number;
+  height: number;
+}
+
+interface DashboardSettings {
+  autoRefresh: boolean;
+  refreshInterval: number;
+  theme: string;
+}
+
+interface DashboardState {
+  id: string;
+  name: string;
+  widgets: WidgetConfig[];
+  layout: LayoutConfig;
+  userId: string;
+  isPublic: boolean;
+  tags: string[];
+  autoRefresh: boolean;
+  refreshInterval: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const initialState: DashboardState = {
   id: '',
@@ -49,7 +94,7 @@ export interface DashboardContextValue {
   refreshAllWidgets: () => Promise<void>;
 
   // Layout management
-  updateLayout: (layout: DashboardLayout) => void;
+  updateLayout: (layout: LayoutConfig) => void;
 
   // Data management
   getWidget: (widgetId: string) => WidgetConfig | undefined;
@@ -70,16 +115,16 @@ export function createDashboardProvider(dashboardService: {
       const intervals: NodeJS.Timeout[] = [];
 
       state.widgets.forEach((widget: WidgetConfig) => {
-        if (widget.refreshInterval && widget.refreshInterval > 0) {
+        if ((widget as any).refreshInterval && (widget as any).refreshInterval > 0) {
           const interval = setInterval(() => {
             // Use a self-executing function to avoid closure issues
-            const w = state.widgets.find(aw => aw.id === widget.id);
+            const w = state.widgets.find((aw: WidgetConfig) => aw.id === widget.id);
             if (w) {
-              dashboardService.loadWidgetData(widget.id, w).catch(error => {
+              dashboardService.loadWidgetData(widget.id, w).catch((error: any) => {
                 logger.error('Failed to refresh widget:', { widgetId: widget.id }, error);
               });
             }
-          }, widget.refreshInterval * 1000);
+          }, (widget as any).refreshInterval * 1000);
           intervals.push(interval);
         }
       });
@@ -161,7 +206,7 @@ export function createDashboardProvider(dashboardService: {
       await Promise.allSettled(refreshPromises);
     }, [state.widgets]);
 
-    const updateLayout = useCallback((layout: DashboardLayout) => {
+    const updateLayout = useCallback((layout: LayoutConfig) => {
       setState(prev => ({
         ...prev,
         layout,

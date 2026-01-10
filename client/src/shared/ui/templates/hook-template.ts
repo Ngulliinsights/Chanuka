@@ -97,7 +97,7 @@ async function fetchData(): Promise<any> {
 // ============================================================================
 
 /*
-import { useHookName } from '@/shared/ui/hooks';
+import { useHookName } from '@client/shared/ui/hooks';
 
 function MyComponent() {
   const { data, loading, error, actions } = useHookName({

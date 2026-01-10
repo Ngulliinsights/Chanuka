@@ -5,7 +5,7 @@
  * Polyfills provide JavaScript implementations of features that browsers don't support natively.
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { FeatureDetector } from './feature-detector';
 import type {

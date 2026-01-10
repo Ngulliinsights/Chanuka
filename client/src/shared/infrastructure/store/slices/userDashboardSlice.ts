@@ -8,7 +8,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 
-import { useAppSelector, useAppDispatch } from '@/hooks/store';
+import { useAppSelector, useAppDispatch } from '@client/hooks/store';
 import type {
   UserDashboardData,
   TrackedBill,
@@ -19,7 +19,7 @@ import type {
   DataExportRequest,
   TemporalFilter,
   DashboardPreferences,
-} from '@/shared/types/user-dashboard';
+} from '@client/shared/types/user-dashboard';
 
 import type { RootState } from '../index';
 

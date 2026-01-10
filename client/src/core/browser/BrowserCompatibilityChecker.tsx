@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 
 import { loadPolyfills } from '@client/core';
 import { getBrowserInfo, type BrowserInfo } from '@client/core';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {
   children: React.ReactNode;

@@ -6,9 +6,9 @@
 import {
   TrendAnalysisService as ITrendAnalysisService,
   ClientSystem,
-  ErrorSeverity,
-  ErrorAggregationService
+  ErrorSeverity
 } from './unified-error-monitoring-interface';
+import { ErrorAggregationService } from './error-aggregation-service';
 
 interface TrendDataPoint {
   timestamp: number;
@@ -132,10 +132,9 @@ class TrendAnalysisService implements ITrendAnalysisService {
 
     // Get error data from the last 5 minutes
     Object.values(ClientSystem).forEach(system => {
-      const systemErrors = this.aggregationService.getSystemErrors(system, {
-        start: fiveMinutesAgo,
-        end: now
-      });
+      const systemErrors = this.aggregationService.getAggregatedErrors().filter(
+        err => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
+      );
 
       if (systemErrors.length > 0) {
         this.trendData.push({
@@ -238,7 +237,12 @@ class TrendAnalysisService implements ITrendAnalysisService {
     confidence: number;
     prediction: number;
   }> {
-    const trends = [];
+    const trends: Array<{
+      system: ClientSystem;
+      direction: 'increasing' | 'decreasing' | 'stable';
+      slope: number;
+      confidence: number;
+    }> = [];
     const systems = Object.values(ClientSystem);
 
     systems.forEach(system => {
@@ -286,7 +290,12 @@ class TrendAnalysisService implements ITrendAnalysisService {
     severity: ErrorSeverity;
     affectedSystems: ClientSystem[];
   }> {
-    const alerts = [];
+    const alerts: Array<{
+      type: 'threshold_exceeded' | 'anomaly_detected' | 'trend_shift';
+      message: string;
+      severity: ErrorSeverity;
+      affectedSystems: ClientSystem[];
+    }> = [];
     const now = Date.now();
     const recentData = data.filter(d => d.timestamp > now - 60 * 60 * 1000);
 
@@ -343,7 +352,13 @@ class TrendAnalysisService implements ITrendAnalysisService {
     impact: number;
     recommendedActions: string[];
   }>> {
-    const predictions = [];
+    const predictions: Array<{
+      system: ClientSystem;
+      issue: string;
+      probability: number;
+      impact: number;
+      recommendedActions: string[];
+    }> = [];
     const trends = await this.analyzeTrends({
       start: Date.now() - 24 * 60 * 60 * 1000,
       end: Date.now()

@@ -7,10 +7,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { dataLoaders } from '@/data/mock/loaders';
-import { mockDataService, RealTimeEvent } from '@/shared/testing/mock-data';
+import { dataLoaders } from '@client/data/mock/loaders';
+import { mockDataService, RealTimeEvent } from '@client/shared/testing/mock-data';
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 /**
  * Hook state interface

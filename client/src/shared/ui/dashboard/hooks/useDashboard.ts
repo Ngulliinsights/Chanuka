@@ -10,22 +10,22 @@ import {
   DashboardDataFetchError,
   DashboardActionError,
   DashboardTopicError,
-} from '@/core/error';
-import { getRecoveryStrategy, executeRecovery } from '@/core/recovery';
+} from '@client/core/error';
+import { getRecoveryStrategy, executeRecovery } from '@client/core/recovery';
 import {
   validateDashboardData,
   validateActionItem,
   validateTrackedTopic,
   safeValidateDashboardConfig,
-} from '@/core/validation';
-import { useBills } from '@/features/bills';
+} from '@client/core/validation';
+import { useBills } from '@client/features/bills';
 import type {
   DashboardData,
   DashboardConfig,
   UseDashboardResult,
   ActionItem,
   TrackedTopic,
-} from '@/shared/types';
+} from '@client/shared/types';
 
 const DEFAULT_CONFIG: DashboardConfig = {
   refreshInterval: 30000, // 30 seconds

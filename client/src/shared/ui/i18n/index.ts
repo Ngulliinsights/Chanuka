@@ -22,7 +22,7 @@ export { useI18n } from '@client/shared/hooks/use-i18n';
 export { useKenyanContext } from '@client/shared/context/KenyanContextProvider';
 
 // Types
-export type { SupportedLanguage } from '@client/utils/i18n';
+export type { SupportedLanguage } from '@client/shared/utils/i18n';
 
 /**
  * Utility function to get language display name

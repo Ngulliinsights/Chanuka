@@ -2,8 +2,8 @@ import { BarChart3 } from 'lucide-react';
 import { useId } from 'react';
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
-import { cn } from '@/utils/cn';
+import { Button } from '@client/shared/design-system';
+import { cn } from '@client/shared/utils/cn';
 
 interface AutoHideHeaderProps {
   visible: boolean;

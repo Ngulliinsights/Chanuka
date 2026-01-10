@@ -18,14 +18,12 @@ import { driver as neo4jDriver, Driver } from 'neo4j-driver';
 import { db } from '../../database';
 import {
   graph_sync_status,
-  graph_sync_failures,
-  graph_sync_relationships,
   graph_sync_batches,
 } from '../../schema/graph_sync';
 import { eq, and, desc } from 'drizzle-orm';
 import { runBatchSync, startSyncScheduler, stopSyncScheduler } from './batch-sync-runner';
 import * as neo4jSchema from './schema';
-import { withSession, withReadSession } from '../utils/session-manager';
+import { withSession } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
 import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
 import { NEO4J_CONFIG, SYNC_CONFIG } from '../config/graph-config';

@@ -35,7 +35,7 @@ import {
 import { Separator } from '@client/shared/design-system';
 import { Switch } from '@client/shared/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 interface NotificationChannel {
   type: 'inApp' | 'email' | 'push' | 'sms';

@@ -9,8 +9,8 @@ import { useCommandPalette } from '../../core/command-palette/useCommandPalette'
 import { useNavigation } from '../../core/navigation/context';
 import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../core/search/types';
 import { UnifiedSearchInterface } from '../../core/search/UnifiedSearchInterface';
-import { useDeviceInfo } from '../../hooks/mobile/useDeviceInfo';
-import { cn } from '../../lib/utils';
+import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
+import { cn } from '@client/shared/lib/utils';
 import {
   Avatar,
   AvatarFallback,
@@ -26,7 +26,7 @@ import {
 } from '../../shared/design-system';
 import { useMobileMenu } from '../../shared/hooks/useNavigationSlice';
 import { LanguageSwitcher } from '../../shared/ui/i18n/LanguageSwitcher';
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // Type Definitions
 interface NavigationBarProps {

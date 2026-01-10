@@ -7,19 +7,19 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { DeviceDetector } from '@/core/mobile';
+import { DeviceDetector } from '@client/core/mobile';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 // TouchHandler is deprecated - using SwipeGestures instead
-// import { useSwipeGesture } from '@/hooks/mobile/useSwipeGesture'; // Unused
+// import { useSwipeGesture } from '@client/hooks/mobile/useSwipeGesture'; // Unused
 
 import { IntegrationContext } from './context/IntegrationContext';
 import { useIntegration } from './hooks/useIntegration';
 import type { IntegrationStatus, IntegrationServices, IntegrationContextValue } from './types';
 
-import { PrivacyAnalyticsService } from '@/services/privacyAnalyticsService';
-import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@/utils/security';
+import { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
+import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/utils/security';
 
 // ============================================================================
 // INTEGRATION PROVIDER

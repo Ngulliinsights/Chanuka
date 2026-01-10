@@ -10,13 +10,13 @@ import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { generateBreadcrumbs } from '@/core/navigation/breadcrumbs';
+import { generateBreadcrumbs } from '@client/core/navigation/breadcrumbs';
 import {
   updateBreadcrumbs,
   selectBreadcrumbs,
   selectNavigationPreferences,
-} from '@/shared/infrastructure/store/slices/navigationSlice';
-import type { BreadcrumbItem } from '@/shared/types/navigation';
+} from '@client/shared/infrastructure/store/slices/navigationSlice';
+import type { BreadcrumbItem } from '@client/shared/types/navigation';
 
 interface UseBreadcrumbNavigationOptions {
   /** Whether to automatically generate breadcrumbs from the current path */

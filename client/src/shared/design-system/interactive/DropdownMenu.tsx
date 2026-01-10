@@ -2,9 +2,9 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle, AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
-import { cn } from '@/shared/design-system/utils/cn';
+import { cn } from '@client/shared/design-system/utils/cn';
 
-import { logger } from '../../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { UIComponentError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';

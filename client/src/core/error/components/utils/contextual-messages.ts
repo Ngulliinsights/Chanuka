@@ -3,8 +3,9 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import type { AppError } from '@client/core/error';
-import { BaseError, ErrorDomain } from '@client/utils/logger';
+import type { AppError } from '../../types';
+import { BaseError } from '../../classes';
+import { ErrorDomain } from '../../constants';
 
 export function getContextualMessage(
   error: BaseError,

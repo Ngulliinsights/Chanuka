@@ -27,9 +27,9 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { Button } from '@/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/design-system';
-import { Progress } from '@/shared/design-system';
+import { Button } from '@client/shared/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Progress } from '@client/shared/design-system';
 
 // Type Definitions
 interface SmartDashboardProps {

@@ -2,10 +2,10 @@ import { BarChart3, Search, Bell, User } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@/shared/design-system/feedback/Badge';
-import { Button } from '@/shared/design-system/interactive/Button';
+import { Badge } from '@client/shared/design-system/feedback/Badge';
+import { Button } from '@client/shared/design-system/interactive/Button';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@client/shared/utils/cn';
 
 interface HeaderProps {
   className?: string;

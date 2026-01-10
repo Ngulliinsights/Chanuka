@@ -5,7 +5,7 @@
  * and intelligent eviction policies. Ideal for API responses and computed values.
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { SecureStorage } from './secure-storage';
 import {

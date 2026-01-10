@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { serviceRecovery } from '@client/utils/service-recovery';
+import { serviceRecovery } from '@client/shared/utils/service-recovery';
 
 // Define local ServiceStatus interface for this hook
 interface ServiceStatus {

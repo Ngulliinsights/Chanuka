@@ -350,7 +350,7 @@ class CrossSystemErrorAnalytics implements CrossSystemAnalytics {
     );
   }
 
-  async trackErrorPropagation(errorId: string): Promise<Array<{
+  async getErrorPropagation(errorId: string): Promise<Array<{
     system: ClientSystem;
     timestamp: number;
     error: string;

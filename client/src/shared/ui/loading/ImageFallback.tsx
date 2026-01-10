@@ -1,7 +1,7 @@
 import { Image as ImageIcon, AlertCircle } from 'lucide-react';
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@client/shared/utils/cn';
 
 /**
  * Image fallback props

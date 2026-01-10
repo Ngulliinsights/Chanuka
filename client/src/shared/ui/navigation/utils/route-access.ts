@@ -1,6 +1,6 @@
-import { InvalidNavigationPathError } from '@/core/error';
-import type { NavigationItem, UserRole } from '@/shared/types';
-import { validateNavigationPath, validateUserRole } from '@/validation';
+import { InvalidNavigationPathError } from '@client/core/error';
+import type { NavigationItem, UserRole } from '@client/shared/types';
+import { validateNavigationPath, validateUserRole } from '@client/core/validation';
 
 import { findNavigationItemByPath } from './navigation-utils';
 

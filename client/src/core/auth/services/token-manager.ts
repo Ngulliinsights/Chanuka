@@ -7,7 +7,7 @@
  * - All token-related functionality
  */
 
-import { logger } from '@client/utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import { createError } from '../../error';
 import { ErrorDomain, ErrorSeverity } from '../../error/constants';

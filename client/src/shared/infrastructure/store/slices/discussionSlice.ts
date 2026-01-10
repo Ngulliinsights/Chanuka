@@ -17,7 +17,7 @@ interface RootState {
   discussion: DiscussionState;
 }
 
-// Base types (normally imported from @client/types)
+// Base types (normally imported from @client/shared/types)
 interface Comment {
   id: string;
   billId: string;

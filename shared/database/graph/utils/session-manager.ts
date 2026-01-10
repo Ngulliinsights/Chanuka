@@ -8,7 +8,8 @@
  */
 
 import { Driver, Session, Transaction, Result } from 'neo4j-driver';
-import { GraphErrorHandler, GraphErrorCode } from '../error-adapter-v2';
+
+import { GraphErrorHandler } from '../error-adapter-v2';
 import { retryWithBackoff, RetryConfig, RETRY_PRESETS } from '../retry-utils';
 
 const errorHandler = GraphErrorHandler ? new GraphErrorHandler() : null;
@@ -153,7 +154,7 @@ export async function withTransaction<T>(
 export async function executeCypherSafely(
   driver: Driver,
   cypher: string,
-  params: Record<string, any> = {},
+  params: Record<string, unknown> = {},
   options: {
     mode?: 'READ' | 'WRITE';
     retry?: boolean;
@@ -262,7 +263,7 @@ export async function executeBatch<T>(
  * @param key - Key to extract
  * @returns Extracted value or null
  */
-export function extractSingleValue<T = any>(
+export function extractSingleValue<T = unknown>(
   result: Result,
   key: string
 ): T | null {
@@ -279,11 +280,11 @@ export function extractSingleValue<T = any>(
  * @param key - Key to extract
  * @returns Array of extracted values
  */
-export function extractAllValues<T = any>(
+export function extractAllValues<T = unknown>(
   result: Result,
   key: string
 ): T[] {
-  return result.records.map(record => record.get(key) as T);
+  return result.records.map((record) => (record.get(key) as unknown) as T);
 }
 
 /**

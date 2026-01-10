@@ -15,10 +15,6 @@ import {
   Bell,
   BookOpen,
   HelpCircle,
-  LogOut,
-  Moon,
-  Sun,
-  Palette,
 } from 'lucide-react';
 
 import type { Command, CommandSection } from './types';
@@ -115,7 +111,7 @@ export const createQuickActionCommands = (actions: {
       id: 'action-theme',
       label: 'Toggle Theme',
       description: 'Switch between light and dark mode',
-      icon: Palette,
+      icon: Settings,
       shortcut: '⌘T',
       action: actions.toggleTheme,
       keywords: ['theme', 'dark', 'light', 'mode'],
@@ -170,7 +166,7 @@ export const createQuickActionCommands = (actions: {
       id: 'action-logout',
       label: 'Sign Out',
       description: 'Sign out of your account',
-      icon: LogOut,
+      icon: undefined,
       action: actions.logout,
       keywords: ['logout', 'signout', 'exit'],
       section: 'actions',

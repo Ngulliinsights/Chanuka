@@ -10,7 +10,7 @@
  * @module core/mobile/touch-handler
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@client/shared/utils/logger';
 
 import type { TouchEvent, TouchConfig } from './types';
 

@@ -3,7 +3,8 @@ import { ReactNode } from 'react';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { useAuth } from '@/core/auth';
+import { useAuth } from '@client/core/auth';
+import { logger } from '@client/shared/utils/logger';
 
 // TEMPORARY: Authentication bypass for preview purposes
 // Set to false to enable authentication in production

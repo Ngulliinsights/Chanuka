@@ -3,9 +3,10 @@
  * IMPROVEMENTS: Fixed missing LIMIT clauses, added pagination
  */
 import type { Driver } from 'neo4j-driver';
-import { executeCypherSafely } from './utils/session-manager';
-import { withPagination, PaginationOptions } from './utils/query-builder';
+
 import { GraphErrorHandler, GraphErrorCode, GraphError } from './error-adapter-v2';
+import { withPagination, PaginationOptions } from './utils/query-builder';
+import { executeCypherSafely } from './utils/session-manager';
 
 const errorHandler = new GraphErrorHandler();
 
@@ -28,7 +29,7 @@ export async function calculateNetworkDensity(driver: Driver): Promise<number> {
   }
 }
 
-export async function detectCommunities(driver: Driver, algorithm: string = 'louvain'): Promise<any[]> {
+export async function detectCommunities(driver: Driver): Promise<Array<{ id: unknown; community: unknown }>> {
   try {
     const result = await executeCypherSafely(
       driver,
@@ -41,7 +42,7 @@ export async function detectCommunities(driver: Driver, algorithm: string = 'lou
       {},
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r) => ({
       id: r.get('id'),
       community: r.get('community')
     }));
@@ -51,7 +52,7 @@ export async function detectCommunities(driver: Driver, algorithm: string = 'lou
   }
 }
 
-export async function getCentralityMetrics(driver: Driver, options: PaginationOptions = {}): Promise<any[]> {
+export async function getCentralityMetrics(driver: Driver, options: PaginationOptions = {}): Promise<Array<{ id: unknown; name: unknown; degree_centrality: number }>> {
   const baseQuery = `
     MATCH (p:Person)
     WITH p, size((p)--()) as degree
@@ -64,7 +65,7 @@ export async function getCentralityMetrics(driver: Driver, options: PaginationOp
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r) => ({
       id: r.get('id'),
       name: r.get('name'),
       degree_centrality: Number(r.get('degree'))
