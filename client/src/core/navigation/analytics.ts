@@ -6,7 +6,7 @@
 
 import { logger } from '@client/shared/utils/logger';
 
-import { NavigationItem } from './types';
+import { NavigationItem } from '@client/shared/types/navigation';
 
 /**
  * Navigation event types for analytics tracking

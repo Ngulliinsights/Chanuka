@@ -4,7 +4,7 @@ export type {
   UserRole,
   AccessDenialReason,
   RelatedPage,
-} from './types';
+} from '@client/shared/types/navigation';
 export { useNav, useRouteAccess, useRelatedPages } from './hooks';
 export { NavLink, NavSection, DesktopSidebar } from './ui';
 export { canViewItem } from './core/roleGuard';

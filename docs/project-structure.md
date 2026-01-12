@@ -1,6 +1,6 @@
 # Project Structure
 
-**Generated:** 1/10/2026, 11:51:06 AM
+**Generated:** 1/11/2026, 12:16:23 PM
 **Max Depth:** 7 levels
 
 ```
@@ -74,8 +74,6 @@
 │   │   │       ├── index.ts
 │   │   │       ├── NavigationBar.tsx
 │   │   │       └── SkipLinks.tsx
-│   │   ├── context/
-│   │   │   └── index.ts
 │   │   ├── core/
 │   │   │   ├── analytics/
 │   │   │   │   ├── AnalyticsIntegration.tsx
@@ -812,6 +810,8 @@
 │   │   │   ├── context/
 │   │   │   │   └── KenyanContextProvider.tsx
 │   │   │   ├── contexts/
+│   │   │   │   ├── context/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── NavigationContext.tsx
 │   │   │   │   └── ThemeContext.tsx
 │   │   │   ├── data/
@@ -1784,6 +1784,7 @@
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── CHANUKA_MIGRATION_PLAN.md
+│   ├── ChatGPT Image Jan 10, 2026, 09_32_52 PM.png
 │   ├── check-table-structure.ts
 │   ├── check-tables.ts
 │   ├── check-thresholds.js

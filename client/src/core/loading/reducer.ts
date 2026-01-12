@@ -13,10 +13,104 @@ import {
 
 /**
  * Main reducer for managing loading state
- * Handles action types: retry, fallback, cancel, prioritize, delay, cache
+ * Handles action types: retry, fallback, cancel, prioritize, delay, cache, and custom actions
  */
-export function loadingReducer(state: LoadingStateData, action: LoadingAction): LoadingStateData {
+export function loadingReducer(state: LoadingStateData, action: LoadingAction | any): LoadingStateData {
+  // Handle custom action types from context
   switch (action.type) {
+    case 'START_OPERATION':
+      return {
+        ...state,
+        operations: {
+          ...state.operations,
+          [action.payload.id]: {
+            ...action.payload,
+            startTime: Date.now(),
+            retryCount: 0,
+            timeoutWarningShown: false,
+            cancelled: false,
+          },
+        },
+      };
+
+    case 'UPDATE_OPERATION':
+      return {
+        ...state,
+        operations: {
+          ...state.operations,
+          [action.payload.id]: {
+            ...state.operations[action.payload.id],
+            ...action.payload.updates,
+          },
+        },
+      };
+
+    case 'COMPLETE_OPERATION':
+      const { id, success, error } = action.payload;
+      const { [id]: removed, ...remaining } = state.operations;
+      return {
+        ...state,
+        operations: remaining,
+      };
+
+    case 'UPDATE_CONNECTION':
+      return {
+        ...state,
+        connectionInfo: action.payload.connectionInfo,
+        isOnline: action.payload.isOnline,
+      };
+
+    case 'UPDATE_ASSET_PROGRESS':
+      return {
+        ...state,
+        assetLoadingProgress: action.payload,
+      };
+
+    case 'SHOW_TIMEOUT_WARNING':
+      return {
+        ...state,
+        operations: {
+          ...state.operations,
+          [action.payload.id]: {
+            ...state.operations[action.payload.id],
+            timeoutWarningShown: true,
+          },
+        },
+      };
+
+    case 'TIMEOUT_OPERATION':
+      return {
+        ...state,
+        operations: {
+          ...state.operations,
+          [action.payload.id]: {
+            ...state.operations[action.payload.id],
+            error: new Error('Operation timed out'),
+          },
+        },
+      };
+
+    case 'RETRY_OPERATION':
+      return {
+        ...state,
+        operations: {
+          ...state.operations,
+          [action.payload.id]: {
+            ...state.operations[action.payload.id],
+            retryCount: (state.operations[action.payload.id]?.retryCount || 0) + 1,
+            timeoutWarningShown: false,
+          },
+        },
+      };
+
+    case 'CANCEL_OPERATION':
+      const { [action.payload.id]: cancelled, ...withoutCancelled } = state.operations;
+      return {
+        ...state,
+        operations: withoutCancelled,
+      };
+
+    // Original action types from shared types
     case 'retry':
       return handleRetry(state, action);
 
@@ -58,7 +152,7 @@ function handleRetry(state: LoadingStateData, action: LoadingAction): LoadingSta
     ...operation,
     retryCount: operation.retryCount + 1,
     error: undefined,
-    startTime: new Date(),
+    startTime: Date.now(),
   };
 
   const newOperations = {
@@ -321,7 +415,7 @@ export function areDependenciesComplete(
  */
 export function getOperationsByAge(state: LoadingStateData): LoadingOperation[] {
   return Object.values(state.operations).sort(
-    (a, b) => a.startTime.getTime() - b.startTime.getTime()
+    (a, b) => a.startTime - b.startTime
   );
 }
 
@@ -388,10 +482,13 @@ export function createInitialLoadingState(): LoadingStateData {
       totalOperations: 0,
       completedOperations: 0,
       failedOperations: 0,
-      averageDuration: 0,
+      averageLoadTime: 0,
+      retryRate: 0,
       successRate: 0,
       currentQueueLength: 0,
       peakQueueLength: 0,
+      connectionImpact: 'low',
+      lastUpdate: Date.now(),
     },
   };
 }
@@ -404,10 +501,13 @@ export function createInitialMetrics(): LoadingMetrics {
     totalOperations: 0,
     completedOperations: 0,
     failedOperations: 0,
-    averageDuration: 0,
+    averageLoadTime: 0,
+    retryRate: 0,
     successRate: 0,
     currentQueueLength: 0,
     peakQueueLength: 0,
+    connectionImpact: 'low',
+    lastUpdate: Date.now(),
   };
 }
 

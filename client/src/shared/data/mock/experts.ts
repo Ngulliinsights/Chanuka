@@ -15,7 +15,7 @@ import {
   ExpertConsensus,
   CredibilityMetrics,
   CommunityValidation,
-} from '@client/features/users/types';
+} from '@client/shared/types';
 
 import {
   generateId,

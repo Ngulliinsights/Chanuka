@@ -6,7 +6,7 @@
  * and real-time simulation throughout the application.
  */
 
-import type { DiscussionThread } from '@client/features/community/types';
+import type { DiscussionThread } from '@client/shared/types';
 
 import { logger } from '@client/shared/utils/logger';
 

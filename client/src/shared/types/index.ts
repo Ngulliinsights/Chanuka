@@ -39,7 +39,7 @@ export type {
   VoteRequest,
   Comment,
   DiscussionThread,
-} from '@client/features/community/types';
+} from '@client/shared/types';
 
 // Core types (re-exported from legacy location)
 export type {

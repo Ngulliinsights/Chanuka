@@ -128,7 +128,12 @@ export function validateLoadingScenario(scenario: any): void {
 /**
  * Validate progressive stage
  */
-export function validateProgressiveStage(stage: ProgressiveStage): void {
+export function validateProgressiveStage(stage: any): void {
+  // If stage is a string literal, skip validation
+  if (typeof stage === 'string') {
+    return;
+  }
+
   if (!stage.id || typeof stage.id !== 'string') {
     throw new LoadingValidationError('Stage ID is required and must be a string', 'id');
   }

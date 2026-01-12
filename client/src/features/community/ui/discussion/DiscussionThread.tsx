@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import type { CommunityComment } from '@client/features/community/types';
+import type { CommunityComment } from '@client/shared/types';
 import { cn } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

@@ -15,7 +15,7 @@ import {
   Petition,
   CommunityStats,
   LocalImpactMetrics,
-} from '@client/features/community/types';
+} from '@client/shared/types';
 
 import { mockExperts, mockOfficialExperts } from './experts';
 import {

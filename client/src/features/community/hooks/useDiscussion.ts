@@ -14,14 +14,14 @@
 import { useMemo } from 'react';
 
 import { useUnifiedDiscussion } from '@client/core/community/hooks/useUnifiedDiscussion';
-import type { ViolationType } from '@client/core/community/types';
+import type { ViolationType } from '@client/shared/types';
 import type {
   Comment,
   DiscussionThread,
   CommentFormData,
   ModerationViolationType,
   TypingIndicator,
-} from '@client/features/community/types';
+} from '@client/shared/types';
 interface UseDiscussionOptions {
   billId: number;
   autoSubscribe?: boolean;

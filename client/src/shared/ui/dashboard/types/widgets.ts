@@ -5,19 +5,7 @@
 
 import { BaseComponentProps, ErrorInfo } from '../../types';
 
-import { WidgetConfig } from './core';
-
-// ============================================================================
-// Widget Component Types
-// ============================================================================
-
-export type WidgetType =
-  | 'analytics'
-  | 'performance'
-  | 'engagement'
-  | 'metrics'
-  | 'chart'
-  | 'custom';
+import { WidgetConfig, WidgetType } from './core';
 
 export interface WidgetProps extends BaseComponentProps {
   config: WidgetConfig;

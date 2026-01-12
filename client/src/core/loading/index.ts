@@ -4,8 +4,10 @@
  * Platform-agnostic loading concerns with cross-cutting integration
  */
 
+// Type exports - all from shared/types/loading
+export * from '@client/shared/types/loading';
+
 // Core exports
-export * from './types';
 export * from './context';
 export * from './hooks';
 export * from './reducer';
@@ -30,10 +32,5 @@ export {
   createOperationFromScenario,
 } from './utils/loading-utils';
 
-// Error types
-export {
-  LoadingError,
-  LoadingTimeoutError,
-  LoadingRetryError,
-  LoadingConnectionError,
-} from './types';
+// Error types (already exported from @client/shared/types/loading above)
+// LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError

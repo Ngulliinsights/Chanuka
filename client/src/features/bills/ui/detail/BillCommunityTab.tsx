@@ -1,7 +1,7 @@
 import { MessageCircle, Users, TrendingUp, Award, Plus, Filter, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { CommunityComment } from '@client/features/community/types';
+import type { CommunityComment } from '@client/shared/types';
 import { DiscussionThread, CommentForm } from '@client/features/community/ui';
 import {
   Card,

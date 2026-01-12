@@ -6,7 +6,7 @@
 
 import { logger } from '@client/shared/utils/logger';
 
-import { NavigationItem, UserRole } from './types';
+import { NavigationItem, UserRole } from '@client/shared/types/navigation';
 
 /**
  * Checks if a user has access to a specific navigation item

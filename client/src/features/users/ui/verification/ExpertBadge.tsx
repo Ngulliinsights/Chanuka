@@ -1,7 +1,7 @@
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
 import React from 'react';
 
-import { ExpertVerificationType } from '@client/features/users/types';
+import { ExpertVerificationType } from '@client/shared/types';
 import { cn } from '@client/shared/lib/utils';
 import {
   Tooltip,

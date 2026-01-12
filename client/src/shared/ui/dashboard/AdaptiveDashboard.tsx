@@ -4,7 +4,7 @@ import React from 'react';
 import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { personaDetector } from '@client/core/personalization';
+import { personaDetector } from '@client/shared/types';
 import type {
   PersonaType,
   PersonaClassification,

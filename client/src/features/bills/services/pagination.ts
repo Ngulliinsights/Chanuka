@@ -158,7 +158,7 @@ class BillsPaginationService {
       const nextPage = this.state.currentPage + 1;
       const response = await this.loadPage(nextPage, this.state.searchParams);
 
-      if (response && response.bills.length > 0) {
+      if (response && response.data.length > 0) {
         this.state.currentPage = nextPage;
         this.updateStateFromResponse(response, nextPage);
         this.startPrefetching();
@@ -166,7 +166,7 @@ class BillsPaginationService {
         logger.info('Next page loaded successfully', {
           component: 'BillsPaginationService',
           page: nextPage,
-          billsCount: response.bills.length,
+          billsCount: response.data.length,
         });
 
         return response.bills;

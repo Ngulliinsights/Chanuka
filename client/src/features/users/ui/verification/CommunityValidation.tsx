@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
-import { CommunityValidation as CommunityValidationType } from '@client/features/users/types';
+import { CommunityValidation as CommunityValidationType } from '@client/shared/types';
 import { cn } from '@client/shared/lib/utils';
 import { Badge } from '@client/shared/design-system';
 import { Button } from '@client/shared/design-system';

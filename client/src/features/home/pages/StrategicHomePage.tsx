@@ -42,7 +42,7 @@ import PerformanceMonitor from '@client/shared/components/performance/Performanc
 import { copySystem } from '@client/shared/content/copy-system';
 import { useAuth } from '@client/core/auth';
 import type { User } from '@client/core/auth/types';
-import { personaDetector } from '@client/core/personalization';
+import { personaDetector } from '@client/shared/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import {
   Badge,

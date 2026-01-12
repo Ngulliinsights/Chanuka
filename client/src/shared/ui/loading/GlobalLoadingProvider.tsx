@@ -19,7 +19,7 @@ import {
   type LoadingStateData,
   type ExtendedLoadingOperation,
 } from '@client/shared/infrastructure/store/slices/loadingSlice';
-import { LoadingOperation, LoadingPriority } from '@client/shared/ui/loading/types';
+import { LoadingOperation, LoadingPriority } from '@client/shared/types/loading';
 
 // ============================================================================
 // Utility Functions

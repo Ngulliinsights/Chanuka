@@ -46,7 +46,7 @@ import type {
   Petition,
   CommunityStats,
   LocalImpactMetrics,
-} from '@client/features/community/types';
+} from '@client/shared/types';
 
 // ============================================================================
 // Complete Type Definitions

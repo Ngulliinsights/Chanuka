@@ -78,7 +78,7 @@ export type {
   ConflictReport,
   UserActivity,
   AnalyticsAlert,
-} from '@client/features/analytics/types';
+} from '@client/shared/types/analytics';
 
 export type {
   JourneyStep,

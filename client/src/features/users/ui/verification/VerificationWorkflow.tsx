@@ -15,7 +15,7 @@ import { useState, useCallback } from 'react';
 import {
   VerificationWorkflow as VerificationWorkflowType,
   VerificationStatus,
-} from '@client/features/users/types';
+} from '@client/shared/types';
 import { cn } from '@client/shared/lib/utils';
 import { Avatar, AvatarFallback } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

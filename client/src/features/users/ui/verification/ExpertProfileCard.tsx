@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Expert, ExpertCredential, ExpertAffiliation } from '@client/features/users/types';
+import { Expert, ExpertCredential, ExpertAffiliation } from '@client/shared/types';
 import { cn } from '@client/shared/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
 import { Badge } from '@client/shared/design-system';

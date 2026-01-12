@@ -5,7 +5,7 @@
  * in the DashboardProvider. It's kept here for reference and potential future use.
  */
 
-import { DashboardState } from './types';
+import { DashboardState } from '@client/shared/ui/dashboard/types';
 
 export interface DashboardAction {
   type: string;
