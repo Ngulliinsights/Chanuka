@@ -8,7 +8,12 @@ import React from 'react';
 
 import { cn } from '@client/shared/design-system/utils/cn';
 
-import { DashboardStackProps, DashboardSectionConfig } from '../types';
+import type { DashboardSectionConfig } from '@client/shared/types/dashboard';
+
+interface DashboardStackProps {
+  sections: DashboardSectionConfig[];
+  onUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
+}
 
 interface SectionRendererProps {
   section: DashboardSectionConfig;

@@ -1,5 +1,5 @@
 // ============================================================================
-// FOUNDATION SCHEMA - Core Legislative Entities (PRODUCTION v4.0 OPTIMIZED)
+// FOUNDATION SCHEMA - Core Legislative Entities
 // ============================================================================
 // Kenyan Legislative Engagement Platform - Production-Ready Database Schema
 // Optimized for: High Performance, Data Integrity, Scalability, Type Safety

@@ -29,24 +29,27 @@ export * from './mobile';
 // Loading types
 export * from './loading';
 
-// Community types (re-exported from legacy location)
-export type {
-  ActivityItem,
-  TrendingTopic,
-  ExpertInsight,
-  CommunityStats,
-  LocalImpactMetrics,
-  VoteRequest,
-  Comment,
-  DiscussionThread,
-} from '@client/shared/types';
+// Community types (unified module)
+export * from './community';
 
-// Core types (re-exported from legacy location)
+// Bill types (unified module)
+export * from './bill';
+
+// Core types (re-exported from shared type system)
 export type {
   Bill,
   User,
+} from '../../../shared/types/domains/legislative';
+
+export type {
+  User as AuthUser,
+  UserProfile,
+} from '../../../shared/types/domains/authentication';
+
+// BillAnalysis is still defined locally until migrated to shared types
+export type {
   BillAnalysis,
-} from '../../../shared/types/core';
+} from './bill';
 
 // Planned: After migration, specific type exports will be organized here
 // - Analytics types (from features/analytics/model/types)

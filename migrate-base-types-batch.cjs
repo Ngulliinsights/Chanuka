@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const SCHEMA_DIR = 'shared/schema';
+const SCHEMA_DIR = '../shared/schema';
 const EXCLUDED_FILES = ['enum.ts', 'base-types.ts', 'index.ts', 'citizen_participation.ts', 'constitutional_intelligence.ts'];
 const BASE_TYPES_IMPORT = 'from "./base-types"';
 

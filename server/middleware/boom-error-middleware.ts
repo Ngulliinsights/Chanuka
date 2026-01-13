@@ -1,14 +1,14 @@
 /**
  * Boom-Compatible Error Middleware
- * 
+ *
  * Handles Boom errors and converts them to standardized API responses
  * while maintaining backward compatibility with existing error formats.
  */
 
 import * as Boom from '@hapi/boom';
 import { logger  } from '@shared/core';
-import { errorAdapter } from '@shared/infrastructure/errors/error-adapter.js';
-import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization.js';
+import { errorAdapter } from '@shared/infrastructure/errors/error-adapter';
+import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization';
 import { NextFunction,Request, Response } from 'express';
 import { ZodError } from 'zod';
 
@@ -43,7 +43,7 @@ export function boomErrorMiddleware(
         message: err.message,
         value: err.input
       }));
-      
+
       const validationResult = errorAdapter.createValidationError(
         validationErrors,
         {
@@ -53,7 +53,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (validationResult.isErr()) {
         boomError = Boom.badRequest(validationResult.error.message);
         boomError.data = validationResult.error;
@@ -88,7 +88,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (validationResult.isErr()) {
         boomError = Boom.badRequest(validationResult.error.message);
         boomError.data = validationResult.error;
@@ -108,7 +108,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (authResult.isErr()) {
         boomError = Boom.unauthorized(authResult.error.message);
         boomError.data = authResult.error;
@@ -129,7 +129,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (authzResult.isErr()) {
         boomError = errorAdapter.toBoom(authzResult.error);
         errorResponse = errorAdapter.toErrorResponse(boomError);
@@ -149,7 +149,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (notFoundResult.isErr()) {
         boomError = errorAdapter.toBoom(notFoundResult.error);
         errorResponse = errorAdapter.toErrorResponse(boomError);
@@ -168,7 +168,7 @@ export function boomErrorMiddleware(
           user_id: (req as any).user?.id
         }
       );
-      
+
       if (validationResult.isErr()) {
         boomError = errorAdapter.toBoom(validationResult.error);
         errorResponse = errorAdapter.toErrorResponse(boomError);
@@ -188,7 +188,7 @@ export function boomErrorMiddleware(
       // Generic server errors
       const statusCode = error.status || error.statusCode || 500;
       const message = error.message || 'Internal server error';
-      
+
       if (statusCode >= 500) {
         boomError = Boom.internal(message);
       } else if (statusCode >= 400) {
@@ -196,7 +196,7 @@ export function boomErrorMiddleware(
       } else {
         boomError = Boom.internal(message);
       }
-      
+
       errorResponse = createFallbackErrorResponse(boomError, req);
     }
 

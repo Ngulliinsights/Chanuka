@@ -60,6 +60,147 @@ export {
 } from "./base-types";
 
 // ============================================================================
+// SCHEMA INTEGRATION - Unified Type System with Standardized Patterns
+// ============================================================================
+export {
+  // Core integration types
+  users,
+  userRelations,
+
+  // Branded types for type safety
+  type UserId,
+  type BillId,
+  type SessionId,
+  type ModerationId,
+  type LegislatorId,
+  type CommitteeId,
+  type SponsorId,
+  type AmendmentId,
+  type ConferenceId,
+
+  // Validation types
+  type ValidatedUser,
+  ValidatedUserType,
+  UserSchema,
+
+  // Type guards
+  isUser,
+  isUserId,
+
+  // Utility functions
+  createUserId,
+  createBillId,
+  createSessionId,
+
+  // Version information
+  SCHEMA_INTEGRATION_VERSION,
+  SCHEMA_INTEGRATION_CHANGELOG,
+} from "./integration";
+
+// ============================================================================
+// SCHEMA INTEGRATION EXTENDED - Comprehensive Relationship Migration
+// ============================================================================
+export {
+  // Extended entity tables with comprehensive relationships
+  bills,
+  sponsors,
+  governors,
+  committees,
+
+  // Type-safe relationships using branded types
+  sponsorRelations,
+  governorRelations,
+  committeeRelations,
+  billRelations,
+
+  // Extended validation types
+  type ValidatedBill,
+  type ValidatedSponsor,
+  ValidatedBillType,
+  ValidatedSponsorType,
+  BillSchema,
+  SponsorSchema,
+
+  // Extended type guards
+  isBill,
+  isSponsor,
+  isGovernor,
+  isCommittee,
+
+  // Extended database types
+  type Bill,
+  type NewBill,
+  type Sponsor,
+  type NewSponsor,
+  type Governor,
+  type NewGovernor,
+  type Committee,
+  type NewCommittee,
+
+  // Version information
+  SCHEMA_INTEGRATION_EXTENDED_VERSION,
+  SCHEMA_INTEGRATION_EXTENDED_CHANGELOG,
+} from "./integration-extended";
+
+// ============================================================================
+// VALIDATION INTEGRATION - Comprehensive Database Validation Layer
+// ============================================================================
+export {
+  // Database validation registry
+  DatabaseValidationRegistry,
+
+  // Validation utilities
+  validateDatabaseEntity,
+  validateDatabaseEntityAsync,
+  validateDatabaseBatch,
+  validateBrandedId,
+  validateBrandedIds,
+  validateDatabaseConstraints,
+  validateDatabaseTransaction,
+
+  // Constraint schemas
+  DatabaseConstraintSchemas,
+
+  // Types
+  type TransactionValidationResult,
+
+  // Version information
+  VALIDATION_INTEGRATION_VERSION,
+  VALIDATION_INTEGRATION_CHANGELOG,
+} from "./validation-integration";
+
+// ============================================================================
+// SCHEMA GENERATORS - Type generation and utilities
+// ============================================================================
+export {
+  // Branded ID generators
+  BrandedIdGenerator,
+
+  // Schema transformation utilities
+  transformData,
+  type SchemaTransformConfig,
+
+  // Type-to-schema registry
+  TypeSchemaRegistry,
+
+  // Enhanced validation utilities
+  validateWithContext,
+  type ValidationContext,
+
+  // Schema introspection
+  introspectSchema,
+  type SchemaIntrospectionResult,
+
+  // Schema composition utilities
+  composeSchemas,
+  extendSchema,
+
+  // Version information
+  SCHEMA_GENERATORS_VERSION,
+  SCHEMA_GENERATORS_CHANGELOG,
+} from "./schema-generators";
+
+// ============================================================================
 // ENUMS - Shared across all domains
 // ============================================================================
 export * from "./enum";

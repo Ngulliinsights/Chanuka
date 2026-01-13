@@ -31,311 +31,71 @@
  * - More maintainable code structure
  */
 
-import type { ActivityItem } from '../../shared/types';
-import type { Comment } from '../../shared/types';
-import type { CommunityStats } from '../../shared/types';
-import type { DiscussionThread } from './types/community';
-import type { ExpertInsight } from '../../shared/types';
-import type { LocalImpactMetrics } from '../../shared/types';
-import type { TrendingTopic } from '../../shared/types';
-import type { VoteRequest } from '../../shared/types';
+import type {
+  ActivityItem,
+  Comment,
+  CommunityStats,
+  DiscussionThread,
+  DiscussionThreadMetadata,
+  ExpertInsight,
+  LocalImpactMetrics,
+  TrendingTopic,
+  VoteRequest,
+  VoteResponse,
+  Attachment,
+  Mention,
+  ThreadParticipant,
+  Contributor,
+  Expert,
+  CreateCommentRequest,
+  CreateThreadRequest,
+  UpdateCommentRequest,
+  UpdateThreadRequest,
+  ShareRequest,
+  CommentQueryOptions,
+  CommentCreateData,
+  CommentReportData,
+  ReportResponse,
+  ExpertVerificationResponse,
+  ExpertInsightSubmissionResponse,
+  ActivityFeedOptions,
+  LocationFilter,
+  ExtendedCommunityStats,
+  ExtendedLocalImpactMetrics,
+  InsightSubmission,
+  SearchOptions,
+  SearchResult,
+  CommentsResponse,
+  ThreadsResponse,
+  ThreadEvent,
+  UserEvent,
+} from '@client/shared/types/community';
 import { logger } from '@client/shared/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
 
-// ============================================================================
-// Type Definitions and Interfaces
-// ============================================================================
-
-/**
- * Attachment represents a file or link associated with a comment.
- * Supports multiple media types for rich community discussions.
- */
-export interface Attachment {
-  id: string;
-  url: string;
-  type: 'image' | 'document' | 'link';
-  name: string;
-}
-
-/**
- * Mention represents an @-mention of another user in a comment.
- * Includes position for accurate highlighting in the UI.
- */
-export interface Mention {
-  userId: string;
-  userName: string;
-  position: number;
-}
-
-/**
- * ThreadParticipant tracks user participation in discussion threads.
- * Helps identify active contributors and engagement patterns.
- */
-export interface ThreadParticipant {
-  userId: string;
-  userName: string;
-  joinedAt: string;
-  lastActive: string;
-}
-
-/**
- * Contributor represents a community member with contribution metrics.
- * Used for displaying top contributors and reputation systems.
- */
-export interface Contributor {
-  id: string;
-  name: string;
-  avatar?: string;
-  contributionCount: number;
-  reputation: number;
-}
-
-/**
- * Expert represents a verified domain expert.
- * Tracks expertise areas and verification status for credibility.
- */
-export interface Expert {
-  id: string;
-  name: string;
-  expertise: string[];
-  verified: boolean;
-}
-
-// Request interfaces for creating and updating content
-
-export interface CreateCommentRequest {
-  billId: number;
-  content: string;
-  parentId?: string;
-  mentions?: string[];
-  attachments?: string[];
-}
-
-export interface CreateThreadRequest {
-  billId: number;
-  title: string;
-  description?: string;
-}
-
-export interface UpdateCommentRequest {
-  content: string;
-}
-
-export interface UpdateThreadRequest {
-  title?: string;
-  description?: string;
-}
-
-export interface ShareRequest {
-  platform: string;
-  url: string;
-  title: string;
-  description?: string;
-}
-
-// Response interfaces with proper typing
-
-export interface CommentsResponse {
-  comments: Comment[];
-  total: number;
-  page: number;
-  hasMore: boolean;
-}
-
-export interface ThreadsResponse {
-  threads: DiscussionThread[];
-  total: number;
-  page: number;
-  hasMore: boolean;
-}
-
-/**
- * Extended CommunityStats with all required properties.
- * Provides comprehensive community engagement metrics.
- */
-export interface ExtendedCommunityStats extends CommunityStats {
-  totalMembers: number;
-  activeToday: number;
-  activeThisWeek: number;
-  activeThisMonth: number;
-  totalComments: number;
-  totalThreads: number;
-  averageEngagement: number;
-}
-
-/**
- * Extended LocalImpactMetrics with all required properties.
- * Tracks legislation impact at the community level.
- */
-export interface ExtendedLocalImpactMetrics extends LocalImpactMetrics {
-  billsDiscussed: number;
-  localRepresentatives: number;
-  communityEngagement: number;
-  recentActivity: number;
-}
-
-/**
- * DiscussionThreadMetadata provides high-level statistics about a bill's discussion.
- * Useful for displaying engagement metrics before loading full content.
- */
-export interface DiscussionThreadMetadata {
-  billId: number;
-  participants: number;
-  comment_count: number;
-  lastActivity: string;
-  engagementScore: number;
-  expertParticipation: number;
-}
-
-/**
- * VoteResponse contains updated vote counts after a voting action.
- * Provides immediate feedback for optimistic UI updates.
- */
-export interface VoteResponse {
-  score: number;
-  upvotes: number;
-  downvotes: number;
-  userVote?: 'up' | 'down' | null;
-}
-
-/**
- * ReportResponse confirms receipt of a moderation report.
- * Tracks report status through the moderation pipeline.
- */
-export interface ReportResponse {
-  id: string;
-  status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
-  message: string;
-}
-
-/**
- * ExpertVerificationResponse contains expert credential verification data.
- * Used to display badges and credibility indicators in the UI.
- */
-export interface ExpertVerificationResponse {
-  verified: boolean;
-  verificationType?: 'official' | 'domain' | 'identity';
-  expertise_areas: string[];
-  credibilityScore: number;
-  lastVerified: string;
-}
-
-/**
- * ExpertInsightSubmissionResponse tracks the editorial review process.
- * Provides transparency about insight publication timeline.
- */
-export interface ExpertInsightSubmissionResponse {
-  id: string;
-  status: 'draft' | 'under_review' | 'published' | 'rejected';
-  submittedAt: string;
-  reviewDeadline?: string;
-}
-
-// Event interfaces for real-time updates
-
-export interface ThreadEvent {
-  type: 'thread_created' | 'thread_updated' | 'thread_locked';
-  threadId: string;
-  thread?: DiscussionThread;
-  userId?: string;
-  timestamp: string;
-}
-
-export interface UserEvent {
-  type: 'user_joined' | 'user_left' | 'user_typing';
-  userId: string;
-  userName: string;
-  timestamp: string;
-}
-
-// Query options interfaces for flexible filtering and sorting
-
-export interface CommentQueryOptions {
-  sort?: 'newest' | 'oldest' | 'most_voted' | 'controversial' | 'expert_first';
-  expertOnly?: boolean;
-  limit?: number;
-  offset?: number;
-  includeReplies?: boolean;
-  minVotes?: number;
-}
-
-export interface ActivityFeedOptions {
-  limit?: number;
-  offset?: number;
-  contentTypes?: Array<'comment' | 'vote' | 'expert_insight' | 'bill_update'>;
-  timeRange?: 'hour' | 'day' | 'week' | 'month' | 'all';
-  geography?: {
-    state?: string;
-    district?: string;
-    county?: string;
-  };
-  followedOnly?: boolean;
-}
-
-export interface LocationFilter {
-  state?: string;
-  district?: string;
-  county?: string;
-  zipCode?: string;
-}
-
-export interface SearchOptions {
-  contentTypes?: Array<'comment' | 'thread' | 'insight'>;
-  billId?: number;
-  limit?: number;
-  offset?: number;
-}
-
-// Data interfaces for creating and reporting content
-
-export interface CommentCreateData {
-  billId: number;
-  content: string;
-  parentId?: string;
-  mentions?: string[];
-  attachments?: string[];
-}
-
-export interface CommentReportData {
-  commentId: string;
-  violationType: 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'off_topic';
-  reason: string;
-  description?: string;
-  evidence?: string[];
-}
-
-/**
- * SearchResult represents a single search result item.
- * Provides a unified structure for various content types.
- */
-export interface SearchResult {
-  id: string;
-  type: 'comment' | 'thread' | 'insight';
-  content: string;
-  billId?: number;
-  authorId: string;
-  authorName: string;
-  createdAt: string;
-  relevanceScore: number;
-}
-
-/**
- * InsightSubmission contains all data needed to submit an expert insight.
- * Includes metadata for editorial review and publication workflow.
- */
-export interface InsightSubmission {
-  billId: number;
-  title: string;
-  content: string;
-  summary: string;
-  expertiseAreas: string[];
-  sources?: string[];
-  attachments?: string[];
-}
-
-export type { VoteRequest };
+// Re-export community types from unified module
+export type {
+  Attachment,
+  Mention,
+  ThreadParticipant,
+  Contributor,
+  Expert,
+  CreateCommentRequest,
+  CreateThreadRequest,
+  UpdateCommentRequest,
+  UpdateThreadRequest,
+  ShareRequest,
+  CommentsResponse,
+  ThreadsResponse,
+  CommentQueryOptions,
+  ActivityFeedOptions,
+  LocationFilter,
+  SearchOptions,
+  ThreadEvent,
+  UserEvent,
+} from '@client/shared/types/community';
 
 // ============================================================================
 // Cache Configuration Constants

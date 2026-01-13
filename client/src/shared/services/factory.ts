@@ -129,7 +129,8 @@ export class ServiceContainer {
 
       return instance as T;
     } catch (error) {
-      throw ServiceErrorFactory.createDependencyError(id, `Failed to resolve service: ${error.message}`, 'resolve', { originalError: error });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw ServiceErrorFactory.createDependencyError(id, `Failed to resolve service: ${errorMessage}`, 'resolve', { originalError: error });
     }
   }
 

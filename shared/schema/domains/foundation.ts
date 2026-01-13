@@ -3,53 +3,70 @@
 // ============================================================================
 // Granular import path to avoid loading entire schema
 // Usage: import { users, bills } from '@/shared/schema/domains/foundation'
+//
+// Foundation schema exports include core entities:
+// - users: User accounts with authentication and security
+// - bills: Legislative bills with metadata and relationships
+// - sponsors: Bill sponsors and co-sponsors
+// - committees: Parliamentary committees
+// - governors: County governors
+//
+// These are the core "foundation" entities that other domains reference
 
+// Core user exports
 export {
   users,
-  user_profiles,
-  sponsors,
-  committees,
-  committee_members,
-  parliamentary_sessions,
-  parliamentary_sittings,
-  bills,
-  oauth_providers,
-  oauth_tokens,
-  user_sessions,
-  usersRelations,
-  userProfilesRelations,
-  sponsorsRelations,
-  committeesRelations,
-  committeeMembersRelations,
-  parliamentarySessionsRelations,
-  parliamentarySittingsRelations,
-  billsRelations,
-  oauthProvidersRelations,
-  oauthTokensRelations,
-  userSessionsRelations
-} from "./foundation";
+  userRelations,
+  UserSchema,
+  ValidatedUserType,
+  isUser,
+  isUserId,
+  createUserId,
+} from "../integration";
 
 export type {
   User,
   NewUser,
-  UserProfile,
-  NewUserProfile,
-  Sponsor,
-  NewSponsor,
-  Committee,
-  NewCommittee,
-  CommitteeMember,
-  NewCommitteeMember,
-  ParliamentarySession,
-  NewParliamentarySession,
-  ParliamentarySitting,
-  NewParliamentarySitting,
+  ValidatedUser,
+  UserId,
+} from "../integration";
+
+// Extended foundation entities
+export {
+  bills,
+  billRelations,
+  sponsors,
+  sponsorRelations,
+  committees,
+  committeeRelations,
+  governors,
+  governorRelations,
+  BillSchema,
+  SponsorSchema,
+  ValidatedBillType,
+  ValidatedSponsorType,
+  isBill,
+  isSponsor,
+  isGovernor,
+  isCommittee,
+  createBillId,
+  createSessionId,
+} from "../integration-extended";
+
+export type {
   Bill,
   NewBill,
-  OAuthProvider,
-  NewOAuthProvider,
-  OAuthToken,
-  NewOAuthToken,
-  UserSession,
-  NewUserSession
-} from "./foundation";
+  ValidatedBill,
+  Sponsor,
+  NewSponsor,
+  ValidatedSponsor,
+  Governor,
+  NewGovernor,
+  Committee,
+  NewCommittee,
+  BillId,
+  SessionId,
+  SponsorId,
+  CommitteeId,
+  LegislatorId,
+} from "../integration-extended";

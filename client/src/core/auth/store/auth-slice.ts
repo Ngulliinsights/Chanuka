@@ -14,14 +14,11 @@ import { logger } from '@client/shared/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import type { LoginCredentials, User, RegisterData, PrivacySettings } from '../types';
+import { SliceState, ThunkResult } from '@shared/types/domains/redux';
 
-export interface AuthState {
-  user: User | null;
+export interface AuthState extends SliceState<User, string> {
   isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
   sessionExpiry: string | null;
-  isInitialized: boolean;
   twoFactorRequired: boolean;
 }
 
@@ -410,12 +407,13 @@ export const validateStoredTokens = createAsyncThunk(
 // ============================================================================
 
 const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
+  data: null,
   isLoading: false,
   error: null,
-  sessionExpiry: null,
   isInitialized: false,
+  status: 'idle',
+  isAuthenticated: false,
+  sessionExpiry: null,
   twoFactorRequired: false,
 };
 
@@ -428,13 +426,13 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+      state.data = action.payload;
       state.isAuthenticated = true;
       state.twoFactorRequired = false;
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+      if (state.data) {
+        state.data = { ...state.data, ...action.payload };
       }
     },
     clearError: state => {
@@ -447,7 +445,7 @@ const authSlice = createSlice({
       state.twoFactorRequired = action.payload;
     },
     resetAuthState: state => {
-      state.user = null;
+      state.data = null;
       state.isAuthenticated = false;
       state.sessionExpiry = null;
       state.error = null;
@@ -461,13 +459,15 @@ const authSlice = createSlice({
       .addCase(login.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(login.fulfilled, (state, action) => {
         // Since login returns AuthSession, we need to fetch user separately
         // For now, set a placeholder and mark as authenticated
-        state.user = null; // Will be populated by getCurrentUser call
+        state.data = null; // Will be populated by getCurrentUser call
         state.isAuthenticated = true;
         state.isLoading = false;
+        state.status = 'success';
         state.sessionExpiry = action.payload.sessionExpiry || null;
         state.twoFactorRequired = action.payload.requires2FA || false;
         state.error = null;
@@ -475,8 +475,9 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
         state.isAuthenticated = false;
-        state.user = null;
+        state.data = null;
         state.twoFactorRequired = false;
       })
 
@@ -484,42 +485,48 @@ const authSlice = createSlice({
       .addCase(register.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(register.fulfilled, (state, action) => {
         // Since register returns AuthSession, we need to fetch user separately
         // For now, set a placeholder and mark as authenticated
-        state.user = null; // Will be populated by getCurrentUser call
+        state.data = null; // Will be populated by getCurrentUser call
         state.isAuthenticated = true;
         state.isLoading = false;
+        state.status = 'success';
         state.sessionExpiry = action.payload.sessionExpiry || null;
         state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
         state.isAuthenticated = false;
-        state.user = null;
+        state.data = null;
       })
 
       // Logout
       .addCase(logout.pending, state => {
         state.isLoading = true;
+        state.status = 'loading';
       })
       .addCase(logout.fulfilled, state => {
-        state.user = null;
+        state.data = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
         state.error = null;
         state.isLoading = false;
+        state.status = 'idle';
         state.twoFactorRequired = false;
       })
       .addCase(logout.rejected, state => {
         // Even if logout fails on server, clear local state
-        state.user = null;
+        state.data = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
         state.error = null;
         state.isLoading = false;
+        state.status = 'idle';
         state.twoFactorRequired = false;
       })
 
@@ -576,53 +583,62 @@ const authSlice = createSlice({
       .addCase(enableTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(enableTwoFactor.fulfilled, state => {
-        if (state.user) {
-          state.user.twoFactorEnabled = true;
+        if (state.data) {
+          state.data.twoFactorEnabled = true;
         }
         state.isLoading = false;
         state.error = null;
+        state.status = 'success';
       })
       .addCase(enableTwoFactor.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
       })
 
       // Two-factor disable
       .addCase(disableTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(disableTwoFactor.fulfilled, state => {
-        if (state.user) {
-          state.user.twoFactorEnabled = false;
+        if (state.data) {
+          state.data.twoFactorEnabled = false;
         }
         state.isLoading = false;
         state.error = null;
+        state.status = 'success';
       })
       .addCase(disableTwoFactor.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
       })
 
       // Two-factor verification
       .addCase(verifyTwoFactor.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(verifyTwoFactor.fulfilled, (state, _action) => {
         // Since verifyTwoFactor returns AuthSession, we need to fetch user separately
         // For now, set a placeholder and mark as authenticated
-        state.user = null; // Will be populated by getCurrentUser call
+        state.data = null; // Will be populated by getCurrentUser call
         state.isAuthenticated = true;
         state.isLoading = false;
+        state.status = 'success';
         state.twoFactorRequired = false;
         state.error = null;
       })
       .addCase(verifyTwoFactor.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
         state.twoFactorRequired = true;
       })
 
@@ -630,40 +646,47 @@ const authSlice = createSlice({
       .addCase(updateUserProfile.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
-        state.user = action.payload || null;
+        state.data = action.payload || null;
         state.isLoading = false;
         state.error = null;
+        state.status = 'success';
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
       })
 
       // OAuth login
       .addCase(loginWithOAuth.pending, state => {
         state.isLoading = true;
         state.error = null;
+        state.status = 'loading';
       })
       .addCase(loginWithOAuth.fulfilled, (state, _action) => {
         // Since loginWithOAuth returns AuthSession, we need to fetch user separately
         // For now, set a placeholder and mark as authenticated
-        state.user = null; // Will be populated by getCurrentUser call
+        state.data = null; // Will be populated by getCurrentUser call
         state.isAuthenticated = true;
         state.isLoading = false;
+        state.status = 'success';
         state.error = null;
       })
       .addCase(loginWithOAuth.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isLoading = false;
+        state.status = 'error';
         state.isAuthenticated = false;
-        state.user = null;
+        state.data = null;
       })
 
       // Validate stored tokens
       .addCase(validateStoredTokens.pending, state => {
         state.isLoading = true;
+        state.status = 'loading';
       })
       .addCase(validateStoredTokens.fulfilled, (state, _action) => {
         if (_action.payload) {
@@ -672,14 +695,16 @@ const authSlice = createSlice({
           state.isAuthenticated = true;
         }
         state.isLoading = false;
+        state.status = 'success';
         state.isInitialized = true;
         state.error = null;
       })
       .addCase(validateStoredTokens.rejected, state => {
-        state.user = null;
+        state.data = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
         state.isLoading = false;
+        state.status = 'error';
         state.isInitialized = true;
         state.twoFactorRequired = false;
       });
@@ -704,7 +729,7 @@ export const {
 const selectAuthState = (state: { auth: AuthState }) => state.auth;
 
 // Memoized selectors
-export const selectUser = createSelector([selectAuthState], auth => auth.user);
+export const selectUser = createSelector([selectAuthState], auth => auth.data);
 
 export const selectIsAuthenticated = createSelector(
   [selectAuthState],
@@ -724,14 +749,20 @@ export const selectTwoFactorRequired = createSelector(
   auth => auth.twoFactorRequired
 );
 
+export const selectAuthSliceStatus = createSelector(
+  [selectAuthState],
+  auth => auth.status
+);
+
 // Composite selectors
 export const selectAuthStatus = createSelector(
-  [selectIsAuthenticated, selectIsLoading, selectTwoFactorRequired],
-  (isAuthenticated, isLoading, twoFactorRequired) => ({
+  [selectIsAuthenticated, selectIsLoading, selectTwoFactorRequired, selectAuthSliceStatus],
+  (isAuthenticated, isLoading, twoFactorRequired, status) => ({
     isAuthenticated,
     isLoading,
     twoFactorRequired,
     needsTwoFactor: isAuthenticated && twoFactorRequired,
+    status
   })
 );
 

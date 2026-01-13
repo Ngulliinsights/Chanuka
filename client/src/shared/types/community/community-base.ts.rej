@@ -1,0 +1,22 @@
+--- client/src/shared/types/community/community-base.ts
++++ client/src/shared/types/community/community-base.ts
+@@ -48,12 +48,14 @@
+  */
+ export interface DiscussionThreadMetadata {
+   readonly id: number;
+   readonly billId: number;
+   readonly title: string;
+-  readonly participantCount: number;
+-  readonly messageCount: number;
+-  readonly lastActivityTime: string;
+-  readonly isActive: boolean;
+-  readonly expertReplyCount: number;
++  readonly participantCount?: number;
++  readonly participants?: number;
++  readonly messageCount?: number;
++  readonly comment_count?: number;
++  readonly lastActivityTime?: string;
++  readonly isActive?: boolean;
++  readonly expertReplyCount?: number;
+ }
+ 

@@ -24,3 +24,4 @@ export {
   type CypherClause,
   type QueryBuilderOptions,
   type PaginationOptions,
+} from './query-builder';

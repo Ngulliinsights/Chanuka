@@ -1,7 +1,11 @@
 import { and, desc, eq, lte, sql } from 'drizzle-orm';
 
 import { logger } from '@shared/core';
-import { readDatabase, withTransaction, type DatabaseTransaction } from '@shared/database/connection';
+import {
+  readDatabase,
+  withTransaction,
+  type DatabaseTransaction,
+} from '@shared/database/connection';
 import {
   behavioralAnomalies,
   cibDetections,
@@ -81,8 +85,20 @@ export interface BehavioralAnomalyContext {
   resolutionNotes?: string;
 }
 
+export type CIBPatternType =
+  | 'temporal_clustering'
+  | 'content_similarity'
+  | 'network_isolation'
+  | 'single_issue_focus'
+  | 'rapid_activation'
+  | 'coordinated_voting'
+  | 'template_structure'
+  | 'shared_infrastructure'
+  | 'abnormal_engagement'
+  | 'vote_manipulation';
+
 export interface CIBDetectionContext {
-  patternType: string;
+  patternType: CIBPatternType;
   affectedUserIds: string[];
   investigationStatus: string;
   confidenceScore: number;
@@ -138,7 +154,9 @@ function getErrorMessage(error: unknown): string {
  */
 function validateActivityContext(context: SuspiciousActivityContext): void {
   if (!context.userId && !context.ipAddress && !context.deviceFingerprint) {
-    throw new Error('At least one identifier (userId, ipAddress, or deviceFingerprint) is required');
+    throw new Error(
+      'At least one identifier (userId, ipAddress, or deviceFingerprint) is required'
+    );
   }
   if (!context.activityType) {
     throw new Error('Activity type is required');
@@ -234,9 +252,10 @@ export class CIBDetectionService {
    * @param context - Activity context with details
    * @returns Result with activity log ID
    */
-  async logSuspiciousActivity(context: SuspiciousActivityContext): Promise<CIBDetectionResult> {
+  async logSuspiciousActivity(
+    context: SuspiciousActivityContext
+  ): Promise<CIBDetectionResult> {
     try {
-      // Validate input
       validateActivityContext(context);
 
       const activity: NewSuspiciousActivityLog = {
@@ -246,10 +265,10 @@ export class CIBDetectionService {
         activity_type: context.activityType,
         suspicion_reason: context.suspicionReason,
         severity_level: context.severityLevel,
-        related_entities: context.relatedEntities || {},
-        activity_metadata: context.activityMetadata,
+        related_entities: (context.relatedEntities || {}) as Record<string, unknown>,
+        activity_metadata: context.activityMetadata as Record<string, unknown> | undefined,
         auto_action_taken: context.autoActionTaken,
-        requires_manual_review: context.requiresManualReview || false,
+        requires_manual_review: context.requiresManualReview ?? false,
       };
 
       const result = await readDatabase
@@ -286,7 +305,10 @@ export class CIBDetectionService {
    * @param limit - Maximum number of records
    * @returns Array of suspicious activity logs
    */
-  async getUserSuspiciousActivities(userId: string, limit = 100): Promise<SuspiciousActivityLog[]> {
+  async getUserSuspiciousActivities(
+    userId: string,
+    limit = 100
+  ): Promise<SuspiciousActivityLog[]> {
     try {
       if (!userId) {
         throw new Error('User ID is required');
@@ -318,14 +340,20 @@ export class CIBDetectionService {
     params: PaginationParams = {}
   ): Promise<PaginatedResult<SuspiciousActivityLog>> {
     try {
-      const limit = Math.min(params.limit || CIBDetectionService.DEFAULT_LIMIT, CIBDetectionService.MAX_LIMIT);
+      const limit = Math.min(
+        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        CIBDetectionService.MAX_LIMIT
+      );
       const offset = params.offset || 0;
 
       const activities = await readDatabase
         .select()
         .from(suspiciousActivityLogs)
         .where(eq(suspiciousActivityLogs.requires_manual_review, true))
-        .orderBy(desc(suspiciousActivityLogs.severity_level), desc(suspiciousActivityLogs.created_at))
+        .orderBy(
+          desc(suspiciousActivityLogs.severity_level),
+          desc(suspiciousActivityLogs.created_at)
+        )
         .limit(limit + 1)
         .offset(offset);
 
@@ -352,31 +380,32 @@ export class CIBDetectionService {
    * @param context - Anomaly context with evidence
    * @returns Result with anomaly ID
    */
-  async recordBehavioralAnomaly(context: BehavioralAnomalyContext): Promise<CIBDetectionResult> {
+  async recordBehavioralAnomaly(
+    context: BehavioralAnomalyContext
+  ): Promise<CIBDetectionResult> {
     try {
-      // Validate input
       validateAnomalyContext(context);
 
       const anomaly: NewBehavioralAnomaly = {
-        user_id: context.userId,
         anomaly_type: context.anomalyType,
         anomaly_score: context.anomalyScore.toString(),
         anomaly_description: context.anomalyDescription,
         affected_users: context.affectedUsers || [],
-        affected_content: context.affectedContent || [],
-        temporal_evidence: context.temporalEvidence || {},
-        content_evidence: context.contentEvidence || {},
-        network_evidence: context.networkEvidence || {},
-        statistical_measures: context.statisticalMeasures || {},
+        affected_content: (context.affectedContent || []) as unknown,
+        temporal_evidence: (context.temporalEvidence || {}) as unknown,
+        content_evidence: (context.contentEvidence || {}) as unknown,
+        network_evidence: (context.networkEvidence || {}) as unknown,
+        statistical_measures: (context.statisticalMeasures || {}) as unknown,
         detection_method: context.detectionMethod,
         detection_algorithm: context.detectionAlgorithm,
         detected_at: context.detectedAt || new Date(),
-        is_escalated: context.isEscalated || false,
+        is_escalated: context.isEscalated ?? false,
         escalated_at: context.escalatedAt,
-        escalated_to_moderation: context.escalatedToModeration || false,
-        false_positive: context.isFalsePositive || false,
+        escalated_to_moderation: context.escalatedToModeration ?? false,
+        false_positive: context.isFalsePositive ?? false,
         verified_by: context.verifiedBy,
         resolution_notes: context.resolutionNotes,
+        metadata: { userId: context.userId } as unknown,
       };
 
       const result = await readDatabase
@@ -416,7 +445,10 @@ export class CIBDetectionService {
     params: PaginationParams = {}
   ): Promise<PaginatedResult<BehavioralAnomaly>> {
     try {
-      const limit = Math.min(params.limit || CIBDetectionService.DEFAULT_LIMIT, CIBDetectionService.MAX_LIMIT);
+      const limit = Math.min(
+        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        CIBDetectionService.MAX_LIMIT
+      );
       const offset = params.offset || 0;
 
       const anomalies = await readDatabase
@@ -428,7 +460,10 @@ export class CIBDetectionService {
             eq(behavioralAnomalies.false_positive, false)
           )
         )
-        .orderBy(desc(behavioralAnomalies.anomaly_score), desc(behavioralAnomalies.detected_at))
+        .orderBy(
+          desc(behavioralAnomalies.anomaly_score),
+          desc(behavioralAnomalies.detected_at)
+        )
         .limit(limit + 1)
         .offset(offset);
 
@@ -449,7 +484,7 @@ export class CIBDetectionService {
   }
 
   /**
-   * Get user anomalies
+   * Get user anomalies by querying metadata field
    * @param userId - User identifier
    * @returns Array of anomalies
    */
@@ -463,10 +498,7 @@ export class CIBDetectionService {
         .select()
         .from(behavioralAnomalies)
         .where(
-          and(
-            eq(behavioralAnomalies.user_id, userId),
-            eq(behavioralAnomalies.false_positive, false)
-          )
+          sql`${behavioralAnomalies.metadata}->>'userId' = ${userId} AND ${behavioralAnomalies.false_positive} = false`
         )
         .orderBy(desc(behavioralAnomalies.detected_at))
         .limit(100);
@@ -488,30 +520,33 @@ export class CIBDetectionService {
    * @param context - CIB detection context
    * @returns Result with detection ID
    */
-  async recordCIBDetection(context: CIBDetectionContext): Promise<CIBDetectionResult> {
+  async recordCIBDetection(
+    context: CIBDetectionContext
+  ): Promise<CIBDetectionResult> {
     try {
-      // Validate input
       validateCIBContext(context);
 
       const detection: NewCIBDetection = {
-        pattern_type: context.patternType,
-        affected_user_ids: context.affectedUserIds,
-        investigation_status: context.investigationStatus,
+        pattern_type: context.patternType as CIBPatternType,
         confidence_score: context.confidenceScore.toString(),
         severity: context.severity,
         detection_method: context.detectionMethod,
         detection_algorithm: context.detectionAlgorithm,
-        evidence: context.evidence,
-        coordinated_activity_indicators: context.coordinatedActivityIndicators || {},
-        network_analysis: context.networkAnalysis || {},
-        content_analysis: context.contentAnalysis || {},
-        temporal_analysis: context.temporalAnalysis || {},
         investigator_id: context.investigatorId,
         investigation_notes: context.investigationNotes,
         mitigation_actions: context.mitigationActions || [],
-        is_mitigated: context.isMitigated || false,
         mitigated_at: context.mitigatedAt,
         mitigated_by: context.mitigatedBy,
+        metadata: {
+          affectedUserIds: context.affectedUserIds,
+          investigationStatus: context.investigationStatus,
+          evidence: context.evidence,
+          coordinatedActivityIndicators: context.coordinatedActivityIndicators || {},
+          networkAnalysis: context.networkAnalysis || {},
+          contentAnalysis: context.contentAnalysis || {},
+          temporalAnalysis: context.temporalAnalysis || {},
+          isMitigated: context.isMitigated ?? false,
+        } as unknown,
       };
 
       const result = await readDatabase
@@ -551,19 +586,22 @@ export class CIBDetectionService {
     params: PaginationParams = {}
   ): Promise<PaginatedResult<CIBDetection>> {
     try {
-      const limit = Math.min(params.limit || CIBDetectionService.DEFAULT_LIMIT, CIBDetectionService.MAX_LIMIT);
+      const limit = Math.min(
+        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        CIBDetectionService.MAX_LIMIT
+      );
       const offset = params.offset || 0;
 
       const detections = await readDatabase
         .select()
         .from(cibDetections)
         .where(
-          and(
-            eq(cibDetections.is_mitigated, false),
-            sql`${cibDetections.investigation_status} IN ('under_investigation', 'confirmed')`
-          )
+          sql`${cibDetections.metadata}->>'isMitigated' = 'false' AND ${cibDetections.metadata}->>'investigationStatus' IN ('under_investigation', 'confirmed')`
         )
-        .orderBy(desc(cibDetections.confidence_score), desc(cibDetections.created_at))
+        .orderBy(
+          desc(cibDetections.confidence_score),
+          desc(cibDetections.created_at)
+        )
         .limit(limit + 1)
         .offset(offset);
 
@@ -590,12 +628,14 @@ export class CIBDetectionService {
    * @param daysOld - Number of days old
    * @returns Number of records deleted
    */
-  async cleanupOldActivityLogs(daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS): Promise<number> {
+  async cleanupOldActivityLogs(
+    daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS
+  ): Promise<number> {
     try {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
       const result = await withTransaction(async (tx: DatabaseTransaction) => {
-        const deleted = await tx
+        const deleted = await readDatabase
           .delete(suspiciousActivityLogs)
           .where(
             and(
@@ -623,12 +663,14 @@ export class CIBDetectionService {
    * @param daysOld - Number of days old
    * @returns Number of records deleted
    */
-  async cleanupResolvedAnomalies(daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS): Promise<number> {
+  async cleanupResolvedAnomalies(
+    daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS
+  ): Promise<number> {
     try {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
       const result = await withTransaction(async (tx: DatabaseTransaction) => {
-        const deleted = await tx
+        const deleted = await readDatabase
           .delete(behavioralAnomalies)
           .where(
             and(

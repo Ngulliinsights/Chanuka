@@ -9,7 +9,7 @@ import React from 'react';
 
 import { cn } from '@client/shared/design-system';
 
-import { DashboardConfig } from '../types';
+import type { DashboardConfig } from '@client/shared/types/dashboard';
 
 interface DashboardContentProps {
   /** Unique identifier for accessibility */

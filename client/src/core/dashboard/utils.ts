@@ -2,7 +2,7 @@
  * Dashboard Utilities - Helper functions for dashboard operations
  */
 
-import type { WidgetConfig, WidgetSize, DashboardLayout } from '@client/shared/ui/dashboard/types';
+import type { WidgetConfig, WidgetSize, DashboardLayout } from '@client/shared/types/dashboard';
 
 export interface ChartData {
   labels: string[];
@@ -18,7 +18,11 @@ export interface ChartData {
 /**
  * Calculate widget dimensions based on size
  */
-export function getWidgetDimensions(size: 'small' | 'medium' | 'large' | 'full'): { width: number; height: number } {
+export function getWidgetDimensions(size: 'small' | 'medium' | 'large' | 'full' | WidgetSize): { width: number; height: number } {
+  if (typeof size === 'object') {
+    return { width: size.width, height: size.height };
+  }
+
   const dimensions = {
     small: { width: 3, height: 2 },
     medium: { width: 6, height: 4 },
@@ -73,7 +77,8 @@ export function widgetsOverlap(widget1: WidgetConfig, widget2: WidgetConfig): bo
  */
 export function findNextAvailablePosition(
   widget: WidgetConfig,
-  layout: DashboardLayout
+  layout: DashboardLayout,
+  existingWidgets: WidgetConfig[] = []
 ): { x: number; y: number } {
   const dimensions = getWidgetDimensions(widget.size);
 
@@ -94,9 +99,10 @@ export function findNextAvailablePosition(
 
   // Fallback to bottom of layout
   const maxY = Math.max(
-    ...layout.widgets.map(w => {
+    ...existingWidgets.map(w => {
       const dims = getWidgetDimensions(w.size);
-      return w.position.y + dims.height;
+      const position = typeof w.position === 'object' ? w.position : { x: (w.position as any), y: 0 };
+      return position.y + dims.height;
     }),
     0
   );
@@ -107,21 +113,20 @@ export function findNextAvailablePosition(
 /**
  * Optimize layout by removing gaps
  */
-export function optimizeLayout(layout: DashboardLayout): DashboardLayout {
-  const sortedWidgets = [...layout.widgets].sort((a, b) => {
-    if (a.position.y !== b.position.y) {
-      return a.position.y - b.position.y;
+export function optimizeLayout(layout: DashboardLayout, widgets: WidgetConfig[]): WidgetConfig[] {
+  const sortedWidgets = [...widgets].sort((a, b) => {
+    const aPos = typeof a.position === 'object' ? a.position : { x: (a.position as any), y: 0 };
+    const bPos = typeof b.position === 'object' ? b.position : { x: (b.position as any), y: 0 };
+    if (aPos.y !== bPos.y) {
+      return aPos.y - bPos.y;
     }
-    return a.position.x - b.position.x;
+    return aPos.x - bPos.x;
   });
 
   const optimizedWidgets: WidgetConfig[] = [];
 
   for (const widget of sortedWidgets) {
-    const optimizedPosition = findNextAvailablePosition(widget, {
-      ...layout,
-      widgets: optimizedWidgets,
-    });
+    const optimizedPosition = findNextAvailablePosition(widget, layout, optimizedWidgets);
 
     optimizedWidgets.push({
       ...widget,
@@ -129,19 +134,25 @@ export function optimizeLayout(layout: DashboardLayout): DashboardLayout {
     });
   }
 
-  return {
-    ...layout,
-    widgets: optimizedWidgets,
-  };
+  return optimizedWidgets;
 }
 
 /**
  * Calculate layout height
  */
-export function calculateLayoutHeight(layout: DashboardLayout): number {
-  if ((layout as any).widgets && (layout as any).widgets.length === 0) return 0;
+export function calculateLayoutHeight(widgets: WidgetConfig[]): number {
+  if (!widgets || widgets.length === 0) return 0;
 
-  return 0;
+  const maxY = Math.max(
+    ...widgets.map(w => {
+      const dims = getWidgetDimensions(w.size);
+      const position = typeof w.position === 'object' ? w.position : { x: (w.position as any), y: 0 };
+      return position.y + dims.height;
+    }),
+    0
+  );
+
+  return maxY * 60; // Rough estimate based on standard row height
 }
 
 /**
@@ -149,8 +160,9 @@ export function calculateLayoutHeight(layout: DashboardLayout): number {
  */
 export function generateResponsiveLayout(
   layout: DashboardLayout,
+  widgets: WidgetConfig[],
   breakpoint: 'mobile' | 'tablet' | 'desktop'
-): DashboardLayout {
+): { layout: DashboardLayout; widgets: WidgetConfig[] } {
   const columnMap = {
     mobile: 1,
     tablet: 6,
@@ -160,19 +172,21 @@ export function generateResponsiveLayout(
   const targetColumns = columnMap[breakpoint];
 
   if (targetColumns >= layout.columns) {
-    return layout; // No changes needed
+    return { layout, widgets }; // No changes needed
   }
 
   // Stack widgets vertically for smaller screens
-  const stackedWidgets = (layout as any).widgets ? (layout as any).widgets.map((widget: WidgetConfig, index: number) => ({
+  const stackedWidgets = widgets.map((widget: WidgetConfig, index: number) => ({
     ...widget,
     position: { x: 0, y: index * 4 }, // Stack with some spacing
     size: breakpoint === 'mobile' ? 'full' : widget.size,
-  })) : [];
+  }));
 
   return {
-    ...layout,
-    columns: targetColumns,
+    layout: {
+      ...layout,
+      columns: targetColumns,
+    },
     widgets: stackedWidgets,
   };
 }

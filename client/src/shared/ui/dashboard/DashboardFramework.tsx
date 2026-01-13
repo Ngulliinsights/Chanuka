@@ -16,9 +16,13 @@ import { DashboardContent } from './layout/DashboardContent';
 import { DashboardFooter } from './layout/DashboardFooter';
 import { DashboardHeader } from './layout/DashboardHeader';
 import { DashboardSidebar } from './layout/DashboardSidebar';
+import type {
+  DashboardConfig,
+  DashboardState,
+  ResponsiveLayout,
+} from '@client/shared/types/dashboard';
 import {
   DashboardFrameworkProps,
-  DashboardConfig,
   DashboardLayoutConfig,
   DashboardThemeConfig,
 } from './types';

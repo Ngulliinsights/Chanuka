@@ -19,8 +19,15 @@ import {
 
 // ==================== Type Definitions ====================
 
+import { RateLimitRule, RateLimitEvent, RateLimitId } from '@shared/types/domains/safeguards';
+import { UserId } from '@shared/types/core/common';
+import { Result, AppError } from '@shared/types/core/errors';
+
+export type { RateLimitRule, RateLimitEvent, RateLimitId } from '@shared/types/domains/safeguards';
+export type { UserId } from '@shared/types/core/common';
+
 export interface RateLimitContext {
-  userId?: string;
+  userId?: UserId;
   ipAddress?: string;
   deviceFingerprint?: string;
   sessionId?: string;

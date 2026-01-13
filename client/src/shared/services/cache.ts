@@ -649,17 +649,18 @@ export class CacheService {
 
       if (!entry) {
         this.metrics.misses++;
-        this.updateMetrics(startTime);
+        await this.updateMetrics(startTime);
         throw new CacheMissError(key, 'get');
       }
 
       this.metrics.hits++;
-      this.updateMetrics(startTime);
+      await this.updateMetrics(startTime);
 
       // Decompress if needed
-      let data = entry.data;
+      let data: T = entry.data;
       if (entry.compressed && this.compressionEnabled) {
-        data = await CacheCompression.decompress(entry.data as Uint8Array, entry.compressionAlgorithm!);
+        const decompressed = await CacheCompression.decompress(entry.data as unknown as Uint8Array, entry.compressionAlgorithm!);
+        data = decompressed as T;
       }
 
       return data as T;
@@ -685,7 +686,7 @@ export class CacheService {
 
     try {
       // Compress data if enabled
-      let cacheData = data;
+      let cacheData: T | Uint8Array = data;
       let compressed = false;
       let compressionAlgorithm: string | undefined;
 
@@ -708,7 +709,7 @@ export class CacheService {
       };
 
       await this.storage.set(key, entry);
-      this.updateMetrics(startTime);
+      await this.updateMetrics(startTime);
     } catch (error) {
       throw ServiceErrorFactory.createCacheError(
         'Failed to set in cache',
@@ -788,11 +789,11 @@ export class CacheService {
   /**
    * Update metrics after operation
    */
-  private updateMetrics(startTime: number): void {
+  private async updateMetrics(startTime: number): Promise<void> {
     if (!this.config.metrics) return;
 
     const accessTime = performance.now() - startTime;
-    this.metrics.size = this.storage.size();
+    this.metrics.size = await this.storage.size();
     this.metrics.hitRate = this.metrics.totalOperations > 0
       ? (this.metrics.hits / this.metrics.totalOperations) * 100
       : 0;

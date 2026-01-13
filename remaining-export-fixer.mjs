@@ -2,9 +2,9 @@
 
 /**
  * REMAINING EXPORT FIXER
- * 
+ *
  * Fixes the remaining 28 missing export issues identified in the analysis.
- * 
+ *
  * Usage:
  *   node remaining-export-fixer.mjs                    # Preview fixes
  *   DRY_RUN=false node remaining-export-fixer.mjs     # Apply fixes
@@ -15,9 +15,9 @@ import fsSync from 'fs';
 import path from 'path';
 
 const CONFIG = {
-    rootDir: process.cwd(),
+    rootDir: path.join(process.cwd(), '..'),
     dryRun: process.env.DRY_RUN !== 'false',
-    
+
     // Remaining missing exports to fix
     fixes: [
         // Test files
@@ -34,13 +34,13 @@ const CONFIG = {
             file: 'tests/utilities/shared/form/base-form-testing.ts',
             exports: ['BaseFormTestingUtils']
         },
-        
+
         // Client logger
         {
             file: 'client/src/utils/logger.ts',
             exports: ['UnifiedLogger']
         },
-        
+
         // Shared database
         {
             file: 'shared/database/utils/base-script.ts',
@@ -50,7 +50,7 @@ const CONFIG = {
             file: 'client/src/types/core.ts',
             exports: ['logger']
         },
-        
+
         // Rate limiting
         {
             file: 'shared/core/rate-limiting/algorithms/sliding-window.ts',
@@ -60,7 +60,7 @@ const CONFIG = {
             file: 'shared/core/rate-limiting/algorithms/token-bucket.ts',
             exports: ['TokenBucketStore']
         },
-        
+
         // Caching
         {
             file: 'shared/core/caching/cache.ts',
@@ -71,13 +71,13 @@ const CONFIG = {
             file: 'shared/core/caching/types.ts',
             exports: ['CacheMetrics', 'CacheHealthStatus', 'CacheTierStats']
         },
-        
+
         // Server websocket
         {
             file: 'server/infrastructure/websocket/adapters/websocket-adapter.ts',
             exports: ['WebSocketAdapter']
         },
-        
+
         // Client UI missing files
         {
             file: 'client/src/shared/ui/templates/utils/error-handling.ts',
@@ -128,19 +128,19 @@ async function fileExists(filePath) {
 function generateFileContent(fileName, exports) {
     const isReact = fileName.includes('.tsx');
     const isTest = fileName.includes('test') || fileName.includes('spec');
-    
+
     let content = '';
-    
+
     if (isReact) {
         content += `import React from 'react';\n\n`;
     }
-    
+
     if (isTest) {
         content += `// Generated test utilities\n\n`;
     } else {
         content += `// Generated exports for ${fileName}\n\n`;
     }
-    
+
     for (const exportName of exports) {
         if (exportName === 'default') {
             if (isReact) {
@@ -160,7 +160,7 @@ function generateFileContent(fileName, exports) {
             content += `export const ${exportName} = {\n  // Generated export\n};\n\n`;
         }
     }
-    
+
     return content;
 }
 
@@ -188,23 +188,23 @@ function generateExportCode(exportName) {
 
 async function fixRemainingExports() {
     log.info('Fixing remaining missing exports...');
-    
+
     let fixedCount = 0;
     let createdCount = 0;
-    
+
     for (const { file, exports, create } of CONFIG.fixes) {
         const filePath = path.join(CONFIG.rootDir, file);
-        
+
         if (!(await fileExists(filePath))) {
             if (create) {
                 // Create the file
                 const content = generateFileContent(file, exports);
-                
+
                 if (!CONFIG.dryRun) {
                     await fs.mkdir(path.dirname(filePath), { recursive: true });
                     await fs.writeFile(filePath, content, 'utf-8');
                 }
-                
+
                 log.fix(`Created ${file} with exports: ${exports.join(', ')}`);
                 createdCount++;
                 continue;
@@ -213,35 +213,35 @@ async function fixRemainingExports() {
                 continue;
             }
         }
-        
+
         // Add exports to existing file
         const content = await fs.readFile(filePath, 'utf-8');
         let newContent = content;
         let hasChanges = false;
-        
+
         for (const exportName of exports) {
             // Check if export already exists
             const exportRegex = new RegExp(`export.*${exportName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g');
             if (exportRegex.test(content)) {
                 continue;
             }
-            
+
             // Add export
             const exportCode = generateExportCode(exportName);
             newContent += exportCode;
             hasChanges = true;
         }
-        
+
         if (hasChanges) {
             if (!CONFIG.dryRun) {
                 await fs.writeFile(filePath, newContent, 'utf-8');
             }
-            
+
             log.fix(`Added exports to ${file}: ${exports.join(', ')}`);
             fixedCount++;
         }
     }
-    
+
     log.success(`Fixed ${fixedCount} files, created ${createdCount} files`);
 }
 
@@ -254,9 +254,9 @@ Mode: ${CONFIG.dryRun ? '🔍 Dry Run (Preview)' : '⚡ Live (Applied)'}
 Remaining Issues: ${CONFIG.fixes.length}
 ======================================================================
 `);
-    
+
     await fixRemainingExports();
-    
+
     console.log(`
 ======================================================================
 ✅ FIXING COMPLETE

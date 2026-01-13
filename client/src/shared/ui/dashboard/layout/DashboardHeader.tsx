@@ -8,7 +8,7 @@ import React from 'react';
 
 import { Button, cn } from '@client/shared/design-system';
 
-import { DashboardConfig } from '../types';
+import type { DashboardConfig } from '@client/shared/types/dashboard';
 
 interface DashboardHeaderProps {
   /** Dashboard configuration */

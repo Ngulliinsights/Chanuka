@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
-const SCHEMA_DIR = path.join(__dirname, 'shared/schema');
+const SCHEMA_DIR = path.join(__dirname, '../shared/schema');
 
 // Track migration statistics
 const stats = {

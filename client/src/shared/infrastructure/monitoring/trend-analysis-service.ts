@@ -3,12 +3,12 @@
  * Analyzes error trends and provides alerting capabilities
  */
 
+import { ErrorAggregationService } from './error-aggregation-service';
 import {
   TrendAnalysisService as ITrendAnalysisService,
   ClientSystem,
   ErrorSeverity
 } from './unified-error-monitoring-interface';
-import { ErrorAggregationService } from './error-aggregation-service';
 
 interface TrendDataPoint {
   timestamp: number;
@@ -132,8 +132,8 @@ class TrendAnalysisService implements ITrendAnalysisService {
 
     // Get error data from the last 5 minutes
     Object.values(ClientSystem).forEach(system => {
-      const systemErrors = this.aggregationService.getAggregatedErrors().filter(
-        err => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
+      const systemErrors = (await this.aggregationService.aggregateErrors()).errors.filter(
+        (err: any) => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
       );
 
       if (systemErrors.length > 0) {
@@ -238,10 +238,10 @@ class TrendAnalysisService implements ITrendAnalysisService {
     prediction: number;
   }> {
     const trends: Array<{
-      system: ClientSystem;
-      direction: 'increasing' | 'decreasing' | 'stable';
-      slope: number;
+      pattern: string;
+      trend: 'increasing' | 'decreasing' | 'stable';
       confidence: number;
+      prediction: number;
     }> = [];
     const systems = Object.values(ClientSystem);
 

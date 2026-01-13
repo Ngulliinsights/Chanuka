@@ -6,7 +6,8 @@ import { handleError, measureAsync, recordMetric } from '@client/core';
 import { Button, Card, CardContent, CardHeader } from '../../design-system';
 
 import { useDashboard } from './hooks';
-import type { DashboardComponentProps, DashboardConfig } from './types';
+import type { DashboardComponentProps } from './types';
+import type { DashboardConfig } from '@client/shared/types/dashboard';
 import { validateActivitySummary } from './validation';
 
 export const ActivitySummary = React.memo<DashboardComponentProps>(

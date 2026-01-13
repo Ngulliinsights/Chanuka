@@ -2,7 +2,17 @@
  * Dashboard Widget Definitions - Consolidated widget configurations
  */
 
-import { WidgetConfig, WidgetType, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from './types';
+import type { WidgetConfig, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/shared/types/dashboard';
+
+// Widget type definitions
+export enum WidgetType {
+  ANALYTICS = 'analytics',
+  METRICS = 'metrics',
+  CHART = 'chart',
+  TABLE = 'table',
+  LIST = 'list',
+  CARD = 'card'
+}
 
 /**
  * Widget factory functions for creating common widget configurations

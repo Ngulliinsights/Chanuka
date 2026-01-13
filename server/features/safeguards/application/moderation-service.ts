@@ -13,46 +13,11 @@ import { and, asc, desc, eq, gte, inArray,lte, or, sql } from 'drizzle-orm';
 
 // ==================== Type Definitions ====================
 
-export interface ModerationContext {
-  contentType: string;
-  contentId: string;
-  authorId: string;
-  billId?: string;
-  triggerType: string;
-  triggerConfidence?: number;
-  automatedSignals?: Record<string, unknown>;
-  flagReasons?: string[];
-  flaggedBy?: string[];
-  flagCount?: number;
-  priority?: number;
-  tribalIncitementDetected?: boolean;
-  hateSpeechLanguage?: string;
-  targetsProtectedGroup?: boolean;
-  violenceThreatLevel?: string;
-}
+import { ModerationContext, ModerationDecision, ModerationAppeal } from '@shared/types/domains/safeguards';
+import { Result, AppError } from '@shared/types/core/errors';
 
-export interface ModerationDecisionContext {
-  queueItemId: string;
-  moderatorId: string;
-  decision: string;
-  decisionReason: string;
-  violatedPolicies?: string[];
-  actionTaken: 'approve' | 'reject' | 'flag_for_review' | 'remove' | 'warn_user' | 'suspend_user' | 'ban_user' | 'require_edit' | 'escalate' | 'dismiss';
-  confidenceLevel?: string;
-  userNotified?: boolean;
-  reputationPenalty?: number;
-  suspensionDurationHours?: number;
-  isPermanentBan?: boolean;
-  reviewNotes?: string;
-}
-
-export interface ModerationAppealContext {
-  decisionId: string;
-  appellantUserId: string;
-  appealReasoning: string;
-  appealGrounds?: string[];
-  supportingEvidence?: Record<string, unknown>;
-}
+// Using standardized types from the new safeguards domain
+export { ModerationContext, ModerationDecision, ModerationAppeal } from '@shared/types/domains/safeguards';
 
 export interface ModerationQueueResult {
   success: boolean;
@@ -107,60 +72,32 @@ function getErrorMessage(error: unknown): string {
   return String(error);
 }
 
+import { isModerationContext, isModerationDecision, isModerationAppeal } from '@shared/types/domains/safeguards';
+
 /**
- * Validate moderation context
+ * Validate moderation context using standardized type guard
  */
-function validateModerationContext(context: ModerationContext): void {
-  if (!context.contentType) {
-    throw new Error('Content type is required');
-  }
-  if (!context.contentId) {
-    throw new Error('Content ID is required');
-  }
-  if (!context.authorId) {
-    throw new Error('Author ID is required');
-  }
-  if (!context.triggerType) {
-    throw new Error('Trigger type is required');
-  }
-  if (context.priority !== undefined && (context.priority < 1 || context.priority > 5)) {
-    throw new Error('Priority must be between 1 and 5');
+function validateModerationContext(context: unknown): asserts context is ModerationContext {
+  if (!isModerationContext(context)) {
+    throw new Error('Invalid moderation context');
   }
 }
 
 /**
- * Validate decision context
+ * Validate moderation decision using standardized type guard
  */
-function validateDecisionContext(context: ModerationDecisionContext): void {
-  if (!context.queueItemId) {
-    throw new Error('Queue item ID is required');
-  }
-  if (!context.moderatorId) {
-    throw new Error('Moderator ID is required');
-  }
-  if (!context.decision) {
-    throw new Error('Decision is required');
-  }
-  if (!context.decisionReason) {
-    throw new Error('Decision reason is required');
-  }
-  if (!context.actionTaken) {
-    throw new Error('Action taken is required');
+function validateModerationDecision(decision: unknown): asserts decision is ModerationDecision {
+  if (!isModerationDecision(decision)) {
+    throw new Error('Invalid moderation decision');
   }
 }
 
 /**
- * Validate appeal context
+ * Validate moderation appeal using standardized type guard
  */
-function validateAppealContext(context: ModerationAppealContext): void {
-  if (!context.decisionId) {
-    throw new Error('Decision ID is required');
-  }
-  if (!context.appellantUserId) {
-    throw new Error('Appellant user ID is required');
-  }
-  if (!context.appealReasoning) {
-    throw new Error('Appeal reasoning is required');
+function validateModerationAppeal(appeal: unknown): asserts context is ModerationAppeal {
+  if (!isModerationAppeal(appeal)) {
+    throw new Error('Invalid moderation appeal');
   }
 }
 
@@ -402,13 +339,13 @@ export class ModerationService {
   /**
    * Record moderation decision with transactional consistency
    * Ensures queue item status is updated atomically with decision creation
-   * @param context - Decision context with details
+   * @param decision - Standardized moderation decision
    * @returns Result with decision ID
    */
-  async recordDecision(context: ModerationDecisionContext): Promise<ModerationDecisionResult> {
+  async recordDecision(decision: ModerationDecision): Promise<ModerationDecisionResult> {
     try {
       // Validate input
-      validateDecisionContext(context);
+      validateModerationDecision(decision);
 
       return await withTransaction(async (tx: DatabaseTransaction) => {
         // Verify queue item exists and is assigned to this moderator using raw SQL
@@ -418,7 +355,7 @@ export class ModerationService {
           LIMIT 1
         `;
 
-        const queueItem = await tx.query<ModerationQueueItem[]>(queueQuery, [context.queueItemId]);
+        const queueItem = await tx.query<ModerationQueueItem[]>(queueQuery, [decision.queueItemId]);
 
         if (!queueItem || queueItem.length === 0) {
           throw new Error('Queue item not found');
@@ -428,7 +365,7 @@ export class ModerationService {
           throw new Error('Queue item not found');
         }
 
-        if (queueItem[0].assigned_to !== context.moderatorId) {
+        if (queueItem[0].assigned_to !== decision.moderatorId) {
           throw new Error('Queue item not assigned to this moderator');
         }
 
@@ -449,17 +386,17 @@ export class ModerationService {
         `;
 
         const result = await tx.query<ModerationDecision[]>(insertDecisionQuery, [
-          context.queueItemId,
-          context.moderatorId,
-          context.actionTaken,
-          context.decisionReason,
-          null, // user_affected
-          context.suspensionDurationHours || null,
-          context.reputationPenalty || null,
-          false,
-          0,
-          true,
-          true
+          decision.queueItemId,
+          decision.moderatorId,
+          decision.actionTaken,
+          decision.decisionReason,
+          decision.userAffected,
+          decision.penaltyDurationHours,
+          decision.reputationImpact,
+          decision.requiredPeerReview,
+          decision.peerReviewCount,
+          decision.isAppealable,
+          decision.isPublic
         ]);
 
         // Update queue item status using raw SQL
@@ -471,12 +408,12 @@ export class ModerationService {
           WHERE id = $1
         `;
 
-        await tx.query(updateQueueQuery, [context.queueItemId]);
+        await tx.query(updateQueueQuery, [decision.queueItemId]);
 
         logger.info('Moderation decision recorded', {
           decisionId: result[0].id,
-          queueItemId: context.queueItemId,
-          action: context.actionTaken,
+          queueItemId: decision.queueItemId,
+          action: decision.actionTaken,
         });
 
         return {
@@ -487,7 +424,7 @@ export class ModerationService {
     } catch (error) {
       logger.error('Failed to record moderation decision', {
         error: getErrorMessage(error),
-        context,
+        decision,
       });
       return {
         success: false,
@@ -528,13 +465,13 @@ export class ModerationService {
   /**
    * File appeal against moderation decision with validation
    * Prevents duplicate appeals for the same decision
-   * @param context - Appeal context with reasoning
+   * @param appeal - Standardized moderation appeal
    * @returns Result with appeal ID
    */
-  async fileAppeal(context: ModerationAppealContext): Promise<ModerationAppealResult> {
+  async fileAppeal(appeal: ModerationAppeal): Promise<ModerationAppealResult> {
     try {
       // Validate input
-      validateAppealContext(context);
+      validateModerationAppeal(appeal);
 
       return await withTransaction(async (tx: DatabaseTransaction) => {
         // Verify decision exists and is appealable using raw SQL
@@ -544,7 +481,7 @@ export class ModerationService {
           LIMIT 1
         `;
 
-        const decision = await tx.query<ModerationDecision[]>(decisionQuery, [context.decisionId]);
+        const decision = await tx.query<ModerationDecision[]>(decisionQuery, [appeal.decisionId]);
 
         if (!decision || decision.length === 0) {
           throw new Error('Decision not found');
@@ -566,7 +503,7 @@ export class ModerationService {
           LIMIT 1
         `;
 
-        const existingAppeal = await tx.query<ModerationAppeal[]>(existingAppealQuery, [context.decisionId]);
+        const existingAppeal = await tx.query<ModerationAppeal[]>(existingAppealQuery, [appeal.decisionId]);
 
         if (existingAppeal && existingAppeal.length > 0) {
           throw new Error('Appeal already pending for this decision');
@@ -583,15 +520,15 @@ export class ModerationService {
         `;
 
         const result = await tx.query<ModerationAppeal[]>(insertAppealQuery, [
-          context.decisionId,
-          context.appellantUserId,
-          context.appealReasoning,
-          JSON.stringify(context.supportingEvidence || [])
+          appeal.decisionId,
+          appeal.appellantUserId,
+          appeal.appealReasoning,
+          JSON.stringify(appeal.supportingEvidence || {})
         ]);
 
         logger.info('Moderation appeal filed', {
           appealId: result[0]?.id,
-          decisionId: context.decisionId,
+          decisionId: appeal.decisionId,
         });
 
         return {
@@ -602,7 +539,7 @@ export class ModerationService {
     } catch (error) {
       logger.error('Failed to file moderation appeal', {
         error: getErrorMessage(error),
-        context,
+        appeal,
       });
       return {
         success: false,

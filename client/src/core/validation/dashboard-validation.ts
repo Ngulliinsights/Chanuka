@@ -6,7 +6,7 @@ import type {
   ActionItem,
   TrackedTopic,
   DashboardData,
-  DashboardConfig,
+  DashboardAppConfig,
 } from '@client/shared/types/dashboard';
 
 export function validateActionItem(action: ActionItem): void {
@@ -107,7 +107,7 @@ export function validateDashboardData(data: DashboardData): void {
   });
 }
 
-export function validateDashboardConfig(config: DashboardConfig): void {
+export function validateDashboardConfig(config: DashboardAppConfig): void {
   if (typeof config.refreshInterval !== 'number' || config.refreshInterval < 0) {
     throw new Error('Dashboard config refresh interval must be a non-negative number');
   }

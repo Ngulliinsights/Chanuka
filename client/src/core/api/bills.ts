@@ -1,29 +1,21 @@
-import type { Bill } from '@client/shared/types';
+import type {
+  Bill,
+  BillAnalysis,
+  BillsSearchParams,
+  PaginatedBillsResponse,
+  Sponsor,
+  BillCategory,
+} from '@client/shared/types/bill';
 import { logger } from '@client/shared/utils/logger';
 
 import { globalApiClient } from './client';
 
-// ============================================================================
-// Types
-// ============================================================================
-
-export interface BillsSearchParams {
-  query?: string;
-  status?: string[];
-  category?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface PaginatedBillsResponse {
-  data: Bill[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+// Re-export unified bill types for backward compatibility
+export type {
+  BillAnalysis,
+  Sponsor,
+  BillCategory,
+} from '@client/shared/types/bill';
 
 export interface Comment {
   id: number;
@@ -74,33 +66,7 @@ export interface CreatePollPayload {
   endDate?: string;
 }
 
-export interface Sponsor {
-  id: number;
-  name: string;
-  party: string;
-  state: string;
-  isPrimary: boolean;
-  imageUrl?: string;
-}
-
-export interface BillAnalysis {
-  id: number;
-  billId: number;
-  summary: string;
-  impact: {
-    economic?: string;
-    social?: string;
-    environmental?: string;
-  };
-  stakeholders: string[];
-  sentiment: {
-    positive: number;
-    neutral: number;
-    negative: number;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+// Sponsor and BillAnalysis are now imported from @client/shared/types/bill
 
 export interface SponsorshipAnalysis {
   billId: number;
@@ -147,12 +113,7 @@ export interface FinancialNetworkAnalysis {
   networkDensity: number;
 }
 
-export interface BillCategory {
-  id: string;
-  name: string;
-  description: string;
-  billCount: number;
-}
+// BillCategory is now imported from @client/shared/types/bill
 
 export interface BillStatus {
   id: string;

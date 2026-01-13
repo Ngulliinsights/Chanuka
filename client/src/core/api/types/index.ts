@@ -109,9 +109,12 @@ export {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
-  type Bill,
-  type Sponsor,
-  type BillsQueryParams,
+} from './bill';
+
+export type {
+  Bill,
+  Sponsor,
+  BillsQueryParams,
 } from './bill';
 
 // Community types

@@ -1,8 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { communityApiService } from '@client/core/api/community';
-import type { CommentQueryOptions, VoteResponse } from '@client/core/api/community';
-import type { Comment, DiscussionThread } from '@client/shared/types';
+import type {
+  CommentQueryOptions,
+  VoteResponse,
+  Comment,
+  DiscussionThread,
+  CreateCommentRequest,
+  UpdateCommentRequest,
+  VoteRequest,
+  CreateThreadRequest,
+  ShareRequest,
+} from '@client/shared/types/community';
 import { useToast } from '@client/shared/hooks/use-toast';
 
 // Define CommunityFilters interface locally since it's not exported from types
@@ -14,34 +23,6 @@ interface CommunityFilters {
     districts?: string[];
     counties?: string[];
   };
-}
-// Additional interfaces for API requests
-interface CreateCommentRequest {
-  bill_id: number;
-  content: string;
-  parent_id?: string;
-}
-
-interface UpdateCommentRequest {
-  content: string;
-}
-
-interface VoteRequest {
-  comment_id: string;
-  vote_type: 'up' | 'down';
-}
-
-interface CreateThreadRequest {
-  billId: number;
-  title: string;
-  description?: string;
-}
-
-interface ShareRequest {
-  platform: string;
-  url: string;
-  title: string;
-  description?: string;
 }
 
 interface ShareResponse {

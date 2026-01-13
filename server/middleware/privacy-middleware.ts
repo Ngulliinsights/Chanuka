@@ -1,7 +1,7 @@
-import { privacyService } from '@server/features/privacy/privacy-service.ts';
+import { privacyService } from '@server/features/privacy/privacy-service';
 import { logger   } from '@shared/core';
-import { auditLogger } from '@shared/infrastructure/monitoring/audit-log.js';
-import { AuthenticatedRequest } from '@shared/middleware/auth.js';
+import { auditLogger } from '@shared/infrastructure/monitoring/audit-log';
+import { AuthenticatedRequest } from '@server/middleware/auth';
 import { NextFunction,Request, Response } from 'express';
 
 export interface PrivacyRequest extends AuthenticatedRequest {
@@ -26,7 +26,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
 
       const user_id = req.user.id;
       const preferences = await privacyService.getPrivacyPreferences(user_id);
-      
+
       // Attach privacy consent to request
       req.privacyConsent = preferences.dataProcessing;
 
@@ -127,7 +127,7 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
       // Add response time logging
       const originalSend = res.send;
       res.send = function(data) { const responseTime = Date.now() - startTime;
-        
+
         // Log response details for high sensitivity data
         if (sensitivityLevel === 'high') {
           auditLogger.log({
@@ -166,7 +166,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
     try {
       // Check for cookie consent in request headers or cookies
       const cookieConsent = req.cookies?.cookieConsent;
-      
+
       if (cookieConsent) {
         const consent = JSON.parse(cookieConsent);
         if (!consent[cookieType]) {
@@ -180,7 +180,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
       } else if (req.user) { // Check user's privacy preferences for authenticated users
         const user_id = req.user.id;
         const preferences = await privacyService.getPrivacyPreferences(user_id);
-        
+
         if (!preferences.cookies[cookieType]) {
           return res.status(403).json({
             error: 'Cookie consent required',
@@ -210,10 +210,10 @@ export const addPrivacyHeaders = (req: Request, res: Response, next: NextFunctio
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
+
   // Add data processing transparency header
   res.setHeader('X-Data-Processing', 'GDPR-Compliant');
-  
+
   // Add cache control for sensitive data
   if (req.originalUrl.includes('/privacy/') || req.originalUrl.includes('/profile/')) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -251,7 +251,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
  */
 export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => {
   const originalIP = req.ip || req.connection.remoteAddress || '';
-  
+
   // Anonymize IPv4 addresses (remove last octet)
   if (originalIP.includes('.')) {
     const parts = originalIP.split('.');
