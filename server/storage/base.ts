@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool';
+import { db } from '@server/infrastructure/database/pool';
 
 export interface StorageConfig {
   prefix?: string;

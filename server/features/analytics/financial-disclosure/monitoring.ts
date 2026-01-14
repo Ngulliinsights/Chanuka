@@ -7,7 +7,7 @@ import { logger } from '@shared/core/observability/logging/logger.js';
 import {
   notifications,
   sponsors,
-  sponsorTransparency} from '@shared/schema/schema.js';
+  sponsorTransparency} from '@server/infrastructure/schema/schema.js';
 import { and, desc, eq, gte, inArray,sql } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
 

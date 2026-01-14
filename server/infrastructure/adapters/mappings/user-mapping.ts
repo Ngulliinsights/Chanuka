@@ -6,7 +6,7 @@
  */
 
 import { EntityMapping } from '@shared/drizzle-adapter';
-import { users } from '@shared/schema';
+import { users } from '@server/infrastructure/schema';
 
 import { User } from '@/features/users/domain/entities/user';
 

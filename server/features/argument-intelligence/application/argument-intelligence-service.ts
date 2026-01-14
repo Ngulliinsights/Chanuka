@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool.js';
+import { db } from '@server/infrastructure/database/pool.js';
 import {
   type Argument,
   argument_relationships,
@@ -12,7 +12,7 @@ import {
   legislative_briefs,
   type LegislativeBrief,
   synthesis_jobs
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================

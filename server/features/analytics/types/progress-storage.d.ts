@@ -1,5 +1,5 @@
 import { logger } from '@shared/core';
-import { type InsertUserProgress, type UserProgress } from '@shared/schema/platform_operations';
+import { type InsertUserProgress, type UserProgress } from '@server/infrastructure/schema/platform_operations';
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
 

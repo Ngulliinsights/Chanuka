@@ -1,6 +1,6 @@
 import { auditLogger } from '@server/infrastructure/monitoring/index.js';
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import {
   bill_engagement,
   comment_votes,
@@ -14,7 +14,7 @@ import {
   user_interest,
   user_profiles,
   user_progress,
-  userSocialProfile} from "@shared/schema";
+  userSocialProfile} from '@server/infrastructure/schema';
 import { and, eq, lt, sql } from "drizzle-orm";
 
 export interface UserDataExport {

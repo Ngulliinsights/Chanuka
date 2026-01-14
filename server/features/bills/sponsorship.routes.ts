@@ -1,7 +1,7 @@
 import { logger   } from '@shared/core';
 import { asyncHandler } from '@shared/core/observability/error-management/middleware/express-error-middleware';
 import { ApiError, ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api-utils.js';
-import { bill_sponsorships, bills, billSectionConflicts,sponsorAffiliations, sponsors, sponsorTransparency } from '@shared/schema/index.ts';
+import { bill_sponsorships, bills, billSectionConflicts,sponsorAffiliations, sponsors, sponsorTransparency } from '@server/infrastructure/schema/index.ts';
 import { and,count, desc, eq, sql } from 'drizzle-orm';
 import express, { Router } from 'express';
 

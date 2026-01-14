@@ -1,4 +1,4 @@
-import { type Bill,bills } from '@shared/schema';
+import { type Bill,bills } from '@server/infrastructure/schema';
 import { and, desc, eq, like, or, sql } from 'drizzle-orm';
 
 import { BaseStorage } from './base';

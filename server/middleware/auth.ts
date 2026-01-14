@@ -1,4 +1,4 @@
-import { authService } from '@server/core/auth/auth-service';
+import { authService } from '@server/infrastructure/core/auth/auth-service';
 import { logger   } from '@shared/core';
 import { NextFunction,Request, Response } from 'express';
 

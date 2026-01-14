@@ -8,7 +8,7 @@ import type { ConflictDetectionResult } from '@server/features/sponsors/applicat
 // Adjust path based on final location of sponsor conflict analysis
 import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
 import { logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { and,eq } from 'drizzle-orm';
 
 import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results

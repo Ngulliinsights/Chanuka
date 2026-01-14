@@ -1,7 +1,7 @@
 import { logger } from '@shared/core';
-import { database as db } from '@shared/database';
-import { notifications } from '@shared/schema';
-import { alert_preferences, user_contact_methods } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { notifications } from '@server/infrastructure/schema';
+import { alert_preferences, user_contact_methods } from '@server/infrastructure/schema';
 import { and, count, desc, eq, inArray,sql } from 'drizzle-orm';
 
 // Types for notification operations

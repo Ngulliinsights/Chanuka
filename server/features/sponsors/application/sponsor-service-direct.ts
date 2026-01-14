@@ -1,9 +1,9 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool.js';
+import { db } from '@server/infrastructure/database/pool.js';
 import {
 type Bill,
 bill_cosponsors, bills, type InsertSponsor,   type Sponsor, sponsor_affiliations, sponsor_transparency,
-  sponsors} from '@shared/schema';
+  sponsors} from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, inArray, isNotNull,isNull, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================

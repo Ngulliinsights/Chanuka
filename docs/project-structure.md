@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** January 14, 2026 at 04:14 PM
+**Generated:** January 14, 2026 at 10:28 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,568
+**Total Items:** 3,509
 
 ```
 .
@@ -1783,8 +1783,13 @@
 ├── plans/
 │   ├── COMPREHENSIVE_REDUNDANCY_CONSOLIDATION_PLAN.md
 │   ├── dashboard-consolidation-plan.md
+│   ├── design.md
 │   ├── GRAPH_SCHEMA_ANALYSIS_AND_INTEGRATION_PLAN.md
-│   └── HOOKS_CONSOLIDATION_OPPORTUNITIES.md
+│   ├── HOOKS_CONSOLIDATION_OPPORTUNITIES.md
+│   ├── implementation-plan.md
+│   ├── QUALITY_COMPARISON_FRAMEWORK.md
+│   ├── QUALITY_COMPARISON_RESULTS.md
+│   └── requirements.md
 ├── playwright-report/
 │   └── index.html
 ├── scripts/
@@ -2897,20 +2902,6 @@
 │   │   │   ├── registry.ts
 │   │   │   ├── types.ts
 │   │   │   └── unified.ts
-│   │   ├── modernization/
-│   │   │   ├── cleanup/
-│   │   │   │   ├── backup-system.ts
-│   │   │   │   ├── cli.ts
-│   │   │   │   ├── executor.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── orchestrator.ts
-│   │   │   ├── analysis.ts
-│   │   │   ├── backup.ts
-│   │   │   ├── index.ts
-│   │   │   ├── orchestrator.ts
-│   │   │   ├── progress.ts
-│   │   │   ├── types.ts
-│   │   │   └── validation.ts
 │   │   ├── observability/
 │   │   │   ├── error-management/
 │   │   │   │   ├── analytics/
@@ -2997,56 +2988,6 @@
 │   │   │   │   ├── maybe.ts
 │   │   │   │   └── result.ts
 │   │   │   └── index.ts
-│   │   ├── rate-limiting/
-│   │   │   ├── adapters/
-│   │   │   │   ├── fixed-window-adapter.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── memory-adapter.ts
-│   │   │   │   ├── sliding-window-adapter.ts
-│   │   │   │   └── token-bucket-adapter.ts
-│   │   │   ├── algorithms/
-│   │   │   │   ├── fixed-window.ts
-│   │   │   │   ├── interfaces.ts
-│   │   │   │   ├── sliding-window.ts
-│   │   │   │   └── token-bucket.ts
-│   │   │   ├── core/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── interfaces.ts
-│   │   │   │   └── service.ts
-│   │   │   ├── middleware/
-│   │   │   │   ├── express-middleware.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── services/
-│   │   │   │   └── rate-limiting-service.ts
-│   │   │   ├── stores/
-│   │   │   │   ├── memory-store.ts
-│   │   │   │   └── redis-store.ts
-│   │   │   ├── ai-rate-limiter.ts
-│   │   │   ├── factory.ts
-│   │   │   ├── index.ts
-│   │   │   ├── metrics.ts
-│   │   │   ├── middleware.ts
-│   │   │   └── types.ts
-│   │   ├── repositories/
-│   │   │   ├── interfaces/
-│   │   │   │   ├── bill-repository.interface.ts
-│   │   │   │   └── sponsor-repository.interface.ts
-│   │   │   ├── test-implementations/
-│   │   │   │   ├── bill-test-repository.ts
-│   │   │   │   └── sponsor-test-repository.ts
-│   │   │   └── index.ts
-│   │   ├── services/
-│   │   │   ├── interfaces/
-│   │   │   │   ├── bill-service.interface.ts
-│   │   │   │   └── notification-service.interface.ts
-│   │   │   ├── test-implementations/
-│   │   │   │   ├── bill-test-service.ts
-│   │   │   │   └── notification-test-service.ts
-│   │   │   ├── cache.ts
-│   │   │   ├── composition.ts
-│   │   │   ├── index.ts
-│   │   │   ├── rate-limit.ts
-│   │   │   └── validation.ts
 │   │   ├── types/
 │   │   │   ├── auth.types.ts
 │   │   │   ├── feature-flags.ts

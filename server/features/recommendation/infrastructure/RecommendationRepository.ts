@@ -1,4 +1,4 @@
- import { readDatabase } from '@shared/database';
+ import { readDatabase } from '@server/infrastructure/database';
 import type { PlainBill } from '@shared/domain/recommendation.dto';
 import {
   bill_cosponsors,
@@ -7,7 +7,7 @@ import {
   bills,
   sponsors,
   user_interests,
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 import { and, count,desc, eq, gt, inArray, or, SQL, sql } from 'drizzle-orm';
 
  import { databaseService } from '@/services/database-service';

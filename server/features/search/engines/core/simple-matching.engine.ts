@@ -5,8 +5,8 @@
 // Replaces basic LIKE queries with proper full-text search capabilities
 
 import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { database } from '@shared/database';
-import { bills, comments,sponsors } from '@shared/schema';
+import { database } from '@server/infrastructure/database';
+import { bills, comments,sponsors } from '@server/infrastructure/schema';
 import { desc,ilike, or, sql } from 'drizzle-orm';
 // Simple logger for search engine
 const logger = {

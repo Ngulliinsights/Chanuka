@@ -6,7 +6,7 @@
  */
 
 import type { Maybe,Result } from '@shared/core';
-import type { NewSponsor,Sponsor } from '@shared/schema';
+import type { NewSponsor,Sponsor } from '@server/infrastructure/schema';
 
 export interface ISponsorRepository {
   /**

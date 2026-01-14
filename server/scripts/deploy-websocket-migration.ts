@@ -6,7 +6,7 @@
 // Migrates from custom WebSocket service to Socket.IO with zero downtime
 
 import { logger } from '@shared/core/observability/logging';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { users } from '@shared/schema.js';
 import { eq } from 'drizzle-orm';
 import { Server as HttpServer } from 'http';

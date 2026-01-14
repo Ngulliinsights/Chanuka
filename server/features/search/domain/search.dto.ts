@@ -1,4 +1,4 @@
-import type { Bill } from '@shared/schema';
+import type { Bill } from '@server/infrastructure/schema';
 
 /* ----------  Search Query  ---------- */
 export interface SearchFilters {

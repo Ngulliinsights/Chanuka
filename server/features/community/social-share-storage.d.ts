@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
-import type { InsertSocialShare, SocialShare } from '@shared/schema';
+import type { InsertSocialShare, SocialShare } from '@server/infrastructure/schema';
 import { BaseStorage } from '../../../BaseStorage.d';
 import { logger } from '@shared/core';
 export declare class SocialShareStorage extends BaseStorage<SocialShare> { constructor(redis: Redis, pool: Pool);

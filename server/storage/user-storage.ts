@@ -1,4 +1,4 @@
-import { type NewUser,type User, users } from '@shared/schema';
+import { type NewUser,type User, users } from '@server/infrastructure/schema';
 import { eq, sql } from 'drizzle-orm';
 
 import { BaseStorage } from './base';

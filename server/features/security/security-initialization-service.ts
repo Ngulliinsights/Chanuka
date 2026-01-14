@@ -6,8 +6,8 @@ import https from 'https';
 import { encryptionService } from './encryption-service';
 import { securityAuditService } from './security-audit-service';
 import { tlsConfigService } from './tls-config-service';
-// import { inputValidationService } from '@server/core/validation/input-validation-service.ts'; // TODO: Fix missing module
-// import { secureSessionService } from '@server/core/auth/secure-session-service.ts'; // TODO: Fix missing module
+// import { inputValidationService } from '@server/infrastructure/core/validation/input-validation-service.ts'; // TODO: Fix missing module
+// import { secureSessionService } from '@server/infrastructure/core/auth/secure-session-service.ts'; // TODO: Fix missing module
 // import { securityMiddleware } from '@shared/middleware/security-middleware.ts'; // TODO: Fix missing module
 // import { authRateLimit, apiRateLimit } from '@shared/middleware/rate-limiter.ts'; // TODO: Fix missing module
 

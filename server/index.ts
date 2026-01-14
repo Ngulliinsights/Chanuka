@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
 import { config } from '@server/config/index';
-import { router as authRouter } from '@server/core/auth/auth';
-import { sessionCleanupService } from '@server/core/auth/session-cleanup';
-import { schemaValidationService } from '@server/core/validation/schema-validation-service';
+import { router as authRouter } from '@server/infrastructure/core/auth/auth';
+import { sessionCleanupService } from '@server/infrastructure/core/auth/session-cleanup';
+import { schemaValidationService } from '@server/infrastructure/core/validation/schema-validation-service';
 import { router as adminRouter } from '@server/features/admin/admin';
 import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
 import { router as externalApiManagementRouter } from '@server/features/admin/external-api-dashboard';
@@ -31,6 +31,7 @@ import { notificationSchedulerService } from '@server/infrastructure/notificatio
 import { router as notificationsRouter } from '@server/infrastructure/notifications/notifications';
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
+import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
 import { webSocketService } from '@server/utils/missing-modules-fallback';
 import { setupVite } from '@server/vite';
 import { logger } from '@shared/core';
@@ -90,21 +91,6 @@ const isDevelopment = config.server.nodeEnv === 'development';
 
 // Configure middleware
 configureAppMiddleware(app);
-
-// Error handler middleware with proper typing
-const errorHandler = (err: AppError, req: Request, res: Response, _next: NextFunction): void => {
-  logger.error('Request error:', { error: err.message, path: req.path, component: 'Chanuka' } as LogContext);
-
-  const statusCode = err.statusCode || err.status || 500;
-  const response = {
-    success: false,
-    error: err.message || 'Internal server error',
-    code: err.code || 'INTERNAL_ERROR',
-    timestamp: new Date().toISOString(),
-  };
-
-  res.status(statusCode).json(response);
-};
 
 // Root API endpoint
 app.get('/api', (_req: Request, res: Response) => {
@@ -363,60 +349,9 @@ app.use('/api/constitutional-analysis', constitutionalAnalysisRouter);
 app.use('/api/argument-intelligence', argumentIntelligenceRouter);
 app.use('/api/recommendation', recommendationRouter);
 
-// API-specific error handling middleware
-app.use('/api', (error: AppError, req: Request, res: Response, _next: NextFunction): void => {
-  logger.error('API Error:', { error: error.message, component: 'Chanuka' } as LogContext);
-
-  if (error.message && error.message.includes('CORS')) {
-    res.status(403).json({
-      error: 'CORS policy violation',
-      message: 'Cross-origin request blocked',
-      code: 'CORS_ERROR',
-      timestamp: new Date().toISOString()
-    });
-    return;
-  }
-
-  if (error.type === 'entity.parse.failed') {
-    res.status(400).json({
-      error: 'Invalid JSON in request body',
-      message: 'Request body contains malformed JSON',
-      code: 'JSON_PARSE_ERROR',
-      timestamp: new Date().toISOString()
-    });
-    return;
-  }
-
-  if (error.type === 'entity.too.large') {
-    res.status(413).json({
-      error: 'Request entity too large',
-      message: 'Request body exceeds size limit',
-      code: 'REQUEST_TOO_LARGE',
-      timestamp: new Date().toISOString()
-    });
-    return;
-  }
-
-  if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
-    res.status(408).json({
-      error: 'Request timeout',
-      message: 'Request took too long to process',
-      code: 'REQUEST_TIMEOUT',
-      timestamp: new Date().toISOString()
-    });
-    return;
-  }
-
-  res.status(error.status || 500).json({
-    error: error.message || 'Internal server error',
-    code: error.code || 'INTERNAL_ERROR',
-    timestamp: new Date().toISOString(),
-    ...(isDevelopment && { stack: error.stack })
-  });
-});
-
-// General error handling
-app.use(errorHandler);
+// Unified error handling middleware (MUST BE LAST!)
+// This integrates @shared/core error management with server configuration
+app.use(createUnifiedErrorMiddleware());
 
 // Database connection test
 async function testConnection(): Promise<void> {

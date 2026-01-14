@@ -1,8 +1,8 @@
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys   } from '@shared/core';
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
-import { bill_engagement, bills, comments, notifications, user_profiles, user_verification,users } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { bill_engagement, bills, comments, notifications, user_profiles, user_verification,users } from '@server/infrastructure/schema';
 import { and, count,desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 

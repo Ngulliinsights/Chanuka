@@ -1,5 +1,5 @@
 import { logger  } from '@shared/core';
-import { comments, database as db, notifications,sessions, users } from '@shared/database';
+import { comments, database as db, notifications,sessions, users } from '@server/infrastructure/database';
 import bcrypt from 'bcrypt';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 

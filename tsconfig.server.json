@@ -71,7 +71,16 @@
         "./server/infrastructure/*"
       ],
       "@server/core/*": [
-        "./server/core/*"
+        "./server/infrastructure/core/*"
+      ],
+      "@server/infrastructure/core/*": [
+        "./server/infrastructure/core/*"
+      ],
+      "@server/infrastructure/database/*": [
+        "./server/infrastructure/database/*"
+      ],
+      "@server/infrastructure/persistence/*": [
+        "./server/infrastructure/database/persistence/*"
       ],
       "@server/utils/*": [
         "./server/utils/*"
@@ -80,22 +89,22 @@
         "./shared/*"
       ],
       "@shared/core": [
-        "./shared/core"
+        "./server/infrastructure/core"
       ],
       "@shared/core/*": [
-        "./shared/core/*"
+        "./server/infrastructure/core/*"
       ],
       "@shared/schema": [
-        "./shared/schema/index.ts"
+        "./server/infrastructure/schema/index.ts"
       ],
       "@shared/schema/*": [
-        "./shared/schema/*"
+        "./server/infrastructure/schema/*"
       ],
       "@shared/database": [
-        "./shared/database/index.ts"
+        "./server/infrastructure/database/index.ts"
       ],
       "@shared/database/*": [
-        "./shared/database/*"
+        "./server/infrastructure/database/*"
       ],
       "@db": [
         "./db/index.ts"
@@ -115,10 +124,10 @@
     "server/**/*.ts",
     "server/**/*.d.ts",
     "server/types/**/*",
-    "shared/schema.ts",
-    "shared/schema/**/*",
-    "shared/core/**/*",
-    "shared/database/**/*",
+    "server/infrastructure/schema.ts",
+    "server/infrastructure/schema/**/*",
+    "server/infrastructure/core/**/*",
+    "server/infrastructure/database/**/*",
     "db/**/*",
     "drizzle.config.ts",
     "scripts/**/*.ts"

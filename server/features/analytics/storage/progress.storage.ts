@@ -1,9 +1,9 @@
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@server/infrastructure/database/connection';
 import {
   type InsertUserProgress,
   user_progress,
-  type UserProgress} from '@shared/schema';
+  type UserProgress} from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
 import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';

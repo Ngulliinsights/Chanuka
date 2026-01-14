@@ -1,9 +1,9 @@
 // Repository interfaces removed - using direct Drizzle queries
 import { UserAggregate } from '@shared/aggregates/user-aggregate';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '@shared/entities/value-objects';
-import { user_verification } from '@shared/schema';
+import { user_verification } from '@server/infrastructure/schema';
 import { desc,eq, sql } from 'drizzle-orm';
 
 import { UserService } from '../../application/user-service-direct';

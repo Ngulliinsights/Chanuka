@@ -1,5 +1,5 @@
 import { logger } from '@shared/core';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { desc,eq, gt, sql } from 'drizzle-orm';
 import { boolean,integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { Request } from 'express';

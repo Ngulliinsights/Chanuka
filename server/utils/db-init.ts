@@ -1,5 +1,5 @@
 import { logger } from "@shared/core";
-import { pool } from "@shared/database";
+import { pool } from '@server/infrastructure/database';
 
 export async function initializeDatabase(): Promise<boolean> {
   try {

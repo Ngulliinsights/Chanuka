@@ -6,7 +6,7 @@
 
 import { Server } from 'http';
 
-import { WebSocketService } from '../core/websocket-service';
+import { WebSocketService } from '@server/infrastructure/core/websocket-service';
 import { HealthStatus,ServiceStats, WebSocketAdapter } from './websocket-adapter';
 
 

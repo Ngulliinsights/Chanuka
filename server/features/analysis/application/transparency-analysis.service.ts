@@ -1,6 +1,6 @@
 import { logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
-import * as schema from '@shared/schema';
+import { readDatabase } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure

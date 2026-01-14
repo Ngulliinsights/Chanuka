@@ -1,10 +1,10 @@
 // Import the status monitor service if it exists at this path
 import { billStatusMonitorService } from '@shared/bill-status-monitor.js'; // Adjust path if needed
 import { logger  } from '@shared/core';
-import { databaseService } from '@shared/database';
-import { readDatabase } from '@shared/database';
-import * as schema from '@shared/schema';
-import { Bill } from '@shared/schema'; // Ensure Bill type is correctly imported
+import { databaseService } from '@server/infrastructure/database';
+import { readDatabase } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
+import { Bill } from '@server/infrastructure/schema'; // Ensure Bill type is correctly imported
 import { and, asc, count, desc, eq, inArray, or,sql } from 'drizzle-orm';
 import { z } from 'zod';
 

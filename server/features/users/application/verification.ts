@@ -1,10 +1,13 @@
-import { ApiError, ApiNotFound, ApiResponseWrapper,ApiSuccess, ApiValidationError } from '@shared/core/utils/api-utils';
-import { database as db } from '@shared/database';
-import { user_verification, users } from '@shared/schema';
-import { desc, eq, sql } from "drizzle-orm";
-import { Router } from "express";
+import { Response, Router } from 'express';
+import { desc, eq, sql } from 'drizzle-orm';
 
-import { errorTracker } from '@/core/errors/error-tracker.js';
+import { database as db } from '@server/infrastructure/database';
+import { user_verification, users } from '@server/infrastructure/schema';
+import { asyncHandler } from '@/middleware/error-management';
+import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { logger } from '@shared/core';
 
 const router = Router();
 
@@ -13,25 +16,23 @@ const router = Router();
  * This function configures endpoints for managing bill verifications
  */
 export function setupVerificationRoutes() {
-  
+
   /**
    * GET /verification/bills/:bill_id
    * Retrieves all verifications associated with a specific bill
    * Returns verification details along with the verifying user's information
    */
-  router.get("/verification/bills/:bill_id", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.get('/verification/bills/:bill_id', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'GET /api/users/verification/bills/:bill_id');
+
     try {
-  const bill_id = parseInt(req.params.bill_id);
+      const bill_id = parseInt(req.params.bill_id);
 
       // Validate that bill_id is a valid number
       if (isNaN(bill_id)) {
-        return ApiValidationError(
-          res, 
-          { field: 'bill_id', message: 'Invalid bill ID' }, 
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
+        throw new ValidationError('Invalid bill ID', [
+          { field: 'bill_id', message: 'Bill ID must be a valid number', code: 'INVALID_FORMAT' }
+        ]);
       }
 
       // Query verifications with joined user data
@@ -56,35 +57,36 @@ export function setupVerificationRoutes() {
         .where(sql`(user_verification.verification_data->>'bill_id')::int = ${bill_id}`)
         .orderBy(desc(user_verification.created_at));
 
-      return ApiSuccess(
-        res, 
-        verifications,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+      res.json(verifications);
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      if (error instanceof ValidationError) {
+        throw error;
+      }
+
+      logger.error(
+        'Error fetching verifications for bill',
+        { component: 'verification-routes', context, billId: req.params.bill_id },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to fetch bill verifications', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes', billId: req.params.bill_id }
+      });
     }
-  });
+  }));
 
   /**
    * POST /verification
    * Creates a new verification for a bill
    * Requires bill_id, citizen_id, verification_type, and claim in request body
    */
-  router.post("/verification", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.post('/verification', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'POST /api/users/verification');
+
     try {
       const {
         bill_id,
@@ -103,14 +105,13 @@ export function setupVerificationRoutes() {
       if (!claim) missingFields.push('claim');
 
       if (missingFields.length > 0) {
-        return ApiValidationError(
-          res, 
-          { 
+        throw new ValidationError('Missing required fields', [
+          {
             field: 'required_fields',
-            message: `Missing required fields: ${missingFields.join(', ')}`
-          },
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
+            message: `Missing required fields: ${missingFields.join(', ')}`,
+            code: 'MISSING_REQUIRED_FIELDS'
+          }
+        ]);
       }
 
       // Insert new verification into database
@@ -131,36 +132,46 @@ export function setupVerificationRoutes() {
         })
         .returning();
 
-      return ApiSuccess(
-        res, 
-        verification[0],
-        ApiResponseWrapper.createMetadata(startTime, 'database'),
-        201
-      );
+      if (!verification || verification.length === 0) {
+        throw new BaseError('Failed to create verification', {
+          statusCode: 500,
+          code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+          domain: ErrorDomain.SYSTEM,
+          severity: ErrorSeverity.HIGH,
+          details: { component: 'verification-routes' }
+        });
+      }
+
+      res.status(201).json(verification[0]);
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      if (error instanceof ValidationError || error instanceof BaseError) {
+        throw error;
+      }
+
+      logger.error(
+        'Error creating verification',
+        { component: 'verification-routes', context },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to create verification', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes' }
+      });
     }
-  });
+  }));
 
   /**
    * PUT /verification/:id
    * Updates an existing verification
    * Accepts verification_status, claim, and reasoning updates
    */
-  router.put("/verification/:id", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.put('/verification/:id', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'PUT /api/users/verification/:id');
+
     try {
       // Verification IDs are UUIDs (strings), not integers
       const verification_id = req.params.id;
@@ -178,34 +189,51 @@ export function setupVerificationRoutes() {
 
       // Check if there's anything to update
       if (Object.keys(updateData).length === 0) {
-        return ApiValidationError(
-          res, 
-          { 
+        throw new ValidationError('No valid fields provided', [
+          {
             field: 'update_data',
-            message: 'No valid fields provided for update'
-          },
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
+            message: 'No valid fields provided for update',
+            code: 'NO_UPDATE_FIELDS'
+          }
+        ]);
       }
 
       // Perform update using string comparison for UUID
       // If verification_data needs merging, do a two-step read/merge to avoid overwriting other keys
       if (updateData.verification_data) {
-        const [existing] = await db.select({ verification_data: user_verification.verification_data }).from(user_verification).where(eq(user_verification.id, verification_id)).limit(1);
+        const [existing] = await db
+          .select({ verification_data: user_verification.verification_data })
+          .from(user_verification)
+          .where(eq(user_verification.id, verification_id))
+          .limit(1);
+
         const merged = { ...(existing?.verification_data || {}), ...(updateData.verification_data || {}) };
-        await db.update(user_verification).set({ verification_data: merged, ...(updateData.verification_status ? { verification_status: updateData.verification_status } : {}) }).where(eq(user_verification.id, verification_id));
-        const updatedVerification = await db.select().from(user_verification).where(eq(user_verification.id, verification_id)).limit(1);
-        // normalize to array shape like .returning()
-        const ret = updatedVerification;
-        if (!ret || ret.length === 0) {
-          return ApiNotFound(res, 'Verification');
+        await db
+          .update(user_verification)
+          .set({
+            verification_data: merged,
+            ...(updateData.verification_status ? { verification_status: updateData.verification_status } : {})
+          })
+          .where(eq(user_verification.id, verification_id));
+
+        const updatedVerification = await db
+          .select()
+          .from(user_verification)
+          .where(eq(user_verification.id, verification_id))
+          .limit(1);
+
+        if (!updatedVerification || updatedVerification.length === 0) {
+          throw new BaseError('Verification not found', {
+            statusCode: 404,
+            code: ERROR_CODES.RESOURCE_NOT_FOUND,
+            domain: ErrorDomain.SYSTEM,
+            severity: ErrorSeverity.LOW,
+            details: { component: 'verification-routes', verificationId: verification_id }
+          });
         }
 
-        return ApiSuccess(
-          res,
-          ret[0],
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
+        res.json(updatedVerification[0]);
+        return;
       }
 
       const updatedVerification = await db
@@ -215,38 +243,45 @@ export function setupVerificationRoutes() {
         .returning();
 
       if (updatedVerification.length === 0) {
-        return ApiNotFound(res, 'Verification');
+        throw new BaseError('Verification not found', {
+          statusCode: 404,
+          code: ERROR_CODES.RESOURCE_NOT_FOUND,
+          domain: ErrorDomain.SYSTEM,
+          severity: ErrorSeverity.LOW,
+          details: { component: 'verification-routes', verificationId: verification_id }
+        });
       }
 
-      return ApiSuccess(
-        res, 
-        updatedVerification[0],
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+      res.json(updatedVerification[0]);
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      if (error instanceof ValidationError || error instanceof BaseError) {
+        throw error;
+      }
+
+      logger.error(
+        'Error updating verification',
+        { component: 'verification-routes', context, verificationId: req.params.id },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to update verification', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes', verificationId: req.params.id }
+      });
     }
-  });
+  }));
 
   /**
    * GET /verification/stats
    * Retrieves aggregated statistics about verifications
    * Returns total count and breakdown by verification status
    */
-  router.get("/verification/stats", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.get('/verification/stats', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'GET /api/users/verification/stats');
+
     try {
       // Aggregate verifications by status
       const stats = await db
@@ -259,7 +294,7 @@ export function setupVerificationRoutes() {
 
       // Calculate total with proper typing
       const totalVerifications = stats.reduce(
-        (sum: number, stat: { verification_status: string; count: number }) => sum + stat.count, 
+        (sum: number, stat: { verification_status: string; count: number }) => sum + stat.count,
         0
       );
 
@@ -268,42 +303,39 @@ export function setupVerificationRoutes() {
         (acc: Record<string, number>, stat: { verification_status: string; count: number }) => {
           acc[stat.verification_status] = stat.count;
           return acc;
-        }, 
+        },
         {} as Record<string, number>
       );
 
-      return ApiSuccess(
-        res, 
-        {
-          total: totalVerifications,
-          breakdown,
-        },
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+      res.json({
+        total: totalVerifications,
+        breakdown,
+      });
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      logger.error(
+        'Error fetching verification stats',
+        { component: 'verification-routes', context },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to fetch verification statistics', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes' }
+      });
     }
-  });
+  }));
 
   /**
    * GET /verification/user/:citizen_id
    * Retrieves all verifications submitted by a specific user
    * Useful for displaying a user's verification history
    */
-  router.get("/verification/user/:citizen_id", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.get('/verification/user/:citizen_id', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'GET /api/users/verification/user/:citizen_id');
+
     try {
       const { citizen_id } = req.params;
 
@@ -321,42 +353,39 @@ export function setupVerificationRoutes() {
         .where(eq(user_verification.user_id, citizen_id))
         .orderBy(desc(user_verification.created_at));
 
-      return ApiSuccess(
-        res, 
-        userVerifications,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+      res.json(userVerifications);
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      logger.error(
+        'Error fetching user verifications',
+        { component: 'verification-routes', context, citizenId: req.params.citizen_id },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to fetch user verifications', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes', citizenId: req.params.citizen_id }
+      });
     }
-  });
+  }));
 
   /**
    * DELETE /verification/:id
    * Deletes a verification (soft delete by updating status)
    * For audit purposes, we mark as deleted rather than removing the record
    */
-  router.delete("/verification/:id", async (req, res) => {
-    const startTime = Date.now();
-    
+  router.delete('/verification/:id', asyncHandler(async (req, res: Response) => {
+    const context = createErrorContext(req, 'DELETE /api/users/verification/:id');
+
     try {
       const verification_id = req.params.id;
 
       // Soft delete by updating status to 'deleted'
       const deletedVerification = await db
         .update(user_verification)
-        .set({ 
+        .set({
           verification_status: 'deleted',
           updated_at: new Date()
         })
@@ -364,32 +393,39 @@ export function setupVerificationRoutes() {
         .returning();
 
       if (deletedVerification.length === 0) {
-        return ApiNotFound(res, 'Verification');
+        throw new BaseError('Verification not found', {
+          statusCode: 404,
+          code: ERROR_CODES.RESOURCE_NOT_FOUND,
+          domain: ErrorDomain.SYSTEM,
+          severity: ErrorSeverity.LOW,
+          details: { component: 'verification-routes', verificationId: verification_id }
+        });
       }
 
-      return ApiSuccess(
-        res, 
-        { 
-          message: 'Verification deleted successfully',
-          id: verification_id 
-        },
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+      res.json({
+        message: 'Verification deleted successfully',
+        id: verification_id
+      });
     } catch (error) {
-      errorTracker.trackRequestError(
-        error as Error,
-        req,
-        'medium',
-        'database'
+      if (error instanceof BaseError) {
+        throw error;
+      }
+
+      logger.error(
+        'Error deleting verification',
+        { component: 'verification-routes', context, verificationId: req.params.id },
+        error as Record<string, any> | undefined
       );
-      return ApiError(
-        res, 
-        { code: 'INTERNAL_ERROR', message: 'Internal server error' },
-        500,
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
+
+      throw new BaseError('Failed to delete verification', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
+        details: { component: 'verification-routes', verificationId: req.params.id }
+      });
     }
-  });
+  }));
 }
 
 // Initialize routes on the router instance
@@ -397,5 +433,3 @@ setupVerificationRoutes();
 
 // Export the configured router for use in main application
 export { router };
-
-

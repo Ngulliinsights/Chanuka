@@ -1,8 +1,8 @@
 // Query builder service removed - using direct Drizzle queries
 import { parallelQueryExecutor, QueryTask } from "@server/utils/parallel-query-executor";
 import { logger } from '@shared/core/index';
-import { readDatabase } from '@shared/database';
-import * as schema from "@shared/schema";
+import { readDatabase } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte,like, or, sql } from "drizzle-orm";
 
 import { cacheService } from '@/infrastructure/cache/cache-service';

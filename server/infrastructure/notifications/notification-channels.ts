@@ -1,7 +1,7 @@
 import { Notification } from '@server/features/notifications/domain/entities/notification';
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database';
-import { notifications, user_profiles,users } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { notifications, user_profiles,users } from '@server/infrastructure/schema';
 import { webSocketService } from '@shared/websocket.js';
 import { eq } from 'drizzle-orm';
 

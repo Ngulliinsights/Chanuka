@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
 import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring.ts';
 import { ApiResponseWrapper   } from '@shared/core';
 import { logger   } from '@shared/core';

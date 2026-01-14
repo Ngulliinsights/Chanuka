@@ -4,8 +4,8 @@ import { BillServiceError } from '@shared/domain/errors/bill-errors';
 import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
-import { BillStatus, BillVoteType } from '@shared/schema';
-import { bills } from '@shared/schema';
+import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
 import { DatabaseService } from '@/infrastructure/database/database-service';

@@ -11,7 +11,7 @@ import { BillServiceError } from '@shared/domain/errors/bill-errors';
 import { DomainEventPublisher } from '@shared/domain/events/bill-events';
 import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
-import { BillStatus, BillVoteType } from '@shared/schema';
+import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
 
 import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
 

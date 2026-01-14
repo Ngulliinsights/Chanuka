@@ -1,6 +1,6 @@
 import { logger } from '@shared/core';
-import { readDatabase } from '@shared/database';
-import { searchAnalytics,searchQueries } from '@shared/schema/advanced_discovery';
+import { readDatabase } from '@server/infrastructure/database';
+import { searchAnalytics,searchQueries } from '@server/infrastructure/schema/advanced_discovery';
 
 import type { SearchQuery, SearchResponseDto } from './search.dto';
 

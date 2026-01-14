@@ -1,5 +1,5 @@
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { type Analysis, analysis,   type Bill, bill as bills, bill_engagement,
   bill_sponsorship as bill_sponsorships,   type BillComment,   type BillEngagement, type BillSectionConflict,
 billSectionConflict as billSectionConflicts,

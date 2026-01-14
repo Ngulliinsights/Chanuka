@@ -5,7 +5,7 @@ import {
   readDatabase,
   withTransaction,
   type DatabaseTransaction,
-} from '@shared/database/connection';
+} from '@server/infrastructure/database/connection';
 import {
   behavioralAnomalies,
   cibDetections,
@@ -16,7 +16,7 @@ import {
   type NewCIBDetection,
   type NewSuspiciousActivityLog,
   type SuspiciousActivityLog,
-} from '@shared/schema/safeguards';
+} from '@server/infrastructure/schema/safeguards';
 
 // ==================== Type Definitions ====================
 

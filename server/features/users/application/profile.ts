@@ -1,10 +1,16 @@
-import { logger   } from '@shared/core';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { logger } from '@shared/core';
 import { user_profileservice } from '@shared/domain/user-profile.js';
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 
-import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert';
+import {
+  AuthenticatedRequest,
+  authenticateToken
+} from '../../../../AuthAlert';
+import { asyncHandler } from '@/middleware/error-management';
+import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { createErrorContext } from '@shared/core/observability/distributed-tracing';
 
 export const router = Router();
 
@@ -59,10 +65,11 @@ const engagementSchema = z.object({
  * Each Zod error contains a path array and message, which we convert
  * to a field string (joined path) and message string
  */
-function formatZodErrors(zodErrors: z.ZodIssue[]): { field: string; message: string }[] {
+function formatZodErrors(zodErrors: z.ZodIssue[]): Array<{ field: string; message: string; code?: string }> {
   return zodErrors.map(error => ({
     field: error.path.join('.') || 'unknown',
-    message: error.message
+    message: error.message,
+    code: 'VALIDATION_ERROR'
   }));
 }
 
@@ -73,138 +80,140 @@ function formatZodErrors(zodErrors: z.ZodIssue[]): { field: string; message: str
 /**
  * GET /me - Retrieve the authenticated user's profile
  */
-router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.get('/me', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/me');
+
   try {
     const user_id = req.user!.id;
     const profile = await user_profileservice.getUserProfile(user_id);
-    
-    return ApiSuccess(
-      res, 
-      profile, 
-      ApiResponseWrapper.createMetadata(startTime, 'getUserProfile')
-    );
-   } catch (error) {
-    logger.error('Error fetching profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    
-    // ApiError now requires a structured error object
-    return ApiError(res, {
-      code: 'PROFILE_FETCH_ERROR',
-      message: 'Failed to fetch profile'
-    }, 500);
+
+    res.json(profile);
+  } catch (error) {
+    logger.error('Error fetching profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PATCH /me - Update the authenticated user's profile
  */
-router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.patch('/me', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PATCH /api/users/me');
+
   try {
     const user_id = req.user!.id;
     const profileData = updateProfileSchema.parse(req.body);
 
     const updatedProfile = await user_profileservice.updateUserProfile(user_id, profileData);
-    
-    return ApiSuccess(
-      res, 
-      updatedProfile, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateUserProfile')
-    );
-   } catch (error) {
+
+    res.json(updatedProfile);
+  } catch (error) {
     if (error instanceof z.ZodError) {
-      // Transform Zod errors into the expected format before passing to ApiValidationError
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid profile data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PROFILE_UPDATE_ERROR',
-      message: 'Failed to update profile'
-    }, 500);
+
+    logger.error('Error updating profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PATCH /me/basic - Update basic user information
  */
-router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.patch('/me/basic', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PATCH /api/users/me/basic');
+
   try {
     const user_id = req.user!.id;
     const basicInfo = updateBasicInfoSchema.parse(req.body);
 
     const updatedProfile = await user_profileservice.updateUserBasicInfo(user_id, basicInfo);
-    
-    return ApiSuccess(
-      res, 
-      updatedProfile, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateBasicInfo')
-    );
-   } catch (error) {
+
+    res.json(updatedProfile);
+  } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid basic info', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating basic info:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'BASIC_INFO_UPDATE_ERROR',
-      message: 'Failed to update basic info'
-    }, 500);
+
+    logger.error('Error updating basic info:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update basic info', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PATCH /me/interests - Update user's interests
  */
-router.patch('/me/interests', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.patch('/me/interests', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PATCH /api/users/me/interests');
+
   try {
     const user_id = req.user!.id;
-    const { interests  } = updateInterestsSchema.parse(req.body);
+    const { interests } = updateInterestsSchema.parse(req.body);
 
     await user_profileservice.updateUserInterests(user_id, interests);
-    
-    return ApiSuccess(
-      res, 
-      { success: true }, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateInterests')
-    );
+
+    res.json({ success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid interests data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating interests:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'INTERESTS_UPDATE_ERROR',
-      message: 'Failed to update interests'
-    }, 500);
+
+    logger.error('Error updating interests:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update interests', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * GET /me/complete - Retrieve complete user profile
  */
-router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.get('/me/complete', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/me/complete');
+
   try {
     const user_id = req.user!.id;
     const completeProfile = await user_profileservice.getCompleteUserProfile(user_id);
-    
-    return ApiSuccess(
-      res, 
-      completeProfile, 
-      ApiResponseWrapper.createMetadata(startTime, 'getCompleteProfile')
-    );
-   } catch (error) {
-    logger.error('Error fetching complete profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'COMPLETE_PROFILE_FETCH_ERROR',
-      message: 'Failed to fetch complete profile'
-    }, 500);
+
+    res.json(completeProfile);
+  } catch (error) {
+    logger.error('Error fetching complete profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch complete profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // User Preferences Routes
@@ -213,54 +222,56 @@ router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, 
 /**
  * GET /me/preferences - Retrieve user notification and display preferences
  */
-router.get('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.get('/me/preferences', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/me/preferences');
+
   try {
     const user_id = req.user!.id;
     const preferences = await user_profileservice.getUserPreferences(user_id);
-    
-    return ApiSuccess(
-      res, 
-      preferences, 
-      ApiResponseWrapper.createMetadata(startTime, 'getPreferences')
-    );
-   } catch (error) {
-    logger.error('Error fetching preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PREFERENCES_FETCH_ERROR',
-      message: 'Failed to fetch preferences'
-    }, 500);
+
+    res.json(preferences);
+  } catch (error) {
+    logger.error('Error fetching preferences:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PATCH /me/preferences - Update user preferences
  */
-router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.patch('/me/preferences', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PATCH /api/users/me/preferences');
+
   try {
     const user_id = req.user!.id;
     const preferences = updatePreferencesSchema.parse(req.body);
-    
+
     const updatedPreferences = await user_profileservice.updateUserPreferences(user_id, preferences);
-    
-    return ApiSuccess(
-      res, 
-      updatedPreferences, 
-      ApiResponseWrapper.createMetadata(startTime, 'updatePreferences')
-    );
-   } catch (error) {
+
+    res.json(updatedPreferences);
+  } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid preferences data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PREFERENCES_UPDATE_ERROR',
-      message: 'Failed to update preferences'
-    }, 500);
+
+    logger.error('Error updating preferences:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // Verification Routes
@@ -269,62 +280,71 @@ router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequ
 /**
  * GET /me/verification - Retrieve verification status
  */
-router.get('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.get('/me/verification', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/me/verification');
+
   try {
     const user_id = req.user!.id;
     const verification_status = await user_profileservice.getUserVerificationStatus(user_id);
-    
-    return ApiSuccess(
-      res, 
-      verification_status, 
-      ApiResponseWrapper.createMetadata(startTime, 'getVerificationStatus')
-    );
-   } catch (error) {
-    logger.error('Error fetching verification status:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'VERIFICATION_FETCH_ERROR',
-      message: 'Failed to fetch verification status'
-    }, 500);
+
+    res.json(verification_status);
+  } catch (error) {
+    logger.error('Error fetching verification status:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch verification status', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PATCH /me/verification - Update verification status
  */
-router.patch('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.patch('/me/verification', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PATCH /api/users/me/verification');
+
   try {
     const user_id = req.user!.id;
     const verification_data = updateVerificationSchema.parse(req.body);
-    
+
     // Authorization check: only admins can approve/reject verification
     if (verification_data.verification_status !== 'pending' && req.user!.role !== 'admin') {
-      return ApiError(res, {
-        code: 'INSUFFICIENT_PERMISSIONS',
-        message: 'Only administrators can approve or reject verification'
-       }, 403);
+      throw new BaseError('Insufficient permissions', {
+        statusCode: 403,
+        code: ERROR_CODES.ACCESS_DENIED,
+        domain: ErrorDomain.AUTHORIZATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'profile-routes', action: 'update_verification_status' }
+      });
     }
-    
+
     const updatedProfile = await user_profileservice.updateUserVerificationStatus(user_id, verification_data);
-    
-    return ApiSuccess(
-      res, 
-      updatedProfile, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateVerificationStatus')
-    );
+
+    res.json(updatedProfile);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid verification data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating verification status:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'VERIFICATION_UPDATE_ERROR',
-      message: 'Failed to update verification status'
-    }, 500);
+
+    if (error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Error updating verification status:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update verification status', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // Engagement Routes
@@ -333,64 +353,69 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
 /**
  * GET /me/engagement - Retrieve user's engagement history
  */
-router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.get('/me/engagement', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/me/engagement');
+
   try {
     const user_id = req.user!.id;
     const engagementHistory = await user_profileservice.getUserEngagementHistory(user_id);
-    
-    return ApiSuccess(
-      res, 
-      engagementHistory, 
-      ApiResponseWrapper.createMetadata(startTime, 'getEngagementHistory')
-    );
-   } catch (error) {
-    logger.error('Error fetching engagement history:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'ENGAGEMENT_FETCH_ERROR',
-      message: 'Failed to fetch engagement history'
-    }, 500);
+
+    res.json(engagementHistory);
+  } catch (error) {
+    logger.error('Error fetching engagement history:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch engagement history', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * POST /me/engagement/:bill_id - Record user engagement with a bill
  */
-router.post('/me/engagement/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
-  
+router.post('/me/engagement/:bill_id', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'POST /api/users/me/engagement/:bill_id');
+
   try {
     const user_id = req.user!.id;
     const bill_id = parseInt(req.params.bill_id, 10);
-    
+
     // Validate that bill_id is a proper number
     if (isNaN(bill_id)) {
-      return ApiError(res, {
-        code: 'INVALID_BILL_ID',
-        message: 'Bill ID must be a valid number'
-        }, 400);
+      throw new ValidationError('Invalid bill ID', [
+        { field: 'bill_id', message: 'Bill ID must be a valid number', code: 'INVALID_FORMAT' }
+      ]);
     }
-    
+
     const { engagement_type } = engagementSchema.parse(req.body);
-    
+
     const result = await user_profileservice.updateUserEngagement(user_id, bill_id, engagement_type);
-    
-    return ApiSuccess(
-      res, 
-      result, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateEngagement')
-    );
+
+    res.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid engagement data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating engagement:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'ENGAGEMENT_UPDATE_ERROR',
-      message: 'Failed to update engagement'
-    }, 500);
+
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+
+    logger.error('Error updating engagement:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update engagement', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // Public Profile Routes
@@ -400,163 +425,164 @@ router.post('/me/engagement/:bill_id', authenticateToken, async (req: Authentica
  * GET /profile - Alias for /me (for client compatibility)
  * This route provides backward compatibility with clients expecting /api/users/profile
  */
-router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
+router.get('/profile', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/profile');
+
   try {
     const user_id = req.user!.id;
     const profile = await user_profileservice.getUserProfile(user_id);
-    
-    return ApiSuccess(
-      res, 
-      profile, 
-      ApiResponseWrapper.createMetadata(startTime, 'getUserProfile')
-    );
-   } catch (error) {
-    logger.error('Error fetching profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    
-    return ApiError(res, {
-      code: 'PROFILE_FETCH_ERROR',
-      message: 'Failed to fetch profile'
-    }, 500);
+
+    res.json(profile);
+  } catch (error) {
+    logger.error('Error fetching profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * GET /preferences - Alias for /me/preferences (for client compatibility)
  */
-router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
+router.get('/preferences', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/preferences');
+
   try {
     const user_id = req.user!.id;
     const preferences = await user_profileservice.getUserPreferences(user_id);
-    
-    return ApiSuccess(
-      res, 
-      preferences, 
-      ApiResponseWrapper.createMetadata(startTime, 'getUserPreferences')
-    );
-   } catch (error) {
-    logger.error('Error fetching preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PREFERENCES_FETCH_ERROR',
-      message: 'Failed to fetch preferences'
-    }, 500);
+
+    res.json(preferences);
+  } catch (error) {
+    logger.error('Error fetching preferences:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * PUT /preferences - Alias for /me/preferences (for client compatibility)
  */
-router.put('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
+router.put('/preferences', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'PUT /api/users/preferences');
+
   try {
     const user_id = req.user!.id;
     const preferences = updatePreferencesSchema.parse(req.body);
 
     const updatedPreferences = await user_profileservice.updateUserPreferences(user_id, preferences);
-    
-    return ApiSuccess(
-      res, 
-      updatedPreferences, 
-      ApiResponseWrapper.createMetadata(startTime, 'updateUserPreferences')
-    );
+
+    res.json(updatedPreferences);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, formatZodErrors(error.errors));
+      throw new ValidationError('Invalid preferences data', formatZodErrors(error.errors));
     }
-    
-    logger.error('Error updating preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PREFERENCES_UPDATE_ERROR',
-      message: 'Failed to update preferences'
-    }, 500);
+
+    logger.error('Error updating preferences:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.user?.id }
+    });
   }
-});
+}));
 
 /**
  * GET /search/:query - Search for users by name or username
  */
-router.get('/search/:query', async (req, res) => {
-  const startTime = Date.now();
-  
+router.get('/search/:query', asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/search/:query');
+
   try {
     const query = req.params.query;
     const limit = parseInt(req.query.limit as string, 10) || 10;
-    
+
     // Validate limit falls within acceptable range
     if (limit < 1 || limit > 100) {
-      return ApiError(res, {
-        code: 'INVALID_LIMIT',
-        message: 'Limit must be between 1 and 100'
-      }, 400);
+      throw new ValidationError('Invalid limit parameter', [
+        { field: 'limit', message: 'Limit must be between 1 and 100', code: 'INVALID_RANGE' }
+      ]);
     }
-    
+
     const users = await user_profileservice.searchUsers(query, limit);
-    
-    return ApiSuccess(
-      res, 
-      { users }, 
-      ApiResponseWrapper.createMetadata(startTime, 'searchUsers')
-    );
+
+    res.json({ users });
   } catch (error) {
-    logger.error('Error searching users:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'USER_SEARCH_ERROR',
-      message: 'User search failed'
-    }, 500);
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+
+    logger.error('Error searching users:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('User search failed', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes' }
+    });
   }
-});
+}));
 
 /**
  * GET /:user_id/profile - Get specific user's profile (for client compatibility)
  * This provides an explicit /profile suffix for clarity
  */
-router.get('/:user_id/profile', async (req, res) => {
-  const startTime = Date.now();
-  
+router.get('/:user_id/profile', asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/:user_id/profile');
+
   try {
     const user_id = req.params.user_id;
     const profile = await user_profileservice.getUserPublicProfile(user_id);
-    
-    return ApiSuccess(
-      res, 
-      profile, 
-      ApiResponseWrapper.createMetadata(startTime, 'getPublicProfile')
-    );
+
+    res.json(profile);
   } catch (error) {
-    logger.error('Error fetching public profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PUBLIC_PROFILE_FETCH_ERROR',
-      message: 'Failed to fetch profile'
-    }, 500);
+    logger.error('Error fetching public profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.params.user_id }
+    });
   }
-});
+}));
 
 /**
  * GET /:user_id - Retrieve public profile for a specific user
  * Note: This catch-all route must be last to avoid intercepting other routes
  */
-router.get('/:user_id', async (req, res) => { const startTime = Date.now();
-  
+router.get('/:user_id', asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/users/:user_id');
+
   try {
     const user_id = req.params.user_id;
     const profile = await user_profileservice.getUserPublicProfile(user_id);
-    
-    return ApiSuccess(
-      res, 
-      profile, 
-      ApiResponseWrapper.createMetadata(startTime, 'getPublicProfile')
-    );
-   } catch (error) {
-    logger.error('Error fetching public profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, {
-      code: 'PUBLIC_PROFILE_FETCH_ERROR',
-      message: 'Failed to fetch profile'
-    }, 500);
+
+    res.json(profile);
+  } catch (error) {
+    logger.error('Error fetching public profile:', { component: 'profile-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch profile', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'profile-routes', userId: req.params.user_id }
+    });
   }
-});
-
-
+}));

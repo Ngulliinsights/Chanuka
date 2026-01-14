@@ -6,7 +6,7 @@ import {
   withTransaction,
   writeDatabase,
   type DatabaseTransaction,
-} from '@shared/database/connection';
+} from '@server/infrastructure/database/connection';
 import {
   rateLimitBlacklist,
   rateLimitConfig,
@@ -15,7 +15,7 @@ import {
   type NewRateLimit,
   type RateLimit,
   type RateLimitConfig,
-} from '@shared/schema/safeguards';
+} from '@server/infrastructure/schema/safeguards';
 
 // ==================== Type Definitions ====================
 

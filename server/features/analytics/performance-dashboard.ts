@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
 import { performanceMonitor   } from '@shared/core';
 import { logger   } from '@shared/core';
 import { Router } from 'express';

@@ -1,4 +1,4 @@
-import { bills } from '@shared/schema';
+import { bills } from '@server/infrastructure/schema';
 import { gte, ilike, inArray, lte, or,SQL, sql } from 'drizzle-orm';
 
 // Alias for backward compatibility

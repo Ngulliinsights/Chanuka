@@ -5,9 +5,9 @@
 // Supports batch processing and error handling with fallback mechanisms
 
 import { logger } from '@shared/core';
-import { database } from '@shared/database';
+import { database } from '@server/infrastructure/database';
 import { cacheService } from '@shared/infrastructure/cache/cache-service';
-import { content_embeddings, ContentType, ProcessingStatus } from '@shared/schema/search_system';
+import { content_embeddings, ContentType, ProcessingStatus } from '@server/infrastructure/schema/search_system';
 import crypto from 'crypto';
 import { and, eq, sql } from 'drizzle-orm';
 import OpenAI from 'openai';

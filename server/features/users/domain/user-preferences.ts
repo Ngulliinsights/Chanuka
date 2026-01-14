@@ -1,6 +1,6 @@
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
-import { user_profiles } from '@shared/schema';
+import { readDatabase } from '@server/infrastructure/database';
+import { user_profiles } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 // --- Interface Definitions ---

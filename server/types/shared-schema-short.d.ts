@@ -32,7 +32,7 @@ declare module '@shared/schema' {
 }
 
 declare module '@shared/schema' {
-  export * from '@shared/schema';
+  export * from '@server/infrastructure/schema';
   const _default: any;
   export default _default;
 }

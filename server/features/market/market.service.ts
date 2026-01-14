@@ -1,5 +1,5 @@
-import { db } from '@shared/database';
-import { market_commodities,market_signals } from '@shared/schema/market_intelligence';
+import { db } from '@server/infrastructure/database';
+import { market_commodities,market_signals } from '@server/infrastructure/schema/market_intelligence';
 import { and, desc, eq, gte,sql } from 'drizzle-orm';
 import { injectable } from 'inversify';
 

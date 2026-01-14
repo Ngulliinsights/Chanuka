@@ -1,9 +1,9 @@
 import { Bill, BillNumber, BillSummary,BillTitle } from '@shared/entities/bill';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
 import { DomainEventPublisher } from '@shared/events/bill-events';
-import { BillStatus, BillVoteType } from '@shared/schema';
-import { bill_engagement, bills, sponsors, users } from '@shared/schema';
-import { bill_trackers,bill_votes } from '@shared/schema';
+import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
+import { bill_engagement, bills, sponsors, users } from '@server/infrastructure/schema';
+import { bill_trackers,bill_votes } from '@server/infrastructure/schema';
 import { and, count, desc,eq, sql } from 'drizzle-orm';
 
 import { databaseService } from '@/infrastructure/database/database-service';

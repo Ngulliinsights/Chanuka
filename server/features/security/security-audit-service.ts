@@ -1,8 +1,8 @@
 import { logger } from '@shared/core';
-import { db } from '@shared/database';
+import { db } from '@server/infrastructure/database';
 import {
   audit_payloads,
-  system_audit_log} from '@shared/schema/integrity_operations';
+  system_audit_log} from '@server/infrastructure/schema/integrity_operations';
 import { and, count, desc, eq, gte, inArray, lte, type SQL,sql } from 'drizzle-orm';
 import type { Request } from 'express';
 

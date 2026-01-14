@@ -1,12 +1,12 @@
 
 import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage.js';
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@server/infrastructure/database/connection';
 import { 
   bills,
   type InsertSocialShare,
   social_shares,
-  type SocialShare} from '@shared/schema';
+  type SocialShare} from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
 const CACHE_TTL = 3600; // 1 hour in seconds

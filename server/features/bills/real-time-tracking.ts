@@ -14,7 +14,7 @@ import type {
   ConnectionState,
   NotificationData,
   Priority,
-  WebSocketStats as SharedWebSocketStats} from '@shared/schema/websocket';
+  WebSocketStats as SharedWebSocketStats} from '@server/infrastructure/schema/websocket';
 import { NextFunction, Request, Response, Router } from 'express';
 
 // ============================================================================
@@ -952,4 +952,4 @@ export type {
   ConnectionState,
   ConnectionQuality,
   ConnectionMetrics
-} from '@shared/schema/websocket';
+} from '@server/infrastructure/schema/websocket';

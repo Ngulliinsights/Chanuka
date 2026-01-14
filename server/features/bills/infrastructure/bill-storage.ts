@@ -1,12 +1,12 @@
 import { BaseStorage, type StorageConfig } from '@server/infrastructure/database/base/BaseStorage.ts';
 import { logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import {
   type Bill,
   bill as bills,
   bill_tag as bill_tags,
   type InsertBill
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";

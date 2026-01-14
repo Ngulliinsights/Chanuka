@@ -1,5 +1,5 @@
-import { database as db } from '@shared/database';
-import type { User } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import type { User } from '@server/infrastructure/schema';
 
 import { logger } from '@/shared/core';
 

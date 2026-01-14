@@ -8,11 +8,11 @@
 import { Stakeholder, StakeholderInterest } from '@server/features/analytics/conflict-detection/types.ts';
 import { logger  } from '@shared/core';
 import { getDefaultCache } from '@shared/core/caching/index.js';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import {
 type Bill,
 bill_sponsorships,
-  bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors} from '@shared/schema';
+  bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors} from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
 export class StakeholderAnalysisService {

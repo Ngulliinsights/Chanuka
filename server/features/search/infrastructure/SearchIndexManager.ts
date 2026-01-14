@@ -3,7 +3,7 @@
  *  ONLY the export path changes – now exported from here.
  *  ------------------------------------------------------------------ */
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { sql } from 'drizzle-orm';
 
 import { databaseService } from '@/infrastructure/database/database-service';

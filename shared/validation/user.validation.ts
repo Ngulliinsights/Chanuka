@@ -1,0 +1,123 @@
+/**
+ * User Validation Schema
+ *
+ * Centralized validation rules for user data used by both client and server.
+ * Integrates with @shared/core/validation framework for enterprise features.
+ */
+
+import { z } from 'zod';
+
+/**
+ * User Validation Rules
+ * Constants defining min/max lengths and patterns
+ */
+export const USER_VALIDATION_RULES = {
+  EMAIL_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  USERNAME_PATTERN: /^[a-zA-Z0-9_-]{3,20}$/,
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  PHONE_PATTERN: /^(\+\d{1,3})?[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/,
+  FIRST_NAME_MIN_LENGTH: 1,
+  FIRST_NAME_MAX_LENGTH: 50,
+  LAST_NAME_MIN_LENGTH: 1,
+  LAST_NAME_MAX_LENGTH: 50,
+  BIO_MAX_LENGTH: 500,
+} as const;
+
+/**
+ * Zod Schema for User validation
+ * Can be used with @shared/core/validation/ValidationService
+ */
+export const UserSchema = z.object({
+  id: z.string().uuid().optional(),
+  email: z
+    .string()
+    .email('Invalid email address')
+    .regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid'),
+  username: z
+    .string()
+    .regex(USER_VALIDATION_RULES.USERNAME_PATTERN, 'Username must be 3-20 characters (alphanumeric, dash, underscore)'),
+  first_name: z
+    .string()
+    .min(USER_VALIDATION_RULES.FIRST_NAME_MIN_LENGTH)
+    .max(USER_VALIDATION_RULES.FIRST_NAME_MAX_LENGTH)
+    .optional(),
+  last_name: z
+    .string()
+    .min(USER_VALIDATION_RULES.LAST_NAME_MIN_LENGTH)
+    .max(USER_VALIDATION_RULES.LAST_NAME_MAX_LENGTH)
+    .optional(),
+  bio: z
+    .string()
+    .max(USER_VALIDATION_RULES.BIO_MAX_LENGTH, 'Bio must not exceed 500 characters')
+    .optional()
+    .nullable(),
+  phone: z
+    .string()
+    .regex(USER_VALIDATION_RULES.PHONE_PATTERN, 'Invalid phone number format')
+    .optional()
+    .nullable(),
+  role: z.enum(['citizen', 'representative', 'admin']).default('citizen'),
+  is_active: z.boolean().default(true),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
+/**
+ * User Registration Schema - includes password validation
+ */
+export const UserRegistrationSchema = UserSchema.extend({
+  password: z
+    .string()
+    .min(USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH, 'Password must be at least 8 characters')
+    .regex(
+      USER_VALIDATION_RULES.PASSWORD_PATTERN,
+      'Password must contain uppercase, lowercase, number, and special character'
+    ),
+  password_confirm: z.string(),
+}).refine((data) => data.password === data.password_confirm, {
+  message: 'Passwords do not match',
+  path: ['password_confirm'],
+});
+
+export type UserValidationInput = z.input<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>;
+export type UserRegistrationInput = z.input<typeof UserRegistrationSchema>;
+
+/**
+ * Validation helper function for users
+ * Can be used in both client and server without duplication
+ */
+export function validateUser(data: unknown): { valid: boolean; errors: Record<string, string[]> } {
+  const result = UserSchema.safeParse(data);
+  if (result.success) {
+    return { valid: true, errors: {} };
+  }
+
+  const errors: Record<string, string[]> = {};
+  result.error.errors.forEach((err) => {
+    const field = err.path.join('.');
+    if (!errors[field]) errors[field] = [];
+    errors[field].push(err.message);
+  });
+  return { valid: false, errors };
+}
+
+/**
+ * Validation helper function for user registration
+ * Can be used in both client and server without duplication
+ */
+export function validateUserRegistration(data: unknown): { valid: boolean; errors: Record<string, string[]> } {
+  const result = UserRegistrationSchema.safeParse(data);
+  if (result.success) {
+    return { valid: true, errors: {} };
+  }
+
+  const errors: Record<string, string[]> = {};
+  result.error.errors.forEach((err) => {
+    const field = err.path.join('.');
+    if (!errors[field]) errors[field] = [];
+    errors[field].push(err.message);
+  });
+  return { valid: false, errors };
+}

@@ -1,5 +1,5 @@
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 
 /**
  * Kenyan Government Data Integration Service

@@ -1,178 +1,230 @@
-// Import repository for fetching historical data
-import { analysisService } from '@shared/application/analysis-service-direct.js';
-// Import the NEW comprehensive analysis service
 import { billComprehensiveAnalysisService } from '@shared/application/bill-comprehensive-analysis.service.js';
-import { logger   } from '@shared/core';
-import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
-import { NextFunction,Request, Response, Router } from 'express';
-import { z } from 'zod';
+import { analysisService } from '@shared/application/analysis-service-direct.js';
+import { BaseError, ValidationError } from '@shared/core/errors';
+import { ErrorCode, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { logger } from '@shared/core';
+import { authenticateToken, requireAuth } from '../../../../AuthAlert';
+import express, { Response } from 'express';
+import { asyncHandler } from '@shared/middleware/async-handler';
+import { createErrorContext } from '@shared/middleware/error-context';
 
-import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert'; // Use if auth needed
-
-const router = Router();
-
-// --- Helper Functions ---
-function parseIntParam(value: string | undefined, paramName: string): number {
-    if (value === undefined) throw new Error(`${paramName} route parameter is required.`);
-    const parsed = parseInt(value, 10);
-    if (isNaN(parsed) || parsed <= 0) {
-        // More specific error for validation
-        throw new Error(`Invalid ${paramName}: Must be a positive integer.`);
-    }
-    return parsed;
-}
-
-// --- API Endpoints ---
+const router = express.Router();
 
 /**
  * GET /api/analysis/bills/:bill_id/comprehensive
- * Retrieve the latest comprehensive analysis result for a specific bills.
- * This endpoint triggers the analysis on-demand. Consider adding caching or
- * directing users to pre-computed results if performance is critical.
+ * Retrieve the latest comprehensive analysis result for a specific bill.
+ * This endpoint triggers the analysis on-demand.
  */
-router.get('/bills/:bill_id/comprehensive', async (req: Request, res: Response, next: NextFunction) => { const startTime = Date.now();
+router.get('/bills/:bill_id/comprehensive', asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /bills/:bill_id/comprehensive');
   try {
-    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
-    logger.info(`Request received for comprehensive analysis of bill ${bill_id }`);
+    const bill_id_str = req.params.bill_id;
+    if (!bill_id_str) {
+      throw new ValidationError('Bill ID is required', {
+        field: 'bill_id',
+        message: 'Bill ID route parameter is required'
+      });
+    }
 
-    // Run analysis on-demand
-    // For high-traffic systems, consider:
-    // 1. Caching the result here with a short TTL.
-    // 2. Having a background job compute analyses and storing them, then fetching the stored result.
+    const bill_id = parseInt(bill_id_str, 10);
+    if (isNaN(bill_id) || bill_id <= 0) {
+      throw new ValidationError('Invalid bill ID format', {
+        field: 'bill_id',
+        message: 'Bill ID must be a positive integer'
+      });
+    }
+
+    logger.info(`Request received for comprehensive analysis of bill ${bill_id}`, {
+      component: 'AnalysisRoutes',
+      context
+    });
+
     const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
 
-    // Add metadata about the source (live analysis)
-    const metadata = { source: 'live_analysis', timestamp: new Date(startTime), durationMs: Date.now() - startTime };
-    return ApiSuccess(res, analysisResult, metadata);
-
+    const metadata = {
+      source: 'live_analysis',
+      timestamp: new Date().toISOString(),
+      durationMs: Date.now() - req.startTime
+    };
+    res.json({ data: analysisResult, metadata });
   } catch (error) {
-    next(error); // Pass error to the centralized handler
+    if (error instanceof ValidationError || error instanceof BaseError) throw error;
+    logger.error('Failed to retrieve comprehensive analysis', {
+      component: 'AnalysisRoutes',
+      context
+    }, error as Error);
+    throw new BaseError('Failed to retrieve comprehensive analysis', {
+      statusCode: 500,
+      code: ErrorCode.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { bill_id: req.params.bill_id }
+    });
   }
-});
+}));
 
 /**
  * POST /api/analysis/bills/:bill_id/comprehensive/run
- * Manually trigger a new comprehensive analysis run for a specific bills.
- * Useful for admin interfaces or specific events requiring fresh analysis.
- * Requires Authentication (e.g., admin role).
+ * Manually trigger a new comprehensive analysis run for a specific bill.
+ * Requires admin role.
  */
-router.post('/bills/:bill_id/comprehensive/run', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const startTime = Date.now();
-    // Example Role Check (adjust role name as needed)
+router.post('/bills/:bill_id/comprehensive/run', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'POST /bills/:bill_id/comprehensive/run');
+  try {
+    // Authorization check
     if (req.user?.role !== 'admin') {
-        logger.warn(`Unauthorized attempt to run analysis by user ${req.user?.id}`, { component: 'AnalysisRoutes' });
-        // Use standard error response
-        return ApiError(res, "Permission denied. Admin role required.", 403);
+      logger.warn(`Unauthorized analysis trigger attempt by user ${req.user?.id}`, {
+        component: 'AnalysisRoutes',
+        context
+      });
+      throw new BaseError('Insufficient permissions to trigger analysis', {
+        statusCode: 403,
+        code: ErrorCode.ACCESS_DENIED,
+        domain: ErrorDomain.AUTHORIZATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { required_role: 'admin', user_id: req.user?.id }
+      });
     }
 
-    try { const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
-        logger.info(`Admin trigger for NEW comprehensive analysis run for bill ${bill_id } by user ${req.user?.id}`);
-
-        // Run the analysis (this might take time - consider background job for long analyses)
-        const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
-
-        const metadata = { source: 'manual_trigger', timestamp: new Date(startTime), durationMs: Date.now() - startTime };
-        // Use 201 Created as a new analysis run was initiated and completed
-        return ApiSuccess(res, { message: "Analysis re-run completed successfully.", analysis: analysisResult }, metadata, 201);
-
-    } catch (error) {
-        next(error);
+    const bill_id_str = req.params.bill_id;
+    if (!bill_id_str) {
+      throw new ValidationError('Bill ID is required', {
+        field: 'bill_id',
+        message: 'Bill ID route parameter is required'
+      });
     }
-});
+
+    const bill_id = parseInt(bill_id_str, 10);
+    if (isNaN(bill_id) || bill_id <= 0) {
+      throw new ValidationError('Invalid bill ID format', {
+        field: 'bill_id',
+        message: 'Bill ID must be a positive integer'
+      });
+    }
+
+    logger.info(`Admin trigger for comprehensive analysis of bill ${bill_id} by user ${req.user?.id}`, {
+      component: 'AnalysisRoutes',
+      context
+    });
+
+    const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
+
+    const metadata = {
+      source: 'manual_trigger',
+      triggered_by: req.user?.id,
+      timestamp: new Date().toISOString()
+    };
+    res.status(201).json({
+      message: 'Analysis re-run completed successfully',
+      data: analysisResult,
+      metadata
+    });
+  } catch (error) {
+    if (error instanceof ValidationError || error instanceof BaseError) throw error;
+    logger.error('Analysis trigger failed', {
+      component: 'AnalysisRoutes',
+      context,
+      user_id: req.user?.id
+    }, error as Error);
+    throw new BaseError('Analysis trigger failed', {
+      statusCode: 500,
+      code: ErrorCode.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { bill_id: req.params.bill_id, user_id: req.user?.id }
+    });
+  }
+}));
 
 /**
  * GET /api/analysis/bills/:bill_id/history
- * Retrieve historical comprehensive analysis runs for a bill from the repository.
+ * Retrieve historical comprehensive analysis runs for a bill.
  */
-router.get('/bills/:bill_id/history', async (req: Request, res: Response, next: NextFunction) => { const startTime = Date.now();
-    try {
-        const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
-        // Validate limit query parameter
-        const limitParam = req.query.limit as string | undefined;
-        let limit = 10; // Default limit
-        if (limitParam !== undefined) {
-             const parsedLimit = parseInt(limitParam, 10);
-             if (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 50) {
-                 throw new Error("Invalid 'limit' query parameter: Must be an integer between 1 and 50.");
-              }
-             limit = parsedLimit;
-        }
-
-
-        // Use the new analysis service for historical data
-        const historyRecords = await analysisService.findHistoryByBillId(bill_id, limit);
-
-        // Transform results for frontend consumption, extracting key info from JSONB
-        const historyResults = historyRecords.map(record => {
-            const resultsData = record.results as any; // Cast to access potential fields
-            return {
-                dbId: record.id, // Include DB record ID
-                analysis_id: resultsData?.analysis_id,
-                timestamp: record.created_at, // Use DB creation time
-                version: resultsData?.version || record.analysis_type,
-                overallConfidence: parseFloat(record.confidence ?? '0'),
-                status: resultsData?.status || 'unknown', // Include status if saved
-                // Optionally include a summary of scores
-                scores: {
-                    publicInterest: resultsData?.publicInterestScore?.score,
-                    transparency: resultsData?.transparency_score?.overall,
-                    constitutional: resultsData?.constitutionalAnalysis?.constitutionalityScore,
-                },
-                // recommendationsCount: resultsData?.recommendations?.length ?? 0,
-            };
-        });
-
-        const metadata = { source: 'database', timestamp: new Date(startTime), durationMs: Date.now() - startTime };
-        return ApiSuccess(res, { history: historyResults, count: historyResults.length }, metadata);
-    } catch (error) {
-        next(error);
+router.get('/bills/:bill_id/history', asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /bills/:bill_id/history');
+  try {
+    const bill_id_str = req.params.bill_id;
+    if (!bill_id_str) {
+      throw new ValidationError('Bill ID is required', {
+        field: 'bill_id',
+        message: 'Bill ID route parameter is required'
+      });
     }
-});
+
+    const bill_id = parseInt(bill_id_str, 10);
+    if (isNaN(bill_id) || bill_id <= 0) {
+      throw new ValidationError('Invalid bill ID format', {
+        field: 'bill_id',
+        message: 'Bill ID must be a positive integer'
+      });
+    }
+
+    // Validate limit query parameter
+    let limit = 10; // Default limit
+    if (req.query.limit) {
+      const limitParam = req.query.limit as string;
+      const parsedLimit = parseInt(limitParam, 10);
+      if (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 50) {
+        throw new ValidationError('Invalid limit parameter', {
+          field: 'limit',
+          message: 'Limit must be an integer between 1 and 50'
+        });
+      }
+      limit = parsedLimit;
+    }
+
+    const historyRecords = await analysisService.findHistoryByBillId(bill_id, limit);
+
+    // Transform results for frontend consumption
+    const historyResults = historyRecords.map((record: any) => {
+      const resultsData = record.results as any;
+      return {
+        dbId: record.id,
+        analysis_id: resultsData?.analysis_id,
+        timestamp: record.created_at,
+        version: resultsData?.version || record.analysis_type,
+        overallConfidence: parseFloat(record.confidence ?? '0'),
+        status: resultsData?.status || 'unknown',
+        scores: {
+          publicInterest: resultsData?.publicInterestScore?.score,
+          transparency: resultsData?.transparency_score?.overall,
+          constitutional: resultsData?.constitutionalAnalysis?.constitutionalityScore
+        }
+      };
+    });
+
+    const metadata = {
+      source: 'database',
+      timestamp: new Date().toISOString(),
+      count: historyResults.length
+    };
+    res.json({ data: { history: historyResults, count: historyResults.length }, metadata });
+  } catch (error) {
+    if (error instanceof ValidationError || error instanceof BaseError) throw error;
+    logger.error('Failed to retrieve analysis history', {
+      component: 'AnalysisRoutes',
+      context,
+      bill_id: req.params.bill_id
+    }, error as Error);
+    throw new BaseError('Failed to retrieve analysis history', {
+      statusCode: 500,
+      code: ErrorCode.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { bill_id: req.params.bill_id }
+    });
+  }
+}));
 
 /**
  * GET /api/analysis/health
  * Basic health check endpoint for the analysis feature.
  */
-router.get('/health', (req: Request, res: Response) => {
-    return ApiSuccess(res, { status: 'Analysis feature operational', timestamp: new Date().toISOString() });
+router.get('/health', (req, res: Response) => {
+  res.json({
+    status: 'Analysis feature operational',
+    timestamp: new Date().toISOString()
+  });
 });
 
-
-// --- Centralized Error Handler for this Router ---
-router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    // Log the error with context
-    logger.error(`Error in Analysis route ${req.method} ${req.originalUrl}:`, {
-        component: 'AnalysisRoutes',
-        path: req.path,
-        errorName: err.name,
-        errorMessage: err.message,
-        // stack: err.stack // Optional: include stack trace in logs but not response
-    });
-
-    // Handle specific, known error types
-    if (err.message.includes('Bill with ID') && err.message.includes('not found')) {
-        return ApiError(res, err.message, 404); // Use 404 Not Found
-    }
-    // Handle validation errors (e.g., invalid ID, invalid limit)
-    if (err.message.startsWith('Invalid') || err.message.endsWith('is required.')) {
-        return ApiValidationError(res, err.message); // Use 400 Bad Request
-    }
-    // Handle specific analysis failures if thrown by the service
-    if (err.message.includes('Analysis failed') || err.message.includes('analysis orchestration failed')) {
-         return ApiError(res, `Analysis could not be completed: ${err.message}`, 500);
-     }
-
-    // Generic fallback for unexpected errors
-    return ApiError(res, 'An internal server error occurred during analysis processing.', 500);
-});
-
-export { router as analysisRouter }; // Export with a unique name
-
-
-
-
-
-
-
-
-
+export { router as analysisRouter };

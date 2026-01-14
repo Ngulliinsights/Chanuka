@@ -1,11 +1,11 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool.js';
+import { db } from '@server/infrastructure/database/pool.js';
 import {
   analysis_audit_trail,
   constitutional_analyses,
   constitutional_provisions,
   expert_review_queue,
-  legal_precedents} from '@shared/schema';
+  legal_precedents} from '@server/infrastructure/schema';
 import { and, asc, desc, eq, like, or,sql } from 'drizzle-orm';
 
 // ============================================================================

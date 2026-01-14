@@ -6,7 +6,7 @@
  */
 
 import type { Maybe,Result } from '@shared/core';
-import type { Bill, NewBill } from '@shared/schema';
+import type { Bill, NewBill } from '@server/infrastructure/schema';
 
 export interface IBillRepository {
   /**

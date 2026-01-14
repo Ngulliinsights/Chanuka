@@ -1,18 +1,28 @@
-// TODO: Fix bil
-//import { billService } from '@shared/bills/application/bill-service.js';
+/**
+ * Admin Router - Migrated to Unified Error Handling System
+ * 
+ * Migration from ApiError/ApiForbidden/ApiSuccess to BaseError/ValidationError
+ * 9 routes covering:
+ * - Dashboard analytics
+ * - User management (list, update role, update status)
+ * - System health monitoring
+ * - Cache management
+ * - Query performance analysis
+ * - Application logging
+ */
+
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { commonSchemas,inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
-// Security Services
+import { commonSchemas, inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
 import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder.js';
-// Local Application Imports
 import { authenticateToken, requireRole } from '@server/middleware/auth.js';
-import { logger  } from '@shared/core';
-import { ApiError, ApiForbidden,ApiSuccess } from '@shared/core/utils/api-utils';
-// Database & Schema Imports
-import { database as db } from '@shared/database';
-import { bills,users } from '@shared/schema';
-import { and, count,desc, eq, ilike, or, sql } from 'drizzle-orm';
-import { Request, Response,Router } from 'express';
+import { logger } from '@shared/core';
+import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
+import { ERROR_CODES } from '@shared/constants';
+import { createErrorContext } from '@server/infrastructure/error-handling';
+import { NextFunction, Request, Response, Router } from 'express';
+import { database as db } from '@server/infrastructure/database';
+import { bills, users } from '@server/infrastructure/schema';
+import { and, count, desc, eq, ilike, or, sql } from 'drizzle-orm';
 
 // --- Constants and Types ---
 
@@ -29,7 +39,17 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-const router = Router();
+export const router = Router();
+
+/**
+ * Higher-order function that wraps async route handlers with error handling
+ * Errors are automatically caught and passed to the unified error middleware
+ */
+function asyncHandler(fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+}
 
 // --- Middleware ---
 
@@ -69,7 +89,9 @@ router.use((req, res, next) => {
  * Key optimization: All aggregations happen at the database level, minimizing memory
  * usage and network transfer. Queries execute in parallel for maximum efficiency.
  */
-router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/dashboard', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/admin/dashboard');
+
   try {
     // Execute all dashboard queries in parallel to minimize total response time
     const [billStats, userStats, recentBills, recentUsers] = await Promise.all([
@@ -164,8 +186,6 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
         recent: recentUsers,
       },
       system: {
-        // TODO: Fix cacheStats when billService is available
-        // cacheStats: billService.getCacheStats(),
         cacheStats: { hits: 0, misses: 0, size: 0 },
         uptime: process.uptime(),
         memory: process.memoryUsage(),
@@ -174,19 +194,21 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
       },
     };
 
-    return ApiSuccess(res, stats);
+    res.json(stats);
   } catch (error) {
     logger.error('Admin dashboard critical error', {
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'DASHBOARD_FETCH_ERROR',
-      message: 'Failed to fetch dashboard data',
+    throw new BaseError('Failed to fetch dashboard data', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
 /**
  * GET /api/admin/users
@@ -195,7 +217,9 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
  * Uses Drizzle's composable query builder for type-safe, SQL-injection-proof queries.
  * Supports filtering by role and searching across name/email fields with case-insensitive matching.
  */
-router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/admin/users');
+  
   try {
     const { page = '1', limit = '20', role, search } = req.query;
 
@@ -206,11 +230,14 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     );
 
     if (!paginationValidation.isValid) {
-      return ApiError(res, {
-        code: 'INVALID_PAGINATION',
-        message: 'Invalid pagination parameters',
-        details: paginationValidation.errors
-      }, 400);
+      throw new ValidationError('Invalid pagination parameters', [
+        {
+          field: 'pagination',
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Invalid pagination parameters',
+          value: paginationValidation.errors
+        }
+      ]);
     }
 
     const { page: pageNum, limit: limitNum, offset } = secureQueryBuilder.validatePaginationParams(
@@ -223,11 +250,14 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     if (search && typeof search === 'string') {
       const searchValidation = inputValidationService.validateSearchQuery(search);
       if (!searchValidation.isValid) {
-        return ApiError(res, {
-          code: 'INVALID_SEARCH',
-          message: 'Invalid search query',
-          details: searchValidation.errors
-        }, 400);
+        throw new ValidationError('Invalid search query', [
+          {
+            field: 'search',
+            code: ERROR_CODES.VALIDATION_ERROR,
+            message: 'Invalid search query',
+            value: searchValidation.errors
+          }
+        ]);
       }
       sanitizedSearch = searchValidation.data;
     }
@@ -237,11 +267,14 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     if (role && typeof role === 'string') {
       const roleValidation = inputValidationService.validateUserRole(role);
       if (!roleValidation.isValid) {
-        return ApiError(res, {
-          code: 'INVALID_ROLE',
-          message: 'Invalid role parameter',
-          details: roleValidation.errors
-        }, 400);
+        throw new ValidationError('Invalid role parameter', [
+          {
+            field: 'role',
+            code: ERROR_CODES.VALIDATION_ERROR,
+            message: 'Invalid role parameter',
+            value: roleValidation.errors
+          }
+        ]);
       }
       validatedRole = roleValidation.data as UserRole;
     }
@@ -289,7 +322,7 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
       secureQueryBuilder.sanitizeOutput(user)
     );
 
-    return ApiSuccess(res, {
+    res.json({
       users: sanitizedUsers,
       pagination: {
         page: pageNum,
@@ -299,19 +332,22 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
         hasNext: pageNum < totalPages,
         hasPrev: pageNum > 1
       },
+      message: 'Users retrieved successfully'
     });
   } catch (error) {
     logger.error('Error fetching users list', {
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'USERS_FETCH_ERROR',
-      message: 'Failed to fetch users',
+    throw new BaseError('Failed to fetch users', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
 /**
  * PUT /api/admin/users/:id/role
@@ -328,24 +364,34 @@ router.put('/users/:id/role',
     commonSchemas.userUpdate.pick({ role: true }),
     'body'
   ),
-  async (req: AuthenticatedRequest, res: Response) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const context = createErrorContext(req, 'PUT /api/admin/users/:id/role');
     const { id } = req.params;
+    
     try {
       const { role } = req.body as { role: UserRole };
 
       // Additional validation for role update
       const roleValidation = inputValidationService.validateUserRole(role);
       if (!roleValidation.isValid) {
-        return ApiError(res, {
-          code: 'INVALID_ROLE',
-          message: 'Invalid role provided',
-          details: roleValidation.errors
-        }, 400);
+        throw new ValidationError('Invalid role provided', [
+          {
+            field: 'role',
+            code: ERROR_CODES.VALIDATION_ERROR,
+            message: 'Invalid role provided',
+            value: roleValidation.errors
+          }
+        ]);
       }
 
       // Prevent admins from accidentally demoting themselves and losing access
       if (req.user?.id === id && req.user?.role === 'admin' && role !== 'admin') {
-        return ApiForbidden(res, 'Admins cannot demote their own role.');
+        throw new BaseError('Admins cannot demote their own role', {
+          statusCode: 403,
+          code: ERROR_CODES.ACCESS_DENIED,
+          domain: ErrorDomain.AUTHORIZATION,
+          severity: ErrorSeverity.MEDIUM,
+        });
       }
 
       // Transaction ensures atomicity: either both operations succeed or both roll back
@@ -391,30 +437,34 @@ router.put('/users/:id/role',
         }
       );
 
-      return ApiSuccess(res, {
+      res.json({
         user: result.updatedUser,
         message: 'User role updated successfully'
       });
     } catch (error) {
       if (error instanceof Error && error.message === 'UserNotFound') {
-        return ApiError(res, {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found',
+        throw new BaseError('User not found', {
+          statusCode: 404,
+          code: ERROR_CODES.RESOURCE_NOT_FOUND,
+          domain: ErrorDomain.SYSTEM,
+          severity: ErrorSeverity.LOW,
           details: { user_id: id }
-        }, 404);
+        });
       }
       logger.error('Error updating user role', {
         component: 'admin-router',
         user_id: id,
         error: error instanceof Error ? error.message : String(error)
       });
-      return ApiError(res, {
-        code: 'USER_ROLE_UPDATE_ERROR',
-        message: 'Failed to update user role',
+      throw new BaseError('Failed to update user role', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
         details: { user_id: id }
-      }, 500);
+      });
     }
-  });
+  }));
 
 /**
  * PUT /api/admin/users/:id/status
@@ -431,23 +481,33 @@ router.put('/users/:id/status',
     commonSchemas.userUpdate.pick({ is_active: true }),
     'body'
   ),
-  async (req: AuthenticatedRequest, res: Response) => {
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const context = createErrorContext(req, 'PUT /api/admin/users/:id/status');
     const { id } = req.params;
+    
     try {
       const { is_active } = req.body;
 
       // Additional validation already handled by middleware
       if (typeof is_active !== 'boolean') {
-        return ApiError(res, {
-          code: 'INVALID_STATUS',
-          message: 'The "is_active" field must be a boolean value.',
-          details: { providedValue: is_active, expectedType: 'boolean' }
-        }, 400);
+        throw new ValidationError('The "is_active" field must be a boolean value', [
+          {
+            field: 'is_active',
+            code: ERROR_CODES.VALIDATION_ERROR,
+            message: 'Expected boolean value',
+            value: is_active
+          }
+        ]);
       }
 
       // Prevent admins from accidentally locking themselves out
       if (req.user?.id === id && !is_active) {
-        return ApiForbidden(res, 'You cannot deactivate your own account.');
+        throw new BaseError('You cannot deactivate your own account', {
+          statusCode: 403,
+          code: ERROR_CODES.ACCESS_DENIED,
+          domain: ErrorDomain.AUTHORIZATION,
+          severity: ErrorSeverity.MEDIUM,
+        });
       }
 
       // Transaction ensures we only update if the user exists
@@ -493,30 +553,34 @@ router.put('/users/:id/status',
         }
       );
 
-      return ApiSuccess(res, {
+      res.json({
         user: result.updatedUser,
         message: `User account has been ${is_active ? 'activated' : 'deactivated'}.`
       });
     } catch (error) {
       if (error instanceof Error && error.message === 'UserNotFound') {
-        return ApiError(res, {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found',
+        throw new BaseError('User not found', {
+          statusCode: 404,
+          code: ERROR_CODES.RESOURCE_NOT_FOUND,
+          domain: ErrorDomain.SYSTEM,
+          severity: ErrorSeverity.LOW,
           details: { user_id: id }
-        }, 404);
+        });
       }
       logger.error('Error updating user status', {
         component: 'admin-router',
         user_id: id,
         error: error instanceof Error ? error.message : String(error)
       });
-      return ApiError(res, {
-        code: 'USER_STATUS_UPDATE_ERROR',
-        message: 'Failed to update user status',
+      throw new BaseError('Failed to update user status', {
+        statusCode: 500,
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.HIGH,
         details: { user_id: id }
-      }, 500);
+      });
     }
-  });
+  }));
 
 /**
  * GET /api/admin/system/health
@@ -524,7 +588,9 @@ router.put('/users/:id/status',
  * 
  * Returns structured health information for monitoring and alerting systems.
  */
-router.get('/system/health', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/system/health', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/admin/system/health');
+  
   try {
     const health = {
       status: 'healthy' as 'healthy' | 'degraded' | 'critical',
@@ -537,8 +603,6 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
         connected: false,
         responseTime: 0
       },
-      // TODO: Fix cache stats when billService is available
-      // cache: billService.getCacheStats()
       cache: { hits: 0, misses: 0, size: 0 }
     };
 
@@ -558,19 +622,21 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
       });
     }
 
-    return ApiSuccess(res, health);
+    res.json(health);
   } catch (error) {
     logger.error('System health check critical error', {
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'HEALTH_CHECK_ERROR',
-      message: 'Failed to fetch system health',
+    throw new BaseError('Failed to fetch system health', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
 /**
  * POST /api/admin/cache/clear
@@ -579,9 +645,11 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
  * Use this endpoint to force cache invalidation when data is updated through
  * external means or when troubleshooting stale data issues.
  */
-router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => {
+router.post('/cache/clear', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'POST /api/admin/cache/clear');
+  
   try {
-    // TODO: Fix clearCache when billService is available
+    // Cache clearing logic would go here
     // billService.clearCache();
 
     // Log this admin action for compliance and debugging
@@ -596,7 +664,7 @@ router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => 
       }
     );
 
-    return ApiSuccess(res, {
+    res.json({
       message: 'Cache cleared successfully',
       timestamp: new Date().toISOString()
     });
@@ -605,13 +673,15 @@ router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => 
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'CACHE_CLEAR_ERROR',
-      message: 'Failed to clear cache',
+    throw new BaseError('Failed to clear cache', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
 /**
  * GET /api/admin/slow-queries
@@ -620,10 +690,24 @@ router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => 
  * Supports filtering by query type (SELECT, INSERT, etc.) and minimum duration threshold.
  * This helps identify performance bottlenecks in your application.
  */
-router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/slow-queries', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/admin/slow-queries');
+  
   try {
     const { limit = '50', type, minDuration } = req.query;
     const queryLimit = Math.min(parseInt(limit as string) || 50, 500);
+
+    // Validate limit parameter
+    if (isNaN(queryLimit) || queryLimit < 1) {
+      throw new ValidationError('Invalid limit parameter', [
+        {
+          field: 'limit',
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Limit must be a positive number between 1 and 500',
+          value: limit
+        }
+      ]);
+    }
 
     // Dynamic import allows this to work even if query executor isn't available
     const { queryExecutor } = await import('../../../query-executor');
@@ -675,27 +759,30 @@ router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => 
       explainPlan: q.explainPlan?.split('\n').slice(0, 10).join('\n')
     }));
 
-    return ApiSuccess(res, {
+    res.json({
       slowQueries: formattedQueries,
       summary,
       filters: {
         limit: queryLimit,
         type: type || null,
         minDuration: minDuration || null
-      }
+      },
+      message: 'Slow queries retrieved successfully'
     });
   } catch (error) {
     logger.error('Error fetching slow queries', {
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'SLOW_QUERIES_FETCH_ERROR',
-      message: 'Failed to fetch slow queries. Ensure the query executor module is available.',
-      details: { component: 'admin-router' }
-    }, 500);
+    throw new BaseError('Failed to fetch slow queries', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'admin-router', note: 'Ensure the query executor module is available' }
+    });
   }
-});
+}));
 
 /**
  * DELETE /api/admin/slow-queries
@@ -704,7 +791,9 @@ router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => 
  * Use this after you've analyzed current slow queries and want to start
  * fresh monitoring after deploying optimizations.
  */
-router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/slow-queries', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'DELETE /api/admin/slow-queries');
+  
   try {
     const { queryExecutor } = await import('../../../query-executor');
     queryExecutor.clearSlowQueries();
@@ -721,7 +810,7 @@ router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) 
       }
     );
 
-    return ApiSuccess(res, {
+    res.json({
       message: 'Slow query history cleared successfully',
       timestamp: new Date().toISOString()
     });
@@ -730,13 +819,15 @@ router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) 
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'SLOW_QUERIES_CLEAR_ERROR',
-      message: 'Failed to clear slow queries',
+    throw new BaseError('Failed to clear slow queries', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
 /**
  * GET /api/admin/logs
@@ -745,10 +836,24 @@ router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) 
  * NOTE: This is a placeholder implementation. In production, integrate with
  * your actual logging backend (Winston transport, Datadog, LogRocket, etc.)
  */
-router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/logs', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/admin/logs');
+  
   try {
     const { level = 'all', limit = '100' } = req.query;
     const logLimit = Math.min(parseInt(limit as string) || 100, 1000);
+
+    // Validate limit parameter
+    if (isNaN(logLimit) || logLimit < 1) {
+      throw new ValidationError('Invalid limit parameter', [
+        {
+          field: 'limit',
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Limit must be a positive number between 1 and 1000',
+          value: limit
+        }
+      ]);
+    }
 
     // Mock implementation - replace with actual logging service integration
     const logs = [{
@@ -762,32 +867,29 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
       }
     }];
 
-    return ApiSuccess(res, {
+    res.json({
       logs,
       count: logs.length,
       filters: { level, limit: logLimit },
-      note: 'This is a placeholder endpoint. Integrate with your production logging backend (e.g., Winston, Pino, Datadog) for real log data.'
+      note: 'This is a placeholder endpoint. Integrate with your production logging backend (e.g., Winston, Pino, Datadog) for real log data.',
+      message: 'Logs retrieved successfully'
     });
   } catch (error) {
     logger.error('Error fetching logs', {
       component: 'admin-router',
       error: error instanceof Error ? error.message : String(error)
     });
-    return ApiError(res, {
-      code: 'LOGS_FETCH_ERROR',
-      message: 'Failed to fetch logs',
+    throw new BaseError('Failed to fetch logs', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
       details: { component: 'admin-router' }
-    }, 500);
+    });
   }
-});
+}));
 
-export { router };
-
-
-
-
-
-
-
-
-
+/**
+ * All errors are now handled by the unified error middleware
+ * (createUnifiedErrorMiddleware) which is registered in server/index.ts
+ */

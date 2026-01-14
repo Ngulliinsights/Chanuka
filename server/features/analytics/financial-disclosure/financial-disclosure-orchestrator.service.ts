@@ -3,7 +3,7 @@
 // Maintains backward compatibility with the original API
 
 import { cache, DatabaseError,logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { sponsors } from "@shared/foundation";
 import type {
   CompletenessReport,

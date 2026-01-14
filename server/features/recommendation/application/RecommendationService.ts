@@ -1,5 +1,5 @@
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { RecommendationEngine } from '@shared/domain/RecommendationEngine';
 import { RecommendationValidator } from '@shared/domain/RecommendationValidator';
 import { RecommendationCache } from '@shared/infrastructure/RecommendationCache';
@@ -10,7 +10,7 @@ import {
   bill_tags,
   bills,
   user_interests,
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
 
 /**

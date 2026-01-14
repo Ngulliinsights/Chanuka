@@ -2,8 +2,8 @@
 import type { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
 import { getDefaultCache  } from '@shared/core/caching';
-import { database as db, readDatabase } from '@shared/database';
-import { bill_cosponsors,bill_engagement, bills, comments, sponsors, user_interests, users } from '@shared/schema';
+import { database as db, readDatabase } from '@server/infrastructure/database';
+import { bill_cosponsors,bill_engagement, bills, comments, sponsors, user_interests, users } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
 // Cache key constants (moved from cache-service.ts)

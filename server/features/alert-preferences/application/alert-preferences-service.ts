@@ -1,11 +1,11 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool.js';
+import { db } from '@server/infrastructure/database/pool.js';
 import {
   alert_preferences,
   type Notification,
   notifications,
   type User,
-  users} from '@shared/schema';
+  users} from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, gte, inArray, isNotNull,like, lte, or, sql } from 'drizzle-orm';
 
 // ============================================================================

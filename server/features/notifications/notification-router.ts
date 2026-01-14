@@ -1,10 +1,13 @@
+import { Router, Response } from 'express';
+import { z } from 'zod';
+
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
 import { logger } from '@shared/core';
-import { ApiResponseWrapper,ApiSuccess, ApiValidationError } from '@shared/core/utils/api-utils';
-import { Router } from "express";
-import { z } from "zod";
-
-import { notificationService } from "./notification-service";
+import { asyncHandler } from '@/middleware/error-management';
+import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { notificationService } from './notification-service';
 
 export const router: Router = Router();
 
@@ -43,84 +46,63 @@ const updateAlertPreferencesSchema = z.object({
 });
 
 // ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function handleApiError(res: any, error: unknown, message: string, startTime: number) {
-  logger.error(message, { component: 'NotificationRouter' }, error);
-
-  const errorDetails = error instanceof Error ? { message: error.message } : undefined;
-
-  return res.status(500).json({
-    success: false,
-    message,
-    error: errorDetails,
-    metadata: ApiResponseWrapper.createMetadata(startTime, 'database')
-  });
-}
-
-function createErrorResponse(res: any, message: string, statusCode: number, startTime: number) {
-  return res.status(statusCode).json({
-    success: false,
-    message,
-    metadata: ApiResponseWrapper.createMetadata(startTime, 'database')
-  });
-}
-
-/**
- * Transform Zod validation errors to the expected format
- */
-function transformZodErrors(zodErrors: any[]): Array<{ field: string; message: string }> {
-  return zodErrors.map(err => ({
-    field: err.path.join('.'),
-    message: err.message
-  }));
-}
-
-// ============================================================================
 // NOTIFICATION ENDPOINTS
 // ============================================================================
 
 /**
- * GET /notifications
- * Get user's notifications with filtering and pagination
+ * GET /notifications - Get user's notifications with filtering and pagination
  */
-router.get("/", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.get('/', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/notifications');
 
   try {
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     // Validate query parameters
     const queryResult = notificationFiltersSchema.safeParse(req.query);
     if (!queryResult.success) {
-      const errors = queryResult.error.errors.map(err => ({
-        field: err.path.join('.'),
-        message: err.message
-      }));
-      return ApiValidationError(res, errors,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      throw new ValidationError('Invalid filter parameters', queryResult.error.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message,
+        code: 'VALIDATION_ERROR'
+      })));
     }
 
     const result = await notificationService.getUserNotifications(user_id, queryResult.data);
 
-    return ApiSuccess(res, result,
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json(result);
   } catch (error) {
-    return handleApiError(res, error, "Failed to fetch notifications", startTime);
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to fetch notifications', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch notifications', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
   }
-});
+}));
 
 /**
- * POST /notifications
- * Create a new notification (admin/system use)
+ * POST /notifications - Create a new notification (admin/system use)
  */
-router.post("/", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.post('/', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'POST /api/notifications');
 
   try {
     const data = req.body;
@@ -128,9 +110,11 @@ router.post("/", requireAuth, async (req, res) => {
     // Validate input
     const result = createNotificationSchema.safeParse(data);
     if (!result.success) {
-      const errors = transformZodErrors(result.error.errors);
-      return ApiValidationError(res, errors,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      throw new ValidationError('Invalid notification data', result.error.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message,
+        code: 'VALIDATION_ERROR'
+      })));
     }
 
     const notification = await notificationService.createNotification({
@@ -144,248 +128,409 @@ router.post("/", requireAuth, async (req, res) => {
       delivery_method: result.data.delivery_method
     });
 
-    return ApiSuccess(res, notification,
-      ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
+    res.status(201).json(notification);
   } catch (error) {
-    return handleApiError(res, error, "Failed to create notification", startTime);
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+
+    logger.error('Failed to create notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to create notification', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes' }
+    });
   }
-});
+}));
 
 /**
- * PUT /notifications/:id/read
- * Mark a notification as read
+ * PUT /notifications/:id/read - Mark a notification as read
  */
-router.put("/:id/read", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.put('/:id/read', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'PUT /api/notifications/:id/read');
 
   try {
     const notification_id = req.params.id;
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     if (!notification_id) {
-      return createErrorResponse(res, "Notification ID is required", 400, startTime);
+      throw new ValidationError('Notification ID is required', [
+        { field: 'id', message: 'Notification ID parameter is required', code: 'REQUIRED_FIELD' }
+      ]);
     }
 
     const success = await notificationService.markAsRead(notification_id, user_id);
 
     if (!success) {
-      return createErrorResponse(res, "Notification not found or access denied", 404, startTime);
+      throw new BaseError('Notification not found or access denied', {
+        statusCode: 404,
+        code: ERROR_CODES.RESOURCE_NOT_FOUND,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.LOW,
+        details: { component: 'notification-routes', notificationId: notification_id }
+      });
     }
 
-    return ApiSuccess(res, { success: true },
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json({ success: true });
   } catch (error) {
-    return handleApiError(res, error, "Failed to mark notification as read", startTime);
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to mark notification as read', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to mark notification as read', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', notificationId: req.params.id }
+    });
   }
-});
+}));
 
 /**
- * PUT /notifications/read-multiple
- * Mark multiple notifications as read
+ * PUT /notifications/read-multiple - Mark multiple notifications as read
  */
-router.put("/read-multiple", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.put('/read-multiple', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'PUT /api/notifications/read-multiple');
 
   try {
     const { notification_ids } = req.body;
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     if (!Array.isArray(notification_ids) || notification_ids.length === 0) {
-      return createErrorResponse(res, "Notification IDs array is required", 400, startTime);
+      throw new ValidationError('Invalid notification IDs', [
+        { field: 'notification_ids', message: 'Notification IDs array is required and must not be empty', code: 'REQUIRED_FIELD' }
+      ]);
     }
 
     const updatedCount = await notificationService.markMultipleAsRead(notification_ids, user_id);
 
-    return ApiSuccess(res, { success: true, updatedCount },
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json({ success: true, updatedCount });
   } catch (error) {
-    return handleApiError(res, error, "Failed to mark notifications as read", startTime);
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to mark multiple notifications as read', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to mark notifications as read', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
   }
-});
+}));
 
 /**
- * PUT /notifications/:id/dismiss
- * Dismiss a notification
+ * PUT /notifications/:id/dismiss - Dismiss a notification
  */
-router.put("/:id/dismiss", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.put('/:id/dismiss', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'PUT /api/notifications/:id/dismiss');
 
   try {
     const notification_id = req.params.id;
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     if (!notification_id) {
-      return createErrorResponse(res, "Notification ID is required", 400, startTime);
+      throw new ValidationError('Notification ID is required', [
+        { field: 'id', message: 'Notification ID parameter is required', code: 'REQUIRED_FIELD' }
+      ]);
     }
 
     const success = await notificationService.dismissNotification(notification_id, user_id);
 
     if (!success) {
-      return createErrorResponse(res, "Notification not found or access denied", 404, startTime);
+      throw new BaseError('Notification not found or access denied', {
+        statusCode: 404,
+        code: ERROR_CODES.RESOURCE_NOT_FOUND,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.LOW,
+        details: { component: 'notification-routes', notificationId: notification_id }
+      });
     }
 
-    return ApiSuccess(res, { success: true },
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json({ success: true });
   } catch (error) {
-    return handleApiError(res, error, "Failed to dismiss notification", startTime);
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to dismiss notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to dismiss notification', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', notificationId: req.params.id }
+    });
   }
-});
+}));
 
 /**
- * DELETE /notifications/:id
- * Delete a notification
+ * DELETE /notifications/:id - Delete a notification
  */
-router.delete("/:id", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.delete('/:id', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'DELETE /api/notifications/:id');
 
   try {
     const notification_id = req.params.id;
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     if (!notification_id) {
-      return createErrorResponse(res, "Notification ID is required", 400, startTime);
+      throw new ValidationError('Notification ID is required', [
+        { field: 'id', message: 'Notification ID parameter is required', code: 'REQUIRED_FIELD' }
+      ]);
     }
 
     const success = await notificationService.deleteNotification(notification_id, user_id);
 
     if (!success) {
-      return createErrorResponse(res, "Notification not found or access denied", 404, startTime);
+      throw new BaseError('Notification not found or access denied', {
+        statusCode: 404,
+        code: ERROR_CODES.RESOURCE_NOT_FOUND,
+        domain: ErrorDomain.SYSTEM,
+        severity: ErrorSeverity.LOW,
+        details: { component: 'notification-routes', notificationId: notification_id }
+      });
     }
 
-    return ApiSuccess(res, { success: true },
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json({ success: true });
   } catch (error) {
-    return handleApiError(res, error, "Failed to delete notification", startTime);
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to delete notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to delete notification', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', notificationId: req.params.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // STATISTICS ENDPOINTS
 // ============================================================================
 
 /**
- * GET /notifications/stats
- * Get notification statistics for the user
+ * GET /notifications/stats - Get notification statistics for the user
  */
-router.get("/stats", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.get('/stats', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/notifications/stats');
 
   try {
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     const stats = await notificationService.getNotificationStats(user_id);
 
-    return ApiSuccess(res, stats,
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json(stats);
   } catch (error) {
-    return handleApiError(res, error, "Failed to fetch notification statistics", startTime);
+    if (error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to fetch notification statistics', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch notification statistics', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
   }
-});
+}));
 
 // ============================================================================
 // ALERT PREFERENCES ENDPOINTS
 // ============================================================================
 
 /**
- * GET /notifications/preferences
- * Get user's alert preferences
+ * GET /notifications/preferences - Get user's alert preferences
  */
-router.get("/preferences", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.get('/preferences', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/notifications/preferences');
 
   try {
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     const preferences = await notificationService.getUserAlertPreferences(user_id);
 
-    return ApiSuccess(res, preferences,
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json(preferences);
   } catch (error) {
-    return handleApiError(res, error, "Failed to fetch alert preferences", startTime);
+    if (error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to fetch alert preferences', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch alert preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
   }
-});
+}));
 
 /**
- * PUT /notifications/preferences
- * Update user's alert preferences
+ * PUT /notifications/preferences - Update user's alert preferences
  */
-router.put("/preferences", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.put('/preferences', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'PUT /api/notifications/preferences');
 
   try {
     const user_id = (req as any).user?.id;
     const data = req.body;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     // Validate input
     const result = updateAlertPreferencesSchema.safeParse(data);
     if (!result.success) {
-      const errors = transformZodErrors(result.error.errors);
-      return ApiValidationError(res, errors,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      throw new ValidationError('Invalid preference data', result.error.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message,
+        code: 'VALIDATION_ERROR'
+      })));
     }
 
     const preferences = await notificationService.updateUserAlertPreferences(user_id, result.data);
 
-    return ApiSuccess(res, preferences,
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json(preferences);
   } catch (error) {
-    return handleApiError(res, error, "Failed to update alert preferences", startTime);
-  }
-});
+    if (error instanceof ValidationError || error instanceof BaseError) {
+      throw error;
+    }
 
-// ============================================================================
-// CONTACT METHODS ENDPOINTS
-// ============================================================================
+    logger.error('Failed to update alert preferences', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to update alert preferences', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
+  }
+}));
 
 /**
- * GET /notifications/contact-methods
- * Get user's contact methods for notification delivery
+ * GET /notifications/contact-methods - Get user's contact methods for notification delivery
  */
-router.get("/contact-methods", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.get('/contact-methods', requireAuth, asyncHandler(async (req, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/notifications/contact-methods');
 
   try {
     const user_id = (req as any).user?.id;
 
     if (!user_id) {
-      return createErrorResponse(res, "Authentication required", 401, startTime);
+      throw new BaseError('Authentication required', {
+        statusCode: 401,
+        code: ERROR_CODES.NOT_AUTHENTICATED,
+        domain: ErrorDomain.AUTHENTICATION,
+        severity: ErrorSeverity.MEDIUM,
+        details: { component: 'notification-routes' }
+      });
     }
 
     const contactMethods = await notificationService.getUserContactMethods(user_id);
 
-    return ApiSuccess(res, contactMethods,
-      ApiResponseWrapper.createMetadata(startTime, 'database'));
+    res.json(contactMethods);
   } catch (error) {
-    return handleApiError(res, error, "Failed to fetch contact methods", startTime);
+    if (error instanceof BaseError) {
+      throw error;
+    }
+
+    logger.error('Failed to fetch contact methods', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+
+    throw new BaseError('Failed to fetch contact methods', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'notification-routes', userId: (req as any).user?.id }
+    });
   }
-});
-
-
+}));

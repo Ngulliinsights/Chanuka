@@ -1,10 +1,10 @@
 import { logger  } from '@shared/core';
-import { db } from '@shared/database/pool';
+import { db } from '@server/infrastructure/database/pool';
 import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
 import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
 import { User } from '@shared/domain/entities/user';
 import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
-import { user_profiles,users } from '@shared/schema';
+import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
 
 import { databaseService } from '@/infrastructure/database/database-service';

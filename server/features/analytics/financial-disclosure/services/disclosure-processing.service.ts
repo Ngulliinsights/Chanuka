@@ -7,7 +7,7 @@ import type {
   SponsorInfo} from '@server/types/index.js';
 import { FinancialDisclosureConfig } from '@shared/config';
 import { cache, DatabaseError,logger, NotFoundError  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import {
 sponsorAffiliations,
   sponsors, sponsorTransparency} from "@shared/foundation";

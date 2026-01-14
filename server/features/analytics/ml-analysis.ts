@@ -1,8 +1,8 @@
-import { errorTracker } from '@server/core/errors/error-tracker.ts';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database';
-import { bills } from '@shared/schema';
-import { argumentTable } from '@shared/schema/argument_intelligence';
+import { database as db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { argumentTable } from '@server/infrastructure/schema/argument_intelligence';
 import { desc,eq } from 'drizzle-orm';
 
 import type {

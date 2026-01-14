@@ -2,10 +2,10 @@
 import { cacheService } from '@server/infrastructure/cache/cache-service';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { cacheKeys } from '@shared/core/caching/key-generator';
-import { database as db } from '@shared/database';
-import { comments } from '@shared/schema';
-import { user_profiles,users } from '@shared/schema';
-import { bills } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { comments } from '@server/infrastructure/schema';
+import { user_profiles,users } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, inArray,isNull, or, sql } from 'drizzle-orm';
 
 import { logger } from '@/shared/core';

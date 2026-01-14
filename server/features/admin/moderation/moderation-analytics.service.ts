@@ -6,7 +6,7 @@
 
 import { ContentAnalytics } from '@server/features/admin/moderation/types.ts';
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { bill, 
   comments, 
   content_report, 

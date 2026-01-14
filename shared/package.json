@@ -6,7 +6,13 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./types": "./types/index.ts",
+    "./validation": "./validation/index.ts",
+    "./constants": "./constants/index.ts",
+    "./i18n": "./i18n/index.ts",
+    "./utils": "./utils/index.ts",
     "./core": "./core/src/index.ts",
+    "./core/*": "./core/src/*",
     "./schema": "./schema/index.ts",
     "./database": "./database/index.ts",
     "./platform": "./platform/index.ts"

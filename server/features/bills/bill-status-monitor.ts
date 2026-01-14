@@ -2,9 +2,9 @@ import { cacheService } from '@server/infrastructure/cache/cache-service.js';
 import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator.js';
 import { webSocketService } from '@server/infrastructure/websocket.js';
 import { logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
-import * as schema from '@shared/schema';
-import { Bill } from '@shared/schema';
+import { readDatabase } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
+import { Bill } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 // --- Cache Configuration ---

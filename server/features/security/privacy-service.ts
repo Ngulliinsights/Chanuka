@@ -1,8 +1,8 @@
 import { encryptionService } from '@server/features/security/encryption-service.ts';
 import { securityAuditService } from '@server/features/security/security-audit-service.ts';
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
-import { comments, notifications, sessions,user_profiles, users } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { comments, notifications, sessions,user_profiles, users } from '@server/infrastructure/schema';
 import { and, eq, lt } from 'drizzle-orm';
 import { Request } from 'express';
 

@@ -13,8 +13,8 @@
  */
 
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database';
-import { databaseService } from '@shared/database/database-service';
+import { database as db } from '@server/infrastructure/database';
+import { databaseService } from '@server/infrastructure/database/database-service';
 import { and, asc, count, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
 
 // Type helper to ensure timestamp fields exist

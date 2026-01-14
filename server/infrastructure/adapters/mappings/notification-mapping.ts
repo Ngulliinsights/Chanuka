@@ -6,7 +6,7 @@
  */
 
 import { EntityMapping } from '@shared/drizzle-adapter';
-import { notifications } from '@shared/schema';
+import { notifications } from '@server/infrastructure/schema';
 
 import { Notification } from '@/features/notifications/domain/entities/notification';
 

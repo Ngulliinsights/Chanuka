@@ -6,7 +6,7 @@ import type {
   FinancialDisclosure} from '@server/types/index.js';
 import { FinancialDisclosureConfig } from '@shared/config';
 import { cache, DatabaseError,logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { and, count,desc, eq, sql } from "drizzle-orm";
 

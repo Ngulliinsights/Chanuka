@@ -1,6 +1,6 @@
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
-import { bill_cosponsors, bills, sponsors as sponsorAffiliations,sponsors } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { bill_cosponsors, bills, sponsors as sponsorAffiliations,sponsors } from '@server/infrastructure/schema';
 import { and, eq, or } from 'drizzle-orm';
 import { z } from 'zod';
 

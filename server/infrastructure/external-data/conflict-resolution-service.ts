@@ -6,8 +6,8 @@
  */
 
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
-import { data_sources } from '@shared/schema';
+import { readDatabase } from '@server/infrastructure/database';
+import { data_sources } from '@server/infrastructure/schema';
 import { and,eq } from 'drizzle-orm';
 
 import { 

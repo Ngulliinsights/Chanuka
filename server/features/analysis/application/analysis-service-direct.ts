@@ -1,12 +1,12 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@shared/database/pool.js';
+import { db } from '@server/infrastructure/database/pool.js';
 import {
   bill_engagement,
   bills,
   comments,
   constitutional_analyses,
   sponsors,
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 import { and, count,desc, eq, sql } from 'drizzle-orm';
 
 // ============================================================================

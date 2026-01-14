@@ -1,6 +1,6 @@
 import { logger   } from '@shared/core';
-import { database as db } from '@shared/database';
-import * as schema from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
 import { and, desc, eq, inArray,sql } from 'drizzle-orm';
 import { z } from 'zod';
 

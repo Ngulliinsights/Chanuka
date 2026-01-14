@@ -1,9 +1,9 @@
-import { databaseService } from '@shared/database/database-service';
+import { databaseService } from '@server/infrastructure/database/database-service';
 import {
   AsyncServiceResult,
   ResultAdapter,
   withResultHandling} from '@shared/errors/result-adapter.js';
-import { bill_engagement,bills, comments, users } from '@shared/schema/index.js';
+import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index.js';
 import { and, avg, count, desc,eq, sql } from "drizzle-orm";
 
 import { logger } from '@/shared/core';

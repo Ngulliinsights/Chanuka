@@ -5,8 +5,8 @@
 // Replaces PostgreSQL trigram-based fuzzy matching with more flexible scoring
 
 import { SearchEngine,SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { database } from '@shared/database';
-import { bills, comments, sponsors, users } from '@shared/schema';
+import { database } from '@server/infrastructure/database';
+import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
 import { sql } from 'drizzle-orm';
 import Fuse from 'fuse.js';
 

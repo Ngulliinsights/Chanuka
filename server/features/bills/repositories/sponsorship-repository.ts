@@ -5,13 +5,13 @@
 // compile and tests can mock or replace these functions with real DB
 // logic later.
 
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import {
   bill_sponsorships,
   billSectionConflicts,
   sponsorAffiliations,
   sponsors,
-  sponsorTransparency} from '@shared/schema';
+  sponsorTransparency} from '@server/infrastructure/schema';
 import { desc,eq, inArray } from 'drizzle-orm';
 
 export interface SponsorAffiliation {

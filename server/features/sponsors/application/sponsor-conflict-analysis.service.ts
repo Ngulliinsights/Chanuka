@@ -3,7 +3,7 @@ import { logger   } from '@shared/core';
 
 import { sponsorService } from './sponsor-service-direct';
 const loggerAny = logger as any;
-import type { Bill,Sponsor } from '@shared/schema';
+import type { Bill,Sponsor } from '@server/infrastructure/schema';
 // Local helper types used by this service but not exported elsewhere in repo
 type BillSponsorship = { id?: number; bill_id: number; role?: string  };
 

@@ -1,68 +1,58 @@
-import { BillNotFoundError, billService, CommentNotFoundError, ValidationError } from '@shared/application/bills.js';
-import { ApiError, ApiNotFound, ApiResponse, ApiSuccess, ApiValidationError } from '@shared/core';
-import { NextFunction,Request, Response, Router } from 'express';
+/**
+ * Bills Router - Complete Migration to New Error System
+ * 
+ * This is a fully migrated version using:
+ * - BaseError, ValidationError from @shared/core/observability/error-management
+ * - ERROR_CODES from @shared/constants
+ * - Unified error middleware for handling all errors
+ * - asyncHandler() for automatic error propagation
+ * - createErrorContext() for distributed tracing
+ */
+
+import { NextFunction, Response, Router } from 'express';
 
 import type { AuthenticatedRequest } from '../../../../AuthAlert';
 import { authenticateToken } from '../../../../AuthAlert';
-// Temporary logger import - will be fixed when shared/core is properly configured
+import { securityAuditService } from '../../../../security-audit-service';
+import { billService } from '@shared/application/bills.js';
+import { ERROR_CODES } from '@shared/constants';
+import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
+import { createErrorContext } from '@server/infrastructure/error-handling';
+
 const logger = {
-  error: (message: string, context?: any, error?: any) => {
+  error: (message: string, context?: Record<string, unknown>, error?: Error) => {
     console.error(`[ERROR] ${message}`, context || '', error || '');
   },
-  info: (message: string, context?: any, meta?: any) => {
+  info: (message: string, context?: Record<string, unknown>, meta?: Record<string, unknown>) => {
     console.info(`[INFO] ${message}`, context || '', meta || '');
   }
 };
-import type { Bill, BillComment } from '@shared/schema/index.js';
 
-import { securityAuditService } from '../../../../security-audit-service';
-
-const router = Router();
+const router: Router = Router();
 
 /**
  * Utility function to parse and validate integer parameters from route params
- * This reduces code duplication and provides consistent validation across all endpoints
+ * Throws ValidationError for invalid values (caught by unified middleware)
  */
-function parseIntParam(value: string, paramName: string): { valid: true; value: number } | { valid: false; error: string } {
+function parseIntParam(value: string, paramName: string): number {
   const parsed = parseInt(value, 10);
   if (isNaN(parsed) || parsed <= 0) {
-    return { valid: false, error: `${paramName} must be a valid positive number` };
+    throw new ValidationError(`${paramName} must be a valid positive number`, [
+      {
+        field: paramName,
+        message: `${paramName} must be a valid positive number`,
+        value,
+      },
+    ]);
   }
-  return { valid: true, value: parsed };
-}
-
-/**
- * Centralized error handler that maps domain errors to appropriate HTTP responses
- * This approach keeps our route handlers clean and maintains consistent error responses
- */
-function handleRouteError(res: Response, error: unknown, context: string, user_id?: number): void {
-    // Log the error with full context for debugging and monitoring
-    logger.error(`Error in ${context}:`, { component: 'BillsRouter',
-      context,
-      user_id: user_id !== undefined ? String(user_id) : undefined,
-      errorType: error instanceof Error ? error.constructor.name : 'Unknown'
-     }, error);
-
-    // Map domain-specific errors to appropriate HTTP responses
-    if (error instanceof BillNotFoundError || error instanceof CommentNotFoundError) {
-      ApiNotFound(res, error.message);
-      return;
-    }
-
-    if (error instanceof ValidationError) {
-      ApiValidationError(res, [{ field: 'general', message: error.message }]);
-      return;
-    }
-
-    // Generic fallback for unexpected errors
-    ApiError(res, `Failed to ${context.toLowerCase()}`);
+  return parsed;
 }
 
 /**
  * Higher-order function that wraps async route handlers with error handling
- * This eliminates the need for try-catch blocks in every route handler
+ * Errors are automatically caught and passed to the unified error middleware
  */
-function asyncHandler(fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<any>) {
+function asyncHandler(fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
@@ -71,13 +61,9 @@ function asyncHandler(fn: (req: AuthenticatedRequest, res: Response, next: NextF
 /**
  * GET /api/bills
  * Retrieve all bills with optional filtering by tags
- * 
- * Query Parameters:
- *   - tags: comma-separated string or array of tag names
- *   - limit: maximum number of results (optional)
- *   - offset: pagination offset (optional)
  */
 router.get('/', asyncHandler(async (req, res) => {
+  const context = createErrorContext(req, 'GET /api/bills');
   const { tags, limit, offset } = req.query;
   
   // Parse pagination parameters with sensible defaults
@@ -86,25 +72,41 @@ router.get('/', asyncHandler(async (req, res) => {
 
   // Validate pagination parameters if provided
   if (parsedLimit !== undefined && (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 100)) {
-    return ApiValidationError(res, [{ field: 'limit', message: 'Limit must be a positive number between 1 and 100' }]);
+    throw new ValidationError('Invalid limit parameter', [
+      {
+        field: 'limit',
+        message: 'Limit must be a positive number between 1 and 100',
+        value: parsedLimit,
+      },
+    ]);
   }
 
   if (parsedOffset !== undefined && (isNaN(parsedOffset) || parsedOffset < 0)) {
-    return ApiValidationError(res, [{ field: 'offset', message: 'Offset must be a non-negative number' }]);
+    throw new ValidationError('Invalid offset parameter', [
+      {
+        field: 'offset',
+        message: 'Offset must be a non-negative number',
+        value: parsedOffset,
+      },
+    ]);
   }
   
   let bills;
   if (tags) {
-    // Normalize tags input to always work with an array, handling both formats gracefully
     const tagArray = Array.isArray(tags) 
       ? tags.filter(tag => typeof tag === 'string' && tag.trim()) as string[]
       : (tags as string).split(',').map(tag => tag.trim()).filter(Boolean);
     
     if (tagArray.length === 0) {
-      return ApiValidationError(res, [{ field: 'tags', message: 'At least one valid tag must be provided' }]);
+      throw new ValidationError('At least one valid tag must be provided', [
+        {
+          field: 'tags',
+          message: 'At least one valid tag must be provided',
+          value: tags,
+        },
+      ]);
     }
     
-    // billService currently returns the full set; apply pagination here
     const all = await billService.getBillsByTags(tagArray);
     const start = parsedOffset || 0;
     const end = parsedLimit ? start + parsedLimit : undefined;
@@ -116,17 +118,16 @@ router.get('/', asyncHandler(async (req, res) => {
     bills = typeof end === 'number' ? all.slice(start, end) : all.slice(start);
   }
 
-  // Log data access for bill listing
   await securityAuditService.logDataAccess(
     'bills:list',
     'read',
     req,
-    String((req as any).user?.id || ''),
+    String((req as AuthenticatedRequest).user?.id || ''),
     bills.length,
     true
   );
 
-  return ApiSuccess(res, {
+  res.json({
     bills,
     count: bills.length,
     hasMore: parsedLimit ? bills.length === parsedLimit : false,
@@ -142,63 +143,61 @@ router.get('/', asyncHandler(async (req, res) => {
 /**
  * GET /api/bills/:id
  * Retrieve a specific bill by ID and increment its view count
- * 
- * The view count is incremented asynchronously to minimize response latency
- * View count failures are logged but don't affect the primary response
  */
 router.get('/:id', asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.id, 'Bill ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
-   }
+  const context = createErrorContext(req, 'GET /api/bills/:id');
+  const billId = parseIntParam(req.params.id, 'Bill ID');
 
-  const bill = await billService.getBill(idResult.value);
+  const bill = await billService.getBill(billId);
+  if (!bill) {
+    throw new BaseError('Bill not found', {
+      statusCode: 404,
+      code: ERROR_CODES.BILL_NOT_FOUND,
+      domain: ErrorDomain.APPLICATION,
+      severity: ErrorSeverity.LOW,
+      details: { billId },
+      context,
+    });
+  }
 
-  // Log data access
   await securityAuditService.logDataAccess(
-    `bill:${idResult.value}`,
+    `bill:${billId}`,
     'read',
     req,
-    (req as any).user?.id,
+    (req as AuthenticatedRequest).user?.id,
     1,
     true
   );
 
-  // Fire-and-forget pattern for view count: improves performance without sacrificing reliability
-  // If the increment fails, we log it but don't block the user's request
-  billService.incrementBillViews(idResult.value).catch(err =>
-    logger.error('Failed to increment bill views:', { bill_id: idResult.value,
+  billService.incrementBillViews(billId).catch((err: Error) =>
+    logger.error('Failed to increment bill views:', { 
+      bill_id: billId,
       component: 'BillsRouter'
-     }, err)
+    }, err)
   );
 
-  return ApiSuccess(res, { bill });
+  res.json({ bill });
 }));
 
 /**
  * POST /api/bills
  * Create a new bill (requires authentication)
- * 
- * The authenticated user is automatically set as the sponsor unless explicitly overridden
- * This ensures proper attribution while allowing flexibility for administrative actions
  */
 router.post('/', authenticateToken, asyncHandler(async (req, res) => {
   const billData = {
     ...req.body,
-    // Default to authenticated user as sponsor, but allow override for admin actions
     sponsor_id: req.body.sponsor_id || req.user!.id
   };
 
   const newBill = await billService.createBill(billData);
 
-  // Log successful bill creation for audit trail
-  logger.info('Bill created successfully', { component: 'BillsRouter',
+  logger.info('Bill created successfully', { 
+    component: 'BillsRouter',
     bill_id: newBill.id,
     user_id: req.user!.id,
     sponsor_id: billData.sponsor_id
-    });
+  });
 
-  // Log data access for bill creation
   await securityAuditService.logDataAccess(
     `bill:${newBill.id}`,
     'write',
@@ -208,28 +207,33 @@ router.post('/', authenticateToken, asyncHandler(async (req, res) => {
     true
   );
 
-  return ApiSuccess(res, {
+  res.status(201).json({
     bill: newBill,
     message: 'Bill created successfully'
-  }, undefined, 201);
+  });
 }));
 
 /**
  * POST /api/bills/:id/share
  * Increment share count for a bill
- * 
- * This is a public endpoint to support social sharing without authentication
- * Consider implementing rate limiting to prevent abuse
  */
 router.post('/:id/share', asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.id, 'Bill ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
-   }
+  const context = createErrorContext(req, 'POST /api/bills/:id/share');
+  const billId = parseIntParam(req.params.id, 'Bill ID');
 
-  const updatedBill = await billService.incrementBillShares(idResult.value);
+  const updatedBill = await billService.incrementBillShares(billId);
+  if (!updatedBill) {
+    throw new BaseError('Failed to update bill shares', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { billId },
+      context,
+    });
+  }
 
-  return ApiSuccess(res, {
+  res.json({
     bill: updatedBill,
     shares: updatedBill.shares,
     message: 'Share count updated'
@@ -239,137 +243,126 @@ router.post('/:id/share', asyncHandler(async (req, res) => {
 /**
  * GET /api/bills/:id/comments
  * Retrieve all comments for a specific bill with optional filtering
- * 
- * Query Parameters:
- *   - highlighted: if 'true', returns only highlighted comments
- *   - sortBy: 'recent', 'popular', or 'endorsements' (default: 'recent')
  */
 router.get('/:id/comments', asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.id, 'Bill ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
-   }
+  const billId = parseIntParam(req.params.id, 'Bill ID');
 
   const { highlighted, sortBy } = req.query;
 
-  // Validate query parameters
   if (sortBy && !['recent', 'popular', 'endorsements'].includes(sortBy as string)) {
-    return ApiValidationError(res, [{ field: 'sortBy', message: 'sortBy must be one of: recent, popular, endorsements' }]);
+    throw new ValidationError('Invalid sortBy parameter', [
+      {
+        field: 'sortBy',
+        message: 'sortBy must be one of: recent, popular, endorsements',
+        value: sortBy,
+      },
+    ]);
   }
 
-  const commentsRaw = await billService.getBillComments(idResult.value);
+  const commentsRaw = await billService.getBillComments(billId);
 
-  // Apply filtering and sorting at the router level since service returns raw comments
   let comments = commentsRaw.slice();
   if (highlighted === 'true') {
-    comments = comments.filter(c => (c as any).isHighlighted === true);
+    comments = comments.filter((c: { isHighlighted?: boolean }) => c.isHighlighted === true);
   }
 
   const sortKey = (sortBy as string) || 'recent';
   if (sortKey === 'recent') {
-    comments.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    comments.sort((a: { created_at: string }, b: { created_at: string }) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
   } else if (sortKey === 'popular') {
-    comments.sort((a: any, b: any) => (b.likes || 0) - (a.likes || 0));
+    comments.sort((a: { likes?: number }, b: { likes?: number }) => 
+      (b.likes || 0) - (a.likes || 0)
+    );
   } else if (sortKey === 'endorsements') {
-    comments.sort((a: any, b: any) => (b.endorsements || 0) - (a.endorsements || 0));
+    comments.sort((a: { endorsements?: number }, b: { endorsements?: number }) => 
+      (b.endorsements || 0) - (a.endorsements || 0)
+    );
   }
 
-  return ApiSuccess(res, { comments,
+  res.json({ 
+    comments,
     count: comments.length,
-    bill_id: idResult.value,
-    filters: { highlighted: highlighted === 'true', sortBy: sortKey  }
+    bill_id: billId,
+    filters: { highlighted: highlighted === 'true', sortBy: sortKey }
   });
 }));
 
 /**
  * POST /api/bills/:id/comments
  * Create a new comment on a bill (requires authentication)
- * 
- * Supports both top-level comments and replies to existing comments
- * The parent_id field determines whether this is a reply
  */
 router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.id, 'Bill ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
-   }
+  const billId = parseIntParam(req.params.id, 'Bill ID');
 
-   // Validate parent comment ID if this is a reply
-   if (req.body.parent_id !== undefined) {
-     const parent_idResult = parseIntParam(req.body.parent_id.toString(), 'Parent Comment ID');
-     if (!parent_idResult.valid) {
-       return ApiValidationError(res, [{ field: 'parent_id', message: (parent_idResult as any).error }]);
-     }
-   }
+  if (req.body.parent_id !== undefined) {
+    parseIntParam(req.body.parent_id.toString(), 'Parent Comment ID');
+  }
 
-  const commentData = { ...req.body,
-    bill_id: idResult.value,
+  const commentData = { 
+    ...req.body,
+    bill_id: billId,
     user_id: req.user!.id
-    };
+  };
 
   const newComment = await billService.createBillComment(commentData);
 
-  // Log comment creation for moderation and analytics
-  logger.info('Comment created', { component: 'BillsRouter',
+  logger.info('Comment created', { 
+    component: 'BillsRouter',
     comment_id: newComment.id,
-    bill_id: idResult.value,
+    bill_id: billId,
     user_id: req.user!.id,
     isReply: !!req.body.parent_id
-    });
+  });
 
-  return ApiSuccess(res, {
+  res.status(201).json({
     comment: newComment,
     message: 'Comment created successfully'
-  }, undefined, 201);
+  });
 }));
 
 /**
  * GET /api/bills/comments/:comment_id/replies
- * Get all replies to a specific comment (supports nested discussions)
- * 
- * This enables threaded conversations and improves discussion organization
+ * Get all replies to a specific comment
  */
 router.get('/comments/:comment_id/replies', asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
-   }
+  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
 
-  const replies = await billService.getCommentReplies(idResult.value);
+  const replies = await billService.getCommentReplies(commentId);
 
-  return ApiSuccess(res, {
+  res.json({
     replies,
     count: replies.length,
-    parent_id: idResult.value
+    parent_id: commentId
   });
 }));
 
 /**
  * PUT /api/bills/comments/:comment_id/endorsements
  * Update endorsement count for a comment (requires authentication)
- * 
- * This endpoint should be idempotent - calling it multiple times with the same
- * endorsement value should not create duplicate endorsements
  */
 router.put('/comments/:comment_id/endorsements', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
-   }
+  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
 
   const { endorsements } = req.body;
 
-  // Validate endorsements is a non-negative integer
   if (typeof endorsements !== 'number' || !Number.isInteger(endorsements) || endorsements < 0) {
-    return ApiValidationError(res, [{ field: 'endorsements', message: 'Endorsements must be a non-negative integer' }]);
+    throw new ValidationError('Invalid endorsements value', [
+      {
+        field: 'endorsements',
+        message: 'Endorsements must be a non-negative integer',
+        value: endorsements,
+      },
+    ]);
   }
 
   const updatedComment = await billService.updateBillCommentEndorsements(
-    idResult.value,
+    commentId,
     endorsements
   );
 
-  return ApiSuccess(res, {
+  res.json({
     comment: updatedComment,
     message: 'Endorsements updated successfully'
   });
@@ -378,32 +371,32 @@ router.put('/comments/:comment_id/endorsements', authenticateToken, asyncHandler
 /**
  * PUT /api/bills/comments/:comment_id/highlight
  * Highlight a comment (requires authentication and appropriate permissions)
- * 
- * Highlighted comments are featured prominently in the UI
- * This is typically restricted to moderators and administrators
  */
 router.put('/comments/:comment_id/highlight', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
-   }
+  const context = createErrorContext(req, 'PUT /api/bills/comments/:comment_id/highlight');
+  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
 
-  // Check if user has permission to highlight comments
-  // This could be expanded to check for moderator role as well
   if (req.user!.role !== 'admin' && req.user!.role !== 'moderator') {
-    return ApiError(res, 'Insufficient permissions to highlight comments', 403);
+    throw new BaseError('Insufficient permissions to highlight comments', {
+      statusCode: 403,
+      code: ERROR_CODES.INSUFFICIENT_PERMISSIONS,
+      domain: ErrorDomain.AUTHORIZATION,
+      severity: ErrorSeverity.MEDIUM,
+      details: { commentId, userRole: req.user!.role },
+      context,
+    });
   }
 
-  const updatedComment = await billService.highlightComment(idResult.value);
+  const updatedComment = await billService.highlightComment(commentId);
 
-  // Log highlight action for audit trail
-  logger.info('Comment highlighted', { component: 'BillsRouter',
-    comment_id: idResult.value,
+  logger.info('Comment highlighted', { 
+    component: 'BillsRouter',
+    comment_id: commentId,
     user_id: req.user!.id,
     user_role: req.user!.role
-   });
+  });
 
-  return ApiSuccess(res, {
+  res.json({
     comment: updatedComment,
     message: 'Comment highlighted successfully'
   });
@@ -414,23 +407,30 @@ router.put('/comments/:comment_id/highlight', authenticateToken, asyncHandler(as
  * Remove highlight from a comment (requires authentication and appropriate permissions)
  */
 router.delete('/comments/:comment_id/highlight', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
-   if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
-   }
+  const context = createErrorContext(req, 'DELETE /api/bills/comments/:comment_id/highlight');
+  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
 
   if (req.user!.role !== 'admin' && req.user!.role !== 'moderator') {
-    return ApiError(res, 'Insufficient permissions to unhighlight comments', 403);
+    throw new BaseError('Insufficient permissions to remove highlight from comments', {
+      statusCode: 403,
+      code: ERROR_CODES.INSUFFICIENT_PERMISSIONS,
+      domain: ErrorDomain.AUTHORIZATION,
+      severity: ErrorSeverity.MEDIUM,
+      details: { commentId, userRole: req.user!.role },
+      context,
+    });
   }
 
-  const updatedComment = await billService.unhighlightComment(idResult.value);
+  const updatedComment = await billService.unhighlightComment(commentId);
 
-  logger.info('Comment unhighlighted', { component: 'BillsRouter',
-    comment_id: idResult.value,
-    user_id: req.user!.id
-   });
+  logger.info('Comment highlight removed', { 
+    component: 'BillsRouter',
+    comment_id: commentId,
+    user_id: req.user!.id,
+    user_role: req.user!.role
+  });
 
-  return ApiSuccess(res, {
+  res.json({
     comment: updatedComment,
     message: 'Comment highlight removed successfully'
   });
@@ -439,18 +439,24 @@ router.delete('/comments/:comment_id/highlight', authenticateToken, asyncHandler
 /**
  * GET /api/bills/cache/stats
  * Get cache performance statistics (admin only)
- * 
- * This endpoint provides insights into cache hit rates, memory usage,
- * and other performance metrics useful for optimization
  */
 router.get('/cache/stats', authenticateToken, asyncHandler(async (req, res) => {
+  const context = createErrorContext(req, 'GET /api/bills/cache/stats');
+  
   if (req.user!.role !== 'admin') {
-    return ApiError(res, 'Insufficient permissions', 403);
+    throw new BaseError('Insufficient permissions', {
+      statusCode: 403,
+      code: ERROR_CODES.INSUFFICIENT_PERMISSIONS,
+      domain: ErrorDomain.AUTHORIZATION,
+      severity: ErrorSeverity.MEDIUM,
+      details: { userRole: req.user!.role },
+      context,
+    });
   }
 
   const stats = billService.getCacheStats();
 
-  return ApiSuccess(res, {
+  res.json({
     cacheStats: stats,
     timestamp: new Date().toISOString(),
     message: 'Cache statistics retrieved successfully'
@@ -458,66 +464,8 @@ router.get('/cache/stats', authenticateToken, asyncHandler(async (req, res) => {
 }));
 
 /**
- * Global error handler for this router
- * Catches any errors that weren't handled by individual route handlers
+ * All errors are now handled by the unified error middleware
+ * (createUnifiedErrorMiddleware) which is registered in server/index.ts
  */
-router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  return handleRouteError(res, err, 'handle request', (req as any).user?.id);
-});
 
 export { router };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,5 @@
  
-import type { Bill } from '@shared/schema';
+import type { Bill } from '@server/infrastructure/schema';
 
 export interface PlainBill extends Bill {}
 

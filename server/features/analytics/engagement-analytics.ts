@@ -7,7 +7,7 @@ import { getDefaultCache  } from '@shared/core/caching';
 import { cacheKeys  } from '@shared/core/caching/key-generator';
 import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
 import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
-import { database, getDatabase,withTransaction } from '@shared/database';
+import { database, getDatabase,withTransaction } from '@server/infrastructure/database';
 import { bills,comments, user_profiles, users } from '@shared/foundation';
 import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';

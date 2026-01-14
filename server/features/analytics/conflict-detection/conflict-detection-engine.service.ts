@@ -7,7 +7,7 @@
 
 import { logger  } from '@shared/core';
 import { getDefaultCache } from '@shared/core/caching/index.js';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
 import {

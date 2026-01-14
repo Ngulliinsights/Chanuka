@@ -1,6 +1,6 @@
 
-import { database as db } from '@shared/database';
-import { user_verification,users } from '@shared/schema';
+import { database as db } from '@server/infrastructure/database';
+import { user_verification,users } from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
 export interface CitizenVerification {

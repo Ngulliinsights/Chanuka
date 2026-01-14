@@ -1,6 +1,6 @@
 import { logger } from '@shared/core';
-import { type DatabaseTransaction,withTransaction } from '@shared/database/connection';
-import { readDb as readDatabase } from '@shared/database/pool';
+import { type DatabaseTransaction,withTransaction } from '@server/infrastructure/database/connection';
+import { readDb as readDatabase } from '@server/infrastructure/database/pool';
 import {
   type ModerationAppeal,
   moderationAppeals,
@@ -8,7 +8,7 @@ import {
   moderationDecisions,
   moderationQueue,
   type ModerationQueueItem,
-} from '@shared/schema/safeguards';
+} from '@server/infrastructure/schema/safeguards';
 import { and, asc, desc, eq, gte, inArray,lte, or, sql } from 'drizzle-orm';
 
 // ==================== Type Definitions ====================
