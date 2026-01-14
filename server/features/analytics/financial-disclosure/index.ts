@@ -3,7 +3,7 @@
 // Provides REST endpoints for monitoring, analytics, and data export
 
 import { FinancialDisclosureMonitoringService } from "@server/features/analytics/financial-disclosure/monitoring.ts";
-import { FinancialDisclosureAnalyticsService } from "@server/services/financial-disclosure.service.ts";
+import { FinancialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
 import { logger } from '@shared/core/observability/logging/logger.js';
 import { ApiError,ApiSuccess  } from '@shared/core/utils/api-utils.js';
 import * as crypto from 'crypto';

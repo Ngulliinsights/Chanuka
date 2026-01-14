@@ -1,108 +1,43 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+/**
+ * useMobile Hook
+ *
+ * Detects if the viewport is mobile-sized
+ * Default breakpoint: 768px (tablet and below)
+ */
 
-import { useDeviceInfo } from './mobile/useDeviceInfo';
+import { useMediaQuery } from './useMediaQuery';
 
-export function useIsMobile() {
-  const { isMobile } = useDeviceInfo();
-  return isMobile;
+interface UseMobileOptions {
+  /** Custom breakpoint in pixels (default: 768) */
+  breakpoint?: number;
 }
 
-// Enhanced media query hook with SSR support and debouncing
-export function useMediaQuery(query: string): boolean {
-  // Always start with false to prevent hydration mismatches
-  const [matches, setMatches] = useState<boolean>(false);
-  const [isClient, setIsClient] = useState<boolean>(false);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const currentQueryRef = useRef<string>('');
-  const isMountedRef = useRef<boolean>(true);
-  const mediaQueryRef = useRef<MediaQueryList | null>(null);
+export function useMobile(options?: UseMobileOptions): boolean {
+  const breakpoint = options?.breakpoint ?? 768;
+  return useMediaQuery(`(max-width: ${breakpoint - 1}px)`);
+}
 
-  const debouncedSetMatches = useCallback((value: boolean, queryToCheck: string) => {
-    // Clear any existing timer to prevent race conditions
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
+/**
+ * Additional responsive hooks for common breakpoints
+ */
 
-    debounceTimerRef.current = setTimeout(() => {
-      // Only update if query hasn't changed and component is still mounted
-      if (isMountedRef.current && currentQueryRef.current === queryToCheck) {
-        setMatches(value);
-      }
-      debounceTimerRef.current = null;
-    }, 100); // 100ms debounce
-  }, []);
+/** Detects tablet-sized viewports (768px - 1024px) */
+export function useTablet(): boolean {
+  return useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
+}
 
-  useEffect(() => {
-    isMountedRef.current = true;
-    currentQueryRef.current = query;
+/** Detects desktop-sized viewports (1024px and above) */
+export function useDesktop(): boolean {
+  return useMediaQuery('(min-width: 1024px)');
+}
 
-    // Check if we're in a browser environment
-    if (typeof window === 'undefined') {
-      return;
-    }
+/** Detects if device prefers dark mode */
+export function usePrefersColorScheme(): 'light' | 'dark' {
+  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
+  return prefersDark ? 'dark' : 'light';
+}
 
-    // Set isClient to true first
-    setIsClient(true);
-
-    try {
-      const mediaQuery = window.matchMedia(query);
-      mediaQueryRef.current = mediaQuery;
-
-      const handleChange = () => {
-        if (isMountedRef.current && currentQueryRef.current === query) {
-          debouncedSetMatches(mediaQuery.matches, query);
-        }
-      };
-
-      // Use setTimeout to set initial value after state update
-      const timeoutId = setTimeout(() => {
-        if (isMountedRef.current && currentQueryRef.current === query) {
-          setMatches(mediaQuery.matches);
-        }
-      }, 0);
-
-      // Listen for changes
-      mediaQuery.addEventListener('change', handleChange);
-
-      // Cleanup function to remove event listener and clear timeout
-      return () => {
-        isMountedRef.current = false;
-        clearTimeout(timeoutId);
-
-        // Clean up media query listener
-        if (mediaQueryRef.current) {
-          mediaQueryRef.current.removeEventListener('change', handleChange);
-          mediaQueryRef.current = null;
-        }
-
-        // Clean up debounce timer
-        if (debounceTimerRef.current) {
-          clearTimeout(debounceTimerRef.current);
-          debounceTimerRef.current = null;
-        }
-      };
-    } catch (error) {
-      // Handle potential errors with matchMedia
-      console.warn('Error setting up media query:', error);
-      return () => {
-        isMountedRef.current = false;
-      };
-    }
-  }, [query, debouncedSetMatches]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-    };
-  }, []);
-
-  // Return false during SSR and before client-side hydration to prevent layout shifts
-  // Only return actual matches value after we're confirmed to be on the client
-  return isClient ? matches : false;
+/** Detects if user prefers reduced motion */
+export function usePrefersReducedMotion(): boolean {
+  return useMediaQuery('(prefers-reduced-motion: reduce)');
 }

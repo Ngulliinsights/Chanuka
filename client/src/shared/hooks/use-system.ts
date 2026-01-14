@@ -1,12 +1,14 @@
 /**
- * System Hook
+ * System Hooks - Optimized with React Query
  * Provides system-level information and health monitoring
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
+import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/shared/utils/logger';
 
+// Types
 export interface SystemHealth {
   isHealthy: boolean;
   warnings: string[];
@@ -50,234 +52,154 @@ export interface SystemEnvironment {
   timezone: string;
 }
 
-export function useSystem(): {
-  health: SystemHealth;
-  stats: SystemStats;
-  activity: SystemActivity;
-  schema: SystemSchema;
-  environment: SystemEnvironment;
-  checkHealth: () => Promise<void>;
-  getStats: () => SystemStats;
-  resetActivity: () => void;
-} {
-  const [health, setHealth] = useState<SystemHealth>({
-    isHealthy: true,
-    warnings: [],
-    errors: [],
-    lastCheck: Date.now(),
-  });
+// Query keys for easy invalidation
+export const systemKeys = {
+  all: ['system'] as const,
+  health: () => [...systemKeys.all, 'health'] as const,
+  stats: () => [...systemKeys.all, 'stats'] as const,
+  activity: () => [...systemKeys.all, 'activity'] as const,
+  schema: () => [...systemKeys.all, 'schema'] as const,
+  environment: () => [...systemKeys.all, 'environment'] as const,
+};
 
-  const [stats, setStats] = useState<SystemStats>({
-    memory: { used: 0, total: 0, percentage: 0 },
-    performance: { navigation: null, resource: [] },
-    connection: { type: 'unknown', effectiveType: 'unknown', downlink: 0 },
-  });
+// Custom hook options
+interface SystemQueryOptions {
+  refetchInterval?: number;
+  enabled?: boolean;
+}
 
-  const [activity, setActivity] = useState<SystemActivity>({
-    activeRequests: 0,
-    lastActivity: Date.now(),
-    isIdle: true,
-  });
-
-  const [schema, setSchema] = useState<SystemSchema>({
-    version: '1.0.0',
-    features: [],
-    capabilities: [],
-  });
-
-  const [environment, setEnvironment] = useState<SystemEnvironment>({
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  });
-
-  const activityTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Check system health
-  const checkHealth = useCallback(async () => {
-    const warnings: string[] = [];
-    const errors: string[] = [];
-
-    try {
-      // Check memory usage
-      if ('memory' in performance) {
-        const memory = (performance as any).memory;
-        const percentage = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
-
-        if (percentage > 90) {
-          errors.push('High memory usage detected');
-        } else if (percentage > 70) {
-          warnings.push('Memory usage is elevated');
-        }
+/**
+ * Monitor system health
+ * Default: Refetch every 30 seconds
+ */
+export function useSystemHealth(options?: SystemQueryOptions) {
+  return useQuery({
+    queryKey: systemKeys.health(),
+    queryFn: async () => {
+      try {
+        const response = await globalApiClient.get<SystemHealth>('/system/health');
+        return response.data;
+      } catch (error) {
+        logger.error('Failed to fetch system health', { error, component: 'useSystemHealth' });
+        throw error;
       }
+    },
+    refetchInterval: options?.refetchInterval ?? 30000,
+    enabled: options?.enabled ?? true,
+    staleTime: 20000, // Consider fresh for 20s
+    retry: 2,
+  });
+}
 
-      // Check connection quality
-      if ('connection' in navigator) {
-        const connection = (navigator as any).connection;
-        if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
-          warnings.push('Slow network connection detected');
-        }
+/**
+ * Get system performance statistics
+ * Default: Refetch every 60 seconds
+ */
+export function useSystemStats(options?: SystemQueryOptions) {
+  return useQuery({
+    queryKey: systemKeys.stats(),
+    queryFn: async () => {
+      try {
+        const response = await globalApiClient.get<SystemStats>('/system/stats');
+        return response.data;
+      } catch (error) {
+        logger.error('Failed to fetch system stats', { error, component: 'useSystemStats' });
+        throw error;
       }
+    },
+    refetchInterval: options?.refetchInterval ?? 60000,
+    enabled: options?.enabled ?? true,
+    staleTime: 45000,
+    retry: 2,
+  });
+}
 
-      // Check performance metrics
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      if (navigation && navigation.loadEventEnd - navigation.loadEventStart > 5000) {
-        warnings.push('Slow page load detected');
+/**
+ * Track system activity
+ * Default: Refetch every 30 seconds
+ */
+export function useSystemActivity(options?: SystemQueryOptions) {
+  return useQuery({
+    queryKey: systemKeys.activity(),
+    queryFn: async () => {
+      try {
+        const response = await globalApiClient.get<SystemActivity>('/system/activity');
+        return response.data;
+      } catch (error) {
+        logger.error('Failed to fetch system activity', { error, component: 'useSystemActivity' });
+        throw error;
       }
+    },
+    refetchInterval: options?.refetchInterval ?? 30000,
+    enabled: options?.enabled ?? true,
+    staleTime: 20000,
+    retry: 2,
+  });
+}
 
-      const isHealthy = errors.length === 0;
-
-      setHealth({
-        isHealthy,
-        warnings,
-        errors,
-        lastCheck: Date.now(),
-      });
-
-      logger.info('System health check completed', {
-        isHealthy,
-        warnings: warnings.length,
-        errors: errors.length,
-        component: 'useSystem',
-      });
-
-    } catch (error) {
-      logger.error('System health check failed', { error, component: 'useSystem' });
-      setHealth(prev => ({
-        ...prev,
-        isHealthy: false,
-        errors: [...prev.errors, 'Health check failed'],
-      }));
-    }
-  }, []);
-
-  // Get system statistics
-  const getStats = useCallback((): SystemStats => {
-    const newStats: SystemStats = { ...stats };
-
-    // Memory stats
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      newStats.memory = {
-        used: memory.usedJSHeapSize,
-        total: memory.jsHeapSizeLimit,
-        percentage: (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100,
-      };
-    }
-
-    // Performance stats
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const resource = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-
-    newStats.performance = {
-      navigation,
-      resource,
-    };
-
-    // Connection stats
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
-      newStats.connection = {
-        type: connection.type || 'unknown',
-        effectiveType: connection.effectiveType || 'unknown',
-        downlink: connection.downlink || 0,
-      };
-    }
-
-    setStats(newStats);
-    return newStats;
-  }, [stats]);
-
-  // Track system activity
-  const trackActivity = useCallback(() => {
-    setActivity(prev => ({
-      ...prev,
-      activeRequests: prev.activeRequests + 1,
-      lastActivity: Date.now(),
-      isIdle: false,
-    }));
-
-    // Clear existing timer
-    if (activityTimerRef.current) {
-      clearTimeout(activityTimerRef.current);
-    }
-
-    // Set idle timer
-    activityTimerRef.current = setTimeout(() => {
-      setActivity(prev => ({
-        ...prev,
-        isIdle: true,
-      }));
-    }, 5000); // 5 seconds of inactivity
-  }, []);
-
-  // Reset activity tracking
-  const resetActivity = useCallback(() => {
-    setActivity({
-      activeRequests: 0,
-      lastActivity: Date.now(),
-      isIdle: true,
-    });
-  }, []);
-
-  // Initialize system information
-  useEffect(() => {
-    // Initial health check
-    checkHealth();
-
-    // Initial stats collection
-    getStats();
-
-    // Track initial activity
-    trackActivity();
-
-    // Set up periodic health checks
-    const healthInterval = setInterval(checkHealth, 60000); // Every minute
-
-    // Set up periodic stats updates
-    const statsInterval = setInterval(getStats, 30000); // Every 30 seconds
-
-    return () => {
-      clearInterval(healthInterval);
-      clearInterval(statsInterval);
-      if (activityTimerRef.current) {
-        clearTimeout(activityTimerRef.current);
+/**
+ * Get system schema and capabilities
+ * Default: No refetch (static data)
+ */
+export function useSystemSchema(options?: SystemQueryOptions) {
+  return useQuery({
+    queryKey: systemKeys.schema(),
+    queryFn: async () => {
+      try {
+        const response = await globalApiClient.get<SystemSchema>('/system/schema');
+        return response.data;
+      } catch (error) {
+        logger.error('Failed to fetch system schema', { error, component: 'useSystemSchema' });
+        throw error;
       }
-    };
-  }, [checkHealth, getStats, trackActivity]);
+    },
+    enabled: options?.enabled ?? true,
+    staleTime: Infinity, // Schema rarely changes
+    retry: 1,
+  });
+}
 
-  // Listen for performance entries
-  useEffect(() => {
-    const handlePerformanceEntry = (entry: PerformanceEntry) => {
-      if (entry.entryType === 'resource') {
-        setStats(prev => ({
-          ...prev,
-          performance: {
-            ...prev.performance,
-            resource: [...(prev.performance.resource || []), entry as PerformanceResourceTiming],
-          },
-        }));
+/**
+ * Get system environment information
+ * Default: No refetch (static data)
+ */
+export function useSystemEnvironment(options?: SystemQueryOptions) {
+  return useQuery({
+    queryKey: systemKeys.environment(),
+    queryFn: async () => {
+      try {
+        const response = await globalApiClient.get<SystemEnvironment>('/system/environment');
+        return response.data;
+      } catch (error) {
+        logger.error('Failed to fetch system environment', { error, component: 'useSystemEnvironment' });
+        throw error;
       }
-    };
+    },
+    enabled: options?.enabled ?? true,
+    staleTime: Infinity, // Environment info is static
+    retry: 1,
+  });
+}
 
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach(handlePerformanceEntry);
-    });
-
-    observer.observe({ entryTypes: ['resource'] });
-
-    return () => observer.disconnect();
-  }, []);
+/**
+ * Composite hook for complete system overview
+ * Use when you need all system data at once
+ */
+export function useSystemOverview(options?: SystemQueryOptions) {
+  const health = useSystemHealth(options);
+  const stats = useSystemStats(options);
+  const activity = useSystemActivity(options);
+  const schema = useSystemSchema(options);
+  const environment = useSystemEnvironment(options);
 
   return {
-    health,
-    stats,
-    activity,
-    schema,
-    environment,
-    checkHealth,
-    getStats,
-    resetActivity,
+    health: health.data,
+    stats: stats.data,
+    activity: activity.data,
+    schema: schema.data,
+    environment: environment.data,
+    isLoading: health.isLoading || stats.isLoading || activity.isLoading || schema.isLoading || environment.isLoading,
+    isError: health.isError || stats.isError || activity.isError || schema.isError || environment.isError,
+    error: health.error || stats.error || activity.error || schema.error || environment.error,
   };
 }

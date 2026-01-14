@@ -3,7 +3,7 @@
 // ============================================================================
 // Express router for constitutional analysis endpoints
 
-import { createAnalysisServices } from '@server/services/constitutional-analysis-factory.ts';
+import { createAnalysisServices } from '@server/features/constitutional-analysis/application/constitutional-analysis-factory';
 import { ApiResponse,logger  } from '@shared/core';
 import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { Router } from 'express';

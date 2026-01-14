@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * PROJECT STRUCTURE GENERATOR
  *
@@ -8,104 +7,153 @@
  */
 
 import fs from 'fs/promises';
-import fsSync from 'fs';
 import path from 'path';
 
 const CONFIG = {
-    rootDir: path.join(process.cwd(), '..'),
-    outputFile: 'docs/project-structure.md',
-    maxDepth: 7,
-    exclude: [
-        'node_modules', 'dist', 'build', '.git', 'coverage',
-        '.next', 'out', '__tests__', 'vendor', 'backup',
-        '__pycache__', 'target', '.venv', 'venv', 'tmp', 'temp'
-    ]
+  rootDir: process.cwd(),
+  outputFile: 'docs/project-structure.md',
+  maxDepth: 7,
+  exclude: [
+    'node_modules',
+    'dist',
+    'build',
+    '.git',
+    'coverage',
+    '.next',
+    'out',
+    '__tests__',
+    'vendor',
+    'backup',
+    '__pycache__',
+    'target',
+    '.venv',
+    'venv',
+    'tmp',
+    'temp',
+    '.cache'
+  ]
 };
 
+/**
+ * Checks if a path should be excluded
+ */
+function shouldExclude(itemName, relativePath) {
+  return (
+    itemName.startsWith('.') ||
+    CONFIG.exclude.some(pattern => {
+      const segments = relativePath.split(path.sep);
+      return segments.includes(pattern);
+    })
+  );
+}
+
+/**
+ * Builds the directory tree recursively
+ */
 async function buildTree(dir, depth = 0, prefix = '') {
-    if (depth > CONFIG.maxDepth) return [];
+  if (depth > CONFIG.maxDepth) return [];
 
-    const entries = [];
+  const entries = [];
 
-    try {
-        const items = await fs.readdir(dir, { withFileTypes: true });
+  try {
+    const items = await fs.readdir(dir, { withFileTypes: true });
 
-        // Sort: directories first, then files
-        items.sort((a, b) => {
-            if (a.isDirectory() && !b.isDirectory()) return -1;
-            if (!a.isDirectory() && b.isDirectory()) return 1;
-            return a.name.localeCompare(b.name);
-        });
+    // Sort: directories first, then alphabetically
+    items.sort((a, b) => {
+      if (a.isDirectory() !== b.isDirectory()) {
+        return a.isDirectory() ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name, undefined, { numeric: true });
+    });
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const itemPath = path.join(dir, item.name);
-            const relativePath = path.relative(CONFIG.rootDir, itemPath);
+    // Filter excluded items
+    const filtered = items.filter(item => {
+      const itemPath = path.join(dir, item.name);
+      const relativePath = path.relative(CONFIG.rootDir, itemPath);
+      return !shouldExclude(item.name, relativePath);
+    });
 
-            // Skip excluded and hidden items
-            if (item.name.startsWith('.') || CONFIG.exclude.some(ex => relativePath.includes(ex))) {
-                continue;
-            }
+    for (let i = 0; i < filtered.length; i++) {
+      const item = filtered[i];
+      const itemPath = path.join(dir, item.name);
+      const isLast = i === filtered.length - 1;
+      const connector = isLast ? '└── ' : '├── ';
+      const childPrefix = prefix + (isLast ? '    ' : '│   ');
 
-            const isLast = i === items.length - 1;
-            const connector = isLast ? '└── ' : '├── ';
-            const extension = isLast ? '    ' : '│   ';
-
-            if (item.isDirectory()) {
-                entries.push(`${prefix}${connector}${item.name}/`);
-
-                const subEntries = await buildTree(
-                    itemPath,
-                    depth + 1,
-                    prefix + extension
-                );
-                entries.push(...subEntries);
-            } else {
-                entries.push(`${prefix}${connector}${item.name}`);
-            }
-        }
-    } catch (error) {
-        // Skip directories we can't read
+      if (item.isDirectory()) {
+        entries.push(`${prefix}${connector}${item.name}/`);
+        const subEntries = await buildTree(itemPath, depth + 1, childPrefix);
+        entries.push(...subEntries);
+      } else {
+        entries.push(`${prefix}${connector}${item.name}`);
+      }
     }
+  } catch (err) {
+    // Silently skip directories we can't read
+  }
 
-    return entries;
+  return entries;
 }
 
+/**
+ * Generates the markdown structure file
+ */
 async function generateStructure() {
-    console.log('📁 Generating project structure...');
+  console.log('📁 Generating project structure...');
 
-    await fs.mkdir(path.dirname(CONFIG.outputFile), { recursive: true });
+  const outputDir = path.dirname(CONFIG.outputFile);
+  await fs.mkdir(outputDir, { recursive: true });
 
-    const tree = await buildTree(CONFIG.rootDir);
+  const tree = await buildTree(CONFIG.rootDir);
+  const timestamp = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
-    const report = [
-        '# Project Structure',
-        '',
-        `**Generated:** ${new Date().toLocaleString()}`,
-        `**Max Depth:** ${CONFIG.maxDepth} levels`,
-        '',
-        '```',
-        '.',
-        ...tree,
-        '```',
-        '',
-        '## Excluded',
-        '',
-        'The following are excluded from this view:',
-        '- Hidden files and directories (starting with `.`)',
-        ...CONFIG.exclude.map(ex => `- \`${ex}\``),
-        '',
-        '---',
-        '*Generated by Project Structure Generator*'
-    ].join('\n');
+  const report = [
+    '# Project Structure',
+    '',
+    `**Generated:** ${timestamp}`,
+    `**Max Depth:** ${CONFIG.maxDepth} levels`,
+    `**Total Items:** ${tree.length.toLocaleString()}`,
+    '',
+    '```',
+    '.',
+    ...tree,
+    '```',
+    '',
+    '## Configuration',
+    '',
+    '### Excluded Patterns',
+    '',
+    'The following are automatically excluded:',
+    '',
+    ...CONFIG.exclude.map(ex => `- \`${ex}\``),
+    '- Hidden files and directories (starting with \`.`)',
+    '',
+    '### Settings',
+    '',
+    `- **Root Directory:** \`${path.basename(CONFIG.rootDir)}/\``,
+    `- **Maximum Depth:** ${CONFIG.maxDepth} levels`,
+    `- **Output File:** \`${CONFIG.outputFile}\``,
+    '',
+    '---',
+    '',
+    '*Generated automatically by Project Structure Generator*'
+  ].join('\n');
 
-    await fs.writeFile(CONFIG.outputFile, report, 'utf-8');
+  await fs.writeFile(CONFIG.outputFile, report, 'utf-8');
 
-    console.log(`✅ Structure saved to: ${CONFIG.outputFile}`);
-    console.log(`📊 Max depth: ${CONFIG.maxDepth} levels`);
+  console.log(`✅ Structure saved to: ${CONFIG.outputFile}`);
+  console.log(`📊 Items catalogued: ${tree.length.toLocaleString()}`);
+  console.log(`🔍 Max depth: ${CONFIG.maxDepth} levels`);
 }
 
-generateStructure().catch(error => {
-    console.error('❌ Error:', error.message);
-    process.exit(1);
+// Execute
+generateStructure().catch(err => {
+  console.error('❌ Error generating structure:', err.message);
+  process.exit(1);
 });

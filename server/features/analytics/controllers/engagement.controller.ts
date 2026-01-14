@@ -1,4 +1,4 @@
-import { engagementAnalyticsService } from '@server/services/engagement.service.ts';
+import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
 import { z } from 'zod';
 
 import { AuthenticatedRequest } from '@/middleware/auth.js';

@@ -35,15 +35,14 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import React, { useState, useEffect, Suspense, lazy, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import PerformanceMonitor from '@client/shared/components/performance/PerformanceMonitor';
-import { copySystem } from '@client/shared/content/copy-system';
 import { useAuth } from '@client/core/auth';
 import type { User } from '@client/core/auth/types';
-import { personaDetector } from '@client/shared/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
+import PerformanceMonitor from '@client/shared/components/performance/PerformanceMonitor';
+import { copySystem } from '@client/shared/content/copy-system';
 import {
   Badge,
   Button,
@@ -55,11 +54,39 @@ import {
 } from '@client/shared/design-system';
 import { logger } from '@client/shared/utils/logger';
 
-// Lazy load non-critical components for performance
-const PlatformStats = lazy(() => import('../components/home/PlatformStats'));
-const RecentActivity = lazy(() => import('../components/home/RecentActivity'));
-const PersonalizedDashboardPreview = lazy(
-  () => import('../components/home/PersonalizedDashboardPreview')
+// Stub components for future implementation
+const PlatformStats: React.FC<{ stats: StatItem[] }> = ({ stats }) => (
+  <div className="text-center">
+    <h2 className="text-3xl font-bold text-gray-900 mb-8">Platform Statistics</h2>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+      {stats.map((stat) => {
+        const Icon = stat.icon;
+        return (
+          <div key={stat.label} className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg mb-2">
+              <Icon className="h-6 w-6" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+            <div className="text-sm text-gray-600">{stat.label}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+const RecentActivity: React.FC = () => (
+  <div className="text-center">
+    <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Activity</h2>
+    <p className="text-gray-600">Recent activity will be displayed here</p>
+  </div>
+);
+
+const PersonalizedDashboardPreview: React.FC<{ persona: string; userId: string }> = ({ persona, userId }) => (
+  <div className="text-center">
+    <h2 className="text-3xl font-bold text-gray-900 mb-8">Your Dashboard</h2>
+    <p className="text-gray-600">Personalized dashboard for {persona} user</p>
+  </div>
 );
 
 /**
@@ -432,53 +459,29 @@ export default function StrategicHomePage() {
    */
   useEffect(() => {
     if (isAuthenticated && userProfile && !isPersonaDetected) {
-      const detectPersona = async () => {
-        try {
-          const activityHistory: import('@client/shared/types/analytics').UserActivity[] = [];
+      try {
+        // Determine persona based on user role or login count
+        let determinedPersona: 'novice' | 'intermediate' | 'expert' = 'novice';
 
-          // Map ExtendedUserProfile to User type for persona detection
-          const userForPersonaDetection: User = {
-            id: userProfile.id,
-            email: userProfile.email || '',
-            name: userProfile.name || '',
-            role: (userProfile.role as User['role']) || 'citizen',
-            verified: true, // Assume verified if they have a profile
-            twoFactorEnabled: false, // Default value
-            preferences: {
-              notifications: true,
-              emailAlerts: true,
-              theme: 'system',
-              language: 'en',
-            },
-            permissions: [],
-            lastLogin: new Date().toISOString(),
-            createdAt: userProfile.createdAt || new Date().toISOString(),
-          };
-
-          const classification = await personaDetector.detectPersona(
-            userForPersonaDetection,
-            activityHistory,
-            undefined
-          );
-
-          setUserPersona(classification.type);
-          setIsPersonaDetected(true);
-
-          logger.info('User persona detected', {
-            userId: userProfile.id,
-            persona: classification.type,
-            confidence: classification.confidence,
-          });
-        } catch (error) {
-          logger.error('Persona detection failed', { error });
-          // Fallback to role-based or default persona
-          const fallbackPersona = userProfile.role === 'expert' ? 'intermediate' : 'novice';
-          setUserPersona(fallbackPersona);
-          setIsPersonaDetected(true);
+        if (userProfile.role === 'expert') {
+          determinedPersona = 'expert';
+        } else if ((userProfile.login_count || 0) > 5) {
+          determinedPersona = 'intermediate';
         }
-      };
 
-      detectPersona();
+        setUserPersona(determinedPersona);
+        setIsPersonaDetected(true);
+
+        logger.info('User persona detected', {
+          userId: userProfile.id,
+          persona: determinedPersona,
+        });
+      } catch (error) {
+        logger.error('Persona detection failed', { error });
+        // Fallback to novice
+        setUserPersona('novice');
+        setIsPersonaDetected(true);
+      }
     }
   }, [isAuthenticated, userProfile, isPersonaDetected]);
 
@@ -566,15 +569,7 @@ export default function StrategicHomePage() {
               </p>
             </div>
 
-            <Suspense
-              fallback={
-                <div className="flex justify-center items-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              }
-            >
-              <PersonalizedDashboardPreview persona={userPersona} userId={userProfile.id} />
-            </Suspense>
+            <PersonalizedDashboardPreview persona={userPersona} userId={userProfile.id} />
           </div>
         </section>
       ) : (
@@ -755,15 +750,7 @@ export default function StrategicHomePage() {
       {/* Platform Impact Statistics - Always Visible */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="container mx-auto px-4">
-          <Suspense
-            fallback={
-              <div className="flex justify-center items-center py-12">
-                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            }
-          >
-            <PlatformStats stats={stats} />
-          </Suspense>
+          <PlatformStats stats={stats} />
         </div>
       </section>
 
@@ -771,15 +758,7 @@ export default function StrategicHomePage() {
       {!isAuthenticated && (
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <Suspense
-              fallback={
-                <div className="flex justify-center items-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              }
-            >
-              <RecentActivity />
-            </Suspense>
+            <RecentActivity />
           </div>
         </section>
       )}

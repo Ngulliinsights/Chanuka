@@ -1,6 +1,6 @@
 import { cacheService } from '@server/infrastructure/cache/cache-service.js';
 import { demoDataService } from '@server/infrastructure/demo-data.js';
-import { databaseService } from "@server/services/database-service.ts";
+import { databaseService } from '@server/infrastructure/database/database.service';
 import { logger   } from '@shared/core';
 import { readDatabase } from '@shared/database';
 import * as schema from "@shared/schema";

@@ -8,7 +8,6 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import React from 'react';
 
 import {
   languages,
@@ -16,10 +15,16 @@ import {
   saveLanguagePreference,
   getKenyanContext,
   type SupportedLanguage,
-} from '../../utils/i18n';
+} from '@client/shared/utils/i18n';
 
-type Translations = typeof languages.en;
+/**
+ * Translation object type that accepts both English and Swahili
+ */
+type TranslationObject = typeof languages.en | typeof languages.sw;
 
+/**
+ * I18n context interface
+ */
 interface I18nContextType {
   t: (key: string, values?: Record<string, unknown>) => string;
   changeLanguage: (lang: SupportedLanguage) => void;
@@ -31,27 +36,32 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
+/**
+ * I18n Provider Component
+ * Manages language state and provides translation utilities
+ */
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<SupportedLanguage>(() => detectLanguage());
-  const [translations, setTranslations] = useState<Translations>(() => languages[detectLanguage()]);
+  const [translations, setTranslations] = useState<TranslationObject>(() =>
+    languages[detectLanguage()]
+  );
 
   // Load translations when language changes
   useEffect(() => {
-    const loadTranslations = async () => {
+    const loadTranslations = () => {
       try {
         const newTranslations = languages[language];
         setTranslations(newTranslations);
 
         // Update document language and direction
         document.documentElement.lang = language;
-        // Future Arabic support - currently no RTL languages supported
-        document.documentElement.dir = 'ltr';
+        document.documentElement.dir = 'ltr'; // Future: support RTL if needed
 
-        // Save preference
+        // Save preference to localStorage
         saveLanguagePreference(language);
       } catch (error) {
         console.error(`Failed to load translations for ${language}:`, error);
-        // Fallback to English
+        // Fallback to English on error
         setTranslations(languages.en);
       }
     };
@@ -59,17 +69,28 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     loadTranslations();
   }, [language]);
 
+  /**
+   * Translation function with interpolation support
+   * @param key - Dot-notation key (e.g., 'common.loading')
+   * @param values - Optional values for interpolation (e.g., {name: 'John'})
+   * @returns Translated string
+   */
   const t = useCallback(
     (key: string, values?: Record<string, unknown>): string => {
       const keys = key.split('.');
 
-      let value: unknown = translations as unknown;
+      // Navigate through the translation object
+      let value: unknown = translations;
       for (const k of keys) {
-        if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
+        if (
+          value &&
+          typeof value === 'object' &&
+          Object.prototype.hasOwnProperty.call(value, k)
+        ) {
           value = (value as Record<string, unknown>)[k];
         } else {
-          // Fallback to English if key not found
-          let fallbackValue: unknown = languages.en as unknown;
+          // Fallback to English if key not found in current language
+          let fallbackValue: unknown = languages.en;
           for (const fallbackKey of keys) {
             if (
               fallbackValue &&
@@ -78,7 +99,9 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
             ) {
               fallbackValue = (fallbackValue as Record<string, unknown>)[fallbackKey];
             } else {
-              return key; // Return key if not found in fallback either
+              // Return key if not found in fallback either (helps debugging)
+              console.warn(`Translation key not found: ${key}`);
+              return key;
             }
           }
           value = fallbackValue;
@@ -86,37 +109,57 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
+      // Ensure we have a string value
       if (typeof value !== 'string') {
+        console.warn(`Translation value is not a string for key: ${key}`);
         return key;
       }
 
-      // Replace parameters in translation
+      // Interpolate values if provided
       if (values) {
         return Object.entries(values).reduce((acc, [k, v]) => {
           return acc.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
-        }, value as string);
+        }, value);
       }
 
-      return value as string;
+      return value;
     },
     [translations]
   );
 
+  /**
+   * Change the active language
+   */
   const changeLanguage = useCallback((lang: SupportedLanguage) => {
     if (lang in languages) {
       setLanguage(lang);
+    } else {
+      console.warn(`Unsupported language: ${lang}`);
     }
   }, []);
 
+  /**
+   * Kenyan localization context
+   */
   const kenyanContext = useMemo(() => getKenyanContext(), []);
 
-  const availableLanguages = useMemo(() => Object.keys(languages) as SupportedLanguage[], []);
+  /**
+   * List of available languages
+   */
+  const availableLanguages = useMemo(
+    () => Object.keys(languages) as SupportedLanguage[],
+    []
+  );
 
-  const isRTL = useMemo(() => {
-    // Future support for RTL languages
-    return false;
-  }, [language]);
+  /**
+   * Check if current language is RTL
+   * Currently returns false, but can be extended for Arabic support
+   */
+  const isRTL = useMemo(() => false, []);
 
+  /**
+   * Memoized context value
+   */
   const contextValue = useMemo(
     () => ({
       t,
@@ -132,6 +175,10 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   return <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>;
 };
 
+/**
+ * Hook to access i18n context
+ * @throws Error if used outside I18nProvider
+ */
 export const useI18n = () => {
   const context = useContext(I18nContext);
   if (!context) {
@@ -139,3 +186,37 @@ export const useI18n = () => {
   }
   return context;
 };
+
+/**
+ * Type-safe translation key helper
+ * Use this to get autocomplete for translation keys
+ */
+export type TranslationKey =
+  | `common.${keyof typeof languages.en.common}`
+  | `navigation.${keyof typeof languages.en.navigation}`
+  | `errors.${keyof typeof languages.en.errors}`
+  | `auth.${keyof typeof languages.en.auth}`
+  | `bills.${keyof typeof languages.en.bills}`
+  | `dashboard.${keyof typeof languages.en.dashboard}`
+  | `analysis.${keyof typeof languages.en.analysis}`
+  | `settings.${keyof typeof languages.en.settings}`
+  | `validation.${keyof typeof languages.en.validation}`
+  | `dates.${keyof typeof languages.en.dates}`;
+
+/**
+ * Example usage:
+ *
+ * const MyComponent = () => {
+ *   const { t, language, changeLanguage } = useI18n();
+ *
+ *   return (
+ *     <div>
+ *       <h1>{t('common.loading')}</h1>
+ *       <p>{t('dashboard.welcome', { name: 'John' })}</p>
+ *       <button onClick={() => changeLanguage('sw')}>
+ *         Switch to Swahili
+ *       </button>
+ *     </div>
+ *   );
+ * };
+ */

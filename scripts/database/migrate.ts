@@ -2,13 +2,12 @@
 /**
  * Strategic Consolidated Migration Script
  * 
- * Replaces: simple-migrate.ts, run-migrations.ts, migration-testing.ts, rollback-testing.ts
- * Provides unified interface for all migration operations with comprehensive testing
+ * Uses Drizzle ORM migration system for database alignment
  */
 
-import { createConnectionManager } from '@shared/database/core';
-import { createMigrationManager } from '@server/infrastructure/database';
-import { logger } from '@shared/core';
+import { Pool } from 'pg';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface MigrationOptions {
   rollback?: string;

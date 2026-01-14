@@ -2,7 +2,7 @@ import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSc
 import { analyticsContextMiddleware } from '@server/features/analytics/middleware/analytics-context.ts';
 import { performanceTrackingMiddleware } from '@server/features/analytics/middleware/performance-tracking.ts';
 import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
-import { engagementAnalyticsService } from '@server/services/engagement.service.ts';
+import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
 import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
 import { logger   } from '@shared/core';
 import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';

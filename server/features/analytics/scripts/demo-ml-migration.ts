@@ -5,7 +5,7 @@
  */
 
 import MLMigrationConfigurator from '@server/features/analytics/scripts/configure-ml-migration.ts';
-import { RealMLAnalysisService } from '@server/services/real-ml.service.ts';
+import { RealMLAnalysisService } from '@server/features/analytics/ml/real-ml-analysis.service';
 
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 

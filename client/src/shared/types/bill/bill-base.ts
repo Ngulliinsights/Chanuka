@@ -7,8 +7,12 @@
  * @module shared/types/bill
  */
 
-import { BaseEntity } from '../../../../shared/types/core/base';
-import { BillId } from '../../../../shared/types/core/common';
+// Base entity interface for common fields
+interface BaseEntity {
+  readonly id: number;
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
+}
 
 // ============================================================================
 // Enums and Constants
@@ -178,7 +182,7 @@ export interface RelatedBill {
  * };
  */
 export interface BillAnalysis extends BaseEntity {
-  readonly billId: BillId;
+  readonly billId: number;
   readonly summary: string;
   readonly keyPoints: readonly string[];
   readonly impact: {
@@ -225,7 +229,7 @@ export interface HealthSafetyImpact {
   readonly billId: number;
   readonly healthImpact?: string;
   readonly safetyImpact?: string;
-  readonly publcHealthConcerns?: readonly string[];
+  readonly publicHealthConcerns?: readonly string[];
   readonly affectedPopulation?: string;
   readonly implementation?: string;
 }
