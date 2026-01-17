@@ -1,4 +1,4 @@
-import { cacheService } from '@server/infrastructure/cache/cache-service.js';
+import { cacheService } from '@shared/core/caching';
 import { demoDataService } from '@server/infrastructure/demo-data.js';
 import { databaseService } from '@server/infrastructure/database/database.service';
 import { logger   } from '@shared/core';

@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** January 14, 2026 at 10:28 PM
+**Generated:** January 17, 2026 at 12:48 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,509
+**Total Items:** 3,466
 
 ```
 .
@@ -28,12 +28,16 @@
 │   │   ├── index.ts
 │   │   └── shims.d.ts
 │   ├── server/
+│   │   ├── api-response.d.ts
 │   │   ├── features.d.ts
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   ├── middleware.d.ts
+│   │   └── services.d.ts
 │   ├── shared/
 │   │   ├── core.d.ts
 │   │   ├── database.d.ts
 │   │   ├── design-system.d.ts
+│   │   ├── errors.d.ts
 │   │   ├── index.ts
 │   │   └── ui.d.ts
 │   └── index.ts
@@ -102,12 +106,11 @@
 │   │   │   │   │   ├── community.ts
 │   │   │   │   │   ├── config.ts
 │   │   │   │   │   ├── engagement.ts
-│   │   │   │   │   ├── error-response.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── performance.ts
 │   │   │   │   │   ├── preferences.ts
-│   │   │   │   │   ├── request.ts
 │   │   │   │   │   ├── service.ts
+│   │   │   │   │   ├── shared-imports.ts
 │   │   │   │   │   └── sponsor.ts
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── auth.ts
@@ -1244,7 +1247,6 @@
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── browser.ts
 │   │   │   │   ├── core.ts
-│   │   │   │   ├── dashboard.legacy.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── loading.ts
 │   │   │   │   ├── lucide-react.d.ts
@@ -1756,6 +1758,7 @@
 │   │   ├── 0021_snapshot.json
 │   │   └── 20251104110148_snapshot.json
 │   ├── 0001_create_foundation_tables_optimized.sql
+│   ├── 0001_create_foundation_tables.sql
 │   ├── 0021_clean_comprehensive_schema.sql
 │   ├── 0022_fix_schema_alignment.sql
 │   ├── 0023_migration_infrastructure.sql
@@ -1786,6 +1789,7 @@
 │   ├── design.md
 │   ├── GRAPH_SCHEMA_ANALYSIS_AND_INTEGRATION_PLAN.md
 │   ├── HOOKS_CONSOLIDATION_OPPORTUNITIES.md
+│   ├── IMPLEMENTATION_PROGRESS.md
 │   ├── implementation-plan.md
 │   ├── QUALITY_COMPARISON_FRAMEWORK.md
 │   ├── QUALITY_COMPARISON_RESULTS.md
@@ -2059,35 +2063,6 @@
 │   │   ├── index.ts
 │   │   ├── production.ts
 │   │   └── test.ts
-│   ├── core/
-│   │   ├── auth/
-│   │   │   ├── auth-service.ts
-│   │   │   ├── auth.ts
-│   │   │   ├── index.ts
-│   │   │   ├── passwordReset.ts
-│   │   │   ├── secure-session-service.ts
-│   │   │   └── session-cleanup.ts
-│   │   ├── errors/
-│   │   │   ├── error-tracker.ts
-│   │   │   └── index.ts
-│   │   ├── types/
-│   │   │   └── index.ts
-│   │   ├── validation/
-│   │   │   ├── data-completeness.ts
-│   │   │   ├── data-validation-service.ts
-│   │   │   ├── data-validation.ts
-│   │   │   ├── index.ts
-│   │   │   ├── input-validation-service.ts
-│   │   │   ├── schema-validation-service.ts
-│   │   │   ├── security-schemas.ts
-│   │   │   ├── validation-metrics.ts
-│   │   │   ├── validation-services-init.ts
-│   │   │   └── validation-utils.ts
-│   │   ├── index.ts
-│   │   ├── services-init.ts
-│   │   ├── StorageTypes.d.ts
-│   │   ├── StorageTypes.ts
-│   │   └── types.ts
 │   ├── demo/
 │   │   └── real-time-tracking-demo.ts
 │   ├── docs/
@@ -2116,6 +2091,7 @@
 │   │   │   │   ├── moderation-orchestrator.service.ts
 │   │   │   │   ├── moderation-queue.service.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── admin-router.OLD.ts
 │   │   │   ├── admin-router.ts
 │   │   │   ├── admin.ts
 │   │   │   ├── content-moderation.ts
@@ -2198,6 +2174,7 @@
 │   │   │   │       └── ml-service-adapter.ts
 │   │   │   ├── types/
 │   │   │   │   └── index.ts
+│   │   │   ├── analysis.routes.OLD.ts
 │   │   │   ├── analysis.routes.ts
 │   │   │   └── architecture-analysis-report.md
 │   │   ├── analytics/
@@ -2331,7 +2308,9 @@
 │   │   │   ├── bill-status-monitor.ts
 │   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── bill.js
+│   │   │   ├── BILLS_MIGRATION_ADAPTER.ts
 │   │   │   ├── bills-router-migrated.ts
+│   │   │   ├── bills-router.OLD.ts
 │   │   │   ├── bills-router.ts
 │   │   │   ├── index.ts
 │   │   │   ├── legislative-storage.ts
@@ -2343,6 +2322,7 @@
 │   │   ├── community/
 │   │   │   ├── comment-voting.ts
 │   │   │   ├── comment.ts
+│   │   │   ├── community.OLD.ts
 │   │   │   ├── community.ts
 │   │   │   ├── index.ts
 │   │   │   ├── social-integration.ts
@@ -2405,6 +2385,7 @@
 │   │   │   │   └── entities/
 │   │   │   │       └── notification.ts
 │   │   │   ├── index.ts
+│   │   │   ├── notification-router.OLD.ts
 │   │   │   ├── notification-router.ts
 │   │   │   └── notification-service.ts
 │   │   ├── privacy/
@@ -2482,6 +2463,7 @@
 │   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
 │   │   │   ├── search-index-manager.ts
+│   │   │   ├── SearchController.OLD.ts
 │   │   │   └── SearchController.ts
 │   │   ├── security/
 │   │   │   ├── encryption-service.ts
@@ -2502,6 +2484,7 @@
 │   │   │   │   ├── analysis.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── index.ts
+│   │   │   ├── sponsors.routes.OLD.ts
 │   │   │   └── sponsors.routes.ts
 │   │   ├── universal_access/
 │   │   │   ├── index.ts
@@ -2528,10 +2511,12 @@
 │   │   │   │   │   ├── profile-management-use-case.ts
 │   │   │   │   │   ├── user-registration-use-case.ts
 │   │   │   │   │   └── verification-operations-use-case.ts
+│   │   │   │   ├── profile.OLD.ts
 │   │   │   │   ├── profile.ts
 │   │   │   │   ├── user-application-service.ts
 │   │   │   │   ├── user-service-direct.ts
 │   │   │   │   ├── users.ts
+│   │   │   │   ├── verification.OLD.ts
 │   │   │   │   └── verification.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── aggregates/
@@ -2579,15 +2564,129 @@
 │   │   │   ├── cache.ts
 │   │   │   ├── index.ts
 │   │   │   └── query-cache.ts
-│   │   ├── caching/
-│   │   │   └── query-cache.ts
+│   │   ├── core/
+│   │   │   ├── auth/
+│   │   │   │   ├── auth-service.ts
+│   │   │   │   ├── auth.OLD.ts
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── passwordReset.ts
+│   │   │   │   ├── secure-session-service.ts
+│   │   │   │   └── session-cleanup.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── error-tracker.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── types/
+│   │   │   │   └── index.ts
+│   │   │   ├── validation/
+│   │   │   │   ├── data-completeness.ts
+│   │   │   │   ├── data-validation-service.ts
+│   │   │   │   ├── data-validation.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── input-validation-service.ts
+│   │   │   │   ├── schema-validation-service.ts
+│   │   │   │   ├── security-schemas.ts
+│   │   │   │   ├── validation-metrics.ts
+│   │   │   │   ├── validation-services-init.ts
+│   │   │   │   └── validation-utils.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services-init.ts
+│   │   │   ├── StorageTypes.d.ts
+│   │   │   ├── StorageTypes.ts
+│   │   │   └── types.ts
 │   │   ├── database/
-│   │   │   ├── database-service.ts
-│   │   │   └── pool-config.ts
+│   │   │   ├── core/
+│   │   │   │   ├── config.ts
+│   │   │   │   ├── connection-manager.ts
+│   │   │   │   ├── database-orchestrator.ts
+│   │   │   │   ├── health-monitor.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── unified-config.ts
+│   │   │   ├── graph/
+│   │   │   │   ├── config/
+│   │   │   │   │   ├── graph-config.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── core/
+│   │   │   │   │   ├── batch-sync-runner.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── neo4j-client.ts
+│   │   │   │   │   ├── schema.ts
+│   │   │   │   │   ├── sync-executor.ts
+│   │   │   │   │   └── transaction-executor.ts
+│   │   │   │   ├── query/
+│   │   │   │   │   ├── advanced-queries.ts
+│   │   │   │   │   ├── engagement-queries.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── network-queries.ts
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── query-builder.ts
+│   │   │   │   │   └── session-manager.ts
+│   │   │   │   ├── advanced-analytics.ts
+│   │   │   │   ├── advanced-queries.ts
+│   │   │   │   ├── advanced-relationships.ts
+│   │   │   │   ├── advanced-sync.ts
+│   │   │   │   ├── app-init.ts
+│   │   │   │   ├── array-field-sync.ts
+│   │   │   │   ├── batch-sync-runner.ts
+│   │   │   │   ├── cache-adapter-v2.ts
+│   │   │   │   ├── conflict-resolver.ts
+│   │   │   │   ├── engagement-networks.ts
+│   │   │   │   ├── engagement-queries.ts
+│   │   │   │   ├── engagement-sync.ts
+│   │   │   │   ├── error-adapter-v2.ts
+│   │   │   │   ├── error-classifier.ts
+│   │   │   │   ├── graph-config.ts
+│   │   │   │   ├── graphql-api.ts
+│   │   │   │   ├── health-adapter-v2.ts
+│   │   │   │   ├── idempotency-ledger.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── influence-service.ts
+│   │   │   │   ├── institutional-networks.ts
+│   │   │   │   ├── neo4j-client.ts
+│   │   │   │   ├── network-discovery.ts
+│   │   │   │   ├── network-queries.ts
+│   │   │   │   ├── network-sync.ts
+│   │   │   │   ├── operation-guard.ts
+│   │   │   │   ├── parliamentary-networks.ts
+│   │   │   │   ├── pattern-discovery-service.ts
+│   │   │   │   ├── pattern-discovery.ts
+│   │   │   │   ├── query-builder.ts
+│   │   │   │   ├── recommendation-engine.ts
+│   │   │   │   ├── REFACTORING_SUMMARY.md
+│   │   │   │   ├── relationships.ts
+│   │   │   │   ├── result-normalizer.ts
+│   │   │   │   ├── retry-utils.ts
+│   │   │   │   ├── safeguards-networks.ts
+│   │   │   │   ├── schema.ts
+│   │   │   │   ├── session-manager.ts
+│   │   │   │   ├── sync-executor.ts
+│   │   │   │   ├── sync-monitoring.ts
+│   │   │   │   ├── test-harness.ts
+│   │   │   │   └── transaction-executor.ts
+│   │   │   ├── persistence/
+│   │   │   │   ├── drizzle/
+│   │   │   │   │   ├── drizzle-bill-repository.ts
+│   │   │   │   │   ├── drizzle-sponsor-repository.ts
+│   │   │   │   │   ├── drizzle-user-repository.ts
+│   │   │   │   │   ├── hybrid-bill-repository.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── lazy-loader.ts
+│   │   │   ├── utils/
+│   │   │   │   └── base-script.ts
+│   │   │   ├── connection.ts
+│   │   │   ├── example-usage.ts
+│   │   │   ├── index.ts
+│   │   │   ├── init.ts
+│   │   │   ├── monitoring.ts
+│   │   │   └── pool.ts
 │   │   ├── errors/
 │   │   │   ├── error-adapter.ts
+│   │   │   ├── error-configuration.ts
 │   │   │   ├── error-standardization.ts
+│   │   │   ├── index.ts
 │   │   │   ├── migration-example.ts
+│   │   │   ├── recovery-patterns.ts
 │   │   │   ├── result-adapter.ts
 │   │   │   └── result-integration-summary.md
 │   │   ├── external-api/
@@ -2602,11 +2701,6 @@
 │   │   │   └── types.ts
 │   │   ├── integration/
 │   │   │   └── service-orchestrator.ts
-│   │   ├── logging/
-│   │   │   ├── database-logger.ts
-│   │   │   ├── index.ts
-│   │   │   ├── log-aggregator.ts
-│   │   │   └── logging-config.ts
 │   │   ├── migration/
 │   │   │   ├── ab-testing.service.ts
 │   │   │   ├── dashboard.service.ts
@@ -2630,12 +2724,6 @@
 │   │   │   ├── repository-deployment.service.ts
 │   │   │   ├── rollback.service.ts
 │   │   │   └── validation.service.ts
-│   │   ├── monitoring/
-│   │   │   ├── audit-log.ts
-│   │   │   ├── external-api-management.ts
-│   │   │   ├── index.ts
-│   │   │   ├── monitoring-scheduler.ts
-│   │   │   └── performance-monitor.ts
 │   │   ├── notifications/
 │   │   │   ├── alerting-service.ts
 │   │   │   ├── email-service.ts
@@ -2650,16 +2738,64 @@
 │   │   │   ├── refactored_summary.md
 │   │   │   ├── smart-notification-filter.ts
 │   │   │   └── types.ts
+│   │   ├── observability/
+│   │   │   ├── audit-log.ts
+│   │   │   ├── database-logger.ts
+│   │   │   ├── external-api-management.ts
+│   │   │   ├── index.ts
+│   │   │   ├── log-aggregator.ts
+│   │   │   ├── logging-config.ts
+│   │   │   ├── monitoring-scheduler.ts
+│   │   │   └── performance-monitor.ts
 │   │   ├── performance/
 │   │   │   └── performance-monitor.ts
-│   │   ├── persistence/
-│   │   │   ├── drizzle/
-│   │   │   │   ├── drizzle-bill-repository.ts
-│   │   │   │   ├── drizzle-sponsor-repository.ts
-│   │   │   │   ├── drizzle-user-repository.ts
-│   │   │   │   ├── hybrid-bill-repository.ts
-│   │   │   │   └── index.ts
-│   │   │   └── lazy-loader.ts
+│   │   ├── schema/
+│   │   │   ├── domains/
+│   │   │   │   ├── citizen-participation.ts
+│   │   │   │   ├── constitutional-intelligence.ts
+│   │   │   │   ├── foundation.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── integrity-operations.ts
+│   │   │   │   ├── parliamentary-process.ts
+│   │   │   │   └── safeguards.ts
+│   │   │   ├── accountability_ledger.ts
+│   │   │   ├── advanced_discovery.ts
+│   │   │   ├── advocacy_coordination.ts
+│   │   │   ├── analysis.ts
+│   │   │   ├── argument_intelligence.ts
+│   │   │   ├── base-types.ts
+│   │   │   ├── citizen_participation.ts
+│   │   │   ├── constitutional_intelligence.ts
+│   │   │   ├── enum-validator.ts
+│   │   │   ├── enum.ts
+│   │   │   ├── ERROR_FIXES_GUIDE.md
+│   │   │   ├── expert_verification.ts
+│   │   │   ├── foundation.ts
+│   │   │   ├── graph_sync.ts
+│   │   │   ├── impact_measurement.ts
+│   │   │   ├── index.ts
+│   │   │   ├── integration-extended.ts
+│   │   │   ├── integration.ts
+│   │   │   ├── integrity_operations.ts
+│   │   │   ├── market_intelligence.ts
+│   │   │   ├── migration-state.ts
+│   │   │   ├── parliamentary_process.ts
+│   │   │   ├── participation_oversight.ts
+│   │   │   ├── platform_operations.ts
+│   │   │   ├── political_economy.ts
+│   │   │   ├── real_time_engagement.ts
+│   │   │   ├── REFINEMENT_SUMMARY.md
+│   │   │   ├── safeguards.ts
+│   │   │   ├── schema-generators.ts
+│   │   │   ├── search_system.ts
+│   │   │   ├── sync-triggers.ts
+│   │   │   ├── transparency_analysis.ts
+│   │   │   ├── transparency_intelligence.ts
+│   │   │   ├── trojan_bill_detection.ts
+│   │   │   ├── universal_access.ts
+│   │   │   ├── validate-static.ts
+│   │   │   ├── validation-integration.ts
+│   │   │   └── websocket.ts
 │   │   ├── security/
 │   │   │   ├── data-privacy-service.ts
 │   │   │   ├── input-validation-service.ts
@@ -2729,7 +2865,8 @@
 │   │   │   └── VALIDATION_SUMMARY.md
 │   │   ├── demo-data.ts
 │   │   ├── feature-flags.ts
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── SERVER_SETUP_GUIDE.ts
 │   ├── middleware/
 │   │   ├── app-middleware.ts
 │   │   ├── auth.ts
@@ -2737,6 +2874,7 @@
 │   │   ├── boom-migration-summary.md
 │   │   ├── cache-middleware.ts
 │   │   ├── circuit-breaker-middleware.ts
+│   │   ├── error-management.ts
 │   │   ├── file-upload-validation.ts
 │   │   ├── index.ts
 │   │   ├── migration-wrapper.ts
@@ -2821,14 +2959,18 @@
 │   │   ├── shared-core-fallback.ts
 │   │   └── validation.ts
 │   ├── index.ts
+│   ├── MIGRATION_EXAMPLES.ts
 │   ├── package.json
 │   ├── project.json
 │   ├── tsconfig.json
 │   └── vite.ts
 ├── shared/
+│   ├── constants/
+│   │   ├── error-codes.ts
+│   │   ├── feature-flags.ts
+│   │   ├── index.ts
+│   │   └── limits.ts
 │   ├── core/
-│   │   ├── cache/
-│   │   │   └── index.ts
 │   │   ├── caching/
 │   │   │   ├── adapters/
 │   │   │   │   ├── ai-cache.ts
@@ -2902,81 +3044,6 @@
 │   │   │   ├── registry.ts
 │   │   │   ├── types.ts
 │   │   │   └── unified.ts
-│   │   ├── observability/
-│   │   │   ├── error-management/
-│   │   │   │   ├── analytics/
-│   │   │   │   │   └── error-analytics.ts
-│   │   │   │   ├── errors/
-│   │   │   │   │   ├── base-error.ts
-│   │   │   │   │   └── specialized-errors.ts
-│   │   │   │   ├── handlers/
-│   │   │   │   │   ├── error-boundary.tsx
-│   │   │   │   │   └── error-handler-chain.ts
-│   │   │   │   ├── integrations/
-│   │   │   │   │   └── error-tracking-integration.ts
-│   │   │   │   ├── middleware/
-│   │   │   │   │   └── express-error-middleware.ts
-│   │   │   │   ├── monitoring/
-│   │   │   │   │   └── error-monitor.ts
-│   │   │   │   ├── patterns/
-│   │   │   │   │   ├── circuit-breaker.ts
-│   │   │   │   │   └── retry-patterns.ts
-│   │   │   │   ├── recovery/
-│   │   │   │   │   └── error-recovery-engine.ts
-│   │   │   │   ├── reporting/
-│   │   │   │   │   └── user-error-reporter.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── health/
-│   │   │   │   ├── checks/
-│   │   │   │   │   ├── database-check.ts
-│   │   │   │   │   ├── memory-check.ts
-│   │   │   │   │   └── redis-check.ts
-│   │   │   │   ├── checks.ts
-│   │   │   │   ├── health-checker.ts
-│   │   │   │   ├── health-service.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── middleware.ts
-│   │   │   │   ├── server-health.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── logging/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── logger.ts
-│   │   │   │   ├── logging-service.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── metrics/
-│   │   │   │   ├── exporters/
-│   │   │   │   │   ├── cloudwatch.ts
-│   │   │   │   │   ├── prometheus.ts
-│   │   │   │   │   └── statsd.ts
-│   │   │   │   ├── collectors.ts
-│   │   │   │   ├── exporters.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── registry.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── tracing/
-│   │   │   │   ├── context.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── span.ts
-│   │   │   │   ├── tracer.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── base-interfaces.ts
-│   │   │   ├── common-types.ts
-│   │   │   ├── correlation.ts
-│   │   │   ├── index.ts
-│   │   │   ├── interfaces.ts
-│   │   │   ├── iobservability-stack.ts
-│   │   │   ├── middleware.ts
-│   │   │   ├── observability-stack-service.ts
-│   │   │   ├── stack.ts
-│   │   │   ├── telemetry.ts
-│   │   │   └── types.ts
-│   │   ├── performance/
-│   │   │   ├── budgets.ts
-│   │   │   ├── index.ts
-│   │   │   ├── method-timing.ts
-│   │   │   ├── monitoring.ts
-│   │   │   └── unified-monitoring.ts
 │   │   ├── primitives/
 │   │   │   ├── constants/
 │   │   │   │   ├── http-status.ts
@@ -3033,113 +3100,11 @@
 │   │   │   ├── security-utils.ts
 │   │   │   ├── string-utils.ts
 │   │   │   └── type-guards.ts
-│   │   ├── validation/
-│   │   │   ├── adapters/
-│   │   │   │   ├── custom-adapter.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── joi-adapter.ts
-│   │   │   │   └── zod-adapter.ts
-│   │   │   ├── core/
-│   │   │   │   ├── base-adapter.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── interfaces.ts
-│   │   │   │   └── validation-service.ts
-│   │   │   ├── middleware/
-│   │   │   │   └── index.ts
-│   │   │   ├── schemas/
-│   │   │   │   ├── auth.ts
-│   │   │   │   ├── common.ts
-│   │   │   │   ├── entities.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── property.ts
-│   │   │   ├── constants.ts
-│   │   │   ├── helpers.ts
-│   │   │   ├── index.ts
-│   │   │   ├── ivalidation-service.ts
-│   │   │   ├── middleware.ts
-│   │   │   ├── sanitization.ts
-│   │   │   ├── types.ts
-│   │   │   ├── validation-service-wrapper.ts
-│   │   │   └── validation-service.ts
-│   │   └── index.ts
-│   ├── database/
-│   │   ├── core/
-│   │   │   ├── config.ts
-│   │   │   ├── connection-manager.ts
-│   │   │   ├── database-orchestrator.ts
-│   │   │   ├── health-monitor.ts
-│   │   │   ├── index.ts
-│   │   │   └── unified-config.ts
-│   │   ├── graph/
-│   │   │   ├── config/
-│   │   │   │   ├── graph-config.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── core/
-│   │   │   │   ├── batch-sync-runner.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── neo4j-client.ts
-│   │   │   │   ├── schema.ts
-│   │   │   │   ├── sync-executor.ts
-│   │   │   │   └── transaction-executor.ts
-│   │   │   ├── query/
-│   │   │   │   ├── advanced-queries.ts
-│   │   │   │   ├── engagement-queries.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── network-queries.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── query-builder.ts
-│   │   │   │   └── session-manager.ts
-│   │   │   ├── advanced-analytics.ts
-│   │   │   ├── advanced-queries.ts
-│   │   │   ├── advanced-relationships.ts
-│   │   │   ├── advanced-sync.ts
-│   │   │   ├── app-init.ts
-│   │   │   ├── array-field-sync.ts
-│   │   │   ├── batch-sync-runner.ts
-│   │   │   ├── cache-adapter-v2.ts
-│   │   │   ├── conflict-resolver.ts
-│   │   │   ├── engagement-networks.ts
-│   │   │   ├── engagement-queries.ts
-│   │   │   ├── engagement-sync.ts
-│   │   │   ├── error-adapter-v2.ts
-│   │   │   ├── error-classifier.ts
-│   │   │   ├── graph-config.ts
-│   │   │   ├── graphql-api.ts
-│   │   │   ├── health-adapter-v2.ts
-│   │   │   ├── idempotency-ledger.ts
-│   │   │   ├── index.ts
-│   │   │   ├── influence-service.ts
-│   │   │   ├── institutional-networks.ts
-│   │   │   ├── neo4j-client.ts
-│   │   │   ├── network-discovery.ts
-│   │   │   ├── network-queries.ts
-│   │   │   ├── network-sync.ts
-│   │   │   ├── operation-guard.ts
-│   │   │   ├── parliamentary-networks.ts
-│   │   │   ├── pattern-discovery-service.ts
-│   │   │   ├── pattern-discovery.ts
-│   │   │   ├── query-builder.ts
-│   │   │   ├── recommendation-engine.ts
-│   │   │   ├── REFACTORING_SUMMARY.md
-│   │   │   ├── relationships.ts
-│   │   │   ├── result-normalizer.ts
-│   │   │   ├── retry-utils.ts
-│   │   │   ├── safeguards-networks.ts
-│   │   │   ├── schema.ts
-│   │   │   ├── session-manager.ts
-│   │   │   ├── sync-executor.ts
-│   │   │   ├── sync-monitoring.ts
-│   │   │   ├── test-harness.ts
-│   │   │   └── transaction-executor.ts
-│   │   ├── utils/
-│   │   │   └── base-script.ts
-│   │   ├── connection.ts
-│   │   ├── example-usage.ts
+│   │   ├── cache.ts
 │   │   ├── index.ts
-│   │   ├── init.ts
-│   │   ├── monitoring.ts
-│   │   └── pool.ts
+│   │   ├── observability.ts
+│   │   ├── performance.ts
+│   │   └── validation.ts
 │   ├── docs/
 │   │   ├── database_architecture.md
 │   │   ├── GRAPH_DATABASE_IMPLEMENTATION_PHASE2.md
@@ -3180,53 +3145,6 @@
 │   │   │   └── anonymity/
 │   │   │       └── anonymity-helper.ts
 │   │   └── index.ts
-│   ├── schema/
-│   │   ├── domains/
-│   │   │   ├── citizen-participation.ts
-│   │   │   ├── constitutional-intelligence.ts
-│   │   │   ├── foundation.ts
-│   │   │   ├── index.ts
-│   │   │   ├── integrity-operations.ts
-│   │   │   ├── parliamentary-process.ts
-│   │   │   └── safeguards.ts
-│   │   ├── accountability_ledger.ts
-│   │   ├── advanced_discovery.ts
-│   │   ├── advocacy_coordination.ts
-│   │   ├── analysis.ts
-│   │   ├── argument_intelligence.ts
-│   │   ├── base-types.ts
-│   │   ├── citizen_participation.ts
-│   │   ├── constitutional_intelligence.ts
-│   │   ├── enum-validator.ts
-│   │   ├── enum.ts
-│   │   ├── ERROR_FIXES_GUIDE.md
-│   │   ├── expert_verification.ts
-│   │   ├── foundation.ts
-│   │   ├── graph_sync.ts
-│   │   ├── impact_measurement.ts
-│   │   ├── index.ts
-│   │   ├── integration-extended.ts
-│   │   ├── integration.ts
-│   │   ├── integrity_operations.ts
-│   │   ├── market_intelligence.ts
-│   │   ├── migration-state.ts
-│   │   ├── parliamentary_process.ts
-│   │   ├── participation_oversight.ts
-│   │   ├── platform_operations.ts
-│   │   ├── political_economy.ts
-│   │   ├── real_time_engagement.ts
-│   │   ├── REFINEMENT_SUMMARY.md
-│   │   ├── safeguards.ts
-│   │   ├── schema-generators.ts
-│   │   ├── search_system.ts
-│   │   ├── sync-triggers.ts
-│   │   ├── transparency_analysis.ts
-│   │   ├── transparency_intelligence.ts
-│   │   ├── trojan_bill_detection.ts
-│   │   ├── universal_access.ts
-│   │   ├── validate-static.ts
-│   │   ├── validation-integration.ts
-│   │   └── websocket.ts
 │   ├── types/
 │   │   ├── api/
 │   │   │   ├── websocket/
@@ -3276,7 +3194,6 @@
 │   │   │   ├── breaking-changes.ts
 │   │   │   ├── deprecation-warnings.ts
 │   │   │   ├── index.ts
-│   │   │   ├── legacy-types.ts
 │   │   │   ├── migration-config.ts
 │   │   │   ├── migration-helpers.ts
 │   │   │   ├── migration-tools.ts
@@ -3313,11 +3230,15 @@
 │   │   │   ├── index.ts
 │   │   │   ├── type-generation.ts
 │   │   │   └── validation-schemas.ts
-│   │   ├── deprecation.ts
 │   │   ├── index.ts
 │   │   └── performance.ts
 │   ├── utils/
 │   │   └── intelligent-cache.ts
+│   ├── validation/
+│   │   ├── bill.validation.ts
+│   │   ├── comment.validation.ts
+│   │   ├── index.ts
+│   │   └── user.validation.ts
 │   ├── fix-unused.ts
 │   ├── index.ts
 │   ├── package-lock.json
@@ -3448,14 +3369,22 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
+├── 00_README_SESSION_SUMMARY.md
+├── ADMIN_ROUTER_MIGRATION_COMPLETE.md
 ├── ANALYSIS_SUMMARY.md
+├── ARCHITECTURAL_OPTIONS_SHARED_CORE.md
 ├── ARCHITECTURE_MIGRATION_FINAL_REPORT.md
+├── ARCHITECTURE_QUICK_REFERENCE.md
 ├── ARCHITECTURE_REFACTORING_COMPLETE.md
 ├── ARCHITECTURE_VISUAL_OVERVIEW.md
+├── ARCHITECTURE.md
 ├── archive-docs.sh
 ├── ARGUMENT_CONSTITUTIONAL_IMPLEMENTATION.md
+├── AUTH_ROUTER_MIGRATION_COMPLETE.md
 ├── CHANGELOG.md
 ├── clear-sw.html
+├── COMPLETION_STRATEGY.ts
+├── CRITICAL_DISCOVERY_PHASE_R4_REVERSAL.md
 ├── cspell.config.yaml
 ├── DATABASE_ALIGNMENT_AND_FEATURE_INTEGRATION.md
 ├── DATABASE_ALIGNMENT_COMPLETE.md
@@ -3474,37 +3403,60 @@
 ├── FEATURE_INTEGRATION_ANALYSIS.md
 ├── FEATURE_VERIFICATION_SUMMARY.md
 ├── generate-structure.mjs
+├── IMPLEMENTATION_GUIDE.md
 ├── IMPORT_MIGRATION_AND_UI_COMPLETION.md
 ├── IMPORT_MIGRATION_GUIDE.md
+├── INCOMPLETE_MIGRATIONS_COMPREHENSIVE_AUDIT.md
+├── INFRASTRUCTURE_REORGANIZATION_SUMMARY.md
 ├── knip.config.ts
 ├── knip.json
+├── MIGRATION_EXECUTION_PHASE_R4_COMPLETE.md
+├── MIGRATION_PROGRESS_TRACKER.txt
 ├── monitoring-fsd-restructure-plan.md
 ├── MVP_COMPLETION_ACTION_PLAN.md
 ├── MVP_READINESS_QUICK_REFERENCE.md
 ├── nginx.conf
 ├── nx.json
+├── OPTION_1_IMPLEMENTATION_COMPLETE.md
 ├── package.json
 ├── performance-baselines.json
+├── PHASE_1_2A_COMPLETION.md
+├── PHASE_2B_3_4_PLAN.md
+├── PHASE_2B_SESSION_2_STATUS.md
+├── PHASE_3_COMPLETION_SUMMARY.md
+├── PHASE_4_QUALITY_AUDIT_REDUNDANCY_ANALYSIS.md
+├── PHASE_R4_COMPATIBILITY_LAYER_COMPLETE.md
+├── PHASE_R4_COMPLETION_REPORT.md
+├── PHASE_R4_GHOST_MODULE_CLEANUP.md
 ├── PHASE2_IMPLEMENTATION_ROADMAP.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
 ├── PROJECT_STATUS.md
+├── QUICK_MIGRATION_REFERENCE.md
 ├── QUICK_REFERENCE.md
+├── QUICK_START_FOR_NEXT_SESSION.ts
 ├── QUICK_START_REFERENCE.md
 ├── QUICK_STATS.txt
 ├── README.md
 ├── REFACTORING_EXECUTION_SUMMARY.md
 ├── REFACTORING_SUMMARY.txt
 ├── run_codebase_stats.bat
+├── SAFE_MIGRATION_CLEANUP_COMPLETE.md
 ├── SCHEMA_ANALYSIS_AND_READINESS_REPORT.md
+├── SEARCH_FEATURE_MIGRATION_COMPLETE.md
 ├── SERVER_SERVICES_DEPRECATION.md
+├── SESSION_2_COMPLETION_SUMMARY.ts
+├── SESSION_2_EXECUTION_SUMMARY.md
+├── SESSION_2_FINAL_SUMMARY.md
 ├── SESSION_COMPLETION_SUMMARY.md
+├── SESSION_SUMMARY_TYPE_SYSTEM_CLEANUP.md
 ├── SHARED_AUDIT_QUICK_SUMMARY.md
 ├── SHARED_AUDIT_REPORT.md
 ├── SHARED_REORGANIZATION_STRATEGY.md
 ├── start-dev.js
+├── STATUS_REPORT.md
 ├── STRATEGIC_FEATURE_INTEGRATION_ROADMAP.md
 ├── tailwind.config.js
 ├── test_api_integration.js
@@ -3512,6 +3464,11 @@
 ├── tsconfig.server.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
+├── TYPE_SYSTEM_COMPLETE_AUDIT.md
+├── TYPE_SYSTEM_RESTRUCTURE_PLAN.md
+├── TYPES_MIGRATION_GUIDE.md
+├── TYPES_SYSTEM_GOVERNANCE.md
+├── USERS_FEATURE_MIGRATION_COMPLETE.md
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
 └── vitest.workspace.ts

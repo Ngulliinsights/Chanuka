@@ -1,4 +1,4 @@
-import { cacheService } from '@server/infrastructure/cache/cache-service.js';
+import { cacheService } from '@shared/core/caching';
 import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator.js';
 import { webSocketService } from '@server/infrastructure/websocket.js';
 import { logger  } from '@shared/core';

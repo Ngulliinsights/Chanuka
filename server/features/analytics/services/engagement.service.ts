@@ -1,5 +1,5 @@
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
-import { cacheService } from '@server/infrastructure/cache';
+import { cacheService } from '@shared/core/caching';
 // FIXED: Import plural table names and correct type references
 import { bills, comment_votes,comments, user_profiles, users } from '@shared/citizen_participation';
 import { bill_engagement } from '@shared/citizen_participation';

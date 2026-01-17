@@ -57,6 +57,19 @@ export { CacheSerializer } from './serialization/cache-serializer';
 export { CacheTagManager } from './tagging/tag-manager';
 export { CacheClusterManager } from './clustering/cluster-manager';
 
+// Wrapper services for infrastructure
+export {
+  CacheWarmingService,
+  cacheWarmingService,
+  AdvancedCachingService,
+  advancedCachingService,
+  CacheCoordinator,
+  cacheCoordinator
+} from './cache-wrappers';
+
+// Convenience export for default cache service
+export { cacheService, createCacheService } from './simple-factory';
+
 // Note: Advanced features like MultiTierAdapter, BrowserAdapter, and UnifiedCacheFactory
 // are available but may require additional configuration and dependencies
 

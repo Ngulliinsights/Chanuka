@@ -9,7 +9,6 @@ export * from './migration-tools';
 export * from './deprecation-warnings';
 export * from './type-transformers';
 export * from './validation-migrator';
-export * from './legacy-types';
 export * from './migration-config';
 export * from './migration-helpers';
 export * from './breaking-changes';

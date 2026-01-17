@@ -22,6 +22,7 @@ Visit:
 ## 📚 Documentation
 
 - [📖 Full Documentation](./docs/README.md)
+- [🏗️ Architecture Overview](./ARCHITECTURE.md) ← **Start here for module organization**
 - [🏗️ Setup Guide](./docs/setup.md)
 - [🔧 Monorepo Guide](./docs/monorepo.md)
 - [🏛️ Architecture](./docs/architecture.md)
@@ -37,9 +38,22 @@ chanuka-platform/
 ├── client/          # React frontend (@chanuka/client)
 ├── server/          # Express backend (@chanuka/server)  
 ├── shared/          # Shared utilities (@shared)
+│   ├── core/       # ⚠️ Mostly server infrastructure (see ARCHITECTURE.md)
+│   ├── types/      # Shared type definitions
+│   └── db/         # Database utilities
 ├── docs/           # Documentation
 └── package.json    # Monorepo configuration
 ```
+
+### ⚠️ Module Organization Note
+
+The `shared/core/` module contains mostly **server-only infrastructure** (observability, caching, validation, middleware, performance, config). This is a legacy pattern—ideally these should be in `server/core/`, but refactoring would require updating 30+ imports.
+
+**See [ARCHITECTURE.md](./ARCHITECTURE.md) for:**
+- Detailed module breakdown
+- What's "shared" vs "server-only"
+- Guidelines for adding new code
+- Future refactoring plans
 
 ## ⚡ Commands
 

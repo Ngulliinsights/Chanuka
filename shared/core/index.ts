@@ -1,16 +1,85 @@
 /**
  * Shared Core - Main Export File
+ *
+ * ⚠️ ARCHITECTURE NOTE:
+ *
+ * IMPORTANT: Despite the "shared" name, this module is 80% SERVER INFRASTRUCTURE.
+ * This is a legacy organizational pattern. Ideally, server-only modules should be
+ * in server/core/, but that refactoring would require updating 30+ import statements.
+ *
+ * SERVER-ONLY MODULES (in this directory):
+ * - observability/  - Server logging, error management, tracing, metrics
+ * - caching/        - Server-side cache implementation
+ * - validation/     - Server validation schemas
+ * - middleware/     - Express middleware
+ * - performance/    - Server performance monitoring
+ * - config/         - Server configuration
+ *
+ * TRULY SHARED ITEMS (in this directory):
+ * - primitives/     - Constants, enums, basic types
+ * - types/          - Core type definitions (auth, feature-flags)
+ * - utils/          - Generic utilities (string, number, type-guards, security, regex, formatting)
+ *
+ * RECOMMENDATION:
+ * - Client code should NOT import from observability/, caching/, validation/,
+ *   middleware/, performance/, or config/ - these are server-only
+ * - Client code CAN import from primitives/, types/, and utils/
+ * - For server-only utilities, prefer server/infrastructure/ for clarity
+ *
+ * FUTURE REFACTORING:
+ * See docs/ARCHITECTURE.md for planned reorganization to move server modules
+ * to server/core/ for proper architectural separation.
  */
 
-// Error management
+// Primitives - Core type utilities (SHARED)
+export * from './primitives';
+
+// Types - Core type definitions (SHARED)
+export * from './types';
+
+// Utilities - Shared utilities (SHARED)
+export * from './utils';
+export * from './utils/correlation-id';
+export * from './utils/common-utils';
+export * from './utils/string-utils';
+export * from './utils/number-utils';
+export * from './utils/type-guards';
+export * from './utils/security-utils';
+export * from './utils/regex-patterns';
+export * from './utils/formatting';
+
+// ============================================================================
+// SERVER-ONLY INFRASTRUCTURE MODULES
+// ============================================================================
+// NOTE: The following are server-only and should ideally be in server/core/
+// but are kept here for now due to existing import patterns.
+// See docs/ARCHITECTURE.md for more information.
+
+// Error management (SERVER ONLY)
 export * from './observability/error-management/errors/base-error';
 export * from './observability/error-management/errors/specialized-errors';
 export * from './observability/error-management/types';
 
-// Logging
+// Logging (SERVER ONLY)
 export * from './observability/logging';
 
-// Types and enums
+// Caching (SERVER ONLY) - Re-exported from server/infrastructure/cache
+// MIGRATED: Actual implementation moved to server/infrastructure/cache/
+export * from './cache'; // Compatibility layer
+
+// Observability (SERVER ONLY) - Re-exported from server/infrastructure/observability
+// MIGRATED: Actual implementation moved to server/infrastructure/observability/
+export * from './observability'; // Compatibility layer
+
+// Performance (SERVER ONLY) - Re-exported from server/infrastructure/performance
+// MIGRATED: Actual implementation moved to server/infrastructure/performance/
+export * from './performance'; // Compatibility layer
+
+// Validation (SERVER ONLY) - Re-exported from server/infrastructure/validation
+// MIGRATED: Actual implementation moved to server/infrastructure/validation/
+export * from './validation'; // Compatibility layer
+
+// Error severity and domain enums
 export enum ErrorDomain {
   SYSTEM = 'system',
   VALIDATION = 'validation',
@@ -33,47 +102,3 @@ export enum ErrorSeverity {
   HIGH = 'high',
   CRITICAL = 'critical'
 }
-
-// Primitives
-export * from './primitives';
-
-// Validation - selective exports to avoid conflicts
-export {
-  validateRequest,
-  ValidationError as CoreValidationError
-} from './validation';
-
-// Utilities
-export * from './utils/api-utils';
-export * from './utils/cache-utils';
-export * from './utils/correlation-id';
-export * from './utils/anonymity-service';
-export * from './utils/common-utils';
-
-// Services
-export * from './services';
-
-// Rate limiting
-export * from './rate-limiting';
-
-// Performance monitoring
-export * from './performance';
-
-// Types - selective to avoid conflicts
-export type { Result, Maybe } from './primitives/types';
-export { Ok, Err, ok, err, some, none } from './primitives/types';
-
-// Re-export commonly used types
-export type { BaseError } from './observability/error-management/errors/base-error';
-export type { ValidationError, NetworkError } from './observability/error-management/errors/specialized-errors';
-export type { ApiResponse, ApiError, ErrorResponse } from './utils/api-utils';
-
-// ============================================================================
-// Additional Exports - Added by Phase 1 fix
-// ============================================================================
-
-// Cache Utilities
-export { getDefaultCache, createCache } from './caching/cache-manager';
-
-// Observability Stack
-export { createObservabilityStack } from './observability/observability-stack';

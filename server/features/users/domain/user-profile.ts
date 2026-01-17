@@ -1,4 +1,4 @@
-import { cacheService } from '@server/infrastructure/cache';
+import { cacheService } from '@shared/core/caching';
 import { cacheKeys   } from '@shared/core';
 import { logger   } from '@shared/core';
 import { database as db } from '@server/infrastructure/database';

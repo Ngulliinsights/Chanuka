@@ -1,5 +1,5 @@
 
-import { cacheService } from '@server/infrastructure/cache/cache-service';
+import { cacheService } from '@shared/core/caching';
 import { databaseService } from '@server/infrastructure/database/database-service.js';
 import { cacheKeys } from '@shared/core/caching/key-generator';
 import { database as db } from '@server/infrastructure/database';
