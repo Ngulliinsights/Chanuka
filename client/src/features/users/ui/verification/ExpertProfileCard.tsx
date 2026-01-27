@@ -26,7 +26,7 @@ import { Separator } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import { Expert, ExpertCredential, ExpertAffiliation } from '@client/lib/types';
 
-import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/SimpleIcons';
+import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/ChanukaIcons';
 
 import { CredibilityIndicator } from './CredibilityScoring';
 import { ExpertBadge } from './ExpertBadge';

@@ -37,7 +37,7 @@ import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@cl
 import { logger } from '@client/lib/utils/logger';
 import { privacyCompliance } from '@client/lib/utils/privacy-compliance';
 
-import { Globe } from '../icons/SimpleIcons';
+import { Globe } from '../icons/ChanukaIcons';
 
 interface DataUsageStats {
   totalDataPoints: number;

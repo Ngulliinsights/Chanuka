@@ -61,6 +61,8 @@ export type {
   VerificationStatus,
 } from '@shared/types/domains/authentication';
 
+// Core types (re-exported from shared type system using @shared alias)
+export * from './core';
 
 // Planned: After migration, specific type exports will be organized here
 // - Analytics types (from features/analytics/model/types)

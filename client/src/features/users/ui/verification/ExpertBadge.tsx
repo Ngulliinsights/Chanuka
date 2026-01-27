@@ -7,11 +7,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@client/lib/design-system';
-import { UnifiedBadge } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import { ExpertVerificationType } from '@client/lib/types';
 
-import { GraduationCap } from '../icons/SimpleIcons';
+import { GraduationCap } from '../icons/ChanukaIcons';
 
 interface ExpertBadgeProps {
   verificationType: ExpertVerificationType;
@@ -262,24 +262,24 @@ export function ExpertBadgeGroup({
 
       {/* Affiliation badge */}
       {affiliationType && (
-        <UnifiedBadge variant="outline" className="text-xs flex items-center gap-1">
+        <Badge variant="outline" className="text-xs flex items-center gap-1">
           <AffiliationIcon className="h-3 w-3" />
           {affiliationType.charAt(0).toUpperCase() + affiliationType.slice(1)}
-        </UnifiedBadge>
+        </Badge>
       )}
 
       {/* Specialization badges */}
       {specializations.slice(0, maxSpecializations).map((spec, index) => (
-        <UnifiedBadge key={index} variant="secondary" className="text-xs">
+        <Badge key={index} variant="secondary" className="text-xs">
           {spec}
-        </UnifiedBadge>
+        </Badge>
       ))}
 
       {/* Show remaining count */}
       {specializations.length > maxSpecializations && (
-        <UnifiedBadge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-xs">
           +{specializations.length - maxSpecializations}
-        </UnifiedBadge>
+        </Badge>
       )}
     </div>
   );
