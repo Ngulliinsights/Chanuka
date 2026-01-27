@@ -7,7 +7,7 @@
  */
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
-import { ConnectionState } from '@server/infrastructure/schema/websocket';
+import { ConnectionState } from '@shared/types/api/websocket';
 
 import { realTimeService } from '@client/core/realtime';
 import { WebSocketSubscription } from '@client/core/realtime/types';

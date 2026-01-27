@@ -5,13 +5,13 @@
  * Uses unified WebSocket types from shared schema for consistency.
  */
 
-// Import unified types from shared schema
-import type { ConnectionQuality, WebSocketMessage } from '@server/infrastructure/schema/websocket';
+// Import unified types from shared types
+import type { ConnectionQuality, WebSocketMessage } from '@shared/types/api/websocket';
 
 import { WebSocketClient } from '../websocket-client';
 
 // Re-export shared types for backward compatibility
-export type { ConnectionQuality, WebSocketMessage } from '@server/infrastructure/schema/websocket';
+export type { ConnectionQuality, WebSocketMessage } from '@shared/types/api/websocket';
 
 export { WebSocketClient };
 

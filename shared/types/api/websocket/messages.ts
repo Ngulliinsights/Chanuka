@@ -70,6 +70,46 @@ export function isMessageId(value: unknown): value is MessageId {
 }
 
 // ============================================================================
+// Connection State & Quality (shared with server)
+// ============================================================================
+
+/**
+ * WebSocket connection lifecycle states
+ */
+export enum ConnectionState {
+  DISCONNECTED = 'disconnected',
+  CONNECTING = 'connecting',
+  CONNECTED = 'connected',
+  RECONNECTING = 'reconnecting',
+  FAILED = 'failed'
+}
+
+/**
+ * Connection quality assessment metrics
+ */
+export interface ConnectionQuality {
+  level: 'excellent' | 'good' | 'poor' | 'disconnected';
+  /** Round-trip latency in milliseconds */
+  latency: number;
+  /** Packet loss percentage (0-100) */
+  packetLoss?: number;
+}
+
+/**
+ * Generic WebSocket message interface (for compatibility with server types)
+ */
+export interface WebSocketMessage<T = unknown> {
+  /** Discriminator for message type routing and type narrowing */
+  type: string;
+  /** Message payload (optional for messages like ping/pong) */
+  data?: T;
+  /** Unique identifier for request/response correlation */
+  messageId?: string;
+  /** Unix timestamp (ms) when message was created */
+  timestamp?: number;
+}
+
+// ============================================================================
 // Base Message Interface
 // ============================================================================
 

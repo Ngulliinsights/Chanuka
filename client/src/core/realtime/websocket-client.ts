@@ -6,11 +6,17 @@
  */
 
 import {
-  WebSocketConfig,
   ConnectionState,
   WebSocketMessage,
-  WebSocketError,
-} from '@server/infrastructure/schema/websocket';
+} from '@shared/types/api/websocket';
+import type { WebSocketConfig } from '@client/core/realtime/types';
+
+// WebSocket error interface (for client-side use)
+interface WebSocketError extends Error {
+  code: number;
+  wasClean: boolean;
+  timestamp: string;
+}
 
 import { logger } from '@client/lib/utils/logger';
 
@@ -105,8 +111,8 @@ export class WebSocketClient {
       this.stopHeartbeat();
       this.emit('disconnected', event.code, event.reason);
 
-      // Auto-reconnect logic based on shared config
-      if (this.config.autoConnect !== false) {
+      // Auto-reconnect logic based on client config
+      if (this.config.reconnect?.enabled !== false) {
         this.attemptReconnect();
       }
     };
@@ -195,16 +201,16 @@ export class WebSocketClient {
   }
 
   private attemptReconnect() {
-    if (this.reconnectAttempts < (this.config.reconnect?.maxRetries || 5)) {
-      const delay = Math.min(
-        (this.config.reconnect?.baseDelay || 1000) * Math.pow(2, this.reconnectAttempts),
-        this.config.reconnect?.maxDelay || 30000
+    if (this.reconnectAttempts < (this.config.reconnect?.maxAttempts || 5)) {
+      const reconnectDelay = Math.min(
+        (this.config.reconnect?.delay || 1000) * Math.pow(2, this.reconnectAttempts),
+        30000
       );
 
       this.reconnectTimerRef = window.setTimeout(() => {
         this.reconnectAttempts++;
         this.connect();
-      }, delay);
+      }, reconnectDelay);
     }
   }
 

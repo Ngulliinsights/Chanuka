@@ -9,3 +9,4 @@ export * from './response-types';
 export * from './error-types';
 export * from './factories';
 export * from './serialization';
+export * from './websocket';

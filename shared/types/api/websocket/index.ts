@@ -47,7 +47,13 @@ export type {
   SystemMessage,
   ServerToClientMessage,
   AnyWebSocketMessage,
+  // Connection types (shared with server)
+  ConnectionQuality,
+  WebSocketMessage,
 } from './messages';
+
+// Export connection state enum
+export { ConnectionState } from './messages';
 
 // Export message type guards
 export {
