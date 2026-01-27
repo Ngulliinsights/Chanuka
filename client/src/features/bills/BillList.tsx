@@ -20,9 +20,9 @@ import {
   DropdownMenuTrigger,
 } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
-import type { Bill, BillsQueryParams } from '@client/lib/types';
+import type { Bill, BillsQueryParams, BillStatus } from '@client/lib/types';
 
-import { BillCard } from './BillCard';
+import BillCard from './ui/list/BillCard';
 
 interface BillListProps {
   bills: Bill[];
@@ -47,14 +47,13 @@ type ViewMode = 'card' | 'list';
 // Extract status badge styling logic outside component to prevent recreation
 const STATUS_STYLES: Record<string, string> = {
   introduced: 'bg-green-100 text-green-800 border-green-300',
-  active: 'bg-green-100 text-green-800 border-green-300',
-  committee: 'bg-blue-100 text-blue-800 border-blue-300',
-  upcoming: 'bg-blue-100 text-blue-800 border-blue-300',
-  passed: 'bg-purple-100 text-purple-800 border-purple-300',
-  failed: 'bg-red-100 text-red-800 border-red-300',
-  rejected: 'bg-red-100 text-red-800 border-red-300',
-  signed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  committee_review: 'bg-blue-100 text-blue-800 border-blue-300',
+  floor_debate: 'bg-blue-100 text-blue-800 border-blue-300',
+  passed_chamber: 'bg-purple-100 text-purple-800 border-purple-300',
+  passed_both_chambers: 'bg-purple-100 text-purple-800 border-purple-300',
+  enacted: 'bg-emerald-100 text-emerald-800 border-emerald-300',
   vetoed: 'bg-orange-100 text-orange-800 border-orange-300',
+  failed: 'bg-red-100 text-red-800 border-red-300',
   default: 'bg-gray-100 text-gray-800 border-gray-300',
 };
 
@@ -73,11 +72,13 @@ const billMatchesFilter = (bill: Bill, filter: FilterStatus): boolean => {
   if (filter === 'all') return true;
 
   const status = bill.status.toLowerCase();
-  return (
-    status === filter.toLowerCase() ||
-    (filter === 'introduced' && status === 'active') ||
-    (filter === 'committee' && status === 'upcoming')
-  );
+  if (filter === 'introduced') return status === 'introduced';
+  if (filter === 'committee') return status === 'committee_review';
+  if (filter === 'passed') {
+    return status === 'passed_chamber' || status === 'passed_both_chambers' || status === 'enacted';
+  }
+  
+  return false;
 };
 
 export const BillList = ({
@@ -135,7 +136,7 @@ export const BillList = ({
   }, []);
 
   const handleExternalFilterChange = useCallback(
-    (status: string[]) => {
+    (status: BillStatus[]) => {
       if (onFiltersChange) {
         onFiltersChange({ ...filters, status });
       }
@@ -244,10 +245,10 @@ export const BillList = ({
                 <DropdownMenuItem onClick={() => handleExternalFilterChange(['introduced'])}>
                   Introduced Bills
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExternalFilterChange(['committee'])}>
+                <DropdownMenuItem onClick={() => handleExternalFilterChange(['committee_review'])}>
                   In Committee
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExternalFilterChange(['passed'])}>
+                <DropdownMenuItem onClick={() => handleExternalFilterChange(['passed_chamber'])}>
                   Passed Bills
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onFiltersChange?.({})}>
@@ -368,7 +369,7 @@ export const BillList = ({
                             {bill.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bill.introducedDate).toLocaleDateString()}
+                            {new Date(bill.introductionDate).toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
@@ -392,15 +393,15 @@ export const BillList = ({
                       </CardContent>
                       <CardFooter className="pt-0 border-t flex justify-between text-sm text-muted-foreground">
                         <div className="flex gap-4">
-                          {bill.engagementMetrics && (
+                          {bill.engagement && (
                             <>
                               <div className="flex items-center">
                                 <span className="mr-1">🔍</span>
-                                <span>{formatCount(bill.engagementMetrics.views, 'view')}</span>
+                                <span>{formatCount(bill.engagement.views, 'view')}</span>
                               </div>
                               <div className="flex items-center">
                                 <span className="mr-1">💬</span>
-                                <span>{formatCount(bill.comments?.length || 0, 'comment')}</span>
+                                <span>{formatCount(bill.engagement.comments, 'comment')}</span>
                               </div>
                             </>
                           )}

@@ -1,0 +1,100 @@
+
+> @chanuka/client@1.0.0 type-check
+> tsc --noEmit
+
+../@types/index.ts(9,15): error TS2307: Cannot find module './core' or its corresponding type declarations.
+../@types/index.ts(12,15): error TS2307: Cannot find module './features' or its corresponding type declarations.
+../@types/server/index.ts(10,1): error TS2308: Module './api-response' has already exported a member named 'AuthenticatedRequest'. Consider explicitly re-exporting to resolve the ambiguity.
+src/app/providers/AppProviders.tsx(191,7): error TS2322: Type '() => { type: "slow" | "fast" | "unknown"; effectiveType: "2g" | "3g" | "4g" | "5g" | undefined; downlink: number | undefined; rtt: number | undefined; saveData: boolean; }' is not assignable to type '() => ConnectionInfo'.
+  Property 'online' is missing in type '{ type: "slow" | "fast" | "unknown"; effectiveType: "2g" | "3g" | "4g" | "5g" | undefined; downlink: number | undefined; rtt: number | undefined; saveData: boolean; }' but required in type 'ConnectionInfo'.
+src/app/providers/AppProviders.tsx(193,7): error TS2322: Type 'AssetLoadingManager' is not assignable to type '{ onProgress?: ((callback: (progress: AssetLoadingProgress) => void) => () => void) | undefined; }'.
+  Types of property 'onProgress' are incompatible.
+    Type '(callback: (progress: LoadingProgress) => void) => () => void' is not assignable to type '(callback: (progress: AssetLoadingProgress) => void) => () => void'.
+      Types of parameters 'callback' and 'callback' are incompatible.
+        Types of parameters 'progress' and 'progress' are incompatible.
+          Property 'status' is missing in type 'LoadingProgress' but required in type 'AssetLoadingProgress'.
+src/core/api/hooks/use-api-with-fallback.ts(14,50): error TS2307: Cannot find module '../types/request' or its corresponding type declarations.
+src/core/api/privacy.ts(4,63): error TS2307: Cannot find module './types/error-response' or its corresponding type declarations.
+src/core/api/types/service.ts(12,37): error TS2307: Cannot find module './request' or its corresponding type declarations.
+src/core/community/services/moderation.service.ts(147,29): error TS2339: Property 'trim' does not exist on type 'number'.
+src/core/community/services/moderation.service.ts(151,18): error TS2339: Property 'contentType' does not exist on type 'ModerationRequest'.
+src/core/community/services/moderation.service.ts(151,73): error TS2339: Property 'contentType' does not exist on type 'ModerationRequest'.
+src/core/community/services/moderation.service.ts(180,7): error TS2353: Object literal may only specify known properties, and 'inappropriate_language' does not exist in type 'Record<ViolationType, string>'.
+src/core/community/services/moderation.service.ts(197,7): error TS2353: Object literal may only specify known properties, and 'duplicate_content' does not exist in type 'Record<ViolationType, "critical" | "high" | "medium" | "low">'.
+src/core/loading/context.tsx(49,3): error TS2741: Property 'online' is missing in type '{ type: "unknown"; }' but required in type 'ConnectionInfo'.
+src/core/loading/context.tsx(225,25): error TS2367: This comparison appears to be unintentional because the types 'ConnectionType' and '"slow"' have no overlap.
+src/core/loading/reducer.ts(482,5): error TS2741: Property 'online' is missing in type '{ type: "unknown"; }' but required in type 'ConnectionInfo'.
+src/core/loading/utils/loading-utils.ts(116,5): error TS2322: Type 'Date' is not assignable to type 'number'.
+src/core/loading/utils/loading-utils.ts(136,5): error TS2322: Type '"loading"' is not assignable to type 'LoadingType'.
+src/core/loading/utils/loading-utils.ts(137,5): error TS2322: Type 'Date' is not assignable to type 'number'.
+src/core/loading/utils/loading-utils.ts(167,5): error TS2322: Type '"loading"' is not assignable to type 'LoadingType'.
+src/core/loading/utils/loading-utils.ts(168,5): error TS2322: Type 'Date' is not assignable to type 'number'.
+src/core/loading/utils/loading-utils.ts(245,45): error TS2339: Property 'getTime' does not exist on type 'number'.
+src/core/navigation/breadcrumbs.ts(23,5): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
+src/core/navigation/breadcrumbs.ts(40,9): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
+src/core/navigation/breadcrumbs.ts(106,9): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
+src/core/navigation/breadcrumbs.ts(143,7): error TS2322: Type 'NavigationSection' is not assignable to type 'PageCategory'.
+  Type '"system"' is not assignable to type 'PageCategory'.
+src/core/navigation/breadcrumbs.ts(165,9): error TS2322: Type 'NavigationSection' is not assignable to type 'PageCategory'.
+  Type '"system"' is not assignable to type 'PageCategory'.
+src/core/navigation/hooks/use-unified-navigation.ts(21,27): error TS2551: Property 'user_role' does not exist on type 'NavigationContextValue'. Did you mean 'userRole'?
+src/core/navigation/hooks/use-unified-navigation.ts(43,27): error TS2551: Property 'is_active' does not exist on type 'NavigationContextValue'. Did you mean 'isActive'?
+src/core/navigation/index.ts(38,1): error TS2308: Module './types' has already exported a member named 'NavigationSection'. Consider explicitly re-exporting to resolve the ambiguity.
+src/core/navigation/NavigationConsistency.tsx(210,18): error TS2551: Property 'setCurrentSection' does not exist on type 'NavigationContextValue'. Did you mean 'currentSection'?
+src/core/navigation/persistence.ts(17,26): error TS2551: Property 'user_role' does not exist on type 'NavigationState'. Did you mean 'userRole'?
+src/core/navigation/persistence.ts(84,9): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/core/navigation/persistence.ts(93,9): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/core/navigation/preferences.ts(26,5): error TS2353: Object literal may only specify known properties, and 'sidebarCollapsed' does not exist in type 'NavigationPreferences'.
+src/core/navigation/preferences.ts(55,37): error TS2339: Property 'recentPages' does not exist on type 'NavigationPreferences'.
+src/core/navigation/preferences.ts(58,41): error TS7006: Parameter 'page' implicitly has an 'any' type.
+src/core/navigation/preferences.ts(66,33): error TS2353: Object literal may only specify known properties, and 'recentPages' does not exist in type 'Partial<NavigationPreferences>'.
+src/core/navigation/preferences.ts(81,21): error TS2339: Property 'push' does not exist on type 'readonly string[]'.
+src/core/navigation/search.ts(31,30): error TS2339: Property 'description' does not exist on type 'NavigationItem'.
+src/core/navigation/test-navigation.ts(20,3): error TS2353: Object literal may only specify known properties, and 'description' does not exist in type 'NavigationItem'.
+src/core/navigation/test-navigation.ts(25,3): error TS2741: Property 'path' is missing in type '{ id: string; label: string; href: string; icon: any; section: "legislative"; }' but required in type 'NavigationItem'.
+src/core/navigation/test-navigation.ts(33,3): error TS2741: Property 'path' is missing in type '{ id: string; label: string; href: string; icon: any; section: "community"; requiresAuth: true; }' but required in type 'NavigationItem'.
+src/core/navigation/utils.ts(17,70): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
+src/core/navigation/utils.ts(26,7): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
+src/core/navigation/utils.ts(379,30): error TS2339: Property 'description' does not exist on type 'NavigationItem'.
+src/core/personalization/persona-detector.ts(122,9): error TS2367: This comparison appears to be unintentional because the types '"user" | "comment" | "bill" | "page"' and '"analytics"' have no overlap.
+src/core/personalization/persona-detector.ts(146,52): error TS2367: This comparison appears to be unintentional because the types '"user" | "comment" | "bill" | "page"' and '"analytics"' have no overlap.
+src/core/realtime/hooks/use-bill-tracking.ts(163,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
+src/core/realtime/hooks/use-bill-tracking.ts(165,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
+src/core/realtime/hooks/use-bill-tracking.ts(181,68): error TS2345: Argument of type '(update: BillUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+  Types of parameters 'update' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'BillRealTimeUpdate'.
+src/core/realtime/hooks/use-bill-tracking.ts(184,7): error TS2345: Argument of type '(metrics: BillEngagementUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+  Types of parameters 'metrics' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'EngagementMetricsUpdate'.
+src/core/realtime/hooks/use-bill-tracking.ts(268,5): error TS2353: Object literal may only specify known properties, and 'billUpdates' does not exist in type 'BillTrackingHookReturn'.
+src/core/realtime/hooks/use-community-realtime.ts(13,10): error TS2305: Module '"../types"' has no exported member 'CommunityRealTimeHookReturn'.
+src/core/realtime/hooks/use-community-realtime.ts(273,69): error TS2345: Argument of type '(indicator: TypingIndicator) => void' is not assignable to parameter of type 'EventCallback'.
+  Types of parameters 'indicator' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'TypingIndicator'.
+src/core/realtime/hooks/use-community-realtime.ts(274,68): error TS2345: Argument of type '(update: CommentUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+  Types of parameters 'update' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'CommentUpdate'.
+src/core/realtime/hooks/use-websocket.ts(16,8): error TS2307: Cannot find module '../api/types/websocket' or its corresponding type declarations.
+src/core/realtime/hooks/use-websocket.ts(18,56): error TS2307: Cannot find module './websocket-client' or its corresponding type declarations.
+src/core/realtime/hooks/use-websocket.ts(92,45): error TS7006: Parameter 'code' implicitly has an 'any' type.
+src/core/realtime/hooks/use-websocket.ts(92,51): error TS7006: Parameter 'reason' implicitly has an 'any' type.
+src/core/realtime/hooks/use-websocket.ts(222,42): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/core/realtime/index.ts(14,27): error TS2724: '"./websocket-client"' has no exported member named 'createWebSocketClient'. Did you mean 'WebSocketClient'?
+src/core/realtime/manager.ts(10,30): error TS2307: Cannot find module '../utils/event-emitter' or its corresponding type declarations.
+src/core/realtime/manager.ts(257,9): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(262,9): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(314,7): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(317,32): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(320,42): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(359,9): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/core/realtime/manager.ts(410,7): error TS2353: Object literal may only specify known properties, and 'filters' does not exist in type 'SubscriptionMessage'.
+src/core/realtime/manager.ts(420,7): error TS2561: Object literal may only specify known properties, but 'subscriptionId' does not exist in type 'SubscriptionMessage'. Did you mean to write 'subscriptions'?
+src/core/realtime/manager.ts(487,42): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(497,8): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(516,8): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(527,47): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(533,9): error TS2322: Type 'number' is not assignable to type 'string'.
+src/core/realtime/manager.ts(546,7): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(547,11): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/manager.ts(548,11): error TS2532: Object is possibly 'undefined'.
+src/core/realtime/services/bill-tracking.ts(351,11): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.

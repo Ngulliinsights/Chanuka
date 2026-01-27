@@ -5,27 +5,47 @@
  * Consolidated from client/src/types/auth.ts into core/auth module
  */
 
+import { User as SharedUser, UserProfile as SharedUserProfile, VerificationStatus } from '@client/lib/types';
+
 export interface User {
   id: string;
   email: string;
-  name: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
-  verified: boolean;
-  twoFactorEnabled: boolean;
-  avatar_url?: string;
-  preferences: UserPreferences;
-  permissions: string[];
-  lastLogin: string;
+  
+  // Shared Type Structure
+  profile: SharedUserProfile;
+  verification: VerificationStatus;
+  preferences: UserPreferences; // Note: Check consistency with Shared UserPreferences later
+  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator'; // Map to Shared UserRole if possible
+
+  // Audit (String for JSON)
   createdAt: string;
-  verification_status?: 'pending' | 'verified' | 'rejected';
+  lastLogin: string;
+
+  // Legacy Fields (Deprecated)
+  /** @deprecated use profile.displayName */
+  name: string;
+  /** @deprecated use profile.displayName */
+  username?: string;
+  /** @deprecated use profile.displayName */
+  first_name?: string;
+  /** @deprecated use profile.displayName */
+  last_name?: string;
+  /** @deprecated use verification === 'verified' */
+  verified: boolean;
+  /** @deprecated use profile.avatarUrl */
+  avatar_url?: string;
+  
+  // Existing Core fields
+  twoFactorEnabled: boolean;
+  permissions: string[];
+  
+  // Feature fields (keep as optional)
+  verification_status?: 'pending' | 'verified' | 'rejected'; // This duplicates verification?
   expertise?: string | string[];
   is_active?: boolean;
   reputation?: number;
-  two_factor_enabled?: boolean;
-  last_login?: string;
+  two_factor_enabled?: boolean; // duplicate of twoFactorEnabled?
+  last_login?: string; // duplicate of lastLogin
   login_count?: number;
   account_locked?: boolean;
   locked_until?: string | null;

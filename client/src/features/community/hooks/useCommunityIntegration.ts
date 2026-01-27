@@ -116,7 +116,14 @@ export function useReportContent() {
       commentId: string;
       violationType: 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'off_topic';
       reason: string;
-    }) => communityApiService.reportComment(data),
+    }) => {
+      const apiReason = data.violationType === 'off_topic' ? 'other' : data.violationType;
+      return communityApiService.reportComment({
+        commentId: parseInt(data.commentId, 10),
+        reason: apiReason as any, 
+        details: data.reason
+      });
+    },
     onSuccess: () => {
       toast({
         title: 'Report submitted',

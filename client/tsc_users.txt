@@ -1,0 +1,20 @@
+src/features/users/hooks/useOnboarding.ts(9,15): error TS2724: '"@client/lib/types"' has no exported member named 'OnboardingStatus'. Did you mean 'LoadingStats'?
+src/features/users/hooks/useUserAPI.ts(18,3): error TS2724: '"@client/lib/types/user-dashboard"' has no exported member named 'DashboardPreferences'. Did you mean 'UserDashboardPreferences'?
+src/features/users/services/achievements-service.ts(117,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/achievements-service.ts(160,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/achievements-service.ts(190,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/achievements-service.ts(233,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/achievements-service.ts(278,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/achievements-service.ts(318,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/engagement-service.ts(185,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/engagement-service.ts(215,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/engagement-service.ts(294,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(122,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(164,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(171,48): error TS2304: Cannot find name 'UserPreferences'.
+src/features/users/services/profile-service.ts(171,75): error TS2304: Cannot find name 'UserPreferences'.
+src/features/users/services/profile-service.ts(206,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(238,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(270,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(304,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/features/users/services/profile-service.ts(334,9): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.

@@ -288,7 +288,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
               {['all', 'critical', 'high', 'medium', 'low'].map(severity => (
                 <Button
                   key={severity}
-                  variant={selectedSeverity === severity ? 'default' : 'outline'}
+                  variant={selectedSeverity === severity ? 'secondary' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedSeverity(severity)}
                 >

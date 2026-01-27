@@ -42,6 +42,7 @@ export interface LoadingProgress {
   total: number;
   currentAsset?: string;
   phase: 'preload' | 'critical' | 'lazy' | 'complete';
+  status: 'idle' | 'loading' | 'success' | 'error';
 }
 
 export interface AssetFallbackStrategy {
@@ -889,6 +890,7 @@ export class AssetLoadingManager {
     loaded: 0,
     total: 0,
     phase: 'preload',
+    status: 'idle',
   };
 
   private progressCallbacks: Array<(progress: LoadingProgress) => void> = [];
@@ -1416,6 +1418,7 @@ export function useAssetLoading(
     loaded: 0,
     total: 0,
     phase: 'preload',
+    status: 'idle',
   });
   const [errors, setErrors] = useState<Error[]>([]);
   const managerRef = useRef(null as AssetLoadingManager | null);

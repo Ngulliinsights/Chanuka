@@ -15,7 +15,7 @@ import type { UserProfile, NotificationPreferences } from '@client/lib/services/
 import type {
   PrivacyControls,
   DataExportRequest,
-  DashboardPreferences,
+  UserDashboardPreferences,
   UserDashboardData,
 } from '@client/lib/types/user-dashboard';
 import { logger } from '@client/lib/utils/logger';
@@ -464,7 +464,7 @@ export function useUpdateUserPreferences() {
       queryClient.setQueryData(userQueryKeys.preferences(userId), data);
 
       if (user?.id === userId && dashboardStore.updatePreferences) {
-        dashboardStore.updatePreferences(data as unknown as DashboardPreferences);
+        dashboardStore.updatePreferences(data as unknown as UserDashboardPreferences);
       }
 
       logger.info('User preferences updated', { userId });

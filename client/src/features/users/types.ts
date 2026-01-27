@@ -169,17 +169,18 @@ export interface EngagementHistoryResponse {
   };
 }
 
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  bio?: string;
-  joined_date: string;
+export type UserProfile = User & {
+  // Flattened properties - deprecating 'name' and 'joined_date' in favor of 'profile.displayName' and 'createdAt'
+  avatar?: string;   // maps to profile.avatarUrl
+  bio?: string;      // maps to profile.bio
+
+  // Feature-specific metrics (likely need to be fetched/joined separately or added to User metadata)
   civic_score: number;
   badge_count: number;
-  verification_status: 'unverified' | 'verified' | 'expert';
-}
+  
+  // Legacy alias
+  verification_status?: 'unverified' | 'verified' | 'expert';
+};
 
 export interface Achievement {
   id: string;

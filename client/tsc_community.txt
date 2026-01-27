@@ -1,0 +1,20 @@
+src/features/community/hooks/index.ts(25,10): error TS2305: Module '"./useCommunityIntegration"' has no exported member 'useCommunityIntegration'.
+src/features/community/hooks/useArgumentClusters.ts(10,38): error TS2307: Cannot find module '@/server/features/argument-intelligence' or its corresponding type declarations.
+src/features/community/hooks/useArgumentsForBill.ts(10,31): error TS2307: Cannot find module '@/types/domains/arguments' or its corresponding type declarations.
+src/features/community/hooks/useCommunityIntegration.ts(119,45): error TS2345: Argument of type '{ commentId: string; violationType: "spam" | "offensive" | "misinformation" | "harassment" | "off_topic"; reason: string; }' is not assignable to parameter of type 'CommentReportData'.
+src/features/community/hooks/useDiscussion.ts(17,15): error TS2724: '"@client/lib/types"' has no exported member named 'ViolationType'. Did you mean 'ActionType'?
+src/features/community/hooks/useDiscussion.ts(22,3): error TS2305: Module '"@client/lib/types"' has no exported member 'ModerationViolationType'.
+src/features/community/hooks/useDiscussion.ts(78,9): error TS2322: Type '{ id: number; billId: number; comments: Comment[]; totalComments: any; participantCount: number | undefined; isLocked: any; engagementScore: number; qualityScore: any; expertParticipation: number; lastActivity: any; activeUsers: string[]; createdAt: string; updatedAt: string; } | { ...; } | null' is not assignable to type 'DiscussionThread | null'.
+src/features/community/hooks/useDiscussion.ts(89,56): error TS2339: Property 'commentCount' does not exist on type 'UnifiedThread'.
+src/features/community/hooks/useDiscussion.ts(91,51): error TS2551: Property 'isLocked' does not exist on type 'UnifiedThread'. Did you mean 'locked'?
+src/features/community/hooks/useDiscussion.ts(93,31): error TS2551: Property 'upvotes' does not exist on type 'UnifiedComment'. Did you mean 'votes'?
+src/features/community/hooks/useDiscussion.ts(93,43): error TS2339: Property 'downvotes' does not exist on type 'UnifiedComment'.
+src/features/community/hooks/useDiscussion.ts(96,55): error TS2339: Property 'qualityScore' does not exist on type 'UnifiedThread'.
+src/features/community/hooks/useDiscussion.ts(98,53): error TS2339: Property 'isExpertVerified' does not exist on type 'UnifiedComment'.
+src/features/community/hooks/useDiscussion.ts(101,55): error TS2551: Property 'lastActivityAt' does not exist on type 'UnifiedThread'. Did you mean 'lastActivity'?
+src/features/community/hooks/useDiscussion.ts(117,29): error TS2551: Property 'upvotes' does not exist on type 'UnifiedComment'. Did you mean 'votes'?
+src/features/community/hooks/useDiscussion.ts(117,41): error TS2339: Property 'downvotes' does not exist on type 'UnifiedComment'.
+src/features/community/hooks/useDiscussion.ts(121,63): error TS2339: Property 'qualityScore' does not exist on type 'UnifiedComment'.
+src/features/community/hooks/useDiscussion.ts(124,51): error TS2339: Property 'isExpertVerified' does not exist on type 'UnifiedComment'.
+src/features/community/hooks/useDiscussion.ts(140,9): error TS2322: Type '{ userId: string; userName: string; parentId: undefined; timestamp: number; }[]' is not assignable to type 'TypingIndicator[]'.
+src/features/community/hooks/useDiscussion.ts(179,7): error TS2322: Type 'string' is not assignable to type 'number'.

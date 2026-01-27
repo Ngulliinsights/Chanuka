@@ -12,7 +12,8 @@ import { CacheService } from '@client/lib/services/cache';
 import {
   ServiceErrorFactory,
   ValidationError,
-  ResourceNotFoundError
+  ResourceNotFoundError,
+  SystemError
 } from '@client/lib/services/errors';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
@@ -22,7 +23,8 @@ import {
   UserAchievement,
   ActivitySummary,
   UserEngagementHistory,
-  EngagementFilters
+  EngagementFilters,
+  UserPreferences
 } from '@client/lib/services/interfaces';
 import { logger } from '@client/lib/utils/logger';
 
@@ -115,11 +117,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user profile',
         'UserProfileService',
         'getUserProfile',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -157,11 +158,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to update user profile',
         'UserProfileService',
         'updateProfile',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -199,11 +199,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to update user preferences',
         'UserProfileService',
         'updatePreferences',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -231,11 +230,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to update user avatar',
         'UserProfileService',
         'updateAvatar',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -263,11 +261,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to update user cover image',
         'UserProfileService',
         'updateCoverImage',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -297,11 +294,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return statistics;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user statistics',
         'UserProfileService',
         'getUserStatistics',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -327,11 +323,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return badges;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user badges',
         'UserProfileService',
         'getUserBadges',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -357,11 +352,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return achievements;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user achievements',
         'UserProfileService',
         'getUserAchievements',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -406,11 +400,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return result;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get activity history',
         'UserProfileService',
         'getActivityHistory',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -550,7 +543,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
           website: 'https://example.com',
           twitter: '@testuser',
           linkedin: 'test-user',
-          cover_image_url: null,
+          cover_image_url: undefined,
           civic_engagement_score: 85,
           badges: [],
           achievements: [],

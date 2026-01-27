@@ -7,7 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { Argument } from '@/types/domains/arguments';
+import type { Argument } from '@client/lib/types';
 
 export function useArgumentsForBill(billId: string) {
   return useQuery({

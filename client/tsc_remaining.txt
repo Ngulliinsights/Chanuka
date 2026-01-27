@@ -1,0 +1,30 @@
+
+> @chanuka/client@1.0.0 type-check
+> tsc --noEmit
+
+../@types/index.ts(9,15): error TS2307: Cannot find module './core' or its corresponding type declarations.
+../@types/index.ts(12,15): error TS2307: Cannot find module './features' or its corresponding type declarations.
+../@types/server/index.ts(10,1): error TS2308: Module './api-response' has already exported a member named 'AuthenticatedRequest'. Consider explicitly re-exporting to resolve the ambiguity.
+src/app/providers/AppProviders.tsx(191,7): error TS2322: Type '() => { type: "slow" | "fast" | "unknown"; effectiveType: "2g" | "3g" | "4g" | "5g" | undefined; downlink: number | undefined; rtt: number | undefined; saveData: boolean; }' is not assignable to type '() => ConnectionInfo'.
+  Property 'online' is missing in type '{ type: "slow" | "fast" | "unknown"; effectiveType: "2g" | "3g" | "4g" | "5g" | undefined; downlink: number | undefined; rtt: number | undefined; saveData: boolean; }' but required in type 'ConnectionInfo'.
+src/app/providers/AppProviders.tsx(193,7): error TS2322: Type 'AssetLoadingManager' is not assignable to type '{ onProgress?: ((callback: (progress: AssetLoadingProgress) => void) => () => void) | undefined; }'.
+  Types of property 'onProgress' are incompatible.
+    Type '(callback: (progress: LoadingProgress) => void) => () => void' is not assignable to type '(callback: (progress: AssetLoadingProgress) => void) => () => void'.
+      Types of parameters 'callback' and 'callback' are incompatible.
+        Types of parameters 'progress' and 'progress' are incompatible.
+          Property 'status' is missing in type 'LoadingProgress' but required in type 'AssetLoadingProgress'.
+src/core/api/hooks/use-api-with-fallback.ts(14,50): error TS2307: Cannot find module '../types/request' or its corresponding type declarations.
+src/core/api/privacy.ts(4,63): error TS2307: Cannot find module './types/error-response' or its corresponding type declarations.
+src/core/api/types/service.ts(12,37): error TS2307: Cannot find module './request' or its corresponding type declarations.
+src/core/community/services/moderation.service.ts(147,29): error TS2339: Property 'trim' does not exist on type 'number'.
+src/core/community/services/moderation.service.ts(151,18): error TS2339: Property 'contentType' does not exist on type 'ModerationRequest'.
+src/core/community/services/moderation.service.ts(151,73): error TS2339: Property 'contentType' does not exist on type 'ModerationRequest'.
+src/core/community/services/moderation.service.ts(180,7): error TS2353: Object literal may only specify known properties, and 'inappropriate_language' does not exist in type 'Record<ViolationType, string>'.
+src/core/community/services/moderation.service.ts(197,7): error TS2353: Object literal may only specify known properties, and 'duplicate_content' does not exist in type 'Record<ViolationType, "medium" | "low" | "high" | "critical">'.
+src/core/navigation/index.ts(38,1): error TS2308: Module './types' has already exported a member named 'NavigationSection'. Consider explicitly re-exporting to resolve the ambiguity.
+src/core/navigation/NavigationConsistency.tsx(210,18): error TS2551: Property 'setCurrentSection' does not exist on type 'NavigationContextValue'. Did you mean 'currentSection'?
+src/core/navigation/preferences.ts(26,5): error TS2353: Object literal may only specify known properties, and 'sidebarCollapsed' does not exist in type 'NavigationPreferences'.
+src/core/navigation/preferences.ts(55,37): error TS2339: Property 'recentPages' does not exist on type 'NavigationPreferences'.
+src/core/navigation/preferences.ts(58,41): error TS7006: Parameter 'page' implicitly has an 'any' type.
+src/core/navigation/preferences.ts(66,33): error TS2353: Object literal may only specify known properties, and 'recentPages' does not exist in type 'Partial<NavigationPreferences>'.
+src/core/navigation/preferences.ts(81,21): error TS2339: Property 'push' does not exist on type 'readonly string[]'.

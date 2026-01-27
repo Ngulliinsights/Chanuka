@@ -15,6 +15,8 @@ export type {
   BillAnalysis,
   Sponsor,
   BillCategory,
+  BillsSearchParams,
+  PaginatedBillsResponse,
 } from '@client/lib/types/bill';
 
 export interface Comment {

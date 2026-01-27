@@ -130,7 +130,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <div className="bg-white rounded-lg p-4 border border-blue-100">
               <h4 className="font-semibold text-gray-800 mb-3">Common Themes</h4>
               <div className="flex flex-wrap gap-2">
-                {brief.commonThemes.map((theme, idx) => (
+                {brief.commonThemes.map((theme: string, idx: number) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
@@ -147,7 +147,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <div className="bg-white rounded-lg p-4 border border-green-100">
               <h4 className="font-semibold text-gray-800 mb-3 text-green-700">✓ Top Supporting Arguments</h4>
               <ul className="space-y-2">
-                {brief.topSupportingArguments.map((arg, idx) => (
+                {brief.topSupportingArguments.map((arg: string, idx: number) => (
                   <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-green-300">
                     {arg}
                   </li>
@@ -161,7 +161,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <div className="bg-white rounded-lg p-4 border border-red-100">
               <h4 className="font-semibold text-gray-800 mb-3 text-red-700">✗ Top Opposing Arguments</h4>
               <ul className="space-y-2">
-                {brief.topOpposingArguments.map((arg, idx) => (
+                {brief.topOpposingArguments.map((arg: string, idx: number) => (
                   <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-red-300">
                     {arg}
                   </li>

@@ -14,7 +14,7 @@ import { NavigationItem, BreadcrumbItem, RelatedPage, NavigationSection, UserRol
  */
 export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
   const segments = path.split('/').filter(Boolean);
-  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: path === '/' }];
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', isActive: path === '/' }];
 
   let currentPath = '';
   segments.forEach((segment, index) => {
@@ -23,7 +23,7 @@ export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
     breadcrumbs.push({
       label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
       path: currentPath,
-      is_active: isLast,
+      isActive: isLast,
     });
   });
 

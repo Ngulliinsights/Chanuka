@@ -13,14 +13,14 @@ import {
   Clock,
   FileText,
 } from 'lucide-react';
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import { BillCard } from '@client/features/bills';
 import { useBills } from '@client/features/bills/hooks';
-import type { BillsQueryParams } from '@client/features/bills/types';
 import { FilterPanel } from '@client/features/bills/ui/filter-panel';
 import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
+import { BillStatus, UrgencyLevel } from '@client/lib/types/bill/bill-base';
 import { Button } from '@client/lib/design-system';
 import { Input } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
@@ -39,12 +39,15 @@ import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
 
 // Types for the portal
-interface BillsPortalFilters extends BillsQueryParams {
+interface BillsPortalFilters {
   searchQuery?: string;
+  status?: string[];
   sortBy?: 'date' | 'title' | 'status' | 'urgency' | 'engagement';
   sortOrder?: 'asc' | 'desc';
   viewMode?: 'grid' | 'list';
   category?: 'all' | 'urgent' | 'trending' | 'saved' | 'recent';
+  page?: number;
+  pageSize?: number;
 }
 
 interface BillsPortalStats {
@@ -81,7 +84,7 @@ export default function BillsPortalPage() {
   const currentFilters = useMemo<BillsPortalFilters>(
     () => ({
       searchQuery: searchParams.get('search') || '',
-      status: searchParams.get('status') || undefined,
+      status: searchParams.get('status')?.split(',') || undefined,
       sortBy: (searchParams.get('sortBy') as BillsPortalFilters['sortBy']) || 'date',
       sortOrder: (searchParams.get('sortOrder') as BillsPortalFilters['sortOrder']) || 'desc',
       viewMode: (searchParams.get('view') as BillsPortalFilters['viewMode']) || 'grid',
@@ -110,9 +113,11 @@ export default function BillsPortalPage() {
 
     return {
       total: totalBills,
-      active: bills.filter(bill => bill.status === 'active').length,
-      urgent: bills.filter(bill => bill.urgencyLevel === 'HIGH' || bill.urgencyLevel === 'URGENT')
-        .length,
+      active: bills.filter(bill => bill.status !== BillStatus.FAILED && bill.status !== BillStatus.VETOED).length,
+      urgent: bills.filter(bill => {
+        const urgency = bill.urgency;
+        return urgency === UrgencyLevel.HIGH || urgency === UrgencyLevel.CRITICAL;
+      }).length,
       trending: bills.filter(bill => (bill as any).trending).length,
       saved: bills.filter(bill => (bill as any).saved).length,
     };
@@ -157,8 +162,8 @@ export default function BillsPortalPage() {
   );
 
   const handleSortChange = useCallback(
-    (sortBy: BillsPortalFilters['sortBy']) => {
-      updateFilters({ sortBy, page: 1 });
+    (sortBy: string) => {
+      updateFilters({ sortBy: sortBy as BillsPortalFilters['sortBy'], page: 1 });
     },
     [updateFilters]
   );
@@ -192,7 +197,7 @@ export default function BillsPortalPage() {
     try {
       const billsToExport =
         selectedBills.length > 0
-          ? bills.filter(bill => selectedBills.includes(bill.id || ''))
+          ? bills.filter(bill => selectedBills.includes(String(bill.id)))
           : bills;
 
       if (billsToExport.length === 0) {
@@ -206,12 +211,12 @@ export default function BillsPortalPage() {
 
       // Create CSV content
       const csvData = billsToExport.map(bill => ({
-        ID: bill.id || '',
+        ID: String(bill.id),
         Title: bill.title || '',
         Status: bill.status || '',
-        Introduced: bill.introduced_date || '',
-        Sponsor: (bill as any).sponsor_name || '',
-        Description: (bill as any).description || '',
+        Introduced: bill.introducedDate || '',
+        Sponsor: bill.sponsors?.[0]?.name || '',
+        Description: bill.summary || '',
       }));
 
       const headers = Object.keys(csvData[0]);
@@ -458,15 +463,17 @@ export default function BillsPortalPage() {
         <Card>
           <CardContent className="p-4">
             <FilterPanel
-              filters={currentFilters}
-              onFiltersChange={newFilters => updateFilters(newFilters)}
+              filters={currentFilters as Record<string, any>}
+              onFiltersChange={newFilters => updateFilters(newFilters as Partial<BillsPortalFilters>)}
+              resultCount={bills.length}
+              totalCount={totalBills}
             />
           </CardContent>
         </Card>
       )}
 
       {/* Category Tabs */}
-      <Tabs value={currentFilters.category} onValueChange={handleCategoryChange}>
+      <Tabs value={currentFilters.category || 'all'} onValueChange={(value) => handleCategoryChange(value as BillsPortalFilters['category'])}>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="all">All Bills</TabsTrigger>
           <TabsTrigger value="urgent">Urgent</TabsTrigger>
@@ -475,7 +482,7 @@ export default function BillsPortalPage() {
           <TabsTrigger value="recent">Recent</TabsTrigger>
         </TabsList>
 
-        <TabsContent value={currentFilters.category} className="mt-6">
+        <TabsContent value={currentFilters.category || 'all'} className="mt-6">
           {/* Bills Display */}
           {currentFilters.viewMode === 'grid' ? (
             <VirtualBillGrid
@@ -509,10 +516,6 @@ export default function BillsPortalPage() {
                   <BillCard
                     key={bill.id}
                     bill={bill}
-                    onClick={() => handleBillClick(bill.id || '')}
-                    onSelect={() => handleBillSelect(bill.id || '')}
-                    isSelected={selectedBills.includes(bill.id || '')}
-                    showCheckbox={true}
                   />
                 ))
               )}

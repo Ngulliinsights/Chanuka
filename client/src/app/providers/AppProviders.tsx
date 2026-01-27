@@ -182,6 +182,7 @@ const LoadingProviderWithDeps = React.memo<{ children: React.ReactNode }>(({ chi
       downlink: connectionInfo.downlink,
       rtt: connectionInfo.rtt,
       saveData: false,
+      online: isOnline,
     }),
     [connectionInfo]
   );

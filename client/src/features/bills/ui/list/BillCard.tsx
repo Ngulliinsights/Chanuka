@@ -23,7 +23,7 @@ import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { cn } from '@client/lib/design-system';
-import { Bill } from '@client/lib/types';
+import { Bill, Sponsor } from '@client/lib/types';
 
 interface BillCardProps {
   bill: Bill;
@@ -80,7 +80,7 @@ export default function BillCard({
 
   // Check for conflicts of interest
   const hasConflicts = bill.sponsors?.some(
-    sponsor => sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0
+    (sponsor: Sponsor) => sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0
   );
 
   const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
@@ -98,9 +98,9 @@ export default function BillCard({
   };
 
   // Get engagement metrics with fallbacks
-  const viewCount = bill.engagementMetrics?.views || 0;
-  const commentCount = bill.comments?.length || 0;
-  const shareCount = bill.engagementMetrics?.shares || 0;
+  const viewCount = bill.engagement?.views || 0;
+  const commentCount = bill.engagement?.comments || 0;
+  const shareCount = bill.engagement?.shares || 0;
 
   return (
     <Card
@@ -124,10 +124,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onSave?.(bill.id)}
+            onClick={() => onSave?.(bill.billId)}
             onFocus={() => setQuickActionFocus('save')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.billId))}
             aria-label={isSaved ? 'Remove from saved bills' : 'Save bill'}
           >
             {isSaved ? (
@@ -141,10 +141,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onShare?.(bill.id)}
+            onClick={() => onShare?.(bill.billId)}
             onFocus={() => setQuickActionFocus('share')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.billId))}
             aria-label="Share bill"
           >
             <Share2 className="h-4 w-4" />
@@ -154,10 +154,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onComment?.(bill.id)}
+            onClick={() => onComment?.(bill.billId)}
             onFocus={() => setQuickActionFocus('comment')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.billId))}
             aria-label="View comments"
           >
             <MessageCircle className="h-4 w-4" />
@@ -169,13 +169,13 @@ export default function BillCard({
         <div className={cn('flex items-start justify-between gap-2', showQuickActions && 'pr-20')}>
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="font-mono">{bill.id}</span>
-              {bill.introduced_date && (
+              <span className="font-mono">{bill.billNumber}</span>
+              {bill.introductionDate && (
                 <>
                   <span>•</span>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    <span>{new Date(bill.introduced_date).toLocaleDateString()}</span>
+                    <span>{new Date(bill.introductionDate).toLocaleDateString()}</span>
                   </div>
                 </>
               )}
@@ -183,7 +183,7 @@ export default function BillCard({
 
             <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
               <Link
-                to={`/bills/${bill.id}`}
+                to={`/bills/${bill.billId}`}
                 className="hover:underline focus:underline focus:outline-none"
                 tabIndex={0}
               >
@@ -192,9 +192,9 @@ export default function BillCard({
             </CardTitle>
           </div>
 
-          {bill.category && (
+          {bill.billType && (
             <Badge variant="secondary" className="text-xs shrink-0">
-              {bill.category}
+              {bill.billType}
             </Badge>
           )}
         </div>
@@ -253,7 +253,7 @@ export default function BillCard({
           </div>
 
           <Link
-            to={`/bills/${bill.id}`}
+            to={`/bills/${bill.billId}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors text-sm"
             tabIndex={0}
           >

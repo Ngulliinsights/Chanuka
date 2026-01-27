@@ -7,7 +7,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { isFeatureEnabledForUser, getCurrentUserGroup } from '../../config/feature-flags';
+import { isFeatureEnabledForUser, getCurrentUserGroup } from '@client/lib/config/feature-flags';
 
 export interface ArchitectureMetrics {
   routeTransitions: RouteTransitionMetric[];

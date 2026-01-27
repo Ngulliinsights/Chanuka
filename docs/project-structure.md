@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** January 27, 2026 at 11:21 AM
+**Generated:** January 27, 2026 at 11:30 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,441
+**Total Items:** 3,445
 
 ```
 .
@@ -1603,6 +1603,92 @@
 │   │   ├── REVISED-SCHEMA-INTEGRATION-FOCUSED.md
 │   │   ├── schema-domain-relationships.md
 │   │   └── SHARED_INTEGRATION_STATUS.md
+│   ├── archive/
+│   │   └── legacy_migrations/
+│   │       ├── 00_README_SESSION_SUMMARY.md
+│   │       ├── ADMIN_ROUTER_MIGRATION_COMPLETE.md
+│   │       ├── ANALYSIS_SUMMARY.md
+│   │       ├── ARCHITECTURAL_OPTIONS_SHARED_CORE.md
+│   │       ├── ARCHITECTURE_MIGRATION_FINAL_REPORT.md
+│   │       ├── ARCHITECTURE_QUICK_REFERENCE.md
+│   │       ├── ARCHITECTURE_REFACTORING_COMPLETE.md
+│   │       ├── ARCHITECTURE_VISUAL_OVERVIEW.md
+│   │       ├── ARGUMENT_CONSTITUTIONAL_IMPLEMENTATION.md
+│   │       ├── AUTH_ROUTER_MIGRATION_COMPLETE.md
+│   │       ├── CLIENT_ERROR_MIGRATION_REPORT.md
+│   │       ├── CLIENT_ERROR_SYSTEM_AUDIT.md
+│   │       ├── CLIENT_ERROR_USAGE_GUIDE.md
+│   │       ├── CONFLICT_ANALYSIS_AND_RESOLUTION.md
+│   │       ├── CONFLICT_RESOLUTION_EXECUTION_PLAN.md
+│   │       ├── CONFLICT_RESOLUTION_FILE_INVENTORY.md
+│   │       ├── CONFLICT_RESOLUTION_INDEX.md
+│   │       ├── CONFLICT_RESOLUTION_PROJECT_COMPLETE.md
+│   │       ├── CONFLICT_RESOLUTION_QUICK_REFERENCE.md
+│   │       ├── CONFLICT_RESOLUTION_SESSION_COMPLETE.md
+│   │       ├── CONFLICT_RESOLUTION_VISUAL_SUMMARY.md
+│   │       ├── CRITICAL_DISCOVERY_PHASE_R4_REVERSAL.md
+│   │       ├── DATABASE_ALIGNMENT_AND_FEATURE_INTEGRATION.md
+│   │       ├── DATABASE_ALIGNMENT_COMPLETE.md
+│   │       ├── DATABASE_MIGRATION_GUIDE.md
+│   │       ├── DATABASE_SCHEMA_ANALYSIS.md
+│   │       ├── DELETED_VS_REPLACEMENT_ANALYSIS.md
+│   │       ├── DOCUMENTATION_INDEX.md
+│   │       ├── ERROR_CONSOLIDATION_SUMMARY.md
+│   │       ├── ERROR_SYSTEM_DOCUMENTATION_INDEX.md
+│   │       ├── EXECUTION_COMPLETE_SUMMARY.md
+│   │       ├── FEATURE_INTEGRATION_ANALYSIS.md
+│   │       ├── FEATURE_VERIFICATION_SUMMARY.md
+│   │       ├── IMPLEMENTATION_GUIDE.md
+│   │       ├── IMPORT_MIGRATION_AND_UI_COMPLETION.md
+│   │       ├── IMPORT_MIGRATION_GUIDE.md
+│   │       ├── INCOMPLETE_MIGRATIONS_COMPREHENSIVE_AUDIT.md
+│   │       ├── INFRASTRUCTURE_AUDIT_REPORT.md
+│   │       ├── INFRASTRUCTURE_AUDIT_SUMMARY.md
+│   │       ├── INFRASTRUCTURE_QUICK_REFERENCE.md
+│   │       ├── INFRASTRUCTURE_REORGANIZATION_SUMMARY.md
+│   │       ├── MIGRATION_EXECUTION_PHASE_R4_COMPLETE.md
+│   │       ├── MIGRATION_PROGRESS_TRACKER_PHASE2B.txt
+│   │       ├── MVP_COMPLETION_ACTION_PLAN.md
+│   │       ├── MVP_READINESS_QUICK_REFERENCE.md
+│   │       ├── OPTION_1_IMPLEMENTATION_COMPLETE.md
+│   │       ├── PHASE_1_2A_COMPLETION.md
+│   │       ├── PHASE_1_CACHING_CONSOLIDATION_COMPLETE.md
+│   │       ├── PHASE_2_MIDDLEWARE_ASSESSMENT_COMPLETE.md
+│   │       ├── PHASE_2B_3_4_PLAN.md
+│   │       ├── PHASE_2B_SESSION_2_STATUS.md
+│   │       ├── PHASE_3_COMPLETION_SUMMARY.md
+│   │       ├── PHASE_3_ERROR_HANDLING_VERIFICATION_COMPLETE.md
+│   │       ├── PHASE_4_CONFIG_AUDIT_COMPLETE.md
+│   │       ├── PHASE_4_QUALITY_AUDIT_REDUNDANCY_ANALYSIS.md
+│   │       ├── PHASE_R4_COMPATIBILITY_LAYER_COMPLETE.md
+│   │       ├── PHASE_R4_COMPLETION_REPORT.md
+│   │       ├── PHASE_R4_GHOST_MODULE_CLEANUP.md
+│   │       ├── PHASE2_IMPLEMENTATION_ROADMAP.md
+│   │       ├── PROJECT_STATUS.md
+│   │       ├── QUICK_MIGRATION_REFERENCE.md
+│   │       ├── QUICK_REFERENCE.md
+│   │       ├── QUICK_START_REFERENCE.md
+│   │       ├── README_CONFLICT_RESOLUTION.md
+│   │       ├── REFACTORING_EXECUTION_SUMMARY.md
+│   │       ├── SAFE_MIGRATION_CLEANUP_COMPLETE.md
+│   │       ├── SCHEMA_ANALYSIS_AND_READINESS_REPORT.md
+│   │       ├── SEARCH_FEATURE_MIGRATION_COMPLETE.md
+│   │       ├── SERVER_SERVICES_DEPRECATION.md
+│   │       ├── SESSION_2_EXECUTION_SUMMARY.md
+│   │       ├── SESSION_2_FINAL_SUMMARY.md
+│   │       ├── SESSION_COMPLETE_INFRASTRUCTURE_AUDIT.md
+│   │       ├── SESSION_COMPLETION_SUMMARY.md
+│   │       ├── SESSION_SUMMARY_TYPE_SYSTEM_CLEANUP.md
+│   │       ├── SHARED_AUDIT_QUICK_SUMMARY.md
+│   │       ├── SHARED_AUDIT_REPORT.md
+│   │       ├── SHARED_REORGANIZATION_STRATEGY.md
+│   │       ├── STATUS_REPORT.md
+│   │       ├── STRATEGIC_FEATURE_INTEGRATION_ROADMAP.md
+│   │       ├── TYPE_SYSTEM_COMPLETE_AUDIT.md
+│   │       ├── TYPE_SYSTEM_RESTRUCTURE_PLAN.md
+│   │       ├── TYPES_MIGRATION_GUIDE.md
+│   │       ├── TYPES_SYSTEM_GOVERNANCE.md
+│   │       └── USERS_FEATURE_MIGRATION_COMPLETE.md
 │   ├── chanuka/
 │   │   ├── # Chanuka Platform Consolidation Impleme.md
 │   │   ├── api_strategy_doc.md
@@ -1634,6 +1720,8 @@
 │   │   ├── strategic_additions_poems.md
 │   │   ├── strategic-ui-features-analysis.md
 │   │   └── strategy_template_flow.mermaid
+│   ├── plans/
+│   │   └── monitoring-fsd-restructure.md
 │   ├── reference/
 │   │   ├── Adversarial Validation of 'Chanuka' as Democratic Infrastructure in Kenya.md
 │   │   ├── api-consumer-guide.md
@@ -1700,6 +1788,7 @@
 │   ├── BOUNDARY_DEFINITIONS.md
 │   ├── GOVERNOR_INTEGRATION_PHASE1.md
 │   ├── IMPORT_PATH_GOVERNANCE.md
+│   ├── MIGRATION_LOG.md
 │   ├── project-structure.md
 │   └── race-condition-analysis.md
 ├── drizzle/
@@ -3320,130 +3409,45 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
-├── 00_README_SESSION_SUMMARY.md
-├── ADMIN_ROUTER_MIGRATION_COMPLETE.md
-├── ANALYSIS_SUMMARY.md
-├── ARCHITECTURAL_OPTIONS_SHARED_CORE.md
-├── ARCHITECTURE_MIGRATION_FINAL_REPORT.md
-├── ARCHITECTURE_QUICK_REFERENCE.md
-├── ARCHITECTURE_REFACTORING_COMPLETE.md
-├── ARCHITECTURE_VISUAL_OVERVIEW.md
 ├── ARCHITECTURE.md
 ├── archive-docs.sh
-├── ARGUMENT_CONSTITUTIONAL_IMPLEMENTATION.md
-├── AUTH_ROUTER_MIGRATION_COMPLETE.md
 ├── CHANGELOG.md
 ├── clear-sw.html
-├── CLIENT_ERROR_MIGRATION_REPORT.md
-├── CLIENT_ERROR_SYSTEM_AUDIT.md
-├── CLIENT_ERROR_USAGE_GUIDE.md
 ├── COMPLETION_STRATEGY.ts
-├── CONFLICT_ANALYSIS_AND_RESOLUTION.md
-├── CONFLICT_RESOLUTION_EXECUTION_PLAN.md
-├── CONFLICT_RESOLUTION_FILE_INVENTORY.md
-├── CONFLICT_RESOLUTION_INDEX.md
-├── CONFLICT_RESOLUTION_PROJECT_COMPLETE.md
-├── CONFLICT_RESOLUTION_QUICK_REFERENCE.md
-├── CONFLICT_RESOLUTION_SESSION_COMPLETE.md
-├── CONFLICT_RESOLUTION_VISUAL_SUMMARY.md
-├── CRITICAL_DISCOVERY_PHASE_R4_REVERSAL.md
+├── CONTRIBUTING.md
 ├── cspell.config.yaml
-├── DATABASE_ALIGNMENT_AND_FEATURE_INTEGRATION.md
-├── DATABASE_ALIGNMENT_COMPLETE.md
-├── DATABASE_MIGRATION_GUIDE.md
-├── DATABASE_SCHEMA_ANALYSIS.md
-├── DELETED_VS_REPLACEMENT_ANALYSIS.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
-├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
-├── ERROR_CONSOLIDATION_SUMMARY.md
 ├── ERROR_EXTRACTION_SUMMARY.txt
-├── ERROR_SYSTEM_DOCUMENTATION_INDEX.md
 ├── errors-comprehensive.json
 ├── errors.json
-├── EXECUTION_COMPLETE_SUMMARY.md
-├── FEATURE_INTEGRATION_ANALYSIS.md
-├── FEATURE_VERIFICATION_SUMMARY.md
 ├── generate-structure.mjs
-├── IMPLEMENTATION_GUIDE.md
-├── IMPORT_MIGRATION_AND_UI_COMPLETION.md
-├── IMPORT_MIGRATION_GUIDE.md
-├── INCOMPLETE_MIGRATIONS_COMPREHENSIVE_AUDIT.md
-├── INFRASTRUCTURE_AUDIT_REPORT.md
-├── INFRASTRUCTURE_AUDIT_SUMMARY.md
-├── INFRASTRUCTURE_QUICK_REFERENCE.md
-├── INFRASTRUCTURE_REORGANIZATION_SUMMARY.md
 ├── knip.config.ts
 ├── knip.json
-├── MIGRATION_EXECUTION_PHASE_R4_COMPLETE.md
-├── MIGRATION_PROGRESS_TRACKER.txt
-├── monitoring-fsd-restructure-plan.md
-├── MVP_COMPLETION_ACTION_PLAN.md
-├── MVP_READINESS_QUICK_REFERENCE.md
 ├── nginx.conf
-├── nul
 ├── nx.json
-├── OPTION_1_IMPLEMENTATION_COMPLETE.md
 ├── package.json
 ├── performance-baselines.json
-├── PHASE_1_2A_COMPLETION.md
-├── PHASE_1_CACHING_CONSOLIDATION_COMPLETE.md
-├── PHASE_2_MIDDLEWARE_ASSESSMENT_COMPLETE.md
-├── PHASE_2B_3_4_PLAN.md
-├── PHASE_2B_SESSION_2_STATUS.md
-├── PHASE_3_COMPLETION_SUMMARY.md
-├── PHASE_3_ERROR_HANDLING_VERIFICATION_COMPLETE.md
-├── PHASE_4_CONFIG_AUDIT_COMPLETE.md
-├── PHASE_4_QUALITY_AUDIT_REDUNDANCY_ANALYSIS.md
-├── PHASE_R4_COMPATIBILITY_LAYER_COMPLETE.md
-├── PHASE_R4_COMPLETION_REPORT.md
-├── PHASE_R4_GHOST_MODULE_CLEANUP.md
-├── PHASE2_IMPLEMENTATION_ROADMAP.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
-├── PROJECT_STATUS.md
-├── QUICK_MIGRATION_REFERENCE.md
-├── QUICK_REFERENCE.md
 ├── QUICK_START_FOR_NEXT_SESSION.ts
-├── QUICK_START_REFERENCE.md
 ├── QUICK_STATS.txt
-├── README_CONFLICT_RESOLUTION.md
 ├── README.md
-├── REFACTORING_EXECUTION_SUMMARY.md
 ├── REFACTORING_SUMMARY.txt
 ├── run_codebase_stats.bat
-├── SAFE_MIGRATION_CLEANUP_COMPLETE.md
-├── SCHEMA_ANALYSIS_AND_READINESS_REPORT.md
-├── SEARCH_FEATURE_MIGRATION_COMPLETE.md
-├── SERVER_SERVICES_DEPRECATION.md
 ├── SESSION_2_COMPLETION_SUMMARY.ts
-├── SESSION_2_EXECUTION_SUMMARY.md
-├── SESSION_2_FINAL_SUMMARY.md
-├── SESSION_COMPLETE_INFRASTRUCTURE_AUDIT.md
-├── SESSION_COMPLETION_SUMMARY.md
-├── SESSION_SUMMARY_TYPE_SYSTEM_CLEANUP.md
-├── SHARED_AUDIT_QUICK_SUMMARY.md
-├── SHARED_AUDIT_REPORT.md
-├── SHARED_REORGANIZATION_STRATEGY.md
 ├── start-dev.js
-├── STATUS_REPORT.md
-├── STRATEGIC_FEATURE_INTEGRATION_ROADMAP.md
 ├── tailwind.config.js
 ├── test_api_integration.js
 ├── tsconfig.json
 ├── tsconfig.server.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
-├── TYPE_SYSTEM_COMPLETE_AUDIT.md
-├── TYPE_SYSTEM_RESTRUCTURE_PLAN.md
-├── TYPES_MIGRATION_GUIDE.md
-├── TYPES_SYSTEM_GOVERNANCE.md
-├── USERS_FEATURE_MIGRATION_COMPLETE.md
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
 └── vitest.workspace.ts

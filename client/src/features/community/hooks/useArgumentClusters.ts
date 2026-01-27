@@ -7,7 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { ArgumentCluster } from '@/server/features/argument-intelligence';
+import type { ArgumentCluster } from '@client/lib/types';
 
 export function useArgumentClusters(billId: string) {
   return useQuery({

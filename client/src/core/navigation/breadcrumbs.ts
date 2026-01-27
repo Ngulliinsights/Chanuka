@@ -20,7 +20,7 @@ export function generateBreadcrumbs(
   breadcrumbs.push({
     label: 'Home',
     path: '/',
-    is_active: path === '/',
+    isActive: path === '/',
   });
 
   // Build breadcrumbs from path segments
@@ -37,7 +37,7 @@ export function generateBreadcrumbs(
       breadcrumbs.push({
         label: navItem.label,
         path: navItem.href,
-        is_active: isLast,
+        isActive: isLast,
       });
     } else {
       // Generate human-readable labels from path segments
@@ -103,7 +103,7 @@ export function generateBreadcrumbs(
       breadcrumbs.push({
         label,
         path: currentPath,
-        is_active: isLast,
+        isActive: isLast,
       });
     }
   }
@@ -140,7 +140,7 @@ export function findRelatedPages(
       title: item.label,
       path: item.href,
       description: `Related to ${currentItem.label}`,
-      category: item.section || 'legislative',
+      category: (item.section || 'legislative') as RelatedPage['category'],
       type: 'sibling',
       weight: 1,
       relevanceScore: 0.8,
@@ -162,7 +162,7 @@ export function findRelatedPages(
         title: item.label,
         path: item.href,
         description: `More ${item.section || 'related'} content`,
-        category: item.section || 'legislative',
+        category: (item.section || 'legislative') as RelatedPage['category'],
         type: 'related',
         weight: 0.5,
         relevanceScore: 0.6,

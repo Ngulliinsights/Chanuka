@@ -479,7 +479,7 @@ export function createInitialLoadingState(): LoadingStateData {
     isLoading: false,
     operations: {},
     stats: createInitialMetrics(),
-    connectionInfo: { type: 'unknown' },
+    connectionInfo: { type: 'unknown', online: typeof navigator !== 'undefined' ? navigator.onLine : true },
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
     adaptiveSettings: {
       enableAnimations: true,

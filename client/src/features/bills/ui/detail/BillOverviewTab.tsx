@@ -39,17 +39,17 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              {bill.readingTime || '5'} min read
+              {(bill as any).readingTime || '5'} min read
             </span>
             <Badge
               variant="outline"
               className={`
-                ${bill.complexity === 'high' ? 'border-red-300 text-red-700' : ''}
-                ${bill.complexity === 'medium' ? 'border-yellow-300 text-yellow-700' : ''}
-                ${bill.complexity === 'low' ? 'border-green-300 text-green-700' : ''}
+                ${(bill as any).complexity === 'high' ? 'border-red-300 text-red-700' : ''}
+                ${(bill as any).complexity === 'medium' ? 'border-yellow-300 text-yellow-700' : ''}
+                ${(bill as any).complexity === 'low' ? 'border-green-300 text-green-700' : ''}
               `}
             >
-              {bill.complexity || 'medium'} complexity
+              {(bill as any).complexity || 'medium'} complexity
             </Badge>
           </div>
         </CardContent>
@@ -74,14 +74,14 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <div className="flex items-center justify-between">
               <span className="font-medium">Introduced:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.introducedDate).toLocaleDateString()}
+                {new Date(bill.introductionDate).toLocaleDateString()}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <span className="font-medium">Last Updated:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.lastUpdated).toLocaleDateString()}
+                {new Date(bill.timeline?.[bill.timeline.length - 1]?.timestamp || bill.introductionDate).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -105,13 +105,13 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
                 className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
               >
                 <div>
-                  <div className="font-medium">{sponsor.name}</div>
+                  <div className="font-medium">{sponsor.legislatorName}</div>
                   <div className="text-sm text-muted-foreground">
                     {sponsor.party} • {sponsor.state}
                   </div>
                 </div>
-                <Badge variant={sponsor.type === 'primary' ? 'default' : 'secondary'}>
-                  {sponsor.type || 'Co-sponsor'}
+                <Badge variant={sponsor.sponsorType === 'primary' ? 'default' : 'secondary'}>
+                  {sponsor.sponsorType || 'Co-sponsor'}
                 </Badge>
               </div>
             )) || <p className="text-muted-foreground">No sponsor information available</p>}

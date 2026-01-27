@@ -35,7 +35,7 @@ import { Label } from '@client/lib/design-system';
 import { Separator } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 
-import type { BillsQueryParams } from '../model/types';
+import type { BillsQueryParams } from '../types';
 
 // ============================================================================
 // Type Definitions

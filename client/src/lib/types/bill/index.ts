@@ -115,6 +115,8 @@ export type {
   BatchBillOperation,
   BatchOperationResponse as BillBatchOperationResponse,
   BillSearchResult,
+  BillsStats,
+  BillUpdate,
   SearchResponse,
   BillComparison,
   BillDifference,

@@ -20,12 +20,12 @@ export function BillHeader({ bill }: BillHeaderProps) {
     name: bill.title,
     identifier: bill.billNumber,
     description: bill.summary,
-    dateCreated: bill.introducedDate,
-    dateModified: bill.lastUpdated,
+    dateCreated: bill.introductionDate,
+    dateModified: bill.timeline?.[bill.timeline.length - 1]?.timestamp,
     legislativeStatus: bill.status,
     sponsor: bill.sponsors?.map(sponsor => ({
       '@type': 'Person',
-      name: sponsor.name,
+      name: sponsor.legislatorName,
       affiliation: sponsor.party,
     })),
     about: bill.policyAreas?.map(area => ({
@@ -86,12 +86,12 @@ export function BillHeader({ bill }: BillHeaderProps) {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>Introduced: {new Date(bill.introducedDate).toLocaleDateString()}</span>
+                <span>Introduced: {new Date(bill.introductionDate).toLocaleDateString()}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Updated: {new Date(bill.lastUpdated).toLocaleDateString()}</span>
+                <span>Updated: {new Date(bill.timeline?.[bill.timeline.length - 1]?.timestamp || bill.introductionDate).toLocaleDateString()}</span>
               </div>
 
               <div className="flex items-center gap-2">

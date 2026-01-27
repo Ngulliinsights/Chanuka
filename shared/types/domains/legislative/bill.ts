@@ -121,6 +121,7 @@ export interface Sponsor extends BaseEntity {
   readonly sponsorshipDate: Date;
   readonly isPrimary: boolean;
   readonly contactInfo?: Readonly<Record<string, unknown>>;
+  readonly conflictOfInterest?: readonly string[];
 }
 
 /**

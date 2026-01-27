@@ -6,7 +6,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { NavigationPreferences } from './types';
+import { NavigationPreferences, RecentPage } from './types';
 
 /**
  * Gets user navigation preferences from localStorage
@@ -24,7 +24,7 @@ export function getNavigationPreferences(): NavigationPreferences {
   // Default preferences
   return {
     sidebarCollapsed: false,
-    recentPages: [],
+    recentlyVisited: [],
     favoritePages: [],
     defaultLandingPage: '/',
     compactMode: false,
@@ -52,18 +52,25 @@ export function saveNavigationPreferences(preferences: Partial<NavigationPrefere
 export function addToRecentPages(path: string, title: string): void {
   try {
     const preferences = getNavigationPreferences();
-    const recentPages = preferences.recentPages || [];
-
+    const recentPages = preferences.recentlyVisited || [];
+    // Convert string path to RecentPage object if needed, or handle check
+    // Wait, RecentPage is object { path, title, visitedAt, visitCount }
+    // But usage passed path, title.
+    
     // Remove if already exists
-    const filtered = recentPages.filter(page => page !== path);
+    const filtered = recentPages.filter(p => p.path !== path);
+
+    const newPage: RecentPage = {
+      path,
+      title,
+      visitedAt: new Date().toISOString(),
+      visitCount: (recentPages.find(p => p.path === path)?.visitCount || 0) + 1
+    };
 
     // Add to beginning
-    filtered.unshift(path);
+    const updated = [newPage, ...filtered].slice(0, 10);
 
-    // Keep only last 10 pages
-    const updated = filtered.slice(0, 10);
-
-    saveNavigationPreferences({ recentPages: updated });
+    saveNavigationPreferences({ recentlyVisited: updated });
   } catch (error) {
     logger.error('Failed to add to recent pages', { error, path, title });
   }
@@ -78,8 +85,8 @@ export function addToFavorites(path: string): void {
     const favoritePages = preferences.favoritePages || [];
 
     if (!favoritePages.includes(path)) {
-      favoritePages.push(path);
-      saveNavigationPreferences({ favoritePages });
+      const updated = [...favoritePages, path];
+      saveNavigationPreferences({ favoritePages: updated });
     }
   } catch (error) {
     logger.error('Failed to add to favorites', { error, path });

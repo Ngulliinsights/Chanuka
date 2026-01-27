@@ -38,15 +38,28 @@ export * from './bill';
 // Security types
 export * from './security';
 
+// Argument types
+export * from './arguments';
+
 // Core types (re-exported from shared type system)
 export type {
   Bill,
   User,
+  Sponsor,
+  Committee,
+  BillStatus,
+  BillPriority,
+  BillType,
+  Chamber,
+  LegislativeActionType,
+  BillTimelineEvent,
+  BillCommitteeAssignment,
 } from '../../../shared/types/domains/legislative';
 
 export type {
   User as AuthUser,
   UserProfile,
+  VerificationStatus,
 } from '../../../shared/types/domains/authentication';
 
 

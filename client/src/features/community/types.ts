@@ -53,7 +53,7 @@ export interface DiscussionThread {
   isLocked: boolean;
 }
 
-export interface UserProfile {
+export interface CommunityProfile {
   id: string;
   username: string;
   displayName: string;

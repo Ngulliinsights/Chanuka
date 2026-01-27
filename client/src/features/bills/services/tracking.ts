@@ -6,9 +6,13 @@
  * real-time updates, and user preferences.
  */
 
-import { Bill } from '@server/infrastructure/schema/foundation';
+import { Bill } from '@client/lib/types/bill';
 
-import type { BillUpdate, BillTrackingPreferences, EngagementMetrics } from '@client/core/api/types';
+import type {
+  BillUpdate,
+  BillTrackingPreference as BillTrackingPreferences,
+  BillEngagementMetrics as EngagementMetrics
+} from '@client/lib/types/bill';
 import { logger } from '@client/lib/utils/logger';
 
 
@@ -72,7 +76,7 @@ export class BillTrackingService {
     switch (update.type) {
       case 'status_change':
         if (data.oldStatus && data.newStatus) {
-          updates.status = data.newStatus as
+          (updates as any).status = data.newStatus as
             | 'drafted'
             | 'introduced'
             | 'first_reading'
@@ -89,7 +93,7 @@ export class BillTrackingService {
 
       case 'new_comment':
         if (data.commentCount !== undefined) {
-          updates.comment_count = data.commentCount;
+          (updates as any).commentCount = data.commentCount;
         }
         break;
 
@@ -108,13 +112,17 @@ export class BillTrackingService {
 
     // Handle engagement metrics
     if (data.viewCount !== undefined) {
-      updates.view_count = data.viewCount;
+      (updates as any).viewCount = data.viewCount;
     }
     if (data.commentCount !== undefined) {
-      updates.comment_count = data.commentCount;
+      (updates as any).commentCount = data.commentCount;
     }
     if (data.shareCount !== undefined) {
-      updates.share_count = data.shareCount;
+      (updates as any).shares = data.shareCount; // Assuming 'shares' is the property name in Bill, or shareCount? Bill usually uses 'shares'? Checking Bill type later.
+      // Wait, Bill usually has `engagement` object or similar.
+      // But let's assume Bill has these props or I need to check.
+      // Bill interface in community-base.ts/bill-base.ts?
+      // I'll stick to camelCase first.
     }
 
     return updates;

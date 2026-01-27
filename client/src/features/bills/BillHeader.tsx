@@ -23,12 +23,12 @@ export function BillHeader({ bill }: BillHeaderProps) {
     dateCreated: bill.introducedDate,
     dateModified: bill.lastUpdated,
     legislativeStatus: bill.status,
-    sponsor: bill.sponsors?.map(sponsor => ({
+    sponsor: bill.sponsors?.map((sponsor: any) => ({
       '@type': 'Person',
       name: sponsor.name,
       affiliation: sponsor.party,
     })),
-    about: bill.policyAreas?.map(area => ({
+    about: bill.policyAreas?.map((area: string) => ({
       '@type': 'Thing',
       name: area,
     })),

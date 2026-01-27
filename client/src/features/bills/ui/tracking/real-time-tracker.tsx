@@ -63,7 +63,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
     updatePreferences,
     getPreferences,
   } = useWebSocket({
-    subscriptions: billId ? [{ type: 'bill', id: billId }] : [],
+    subscriptions: billId ? [{ type: 'bill', id: String(billId) }] : [],
     handlers: {
       onBillUpdate: (update: BillUpdate) => {
         logger.debug('Bill update received in tracker', {
@@ -85,7 +85,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
       },
       onError: (err: Error) => {
         toast.error('WebSocket error occurred');
-        logger.error('WebSocket error in tracker:', err);
+        logger.error('WebSocket error in tracker:', { error: err.message });
       },
     },
   });
@@ -120,7 +120,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   const handleSubscribe = useCallback(() => {
     if (billId && isConnected) {
-      subscribe({ type: 'bill', id: billId });
+      subscribe({ type: 'bill', id: String(billId) });
       setIsSubscribed(true);
       toast.success(`Subscribed to bill ${billId} updates`);
     }
@@ -128,7 +128,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   const handleUnsubscribe = useCallback(() => {
     if (billId && isConnected) {
-      unsubscribe({ type: 'bill', id: billId });
+      unsubscribe({ type: 'bill', id: String(billId) });
       setIsSubscribed(false);
       toast.info(`Unsubscribed from bill ${billId} updates`);
     }
@@ -185,7 +185,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
               Real-Time Bill Tracking
             </span>
             <Badge
-              variant={isConnected ? 'primary' : 'destructive'}
+              variant={isConnected ? 'default' : 'destructive'}
               className={getConnectionStatusColor()}
             >
               {getConnectionStatusText()}

@@ -11,7 +11,8 @@
 import { CacheService } from '@client/lib/services/cache';
 import {
   ServiceErrorFactory,
-  ValidationError
+  ValidationError,
+  SystemError
 } from '@client/lib/services/errors';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
@@ -178,11 +179,10 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return result;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get engagement history',
         'EngagementService',
         'getEngagementHistory',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -208,11 +208,10 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return stats;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get engagement stats',
         'EngagementService',
         'getEngagementStats',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -287,11 +286,10 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return streak;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user streak',
         'EngagementService',
         'getUserStreak',
-        undefined,
         undefined,
         { originalError: error, userId }
       );

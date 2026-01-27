@@ -17,7 +17,7 @@ import type {
 // Define CommunityFilters interface locally since it's not exported from types
 interface CommunityFilters {
   contentTypes?: Array<'comments' | 'expert_insights' | 'threads'>;
-  timeRange?: 'hour' | 'day' | 'week' | 'month' | 'all';
+  timeRange?: 'day' | 'week' | 'month' | 'all';
   geography?: {
     states?: string[];
     districts?: string[];
@@ -49,9 +49,9 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
     mutationFn: async (request: CreateCommentRequest) => {
       // Adapt the request to match API service expectations
       const apiRequest = {
-        billId: request.bill_id,
+        billId: request.billId,
         content: request.content,
-        parentId: request.parent_id,
+        parentId: request.parentId,
       };
       return await communityApiService.addComment(apiRequest);
     },
@@ -92,7 +92,7 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
       // Remove from cache
       queryClient.setQueryData(
         ['community', 'comments'],
-        (old: Comment[] | undefined) => old?.filter((c: Comment) => c.id !== comment_id) || []
+        (old: Comment[] | undefined) => old?.filter((c: Comment) => String(c.id) !== comment_id) || []
       );
     },
     onError: (error: Error) => {
@@ -102,7 +102,7 @@ export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
 
   const voteOnComment = useMutation<VoteResponse | null, Error, VoteRequest>({
     mutationFn: async (request: VoteRequest) => {
-      const result = await communityApiService.voteComment(request.comment_id, request.vote_type);
+      const result = await communityApiService.voteComment(String(request.commentId), request.voteType as 'up' | 'down');
       return result; // API returns VoteResponse | null
     },
     onSuccess: () => {

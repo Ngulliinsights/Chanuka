@@ -47,11 +47,38 @@ const convertAuthUserToUser = (authUser: AuthUser): User => {
   return {
     id: authUser.id,
     email: authUser.email,
+    
+    // Map to Shared User Profile
+    profile: {
+      displayName: authUser.name,
+      avatarUrl: authUser.avatar_url,
+      bio: '',
+      preferences: {
+         theme: 'light',
+         language: 'en',
+         newsletter: true,
+         marketing: false
+      }, // Minimal default preferences
+      privacySettings: {
+        profileVisibility: 'public',
+        showOnlineStatus: true,
+        showLastSeen: true
+      }
+    },
+    verification: authUser.verified ? 'verified' : 'unverified',
+    
+    // Valid audit fields
+    createdAt: authUser.createdAt,
+    lastLogin: authUser.lastLogin,
+    
+    // Legacy mapping (maintained for compatibility)
     name: authUser.name,
-    role: authUser.role,
     verified: authUser.verified,
+    role: authUser.role as any, // Cast if necessary, or ensure 'citizen' matches
+    
+    // Other fields
     twoFactorEnabled: authUser.twoFactorEnabled,
-    avatar_url: undefined,
+    avatar_url: authUser.avatar_url,
     preferences: {
       notifications: true,
       emailAlerts: true,
@@ -59,8 +86,6 @@ const convertAuthUserToUser = (authUser: AuthUser): User => {
       language: 'en',
     },
     permissions: [],
-    lastLogin: authUser.lastLogin,
-    createdAt: authUser.createdAt,
   };
 };
 

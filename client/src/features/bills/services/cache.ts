@@ -6,9 +6,9 @@
  * intelligent cache invalidation, and background synchronization.
  */
 
-import { Bill } from '@server/infrastructure/schema/foundation';
+import { Bill } from '@client/lib/types/bill';
 
-import { BillsStats } from '@client/core/api/bills';
+import { BillsStats } from '@client/lib/types/bill';
 import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================

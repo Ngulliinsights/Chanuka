@@ -113,10 +113,17 @@ export function createOperationFromScenario(
         : scenario.id.includes('api')
           ? 'api'
           : 'asset',
-    startTime: new Date(),
+    startTime: Date.now(),
     state: 'idle',
     retryCount: 0,
     maxRetries: scenario.maxRetries,
+    priority: scenario.priority === 'high' ? 'high' : scenario.priority === 'low' ? 'low' : 'medium',
+    retryStrategy: scenario.retryStrategy,
+    retryDelay: 1000,
+    connectionAware: scenario.connectionAware,
+    timeoutWarningShown: false,
+    cancelled: false,
+    timeout: adjustedTimeout,
     metadata: {
       priority: scenario.priority,
       timeout: adjustedTimeout,
@@ -133,11 +140,18 @@ export function createOperationFromConfig(
 ): LoadingOperation {
   return {
     id: operationId,
-    type: 'loading',
-    startTime: new Date(),
+    type: 'data',
+    startTime: Date.now(),
     state: 'idle',
     retryCount: 0,
     maxRetries: config.maxRetries,
+    priority: config.priority === 'high' || config.priority === 'critical' ? 'high' : config.priority === 'low' ? 'low' : 'medium',
+    retryStrategy: 'exponential',
+    retryDelay: config.retryDelay,
+    connectionAware: true,
+    timeoutWarningShown: false,
+    cancelled: false,
+    timeout: config.timeout,
     metadata: {
       timeout: config.timeout,
       retryDelay: config.retryDelay,
@@ -164,11 +178,18 @@ export function createLoadingOperation(
 
   return {
     id: operationId,
-    type: 'loading',
-    startTime: new Date(),
+    type: 'data',
+    startTime: Date.now(),
     state: 'idle',
     retryCount: 0,
     maxRetries: config.maxRetries,
+    priority: config.priority === 'high' || config.priority === 'critical' ? 'high' : config.priority === 'low' ? 'low' : 'medium',
+    retryStrategy: 'exponential',
+    retryDelay: config.retryDelay,
+    connectionAware: true,
+    timeoutWarningShown: false,
+    cancelled: false,
+    timeout: config.timeout,
     metadata: {
       timeout: config.timeout,
       retryDelay: config.retryDelay,
@@ -240,9 +261,9 @@ export function hasOperationTimedOut(
   timeoutMs: number = 30000,
   currentTime?: Date
 ): boolean {
-  const now = currentTime || new Date();
+  const now = currentTime ? currentTime.getTime() : Date.now();
   const startTime = operation.startTime;
-  const elapsed = now.getTime() - startTime.getTime();
+  const elapsed = now - startTime;
   return elapsed > timeoutMs;
 }
 

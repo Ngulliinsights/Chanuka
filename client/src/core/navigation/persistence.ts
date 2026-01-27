@@ -14,7 +14,7 @@ export class NavigationStatePersistence {
         preferences: state.preferences,
         sidebarOpen: state.sidebarOpen,
         sidebarCollapsed: state.sidebarCollapsed,
-        user_role: state.user_role,
+        userRole: state.userRole,
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persistableState));
     } catch (error) {
@@ -81,7 +81,7 @@ export class NavigationStatePersistence {
       updatedRecentPages.splice(existingPageIndex, 1);
       updatedRecentPages.unshift({
         ...existingPage,
-        visitedAt: new Date(),
+        visitedAt: new Date().toISOString(),
         visitCount: existingPage.visitCount + 1,
       });
       return updatedRecentPages;
@@ -90,7 +90,7 @@ export class NavigationStatePersistence {
       const newRecentPage: RecentPage = {
         path: newPage.path,
         title: newPage.title,
-        visitedAt: new Date(),
+        visitedAt: new Date().toISOString(),
         visitCount: 1,
       };
       return [newRecentPage, ...recentlyVisited].slice(0, 10);

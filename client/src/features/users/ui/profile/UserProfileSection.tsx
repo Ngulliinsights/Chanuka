@@ -74,7 +74,7 @@ export function UserProfileSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div data-testid="profile-name">
                 <label className="text-sm font-medium text-slate-500">Name</label>
-                <p className="text-slate-900">{user.name || user.username || 'User'}</p>
+                <p className="text-slate-900">{user.profile?.displayName || user.name || (user as any).username || 'User'}</p>
               </div>
               <div data-testid="profile-email">
                 <label className="text-sm font-medium text-slate-500">Email</label>
@@ -87,7 +87,7 @@ export function UserProfileSection() {
               <div data-testid="profile-verification">
                 <label className="text-sm font-medium text-slate-500">Verification Status</label>
                 <p className="text-slate-900 capitalize">
-                  {user.verification_status || 'Unverified'}
+                  {user.verification || user.verification_status || 'Unverified'}
                 </p>
               </div>
             </div>
@@ -108,8 +108,8 @@ export function UserProfileSection() {
               <div data-testid="profile-joined">
                 <label className="text-sm font-medium text-slate-500">Member Since</label>
                 <p className="text-slate-900">
-                  {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
+                  {user.createdAt || (user as any).created_at
+                    ? new Date(user.createdAt || (user as any).created_at).toLocaleDateString()
                     : 'January 15, 2023'}
                 </p>
               </div>

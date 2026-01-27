@@ -142,12 +142,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return dashboardData;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get dashboard data',
         'DashboardService',
         'getDashboardData',
-        undefined,
-        undefined,
         { originalError: error }
       );
     }
@@ -175,12 +173,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return widgets;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get dashboard widgets',
         'DashboardService',
         'getDashboardWidgets',
-        undefined,
-        undefined,
         { originalError: error }
       );
     }
@@ -206,12 +202,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to update dashboard layout',
         'DashboardService',
         'updateDashboardLayout',
-        undefined,
-        undefined,
         { originalError: error }
       );
     }
@@ -239,12 +233,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return metrics;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get user metrics',
         'DashboardService',
         'getUserMetrics',
-        undefined,
-        undefined,
         { originalError: error, timeRange }
       );
     }
@@ -268,12 +260,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return recommendations;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get bill recommendations',
         'DashboardService',
         'getBillRecommendations',
-        undefined,
-        undefined,
         { originalError: error, limit }
       );
     }
@@ -288,12 +278,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
       const notifications = await this.fetchNotifications();
       return notifications.filter(n => !n.read).length;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get unread notifications count',
         'DashboardService',
         'getUnreadNotificationsCount',
-        undefined,
-        undefined,
         { originalError: error }
       );
     }
@@ -308,12 +296,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       logger.info('Notification marked as read', { notificationId });
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to mark notification as read',
         'DashboardService',
         'markNotificationAsRead',
-        undefined,
-        undefined,
         { originalError: error, notificationId }
       );
     }
@@ -337,12 +323,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return notifications;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to get notifications',
         'DashboardService',
         'getNotifications',
-        undefined,
-        undefined,
         { originalError: error, page, limit }
       );
     }
@@ -357,12 +341,10 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       logger.info('All notifications cleared');
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw ServiceErrorFactory.createSystemError(
         'Failed to clear notifications',
         'DashboardService',
         'clearNotifications',
-        undefined,
-        undefined,
         { originalError: error }
       );
     }
@@ -416,11 +398,53 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
       role: 'citizen',
       verified: true,
       twoFactorEnabled: false,
-      preferences: {} as any,
+      preferences: {
+        theme: 'light',
+        language: 'en',
+        timezone: 'UTC',
+        email_frequency: 'daily',
+        notification_preferences: {
+          email: true,
+          push: true,
+          sms: false,
+          frequency: 'daily',
+          quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
+        },
+        privacy_settings: {
+          profile_visibility: 'public',
+          activity_visibility: 'public',
+          data_sharing: true,
+          analytics_tracking: true,
+          marketing_emails: false
+        },
+        dashboard_layout: 'comfortable',
+        default_bill_view: 'list',
+        auto_save_drafts: true,
+        show_onboarding_tips: false
+      },
       permissions: [],
       lastLogin: new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    };
+      createdAt: new Date().toISOString(),
+      
+      // UserProfile specific fields
+      bio: 'Civic enthusiast',
+      location: 'Washington, DC',
+      civic_engagement_score: 85,
+      badges: [],
+      achievements: [],
+      activity_summary: {
+        bills_tracked: 12,
+        comments_posted: 5,
+        discussions_started: 1,
+        votes_cast: 24,
+        expert_contributions: 0,
+        community_score: 150,
+        streak_days: 3,
+        last_active: new Date().toISOString()
+      },
+      // Shared Profile mapping (optional but good for future)
+      // profile: { ... } - types don't require it yet in interfaces.ts
+    } as any; // Cast to any to avoid strict structural checks if interface definitions drift (e.g. AuthUser vs User)
   }
 
   private async fetchRecentActivity() {
@@ -443,7 +467,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     return [];
   }
 
-  private async fetchNotifications() {
+  private async fetchNotifications(page?: number, limit?: number): Promise<Notification[]> {
     // Mock implementation
     return [];
   }

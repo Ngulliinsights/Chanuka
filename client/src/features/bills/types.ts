@@ -3,16 +3,14 @@
  * Consolidated type definitions for the bills feature
  */
 
-import { Bill, Comment } from '@client/lib/types';
+import { Bill, Comment, Sponsor as SharedSponsor } from '@client/lib/types';
 
-export interface Sponsor {
-  id: string;
-  name: string;
-  party: string;
-  district: string;
-  role: string;
+// Re-export shared Sponsor to maintain import compatibility where possible,
+// but users will need to adapt to the new structure (e.g. name -> legislatorName)
+export type Sponsor = SharedSponsor & {
+  // Augment with UI-specific fields if necessary, or strictly use shared type
   conflictOfInterest?: ConflictOfInterest[];
-}
+};
 
 export interface BillAnalysis {
   summary: string;

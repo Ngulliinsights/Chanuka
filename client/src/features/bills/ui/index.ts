@@ -4,9 +4,9 @@
  * Re-export from flattened structure for backward compatibility
  */
 
-export { BillCard } from '../BillCard';
+export { default as BillCard } from './list/BillCard';
 export { BillList } from '../BillList';
-export { BillAnalysis } from '../BillAnalysis';
+export { default as BillAnalysis } from '../BillAnalysis';
 export { BillHeader } from '../BillHeader';
 
 // Legacy exports from nested structure

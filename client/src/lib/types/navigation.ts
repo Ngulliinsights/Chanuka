@@ -137,6 +137,7 @@ export interface NavigationPreferences {
   compactMode: boolean;
   showBreadcrumbs: boolean;
   autoExpand: boolean;
+  sidebarCollapsed: boolean;
 }
 
 // ============================================================================

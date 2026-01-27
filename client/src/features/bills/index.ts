@@ -13,9 +13,9 @@ export * from './hooks';
 export * from './services';
 
 // UI Components
-export { BillCard } from './BillCard';
+export { default as BillCard } from './ui/list/BillCard';
 export { BillList } from './BillList';
-export { BillAnalysis } from './BillAnalysis';
+export { default as BillAnalysis } from './BillAnalysis';
 export { BillHeader } from './BillHeader';
 
 // Legacy UI exports for compatibility

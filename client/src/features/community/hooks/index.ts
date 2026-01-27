@@ -4,9 +4,25 @@
  */
 
 export {
-  useCommunityRealTime,
-  useTypingIndicators,
-  useCommunityAnalytics,
-} from './useCommunityRealTime';
-export { useCommunityWebSocket } from './useCommunityWebSocket';
+  useComments,
+  useThreads,
+  useThread,
+  useSocialSharing,
+  useCommunityStats,
+  useThreadParticipation,
+  useCommunitySearch,
+  usePopularTags,
+  useActivityFeed,
+  useTrendingTopics,
+  useExpertInsights,
+  useCampaigns,
+  usePetitions,
+  useLocalImpact,
+  useRealtimeCommunity,
+} from './useCommunity';
+
 export { useDiscussion } from './useDiscussion';
+export { useCommunityData as useCommunityIntegration } from './useCommunityIntegration';
+export { useLegislativeBrief } from './useLegislativeBrief';
+export { useArgumentClusters } from './useArgumentClusters';
+export { useArgumentsForBill } from './useArgumentsForBill';

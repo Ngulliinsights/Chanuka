@@ -37,8 +37,8 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
       ),
       contactInfo: {
         phone: '(202) 225-0000',
-        email: `${sponsor.name?.toLowerCase().replace(' ', '.')}@house.gov`,
-        website: `https://house.gov/${sponsor.name?.toLowerCase().replace(' ', '-')}`,
+        email: `${sponsor.legislatorName?.toLowerCase().replace(' ', '.')}@house.gov`,
+        website: `https://house.gov/${sponsor.legislatorName?.toLowerCase().replace(' ', '-')}`,
       },
       votingRecord: {
         totalVotes: Math.floor(Math.random() * 1000) + 500,
@@ -47,8 +47,8 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
       },
     })) || [];
 
-  const primarySponsor = enhancedSponsors.find(s => s.type === 'primary');
-  const coSponsors = enhancedSponsors.filter(s => s.type !== 'primary');
+  const primarySponsor = enhancedSponsors.find(s => s.sponsorType === 'primary');
+  const coSponsors = enhancedSponsors.filter(s => s.sponsorType !== 'primary');
 
   return (
     <div className="space-y-6">
@@ -65,9 +65,9 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
           <CardContent>
             <div className="flex items-start gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={primarySponsor.avatar} alt={primarySponsor.name} />
+                <AvatarImage src={primarySponsor.avatar} alt={primarySponsor.legislatorName} />
                 <AvatarFallback className="text-lg">
-                  {primarySponsor.name
+                  {primarySponsor.legislatorName
                     ?.split(' ')
                     .map(n => n[0])
                     .join('') || 'SP'}
@@ -76,7 +76,7 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
 
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-semibold">{primarySponsor.name}</h3>
+                  <h3 className="text-xl font-semibold">{primarySponsor.legislatorName}</h3>
                   <Badge variant="default" className="bg-blue-100 text-blue-800">
                     Primary Sponsor
                   </Badge>
@@ -159,9 +159,9 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={sponsor.avatar} alt={sponsor.name} />
+                      <AvatarImage src={sponsor.avatar} alt={sponsor.legislatorName} />
                       <AvatarFallback>
-                        {sponsor.name
+                        {sponsor.legislatorName
                           ?.split(' ')
                           .map(n => n[0])
                           .join('') || 'CS'}
@@ -169,7 +169,7 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
                     </Avatar>
 
                     <div>
-                      <div className="font-medium">{sponsor.name}</div>
+                      <div className="font-medium">{sponsor.legislatorName}</div>
                       <div className="text-sm text-muted-foreground">
                         {sponsor.party} • {sponsor.state}
                         {sponsor.district && ` - District ${sponsor.district}`}

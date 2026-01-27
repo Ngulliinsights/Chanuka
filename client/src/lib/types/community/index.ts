@@ -269,6 +269,13 @@ export function getActivityTypeLabel(type: ActivityType): string {
     topic_trending: 'Trending topic',
     user_followed: 'Started following',
     achievement_unlocked: 'Unlocked achievement',
+    comment: 'Commented',
+    discussion: 'Started a discussion',
+    expert_contribution: 'Contributed expert insight',
+    bill_save: 'Saved a bill',
+    bill_share: 'Shared a bill',
+    campaign_join: 'Joined a campaign',
+    petition_sign: 'Signed a petition',
   };
   return labels[type] || 'Activity';
 }

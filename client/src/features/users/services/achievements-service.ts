@@ -12,7 +12,8 @@ import { CacheService } from '@client/lib/services/cache';
 import {
   ServiceErrorFactory,
   ValidationError,
-  ResourceNotFoundError
+  ResourceNotFoundError,
+  SystemError
 } from '@client/lib/services/errors';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
@@ -110,11 +111,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return definitions;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get achievement definitions',
         'AchievementService',
         'getAchievementDefinitions',
-        undefined,
         undefined,
         { originalError: error }
       );
@@ -153,11 +153,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return result;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get user achievements',
         'AchievementService',
         'getUserAchievements',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -183,11 +182,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return progress;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to check achievement progress',
         'AchievementService',
         'checkAchievementProgress',
-        undefined,
         undefined,
         { originalError: error, achievementId, userId }
       );
@@ -226,11 +224,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
         throw error;
       }
 
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to award achievement',
         'AchievementService',
         'awardAchievement',
-        undefined,
         undefined,
         { originalError: error, achievementId, userId }
       );
@@ -271,11 +268,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return stats;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get achievement stats',
         'AchievementService',
         'getAchievementStats',
-        undefined,
         undefined,
         { originalError: error, userId }
       );
@@ -311,11 +307,10 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return leaderboard;
     } catch (error) {
-      throw ServiceErrorFactory.createValidationError(
+      throw new SystemError(
         'Failed to get leaderboard',
         'AchievementService',
         'getLeaderboard',
-        undefined,
         undefined,
         { originalError: error, category, limit }
       );

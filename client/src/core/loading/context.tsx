@@ -48,6 +48,7 @@ const initialState: LoadingStateData = {
   highPriorityLoading: false,
   connectionInfo: {
     type: 'unknown',
+    online: navigator.onLine,
   },
   isOnline: navigator.onLine,
   adaptiveSettings: {
@@ -221,8 +222,9 @@ export function LoadingProvider({
         return;
       }
 
-      // Connection-aware operation gating
-      if (!isOnline || (connectionInfo.type === 'slow' && operation.priority === 'low')) {
+      // Connection-aware operation gating (check for slow connections via effectiveType or cellular)
+      const isSlowConnection = connectionInfo.effectiveType === '2g' || connectionInfo.effectiveType === '3g';
+      if (!isOnline || (isSlowConnection && operation.priority === 'low')) {
         const connectionError = new LoadingConnectionError(operation.id, connectionInfo.type, {
           isOnline,
           connectionInfo,

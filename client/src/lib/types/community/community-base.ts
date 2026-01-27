@@ -292,16 +292,35 @@ export interface ExpertVerificationResponse {
  * Expert insight submission
  */
 export interface ExpertInsight {
-  readonly id: number;
-  readonly billId: number;
-  readonly expertId: number;
+  readonly id: number | string;
+  readonly billId: number | string;
+  readonly expertId: number | string;
+  readonly expertName?: string;
+  readonly expertAvatar?: string;
+  readonly title?: string;
+  readonly summary?: string;
   readonly content: string;
   readonly createdAt: string;
   readonly updatedAt?: string;
+  readonly lastUpdated?: string;
   readonly published: boolean;
   readonly reviewStatus: 'pending' | 'approved' | 'rejected';
   readonly upvoteCount?: number;
   readonly downvoteCount?: number;
+  readonly confidence?: number;
+  readonly timestamp?: string;
+  readonly billTitle?: string;
+  readonly communityValidation?: {
+    readonly validationScore: number;
+    readonly upvotes: number;
+    readonly downvotes: number;
+  };
+  readonly comments?: number;
+  readonly shares?: number;
+  readonly specializations?: string[];
+  readonly methodology?: string;
+  readonly sources?: string[];
+  readonly policyAreas?: string[];
 }
 
 /**
@@ -336,12 +355,28 @@ export interface ExpertInsightSubmissionResponse {
 export interface ActivityItem {
   readonly id: string;
   readonly type: ActivityType;
-  readonly userId: number;
-  readonly billId?: number;
-  readonly threadId?: number;
-  readonly commentId?: number;
+  readonly userId: number | string;
+  readonly userName?: string;
+  readonly userAvatar?: string;
+  readonly billId?: number | string;
+  readonly billTitle?: string;
+  readonly threadId?: number | string;
+  readonly commentId?: number | string;
   readonly timestamp: string;
+  readonly title?: string;
   readonly content?: string;
+  readonly summary?: string;
+  readonly location?: LocationFilter;
+  readonly trendingScore?: number;
+  readonly userHasLiked?: boolean;
+  readonly likes?: number;
+  readonly replies?: number;
+  readonly shares?: number;
+  readonly expertInfo?: {
+    readonly isVerified: boolean;
+    readonly specialty?: string;
+    readonly credibilityScore?: number;
+  };
   readonly metadata?: Record<string, unknown>;
 }
 
@@ -355,7 +390,14 @@ export type ActivityType =
   | 'vote_cast'
   | 'topic_trending'
   | 'user_followed'
-  | 'achievement_unlocked';
+  | 'achievement_unlocked'
+  | 'comment'
+  | 'discussion'
+  | 'expert_contribution'
+  | 'bill_save'
+  | 'bill_share'
+  | 'campaign_join'
+  | 'petition_sign';
 
 /**
  * Trending topic in the community

@@ -105,6 +105,37 @@ export interface ErrorResponse {
   readonly timestamp: string;
 }
 
+
+/**
+ * Global bills statistics
+ */
+export interface BillsStats {
+  readonly totalBills: number;
+  readonly billsByStatus: Record<string, number>;
+  readonly activeBills: number;
+  readonly passedBills: number;
+  readonly upcomingVotes: number;
+  readonly trendingBills?: number;
+}
+
+/**
+ * Bill update event type for tracking service
+ */
+export interface BillUpdate {
+  readonly type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 'sponsor_change';
+  readonly data: {
+    readonly billId: number;
+    readonly title?: string;
+    readonly oldStatus?: string;
+    readonly newStatus?: string;
+    readonly commentCount?: number;
+    readonly viewCount?: number;
+    readonly shareCount?: number;
+    readonly timestamp: string;
+    readonly [key: string]: any;
+  };
+}
+
 // ============================================================================
 // Bill Action and History Types
 // ============================================================================

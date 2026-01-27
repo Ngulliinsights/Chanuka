@@ -2,8 +2,8 @@ import React from 'react';
 
 import { cn } from '@lib/utils';
 
-import { BillCard } from '../BillCard';
-import { Bill } from '../model/types';
+import BillCard from './list/BillCard';
+import type { Bill } from '@client/lib/types/bill/bill-base';
 
 interface VirtualBillGridProps {
   bills: Bill[];
@@ -13,6 +13,10 @@ interface VirtualBillGridProps {
   savedBills?: Set<string>;
   className?: string;
   viewMode?: string;
+  isLoading?: boolean;
+  onBillClick?: (billId: string) => void;
+  onBillSelect?: (billId: string) => void;
+  selectedBills?: string[];
 }
 
 /**
@@ -30,7 +34,17 @@ export function VirtualBillGrid({
   onComment,
   savedBills,
   className,
+  isLoading,
 }: VirtualBillGridProps) {
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">Loading bills...</p>
+      </div>
+    );
+  }
+
   // Handle empty state gracefully with helpful messaging
   if (bills.length === 0) {
     return (
@@ -50,20 +64,23 @@ export function VirtualBillGrid({
         className
       )}
     >
-      {bills.map(bill => (
-        <BillCard
-          key={bill.id}
-          bill={bill}
-          // Wrap callbacks to pass bill ID to parent handlers
-          onSave={() => onSave?.(bill.id)}
-          onShare={() => onShare?.(bill.id)}
-          onComment={() => onComment?.(bill.id)}
-          isSaved={savedBills?.has(bill.id)}
-          viewMode="grid"
-        />
-      ))}
+      {bills.map(bill => {
+        const billId = String(bill.id);
+        return (
+          <BillCard
+            key={bill.id}
+            bill={bill}
+            // Wrap callbacks to pass bill ID to parent handlers
+            onSave={() => onSave?.(billId)}
+            onShare={() => onShare?.(billId)}
+            onComment={() => onComment?.(billId)}
+            isSaved={savedBills?.has(billId)}
+            viewMode="grid"
+          />
+        );
+      })}
     </div>
   );
 }
-const defaultExport = {};
-export default defaultExport;
+export default VirtualBillGrid;
+
