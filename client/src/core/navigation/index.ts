@@ -34,9 +34,6 @@ export * from './analytics';
 // Route preloading and performance
 export * from './route-preloading';
 
-// Navigation utilities and backward compatibility
-export * from './navigation-wrapper';
-
 // User preferences
 export {
   getNavigationPreferences,

@@ -32,7 +32,8 @@ export interface UnifiedThread extends DiscussionThread {
  * Moderation request
  */
 export interface ModerationRequest {
-  readonly contentId: number;
+  readonly contentId: string;
+  readonly contentType: 'comment' | 'thread';
   readonly violationType: ViolationType;
   readonly reason: string;
   readonly description?: string;
@@ -44,7 +45,12 @@ export type ViolationType =
   | 'misinformation'
   | 'offensive'
   | 'off_topic'
-  | 'other';
+  | 'other'
+  | 'inappropriate_language'
+  | 'personal_attack'
+  | 'copyright_violation'
+  | 'hate_speech'
+  | 'duplicate_content';
 
 /**
  * Unified moderation action

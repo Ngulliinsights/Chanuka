@@ -14,6 +14,7 @@ import {
 const testNavItem: NavigationItem = {
   id: 'test-bill',
   label: 'Test Bill',
+  path: '/bills/test-bill',
   href: '/bills/test-bill',
   icon: 'document' as any, // Simplified for testing
   section: 'legislative',
@@ -25,6 +26,7 @@ const testNavItems: NavigationItem[] = [
   {
     id: 'home',
     label: 'Home',
+    path: '/',
     href: '/',
     icon: 'home' as any,
     section: 'legislative',
@@ -33,6 +35,7 @@ const testNavItems: NavigationItem[] = [
   {
     id: 'community',
     label: 'Community',
+    path: '/community',
     href: '/community',
     icon: 'users' as any,
     section: 'community',

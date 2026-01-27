@@ -73,6 +73,9 @@ export interface NavigationItem extends BaseNavigationItem {
 
   // State
   isActive?: boolean;
+  
+  // Optional metadata
+  description?: string;
 }
 
 /**
@@ -183,6 +186,7 @@ export interface NavigationContextValue extends NavigationState {
   toggleSidebar: () => void;
   toggleMobileMenu: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  setCurrentSection?: (section: string) => void;
   isActive: (path: string) => boolean; // Standardized from is_active
 }
 
