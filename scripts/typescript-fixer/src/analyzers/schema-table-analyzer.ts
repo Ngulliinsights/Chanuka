@@ -118,7 +118,7 @@ export class SchemaTableAnalyzer {
     // Create table import mappings
     for (const [moduleName, tables] of Object.entries(schemaModuleMappings)) {
       this.knownSchemaModules.add(moduleName);
-      const importPath = `@shared/schema/${moduleName}`;
+      const importPath = `@server/infrastructure/schema/${moduleName}`;
       
       for (const tableName of tables) {
         this.tableImportMappings.set(tableName, {

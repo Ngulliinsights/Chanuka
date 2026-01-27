@@ -40,4 +40,4 @@ export type {
   ExpertVerificationType,
   ContributionType,
   VerificationStatus,
-} from '@client/shared/types';
+} from '@client/lib/types';

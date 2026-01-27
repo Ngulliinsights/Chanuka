@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@server/infrastructure/database/connection';
 import { logger } from '@shared/core';
-import * as schema from '@shared/schema';
+import * as schema from '@server/infrastructure/schema';
 
 export default async function seedSimple() {
   logger.info('🌱 Starting simple comprehensive seed process...', { component: 'Chanuka' });

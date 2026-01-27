@@ -6,17 +6,17 @@
  * session management, and business logic orchestration.
  */
 
-import { rbacManager } from '@client/core/auth/rbac';
-import { securityMonitor, validatePassword } from '@client/shared/utils/security';
 
 import { authApiService } from '@client/core/api/auth';
 import type { AuthUser } from '@client/core/api/auth';
 import { tokenManager } from '@client/core/auth';
 import type { AuthTokens as JWTTokens } from '@client/core/auth';
-import type { SessionInfo } from '@client/shared/infrastructure/store/slices/sessionSlice';
-import { getStore } from '@client/shared/infrastructure/store';
-import { setCurrentSession } from '@client/shared/infrastructure/store/slices/sessionSlice';
-import { logger } from '@client/shared/utils/logger';
+import { rbacManager } from '@client/core/auth/rbac';
+import { getStore } from '@client/lib/infrastructure/store';
+import type { SessionInfo } from '@client/lib/infrastructure/store/slices/sessionSlice';
+import { setCurrentSession } from '@client/lib/infrastructure/store/slices/sessionSlice';
+import { logger } from '@client/lib/utils/logger';
+import { securityMonitor, validatePassword } from '@client/lib/utils/security';
 
 import type { AuthResponse, RegisterData, User } from './types';
 
@@ -236,7 +236,7 @@ export class AuthService {
       if (user) {
         // Clear session from store
         const { resetSessionState } = await import(
-          '@client/shared/infrastructure/store/slices/sessionSlice'
+          '@client/lib/infrastructure/store/slices/sessionSlice'
         );
         getStore().dispatch(resetSessionState());
         rbacManager.clearCache();

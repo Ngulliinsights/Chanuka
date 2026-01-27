@@ -24,9 +24,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@client/shared/design-system';
-import { MonitoringDashboard } from '@client/shared/ui/dashboard/MonitoringDashboard';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { MonitoringDashboard } from '@client/lib/ui/dashboard/MonitoringDashboard';
+import { logger } from '@client/lib/utils/logger';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {

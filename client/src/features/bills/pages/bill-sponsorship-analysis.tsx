@@ -15,16 +15,16 @@ import { useParams } from 'react-router-dom';
 
 import { useBillSponsorshipAnalysis as useSponsorshipAnalysis } from '@client/features/bills';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/implementation-workarounds';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
 // Define proper TypeScript interfaces for our data structures
 // This gives TypeScript complete knowledge of what properties exist and their types

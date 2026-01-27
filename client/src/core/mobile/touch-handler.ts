@@ -10,7 +10,7 @@
  * @module core/mobile/touch-handler
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import type { TouchEvent, TouchConfig } from './types';
 
@@ -56,6 +56,10 @@ export class TouchHandler {
       onSwipe: config.onSwipe || (() => {}),
       onLongPress: config.onLongPress || (() => {}),
       onTap: config.onTap || (() => {}),
+      // Legacy properties
+      threshold: config.threshold || 0,
+      velocity: config.velocity || 0,
+      preventDefault: config.preventDefault || false,
     };
   }
 

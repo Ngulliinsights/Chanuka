@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 
 export const ImplementationWorkarounds: React.FC<{ bill_id: string }> = ({ bill_id }) => {
   return (

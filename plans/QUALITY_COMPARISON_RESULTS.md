@@ -142,19 +142,19 @@ This analysis compared 5 competing systems across @shared/core and server implem
 
 ### ❌ DO NOT SHARE (Specialized for Browser/React)
 
-**client/src/shared/utils/logger.ts (390 lines)**
+**client/src/lib/utils/logger.ts (390 lines)**
 - Purpose: React component lifecycle tracking
 - Features: RenderTrackingData, RenderStats, infinite render detection, mount/unmount counting
 - Incompatible: @shared logger has RequestLogData, DatabaseQueryLogData (server-focused)
 - Decision: **KEEP SEPARATE** - Different purposes
 
-**client/src/shared/utils/security.ts (114 lines)**
+**client/src/lib/utils/security.ts (114 lines)**
 - Purpose: Browser security (CSP manager, DOM sanitizer, input validation)
 - Features: Singleton pattern, DOM-safe, keyboard navigation support
 - Problem: @shared/core/utils/security-utils.ts imports Node crypto (`import * as crypto`) - **CANNOT RUN IN BROWSER**
 - Decision: **KEEP SEPARATE** - Client version is BETTER for browser
 
-**client/src/shared/utils/i18n.ts (600+ lines)**
+**client/src/lib/utils/i18n.ts (600+ lines)**
 - Purpose: Kenya-specific internationalization
 - Features: English & Swahili translations, Kenyan phone validation, KES currency, timezone/business hours
 - Scope: Domain-specific, not reusable
@@ -183,9 +183,9 @@ security-utils.ts     (Node crypto - incompatible with browser)
 ```
 
 ### Actual Duplication (Corrected)
-- ~~client/src/shared/utils/logger.ts (390 lines)~~ **SPECIALIZED (React tracking)**
-- ~~client/src/shared/utils/security.ts (114 lines)~~ **SPECIALIZED & BETTER (browser-safe vs Node crypto)**
-- ~~client/src/shared/utils/i18n.ts (600+ lines)~~ **DOMAIN-SPECIFIC (Kenya-specific)**
+- ~~client/src/lib/utils/logger.ts (390 lines)~~ **SPECIALIZED (React tracking)**
+- ~~client/src/lib/utils/security.ts (114 lines)~~ **SPECIALIZED & BETTER (browser-safe vs Node crypto)**
+- ~~client/src/lib/utils/i18n.ts (600+ lines)~~ **DOMAIN-SPECIFIC (Kenya-specific)**
 - client/src/core/error/types.ts (417 lines) - Consider sharing once error-management is finalized
 - Various client types (150+ lines) - Can share after audit
 

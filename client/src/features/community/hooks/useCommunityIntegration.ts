@@ -8,7 +8,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { communityApiService } from '@client/core/api/community';
-import { useToast } from '@client/shared/hooks/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 import {
   useActivityFeed as storeActivityFeed,

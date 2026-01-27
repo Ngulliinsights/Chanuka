@@ -11,26 +11,26 @@ import {
 import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card } from '@client/lib/design-system';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';

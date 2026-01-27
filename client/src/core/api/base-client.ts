@@ -5,7 +5,8 @@
  * This is the foundation for all API communication in the application.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
 import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 
 import { ApiCacheManager, CacheKeyGenerator } from './cache-manager';

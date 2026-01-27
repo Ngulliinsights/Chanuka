@@ -14,19 +14,19 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

@@ -5,25 +5,25 @@ import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@client/core/auth';
 import { ErrorBoundary } from '@client/core/error/components';
 import { createNavigationProvider } from '@client/core/navigation/context';
-import { useDeviceInfo } from '@client/hooks/mobile/useDeviceInfo';
-import { Toaster } from '@client/shared/design-system';
+import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
+import { Toaster } from '@client/lib/design-system';
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import {
   setCurrentPath,
   addToRecentPages,
   setUserRole,
-} from '@client/shared/infrastructure/store/slices/navigationSlice';
-import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
-import { BreadcrumbNavigation } from '@client/shared/ui/navigation/BreadcrumbNavigation';
-import { useBreadcrumbNavigation } from '@client/shared/ui/navigation/hooks/useBreadcrumbNavigation';
-import { OfflineProvider } from '@client/shared/ui/offline';
+} from '@client/lib/infrastructure/store/slices/navigationSlice';
+import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
+import { BreadcrumbNavigation } from '@client/lib/ui/navigation/BreadcrumbNavigation';
+import { useBreadcrumbNavigation } from '@client/lib/ui/navigation/hooks/useBreadcrumbNavigation';
+import { OfflineProvider } from '@client/lib/ui/offline';
+import { logger } from '@client/lib/utils/logger';
 
-import { ThemeProvider } from '@client/shared/contexts/ThemeContext';
 import { AnalyticsIntegration } from '../../core/analytics/AnalyticsIntegration';
 // import { DevelopmentMonitoringDashboard } from '../../core/monitoring/DevelopmentMonitoringDashboard';
 // import { RouteProfiler } from '../../core/monitoring/RouteProfiler';
 import { NavigationConsistency } from '../../core/navigation/NavigationConsistency';
 import { NavigationPerformance } from '../../core/navigation/NavigationPerformance';
-import { logger } from '@client/shared/utils/logger';
 
 import { AppRouter } from './AppRouter';
 import { NavigationBar } from './NavigationBar';

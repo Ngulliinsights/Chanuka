@@ -3,7 +3,7 @@
  * Validates loading operations and configurations
  */
 
-import { LoadingOperation, ProgressiveStage } from '@client/shared/types';
+import { LoadingOperation, ProgressiveStage } from '@client/lib/types';
 
 export class LoadingValidationError extends Error {
   public readonly field?: string;

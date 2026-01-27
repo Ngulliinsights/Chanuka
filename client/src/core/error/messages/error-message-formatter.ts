@@ -4,9 +4,10 @@
  * Utilities for formatting error messages with context, variables, and consistent styling
  */
 
-import { AppError, ErrorContext } from '../types';
-import { ErrorMessageTemplate, getBestMatchTemplate, getLocalizedMessage } from './error-message-templates';
 import { ErrorDomain, ErrorSeverity } from '../constants';
+import { AppError, ErrorContext } from '../types';
+
+import { ErrorMessageTemplate, getBestMatchTemplate, getLocalizedMessage } from './error-message-templates';
 
 // ============================================================================
 // Error Message Formatter

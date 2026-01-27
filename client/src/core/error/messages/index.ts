@@ -72,11 +72,12 @@ export {
 // Integrated Error Message Service
 // ============================================================================
 
-import { AppError } from '../types';
 import { ErrorDomain, ErrorSeverity } from '../constants';
+import { AppError } from '../types';
+
 import { formatErrorMessage, FormatOptions } from './error-message-formatter';
-import { getRecoverySuggestions } from './error-recovery-suggestions';
 import { ErrorMessageTemplate, getBestMatchTemplate, getLocalizedMessage, addLocalizedMessages } from './error-message-templates';
+import { getRecoverySuggestions } from './error-recovery-suggestions';
 
 export interface EnhancedErrorMessage {
   formattedMessage: ReturnType<typeof formatErrorMessage>;

@@ -11,18 +11,18 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
-import { CommunityValidation as CommunityValidationType } from '@client/shared/types';
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
+import { CommunityValidation as CommunityValidationType } from '@client/lib/types';
 
 interface CommunityValidationProps {
   validation: CommunityValidationType;

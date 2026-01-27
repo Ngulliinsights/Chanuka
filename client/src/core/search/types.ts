@@ -35,18 +35,19 @@ export interface UnifiedSearchQuery {
 
 export interface UnifiedSearchResult {
   results: SearchResult[];
-  metadata: SearchMetadata & {
+  metadata: {
     strategy: SearchStrategy;
     fallbackUsed: boolean;
     searchTime: number;
     totalResults: number;
+    [key: string]: unknown;
   };
   suggestions?: string[];
   facets?: {
-    categories: string[];
-    sponsors: string[];
-    tags: string[];
-    statuses: string[];
+    categories?: Record<string, number>;
+    sponsors?: Record<string, number>;
+    tags?: Record<string, number>;
+    statuses?: Record<string, number>;
   };
 }
 

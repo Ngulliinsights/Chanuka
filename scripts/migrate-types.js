@@ -42,17 +42,17 @@ const IMPORT_MAPPINGS = [
   // Shared types
   {
     pattern: /from\s+['"](\.\.?\/)*types\/navigation['"];/g,
-    replacement: "from '@client/shared/types/navigation';",
+    replacement: "from '@client/lib/types/navigation';",
     description: 'Navigation types'
   },
   {
     pattern: /from\s+['"](\.\.?\/)*types\/mobile['"];/g,
-    replacement: "from '@client/shared/types/mobile';",
+    replacement: "from '@client/lib/types/mobile';",
     description: 'Mobile types'
   },
   {
     pattern: /from\s+['"](\.\.?\/)*types\/user-dashboard['"];/g,
-    replacement: "from '@client/shared/types/user-dashboard';",
+    replacement: "from '@client/lib/types/user-dashboard';",
     description: 'User dashboard types'
   },
 
@@ -73,7 +73,7 @@ const IMPORT_MAPPINGS = [
   // Generic/core types - keep in shared
   {
     pattern: /from\s+['"](\.\.?\/)*types\/core['"];/g,
-    replacement: "from '@client/shared/types';",
+    replacement: "from '@client/lib/types';",
     description: 'Core types'
   },
 
@@ -95,17 +95,17 @@ const IMPORT_MAPPINGS = [
   },
   {
     pattern: /from\s+['"]@client\/types\/navigation['"];/g,
-    replacement: "from '@client/shared/types/navigation';",
+    replacement: "from '@client/lib/types/navigation';",
     description: '@client/types/navigation alias'
   },
   {
     pattern: /from\s+['"]@client\/types\/mobile['"];/g,
-    replacement: "from '@client/shared/types/mobile';",
+    replacement: "from '@client/lib/types/mobile';",
     description: '@client/types/mobile alias'
   },
   {
     pattern: /from\s+['"]@client\/types\/user-dashboard['"];/g,
-    replacement: "from '@client/shared/types/user-dashboard';",
+    replacement: "from '@client/lib/types/user-dashboard';",
     description: '@client/types/user-dashboard alias'
   },
   {
@@ -120,7 +120,7 @@ const IMPORT_MAPPINGS = [
   },
   {
     pattern: /from\s+['"]@client\/types\/core['"];/g,
-    replacement: "from '@client/shared/types';",
+    replacement: "from '@client/lib/types';",
     description: '@client/types/core alias'
   },
 ];

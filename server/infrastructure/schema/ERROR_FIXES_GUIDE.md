@@ -132,7 +132,7 @@ import { logger } from '@/server/utils/logger';
 import { reputationSourceEnum } from '@/shared/schema';
 
 // ✅ CORRECT:
-import { readDatabase, writeDatabase, withTransaction } from '@shared/database/connection';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import { logger } from '@shared/core';
 import { reputationScores, reputationHistory, rateLimits, ...etc } from '@shared/schema/safeguards';
 ```
@@ -243,7 +243,7 @@ Since `DatabaseTransaction` doesn't support it, use optimistic locking with time
 #### 1. Fix Import Paths
 ```typescript
 // Update all imports to use correct paths
-import { readDatabase, writeDatabase, withTransaction, type DatabaseTransaction } from '@shared/database/connection';
+import { readDatabase, writeDatabase, withTransaction, type DatabaseTransaction } from '@server/infrastructure/database/connection';
 import { logger } from '@shared/core';
 ```
 

@@ -7,7 +7,7 @@
  * @module init-auth-system
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
 import { initializeAuth, getAuthSystemStatus, type AuthInitOptions } from '../config/auth-init';

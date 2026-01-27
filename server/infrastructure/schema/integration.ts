@@ -2,7 +2,7 @@
 // SCHEMA INTEGRATION - Unified Type System for Database and Application
 // ============================================================================
 // Integrates Drizzle ORM schemas with standardized type patterns
-// Follows exemplary patterns from client/src/shared/types/loading.ts
+// Follows exemplary patterns from client/src/lib/types/loading.ts
 // and shared/schema/base-types.ts
 
 import { relations, sql } from "drizzle-orm";

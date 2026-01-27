@@ -5,7 +5,7 @@
  * can be used independently or as part of unified community hooks.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 import { WebSocketManager } from '../services/websocket-manager';
 import type { WebSocketEvents } from '../types';
@@ -34,34 +34,44 @@ export function useRealtime({
 }: UseRealtimeOptions = {}): UseRealtimeReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [wsManager] = useState(() => WebSocketManager.getInstance());
+  const isMountedRef = useRef(true);
 
   // Connect on mount if autoConnect is enabled
   useEffect(() => {
+    isMountedRef.current = true;
+
     if (autoConnect) {
       wsManager
         .connect()
         .then(() => {
-          setIsConnected(true);
+          if (isMountedRef.current) {
+            setIsConnected(true);
 
-          // Join initial rooms
-          rooms.forEach(room => {
-            wsManager.joinRoom(room);
-          });
+            // Join initial rooms
+            rooms.forEach(room => {
+              wsManager.joinRoom(room);
+            });
+          }
         })
         .catch(error => {
-          console.error('Failed to connect to WebSocket:', error);
-          setIsConnected(false);
+          if (isMountedRef.current) {
+            console.error('Failed to connect to WebSocket:', error);
+            setIsConnected(false);
+          }
         });
     }
 
     // Set up connection status monitoring
     const checkConnection = () => {
-      setIsConnected(wsManager.isConnected());
+      if (isMountedRef.current) {
+        setIsConnected(wsManager.isConnected());
+      }
     };
 
     const interval = setInterval(checkConnection, 5000);
 
     return () => {
+      isMountedRef.current = false;
       clearInterval(interval);
       if (autoConnect) {
         wsManager.disconnect();
@@ -72,17 +82,23 @@ export function useRealtime({
   const connect = useCallback(async () => {
     try {
       await wsManager.connect();
-      setIsConnected(true);
+      if (isMountedRef.current) {
+        setIsConnected(true);
+      }
     } catch (error) {
-      console.error('Failed to connect:', error);
-      setIsConnected(false);
+      if (isMountedRef.current) {
+        console.error('Failed to connect:', error);
+        setIsConnected(false);
+      }
       throw error;
     }
   }, [wsManager]);
 
   const disconnect = useCallback(() => {
     wsManager.disconnect();
-    setIsConnected(false);
+    if (isMountedRef.current) {
+      setIsConnected(false);
+    }
   }, [wsManager]);
 
   const joinRoom = useCallback(

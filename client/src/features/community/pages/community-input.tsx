@@ -17,20 +17,20 @@ import ActivityFeed from '@client/features/community/ui/activity/ActivityFeed';
 import CommunityStats from '@client/features/community/ui/activity/CommunityStats';
 import { ExpertInsights } from '@client/features/community/ui/expert/ExpertInsights';
 import CommunityHub from '@client/features/community/ui/hub/CommunityHub';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
-import { AppLayout } from '@client/shared/ui/layout/AppLayout';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { AppLayout } from '@client/lib/ui/layout/AppLayout';
 
 interface Announcement {
   id: string;

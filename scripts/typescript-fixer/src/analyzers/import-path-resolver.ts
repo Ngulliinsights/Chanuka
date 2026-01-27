@@ -278,8 +278,8 @@ export class ImportPathResolver {
     // Default aliases for Chanuka project
     aliasMap.set('@shared/core', path.join(this.projectStructure.rootPath, 'shared/core'));
     aliasMap.set('@shared/core/src', path.join(this.projectStructure.rootPath, 'shared/core/src'));
-    aliasMap.set('@shared/schema', path.join(this.projectStructure.rootPath, 'shared/schema'));
-    aliasMap.set('@shared/database', path.join(this.projectStructure.rootPath, 'shared/database'));
+    aliasMap.set('@server/infrastructure/schema', path.join(this.projectStructure.rootPath, 'shared/schema'));
+    aliasMap.set('@server/infrastructure/database', path.join(this.projectStructure.rootPath, 'shared/database'));
     aliasMap.set('@server', path.join(this.projectStructure.rootPath, 'server'));
     aliasMap.set('@client', path.join(this.projectStructure.rootPath, 'client'));
 

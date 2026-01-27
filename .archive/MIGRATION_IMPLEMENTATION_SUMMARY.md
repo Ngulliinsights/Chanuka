@@ -291,7 +291,7 @@ The migration utilities provide a **complete, production-ready solution** for mi
 7. ✅ **Configuration management** for flexible migration
 8. ✅ **Helper utilities** for common migration tasks
 
-The implementation follows the exemplary patterns from `client/src/shared/types/loading.ts` and `shared/schema/base-types.ts`, ensuring consistency with the established codebase standards.
+The implementation follows the exemplary patterns from `client/src/lib/types/loading.ts` and `shared/schema/base-types.ts`, ensuring consistency with the established codebase standards.
 
 **All types are properly placed in `shared/types/migration/`** as specified, maintaining the project's architectural organization and ensuring backward compatibility where applicable.
 

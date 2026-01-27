@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { ErrorBoundary } from '../../../core/error/ErrorBoundary';
-import { SecurityErrorHandler } from '../../../core/error/security/SecurityErrorHandler';
-import { HookErrorHandler } from '../../../core/error/hooks/HookErrorHandler';
-import { ServiceErrorHandler } from '../../../core/error/services/ServiceErrorHandler';
-import { LibraryErrorHandler } from '../../../core/error/library/LibraryErrorHandler';
 import { ErrorPropagationService } from '../../../core/error/ErrorPropagationService';
+import { HookErrorHandler } from '../../../core/error/hooks/HookErrorHandler';
+import { LibraryErrorHandler } from '../../../core/error/library/LibraryErrorHandler';
+import { SecurityErrorHandler } from '../../../core/error/security/SecurityErrorHandler';
+import { ServiceErrorHandler } from '../../../core/error/services/ServiceErrorHandler';
 import { ErrorContext } from '../../../core/error/types/ErrorContext';
 import { ErrorSeverity } from '../../../core/error/types/ErrorSeverity';
 import { ErrorType } from '../../../core/error/types/ErrorType';

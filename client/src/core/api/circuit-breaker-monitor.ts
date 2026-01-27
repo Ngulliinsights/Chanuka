@@ -5,7 +5,8 @@
  * with the error correlation system for comprehensive observability.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
 import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 import { getCircuitBreakerStats } from './interceptors';

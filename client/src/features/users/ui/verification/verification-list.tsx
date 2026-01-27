@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 
 import { useBills } from '@client/features/bills';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { LoadingSpinner } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
 import {
   Table,
   TableBody,
@@ -12,8 +12,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface VerificationItem {
   id: number;

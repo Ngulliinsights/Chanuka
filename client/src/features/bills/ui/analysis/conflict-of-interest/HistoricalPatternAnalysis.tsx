@@ -24,15 +24,15 @@ import {
 } from 'recharts';
 
 import { VotingPattern, ConflictAnalysis } from '@client/features/analysis/types';
-import { Badge } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
 interface HistoricalPatternAnalysisProps {
   conflictAnalysis: ConflictAnalysis;

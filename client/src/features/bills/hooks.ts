@@ -13,7 +13,7 @@ import type {
   CreatePollPayload,
 } from '@client/core/api/bills';
 import { billsApiService } from '@client/core/api/bills';
-import { useToast } from '@client/shared/hooks/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 // ============================================================================
 // Query Keys Factory

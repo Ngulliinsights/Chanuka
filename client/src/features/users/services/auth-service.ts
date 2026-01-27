@@ -9,6 +9,15 @@
  * - Session management
  */
 
+import { CacheService } from '@client/lib/services/cache';
+import {
+  ServiceErrorFactory,
+  AuthenticationError,
+  ValidationError,
+  TokenExpiredError,
+  TwoFactorRequiredError
+} from '@client/lib/services/errors';
+import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   AuthService as IAuthService,
   AuthCredentials,
@@ -19,17 +28,8 @@ import {
   UserPreferences,
   NotificationPreferences,
   PrivacySettings
-} from '@client/shared/services/interfaces';
-import {
-  ServiceErrorFactory,
-  AuthenticationError,
-  ValidationError,
-  TokenExpiredError,
-  TwoFactorRequiredError
-} from '@client/shared/services/errors';
-import { CacheService } from '@client/shared/services/cache';
-import { ServiceLifecycleInterface } from '@client/shared/services/factory';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/services/interfaces';
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // AUTH SERVICE IMPLEMENTATION

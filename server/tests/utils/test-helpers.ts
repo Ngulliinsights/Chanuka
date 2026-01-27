@@ -1,5 +1,5 @@
 import { logger } from '@shared/core';
-import database from '@shared/database';
+import database from '@server/infrastructure/database';
 import { bills, sponsors,users } from '@shared/schema';
 import { bill_engagement,comments, notifications } from '@shared/schema';
 import { eq } from 'drizzle-orm';

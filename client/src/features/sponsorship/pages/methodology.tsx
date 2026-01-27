@@ -16,12 +16,12 @@ import {
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface MethodologyProps {
   bill_id?: string;

@@ -7,10 +7,11 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+import { BaseError, ErrorDomain, ErrorSeverity, handleError } from '@client/core/error';
+
 import { globalApiClient } from '../client';
 import type { UnifiedError } from '../types/common';
 import type { ApiResponse, RequestOptions } from '../types/request';
-import { BaseError, ErrorDomain, ErrorSeverity, handleError } from '@client/core/error';
 
 export interface UseApiOptions extends Omit<RequestOptions, 'method'> {
   enabled?: boolean;

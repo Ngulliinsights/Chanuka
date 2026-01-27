@@ -8,7 +8,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { useNavigation } from './context';
 

@@ -3,23 +3,25 @@
  * Ensures backward compatibility during migration
  */
 
+import { inputSanitizer } from '../input-sanitizer';
+import { clientRateLimiter, RateLimiter, RateLimitConfigs } from '../rate-limiter';
+import { SecurityService } from '../security-service';
+import { securityUtils } from '../security-utils';
+import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
+import { UnifiedCSPManager } from '../unified/csp-manager';
+import { SecurityErrorHandler } from '../unified/error-handler';
+import { SecurityErrorMiddleware } from '../unified/error-middleware';
+import { UnifiedInputSanitizer } from '../unified/input-sanitizer';
+import { UnifiedRateLimiter } from '../unified/rate-limiter';
+import { UnifiedSecuritySystem } from '../unified';
+
+// Legacy security system imports
 import {
   UnifiedSecurityConfig,
   SecurityComponent,
   SecurityHealth,
   SecurityMetrics
 } from '../unified/security-interface';
-import { UnifiedCSPManager } from '../unified/csp-manager';
-import { UnifiedInputSanitizer } from '../unified/input-sanitizer';
-import { SecurityErrorHandler } from '../unified/error-handler';
-import { SecurityErrorMiddleware } from '../unified/error-middleware';
-import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
-
-// Legacy security system imports
-import { securityUtils } from '../../core/security';
-import { SecurityService } from '../security-service';
-import { inputSanitizer } from '../input-sanitizer';
-import { clientRateLimiter } from '../rate-limiter';
 
 export interface LegacySecurityConfig {
   enableCSP: boolean;
@@ -83,7 +85,8 @@ export class SecurityCompatibilityLayer {
     resetTime: number;
   }> {
     if (this.shouldUseUnifiedImplementation('rateLimiting')) {
-      return this.unifiedSecurity.rateLimiter.checkLimit(key, configName);
+      const config = RateLimitConfigs[configName as keyof typeof RateLimitConfigs] || RateLimitConfigs.normal;
+      return this.unifiedSecurity.rateLimiter.checkLimit(key, config);
     } else {
       return this.legacySecurity.checkRateLimit(key, configName);
     }
@@ -253,7 +256,7 @@ class LegacySecuritySystem {
   async initialize(config: LegacySecurityConfig): Promise<void> {
     // Initialize legacy security utilities
     if (config.enableCSP) {
-      const cspHeader = securityUtils.generateCSPHeader(config.csp?.directives);
+      const cspHeader = securityUtils.generateCSPHeader(config.csp?.directives as any);
       // Apply CSP header (would be done via HTTP headers in real implementation)
       console.log('Legacy CSP initialized:', cspHeader);
     }
@@ -279,7 +282,7 @@ class LegacySecuritySystem {
   }
 
   generateCSPHeader(directives?: Record<string, string[]>): string {
-    return securityUtils.generateCSPHeader(directives);
+    return securityUtils.generateCSPHeader(directives as any);
   }
 
   validatePasswordStrength(password: string): {
@@ -317,74 +320,6 @@ class LegacySecuritySystem {
   }
 }
 
-/**
- * Unified Security System - Wrapper for unified security components
- */
-class UnifiedSecuritySystem implements SecurityComponent {
-  private cspManager: UnifiedCSPManager;
-  private sanitizer: UnifiedInputSanitizer;
-  private errorHandler: SecurityErrorHandler;
-  private errorMiddleware: SecurityErrorMiddleware;
-
-  constructor(config: UnifiedSecurityConfig) {
-    this.cspManager = new UnifiedCSPManager({
-      enabled: config.csp.enabled,
-      reportOnly: config.csp.reportOnly,
-      directives: config.csp.directives,
-      reportUri: '/api/security/csp-violations',
-    });
-
-    this.sanitizer = new UnifiedInputSanitizer({
-      enabled: config.inputSanitization.enabled,
-      mode: config.inputSanitization.mode,
-      allowedTags: config.inputSanitization.allowedTags,
-      allowedAttributes: config.inputSanitization.allowedAttributes,
-    });
-
-    this.errorHandler = new SecurityErrorHandler(config.errorHandling);
-    this.errorMiddleware = new SecurityErrorMiddleware(config.errorHandling);
-  }
-
-  async initialize(config: UnifiedSecurityConfig): Promise<void> {
-    await this.cspManager.initialize();
-    await this.sanitizer.initialize(config);
-    await this.errorHandler.initialize(config);
-    await this.errorMiddleware.initialize(config);
-  }
-
-  async shutdown(): Promise<void> {
-    await this.cspManager.shutdown();
-    await this.sanitizer.shutdown();
-    await this.errorHandler.shutdown();
-    await this.errorMiddleware.shutdown();
-  }
-
-  getHealthStatus(): SecurityHealth {
-    const cspStatus = this.cspManager.getHealthStatus();
-    const sanitizerStatus = this.sanitizer.getHealthStatus();
-    const errorHandlerStatus = this.errorHandler.getHealthStatus();
-
-    return {
-      enabled: true,
-      status: 'healthy', // Would aggregate status from all components
-      lastCheck: new Date(),
-      issues: [],
-    };
-  }
-
-  getMetrics(): SecurityMetrics {
-    const cspMetrics = this.cspManager.getMetrics();
-    const sanitizerMetrics = this.sanitizer.getMetrics();
-    const errorMetrics = this.errorHandler.getMetrics();
-
-    return {
-      requestsProcessed: cspMetrics.requestsProcessed + sanitizerMetrics.requestsProcessed,
-      threatsBlocked: cspMetrics.threatsBlocked + sanitizerMetrics.threatsBlocked,
-      averageResponseTime: (cspMetrics.averageResponseTime + sanitizerMetrics.averageResponseTime) / 2,
-      errorRate: Math.max(cspMetrics.errorRate, sanitizerMetrics.errorRate, errorMetrics.errorRate),
-    };
-  }
-}
 
 // Export singleton instance
 export const securityCompatibilityLayer = new SecurityCompatibilityLayer();

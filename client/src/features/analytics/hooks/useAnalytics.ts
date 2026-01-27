@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useToast } from '@client/shared/hooks/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
+
 import { analyticsService } from '../services/analytics';
 import type { AnalyticsFilters } from '../types';
 

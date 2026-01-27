@@ -35,7 +35,7 @@ import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/e
 import { webSocketService } from '@server/utils/missing-modules-fallback';
 import { setupVite } from '@server/vite';
 import { logger } from '@shared/core';
-import { pool } from '@shared/database';
+import { pool } from '@server/infrastructure/database';
 import crypto from 'crypto';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createServer, Server } from 'http';

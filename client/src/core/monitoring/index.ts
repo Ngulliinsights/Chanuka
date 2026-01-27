@@ -18,17 +18,17 @@ export { performanceRegressionTester } from '@client/features/monitoring';
 export { continuousPerformanceMonitor } from '@client/features/monitoring';
 
 // Development Dashboard (moved to shared infrastructure)
-export { DevelopmentMonitoringDashboard } from '@client/shared/infrastructure/monitoring';
+export { DevelopmentMonitoringDashboard } from '@client/lib/infrastructure/monitoring';
 
 // Enhanced Error Monitoring (moved to shared infrastructure)
-export { ErrorMonitor as ErrorMonitoring } from '@client/shared/infrastructure/monitoring';
+export { ErrorMonitor as ErrorMonitoring } from '@client/lib/infrastructure/monitoring';
 
 // Enhanced Performance Monitoring (moved to shared infrastructure)
-export { PerformanceMonitor as PerformanceMonitoring } from '@client/shared/infrastructure/monitoring';
+export { PerformanceMonitor as PerformanceMonitoring } from '@client/lib/infrastructure/monitoring';
 
 // Enhanced Monitoring Integration (moved to shared infrastructure)
-export { MonitoringIntegration as MonitoringService } from '@client/shared/infrastructure/monitoring';
-export type { MonitoringConfig } from '@client/shared/infrastructure/monitoring';
+export { MonitoringIntegration as MonitoringService } from '@client/lib/infrastructure/monitoring';
+export type { MonitoringConfig } from '@client/lib/infrastructure/monitoring';
 
 // Monitoring Initialization
 export {

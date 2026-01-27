@@ -22,9 +22,9 @@ import {
 import React from 'react';
 import { useEffect, useMemo, memo } from 'react';
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
 
 // Type definitions for better type safety and clarity
 interface CommunityStatsType {

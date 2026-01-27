@@ -4,9 +4,9 @@
  * Handles navigation event tracking and analytics
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { NavigationItem } from '@client/lib/types/navigation';
+import { logger } from '@client/lib/utils/logger';
 
-import { NavigationItem } from '@client/shared/types/navigation';
 
 /**
  * Navigation event types for analytics tracking

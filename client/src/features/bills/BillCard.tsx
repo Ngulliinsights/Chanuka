@@ -13,12 +13,12 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Checkbox } from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system/utils/cn';
-import type { Bill } from '@client/shared/types';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Checkbox } from '@client/lib/design-system';
+import { cn } from '@client/lib/design-system/utils/cn';
+import type { Bill } from '@client/lib/types';
 
 interface BillCardProps {
   bill: Bill;

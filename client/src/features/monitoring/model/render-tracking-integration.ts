@@ -5,7 +5,7 @@
  * without requiring JSX compilation for the examples.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 // Integration helper for existing components
 export class RenderTrackingIntegration {

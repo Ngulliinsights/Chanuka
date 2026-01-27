@@ -51,7 +51,7 @@ const DEFAULT_CONFIG: Configuration = {
       'ApiResponseWrapper', 'validateRequest', 'ErrorHandler'
     ],
     databasePatterns: [
-      '@shared/database/connection',
+      '@server/infrastructure/database/connection',
       'databaseService',
       'db',
       'connection'

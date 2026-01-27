@@ -21,13 +21,13 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useToast } from '@client/shared/hooks/use-toast.ts';
-import { Badge } from '@client/shared/design-system';
-import { Tooltip } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system';
-import type { SearchResult, SearchHighlight } from '@client/shared/types';
+import { Badge } from '@client/lib/design-system';
+import { Tooltip } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import { cn } from '@client/lib/design-system';
+import { useToast } from '@client/lib/hooks/use-toast.ts';
+import type { SearchResult, SearchHighlight } from '@client/lib/types';
 
 interface SearchResultCardProps {
   result: SearchResult;

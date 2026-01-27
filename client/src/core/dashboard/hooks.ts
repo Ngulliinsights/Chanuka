@@ -5,7 +5,6 @@
 import { useCallback } from 'react';
 
 import { WidgetConfig } from './context';
-
 import { useDashboard } from './context';
 
 /**

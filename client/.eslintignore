@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+coverage
+/*.config.ts
+/*.config.js
+/vite*.ts
+/playwright*.ts
+/postcss.config.js
+/tailwind.config.ts
+.vite
+*.js
+migration-helper.js

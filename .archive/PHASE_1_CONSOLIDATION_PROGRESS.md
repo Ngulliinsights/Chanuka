@@ -60,8 +60,8 @@ Fixed layout utility functions to properly handle widget state:
 ### 6. **Path Mapping Configuration** ✅
 Added explicit TypeScript path mappings in `client/tsconfig.json`:
 ```json
-"@client/shared/types/dashboard": ["./shared/types/dashboard/index.ts"],
-"@client/shared/types": ["./shared/types/index.ts"]
+"@client/lib/types/dashboard": ["./shared/types/dashboard/index.ts"],
+"@client/lib/types": ["./shared/types/index.ts"]
 ```
 
 ### 7. **Validation Type Updates** ✅
@@ -107,7 +107,7 @@ Fixed validation functions to use correct type aliases:
 
 ### Code Quality
 ✅ Reduced type duplication (~2,000+ lines)
-✅ Unified import paths (`@client/shared/types/dashboard`)
+✅ Unified import paths (`@client/lib/types/dashboard`)
 ✅ Improved type safety with optional properties
 ✅ Better function signatures with explicit parameters
 
@@ -140,11 +140,11 @@ Fixed validation functions to use correct type aliases:
 ## Files Modified
 
 ### New Files
-- `client/src/shared/types/dashboard/dashboard-base.ts` (391 lines)
-- `client/src/shared/types/dashboard/dashboard-metrics.ts` (80+ lines)
-- `client/src/shared/types/dashboard/dashboard-components.ts` (100+ lines)
-- `client/src/shared/types/dashboard/dashboard-events.ts` (80+ lines)
-- `client/src/shared/types/dashboard/index.ts` (333 lines)
+- `client/src/lib/types/dashboard/dashboard-base.ts` (391 lines)
+- `client/src/lib/types/dashboard/dashboard-metrics.ts` (80+ lines)
+- `client/src/lib/types/dashboard/dashboard-components.ts` (100+ lines)
+- `client/src/lib/types/dashboard/dashboard-events.ts` (80+ lines)
+- `client/src/lib/types/dashboard/index.ts` (333 lines)
 
 ### Modified Files
 - `client/src/core/dashboard/utils.ts` (refactored 4 functions)

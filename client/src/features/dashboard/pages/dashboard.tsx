@@ -7,14 +7,14 @@
  * Requirements: 7.4, 7.5
  */
 
+import type { PersonaType } from '@client/core/personalization/types';
 import React, { useState } from 'react';
 
-import type { PersonaType } from '@client/core/personalization/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
-import { AdaptiveDashboard } from '@client/shared/ui/dashboard';
-import { RealTimeDashboard } from '@client/shared/ui/realtime';
-import { logger } from '@client/shared/utils/logger';
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
+import { AdaptiveDashboard } from '@client/lib/ui/dashboard';
+import { RealTimeDashboard } from '@client/lib/ui/realtime';
+import { logger } from '@client/lib/utils/logger';
 
 export default function Dashboard() {
   const { data: user } = useUserProfile();

@@ -6,7 +6,7 @@ This document defines the clear architectural boundaries between the `shared`, `
 
 ## Directory Structure and Responsibilities
 
-### 1. Shared Directory (`client/src/shared/`)
+### 1. Shared Directory (`client/src/lib/`)
 
 **Purpose**: Cross-cutting concerns and reusable infrastructure that can be consumed by both client and server modules.
 
@@ -50,7 +50,7 @@ export class BillNavigationService { ... }
 - Storage management and validation
 
 **Boundary Rules**:
-- ✅ **CAN** import from `client/src/shared/`
+- ✅ **CAN** import from `client/src/lib/`
 - ✅ **CAN** import from `@types/` and external dependencies
 - ❌ **CANNOT** import from `client/src/features/`
 - ❌ **CANNOT** contain UI components
@@ -80,7 +80,7 @@ export const Dashboard = () => { ... };
 - Feature-specific routing and navigation
 
 **Boundary Rules**:
-- ✅ **CAN** import from `client/src/shared/`
+- ✅ **CAN** import from `client/src/lib/`
 - ✅ **CAN** import from `client/src/core/`
 - ✅ **CAN** import from `@types/` and external dependencies
 - ❌ **CANNOT** import from other features
@@ -137,7 +137,7 @@ import { UserDashboard } from '@/features/users';
 
 ### When to Use Shared Services
 
-Use `client/src/shared/services/` for:
+Use `client/src/lib/services/` for:
 - **Navigation**: Cross-cutting navigation logic
 - **Data Retention**: Platform-wide data lifecycle management
 - **Error Handling**: Global error management and boundaries
@@ -232,12 +232,12 @@ Add to `.eslintrc.js`:
           "message": "Core cannot import from features"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/core",
           "message": "Shared cannot import from core"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/features",
           "message": "Shared cannot import from features"
         }
@@ -269,7 +269,7 @@ Add to CI pipeline:
 // ❌ client/src/core/analytics/data-retention-service.ts
 import { Button } from '@/shared/ui/button'; // Core importing UI
 
-// ❌ client/src/shared/services/navigation.ts
+// ❌ client/src/lib/services/navigation.ts
 import { BillService } from '@/features/bills'; // Shared importing feature
 
 // ❌ client/src/features/bills/components/BillList.tsx
@@ -281,7 +281,7 @@ import { UserProfile } from '@/features/users'; // Feature importing feature
 // ✅ client/src/core/analytics/data-retention-service.ts
 import { logger } from '@/shared/utils/logger'; // Core using shared infrastructure
 
-// ✅ client/src/shared/services/navigation.ts
+// ✅ client/src/lib/services/navigation.ts
 export class NavigationService { /* generic navigation logic */ } // Shared providing generic service
 
 // ✅ client/src/features/bills/components/BillList.tsx

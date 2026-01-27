@@ -6,8 +6,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { AppError } from '../../types';
+
 import { ErrorDomain, ErrorSeverity } from '../../constants';
+import { AppError } from '../../types';
 import {
   ErrorMessageTemplate,
   getTemplateById,

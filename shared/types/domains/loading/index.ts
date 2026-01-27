@@ -3,7 +3,7 @@
  * Standardized loading types following the exemplary pattern
  */
 
-export * from '../../../../client/src/shared/types/loading';
+export * from '../../../../client/src/lib/types/loading';
 
 /**
  * Loading domain version and metadata

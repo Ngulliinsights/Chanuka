@@ -25,19 +25,19 @@ import React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { useDatabaseStatus } from '@client/shared/hooks/useDatabaseStatus';
-import ConnectionStatus from '@client/shared/ui/status/connection-status';
-import DatabaseStatus from '@client/shared/ui/status/database-status';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { useDatabaseStatus } from '@client/lib/hooks/useDatabaseStatus';
+import ConnectionStatus from '@client/lib/ui/status/connection-status';
+import DatabaseStatus from '@client/lib/ui/status/database-status';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview');

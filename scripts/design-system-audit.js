@@ -195,7 +195,7 @@ class DesignSystemAuditor {
       console.log('   2. Remove CSS module imports');
       console.log('   3. Use design tokens for colors (hsl(var(--primary)))');
       console.log('   4. Add proper ARIA attributes for accessibility');
-      console.log('   5. See client/src/shared/design-system/README.md for guidance\n');
+      console.log('   5. See client/src/lib/design-system/README.md for guidance\n');
     }
     
     // Exit with error code if there are errors

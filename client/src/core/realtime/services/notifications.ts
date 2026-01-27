@@ -5,7 +5,7 @@
  * including user notifications, system alerts, and push notifications.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { UnifiedWebSocketManager } from '../manager';
 import { WebSocketNotification, WebSocketMessage } from '../types';

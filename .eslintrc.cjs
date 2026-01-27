@@ -207,7 +207,7 @@ module.exports = {
       },
     },
     {
-      files: ["client/src/shared/**/*"],
+      files: ["client/src/lib/**/*"],
       settings: {
         "import/resolver": {
           typescript: {

@@ -8,12 +8,12 @@
           "message": "Core cannot import from features - violates architectural boundaries"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/core",
           "message": "Shared cannot import from core - creates circular dependencies"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/features",
           "message": "Shared cannot import from features - violates architectural boundaries"
         },

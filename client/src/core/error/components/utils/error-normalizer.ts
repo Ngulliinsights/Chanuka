@@ -3,7 +3,6 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
-import { ErrorSeverity } from '../../constants';
 import {
   BaseError,
   NetworkError,
@@ -12,6 +11,7 @@ import {
   NotFoundError,
   ValidationError,
 } from '../../classes';
+import { ErrorSeverity } from '../../constants';
 
 export function normalizeError(
   error: Record<string, unknown> | unknown,

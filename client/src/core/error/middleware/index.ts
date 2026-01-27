@@ -65,9 +65,9 @@ export {
 // Middleware Registry and Utilities
 // ============================================================================
 
-import { securityErrorMiddleware } from './security-middleware';
 import { hooksErrorMiddleware } from './hooks-middleware';
 import { libraryErrorMiddleware } from './library-middleware';
+import { securityErrorMiddleware } from './security-middleware';
 import { serviceErrorMiddleware } from './service-middleware';
 
 /**

@@ -10,7 +10,7 @@
 
 import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import { tokenManager } from '../services/token-manager';

@@ -1,9 +1,9 @@
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 
 import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
 

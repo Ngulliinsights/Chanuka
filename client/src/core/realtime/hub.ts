@@ -6,7 +6,7 @@
  * The WebSocket manager serves as the primary engine for all real-time operations.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { getRealTimeConfig } from './config';
 import { UnifiedWebSocketManager } from './manager';

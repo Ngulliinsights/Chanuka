@@ -1,12 +1,12 @@
 import { Send, AlertCircle, CheckCircle, X, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import { cn } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
+import { cn } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
 
 interface CommentFormData {
   content: string;

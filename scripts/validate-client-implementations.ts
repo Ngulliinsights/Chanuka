@@ -145,7 +145,7 @@ class ClientImplementationValidator {
     
     // Core services
     if (content.includes('@client/core/')) deps.push('core-services');
-    if (content.includes('@client/shared/')) deps.push('shared-services');
+    if (content.includes('@client/lib/')) deps.push('shared-services');
     if (content.includes('@client/features/')) deps.push('feature-services');
     
     return deps;

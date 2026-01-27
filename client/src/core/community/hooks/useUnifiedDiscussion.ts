@@ -17,7 +17,7 @@ import { WebSocketManager } from '../services/websocket-manager';
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
-  DiscussionState,
+  DiscussionViewState,
   ModerationRequest,
   UnifiedComment,
   UnifiedThread,
@@ -39,7 +39,7 @@ export function useUnifiedDiscussion({
   enableRealtime = true,
 }: UseUnifiedDiscussionOptions): UseDiscussionReturn {
   const queryClient = useQueryClient();
-  const [discussionState, setDiscussionState] = useState<DiscussionState>({
+  const [discussionState, setDiscussionState] = useState<DiscussionViewState>({
     currentBillId: String(billId),
     sortBy: 'newest',
     filterBy: 'all',
@@ -155,7 +155,7 @@ export function useUnifiedDiscussion({
       // Update React Query cache
       queryClient.setQueryData(
         ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => old.filter(comment => comment.id !== commentId)
+        (old: UnifiedComment[] = []) => old.filter(comment => String(comment.id) !== String(commentId))
       );
 
       // Sync with WebSocket
@@ -229,56 +229,52 @@ export function useUnifiedDiscussion({
 
     const unsubscribers = [
       // Comment events
-      wsManager.on('comment:created', data => {
-        if (data.comment.billId === String(billId)) {
+      wsManager.on('comment:new', comment => {
+        if (String(comment.billId) === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-            (old: UnifiedComment[] = []) => [data.comment, ...old]
+            (old: UnifiedComment[] = []) => [comment, ...old]
           );
         }
       }),
 
-      wsManager.on('comment:updated', data => {
-        if (data.comment.billId === String(billId)) {
+      wsManager.on('comment:updated', updatedComment => {
+        if (String(updatedComment.billId) === String(billId)) {
           queryClient.setQueryData(
             ['comments', billId, discussionState.sortBy, discussionState.filterBy],
             (old: UnifiedComment[] = []) =>
-              old.map(comment => (comment.id === data.comment.id ? data.comment : comment))
+              old.map(c => (c.id === updatedComment.id ? updatedComment : c))
           );
         }
       }),
 
-      wsManager.on('comment:deleted', data => {
+      wsManager.on('comment:deleted', ({ id }) => {
         queryClient.setQueryData(
           ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-          (old: UnifiedComment[] = []) => old.filter(comment => comment.id !== data.commentId)
+          (old: UnifiedComment[] = []) => old.filter(c => c.id !== id)
         );
       }),
 
       // Typing indicators
-      wsManager.on('user:typing', data => {
+      wsManager.on('typing:indicator', data => {
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
-          setTypingUsers(prev => [...prev.filter(id => id !== data.userId), data.userId]);
+          setTypingUsers(prev => {
+            const userIdStr = String(data.userId); // Ensure string comparison
+            return [...prev.filter(id => id !== userIdStr), userIdStr];
+          });
         }
       }),
 
-      wsManager.on('user:stopped_typing', data => {
-        if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
-          setTypingUsers(prev => prev.filter(id => id !== data.userId));
-        }
-      }),
-
-      // Active users
-      wsManager.on('user:joined', data => {
-        if (data.threadId === discussionState.currentThreadId) {
-          setActiveUsers(prev => [...prev.filter(id => id !== data.userId), data.userId]);
-        }
-      }),
-
-      wsManager.on('user:left', data => {
-        if (data.threadId === discussionState.currentThreadId) {
-          setActiveUsers(prev => prev.filter(id => id !== data.userId));
-        }
+      // Active users (Presence)
+      wsManager.on('presence:update', data => {
+         if (data.threadId === discussionState.currentThreadId) {
+           const userIdStr = String(data.userId);
+           if (data.status === 'online') {
+             setActiveUsers(prev => [...prev.filter(id => id !== userIdStr), userIdStr]);
+           } else {
+             setActiveUsers(prev => prev.filter(id => id !== userIdStr));
+           }
+         }
       }),
     ];
 
@@ -345,7 +341,7 @@ export function useUnifiedDiscussion({
     [createThreadMutation]
   );
 
-  const selectThread = useCallback((threadId: string) => {
+  const selectThread = useCallback((threadId: number) => {
     setDiscussionState(prev => ({
       ...prev,
       currentThreadId: threadId,
@@ -361,22 +357,17 @@ export function useUnifiedDiscussion({
 
   const startTyping = useCallback(() => {
     if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
-      wsManager.emit('user:typing', {
+      wsManager.emit('typing:indicator', {
         threadId: discussionState.currentThreadId,
-        userId: 'current-user',
+        userId: 0, // Should be actual user, but using 0/placeholder as per hook limitations
         userName: 'Current User',
       });
     }
   }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   const stopTyping = useCallback(() => {
-    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
-      wsManager.emit('user:stopped_typing', {
-        threadId: discussionState.currentThreadId,
-        userId: 'current-user',
-      });
-    }
-  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
+    // No specific stop typing event in defined types, usually handled by timeout or presence
+  }, []);
 
   // ============================================================================
   // RETURN INTERFACE

@@ -22,8 +22,8 @@ interface ComponentValidation {
 }
 
 class FinalDesignSystemValidator {
-  private designSystemDir = 'client/src/shared/design-system';
-  private sharedDir = 'client/src/shared';
+  private designSystemDir = 'client/src/lib/design-system';
+  private sharedDir = 'client/src/lib';
   private components: ComponentValidation[] = [];
   private exportChain: Map<string, string[]> = new Map();
 

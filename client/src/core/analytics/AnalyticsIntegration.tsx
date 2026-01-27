@@ -14,8 +14,8 @@ import { useAuth } from '@client/core/auth';
 import { useNavigation } from '@client/core/navigation/context';
 import { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
 import { userJourneyTracker, type NavigationSection } from '@client/features/analytics/model/user-journey-tracker';
-import type { UserRole } from '@client/shared/types/navigation';
-import { logger } from '@client/shared/utils/logger';
+import type { UserRole } from '@client/lib/types/navigation';
+import { logger } from '@client/lib/utils/logger';
 
 /**
  * Analytics Integration Hook

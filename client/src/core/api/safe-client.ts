@@ -5,7 +5,7 @@
  * instead returning result objects for type-safe error handling.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { BaseApiClient, ApiRequest, ApiResponse, RequestBody } from './base-client';
 import { ApiError } from './base-client';

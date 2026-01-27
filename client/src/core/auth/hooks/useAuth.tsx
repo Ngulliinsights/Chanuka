@@ -10,8 +10,8 @@
 import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } from 'react';
 import React from 'react';
 
-import { useAppDispatch, useAppSelector } from '@client/shared/hooks/store';
-import { logger } from '@client/shared/utils/logger';
+import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
+import { logger } from '@client/lib/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
@@ -585,7 +585,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 /**
  * Custom hook to access authentication context.
  */
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
 
@@ -602,7 +602,7 @@ export function useAuth(): AuthContextType {
 /**
  * Legacy compatibility hook for zustand-style auth store
  */
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export function useAuthStore() {
   const user = useAppSelector((state: any) => state.auth?.user || null);
   return { user } as const;

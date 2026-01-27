@@ -3,6 +3,9 @@
  * Consistent error handling across all security operations
  */
 
+import { logger } from '@client/lib/utils/logger';
+
+import { SecurityErrorHandler, SecurityErrorFactory, SecurityOperationError } from './error-handler';
 import {
   SecurityError,
   SecurityErrorResult,
@@ -10,8 +13,6 @@ import {
   ErrorHandlingConfig,
   SecurityEvent
 } from './security-interface';
-import { SecurityErrorHandler, SecurityErrorFactory, SecurityOperationError } from './error-handler';
-import { logger } from '@client/shared/utils/logger';
 
 export class SecurityErrorMiddleware {
   private errorHandler: SecurityErrorHandler;
@@ -20,6 +21,14 @@ export class SecurityErrorMiddleware {
   constructor(config: ErrorHandlingConfig) {
     this.errorHandler = new SecurityErrorHandler(config);
     this.errorLogger = new SecurityLogger(config.logLevel);
+  }
+
+  async initialize(config?: Partial<ErrorHandlingConfig>): Promise<void> {
+    if (config) {
+      // Re-initialize handler with new config if needed
+      this.errorHandler = new SecurityErrorHandler({ ...this.errorHandler.getErrorStatistics(), ...config } as any);
+      this.errorLogger = new SecurityLogger(config.logLevel || 'error');
+    }
   }
 
   async handleSecurityOperation<T>(

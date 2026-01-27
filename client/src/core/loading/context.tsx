@@ -29,8 +29,8 @@ import {
   LoadingTimeoutError,
   LoadingRetryError,
   LoadingConnectionError,
-} from '@client/shared/types/loading';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/types/loading';
+import { logger } from '@client/lib/utils/logger';
 
 import { loadingReducer } from './reducer';
 

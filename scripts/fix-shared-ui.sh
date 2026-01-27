@@ -27,7 +27,7 @@ print_error() {
 }
 
 # Check if we're in the right directory
-if [ ! -d "client/src/shared/ui" ]; then
+if [ ! -d "client/src/lib/ui" ]; then
     print_error "Must be run from project root directory"
     exit 1
 fi
@@ -39,7 +39,7 @@ echo -e "\n${YELLOW}Phase 1: Critical Fixes${NC}"
 
 # 1. Fix import paths
 echo "1. Fixing import paths..."
-find client/src/shared/ui -name "*.ts" -o -name "*.tsx" | while read file; do
+find client/src/lib/ui -name "*.ts" -o -name "*.tsx" | while read file; do
     if grep -q "from '@/" "$file"; then
         sed -i 's|from '\''@/|from '\''@client/|g' "$file"
         sed -i 's|import '\''@/|import '\''@client/|g' "$file"
@@ -51,28 +51,28 @@ print_status "Import paths standardized"
 # 2. Add missing React imports
 echo "2. Adding missing React imports..."
 tsx_files=(
-    "client/src/shared/ui/realtime/RealTimeNotifications.tsx"
-    "client/src/shared/ui/realtime/RealTimeDashboard.tsx"
-    "client/src/shared/ui/privacy/PrivacyManager.tsx"
-    "client/src/shared/ui/privacy/ModalInterface.tsx"
-    "client/src/shared/ui/privacy/controls/DataUsageControls.tsx"
-    "client/src/shared/ui/privacy/controls/ConsentControls.tsx"
-    "client/src/shared/ui/privacy/CompactInterface.tsx"
-    "client/src/shared/ui/performance/PerformanceDashboard.tsx"
-    "client/src/shared/ui/offline/offline-manager.tsx"
-    "client/src/shared/ui/notifications/NotificationPreferences.tsx"
-    "client/src/shared/ui/notifications/NotificationItem.tsx"
-    "client/src/shared/ui/notifications/NotificationCenter.tsx"
-    "client/src/shared/ui/navigation/Navigation.tsx"
-    "client/src/shared/ui/navigation/performance/NavigationPerformanceDashboard.tsx"
-    "client/src/shared/ui/navigation/analytics/NavigationAnalytics.tsx"
-    "client/src/shared/ui/mobile/feedback/OfflineStatusBanner.tsx"
-    "client/src/shared/ui/mobile/interaction/ScrollToTopButton.tsx"
-    "client/src/shared/ui/mobile/interaction/SwipeGestures.tsx"
-    "client/src/shared/ui/mobile/layout/SafeAreaWrapper.tsx"
-    "client/src/shared/ui/mobile/interaction/PullToRefresh.tsx"
-    "client/src/shared/ui/mobile/layout/MobileLayout.tsx"
-    "client/src/shared/ui/mobile/layout/AutoHideHeader.tsx"
+    "client/src/lib/ui/realtime/RealTimeNotifications.tsx"
+    "client/src/lib/ui/realtime/RealTimeDashboard.tsx"
+    "client/src/lib/ui/privacy/PrivacyManager.tsx"
+    "client/src/lib/ui/privacy/ModalInterface.tsx"
+    "client/src/lib/ui/privacy/controls/DataUsageControls.tsx"
+    "client/src/lib/ui/privacy/controls/ConsentControls.tsx"
+    "client/src/lib/ui/privacy/CompactInterface.tsx"
+    "client/src/lib/ui/performance/PerformanceDashboard.tsx"
+    "client/src/lib/ui/offline/offline-manager.tsx"
+    "client/src/lib/ui/notifications/NotificationPreferences.tsx"
+    "client/src/lib/ui/notifications/NotificationItem.tsx"
+    "client/src/lib/ui/notifications/NotificationCenter.tsx"
+    "client/src/lib/ui/navigation/Navigation.tsx"
+    "client/src/lib/ui/navigation/performance/NavigationPerformanceDashboard.tsx"
+    "client/src/lib/ui/navigation/analytics/NavigationAnalytics.tsx"
+    "client/src/lib/ui/mobile/feedback/OfflineStatusBanner.tsx"
+    "client/src/lib/ui/mobile/interaction/ScrollToTopButton.tsx"
+    "client/src/lib/ui/mobile/interaction/SwipeGestures.tsx"
+    "client/src/lib/ui/mobile/layout/SafeAreaWrapper.tsx"
+    "client/src/lib/ui/mobile/interaction/PullToRefresh.tsx"
+    "client/src/lib/ui/mobile/layout/MobileLayout.tsx"
+    "client/src/lib/ui/mobile/layout/AutoHideHeader.tsx"
 )
 
 for file in "${tsx_files[@]}"; do
@@ -109,7 +109,7 @@ print_status "React imports added"
 
 # 3. Fix button type attributes
 echo "3. Fixing button type attributes..."
-find client/src/shared/ui -name "*.tsx" | while read file; do
+find client/src/lib/ui -name "*.tsx" | while read file; do
     if grep -q '<button[^>]*onClick' "$file" && ! grep -q 'type=' "$file"; then
         # Add type="button" to buttons that have onClick but no type
         sed -i 's|<button \([^>]*\)onClick|<button type="button" \1onClick|g' "$file"
@@ -123,7 +123,7 @@ echo -e "\n${YELLOW}Phase 2: Structural Improvements${NC}"
 
 # 4. Update shared UI main index
 echo "4. Updating shared UI main index..."
-cat > client/src/shared/ui/index.ts << 'EOF'
+cat > client/src/lib/ui/index.ts << 'EOF'
 /**
  * Shared UI Components - Simplified Exports
  * 
@@ -172,7 +172,7 @@ print_status "Main index updated"
 
 # 5. Create simplified shared types
 echo "5. Creating simplified shared types..."
-cat > client/src/shared/ui/types/index.ts << 'EOF'
+cat > client/src/lib/ui/types/index.ts << 'EOF'
 /**
  * Shared UI Types - Core Definitions
  * 
@@ -263,7 +263,7 @@ print_status "Simplified shared types created"
 
 # 6. Update utils index
 echo "6. Updating utils index..."
-cat > client/src/shared/ui/utils/index.ts << 'EOF'
+cat > client/src/lib/ui/utils/index.ts << 'EOF'
 /**
  * Shared UI Utilities
  */
@@ -280,7 +280,7 @@ echo -e "\n${YELLOW}Phase 3: Validation${NC}"
 echo "7. Validating fixes..."
 
 # Check for remaining @/ imports
-remaining_imports=$(find client/src/shared/ui -name "*.ts" -o -name "*.tsx" | xargs grep -l "from '@/" 2>/dev/null | wc -l)
+remaining_imports=$(find client/src/lib/ui -name "*.ts" -o -name "*.tsx" | xargs grep -l "from '@/" 2>/dev/null | wc -l)
 if [ "$remaining_imports" -eq 0 ]; then
     print_status "No remaining @/ imports found"
 else
@@ -288,7 +288,7 @@ else
 fi
 
 # Check for TSX files without React imports
-tsx_without_react=$(find client/src/shared/ui -name "*.tsx" | xargs grep -L "import React" 2>/dev/null | wc -l)
+tsx_without_react=$(find client/src/lib/ui -name "*.tsx" | xargs grep -L "import React" 2>/dev/null | wc -l)
 if [ "$tsx_without_react" -eq 0 ]; then
     print_status "All TSX files have React imports"
 else
@@ -296,7 +296,7 @@ else
 fi
 
 # Check for buttons without type attributes
-buttons_without_type=$(find client/src/shared/ui -name "*.tsx" | xargs grep -l '<button[^>]*onClick' 2>/dev/null | xargs grep -L 'type=' 2>/dev/null | wc -l)
+buttons_without_type=$(find client/src/lib/ui -name "*.tsx" | xargs grep -l '<button[^>]*onClick' 2>/dev/null | xargs grep -L 'type=' 2>/dev/null | wc -l)
 if [ "$buttons_without_type" -eq 0 ]; then
     print_status "All buttons have type attributes"
 else
@@ -338,10 +338,10 @@ Generated: $(date)
 
 ## Files Created
 
-- \`client/src/shared/ui/types/index.ts\` - Simplified shared types
-- \`client/src/shared/ui/utils/error-handling.ts\` - Standardized error handling
-- \`client/src/shared/ui/templates/component-template.tsx\` - Component template
-- \`client/src/shared/ui/templates/hook-template.ts\` - Hook template
+- \`client/src/lib/ui/types/index.ts\` - Simplified shared types
+- \`client/src/lib/ui/utils/error-handling.ts\` - Standardized error handling
+- \`client/src/lib/ui/templates/component-template.tsx\` - Component template
+- \`client/src/lib/ui/templates/hook-template.ts\` - Hook template
 - \`docs/SHARED_UI_GUIDELINES.md\` - Architectural guidelines
 
 ## Guidelines
@@ -356,6 +356,6 @@ echo -e "\n${YELLOW}Next steps:${NC}"
 echo "1. Review the generated report: shared-ui-fix-report.md"
 echo "2. Run your test suite to check for regressions"
 echo "3. Follow the guidelines in docs/SHARED_UI_GUIDELINES.md"
-echo "4. Use the templates in client/src/shared/ui/templates/ for new components"
+echo "4. Use the templates in client/src/lib/ui/templates/ for new components"
 
 exit 0

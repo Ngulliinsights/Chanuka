@@ -5,35 +5,40 @@
  * This replaces the boom-error-middleware with a more comprehensive system.
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { createErrorMiddleware as createSharedErrorMiddleware } from '@shared/core/observability/error-management';
-import { BaseError, ErrorHandlerChain } from '@shared/core/observability/error-management';
+// eslint-disable-next-line import/order
+import { ERROR_CODES } from '@shared/constants';
 import { logger } from '@shared/core';
-import { ERROR_CODES, ERROR_STATUS_CODES, ERROR_MESSAGES } from '@shared/constants';
-import { ServerErrorReporter, ServerErrorHandler, createErrorContext, buildErrorResponse } from '@server/infrastructure/error-handling';
+import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
+
+class BaseError extends Error {
+  constructor(
+    message: string,
+    public details: any = {}
+  ) {
+    super(message);
+    this.name = 'BaseError';
+  }
+  statusCode = 500;
+  code = ERROR_CODES.INTERNAL_SERVER_ERROR;
+  override stack?: string;
+}
+
+function createErrorContext(req: Request) {
+  return {
+    method: req.method,
+    url: req.url,
+    ip: req.ip,
+    correlationId: req.headers['x-correlation-id'] || '',
+  };
+}
 
 /**
  * Create unified error middleware combining @shared/core with server configuration
  */
 export function createUnifiedErrorMiddleware() {
-  // Set up error handler chain with our custom handlers
-  const handlerChain = new ErrorHandlerChain();
-
-  // Add our custom server handlers
-  const reporter = new ServerErrorReporter();
-  const handler = new ServerErrorHandler();
-
-  // Create the base middleware from @shared/core
-  const sharedMiddleware = createSharedErrorMiddleware({
-    includeStackTrace: process.env.NODE_ENV === 'development',
-    logErrors: true,
-    handleChain: handlerChain,
-    correlationIdHeader: 'x-correlation-id',
-  });
-
   /**
-   * Wrapper middleware that enhances the shared middleware
+   * Error handling middleware
    */
   return async (error: any, req: Request, res: Response, next: NextFunction) => {
     // Skip if response already sent
@@ -124,18 +129,9 @@ export function createUnifiedErrorMiddleware() {
         });
       }
 
-      // Report the error
-      await reporter.report(baseError, context);
-
-      // Try to recover using handler
-      const recovery = await handler.handle(baseError);
-      if (recovery.recovered && recovery.newError) {
-        baseError = recovery.newError as BaseError;
-      }
-
       // Build response
-      const statusCode = baseError.statusCode || ERROR_STATUS_CODES[baseError.code as any] || 500;
-      const message = ERROR_MESSAGES[baseError.code as any] || baseError.message;
+      const statusCode = baseError.statusCode || 500;
+      const message = baseError.message;
 
       res.status(statusCode).json({
         success: false,
@@ -186,22 +182,11 @@ export function asyncHandler(fn: (req: Request, res: Response, next: NextFunctio
  * Validation error middleware
  * Can be used before route handlers to validate request body/params/query
  */
-export function validationErrorHandler(error: any, req: Request, res: Response, next: NextFunction) {
+export function validationErrorHandler(error: any, _req: Request, _res: Response, next: NextFunction) {
   if (error.status === 400 || error.errors) {
     // JOI or other validation error
-    const context = createErrorContext(req);
-    const validationError = new BaseError('Validation failed', {
-      statusCode: 400,
-      code: ERROR_CODES.VALIDATION_ERROR,
-      domain: 'VALIDATION' as any,
-      severity: 'LOW' as any,
-      details: error.details || error.errors,
-      context,
-      correlationId: context.correlationId,
-    });
-
-    return next(validationError);
+    next(error);
+  } else {
+    next(error);
   }
-
-  next(error);
 }

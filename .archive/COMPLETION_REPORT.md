@@ -38,12 +38,12 @@ The type system standardization initiative has been **fully completed**, deliver
 ### Files Modified
 
 **Type System Files**: 7
-- `client/src/shared/types/components/dashboard.ts`
-- `client/src/shared/types/dashboard/index.ts`
-- `client/src/shared/types/dashboard/dashboard-components.ts`
-- `client/src/shared/types/bill/index.ts`
-- `client/src/shared/types/bill/auth-types.ts`
-- `client/src/shared/types/community/index.ts` (3 changes)
+- `client/src/lib/types/components/dashboard.ts`
+- `client/src/lib/types/dashboard/index.ts`
+- `client/src/lib/types/dashboard/dashboard-components.ts`
+- `client/src/lib/types/bill/index.ts`
+- `client/src/lib/types/bill/auth-types.ts`
+- `client/src/lib/types/community/index.ts` (3 changes)
 - `client/tsconfig.json`
 
 **Legacy Files Managed**: 1
@@ -217,8 +217,8 @@ See: `TYPE_SYSTEM_STANDARDIZATION_ROADMAP.md`
 - `TYPE_SYSTEM_STANDARDIZATION_ROADMAP.md` - Full timeline
 
 ### Code Examples
-- Dashboard types: `client/src/shared/types/components/dashboard.ts`
-- Type guards: `client/src/shared/types/*/index.ts`
+- Dashboard types: `client/src/lib/types/components/dashboard.ts`
+- Type guards: `client/src/lib/types/*/index.ts`
 - Validation: All modules with schema definitions
 
 ---
@@ -353,7 +353,7 @@ The foundation is now solid for the remaining migration tasks (14-19), which are
 - [View Implementation Guide](REMAINING_TASKS_IMPLEMENTATION_GUIDE.md)
 - [View Roadmap](TYPE_SYSTEM_STANDARDIZATION_ROADMAP.md)
 - [View Design Document](.kiro/specs/type-system-standardization/design.md)
-- [View Tasks](client/src/shared/types)
+- [View Tasks](client/src/lib/types)
 
 ---
 

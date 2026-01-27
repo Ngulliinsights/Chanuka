@@ -1,9 +1,9 @@
 import { AlertTriangle, Clock, Users, FileText, ExternalLink } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 
 import { PretextScore } from '../types';
 

@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { Alert, AlertDescription, Button } from '@client/shared/design-system';
-import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
-import { logger } from '@client/shared/utils/logger';
+import { Alert, AlertDescription, Button } from '@client/lib/design-system';
+import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
+import { logger } from '@client/lib/utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -278,7 +278,7 @@ export function ProtectedRoute({
 /**
  * Higher-order component for creating protected routes with specific requirements
  */
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export function createProtectedRoute(defaultProps: Partial<ProtectedRouteProps>) {
   return function ProtectedRouteWrapper(props: ProtectedRouteProps) {
     return <ProtectedRoute {...defaultProps} {...props} />;

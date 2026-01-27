@@ -69,8 +69,8 @@ import type {
   ThreadsResponse,
   ThreadEvent,
   UserEvent,
-} from '@client/shared/types/community';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/types/community';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
@@ -95,7 +95,7 @@ export type {
   SearchOptions,
   ThreadEvent,
   UserEvent,
-} from '@client/shared/types/community';
+} from '@client/lib/types/community';
 
 // ============================================================================
 // Cache Configuration Constants
@@ -511,7 +511,7 @@ export class CommunityApiService {
         component: 'CommunityApiService',
         userId,
         isVerified: response.data.verified,
-        expertiseCount: response.data.expertise_areas.length,
+        expertiseCount: response.data.expertise_areas?.length || 0,
       });
 
       return response.data;
@@ -930,7 +930,7 @@ export class CommunityApiService {
    * Provides flexible filtering by content type and bill association.
    * Results are ranked by relevance score for best user experience.
    */
-  async searchCommunity(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
+  async searchCommunity(query: string, options: Partial<SearchOptions> = {}): Promise<SearchResult[]> {
     try {
       const params = new URLSearchParams({
         q: query,

@@ -21,7 +21,7 @@ import {
   CardTitle,
   Button,
   Badge,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 
 // --- Types ---
 

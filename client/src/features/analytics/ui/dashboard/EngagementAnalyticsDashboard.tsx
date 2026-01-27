@@ -19,11 +19,11 @@ import {
 import React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
 
 import { CivicScoreCard } from '../metrics/CivicScoreCard';
 

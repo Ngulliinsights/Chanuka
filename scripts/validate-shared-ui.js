@@ -55,7 +55,7 @@ function findFiles(dir, extensions) {
 function validateButtonTypes() {
   log('\n🔍 Validating button type attributes...', 'blue');
   
-  const tsxFiles = findFiles('client/src/shared/ui', ['.tsx']);
+  const tsxFiles = findFiles('client/src/lib/ui', ['.tsx']);
   const issues = [];
   
   for (const file of tsxFiles) {
@@ -68,7 +68,7 @@ function validateButtonTypes() {
       // Check for buttons without type attribute
       if (line.includes('<button') && line.includes('onClick') && !line.includes('type=')) {
         issues.push({
-          file: file.replace('client/src/shared/ui/', ''),
+          file: file.replace('client/src/lib/ui/', ''),
           line: i + 1,
           issue: 'Button missing type attribute'
         });
@@ -91,7 +91,7 @@ function validateButtonTypes() {
 function validateImportPaths() {
   log('\n🔍 Validating import paths...', 'blue');
   
-  const files = findFiles('client/src/shared/ui', ['.ts', '.tsx']);
+  const files = findFiles('client/src/lib/ui', ['.ts', '.tsx']);
   const issues = [];
   
   for (const file of files) {
@@ -104,7 +104,7 @@ function validateImportPaths() {
       // Check for @/ imports that should be @client/
       if (line.includes('from ') && line.includes('"@/')) {
         issues.push({
-          file: file.replace('client/src/shared/ui/', ''),
+          file: file.replace('client/src/lib/ui/', ''),
           line: i + 1,
           issue: 'Using @/ instead of @client/ import'
         });
@@ -127,7 +127,7 @@ function validateImportPaths() {
 function validateReactImports() {
   log('\n🔍 Validating React imports in TSX files...', 'blue');
   
-  const tsxFiles = findFiles('client/src/shared/ui', ['.tsx']);
+  const tsxFiles = findFiles('client/src/lib/ui', ['.tsx']);
   const issues = [];
   
   for (const file of tsxFiles) {
@@ -141,7 +141,7 @@ function validateReactImports() {
     // Only flag as issue if file has JSX elements but no React-related imports
     if (hasJSXElements && !hasReactImport && !hasReactHooks) {
       issues.push({
-        file: file.replace('client/src/shared/ui/', ''),
+        file: file.replace('client/src/lib/ui/', ''),
         issue: 'TSX file with JSX elements missing React import'
       });
     }
@@ -163,10 +163,10 @@ function validateRequiredFiles() {
   log('\n🔍 Validating required files exist...', 'blue');
   
   const requiredFiles = [
-    'client/src/shared/ui/utils/error-handling.tsx',
-    'client/src/shared/ui/types/index.ts',
-    'client/src/shared/ui/templates/component-template.tsx',
-    'client/src/shared/ui/templates/hook-template.ts'
+    'client/src/lib/ui/utils/error-handling.tsx',
+    'client/src/lib/ui/types/index.ts',
+    'client/src/lib/ui/templates/component-template.tsx',
+    'client/src/lib/ui/templates/hook-template.ts'
   ];
   
   const missing = [];
@@ -219,7 +219,7 @@ function main() {
   log('===================================', 'cyan');
   
   // Check if we're in the right directory
-  if (!fs.existsSync('client/src/shared/ui')) {
+  if (!fs.existsSync('client/src/lib/ui')) {
     log('❌ Error: Must be run from project root directory', 'red');
     process.exit(1);
   }

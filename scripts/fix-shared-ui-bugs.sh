@@ -33,7 +33,7 @@ print_error() {
 }
 
 # Check if we're in the right directory
-if [ ! -d "client/src/shared/ui" ]; then
+if [ ! -d "client/src/lib/ui" ]; then
     print_error "This script must be run from the project root directory"
     exit 1
 fi
@@ -58,7 +58,7 @@ backup_file() {
 print_status "Phase 1: Fixing button type attributes..."
 
 # Find all TSX files with buttons missing type attribute
-find client/src/shared/ui -name "*.tsx" -type f | while read -r file; do
+find client/src/lib/ui -name "*.tsx" -type f | while read -r file; do
     if grep -q '<button[^>]*onClick' "$file" && ! grep -q 'type=' "$file"; then
         backup_file "$file"
         
@@ -72,7 +72,7 @@ done
 print_status "Phase 2: Validating import paths..."
 
 # Check for any remaining @/ imports that should be @client/
-find client/src/shared/ui -name "*.ts" -o -name "*.tsx" | while read -r file; do
+find client/src/lib/ui -name "*.ts" -o -name "*.tsx" | while read -r file; do
     if grep -q "from ['\"]@/" "$file"; then
         backup_file "$file"
         
@@ -86,7 +86,7 @@ done
 # Phase 3: Validate React Imports
 print_status "Phase 3: Validating React imports in TSX files..."
 
-find client/src/shared/ui -name "*.tsx" -type f | while read -r file; do
+find client/src/lib/ui -name "*.tsx" -type f | while read -r file; do
     # Check if file has JSX elements but no React import
     if grep -q '<[A-Z][a-zA-Z0-9]*' "$file" && ! grep -q 'import React' "$file" && ! grep -q 'import.*from.*react' "$file"; then
         backup_file "$file"
@@ -109,7 +109,7 @@ done
 # Phase 4: Create Standardized Error Handling (if not exists)
 print_status "Phase 4: Ensuring standardized error handling..."
 
-ERROR_HANDLING_FILE="client/src/shared/ui/utils/error-handling.tsx"
+ERROR_HANDLING_FILE="client/src/lib/ui/utils/error-handling.tsx"
 if [ ! -f "$ERROR_HANDLING_FILE" ]; then
     print_warning "Error handling file not found, but it should exist based on analysis"
 else
@@ -119,8 +119,8 @@ fi
 # Phase 5: Validate Component Templates
 print_status "Phase 5: Validating component templates..."
 
-COMPONENT_TEMPLATE="client/src/shared/ui/templates/component-template.tsx"
-HOOK_TEMPLATE="client/src/shared/ui/templates/hook-template.ts"
+COMPONENT_TEMPLATE="client/src/lib/ui/templates/component-template.tsx"
+HOOK_TEMPLATE="client/src/lib/ui/templates/hook-template.ts"
 
 if [ ! -f "$COMPONENT_TEMPLATE" ]; then
     print_warning "Component template missing: $COMPONENT_TEMPLATE"
@@ -137,7 +137,7 @@ fi
 # Phase 6: Validate Type Definitions
 print_status "Phase 6: Validating type definitions..."
 
-TYPES_FILE="client/src/shared/ui/types/index.ts"
+TYPES_FILE="client/src/lib/ui/types/index.ts"
 if [ ! -f "$TYPES_FILE" ]; then
     print_warning "Shared types file missing: $TYPES_FILE"
 else
@@ -148,7 +148,7 @@ fi
 print_status "Phase 7: Checking for accessibility issues..."
 
 # Find buttons without aria-label when they should have one
-find client/src/shared/ui -name "*.tsx" -type f | while read -r file; do
+find client/src/lib/ui -name "*.tsx" -type f | while read -r file; do
     # Check for icon-only buttons without aria-label
     if grep -q '<button[^>]*><[A-Z].*className.*h-[0-9]' "$file" && ! grep -q 'aria-label' "$file"; then
         print_warning "Potential accessibility issue in $file: Icon buttons should have aria-label"
@@ -204,7 +204,7 @@ This report summarizes the fixes applied to the shared UI system based on the bu
 
 ## Files Modified
 
-$(find client/src/shared/ui -name "*.tsx" -o -name "*.ts" | wc -l) files checked in shared UI directory
+$(find client/src/lib/ui -name "*.tsx" -o -name "*.ts" | wc -l) files checked in shared UI directory
 
 ## Recommendations
 
@@ -228,8 +228,8 @@ print_success "Generated report: $REPORT_FILE"
 print_status "Phase 9: Running validation checks..."
 
 # Count remaining issues
-BUTTON_ISSUES=$(find client/src/shared/ui -name "*.tsx" -exec grep -l '<button[^>]*onClick' {} \; | xargs grep -L 'type=' | wc -l)
-IMPORT_ISSUES=$(find client/src/shared/ui -name "*.ts*" -exec grep -l "from ['\"]@/" {} \; | wc -l)
+BUTTON_ISSUES=$(find client/src/lib/ui -name "*.tsx" -exec grep -l '<button[^>]*onClick' {} \; | xargs grep -L 'type=' | wc -l)
+IMPORT_ISSUES=$(find client/src/lib/ui -name "*.ts*" -exec grep -l "from ['\"]@/" {} \; | wc -l)
 
 echo ""
 echo "🎯 VALIDATION RESULTS"

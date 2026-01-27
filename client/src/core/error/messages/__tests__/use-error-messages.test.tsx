@@ -7,8 +7,9 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AppError } from '../../types';
+
 import { ErrorDomain, ErrorSeverity } from '../../constants';
+import { AppError } from '../../types';
 import {
   useErrorMessages,
   useErrorMessageComponent,

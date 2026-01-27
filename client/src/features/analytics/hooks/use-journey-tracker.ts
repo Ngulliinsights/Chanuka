@@ -2,11 +2,11 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useNavigation } from '@client/core/navigation/context';
-import { UserRole, NavigationSection } from '@client/shared/types/navigation';
 import {
   userJourneyTracker,
   JourneyAnalytics,
 } from '@client/features/analytics/model/user-journey-tracker';
+import { UserRole, NavigationSection } from '@client/lib/types/navigation';
 
 /**
  * Hook for tracking user journeys and analytics

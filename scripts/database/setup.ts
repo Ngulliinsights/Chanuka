@@ -17,7 +17,7 @@
  * Replaces: setup-schema.ts and other initialization scripts
  */
 
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 import { createMigrationManager } from '@server/infrastructure/database';
 import { logger } from '@shared/core';
 

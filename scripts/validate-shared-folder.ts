@@ -3,7 +3,7 @@
 /**
  * Shared Folder Validation Script
  * 
- * Validates the entire client/src/shared folder for:
+ * Validates the entire client/src/lib folder for:
  * - Internal consistency
  * - Proper module organization
  * - Export/import alignment
@@ -37,7 +37,7 @@ interface ValidationResult {
 }
 
 class SharedFolderValidator {
-  private sharedDir = 'client/src/shared';
+  private sharedDir = 'client/src/lib';
   private modules: Map<string, ModuleInfo> = new Map();
   private issues: ValidationResult[] = [];
   private dependencyGraph: Map<string, Set<string>> = new Map();
@@ -314,7 +314,7 @@ class SharedFolderValidator {
       const content = await fs.readFile(indexPath, 'utf-8');
       
       for (const importPath of module.imports) {
-        if (importPath.startsWith('.') || importPath.startsWith('@client/shared')) {
+        if (importPath.startsWith('.') || importPath.startsWith('@client/lib')) {
           const resolvedPath = await this.resolveImportPath(importPath, indexPath);
           if (!resolvedPath || !(await this.fileExists(resolvedPath))) {
             this.issues.push({
@@ -380,7 +380,7 @@ class SharedFolderValidator {
       }
 
       for (const importPath of module.imports) {
-        if (importPath.startsWith('@client/shared/')) {
+        if (importPath.startsWith('@client/lib/')) {
           const dependencyModule = importPath.split('/')[2];
           if (dependencyModule && dependencyModule !== name) {
             this.dependencyGraph.get(name)!.add(dependencyModule);
@@ -456,8 +456,8 @@ class SharedFolderValidator {
       }
     }
 
-    if (importPath.startsWith('@client/shared/')) {
-      const relativePath = importPath.replace('@client/shared/', 'client/src/shared/');
+    if (importPath.startsWith('@client/lib/')) {
+      const relativePath = importPath.replace('@client/lib/', 'client/src/lib/');
       
       for (const ext of ['.ts', '.tsx', '/index.ts', '/index.tsx']) {
         const fullPath = relativePath + ext;
@@ -635,7 +635,7 @@ fixSharedFolder().catch(console.error);
             fixes.push(`
   // Create missing module: ${moduleName}
   try {
-    const modulePath = 'client/src/shared/${moduleName}';
+    const modulePath = 'client/src/lib/${moduleName}';
     await fs.mkdir(modulePath, { recursive: true });
     await fs.writeFile(path.join(modulePath, 'index.ts'), '// ${moduleName} module\\n');
     console.log('✅ Created module: ${moduleName}');

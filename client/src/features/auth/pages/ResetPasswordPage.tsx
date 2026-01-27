@@ -3,24 +3,24 @@
  * Password reset completion page
  */
 
-import { validatePassword } from '@client/shared/utils/security';
 import { Shield, Eye, EyeOff, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Label } from '@client/lib/design-system';
+import { validatePassword } from '@client/lib/utils/security';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

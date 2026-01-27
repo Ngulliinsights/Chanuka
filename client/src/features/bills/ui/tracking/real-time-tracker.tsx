@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useCallback } from 'react';
 import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
 import type { BillTrackingPreferences } from '@client/core/api/types';
-import { Badge } from '@client/shared/design-system/feedback/Badge';
-import { Button } from '@client/shared/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system/typography/Card';
 import { useWebSocket } from '@client/core/realtime/hooks/use-websocket';
+import { Badge } from '@client/lib/design-system/feedback/Badge';
+import { Button } from '@client/lib/design-system/interactive/Button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system/interactive/Select';
-import { Switch } from '@client/shared/design-system/interactive/Switch';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system/interactive/Select';
+import { Switch } from '@client/lib/design-system/interactive/Switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
+import { logger } from '@client/lib/utils/logger';
 
 interface RealTimeBillTrackerProps {
   billId?: number;

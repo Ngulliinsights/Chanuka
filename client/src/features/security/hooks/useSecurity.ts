@@ -3,12 +3,11 @@
  * React hook for using security services in components
  */
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-
-import { securityService, SecurityStatus } from '@client/security/security-service';
 
 import { clientRateLimiter, RateLimitConfigs } from '@client/security/rate-limiter';
+import { securityService, SecurityStatus } from '@client/security/security-service';
 import { SecurityThreat } from '@client/security/vulnerability-scanner';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Constants extracted to module level for better performance
 const DEFAULT_SCAN_INTERVAL = 300000; // 5 minutes

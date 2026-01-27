@@ -105,7 +105,7 @@ import {
   syncPersonToGraph,
   createSponsorshipRelationship,
   executeReadQuery,
-} from '@shared/database/graph';
+} from '@server/infrastructure/database/graph';
 ```
 
 ### Initialize on App Startup

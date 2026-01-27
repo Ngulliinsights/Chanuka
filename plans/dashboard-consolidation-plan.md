@@ -82,7 +82,7 @@ Develop a robust core framework for dashboard components with responsive layouts
 ### Technical Specification
 
 #### 1. Create Core Dashboard Framework
-- **Location**: `client/src/shared/ui/dashboard/`
+- **Location**: `client/src/lib/ui/dashboard/`
 - **Files to Create/Update**:
   - `DashboardCore.tsx` - Core dashboard component with layout management
   - `DashboardProvider.tsx` - State management context
@@ -158,7 +158,7 @@ Identify and extract common dashboard components to reduce duplication and impro
   - Export functionality
 
 #### 2. Create Shared Component Library
-- **Location**: `client/src/shared/ui/dashboard/components/`
+- **Location**: `client/src/lib/ui/dashboard/components/`
 - **Components to Create**:
   - `DashboardHeader.tsx`
   - `DashboardToolbar.tsx`
@@ -219,7 +219,7 @@ Create a flexible dashboard composition system with a registry pattern for dynam
 ### Technical Specification
 
 #### 1. Dashboard Registry System
-- **Location**: `client/src/shared/ui/dashboard/registry/`
+- **Location**: `client/src/lib/ui/dashboard/registry/`
 - **Files to Create**:
   - `DashboardRegistry.ts` - Core registry implementation
   - `WidgetRegistry.ts` - Widget registration and management

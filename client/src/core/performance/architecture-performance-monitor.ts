@@ -5,8 +5,9 @@
  * Tracks metrics related to route transitions, component loading, and user journeys.
  */
 
+import { logger } from '@client/lib/utils/logger';
+
 import { isFeatureEnabledForUser, getCurrentUserGroup } from '../../config/feature-flags';
-import { logger } from '@client/shared/utils/logger';
 
 export interface ArchitectureMetrics {
   routeTransitions: RouteTransitionMetric[];

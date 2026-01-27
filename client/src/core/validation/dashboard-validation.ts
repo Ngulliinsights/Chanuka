@@ -7,7 +7,7 @@ import type {
   TrackedTopic,
   DashboardData,
   DashboardAppConfig,
-} from '@client/shared/types/dashboard';
+} from '@client/lib/types/dashboard';
 
 export function validateActionItem(action: ActionItem): void {
   if (!action.id || typeof action.id !== 'string') {

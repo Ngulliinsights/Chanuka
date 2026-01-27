@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 export interface ErrorRecoveryManagerProps {
   children: React.ReactNode;

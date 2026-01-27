@@ -5,7 +5,8 @@
  * and error correlation for robust external service communication.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
 import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 import { processRequestInterceptors, processResponseInterceptors } from './interceptors';

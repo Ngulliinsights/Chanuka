@@ -3,8 +3,8 @@
  * Provides token-based CSRF protection for forms and API requests
  */
 
-import { SecurityEvent } from '@client/shared/types';
-import { logger } from '@client/shared/utils/logger';
+import { SecurityEvent } from '@client/lib/types';
+import { logger } from '@client/lib/utils/logger';
 
 export interface CSRFConfig {
   enabled: boolean;

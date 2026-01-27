@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** January 17, 2026 at 12:48 PM
+**Generated:** January 27, 2026 at 11:21 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,466
+**Total Items:** 3,441
 
 ```
 .
@@ -296,7 +296,8 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── performance-optimizer.ts
 │   │   │   │   ├── responsive-utils.ts
-│   │   │   │   └── touch-handler.ts
+│   │   │   │   ├── touch-handler.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── monitoring/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── monitoring-init.ts
@@ -400,6 +401,7 @@
 │   │   │   │   │   ├── error-middleware.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── input-sanitizer.ts
+│   │   │   │   │   ├── rate-limiter.ts
 │   │   │   │   │   └── security-interface.ts
 │   │   │   │   ├── csp-manager.ts
 │   │   │   │   ├── csp-nonce.ts
@@ -425,8 +427,7 @@
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── core-monitoring.ts
 │   │   │   ├── index.ts
-│   │   │   ├── MIGRATION_GUIDE.md
-│   │   │   └── test-consolidated-realtime.ts
+│   │   │   └── MIGRATION_GUIDE.md
 │   │   ├── features/
 │   │   │   ├── accountability/
 │   │   │   │   └── ShadowLedgerDashboard.ts
@@ -789,18 +790,7 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   └── index.ts
-│   │   ├── scripts/
-│   │   │   ├── analyze-bundle.ts
-│   │   │   ├── consolidate-websocket-migration.ts
-│   │   │   ├── fsd-migration.ts
-│   │   │   ├── migrate-components.ts
-│   │   │   ├── performance-audit.ts
-│   │   │   ├── README.md
-│   │   │   ├── run-emergency-triage.ts
-│   │   │   ├── validate-home-page.ts
-│   │   │   ├── validate-migration.ts
-│   │   │   └── validate-websocket-consolidation.ts
-│   │   ├── shared/
+│   │   ├── lib/
 │   │   │   ├── components/
 │   │   │   │   ├── home/
 │   │   │   │   │   ├── PersonalizedDashboardPreview.tsx
@@ -1107,66 +1097,6 @@
 │   │   │   ├── interfaces/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-interfaces.ts
-│   │   │   ├── lib/
-│   │   │   │   ├── form-builder/
-│   │   │   │   │   ├── components/
-│   │   │   │   │   │   └── DynamicForm.tsx
-│   │   │   │   │   ├── factories/
-│   │   │   │   │   │   └── form-builder.factory.ts
-│   │   │   │   │   ├── hooks/
-│   │   │   │   │   │   └── useFormBuilder.ts
-│   │   │   │   │   ├── services/
-│   │   │   │   │   │   └── form-builder.service.ts
-│   │   │   │   │   ├── types/
-│   │   │   │   │   │   └── form-builder.types.ts
-│   │   │   │   │   ├── utils/
-│   │   │   │   │   │   └── form-utils.ts
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── migration/
-│   │   │   │   │   └── compatibility-layer.ts
-│   │   │   │   ├── query-client/
-│   │   │   │   │   ├── services/
-│   │   │   │   │   │   └── query-client.service.ts
-│   │   │   │   │   ├── types/
-│   │   │   │   │   │   └── query-client.types.ts
-│   │   │   │   │   ├── utils/
-│   │   │   │   │   │   └── query-client-utils.ts
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── utils/
-│   │   │   │   │   ├── common/
-│   │   │   │   │   │   ├── common-utils.ts
-│   │   │   │   │   │   └── validation-utils.ts
-│   │   │   │   │   ├── formatters/
-│   │   │   │   │   │   └── formatters.ts
-│   │   │   │   │   ├── helpers/
-│   │   │   │   │   │   └── helpers.ts
-│   │   │   │   │   ├── validators/
-│   │   │   │   │   │   └── validators.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── logger.ts
-│   │   │   │   ├── validation/
-│   │   │   │   │   ├── schemas/
-│   │   │   │   │   │   ├── bill-schemas.ts
-│   │   │   │   │   │   ├── form-schemas.ts
-│   │   │   │   │   │   └── user-schemas.ts
-│   │   │   │   │   ├── types/
-│   │   │   │   │   │   └── validation.types.ts
-│   │   │   │   │   ├── utils/
-│   │   │   │   │   │   └── validation-utils.ts
-│   │   │   │   │   ├── fsd-validation.ts
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── form-builder.tsx
-│   │   │   │   ├── FSD_BEST_PRACTICES.md
-│   │   │   │   ├── FSD_MIGRATION_COMPLETE.md
-│   │   │   │   ├── FSD_MIGRATION_GUIDE.md
-│   │   │   │   ├── FSD_MIGRATION_IMPLEMENTATION_PLAN.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── protected-route.tsx
-│   │   │   │   ├── queryClient.ts
-│   │   │   │   ├── react-query-config.ts
-│   │   │   │   ├── utils.ts
-│   │   │   │   ├── validation-schemas.test.ts
-│   │   │   │   └── validation-schemas.ts
 │   │   │   ├── pages/
 │   │   │   │   └── not-found.tsx
 │   │   │   ├── recovery/
@@ -1254,6 +1184,7 @@
 │   │   │   │   ├── navigation.ts
 │   │   │   │   ├── search-response.ts
 │   │   │   │   ├── search.ts
+│   │   │   │   ├── security.ts
 │   │   │   │   └── user-dashboard.ts
 │   │   │   ├── ui/
 │   │   │   │   ├── accessibility/
@@ -1565,6 +1496,7 @@
 │   │   │   │   ├── emergency-triage.ts
 │   │   │   │   ├── env-config.ts
 │   │   │   │   ├── i18n.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── input-validation.ts
 │   │   │   │   ├── investor-demo-enhancements.ts
 │   │   │   │   ├── logger.ts
@@ -1581,6 +1513,17 @@
 │   │   │   │   ├── consolidated.ts
 │   │   │   │   └── index.ts
 │   │   │   └── index.ts
+│   │   ├── scripts/
+│   │   │   ├── analyze-bundle.ts
+│   │   │   ├── consolidate-websocket-migration.ts
+│   │   │   ├── fsd-migration.ts
+│   │   │   ├── migrate-components.ts
+│   │   │   ├── performance-audit.ts
+│   │   │   ├── README.md
+│   │   │   ├── run-emergency-triage.ts
+│   │   │   ├── validate-home-page.ts
+│   │   │   ├── validate-migration.ts
+│   │   │   └── validate-websocket-consolidation.ts
 │   │   ├── tests/
 │   │   │   ├── accessibility/
 │   │   │   │   └── home-page-accessibility.test.ts
@@ -1605,8 +1548,18 @@
 │   ├── project.json
 │   ├── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   ├── tailwind.config.ts
-│   ├── test-lucide-imports.ts
 │   ├── tsconfig.json
+│   ├── tsconfig.tsbuildinfo
+│   ├── typecheck_error_2.log
+│   ├── typecheck_error_3.log
+│   ├── typecheck_error.log
+│   ├── typecheck_fix_1.log
+│   ├── typecheck_fix_2.log
+│   ├── typecheck_fix_3.log
+│   ├── typecheck_fix_4.log
+│   ├── typecheck_fix_5.log
+│   ├── typecheck_fix_6.log
+│   ├── typecheck_new.log
 │   ├── validate-fixes.cjs
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
@@ -2558,12 +2511,6 @@
 │   │   │   │   ├── notification-mapping.ts
 │   │   │   │   └── user-mapping.ts
 │   │   │   └── drizzle-adapter.ts
-│   │   ├── cache/
-│   │   │   ├── cache-management.routes.ts
-│   │   │   ├── cache-service.ts
-│   │   │   ├── cache.ts
-│   │   │   ├── index.ts
-│   │   │   └── query-cache.ts
 │   │   ├── core/
 │   │   │   ├── auth/
 │   │   │   │   ├── auth-service.ts
@@ -3003,6 +2950,7 @@
 │   │   │   │   └── cache-warmer.ts
 │   │   │   ├── ai-cache.ts
 │   │   │   ├── cache-factory.ts
+│   │   │   ├── cache-wrappers.ts
 │   │   │   ├── cache.ts
 │   │   │   ├── caching-service.ts
 │   │   │   ├── decorators.ts
@@ -3167,6 +3115,9 @@
 │   │   ├── dashboard/
 │   │   │   └── index.ts
 │   │   ├── domains/
+│   │   │   ├── arguments/
+│   │   │   │   ├── argument.types.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── authentication/
 │   │   │   │   ├── auth-state.ts
 │   │   │   │   ├── index.ts
@@ -3383,20 +3334,34 @@
 ├── AUTH_ROUTER_MIGRATION_COMPLETE.md
 ├── CHANGELOG.md
 ├── clear-sw.html
+├── CLIENT_ERROR_MIGRATION_REPORT.md
+├── CLIENT_ERROR_SYSTEM_AUDIT.md
+├── CLIENT_ERROR_USAGE_GUIDE.md
 ├── COMPLETION_STRATEGY.ts
+├── CONFLICT_ANALYSIS_AND_RESOLUTION.md
+├── CONFLICT_RESOLUTION_EXECUTION_PLAN.md
+├── CONFLICT_RESOLUTION_FILE_INVENTORY.md
+├── CONFLICT_RESOLUTION_INDEX.md
+├── CONFLICT_RESOLUTION_PROJECT_COMPLETE.md
+├── CONFLICT_RESOLUTION_QUICK_REFERENCE.md
+├── CONFLICT_RESOLUTION_SESSION_COMPLETE.md
+├── CONFLICT_RESOLUTION_VISUAL_SUMMARY.md
 ├── CRITICAL_DISCOVERY_PHASE_R4_REVERSAL.md
 ├── cspell.config.yaml
 ├── DATABASE_ALIGNMENT_AND_FEATURE_INTEGRATION.md
 ├── DATABASE_ALIGNMENT_COMPLETE.md
 ├── DATABASE_MIGRATION_GUIDE.md
 ├── DATABASE_SCHEMA_ANALYSIS.md
+├── DELETED_VS_REPLACEMENT_ANALYSIS.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
 ├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
+├── ERROR_CONSOLIDATION_SUMMARY.md
 ├── ERROR_EXTRACTION_SUMMARY.txt
+├── ERROR_SYSTEM_DOCUMENTATION_INDEX.md
 ├── errors-comprehensive.json
 ├── errors.json
 ├── EXECUTION_COMPLETE_SUMMARY.md
@@ -3407,6 +3372,9 @@
 ├── IMPORT_MIGRATION_AND_UI_COMPLETION.md
 ├── IMPORT_MIGRATION_GUIDE.md
 ├── INCOMPLETE_MIGRATIONS_COMPREHENSIVE_AUDIT.md
+├── INFRASTRUCTURE_AUDIT_REPORT.md
+├── INFRASTRUCTURE_AUDIT_SUMMARY.md
+├── INFRASTRUCTURE_QUICK_REFERENCE.md
 ├── INFRASTRUCTURE_REORGANIZATION_SUMMARY.md
 ├── knip.config.ts
 ├── knip.json
@@ -3416,14 +3384,19 @@
 ├── MVP_COMPLETION_ACTION_PLAN.md
 ├── MVP_READINESS_QUICK_REFERENCE.md
 ├── nginx.conf
+├── nul
 ├── nx.json
 ├── OPTION_1_IMPLEMENTATION_COMPLETE.md
 ├── package.json
 ├── performance-baselines.json
 ├── PHASE_1_2A_COMPLETION.md
+├── PHASE_1_CACHING_CONSOLIDATION_COMPLETE.md
+├── PHASE_2_MIDDLEWARE_ASSESSMENT_COMPLETE.md
 ├── PHASE_2B_3_4_PLAN.md
 ├── PHASE_2B_SESSION_2_STATUS.md
 ├── PHASE_3_COMPLETION_SUMMARY.md
+├── PHASE_3_ERROR_HANDLING_VERIFICATION_COMPLETE.md
+├── PHASE_4_CONFIG_AUDIT_COMPLETE.md
 ├── PHASE_4_QUALITY_AUDIT_REDUNDANCY_ANALYSIS.md
 ├── PHASE_R4_COMPATIBILITY_LAYER_COMPLETE.md
 ├── PHASE_R4_COMPLETION_REPORT.md
@@ -3439,6 +3412,7 @@
 ├── QUICK_START_FOR_NEXT_SESSION.ts
 ├── QUICK_START_REFERENCE.md
 ├── QUICK_STATS.txt
+├── README_CONFLICT_RESOLUTION.md
 ├── README.md
 ├── REFACTORING_EXECUTION_SUMMARY.md
 ├── REFACTORING_SUMMARY.txt
@@ -3450,6 +3424,7 @@
 ├── SESSION_2_COMPLETION_SUMMARY.ts
 ├── SESSION_2_EXECUTION_SUMMARY.md
 ├── SESSION_2_FINAL_SUMMARY.md
+├── SESSION_COMPLETE_INFRASTRUCTURE_AUDIT.md
 ├── SESSION_COMPLETION_SUMMARY.md
 ├── SESSION_SUMMARY_TYPE_SYSTEM_CLEANUP.md
 ├── SHARED_AUDIT_QUICK_SUMMARY.md

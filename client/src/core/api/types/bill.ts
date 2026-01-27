@@ -4,7 +4,7 @@
  * Type definitions for bill-related API operations
  *
  * MIGRATION NOTE: Bill types have been consolidated into
- * @client/shared/types/bill module. This file now re-exports
+ * @client/lib/types/bill module. This file now re-exports
  * from that unified location for backward compatibility.
  */
 
@@ -17,10 +17,11 @@ export type {
   BillAnalysis,
   BillsQueryParams,
   BillsSearchParams,
-} from '@client/shared/types/bill';
+} from '@client/lib/types/bill';
 
-export {
+// Re-export types
+export type {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
-} from '@client/shared/types/bill';
+} from '@client/lib/types/bill';

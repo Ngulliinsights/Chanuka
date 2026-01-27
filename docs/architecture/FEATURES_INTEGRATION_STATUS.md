@@ -139,7 +139,7 @@ import { useUsers } from '@client/features/users';
 import { Bill } from '@client/features/bills';  // in community context
 
 // ✅ Correct - shared components
-import { Button } from '@client/shared/ui';
+import { Button } from '@client/lib/ui';
 ```
 
 ### Type Consistency
@@ -274,7 +274,7 @@ import { getUserBills } from '@client/features/bills';
 ### Pattern 3: Shared Utilities
 ```typescript
 // All features use shared components
-import { Button, Card, Modal } from '@client/shared/ui';
+import { Button, Card, Modal } from '@client/lib/ui';
 
 // Not dependencies - composition pattern
 // Reduces duplication significantly

@@ -168,27 +168,31 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     resolve: {
       // Path aliases let you use cleaner imports like '@/components' instead of '../../../components'
       alias: {
+        '@': path.resolve(rootDir, './src'),
         '@client': path.resolve(rootDir, './src'),
-        '@shared': path.resolve(rootDir, '../shared'),
-        '@shared/core': path.resolve(rootDir, '../shared/core/src'),
-        '@shared/schema': path.resolve(rootDir, '../shared/schema'),
-        '@shared/platform': path.resolve(rootDir, '../shared/platform'),
-        '@shared/i18n': path.resolve(rootDir, '../shared/i18n'),
+        '@core': path.resolve(rootDir, './src/core'),
+        '@lib': path.resolve(rootDir, './src/lib'),
+        '@features': path.resolve(rootDir, './src/features'),
+        '@app': path.resolve(rootDir, './src/app'),
+        '@hooks': path.resolve(rootDir, './src/lib/hooks'),
+        '@utils': path.resolve(rootDir, './src/lib/utils'),
 
-        // Client-safe shared module paths
-        '@shared/core/utils': path.resolve(rootDir, '../shared/core/src/utils'),
+        // Workspace-level modules
+        '@workspace': path.resolve(rootDir, '../shared'),
+        '@workspace/types': path.resolve(rootDir, '../shared/types'),
+        '@workspace/core': path.resolve(rootDir, '../shared/core'),
+        '@workspace/validation': path.resolve(rootDir, '../shared/validation'),
+        '@workspace/constants': path.resolve(rootDir, '../shared/constants'),
 
         // Exclude server-only modules (redirect to stubs)
-        '@shared/database': path.resolve(rootDir, './src/stubs/database-stub.ts'),
-        '@shared/core/middleware': path.resolve(rootDir, './src/stubs/middleware-stub.ts'),
+        '@server-stub/database': path.resolve(rootDir, './src/stubs/database-stub.ts'),
+        '@server-stub/middleware': path.resolve(rootDir, './src/stubs/middleware-stub.ts'),
 
         // Security fixes - redirect to secure implementations
-        '@client/utils/authenticated-api': path.resolve(rootDir, './src/utils/secure-authenticated-api.ts'),
-        '@client/utils/secure-token-manager': path.resolve(rootDir, './src/utils/secure-token-manager.ts'),
+        '@secure': path.resolve(rootDir, './src/lib/utils/secure'),
 
         // Logger consolidation - redirect all logger imports to unified implementation
-        '@client/utils/logger': path.resolve(rootDir, './src/utils/logger.ts'),
-        '@client/utils/logger-simple': path.resolve(rootDir, './src/utils/logger.ts'),
+        '@logger': path.resolve(rootDir, './src/lib/utils/logger'),
       },
       // Extension resolution order affects lookup speed
       // More common extensions first means fewer failed lookups

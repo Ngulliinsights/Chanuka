@@ -7,7 +7,7 @@
  * - All authentication-related API operations
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
 import { createError } from '../../error';

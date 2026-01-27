@@ -1,5 +1,5 @@
 import { logger  } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@shared/schema';
 import { eq } from 'drizzle-orm';
 

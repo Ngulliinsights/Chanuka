@@ -12,7 +12,7 @@
  * @module api/system
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
@@ -587,7 +587,6 @@ export class SystemApiService {
     // Priority: response.data.message > response.data.error > error.message > default
     const errorMessage =
       (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
-      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
       (errorResponse as Error)?.message ||
       defaultMessage;
 

@@ -12,7 +12,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock UI component services
-vi.mock('@client/shared/components', () => ({
+vi.mock('@client/lib/components', () => ({
   Button: vi.fn(),
   Input: vi.fn(),
   Modal: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock('@client/shared/components', () => ({
 }));
 
 // Mock component state management
-vi.mock('@client/shared/hooks', () => ({
+vi.mock('@client/lib/hooks', () => ({
   useComponentState: vi.fn(),
   useInteraction: vi.fn(),
   useAccessibility: vi.fn(),

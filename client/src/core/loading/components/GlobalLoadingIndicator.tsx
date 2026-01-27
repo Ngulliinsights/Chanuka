@@ -3,9 +3,9 @@
  * Shows loading state for the entire application
  */
 
+import { useLoading } from '../context';
 import React from 'react';
 
-import { useLoading } from '@client/shared/contexts';
 
 import { LoadingProgress } from './LoadingProgress';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -73,6 +73,7 @@ export function GlobalLoadingIndicator({
                 size="sm"
                 showMessage={false}
                 showPercentage={false}
+                isLoading={true}
                 className="w-24"
               />
               <span className="text-xs text-gray-500 dark:text-gray-400">

@@ -205,23 +205,23 @@ class MigrationCompleter {
     const replacements = [
       {
         from: /from\s+['"]\.\.\/\.\.\/ui\/button['"]/g,
-        to: "from '@client/shared/design-system'"
+        to: "from '@client/lib/design-system'"
       },
       {
         from: /from\s+['"]\.\.\/\.\.\/ui\/card['"]/g,
-        to: "from '@client/shared/design-system'"
+        to: "from '@client/lib/design-system'"
       },
       {
         from: /from\s+['"]\.\.\/primitives\/([^'"]+)['"]/g,
-        to: "from '@client/shared/design-system'"
+        to: "from '@client/lib/design-system'"
       },
       {
         from: /from\s+['"]@client\/shared\/design-system\/primitives\/[^'"]+['"]/g,
-        to: "from '@client/shared/design-system'"
+        to: "from '@client/lib/design-system'"
       },
       {
         from: /from\s+['"]@client\/lib\/utils['"]/g,
-        to: "from '@client/shared/design-system'"
+        to: "from '@client/lib/design-system'"
       },
     ];
 
@@ -273,7 +273,7 @@ class MigrationCompleter {
         if (content.includes('throw new Error(') && !content.includes('UIComponentError')) {
           // This is a simple heuristic - in practice, you'd want more sophisticated analysis
           if (file.includes('/components/') || file.includes('/ui/')) {
-            content = `import { createUIError } from '@client/shared/design-system/components/errors';\n${content}`;
+            content = `import { createUIError } from '@client/lib/design-system/components/errors';\n${content}`;
             modified = true;
           }
         }
@@ -386,7 +386,7 @@ Generated: ${report.timestamp}
 
 ### Design System Migration ✅
 - Consolidated all components to unified design system
-- Updated import paths to use \`@client/shared/design-system\`
+- Updated import paths to use \`@client/lib/design-system\`
 - Removed legacy backup directories
 
 ### Component Architecture Migration ✅  

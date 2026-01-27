@@ -7,8 +7,9 @@
  * @module core/mobile/responsive-utils
  */
 
-import { MOBILE_BREAKPOINTS } from '../../config';
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
+import { MOBILE_BREAKPOINTS } from '@client/lib/config/mobile';
 
 import type { ResponsiveBreakpoints } from './types';
 
@@ -20,7 +21,7 @@ export class ResponsiveUtils {
   private mediaQueries: Map<string, MediaQueryList> = new Map();
 
   private getBreakpointValue(key: keyof ResponsiveBreakpoints): number {
-    const upperKey = key.toUpperCase() as keyof typeof MOBILE_BREAKPOINTS;
+    const upperKey = (key as string).toUpperCase() as keyof typeof MOBILE_BREAKPOINTS;
     return MOBILE_BREAKPOINTS[upperKey];
   }
 
@@ -68,7 +69,7 @@ export class ResponsiveUtils {
     if (typeof window === 'undefined') return 'lg';
 
     const width = window.innerWidth;
-    const breakpoints = Object.entries(this.getBreakpointsMap()).sort(([, a], [, b]) => b - a);
+    const breakpoints = Object.entries(this.getBreakpointsMap()).sort(([, a]: [string, number], [, b]: [string, number]) => b - a);
 
     for (const [name, minWidth] of breakpoints) {
       if (width >= minWidth) {

@@ -105,7 +105,7 @@ Complete remaining client component and hook type standardization.
 **Pattern to Implement**:
 ```typescript
 // Component props should extend DashboardComponentProps
-import type { DashboardComponentProps } from '@client/shared/types/components/dashboard';
+import type { DashboardComponentProps } from '@client/lib/types/components/dashboard';
 
 export interface UserProfileCardProps extends DashboardComponentProps {
   readonly user: User;
@@ -288,7 +288,7 @@ const MIGRATION_RULES: readonly MigrationRule[] = [
     pattern: /type DashboardState =/g,
     replacement: 'type DashboardState = DashboardData;',
     description: 'Consolidate duplicate DashboardState definition',
-    files: ['client/src/shared/types/**/*.ts'],
+    files: ['client/src/lib/types/**/*.ts'],
   },
   {
     pattern: /WidgetTabsProps(?!Layout)/g,
@@ -570,7 +570,7 @@ describe('Type Validation Integration', () => {
 describe('Backward Compatibility', () => {
   test('legacy imports still work', () => {
     // Old import path should still work
-    import { User } from '@client/shared/types/bill';
+    import { User } from '@client/lib/types/bill';
     expect(User).toBeDefined();
   });
   

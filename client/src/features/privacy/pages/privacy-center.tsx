@@ -14,17 +14,17 @@ import React, { useState } from 'react';
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
 import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
 import { GDPRComplianceManager } from '@client/features/security/ui/privacy/GDPRComplianceManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Alert, AlertDescription } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
 
 export default function PrivacyCenterPage() {
   const [activeTab, setActiveTab] = useState('overview');

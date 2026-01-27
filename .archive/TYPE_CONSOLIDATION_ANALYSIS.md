@@ -18,7 +18,7 @@
 
 ---
 
-### 2. **`@client/shared/types/loading.ts`** (Shared Types - 160 lines)
+### 2. **`@client/lib/types/loading.ts`** (Shared Types - 160 lines)
 **Focus:** Generic async operations, connection info, queues
 
 **Key Types:**
@@ -33,7 +33,7 @@
 
 ---
 
-### 3. **`@client/shared/ui/loading/types.ts`** (UI Component Version - 133 lines)
+### 3. **`@client/lib/ui/loading/types.ts`** (UI Component Version - 133 lines)
 **Focus:** Component props, UI display configuration
 
 **Key Types:**
@@ -62,7 +62,7 @@
 
 ## Consolidation Strategy
 
-### **Single Source of Truth: `@client/shared/types/loading.ts`**
+### **Single Source of Truth: `@client/lib/types/loading.ts`**
 
 **Why shared/types?**
 - ✅ Central location for cross-cutting concerns
@@ -146,14 +146,14 @@ export type LoadingState =
 
 ## Files to Delete
 - ❌ `@client/core/loading/types.ts` → Move content to shared/types/loading.ts
-- ❌ `@client/shared/ui/loading/types.ts` → Export UI-specific interfaces from shared/types/loading.ts
+- ❌ `@client/lib/ui/loading/types.ts` → Export UI-specific interfaces from shared/types/loading.ts
 
 ## Files to Update
-- ✅ `@client/shared/types/loading.ts` → Consolidate all definitions
-- ✅ `@client/core/loading/context.tsx` → Import from @client/shared/types/loading (already does)
+- ✅ `@client/lib/types/loading.ts` → Consolidate all definitions
+- ✅ `@client/core/loading/context.tsx` → Import from @client/lib/types/loading (already does)
 - ✅ `@client/core/loading/reducer.ts` → Use unified types
 - ✅ `@client/core/loading/utils.ts` → Update for number startTime
-- ✅ `@client/shared/types/index.ts` → Ensure loading.ts is exported
+- ✅ `@client/lib/types/index.ts` → Ensure loading.ts is exported
 
 ## Expected Impact
 - **Errors reduced:** ~15-20 (by removing type conflicts)

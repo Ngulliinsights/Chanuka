@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Card, CardContent, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+import { Card, CardContent, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface Bill {
   supportPercentage?: number;

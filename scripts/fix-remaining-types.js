@@ -14,25 +14,25 @@ const REPLACEMENTS = [
   // Generic @client/types imports
   {
     pattern: /from\s+['"]@client\/types['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Generic @client/types'
   },
   // Relative imports to types (in core/loading, etc)
   {
     pattern: /from\s+['"](\.\.?\/)*types['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Relative types imports'
   },
   // Security types
   {
     pattern: /from\s+['"].*types\/security-types['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Security types'
   },
   // Engagement analytics
   {
     pattern: /from\s+['"].*types\/engagement-analytics['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Engagement analytics types'
   },
   // Onboarding - still needed
@@ -44,31 +44,31 @@ const REPLACEMENTS = [
   // Browser types
   {
     pattern: /from\s+['"].*types\/browser['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Browser types'
   },
   // Constitutional types
   {
     pattern: /from\s+['"].*types\/constitutional['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Constitutional types'
   },
   // Form types
   {
     pattern: /from\s+['"].*types\/form['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Form types'
   },
   // Error types
   {
     pattern: /from\s+['"].*types\/error['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Error types'
   },
   // Performance types
   {
     pattern: /from\s+['"].*types\/performance['"]/g,
-    replacement: "from '@client/shared/types'",
+    replacement: "from '@client/lib/types'",
     description: 'Performance types'
   },
 ];

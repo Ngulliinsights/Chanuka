@@ -11,6 +11,16 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
+import {
+  AuthService,
+  UserProfileService,
+  DashboardService,
+  EngagementService,
+  AchievementService,
+  userService as legacyUserService
+} from '@client/features/users/services';
+import { CacheService, CacheServiceFactory } from '@client/lib/services/cache';
 import {
   ServiceError,
   AuthenticationError,
@@ -30,18 +40,8 @@ import {
   ErrorRecoveryManager,
   globalErrorHandler,
   errorRecoveryManager
-} from '@client/shared/services/errors';
-
-import { CacheService, CacheServiceFactory } from '@client/shared/services/cache';
-import { ServiceFactory, ServiceContainer, ServiceLifecycle } from '@client/shared/services/factory';
-import {
-  AuthService,
-  UserProfileService,
-  DashboardService,
-  EngagementService,
-  AchievementService,
-  userService as legacyUserService
-} from '@client/features/users/services';
+} from '@client/lib/services/errors';
+import { ServiceFactory, ServiceContainer, ServiceLifecycle } from '@client/lib/services/factory';
 
 // ============================================================================
 // SERVICE ERROR HIERARCHY TESTS

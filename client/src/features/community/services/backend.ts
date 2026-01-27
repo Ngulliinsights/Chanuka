@@ -7,10 +7,10 @@
  */
 
 import { communityApiService } from '@client/core/api/community';
-import type { CommentFormData } from '@client/shared/types/community';
 import { realTimeService } from '@client/core/realtime';
-import type { Comment } from '@client/shared/types/community';
-import { logger } from '@client/shared/utils/logger';
+import type { CommentFormData } from '@client/lib/types/community';
+import type { Comment } from '@client/lib/types/community';
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // Type Definitions

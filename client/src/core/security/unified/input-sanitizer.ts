@@ -4,13 +4,15 @@
  */
 
 import DOMPurify from 'dompurify';
+
+import { logger } from '@client/lib/utils/logger';
+
 import {
   SanitizationResult,
   ThreatDetection,
   ThreatType,
   SanitizationOptions
 } from './security-interface';
-import { logger } from '@client/shared/utils/logger';
 
 // Type definitions for DOMPurify hook data
 interface DOMPurifyHookData {
@@ -57,6 +59,14 @@ export class UnifiedInputSanitizer {
 
     // Initialize threat detection patterns
     this.threatPatterns = this.initializeThreatPatterns();
+  }
+
+  async initialize(config?: Partial<InputSanitizationConfig>): Promise<void> {
+    if (config) {
+      this.config = { ...this.config, ...config };
+      this.setupDOMPurify();
+      logger.info('Unified Input Sanitizer re-initialized');
+    }
   }
 
   private setupDOMPurify(): void {

@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useCallback } from 'react';
 
-import { logger, type RenderStats } from '@client/shared/utils/logger';
+import { logger, type RenderStats } from '@client/lib/utils/logger';
 
 interface UseRenderTrackerOptions {
   componentName: string;

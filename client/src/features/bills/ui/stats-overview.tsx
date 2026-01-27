@@ -1,7 +1,7 @@
 import { FileText, AlertTriangle, Shield, TrendingUp, Clock } from 'lucide-react';
 import React from 'react';
 
-import { Card, CardContent } from '@client/shared/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
 
 // Stats data structure that the component expects
 interface BillsStats {

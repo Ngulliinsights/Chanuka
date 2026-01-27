@@ -3,8 +3,8 @@
  * Centralized security event monitoring and alerting system
  */
 
-import { SecurityMetrics, ThreatLevel } from '@client/shared/types';
-import { logger } from '@client/shared/utils/logger';
+import { SecurityMetrics, ThreatLevel } from '@client/lib/types';
+import { logger } from '@client/lib/utils/logger';
 
 // Type definitions for missing types
 export type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';

@@ -9,7 +9,7 @@
  * - Performance optimization
  */
 
-import { ErrorMonitor } from '../../shared/infrastructure/monitoring/error-monitor';
+import { ErrorMonitor } from '../../lib/infrastructure/monitoring/error-monitor';
 
 // ============================================================================
 // Types and Interfaces

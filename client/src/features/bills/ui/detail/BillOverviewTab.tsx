@@ -1,16 +1,16 @@
 import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import type { Bill } from '@client/shared/types';
+} from '@client/lib/design-system';
+import type { Bill } from '@client/lib/types';
 
 interface BillOverviewTabProps {
   bill: Bill;

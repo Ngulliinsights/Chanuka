@@ -2,14 +2,14 @@
  * Core Community Module Types
  *
  * Internal type definitions for the unified community system
- * These are distinct from @client/shared/types/community which are shared across the app
+ * These are distinct from @client/lib/types/community which are shared across the app
  */
 
 import type {
   Comment,
   DiscussionThread,
   ActivityItem,
-} from '@client/shared/types/community';
+} from '@client/lib/types/community';
 
 /**
  * Unified comment representation for internal use
@@ -92,6 +92,19 @@ export interface DiscussionState {
 }
 
 /**
+ * UI State for discussion view
+ */
+export interface DiscussionViewState {
+  currentBillId: string;
+  sortBy: string;
+  filterBy: string;
+  showModerated: boolean;
+  autoSubscribe: boolean;
+  enableTypingIndicators: boolean;
+  currentThreadId?: number;
+}
+
+/**
  * WebSocket events
  */
 export interface WebSocketEvents {
@@ -99,6 +112,7 @@ export interface WebSocketEvents {
   'comment:updated': UnifiedComment;
   'comment:deleted': { id: number };
   'comment:voted': { id: number; upvotes: number; downvotes: number };
+  'thread:created': UnifiedThread; // Added for state sync
   'thread:updated': UnifiedThread;
   'typing:indicator': { userId: number; userName: string; threadId: number };
   'moderation:action': UnifiedModeration;
@@ -108,6 +122,26 @@ export interface WebSocketEvents {
     status: 'online' | 'offline';
     lastSeen: string;
   };
+}
+
+/**
+ * Request types
+ */
+export interface CreateCommentRequest {
+  billId: number | string;
+  content: string;
+  parentId?: number | string;
+}
+
+export interface UpdateCommentRequest {
+  commentId: number | string;
+  content: string;
+}
+
+export interface CreateThreadRequest {
+  billId: number | string;
+  title: string;
+  content: string;
 }
 
 /**
@@ -125,4 +159,40 @@ export interface UseCommunityReturn {
   error?: string;
   selectDiscussion: (id: number) => Promise<void>;
   refreshDiscussions: () => Promise<void>;
+}
+
+export interface UseDiscussionReturn {
+  comments: UnifiedComment[];
+  threads: UnifiedThread[];
+  currentThread?: UnifiedThread;
+  isLoading: boolean;
+  isLoadingComments: boolean;
+  isLoadingThreads: boolean;
+  error?: string | null;
+  createComment: (data: CreateCommentRequest) => Promise<UnifiedComment>;
+  updateComment: (data: UpdateCommentRequest) => Promise<UnifiedComment>;
+  deleteComment: (commentId: string) => Promise<void>;
+  voteComment: (commentId: string, vote: 'up' | 'down') => Promise<void>;
+  createThread: (data: CreateThreadRequest) => Promise<UnifiedThread>;
+  selectThread: (threadId: number) => void;
+  reportContent: (data: ModerationRequest) => Promise<void>;
+  typingUsers: string[];
+  activeUsers: string[];
+  startTyping: () => void;
+  stopTyping: () => void;
+}
+
+export interface UseUnifiedCommunityReturn {
+  discussion: UseDiscussionReturn;
+  stats: {
+    totalComments: number;
+    totalThreads: number;
+    activeUsers: number;
+    expertComments: number;
+  };
+  shareThread: (threadId: string, platform: string) => Promise<void>;
+  bookmarkComment: (commentId: string) => Promise<void>;
+  followThread: (threadId: string) => Promise<void>;
+  expertInsights: UnifiedComment[];
+  trendingTopics: string[];
 }

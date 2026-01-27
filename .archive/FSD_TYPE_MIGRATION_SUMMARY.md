@@ -29,7 +29,7 @@ client/src/core/api/types/                    ← API infrastructure types
 
 ### Shared Types (Cross-feature utilities)
 ```
-client/src/shared/types/
+client/src/lib/types/
   ├── index.ts                  ← Central type exports
   ├── navigation.ts             ← Navigation & routing types
   ├── mobile.ts                 ← Mobile-specific types
@@ -47,13 +47,13 @@ client/src/shared/types/
 | `@client/types/expert` | `@client/features/users/types` |
 | `@client/types/onboarding` | `@client/features/users/types` |
 | `@client/types/conflict-of-interest` | `@client/features/analysis/types` |
-| `@client/types/navigation` | `@client/shared/types/navigation` |
-| `@client/types/mobile` | `@client/shared/types/mobile` |
-| `@client/types/user-dashboard` | `@client/shared/types/user-dashboard` |
-| `@client/types/loading` | `@client/shared/types/loading` |
+| `@client/types/navigation` | `@client/lib/types/navigation` |
+| `@client/types/mobile` | `@client/lib/types/mobile` |
+| `@client/types/user-dashboard` | `@client/lib/types/user-dashboard` |
+| `@client/types/loading` | `@client/lib/types/loading` |
 | `@client/types/auth` | `@client/core/auth` |
 | `@client/types/realtime` | `@client/core/realtime/types` |
-| `@client/types` (generic) | `@client/shared/types` |
+| `@client/types` (generic) | `@client/lib/types` |
 
 ## Updated File Categories
 
@@ -102,7 +102,7 @@ client/src/shared/types/
 - Analysis types with analysis feature
 
 ### 2. **Unified Shared Types**
-- All cross-feature types centralized in `client/src/shared/types/`
+- All cross-feature types centralized in `client/src/lib/types/`
 - Clear separation of concerns
 - Single source of truth for shared types
 

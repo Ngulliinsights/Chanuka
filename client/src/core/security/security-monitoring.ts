@@ -3,6 +3,9 @@
  * Implements unified error monitoring for the Security system
  */
 
+import { createError } from '@client/core/error';
+import { CrossSystemErrorAnalytics } from '@client/lib/infrastructure/monitoring/cross-system-error-analytics';
+import { ErrorAggregationService } from '@client/lib/infrastructure/monitoring/error-aggregation-service';
 import {
   UnifiedErrorMonitoring,
   ErrorMonitoringMiddleware,
@@ -14,10 +17,7 @@ import {
   AppError,
   ErrorDomain,
   ErrorSeverity
-} from '@client/shared/infrastructure/monitoring/unified-error-monitoring-interface';
-import { ErrorAggregationService } from '@client/shared/infrastructure/monitoring/error-aggregation-service';
-import { CrossSystemErrorAnalytics } from '@client/shared/infrastructure/monitoring/cross-system-error-analytics';
-import { createError } from '@client/core/error';
+} from '@client/lib/infrastructure/monitoring/unified-error-monitoring-interface';
 
 class SecurityMonitoring implements UnifiedErrorMonitoring {
   private static instance: SecurityMonitoring;

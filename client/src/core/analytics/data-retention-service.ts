@@ -10,7 +10,7 @@
  * - Compliance validation
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // Types and Interfaces

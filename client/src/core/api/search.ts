@@ -1,4 +1,4 @@
-import type { SearchRequest, SaveSearchRequest } from '@client/shared/types/search';
+import type { SearchRequest, SaveSearchRequest } from '@client/lib/types/search';
 import type {
   SearchResponse,
   SearchSuggestion,
@@ -8,7 +8,7 @@ import type {
   SearchResult,
   SavedSearch,
   SearchExportResponse,
-} from '@client/shared/types/search-response';
+} from '@client/lib/types/search-response';
 
 import { globalApiClient as api } from './client';
 

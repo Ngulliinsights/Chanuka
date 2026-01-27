@@ -1,8 +1,8 @@
-// Focused, permissive shim for '@shared/schema' used during migration.
+// Focused, permissive shim for '@server/infrastructure/schema' used during migration.
 // This lists the most commonly imported names as `any` so TypeScript import
 // sites compile while we iteratively stabilize real types.
 
-declare module '@shared/schema' {
+declare module '@server/infrastructure/schema' {
   // Tables
   export const bills: any;
   export const bill_tags: any;
@@ -31,7 +31,7 @@ declare module '@shared/schema' {
   export default _default;
 }
 
-declare module '@shared/schema' {
+declare module '@server/infrastructure/schema' {
   export * from '@server/infrastructure/schema';
   const _default: any;
   export default _default;

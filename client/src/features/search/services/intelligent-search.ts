@@ -15,7 +15,7 @@
 import Fuse, { type IFuseOptions } from 'fuse.js';
 
 import { searchApiClient } from '@client/core/api/search';
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import type { SearchResult, SearchMetadata } from '../types';
 

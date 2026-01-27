@@ -9,7 +9,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { ComprehensiveAnalyticsTracker } from './comprehensive-tracker';
 

@@ -9,7 +9,7 @@
  */
 
 import { useOfflineDetection } from '@client/core/hooks/useOfflineDetection';
-import { ErrorBoundary } from '@client/shared/components/ErrorBoundary';
+import { ErrorBoundary } from '@client/lib/components/ErrorBoundary';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';

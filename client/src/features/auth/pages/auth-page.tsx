@@ -12,16 +12,16 @@ import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 type AuthMode =
   | 'login'

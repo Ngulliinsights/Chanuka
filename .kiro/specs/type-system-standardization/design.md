@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design establishes a unified, consistent, and strategic type system architecture across the entire codebase. Based on analysis of existing types, we've identified exemplary patterns in the loading system (`client/src/shared/types/loading.ts`) and schema architecture (`shared/schema/`) that demonstrate best practices. The design will standardize all types to adopt these strategic patterns while maintaining backward compatibility.
+This design establishes a unified, consistent, and strategic type system architecture across the entire codebase. Based on analysis of existing types, we've identified exemplary patterns in the loading system (`client/src/lib/types/loading.ts`) and schema architecture (`shared/schema/`) that demonstrate best practices. The design will standardize all types to adopt these strategic patterns while maintaining backward compatibility.
 
 ## Architecture
 

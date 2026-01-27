@@ -11,7 +11,7 @@ export type {
   SearchHistory as SharedSearchHistory,
   SearchSuggestion as SharedSearchSuggestion,
   SearchAnalytics as SharedSearchAnalytics,
-} from '@client/shared/types/search';
+} from '@client/lib/types/search';
 
 // Feature-specific extensions and aliases
 export interface SearchQuery {

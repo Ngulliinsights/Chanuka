@@ -1,15 +1,15 @@
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
 import React from 'react';
 
-import { ExpertVerificationType } from '@client/shared/types';
-import { cn } from '@client/shared/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@client/shared/design-system';
-import { UnifiedBadge } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { UnifiedBadge } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
+import { ExpertVerificationType } from '@client/lib/types';
 
 import { GraduationCap } from '../icons/SimpleIcons';
 

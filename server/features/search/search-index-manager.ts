@@ -2,7 +2,7 @@ import { cacheService } from '@shared/core/caching';
 import { demoDataService } from '@server/infrastructure/demo-data.js';
 import { databaseService } from '@server/infrastructure/database/database.service';
 import { logger   } from '@shared/core';
-import { readDatabase } from '@shared/database';
+import { readDatabase } from '@server/infrastructure/database';
 import * as schema from "@shared/schema";
 import { sql } from "drizzle-orm";
 

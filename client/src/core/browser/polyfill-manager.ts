@@ -5,7 +5,7 @@
  * Polyfills provide JavaScript implementations of features that browsers don't support natively.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { FeatureDetector } from './feature-detector';
 import type {
@@ -197,7 +197,7 @@ export class PolyfillManager {
       () => {
         if (typeof Promise !== 'undefined') return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (window as any).Promise = class SimplePromise<T = unknown> {
           private state: 'pending' | 'fulfilled' | 'rejected' = 'pending';
           private value: T | undefined;
@@ -341,7 +341,7 @@ export class PolyfillManager {
       () => {
         if ('IntersectionObserver' in window) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (window as any).IntersectionObserver = class IntersectionObserverPolyfill {
           private callback: (entries: IntersectionObserverEntry[]) => void;
           private elements: Set<Element> = new Set();
@@ -516,7 +516,7 @@ export class PolyfillManager {
       () => {
         if ('ResizeObserver' in window) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (window as any).ResizeObserver = class ResizeObserverPolyfill {
           private callback: ResizeObserverCallback;
           private elements: Set<Element> = new Set();
@@ -721,7 +721,7 @@ export class PolyfillManager {
           },
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (navigator as any).clipboard = clipboardPolyfill;
       }
     );

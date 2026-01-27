@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import {
   BaseError,
   ValidationError,
@@ -25,8 +26,8 @@ import {
   ErrorSeverity,
   RecoveryAction,
 } from '@client/core/error/constants';
-import { AppError, ErrorContext, ErrorMetadata } from '@client/core/error/types';
 import { coreErrorHandler } from '@client/core/error/handler';
+import { AppError, ErrorContext, ErrorMetadata } from '@client/core/error/types';
 
 // Mock the error handler to avoid side effects in tests
 vi.mock('../../../core/error/handler', () => ({

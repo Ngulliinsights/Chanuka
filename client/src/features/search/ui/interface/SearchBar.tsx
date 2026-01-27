@@ -1,13 +1,13 @@
+import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/lib/hooks/useSearch';
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import React from 'react';
 
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
 
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/shared/hooks/useSearch';
 
 // Define SearchSuggestion type locally
 interface SearchSuggestion {

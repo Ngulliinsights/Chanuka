@@ -47,12 +47,12 @@ const importUpdates: ImportUpdate[] = [
   // Validation consolidation
   {
     pattern: /from ['"]([^'"]*\/shared\/validation\/base-validation)['"]\b/g,
-    replacement: "from '@client/shared/validation'",
+    replacement: "from '@client/lib/validation'",
     description: 'Base validation imports'
   },
   {
     pattern: /from ['"]([^'"]*\/validation)['"]\b(?!.*\/shared\/validation)/g,
-    replacement: "from '@client/shared/validation'",
+    replacement: "from '@client/lib/validation'",
     description: 'Root validation imports'
   },
 ];

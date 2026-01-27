@@ -5,7 +5,8 @@
  * and comprehensive error handling for API requests.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
 import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 
 /**

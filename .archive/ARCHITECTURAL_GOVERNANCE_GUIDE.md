@@ -6,7 +6,7 @@ This document establishes the architectural governance framework for the Chanuka
 
 ## Directory Structure and Boundaries
 
-### 1. Shared Directory (`client/src/shared/`)
+### 1. Shared Directory (`client/src/lib/`)
 
 **Purpose**: UI components, design system, and technical infrastructure
 
@@ -63,11 +63,11 @@ This document establishes the architectural governance framework for the Chanuka
 ### 1. Data Retention Services
 
 **Current State**:
-- `client/src/shared/services/data-retention.ts` (553 lines) - Basic implementation
+- `client/src/lib/services/data-retention.ts` (553 lines) - Basic implementation
 - `client/src/core/analytics/data-retention-service.ts` (960 lines) - Enterprise implementation
 
 **Consolidation Plan**:
-1. **Remove**: `client/src/shared/services/data-retention.ts`
+1. **Remove**: `client/src/lib/services/data-retention.ts`
 2. **Keep**: `client/src/core/analytics/data-retention-service.ts` as primary
 3. **Update**: All imports to use core version
 4. **Document**: Migration path for existing usage
@@ -77,14 +77,14 @@ This document establishes the architectural governance framework for the Chanuka
 ### 2. Navigation Services
 
 **Current State**:
-- `client/src/shared/services/navigation.ts` (506 lines) - Comprehensive navigation
+- `client/src/lib/services/navigation.ts` (506 lines) - Comprehensive navigation
 - `client/src/core/navigation/navigation-service.ts` (82 lines) - Testing abstraction
 - `client/src/config/navigation.ts` (117 lines) - Static configuration
 
 **Consolidation Plan**:
-1. **Keep**: `client/src/shared/services/navigation.ts` as primary navigation service
+1. **Keep**: `client/src/lib/services/navigation.ts` as primary navigation service
 2. **Keep**: `client/src/core/navigation/navigation-service.ts` for testing abstraction
-3. **Move**: `client/src/config/navigation.ts` to `client/src/shared/config/navigation.ts`
+3. **Move**: `client/src/config/navigation.ts` to `client/src/lib/config/navigation.ts`
 4. **Update**: Import paths and dependencies
 
 **Rationale**: Clear separation of concerns - shared handles navigation logic, core handles testing abstraction.
@@ -93,7 +93,7 @@ This document establishes the architectural governance framework for the Chanuka
 
 **Current State**:
 - `client/src/core/storage/` - Comprehensive storage management
-- `client/src/shared/` - Some storage utilities
+- `client/src/lib/` - Some storage utilities
 
 **Consolidation Plan**:
 1. **Audit**: All storage-related code in shared directory
@@ -142,13 +142,13 @@ shared → features (breaks layer boundaries)
 **Recommended Import Structure**:
 ```typescript
 // ✅ Good
-import { Button } from '@client/shared/ui';
+import { Button } from '@client/lib/ui';
 import { AuthService } from '@client/core/auth';
 import { UserProfile } from '@client/features/users';
 
 // ❌ Bad
 import { Button } from '@client/core/ui'; // Wrong layer
-import { UserProfile } from '@client/shared/features'; // Wrong layer
+import { UserProfile } from '@client/lib/features'; // Wrong layer
 ```
 
 ### 3. Naming Conventions
@@ -159,7 +159,7 @@ import { UserProfile } from '@client/shared/features'; // Wrong layer
 - Feature services: `[Feature]Service` (e.g., `UserProfileService`)
 
 **File Organization**:
-- Shared: `client/src/shared/[category]/[service].ts`
+- Shared: `client/src/lib/[category]/[service].ts`
 - Core: `client/src/core/[domain]/[service].ts`
 - Features: `client/src/features/[feature]/[service].ts`
 
@@ -197,7 +197,7 @@ import { UserProfile } from '@client/shared/features'; // Wrong layer
 ### Phase 1: Immediate Actions (Week 1)
 
 1. **Remove Redundant Services**:
-   - Remove `client/src/shared/services/data-retention.ts`
+   - Remove `client/src/lib/services/data-retention.ts`
    - Update all imports to use core version
    - Test all functionality
 

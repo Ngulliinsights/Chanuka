@@ -191,7 +191,7 @@ find client/src/features -name "*.ts" -o -name "*.tsx" | while read -r file; do
         backup_file "$file"
         
         # Convert feature-specific relative imports
-        sed -i "s|from ['\"]../../shared|from '@client/shared|g" "$file"
+        sed -i "s|from ['\"]../../shared|from '@client/lib|g" "$file"
         sed -i "s|from ['\"]../../core|from '@client/core|g" "$file"
         sed -i "s|from ['\"]../../types|from '@client/types|g" "$file"
         sed -i "s|from ['\"]../../utils|from '@client/utils|g" "$file"

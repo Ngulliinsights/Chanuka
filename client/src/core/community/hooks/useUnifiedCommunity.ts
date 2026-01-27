@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { globalApiClient } from '../../api/client';
-import type { UseCommunityReturn, UnifiedComment } from '../types';
+import type { UseUnifiedCommunityReturn, UnifiedComment } from '../types';
 
 import { useUnifiedDiscussion } from './useUnifiedDiscussion';
 
@@ -25,7 +25,7 @@ export function useUnifiedCommunity({
   autoSubscribe = true,
   enableTypingIndicators = true,
   enableRealtime = true,
-}: UseUnifiedCommunityOptions): UseCommunityReturn {
+}: UseUnifiedCommunityOptions): UseUnifiedCommunityReturn {
   // Get all discussion functionality
   const discussion = useUnifiedDiscussion({
     billId,
@@ -107,7 +107,7 @@ export function useUnifiedCommunity({
       totalThreads: statsData?.totalThreads || discussion.threads.length,
       activeUsers: statsData?.activeUsers || discussion.activeUsers.length,
       expertComments:
-        statsData?.expertComments || discussion.comments.filter(c => c.isExpertVerified).length,
+        statsData?.expertComments || discussion.comments.filter(c => c.isAuthorExpert).length,
     };
   }, [stats, discussion.comments, discussion.threads, discussion.activeUsers]);
 

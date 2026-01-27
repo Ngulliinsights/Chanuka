@@ -10,13 +10,13 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 
-import navigationSlice from '../../shared/infrastructure/store/slices/navigationSlice';
+import navigationSlice from '../../lib/infrastructure/store/slices/navigationSlice';
 
 import { createNavigationProvider } from './context';
 import { NavigationConsistency } from './NavigationConsistency';
 
 // Mock logger
-vi.mock('@client/shared/utils/logger', () => ({
+vi.mock('@client/lib/utils/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),

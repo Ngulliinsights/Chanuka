@@ -1,18 +1,18 @@
 import { FileText, Download, Search, Copy, BookOpen, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-import { Button } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import type { Bill } from '@client/shared/types';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import type { Bill } from '@client/lib/types';
 
 interface BillFullTextTabProps {
   bill: Bill;

@@ -102,7 +102,7 @@ This document tracks the implementation of the Tier 1 integration plan, which fo
 
 **Target Files:**
 - `client/src/components/ui/index.ts` (195 LOC)
-- `client/src/shared/design-system/` (100+ files)
+- `client/src/lib/design-system/` (100+ files)
 
 **Planned Services:**
 - Unified component system

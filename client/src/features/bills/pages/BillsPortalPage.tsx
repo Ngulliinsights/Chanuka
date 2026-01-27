@@ -21,22 +21,22 @@ import { useBills } from '@client/features/bills/hooks';
 import type { BillsQueryParams } from '@client/features/bills/types';
 import { FilterPanel } from '@client/features/bills/ui/filter-panel';
 import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
-import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
-import { useToast } from '@client/shared/hooks/use-toast';
-import { Button } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system/utils/cn';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { cn } from '@client/lib/design-system/utils/cn';
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/lib/hooks/use-toast';
+import { logger } from '@client/lib/utils/logger';
 
 // Types for the portal
 interface BillsPortalFilters extends BillsQueryParams {

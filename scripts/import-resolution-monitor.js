@@ -40,7 +40,7 @@ const PATH_MAPPINGS = {
   '@shared': './shared',
   '@server': './server',
   '@shared/core': './shared/core/src/index.ts',
-  '@shared/schema': './shared/schema/index.ts',
+  '@server/infrastructure/schema': './shared/schema/index.ts',
   '@db': './db/index.ts'
 };
 

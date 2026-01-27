@@ -203,7 +203,7 @@ export class DatabaseService {
 ### Step 1: Initialize Orchestrator (Already Done)
 ```typescript
 // In server startup
-import { DatabaseOrchestrator } from '@shared/database';
+import { DatabaseOrchestrator } from '@server/infrastructure/database';
 
 const orchestrator = DatabaseOrchestrator.getInstance();
 // Orchestrator already initialized with unified-config
@@ -212,7 +212,7 @@ const orchestrator = DatabaseOrchestrator.getInstance();
 ### Step 2: Wrap with DatabaseService (New)
 ```typescript
 import { DatabaseService } from '@server/infrastructure/database/database-service';
-import { pool } from '@shared/database';
+import { pool } from '@server/infrastructure/database';
 
 const dbService = DatabaseService.getInstance();
 dbService.initialize(pool);  // Use orchestrator's pool

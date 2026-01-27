@@ -45,7 +45,7 @@ const result = await databaseService.withFallback(
 
   // Missing Drizzle ORM imports
   MISSING_DRIZZLE_IMPORTS: `
-import { database } from '@shared/database';
+import { database } from '@server/infrastructure/database';
 
 // This should trigger: Cannot find name 'eq', 'and', 'desc'
 const users = await database.select()
@@ -74,8 +74,8 @@ const result = await withTransaction(async (tx) => {
 
   // Mixed database patterns (realistic Chanuka usage)
   REALISTIC_CHANUKA_PATTERN: `
-import { database } from '@shared/database';
-import { users, bills, bill_engagement } from '@shared/schema';
+import { database } from '@server/infrastructure/database';
+import { users, bills, bill_engagement } from '@server/infrastructure/schema';
 
 // Missing: eq, and, desc, count, withTransaction
 export class UserEngagementService {
@@ -120,8 +120,8 @@ export class UserEngagementService {
 
   // Database service with fallback pattern
   DATABASE_SERVICE_FALLBACK: `
-import { readDatabase } from '@shared/database';
-import { bills, sponsors } from '@shared/schema';
+import { readDatabase } from '@server/infrastructure/database';
+import { bills, sponsors } from '@server/infrastructure/schema';
 
 // Missing: databaseService, eq, sql
 export class BillAnalyticsService {
@@ -147,9 +147,9 @@ export class BillAnalyticsService {
 
   // Unused database imports
   UNUSED_DATABASE_IMPORTS: `
-import { database, withTransaction, readDatabase } from '@shared/database';
+import { database, withTransaction, readDatabase } from '@server/infrastructure/database';
 import { eq, and, or } from 'drizzle-orm';
-import { users } from '@shared/schema';
+import { users } from '@server/infrastructure/schema';
 
 // Only using 'users' and 'eq' - others should be removed
 export async function getActiveUsers() {
@@ -161,8 +161,8 @@ export async function getActiveUsers() {
 
   // Complex transaction with multiple database operations
   COMPLEX_TRANSACTION_PATTERN: `
-import { writeDatabase } from '@shared/database';
-import { users, user_profiles, notifications } from '@shared/schema';
+import { writeDatabase } from '@server/infrastructure/database';
+import { users, user_profiles, notifications } from '@server/infrastructure/schema';
 
 // Missing: withTransaction, eq, and, sql
 export class UserRegistrationService {
@@ -267,16 +267,16 @@ export class DataAccessService {
 export const EXPECTED_FIXES = {
   // Expected imports for each fixture
   MISSING_DATABASE_IMPORT: [
-    "import { database } from '@shared/database';",
+    "import { database } from '@server/infrastructure/database';",
     "import { eq } from 'drizzle-orm';"
   ],
 
   MISSING_TRANSACTION_IMPORT: [
-    "import { withTransaction } from '@shared/database';"
+    "import { withTransaction } from '@server/infrastructure/database';"
   ],
 
   MISSING_DATABASE_SERVICE: [
-    "import { databaseService } from '@shared/database';"
+    "import { databaseService } from '@server/infrastructure/database';"
   ],
 
   MISSING_DRIZZLE_IMPORTS: [
@@ -285,26 +285,26 @@ export const EXPECTED_FIXES = {
 
   REALISTIC_CHANUKA_PATTERN: [
     "import { eq, and, desc, count, withTransaction } from 'drizzle-orm';",
-    "import { withTransaction } from '@shared/database';"
+    "import { withTransaction } from '@server/infrastructure/database';"
   ],
 
   DATABASE_SERVICE_FALLBACK: [
-    "import { databaseService } from '@shared/database';",
+    "import { databaseService } from '@server/infrastructure/database';",
     "import { eq, sql } from 'drizzle-orm';"
   ],
 
   COMPLEX_TRANSACTION_PATTERN: [
-    "import { withTransaction } from '@shared/database';",
+    "import { withTransaction } from '@server/infrastructure/database';",
     "import { eq, and, sql } from 'drizzle-orm';"
   ],
 
   HEALTH_CHECK_PATTERN: [
-    "import { checkDatabaseHealth } from '@shared/database';",
-    "import { databaseService } from '@shared/database';"
+    "import { checkDatabaseHealth } from '@server/infrastructure/database';",
+    "import { databaseService } from '@server/infrastructure/database';"
   ],
 
   MULTI_DATABASE_PATTERN: [
-    "import { readDatabase, writeDatabase, operationalDb, analyticsDb } from '@shared/database';",
+    "import { readDatabase, writeDatabase, operationalDb, analyticsDb } from '@server/infrastructure/database';",
     "import { eq, count } from 'drizzle-orm';"
   ]
 };

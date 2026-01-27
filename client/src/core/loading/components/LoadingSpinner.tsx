@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { LoadingComponentProps } from '@client/shared/types';
+import { LoadingComponentProps } from '@client/lib/types';
 
 export interface LoadingSpinnerProps extends Omit<LoadingComponentProps, 'isLoading'> {
   isLoading?: boolean; // Make isLoading optional

@@ -5,7 +5,7 @@
  * and comprehensive error handling. Uses AES-GCM encryption when available.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import {
   StorageOptions,

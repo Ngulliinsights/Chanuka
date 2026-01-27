@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Provider as ReduxProvider } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ThemeProvider } from '@client/shared/contexts/ThemeContext';
 import { AnalyticsProvider } from '@client/core/analytics/AnalyticsProvider';
 import { useConnectionAware } from '@client/core/api/hooks/useConnectionAware';
 import { useAuth } from '@client/core/auth';
@@ -13,15 +12,16 @@ import { LoadingProvider } from '@client/core/loading';
 import { createNavigationProvider } from '@client/core/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
 import { AuthProvider } from '@client/features/users/hooks';
-import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
-import { useOfflineDetection } from '@client/shared/hooks/useOfflineDetection';
-import { KenyanContextProvider } from '@client/shared/context/KenyanContextProvider';
-import { ChanukaProviders } from '@client/shared/design-system';
-import { I18nProvider } from '@client/shared/hooks/use-i18n';
-import { initializeStore } from '@client/shared/infrastructure/store';
-import { AccessibilityProvider } from '@client/shared/ui/accessibility/accessibility-manager';
-import { OfflineProvider } from '@client/shared/ui/offline/offline-manager';
-import { assetLoadingManager } from '@client/shared/utils/assets';
+import { KenyanContextProvider } from '@client/lib/context/KenyanContextProvider';
+import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
+import { ChanukaProviders } from '@client/lib/design-system';
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
+import { I18nProvider } from '@client/lib/hooks/use-i18n';
+import { useOfflineDetection } from '@client/lib/hooks/useOfflineDetection';
+import { initializeStore } from '@client/lib/infrastructure/store';
+import { AccessibilityProvider } from '@client/lib/ui/accessibility/accessibility-manager';
+import { OfflineProvider } from '@client/lib/ui/offline/offline-manager';
+import { assetLoadingManager } from '@client/lib/utils/assets';
 
 import { defaultQueryClient } from './queryClient';
 
@@ -178,7 +178,7 @@ const LoadingProviderWithDeps = React.memo<{ children: React.ReactNode }>(({ chi
   const connectionAdapter = useMemo(
     () => ({
       type: (connectionInfo.connectionType ?? 'fast') as 'slow' | 'fast' | 'unknown',
-      effectiveType: connectionInfo.effectiveType,
+      effectiveType: connectionInfo.effectiveType as '2g' | '3g' | '4g' | '5g' | undefined,
       downlink: connectionInfo.downlink,
       rtt: connectionInfo.rtt,
       saveData: false,
@@ -297,6 +297,8 @@ const ReduxStoreProvider = React.memo<{ children: React.ReactNode }>(({ children
     if (!storeData?.persistor) return;
 
     const persistor = storeData.persistor as Persistor;
+    let unsubscribe: (() => void) | undefined;
+    let timeoutId: NodeJS.Timeout | undefined;
 
     // Check if already bootstrapped
     if (persistor.getState?.()?.bootstrapped) {
@@ -305,25 +307,36 @@ const ReduxStoreProvider = React.memo<{ children: React.ReactNode }>(({ children
     }
 
     // Subscribe to bootstrap completion
-    const unsubscribe = persistor.subscribe?.(() => {
+    unsubscribe = persistor.subscribe?.(() => {
       if (persistor.getState?.()?.bootstrapped && isMountedRef.current) {
         setBootstrapped(true);
+        // Cleanup immediately after bootstrap
+        if (unsubscribe) {
+          unsubscribe();
+        }
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
       }
     });
 
     // Fallback: assume bootstrapped after timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
+    timeoutId = setTimeout(() => {
       if (!bootstrapped && isMountedRef.current) {
         console.warn('[Store] Bootstrap timeout, proceeding anyway');
         setBootstrapped(true);
       }
-    }, 10000); // 10 second timeout
+    }, 5000); // Reduced to 5 second timeout
 
     return () => {
-      clearTimeout(timeoutId);
-      unsubscribe?.();
+      if (unsubscribe) {
+        unsubscribe();
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
-  }, [storeData, bootstrapped]);
+  }, [storeData]);
 
   const handleReload = useCallback(() => window.location.reload(), []);
 

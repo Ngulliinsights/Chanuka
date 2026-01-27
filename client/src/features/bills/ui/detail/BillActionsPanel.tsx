@@ -10,8 +10,8 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
 
 /**
  * Bill Actions Panel Props

@@ -124,7 +124,7 @@ import {
   initializeNeo4jDriver,
   syncPersonToGraph,
   createSponsorshipRelationship,
-} from '@shared/database/graph';
+} from '@server/infrastructure/database/graph';
 
 // Initialize on app startup
 initializeNeo4jDriver({

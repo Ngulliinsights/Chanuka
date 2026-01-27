@@ -70,7 +70,7 @@ export function createLogger(name: string) {
   fs.writeFileSync(
     path.join(projectRoot, 'server/features/users/user-service.ts'),
     `// This file contains intentional TypeScript errors for testing
-import { users } from '@shared/schema/users'; // Missing import
+import { users } from '@server/infrastructure/schema/users'; // Missing import
 // Missing logger import
 
 export class UserService {

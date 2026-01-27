@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { LoadingComponentProps } from '@client/shared/types';
+import { LoadingComponentProps } from '@client/lib/types';
 
 export interface LoadingProgressProps extends LoadingComponentProps {
   progress: number;

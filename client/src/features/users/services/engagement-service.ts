@@ -8,19 +8,19 @@
  * - Engagement analytics
  */
 
+import { CacheService } from '@client/lib/services/cache';
+import {
+  ServiceErrorFactory,
+  ValidationError
+} from '@client/lib/services/errors';
+import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   EngagementService as IEngagementService,
   UserEngagementHistory,
   EngagementFilters,
   EngagementAnalytics
-} from '@client/shared/services/interfaces';
-import {
-  ServiceErrorFactory,
-  ValidationError
-} from '@client/shared/services/errors';
-import { CacheService } from '@client/shared/services/cache';
-import { ServiceLifecycleInterface } from '@client/shared/services/factory';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/services/interfaces';
+import { logger } from '@client/lib/utils/logger';
 
 export class EngagementService implements IEngagementService, ServiceLifecycleInterface {
   public readonly id = 'EngagementService';

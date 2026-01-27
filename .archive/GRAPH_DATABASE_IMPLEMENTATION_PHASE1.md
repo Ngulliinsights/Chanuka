@@ -166,7 +166,7 @@ Login: `neo4j` / (password from `.env`)
 ### 1. Application Startup
 
 ```typescript
-import { initializeNeo4jDriver } from '@shared/database/graph';
+import { initializeNeo4jDriver } from '@server/infrastructure/database/graph';
 
 // In your app initialization
 initializeNeo4jDriver({
@@ -182,7 +182,7 @@ initializeNeo4jDriver({
 import {
   syncPersonToGraph,
   createSponsorshipRelationship,
-} from '@shared/database/graph';
+} from '@server/infrastructure/database/graph';
 
 // When a person is created/updated
 const person = await db.query.people.findById(personId);

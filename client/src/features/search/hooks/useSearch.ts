@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { searchApiClient as searchApi } from '@client/core/api/search';
-import { useToast } from '@client/shared/hooks/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 // Define types locally since they're not available in the types directory
 interface SearchRequest {

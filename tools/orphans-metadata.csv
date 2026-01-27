@@ -555,27 +555,27 @@ path,category,loc,size_kb,exports,last_commit,author,has_tests,has_todos
 "client/src/services/realistic-demo-data.ts",Service,593,19,"DemoBill, DemoUser, DemoComment, demoBills, demoUsers",2025-12-04,muski4real,no,no
 "client/src/services/webSocketService.ts",Service,330,9,"WebSocketService, webSocketService",2025-12-04,muski4real,no,no
 "client/src/setupTests.ts",Other,81,1,"",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/accessibility/index.ts",Other,12,0,"",2025-10-28,muski4real,no,no
-"client/src/shared/design-system/components/DesignStandardsDemo.tsx",Component,363,15,"DesignStandardsDemo",2025-10-28,muski4real,no,no
-"client/src/shared/design-system/components/ResponsiveButton.tsx",Component,207,5,"ResponsiveButtonProps, ResponsiveButton",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/ResponsiveContainer.tsx",Component,79,2,"ResponsiveContainerProps, ResponsiveContainer",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/ResponsiveGrid.tsx",Component,101,2,"ResponsiveGridProps, ResponsiveGrid",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/ResponsiveInput.tsx",Component,312,10,"ResponsiveInputProps, ResponsiveInput",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/ResponsiveStack.tsx",Component,111,3,"ResponsiveStackProps, ResponsiveStack",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/TouchTarget.tsx",Component,116,3,"TouchTargetProps, TouchTarget",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/card.ts",Component,140,4,"cardDesignStandards, cardUtils",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/empty-states.ts",Component,597,19,"emptyStates, emptyStateUtils",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/error-states.ts",Component,566,18,"errorStates, errorStateUtils",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/interactive-states.ts",Component,283,9,"interactiveStates, interactiveStateUtils",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/loading-states.ts",Component,542,18,"SkeletonElement, loadingStates, loadingStateUtils",2025-12-04,muski4real,no,no
-"client/src/shared/design-system/components/typography.ts",Component,314,10,"typographyDesignStandards, typographyUtils",2025-10-30,muski4real,no,no
-"client/src/shared/design-system/index.ts",Other,19,0,"",2025-10-30,muski4real,no,no
-"client/src/shared/design-system/lib/utils.ts",Utility,73,2,"cn, generateId, debounce, isEmpty, clamp",2025-10-28,muski4real,no,no
-"client/src/shared/design-system/themes/index.ts",Other,11,0,"",2025-10-28,muski4real,no,no
-"client/src/shared/design-system/utils/contrast.ts",Utility,264,7,"CONTRAST_THRESHOLDS, getContrastRatio, meetsContrastRequirement, getContrastLevel, generateAccessibleColors",2025-11-16,muski4real,no,no
-"client/src/shared/design-system/utils/index.ts",Utility,11,0,"",2025-10-28,muski4real,no,no
-"client/src/shared/index.ts",Other,19,0,"z",2025-10-28,muski4real,no,no
-"client/src/shared/interfaces/unified-interfaces.ts",Other,561,17,"LoadingState, LoadingOptions, LoadingOperation, ProgressiveStage, LoadingIndicatorProps",2025-12-04,muski4real,yes,no
+"client/src/lib/design-system/accessibility/index.ts",Other,12,0,"",2025-10-28,muski4real,no,no
+"client/src/lib/design-system/components/DesignStandardsDemo.tsx",Component,363,15,"DesignStandardsDemo",2025-10-28,muski4real,no,no
+"client/src/lib/design-system/components/ResponsiveButton.tsx",Component,207,5,"ResponsiveButtonProps, ResponsiveButton",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/ResponsiveContainer.tsx",Component,79,2,"ResponsiveContainerProps, ResponsiveContainer",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/ResponsiveGrid.tsx",Component,101,2,"ResponsiveGridProps, ResponsiveGrid",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/ResponsiveInput.tsx",Component,312,10,"ResponsiveInputProps, ResponsiveInput",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/ResponsiveStack.tsx",Component,111,3,"ResponsiveStackProps, ResponsiveStack",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/TouchTarget.tsx",Component,116,3,"TouchTargetProps, TouchTarget",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/card.ts",Component,140,4,"cardDesignStandards, cardUtils",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/empty-states.ts",Component,597,19,"emptyStates, emptyStateUtils",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/error-states.ts",Component,566,18,"errorStates, errorStateUtils",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/interactive-states.ts",Component,283,9,"interactiveStates, interactiveStateUtils",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/loading-states.ts",Component,542,18,"SkeletonElement, loadingStates, loadingStateUtils",2025-12-04,muski4real,no,no
+"client/src/lib/design-system/components/typography.ts",Component,314,10,"typographyDesignStandards, typographyUtils",2025-10-30,muski4real,no,no
+"client/src/lib/design-system/index.ts",Other,19,0,"",2025-10-30,muski4real,no,no
+"client/src/lib/design-system/lib/utils.ts",Utility,73,2,"cn, generateId, debounce, isEmpty, clamp",2025-10-28,muski4real,no,no
+"client/src/lib/design-system/themes/index.ts",Other,11,0,"",2025-10-28,muski4real,no,no
+"client/src/lib/design-system/utils/contrast.ts",Utility,264,7,"CONTRAST_THRESHOLDS, getContrastRatio, meetsContrastRequirement, getContrastLevel, generateAccessibleColors",2025-11-16,muski4real,no,no
+"client/src/lib/design-system/utils/index.ts",Utility,11,0,"",2025-10-28,muski4real,no,no
+"client/src/lib/index.ts",Other,19,0,"z",2025-10-28,muski4real,no,no
+"client/src/lib/interfaces/unified-interfaces.ts",Other,561,17,"LoadingState, LoadingOptions, LoadingOperation, ProgressiveStage, LoadingIndicatorProps",2025-12-04,muski4real,yes,no
 "client/src/store/slices/communitySlice.tsx",Other,1143,35,"communityKeys, CommunityUIProvider, useActivityFeed, useTrendingTopics, useExpertInsights",2025-12-04,muski4real,no,no
 "client/src/stubs/database-stub.ts",Other,19,1,"database, db",2025-12-04,muski4real,no,no
 "client/src/stubs/middleware-stub.ts",Other,17,1,"middleware",2025-12-04,muski4real,no,no

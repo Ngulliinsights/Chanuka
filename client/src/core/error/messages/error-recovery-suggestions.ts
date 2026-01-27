@@ -5,9 +5,10 @@
  * recovery suggestions based on error type, context, and system state
  */
 
-import { AppError, ErrorContext, ErrorRecoveryStrategy } from '../types';
+import { RecoveryStrategy } from '@client/lib/hooks/useErrorRecovery';
+
 import { ErrorDomain, ErrorSeverity } from '../constants';
-import { RecoveryStrategy } from '@client/shared/hooks/useErrorRecovery';
+import { AppError, ErrorContext, ErrorRecoveryStrategy } from '../types';
 
 // ============================================================================
 // Recovery Suggestion Types

@@ -87,7 +87,7 @@ export async function initializeStrategicDatabase(options: InitOptions = {}): Pr
 
 async function validateProductionPerformance(): Promise<void> {
   try {
-    const { createConnectionManager } = await import('@shared/database/core');
+    const { createConnectionManager } = await import('@server/infrastructure/database/core');
     const connectionManager = await createConnectionManager({
       max: 20, // Production settings
       idleTimeoutMillis: 30000,
@@ -118,7 +118,7 @@ async function validateProductionPerformance(): Promise<void> {
 
 async function validateDatabaseSecurity(): Promise<void> {
   try {
-    const { createConnectionManager } = await import('@shared/database/core');
+    const { createConnectionManager } = await import('@server/infrastructure/database/core');
     const connectionManager = await createConnectionManager();
     const pool = connectionManager.getPool();
 

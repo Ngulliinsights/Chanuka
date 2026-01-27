@@ -7,7 +7,7 @@
 ---
 
 ### Phase 2 Objectives
-Consolidate all community-related types from scattered locations across the codebase into a unified `@client/shared/types/community` module, following the successful pattern established in Phase 1 (Dashboard Types Consolidation).
+Consolidate all community-related types from scattered locations across the codebase into a unified `@client/lib/types/community` module, following the successful pattern established in Phase 1 (Dashboard Types Consolidation).
 
 **Expected Error Reduction:** 50-100 TypeScript errors → **Achieved: TypeScript compilation now shows 0 errors**
 
@@ -16,7 +16,7 @@ Consolidate all community-related types from scattered locations across the code
 ### Deliverables Completed
 
 #### 1. **Unified Community Types Module Structure**
-Created 4 modular files in `client/src/shared/types/community/`:
+Created 4 modular files in `client/src/lib/types/community/`:
 
 **community-base.ts (17 KB)**
 - Discussion Types: `DiscussionThread`, `DiscussionThreadMetadata`, `ThreadParticipant`
@@ -57,7 +57,7 @@ Created `client/src/core/community/types.ts`:
 #### 3. **Configuration Updates**
 - Added path mapping to `tsconfig.json`
 - Updated shared types index
-- All path aliases now support `@client/shared/types/community`
+- All path aliases now support `@client/lib/types/community`
 
 #### 4. **Import Migration**
 ✅ Updated 5 key files:
@@ -94,7 +94,7 @@ Consolidated **70+ community types** from scattered locations into unified modul
 ### Architecture
 
 ```
-@client/shared/types/community/
+@client/lib/types/community/
 ├── community-base.ts      (Core entity + query types)
 ├── community-hooks.ts     (React hook types)
 ├── community-services.ts  (API/WebSocket types)
@@ -113,8 +113,8 @@ Consolidated **70+ community types** from scattered locations into unified modul
 
 All community features now import from single source:
 ```typescript
-import type { Comment, DiscussionThread, Expert } from '@client/shared/types/community';
-import { calculateCommentEngagementScore, formatCommentForDisplay } from '@client/shared/types/community';
+import type { Comment, DiscussionThread, Expert } from '@client/lib/types/community';
+import { calculateCommentEngagementScore, formatCommentForDisplay } from '@client/lib/types/community';
 ```
 
 **API Service Updated:**

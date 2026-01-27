@@ -43,10 +43,10 @@ const IMPORT_MAPPINGS = {
   
   // Database connection imports
   database: [
-    { pattern: /from ['"]\.\.\/shared\/database\/connection['"]/g, replacement: "from '@shared/database'" },
-    { pattern: /from ['"]\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@shared/database'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@shared/database'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@shared/database'" },
+    { pattern: /from ['"]\.\.\/shared\/database\/connection['"]/g, replacement: "from '@server/infrastructure/database'" },
+    { pattern: /from ['"]\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@server/infrastructure/database'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@server/infrastructure/database'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/database\/connection['"]/g, replacement: "from '@server/infrastructure/database'" },
   ],
   
   // Validation schema imports

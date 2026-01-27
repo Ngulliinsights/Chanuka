@@ -16,7 +16,7 @@
  * @module ServiceRegistry
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { ErrorFactory } from '../error';
 
@@ -781,7 +781,7 @@ const registerCoreServices = async (): Promise<void> => {
   try {
     // Note: Uncomment and adjust these imports as services become available
     // const { BillTrackingService } = await import('@client/features/bills/services/tracking');
-    // const { WebSocketService } = await import('@client/shared/services/webSocketService');
+    // const { WebSocketService } = await import('@client/lib/services/webSocketService');
 
     // globalServiceLocator.registerService('billTrackingService', BillTrackingService);
     // globalServiceLocator.registerService('webSocketService', WebSocketService);

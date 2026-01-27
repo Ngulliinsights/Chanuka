@@ -7,11 +7,11 @@ import React from 'react';
  * level progression, and achievement tracking.
  */
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
 
 interface PersonalCivicScore {
   totalScore: number;

@@ -10,7 +10,7 @@
 
 ### Current Type Organization
 1. **`client/src/core/api/types/`** - API-related types (well organized)
-2. **`client/src/shared/types/`** - Shared types (minimal, mostly re-exports)
+2. **`client/src/lib/types/`** - Shared types (minimal, mostly re-exports)
 3. **`client/src/types/`** - Legacy location (deprecated but active)
 
 ## Migration Strategy: REPLACE with Gradual Migration
@@ -27,11 +27,11 @@
 - Used in: Privacy components, auth forms
 
 #### Medium Priority - Navigation Types
-- `@client/types/navigation` → `@client/shared/types/navigation` (new)
+- `@client/types/navigation` → `@client/lib/types/navigation` (new)
 - Used in: Navigation components, routing
 
 #### Medium Priority - Mobile Types
-- `@client/types/mobile` → `@client/shared/types/mobile` (new)
+- `@client/types/mobile` → `@client/lib/types/mobile` (new)
 - Used in: Mobile UI components
 
 #### Low Priority - Core Types
@@ -40,7 +40,7 @@
 
 ### Phase 2: Create Missing Type Locations
 
-#### Create `client/src/shared/types/navigation.ts`
+#### Create `client/src/lib/types/navigation.ts`
 ```typescript
 // Navigation-specific types that don't belong in API layer
 export type NavigationItem = { ... }
@@ -48,7 +48,7 @@ export type NavigationSection = { ... }
 export type UserRole = { ... }
 ```
 
-#### Create `client/src/shared/types/mobile.ts`
+#### Create `client/src/lib/types/mobile.ts`
 ```typescript
 // Mobile UI-specific types
 export type MobileTab = { ... }
@@ -94,9 +94,9 @@ After all imports are updated:
 ### Step 1: Create Missing Type Files
 ```bash
 # Create navigation types
-mkdir -p client/src/shared/types
+mkdir -p client/src/lib/types
 # Copy navigation types from legacy location
-# Update exports in client/src/shared/types/index.ts
+# Update exports in client/src/lib/types/index.ts
 ```
 
 ### Step 2: Update Imports (Automated)

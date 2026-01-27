@@ -11,7 +11,7 @@
  */
 
 import { PerformanceMonitor } from '@client/core/performance/monitor';
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 export interface PerformanceThresholds {
   home: number; // < 2000ms

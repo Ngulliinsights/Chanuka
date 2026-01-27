@@ -435,7 +435,7 @@ class PluralSingularFixer {
   private isProtectedContext(line: string): boolean {
     // Schema imports and exports should always keep plural table names
     if ((line.includes('import') || line.includes('export')) && 
-        (line.includes('@shared/schema') || line.includes('schema') || line.includes('from'))) {
+        (line.includes('@server/infrastructure/schema') || line.includes('schema') || line.includes('from'))) {
       return true;
     }
     

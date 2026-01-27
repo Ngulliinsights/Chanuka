@@ -15,20 +15,20 @@ import {
 import React, { useState, useEffect } from 'react';
 
 import { useBillAnalysis } from '@client/features/bills';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card } from '@client/lib/design-system';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 // Using a simple date formatting function instead of date-fns
 const formatDistanceToNow = (date: Date) => {
   const now = new Date();

@@ -4,7 +4,7 @@
  * Handles user navigation preferences and settings
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { NavigationPreferences } from './types';
 

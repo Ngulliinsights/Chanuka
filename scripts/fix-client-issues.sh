@@ -128,7 +128,7 @@ find client/src -name "*.ts" -o -name "*.tsx" | while read -r file; do
         sed -i "s|from ['\"]../../../types|from '@client/types|g" "$file"
         sed -i "s|from ['\"]../../../utils|from '@client/utils|g" "$file"
         sed -i "s|from ['\"]../../../core|from '@client/core|g" "$file"
-        sed -i "s|from ['\"]../../../shared|from '@client/shared|g" "$file"
+        sed -i "s|from ['\"]../../../shared|from '@client/lib|g" "$file"
         
         print_success "Converted deep imports in: $file"
     fi

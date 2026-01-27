@@ -9,15 +9,15 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 export default function RegisterPage() {
   const navigate = useNavigate();

@@ -3,14 +3,14 @@
  * Helper functions for migrating from legacy to unified security
  */
 
+import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
+import { SecurityErrorFactory } from '../unified/error-handler';
 import {
   UnifiedSecurityConfig,
   MigrationValidationResult,
   SecurityError,
   SecurityErrorType
 } from '../unified/security-interface';
-import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
-import { SecurityErrorFactory } from '../unified/error-handler';
 
 export interface LegacySecurityConfig {
   enableCSP: boolean;

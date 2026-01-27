@@ -6,7 +6,7 @@
  */
 
 // Infrastructure hooks - these manage system-level concerns
-export { useOfflineDetection } from '@client/shared/hooks/useOfflineDetection';
+export { useOfflineDetection } from '@client/lib/hooks/useOfflineDetection';
 export { useConnectionAware } from '../api/hooks/useConnectionAware';
 export { useServiceStatus } from '../api/hooks/useServiceStatus';
 export { useOnlineStatus } from '../loading/hooks';
@@ -15,8 +15,8 @@ export { useOnlineStatus } from '../loading/hooks';
 // Original files are still in hooks/ directory
 // Transition: hooks/ → core/ over next 2 weeks
 
-export { useErrorRecovery } from '@client/shared/hooks/useErrorRecovery';
-export { useOfflineCapabilities } from '@client/shared/hooks/useOfflineCapabilities';
+export { useErrorRecovery } from '@client/lib/hooks/useErrorRecovery';
+export { useOfflineCapabilities } from '@client/lib/hooks/useOfflineCapabilities';
 
 // Error handling
-export { useErrorRecovery as useErrorHandling } from '@client/shared/hooks/useErrorRecovery';
+export { useErrorRecovery as useErrorHandling } from '@client/lib/hooks/useErrorRecovery';

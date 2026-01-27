@@ -10,15 +10,15 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { userJourneyTracker, JourneyAnalytics } from '@client/features/analytics/model/user-journey-tracker';
 import { useCallback } from 'react';
 
 import { analyticsApiService } from '@client/core/api/analytics';
 import { ErrorAnalyticsService } from '@client/core/error/analytics';
 import { PerformanceMonitor } from '@client/core/performance/monitor';
 import type { PerformanceMetric, WebVitalsMetric } from '@client/core/performance/types';
-import type { UserRole, NavigationSection } from '@client/shared/types/navigation';
-import { logger } from '@client/shared/utils/logger';
+import { userJourneyTracker, JourneyAnalytics } from '@client/features/analytics/model/user-journey-tracker';
+import type { UserRole, NavigationSection } from '@client/lib/types/navigation';
+import { logger } from '@client/lib/utils/logger';
 
 /**
  * Persona-specific analytics configuration

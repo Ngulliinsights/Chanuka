@@ -41,7 +41,7 @@ export function processData(data: any) {
 
 // Example 3: Unused database service imports
 export const unusedDatabaseImports = `
-import { databaseService } from '@shared/database';
+import { databaseService } from '@server/infrastructure/database';
 import { eq, and, desc } from 'drizzle-orm';
 import { users, bills } from '@shared/schema';
 
@@ -72,7 +72,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
 // Example 5: Unused variables in service functions
 export const unusedVariablesInServices = `
 import { logger } from '@shared/core';
-import { databaseService } from '@shared/database';
+import { databaseService } from '@server/infrastructure/database';
 
 export async function getUserProfile(user_id: string) {
   const startTime = Date.now(); // Unused variable

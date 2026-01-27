@@ -21,8 +21,8 @@ import {
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { copySystem } from '@client/shared/content/copy-system';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
+import { copySystem } from '@client/lib/content/copy-system';
 import {
   Badge,
   Button,
@@ -31,7 +31,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 
 /**
  * Extended UserProfile interface to include persona and onboarding status

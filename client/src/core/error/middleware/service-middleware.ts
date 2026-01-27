@@ -5,7 +5,6 @@
  * normalization, and service-specific recovery strategies.
  */
 
-import { AppError, RecoveryStrategy } from '../types';
 import {
   ErrorDomain,
   ErrorSeverity,
@@ -15,6 +14,7 @@ import {
   coreErrorHandler,
   ErrorAnalyticsService,
 } from '../index';
+import { AppError, RecoveryStrategy } from '../types';
 
 /**
  * Service architecture error codes

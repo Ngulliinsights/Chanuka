@@ -12,7 +12,7 @@
  * @version 2.0.0
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { DeviceDetector, deviceDetector } from './device-detector';
 // import { TouchHandler, touchHandler } from './touch-handler'; // Deprecated - use SwipeGestures instead

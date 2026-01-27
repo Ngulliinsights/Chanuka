@@ -20,7 +20,7 @@ describe('Form Builder FSD', () => {
 
   describe('Form Builder Services', () => {
     it('should create form service', () => {
-      const { FormBuilderServiceImpl } = require('@client/shared/lib/form-builder/services/form-builder.service');
+      const { FormBuilderServiceImpl } = require('@lib/form-builder/services/form-builder.service');
 
       const service = new FormBuilderServiceImpl({
         schema: {},
@@ -37,7 +37,7 @@ describe('Form Builder FSD', () => {
 
   describe('Form Builder Factories', () => {
     it('should create login form builder', () => {
-      const { createLoginFormBuilder } = require('@client/shared/lib/form-builder/factories/form-builder.factory');
+      const { createLoginFormBuilder } = require('@lib/form-builder/factories/form-builder.factory');
 
       const formBuilder = createLoginFormBuilder();
       expect(formBuilder).toBeDefined();
@@ -45,7 +45,7 @@ describe('Form Builder FSD', () => {
     });
 
     it('should create registration form builder', () => {
-      const { createRegistrationFormBuilder } = require('@client/shared/lib/form-builder/factories/form-builder.factory');
+      const { createRegistrationFormBuilder } = require('@lib/form-builder/factories/form-builder.factory');
 
       const formBuilder = createRegistrationFormBuilder();
       expect(formBuilder).toBeDefined();
@@ -55,7 +55,7 @@ describe('Form Builder FSD', () => {
 
   describe('Form Builder Utilities', () => {
     it('should create schema from config', () => {
-      const { createSchemaFromConfig } = require('@client/shared/lib/form-builder/utils/form-utils');
+      const { createSchemaFromConfig } = require('@lib/form-builder/utils/form-utils');
 
       const config = {
         fields: [
@@ -74,14 +74,14 @@ describe('Form Builder FSD', () => {
     });
 
     it('should validate field', () => {
-      const { validateField } = require('@client/shared/lib/form-builder/utils/form-utils');
+      const { validateField } = require('@lib/form-builder/utils/form-utils');
 
       const result = validateField({}, 'email', 'test@example.com');
       expect(result).toBeUndefined();
     });
 
     it('should validate form data', () => {
-      const { validateFormData } = require('@client/shared/lib/form-builder/utils/form-utils');
+      const { validateFormData } = require('@lib/form-builder/utils/form-utils');
 
       const data = {
         email: 'test@example.com',
@@ -97,7 +97,7 @@ describe('Form Builder FSD', () => {
 
   describe('Form Builder Components', () => {
     it('should render dynamic form', () => {
-      const { DynamicForm } = require('@client/shared/lib/form-builder/components/DynamicForm');
+      const { DynamicForm } = require('@lib/form-builder/components/DynamicForm');
 
       const config = {
         fields: [

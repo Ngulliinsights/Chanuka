@@ -3,26 +3,26 @@
  * Demonstrates the security system features
  */
 
+import { getSecuritySystem } from '@client/security';
 import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Activity } from 'lucide-react';
 import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { SecurityDashboard } from '@client/features/security/ui/dashboard/SecurityDashboard';
 import { SecuritySettings } from '@client/features/security/ui/dashboard/SecuritySettings';
-import { getSecuritySystem } from '@client/security';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 export default function SecurityDemoPage() {
   const [testInput, setTestInput] = useState('');

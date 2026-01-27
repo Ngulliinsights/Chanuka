@@ -7,12 +7,26 @@
 
 // Core interfaces and types
 export * from './security-interface';
+import { SecurityHealth, SecurityMetrics, UnifiedSecurityConfig } from './security-interface';
 
+// Security components
 // Security components
 import { UnifiedCSPManager } from './csp-manager';
 import { UnifiedInputSanitizer } from './input-sanitizer';
 import { SecurityErrorHandler, SecurityErrorFactory, SecurityOperationError } from './error-handler';
 import { SecurityErrorMiddleware, createSecurityErrorMiddleware } from './error-middleware';
+import { UnifiedRateLimiter } from './rate-limiter';
+
+export {
+  UnifiedCSPManager,
+  UnifiedInputSanitizer,
+  SecurityErrorHandler,
+  SecurityErrorFactory,
+  SecurityOperationError,
+  SecurityErrorMiddleware,
+  createSecurityErrorMiddleware,
+  UnifiedRateLimiter
+};
 
 // Configuration
 export {
@@ -49,11 +63,11 @@ import {
 // legacy exports removed to avoid duplicate/declaration conflicts — use unified API instead
 
 // Default unified configuration
-export const DEFAULT_UNIFIED_CONFIG = {
+export const DEFAULT_UNIFIED_CONFIG: UnifiedSecurityConfig = {
   csp: {
     enabled: true,
     reportOnly: false,
-    directives: STANDARD_CSP_CONFIG.development,
+    directives: { ...STANDARD_CSP_CONFIG.development }, // Spread to copy/make mutable if needed
     nonce: undefined,
   },
   inputSanitization: {
@@ -72,46 +86,114 @@ export const DEFAULT_UNIFIED_CONFIG = {
     logLevel: 'info',
     reportToBackend: true,
   },
-} as const;
+};
 
 /**
- * Create unified security system instance
+ * Unified Security System Class
  */
-export function createUnifiedSecuritySystem(config?: Partial<typeof DEFAULT_UNIFIED_CONFIG>) {
-  const finalConfig = { ...DEFAULT_UNIFIED_CONFIG, ...config };
+export class UnifiedSecuritySystem {
+  public cspManager: UnifiedCSPManager;
+  public sanitizer: UnifiedInputSanitizer;
+  public errorHandler: SecurityErrorHandler;
+  public errorMiddleware: SecurityErrorMiddleware;
+  public rateLimiter: UnifiedRateLimiter;
+  public compatibilityLayer: SecurityCompatibilityLayer;
 
-  return {
-    cspManager: new UnifiedCSPManager({
+  constructor(config?: Partial<UnifiedSecurityConfig>) {
+    const finalConfig = { ...DEFAULT_UNIFIED_CONFIG, ...config } as UnifiedSecurityConfig;
+
+    this.cspManager = new UnifiedCSPManager({
       enabled: finalConfig.csp.enabled,
       reportOnly: finalConfig.csp.reportOnly,
       directives: finalConfig.csp.directives,
       reportUri: '/api/security/csp-violations',
-    }),
-    sanitizer: new UnifiedInputSanitizer({
+    });
+
+    this.sanitizer = new UnifiedInputSanitizer({
       enabled: finalConfig.inputSanitization.enabled,
       mode: finalConfig.inputSanitization.mode,
       allowedTags: finalConfig.inputSanitization.allowedTags,
       allowedAttributes: finalConfig.inputSanitization.allowedAttributes,
-    }),
-    errorHandler: new SecurityErrorHandler(finalConfig.errorHandling),
-    errorMiddleware: new SecurityErrorMiddleware(finalConfig.errorHandling),
-    compatibilityLayer: new SecurityCompatibilityLayer(),
-  };
+    });
+
+    this.errorHandler = new SecurityErrorHandler(finalConfig.errorHandling);
+    this.errorMiddleware = new SecurityErrorMiddleware(finalConfig.errorHandling);
+    
+    this.rateLimiter = new UnifiedRateLimiter({
+      enabled: finalConfig.rateLimiting.enabled,
+      windowMs: finalConfig.rateLimiting.windowMs,
+      maxRequests: finalConfig.rateLimiting.maxRequests,
+    });
+
+    this.compatibilityLayer = new SecurityCompatibilityLayer();
+  }
+
+  async initialize(config?: Partial<UnifiedSecurityConfig>): Promise<void> {
+    await Promise.all([
+      this.cspManager.initialize(),
+      this.sanitizer.initialize(config?.inputSanitization),
+      this.errorHandler.initialize(config?.errorHandling),
+      this.errorMiddleware.initialize(config?.errorHandling),
+      this.rateLimiter.initialize(config?.rateLimiting),
+    ]);
+  }
+
+  async shutdown(): Promise<void> {
+    await Promise.all([
+      this.cspManager.shutdown(),
+      this.sanitizer.shutdown(),
+      this.errorHandler.shutdown(),
+      this.errorMiddleware.shutdown(),
+      this.rateLimiter.shutdown(),
+      this.compatibilityLayer.shutdown(),
+    ]);
+  }
+
+  getHealthStatus(): SecurityHealth {
+    const cspStatus = this.cspManager.getHealthStatus();
+    const sanitizerStatus = this.sanitizer.getHealthStatus();
+    const errorHandlerStatus = this.errorHandler.getHealthStatus();
+    const rateLimiterStatus = this.rateLimiter.getHealthStatus();
+
+    const allHealthy = cspStatus.status === 'healthy' && 
+                       sanitizerStatus.status === 'healthy' && 
+                       errorHandlerStatus.status === 'healthy' && 
+                       rateLimiterStatus.status === 'healthy';
+
+    return {
+      enabled: true,
+      status: allHealthy ? 'healthy' : 'degraded',
+      lastCheck: new Date(),
+      issues: [
+        ...cspStatus.issues,
+        ...sanitizerStatus.issues,
+        ...errorHandlerStatus.issues,
+        ...rateLimiterStatus.issues
+      ],
+    };
+  }
+
+  getMetrics(): SecurityMetrics {
+    const cspMetrics = this.cspManager.getMetrics();
+    const sanitizerMetrics = this.sanitizer.getMetrics();
+    const errorMetrics = this.errorHandler.getMetrics();
+    const rateLimiterMetrics = this.rateLimiter.getMetrics();
+
+    return {
+      requestsProcessed: cspMetrics.requestsProcessed + sanitizerMetrics.requestsProcessed + rateLimiterMetrics.requestsProcessed,
+      threatsBlocked: cspMetrics.threatsBlocked + sanitizerMetrics.threatsBlocked + rateLimiterMetrics.threatsBlocked,
+      averageResponseTime: (cspMetrics.averageResponseTime + sanitizerMetrics.averageResponseTime + rateLimiterMetrics.averageResponseTime) / 3,
+      errorRate: Math.max(cspMetrics.errorRate, sanitizerMetrics.errorRate, errorMetrics.errorRate, rateLimiterMetrics.errorRate),
+    };
+  }
 }
 
 /**
  * Initialize unified security system with default configuration
  */
-export async function initializeUnifiedSecurity(config?: Partial<typeof DEFAULT_UNIFIED_CONFIG>) {
-  const system = createUnifiedSecuritySystem(config);
-
-  await Promise.all([
-    system.cspManager.initialize(),
-    system.sanitizer.initialize(config?.inputSanitization),
-    system.errorHandler.initialize(config?.errorHandling),
-    system.errorMiddleware.initialize(config?.errorHandling),
-  ]);
-
+export async function initializeUnifiedSecurity(config?: Partial<UnifiedSecurityConfig>) {
+  const system = new UnifiedSecuritySystem(config);
+  await system.initialize(config);
   return system;
 }
 
@@ -193,7 +275,7 @@ export default {
   SecurityMigrationUtils,
   STANDARD_CSP_CONFIG,
   DEFAULT_UNIFIED_CONFIG,
-  createUnifiedSecuritySystem,
+  UnifiedSecuritySystem,
   initializeUnifiedSecurity,
   isUnifiedSecurityEnabled,
   getSecurityStatus,

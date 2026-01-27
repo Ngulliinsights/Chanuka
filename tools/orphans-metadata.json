@@ -4001,7 +4001,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/accessibility/index.ts",
+      "path": "client/src/lib/design-system/accessibility/index.ts",
       "category": "Other",
       "loc": 12,
       "size_kb": 0,
@@ -4012,7 +4012,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/DesignStandardsDemo.tsx",
+      "path": "client/src/lib/design-system/components/DesignStandardsDemo.tsx",
       "category": "Component",
       "loc": 363,
       "size_kb": 15,
@@ -4023,7 +4023,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/ResponsiveButton.tsx",
+      "path": "client/src/lib/design-system/components/ResponsiveButton.tsx",
       "category": "Component",
       "loc": 207,
       "size_kb": 5,
@@ -4034,7 +4034,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/ResponsiveContainer.tsx",
+      "path": "client/src/lib/design-system/components/ResponsiveContainer.tsx",
       "category": "Component",
       "loc": 79,
       "size_kb": 2,
@@ -4045,7 +4045,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/ResponsiveGrid.tsx",
+      "path": "client/src/lib/design-system/components/ResponsiveGrid.tsx",
       "category": "Component",
       "loc": 101,
       "size_kb": 2,
@@ -4056,7 +4056,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/ResponsiveInput.tsx",
+      "path": "client/src/lib/design-system/components/ResponsiveInput.tsx",
       "category": "Component",
       "loc": 312,
       "size_kb": 10,
@@ -4067,7 +4067,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/ResponsiveStack.tsx",
+      "path": "client/src/lib/design-system/components/ResponsiveStack.tsx",
       "category": "Component",
       "loc": 111,
       "size_kb": 3,
@@ -4078,7 +4078,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/TouchTarget.tsx",
+      "path": "client/src/lib/design-system/components/TouchTarget.tsx",
       "category": "Component",
       "loc": 116,
       "size_kb": 3,
@@ -4089,7 +4089,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/card.ts",
+      "path": "client/src/lib/design-system/components/card.ts",
       "category": "Component",
       "loc": 140,
       "size_kb": 4,
@@ -4100,7 +4100,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/empty-states.ts",
+      "path": "client/src/lib/design-system/components/empty-states.ts",
       "category": "Component",
       "loc": 597,
       "size_kb": 19,
@@ -4111,7 +4111,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/error-states.ts",
+      "path": "client/src/lib/design-system/components/error-states.ts",
       "category": "Component",
       "loc": 566,
       "size_kb": 18,
@@ -4122,7 +4122,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/interactive-states.ts",
+      "path": "client/src/lib/design-system/components/interactive-states.ts",
       "category": "Component",
       "loc": 283,
       "size_kb": 9,
@@ -4133,7 +4133,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/loading-states.ts",
+      "path": "client/src/lib/design-system/components/loading-states.ts",
       "category": "Component",
       "loc": 542,
       "size_kb": 18,
@@ -4144,7 +4144,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/components/typography.ts",
+      "path": "client/src/lib/design-system/components/typography.ts",
       "category": "Component",
       "loc": 314,
       "size_kb": 10,
@@ -4155,7 +4155,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/index.ts",
+      "path": "client/src/lib/design-system/index.ts",
       "category": "Other",
       "loc": 19,
       "size_kb": 0,
@@ -4166,7 +4166,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/lib/utils.ts",
+      "path": "client/src/lib/design-system/lib/utils.ts",
       "category": "Utility",
       "loc": 73,
       "size_kb": 2,
@@ -4177,7 +4177,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/themes/index.ts",
+      "path": "client/src/lib/design-system/themes/index.ts",
       "category": "Other",
       "loc": 11,
       "size_kb": 0,
@@ -4188,7 +4188,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/utils/contrast.ts",
+      "path": "client/src/lib/design-system/utils/contrast.ts",
       "category": "Utility",
       "loc": 264,
       "size_kb": 7,
@@ -4199,7 +4199,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/design-system/utils/index.ts",
+      "path": "client/src/lib/design-system/utils/index.ts",
       "category": "Utility",
       "loc": 11,
       "size_kb": 0,
@@ -4210,7 +4210,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/index.ts",
+      "path": "client/src/lib/index.ts",
       "category": "Other",
       "loc": 19,
       "size_kb": 0,
@@ -4221,7 +4221,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/shared/interfaces/unified-interfaces.ts",
+      "path": "client/src/lib/interfaces/unified-interfaces.ts",
       "category": "Other",
       "loc": 561,
       "size_kb": 17,

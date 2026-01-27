@@ -11,7 +11,7 @@ This guide provides step-by-step instructions for implementing the service archi
 Create the service architecture guidelines file:
 
 ```typescript
-// client/src/shared/lib/services/architecture-guidelines.ts
+// client/src/lib/lib/services/architecture-guidelines.ts
 
 /**
  * Service Architecture Guidelines
@@ -57,7 +57,7 @@ export const SERVICE_ARCHITECTURE_GUIDELINES: ServiceArchitectureGuidelines = {
 Create the error handling framework:
 
 ```typescript
-// client/src/shared/lib/services/error-handling.ts
+// client/src/lib/lib/services/error-handling.ts
 
 /**
  * Service Error Handling Framework
@@ -130,7 +130,7 @@ export class ServiceErrorHandler {
 Create the caching framework:
 
 ```typescript
-// client/src/shared/lib/services/cache-service.ts
+// client/src/lib/lib/services/cache-service.ts
 
 /**
  * Unified Cache Service
@@ -452,7 +452,7 @@ export class UserProfileServiceImpl implements IUserProfileService {
 ### 2.2 Service Factory Implementation
 
 ```typescript
-// client/src/shared/lib/services/service-factory.ts
+// client/src/lib/lib/services/service-factory.ts
 
 /**
  * Service Factory for Dependency Injection
@@ -541,7 +541,7 @@ export function initializeServices(): void {
 ### 3.1 Create Testing Utilities
 
 ```typescript
-// client/src/shared/lib/services/testing-utils.ts
+// client/src/lib/lib/services/testing-utils.ts
 
 /**
  * Service Testing Utilities
@@ -746,7 +746,7 @@ describe('UserProfileService', () => {
 ### 4.1 Gradual Migration Strategy
 
 ```typescript
-// client/src/shared/lib/services/migration-utils.ts
+// client/src/lib/lib/services/migration-utils.ts
 
 /**
  * Migration Utilities
@@ -816,7 +816,7 @@ export class LegacyUserServiceWrapper {
 ### 4.2 Feature Flag Implementation
 
 ```typescript
-// client/src/shared/lib/services/feature-flags.ts
+// client/src/lib/lib/services/feature-flags.ts
 
 /**
  * Feature Flags for Migration

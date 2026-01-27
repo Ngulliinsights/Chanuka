@@ -250,7 +250,7 @@ SimpleTool/.kiro/specs/type-system-standardization/
 
 ### Type System Implementation
 ```
-SimpleTool/client/src/shared/types/
+SimpleTool/client/src/lib/types/
 ├── core/                        (Foundation)
 ├── dashboard/                   (Dashboard types - UPDATED)
 ├── bill/                        (Bill types - UPDATED)
@@ -297,10 +297,10 @@ Use this checklist to verify the project status:
 
 | Pattern | Location | Status |
 |---------|----------|--------|
-| Discriminated Unions | `client/src/shared/types/components/dashboard.ts` | ✅ Active |
+| Discriminated Unions | `client/src/lib/types/components/dashboard.ts` | ✅ Active |
 | Type Guards | All type modules | ✅ Active |
-| Branded Types | `client/src/shared/types/core/` | ✅ Planned |
-| Result Types | `client/src/shared/types/core/` | ✅ Planned |
+| Branded Types | `client/src/lib/types/core/` | ✅ Planned |
+| Result Types | `client/src/lib/types/core/` | ✅ Planned |
 | Readonly Properties | All new code | ✅ Active |
 
 ### Error Categories

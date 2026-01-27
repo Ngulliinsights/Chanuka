@@ -8,7 +8,7 @@ Successfully migrated all server imports from the old schema structure to the ne
 ### 1. Import Path Updates
 - ✅ Updated all imports from relative paths to `@shared/schema`
 - ✅ Replaced `from '../../../shared/schema/schema.js'` with `from '@shared/schema'`
-- ✅ Updated database connection imports to use `@shared/database/connection`
+- ✅ Updated database connection imports to use `@server/infrastructure/database/connection`
 
 ### 2. Table Name Standardization
 Updated table names to match the new schema organization:

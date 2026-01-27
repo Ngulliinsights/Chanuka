@@ -428,11 +428,11 @@
 **Deliverable**: Documentation of client utilities and their specialization
 
 **Subtasks**:
-- [ ] Review `client/src/shared/utils/logger.ts` (390 lines)
+- [ ] Review `client/src/lib/utils/logger.ts` (390 lines)
 - [ ] Document React-specific features (RenderTrackingData, component lifecycle)
-- [ ] Review `client/src/shared/utils/security.ts` (114 lines)
+- [ ] Review `client/src/lib/utils/security.ts` (114 lines)
 - [ ] Document browser-specific features (CSP, DOM sanitizer)
-- [ ] Review `client/src/shared/utils/i18n.ts` (600+ lines)
+- [ ] Review `client/src/lib/utils/i18n.ts` (600+ lines)
 - [ ] Document Kenya-specific features (Swahili, phone validation, KES currency)
 - [ ] Create SPECIALIZED_CLIENT_UTILITIES.md explaining why these stay separate
 
@@ -487,9 +487,9 @@
 **Deliverable**: Client utilities remain separate and functional
 
 **Subtasks**:
-- [ ] Verify `client/src/shared/utils/logger.ts` is NOT deleted
-- [ ] Verify `client/src/shared/utils/security.ts` is NOT deleted
-- [ ] Verify `client/src/shared/utils/i18n.ts` is NOT deleted
+- [ ] Verify `client/src/lib/utils/logger.ts` is NOT deleted
+- [ ] Verify `client/src/lib/utils/security.ts` is NOT deleted
+- [ ] Verify `client/src/lib/utils/i18n.ts` is NOT deleted
 - [ ] Test React component lifecycle tracking in logger
 - [ ] Test browser CSP and DOM sanitization in security
 - [ ] Test Kenya-specific translations in i18n

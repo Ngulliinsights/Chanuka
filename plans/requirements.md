@@ -89,9 +89,9 @@
 **User Story**: As a developer, I want to share only Node-dependency-free modules with the client so that browser-incompatible code remains separate and specialized client utilities are preserved.
 
 **Acceptance Criteria**:
-- **R6.1**: WHEN client/src/shared/utils/logger.ts exists THEN the system SHALL preserve it WHERE React component lifecycle tracking is specialized for browser
-- **R6.2**: WHEN client/src/shared/utils/security.ts exists THEN the system SHALL preserve it WHERE browser-safe DOM sanitization is superior to Node crypto implementation
-- **R6.3**: WHEN client/src/shared/utils/i18n.ts exists THEN the system SHALL preserve it WHERE Kenya-specific translations and phone validation are domain-specific
+- **R6.1**: WHEN client/src/lib/utils/logger.ts exists THEN the system SHALL preserve it WHERE React component lifecycle tracking is specialized for browser
+- **R6.2**: WHEN client/src/lib/utils/security.ts exists THEN the system SHALL preserve it WHERE browser-safe DOM sanitization is superior to Node crypto implementation
+- **R6.3**: WHEN client/src/lib/utils/i18n.ts exists THEN the system SHALL preserve it WHERE Kenya-specific translations and phone validation are domain-specific
 - **R6.4**: WHEN client imports shared types THEN the system SHALL use `@shared/types` WHERE type definitions have no Node dependencies
 - **R6.5**: WHEN client imports shared constants THEN the system SHALL use `@shared/constants` WHERE primitive values are environment-agnostic
 - **R6.6**: WHEN client builds THEN the system SHALL compile successfully WHERE only browser-compatible modules from @shared are imported

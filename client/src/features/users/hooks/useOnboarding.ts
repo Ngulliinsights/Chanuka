@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import type { OnboardingStatus } from '@client/shared/types';
+import type { OnboardingStatus } from '@client/lib/types';
 
 import { OnboardingService } from '../services/onboarding-service';
 

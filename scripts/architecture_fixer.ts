@@ -348,8 +348,8 @@ class TypeScriptConfigUpdater {
         '@shared/core/*': ['./shared/core/src/*'],
         '@shared/schema': ['./shared/schema/index.ts'],
         '@shared/schema/*': ['./shared/schema/*'],
-        '@shared/database': ['./shared/database/index.ts'],
-        '@shared/database/*': ['./shared/database/*'],
+        '@server/infrastructure/database': ['./server/infrastructure/database/index.ts'],
+        '@server/infrastructure/database/*': ['./server/infrastructure/database/*'],
         '@server/*': ['./server/*'],
         '@/*': ['./client/src/*']
       };

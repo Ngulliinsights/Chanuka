@@ -2,7 +2,7 @@
  * Dashboard Widget Definitions - Consolidated widget configurations
  */
 
-import type { WidgetConfig, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/shared/types/dashboard';
+import type { WidgetConfig, AnalyticsMetrics, PerformanceMetrics, EngagementMetrics } from '@client/lib/types/dashboard';
 
 // Widget type definitions
 export enum WidgetType {

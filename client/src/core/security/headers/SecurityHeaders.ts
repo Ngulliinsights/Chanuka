@@ -4,5 +4,5 @@
  * Manages security headers and HTTPS enforcement
  */
 
-import type { SecurityEvent } from '@client/shared/types';
+import type { SecurityEvent } from '@client/lib/types';
 impo;

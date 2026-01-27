@@ -41,8 +41,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@client/core/auth';
 import type { User } from '@client/core/auth/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
-import PerformanceMonitor from '@client/shared/components/performance/PerformanceMonitor';
-import { copySystem } from '@client/shared/content/copy-system';
+import PerformanceMonitor from '@client/lib/components/performance/PerformanceMonitor';
+import { copySystem } from '@client/lib/content/copy-system';
 import {
   Badge,
   Button,
@@ -51,8 +51,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 // Stub components for future implementation
 const PlatformStats: React.FC<{ stats: StatItem[] }> = ({ stats }) => (

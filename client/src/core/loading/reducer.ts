@@ -9,7 +9,7 @@ import {
   LoadingAction,
   LoadingOperation,
   LoadingMetrics,
-} from '@client/shared/types';
+} from '@client/lib/types';
 
 /**
  * Main reducer for managing loading state
@@ -478,17 +478,24 @@ export function createInitialLoadingState(): LoadingStateData {
   return {
     isLoading: false,
     operations: {},
-    stats: {
-      totalOperations: 0,
-      completedOperations: 0,
-      failedOperations: 0,
-      averageLoadTime: 0,
-      retryRate: 0,
-      successRate: 0,
-      currentQueueLength: 0,
-      peakQueueLength: 0,
-      connectionImpact: 'low',
-      lastUpdate: Date.now(),
+    stats: createInitialMetrics(),
+    connectionInfo: { type: 'unknown' },
+    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    adaptiveSettings: {
+      enableAnimations: true,
+      maxConcurrentOperations: 4,
+      defaultTimeout: 30000,
+      retryDelay: 1000,
+      timeoutWarningThreshold: 0.7,
+      connectionMultiplier: 1,
+    },
+    globalLoading: false,
+    highPriorityLoading: false,
+    assetLoadingProgress: {
+      loaded: 0,
+      total: 0,
+      phase: 'initial',
+      status: 'pending',
     },
   };
 }
@@ -499,6 +506,7 @@ export function createInitialLoadingState(): LoadingStateData {
 export function createInitialMetrics(): LoadingMetrics {
   return {
     totalOperations: 0,
+    activeOperations: 0,
     completedOperations: 0,
     failedOperations: 0,
     averageLoadTime: 0,

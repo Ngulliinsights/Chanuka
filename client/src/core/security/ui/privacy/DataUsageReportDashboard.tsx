@@ -3,7 +3,6 @@
  * Transparent reporting of how user data is collected, used, and shared
  */
 
-import { privacyAnalyticsService } from '@client/shared/services/privacyAnalyticsService';
 import {
   Database,
   BarChart3,
@@ -18,23 +17,25 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { useEffect } from 'react';
-import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@client/shared/ui/dashboard/hooks';
+
 
 import { useAuth } from '@client/core/auth';
-import { dataRetentionService, retentionUtils } from '@client/shared/services/dataRetentionService';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
-import { privacyCompliance } from '@client/shared/utils/privacy-compliance';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { dataRetentionService, retentionUtils } from '@client/lib/services/dataRetentionService';
+import { privacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
+import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@client/lib/ui/dashboard/hooks';
+import { logger } from '@client/lib/utils/logger';
+import { privacyCompliance } from '@client/lib/utils/privacy-compliance';
 
 import { Globe } from '../icons/SimpleIcons';
 

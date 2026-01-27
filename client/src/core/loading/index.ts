@@ -5,7 +5,7 @@
  */
 
 // Type exports - all from shared/types/loading
-export * from '@client/shared/types/loading';
+export * from '@client/lib/types/loading';
 
 // Core exports
 export * from './context';
@@ -32,5 +32,5 @@ export {
   createOperationFromScenario,
 } from './utils/loading-utils';
 
-// Error types (already exported from @client/shared/types/loading above)
+// Error types (already exported from @client/lib/types/loading above)
 // LoadingError, LoadingTimeoutError, LoadingRetryError, LoadingConnectionError

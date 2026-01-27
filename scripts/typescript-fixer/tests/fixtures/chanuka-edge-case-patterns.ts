@@ -73,7 +73,7 @@ async function performOperation() {
 
 // Edge Case 5: Unused imports in type-only contexts
 export const unusedTypeOnlyImports = `
-import type { User, Bill, Comment } from '@shared/schema/types';
+import type { User, Bill, Comment } from '@server/infrastructure/schema/types';
 import { logger } from '@shared/core';
 
 // Only User type is used, Bill and Comment are unused
@@ -112,7 +112,7 @@ function processItem(item: any) {
 // Edge Case 7: Unused imports with namespace imports
 export const unusedNamespaceImports = `
 import * as CoreUtils from '@shared/core';
-import * as SchemaTypes from '@shared/schema/types';
+import * as SchemaTypes from '@server/infrastructure/schema/types';
 import { logger } from '@shared/core';
 
 export function useOnlyLogger() {
@@ -123,7 +123,7 @@ export function useOnlyLogger() {
 
 // Edge Case 8: Unused variables in async/await patterns
 export const unusedVariablesInAsync = `
-import { databaseService } from '@shared/database';
+import { databaseService } from '@server/infrastructure/database';
 import { logger, PerformanceMonitor } from '@shared/core';
 
 export async function complexAsyncOperation(user_id: string) {

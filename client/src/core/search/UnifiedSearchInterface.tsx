@@ -14,7 +14,7 @@ import { useStreamingSearch } from '../../features/search/hooks/useStreamingSear
 import { intelligentSearch } from '../../features/search/services/intelligent-search';
 import { streamingSearchService } from '../../features/search/services/streaming-search';
 import IntelligentAutocomplete from '../../features/search/ui/interface/IntelligentAutocomplete';
-import { cn } from '../../shared/design-system/utils/cn';
+import { cn } from '../../lib/design-system/utils/cn';
 import { searchApiClient } from '../api/search';
 
 import { SearchStrategySelector, DEFAULT_SEARCH_STRATEGY_CONFIG } from './search-strategy-selector';
@@ -157,7 +157,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
     startTime: number
   ): Promise<UnifiedSearchResult> => {
     const response = await intelligentSearch.search({
-      query: query.q,
+      q: query.q,
       limit: query.limit,
       offset: query.offset,
       filters: query.filters,
@@ -166,7 +166,6 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
     return {
       results: response.results,
       metadata: {
-        ...response.metadata,
         strategy: 'intelligent',
         fallbackUsed: false,
         searchTime: Date.now() - startTime,
@@ -232,15 +231,26 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
       filters: query.filters,
     });
 
+    const mappedResults: any[] = response.results.map((item: any) => ({
+      id: item.id,
+      type: item.type,
+      title: item.title,
+      content: item.description || '',
+      excerpt: item.description || '',
+      relevanceScore: item.score || 0,
+      metadata: item.metadata || {},
+      highlights: [],
+    }));
+
     return {
-      results: response.results,
+      results: mappedResults,
       metadata: {
-        ...response.metadata,
         strategy: 'api',
         fallbackUsed: false,
         searchTime: Date.now() - startTime,
         totalResults: response.results.length,
       },
+      // Facets might need mapping too, but let's assume API structure aligns or is ignored for now
     };
   };
 
@@ -273,10 +283,16 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
    * Handle suggestion selection
    */
   const handleSuggestionSelect = useCallback(
-    (suggestion: string) => {
-      setQuery(suggestion);
-      setShowSuggestionsDropdown(false);
-      executeSearch(suggestion);
+    (suggestion: string | { term?: string; text?: string }) => {
+      const value = typeof suggestion === 'string' 
+        ? suggestion 
+        : (suggestion.term || suggestion.text || '');
+      
+      if (value) {
+        setQuery(value);
+        setShowSuggestionsDropdown(false);
+        executeSearch(value);
+      }
     },
     [executeSearch]
   );

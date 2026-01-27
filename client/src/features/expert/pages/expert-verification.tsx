@@ -12,15 +12,15 @@ import { ExpertConsensus } from '@client/features/users/ui/verification/ExpertCo
 import { ExpertProfileCard } from '@client/features/users/ui/verification/ExpertProfileCard';
 import { ExpertVerificationDemo } from '@client/features/users/ui/verification/ExpertVerificationDemo';
 import { VerificationWorkflow } from '@client/features/users/ui/verification/VerificationWorkflow';
-import { Badge } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
 export default function ExpertVerification() {
   const [activeTab, setActiveTab] = useState('overview');

@@ -4,7 +4,7 @@
  * Type definitions for community features, discussions, and comments
  *
  * MIGRATION NOTE: Community types have been consolidated into
- * @client/shared/types/community module. This file now re-exports
+ * @client/lib/types/community module. This file now re-exports
  * from that unified location for backward compatibility.
  */
 
@@ -17,4 +17,4 @@ export type {
   CreateCommentRequest,
   UpdateCommentRequest,
   VoteRequest,
-} from '@client/shared/types/community';
+} from '@client/lib/types/community';

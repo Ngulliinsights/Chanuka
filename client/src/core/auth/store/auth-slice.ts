@@ -8,13 +8,13 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { SliceState, ThunkResult } from '@workspace/types/domains/redux';
 import { createSelector } from 'reselect';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@lib/utils/logger';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import type { LoginCredentials, User, RegisterData, PrivacySettings } from '../types';
-import { SliceState, ThunkResult } from '@shared/types/domains/redux';
 
 export interface AuthState extends SliceState<User, string> {
   isAuthenticated: boolean;
@@ -536,7 +536,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(refreshTokens.rejected, state => {
-        state.user = null;
+        state.data = null;
         state.isAuthenticated = false;
         state.sessionExpiry = null;
         state.twoFactorRequired = false;

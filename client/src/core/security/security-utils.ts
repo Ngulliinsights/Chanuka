@@ -5,7 +5,7 @@
  * CSRF protection, rate limiting, and security monitoring
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // Core Security Types

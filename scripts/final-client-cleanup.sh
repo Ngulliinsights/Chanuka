@@ -45,8 +45,8 @@ remaining_react_files=(
     "client/src/pages/integration-status.tsx"
     "client/src/pages/onboarding.tsx"
     "client/src/pages/search.tsx"
-    "client/src/shared/design-system/feedback/skeleton.tsx"
-    "client/src/shared/design-system/feedback/Toaster.tsx"
+    "client/src/lib/design-system/feedback/skeleton.tsx"
+    "client/src/lib/design-system/feedback/Toaster.tsx"
 )
 
 for file in "${remaining_react_files[@]}"; do
@@ -61,15 +61,15 @@ done
 remaining_import_files=(
     "client/src/features/security/hooks/useSecurity.ts"
     "client/src/hooks/use-performance-monitor.ts"
-    "client/src/shared/ui/loading/ui/AvatarSkeleton.tsx"
-    "client/src/shared/ui/loading/ui/CardSkeleton.tsx"
-    "client/src/shared/ui/loading/ui/FormSkeleton.tsx"
-    "client/src/shared/ui/loading/ui/ListSkeleton.tsx"
-    "client/src/shared/ui/loading/ui/LoadingIndicator.tsx"
-    "client/src/shared/ui/loading/ui/ProgressiveLoader.tsx"
-    "client/src/shared/ui/loading/ui/Skeleton.tsx"
-    "client/src/shared/ui/loading/ui/TextSkeleton.tsx"
-    "client/src/shared/ui/loading/ui/TimeoutAwareLoader.tsx"
+    "client/src/lib/ui/loading/ui/AvatarSkeleton.tsx"
+    "client/src/lib/ui/loading/ui/CardSkeleton.tsx"
+    "client/src/lib/ui/loading/ui/FormSkeleton.tsx"
+    "client/src/lib/ui/loading/ui/ListSkeleton.tsx"
+    "client/src/lib/ui/loading/ui/LoadingIndicator.tsx"
+    "client/src/lib/ui/loading/ui/ProgressiveLoader.tsx"
+    "client/src/lib/ui/loading/ui/Skeleton.tsx"
+    "client/src/lib/ui/loading/ui/TextSkeleton.tsx"
+    "client/src/lib/ui/loading/ui/TimeoutAwareLoader.tsx"
 )
 
 for file in "${remaining_import_files[@]}"; do
@@ -77,7 +77,7 @@ for file in "${remaining_import_files[@]}"; do
         backup_file "$file"
         
         # Fix specific patterns
-        sed -i "s|from ['\"]../../../shared|from '@client/shared|g" "$file"
+        sed -i "s|from ['\"]../../../shared|from '@client/lib|g" "$file"
         sed -i "s|from ['\"]../../../core|from '@client/core|g" "$file"
         sed -i "s|from ['\"]../../../types|from '@client/types|g" "$file"
         sed -i "s|from ['\"]../../../utils|from '@client/utils|g" "$file"

@@ -86,7 +86,7 @@ Complete GDPR rights management including:
 Manages data retention policies and automatic cleanup:
 
 ```typescript
-import { dataRetentionService } from '@client/shared/services';
+import { dataRetentionService } from '@client/lib/services';
 
 // Get retention policies
 const policies = dataRetentionService.getRetentionPolicies();

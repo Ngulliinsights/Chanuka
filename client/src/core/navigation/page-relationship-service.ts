@@ -1,5 +1,5 @@
-import { RelatedPage, PageRelationship, UserRole } from '@client/shared/types/navigation';
-// import { logger } from '@client/shared/utils/logger'; // Unused
+import { RelatedPage, PageRelationship, UserRole } from '@client/lib/types/navigation';
+// import { logger } from '@client/lib/utils/logger'; // Unused
 
 /**
  * Configuration for page relationships

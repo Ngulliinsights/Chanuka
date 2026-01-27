@@ -32,12 +32,12 @@ const CONFIG = {
         'client/src/features/search/types',
         'client/src/features/analytics/types',
         'client/src/features/bills/model/types',
-        'client/src/shared/types',
-        'client/src/shared/ui/types',
-        'client/src/shared/ui/dashboard/types',
-        'client/src/shared/ui/loading/types',
-        'client/src/shared/ui/navigation/types',
-        'client/src/shared/design-system/interactive/types',
+        'client/src/lib/types',
+        'client/src/lib/ui/types',
+        'client/src/lib/ui/dashboard/types',
+        'client/src/lib/ui/loading/types',
+        'client/src/lib/ui/navigation/types',
+        'client/src/lib/design-system/interactive/types',
         'client/src/types',
         'server/features/users/types',
         'server/features/analytics/types',
@@ -127,7 +127,7 @@ function categorizeTypeFile(filePath) {
     if (relativePath.includes('client/src/features/')) {
         return { category: 'features', subcategory: relativePath.split('/')[2] };
     }
-    if (relativePath.includes('client/src/shared/')) {
+    if (relativePath.includes('client/src/lib/')) {
         return { category: 'shared', subcategory: relativePath.split('/')[2] };
     }
     if (relativePath.includes('server/')) {

@@ -16,7 +16,7 @@ class MockErrorMonitor {
 }
 
 // Mock the ErrorMonitor import
-vi.mock('../../shared/infrastructure/monitoring/error-monitor', () => ({
+vi.mock('../../lib/infrastructure/monitoring/error-monitor', () => ({
   ErrorMonitor: MockErrorMonitor,
 }));
 

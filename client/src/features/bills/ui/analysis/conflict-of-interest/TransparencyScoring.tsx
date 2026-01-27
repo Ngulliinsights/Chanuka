@@ -20,17 +20,17 @@ import {
 } from 'recharts';
 
 import { TransparencyScore, ConflictAnalysis } from '@client/features/analysis/types';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
 
 interface TransparencyScoringProps {
   conflictAnalysis: ConflictAnalysis;

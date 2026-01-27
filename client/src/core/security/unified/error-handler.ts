@@ -3,6 +3,8 @@
  * Consistent error handling across all security components
  */
 
+import { logger } from '@client/lib/utils/logger';
+
 import {
   SecurityError,
   SecurityErrorResult,
@@ -11,7 +13,6 @@ import {
   ErrorStatistics,
   SecurityEvent
 } from './security-interface';
-import { logger } from '@client/shared/utils/logger';
 
 export class SecurityErrorHandler {
   private config: ErrorHandlingConfig;
@@ -29,6 +30,13 @@ export class SecurityErrorHandler {
       lastErrorTime: null,
       averageResolutionTime: 0,
     };
+  }
+
+  async initialize(config?: Partial<ErrorHandlingConfig>): Promise<void> {
+    if (config) {
+      this.config = { ...this.config, ...config };
+      this.logger = new SecurityLogger(this.config.logLevel);
+    }
   }
 
   handleSecurityError(error: SecurityError): SecurityErrorResult {

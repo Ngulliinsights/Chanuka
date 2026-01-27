@@ -6,7 +6,7 @@
 
 import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
 import { logger  } from '@shared/core';
-import { database as db } from '@shared/database';
+import { database as db } from '@server/infrastructure/database';
 import { comments, 
   content_report, 
   moderation_action,

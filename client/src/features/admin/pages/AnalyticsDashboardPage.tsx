@@ -7,7 +7,6 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
 import {
   BarChart3,
   Users,
@@ -24,6 +23,7 @@ import {
 import React, { useState, useEffect } from 'react';
 
 import { useComprehensiveAnalytics } from '@client/core/analytics/comprehensive-tracker';
+import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
 import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
 import {
   Card,
@@ -31,12 +31,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Alert, AlertDescription, AlertTitle } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 /**
  * Analytics Dashboard Page Component

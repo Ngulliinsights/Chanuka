@@ -1,7 +1,8 @@
 // Main API Client with HTTP Methods, Retry Logic, and Caching
 // Optimized implementation with enhanced error handling and performance
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
+
 import { createAuthApiService } from '../auth';
 import { ErrorFactory, ErrorDomain } from '../error';
 import globalErrorHandler from '../error';

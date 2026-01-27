@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
-import type { CommunityComment } from '@client/shared/types';
-import { cn } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import type { Comment } from '@client/shared/types';
+import { cn } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import type { CommunityComment } from '@client/lib/types';
+import type { Comment } from '@client/lib/types';
 
 interface DiscussionThread {
   id: string;

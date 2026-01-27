@@ -4,7 +4,7 @@
  * Tracks and profiles route performance metrics for optimization
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 interface RouteMetrics {
   path: string;

@@ -49,7 +49,7 @@ Based on the exhaustive analysis of the type system standardization specs and co
 - `shared/schema/trojan_bill_detection.ts`
 
 ### 2. Client Loading Types (Excellent - Tier 1)
-**Location:** `client/src/shared/types/loading.ts`
+**Location:** `client/src/lib/types/loading.ts`
 **Quality Score:** 10/10 ⭐ **EXEMPLARY PATTERN**
 
 **Strengths:**
@@ -80,23 +80,23 @@ Based on the exhaustive analysis of the type system standardization specs and co
 - No branded types
 
 ### 4. Client Shared Types (Mixed - Tier 2-3)
-**Location:** `client/src/shared/types/`
+**Location:** `client/src/lib/types/`
 **Files:** 12 files
 **Quality Score:** 6/10
 
 **Files:**
-- `client/src/shared/types/loading.ts` ⭐ **EXEMPLARY**
-- `client/src/shared/types/analytics.ts`
-- `client/src/shared/types/browser.ts`
-- `client/src/shared/types/core.ts`
-- `client/src/shared/types/dashboard.ts`
-- `client/src/shared/types/index.ts`
-- `client/src/shared/types/lucide-react.d.ts`
-- `client/src/shared/types/mobile.ts`
-- `client/src/shared/types/navigation.ts`
-- `client/src/shared/types/search-response.ts`
-- `client/src/shared/types/search.ts`
-- `client/src/shared/types/user-dashboard.ts`
+- `client/src/lib/types/loading.ts` ⭐ **EXEMPLARY**
+- `client/src/lib/types/analytics.ts`
+- `client/src/lib/types/browser.ts`
+- `client/src/lib/types/core.ts`
+- `client/src/lib/types/dashboard.ts`
+- `client/src/lib/types/index.ts`
+- `client/src/lib/types/lucide-react.d.ts`
+- `client/src/lib/types/mobile.ts`
+- `client/src/lib/types/navigation.ts`
+- `client/src/lib/types/search-response.ts`
+- `client/src/lib/types/search.ts`
+- `client/src/lib/types/user-dashboard.ts`
 
 **Issues:**
 - Inconsistent patterns across files
@@ -200,7 +200,7 @@ Based on the exhaustive analysis of the type system standardization specs and co
 ## Best Practices Ranking Summary
 
 ### Tier 1 - Exemplary (Follow These Patterns)
-1. **`client/src/shared/types/loading.ts`** - Perfect example of all best practices
+1. **`client/src/lib/types/loading.ts`** - Perfect example of all best practices
 2. **`shared/schema/base-types.ts`** - Excellent DRY patterns and helpers
 3. **`shared/schema/` domain files** - Consistent Drizzle patterns
 

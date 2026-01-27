@@ -7,7 +7,7 @@
 
 import type { WebSocketEvents } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type EventHandler<T = any> = (data: T) => void;
 
 export class WebSocketManager {

@@ -35,7 +35,7 @@ interface ValidationIssue {
 }
 
 class DesignSystemValidator {
-  private designSystemDir = 'client/src/shared/design-system';
+  private designSystemDir = 'client/src/lib/design-system';
   private components: Map<string, ComponentInfo> = new Map();
   private issues: ValidationIssue[] = [];
   private expectedComponents: Set<string> = new Set();
@@ -281,7 +281,7 @@ class DesignSystemValidator {
 
     for (const [name, component] of this.components) {
       for (const importPath of component.imports) {
-        if (importPath.startsWith('.') || importPath.startsWith('@client/shared/design-system')) {
+        if (importPath.startsWith('.') || importPath.startsWith('@client/lib/design-system')) {
           const resolvedPath = await this.resolveImportPath(importPath, component.path);
           if (!resolvedPath || !(await this.fileExists(resolvedPath))) {
             this.issues.push({
@@ -386,8 +386,8 @@ class DesignSystemValidator {
       }
     }
 
-    if (importPath.startsWith('@client/shared/design-system')) {
-      const relativePath = importPath.replace('@client/shared/design-system', this.designSystemDir);
+    if (importPath.startsWith('@client/lib/design-system')) {
+      const relativePath = importPath.replace('@client/lib/design-system', this.designSystemDir);
       
       for (const ext of ['.ts', '.tsx', '/index.ts', '/index.tsx']) {
         const fullPath = relativePath + ext;

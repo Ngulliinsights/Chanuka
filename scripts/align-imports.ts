@@ -71,13 +71,13 @@ class ImportAligner {
           }
           if (importPath.startsWith('shared/schema/')) {
             const cleanPath = importPath.replace(/^shared\/schema\//, '');
-            return `from '@shared/schema/${cleanPath}'`;
+            return `from '@server/infrastructure/schema/${cleanPath}'`;
           }
           if (importPath.startsWith('shared/database/')) {
             const cleanPath = importPath.replace(/^shared\/database\//, '');
             return cleanPath === 'connection' || cleanPath === 'connection.ts'
-              ? `from '@shared/database'`
-              : `from '@shared/database/${cleanPath}'`;
+              ? `from '@server/infrastructure/database'`
+              : `from '@server/infrastructure/database/${cleanPath}'`;
           }
           if (importPath.startsWith('server/')) {
             const cleanPath = importPath.replace(/^server\//, '');
@@ -106,7 +106,7 @@ class ImportAligner {
       },
       {
         from: /from\s+['"]((?:\.\.\/){2,})shared\/schema\/([^'"]+)['"]/g,
-        to: (_match, _levels, importPath) => `from '@shared/schema/${importPath}'`,
+        to: (_match, _levels, importPath) => `from '@server/infrastructure/schema/${importPath}'`,
         description: 'Standardize server imports of shared/schema',
         applyTo: 'server',
         priority: 80

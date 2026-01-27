@@ -10,8 +10,9 @@ import {
   ConnectionState,
   WebSocketMessage,
   WebSocketError,
-} from '@shared/schema/websocket';
-import { logger } from '@client/shared/utils/logger';
+} from '@server/infrastructure/schema/websocket';
+
+import { logger } from '@client/lib/utils/logger';
 
 // Define events specific to the client implementation
 export interface WebSocketClientEvents {

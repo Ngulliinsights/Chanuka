@@ -1,7 +1,6 @@
 import { MessageCircle, Users, TrendingUp, Award, Plus, Filter, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 
-import type { CommunityComment } from '@client/shared/types';
 import { DiscussionThread, CommentForm } from '@client/features/community/ui';
 import {
   Card,
@@ -9,16 +8,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import type { CommunityComment } from '@client/lib/types';
 
 // TODO: ARCHITECTURAL DECISION NEEDED - Cross-feature dependency
 // This should either be moved to shared/ui or use a shared interface
 // For now, keeping as-is but flagged for review
-import type { Bill } from '@client/shared/types';
+import type { Bill } from '@client/lib/types';
 
 interface BillCommunityTabProps {
   bill: Bill;

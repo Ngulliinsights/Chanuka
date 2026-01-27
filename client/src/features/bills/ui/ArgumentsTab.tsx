@@ -12,15 +12,17 @@
  */
 
 import React, { useState } from 'react';
+
 import { useArgumentsForBill } from '@/features/community';
-import type { Argument } from '@/server/features/argument-intelligence';
+
+import type { Argument, ArgumentPosition } from '@/types/domains/arguments';
 
 interface ArgumentsTabProps {
   billId: string;
 }
 
 export function ArgumentsTab({ billId }: ArgumentsTabProps) {
-  const { data: arguments, isLoading, error } = useArgumentsForBill(billId);
+  const { data: argumentsList, isLoading, error } = useArgumentsForBill(billId);
   const [positionFilter, setPositionFilter] = useState<'all' | 'support' | 'oppose' | 'neutral'>('all');
   const [sortBy, setSortBy] = useState<'strength' | 'confidence' | 'newest'>('strength');
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +44,7 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
     );
   }
 
-  if (!arguments || arguments.length === 0) {
+  if (!argumentsList || argumentsList.length === 0) {
     return (
       <div className="p-6 text-center text-gray-600">
         <p>No arguments yet. Be the first to share your perspective!</p>
@@ -51,7 +53,7 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   }
 
   // Filter arguments
-  let filtered = arguments;
+  let filtered = argumentsList;
   
   if (positionFilter !== 'all') {
     filtered = filtered.filter(arg => arg.position === positionFilter);
@@ -78,10 +80,10 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   });
 
   // Count by position
-  const supportCount = arguments.filter(a => a.position === 'support').length;
-  const opposeCount = arguments.filter(a => a.position === 'oppose').length;
-  const neutralCount = arguments.filter(a => a.position === 'neutral').length;
-  const total = arguments.length;
+  const supportCount = argumentsList.filter(a => a.position === 'support').length;
+  const opposeCount = argumentsList.filter(a => a.position === 'oppose').length;
+  const neutralCount = argumentsList.filter(a => a.position === 'neutral').length;
+  const total = argumentsList.length;
 
   return (
     <div className="space-y-6">
@@ -113,13 +115,18 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
         
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Filter</label>
+            <label htmlFor="filter-select" className="block text-sm font-medium text-gray-700 mb-2">Filter</label>
             <select
+              id="filter-select"
+              title="Filter arguments by position"
               value={positionFilter}
-              onChange={(e) => setPositionFilter(e.target.value as any)}
+              onChange={(e) => {
+                const value = e.target.value as 'all' | 'support' | 'oppose' | 'neutral';
+                setPositionFilter(value);
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Positions ({arguments.length})</option>
+              <option value="all">All Positions ({argumentsList.length})</option>
               <option value="support">Support ({supportCount})</option>
               <option value="oppose">Oppose ({opposeCount})</option>
               <option value="neutral">Neutral ({neutralCount})</option>
@@ -127,10 +134,15 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
             <select
+              id="sort-select"
+              title="Sort arguments by metric"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => {
+                const value = e.target.value as 'strength' | 'confidence' | 'newest';
+                setSortBy(value);
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="strength">Strongest Arguments</option>
@@ -163,36 +175,38 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
 function ArgumentCard({ argument, billId }: { argument: Argument; billId: string }) {
   const [expanded, setExpanded] = useState(false);
 
-  const positionColors = {
+  const positionColors: Record<ArgumentPosition, string> = {
     support: 'bg-green-50 border-green-200',
     oppose: 'bg-red-50 border-red-200',
     neutral: 'bg-gray-50 border-gray-200',
     conditional: 'bg-blue-50 border-blue-200'
   };
 
-  const positionBadgeColors = {
+  const positionBadgeColors: Record<ArgumentPosition, string> = {
     support: 'bg-green-100 text-green-800',
     oppose: 'bg-red-100 text-red-800',
     neutral: 'bg-gray-100 text-gray-800',
     conditional: 'bg-blue-100 text-blue-800'
   };
 
-  const positionLabel = {
+  const positionLabel: Record<ArgumentPosition, string> = {
     support: '✓ Support',
     oppose: '✗ Oppose',
     neutral: '○ Neutral',
     conditional: '≈ Conditional'
   };
 
+  const position: ArgumentPosition = argument.position || 'neutral';
+  
   return (
-    <div className={`border rounded-lg p-4 cursor-pointer transition ${positionColors[argument.position || 'neutral']}`}
+    <div className={`border rounded-lg p-4 cursor-pointer transition ${positionColors[position]}`}
          onClick={() => setExpanded(!expanded)}>
       
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <span className={`px-2 py-1 rounded text-xs font-medium ${positionBadgeColors[argument.position || 'neutral']}`}>
-              {positionLabel[argument.position || 'neutral']}
+            <span className={`px-2 py-1 rounded text-xs font-medium ${positionBadgeColors[position]}`}>
+              {positionLabel[position]}
             </span>
             <span className="text-xs text-gray-600">
               Strength: {Math.round((argument.strength_score || 0) * 100)}%

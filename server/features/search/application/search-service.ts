@@ -4,7 +4,7 @@
 // Comprehensive search with multiple engines, fallbacks, and performance optimization
 
 import { cache,logger  } from '@shared/core';
-import { database } from '@shared/database';
+import { database } from '@server/infrastructure/database';
 import { FuseSearchEngine,FuzzyMatchingEngine, PostgreSQLFullTextEngine, SimpleMatchingEngine } from '@shared/engines/core/index.js';
 import {
   ParsedSearchSyntax,

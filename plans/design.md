@@ -875,9 +875,9 @@ rm -rf shared/core/modernization/        # Dev-only tooling
 1. Audit what can be safely shared
 - ✅ Share: `@shared/types` (no Node deps)
 - ✅ Share: `@shared/constants` (primitives only)
-- ❌ DO NOT share: client/src/shared/utils/logger.ts (React-specific)
-- ❌ DO NOT share: client/src/shared/utils/security.ts (browser-safe, better than Node)
-- ❌ DO NOT share: client/src/shared/utils/i18n.ts (Kenya-specific domain logic)
+- ❌ DO NOT share: client/src/lib/utils/logger.ts (React-specific)
+- ❌ DO NOT share: client/src/lib/utils/security.ts (browser-safe, better than Node)
+- ❌ DO NOT share: client/src/lib/utils/i18n.ts (Kenya-specific domain logic)
 
 2. Verify Node dependency-free modules only
 ```bash

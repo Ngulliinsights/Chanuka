@@ -188,7 +188,7 @@ class DatabaseConsolidator {
  * Provides backward compatibility during the consolidation transition.
  * This file will be removed after all imports are updated.
  *
- * @deprecated Use @shared/database/core instead
+ * @deprecated Use @server/infrastructure/database/core instead
  */
 
 import {
@@ -199,7 +199,7 @@ import {
   getDatabase,
   withTransaction,
   checkDatabaseHealth
-} from '@shared/database/core';
+} from '@server/infrastructure/database/core';
 
 // Legacy exports for backward compatibility
 export {
@@ -216,7 +216,7 @@ export {
 if (process.env.NODE_ENV !== 'test') {
   console.warn(
     '⚠️  DEPRECATION WARNING: Using legacy database imports. ' +
-    'Please migrate to @shared/database/core for better performance and consistency.'
+    'Please migrate to @server/infrastructure/database/core for better performance and consistency.'
   );
 }
 
@@ -257,7 +257,7 @@ export function initializeLegacyCompatibility(connectionManager: UnifiedConnecti
  * Provides unified interface for all migration operations
  */
 
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 import { createMigrationManager } from '@server/infrastructure/database';
 import { logger } from '@shared/core';
 
@@ -384,7 +384,7 @@ if (import.meta.url === \`file://\${process.argv[1]}\`) {
  * Provides safe database reset with confirmation
  */
 
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 import { createMigrationManager } from '@server/infrastructure/database';
 import { logger } from '@shared/core';
 import * as readline from 'readline';
@@ -493,7 +493,7 @@ if (import.meta.url === \`file://\${process.argv[1]}\`) {
 
     // Add recommendations based on findings
     this.report.recommendations = [
-      'Update imports to use @shared/database/core for consistency',
+      'Update imports to use @server/infrastructure/database/core for consistency',
       'Remove redundant database files after testing consolidated versions',
       'Update documentation to reflect new unified architecture',
       'Train team on new consolidated database API',
@@ -531,7 +531,7 @@ ${this.report.recommendations.map(rec => `- ${rec}`).join('\n')}
 ## Next Steps
 
 1. **Test Consolidated Scripts**: Run the new consolidated migration and reset scripts
-2. **Update Imports**: Gradually update imports to use @shared/database/core
+2. **Update Imports**: Gradually update imports to use @server/infrastructure/database/core
 3. **Remove Redundant Files**: After testing, remove the identified redundant files
 4. **Update Documentation**: Reflect the new unified architecture in docs
 5. **Team Training**: Ensure team understands the new consolidated API

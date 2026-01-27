@@ -3,14 +3,16 @@ import { memo, useCallback, useMemo } from 'react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
+import { cn } from '@lib/utils';
+import { logger } from '@client/lib/utils/logger';
+
 import { useAuth } from '../../core/auth';
 import { CommandPalette } from '../../core/command-palette/CommandPalette';
 import { useCommandPalette } from '../../core/command-palette/useCommandPalette';
 import { useNavigation } from '../../core/navigation/context';
 import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../core/search/types';
 import { UnifiedSearchInterface } from '../../core/search/UnifiedSearchInterface';
-import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
-import { cn } from '@client/shared/lib/utils';
 import {
   Avatar,
   AvatarFallback,
@@ -23,10 +25,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../shared/design-system';
-import { useMobileMenu } from '../../shared/hooks/useNavigationSlice';
-import { LanguageSwitcher } from '../../shared/ui/i18n/LanguageSwitcher';
-import { logger } from '@client/shared/utils/logger';
+} from '../../lib/design-system';
+import { useMobileMenu } from '../../lib/hooks/useNavigationSlice';
+import { LanguageSwitcher } from '../../lib/ui/i18n/LanguageSwitcher';
+
 
 // Type Definitions
 interface NavigationBarProps {

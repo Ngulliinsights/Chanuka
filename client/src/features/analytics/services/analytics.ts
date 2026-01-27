@@ -15,7 +15,7 @@ import type {
   AnalyticsResponse,
   UserActivity,
   AnalyticsAlert,
-} from '@client/shared/types/analytics';
+} from '@client/lib/types/analytics';
 
 // ============================================================================
 // Enhanced Type Definitions

@@ -3,7 +3,7 @@ import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext }
 
 /**
  * Fixes database connection import issues in the Chanuka project
- * Handles missing imports from '@shared/database' and database service patterns
+ * Handles missing imports from '@server/infrastructure/database' and database service patterns
  */
 export class DatabaseConnectionFixer implements ErrorFixer {
   private readonly DATABASE_ERROR_CODES = [
@@ -42,7 +42,7 @@ export class DatabaseConnectionFixer implements ErrorFixer {
     
     // Handle module import errors for database connections
     if (error.code === 2307 && (
-      errorText.includes('@shared/database') || 
+      errorText.includes('@server/infrastructure/database') || 
       errorText.includes('shared/database') ||
       errorText.includes('database/connection') ||
       errorText.includes('database-service')
@@ -253,28 +253,28 @@ export class DatabaseConnectionFixer implements ErrorFixer {
   private getKnownImportPath(utility: string): string | null {
     const utilityMappings: Record<string, string> = {
       // Database connection utilities
-      'database': '@shared/database/connection',
-      'readDatabase': '@shared/database/connection',
-      'writeDatabase': '@shared/database/connection',
-      'pool': '@shared/database/connection',
-      'operationalDb': '@shared/database/connection',
-      'analyticsDb': '@shared/database/connection',
-      'securityDb': '@shared/database/connection',
-      'getDatabase': '@shared/database/connection',
+      'database': '@server/infrastructure/database/connection',
+      'readDatabase': '@server/infrastructure/database/connection',
+      'writeDatabase': '@server/infrastructure/database/connection',
+      'pool': '@server/infrastructure/database/connection',
+      'operationalDb': '@server/infrastructure/database/connection',
+      'analyticsDb': '@server/infrastructure/database/connection',
+      'securityDb': '@server/infrastructure/database/connection',
+      'getDatabase': '@server/infrastructure/database/connection',
 
       // Transaction utilities
-      'withTransaction': '@shared/database/connection',
-      'withReadConnection': '@shared/database/connection',
-      'DatabaseTransaction': '@shared/database/connection',
-      'DatabaseOperation': '@shared/database/connection',
-      'TransactionOptions': '@shared/database/connection',
+      'withTransaction': '@server/infrastructure/database/connection',
+      'withReadConnection': '@server/infrastructure/database/connection',
+      'DatabaseTransaction': '@server/infrastructure/database/connection',
+      'DatabaseOperation': '@server/infrastructure/database/connection',
+      'TransactionOptions': '@server/infrastructure/database/connection',
 
       // Health and management utilities
-      'checkDatabaseHealth': '@shared/database/connection',
-      'closeDatabaseConnections': '@shared/database/connection',
+      'checkDatabaseHealth': '@server/infrastructure/database/connection',
+      'closeDatabaseConnections': '@server/infrastructure/database/connection',
 
       // Database service utilities
-      'databaseService': '@shared/database',
+      'databaseService': '@server/infrastructure/database',
       'DatabaseService': '@server/infrastructure/database/database-service',
       'DatabaseResult': '@server/infrastructure/database/database-service',
       'HealthCheckResult': '@server/infrastructure/database/database-service',
@@ -364,7 +364,7 @@ export class DatabaseConnectionFixer implements ErrorFixer {
     }
 
     // Check for incorrect shared database paths
-    if (importPath.includes('shared/database') && !importPath.startsWith('@shared/database')) {
+    if (importPath.includes('shared/database') && !importPath.startsWith('@server/infrastructure/database')) {
       return true;
     }
 
@@ -377,12 +377,12 @@ export class DatabaseConnectionFixer implements ErrorFixer {
   private correctDatabasePath(importPath: string): string | null {
     // Fix relative paths to shared database connection
     if (importPath.includes('shared/database/connection')) {
-      return '@shared/database/connection';
+      return '@server/infrastructure/database/connection';
     }
 
     // Fix relative paths to shared database
     if (importPath.includes('shared/database') && !importPath.includes('/connection')) {
-      return '@shared/database';
+      return '@server/infrastructure/database';
     }
 
     // Fix database service paths

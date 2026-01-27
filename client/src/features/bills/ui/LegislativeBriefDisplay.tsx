@@ -10,6 +10,7 @@
  */
 
 import React, { useState } from 'react';
+
 import { useLegislativeBrief } from '@/features/community';
 
 interface LegislativeBriefDisplayProps {

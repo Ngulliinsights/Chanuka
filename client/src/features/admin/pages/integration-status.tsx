@@ -19,18 +19,18 @@ import React from 'react';
  */
 
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { useIntegratedServices } from '@client/shared/hooks/useIntegratedServices';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { useIntegratedServices } from '@client/lib/hooks/useIntegratedServices';
 
 export default function IntegrationStatusPage() {
   const { isReady, status, error, services, security, privacy, mobile } = useIntegratedServices();

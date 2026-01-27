@@ -1,9 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    // Deprecation handling
-    "ignoreDeprecations": "6.0",
-
     // Language and Environment
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -12,6 +9,7 @@
     // Module Resolution
     "module": "ES2022",
     "moduleResolution": "bundler",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
 
@@ -39,46 +37,88 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    // Project Structure
-    "baseUrl": "./src",
-
     // Path Mappings - Client-specific aliases only
+    // ========================================================
+    // RULE: All client-side paths use @/ or @core, @lib (local)
+    //       All workspace-level paths use @workspace prefix
+    //       This prevents ambiguity between workspace /shared and client @lib
+    // ========================================================
     "paths": {
-      "@": ["."],
-      "@/*": ["./*"],
-      "@client": ["."],
-      "@client/*": ["./*"],
+      // ===== ROOT ALIASES =====
+      "@": ["./src"],
+      "@/*": ["./src/*"],
+      
+      // ===== CLIENT FRAMEWORK =====
+      "@client": ["./src"],
+      "@client/*": ["./src/*"],
       "@client/@types": ["./@types"],
       "@client/@types/*": ["./@types/*"],
       "@client/test-utils": ["./test-utils"],
       "@client/test-utils/*": ["./test-utils/*"],
-      // Hooks moved to shared
-      "@client/hooks": ["./shared/hooks"],
-      "@client/hooks/*": ["./shared/hooks/*"],
-      // Shared module paths - consistent with Vite config
-      "@shared": ["../../shared"],
-      "@shared/core": ["../../shared/core"],
-      "@shared/schema": ["../../shared/schema"],
-      "@shared/platform": ["../../shared/platform"],
-      "@shared/i18n": ["../../shared/i18n"],
-      // Client-safe shared module paths
-      "@shared/core/utils": ["../../shared/core/utils"],
-      // Exclude server-only modules (redirect to stubs)
-      "@shared/database": ["./src/stubs/database-stub.ts"],
-      "@shared/core/middleware": ["./src/stubs/middleware-stub.ts"],
-      // Security fixes - redirect to secure implementations
-      "@client/shared/utils/authenticated-api": ["./src/shared/utils/secure-authenticated-api.ts"],
-      "@client/shared/utils/secure-token-manager": ["./src/shared/utils/secure-token-manager.ts"],
-      // Logger consolidation - redirect all logger imports to unified implementation
-      "@client/shared/utils/logger": ["./shared/utils/logger.ts"],
-      "@client/utils/logger-simple": ["./shared/utils/logger.ts"],
-      // Dashboard types - centralized in shared/types/dashboard
-      "@client/shared/types/dashboard": ["./shared/types/dashboard/index.ts"],
-      // Community types - centralized in shared/types/community
-      "@client/shared/types/community": ["./shared/types/community/index.ts"],
-      // Bill types - centralized in shared/types/bill
-      "@client/shared/types/bill": ["./shared/types/bill/index.ts"],
-      "@client/shared/types": ["./shared/types/index.ts"]
+      
+      // ===== CLIENT-SIDE MODULES (all in ./src) =====
+      "@core": ["./src/core"],
+      "@workspace": ["../shared"],
+      "@workspace/*": ["../shared/*"],
+      "@core/*": ["./src/core/*"],
+      "@lib": ["./src/lib"],
+      "@lib/*": ["./src/lib/*"],
+      "@lib/types": ["./src/lib/types"],
+      "@lib/types/*": ["./src/lib/types/*"],
+      "@lib/services": ["./src/lib/services"],
+      "@lib/services/*": ["./src/lib/services/*"],
+      "@lib/infrastructure": ["./src/lib/infrastructure"],
+      "@lib/infrastructure/*": ["./src/lib/infrastructure/*"],
+      "@lib/ui": ["./src/lib/ui"],
+      "@lib/ui/*": ["./src/lib/ui/*"],
+      "@lib/hooks": ["./src/lib/hooks"],
+      "@lib/hooks/*": ["./src/lib/hooks/*"],
+      "@lib/utils": ["./src/lib/utils"],
+      "@lib/utils/*": ["./src/lib/utils/*"],
+      "@lib/context": ["./src/lib/context"],
+      "@lib/context/*": ["./src/lib/context/*"],
+      "@lib/components": ["./src/lib/components"],
+      "@lib/components/*": ["./src/lib/components/*"],
+      "@lib/design-system": ["./src/lib/design-system"],
+      "@lib/design-system/*": ["./src/lib/design-system/*"],
+      
+      // ===== APP/FEATURE MODULES (all in ./src) =====
+      "@features": ["./src/features"],
+      "@features/*": ["./src/features/*"],
+      "@app": ["./src/app"],
+      "@app/*": ["./src/app/*"],
+      
+      // ===== LIBRARY SHORTCUTS =====
+      "@hooks": ["./src/lib/hooks"],
+      "@hooks/*": ["./src/lib/hooks/*"],
+      "@utils": ["./src/lib/utils"],
+      "@utils/*": ["./src/lib/utils/*"],
+      
+      // ===== WORKSPACE-LEVEL MODULES (all in ../../shared) =====
+      // Use @workspace prefix for clarity - these are NOT client modules
+
+      "@workspace/types": ["../shared/types"],
+      "@workspace/types/*": ["../shared/types/*"],
+      "@workspace/core": ["../shared/core"],
+      "@workspace/core/*": ["../shared/core/*"],
+      "@workspace/validation": ["../shared/validation"],
+      "@workspace/validation/*": ["../shared/validation/*"],
+      "@workspace/constants": ["../shared/constants"],
+      "@workspace/constants/*": ["../shared/constants/*"],
+      "@workspace/utils": ["../shared/utils"],
+      "@workspace/utils/*": ["../shared/utils/*"],
+      
+      // ===== STUBS FOR SERVER-ONLY MODULES =====
+      "@server-stub/database": ["./src/stubs/database-stub.ts"],
+      "@server-stub/middleware": ["./src/stubs/middleware-stub.ts"],
+      
+      // ===== SECURITY MODULES =====
+      "@secure": ["./src/lib/utils/secure"],
+      "@secure/*": ["./src/lib/utils/secure/*"],
+      
+      // ===== LOGGING (UNIFIED) =====
+      "@logger": ["./src/lib/utils/logger"],
+      "@logger/*": ["./src/lib/utils/logger/*"]
     },
 
     // Type Definitions

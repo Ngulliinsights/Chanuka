@@ -29,22 +29,22 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { copySystem } from '@client/shared/content/copy-system';
 import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
-import { useDeviceInfo } from '@client/shared/hooks/mobile/useDeviceInfo';
-import { useToast } from '@client/shared/hooks/use-toast';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
+import { copySystem } from '@client/lib/content/copy-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system/utils/cn';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { cn } from '@client/lib/design-system/utils/cn';
+import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
+import { useToast } from '@client/lib/hooks/use-toast';
+import { logger } from '@client/lib/utils/logger';
 
 import { useBills } from '../hooks';
 import type { Bill, BillsQueryParams } from '../model/types';

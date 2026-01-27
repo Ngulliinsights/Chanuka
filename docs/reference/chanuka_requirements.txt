@@ -89,11 +89,11 @@ WHEN a developer creates a new UI component THEN the system SHALL enforce placem
 
 1. WHEN a component is used exclusively within the bills feature THEN the system SHALL locate that component in `client/src/features/bills/ui/` WHERE the component imports and uses only dependencies available to the bills feature scope.
 
-2. WHEN a component is initially created as shared but analysis shows single-feature usage THEN the system SHALL move that component from `client/src/shared/ui/` or `client/src/components/` to the appropriate feature directory WHERE component movement is tracked in migration documentation.
+2. WHEN a component is initially created as shared but analysis shows single-feature usage THEN the system SHALL move that component from `client/src/lib/ui/` or `client/src/components/` to the appropriate feature directory WHERE component movement is tracked in migration documentation.
 
-3. WHEN a component genuinely serves multiple features (proven by import analysis showing 3+ distinct feature imports) THEN the system SHALL promote it to `client/src/shared/ui/` WHERE the promotion decision is documented with usage patterns justifying the shared status.
+3. WHEN a component genuinely serves multiple features (proven by import analysis showing 3+ distinct feature imports) THEN the system SHALL promote it to `client/src/lib/ui/` WHERE the promotion decision is documented with usage patterns justifying the shared status.
 
-4. WHEN the design system provides primitive components (buttons, inputs, cards) THEN the system SHALL locate these in `client/src/shared/design-system/` WHERE these components have zero feature-specific logic and serve purely as styled HTML element wrappers.
+4. WHEN the design system provides primitive components (buttons, inputs, cards) THEN the system SHALL locate these in `client/src/lib/design-system/` WHERE these components have zero feature-specific logic and serve purely as styled HTML element wrappers.
 
 5. WHEN the client source tree is analyzed for component locations THEN the system SHALL show clear organizational hierarchy: feature-specific in features/[feature]/ui/, cross-feature in shared/ui/, primitives in shared/design-system/ WHERE the generic `client/src/components/` directory is deprecated and empty except for layout components.
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { CoverageDashboard } from '@client/features/admin/ui/coverage/coverage-dashboard';
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 export function CoveragePage() {
   return (

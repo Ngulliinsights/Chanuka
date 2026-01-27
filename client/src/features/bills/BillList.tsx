@@ -3,9 +3,8 @@ import { useState, useMemo, useCallback } from 'react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
@@ -13,14 +12,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@client/shared/design-system';
-import type { Bill, BillsQueryParams } from '@client/shared/types';
+} from '@client/lib/design-system';
+import { cn } from '@lib/utils';
+import type { Bill, BillsQueryParams } from '@client/lib/types';
 
 import { BillCard } from './BillCard';
 

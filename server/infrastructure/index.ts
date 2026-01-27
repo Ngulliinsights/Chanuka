@@ -4,11 +4,8 @@
 // Database (consolidated with shared/database)
 export * from './database';
 
-// Cache (consolidated with shared/core/src/caching)
-export * from './cache';
-
-// Monitoring (consolidated with shared/core/src/observability)
-export * from './monitoring';
+// Observability (monitoring, logging, performance)
+export * from './observability';
 
 // Notifications (server-specific, using shared primitives)
 export * from './notifications';
@@ -41,9 +38,12 @@ export {
   withReadConnection
 } from '@server/infrastructure/database/connection';
 
-// Legacy compatibility exports
-export { cacheService } from './cache';
-export { performanceMonitor, measureAsync, measureSync } from './monitoring';
+// Legacy compatibility exports (from shared/core)
+export { 
+  performanceMonitor, 
+  measureAsync, 
+  measureSync 
+} from './observability';
 
 
 

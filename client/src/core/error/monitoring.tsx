@@ -33,6 +33,8 @@ interface CustomError extends Error {
 class ErrorMonitoringService {
   private initialized = false;
   private context: ErrorContext = {};
+  private unhandledRejectionHandler: ((event: PromiseRejectionEvent) => void) | null = null;
+  private errorHandler: ((event: ErrorEvent) => void) | null = null;
 
   /**
    * Initialize error monitoring with Sentry configuration
@@ -91,6 +93,9 @@ class ErrorMonitoringService {
 
       this.setupUnhandledRejectionTracking();
       this.setupCustomErrorBoundaries();
+
+      // Register cleanup on app unload to prevent memory leaks
+      window.addEventListener('beforeunload', () => this.cleanup());
 
       this.initialized = true;
       console.log('✅ Error monitoring initialized successfully');
@@ -270,10 +275,15 @@ class ErrorMonitoringService {
   }
 
   /**
-   * Set up unhandled promise rejection tracking
+   * Set up unhandled promise rejection tracking (with cleanup support)
    */
   private setupUnhandledRejectionTracking() {
-    window.addEventListener('unhandledrejection', event => {
+    // Remove any existing handler first
+    if (this.unhandledRejectionHandler) {
+      window.removeEventListener('unhandledrejection', this.unhandledRejectionHandler);
+    }
+
+    this.unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
       this.captureError(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
         feature: 'promise-rejection',
         metadata: {
@@ -281,14 +291,21 @@ class ErrorMonitoringService {
           promise: event.promise,
         },
       });
-    });
+    };
+
+    window.addEventListener('unhandledrejection', this.unhandledRejectionHandler);
   }
 
   /**
-   * Set up custom error boundaries
+   * Set up custom error boundaries (with cleanup support)
    */
   private setupCustomErrorBoundaries() {
-    window.addEventListener('error', event => {
+    // Remove any existing handler first
+    if (this.errorHandler) {
+      window.removeEventListener('error', this.errorHandler);
+    }
+
+    this.errorHandler = (event: ErrorEvent) => {
       this.captureError(event.error || new Error(event.message), {
         feature: 'global-error',
         metadata: {
@@ -297,7 +314,27 @@ class ErrorMonitoringService {
           colno: event.colno,
         },
       });
-    });
+    };
+
+    window.addEventListener('error', this.errorHandler);
+  }
+
+  /**
+   * Cleanup error monitoring listeners to prevent memory leaks
+   * Called automatically on app unload
+   */
+  cleanup() {
+    if (this.unhandledRejectionHandler) {
+      window.removeEventListener('unhandledrejection', this.unhandledRejectionHandler);
+      this.unhandledRejectionHandler = null;
+    }
+
+    if (this.errorHandler) {
+      window.removeEventListener('error', this.errorHandler);
+      this.errorHandler = null;
+    }
+
+    this.initialized = false;
   }
 
   /**

@@ -12,9 +12,9 @@ import React from 'react';
 import { browserDetector } from '@client/core/browser/browser-detector';
 import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@client/core/error';
 import { getPerformanceMonitor } from '@client/core/performance';
-// import { startTrace, finishTrace } from '@client/shared/utils/tracing';
+// import { startTrace, finishTrace } from '@client/lib/utils/tracing';
 
-// import { logger } from '@client/shared/utils/logger';
+// import { logger } from '@client/lib/utils/logger';
 
 /**
  * Represents a recovery option for error handling

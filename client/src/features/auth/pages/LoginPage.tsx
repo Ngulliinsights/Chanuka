@@ -7,7 +7,7 @@ import { Shield } from 'lucide-react';
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 export default function LoginPage() {
   const navigate = useNavigate();

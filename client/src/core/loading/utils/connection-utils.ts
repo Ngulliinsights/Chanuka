@@ -3,7 +3,7 @@
  * Provides adaptive loading strategies based on network conditions
  */
 
-import { ConnectionType, ConnectionInfo } from '@client/shared/types';
+import { ConnectionType, ConnectionInfo } from '@client/lib/types';
 
 /**
  * Get connection multiplier for adaptive timeouts and delays
@@ -52,19 +52,19 @@ export function detectConnectionType(): ConnectionInfo {
     const connection = (navigator as any).connection;
     return {
       online: navigator.onLine,
-      connectionType: mapEffectiveTypeToConnectionType(connection.effectiveType),
+      type: mapEffectiveTypeToConnectionType(connection.effectiveType),
       effectiveType: connection.effectiveType,
       downlink: connection.downlink,
       rtt: connection.rtt,
-      lastChecked: new Date(),
+      lastChecked: Date.now(),
     };
   }
 
   // Fallback detection
   return {
     online: navigator.onLine,
-    connectionType: navigator.onLine ? 'wifi' : 'none',
-    lastChecked: new Date(),
+    type: navigator.onLine ? 'wifi' : 'none',
+    lastChecked: Date.now(),
   };
 }
 
@@ -96,7 +96,7 @@ export function isConnectionSuitableForPriority(
     return priority === 'critical';
   }
 
-  if (connectionInfo.connectionType === 'cellular') {
+  if (connectionInfo.type === 'cellular') {
     return priority !== 'low';
   }
 

@@ -15,7 +15,8 @@ export * from './features';
 export * from './shared';
 
 // Server types
-export * from './server';
+// Server types
+export * as Server from './server';
 
 // Global declarations
 export * from './global';

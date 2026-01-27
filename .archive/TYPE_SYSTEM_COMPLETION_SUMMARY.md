@@ -155,42 +155,42 @@ The type system standardization initiative has been successfully completed. The 
 - **Problem**: Module resolution conflict between `dashboard.ts` file and `dashboard/` directory
 - **Solution**: Renamed legacy `dashboard.ts` to `dashboard.legacy.ts`
 - **Files Affected**:
-  - `client/src/shared/types/components/dashboard.ts`
+  - `client/src/lib/types/components/dashboard.ts`
   - Path changed from `../dashboard` to `../dashboard/index`
 
 #### 2. Duplicate Identifier Errors
 - **Problem**: BillStatus, UrgencyLevel, ComplexityLevel, ResourceAccessLevel exported twice
 - **Solution**: Removed duplicate value exports (kept type exports)
 - **Files Affected**:
-  - `client/src/shared/types/bill/index.ts`
+  - `client/src/lib/types/bill/index.ts`
 
 #### 3. Type-Only Imports for Utility Functions
 - **Problem**: Utility functions referencing types not imported into namespace
 - **Solution**: Added internal imports for types used by utility functions
 - **Files Affected**:
-  - `client/src/shared/types/dashboard/index.ts` (DashboardPreferences, DashboardConfig, WidgetConfig)
-  - `client/src/shared/types/community/index.ts` (Comment, DiscussionThread, Expert, ExpertDomain, ActivityType)
+  - `client/src/lib/types/dashboard/index.ts` (DashboardPreferences, DashboardConfig, WidgetConfig)
+  - `client/src/lib/types/community/index.ts` (Comment, DiscussionThread, Expert, ExpertDomain, ActivityType)
 
 #### 4. Type Casting Issues
 - **Problem**: Direct casting from User to Record<string, unknown> causing type overlap errors
 - **Solution**: Cast through unknown intermediary
 - **Files Affected**:
-  - `client/src/shared/types/bill/auth-types.ts`
+  - `client/src/lib/types/bill/auth-types.ts`
   - Functions: isExpertUser, isLegislatorUser
 
 #### 5. Readonly Array Incompatibility
 - **Problem**: Readonly const arrays assigned to mutable array properties
 - **Solution**: Spread readonly arrays to create mutable copies
 - **Files Affected**:
-  - `client/src/shared/types/dashboard/index.ts` (createDashboardConfig function)
+  - `client/src/lib/types/dashboard/index.ts` (createDashboardConfig function)
   - Changed: DEFAULT_RESPONSIVE_LAYOUTS → [...DEFAULT_RESPONSIVE_LAYOUTS]
 
 #### 6. Import Formatting Issues
 - **Problem**: Missing blank line between import groups (ESLint)
 - **Solution**: Added blank lines between different import statement groups
 - **Files Affected**:
-  - `client/src/shared/types/dashboard/dashboard-components.ts`
-  - `client/src/shared/types/components/dashboard.ts`
+  - `client/src/lib/types/dashboard/dashboard-components.ts`
+  - `client/src/lib/types/components/dashboard.ts`
 
 #### 7. TypeScript Configuration Deprecations
 - **Problem**: baseUrl deprecated in TypeScript 7.0
@@ -341,7 +341,7 @@ Key Items:
 
 #### Dashboard Types
 ```typescript
-import type { WidgetLayoutProps, isGridLayout } from '@client/shared/types/dashboard';
+import type { WidgetLayoutProps, isGridLayout } from '@client/lib/types/dashboard';
 
 function renderLayout(props: WidgetLayoutProps) {
   if (isGridLayout(props)) {
@@ -353,7 +353,7 @@ function renderLayout(props: WidgetLayoutProps) {
 
 #### Community Types
 ```typescript
-import type { Comment, DiscussionThread } from '@client/shared/types/community';
+import type { Comment, DiscussionThread } from '@client/lib/types/community';
 
 function formatComment(comment: Comment): string {
   return `${comment.authorName}: ${comment.content}`;
@@ -362,7 +362,7 @@ function formatComment(comment: Comment): string {
 
 #### Bill Types
 ```typescript
-import type { Bill, BillStatus } from '@client/shared/types/bill';
+import type { Bill, BillStatus } from '@client/lib/types/bill';
 
 function isBillActive(bill: Bill): boolean {
   return bill.status === 'active';

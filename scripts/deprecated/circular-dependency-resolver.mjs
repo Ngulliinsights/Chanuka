@@ -53,8 +53,8 @@ const CONFIG = {
         // Store circular deps - extract types
         {
             files: [
-                'client/src/shared/infrastructure/store/index.ts',
-                'client/src/shared/infrastructure/store/slices/userDashboardSlice.ts'
+                'client/src/lib/infrastructure/store/index.ts',
+                'client/src/lib/infrastructure/store/slices/userDashboardSlice.ts'
             ],
             strategy: 'extract_store_types'
         },

@@ -317,7 +317,7 @@ class WebSocketConsolidationMigrator {
       // Relative imports within the realtime module
       {
         from: /from ['"]\.\.\/\.\.\/\.\.\/utils\/logger['"];?/g,
-        to: "from '@client/shared/utils/logger';",
+        to: "from '@client/lib/utils/logger';",
       },
       {
         from: /from ['"]\.\.\/\.\.\/\.\.\/types\/realtime['"];?/g,

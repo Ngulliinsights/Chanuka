@@ -1,4 +1,4 @@
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
 import type { DataExportResponse, DataDeletionResponse } from './types/error-response';

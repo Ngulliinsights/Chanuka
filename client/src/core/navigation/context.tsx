@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { RootState } from '../../shared/infrastructure/store';
+import { RootState } from '../../lib/infrastructure/store';
 import {
   setCurrentPath,
   updateBreadcrumbs,
@@ -21,8 +21,8 @@ import {
   updatePreferences,
   addToRecentPages,
   clearPersistedState,
-} from '../../shared/infrastructure/store/slices/navigationSlice';
-import { UserRole } from '../../shared/types/navigation';
+} from '../../lib/infrastructure/store/slices/navigationSlice';
+import { UserRole } from '../../lib/types/navigation';
 
 import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
 import {
@@ -93,7 +93,7 @@ export function createNavigationProvider(
           dispatch(setCurrentPath(currentPath));
           dispatch(setCurrentSection(determineNavigationSection(currentPath)));
           dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath)));
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           dispatch(updateRelatedPages(calculateRelatedPages(currentPath, state.user_role) as any));
           dispatch(addToRecentPages({ path: currentPath, title: document.title || currentPath }));
         });
@@ -133,7 +133,7 @@ export function createNavigationProvider(
 
     const updateRelatedPagesAction = useCallback(
       (pages: RelatedPage[]) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         dispatch(updateRelatedPages(pages as any));
       },
       [dispatch]
@@ -156,7 +156,7 @@ export function createNavigationProvider(
           autoExpand: boolean;
         }>
       ) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         dispatch(updatePreferences(preferences as any));
       },
       [dispatch]
@@ -193,7 +193,7 @@ export function createNavigationProvider(
 
     // Context value with all functionality - no memoization to avoid dependency issues
     // Use `any` here to bridge type differences between core and shared navigation types.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const contextValue: any = {
       ...state,
 

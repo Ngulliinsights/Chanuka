@@ -16,8 +16,8 @@ import type {
   AnalyticsAlert,
   StakeholderAnalysis,
   AnalyticsExport,
-} from '@client/shared/types/analytics';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/types/analytics';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalErrorHandler } from './errors';
 import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
@@ -340,7 +340,6 @@ export class AnalyticsApiService {
 
     const errorMessage =
       (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
-      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
       (errorResponse as Error)?.message ||
       defaultMessage;
 

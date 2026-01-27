@@ -99,7 +99,7 @@ vi.mock('../../features/search/ui/interface/IntelligentAutocomplete', () => ({
 }));
 
 // Mock the cn utility
-vi.mock('../../shared/design-system/utils/cn', () => ({
+vi.mock('../../lib/design-system/utils/cn', () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 

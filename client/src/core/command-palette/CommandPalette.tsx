@@ -16,8 +16,8 @@ import {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-} from '../../shared/design-system/interactive/Command';
-import { cn } from '../../shared/design-system/utils/cn';
+} from '../../lib/design-system/interactive/Command';
+import { cn } from '../../lib/design-system/utils/cn';
 
 import { createDefaultSections, filterCommands, groupCommandsBySection } from './commands';
 import { Modal } from './Modal';

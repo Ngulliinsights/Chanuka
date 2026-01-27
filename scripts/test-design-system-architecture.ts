@@ -35,8 +35,8 @@ interface ComponentAnalysis {
 }
 
 class DesignSystemArchitecturalAssessment {
-  private designSystemDir = 'client/src/shared/design-system';
-  private sharedDir = 'client/src/shared';
+  private designSystemDir = 'client/src/lib/design-system';
+  private sharedDir = 'client/src/lib';
   private issues: ArchitecturalIssue[] = [];
   private components: Map<string, ComponentAnalysis> = new Map();
   private importPatterns: Map<string, string[]> = new Map();
@@ -292,11 +292,11 @@ class DesignSystemArchitecturalAssessment {
     
     // Check direct exports from various locations
     const locations = [
-      '@client/shared/design-system',
-      '@client/shared/design-system/interactive',
-      '@client/shared/design-system/feedback',
-      '@client/shared/design-system/primitives',
-      '@client/shared/ui'
+      '@client/lib/design-system',
+      '@client/lib/design-system/interactive',
+      '@client/lib/design-system/feedback',
+      '@client/lib/design-system/primitives',
+      '@client/lib/ui'
     ];
 
     for (const location of locations) {
@@ -726,7 +726,7 @@ shared/design-system/
 └── index.ts         # Single entry point
 \`\`\`
 
-**Import Pattern**: \`import { Button, Input, Card } from '@client/shared/design-system';\`
+**Import Pattern**: \`import { Button, Input, Card } from '@client/lib/design-system';\`
 `;
 
     await fs.writeFile('client/src/DESIGN_SYSTEM_CONSOLIDATION_PLAN.md', plan);

@@ -34,7 +34,6 @@ import { SearchAnalyticsDashboard } from '@client/features/search/ui/interface/S
 import { SearchProgressIndicator } from '@client/features/search/ui/interface/SearchProgressIndicator';
 import { SearchTips } from '@client/features/search/ui/interface/SearchTips';
 import { SearchResultCard } from '@client/features/search/ui/results/SearchResultCard';
-import { useToast } from '@client/shared/hooks/use-toast';
 import {
   Badge,
   Button,
@@ -54,8 +53,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { useToast } from '@client/lib/hooks/use-toast';
+import { logger } from '@client/lib/utils/logger';
 
 // Define SearchResult interface for streaming search
 interface SearchResult {

@@ -6,6 +6,9 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
+import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/core/error/constants';
+import { coreErrorHandler } from '@client/core/error/handler';
 import {
   networkRetryStrategy,
   cacheClearStrategy,
@@ -25,8 +28,6 @@ import {
   registerDefaultRecoveryStrategies,
 } from '@client/core/error/recovery';
 import { AppError } from '@client/core/error/types';
-import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/core/error/constants';
-import { coreErrorHandler } from '@client/core/error/handler';
 
 // Mock dependencies
 vi.mock('../../../core/error/handler', () => ({

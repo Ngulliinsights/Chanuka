@@ -1,10 +1,10 @@
 import type { Preview } from '@storybook/react'
 import { DARK_MODE_EVENT_NAME } from 'storybook-addon-dark-mode'
-import '../src/shared/design-system/theme/light.css'
-import '../src/shared/design-system/theme/dark.css'
-import '../src/shared/design-system/theme/high-contrast.css'
+import '../src/lib/design-system/theme/light.css'
+import '../src/lib/design-system/theme/dark.css'
+import '../src/lib/design-system/theme/high-contrast.css'
 import '../src/styles/globals.css'
-import { ThemeProvider } from '../src/shared/design-system/theme/theme-provider'
+import { ThemeProvider } from '../src/lib/design-system/theme/theme-provider'
 import React from 'react'
 
 // Default theme

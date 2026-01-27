@@ -6,9 +6,9 @@
 import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import React from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system/feedback/Alert';
-import { Button } from '@client/shared/design-system/interactive/Button';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
+import { Button } from '@client/lib/design-system/interactive/Button';
+import { cn } from '@client/lib/design-system/utils/cn';
 
 export interface AuthAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';

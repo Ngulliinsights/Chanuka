@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 import React from 'react';
 
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { Button } from '@client/shared/design-system';
-import { LoadingSpinner } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
 
 export interface SectionProps {
   title: string;

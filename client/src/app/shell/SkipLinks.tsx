@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { cn } from '@client/shared/lib/utils';
+import { cn } from '@lib/utils';
 
 interface SkipLinkProps {
   href: string;
@@ -208,7 +208,7 @@ export function SkipLinks({
  * Hook for managing skip link targets
  * Ensures target elements are properly configured for skip navigation
  */
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export function useSkipLinkTargets(targetIds: string[]) {
   useEffect(() => {
     targetIds.forEach(id => {
@@ -242,7 +242,7 @@ export function useSkipLinkTargets(targetIds: string[]) {
 /**
  * Higher-order component that adds skip link functionality to a page
  */
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export function withSkipLinks<P extends object>(
   Component: React.ComponentType<P>,
   customLinks?: SkipLinksProps['links']

@@ -2,9 +2,8 @@ import React, { Suspense, lazy, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { ErrorBoundary } from '@client/core/error/components';
-import { LoadingStateManager } from '@client/shared/ui/loading/LoadingStates';
-
-import { logger } from '@client/shared/utils/logger';
+import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
+import { logger } from '@client/lib/utils/logger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 
@@ -13,10 +12,10 @@ import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute'
  * This wrapper ensures that transient network errors don't permanently
  * break the application by providing a fallback UI with retry capability.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
   return lazy(() =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     importFn().catch((error: any) => {
       logger.error(`Failed to load ${componentName}:`, { component: 'AppRouter' }, error);
 
@@ -97,7 +96,7 @@ const AnalyticsDashboard = createLazyComponent(
   () => import('@client/features/admin/pages/AnalyticsDashboardPage'),
   'Analytics Dashboard'
 );
-const NotFoundPage = createLazyComponent(() => import('@client/shared/pages/not-found'), 'Not Found');
+const NotFoundPage = createLazyComponent(() => import('@client/lib/pages/not-found'), 'Not Found');
 
 interface RouteConfig {
   path: string;
@@ -112,7 +111,7 @@ interface RouteConfig {
 /**
  * Route loading fallback component with consistent styling
  */
-// eslint-disable-next-line react/prop-types
+ 
 const RouteLoadingFallback = React.memo<{ routeName?: string }>(({ routeName }) => {
   return (
     <LoadingStateManager
@@ -130,8 +129,8 @@ RouteLoadingFallback.displayName = 'RouteLoadingFallback';
 /**
  * Route error fallback component with recovery options
  */
-/* eslint-disable react/prop-types */
-// eslint-disable-next-line react/prop-types
+ 
+ 
 const RouteErrorFallback = React.memo<{
   error: Error;
   resetErrorBoundary: () => void;
@@ -180,8 +179,8 @@ RouteErrorFallback.displayName = 'RouteErrorFallback';
  * Wrapper component for individual routes with error boundaries.
  * Memoized to prevent unnecessary re-renders when parent updates.
  */
-/* eslint-disable react/prop-types */
-// eslint-disable-next-line react/prop-types
+ 
+ 
 const RouteWrapper = React.memo<{
   children: React.ReactNode;
   routeName: string;

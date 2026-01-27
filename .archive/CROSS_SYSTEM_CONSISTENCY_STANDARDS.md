@@ -251,7 +251,7 @@ import { useState } from 'react';
 
 // 2. Internal modules
 import { authService } from '@client/core/auth';
-import { CacheService } from '@client/shared/services/cache';
+import { CacheService } from '@client/lib/services/cache';
 
 // 3. Local files
 import { UserForm } from './UserForm';
@@ -314,7 +314,7 @@ describe('AuthService', () => {
 
 ```typescript
 // Use Vitest mocking
-vi.mock('@client/shared/services/cache', () => ({
+vi.mock('@client/lib/services/cache', () => ({
   CacheService: vi.fn().mockImplementation(() => ({
     get: vi.fn(),
     set: vi.fn(),

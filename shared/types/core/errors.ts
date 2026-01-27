@@ -319,11 +319,11 @@ export function enhanceErrorWithContext(
  * Extract error metadata for logging
  */
 export function extractErrorMetadata(error: unknown): {
-  code?: string;
-  severity?: ErrorSeverity;
+  code?: string | undefined;
+  severity?: ErrorSeverity | undefined;
   message?: string;
-  context?: Readonly<Record<string, unknown>>;
-  stack?: string;
+  context?: Readonly<Record<string, unknown>> | undefined;
+  stack?: string | undefined;
 } {
   if (error instanceof AppError) {
     return {
@@ -337,8 +337,8 @@ export function extractErrorMetadata(error: unknown): {
 
   if (error instanceof Error) {
     return {
-      code: undefined,
-      severity: undefined,
+      code: undefined as string | undefined,
+      severity: undefined as ErrorSeverity | undefined,
       message: error.message,
       context: undefined,
       stack: error.stack,
@@ -346,8 +346,8 @@ export function extractErrorMetadata(error: unknown): {
   }
 
   return {
-    code: undefined,
-    severity: undefined,
+    code: undefined as string | undefined,
+    severity: undefined as ErrorSeverity | undefined,
     message: String(error),
     context: undefined,
     stack: undefined,

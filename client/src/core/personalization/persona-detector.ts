@@ -5,7 +5,7 @@
  * Requirements: 4.1, 4.2, 7.1
  */
 
-import type { UserActivity } from '../../shared/types/analytics';
+import type { UserActivity } from '../../lib/types/analytics';
 import type { User } from '../auth/types';
 
 import type {

@@ -8,12 +8,12 @@ CLIENT_SRC = PROJECT_ROOT / 'client' / 'src'
 
 # Define import mappings
 REPLACEMENTS = {
-    r"from\s+['\"]@client/types['\"]": "from '@client/shared/types'",
-    r"from\s+['\"]@client/types/dashboard['\"]": "from '@client/shared/types/dashboard'",
-    r"from\s+['\"]@client/types/loading['\"]": "from '@client/shared/types/loading'",
-    r"from\s+['\"]@client/types/navigation['\"]": "from '@client/shared/types/navigation'",
-    r"from\s+['\"]@client/types/mobile['\"]": "from '@client/shared/types/mobile'",
-    r"from\s+['\"]@client/types/user-dashboard['\"]": "from '@client/shared/types/user-dashboard'",
+    r"from\s+['\"]@client/types['\"]": "from '@client/lib/types'",
+    r"from\s+['\"]@client/types/dashboard['\"]": "from '@client/lib/types/dashboard'",
+    r"from\s+['\"]@client/types/loading['\"]": "from '@client/lib/types/loading'",
+    r"from\s+['\"]@client/types/navigation['\"]": "from '@client/lib/types/navigation'",
+    r"from\s+['\"]@client/types/mobile['\"]": "from '@client/lib/types/mobile'",
+    r"from\s+['\"]@client/types/user-dashboard['\"]": "from '@client/lib/types/user-dashboard'",
     r"from\s+['\"]@client/types/onboarding['\"]": "from '@client/features/users/types'",
     r"from\s+['\"]@client/types/expert['\"]": "from '@client/features/users/types'",
     r"from\s+['\"]@client/types/community['\"]": "from '@client/features/community/types'",

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
+import { logger } from '@client/lib/utils/logger';
+
 import { globalApiClient } from '../index';
-import { logger } from '@client/shared/utils/logger';
 
 // Define types locally since they're not exported
 export interface ConnectionInfo {

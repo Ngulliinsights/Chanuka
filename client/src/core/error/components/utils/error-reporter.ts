@@ -3,9 +3,10 @@
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability
  */
 
+import { logger } from '@client/lib/utils/logger';
+
 import { BaseError } from '../../classes';
 import { ErrorSeverity, ErrorDomain } from '../../constants';
-import { logger } from '@client/shared/utils/logger';
 
 export interface RecoveryStrategy {
   name: string;
@@ -39,7 +40,7 @@ export function createErrorReporter(options: {
 }) {
   return {
     report: (error: Record<string, unknown>) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       logger.error('User error reported', {
         component: 'ErrorReporter',
         error,
@@ -54,7 +55,7 @@ export function createErrorReporter(options: {
       let recoveryOptions: Array<{ label: string; action: string; description?: string }>;
 
       // Note: recoveryStrategies may not be present in all ErrorMetadata instances
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const recoveryStrategies = (error.metadata as any)?.recoveryStrategies as
         | RecoveryStrategy[]
         | undefined;

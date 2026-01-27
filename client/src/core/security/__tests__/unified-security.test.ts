@@ -4,17 +4,18 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
+import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
+import { UnifiedCSPManager } from '../unified/csp-manager';
+import { SecurityErrorHandler, SecurityErrorFactory } from '../unified/error-handler';
+import { SecurityErrorMiddleware } from '../unified/error-middleware';
+import { UnifiedInputSanitizer } from '../unified/input-sanitizer';
 import {
   UnifiedSecurityConfig,
   SecurityErrorType,
   ThreatType,
   SanitizationOptions
 } from '../unified/security-interface';
-import { UnifiedCSPManager } from '../unified/csp-manager';
-import { UnifiedInputSanitizer } from '../unified/input-sanitizer';
-import { SecurityErrorHandler, SecurityErrorFactory } from '../unified/error-handler';
-import { SecurityErrorMiddleware } from '../unified/error-middleware';
-import { STANDARD_CSP_CONFIG } from '../unified/csp-config';
 
 describe('Unified Security System', () => {
   let unifiedSecurity: {

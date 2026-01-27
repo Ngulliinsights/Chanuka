@@ -258,7 +258,7 @@ export class DatabasePatternDetector {
 
     // Common fallback patterns
     const commonPaths = [
-      '@shared/database/connection',
+      '@server/infrastructure/database/connection',
       '../database/connection',
       '../../shared/database/connection',
       './database',

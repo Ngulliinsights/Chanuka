@@ -114,3 +114,58 @@ export interface SecurityHeaders {
   'Referrer-Policy': string;
   'Permissions-Policy'?: string;
 }
+
+export interface SecurityConfiguration {
+  csp: {
+    enabled: boolean;
+    reportOnly: boolean;
+    directives: Record<string, (string | boolean)[] | boolean>;
+    nonce: {
+      enabled: boolean;
+      length: number;
+    };
+  };
+  csrf: {
+    enabled: boolean;
+    tokenName: string;
+    headerName: string;
+    cookieName: string;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none';
+    maxAge: number;
+  };
+  rateLimit: {
+    enabled: boolean;
+    windowMs: number;
+    maxRequests: number;
+    skipSuccessfulRequests: boolean;
+    skipFailedRequests: boolean;
+  };
+  headers: {
+    hsts: {
+      enabled: boolean;
+      maxAge: number;
+      includeSubDomains: boolean;
+      preload: boolean;
+    };
+    xFrameOptions: string;
+    xContentTypeOptions: boolean;
+    referrerPolicy: string;
+    permissionsPolicy: string[];
+  };
+  sanitization: {
+    enabled: boolean;
+    allowedTags: string[];
+    allowedAttributes: Record<string, string[]>;
+    stripIgnoreTag: boolean;
+    stripIgnoreTagBody: string[];
+  };
+}
+
+export interface ExtendedSecurityMetrics extends SecurityMetrics {
+  totalIncidents: number;
+  averageResponseTime: number;
+  uptimePercentage: number;
+}
+
+export type ThreatLevel = 'low' | 'medium' | 'high' | 'critical';

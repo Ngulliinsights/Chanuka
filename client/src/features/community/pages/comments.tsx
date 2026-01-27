@@ -13,25 +13,25 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
 
 interface Comment {
   id: string;

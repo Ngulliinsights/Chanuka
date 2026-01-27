@@ -1,4 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
+ 
 /**
  * Community State Management - React Query Implementation (Optimized)
  *
@@ -46,7 +46,7 @@ import type {
   Petition,
   CommunityStats,
   LocalImpactMetrics,
-} from '@client/shared/types';
+} from '@client/lib/types';
 
 // ============================================================================
 // Complete Type Definitions

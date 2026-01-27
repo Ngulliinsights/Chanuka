@@ -7,7 +7,7 @@
  * @module core/mobile/error-handler
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { DeviceDetector } from './device-detector';
 import type { MobileErrorContext } from './types';

@@ -9,17 +9,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Label } from '@client/lib/design-system';
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();

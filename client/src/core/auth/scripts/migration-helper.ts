@@ -5,7 +5,7 @@
  * to the new consolidated auth system.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 /**
  * Import mapping from old to new locations
@@ -41,9 +41,9 @@ export const IMPORT_MAPPINGS = {
     "import { sessionManager } from '@client/core/auth'",
 
   // Validation
-  "import { validatePasswordComprehensive } from '@client/shared/ui/auth/utils/auth-validation'":
+  "import { validatePasswordComprehensive } from '@client/lib/ui/auth/utils/auth-validation'":
     "import { validatePasswordComprehensive } from '@client/core/auth'",
-  "from '@client/shared/ui/auth/utils/auth-validation'": "from '@client/core/auth'",
+  "from '@client/lib/ui/auth/utils/auth-validation'": "from '@client/core/auth'",
 };
 
 /**

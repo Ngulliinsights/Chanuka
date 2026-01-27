@@ -3,7 +3,7 @@ import { type ChannelDeliveryRequest, type DeliveryResult,notificationChannelSer
 import { type FilterCriteria, type FilterResult,smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
 import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
-import { database as db, readDatabase } from '@shared/database';
+import { database as db, readDatabase } from '@server/infrastructure/database';
 import { bill_tracking_preferences, bills,notifications, users } from '@shared/schema';
 import { and,eq } from 'drizzle-orm';
 

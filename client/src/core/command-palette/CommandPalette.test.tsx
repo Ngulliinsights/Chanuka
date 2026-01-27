@@ -22,7 +22,7 @@ vi.mock('./Modal', () => ({
 }));
 
 // Mock the design system components
-vi.mock('../../shared/design-system/interactive/Command', () => ({
+vi.mock('../../lib/design-system/interactive/Command', () => ({
   Command: ({ children, className }: any) => (
     <div data-testid="command" className={className}>
       {children}
@@ -54,7 +54,7 @@ vi.mock('../../shared/design-system/interactive/Command', () => ({
 }));
 
 // Mock the cn utility
-vi.mock('../../shared/design-system/utils/cn', () => ({
+vi.mock('../../lib/design-system/utils/cn', () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
 

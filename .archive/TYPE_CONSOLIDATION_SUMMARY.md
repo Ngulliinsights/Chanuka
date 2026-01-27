@@ -30,14 +30,14 @@ Updated the following high-priority files to use consolidated type locations:
 - `client/src/core/api/community.ts` → Uses `../../shared/types`
 
 #### Dashboard System
-- `client/src/shared/ui/dashboard/UserDashboard.tsx` → Uses `@client/shared/types/user-dashboard`
-- `client/src/shared/ui/dashboard/useDashboardData.ts` → Uses `@client/shared/types/user-dashboard`
-- `client/src/shared/ui/dashboard/sections/EngagementHistorySection.tsx` → Uses `@client/shared/types/user-dashboard`
-- `client/src/shared/ui/dashboard/sections/RecommendationsSection.tsx` → Uses `@client/shared/types/user-dashboard`
+- `client/src/lib/ui/dashboard/UserDashboard.tsx` → Uses `@client/lib/types/user-dashboard`
+- `client/src/lib/ui/dashboard/useDashboardData.ts` → Uses `@client/lib/types/user-dashboard`
+- `client/src/lib/ui/dashboard/sections/EngagementHistorySection.tsx` → Uses `@client/lib/types/user-dashboard`
+- `client/src/lib/ui/dashboard/sections/RecommendationsSection.tsx` → Uses `@client/lib/types/user-dashboard`
 
 ### 3. New Type Locations Created
 
-#### `client/src/shared/types/user-dashboard.ts`
+#### `client/src/lib/types/user-dashboard.ts`
 - Migrated all user dashboard types from legacy location
 - Includes: `TrackedBill`, `EngagementHistoryItem`, `CivicImpactMetrics`, `BillRecommendation`, etc.
 
@@ -45,7 +45,7 @@ Updated the following high-priority files to use consolidated type locations:
 - Added realtime types from legacy `types/realtime.ts`
 - Includes: `BillRealTimeUpdate`, `CommunityRealTimeUpdate`, `EngagementMetricsUpdate`, etc.
 
-#### `client/src/shared/types/index.ts` (Enhanced)
+#### `client/src/lib/types/index.ts` (Enhanced)
 - Comprehensive re-exports from all consolidated locations
 - Backward compatibility maintained
 
@@ -60,10 +60,10 @@ Updated `client/src/types/index.ts` with:
 
 ### ✅ Successfully Migrated
 - **Realtime types** → `client/src/core/realtime/types/`
-- **Mobile types** → `client/src/shared/types/mobile.ts`
-- **Navigation types** → `client/src/shared/types/navigation.ts`
-- **User dashboard types** → `client/src/shared/types/user-dashboard.ts`
-- **Core domain types** → Available via `client/src/shared/types/`
+- **Mobile types** → `client/src/lib/types/mobile.ts`
+- **Navigation types** → `client/src/lib/types/navigation.ts`
+- **User dashboard types** → `client/src/lib/types/user-dashboard.ts`
+- **Core domain types** → Available via `client/src/lib/types/`
 
 ### ✅ Backward Compatibility Maintained
 - All existing `@client/types/*` imports continue to work

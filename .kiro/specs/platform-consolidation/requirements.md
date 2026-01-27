@@ -78,7 +78,7 @@ The Chanuka platform consolidation project aims to transform the current fragmen
 
 2. WHEN feature APIs are exposed THEN the system SHALL define routes in `server/src/features/[feature]/presentation/` WHERE API concerns are separated from business logic.
 
-3. WHEN features share common functionality THEN the system SHALL place shared server utilities in `server/src/shared/` WHERE cross-feature server code remains accessible.
+3. WHEN features share common functionality THEN the system SHALL place shared server utilities in `server/src/lib/` WHERE cross-feature server code remains accessible.
 
 ### Requirement 7: Progressive Migration with Feature Flags
 

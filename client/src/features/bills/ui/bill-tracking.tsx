@@ -4,14 +4,14 @@ import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { globalApiClient } from '@client/core/api/client';
-import { useSafeQuery } from '@client/shared/hooks/use-safe-query';
-import { useToast } from '@client/shared/hooks/use-toast';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Switch } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Label } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { Switch } from '@client/lib/design-system';
+import { useSafeQuery } from '@client/lib/hooks/use-safe-query';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 interface BillTrackingProps {
   bill_id: number;

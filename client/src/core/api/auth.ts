@@ -4,14 +4,9 @@
  * Provides type-safe, consistent interface for all auth operations
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
-import type {
-  PrivacySettings,
-  DataExportResponse,
-  DataDeletionResponse,
-} from './types/error-response';
 
 // ============================================================================
 // Core Authentication Types
@@ -251,6 +246,35 @@ export interface PasswordValidationResult {
   errors: string[];
   strength: 'weak' | 'fair' | 'good' | 'strong';
   score: number;
+}
+
+export interface PrivacySettings {
+  data_retention: DataRetentionPreference;
+  notifications: NotificationPreferences;
+  consent: ConsentRecord[];
+  sharing_preferences?: {
+    allow_analytics: boolean;
+    allow_marketing: boolean;
+    allow_third_party: boolean;
+  };
+}
+
+export interface DataExportResponse {
+  id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  created_at: string;
+  expires_at?: string;
+  download_url?: string;
+  format: 'json' | 'csv';
+  size_bytes?: number;
+}
+
+export interface DataDeletionResponse {
+  id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  created_at: string;
+  scheduled_for?: string;
+  reason?: string;
 }
 
 export interface SocialLoginProvider {
@@ -982,7 +1006,6 @@ export class AuthApiService {
     // Extract error message from various possible error structures
     const errorMessage =
       (errorResponse as AxiosErrorResponse)?.response?.data?.message ||
-      (errorResponse as AxiosErrorResponse)?.response?.data?.error ||
       (errorResponse as Error)?.message ||
       defaultMessage;
 

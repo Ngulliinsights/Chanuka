@@ -3,22 +3,22 @@
  * Example component demonstrating security features usage
  */
 
-import { useSecureForm, useSecurity, ValidationSchemas } from '@client/shared/hooks/useSecurity';
+import { useSecureForm, useSecurity, ValidationSchemas } from '@client/lib/hooks/useSecurity';
 import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Alert, AlertDescription } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Label } from '@client/lib/design-system';
 
 interface UserFormValues {
   email: string;

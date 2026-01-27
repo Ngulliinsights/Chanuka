@@ -11,8 +11,8 @@ import BillCommunityTab from '@client/features/bills/ui/detail/BillCommunityTab'
 import BillFullTextTab from '@client/features/bills/ui/detail/BillFullTextTab';
 import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
 import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();

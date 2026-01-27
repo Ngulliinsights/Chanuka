@@ -8,8 +8,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import type { ErrorPattern } from '@client/shared/services';
-import type { AppDispatch } from '@client/shared/infrastructure/store';
+import type { AppDispatch } from '@client/lib/infrastructure/store';
 import {
   fetchOverviewMetrics,
   fetchPatterns,
@@ -31,7 +30,8 @@ import {
   selectTrendData,
   setActiveTab,
   updateFilters,
-} from '@client/shared/infrastructure/store/slices/errorAnalyticsSlice';
+} from '@client/lib/infrastructure/store/slices/errorAnalyticsSlice';
+import type { ErrorPattern } from '@client/lib/services';
 
 // Type definitions
 interface TimeRange {
@@ -495,7 +495,7 @@ export function useErrorAnalyticsExport() {
   const exportCSV = useCallback(() => {
     if (!patterns.length) return;
 
-    // CSV export based on actual ErrorPattern interface from @client/shared/services
+    // CSV export based on actual ErrorPattern interface from @client/lib/services
     // Adjust headers and mapping based on the actual properties available
     const headers = ['Pattern', 'Frequency', 'Impact', 'Trend'];
 

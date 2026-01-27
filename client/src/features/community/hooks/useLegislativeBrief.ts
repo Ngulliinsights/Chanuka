@@ -6,6 +6,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+
 import type { LegislativeBrief } from '@/server/features/argument-intelligence';
 
 export function useLegislativeBrief(billId: string) {

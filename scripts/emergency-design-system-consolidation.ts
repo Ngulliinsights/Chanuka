@@ -20,7 +20,7 @@ interface ConsolidationAction {
 }
 
 class EmergencyDesignSystemConsolidation {
-  private designSystemDir = 'client/src/shared/design-system';
+  private designSystemDir = 'client/src/lib/design-system';
   private actions: ConsolidationAction[] = [];
   private backupDir = 'client/src/.design-system-backup';
 
@@ -273,7 +273,7 @@ class EmergencyDesignSystemConsolidation {
  * Single source of truth for all UI components.
  * 
  * Usage:
- * import { Button, Input, Card, Alert } from '@client/shared/design-system';
+ * import { Button, Input, Card, Alert } from '@client/lib/design-system';
  */
 
 // Core UI Components
@@ -356,36 +356,36 @@ export * from './accessibility';
 
     // Button consolidation
     mappings.set(
-      "from '@client/shared/design-system/interactive/button'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/interactive/button'",
+      "from '@client/lib/design-system'"
     );
     mappings.set(
-      "from '@client/shared/design-system/primitives/simple-button'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/primitives/simple-button'",
+      "from '@client/lib/design-system'"
     );
     mappings.set(
-      "from '@client/shared/design-system/primitives/unified-button'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/primitives/unified-button'",
+      "from '@client/lib/design-system'"
     );
 
     // Input consolidation
     mappings.set(
-      "from '@client/shared/design-system/interactive/input'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/interactive/input'",
+      "from '@client/lib/design-system'"
     );
 
     // Other core components
     mappings.set(
-      "from '@client/shared/design-system/interactive/card'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/interactive/card'",
+      "from '@client/lib/design-system'"
     );
     mappings.set(
-      "from '@client/shared/design-system/feedback/Alert'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/feedback/Alert'",
+      "from '@client/lib/design-system'"
     );
     mappings.set(
-      "from '@client/shared/design-system/feedback/Badge'",
-      "from '@client/shared/design-system'"
+      "from '@client/lib/design-system/feedback/Badge'",
+      "from '@client/lib/design-system'"
     );
 
     return mappings;

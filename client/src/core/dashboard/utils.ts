@@ -2,7 +2,7 @@
  * Dashboard Utilities - Helper functions for dashboard operations
  */
 
-import type { WidgetConfig, WidgetSize, DashboardLayout } from '@client/shared/types/dashboard';
+import type { WidgetConfig, WidgetSize, DashboardLayout } from '@client/lib/types/dashboard';
 
 export interface ChartData {
   labels: string[];

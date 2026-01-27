@@ -20,14 +20,14 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Calendar } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Checkbox } from '@client/shared/design-system';
-import { Popover, PopoverContent, PopoverTrigger } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Calendar } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Checkbox } from '@client/lib/design-system';
+import { Popover, PopoverContent, PopoverTrigger } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
 
 // Define SearchFilters type locally
 interface SearchFiltersType {

@@ -22,17 +22,17 @@ export abstract class WebSocketError extends AppError {
   /**
    * WebSocket connection ID associated with this error (if applicable)
    */
-  public readonly connectionId?: string;
+  public readonly connectionId?: string | undefined;
 
   /**
    * WebSocket message ID associated with this error (if applicable)
    */
-  public readonly messageId?: string;
+  public readonly messageId?: string | undefined;
 
   /**
    * Indicates whether the connection can be recovered from this error
    */
-  public readonly recoverable?: boolean;
+  public readonly recoverable?: boolean | undefined;
 
   constructor(
     message: string,
@@ -60,12 +60,12 @@ export class WebSocketConnectionError extends WebSocketError {
   /**
    * WebSocket close code (if applicable)
    */
-  public readonly closeCode?: number;
+  public readonly closeCode?: number | undefined;
 
   /**
    * WebSocket close reason (if applicable)
    */
-  public readonly closeReason?: string;
+  public readonly closeReason?: string | undefined;
 
   constructor(
     message: string,
@@ -93,12 +93,12 @@ export class WebSocketAuthError extends WebSocketError {
   /**
    * Authentication method that failed
    */
-  public readonly authMethod?: string;
+  public readonly authMethod?: string | undefined;
 
   /**
    * Indicates if this is a token expiration issue
    */
-  public readonly isTokenExpired?: boolean;
+  public readonly isTokenExpired?: boolean | undefined;
 
   constructor(
     message: string,
@@ -126,12 +126,12 @@ export class WebSocketMessageError extends WebSocketError {
   /**
    * Message type that caused the error
    */
-  public readonly messageType?: string;
+  public readonly messageType?: string | undefined;
 
   /**
    * Indicates if this is a message format/validation error
    */
-  public readonly isValidationError?: boolean;
+  public readonly isValidationError?: boolean | undefined;
 
   constructor(
     message: string,
@@ -159,17 +159,17 @@ export class WebSocketSubscriptionError extends WebSocketError {
   /**
    * Subscription ID that caused the error
    */
-  public readonly subscriptionId?: string;
+  public readonly subscriptionId?: string | undefined;
 
   /**
    * Topic that caused the error
    */
-  public readonly topic?: string;
+  public readonly topic?: string | undefined;
 
   /**
    * Indicates if this is a duplicate subscription
    */
-  public readonly isDuplicate?: boolean;
+  public readonly isDuplicate?: boolean | undefined;
 
   constructor(
     message: string,
@@ -199,12 +199,12 @@ export class WebSocketProtocolError extends WebSocketError {
   /**
    * Expected protocol version
    */
-  public readonly expectedProtocol?: string;
+  public readonly expectedProtocol?: string | undefined;
 
   /**
    * Actual protocol version
    */
-  public readonly actualProtocol?: string;
+  public readonly actualProtocol?: string | undefined;
 
   constructor(
     message: string,
@@ -237,7 +237,7 @@ export class WebSocketTimeoutError extends WebSocketError {
   /**
    * Operation that timed out
    */
-  public readonly operation?: string;
+  public readonly operation?: string | undefined;
 
   constructor(
     message: string,
@@ -275,7 +275,7 @@ export class WebSocketRateLimitError extends WebSocketError {
   /**
    * Time when the rate limit will reset in milliseconds
    */
-  public readonly resetTime?: number;
+  public readonly resetTime?: number | undefined;
 
   constructor(
     message: string,
@@ -305,12 +305,12 @@ export class WebSocketServerError extends WebSocketError {
   /**
    * Server component that failed
    */
-  public readonly component?: string;
+  public readonly component?: string | undefined;
 
   /**
    * Original server error (if available)
    */
-  public readonly originalError?: Error;
+  public readonly originalError?: Error | undefined;
 
   constructor(
     message: string,
@@ -338,12 +338,12 @@ export class WebSocketClientError extends WebSocketError {
   /**
    * Client platform information
    */
-  public readonly platform?: string;
+  public readonly platform?: string | undefined;
 
   /**
    * Client version information
    */
-  public readonly version?: string;
+  public readonly version?: string | undefined;
 
   constructor(
     message: string,
@@ -675,14 +675,14 @@ export function createClientError(
  * Extract WebSocket-specific error information for logging and monitoring
  */
 export function extractWebSocketErrorInfo(error: unknown): {
-  code?: string;
-  severity?: ErrorSeverity;
+  code?: string | undefined;
+  severity?: ErrorSeverity | undefined;
   message?: string;
-  context?: Readonly<Record<string, unknown>>;
-  connectionId?: string;
-  messageId?: string;
-  recoverable?: boolean;
-  stack?: string;
+  context?: Readonly<Record<string, unknown>> | undefined;
+  connectionId?: string | undefined;
+  messageId?: string | undefined;
+  recoverable?: boolean | undefined;
+  stack?: string | undefined;
 } {
   if (isWebSocketError(error)) {
     return {
@@ -708,7 +708,7 @@ export function extractWebSocketErrorInfo(error: unknown): {
  */
 export function websocketErrorToSafeObject(error: unknown): Record<string, unknown> {
   if (isWebSocketError(error)) {
-    return {
+    const result: Record<string, unknown> = {
       name: error.name,
       message: error.message,
       code: error.code,
@@ -718,52 +718,48 @@ export function websocketErrorToSafeObject(error: unknown): Record<string, unkno
       messageId: error.messageId,
       recoverable: error.recoverable,
       stack: error.stack,
-      ...(isWebSocketConnectionError(error) && {
-        closeCode: error.closeCode,
-        closeReason: error.closeReason,
-      }),
-      ...(isWebSocketAuthError(error) && {
-        authMethod: error.authMethod,
-        isTokenExpired: error.isTokenExpired,
-      }),
-      ...(isWebSocketMessageError(error) && {
-        messageType: error.messageType,
-        isValidationError: error.isValidationError,
-      }),
-      ...(isWebSocketSubscriptionError(error) && {
-        subscriptionId: error.subscriptionId,
-        topic: error.topic,
-        isDuplicate: error.isDuplicate,
-      }),
-      ...(isWebSocketProtocolError(error) && {
-        expectedProtocol: error.expectedProtocol,
-        actualProtocol: error.actualProtocol,
-      }),
-      ...(isWebSocketTimeoutError(error) && {
-        timeout: error.timeout,
-        operation: error.operation,
-      }),
-      ...(isWebSocketRateLimitError(error) && {
-        limit: error.limit,
-        window: error.window,
-        resetTime: error.resetTime,
-      }),
-      ...(isWebSocketServerError(error) && {
-        component: error.component,
-        originalError: error.originalError ? errorToSafeObject(error.originalError) : undefined,
-      }),
-      ...(isWebSocketClientError(error) && {
-        platform: error.platform,
-        version: error.version,
-      }),
     };
+
+    // Add type-specific properties
+    if (isWebSocketConnectionError(error)) {
+      result.closeCode = error.closeCode;
+      result.closeReason = error.closeReason;
+    } else if (isWebSocketAuthError(error)) {
+      result.authMethod = error.authMethod;
+      result.isTokenExpired = error.isTokenExpired;
+    } else if (isWebSocketMessageError(error)) {
+      result.messageType = error.messageType;
+      result.isValidationError = error.isValidationError;
+    } else if (isWebSocketSubscriptionError(error)) {
+      result.subscriptionId = error.subscriptionId;
+      result.topic = error.topic;
+      result.isDuplicate = error.isDuplicate;
+    } else if (isWebSocketProtocolError(error)) {
+      result.expectedProtocol = error.expectedProtocol;
+      result.actualProtocol = error.actualProtocol;
+    } else if (isWebSocketTimeoutError(error)) {
+      result.timeout = error.timeout;
+      result.operation = error.operation;
+    } else if (isWebSocketRateLimitError(error)) {
+      result.limit = error.limit;
+      result.window = error.window;
+      result.resetTime = error.resetTime;
+    } else if (isWebSocketServerError(error)) {
+      result.component = error.component;
+      result.originalError = error.originalError ? errorToSafeObject(error.originalError) : undefined;
+    } else if (isWebSocketClientError(error)) {
+      result.platform = error.platform;
+      result.version = error.version;
+    }
+
+    return result;
   }
 
   if (error instanceof Error) {
     return {
       name: error.name,
       message: error.message,
-      stack: error.stack,
+      stack: error.stack as string | undefined,
     };
   }
 

@@ -45,7 +45,7 @@ import type {
   FilterChangeEvent,
   RefreshEvent,
   ExportEvent,
-} from '@client/shared/types/dashboard';
+} from '@client/lib/types/dashboard';
 ```
 
 ## Type Organization
@@ -171,7 +171,7 @@ import {
   isWidgetConfig, 
   isDashboardLayout, 
   isDashboardConfig 
-} from '@client/shared/types/dashboard';
+} from '@client/lib/types/dashboard';
 
 if (isWidgetConfig(obj)) {
   // obj is WidgetConfig
@@ -211,17 +211,17 @@ const { layout: responsive, widgets: responsive Widgets } =
 
 **Before:**
 ```typescript
-import { DashboardConfig } from '@client/shared/ui/dashboard/types';
+import { DashboardConfig } from '@client/lib/ui/dashboard/types';
 ```
 
 **After:**
 ```typescript
-import type { DashboardConfig } from '@client/shared/types/dashboard';
+import type { DashboardConfig } from '@client/lib/types/dashboard';
 ```
 
 **Or for legacy app config:**
 ```typescript
-import type { DashboardAppConfig } from '@client/shared/types/dashboard';
+import type { DashboardAppConfig } from '@client/lib/types/dashboard';
 ```
 
 ### Updating Components
@@ -231,7 +231,7 @@ import { DashboardComponentProps, DashboardConfig } from './types';
 
 // New
 import type { DashboardComponentProps } from './types';
-import type { DashboardConfig } from '@client/shared/types/dashboard';
+import type { DashboardConfig } from '@client/lib/types/dashboard';
 ```
 
 ## Common Type Combinations
@@ -276,7 +276,7 @@ function useDashboardMetrics(): {
 
 ### Type Safety with Unknown Data
 ```typescript
-import { isWidgetConfig, isDashboardConfig } from '@client/shared/types/dashboard';
+import { isWidgetConfig, isDashboardConfig } from '@client/lib/types/dashboard';
 
 function processData(data: unknown): void {
   if (isWidgetConfig(data)) {
@@ -290,7 +290,7 @@ function processData(data: unknown): void {
 ## Related Documentation
 - [Phase 1 Consolidation Progress](./PHASE_1_CONSOLIDATION_PROGRESS.md)
 - [TypeScript Configuration](./client/tsconfig.json)
-- [Dashboard Component Examples](./client/src/shared/ui/dashboard/)
+- [Dashboard Component Examples](./client/src/lib/ui/dashboard/)
 
 ## File Locations
 | Type Category | Location |

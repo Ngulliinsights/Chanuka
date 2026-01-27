@@ -190,28 +190,28 @@ const COMPONENT_MAPPINGS: ComponentMapping[] = [
  */
 const IMPORT_MAPPINGS = {
   // Design System imports
-  '@client/shared/design-system/button': '@client/shared/design-system/Button',
-  '@client/shared/design-system/input': '@client/shared/design-system/Input',
-  '@client/shared/design-system/card': '@client/shared/design-system/Card',
-  '@client/shared/design-system/badge': '@client/shared/design-system/Badge',
-  '@client/shared/design-system/alert': '@client/shared/design-system/feedback/Alert',
+  '@client/lib/design-system/button': '@client/lib/design-system/Button',
+  '@client/lib/design-system/input': '@client/lib/design-system/Input',
+  '@client/lib/design-system/card': '@client/lib/design-system/Card',
+  '@client/lib/design-system/badge': '@client/lib/design-system/Badge',
+  '@client/lib/design-system/alert': '@client/lib/design-system/feedback/Alert',
 
   // Shared UI imports
-  '@client/shared/components/layout': '@client/shared/ui/layout',
-  '@client/shared/components/navigation': '@client/shared/ui/navigation',
-  '@client/shared/components/loading': '@client/shared/ui/loading',
-  '@client/shared/components/error-handling': '@client/shared/ui/error',
-  '@client/shared/components/mobile': '@client/shared/ui/mobile',
+  '@client/lib/components/layout': '@client/lib/ui/layout',
+  '@client/lib/components/navigation': '@client/lib/ui/navigation',
+  '@client/lib/components/loading': '@client/lib/ui/loading',
+  '@client/lib/components/error-handling': '@client/lib/ui/error',
+  '@client/lib/components/mobile': '@client/lib/ui/mobile',
 
   // Feature-specific imports
-  '@client/shared/components/bill-detail': '@client/features/bills/ui/detail',
-  '@client/shared/components/bill-tracking': '@client/features/bills/ui/tracking',
-  '@client/shared/components/community': '@client/features/community/ui',
-  '@client/shared/components/discussion': '@client/features/community/ui/discussion',
-  '@client/shared/components/search': '@client/features/search/ui',
-  '@client/shared/components/auth': '@client/features/users/ui/auth',
-  '@client/shared/components/user': '@client/features/users/ui/profile',
-  '@client/shared/components/analytics': '@client/features/analytics/ui',
+  '@client/lib/components/bill-detail': '@client/features/bills/ui/detail',
+  '@client/lib/components/bill-tracking': '@client/features/bills/ui/tracking',
+  '@client/lib/components/community': '@client/features/community/ui',
+  '@client/lib/components/discussion': '@client/features/community/ui/discussion',
+  '@client/lib/components/search': '@client/features/search/ui',
+  '@client/lib/components/auth': '@client/features/users/ui/auth',
+  '@client/lib/components/user': '@client/features/users/ui/profile',
+  '@client/lib/components/analytics': '@client/features/analytics/ui',
 };
 
 /**
@@ -243,7 +243,7 @@ const FSD_ESLINT_RULES = {
       groups: ['builtin', 'external', 'internal', ['parent', 'sibling'], 'index'],
       pathGroups: [
         {
-          pattern: '@client/shared/**',
+          pattern: '@client/lib/**',
           group: 'internal',
           position: 'before',
         },
@@ -401,14 +401,14 @@ import { UserProfile } from '@client/features/users/ui';
     `,
     'Shared component usage': `
 // ✅ Good: Using shared UI component
-import { LoadingSpinner } from '@client/shared/ui';
+import { LoadingSpinner } from '@client/lib/ui';
 
 // ✅ Good: Using design system primitive
-import { Button } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
     `,
     'Cross-feature communication': `
 // ✅ Good: Using shared API or events
-import { userApi } from '@client/shared/api';
+import { userApi } from '@client/lib/api';
 
 // ❌ Bad: Direct feature-to-feature import
 import { userService } from '@client/features/users/api';

@@ -139,7 +139,7 @@ If migrating from existing storage implementations:
 
 ## Dependencies
 
-- `@shared/database/pool` - Database connection
+- `@server/infrastructure/database/pool` - Database connection
 - `@shared/core/observability/logging` - Logging functionality
 - `drizzle-orm` - Database ORM
 - `@shared/schema` - Database schema definitions

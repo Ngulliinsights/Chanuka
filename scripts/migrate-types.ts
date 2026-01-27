@@ -38,7 +38,7 @@ export const MIGRATION_RULES: readonly MigrationRule[] = [
     pattern: /type\s+DashboardState\s*=\s*DashboardData;/g,
     replacement: 'type DashboardState = DashboardData;',
     description: 'Consolidate duplicate DashboardState definitions',
-    filePatterns: ['client/src/shared/types/**/*.ts'],
+    filePatterns: ['client/src/lib/types/**/*.ts'],
   },
   {
     pattern: /WidgetTabsProps(?!Layout)/g,
@@ -50,7 +50,7 @@ export const MIGRATION_RULES: readonly MigrationRule[] = [
     pattern: /from\s+['"]\.\/core\.ts['"]/g,
     replacement: "from './domains'",
     description: 'Update imports from ./core.ts to ./domains for standardized types',
-    filePatterns: ['client/src/shared/types/**/*.ts'],
+    filePatterns: ['client/src/lib/types/**/*.ts'],
   },
 ];
 

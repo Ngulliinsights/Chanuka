@@ -6,11 +6,12 @@
  */
 
 // Import unified types from shared schema
-import type { ConnectionQuality, WebSocketMessage } from '@shared/schema/websocket';
+import type { ConnectionQuality, WebSocketMessage } from '@server/infrastructure/schema/websocket';
+
 import { WebSocketClient } from '../websocket-client';
 
 // Re-export shared types for backward compatibility
-export type { ConnectionQuality, WebSocketMessage } from '@shared/schema/websocket';
+export type { ConnectionQuality, WebSocketMessage } from '@server/infrastructure/schema/websocket';
 
 export { WebSocketClient };
 

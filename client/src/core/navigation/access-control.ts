@@ -4,9 +4,9 @@
  * Handles route access permissions and user authorization
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { NavigationItem, UserRole } from '@client/lib/types/navigation';
+import { logger } from '@client/lib/utils/logger';
 
-import { NavigationItem, UserRole } from '@client/shared/types/navigation';
 
 /**
  * Checks if a user has access to a specific navigation item

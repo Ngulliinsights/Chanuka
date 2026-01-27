@@ -5,7 +5,6 @@
  * implementation, and service-specific error recovery strategies.
  */
 
-import { AppError, RecoveryStrategy } from '../types';
 import {
   ErrorDomain,
   ErrorSeverity,
@@ -15,6 +14,7 @@ import {
   coreErrorHandler,
   ErrorAnalyticsService,
 } from '../index';
+import { AppError, RecoveryStrategy } from '../types';
 
 /**
  * Library service error codes

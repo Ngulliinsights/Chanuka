@@ -10,7 +10,7 @@ import { governmentDataIntegrationService } from '@server/features/government-da
 import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';
 import { searchService } from '@server/features/search/application/search-service.ts';
 import { logger } from '@shared/core';
-import { databaseService } from '@shared/database/database-service.js';
+import { databaseService } from '@server/infrastructure/database/database-service.js';
 
 export interface ServiceHealth {
   serviceName: string;

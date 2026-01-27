@@ -2,7 +2,7 @@
 
 ## I. COMPLETE DIRECTORY STRUCTURE
 
-### A. Main Dashboard Hub: `/client/src/shared/ui/dashboard`
+### A. Main Dashboard Hub: `/client/src/lib/ui/dashboard`
 **Primary centralised dashboard system for all persona-based interfaces**
 
 ```

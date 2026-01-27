@@ -22,7 +22,7 @@ import {
   UserBadge,
   UserAchievement,
   ActivitySummary
-} from '@client/shared/services/interfaces';
+} from '@client/lib/services/interfaces';
 
 // Import services from index to avoid circular dependencies
 import {

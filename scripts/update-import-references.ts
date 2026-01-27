@@ -25,12 +25,12 @@ class ImportReferencesUpdater {
     // Offline components moved to shared/ui
     {
       oldPath: '@client/components/OfflineModal',
-      newPath: '@client/shared/ui/offline/OfflineModal',
+      newPath: '@client/lib/ui/offline/OfflineModal',
       reason: 'Consolidated to shared/ui/offline'
     },
     {
       oldPath: '@client/components/OfflineIndicator',
-      newPath: '@client/shared/ui/offline/OfflineIndicator',
+      newPath: '@client/lib/ui/offline/OfflineIndicator',
       reason: 'Consolidated to shared/ui/offline'
     },
     {
@@ -47,7 +47,7 @@ class ImportReferencesUpdater {
     // Database status moved to shared/ui
     {
       oldPath: '@client/components/database-status',
-      newPath: '@client/shared/ui/database-status',
+      newPath: '@client/lib/ui/database-status',
       reason: 'Consolidated to shared/ui'
     },
     {
@@ -59,33 +59,33 @@ class ImportReferencesUpdater {
     // Connection status moved to shared/ui
     {
       oldPath: '@client/components/connection-status',
-      newPath: '@client/shared/ui/connection-status',
+      newPath: '@client/lib/ui/connection-status',
       reason: 'Consolidated to shared/ui'
     },
     
     // Browser compatibility moved to core/browser
     {
-      oldPath: '@client/shared/infrastructure/compatibility/BrowserCompatibilityChecker',
+      oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityChecker',
       newPath: '@client/core/browser/BrowserCompatibilityChecker',
       reason: 'Consolidated to core/browser'
     },
     {
-      oldPath: '@client/shared/infrastructure/compatibility/BrowserCompatibilityReport',
+      oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityReport',
       newPath: '@client/core/browser/BrowserCompatibilityReport',
       reason: 'Consolidated to core/browser'
     },
     {
-      oldPath: '@client/shared/infrastructure/compatibility/BrowserCompatibilityTester',
+      oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityTester',
       newPath: '@client/core/browser/BrowserCompatibilityTester',
       reason: 'Consolidated to core/browser'
     },
     {
-      oldPath: '@client/shared/infrastructure/compatibility/FeatureFallbacks',
+      oldPath: '@client/lib/infrastructure/compatibility/FeatureFallbacks',
       newPath: '@client/core/browser/FeatureFallbacks',
       reason: 'Consolidated to core/browser'
     },
     {
-      oldPath: '@client/shared/infrastructure/compatibility/useBrowserStatus',
+      oldPath: '@client/lib/infrastructure/compatibility/useBrowserStatus',
       newPath: '@client/core/browser/useBrowserStatus',
       reason: 'Consolidated to core/browser'
     },
@@ -132,7 +132,7 @@ class ImportReferencesUpdater {
     // Notifications moved to shared/ui
     {
       oldPath: '@client/components/notifications/',
-      newPath: '@client/shared/ui/notifications/',
+      newPath: '@client/lib/ui/notifications/',
       reason: 'Consolidated to shared/ui/notifications'
     },
     
@@ -146,7 +146,7 @@ class ImportReferencesUpdater {
     // Integration components moved to shared/ui
     {
       oldPath: '@client/components/integration/',
-      newPath: '@client/shared/ui/integration/',
+      newPath: '@client/lib/ui/integration/',
       reason: 'Consolidated to shared/ui/integration'
     },
     
@@ -160,21 +160,21 @@ class ImportReferencesUpdater {
     // Privacy components moved to shared/ui
     {
       oldPath: '@client/components/shared/privacy/',
-      newPath: '@client/shared/ui/privacy/',
+      newPath: '@client/lib/ui/privacy/',
       reason: 'Consolidated to shared/ui/privacy'
     },
     
     // Dashboard components moved to shared/ui
     {
       oldPath: '@client/components/shared/dashboard/',
-      newPath: '@client/shared/ui/dashboard/',
+      newPath: '@client/lib/ui/dashboard/',
       reason: 'Consolidated to shared/ui/dashboard'
     },
     
     // Education components moved to shared/ui
     {
       oldPath: '@client/features/bills/ui/education/',
-      newPath: '@client/shared/ui/education/',
+      newPath: '@client/lib/ui/education/',
       reason: 'Consolidated to shared/ui/education'
     },
     

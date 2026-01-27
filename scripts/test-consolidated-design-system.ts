@@ -21,7 +21,7 @@ interface TestResult {
 }
 
 class ConsolidatedDesignSystemTester {
-  private designSystemDir = 'client/src/shared/design-system';
+  private designSystemDir = 'client/src/lib/design-system';
   private results: TestResult[] = [];
 
   async run(): Promise<void> {
@@ -100,11 +100,11 @@ class ConsolidatedDesignSystemTester {
     console.log('📥 Testing import resolution...');
 
     const testImports = [
-      "import { Button } from '@client/shared/design-system'",
-      "import { Input } from '@client/shared/design-system'",
-      "import { Card } from '@client/shared/design-system'",
-      "import { Alert } from '@client/shared/design-system'",
-      "import { Badge } from '@client/shared/design-system'"
+      "import { Button } from '@client/lib/design-system'",
+      "import { Input } from '@client/lib/design-system'",
+      "import { Card } from '@client/lib/design-system'",
+      "import { Alert } from '@client/lib/design-system'",
+      "import { Badge } from '@client/lib/design-system'"
     ];
 
     let workingImports = 0;
@@ -312,7 +312,7 @@ class ConsolidatedDesignSystemTester {
     }
 
     console.log(`\n📚 Usage Example:`);
-    console.log(`  import { Button, Input, Card } from '@client/shared/design-system';`);
+    console.log(`  import { Button, Input, Card } from '@client/lib/design-system';`);
     console.log(`  // Single, clear import path for all components!`);
   }
 }

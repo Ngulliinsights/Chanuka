@@ -385,7 +385,7 @@ This focused approach delivers better results than maintaining three partially-o
 
 ### Current State Challenge
 
-Your client structure scatters components across four organizational patterns: `client/src/components` for generic components, `client/src/features` for domain-specific components, `client/src/shared` for shared utilities, and `client/src/ui` for your design system. Components also live directly in feature directories without consistent organization.
+Your client structure scatters components across four organizational patterns: `client/src/components` for generic components, `client/src/features` for domain-specific components, `client/src/lib` for shared utilities, and `client/src/ui` for your design system. Components also live directly in feature directories without consistent organization.
 
 This creates the same decision paralysis you experience on the backend. When creating a bill status badge component, should it go in components (generic), features/bills (specific), or ui (design system)? The answer requires judgment rather than following a clear rule, and different developers make different choices, leading to organizational drift.
 

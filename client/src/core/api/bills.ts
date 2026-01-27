@@ -5,8 +5,8 @@ import type {
   PaginatedBillsResponse,
   Sponsor,
   BillCategory,
-} from '@client/shared/types/bill';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/types/bill';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
 
@@ -15,7 +15,7 @@ export type {
   BillAnalysis,
   Sponsor,
   BillCategory,
-} from '@client/shared/types/bill';
+} from '@client/lib/types/bill';
 
 export interface Comment {
   id: number;
@@ -66,7 +66,7 @@ export interface CreatePollPayload {
   endDate?: string;
 }
 
-// Sponsor and BillAnalysis are now imported from @client/shared/types/bill
+// Sponsor and BillAnalysis are now imported from @client/lib/types/bill
 
 export interface SponsorshipAnalysis {
   billId: number;
@@ -113,7 +113,7 @@ export interface FinancialNetworkAnalysis {
   networkDensity: number;
 }
 
-// BillCategory is now imported from @client/shared/types/bill
+// BillCategory is now imported from @client/lib/types/bill
 
 export interface BillStatus {
   id: string;

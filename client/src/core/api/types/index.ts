@@ -47,18 +47,40 @@ export type {
 } from './config';
 
 // Error response types (prefer error-response module for ErrorContext)
+import { ApiErrorResponse } from '@client/lib/types/utils/common';
+
+export type { ApiErrorResponse };
+
+export interface AxiosErrorResponse {
+  response?: {
+    data?: ApiErrorResponse;
+    status: number;
+    statusText?: string;
+  };
+  message: string;
+  code?: string;
+  config?: {
+    url?: string;
+    method?: string;
+    headers?: any;
+    data?: any;
+  };
+}
+
+export interface FetchErrorResponse {
+  status: number;
+  statusText: string;
+  data?: unknown;
+}
+
+export type UnknownError = Error | unknown;
+export type ErrorContext = Record<string, unknown>;
+
 export type {
-  ApiErrorResponse,
-  AxiosErrorResponse,
-  FetchErrorResponse,
-  UnknownError,
-  ErrorContext,
   PrivacySettings,
-  DataExportRequest,
   DataExportResponse,
-  DataDeletionRequest,
   DataDeletionResponse,
-} from './error-response';
+} from '../auth';
 
 // Preferences types
 export type {
@@ -105,7 +127,7 @@ export {
 } from './auth';
 
 // Bill types (prefer bill module for Sponsor to avoid conflict)
-export {
+export type {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
@@ -139,5 +161,5 @@ export type { ApiService, BillsService, CommunityService, AuthService } from './
 // Real-time & WebSocket Types
 // ============================================================================
 
-// WebSocket types are now available from @shared/schema/websocket
+// WebSocket types are now available from @server/infrastructure/schema/websocket
 // Import them directly from there for real-time functionality

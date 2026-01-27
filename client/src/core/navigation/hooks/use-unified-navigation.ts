@@ -1,4 +1,4 @@
-import { useKeyboardFocus } from '@client/shared/hooks/use-keyboard-focus';
+import { useKeyboardFocus } from '@client/lib/hooks/use-keyboard-focus';
 // logger import removed - currently unused
 
 import { useNavigation } from '../context';

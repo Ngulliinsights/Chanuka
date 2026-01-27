@@ -1,15 +1,15 @@
 import { Shield, Eye, Clock, Users, Network } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 export function PrivacyPolicy() {
   return (

@@ -9,6 +9,13 @@
  * - Notification management
  */
 
+import { CacheService } from '@client/lib/services/cache';
+import {
+  ServiceErrorFactory,
+  ValidationError,
+  ResourceNotFoundError
+} from '@client/lib/services/errors';
+import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   DashboardService as IDashboardService,
   DashboardData,
@@ -17,15 +24,8 @@ import {
   UserMetrics,
   Recommendation,
   Notification
-} from '@client/shared/services/interfaces';
-import {
-  ServiceErrorFactory,
-  ValidationError,
-  ResourceNotFoundError
-} from '@client/shared/services/errors';
-import { CacheService } from '@client/shared/services/cache';
-import { ServiceLifecycleInterface } from '@client/shared/services/factory';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/services/interfaces';
+import { logger } from '@client/lib/utils/logger';
 
 export class DashboardService implements IDashboardService, ServiceLifecycleInterface {
   public readonly id = 'DashboardService';

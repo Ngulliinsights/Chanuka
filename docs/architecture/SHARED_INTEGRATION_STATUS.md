@@ -258,11 +258,11 @@ export * from './i18n';
 **Usage in Features:**
 ```typescript
 // ✅ Single, clean import
-import { Button, Card, useMediaQuery } from '@client/shared';
+import { Button, Card, useMediaQuery } from '@client/lib';
 
 // ✅ Or specific imports
-import { Button } from '@client/shared/ui';
-import { useDebounce } from '@client/shared/hooks';
+import { Button } from '@client/lib/ui';
+import { useDebounce } from '@client/lib/hooks';
 ```
 
 ---
@@ -286,7 +286,7 @@ export interface AuthState { ... }
 export interface User { ... }
 
 // All properly exported and reused
-import { Theme, User, APIResponse } from '@client/shared';
+import { Theme, User, APIResponse } from '@client/lib';
 ```
 
 ---

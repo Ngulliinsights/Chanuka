@@ -4,7 +4,7 @@
  * Handles breadcrumb generation and related page discovery
  */
 
-import { NavigationItem, BreadcrumbItem, RelatedPage, UserRole } from '@client/shared/types/navigation';
+import { NavigationItem, BreadcrumbItem, RelatedPage, UserRole } from '@client/lib/types/navigation';
 
 /**
  * Generates breadcrumbs from a path and navigation items

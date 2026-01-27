@@ -2,7 +2,7 @@
  * Client Loading Utilities - Helper functions for loading operations
  */
 
-import { LoadingType, LoadingPriority, LoadingOperation } from '@client/shared/types';
+import { LoadingType, LoadingPriority, LoadingOperation } from '@client/lib/types';
 
 const DEFAULT_TIMEOUT = 10000;
 const DEFAULT_ESTIMATED_TIME = 5000;

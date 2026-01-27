@@ -10,7 +10,7 @@
  * smooth user experience even when backend services face issues.
  */
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
 import { globalErrorHandler } from './errors';
@@ -27,7 +27,7 @@ export type {
   SavedBill,
   UserEngagementHistory,
   UserPreferences,
-} from '@client/shared/services/userService';
+} from '@client/lib/services/userService';
 
 // ============================================================================
 // Request/Response Type Definitions

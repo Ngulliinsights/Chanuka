@@ -49,7 +49,7 @@ function fixImportsInFile(filePath) {
     // Fix other problematic imports
     newContent = newContent.replace(
       /@shared\/database\/connection\.js/g,
-      '@shared/database'
+      '@server/infrastructure/database'
     );
     
     newContent = newContent.replace(

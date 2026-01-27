@@ -19,12 +19,12 @@ Add the following configuration to your `.eslintrc.js` or `.eslintrc.json`:
           "message": "Core cannot import from features - violates architectural boundaries"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/core",
           "message": "Shared cannot import from core - creates circular dependencies"
         },
         {
-          "target": "./client/src/shared",
+          "target": "./client/src/lib",
           "from": "./client/src/features",
           "message": "Shared cannot import from features - violates architectural boundaries"
         },
@@ -84,7 +84,7 @@ Configure path aliases in your `tsconfig.json`:
     "baseUrl": ".",
     "paths": {
       "@/*": ["client/src/*"],
-      "@/shared/*": ["client/src/shared/*"],
+      "@/shared/*": ["client/src/lib/*"],
       "@/core/*": ["client/src/core/*"],
       "@/features/*": ["client/src/features/*"]
     }
@@ -141,14 +141,14 @@ import { BillService } from '@/features/bills/services/bill-service';
 ### 2. Shared → Core (Circular Dependencies)
 ```typescript
 // ❌ FORBIDDEN
-// client/src/shared/services/navigation.ts
+// client/src/lib/services/navigation.ts
 import { DataRetentionService } from '@/core/analytics/data-retention-service';
 ```
 
 ### 3. Shared → Features (Layer Violation)
 ```typescript
 // ❌ FORBIDDEN
-// client/src/shared/ui/components/Button.tsx
+// client/src/lib/ui/components/Button.tsx
 import { UserProfile } from '@/features/users/components/UserProfile';
 ```
 
@@ -188,7 +188,7 @@ import { NavigationService } from '@/shared/services/navigation';
 ### 4. Shared → External (Dependencies)
 ```typescript
 // ✅ ALLOWED
-// client/src/shared/services/navigation.ts
+// client/src/lib/services/navigation.ts
 import { logger } from '@/shared/utils/logger';
 import axios from 'axios';
 ```

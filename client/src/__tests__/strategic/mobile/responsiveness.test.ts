@@ -23,7 +23,7 @@ vi.mock('@client/core/mobile/detection', () => ({
 }));
 
 // Mock responsive utilities
-vi.mock('@client/shared/utils/responsive', () => ({
+vi.mock('@client/lib/utils/responsive', () => ({
   responsiveUtils: {
     getBreakpoint: vi.fn(),
     isBreakpoint: vi.fn(),
@@ -40,7 +40,7 @@ describe('Mobile Responsiveness', () => {
   describe('Responsive Design', () => {
     it('should adapt layout for mobile devices', async () => {
       const { mobileDetector } = await import('@client/core/mobile/detection');
-      const { responsiveUtils } = await import('@client/shared/utils/responsive');
+      const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       // Mock mobile device detection
       mobileDetector.isMobile.mockReturnValue(true);
@@ -83,7 +83,7 @@ describe('Mobile Responsiveness', () => {
 
     it('should handle tablet breakpoints correctly', async () => {
       const { mobileDetector } = await import('@client/core/mobile/detection');
-      const { responsiveUtils } = await import('@client/shared/utils/responsive');
+      const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       mobileDetector.isTablet.mockReturnValue(true);
       mobileDetector.getDeviceType.mockReturnValue('tablet');
@@ -124,7 +124,7 @@ describe('Mobile Responsiveness', () => {
 
     it('should handle desktop breakpoints correctly', async () => {
       const { mobileDetector } = await import('@client/core/mobile/detection');
-      const { responsiveUtils } = await import('@client/shared/utils/responsive');
+      const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       mobileDetector.isDesktop.mockReturnValue(true);
       mobileDetector.getDeviceType.mockReturnValue('desktop');
@@ -164,7 +164,7 @@ describe('Mobile Responsiveness', () => {
     });
 
     it('should handle responsive breakpoints dynamically', async () => {
-      const { responsiveUtils } = await import('@client/shared/utils/responsive');
+      const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       const breakpoints = ['xs', 'sm', 'md', 'lg', 'xl'];
       const viewportSizes = [
@@ -433,7 +433,7 @@ describe('Mobile Responsiveness', () => {
   describe('Integration Scenarios', () => {
     it('should handle complete mobile responsive workflow', async () => {
       const { mobileDetector } = await import('@client/core/mobile/detection');
-      const { responsiveUtils } = await import('@client/shared/utils/responsive');
+      const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       // Complete mobile workflow: device detection -> responsive layout -> touch handling -> performance optimization
       const workflow = {

@@ -142,13 +142,13 @@ export class ProjectAnalyzer {
         tables[moduleName] = exportableItems;
 
         // Set up import path
-        importPaths[moduleName] = `@shared/schema/${moduleName}`;
+        importPaths[moduleName] = `@server/infrastructure/schema/${moduleName}`;
         
         // Add individual table imports for parsed tables
         for (const table of parsedTables) {
           if (!tables[table.name]) {
             tables[table.name] = [table.name];
-            importPaths[table.name] = `@shared/schema/${moduleName}`;
+            importPaths[table.name] = `@server/infrastructure/schema/${moduleName}`;
           }
         }
       }
@@ -419,7 +419,7 @@ export class ProjectAnalyzer {
       // Fallback to default patterns
       return {
         connectionPatterns: [
-          '@shared/database/connection',
+          '@server/infrastructure/database/connection',
           '../database/connection',
           '../../shared/database/connection',
         ],

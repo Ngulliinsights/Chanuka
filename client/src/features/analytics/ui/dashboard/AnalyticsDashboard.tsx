@@ -7,6 +7,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
+import { useAnalyticsDashboard } from '@client/lib/hooks/useAnalytics';
 import {
   Users,
   Activity,
@@ -48,14 +49,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/shared/design-system';
-import { Alert, AlertDescription, AlertTitle } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+} from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Alert, AlertDescription, AlertTitle } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
-import { useAnalyticsDashboard } from '@client/shared/hooks/useAnalytics';
 
 /**
  * Color scheme for charts and visualizations

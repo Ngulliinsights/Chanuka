@@ -5,8 +5,8 @@
 
 import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DashboardData, DashboardConfig, DashboardSection } from '@client/shared/types';
-import { logger } from '@client/shared/utils/logger';
+import { DashboardData, DashboardConfig, DashboardSection } from '@client/lib/types';
+import { logger } from '@client/lib/utils/logger';
 
 // Define minimal types for dashboard state management
 export interface LayoutConfig {

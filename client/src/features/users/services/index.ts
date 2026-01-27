@@ -31,4 +31,4 @@ export type {
   UserBadge,
   UserAchievement,
   ActivitySummary
-} from '@client/shared/services/interfaces';
+} from '@client/lib/services/interfaces';

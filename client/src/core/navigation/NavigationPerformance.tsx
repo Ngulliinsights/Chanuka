@@ -8,7 +8,7 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate, NavigateOptions } from 'react-router-dom';
 
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 interface NavigationPerformanceProps {
   children: React.ReactNode;
@@ -61,13 +61,13 @@ const PRELOAD_CONFIG: RoutePreloadConfig[] = [
  * Route import map for dynamic imports
  */
 const ROUTE_IMPORTS: Record<string, () => Promise<RouteModule>> = {
-  '/': () => import('../../pages/StrategicHomePage'),
-  '/bills': () => import('../../pages/bills/bills-dashboard-page'),
-  '/search': () => import('../../pages/UniversalSearchPage'),
-  '/dashboard': () => import('../../pages/UserAccountPage'),
-  '/community': () => import('../../pages/community-input'),
-  '/account': () => import('../../pages/UserAccountPage'),
-  '/auth': () => import('../../pages/auth/auth-page'),
+  '/': () => import('../../features/home/pages/StrategicHomePage'),
+  '/bills': () => import('../../features/bills/pages/BillsPortalPage'),
+  '/search': () => import('../../features/search/pages/UniversalSearchPage'),
+  '/dashboard': () => import('../../features/users/pages/UserAccountPage'),
+  '/community': () => import('../../features/community/pages/community-input'),
+  '/account': () => import('../../features/users/pages/UserAccountPage'),
+  '/auth': () => import('../../features/auth/pages/LoginPage'),
 };
 
 /**

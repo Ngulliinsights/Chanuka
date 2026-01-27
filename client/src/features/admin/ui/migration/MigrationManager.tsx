@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
   Skeleton,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
 
 interface Migration {
   name: string;

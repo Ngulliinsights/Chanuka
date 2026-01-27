@@ -9,7 +9,7 @@ import { ConflictResolutionService } from '@server/infrastructure/external-data/
 import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service.ts';
 import { logger   } from '@shared/core';
 // Import the database instance properly - adjust path as needed
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@server/infrastructure/database/connection';
 import { bill_cosponsors, bills, data_sources,sponsors, sync_jobs } from '@shared/schema';
 import { and, desc,eq, gte } from 'drizzle-orm';
 import { EventEmitter } from 'events';

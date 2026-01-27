@@ -20,27 +20,27 @@ import {
 import React from 'react';
 import { useState } from 'react';
 
-import { useToast } from '@client/shared/hooks/use-toast.ts';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@client/lib/design-system';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Label } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { Switch } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Label } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { Switch } from '@client/lib/design-system';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { useToast } from '@client/lib/hooks/use-toast.ts';
 
 import type { DualSearchRequest } from '../../services/intelligent-search';
 

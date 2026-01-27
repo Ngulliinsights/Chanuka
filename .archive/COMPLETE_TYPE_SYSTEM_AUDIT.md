@@ -79,15 +79,15 @@ SHARED LAYER (6 files):
 
 | Location | Import Count | Pattern | Risk |
 |----------|--------------|---------|------|
-| `@client/shared/types` | **16+** | Most imported - Bill type | ✅ Good |
+| `@client/lib/types` | **16+** | Most imported - Bill type | ✅ Good |
 | `@client/features/community/types` | **5** | Community comments | ⚠️ Feature duplication |
 | `@client/features/users/types` | **4** | User types | ⚠️ Feature duplication |
 | `@client/core/error/types` | **2** | Error handling | ✅ Core appropriate |
 | `@client/core/community/types` | **1** | Community violations | ⚠️ Unused/redundant |
-| `@client/shared/types/navigation` | **4** | Navigation items | ✅ Good |
-| `@client/shared/types/mobile` | **2** | Mobile specific | ✅ Good |
-| `@client/shared/types/user-dashboard` | **3** | Dashboard data | ✅ Good |
-| `@client/shared/types/analytics` | **2** | Analytics | ✅ Good |
+| `@client/lib/types/navigation` | **4** | Navigation items | ✅ Good |
+| `@client/lib/types/mobile` | **2** | Mobile specific | ✅ Good |
+| `@client/lib/types/user-dashboard` | **3** | Dashboard data | ✅ Good |
+| `@client/lib/types/analytics` | **2** | Analytics | ✅ Good |
 
 ---
 
@@ -98,7 +98,7 @@ SHARED LAYER (6 files):
 **Locations:**
 - `@client/core/community/types/` - BaseComment, DiscussionThread, ViolationType
 - `@client/features/community/types/` - Comment, CommunityComment, ActivityItem
-- `@client/shared/types/core.ts` - Comment (re-exported)
+- `@client/lib/types/core.ts` - Comment (re-exported)
 
 **Problem:**
 ```

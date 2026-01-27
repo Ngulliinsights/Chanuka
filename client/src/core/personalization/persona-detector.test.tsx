@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import type { UserActivity } from '../../shared/types/analytics';
+import type { UserActivity } from '../../lib/types/analytics';
 import type { User } from '../auth/types';
 
 import { PersonaDetector } from './persona-detector';

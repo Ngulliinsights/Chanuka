@@ -1,5 +1,5 @@
-import { database as db } from '@shared/database/connection';
-import * as schema from '@shared/schema';
+import { database as db } from '@server/infrastructure/database/connection';
+import * as schema from '@server/infrastructure/schema';
 import { logger } from '@shared/core';
 
 export default async function seedLegislative() {

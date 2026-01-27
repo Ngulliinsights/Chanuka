@@ -9,15 +9,15 @@ import { useState } from 'react';
 import React from 'react';
 
 import { useAuth } from '@client/core/auth';
-import { Button } from '@client/shared/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Switch } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Switch } from '@client/lib/design-system';
 
 // Session Display Component
 function SessionDisplay() {

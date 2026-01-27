@@ -8,15 +8,15 @@
 import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
 import React from 'react';
 
-import { cn } from '@client/shared/lib/utils';
-import { Badge } from '@client/shared/design-system';
-import { Progress } from '@client/shared/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { cn } from '@lib/utils';
 
 interface CredibilityIndicatorProps {
   score: number;

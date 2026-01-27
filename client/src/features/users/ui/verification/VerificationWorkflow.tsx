@@ -12,22 +12,22 @@ import {
 import React from 'react';
 import { useState, useCallback } from 'react';
 
-import {
-  VerificationWorkflow as VerificationWorkflowType,
-  VerificationStatus,
-} from '@client/shared/types';
-import { cn } from '@client/shared/lib/utils';
-import { Avatar, AvatarFallback } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
+import { Avatar, AvatarFallback } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@client/shared/design-system';
-import { Textarea } from '@client/shared/design-system';
+} from '@client/lib/design-system';
+import { Textarea } from '@client/lib/design-system';
+import { cn } from '@lib/utils';
+import {
+  VerificationWorkflow as VerificationWorkflowType,
+  VerificationStatus,
+} from '@client/lib/types';
 
 interface VerificationWorkflowProps {
   workflow: VerificationWorkflowType;

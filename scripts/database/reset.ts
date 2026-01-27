@@ -6,7 +6,7 @@
  * Provides safe database reset with comprehensive options
  */
 
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 import { createMigrationManager } from '@server/infrastructure/database';
 import { logger } from '@shared/core';
 import * as readline from 'readline';

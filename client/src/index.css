@@ -1,5 +1,5 @@
 /* Import Chanuka Design System */
-@import './shared/design-system/styles/chanuka-design-system.css';
+@import './lib/design-system/styles/chanuka-design-system.css';
 
 .chanuka-nav {
   display: flex;

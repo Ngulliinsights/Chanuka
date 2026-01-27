@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { OnboardingService } from '@client/features/users/services/onboarding-service';
 import type { UserPersona } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
 import { UserJourneyOptimizer } from '@client/features/users/ui/onboarding/UserJourneyOptimizer';
-import AppLayout from '@client/shared/ui/layout/AppLayout';
+import AppLayout from '@client/lib/ui/layout/AppLayout';
 
 export default function Onboarding() {
   const navigate = useNavigate();

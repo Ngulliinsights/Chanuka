@@ -118,7 +118,7 @@ Many orphans are **infrastructure, feature, or platform-level** modules that wer
 - `client/src/components/ui/components.tsx` (397 LOC) – Enhanced components
 - `client/src/components/ui/command.tsx` (156 LOC) – Command palette
 - `client/src/components/ui/context-menu.tsx` (200 LOC)
-- `client/src/shared/design-system/` (100+ files)
+- `client/src/lib/design-system/` (100+ files)
 
 **Gap Addressed:** Missing unified design system integration, UI inconsistencies
 

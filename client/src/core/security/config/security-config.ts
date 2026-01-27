@@ -4,12 +4,12 @@
  * Centralized security configuration for the Chanuka platform
  */
 
-import type { SecurityConfig } from '@client/shared/types';
+import type { SecurityConfiguration } from '@client/lib/types';
 
 const isDevelopment = import.meta.env.MODE === 'development';
 const isProduction = import.meta.env.MODE === 'production';
 
-export const securityConfig: SecurityConfig = {
+export const securityConfig: SecurityConfiguration = {
   csp: {
     enabled: true,
     reportOnly: isDevelopment,

@@ -6,7 +6,7 @@
  */
 
 import { streamSearch, cancelSearch } from '@client/core/api/search';
-import { logger } from '@client/shared/utils/logger';
+import { logger } from '@client/lib/utils/logger';
 
 // Define types locally
 interface SearchResult {

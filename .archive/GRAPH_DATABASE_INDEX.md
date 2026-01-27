@@ -222,7 +222,7 @@ npm run graph:shell      # Access Cypher shell
 
 ### Initialize Driver
 ```typescript
-import { initializeNeo4jDriver } from '@shared/database/graph';
+import { initializeNeo4jDriver } from '@server/infrastructure/database/graph';
 
 initializeNeo4jDriver({
   uri: process.env.NEO4J_URI,
@@ -233,7 +233,7 @@ initializeNeo4jDriver({
 
 ### Sync Data
 ```typescript
-import { syncPersonToGraph, createSponsorshipRelationship } from '@shared/database/graph';
+import { syncPersonToGraph, createSponsorshipRelationship } from '@server/infrastructure/database/graph';
 
 const person = { id: '123', name: 'John', type: 'mp', ... };
 await syncPersonToGraph(person);
@@ -243,7 +243,7 @@ await createSponsorshipRelationship('123', 'bill-456', 'primary');
 
 ### Query Data
 ```typescript
-import { executeReadQuery } from '@shared/database/graph';
+import { executeReadQuery } from '@server/infrastructure/database/graph';
 
 const result = await executeReadQuery(
   'MATCH (b:Bill) RETURN b.title, b.status LIMIT 10'

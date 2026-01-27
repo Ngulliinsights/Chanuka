@@ -5,8 +5,8 @@
 
 import DOMPurify from 'dompurify';
 
-import { SecurityEvent } from '@client/shared/types';
-import { logger } from '@client/shared/utils/logger';
+import { SecurityEvent } from '@client/lib/types';
+import { logger } from '@client/lib/utils/logger';
 
 // Type definitions for DOMPurify hook data
 interface DOMPurifyHookData {

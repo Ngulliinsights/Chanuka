@@ -7,8 +7,8 @@
  */
 
 import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from '@client/core/api/bills';
-import type { Bill } from '@client/shared/types';
-import { logger } from '@client/shared/utils/logger';
+import type { Bill } from '@client/lib/types';
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // Type Definitions

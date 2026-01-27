@@ -12,10 +12,10 @@ import {
 import React from 'react';
 
 import type { Bill } from '@client/features/bills/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/shared/design-system';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { cn } from '@client/shared/design-system/utils/cn';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { cn } from '@client/lib/design-system/utils/cn';
 
 interface BillTimelineTabProps {
   bill: Bill;

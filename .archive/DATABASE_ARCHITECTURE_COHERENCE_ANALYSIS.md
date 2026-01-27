@@ -202,7 +202,7 @@ scripts/database/
 import { DatabaseService } from '@server/infrastructure/database/database-service';
 
 // Others use:
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 
 // Others use direct pool:
 import { Pool } from 'pg';
@@ -330,7 +330,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 // In reset.ts (OLD)
-import { createConnectionManager } from '@shared/database/core';
+import { createConnectionManager } from '@server/infrastructure/database/core';
 ```
 
 **Problem**: Scripts written at different times use different abstraction levels
@@ -343,7 +343,7 @@ import { createConnectionManager } from '@shared/database/core';
 import { DatabaseService } from '@server/infrastructure/database/database-service';
 
 // Tier 2 (For special cases):
-import { UnifiedConnectionManager } from '@shared/database/core';
+import { UnifiedConnectionManager } from '@server/infrastructure/database/core';
 
 // Tier 3 (Last resort - direct pool access):
 import { Pool } from 'pg';

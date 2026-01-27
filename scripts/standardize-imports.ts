@@ -75,7 +75,7 @@ const clientImportReplacements: ImportReplacement[] = [
   },
   {
     pattern: /from ['"]\.\.\/\.\.\/shared\/([^'"]+)['"]/g,
-    replacement: "from '@client/shared/$1'",
+    replacement: "from '@client/lib/$1'",
     description: 'Client shared imports'
   },
   // Fix three-level relative imports
@@ -170,12 +170,12 @@ const sharedImportReplacements: ImportReplacement[] = [
   },
   {
     pattern: /from ['"]\.\.\/\.\.\/database\/([^'"]+)['"]/g,
-    replacement: "from '@shared/database/$1'",
+    replacement: "from '@server/infrastructure/database/$1'",
     description: 'Database imports'
   },
   {
     pattern: /from ['"]\.\.\/\.\.\/schema\/([^'"]+)['"]/g,
-    replacement: "from '@shared/schema/$1'",
+    replacement: "from '@server/infrastructure/schema/$1'",
     description: 'Schema imports'
   },
   {

@@ -94,16 +94,16 @@
       "@shared/core/*": [
         "./server/infrastructure/core/*"
       ],
-      "@shared/schema": [
+      "@server/infrastructure/schema": [
         "./server/infrastructure/schema/index.ts"
       ],
-      "@shared/schema/*": [
+      "@server/infrastructure/schema/*": [
         "./server/infrastructure/schema/*"
       ],
-      "@shared/database": [
+      "@server/infrastructure/database": [
         "./server/infrastructure/database/index.ts"
       ],
-      "@shared/database/*": [
+      "@server/infrastructure/database/*": [
         "./server/infrastructure/database/*"
       ],
       "@db": [

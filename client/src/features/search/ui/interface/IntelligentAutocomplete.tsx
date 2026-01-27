@@ -12,13 +12,13 @@
 import { Search, Clock, TrendingUp, FileText, ArrowRight } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
-import { useDebounce } from '@client/shared/hooks/useDebounce';
-import { Badge } from '@client/shared/design-system';
-import { Button } from '@client/shared/design-system';
-import { Card, CardContent } from '@client/shared/design-system';
-import { Input } from '@client/shared/design-system';
-import { Separator } from '@client/shared/design-system';
-import { logger } from '@client/shared/utils/logger';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import { Input } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
+import { useDebounce } from '@client/lib/hooks/useDebounce';
+import { logger } from '@client/lib/utils/logger';
 
 import { intelligentSearch } from '../../services/intelligent-search';
 

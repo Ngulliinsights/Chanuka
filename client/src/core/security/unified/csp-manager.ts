@@ -3,8 +3,9 @@
  * Combines server-side and client-side CSP approaches
  */
 
+import { logger } from '@client/lib/utils/logger';
+
 import { CSPDirectives, SecurityEvent, CSPViolation } from './security-interface';
-import { logger } from '@client/shared/utils/logger';
 
 export interface CSPConfig {
   enabled: boolean;
@@ -73,7 +74,7 @@ export class UnifiedCSPManager {
     logger.info('Unified CSP Manager initialized with policy');
   }
 
-  private generateCSPHeader(): string {
+  public generateCSPHeader(): string {
     // Get base directives
     const baseDirectives = this.getBaseDirectives();
 
