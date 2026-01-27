@@ -79,9 +79,10 @@ export { useCleanup as useCleanupLegacy } from './use-cleanup';
 
 // FSD Integration Exports - For Feature-Sliced Design integration
 // These will be implemented as features are migrated to FSD structure
-export { useApiWithFallback } from '../core/api/hooks';
-export { useSafeMutation } from '../core/api/hooks';
-export { useSafeQuery as useSafeQueryFSD } from '../core/api/hooks';
+// TODO: Uncomment when modules are created
+// export { useApiWithFallback } from '../core/api/hooks';
+// export { useSafeMutation } from '../core/api/hooks';
+// export { useSafeQuery as useSafeQueryFSD } from '../core/api/hooks';
 export { useNavigationSystem } from '@client/core/navigation/hooks';
 export { useKeyboardNavigation as useKeyboardNavigationFSD } from '@client/core/navigation/hooks';
 export { useBreadcrumbs as useBreadcrumbsFSD } from '@client/core/navigation/hooks';
@@ -89,24 +90,27 @@ export { useRelatedPages as useRelatedPagesFSD } from '@client/core/navigation/h
 export { useNavigationPreferences as useNavigationPreferencesFSD } from '@client/core/navigation/hooks';
 export { useSidebar as useSidebarFSD } from '@client/core/navigation/hooks';
 export { useMobileMenu as useMobileMenuFSD } from '@client/core/navigation/hooks';
-export { useOnlineStatus as useOnlineStatusFSD } from '../core/loading/hooks';
-export { useJourneyTracker } from '../features/analytics/hooks';
-export { useErrorAnalytics } from '../features/analytics/hooks';
-export { useWebVitals } from '../features/analytics/hooks';
-export { useRenderTracker } from '../features/analytics/hooks';
-export { useSecurity, useSecureForm, useRateLimit } from '../features/security/hooks/useSecurity';
+// TODO: Uncomment when modules are created
+// export { useOnlineStatus as useOnlineStatusFSD } from '../core/loading/hooks';
+// export { useJourneyTracker } from '../features/analytics/hooks';
+// export { useErrorAnalytics } from '../features/analytics/hooks';
+// export { useWebVitals } from '../features/analytics/hooks';
+// export { useRenderTracker } from '../features/analytics/hooks';
+// export { useSecurity, useSecureForm, useRateLimit } from '../features/security/hooks/useSecurity';
 
 // Shared UI Hooks - Re-exports for convenience (excluding duplicates)
-export { useI18n } from '../lib/hooks';
+// TODO: Fix circular reference - useI18n should be imported differently
+// export { useI18n } from '../lib/hooks';
 
 // Mobile hooks from shared - Re-exports for convenience (excluding duplicates)
-export {
-  useBottomSheet,
-  useDeviceInfo,
-  useInfiniteScroll,
-  useMobileNavigation,
-  useMobileTabs,
-  usePullToRefresh,
-  useScrollManager,
-  useSwipeGesture,
-} from '../lib/hooks/mobile';
+// TODO: Uncomment when mobile hooks module is created
+// export {
+//   useBottomSheet,
+//   useDeviceInfo,
+//   useInfiniteScroll,
+//   useMobileNavigation,
+//   useMobileTabs,
+//   usePullToRefresh,
+//   useScrollManager,
+//   useSwipeGesture,
+// } from '../lib/hooks/mobile';
