@@ -41,10 +41,9 @@ export * from './security';
 // Argument types
 export * from './arguments';
 
-// Core types (re-exported from shared type system)
+// Core types (re-exported from shared type system using @shared alias)
 export type {
   Bill,
-  User,
   Sponsor,
   Committee,
   BillStatus,
@@ -54,13 +53,13 @@ export type {
   LegislativeActionType,
   BillTimelineEvent,
   BillCommitteeAssignment,
-} from '../../../shared/types/domains/legislative';
+} from '@shared/types/domains/legislative';
 
 export type {
   User as AuthUser,
   UserProfile,
   VerificationStatus,
-} from '../../../shared/types/domains/authentication';
+} from '@shared/types/domains/authentication';
 
 
 // Planned: After migration, specific type exports will be organized here
