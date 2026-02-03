@@ -81,11 +81,11 @@ export function useBreadcrumbNavigation(
 
       // Mark previous items as not active
       newBreadcrumbs.forEach(crumb => {
-        crumb.is_active = false;
+        crumb.isActive = false;
       });
 
       // Add new item as active
-      newBreadcrumbs.push({ ...item, is_active: true });
+      newBreadcrumbs.push({ ...item, isActive: true });
 
       dispatch(updateBreadcrumbs(newBreadcrumbs));
     },
@@ -99,7 +99,7 @@ export function useBreadcrumbNavigation(
 
       // Mark the new last item as active
       if (newBreadcrumbs.length > 0) {
-        newBreadcrumbs[newBreadcrumbs.length - 1].is_active = true;
+        newBreadcrumbs[newBreadcrumbs.length - 1].isActive = true;
       }
 
       dispatch(updateBreadcrumbs(newBreadcrumbs));
@@ -155,68 +155,68 @@ export function useCustomBreadcrumbs() {
 export const routeBreadcrumbConfig: Record<string, (pathname: string) => BreadcrumbItem[]> = {
   // Bills routes
   '/bills': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Bills', path: '/bills', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Bills', path: '/bills', isActive: true },
   ],
 
   '/bills/:id': (pathname: string) => {
     const billId = pathname.split('/')[2];
     return [
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Bills', path: '/bills', is_active: false },
-      { label: `Bill ${billId}`, path: pathname, is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Bills', path: '/bills', isActive: false },
+      { label: `Bill ${billId}`, path: pathname, isActive: true },
     ];
   },
 
   '/bills/:id/analysis': (pathname: string) => {
     const billId = pathname.split('/')[2];
     return [
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Bills', path: '/bills', is_active: false },
-      { label: `Bill ${billId}`, path: `/bills/${billId}`, is_active: false },
-      { label: 'Analysis', path: pathname, is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Bills', path: '/bills', isActive: false },
+      { label: `Bill ${billId}`, path: `/bills/${billId}`, isActive: false },
+      { label: 'Analysis', path: pathname, isActive: true },
     ];
   },
 
   // Search routes
   '/search': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Search', path: '/search', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Search', path: '/search', isActive: true },
   ],
 
   '/results': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Search', path: '/search', is_active: false },
-    { label: 'Results', path: '/results', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Search', path: '/search', isActive: false },
+    { label: 'Results', path: '/results', isActive: true },
   ],
 
   // User routes
   '/dashboard': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Dashboard', path: '/dashboard', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Dashboard', path: '/dashboard', isActive: true },
   ],
 
   '/account': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Account', path: '/account', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Account', path: '/account', isActive: true },
   ],
 
   '/account/settings': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Account', path: '/account', is_active: false },
-    { label: 'Settings', path: '/account/settings', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Account', path: '/account', isActive: false },
+    { label: 'Settings', path: '/account/settings', isActive: true },
   ],
 
   // Community routes
   '/community': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Community', path: '/community', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Community', path: '/community', isActive: true },
   ],
 
   // Admin routes
   '/admin': () => [
-    { label: 'Home', path: '/', is_active: false },
-    { label: 'Administration', path: '/admin', is_active: true },
+    { label: 'Home', path: '/', isActive: false },
+    { label: 'Administration', path: '/admin', isActive: true },
   ],
 };
 

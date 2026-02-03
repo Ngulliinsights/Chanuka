@@ -40,46 +40,15 @@ import {
   SelectValue,
 } from '@client/lib/design-system';
 import { Skeleton } from '@client/lib/design-system';
-
-// Type definitions for better type safety throughout the component
-interface SearchHighlight {
-  field: string;
-  text: string;
-  score?: number;
-}
-
-interface SearchMetadata {
-  created_at?: string;
-  view_count?: number;
-  comment_count?: number;
-  status?: string;
-  tags?: string[] | string[];
-  [key: string]: unknown;
-}
-
-interface SearchResult {
-  id: string;
-  type: string;
-  title: string;
-  content: string;
-  excerpt?: string;
-  relevanceScore: number;
-  highlights?: SearchHighlight[] | string[];
-  metadata: SearchMetadata;
-}
-
-interface SearchEngine {
-  engine: string;
-  results: SearchResult[];
-}
-
-interface CombinedSearchResult {
-  results: SearchResult[];
-  totalCount: number;
-  searchTime: number;
-  suggestions: string[];
-  engines: SearchEngine[];
-}
+// Type definitions imported from shared types
+import type {
+  SearchResult,
+  SearchHighlight,
+  SearchSuggestion,
+  CombinedSearchResult,
+  SearchEngineResult,
+} from '@client/lib/types/search';
+// Local definitions removed in favor of shared types
 
 interface SearchResultsProps {
   results: CombinedSearchResult | null;
@@ -212,7 +181,7 @@ export function SearchResults({
       }
 
       // Extract text from SearchHighlight objects
-      return (highlights as SearchHighlight[]).map(h => h.text);
+      return (highlights as SearchHighlight[]).map(h => h.snippet);
     },
     []
   );
@@ -621,7 +590,7 @@ export function SearchResults({
                     role="button"
                     tabIndex={0}
                   >
-                    {suggestion}
+                    {suggestion.text}
                   </Badge>
                 ))}
               </div>

@@ -183,8 +183,4 @@ export {
 
 export { ThemeToggle, ThemeToggleButton } from './ThemeToggle';
 
-// ════════════════════════════════════════════════════════════════════
-// TOOLTIP COMPONENTS (Contextual help and information)
-// ════════════════════════════════════════════════════════════════════
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';

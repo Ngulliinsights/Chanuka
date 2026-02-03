@@ -49,11 +49,11 @@ export { useExampleEffect, useAdvancedEffect, useDebouncedEffect } from './patte
 export { useStrategyManager, useDynamicStrategyManager, useConditionalStrategy } from './patterns/strategy-template';
 
 // Core Hooks - Direct exports from this directory
-export { useToast } from './use-toast';
+// export { useToast } from './use-toast';
 export { useErrorRecovery, useAutoRecovery, usePredictiveRecovery } from './useErrorRecovery';
 export { useOfflineDetection } from './use-offline-detection';
 export { useOfflineCapabilities } from './useOfflineCapabilities';
-export { useSystem } from './use-system';
+// export { useSystem } from './use-system'; // Invalid
 export type { SystemHealth, SystemStats, SystemActivity, SystemSchema, SystemEnvironment } from './use-system';
 export { useCleanup, useResourceCleanup, useEventListenerCleanup } from './use-cleanup';
 export { useDebounce } from './useDebounce';
@@ -72,9 +72,9 @@ export { useIntegratedServices } from './useIntegratedServices';
 
 // Legacy Compatibility Exports - For backward compatibility during migration
 // TODO: Remove these exports after migration is complete
-export { useIsMobile as useMobileLegacy } from './use-mobile';
+// export { useIsMobile as useMobileLegacy } from './use-mobile'; // Invalid
 export { useOfflineDetection as useOfflineDetectionLegacy } from './use-offline-detection';
-export { useSystem as useSystemLegacy } from './use-system';
+// export { useSystem as useSystemLegacy } from './use-system'; // Invalid
 export { useCleanup as useCleanupLegacy } from './use-cleanup';
 
 // FSD Integration Exports - For Feature-Sliced Design integration
@@ -96,11 +96,16 @@ export { useMobileMenu as useMobileMenuFSD } from '@client/core/navigation/hooks
 // export { useErrorAnalytics } from '../features/analytics/hooks';
 // export { useWebVitals } from '../features/analytics/hooks';
 // export { useRenderTracker } from '../features/analytics/hooks';
-// export { useSecurity, useSecureForm, useRateLimit } from '../features/security/hooks/useSecurity';
+export { useSecurity, useSecureForm, useRateLimit } from './useSecurity';
 
 // Shared UI Hooks - Re-exports for convenience (excluding duplicates)
 // TODO: Fix circular reference - useI18n should be imported differently
 // export { useI18n } from '../lib/hooks';
+export { useToast } from './use-toast';
+export { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from './useNavigationSlice';
+export { useMobile, useTablet, useDesktop } from './use-mobile';
+export { useSystemOverview } from './use-system';
+// export { useSystem } from './use-system'; // Deprecated/Removed
 
 // Mobile hooks from shared - Re-exports for convenience (excluding duplicates)
 // TODO: Uncomment when mobile hooks module is created

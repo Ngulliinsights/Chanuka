@@ -26,11 +26,11 @@
 
 export type {
   Bill,
-  BillStatus,
+  // BillStatus, // Enum exported by value below
   BillStatusType,
-  UrgencyLevel,
+  // UrgencyLevel, // Enum exported by value below
   UrgencyLevelType,
-  ComplexityLevel,
+  // ComplexityLevel, // Enum exported by value below
   ComplexityLevelType,
   Sponsor,
   ExtendedBill,
@@ -56,6 +56,10 @@ export {
   isBill,
   isBillAnalysis,
   isExtendedBill,
+  isExtendedBill,
+  BillStatus,
+  UrgencyLevel,
+  ComplexityLevel,
 } from './bill-base';
 
 // ============================================================================
@@ -117,7 +121,7 @@ export type {
   BillSearchResult,
   BillsStats,
   BillUpdate,
-  SearchResponse,
+  BillSearchResponse,
   BillComparison,
   BillDifference,
   BillAggregation,

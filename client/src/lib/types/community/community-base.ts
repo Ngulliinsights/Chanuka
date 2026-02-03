@@ -238,16 +238,29 @@ export interface VoteRequest {
  * };
  */
 export interface Expert {
-  readonly id: number;
-  readonly userId: number;
+  readonly id: string | number;
+  readonly userId?: number;
   readonly name: string;
-  readonly domain: ExpertDomain;
-  readonly credentials: string[];
+  readonly avatar?: string;
+  readonly domain?: ExpertDomain;
+  readonly credentials: ExpertCredential[];
   readonly bio?: string;
-  readonly affiliations?: string[];
-  readonly verifiedAt: string;
-  readonly verificationLevel: 'pending' | 'verified' | 'revoked';
+  readonly affiliations?: ExpertAffiliation[];
+  readonly specializations?: string[];
+  readonly verifiedAt?: string;
+  readonly verificationLevel?: 'pending' | 'verified' | 'revoked';
+  readonly verificationType?: 'official' | 'domain' | 'identity';
+  readonly verified?: boolean;
+  readonly verificationDate?: string;
   readonly insightCount?: number;
+  readonly credibilityScore?: number;
+  readonly contributionCount?: number;
+  readonly avgCommunityRating?: number;
+  readonly contactInfo?: {
+    email?: string;
+    website?: string;
+    linkedin?: string;
+  };
 }
 
 export type ExpertDomain =
@@ -266,14 +279,136 @@ export type ExpertDomain =
  * Expert credential verification
  */
 export interface ExpertCredential {
-  readonly id: number;
-  readonly expertId: number;
-  readonly credential: string;
-  readonly issuingOrganization: string;
-  readonly issueDate: string;
+  readonly id: string | number;
+  readonly expertId?: number;
+  readonly credential?: string;
+  readonly issuingOrganization?: string;
+  readonly issueDate?: string;
   readonly expiryDate?: string;
   readonly verified: boolean;
+  readonly type?: 'education' | 'certification' | 'experience' | 'publication' | string;
+  readonly title?: string;
+  readonly institution?: string;
+  readonly year?: number;
+  readonly verificationDate?: string;
+  readonly verificationSource?: string;
 }
+
+/**
+ * Expert affiliation with an organization
+ */
+export interface ExpertAffiliation {
+  readonly id: string | number;
+  readonly expertId?: number;
+  readonly organization: string;
+  readonly role: string;
+  readonly type: 'academic' | 'government' | 'nonprofit' | 'corporate' | 'independent' | 'ngo' | 'private' | 'judicial';
+  readonly startDate?: string;
+  readonly endDate?: string;
+  readonly verified: boolean;
+  readonly current?: boolean;
+}
+
+/**
+ * Expert contribution to a bill or discussion
+ */
+export interface ExpertContribution {
+  readonly id: string | number;
+  readonly expertId: string | number;
+  readonly billId?: string | number;
+  readonly type: 'analysis' | 'insight' | 'review' | 'testimony' | 'comment' | 'amendment_suggestion';
+  readonly title?: string;
+  readonly content: string;
+  readonly createdAt: string;
+  readonly updatedAt?: string;
+  readonly lastUpdated?: string;
+  readonly upvotes?: number;
+  readonly downvotes?: number;
+  readonly verified?: boolean;
+  readonly confidence?: number;
+  readonly methodology?: string;
+  readonly sources?: string[];
+  readonly tags?: string[];
+  readonly communityValidation?: CommunityValidation;
+  readonly status?: 'published' | 'under_review' | 'draft' | 'disputed';
+}
+
+/**
+ * Expert consensus on a bill or topic
+ */
+export interface ExpertConsensus {
+  readonly id?: string | number;
+  readonly billId: string | number;
+  readonly topic: string;
+  readonly totalExperts: number;
+  readonly agreementLevel: number;
+  readonly majorityPosition?: string;
+  readonly minorityPositions?: ReadonlyArray<{
+    readonly position: string;
+    readonly expertCount: number;
+    readonly experts: ReadonlyArray<string>;
+  }>;
+  readonly positions?: ReadonlyArray<{
+    readonly stance: string;
+    readonly count: number;
+    readonly percentage: number;
+  }>;
+  readonly keyPoints?: ReadonlyArray<string>;
+  readonly controversyLevel?: 'low' | 'medium' | 'high';
+  readonly lastUpdated: string;
+}
+
+/**
+ * Credibility metrics for an expert
+ */
+export interface CredibilityMetrics {
+  readonly overallScore: number;
+  readonly factualAccuracy: number;
+  readonly sourceQuality: number;
+  readonly peerEndorsements: number;
+  readonly communityTrust: number;
+  readonly verificationLevel: 'basic' | 'verified' | 'distinguished';
+  readonly lastCalculated: string;
+}
+
+/**
+ * Community validation of expert content
+ */
+export interface CommunityValidation {
+  readonly id: string | number;
+  readonly contentId: string | number;
+  readonly contentType: 'insight' | 'contribution' | 'analysis';
+  readonly upvotes: number;
+  readonly downvotes: number;
+  readonly validationScore: number;
+  readonly flagCount: number;
+  readonly lastUpdated: string;
+}
+
+/**
+ * Verification workflow for expert contributions
+ */
+export interface VerificationWorkflow {
+  readonly id: string | number;
+  readonly contributionId: string | number;
+  readonly status: 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
+  readonly reviewerId?: number;
+  readonly submittedAt: string;
+  readonly reviewedAt?: string;
+  readonly feedback?: ReadonlyArray<string>;
+  readonly currentStep: number;
+  readonly totalSteps: number;
+}
+
+/**
+ * Expert verification type enumeration
+ */
+export type ExpertVerificationType = 'official' | 'domain' | 'identity' | 'academic' | 'professional' | 'government' | 'independent';
+
+/**
+ * Contribution type enumeration
+ */
+export type ContributionType = 'analysis' | 'insight' | 'review' | 'testimony' | 'comment';
 
 /**
  * Expert verification response
@@ -577,6 +712,21 @@ export interface SearchOptions {
   readonly billId?: number;
 }
 
+/**
+ * Search result item for community content
+ */
+export interface SearchResult {
+  readonly id: string | number;
+  readonly type: 'comment' | 'thread' | 'expert' | 'insight' | 'bill';
+  readonly title?: string;
+  readonly content?: string;
+  readonly author?: string;
+  readonly createdAt?: string;
+  readonly relevanceScore: number;
+  readonly highlightedContent?: string;
+  readonly metadata?: Record<string, unknown>;
+}
+
 // ============================================================================
 // Extended Types for API Responses
 // ============================================================================
@@ -692,7 +842,7 @@ export interface ReportResponse {
 /**
  * Search result item
  */
-export interface SearchResult {
+export interface CommunitySearchResult {
   readonly id: number;
   readonly type: 'comment' | 'thread' | 'expert' | 'insight';
   readonly title?: string;
@@ -736,6 +886,7 @@ export function isComment(value: unknown): value is Comment {
   );
 }
 
+
 /**
  * Check if a value is an Expert
  */
@@ -749,4 +900,34 @@ export function isExpert(value: unknown): value is Expert {
     typeof obj.domain === 'string' &&
     Array.isArray(obj.credentials)
   );
+}
+
+// ============================================================================
+// Campaign & Petition Types
+// ============================================================================
+
+export interface Campaign {
+  id: string;
+  title: string;
+  description: string;
+  organizerId: string;
+  startDate: string;
+  endDate?: string;
+  goal: number;
+  currentProgress: number;
+  status: 'active' | 'completed' | 'cancelled';
+  tags: string[];
+}
+
+export interface Petition {
+  id: string;
+  title: string;
+  summary: string;
+  target: string;
+  signatureCount: number;
+  signatureGoal: number;
+  deadline?: string;
+  status: 'open' | 'closed' | 'submitted';
+  creatorId: string;
+  createdAt: string;
 }

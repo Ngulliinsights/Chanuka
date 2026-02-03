@@ -23,9 +23,10 @@ export type LoadingState =
   | 'error'
   | 'timeout'
   | 'cancelled'
-  | 'refreshing';
+  | 'refreshing'
+  | 'offline';
 
-export type ConnectionType = 'none' | 'cellular' | 'wifi' | 'ethernet' | 'bluetooth' | 'other' | 'unknown';
+export type ConnectionType = 'none' | 'cellular' | 'wifi' | 'ethernet' | 'bluetooth' | 'other' | 'unknown' | 'slow' | 'fast' | 'offline';
 
 export type LoadingType =
   | 'page'

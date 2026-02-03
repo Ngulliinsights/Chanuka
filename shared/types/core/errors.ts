@@ -40,7 +40,7 @@ export abstract class AppError extends Error {
 /**
  * Error severity levels
  */
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
 
 /**
  * Validation error

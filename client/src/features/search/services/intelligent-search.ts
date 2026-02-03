@@ -17,56 +17,21 @@ import Fuse, { type IFuseOptions } from 'fuse.js';
 import { searchApiClient } from '@client/core/api/search';
 import { logger } from '@client/lib/utils/logger';
 
-import type { SearchResult, SearchMetadata } from '../types';
+import type {
+  SearchResult,
+  SearchMetadata,
+  SearchSuggestion,
+  AutocompleteResult,
+  SavedSearch,
+  SearchAnalytics,
+  SearchHighlight,
+  SearchRequest as SearchQuery,
+  SearchFacets,
+  CombinedSearchResult,
+  SearchEngineResult,
+} from '@client/lib/types/search';
 
-interface SearchSuggestion {
-  term: string;
-  type: string;
-  frequency?: number;
-  score?: number;
-  id?: string;
-  metadata?: any;
-}
-
-interface AutocompleteResult {
-  suggestions: SearchSuggestion[];
-  facets: {
-    categories: string[];
-    sponsors: string[];
-    tags: string[];
-    statuses: string[];
-  };
-  query: string;
-  totalSuggestions: number;
-}
-
-interface SavedSearch {
-  id: string;
-  name: string;
-  query: any;
-  createdAt: string;
-}
-
-interface SearchAnalytics {
-  totalSearches: number;
-  popularQueries: string[];
-  avgResponseTime: number;
-}
-
-interface SearchHighlight {
-  field: string;
-  snippet: string;
-  positions: Array<{ start: number; end: number }>;
-}
-
-interface SearchQuery {
-  q: string;
-  type?: 'bills' | 'users' | 'comments' | 'all';
-  sort?: 'relevance' | 'date' | 'popularity';
-  limit?: number;
-  offset?: number;
-  filters?: Record<string, any>;
-}
+// Local interfaces removed in favor of shared types
 
 // ============================================================================
 // Type Definitions
@@ -80,28 +45,9 @@ export interface DualSearchRequest extends SearchQuery {
   highlightMatches?: boolean;
 }
 
-export interface SearchEngineResult {
-  engine: 'postgresql' | 'fuse';
-  results: SearchResult[];
-  searchTime: number;
-  totalCount: number;
-  quality: number;
-}
+// SearchEngineResult and CombinedSearchResult are now imported from shared types
 
-export interface CombinedSearchResult {
-  results: SearchResult[];
-  engines: SearchEngineResult[];
-  totalCount: number;
-  searchTime: number;
-  suggestions: string[];
-  facets: SearchFacets;
-}
 
-interface SearchFacets {
-  types: Record<string, number>;
-  categories: Record<string, number>;
-  statuses: Record<string, number>;
-}
 
 interface CacheEntry<T> {
   data: T;
@@ -324,19 +270,15 @@ class IntelligentSearchService {
 
       const response = await searchApiClient.searchPostgreSQL(params);
 
-      if (response.status !== 200 || !response.data) {
-        throw new Error('PostgreSQL search returned unsuccessful response');
-      }
-
       const searchTime = Date.now() - startTime;
-      const results = response.data.results || [];
+      const results = response.results || [];
       const quality = this.calculateSearchQuality(results, request.q);
 
       return {
         engine: 'postgresql',
         results,
         searchTime,
-        totalCount: response.data.total || results.length,
+        totalCount: response.total || results.length,
         quality,
       };
     } catch (error) {
@@ -462,11 +404,9 @@ class IntelligentSearchService {
     try {
       const response = await searchApiClient.getSearchData(type);
 
-      if (response.status === 200 && response.data) {
-        // Safely extract array data with multiple fallback paths
-        const data = response.data.results || response.data;
-        return Array.isArray(data) ? data : [];
-      }
+      // Safely extract array data
+      const data = response;
+      return Array.isArray(data) ? data : [];
 
       return [];
     } catch (error) {
@@ -582,10 +522,10 @@ class IntelligentSearchService {
       recentData.forEach((item: any) => {
         if (item.query && item.query.toLowerCase().includes(query.toLowerCase())) {
           suggestions.push({
-            term: item.query,
+            text: item.query,
             type: 'recent',
-            frequency: item.frequency || 1,
-            score: 0.8,
+            count: item.frequency || 1,
+            // score: 0.8, // score not in shared type
           });
         }
       });
@@ -605,10 +545,10 @@ class IntelligentSearchService {
       popularData.forEach((item: any) => {
         if (item.query && item.query.toLowerCase().includes(query.toLowerCase())) {
           suggestions.push({
-            term: item.query,
+            text: item.query,
             type: 'popular',
-            frequency: item.count || 1,
-            score: 0.9,
+            count: item.count || 1,
+            // score: 0.9,
           });
         }
       });
@@ -630,10 +570,10 @@ class IntelligentSearchService {
 
         results.forEach(result => {
           suggestions.push({
-            term: result.item.title,
+            text: result.item.title,
             type: 'bill_title',
-            frequency: 1,
-            score: 1 - (result.score || 0),
+            count: 1,
+            // score: 1 - (result.score || 0),
             id: result.item.id?.toString(),
             metadata: {
               bill_id: result.item.id,
@@ -657,7 +597,7 @@ class IntelligentSearchService {
     return suggestions
       .filter(
         (suggestion, index, self) =>
-          index === self.findIndex(s => s.term.toLowerCase() === suggestion.term.toLowerCase())
+          index === self.findIndex(s => s.text.toLowerCase() === suggestion.text.toLowerCase())
       )
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, limit);
@@ -683,9 +623,7 @@ class IntelligentSearchService {
         is_public: request.isPublic || false,
       });
 
-      if (response.status !== 200 || !response.data) {
-        throw new Error('Failed to save search');
-      }
+      // Note: response data is the saved search object
 
       // Note: emailAlerts functionality would need to be implemented separately
       // as it's not part of the current SaveSearchRequest interface
@@ -695,7 +633,7 @@ class IntelligentSearchService {
         hasAlerts: !!request.emailAlerts?.enabled,
       });
 
-      return response.data;
+      return response;
     } catch (error) {
       logger.error('Failed to save search with alerts', {
         name: request.name,
@@ -708,26 +646,10 @@ class IntelligentSearchService {
   /**
    * Get comprehensive search analytics and performance metrics
    */
-  async getSearchAnalytics(): Promise<
-    SearchAnalytics & {
-      enginePerformance: {
-        postgresql: { avgTime: number; successRate: number };
-        fuse: { avgTime: number; successRate: number };
-      };
-      qualityMetrics: {
-        avgRelevanceScore: number;
-        userSatisfactionRate: number;
-      };
-    }
-  > {
+  async getSearchAnalytics(): Promise<SearchAnalytics> {
     try {
       const response = await searchApiClient.getSearchAnalytics();
-
-      if (response.status !== 200 || !response.data) {
-        throw new Error('Failed to get search analytics');
-      }
-
-      return response.data;
+      return response;
     } catch (error) {
       logger.error('Failed to get search analytics', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -1079,7 +1001,7 @@ class IntelligentSearchService {
         types: {},
         categories: {},
         statuses: {},
-      },
+      } as SearchFacets,
     };
   }
 

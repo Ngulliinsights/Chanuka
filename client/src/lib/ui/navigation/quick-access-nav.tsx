@@ -68,14 +68,14 @@ export const QuickAccessNav = React.memo<QuickAccessNavProps>(
         )}
         <div className="space-y-1">
           {sortedItems.map(item => {
-            const is_active =
+            const isActive =
               location.pathname === item.href ||
               (item.href !== '/' && location.pathname.startsWith(item.href));
 
             return (
               <Link key={item.id} to={item.href}>
                 <Button
-                  variant={is_active ? 'secondary' : 'ghost'}
+                  variant={isActive ? 'secondary' : 'ghost'}
                   className="w-full justify-start h-8 px-2"
                   size="sm"
                 >

@@ -294,9 +294,9 @@ export interface BillSearchResult {
 }
 
 /**
- * Search response
+ * Bill search response
  */
-export interface SearchResponse {
+export interface BillSearchResponse {
   readonly results: readonly BillSearchResult[];
   readonly total: number;
   readonly page: number;

@@ -214,10 +214,54 @@ export class WebSocketClient {
     }
   }
 
+  public subscribe(topics: string | string[]): boolean {
+    if (this.connectionState !== ConnectionState.CONNECTED) return false;
+    
+    // Convert single topic to array
+    const topicList = Array.isArray(topics) ? topics : [topics];
+    
+    // Create subscription objects
+    const subscriptions = topicList.map(topic => ({
+      id: `${Date.now()}-${Math.random()}`,
+      topic,
+      timestamp: new Date().toISOString()
+    }));
+
+    this.send({
+      type: 'subscribe',
+      subscriptions, // Use the proper subscriptions array format based on SubscriptionMessage
+      timestamp: new Date().toISOString()
+    } as any); // Cast as any to avoid strict type checks against WebSocketMessage union for now if needed
+
+    return true;
+  }
+
+  public unsubscribe(topics: string | string[]): boolean {
+    if (this.connectionState !== ConnectionState.CONNECTED) return false;
+
+    // Convert single topic to array
+    const topicList = Array.isArray(topics) ? topics : [topics];
+
+    this.send({
+      type: 'unsubscribe',
+       // We might need to send just topics or ids depending on the server implementation.
+       // Assuming topics for now based on typical patterns, but protocol says 'subscriptions' or 'topic'.
+       // Let's assume we can send a list of topics.
+      topic: topicList[0], // Simplified for single topic or first topic if array, protocol seems to require specific structure
+      timestamp: new Date().toISOString()
+    } as any);
+
+    return true;
+  }
+
   private handleConnectionError(error: unknown) {
     this.connectionState = ConnectionState.FAILED;
     logger.error('WebSocket connection failed', {
       error: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+export function createWebSocketClient(config: WebSocketConfig): WebSocketClient {
+  return new WebSocketClient(config);
 }

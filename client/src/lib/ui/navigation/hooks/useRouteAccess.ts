@@ -1,11 +1,11 @@
 import { useAuth } from '@client/core/auth';
 import { NavigationValidationError, NavigationAccessDeniedError } from '@client/core/error';
 import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
-import { getRecoverySuggestions } from '@client/core/recovery';
-import { validateNavigationPath, validateUserRole } from '@client/core/validation';
-import type { UserRole } from '@client/lib/types';
+import { getRecoverySuggestions } from '../recovery';
+import { validateNavigationPath, validateUserRole } from '../validation';
+import type { UserRole, AccessDenialReason } from '@client/lib/types';
 
-import type { AccessDenialReason } from '../types';
+// import type { AccessDenialReason } from '../types'; // Removed as per findings
 import { checkRouteAccess } from '../utils/route-access';
 
 export interface UseRouteAccessResult {
@@ -22,14 +22,14 @@ export interface UseRouteAccessResult {
  */
 export const useRouteAccess = (path: string): UseRouteAccessResult => {
   const { user } = useAuth();
-  const { user_role } = useUnifiedNavigation();
+  const { userRole } = useUnifiedNavigation();
 
   try {
     // Validate the path parameter
     validateNavigationPath(path);
 
     // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = user_role as string;
+    const contextRole = userRole as string;
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
 

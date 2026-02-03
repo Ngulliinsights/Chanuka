@@ -43,10 +43,7 @@ export * from './arguments';
 
 // Core types (re-exported from shared type system using @shared alias)
 export type {
-  Bill,
-  Sponsor,
   Committee,
-  BillStatus,
   BillPriority,
   BillType,
   Chamber,
@@ -61,11 +58,29 @@ export type {
   VerificationStatus,
 } from '@shared/types/domains/authentication';
 
-// Core types (re-exported from shared type system using @shared alias)
-export * from './core';
+// Core types - explicit exports to avoid conflicts with community/bill/search modules
+export type {
+  CommentStatus,
+  BaseComment,
+  ExpertVerification,
+  ModerationFlag,
+  UnifiedComment,
+  ThreadCategory,
+  UnifiedThread,
+  ViolationType,
+  ModerationViolationType,
+  ModerationStatus,
+  ModerationAction,
+} from './core';
+
+// Search types (domain + response)
+export * from './search';
+
+// Analytics types
+export * from './analytics';
 
 // Planned: After migration, specific type exports will be organized here
-// - Analytics types (from features/analytics/model/types)
 // - Common types (core domain types)
 // - UI types (component prop types)
 // - API types (network/REST types)
+

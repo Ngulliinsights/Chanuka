@@ -253,3 +253,245 @@ export interface RealtimeMetrics {
     average_response_time: number;
   };
 }
+
+// Privacy Analytics Types
+export interface UserConsent {
+  analytics: boolean;
+  performance: boolean;
+  functional: boolean;
+  timestamp: string;
+  version: string;
+}
+
+export interface AnalyticsEvent {
+  id: string;
+  type: 'track' | 'page_view' | 'engagement' | 'performance' | 'error';
+  category: string;
+  action: string;
+  label?: string;
+  value?: number;
+  timestamp: string;
+  sessionId: string;
+  userId?: string;
+  anonymized: boolean;
+  consentGiven: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AnalyticsConfig {
+  enabledCategories: ReadonlyArray<string>;
+  anonymizeData: boolean;
+  respectDoNotTrack: boolean;
+  consentRequired: boolean;
+  retentionDays: number;
+  batchSize: number;
+  flushInterval: number;
+  maxQueueSize: number;
+  maxRetries: number;
+  retryBackoffMs: number;
+  debounceMs: number;
+  enableCircuitBreaker: boolean;
+}
+
+export interface AnalyticsSystemMetrics {
+  totalEvents: number;
+  anonymizedEvents: number;
+  consentedEvents: number;
+  categoriesTracked: string[];
+  retentionCompliance: boolean;
+  lastFlush: string;
+  queueSize: number;
+  failedSends: number;
+  circuitBreakerOpen: boolean;
+}
+
+export interface EngagementTrend {
+  period: string;
+  value: number;
+  change: number;
+  changePercentage: number;
+  trend: 'increasing' | 'decreasing' | 'stable';
+}
+
+export interface LiveEngagementMetrics {
+  communityApproval: number;
+  totalParticipants: number;
+  expertSupport: number;
+  activeDiscussions: number;
+  lastUpdated: string;
+}
+
+export interface PersonalEngagementScore {
+  totalScore: number;
+  breakdown: {
+    participation: number;
+    quality: number;
+    expertise: number;
+    community: number;
+  };
+  rank: number;
+  totalUsers: number;
+  trend: 'up' | 'down' | 'stable';
+  methodology: {
+    description: string;
+    factors: Array<{
+      name: string;
+      weight: number;
+      description: string;
+      currentScore: number;
+    }>;
+  };
+}
+
+export interface CommunitysentimentAnalysis {
+  overall: 'positive' | 'negative' | 'neutral';
+  distribution: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+  trending: Array<{
+    topic: string;
+    sentiment: 'positive' | 'negative' | 'neutral';
+    change: number;
+    volume: number;
+  }>;
+  polls: Array<{
+    id: string;
+    question: string;
+    responses: number;
+    results: Array<{
+      option: string;
+      votes: number;
+      percentage: number;
+    }>;
+    endTime: string;
+  }>;
+}
+
+export interface ExpertVerificationMetrics {
+  totalExperts: number;
+  activeExperts: number;
+  averageCredibility: number;
+  verificationStats: {
+    official: number;
+    domain: number;
+    identity: number;
+  };
+  topExperts: Array<{
+    id: string | number;
+    name: string;
+    credibilityScore?: number;
+    specializations?: string[];
+    recentContributions: number;
+    communityRating?: number;
+  }>;
+}
+
+export interface EngagementStatistics {
+  leaderboard: Array<{
+    userId: string;
+    username: string;
+    score: number;
+    rank: number;
+    badge: string;
+    contributions: {
+      comments: number;
+      votes: number;
+      shares: number;
+    };
+  }>;
+  achievements: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    rarity: 'common' | 'rare' | 'epic' | 'legendary';
+    unlockedBy: number;
+  }>;
+  streaks: {
+    current: number;
+    longest: number;
+    type: 'daily' | 'weekly';
+  };
+}
+
+export interface TemporalAnalyticsData {
+  hourly: Array<{
+    hour: string;
+    engagement: number;
+    participants: number;
+    sentiment: number;
+  }>;
+  daily: Array<{
+    date: string;
+    engagement: number;
+    participants: number;
+    sentiment: number;
+  }>;
+  weekly: Array<{
+    week: string;
+    engagement: number;
+    participants: number;
+    sentiment: number;
+  }>;
+}
+
+export interface CommunityImpactMetrics {
+  billsInfluenced: number;
+  policiesAffected: number;
+  citizensReached: number;
+  mediaAttention: number;
+  legislativeResponse: number;
+}
+
+export interface ContributionQualityMetrics {
+  averageLength: number;
+  citationCount: number;
+  upvoteRatio: number;
+  expertEndorsements: number;
+  factualAccuracy: number;
+  constructiveness: number;
+}
+
+export interface UserEngagementProfile {
+  userId: string;
+  totalScore: number;
+  level: number;
+  badges: string[];
+  achievements: string[];
+  specializations: string[];
+  contributionHistory: Array<{
+    date: string;
+    type: 'comment' | 'vote' | 'share' | 'analysis';
+    billId: number;
+    score: number;
+  }>;
+  impactMetrics: CommunityImpactMetrics;
+  qualityMetrics: ContributionQualityMetrics;
+}
+
+export interface CivicEngagementGoal {
+  id: string;
+  name: string;
+  description: string;
+  category: 'participation' | 'quality' | 'community' | 'expertise';
+  targetValue: number;
+  currentValue: number;
+  progress: number;
+  deadline?: string;
+}
+
+export interface EngagementNotification {
+  id: string;
+  type: 'achievement' | 'milestone' | 'trending' | 'expert_response' | 'community_update';
+  title: string;
+  message: string;
+  data: {
+    billId?: number;
+    expertId?: string;
+  };
+  priority: 'low' | 'medium' | 'high';
+  timestamp: string;
+  read: boolean;
+}

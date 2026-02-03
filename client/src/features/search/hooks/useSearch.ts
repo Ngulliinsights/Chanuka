@@ -2,42 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { searchApiClient as searchApi } from '@client/core/api/search';
 import { useToast } from '@client/lib/hooks/use-toast';
-
-// Define types locally since they're not available in the types directory
-interface SearchRequest {
-  q: string;
-  filters?: Record<string, any>;
-}
-
-interface SearchResponse {
-  results: unknown[];
-  total: number;
-  page: number;
-}
-
-interface SearchSuggestion {
-  text: string;
-  type: string;
-}
-
-interface SavedSearch {
-  id: string;
-  name: string;
-  query: string;
-  filters?: Record<string, any>;
-}
-
-interface SearchHistory {
-  id: string;
-  query: string;
-  timestamp: string;
-}
-
-interface SaveSearchRequest {
-  name: string;
-  query: string;
-  filters?: Record<string, any>;
-}
+import type {
+  SearchRequest,
+  SearchResponse,
+  SearchSuggestion,
+  SavedSearch,
+  SearchHistory,
+  SaveSearchRequest,
+} from '@client/lib/types/search';
 
 /**
  * Hook for performing search queries

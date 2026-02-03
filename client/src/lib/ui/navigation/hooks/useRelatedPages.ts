@@ -1,12 +1,12 @@
 import { useAuth } from '@client/core/auth';
 import { NavigationValidationError } from '@client/core/error';
 import { useUnifiedNavigation } from '@client/core/navigation/hooks/use-unified-navigation';
-import { getRecoverySuggestions } from '@client/core/recovery';
+import { getRecoverySuggestions } from '../recovery';
 import {
   validateNavigationPath,
   validateUserRole,
   validateUseRelatedPagesOptions,
-} from '@client/core/validation';
+} from '../validation';
 import type { RelatedPage, UserRole } from '@client/lib/types';
 
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';
@@ -38,12 +38,12 @@ export const useRelatedPages = (
     validateUseRelatedPagesOptions(options);
 
     const { user } = useAuth();
-    const { user_role, preferences } = useUnifiedNavigation();
+    const { userRole, preferences } = useUnifiedNavigation();
 
     const { maxResults = 5, includeBreadcrumbs = false, filterByRole = true } = options;
 
     // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = user_role as string;
+    const contextRole = userRole as string;
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
 

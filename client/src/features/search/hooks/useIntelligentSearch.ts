@@ -12,31 +12,17 @@ import { useToast } from '@client/lib/hooks/use-toast';
 import { useDebounce } from '@client/lib/hooks/useDebounce';
 import { logger } from '@client/lib/utils/logger';
 
+
 import { intelligentSearch } from '../services/intelligent-search';
 import type {
   DualSearchRequest,
+} from '../services/intelligent-search';
+import type {
+  AutocompleteResult,
+  SearchSuggestion,
   CombinedSearchResult,
   SearchEngineResult,
-} from '../services/intelligent-search';
-
-// Define types locally
-interface AutocompleteResult {
-  suggestions: SearchSuggestion[];
-  facets: {
-    categories: string[];
-    sponsors: string[];
-    tags: string[];
-    statuses: string[];
-  };
-  query: string;
-  totalSuggestions: number;
-}
-
-interface SearchSuggestion {
-  text: string;
-  type: string;
-  count?: number;
-}
+} from '@client/lib/types/search';
 
 interface UseIntelligentSearchOptions {
   debounceMs?: number;

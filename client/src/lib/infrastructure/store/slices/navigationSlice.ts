@@ -39,7 +39,7 @@ const initialState: NavigationState = {
   isMobile: false,
   sidebarCollapsed: false,
   mounted: false,
-  user_role: 'public',
+  userRole: 'public',
   preferences: {
     defaultLandingPage: DEFAULT_PATH,
     favoritePages: [],
@@ -47,6 +47,7 @@ const initialState: NavigationState = {
     compactMode: false,
     showBreadcrumbs: true,
     autoExpand: false,
+    sidebarCollapsed: false,
   },
 };
 
@@ -162,8 +163,8 @@ const navigationSlice = createSlice({
      * and available menu items.
      */
     setUserRole: (state, action: PayloadAction<UserRole>) => {
-      if (state.user_role !== action.payload) {
-        state.user_role = action.payload;
+      if (state.userRole !== action.payload) {
+        state.userRole = action.payload;
         logger.debug('User role updated', { role: action.payload });
       }
     },
@@ -173,7 +174,15 @@ const navigationSlice = createSlice({
      * existing preferences rather than replacing them entirely.
      */
     updatePreferences: (state, action: PayloadAction<Partial<NavigationPreferences>>) => {
-      state.preferences = { ...state.preferences, ...action.payload };
+      // Cast readonly arrays to mutable for Immer
+      const updates = { ...action.payload };
+      if (updates.favoritePages) {
+        // @ts-ignore - Immer handles the mutation, this is a type clash between readonly and mutable draft
+        state.preferences.favoritePages = [...updates.favoritePages];
+        delete updates.favoritePages;
+      }
+      
+      state.preferences = { ...state.preferences, ...updates };
       logger.debug('Navigation preferences updated', {
         updated: Object.keys(action.payload),
       });
@@ -220,6 +229,8 @@ const navigationSlice = createSlice({
      */
     addFavoritePage: (state, action: PayloadAction<string>) => {
       const path = action.payload;
+      // Immer allows direct mutation, so push is fine here.
+      // The type for favoritePages is `string[]`, which is mutable.
       if (!state.preferences.favoritePages.includes(path)) {
         state.preferences.favoritePages.push(path);
         logger.debug('Page added to favorites', { path });
@@ -231,6 +242,7 @@ const navigationSlice = createSlice({
      */
     removeFavoritePage: (state, action: PayloadAction<string>) => {
       const initialLength = state.preferences.favoritePages.length;
+      // Immer handles this filter operation correctly for mutable state.
       state.preferences.favoritePages = state.preferences.favoritePages.filter(
         path => path !== action.payload
       );
@@ -245,12 +257,13 @@ const navigationSlice = createSlice({
      * device-specific flags that should persist.
      */
     resetNavigationState: state => {
-      const { isMobile, mounted } = state;
+      const { isMobile, mounted, userRole } = state;
 
       Object.assign(state, {
         ...initialState,
         isMobile,
         mounted,
+        userRole,
       });
 
       logger.debug('Navigation state reset');
@@ -267,7 +280,11 @@ const navigationSlice = createSlice({
       if (persistedState.preferences) {
         state.preferences = {
           ...state.preferences,
-          ...persistedState.preferences,
+          favoritePages: [...persistedState.preferences.favoritePages],
+          recentlyVisited: persistedState.preferences.recentlyVisited,
+          compactMode: persistedState.preferences.compactMode,
+          showBreadcrumbs: persistedState.preferences.showBreadcrumbs,
+          autoExpand: persistedState.preferences.autoExpand,
         };
       }
 
@@ -281,8 +298,8 @@ const navigationSlice = createSlice({
       }
 
       // Restore user role
-      if (persistedState.user_role) {
-        state.user_role = persistedState.user_role;
+      if (persistedState.userRole) {
+        state.userRole = persistedState.userRole;
       }
 
       logger.debug('Navigation state loaded from persistence', {
@@ -305,11 +322,13 @@ const navigationSlice = createSlice({
      * for "reset preferences" features or when logging out.
      */
     clearPersistedState: state => {
-      state.preferences = { ...initialState.preferences };
+      state.preferences = {
+        ...initialState.preferences,
+        favoritePages: [...initialState.preferences.favoritePages]
+      };
       state.sidebarOpen = false;
       state.sidebarCollapsed = false;
-      state.user_role = 'public';
-
+      state.userRole = 'public';
       logger.debug('Navigation persisted state cleared');
     },
 
@@ -378,7 +397,7 @@ export const selectSidebarCollapsed = (state: { navigation: NavigationState }) =
 export const selectMounted = (state: { navigation: NavigationState }) => state.navigation.mounted;
 
 export const selectUserRole = (state: { navigation: NavigationState }) =>
-  state.navigation.user_role;
+  state.navigation.userRole;
 
 export const selectNavigationPreferences = (state: { navigation: NavigationState }) =>
   state.navigation.preferences;

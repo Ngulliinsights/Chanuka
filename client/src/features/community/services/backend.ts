@@ -10,6 +10,7 @@ import { communityApiService } from '@client/core/api/community';
 import { realTimeService } from '@client/core/realtime';
 import type { CommentFormData } from '@client/lib/types/community';
 import type { Comment } from '@client/lib/types/community';
+import type { DiscussionThreadMetadata } from '@client/lib/types/community';
 import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
@@ -369,7 +370,7 @@ class CommunityBackendService {
       const result = await communityApiService.addComment({
         billId: Number(data.billId),
         content: data.content,
-        parentId: data.parentId?.toString(),
+        parentId: data.parentId,
       });
 
       this.subscribeToDiscussion(Number(data.billId));

@@ -7,7 +7,7 @@ import { Shield, Lock, Eye, Zap, AlertTriangle, CheckCircle, Settings } from 'lu
 import React from 'react';
 import { useState, useEffect } from 'react';
 
-import { getSecuritySystem } from '@client/features/security/ui/dashboard/SecurityDashboard.tsx';
+import { getSecuritySystem } from '@core/security';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {

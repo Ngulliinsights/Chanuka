@@ -36,8 +36,8 @@ interface ExpertProfileCardProps {
   showFullProfile?: boolean;
   compact?: boolean;
   className?: string;
-  onViewProfile?: (expertId: string) => void;
-  onContact?: (expertId: string) => void;
+  onViewProfile?: (expertId: string | number) => void;
+  onContact?: (expertId: string | number) => void;
 }
 
 /**

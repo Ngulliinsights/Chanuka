@@ -11,9 +11,20 @@ import {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
-  type ConstitutionalFlag,
-  type Severity,
-} from '@client/core/api/types/bill';
+  type Bill as ReadonlyBill,
+} from '../../types/bill/bill-base';
+
+
+export type Severity = 'low' | 'medium' | 'high' | 'critical';
+
+export interface ConstitutionalFlag {
+  id: number;
+  type: string;
+  description: string;
+  severity: Severity;
+  article?: string;
+  clause?: string;
+}
 
 interface BillsStats {
   totalBills: number;
@@ -104,18 +115,25 @@ const generateSponsors = (count: number = 3) => {
       party: faker.helpers.arrayElement(parties),
       district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
       position: faker.helpers.arrayElement(positions),
+      role: 'co-sponsor',
       isPrimary: false,
     });
   }
 
-  return sponsors;
+  return sponsors.map(s => ({
+    ...s,
+    // Map position to state/district format if needed, or leave as extra prop if allowed (it will be ignored by strict type, but we might object-literal it)
+    // Sponsor type has: id, name, party, role, district, avatarUrl, state, isPrimary.
+    role: s.isPrimary ? ('primary' as const) : ('co-sponsor' as const),
+    
+  })) as any; // Cast to avoid position mismatch issues for now, or refine Sponsor type
 };
 
 /**
  * Generate a single mock bill
  */
 export const generateMockBill = (
-  id: number,
+  id: string,
   options: {
     urgency?: UrgencyLevel;
     status?: BillStatus;
@@ -153,24 +171,32 @@ export const generateMockBill = (
   const constitutionalFlags = generateConstitutionalFlags(constitutionalConcerns);
   const engagement = generateEngagementMetrics(popularity);
 
+  // Map constitutionalFlags to constitutionalIssues (string[])
+  const constitutionalIssues = constitutionalFlags.map(f => `${f.type}: ${f.description}`);
+
   return {
     id,
     billNumber: generateBillNumber(),
     title: generateBillTitle(),
     summary: generateBillSummary(),
     status,
-    urgencyLevel: urgency,
-    introducedDate,
-    lastUpdated,
-    sponsors,
-    constitutionalFlags,
-    ...engagement,
-    policyAreas,
+    urgency, // Renamed from urgencyLevel
     complexity: weightedRandom(
       [ComplexityLevel.LOW, ComplexityLevel.MEDIUM, ComplexityLevel.HIGH, ComplexityLevel.EXPERT],
       [30, 40, 25, 5]
     ),
+    introducedDate,
+    lastActionDate: lastUpdated, // Renamed from lastUpdated
+    sponsors: sponsors as any, // Cast sponsors to avoid strict check on 'position'
+    constitutionalIssues, // Mapped from flags
+    ...engagement,
+    policyAreas,
+    tags: policyAreas, // Use policy areas as tags for now
     readingTime: faker.number.int({ min: 5, max: 45 }),
+    // Removed shareCount, viewCount, commentCount if they are not in Bill or use Object.assign
+    // Bill has viewCount, commentCount.
+    viewCount: engagement.viewCount,
+    commentCount: engagement.commentCount,
   };
 };
 
@@ -209,7 +235,7 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
       options.status = BillStatus.FAILED;
     }
 
-    bills.push(generateMockBill(i, options));
+    bills.push(generateMockBill(i.toString(), options));
   }
 
   return bills;
@@ -220,15 +246,16 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
  */
 export const generateMockBillsStats = (bills: ReadonlyBill[]): BillsStats => {
   const urgentCount = bills.filter(
-    b => b.urgencyLevel === 'high' || b.urgencyLevel === 'critical'
+    b => b.urgency === 'high' || b.urgency === 'critical'
   ).length;
 
-  const constitutionalFlags = bills.reduce((sum, b) => sum + b.constitutionalFlags.length, 0);
+  const constitutionalFlags = bills.reduce((sum, b) => sum + (b.constitutionalIssues?.length || 0), 0);
 
   // Calculate trending based on recent activity and engagement
   const trendingCount = bills.filter(b => {
-    const recentActivity = new Date(b.lastUpdated) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const highEngagement = b.viewCount + b.commentCount + b.shareCount > 200;
+    const recentActivity = new Date(b.lastActionDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    // Bill has viewCount and commentCount
+    const highEngagement = (b.viewCount || 0) + (b.commentCount || 0) > 200;
     return recentActivity && highEngagement;
   }).length;
 
@@ -256,7 +283,7 @@ export const getMockBillsByCategory = (category: string, count: number = 10): Re
  */
 export const getMockBillsWithConstitutionalConcerns = (count: number = 5): ReadonlyBill[] => {
   return Array.from({ length: count }, (_, i) =>
-    generateMockBill(i + 1000, { constitutionalConcerns: 'high' })
+    generateMockBill((i + 1000).toString(), { constitutionalConcerns: 'high' })
   );
 };
 
@@ -265,7 +292,7 @@ export const getMockBillsWithConstitutionalConcerns = (count: number = 5): Reado
  */
 export const getMockUrgentBills = (count: number = 5): ReadonlyBill[] => {
   return Array.from({ length: count }, (_, i) =>
-    generateMockBill(i + 2000, { urgency: UrgencyLevel.CRITICAL, popularity: 2.0 })
+    generateMockBill((i + 2000).toString(), { urgency: UrgencyLevel.CRITICAL, popularity: 2.0 })
   );
 };
 

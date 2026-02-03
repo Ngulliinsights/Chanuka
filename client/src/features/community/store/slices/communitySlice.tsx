@@ -106,7 +106,7 @@ interface ExtendedTrendingTopic extends TrendingTopic {
  * Extended ExpertInsight type with validation properties.
  * These properties enable filtering and sorting by verification level and community consensus.
  */
-interface ExtendedExpertInsight extends ExpertInsight {
+interface ExtendedExpertInsight extends Omit<ExpertInsight, 'communityValidation'> {
   verificationType: 'official' | 'domain' | 'identity' | 'community';
   communityValidation: {
     validationScore: number;

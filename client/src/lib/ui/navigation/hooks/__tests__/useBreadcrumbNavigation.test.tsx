@@ -84,8 +84,8 @@ describe('generateEnhancedBreadcrumbs', () => {
     const breadcrumbs = generateEnhancedBreadcrumbs('/bills');
 
     expect(breadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Bills', path: '/bills', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Bills', path: '/bills', isActive: true },
     ]);
   });
 
@@ -93,9 +93,9 @@ describe('generateEnhancedBreadcrumbs', () => {
     const breadcrumbs = generateEnhancedBreadcrumbs('/bills/123');
 
     expect(breadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Bills', path: '/bills', is_active: false },
-      { label: 'Bill 123', path: '/bills/123', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Bills', path: '/bills', isActive: false },
+      { label: 'Bill 123', path: '/bills/123', isActive: true },
     ]);
   });
 
@@ -103,10 +103,10 @@ describe('generateEnhancedBreadcrumbs', () => {
     const breadcrumbs = generateEnhancedBreadcrumbs('/bills/456/analysis');
 
     expect(breadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Bills', path: '/bills', is_active: false },
-      { label: 'Bill 456', path: '/bills/456', is_active: false },
-      { label: 'Analysis', path: '/bills/456/analysis', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Bills', path: '/bills', isActive: false },
+      { label: 'Bill 456', path: '/bills/456', isActive: false },
+      { label: 'Analysis', path: '/bills/456/analysis', isActive: true },
     ]);
   });
 
@@ -114,45 +114,45 @@ describe('generateEnhancedBreadcrumbs', () => {
     const breadcrumbs = generateEnhancedBreadcrumbs('/unknown/path');
 
     expect(breadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Unknown', path: '/unknown', is_active: false },
-      { label: 'Path', path: '/unknown/path', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Unknown', path: '/unknown', isActive: false },
+      { label: 'Path', path: '/unknown/path', isActive: true },
     ]);
   });
 
   it('should handle search routes correctly', () => {
     const searchBreadcrumbs = generateEnhancedBreadcrumbs('/search');
     expect(searchBreadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Search', path: '/search', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Search', path: '/search', isActive: true },
     ]);
 
     const resultsBreadcrumbs = generateEnhancedBreadcrumbs('/results');
     expect(resultsBreadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Search', path: '/search', is_active: false },
-      { label: 'Results', path: '/results', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Search', path: '/search', isActive: false },
+      { label: 'Results', path: '/results', isActive: true },
     ]);
   });
 
   it('should handle user routes correctly', () => {
     const dashboardBreadcrumbs = generateEnhancedBreadcrumbs('/dashboard');
     expect(dashboardBreadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Dashboard', path: '/dashboard', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Dashboard', path: '/dashboard', isActive: true },
     ]);
 
     const accountBreadcrumbs = generateEnhancedBreadcrumbs('/account');
     expect(accountBreadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Account', path: '/account', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Account', path: '/account', isActive: true },
     ]);
 
     const settingsBreadcrumbs = generateEnhancedBreadcrumbs('/account/settings');
     expect(settingsBreadcrumbs).toEqual([
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Account', path: '/account', is_active: false },
-      { label: 'Settings', path: '/account/settings', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Account', path: '/account', isActive: false },
+      { label: 'Settings', path: '/account/settings', isActive: true },
     ]);
   });
 });
@@ -183,20 +183,20 @@ describe('routeBreadcrumbConfig', () => {
     const billsBreadcrumbs = routeBreadcrumbConfig['/bills']('/bills');
     expect(billsBreadcrumbs).toHaveLength(2);
     expect(billsBreadcrumbs[1].label).toBe('Bills');
-    expect(billsBreadcrumbs[1].is_active).toBe(true);
+    expect(billsBreadcrumbs[1].isActive).toBe(true);
 
     // Test bill detail route
     const billDetailBreadcrumbs = routeBreadcrumbConfig['/bills/:id']('/bills/123');
     expect(billDetailBreadcrumbs).toHaveLength(3);
     expect(billDetailBreadcrumbs[2].label).toBe('Bill 123');
-    expect(billDetailBreadcrumbs[2].is_active).toBe(true);
+    expect(billDetailBreadcrumbs[2].isActive).toBe(true);
 
     // Test bill analysis route
     const billAnalysisBreadcrumbs =
       routeBreadcrumbConfig['/bills/:id/analysis']('/bills/123/analysis');
     expect(billAnalysisBreadcrumbs).toHaveLength(4);
     expect(billAnalysisBreadcrumbs[3].label).toBe('Analysis');
-    expect(billAnalysisBreadcrumbs[3].is_active).toBe(true);
+    expect(billAnalysisBreadcrumbs[3].isActive).toBe(true);
   });
 });
 
@@ -209,8 +209,8 @@ describe('useBreadcrumbNavigation', () => {
 
   it('should return breadcrumbs from store', () => {
     const mockBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Test', path: '/test', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Test', path: '/test', isActive: true },
     ];
 
     store = createMockStore({
@@ -232,8 +232,8 @@ describe('useBreadcrumbNavigation', () => {
     expect(typeof result.current.setBreadcrumbs).toBe('function');
 
     const newBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'New Page', path: '/new', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'New Page', path: '/new', isActive: true },
     ];
 
     act(() => {
@@ -245,7 +245,7 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should provide addBreadcrumb function', () => {
-    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: true }];
+    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', isActive: true }];
 
     store = createMockStore({
       breadcrumbs: initialBreadcrumbs,
@@ -258,7 +258,7 @@ describe('useBreadcrumbNavigation', () => {
     const newBreadcrumb: BreadcrumbItem = {
       label: 'New Page',
       path: '/new',
-      is_active: true,
+      isActive: true,
     };
 
     act(() => {
@@ -266,15 +266,15 @@ describe('useBreadcrumbNavigation', () => {
     });
 
     expect(result.current.breadcrumbs).toHaveLength(2);
-    expect(result.current.breadcrumbs[0].is_active).toBe(false); // Previous should be inactive
+    expect(result.current.breadcrumbs[0].isActive).toBe(false); // Previous should be inactive
     expect(result.current.breadcrumbs[1]).toEqual(newBreadcrumb);
   });
 
   it('should provide popBreadcrumb function', () => {
     const initialBreadcrumbs: BreadcrumbItem[] = [
-      { label: 'Home', path: '/', is_active: false },
-      { label: 'Page 1', path: '/page1', is_active: false },
-      { label: 'Page 2', path: '/page2', is_active: true },
+      { label: 'Home', path: '/', isActive: false },
+      { label: 'Page 1', path: '/page1', isActive: false },
+      { label: 'Page 2', path: '/page2', isActive: true },
     ];
 
     store = createMockStore({
@@ -291,11 +291,11 @@ describe('useBreadcrumbNavigation', () => {
 
     expect(result.current.breadcrumbs).toHaveLength(2);
     expect(result.current.breadcrumbs[1].label).toBe('Page 1');
-    expect(result.current.breadcrumbs[1].is_active).toBe(true); // Should become active
+    expect(result.current.breadcrumbs[1].isActive).toBe(true); // Should become active
   });
 
   it('should not pop breadcrumb if only one remains', () => {
-    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', is_active: true }];
+    const initialBreadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/', isActive: true }];
 
     store = createMockStore({
       breadcrumbs: initialBreadcrumbs,

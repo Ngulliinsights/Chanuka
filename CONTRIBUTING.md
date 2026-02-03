@@ -18,4 +18,11 @@
 
 ## 📁 Documentation
 - **Architecture:** See `docs/project-structure.md` and `ARCHITECTURE.md`.
-- **Migrations:** See `docs/MIGRATION_LOG.md`.
+- **Migrations:** See `docs/MIGRATION_LOG.md`.\r\n- **Context:** See `docs/CODEBASE_CONTEXT.md` (IDE-agnostic strategic reference).\r\n- **Agent Rules:** See `.agent/rules.md` (enforced development standards).
+
+## 🤖 AI-Assisted Development
+- Log session outcomes in `MIGRATION_LOG.md` before closing.
+- Preserve agent artifacts (`brain/*/task.md`, `implementation_plan.md`) for continuity.
+
+## ✅ Pre-Commit Verification
+- Run `npx tsc --noEmit` and confirm error count is not increasing.

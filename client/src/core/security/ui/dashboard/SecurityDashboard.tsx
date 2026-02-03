@@ -4,11 +4,14 @@
  */
 
 import {
-  SecurityMetrics,
-  SecurityAlert,
-  SecurityEvent,
+  getSecuritySystem,
   VulnerabilityReport,
-} from '@client/features/analytics/types.ts';
+} from '@core/security';
+import type { 
+  ExtendedSecurityMetrics, 
+  SecurityAlert,
+  ExtendedSecurityEvent 
+} from '@client/core/security/security-monitor';
 import {
   Shield,
   AlertTriangle,
@@ -21,7 +24,6 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { getSecuritySystem } from '@client/features/security/ui/dashboard/SecurityDashboard.tsx';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -48,9 +50,9 @@ export function SecurityDashboard({
   autoRefresh = true,
   refreshInterval = 30000,
 }: SecurityDashboardProps) {
-  const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
+  const [metrics, setMetrics] = useState<ExtendedSecurityMetrics | null>(null);
   const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
-  const [events, setEvents] = useState<SecurityEvent[]>([]);
+  const [events, setEvents] = useState<ExtendedSecurityEvent[]>([]);
   const [vulnerabilities, setVulnerabilities] = useState<VulnerabilityReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -82,7 +84,7 @@ export function SecurityDashboard({
       setLastUpdate(new Date());
       setIsLoading(false);
     } catch (error) {
-      logger.error('Failed to refresh security dashboard data', error);
+      logger.error('Failed to refresh security dashboard data', { error });
       setIsLoading(false);
     }
   };
@@ -145,7 +147,7 @@ export function SecurityDashboard({
         await refreshData();
       }
     } catch (error) {
-      logger.error('Failed to acknowledge alert', error);
+      logger.error('Failed to acknowledge alert', { error });
     }
   };
 
@@ -157,7 +159,7 @@ export function SecurityDashboard({
         await refreshData();
       }
     } catch (error) {
-      logger.error('Failed to run vulnerability scan', error);
+      logger.error('Failed to run vulnerability scan', { error });
     }
   };
 
@@ -412,7 +414,7 @@ export function SecurityDashboard({
                       {Object.entries(metrics.eventsByType).map(([type, count]) => (
                         <div key={type} className="flex justify-between">
                           <span className="text-sm">{type.replace('_', ' ')}</span>
-                          <span className="font-medium">{count}</span>
+                          <span className="font-medium">{String(count)}</span>
                         </div>
                       ))}
                     </div>
@@ -432,7 +434,7 @@ export function SecurityDashboard({
                       {Object.entries(metrics.eventsBySeverity).map(([severity, count]) => (
                         <div key={severity} className="flex justify-between">
                           <Badge className={getSeverityColor(severity)}>{severity}</Badge>
-                          <span className="font-medium">{count}</span>
+                          <span className="font-medium">{String(count)}</span>
                         </div>
                       ))}
                     </div>

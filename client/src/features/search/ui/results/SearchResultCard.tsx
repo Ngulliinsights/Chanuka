@@ -22,7 +22,7 @@ import {
 import React, { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';
-import { Tooltip } from '@client/lib/design-system';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { cn } from '@client/lib/design-system';
@@ -85,7 +85,7 @@ export function SearchResultCard({
       if (navigator.share) {
         await navigator.share({
           title: result.title,
-          text: result.excerpt || result.content,
+          text: result.description || result.content,
           url: window.location.origin + getResultUrl(),
         });
       } else {
@@ -220,7 +220,7 @@ export function SearchResultCard({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground line-clamp-2">
-                {highlightText(result.excerpt || result.content)}
+                {highlightText(result.description || result.content || '')}
               </p>
               <div className="flex items-center space-x-2 mt-2">
                 <span
@@ -268,7 +268,7 @@ export function SearchResultCard({
                   {/* Content Preview */}
                   <div className="space-y-2">
                     <p className="text-muted-foreground line-clamp-3">
-                      {highlightText(result.excerpt || result.content)}
+                      {highlightText(result.description || result.content || '')}
                     </p>
 
                     {/* Expandable content */}

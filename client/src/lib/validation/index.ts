@@ -4,6 +4,12 @@
 
 import { z } from 'zod';
 
+export interface ValidationResult<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
 // Common validation schemas
 export const emailSchema = z.string().email('Invalid email address');
 
@@ -110,7 +116,7 @@ export function validateUseRelatedPagesOptions(options: unknown) {
 export function validate<T>(
   schema: z.ZodSchema<T>,
   data: unknown
-): { success: boolean; data?: T; error?: string } {
+): ValidationResult<T> {
   const result = schema.safeParse(data);
 
   if (result.success) {

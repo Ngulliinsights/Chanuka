@@ -3,7 +3,7 @@
  * Demonstrates the security system features
  */
 
-import { getSecuritySystem } from '@client/security';
+import { getSecuritySystem } from '@core/security';
 import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Activity } from 'lucide-react';
 import React from 'react';
 import { useState, useEffect } from 'react';
@@ -78,7 +78,7 @@ export default function SecurityDemoPage() {
     }
   };
 
-  const testInputSanitization = () => {
+  const testInputSanitization = async () => {
     try {
       const securitySystem = getSecuritySystem();
       if (!securitySystem) {
@@ -86,7 +86,7 @@ export default function SecurityDemoPage() {
         return;
       }
 
-      const result = securitySystem.sanitizer.sanitizeHTML(testInput);
+      const result = await securitySystem.sanitizer.sanitizeHTML(testInput);
       setSanitizedResult(result);
     } catch (error) {
       logger.error('Failed to sanitize input', { component: 'SecurityDemoPage' }, error);

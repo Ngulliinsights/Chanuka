@@ -10,12 +10,12 @@ import { logger } from '@client/lib/utils/logger';
 
 import type {
   WebSocketHookReturn,
-  NotificationData,
+  RealTimeNotification,
   ConnectionState,
-  ClientWebSocketMessage,
-} from '../api/types/websocket';
+  WebSocketMessage,
+} from '../types';
 
-import { WebSocketClient, createWebSocketClient } from './websocket-client';
+import { WebSocketClient, createWebSocketClient } from '../websocket-client';
 
 export interface WebSocketOptions {
   autoConnect?: boolean;
@@ -42,7 +42,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     'excellent' | 'good' | 'poor' | 'disconnected'
   >('disconnected');
   const [error, setError] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const [notifications, setNotifications] = useState<RealTimeNotification[]>([]);
   const [recentActivity, setRecentActivity] = useState<
     Array<{
       id: string;
@@ -55,6 +55,102 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
   const wsClientRef = useRef<WebSocketClient | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Forward declarations for these are needed because they are used in initializeClient
+  // which is defined before them. Ideally we'd reorder but to minimize diff noise we'll use refs/hoisting or define valid order.
+  // Actually, initializeClient calls startPollingFallback, so startPollingFallback must be defined or stable.
+  // But initializeClient is a callback.
+  // Let's define startPollingFallback first.
+  
+  // Fallback polling mechanism
+  const startPollingFallback = useCallback(() => {
+    if (pollingIntervalRef.current) return; // Already polling
+
+    logger.info('Starting polling fallback', {
+      component: 'useWebSocket',
+    });
+
+    pollingIntervalRef.current = setInterval(() => {
+      // Simulate receiving notifications
+      if (Math.random() > 0.8) {
+        const newNotification: RealTimeNotification = {
+          id: `notification_${Date.now()}`,
+          type: 'info' as any, // Simplified for fallback
+          title: 'Bill Update',
+          message: "A bill you're following has been updated",
+          priority: 'medium',
+          created_at: new Date().toISOString(),
+          read: false
+        } as unknown as RealTimeNotification;
+        setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
+      }
+
+      // Simulate activity updates
+      if (Math.random() > 0.9) {
+        const newActivity = {
+          id: `activity_${Date.now()}`,
+          type: 'bill_updated',
+          timestamp: new Date().toISOString(),
+          bill_id: `B${Math.floor(Math.random() * 1000)}`,
+        };
+        setRecentActivity(prev => [newActivity, ...prev.slice(0, 19)]);
+      }
+    }, 5000);
+  }, []);
+
+  const stopPollingFallback = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  }, []);
+
+  // Handle incoming messages
+  const handleMessage = useCallback((message: WebSocketMessage) => {
+    switch (message.type) {
+      case 'notification':
+        if (message.data) {
+          const notification: RealTimeNotification = {
+            id: (message.data as any).id || `notification_${Date.now()}`,
+            type: (message.data as any).type || 'community_activity',
+            title: (message.data as any).title || 'Notification',
+            message: (message.data as any).message || '',
+            priority: (message.data as any).priority || 'medium',
+            created_at: (message.data as any).timestamp || new Date().toISOString(),
+            read: false,
+          } as RealTimeNotification;
+          setNotifications(prev => [notification, ...prev.slice(0, 9)]);
+        }
+        break;
+
+      case 'bill_update':
+        if ((message.data as any)?.billId) {
+          const activity = {
+            id: `activity_${Date.now()}`,
+            type: 'bill_updated',
+            timestamp: new Date().toISOString(),
+            bill_id: (message.data as any).billId.toString(),
+          };
+          setRecentActivity(prev => [activity, ...prev.slice(0, 19)]);
+        }
+        break;
+
+      case 'community_update':
+        const communityActivity = {
+          id: `activity_${Date.now()}`,
+          type: 'community_update',
+          timestamp: new Date().toISOString(),
+        };
+        setRecentActivity(prev => [communityActivity, ...prev.slice(0, 19)]);
+        break;
+
+      default:
+        logger.debug('Unhandled message type', {
+          component: 'useWebSocket',
+          messageType: message.type,
+        });
+    }
+  }, []);
+
   // Initialize WebSocket client
   const initializeClient = useCallback(() => {
     if (wsClientRef.current) {
@@ -66,8 +162,8 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       reconnect: {
         enabled: true,
         maxAttempts: reconnectAttempts,
-        baseDelay: reconnectInterval,
-        maxDelay: 30000,
+        delay: reconnectInterval,
+        backoff: 'exponential',
       },
       heartbeat: {
         enabled: true,
@@ -101,7 +197,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       }
     });
 
-    wsClientRef.current.on('message', (message: ClientWebSocketMessage) => {
+    wsClientRef.current.on('message', (message: WebSocketMessage) => {
       handleMessage(message);
     });
 
@@ -119,94 +215,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
         attempt,
       });
     });
-  }, [url, reconnectAttempts, reconnectInterval, subscriptions]);
-
-  // Handle incoming messages
-  const handleMessage = useCallback((message: ClientWebSocketMessage) => {
-    switch (message.type) {
-      case 'notification':
-        if (message.data) {
-          const notification: NotificationData = {
-            id: message.data.id || `notification_${Date.now()}`,
-            type: message.data.type || 'info',
-            title: message.data.title || 'Notification',
-            message: message.data.message || '',
-            data: message.data.data,
-            timestamp: message.data.timestamp || new Date().toISOString(),
-          };
-          setNotifications(prev => [notification, ...prev.slice(0, 9)]);
-        }
-        break;
-
-      case 'bill_update':
-        if (message.data?.billId) {
-          const activity = {
-            id: `activity_${Date.now()}`,
-            type: 'bill_updated',
-            timestamp: new Date().toISOString(),
-            bill_id: message.data.billId.toString(),
-          };
-          setRecentActivity(prev => [activity, ...prev.slice(0, 19)]);
-        }
-        break;
-
-      case 'community_update':
-        const communityActivity = {
-          id: `activity_${Date.now()}`,
-          type: 'community_update',
-          timestamp: new Date().toISOString(),
-        };
-        setRecentActivity(prev => [communityActivity, ...prev.slice(0, 19)]);
-        break;
-
-      default:
-        logger.debug('Unhandled message type', {
-          component: 'useWebSocket',
-          messageType: message.type,
-        });
-    }
-  }, []);
-
-  // Fallback polling mechanism
-  const startPollingFallback = useCallback(() => {
-    if (pollingIntervalRef.current) return; // Already polling
-
-    logger.info('Starting polling fallback', {
-      component: 'useWebSocket',
-    });
-
-    pollingIntervalRef.current = setInterval(() => {
-      // Simulate receiving notifications
-      if (Math.random() > 0.8) {
-        const newNotification: NotificationData = {
-          id: `notification_${Date.now()}`,
-          type: 'info',
-          title: 'Bill Update',
-          message: "A bill you're following has been updated",
-          timestamp: new Date().toISOString(),
-        };
-        setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
-      }
-
-      // Simulate activity updates
-      if (Math.random() > 0.9) {
-        const newActivity = {
-          id: `activity_${Date.now()}`,
-          type: 'bill_updated',
-          timestamp: new Date().toISOString(),
-          bill_id: `B${Math.floor(Math.random() * 1000)}`,
-        };
-        setRecentActivity(prev => [newActivity, ...prev.slice(0, 19)]);
-      }
-    }, 5000);
-  }, []);
-
-  const stopPollingFallback = useCallback(() => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-  }, []);
+  }, [url, reconnectAttempts, reconnectInterval, subscriptions, handleMessage, startPollingFallback]);
 
   const connect = useCallback(() => {
     if (isConnecting || isConnected) return;
@@ -219,18 +228,20 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       initializeClient();
     }
 
-    wsClientRef.current?.connect().catch(err => {
+    try {
+      wsClientRef.current?.connect();
+    } catch (err) {
       logger.error(
         'WebSocket connection failed',
         {
           component: 'useWebSocket',
         },
-        err
+        err as Error
       );
       setIsConnecting(false);
       setError('Connection failed, using polling fallback');
       startPollingFallback();
-    });
+    }
   }, [isConnecting, isConnected, initializeClient, stopPollingFallback, startPollingFallback]);
 
   const disconnect = useCallback(() => {
@@ -250,7 +261,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     return wsClientRef.current?.unsubscribe(topics) || false;
   }, []);
 
-  const send = useCallback((message: ClientWebSocketMessage) => {
+  const send = useCallback((message: WebSocketMessage) => {
     return wsClientRef.current?.send(message) || false;
   }, []);
 

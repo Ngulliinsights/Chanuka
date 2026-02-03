@@ -9,7 +9,7 @@
 
 // Base entity interface for common fields
 interface BaseEntity {
-  readonly id: number;
+  readonly id: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
 }
@@ -84,7 +84,7 @@ export type ComplexityLevelType = keyof typeof ComplexityLevel;
  * };
  */
 export interface Bill {
-  readonly id: number;
+  readonly id: string;
   readonly billNumber: string;
   readonly title: string;
   readonly summary: string;
@@ -92,20 +92,44 @@ export interface Bill {
   readonly urgency: UrgencyLevel;
   readonly complexity: ComplexityLevel;
   readonly introducedDate: string;
+  readonly introductionDate?: string;
   readonly lastActionDate: string;
+  readonly lastUpdated?: string;
   readonly sponsors: readonly Sponsor[];
   readonly tags: readonly string[];
   readonly policyAreas: readonly string[];
+  readonly readingTime?: number;
   readonly trackingCount?: number;
   readonly viewCount?: number;
   readonly commentCount?: number;
   readonly constitutionalIssues?: readonly string[];
+  readonly constitutionalFlags?: readonly ConstitutionalFlag[];
   readonly financialImpact?: string;
   readonly governmentBodies?: readonly string[];
   readonly chamber?: 'House' | 'Senate' | 'Both';
   readonly session?: string;
   readonly fullText?: string;
   readonly url?: string;
+  readonly engagement?: {
+    readonly views?: number;
+    readonly saves?: number;
+    readonly shares?: number;
+    readonly comments?: number;
+    readonly votes?: number;
+  };
+  readonly timeline?: readonly BillAction[];
+}
+
+/**
+ * Constitutional flag indicating a potential constitutional concern with a bill
+ */
+export interface ConstitutionalFlag {
+  readonly id?: string | number;
+  readonly type?: string;
+  readonly severity: 'low' | 'medium' | 'high';
+  readonly description: string;
+  readonly affectedArticles?: readonly string[];
+  readonly expertAnalysis?: string;
 }
 
 /**
@@ -114,12 +138,15 @@ export interface Bill {
 export interface Sponsor {
   readonly id: number;
   readonly name: string;
+  readonly legislatorName?: string;
   readonly party: string;
   readonly role: 'primary' | 'co-sponsor';
+  readonly sponsorType?: 'primary' | 'cosponsor' | 'lead';
   readonly district?: string;
   readonly avatarUrl?: string;
   readonly state?: string;
   readonly isPrimary?: boolean;
+  readonly conflictOfInterest?: boolean;
 }
 
 /**

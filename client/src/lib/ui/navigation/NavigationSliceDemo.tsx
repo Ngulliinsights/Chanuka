@@ -217,7 +217,7 @@ export function NavigationSliceDemo() {
             {navigation.breadcrumbs.map((crumb, index) => (
               <React.Fragment key={crumb.path}>
                 {index > 0 && <span className="text-gray-400">/</span>}
-                <span className={crumb.is_active ? 'font-medium' : 'text-gray-600'}>
+                <span className={crumb.isActive ? 'font-medium' : 'text-gray-600'}>
                   {crumb.label}
                 </span>
               </React.Fragment>

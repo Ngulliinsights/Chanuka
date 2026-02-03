@@ -14,7 +14,7 @@ import { ExpertVerificationType } from '@client/lib/types';
 import { GraduationCap } from '../icons/ChanukaIcons';
 
 interface ExpertBadgeProps {
-  verificationType: ExpertVerificationType;
+  verificationType?: ExpertVerificationType;
   credibilityScore?: number;
   showScore?: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -142,7 +142,7 @@ export function ExpertBadge({
     }
   };
 
-  const verificationConfig = getVerificationConfig(verificationType);
+  const verificationConfig = getVerificationConfig(verificationType ?? 'identity');
   const credibilityConfig = getCredibilityConfig(credibilityScore);
   const sizeClasses = getSizeClasses(size);
   const IconComponent = verificationConfig.icon;
@@ -217,7 +217,7 @@ export function ExpertBadge({
  * ExpertBadgeGroup - Display multiple badges for an expert
  */
 interface ExpertBadgeGroupProps {
-  verificationType: ExpertVerificationType;
+  verificationType?: ExpertVerificationType;
   credibilityScore?: number;
   specializations?: string[];
   affiliationType?: 'academic' | 'government' | 'ngo' | 'private' | 'judicial';

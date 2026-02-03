@@ -22,7 +22,7 @@ import {
   Users,
   FileText,
   Megaphone,
-  Pen,
+  Pen as PenTool,
   Bookmark,
 } from 'lucide-react';
 import React from 'react';
@@ -203,7 +203,7 @@ const ActivityFeedComponent = ({
   return (
     <div className={cn('space-y-4', className)}>
       {activities.map(activity => {
-        const IconComponent = getActivityIcon(activity.type);
+        const IconComponent = getActivityIcon(activity.type || 'discussion');
         const isExpanded = expandedItems.has(activity.id);
         const shouldTruncate = activity.content && activity.content.length > 200;
         const displayContent =
@@ -218,7 +218,7 @@ const ActivityFeedComponent = ({
                 {/* User Avatar */}
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={activity.userAvatar} alt={activity.userName} />
-                  <AvatarFallback>{getInitials(activity.userName)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(activity.userName || '')}</AvatarFallback>
                 </Avatar>
 
                 <div className="flex-1 min-w-0">

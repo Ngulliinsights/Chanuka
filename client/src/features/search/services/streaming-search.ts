@@ -7,23 +7,10 @@
 
 import { streamSearch, cancelSearch } from '@client/core/api/search';
 import { logger } from '@client/lib/utils/logger';
+import type { SearchResult, SearchRequest as SearchQuery, SearchProgress } from '@client/lib/types/search';
 
 // Define types locally
-interface SearchResult {
-  id: string;
-  title: string;
-  type: string;
-  content: string;
-  score: number;
-}
-
-interface SearchQuery {
-  q: string;
-  type?: string;
-  limit?: number;
-  offset?: number;
-  filters?: Record<string, any>;
-}
+// Local types removed in favor of shared types
 
 export interface StreamingSearchOptions {
   onResult?: (result: SearchResult) => void;
@@ -34,13 +21,7 @@ export interface StreamingSearchOptions {
   maxResults?: number;
 }
 
-export interface SearchProgress {
-  loaded: number;
-  total: number;
-  percentage: number;
-  currentEngine: string;
-  searchTime: number;
-}
+// Local types removed in favor of shared types
 
 export interface StreamingSearchSession {
   id: string;
@@ -244,8 +225,8 @@ class StreamingSearchService {
 
         const response = await streamSearch(params);
 
-        if (response.status === 200 && response.data) {
-          const { results, totalCount, isComplete: complete, progress } = response.data;
+        if (response) {
+          const { results, totalCount, isComplete: complete, progress } = response;
 
           // Add new results
           if (results && Array.isArray(results)) {

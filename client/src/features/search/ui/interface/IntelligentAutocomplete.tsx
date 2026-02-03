@@ -21,34 +21,7 @@ import { useDebounce } from '@client/lib/hooks/useDebounce';
 import { logger } from '@client/lib/utils/logger';
 
 import { intelligentSearch } from '../../services/intelligent-search';
-
-// ============================================================================
-// Types
-// ============================================================================
-
-interface SearchSuggestion {
-  term: string;
-  type: string;
-  frequency?: number;
-  score?: number;
-  id?: string;
-  metadata?: {
-    description?: string;
-    [key: string]: unknown;
-  };
-}
-
-interface AutocompleteResult {
-  suggestions: SearchSuggestion[];
-  facets: {
-    categories: string[];
-    sponsors: string[];
-    tags: string[];
-    statuses: string[];
-  };
-  query: string;
-  totalSuggestions: number;
-}
+import type { AutocompleteResult, SearchSuggestion } from '@client/lib/types/search';
 
 interface IntelligentAutocompleteProps {
   onSearch: (query: string) => void;
@@ -191,13 +164,13 @@ export function IntelligentAutocomplete({
 
   const handleSelect = useCallback(
     (suggestion: SearchSuggestion) => {
-      setQuery(suggestion.term);
+      setQuery(suggestion.text);
       closeDropdown();
 
       if (onSelect) {
         onSelect(suggestion);
       } else {
-        onSearch(suggestion.term);
+        onSearch(suggestion.text);
       }
     },
     [onSelect, onSearch, closeDropdown]
@@ -321,7 +294,7 @@ export function IntelligentAutocomplete({
         case 'Tab':
           if (state.selectedIndex >= 0 && state.results!.suggestions[state.selectedIndex]) {
             e.preventDefault();
-            setQuery(state.results!.suggestions[state.selectedIndex].term);
+            setQuery(state.results!.suggestions[state.selectedIndex].text);
           }
           break;
       }
@@ -389,7 +362,7 @@ export function IntelligentAutocomplete({
         >
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <div className="font-medium truncate">{suggestion.term}</div>
+              <div className="font-medium truncate">{suggestion.text}</div>
               {suggestion.metadata?.description && (
                 <div className="text-xs text-muted-foreground truncate mt-0.5">
                   {suggestion.metadata.description}
@@ -397,9 +370,8 @@ export function IntelligentAutocomplete({
               )}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              {suggestion.frequency && suggestion.frequency > 1 && (
+              {suggestion.count && suggestion.count > 1 && (
                 <Badge variant="secondary" className="text-xs">
-                  {suggestion.frequency}
                 </Badge>
               )}
               <Badge variant="outline" className="text-xs">

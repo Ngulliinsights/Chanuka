@@ -415,7 +415,21 @@ export class SecurityService {
 }
 
 // Export validation schemas for easy access (if available)
-// export { ValidationSchemas };
+export const ValidationSchemas = {
+  User: {
+    registration: {
+      email: { type: 'string', format: 'email', required: true },
+      password: { type: 'string', minLength: 8, required: true },
+      firstName: { type: 'string', required: true },
+      lastName: { type: 'string', required: true },
+      acceptTerms: { type: 'boolean', required: true },
+    },
+    login: {
+      email: { type: 'string', format: 'email', required: true },
+      password: { type: 'string', required: true },
+    },
+  },
+};
 
 // Export singleton instance
 export const securityService = SecurityService.getInstance();

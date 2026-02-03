@@ -12,6 +12,8 @@
  * - Added comprehensive JSDoc comments
  */
 
+import { Comment as CommunityComment, DiscussionThread } from './community/community-base';
+
 // ============================================================================
 // BILL TYPES
 // ============================================================================
@@ -108,29 +110,6 @@ export interface ModerationFlag {
 }
 
 /**
- * Full-featured community comment with threading and moderation
- */
-export interface CommunityComment extends Comment {
-  // Threading
-  replies: CommunityComment[];
-  replyCount: number;
-  depth: number;
-
-  // Voting
-  userVote?: VoteType;
-
-  // Moderation
-  moderationFlags: ModerationFlag[];
-  reportCount: number;
-
-  // Quality
-  isHighQuality: boolean;
-
-  // Expert features
-  expertVerification?: ExpertVerification;
-}
-
-/**
  * Unified comment for cross-feature compatibility
  */
 export interface UnifiedComment extends BaseComment {
@@ -196,37 +175,8 @@ export interface UnifiedThread {
   typingUsers: readonly string[];
 }
 
-/**
- * Discussion thread with full comment data
- */
-export interface DiscussionThread {
-  id: number;
-  billId: string;
-  title?: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
+// DiscussionThread removed - use shared definition from community module
 
-  // Comments
-  comments: CommunityComment[];
-  totalComments: number;
-  participantCount: number;
-
-  // Moderation
-  isLocked: boolean;
-  lockReason?: string;
-  lockedBy?: string;
-  lockedAt?: string;
-
-  // Quality
-  engagementScore: number;
-  qualityScore: number;
-  expertParticipation: number;
-
-  // Real-time
-  lastActivity: string;
-  activeUsers: readonly string[];
-}
 
 // ============================================================================
 // MODERATION TYPES
@@ -484,388 +434,18 @@ export interface CommunityConfig {
   };
 }
 
-// ============================================================================
-// ADDITIONAL COMMUNITY FEATURES
-// ============================================================================
-
-export interface ActivityItem {
-  id: string;
-  type: string;
-  title?: string;
-  timestamp?: string;
-  metadata?: Readonly<Record<string, unknown>>;
-}
-
-export interface TrendingTopic {
-  id: string;
-  title: string;
-  score: number;
-  tags?: readonly string[];
-}
-
-export interface ExpertInsight {
-  id: string;
-  authorId: string;
-  expertName: string;
-  expertAvatar?: string;
-  title?: string;
-  summary: string;
-  content?: string;
-  confidence?: number;
-  communityValidation?: {
-    upvotes: number;
-    downvotes: number;
-    validationScore: number;
-  };
-  methodology?: string;
-  sources?: readonly string[];
-  policyAreas?: readonly string[];
-  billTitle?: string;
-  billId?: number;
-  comments?: number;
-  shares?: number;
-  lastUpdated?: string;
-  specializations?: readonly string[];
-  timestamp?: string;
-}
-
-export interface Campaign {
-  id: string;
-  title: string;
-  description?: string;
-  goal?: number;
-}
-
-export interface Petition {
-  id: string;
-  title: string;
-  signatures?: number;
-}
-
-export interface VoteRequest {
-  vote: boolean;
-}
-
-export interface TypingIndicator {
-  userId: string;
-  userName: string;
-  billId: string;
-  parentId?: string;
-  timestamp: string;
-}
-
-export interface CommunityFilters {
-  tags?: readonly string[];
-  authors?: readonly string[];
-  dateRange?: { start?: string; end?: string };
-}
-
-export interface TrendingAlgorithmConfig {
-  windowDays?: number;
-  minScore?: number;
-}
-
-export interface CommentFormData {
-  content: string;
-  parentId?: string;
-  billId: string;
-}
-
-export interface CommentValidation {
-  isValid: boolean;
-  errors: {
-    content?: string;
-    length?: string;
-    quality?: string;
-  };
-  warnings: {
-    similarContent?: string;
-    tone?: string;
-  };
-}
-
-export type CommentSortOptionExtended =
-  | CommentSortOption
-  | 'most_voted'
-  | 'controversial'
-  | 'expert_first';
-
-export type CommentFilterOptionExtended =
-  | CommentFilterOption
-  | 'recent';
-
-// ============================================================================
-// EVENT TYPES
-// ============================================================================
-
-export type CommentEventType =
-  | 'comment_added'
-  | 'comment_updated'
-  | 'comment_removed'
-  | 'comment_voted';
-
-export interface CommentUpdateEvent {
-  type: CommentEventType;
-  billId: string;
-  commentId: string;
-  comment?: CommunityComment;
-  userId?: string;
-  timestamp: string;
-}
-
-export type ModerationEventType =
-  | 'comment_reported'
-  | 'comment_moderated'
-  | 'user_warned'
-  | 'user_banned';
-
-export interface ModerationEvent {
-  type: ModerationEventType;
-  commentId?: string;
-  userId?: string;
-  moderatorId?: string;
-  action?: string;
-  reason?: string;
-  timestamp: string;
-}
-
-// ============================================================================
-// QUALITY & METRICS
-// ============================================================================
-
-export interface CommentQualityMetrics {
-  length: number;
-  readabilityScore: number;
-  sentimentScore: number;
-  hasLinks: boolean;
-  hasCitations: boolean;
-  engagementRatio: number;
-  responseRate: number;
-}
-
-export interface QualityThresholds {
-  minLength: number;
-  maxLength: number;
-  minReadabilityScore: number;
-  minSentimentScore: number;
-  spamKeywords: readonly string[];
-  requiredElements?: readonly string[];
-}
-
-export interface ModerationAppeal {
-  id: number;
-  commentId: string;
-  userId: string;
-  moderationActionId: string;
-  reason: string;
-  description: string;
-  evidence?: readonly string[];
-  createdAt: string;
-  status: 'pending' | 'under_review' | 'approved' | 'denied';
-  reviewedBy?: string;
-  reviewedAt?: string;
-  resolution?: string;
-  resolutionNotes?: string;
-}
-
-export interface ModerationStats {
-  totalReports: number;
-  pendingReports: number;
-  resolvedReports: number;
-  averageResolutionTime: number;
-  topViolationTypes: ReadonlyArray<{
-    type: ViolationType;
-    count: number;
-  }>;
-  moderationActions: ReadonlyArray<{
-    action: string;
-    count: number;
-  }>;
-}
-
-export interface CommunityGuidelines {
-  id: number;
-  title: string;
-  description: string;
-  rules: ReadonlyArray<{
-    id: number;
-    title: string;
-    description: string;
-    examples: readonly string[];
-    consequences: readonly string[];
-  }>;
-  lastUpdated: string;
-}
-
-export type UserModerationStanding =
-  | 'good_standing'
-  | 'warned'
-  | 'restricted'
-  | 'banned';
-
-export interface UserModerationHistory {
-  userId: string;
-  warnings: number;
-  violations: number;
-  bans: number;
-  reputation: number;
-  lastViolation?: string;
-  status: UserModerationStanding;
-}
-
-export interface LocalImpactMetrics {
-  region: string;
-  score: number;
-  changes: Readonly<Record<string, number>>;
-}
-
-// ============================================================================
-// TYPE UNIONS
-// ============================================================================
-
-export type CommunityEntity =
-  | ActivityItem
-  | TrendingTopic
-  | ExpertInsight
-  | Campaign
-  | Petition
-  | DiscussionThread
-  | CommunityComment;
-
-// ============================================================================
-// EXPERT TYPES
-// ============================================================================
-
-export type ExpertVerificationType = 'official' | 'domain' | 'identity';
-export type CredentialType = 'education' | 'certification' | 'experience' | 'publication';
-export type AffiliationType = 'academic' | 'government' | 'ngo' | 'private' | 'judicial';
-
-export interface ExpertCredential {
-  id: string;
-  type: CredentialType;
-  title: string;
-  institution: string;
-  year?: number;
-  verified: boolean;
-  verificationDate?: string;
-  verificationSource?: string;
-}
-
-export interface ExpertAffiliation {
-  id: string;
-  organization: string;
-  role: string;
-  type: AffiliationType;
-  current: boolean;
-  verified: boolean;
-  startDate?: string;
-  endDate?: string;
-}
-
-export interface Expert {
-  id: string;
-  name: string;
-  avatar?: string;
-  verificationType: ExpertVerificationType;
-  credentials: readonly ExpertCredential[];
-  affiliations: readonly ExpertAffiliation[];
-  specializations: readonly string[];
-  credibilityScore: number;
-  contributionCount: number;
-  avgCommunityRating: number;
-  verified: boolean;
-  verificationDate: string;
-  bio?: string;
-  contactInfo?: {
-    email?: string;
-    website?: string;
-    linkedin?: string;
-  };
-}
-
-export type ContributionType = 'analysis' | 'comment' | 'review' | 'amendment_suggestion';
-export type ContributionStatus = 'draft' | 'published' | 'under_review' | 'disputed';
-
-export interface ExpertContribution {
-  id: string;
-  expertId: string;
-  billId: number;
-  type: ContributionType;
-  content: string;
-  confidence: number;
-  methodology?: string;
-  sources?: readonly string[];
-  tags: readonly string[];
-  createdAt: string;
-  lastUpdated: string;
-  communityValidation: {
-    upvotes: number;
-    downvotes: number;
-    comments: number;
-    userVote?: VoteType;
-    validationScore: number;
-  };
-  status: ContributionStatus;
-}
-
-export type ControversyLevel = 'low' | 'medium' | 'high';
-
-export interface ExpertConsensus {
-  billId: number;
-  topic: string;
-  totalExperts: number;
-  agreementLevel: number;
-  majorityPosition: string;
-  minorityPositions: ReadonlyArray<{
-    position: string;
-    expertCount: number;
-    experts: readonly string[];
-  }>;
-  controversyLevel: ControversyLevel;
-  lastUpdated: string;
-}
-
-export type VerificationStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
-export type FeedbackVote = 'approve' | 'reject' | 'needs_revision';
-
-export interface VerificationWorkflow {
-  id: string;
-  contributionId: string;
-  expertId: string;
-  reviewerId?: string;
-  status: VerificationStatus;
-  reviewNotes?: string;
-  reviewDate?: string;
-  communityFeedback: ReadonlyArray<{
-    userId: string;
-    feedback: string;
-    vote: FeedbackVote;
-    timestamp: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CredibilityMetrics {
-  expertId: string;
-  overallScore: number;
-  components: {
-    credentialScore: number;
-    affiliationScore: number;
-    communityScore: number;
-    contributionQuality: number;
-    consensusAlignment: number;
-  };
-  methodology: {
-    description: string;
-    factors: ReadonlyArray<{
-      name: string;
-      weight: number;
-      description: string;
-    }>;
-  };
-  lastCalculated: string;
-}
+// Community types moved to community/community-base.ts
+// - ActivityItem
+// - TrendingTopic
+// - ExpertInsight
+// - Campaign
+// - Petition
+// - VoteRequest
+// - TypingIndicator
+// - CommunityFilters
+// - TrendingAlgorithmConfig
+// - CommentFormData
+// - CommentValidation
 
 // ============================================================================
 // ONBOARDING TYPES
@@ -1008,5 +588,35 @@ export interface UserPersonaProfile {
     confidence: number;
     detectedAt: string;
     reason: string;
+  }>;
+}
+
+// ============================================================================
+// VERIFICATION TYPES
+// ============================================================================
+
+/**
+ * Verification status
+ */
+export type VerificationStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
+
+/**
+ * Verification workflow
+ */
+export interface VerificationWorkflow {
+  id: string;
+  contributionId: string;
+  createdAt: string;
+  updatedAt: string;
+  status: VerificationStatus;
+  expertId: string;
+  reviewerId?: string;
+  reviewDate?: string;
+  reviewNotes?: string;
+  communityFeedback: ReadonlyArray<{
+    userId: string;
+    feedback: string;
+    vote: 'approve' | 'reject' | 'needs_revision';
+    timestamp: string;
   }>;
 }

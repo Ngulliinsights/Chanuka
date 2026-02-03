@@ -16,60 +16,13 @@
 import { privacyAnalyticsApiService } from '@client/core/api/privacy';
 import { logger } from '@client/lib/utils/logger';
 import { privacyUtils, privacyCompliance } from '@client/lib/utils/privacy-compliance';
+import type { AnalyticsEvent, AnalyticsConfig, UserConsent, AnalyticsSystemMetrics as AnalyticsMetrics } from '@client/lib/types/analytics';
 
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
 
-interface AnalyticsEvent {
-  id: string;
-  type: 'track' | 'page_view' | 'engagement' | 'performance' | 'error';
-  category: string;
-  action: string;
-  label?: string;
-  value?: number;
-  timestamp: string;
-  sessionId: string;
-  userId?: string;
-  anonymized: boolean;
-  consentGiven: boolean;
-  metadata?: Record<string, unknown>;
-}
-
-interface AnalyticsConfig {
-  enabledCategories: ReadonlyArray<string>;
-  anonymizeData: boolean;
-  respectDoNotTrack: boolean;
-  consentRequired: boolean;
-  retentionDays: number;
-  batchSize: number;
-  flushInterval: number;
-  maxQueueSize: number;
-  maxRetries: number;
-  retryBackoffMs: number;
-  debounceMs: number;
-  enableCircuitBreaker: boolean;
-}
-
-interface UserConsent {
-  analytics: boolean;
-  performance: boolean;
-  functional: boolean;
-  timestamp: string;
-  version: string;
-}
-
-interface AnalyticsMetrics {
-  totalEvents: number;
-  anonymizedEvents: number;
-  consentedEvents: number;
-  categoriesTracked: string[];
-  retentionCompliance: boolean;
-  lastFlush: string;
-  queueSize: number;
-  failedSends: number;
-  circuitBreakerOpen: boolean;
-}
+// Local types removed in favor of shared types
 
 interface ExportedUserData {
   events: AnalyticsEvent[];

@@ -143,13 +143,13 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
           <div
             key={insight.id}
             className="p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-            onClick={() => toggleExpanded(insight.id)}
+            onClick={() => toggleExpanded(String(insight.id))}
           >
             <div className="flex items-start gap-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={insight.expertAvatar} alt={insight.expertName} />
                 <AvatarFallback className="text-xs">
-                  {getInitials(insight.expertName)}
+                  {getInitials(insight.expertName || '')}
                 </AvatarFallback>
               </Avatar>
 
@@ -197,8 +197,8 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
   return (
     <div className={cn('space-y-4', className)}>
       {insights.map(insight => {
-        const isExpanded = expandedInsights.has(insight.id);
-        const userVote = votedInsights.get(insight.id);
+        const isExpanded = expandedInsights.has(String(insight.id));
+        const userVote = votedInsights.get(String(insight.id));
         const content = insight.content ?? '';
         const shouldTruncate = content.length > 300;
         const displayContent =
@@ -210,7 +210,7 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
               <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={insight.expertAvatar} alt={insight.expertName} />
-                  <AvatarFallback>{getInitials(insight.expertName)}</AvatarFallback>
+                  <AvatarFallback className="cursor-pointer" onClick={() => toggleExpanded(String(insight.id))}>{getInitials(insight.expertName || '')}</AvatarFallback>
                 </Avatar>
 
                 <div className="flex-1 min-w-0">
@@ -280,7 +280,7 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => toggleExpanded(insight.id)}
+                      onClick={() => toggleExpanded(String(insight.id))}
                       className="text-xs p-0 h-auto mt-2"
                     >
                       {isExpanded ? (
@@ -421,7 +421,7 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleVote(insight.id, 'up')}
+                    onClick={() => handleVote(String(insight.id), 'up')}
                     className={cn(
                       'flex items-center gap-2',
                       userVote === 'up' && 'text-green-600 bg-green-50'
@@ -435,7 +435,7 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleVote(insight.id, 'down')}
+                    onClick={() => handleVote(String(insight.id), 'down')}
                     className={cn(
                       'flex items-center gap-2',
                       userVote === 'down' && 'text-red-600 bg-red-50'

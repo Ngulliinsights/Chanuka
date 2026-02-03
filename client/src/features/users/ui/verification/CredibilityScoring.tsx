@@ -19,14 +19,14 @@ import {
 import { cn } from '@lib/utils';
 
 interface CredibilityIndicatorProps {
-  score: number;
+  score?: number;
   size?: 'sm' | 'md' | 'lg';
   showDetails?: boolean;
   className?: string;
 }
 
 export function CredibilityIndicator({
-  score,
+  score = 0,
   size = 'md',
   showDetails = false,
   className,

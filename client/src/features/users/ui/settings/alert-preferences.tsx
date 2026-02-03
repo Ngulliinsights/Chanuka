@@ -116,6 +116,51 @@ export function AlertPreferences({ user_id }: AlertPreferencesProps) {
     loadSponsors();
   }, []);
 
+const defaultPreferences: AlertPreferences = {
+  statusChanges: false,
+  newComments: false,
+  votingSchedule: false,
+  amendments: false,
+  updateFrequency: 'immediate',
+  notificationChannels: {
+    inApp: true,
+    email: false,
+    push: false,
+    sms: false,
+  },
+  quietHours: {
+    enabled: false,
+    startTime: '22:00',
+    endTime: '07:00',
+  },
+  smartFiltering: {
+    enabled: false,
+    interestBasedFiltering: false,
+    priorityThreshold: 'low',
+    categoryFilters: [],
+    keywordFilters: [],
+    sponsorFilters: [],
+  },
+  advancedSettings: {
+    digestSchedule: {
+      enabled: false,
+      frequency: 'daily',
+      timeOfDay: '09:00',
+    },
+    escalationRules: {
+      enabled: false,
+      urgentBillsImmediate: true,
+      importantSponsorsImmediate: true,
+      highEngagementImmediate: false,
+    },
+    batchingRules: {
+      maxBatchSize: 5,
+      batchTimeWindow: 30,
+      similarUpdatesGrouping: true,
+    },
+  },
+};
+
   const loadPreferences = async () => {
     try {
       const response = await fetch('/api/alert-preferences', {
@@ -126,7 +171,11 @@ export function AlertPreferences({ user_id }: AlertPreferencesProps) {
 
       if (response.ok) {
         const data = await response.json();
-        setPreferences(data.data.billTracking);
+        // Merge API data with defaults to ensure all required fields exist
+        setPreferences({
+          ...defaultPreferences,
+          ...data.data.billTracking,
+        });
       }
     } catch (error) {
       logger.error('Error loading preferences:', { component: 'Chanuka' }, error);

@@ -10,9 +10,9 @@ import { Bill } from '@client/lib/types/bill';
 
 import type {
   BillUpdate,
-  BillTrackingPreference as BillTrackingPreferences,
   BillEngagementMetrics as EngagementMetrics
 } from '@client/lib/types/bill';
+import type { BillTrackingPreferences } from '@client/core/api/types/preferences';
 import { logger } from '@client/lib/utils/logger';
 
 

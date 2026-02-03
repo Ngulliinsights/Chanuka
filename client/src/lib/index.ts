@@ -59,14 +59,14 @@ export * from './infrastructure';
 export { useProgressiveDisclosure } from './hooks';
 
 // Shared Libraries - Export only non-conflicting items
-export {
-  ProtectedRoute,
-  queryClient,
-  queryKeys,
-  invalidateQueries,
-  prefetchQueries,
-  cacheUtils,
-} from './lib';
+// export {
+//   ProtectedRoute,
+//   queryClient,
+//   queryKeys,
+//   invalidateQueries,
+//   prefetchQueries,
+//   cacheUtils,
+// } from './lib';
 
 // Cross-cutting services - Export only existing services
 // export {

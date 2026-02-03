@@ -8,7 +8,7 @@
  *
  * @example
  * // Import base community types
- * import type { Comment, DiscussionThread, Expert } from '@client/lib/types/community';
+ * import type { Comment, DiscussionThread, CommunityExpert } from '@client/lib/types/community';
  *
  * // Import hook types
  * import type { UseCommunityResult, UseDiscussionResult } from '@client/lib/types/community';
@@ -26,6 +26,7 @@ export type {
   DiscussionThreadMetadata,
   ThreadParticipant,
   Comment,
+  Comment as CommunityComment,
   CommentVotes,
   CreateCommentRequest,
   UpdateCommentRequest,
@@ -37,10 +38,14 @@ export type {
   VoteType,
   VoteResponse,
   VoteRequest,
+
   Expert,
+  Expert as CommunityExpert,
   ExpertDomain,
   ExpertCredential,
+  ExpertCredential as CommunityExpertCredential,
   ExpertVerificationResponse,
+  ExpertVerificationResponse as CommunityExpertVerificationResponse,
   ExpertInsight,
   ExpertInsightSubmission,
   ExpertInsightSubmissionResponse,
@@ -60,6 +65,8 @@ export type {
   CommentCreateData,
   ActivityFeedOptions,
   LocationFilter,
+  Campaign,
+  Petition,
   SearchOptions,
   ExtendedCommunityStats,
   ExtendedLocalImpactMetrics,
@@ -69,7 +76,16 @@ export type {
   ThreadEvent,
   UserEvent,
   ReportResponse,
+  CommunitySearchResult,
   SearchResult,
+  ExpertAffiliation,
+  ExpertContribution,
+  ExpertConsensus,
+  CredibilityMetrics,
+  CommunityValidation as CommunityValidationType,
+  VerificationWorkflow as VerificationWorkflowType,
+  ExpertVerificationType,
+  ContributionType,
 } from './community-base';
 
 export {
@@ -158,7 +174,7 @@ export type {
 } from './community-base';
 
 // Internal imports for utility functions
-import type { Comment, DiscussionThread, Expert, ExpertDomain, ActivityType } from './community-base';
+import type { Comment, DiscussionThread, Expert as CommunityExpert, ExpertDomain, ActivityType } from './community-base';
 
 // ============================================================================
 // Utility Functions
@@ -206,7 +222,7 @@ export function createDiscussionThreadDefaults(
 /**
  * Create a new expert with default values
  */
-export function createExpertDefaults(overrides?: Partial<Expert>): Expert {
+export function createExpertDefaults(overrides?: Partial<CommunityExpert>): CommunityExpert {
   return {
     id: 0,
     userId: 0,
@@ -216,7 +232,7 @@ export function createExpertDefaults(overrides?: Partial<Expert>): Expert {
     verifiedAt: new Date().toISOString(),
     verificationLevel: 'pending',
     ...overrides,
-  } as Expert;
+  } as CommunityExpert;
 }
 
 /**
@@ -290,7 +306,7 @@ export function isCommentFromExpert(comment: Comment): boolean {
 /**
  * Check if expert is verified
  */
-export function isExpertVerified(expert: Expert): boolean {
+export function isExpertVerified(expert: CommunityExpert): boolean {
   return expert.verificationLevel === 'verified';
 }
 

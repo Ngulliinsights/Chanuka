@@ -1,46 +1,11 @@
 # Project Structure
 
-**Generated:** January 27, 2026 at 11:30 AM
+**Generated:** February 3, 2026 at 12:14 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,445
+**Total Items:** 3,452
 
 ```
 .
-├── @types/
-│   ├── core/
-│   │   ├── api.d.ts
-│   │   ├── browser.d.ts
-│   │   ├── dashboard.d.ts
-│   │   ├── error.d.ts
-│   │   ├── index.ts
-│   │   ├── loading.d.ts
-│   │   ├── mobile.d.ts
-│   │   ├── performance.d.ts
-│   │   └── storage.d.ts
-│   ├── features/
-│   │   ├── analytics.d.ts
-│   │   ├── bills.d.ts
-│   │   ├── index.ts
-│   │   ├── search.d.ts
-│   │   └── users.d.ts
-│   ├── global/
-│   │   ├── declarations.d.ts
-│   │   ├── index.ts
-│   │   └── shims.d.ts
-│   ├── server/
-│   │   ├── api-response.d.ts
-│   │   ├── features.d.ts
-│   │   ├── index.ts
-│   │   ├── middleware.d.ts
-│   │   └── services.d.ts
-│   ├── shared/
-│   │   ├── core.d.ts
-│   │   ├── database.d.ts
-│   │   ├── design-system.d.ts
-│   │   ├── errors.d.ts
-│   │   ├── index.ts
-│   │   └── ui.d.ts
-│   └── index.ts
 ├── client/
 │   ├── public/
 │   │   ├── Chanuka_logo.png
@@ -106,9 +71,11 @@
 │   │   │   │   │   ├── community.ts
 │   │   │   │   │   ├── config.ts
 │   │   │   │   │   ├── engagement.ts
+│   │   │   │   │   ├── error-response.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── performance.ts
 │   │   │   │   │   ├── preferences.ts
+│   │   │   │   │   ├── request.ts
 │   │   │   │   │   ├── service.ts
 │   │   │   │   │   ├── shared-imports.ts
 │   │   │   │   │   └── sponsor.ts
@@ -317,7 +284,6 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── lookup.ts
 │   │   │   │   ├── navigation-service.ts
-│   │   │   │   ├── navigation-wrapper.ts
 │   │   │   │   ├── NavigationConsistency.test.tsx
 │   │   │   │   ├── NavigationConsistency.tsx
 │   │   │   │   ├── NavigationPerformance.test.tsx
@@ -329,6 +295,7 @@
 │   │   │   │   ├── route-validation.ts
 │   │   │   │   ├── search.ts
 │   │   │   │   ├── test-navigation.ts
+│   │   │   │   ├── types.ts
 │   │   │   │   ├── utils.ts
 │   │   │   │   └── validation.ts
 │   │   │   ├── performance/
@@ -342,7 +309,8 @@
 │   │   │   ├── personalization/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── persona-detector.test.tsx
-│   │   │   │   └── persona-detector.ts
+│   │   │   │   ├── persona-detector.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── realtime/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── use-bill-tracking.ts
@@ -386,6 +354,8 @@
 │   │   │   │   │   │   ├── SecureForm.tsx
 │   │   │   │   │   │   ├── SecurityDashboard.tsx
 │   │   │   │   │   │   └── SecuritySettings.tsx
+│   │   │   │   │   ├── icons/
+│   │   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   │   ├── privacy/
 │   │   │   │   │   │   ├── CookieConsentBanner.tsx
 │   │   │   │   │   │   ├── DataUsageReportDashboard.tsx
@@ -489,7 +459,8 @@
 │   │   │   │   │   ├── metrics/
 │   │   │   │   │   │   └── CivicScoreCard.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── auth/
 │   │   │   │   └── pages/
 │   │   │   │       ├── auth-page.tsx
@@ -565,7 +536,6 @@
 │   │   │   │   │   ├── stats-overview.tsx
 │   │   │   │   │   └── virtual-bill-grid.tsx
 │   │   │   │   ├── BillAnalysis.tsx
-│   │   │   │   ├── BillCard.tsx
 │   │   │   │   ├── BillHeader.tsx
 │   │   │   │   ├── BillList.tsx
 │   │   │   │   ├── hooks.ts
@@ -604,8 +574,7 @@
 │   │   │   │   │   ├── hub/
 │   │   │   │   │   │   └── CommunityHub.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── dashboard/
 │   │   │   │   └── pages/
 │   │   │   │       └── dashboard.tsx
@@ -722,6 +691,8 @@
 │   │   │   │   │   │   ├── SecureForm.tsx
 │   │   │   │   │   │   ├── SecurityDashboard.tsx
 │   │   │   │   │   │   └── SecuritySettings.tsx
+│   │   │   │   │   ├── icons/
+│   │   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   │   ├── privacy/
 │   │   │   │   │   │   ├── CookieConsentBanner.tsx
 │   │   │   │   │   │   ├── DataUsageReportDashboard.tsx
@@ -769,6 +740,8 @@
 │   │   │   │   │   │   ├── AuthInput.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── useLoginForm.ts
+│   │   │   │   │   ├── icons/
+│   │   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   │   ├── onboarding/
 │   │   │   │   │   │   └── UserJourneyOptimizer.tsx
 │   │   │   │   │   ├── profile/
@@ -885,7 +858,6 @@
 │   │   │   │   │   ├── Tabs.tsx
 │   │   │   │   │   ├── Textarea.tsx
 │   │   │   │   │   ├── ThemeToggle.tsx
-│   │   │   │   │   ├── tooltip.tsx
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── validation.ts
 │   │   │   │   ├── lib/
@@ -1024,6 +996,7 @@
 │   │   │   │   ├── use-safe-query.ts
 │   │   │   │   ├── use-system.ts
 │   │   │   │   ├── use-toast.ts
+│   │   │   │   ├── useAnalytics.ts
 │   │   │   │   ├── useCleanup.tsx
 │   │   │   │   ├── useDatabaseStatus.ts
 │   │   │   │   ├── useDebounce.ts
@@ -1038,6 +1011,8 @@
 │   │   │   │   ├── useProgressiveDisclosure.ts
 │   │   │   │   ├── useSafeEffect.ts
 │   │   │   │   ├── useSeamlessIntegration.ts
+│   │   │   │   ├── useSearch.ts
+│   │   │   │   ├── useSecurity.ts
 │   │   │   │   └── useService.ts
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── asset-loading/
@@ -1175,16 +1150,19 @@
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── ui.ts
 │   │   │   │   ├── analytics.ts
+│   │   │   │   ├── arguments.ts
 │   │   │   │   ├── browser.ts
 │   │   │   │   ├── core.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── loading.ts
 │   │   │   │   ├── lucide-react.d.ts
 │   │   │   │   ├── mobile.ts
+│   │   │   │   ├── monitoring.ts
 │   │   │   │   ├── navigation.ts
 │   │   │   │   ├── search-response.ts
 │   │   │   │   ├── search.ts
 │   │   │   │   ├── security.ts
+│   │   │   │   ├── storage.ts
 │   │   │   │   └── user-dashboard.ts
 │   │   │   ├── ui/
 │   │   │   │   ├── accessibility/
@@ -1364,6 +1342,7 @@
 │   │   │   │   │   ├── recovery.ts
 │   │   │   │   │   ├── ScriptFallback.tsx
 │   │   │   │   │   ├── test-loading.ts
+│   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── validation.ts
 │   │   │   │   ├── mobile/
 │   │   │   │   │   ├── data-display/
@@ -1435,6 +1414,7 @@
 │   │   │   │   │   ├── ProgressiveDisclosureSimple.tsx
 │   │   │   │   │   ├── quick-access-nav.tsx
 │   │   │   │   │   ├── recovery.ts
+│   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── validation.ts
 │   │   │   │   ├── notifications/
 │   │   │   │   │   ├── index.ts
@@ -1548,6 +1528,21 @@
 │   ├── project.json
 │   ├── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   ├── tailwind.config.ts
+│   ├── ts2307_full.txt
+│   ├── ts2307_remaining.txt
+│   ├── tsc_2307_errors.txt
+│   ├── tsc_all_errors.txt
+│   ├── tsc_bills.txt
+│   ├── tsc_community_2.txt
+│   ├── tsc_community.txt
+│   ├── tsc_errors.txt
+│   ├── tsc_output_2.txt
+│   ├── tsc_output_3.txt
+│   ├── tsc_output_4.txt
+│   ├── tsc_output.txt
+│   ├── tsc_remaining.txt
+│   ├── tsc_sample.txt
+│   ├── tsc_users.txt
 │   ├── tsconfig.json
 │   ├── tsconfig.tsbuildinfo
 │   ├── typecheck_error_2.log
@@ -1786,6 +1781,7 @@
 │   │   ├── Validating Legislative Intelligence Market.md
 │   │   └── Validating Parliamentary Compliance Infrastructure.md
 │   ├── BOUNDARY_DEFINITIONS.md
+│   ├── CODEBASE_CONTEXT.md
 │   ├── GOVERNOR_INTEGRATION_PHASE1.md
 │   ├── IMPORT_PATH_GOVERNANCE.md
 │   ├── MIGRATION_LOG.md
@@ -3413,6 +3409,10 @@
 ├── archive-docs.sh
 ├── CHANGELOG.md
 ├── clear-sw.html
+├── community_errors_after.txt
+├── community_errors_final.txt
+├── community_errors_v2.txt
+├── community_errors.txt
 ├── COMPLETION_STRATEGY.ts
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
@@ -3424,6 +3424,9 @@
 ├── ERROR_EXTRACTION_SUMMARY.txt
 ├── errors-comprehensive.json
 ├── errors.json
+├── expert_profile_errors.txt
+├── final_tsc_check.txt
+├── full_tsc_errors.txt
 ├── generate-structure.mjs
 ├── knip.config.ts
 ├── knip.json
@@ -3444,10 +3447,14 @@
 ├── start-dev.js
 ├── tailwind.config.js
 ├── test_api_integration.js
+├── tsc_output.txt
+├── tsc_remaining.txt
+├── tsc_search.txt
 ├── tsconfig.json
 ├── tsconfig.server.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
+├── type-errors.txt
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
 └── vitest.workspace.ts

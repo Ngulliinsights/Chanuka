@@ -98,7 +98,7 @@ export function DiscussionThread({
         filtered = filtered.filter(comment => comment.parentId);
         break;
       case 'flagged':
-        filtered = filtered.filter(comment => comment.flagCount && comment.flagCount > 0);
+        // filtered = filtered.filter(comment => comment.flagCount && comment.flagCount > 0);
         break;
     }
 
@@ -108,7 +108,7 @@ export function DiscussionThread({
         filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         break;
       case 'most_liked':
-        filtered.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+        filtered.sort((a, b) => (b.votes?.up || 0) - (a.votes?.up || 0));
         break;
       case 'most_replied':
         filtered.sort((a, b) => (b.replyCount || 0) - (a.replyCount || 0));
@@ -328,7 +328,7 @@ export function DiscussionThread({
               onReport={onReportComment}
               onModerate={onModerateComment}
               onReply={parentId => setReplyingTo(parentId)}
-              isReplying={replyingTo === comment.id}
+              isReplying={replyingTo === String(comment.id)}
               onCancelReply={() => setReplyingTo(null)}
             />
           ))
@@ -441,36 +441,37 @@ function CommentItem({
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="font-medium">{comment.author?.name || 'Anonymous'}</span>
+              <span className="font-medium">{comment.authorName || 'Anonymous'}</span>
               <span className="text-xs text-muted-foreground">
                 {new Date(comment.createdAt).toLocaleDateString()}
               </span>
-              {comment.isModerated && (
+              {/* comment.isModerated */}
+              {/* {comment.isModerated && (
                 <Badge variant="destructive" className="text-xs">
                   Moderated
                 </Badge>
-              )}
+              )} */}
             </div>
             <p className="text-sm mb-3">{comment.content}</p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <button
-                onClick={() => onVote(comment.id, 'up')}
+                onClick={() => onVote(String(comment.id), 'up')}
                 className="flex items-center gap-1 hover:text-foreground"
               >
-                👍 {comment.upvotes || 0}
+                👍 {comment.votes?.up || 0}
               </button>
               <button
-                onClick={() => onVote(comment.id, 'down')}
+                onClick={() => onVote(String(comment.id), 'down')}
                 className="flex items-center gap-1 hover:text-foreground"
               >
-                👎 {comment.downvotes || 0}
+                👎 {comment.votes?.down || 0}
               </button>
-              <button onClick={() => onReply(comment.id)} className="hover:text-foreground">
+              <button onClick={() => onReply(String(comment.id))} className="hover:text-foreground">
                 Reply
               </button>
               {canModerate && (
                 <button
-                  onClick={() => onModerate(comment.id, 'hide', 'Inappropriate content')}
+                  onClick={() => onModerate(String(comment.id), 'hide', 'Inappropriate content')}
                   className="hover:text-foreground"
                 >
                   Moderate

@@ -101,4 +101,21 @@ export class UnifiedRateLimiter implements SecurityComponent {
   reset(key: string): void {
     this.requests.delete(key);
   }
+  getRateLimitInfo(key: string): {
+    currentRequests: number;
+    maxRequests: number;
+    windowMs: number;
+    blocked: boolean;
+  } {
+    const record = this.requests.get(key);
+    const count = record ? record.count : 0;
+    const blocked = count > this.config.maxRequests;
+    
+    return {
+      currentRequests: count,
+      maxRequests: this.config.maxRequests,
+      windowMs: this.config.windowMs,
+      blocked
+    };
+  }
 }

@@ -6,16 +6,17 @@
  */
 
 // Re-export the consolidated community service
-export { CommunityService, communityService } from './community-service';
+// export { CommunityService, communityService } from './community-service';
 
 // Backend service for community API integration (real API with WebSocket support)
 export { communityBackendService } from './backend';
-export { communityBackend } from './backend'; // Alias for flexibility
+export { communityBackendService as communityService } from './backend'; // Alias for backward compatibility w/o type check mismatch if possible, or just remove if types differ.
+// export { communityBackend } from './backend'; // Invalid export
 
 // Export types
-export type {
-  CommunityServiceConfig,
-  DiscussionCreateRequest,
-  CommentCreateRequest,
-  ModerationRequest,
-} from './community-service';
+// export type {
+//   CommunityServiceConfig,
+//   DiscussionCreateRequest,
+//   CommentCreateRequest,
+//   ModerationRequest,
+// } from './community-service';

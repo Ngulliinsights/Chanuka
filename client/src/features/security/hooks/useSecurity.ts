@@ -4,9 +4,10 @@
  */
 
 
-import { clientRateLimiter, RateLimitConfigs } from '@client/security/rate-limiter';
-import { securityService, SecurityStatus } from '@client/security/security-service';
-import { SecurityThreat } from '@client/security/vulnerability-scanner';
+import { clientRateLimiter, RateLimitConfigs } from '@client/core/security/rate-limiter';
+import { securityService, SecurityStatus } from '@client/core/security/security-service';
+export type { SecurityStatus };
+import { SecurityThreat } from '@client/core/security/vulnerability-scanner';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Constants extracted to module level for better performance
@@ -293,7 +294,13 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
 /**
  * Optimized hook for form input validation and sanitization
  */
-export function useSecureForm<T extends Record<string, unknown>>(
+// Re-export ValidationSchemas
+export { ValidationSchemas } from '@client/core/security/security-service';
+
+/**
+ * Optimized hook for form input validation and sanitization
+ */
+export function useSecureForm<T extends Record<string, any>>(
   schema: unknown,
   initialValues: T
 ) {

@@ -1,0 +1,42 @@
+src/features/community/hooks/useLegislativeBrief.ts(10,39): error TS2307: Cannot find module '@/server/features/argument-intelligence' or its corresponding type declarations.
+src/features/community/services/backend.ts(329,54): error TS2304: Cannot find name 'DiscussionThreadMetadata'.
+src/features/community/services/backend.ts(372,9): error TS2322: Type 'string | undefined' is not assignable to type 'number | undefined'.
+src/features/community/services/index.ts(9,52): error TS2307: Cannot find module './community-service' or its corresponding type declarations.
+src/features/community/services/index.ts(13,10): error TS2614: Module '"./backend"' has no exported member 'communityBackend'. Did you mean to use 'import communityBackend from "./backend"' instead?
+src/features/community/services/index.ts(21,8): error TS2307: Cannot find module './community-service' or its corresponding type declarations.
+src/features/community/store/slices/communitySlice.tsx(109,11): error TS2430: Interface 'ExtendedExpertInsight' incorrectly extends interface 'ExpertInsight'.
+src/features/community/store/slices/communitySlice.tsx(680,7): error TS2352: Conversion of type 'Promise<{ members: number; activeThreads: number; postsToday: number; }>' to type 'Promise<CommunityStats>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/features/community/ui/activity/ActivityFeed.tsx(70,16): error TS2304: Cannot find name 'PenTool'.
+src/features/community/ui/activity/ActivityFeed.tsx(221,48): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/features/community/ui/activity/ActivityFeed.tsx(299,20): error TS18048: 'activity.trendingScore' is possibly 'undefined'.
+src/features/community/ui/discussion/CommentItem.tsx(76,50): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(109,56): error TS2339: Property 'qualityScore' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/CommentItem.tsx(142,19): error TS2339: Property 'isModerated' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/CommentItem.tsx(152,45): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(152,74): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(154,30): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(156,28): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/features/community/ui/discussion/CommentItem.tsx(162,66): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(164,28): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(166,45): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/CommentItem.tsx(195,22): error TS2339: Property 'isModerated' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/CommentItem.tsx(219,61): error TS2339: Property 'upvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/CommentItem.tsx(229,61): error TS2339: Property 'downvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(95,56): error TS2339: Property 'parentId' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(98,55): error TS2339: Property 'parentId' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(101,55): error TS2339: Property 'flagCount' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(101,76): error TS2339: Property 'flagCount' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(111,36): error TS2339: Property 'upvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(111,55): error TS2339: Property 'upvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(444,54): error TS2551: Property 'author' does not exist on type 'CommunityComment'. Did you mean 'authorId'?
+src/features/community/ui/discussion/DiscussionThread.tsx(448,24): error TS2339: Property 'isModerated' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(460,29): error TS2339: Property 'upvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/discussion/DiscussionThread.tsx(466,29): error TS2339: Property 'downvotes' does not exist on type 'CommunityComment'.
+src/features/community/ui/expert/ExpertInsights.tsx(146,43): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(152,32): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(200,49): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(201,44): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(213,48): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(283,53): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(424,47): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/community/ui/expert/ExpertInsights.tsx(438,47): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.

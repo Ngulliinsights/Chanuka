@@ -7,7 +7,7 @@ import { Bill, Comment, Sponsor as SharedSponsor } from '@client/lib/types';
 
 // Re-export shared Sponsor to maintain import compatibility where possible,
 // but users will need to adapt to the new structure (e.g. name -> legislatorName)
-export type Sponsor = SharedSponsor & {
+export type BillSponsor = SharedSponsor & {
   // Augment with UI-specific fields if necessary, or strictly use shared type
   conflictOfInterest?: ConflictOfInterest[];
 };

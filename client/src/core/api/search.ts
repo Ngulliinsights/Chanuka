@@ -1,5 +1,6 @@
-import type { SearchRequest, SaveSearchRequest } from '@client/lib/types/search';
 import type {
+  SearchRequest,
+  SaveSearchRequest,
   SearchResponse,
   SearchSuggestion,
   SearchHistory,
@@ -8,7 +9,8 @@ import type {
   SearchResult,
   SavedSearch,
   SearchExportResponse,
-} from '@client/lib/types/search-response';
+  StreamingSearchResponse,
+} from '@client/lib/types/search';
 
 import { globalApiClient as api } from './client';
 
@@ -78,8 +80,10 @@ export const searchApiClient = {
   /**
    * Perform streaming search with real-time results
    */
-  async streamSearch(params: Record<string, string | number | boolean>): Promise<SearchResponse> {
-    const response = await api.get<SearchResponse>('/api/search/stream', {
+  async streamSearch(
+    params: Record<string, string | number | boolean>
+  ): Promise<StreamingSearchResponse> {
+    const response = await api.get<StreamingSearchResponse>('/api/search/stream', {
       params,
       timeout: 30000,
     });

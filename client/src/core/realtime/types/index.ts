@@ -124,22 +124,24 @@ export type WebSocketNotification = RealTimeNotification;
 export interface HeartbeatMessage {
   type: 'heartbeat';
   id?: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 export interface SubscriptionMessage {
   type: 'subscribe' | 'unsubscribe';
   subscriptions?: Subscription[];
   topic?: string;
+  filters?: Record<string, unknown>;
+  subscriptionId?: string;
   id?: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 export interface BatchMessage {
   type: 'batch';
   messages: WebSocketMessage[];
   id?: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 // ============================================================================
@@ -310,6 +312,13 @@ export interface WebSocketHookReturn {
   subscribe: (topics: string | string[]) => void;
   unsubscribe: (topics: string | string[]) => void;
   send: (message: WebSocketMessage) => void;
+  getRecentActivity: (limit: number) => Array<{
+    id: string;
+    type: string;
+    timestamp: string;
+    bill_id?: string;
+  }>;
+  markNotificationRead: (id: string) => void; 
 }
 
 export interface BillTrackingHookReturn {

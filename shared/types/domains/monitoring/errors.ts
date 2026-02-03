@@ -35,7 +35,7 @@ export type ErrorType =
   | 'resource_exhaustion'
   | 'unknown';
 
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
 export type ErrorStatus = 'open' | 'acknowledged' | 'investigating' | 'resolved' | 'rejected';
 export type ErrorImpact = 'none' | 'minor' | 'moderate' | 'major' | 'catastrophic';
 export type ErrorFrequency = 'one-time' | 'intermittent' | 'frequent' | 'constant';
