@@ -46,6 +46,11 @@ export function createLoadingOperation(
     retryCount: options.retryCount || 0,
     maxRetries: options.maxRetries || 3,
     connectionAware: options.connectionAware ?? true,
+    retryStrategy: options.retryStrategy || 'exponential',
+    retryDelay: options.retryDelay || 1000,
+    state: 'idle',
+    timeoutWarningShown: false,
+    cancelled: false,
   };
 
   return validateLoadingOperation(operation);
@@ -204,13 +209,15 @@ export function createProgress(
   loaded: number,
   total: number,
   phase: LoadingProgress['phase'] = 'critical',
-  currentAsset?: string
+  currentAsset?: string,
+  status: LoadingProgress['status'] = 'pending'
 ): LoadingProgress {
   return {
     loaded: Math.max(0, loaded),
     total: Math.max(0, total),
     phase,
     currentAsset,
+    status,
   };
 }
 
@@ -242,6 +249,14 @@ export function mergeProgress(
     phase:
       progress1.phase === 'complete' && progress2.phase === 'complete' ? 'complete' : 'critical',
     currentAsset: progress2.currentAsset || progress1.currentAsset,
+    status:
+      progress1.status === 'complete' && progress2.status === 'complete'
+        ? 'complete'
+        : progress2.status === 'error' || progress1.status === 'error'
+        ? 'error'
+        : progress2.status === 'loading' || progress1.status === 'loading'
+        ? 'loading'
+        : 'pending',
   };
 }
 

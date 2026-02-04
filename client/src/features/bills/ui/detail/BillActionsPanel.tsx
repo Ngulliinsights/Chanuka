@@ -62,7 +62,7 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAction = useCallback(
-    async (action: () => void | undefined) => {
+    async (action: (() => void) | undefined) => {
       if (!action || isLoading) return;
 
       setIsLoading(true);
@@ -125,7 +125,7 @@ export const BillActionsPanel: React.FC<BillActionsPanelProps> = ({
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Support Button */}
         <Button
-          variant={userActions.hasSupported ? 'default' : 'outline'}
+          variant={userActions.hasSupported ? 'primary' : 'outline'}
           size="sm"
           onClick={() => handleAction(onSupport)}
           disabled={isLoading}

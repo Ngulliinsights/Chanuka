@@ -1,0 +1,18 @@
+src/features/bills/BillHeader.tsx(94,42): error TS2769: No overload matches this call.
+src/features/bills/pages/BillsPortalPage.tsx(103,83): error TS2345: Argument of type 'BillsPortalFilters' is not assignable to parameter of type 'BillsQueryParams'.
+src/features/bills/ui/analysis/comments.tsx(609,32): error TS2322: Type '{ children: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { children: ReactNode; }'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictNetworkVisualization.tsx(167,41): error TS2339: Property 'size' does not exist on type 'SimulationNodeDatum'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictOfInterestAnalysis.tsx(51,9): error TS2322: Type '{ sponsorId: string | number; sponsorName: string; financialInterests: ({ id: string; source: string; amount: number; industry: string; category: "investment"; date: string; description: string; verified: true; } | { ...; } | { ...; })[]; ... 4 more ...; summary: string; }' is not assignable to type 'ConflictAnalysis'.
+src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(103,5): error TS2322: Type 'string | number' is not assignable to type 'string'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(59,7): error TS2353: Object literal may only specify known properties, and 'qualityScore' does not exist in type 'Comment'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(70,7): error TS2353: Object literal may only specify known properties, and 'qualityScore' does not exist in type 'Comment'.
+src/features/bills/ui/detail/BillOverviewTab.tsx(77,27): error TS2769: No overload matches this call.
+src/features/bills/ui/detail/BillOverviewTab.tsx(84,70): error TS2339: Property 'timestamp' does not exist on type 'BillAction'.
+src/features/bills/ui/detail/BillSponsorsTab.tsx(226,37): error TS2322: Type 'string | number' is not assignable to type 'string | undefined'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(101,41): error TS2345: Argument of type 'BillTrackingPreferences' is not assignable to parameter of type 'LogContext'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(110,75): error TS2345: Argument of type '{ statusChanges: boolean; newComments: boolean; votingSchedule: boolean; amendments: boolean; updateFrequency: UpdateFrequency; notificationChannels: { inApp: boolean; email: boolean; push: boolean; }; }' is not assignable to parameter of type 'BillTrackingPreferences | (() => BillTrackingPreferences)'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(118,17): error TS2339: Property 'catch' does not exist on type 'void'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(139,19): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'string[]'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(147,21): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'string[]'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(409,34): error TS2345: Argument of type '(notification: Notification, index: number) => JSX.Element' is not assignable to parameter of type '(value: WebSocketMessage<unknown>, index: number, array: WebSocketMessage<unknown>[]) => Element'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(440,33): error TS2339: Property 'message' does not exist on type 'string'.

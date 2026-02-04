@@ -1,112 +1,25 @@
 import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/lib/utils/logger';
-
-// Define types locally since they're not available in the types directory
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
-
-interface UserProfile extends User {
-  bio?: string;
-  location?: string;
-  preferences?: UserPreferences;
-}
-
-interface UserPreferences {
-  theme: 'light' | 'dark';
-  notifications: boolean;
-  privacy: 'public' | 'private';
-}
-
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-}
-
-interface UpdateProfileData {
-  name?: string;
-  bio?: string;
-  location?: string;
-}
-
-interface UpdatePreferencesData {
-  theme?: 'light' | 'dark' | 'system';
-  notifications?: boolean;
-  privacy?: 'public' | 'private';
-}
-
-interface VerificationRequest {
-  type: 'citizen' | 'expert';
-  documents: File[];
-  notes?: string;
-}
-
-interface AuthResponse {
-  user: User;
-  token: string;
-  refresh_token: string;
-  expiresAt: string;
-}
-
-interface ProfileResponse {
-  user: UserProfile;
-}
-
-interface VerificationResponse {
-  success: boolean;
-  message: string;
-}
-
-interface VerificationStatus {
-  email: boolean;
-  phone: boolean;
-}
-
-interface SavedBillsFilters {
-  page?: number;
-  limit?: number;
-  category?: string;
-}
-
-interface SavedBillsResponse {
-  bills: Record<string, unknown>[];
-  total: number;
-  page: number;
-}
-
-interface EngagementHistoryFilters {
-  page?: number;
-  limit?: number;
-  type?: string;
-}
-
-interface EngagementHistoryResponse {
-  activities: Record<string, unknown>[];
-  total: number;
-  page: number;
-}
-
-interface EngagementAction {
-  action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
-  entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
-  entity_id: string;
-  metadata?: Record<string, unknown>;
-}
-
-interface DashboardData {
-  savedBills: number;
-  trackedBills: number;
-  recentActivity: Record<string, unknown>[];
-}
+import type { User } from '@client/lib/types';
+import type {
+  UserProfile,
+  UserPreferences,
+  LoginCredentials,
+  RegisterData,
+  UpdateProfileData,
+  UpdatePreferencesData,
+  VerificationRequest,
+  VerificationResponse,
+  VerificationStatus,
+  AuthResponse,
+  ProfileResponse,
+  SavedBillsFilters,
+  SavedBillsResponse,
+  EngagementHistoryFilters,
+  EngagementHistoryResponse,
+  EngagementAction,
+  DashboardData
+} from '../types';
 
 /**
  * Users API service - handles all user-related API calls

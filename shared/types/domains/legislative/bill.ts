@@ -6,30 +6,18 @@
 import { BaseEntity, UserTrackableEntity } from '../../core/base';
 import { BillId } from '../../core/common';
 
-/**
- * Bill Status - Comprehensive lifecycle states
- */
-export type BillStatus =
-  | 'draft'
-  | 'introduced'
-  | 'committee_review'
-  | 'floor_debate'
-  | 'amendment'
-  | 'vote_scheduled'
-  | 'passed_chamber'
-  | 'conference'
-  | 'passed_both_chambers'
-  | 'presidential_action'
-  | 'enacted'
-  | 'vetoed'
-  | 'failed'
-  | 'withdrawn'
-  | 'archived';
+// Import canonical enums from shared enums (single source of truth)
+import { 
+  BillStatus, 
+  Chamber, 
+  UrgencyLevel as BillPriority,
+  type BillStatusValue,
+  type ChamberValue 
+} from '../../enums';
 
-/**
- * Legislative Chamber
- */
-export type Chamber = 'house' | 'senate' | 'joint';
+// Re-export for convenience
+export { BillStatus, Chamber, BillPriority };
+export type { BillStatusValue, ChamberValue };
 
 /**
  * Bill Type Classification
@@ -42,11 +30,6 @@ export type BillType =
   | 'budget'
   | 'treaty'
   | 'nomination';
-
-/**
- * Bill Priority Level
- */
-export type BillPriority = 'low' | 'medium' | 'high' | 'critical';
 
 /**
  * Sponsor Type

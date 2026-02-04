@@ -45,58 +45,58 @@ export type ResponseContentType =
  */
 export interface ApiResponse<T = unknown> extends BaseEntity {
   /**
-   * Unique response identifier
-   */
+    * Unique response identifier
+    */
   readonly responseId: string;
 
   /**
-   * Corresponding request identifier
-   */
+    * Corresponding request identifier
+    */
   readonly requestId: string;
 
   /**
-   * Response status
-   */
+    * Response status
+    */
   readonly status: ResponseStatus;
 
   /**
-   * HTTP status code
-   */
+    * HTTP status code
+    */
   readonly httpStatus: HttpStatusCode;
 
   /**
-   * Response data payload
-   */
+    * Response data payload
+    */
   readonly data?: T;
 
   /**
-   * Response metadata
-   */
+    * Response metadata
+    */
   readonly metadata?: Readonly<Record<string, unknown>>;
 
   /**
-   * Response headers
-   */
+    * Response headers
+    */
   readonly headers?: Readonly<Record<string, string>>;
 
   /**
-   * Content type
-   */
+    * Content type
+    */
   readonly contentType?: ResponseContentType;
 
   /**
-   * Response timestamp
-   */
+    * Response timestamp
+    */
   readonly timestamp: Date;
 
   /**
-   * Processing duration in milliseconds
-   */
+    * Processing duration in milliseconds
+    */
   readonly duration?: number;
 
   /**
-   * Cache control information
-   */
+    * Cache control information
+    */
   readonly cacheControl?: {
     readonly maxAge?: number;
     readonly staleWhileRevalidate?: number;
@@ -107,8 +107,8 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
   };
 
   /**
-   * Pagination information for paginated responses
-   */
+    * Pagination information for paginated responses
+    */
   readonly pagination?: {
     readonly totalItems: number;
     readonly totalPages: number;
@@ -119,18 +119,23 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
   };
 
   /**
-   * Response version for backward compatibility
-   */
-  readonly version?: string;
+    * Response version for backward compatibility
+    */
+  readonly version?: string | undefined;
 
   /**
-   * Timestamp when response was created
-   */
+    * Timestamp when response was created
+    */
+  readonly expiresAt?: Date | undefined;
+
+  /**
+    * Timestamp when response was created
+    */
   readonly createdAt: Date;
 
   /**
-   * Timestamp when response was last updated
-   */
+    * Timestamp when response was last updated
+    */
   readonly updatedAt: Date;
 }
 
@@ -140,8 +145,8 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
  */
 export interface PaginatedApiResponse<T = unknown> extends ApiResponse<T[]> {
   /**
-   * Pagination metadata
-   */
+    * Pagination metadata
+    */
   readonly pagination: {
     readonly totalItems: number;
     readonly totalPages: number;
@@ -149,8 +154,8 @@ export interface PaginatedApiResponse<T = unknown> extends ApiResponse<T[]> {
     readonly pageSize: number;
     readonly hasNextPage: boolean;
     readonly hasPreviousPage: boolean;
-    readonly nextPage?: number;
-    readonly previousPage?: number;
+    readonly nextPage?: number | undefined;
+    readonly previousPage?: number | undefined;
   };
 }
 
@@ -160,25 +165,25 @@ export interface PaginatedApiResponse<T = unknown> extends ApiResponse<T[]> {
  */
 export interface ErrorApiResponse extends ApiResponse<never> {
   /**
-   * Error details
-   */
+    * Error details
+    */
   readonly error: {
     readonly code: string;
     readonly message: string;
-    readonly severity: 'low' | 'medium' | 'high' | 'critical';
-    readonly details?: unknown;
-    readonly stackTrace?: string;
+    readonly severity: 'low' | 'medium' | 'high' | 'critical' | 'blocker';
+    readonly details?: unknown | undefined;
+    readonly stackTrace?: string | undefined;
     readonly timestamp: Date;
   };
 
   /**
-   * Validation errors if applicable
-   */
+    * Validation errors if applicable
+    */
   readonly validationErrors?: readonly {
     readonly field: string;
     readonly message: string;
-    readonly code?: string;
-  }[];
+    readonly code?: string | undefined;
+  }[] | undefined;
 }
 
 /**
@@ -187,29 +192,29 @@ export interface ErrorApiResponse extends ApiResponse<never> {
  */
 export interface FileDownloadResponse extends ApiResponse<Blob> {
   /**
-   * File name
-   */
+    * File name
+    */
   readonly fileName: string;
 
   /**
-   * File type/MIME type
-   */
+    * File type/MIME type
+    */
   readonly fileType: string;
 
   /**
-   * File size in bytes
-   */
+    * File size in bytes
+    */
   readonly fileSize: number;
 
   /**
-   * Download URL
-   */
-  readonly downloadUrl?: string;
+    * Download URL
+    */
+  readonly downloadUrl?: string | undefined;
 
   /**
-   * Content disposition
-   */
-  readonly contentDisposition?: string;
+    * Content disposition
+    */
+  readonly contentDisposition?: string | undefined;
 }
 
 /**
@@ -218,23 +223,23 @@ export interface FileDownloadResponse extends ApiResponse<Blob> {
  */
 export interface GraphQLResponse<T = unknown> extends ApiResponse<T> {
   /**
-   * GraphQL execution result
-   */
+    * GraphQL execution result
+    */
   readonly result: {
-    readonly data?: T;
+    readonly data?: T | undefined;
     readonly errors?: readonly {
       readonly message: string;
-      readonly locations?: readonly { readonly line: number; readonly column: number }[];
-      readonly path?: readonly string[];
-      readonly extensions?: Readonly<Record<string, unknown>>;
-    }[];
-    readonly extensions?: Readonly<Record<string, unknown>>;
+      readonly locations?: readonly { readonly line: number; readonly column: number }[] | undefined;
+      readonly path?: readonly string[] | undefined;
+      readonly extensions?: Readonly<Record<string, unknown>> | undefined;
+    }[] | undefined;
+    readonly extensions?: Readonly<Record<string, unknown>> | undefined;
   };
 
   /**
-   * GraphQL operation name
-   */
-  readonly operationName?: string;
+    * GraphQL operation name
+    */
+  readonly operationName?: string | undefined;
 }
 
 /**
@@ -243,24 +248,24 @@ export interface GraphQLResponse<T = unknown> extends ApiResponse<T> {
  */
 export interface WebSocketResponse<T = unknown> extends ApiResponse<T> {
   /**
-   * WebSocket event type
-   */
+    * WebSocket event type
+    */
   readonly eventType: string;
 
   /**
-   * WebSocket connection state
-   */
+    * WebSocket connection state
+    */
   readonly connectionState: 'connecting' | 'open' | 'closing' | 'closed';
 
   /**
-   * WebSocket message type
-   */
+    * WebSocket message type
+    */
   readonly messageType: 'text' | 'binary' | 'ping' | 'pong';
 
   /**
-   * WebSocket sequence number
-   */
-  readonly sequenceNumber?: number;
+    * WebSocket sequence number
+    */
+  readonly sequenceNumber?: number | undefined;
 }
 
 /**
@@ -269,29 +274,29 @@ export interface WebSocketResponse<T = unknown> extends ApiResponse<T> {
  */
 export interface StreamingResponse<T = unknown> extends ApiResponse<T> {
   /**
-   * Stream identifier
-   */
+    * Stream identifier
+    */
   readonly streamId: string;
 
   /**
-   * Chunk sequence number
-   */
+    * Chunk sequence number
+    */
   readonly chunkSequence: number;
 
   /**
-   * Total chunks
-   */
-  readonly totalChunks?: number;
+    * Total chunks
+    */
+  readonly totalChunks?: number | undefined;
 
   /**
-   * Is final chunk
-   */
+    * Is final chunk
+    */
   readonly isFinal: boolean;
 
   /**
-   * Stream metadata
-   */
-  readonly streamMetadata?: Readonly<Record<string, unknown>>;
+    * Stream metadata
+    */
+  readonly streamMetadata?: Readonly<Record<string, unknown>> | undefined;
 }
 
 /**
@@ -300,18 +305,18 @@ export interface StreamingResponse<T = unknown> extends ApiResponse<T> {
  */
 export interface ResponseValidationResult {
   /**
-   * Whether the response is valid
-   */
+    * Whether the response is valid
+    */
   readonly valid: boolean;
 
   /**
-   * Validation errors if any
-   */
+    * Validation errors if any
+    */
   readonly errors?: readonly string[];
 
   /**
-   * Validated response if successful
-   */
+    * Validated response if successful
+    */
   readonly validatedResponse?: ApiResponse<unknown>;
 }
 
@@ -321,43 +326,43 @@ export interface ResponseValidationResult {
  */
 export interface ResponseFactoryOptions<T = unknown> {
   /**
-   * Request identifier
-   */
+    * Request identifier
+    */
   readonly requestId: string;
 
   /**
-   * Response data
-   */
+    * Response data
+    */
   readonly responseData: T;
 
   /**
-   * Response status
-   */
+    * Response status
+    */
   readonly status?: ResponseStatus;
 
   /**
-   * HTTP status code
-   */
+    * HTTP status code
+    */
   readonly httpStatus?: HttpStatusCode;
 
   /**
-   * Response metadata
-   */
+    * Response metadata
+    */
   readonly metadata?: Readonly<Record<string, unknown>>;
 
   /**
-   * Response headers
-   */
+    * Response headers
+    */
   readonly headers?: Readonly<Record<string, string>>;
 
   /**
-   * Content type
-   */
+    * Content type
+    */
   readonly contentType?: ResponseContentType;
 
   /**
-   * Cache control
-   */
+    * Cache control
+    */
   readonly cacheControl?: {
     readonly maxAge?: number;
     readonly staleWhileRevalidate?: number;
@@ -368,8 +373,8 @@ export interface ResponseFactoryOptions<T = unknown> {
   };
 
   /**
-   * Pagination information
-   */
+    * Pagination information
+    */
   readonly pagination?: {
     readonly totalItems: number;
     readonly totalPages: number;
@@ -378,12 +383,12 @@ export interface ResponseFactoryOptions<T = unknown> {
   };
 
   /**
-   * Error information
-   */
+    * Error information
+    */
   readonly error?: {
     readonly code: string;
     readonly message: string;
-    readonly severity: 'low' | 'medium' | 'high' | 'critical';
+    readonly severity: 'low' | 'medium' | 'high' | 'critical' | 'blocker';
     readonly details?: unknown;
   };
 }

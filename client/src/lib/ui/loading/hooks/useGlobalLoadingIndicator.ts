@@ -84,6 +84,12 @@ export const useGlobalLoadingIndicator = (): UseGlobalLoadingIndicatorReturn => 
         timeout,
         maxRetries,
         progress: 0,
+        retryStrategy: 'exponential',
+        retryDelay: 1000,
+        state: 'loading',
+        connectionAware: true,
+        timeoutWarningShown: false,
+        cancelled: false,
       };
 
       return await startOperation(operation);

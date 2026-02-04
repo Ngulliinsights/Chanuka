@@ -35,11 +35,15 @@ import { Label } from '@client/lib/design-system';
 import { Separator } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 
-import type { BillsQueryParams } from '../types';
+import type { BillsQueryParams, BillStatus, UrgencyLevel } from '../types';
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
+
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
 
 interface FilterOption {
   value: string;
@@ -137,13 +141,13 @@ const normalizeFilters = (filters: BillsQueryParams) => ({
  * This enables shareable URLs with pre-applied filters.
  */
 const parseUrlFilters = (searchParams: URLSearchParams): Partial<BillsQueryParams> => {
-  const urlFilters: Partial<BillsQueryParams> = {};
+  const urlFilters: Mutable<Partial<BillsQueryParams>> = {};
 
   const statusParam = searchParams.get('status');
-  if (statusParam) urlFilters.status = statusParam.split(',');
+  if (statusParam) urlFilters.status = statusParam.split(',') as BillStatus[];
 
   const urgencyParam = searchParams.get('urgency');
-  if (urgencyParam) urlFilters.urgency = urgencyParam.split(',');
+  if (urgencyParam) urlFilters.urgency = urgencyParam.split(',') as UrgencyLevel[];
 
   const policyAreasParam = searchParams.get('policyAreas');
   if (policyAreasParam) urlFilters.policyAreas = policyAreasParam.split(',');
@@ -414,7 +418,7 @@ export const FilterPanel = React.memo<FilterPanelProps>(
           ? [...currentArray, value]
           : currentArray.filter((item: string) => item !== value);
 
-        handleSetFilters({ [filterKey]: newArray });
+        handleSetFilters({ [filterKey]: newArray } as unknown as Partial<BillsQueryParams>);
       },
       [safeFilters, handleSetFilters]
     );
@@ -526,7 +530,7 @@ export const FilterPanel = React.memo<FilterPanelProps>(
                 <div key={option.value} className="flex items-center space-x-2">
                   <Checkbox
                     id={`status-${option.value}`}
-                    checked={safeFilters.status.includes(option.value)}
+                    checked={safeFilters.status.includes(option.value as BillStatus)}
                     onCheckedChange={(checked: boolean) =>
                       handleArrayFilterChange('status', option.value, checked)
                     }
@@ -551,7 +555,7 @@ export const FilterPanel = React.memo<FilterPanelProps>(
                 <div key={option.value} className="flex items-center space-x-2">
                   <Checkbox
                     id={`urgency-${option.value}`}
-                    checked={safeFilters.urgency.includes(option.value)}
+                    checked={safeFilters.urgency.includes(option.value as UrgencyLevel)}
                     onCheckedChange={(checked: boolean) =>
                       handleArrayFilterChange('urgency', option.value, checked)
                     }

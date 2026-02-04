@@ -1,0 +1,140 @@
+src/features/users/ui/verification/ExpertProfileCard.tsx(13,8): error TS1259: Module '"C:/Users/Access Granted/Downloads/projects/SimpleTool/node_modules/.pnpm/@types+react@18.3.26/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+src/features/users/ui/verification/ExpertProfileCard.tsx(15,53): error TS2307: Cannot find module '@client/lib/design-system' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(16,23): error TS2307: Cannot find module '@client/lib/design-system' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(17,24): error TS2307: Cannot find module '@client/lib/design-system' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(24,8): error TS2307: Cannot find module '@client/lib/design-system' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(25,27): error TS2307: Cannot find module '@client/lib/design-system' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(26,20): error TS2307: Cannot find module '@lib/utils' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(27,61): error TS2307: Cannot find module '@client/lib/types' or its corresponding type declarations.
+src/features/users/ui/verification/ExpertProfileCard.tsx(29,62): error TS6142: Module '../icons/ChanukaIcons' was resolved to 'C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/features/users/ui/icons/ChanukaIcons.tsx', but '--jsx' is not set.
+src/features/users/ui/verification/ExpertProfileCard.tsx(31,38): error TS6142: Module './CredibilityScoring' was resolved to 'C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/features/users/ui/verification/CredibilityScoring.tsx', but '--jsx' is not set.
+src/features/users/ui/verification/ExpertProfileCard.tsx(32,29): error TS6142: Module './ExpertBadge' was resolved to 'C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/features/users/ui/verification/ExpertBadge.tsx', but '--jsx' is not set.
+src/features/users/ui/verification/ExpertProfileCard.tsx(110,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(111,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(112,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(113,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(114,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(115,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(118,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(119,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(120,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(121,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(124,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(127,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(132,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(134,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(139,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(147,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(163,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(164,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(165,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(166,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(167,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(168,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(171,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(172,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(173,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(174,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(182,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(187,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(189,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(195,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(196,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(197,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(198,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(200,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(201,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(202,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(207,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(209,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(214,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(220,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(226,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(234,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(237,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(238,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(239,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(241,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(247,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(252,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(258,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(268,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(269,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(270,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(271,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(278,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(279,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(283,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(284,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(292,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(296,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(300,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(301,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(302,49): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(304,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(305,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(306,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(307,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(314,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(319,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(320,29): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(321,29): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(330,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(334,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(335,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(336,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(337,47): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(342,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(353,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(354,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(355,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(356,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(363,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(364,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(368,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(369,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(377,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(381,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(385,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(386,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(387,50): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(389,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(390,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(391,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(392,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(399,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(402,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(403,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(407,29): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(420,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(424,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(425,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(426,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(429,48): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(431,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/features/users/ui/verification/ExpertProfileCard.tsx(439,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(33,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(447,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(682,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1037,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1156,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1506,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1589,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1638,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1766,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1832,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(1939,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(2447,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(2563,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(2597,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(2729,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(3414,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(3822,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(4332,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(4891,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(7072,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(7622,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(7862,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(7955,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(8315,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+../node_modules/.pnpm/puppeteer@23.11.1_typescript@5.6.3/node_modules/puppeteer/lib/types.d.ts(8580,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.

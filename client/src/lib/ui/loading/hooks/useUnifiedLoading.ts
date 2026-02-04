@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 import { DEFAULT_LOADING_CONFIG } from '../constants';
 import { LoadingError, LoadingOperationFailedError, LoadingTimeoutError } from '../errors';
-import { LoadingOperation, LoadingConfig, LoadingStats, UseLoadingResult } from '../types';
+import { LoadingOperation, LoadingConfig, LoadingStats, ExtendedLoadingConfig, LoadingProgress } from '../types';
 import {
   createLoadingOperation,
   hasOperationTimedOut,
@@ -12,16 +12,36 @@ import {
 import { safeValidateLoadingOperation } from '../validation';
 
 export interface UseUnifiedLoadingOptions {
-  config?: Partial<LoadingConfig>;
+  config?: Partial<ExtendedLoadingConfig>;
   onError?: (error: LoadingError) => void;
   onSuccess?: () => void;
   onStateChange?: (isLoading: boolean) => void;
 }
 
-export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLoadingResult {
+export interface UseUnifiedLoadingResult {
+  isLoading: boolean;
+  progress: { loaded: number; total: number; phase: 'critical' | 'complete' } | null;
+  error: Error | null;
+  stats: LoadingStats;
+  actions: {
+    start: (operationData: Partial<LoadingOperation>) => string;
+    complete: (operationId: string) => void;
+    fail: (operationId: string, error: Error) => void;
+    retry: (operationId: string) => Promise<void>;
+    cancel: (operationId: string) => void;
+    reset: () => void;
+  };
+  recovery: {
+    canRecover: boolean;
+    suggestions: string[];
+    recover: () => Promise<boolean>;
+  };
+}
+
+export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseUnifiedLoadingResult {
   // Memoize config to prevent recreation on every render
   const config = useMemo(
-    () => ({ ...DEFAULT_LOADING_CONFIG, ...options.config }),
+    () => ({ ...DEFAULT_LOADING_CONFIG, ...options.config }) as ExtendedLoadingConfig,
     [options.config]
   );
 
@@ -38,9 +58,9 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   // Update online status
   useEffect(() => {
-    const handleOnline = () => setStats(prev => ({ ...prev, isOnline: true }));
+    const handleOnline = () => setStats((prev: LoadingStats) => ({ ...prev, isOnline: true }));
     const handleOffline = () =>
-      setStats(prev => ({ ...prev, isOnline: false, connectionType: 'offline' }));
+      setStats((prev: LoadingStats) => ({ ...prev, isOnline: false, connectionType: 'offline' }));
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -63,7 +83,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
       });
 
       if (timedOutOperations.length > 0) {
-        setOperations(prev => {
+        setOperations((prev: Map<string, LoadingOperation>) => {
           const newMap = new Map(prev);
           timedOutOperations.forEach(id => {
             const operation = newMap.get(id);
@@ -91,7 +111,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
     const loaded = ops.filter(op => !op.error).length;
     const failed = ops.filter(op => op.error).length;
 
-    setStats(prev => ({
+    setStats((prev: LoadingStats) => ({
       ...prev,
       loaded,
       failed,
@@ -118,7 +138,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
           }
         }
 
-        setOperations(prev => new Map(prev).set(operation.id, operation));
+        setOperations((prev: Map<string, LoadingOperation>) => new Map(prev).set(operation.id, operation));
         updateStats();
 
         return operation.id;
@@ -140,7 +160,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const completeOperation = useCallback(
     (operationId: string) => {
-      setOperations(prev => {
+      setOperations((prev: Map<string, LoadingOperation>) => {
         const newMap = new Map(prev);
         const operation = newMap.get(operationId);
 
@@ -161,7 +181,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const failOperation = useCallback(
     (operationId: string, error: Error) => {
-      setOperations(prev => {
+      setOperations((prev: Map<string, LoadingOperation>) => {
         const newMap = new Map(prev);
         const operation = newMap.get(operationId);
 
@@ -197,7 +217,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
     const delay = calculateRetryDelay(operation.retryCount);
 
-    setOperations(prev => {
+    setOperations((prev: Map<string, LoadingOperation>) => {
       const newMap = new Map(prev);
       const op = newMap.get(operationId);
 
@@ -219,7 +239,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const cancelOperation = useCallback(
     (operationId: string) => {
-      setOperations(prev => {
+      setOperations((prev: Map<string, LoadingOperation>) => {
         const newMap = new Map(prev);
         newMap.delete(operationId);
         updateStats();
@@ -231,7 +251,7 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const reset = useCallback(() => {
     setOperations(new Map());
-    setStats(prev => ({
+    setStats((prev: LoadingStats) => ({
       ...prev,
       loaded: 0,
       failed: 0,
@@ -240,9 +260,14 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseLo
 
   const isLoading = operations.size > 0;
   const hasErrors = Array.from(operations.values()).some(op => op.error);
-  const currentError = hasErrors
-    ? new Error(Array.from(operations.values()).find(op => op.error)?.error || 'Unknown error')
-    : null;
+  
+  const getErrorObject = () => {
+    const errorOp = Array.from(operations.values()).find(op => op.error);
+    if (!errorOp || !errorOp.error) return null;
+    return typeof errorOp.error === 'string' ? new Error(errorOp.error) : errorOp.error;
+  };
+  
+  const currentError = hasErrors ? (getErrorObject() || new Error('Unknown error')) : null;
 
   // Calculate overall progress
   const progress =

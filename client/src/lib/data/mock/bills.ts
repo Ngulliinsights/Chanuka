@@ -148,17 +148,17 @@ export const generateMockBill = (
     ),
     status = weightedRandom(
       [
-        BillStatus.INTRODUCED,
-        BillStatus.COMMITTEE,
-        BillStatus.FLOOR_DEBATE,
-        BillStatus.PASSED_HOUSE,
-        BillStatus.PASSED_SENATE,
-        BillStatus.PASSED,
-        BillStatus.FAILED,
-        BillStatus.SIGNED,
-        BillStatus.VETOED,
+        BillStatus.FIRST_READING,
+        BillStatus.SECOND_READING,
+        BillStatus.COMMITTEE_STAGE,
+        BillStatus.THIRD_READING,
+        BillStatus.PRESIDENTIAL_ASSENT,
+        BillStatus.GAZETTED,
+        BillStatus.ENACTED,
+        BillStatus.WITHDRAWN,
+        BillStatus.LOST,
       ],
-      [25, 30, 10, 8, 7, 10, 5, 3, 2]
+      [25, 30, 20, 10, 5, 5, 3, 1, 1]
     ),
     popularity = faker.number.float({ min: 0.1, max: 2.0 }),
     constitutionalConcerns = weightedRandom(['low', 'medium', 'high'], [70, 25, 5]),
@@ -228,11 +228,11 @@ export const generateMockBills = (count: number = 50): ReadonlyBill[] => {
 
     // Vary status distribution
     if (i <= 3) {
-      options.status = BillStatus.SIGNED;
+      options.status = BillStatus.ENACTED;
     } else if (i <= 8) {
-      options.status = BillStatus.PASSED;
+      options.status = BillStatus.THIRD_READING;
     } else if (i <= 12) {
-      options.status = BillStatus.FAILED;
+      options.status = BillStatus.LOST;
     }
 
     bills.push(generateMockBill(i.toString(), options));

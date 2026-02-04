@@ -18,7 +18,7 @@ import {
   FileText,
   Heart,
   LayoutGrid,
-  List,
+  LayoutList,
   Lightbulb,
   MessageCircle,
   RefreshCw,
@@ -28,6 +28,10 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import type { UserPreferences } from '@client/lib/types';
+
+// ... (existing imports)
 
 import { useUserPreferences } from '@client/features/users/hooks/useUserAPI';
 import { copySystem } from '@client/lib/content/copy-system';
@@ -47,7 +51,7 @@ import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
 
 import { useBills } from '../hooks';
-import type { Bill, BillsQueryParams } from '../model/types';
+import type { Bill, BillsQueryParams } from '../types';
 
 import { FilterPanel } from './filter-panel';
 import { StatsOverview } from './stats-overview';
@@ -71,7 +75,7 @@ interface DashboardStats {
 }
 
 type ViewMode = 'grid' | 'list';
-type SortField = 'date' | 'title' | 'urgency' | 'engagement';
+type SortField = NonNullable<BillsQueryParams['sortBy']>;
 type SortOrder = 'asc' | 'desc';
 
 interface ExtendedFilters extends BillsQueryParams {
@@ -83,6 +87,7 @@ interface ExtendedFilters extends BillsQueryParams {
 }
 
 // Extended Bill type with all properties used in the component
+// Extended Bill type with all properties used in the component
 interface ExtendedBill extends Bill {
   description?: string;
   sponsor_name?: string;
@@ -91,18 +96,13 @@ interface ExtendedBill extends Bill {
   saveCount?: number;
   commentCount?: number;
   shareCount?: number;
-  constitutionalFlags?: string[];
-  policyAreas?: string[];
+  // constitutionalFlags property is inherited from Bill as ConstitutionalFlag[]
   introduced_date?: string;
 }
 
 // Extended response type with pagination metadata
-interface PaginatedBillsResponse {
-  bills: ExtendedBill[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+// Extended response type with pagination metadata (matching shared type structure via cast/interface)
+import type { PaginatedBillsResponse } from '@client/lib/types/bill';
 
 // ============================================================================
 // Constants
@@ -357,12 +357,12 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
   // Using useMemo here prevents unnecessary re-renders when billsResponse object
   // reference changes but the actual bills array hasn't changed.
   const bills = useMemo(
-    () => (billsResponse?.bills || []) as ExtendedBill[],
-    [billsResponse?.bills]
+    () => (billsResponse?.data || []) as ExtendedBill[],
+    [billsResponse?.data]
   );
 
   // Get total count from the API response, using the correct property name
-  const totalItems = (billsResponse as PaginatedBillsResponse | undefined)?.total || 0;
+  const totalItems = billsResponse?.pagination?.total || 0;
 
   // Calculate dashboard statistics based on current bills data
   const stats = useDashboardStats(bills, totalItems);
@@ -417,10 +417,11 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
    * server and automatically invalidate cached queries that include this bill.
    */
   const handleSave = useCallback(
-    async (billId: string) => {
+    async (billId: string | number) => {
       try {
+        const id = String(billId);
         // TODO: Implement with useSaveBill mutation hook
-        // await saveBillMutation.mutateAsync(billId);
+        // await saveBillMutation.mutateAsync(id);
 
         toast({
           title: 'Bill saved',
@@ -429,7 +430,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
 
         logger.info('Bill saved', {
           component: 'BillsDashboard',
-          billId,
+          billId: id,
         });
       } catch (error) {
         logger.error('Failed to save bill', {
@@ -447,16 +448,16 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
     },
     [toast]
   );
-
   /**
    * Handle sharing a bill using the Web Share API when available (primarily on
    * mobile devices), with a clipboard fallback for desktop browsers. This provides
    * a native, platform-appropriate sharing experience for users.
    */
   const handleShare = useCallback(
-    async (billId: string) => {
+    async (billId: string | number) => {
       try {
-        const bill = bills.find(b => b.id === billId);
+        const id = String(billId);
+        const bill = bills.find(b => String(b.id) === id);
         if (!bill) {
           toast({
             title: 'Bill not found',
@@ -469,7 +470,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
         const shareData = {
           title: bill.title || 'Legislative Bill',
           text: bill.description || 'Check out this legislative bill',
-          url: `${window.location.origin}/bills/${billId}`,
+          url: `${window.location.origin}/bills/${id}`,
         };
 
         // Try to use native share API first (better UX on mobile)
@@ -520,8 +521,9 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
    * uses a hash fragment to scroll to and focus the comments area, improving
    * the user experience by taking them directly to where they can engage.
    */
-  const handleComment = useCallback((billId: string) => {
-    window.location.href = `/bills/${billId}#comments`;
+  const handleComment = useCallback((billId: string | number) => {
+    const id = String(billId);
+    window.location.href = `/bills/${id}#comments`;
   }, []);
 
   /**
@@ -718,7 +720,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
   }
 
   // Get user level for personalized content, with a safe default
-  const userLevel = (userPreferences as { level?: string })?.level || 'novice';
+  const userLevel = (userPreferences as any)?.level || 'novice';
   const isNoviceUser = userLevel === 'novice';
 
   // Retrieve localized copy based on user level and preferences
@@ -908,7 +910,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
         {!isMobile && (
           <div className="lg:col-span-1">
             <FilterPanel
-              filters={filters as { status?: string; urgency?: string; policyArea?: string }}
+              filters={filters}
               onFiltersChange={handleFiltersChange}
               resultCount={bills.length}
               totalCount={totalItems}
@@ -946,9 +948,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
                     {/* Mobile filter panel trigger */}
                     {isMobile && (
                       <FilterPanel
-                        filters={
-                          filters as { status?: string; urgency?: string; policyArea?: string }
-                        }
+                        filters={filters}
                         onFiltersChange={handleFiltersChange}
                         isMobile={true}
                         resultCount={bills.length}
@@ -959,7 +959,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
                     {/* Sort selector */}
                     <Select
                       value={sortBy}
-                      onChange={e => handleSortChange(e.target.value)}
+                      onValueChange={handleSortChange}
                       disabled={isLoading || bills.length === 0}
                     >
                       <SelectTrigger className="w-[140px]" aria-label="Sort by">

@@ -15,6 +15,7 @@ export function useAssetLoading() {
     total: 0,
     phase: 'preload',
     currentAsset: undefined,
+    status: 'pending',
   });
 
   const getStats = useCallback((): LoadingStats => {

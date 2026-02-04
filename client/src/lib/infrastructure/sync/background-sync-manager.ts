@@ -121,6 +121,9 @@ class BackgroundSyncManager {
       pendingActions: actions,
     };
   }
+  async clearOfflineData(): Promise<void> {
+    localStorage.removeItem('offline-actions');
+  }
 }
 
 export const backgroundSyncManager = new BackgroundSyncManager();

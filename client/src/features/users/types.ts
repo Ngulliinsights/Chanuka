@@ -148,12 +148,15 @@ export interface EngagementHistoryFilters {
   date_to?: string;
 }
 
-export interface EngagementHistoryItem {
+export interface EngagementAction {
   action_type: 'view' | 'comment' | 'save' | 'share' | 'vote' | 'track';
   entity_type: 'bill' | 'comment' | 'discussion' | 'expert_analysis';
   entity_id: string;
-  timestamp: string;
   metadata?: Record<string, unknown>;
+}
+
+export interface EngagementHistoryItem extends EngagementAction {
+  timestamp: string;
 }
 
 export interface EngagementHistoryResponse {

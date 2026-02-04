@@ -4,10 +4,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { useAuth } from '@client/core/auth';
-import type { OnboardingStatus } from '@client/lib/types';
-
 import { OnboardingService } from '../services/onboarding-service';
 
 export function useOnboardingRedirect() {
@@ -22,6 +19,13 @@ export function useOnboardingRedirect() {
       navigate('/onboarding', { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
+}
+
+// Local type definition for the hook result
+export interface OnboardingStatus {
+  isCompleted: boolean;
+  persona: import('../ui/onboarding/UserJourneyOptimizer').UserPersona | null;
+  clearOnboarding: () => void;
 }
 
 export function useOnboardingStatus(): OnboardingStatus {

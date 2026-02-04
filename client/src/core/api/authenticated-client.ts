@@ -14,7 +14,7 @@ import {
   DEFAULT_AUTH_CONFIG,
   AuthConfig,
 } from './authentication';
-import { BaseApiClient, ApiClientConfig, ApiRequest, RequestBody } from './base-client';
+import { BaseApiClient, ApiClientConfig, BaseClientRequest, RequestBody } from './base-client';
 
 /**
  * Configuration for authenticated API client
@@ -102,7 +102,7 @@ export class AuthenticatedApiClient extends BaseApiClient {
   /**
    * Makes an authenticated request (convenience method)
    */
-  async authenticatedRequest<T = unknown>(request: ApiRequest) {
+  async authenticatedRequest<T = unknown>(request: BaseClientRequest) {
     return this.request<T>(request);
   }
 

@@ -212,6 +212,10 @@ export interface DashboardPreferences {
   hiddenWidgets?: string[];
   /** Custom preferences (key-value pairs) */
   custom?: Record<string, unknown>;
+  
+  // Legacy compatibility props
+  pinnedSections?: string[];
+  hiddenSections?: string[];
 }
 
 /**
@@ -244,6 +248,13 @@ export interface DashboardConfig {
   createdAt: Date;
   /** Last update timestamp */
   updatedAt: Date;
+
+  // Legacy compatibility props
+  title?: string; // alias for name
+  navigation?: any;
+  theme?: any;
+  refreshInterval?: number;
+  enableAutoRefresh?: boolean;
 }
 
 /**

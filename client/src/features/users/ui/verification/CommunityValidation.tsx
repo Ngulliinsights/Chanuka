@@ -22,7 +22,14 @@ import {
 } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
-import { CommunityValidation as CommunityValidationType } from '@client/lib/types';
+import { CommunityValidationType } from '@client/lib/types';
+
+// Utility function (module scope for shared use)
+const getValidationScoreColor = (score: number): string => {
+  if (score >= 0.7) return 'text-green-600';
+  if (score >= 0.4) return 'text-amber-600';
+  return 'text-red-600';
+};
 
 interface CommunityValidationProps {
   validation: CommunityValidationType;
@@ -90,12 +97,6 @@ export function CommunityValidation({
       setIsSubmittingComment(false);
     }
   }, [onComment, contributionId, commentText, isSubmittingComment]);
-
-  const getValidationScoreColor = (score: number) => {
-    if (score >= 0.7) return 'text-green-600';
-    if (score >= 0.4) return 'text-amber-600';
-    return 'text-red-600';
-  };
 
   const getValidationScoreLabel = (score: number) => {
     if (score >= 0.7) return 'High Community Support';
@@ -191,7 +192,7 @@ export function CommunityValidation({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
-                variant={validation.userVote === 'up' ? 'default' : 'outline'}
+                variant={validation.userVote === 'up' ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => handleVote('up')}
                 disabled={isVoting}
@@ -205,7 +206,7 @@ export function CommunityValidation({
               </Button>
 
               <Button
-                variant={validation.userVote === 'down' ? 'default' : 'outline'}
+                variant={validation.userVote === 'down' ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => handleVote('down')}
                 disabled={isVoting}

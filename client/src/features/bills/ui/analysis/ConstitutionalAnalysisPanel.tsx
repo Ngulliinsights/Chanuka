@@ -100,7 +100,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
 
   // Mock constitutional analysis data populated with REAL Kenyan context
   const analysisData: ConstitutionalAnalysisData = {
-    billId: bill.id,
+    billId: String(bill.id),
     overallAssessment: {
       constitutionalityScore: 0.78,
       riskLevel: 'medium',

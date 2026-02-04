@@ -362,12 +362,28 @@ export interface ExpertConsensus {
  * Credibility metrics for an expert
  */
 export interface CredibilityMetrics {
+  readonly expertId?: string;
   readonly overallScore: number;
-  readonly factualAccuracy: number;
-  readonly sourceQuality: number;
-  readonly peerEndorsements: number;
-  readonly communityTrust: number;
-  readonly verificationLevel: 'basic' | 'verified' | 'distinguished';
+  readonly factualAccuracy?: number;
+  readonly sourceQuality?: number;
+  readonly peerEndorsements?: number;
+  readonly communityTrust?: number;
+  readonly verificationLevel?: 'basic' | 'verified' | 'distinguished';
+  readonly components?: {
+    credentialScore: number;
+    affiliationScore: number;
+    communityScore: number;
+    contributionQuality: number;
+    consensusAlignment: number;
+  };
+  readonly methodology?: {
+    description: string;
+    factors: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  };
   readonly lastCalculated: string;
 }
 
@@ -383,6 +399,8 @@ export interface CommunityValidation {
   readonly validationScore: number;
   readonly flagCount: number;
   readonly lastUpdated: string;
+  readonly userVote?: 'up' | 'down' | null;
+  readonly comments?: number;
 }
 
 /**
@@ -391,11 +409,20 @@ export interface CommunityValidation {
 export interface VerificationWorkflow {
   readonly id: string | number;
   readonly contributionId: string | number;
+  readonly expertId?: string | number;
   readonly status: 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
   readonly reviewerId?: number;
   readonly submittedAt: string;
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
   readonly reviewedAt?: string;
   readonly feedback?: ReadonlyArray<string>;
+  readonly communityFeedback?: Array<{
+    userId: string;
+    feedback: string;
+    vote: 'approve' | 'reject' | 'needs_revision';
+    timestamp: string;
+  }>;
   readonly currentStep: number;
   readonly totalSteps: number;
 }

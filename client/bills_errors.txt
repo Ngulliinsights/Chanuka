@@ -1,0 +1,66 @@
+src/features/bills/BillHeader.tsx(94,42): error TS2769: No overload matches this call.
+src/features/bills/BillList.tsx(245,78): error TS2322: Type '"introduced"' is not assignable to type 'BillStatus'.
+src/features/bills/BillList.tsx(248,78): error TS2322: Type '"committee_review"' is not assignable to type 'BillStatus'.
+src/features/bills/BillList.tsx(251,78): error TS2322: Type '"passed_chamber"' is not assignable to type 'BillStatus'.
+src/features/bills/BillList.tsx(354,45): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/BillList.tsx(372,39): error TS2769: No overload matches this call.
+src/features/bills/BillList.tsx(400,52): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+src/features/bills/BillList.tsx(404,52): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+src/features/bills/pages/BillsPortalPage.tsx(103,83): error TS2345: Argument of type 'BillsPortalFilters' is not assignable to parameter of type 'BillsQueryParams'.
+src/features/bills/services/pagination.ts(172,25): error TS2339: Property 'bills' does not exist on type 'PaginatedBillsResponse'.
+src/features/bills/services/pagination.ts(219,11): error TS2353: Object literal may only specify known properties, and 'hasNext' does not exist in type '{ readonly total: number; readonly page: number; readonly limit: number; readonly totalPages: number; }'.
+src/features/bills/services/pagination.ts(241,27): error TS2339: Property 'bills' does not exist on type 'PaginatedBillsResponse'.
+src/features/bills/services/pagination.ts(413,33): error TS2339: Property 'policyAreas' does not exist on type 'BillsQueryParams'.
+src/features/bills/services/pagination.ts(415,39): error TS2339: Property 'controversyLevels' does not exist on type 'BillsQueryParams'.
+src/features/bills/services/pagination.ts(437,50): error TS2339: Property 'hasNext' does not exist on type '{ readonly total: number; readonly page: number; readonly limit: number; readonly totalPages: number; }'.
+src/features/bills/services/pagination.ts(438,54): error TS2339: Property 'hasPrevious' does not exist on type '{ readonly total: number; readonly page: number; readonly limit: number; readonly totalPages: number; }'.
+src/features/bills/ui/analysis/comments.tsx(609,32): error TS2322: Type '{ children: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { children: ReactNode; }'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictNetworkVisualization.tsx(167,41): error TS2339: Property 'size' does not exist on type 'SimulationNodeDatum'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictOfInterestAnalysis.tsx(51,9): error TS2322: Type '{ sponsorId: string | number; sponsorName: string; financialInterests: ({ id: string; source: string; amount: number; industry: string; category: "investment"; date: string; description: string; verified: true; } | { ...; } | { ...; })[]; ... 4 more ...; summary: string; }' is not assignable to type 'ConflictAnalysis'.
+src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(103,5): error TS2322: Type 'string | number' is not assignable to type 'string'.
+src/features/bills/ui/ArgumentsTab.tsx(18,49): error TS2307: Cannot find module '@/types/domains/arguments' or its corresponding type declarations.
+src/features/bills/ui/ArgumentsTab.tsx(59,43): error TS2339: Property 'position' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(64,11): error TS2339: Property 'argument_text' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(72,19): error TS2339: Property 'strength_score' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(72,45): error TS2339: Property 'strength_score' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(74,19): error TS2339: Property 'confidence_score' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(74,47): error TS2339: Property 'confidence_score' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(76,27): error TS2551: Property 'created_at' does not exist on type 'Argument'. Did you mean 'createdAt'?
+src/features/bills/ui/ArgumentsTab.tsx(76,67): error TS2551: Property 'created_at' does not exist on type 'Argument'. Did you mean 'createdAt'?
+src/features/bills/ui/ArgumentsTab.tsx(83,52): error TS2339: Property 'position' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(84,51): error TS2339: Property 'position' does not exist on type 'Argument'.
+src/features/bills/ui/ArgumentsTab.tsx(85,52): error TS2339: Property 'position' does not exist on type 'Argument'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(128,11): error TS2322: Type '"default" | "outline"' is not assignable to type '"destructive" | "ghost" | "primary" | "secondary" | "outline" | null | undefined'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(130,39): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void | undefined'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(147,39): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void | undefined'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(168,41): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void | undefined'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(182,41): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void | undefined'.
+src/features/bills/ui/detail/BillActionsPanel.tsx(194,41): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void | undefined'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(51,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(71,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(209,13): error TS2322: Type '{ id: string; title: string; description: string; billId: string | number; status: "active"; commentCount: number; participantCount: number; createdAt: string; updatedAt: string; tags: string[]; isModerated: boolean; }' is not assignable to type 'DiscussionThread'.
+src/features/bills/ui/detail/BillHeader.tsx(24,62): error TS2339: Property 'timestamp' does not exist on type 'BillAction'.
+src/features/bills/ui/detail/BillHeader.tsx(89,45): error TS2769: No overload matches this call.
+src/features/bills/ui/detail/BillHeader.tsx(94,85): error TS2339: Property 'timestamp' does not exist on type 'BillAction'.
+src/features/bills/ui/detail/BillOverviewTab.tsx(77,27): error TS2769: No overload matches this call.
+src/features/bills/ui/detail/BillOverviewTab.tsx(84,70): error TS2339: Property 'timestamp' does not exist on type 'BillAction'.
+src/features/bills/ui/detail/BillSponsorsTab.tsx(226,37): error TS2322: Type 'string | number' is not assignable to type 'string | undefined'.
+src/features/bills/ui/list/BillCard.tsx(83,84): error TS2339: Property 'length' does not exist on type 'true'.
+src/features/bills/ui/list/BillCard.tsx(127,37): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(130,61): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(144,38): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(147,62): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(157,40): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(160,64): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/features/bills/ui/list/BillCard.tsx(195,17): error TS2339: Property 'billType' does not exist on type 'Bill'.
+src/features/bills/ui/list/BillCard.tsx(197,21): error TS2339: Property 'billType' does not exist on type 'Bill'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(57,5): error TS2339: Property 'billUpdates' does not exist on type 'WebSocketHookReturn'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(61,5): error TS2339: Property 'getBillUpdates' does not exist on type 'WebSocketHookReturn'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(63,5): error TS2339: Property 'updatePreferences' does not exist on type 'WebSocketHookReturn'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(64,5): error TS2339: Property 'getPreferences' does not exist on type 'WebSocketHookReturn'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(67,5): error TS2353: Object literal may only specify known properties, and 'handlers' does not exist in type 'WebSocketOptions'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(102,17): error TS2339: Property 'catch' does not exist on type 'void'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(123,19): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'string[]'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(131,21): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'string[]'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(393,34): error TS2345: Argument of type '(notification: Notification, index: number) => JSX.Element' is not assignable to parameter of type '(value: WebSocketMessage<unknown>, index: number, array: WebSocketMessage<unknown>[]) => Element'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(424,33): error TS2339: Property 'message' does not exist on type 'string'.

@@ -20,6 +20,17 @@ import type {
   CommentFormData,
   TypingIndicator,
 } from '@client/lib/types';
+
+// Legacy thread interface extending the base type with UI-specific computed properties
+interface LegacyDiscussionThread extends DiscussionThread {
+  comments: Comment[];
+  engagementScore: number;
+  qualityScore: number;
+  expertParticipation: number;
+  activeUsers: string[];
+  lastActivity: string;
+}
+
 interface UseDiscussionOptions {
   billId: number;
   autoSubscribe?: boolean;
@@ -28,7 +39,7 @@ interface UseDiscussionOptions {
 
 interface UseDiscussionReturn {
   // Data
-  thread: DiscussionThread | null;
+  thread: LegacyDiscussionThread | null;
   comments: Comment[];
   typingIndicators: TypingIndicator[];
 
@@ -73,7 +84,7 @@ export function useDiscussion({
   });
 
   // Transform unified data to legacy format for backward compatibility
-  const thread: DiscussionThread | null = useMemo(() => {
+  const thread: LegacyDiscussionThread | null = useMemo(() => {
     if (!unifiedDiscussion.currentThread && unifiedDiscussion.comments.length === 0) {
       return null;
     }

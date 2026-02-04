@@ -19,27 +19,29 @@ export function useLoadingRecovery(options: UseLoadingRecoveryOptions) {
   const [recoveryState, setRecoveryState] = useState<LoadingRecoveryState>({
     canRecover: true,
     isRecovering: false,
-    attempts: 0,
+    recoveryAttempts: 0,
+    maxRecoveryAttempts: options.maxRecoveryAttempts,
     suggestions: ['Check your internet connection', 'Try refreshing the page'],
   });
 
   const recover = useCallback(() => {
-    if (recoveryState.attempts >= options.maxRecoveryAttempts) {
-      setRecoveryState(prev => ({ ...prev, canRecover: false }));
+    if (recoveryState.recoveryAttempts >= options.maxRecoveryAttempts) {
+      setRecoveryState(prev => ({ ...prev, canRecover: false, maxRecoveryAttempts: options.maxRecoveryAttempts }));
       return;
     }
 
     setRecoveryState(prev => ({
       ...prev,
       isRecovering: true,
-      attempts: prev.attempts + 1,
+      recoveryAttempts: prev.recoveryAttempts + 1,
+      maxRecoveryAttempts: options.maxRecoveryAttempts,
     }));
 
     setTimeout(() => {
       options.onRecoverySuccess();
       setRecoveryState(prev => ({ ...prev, isRecovering: false }));
     }, 1000);
-  }, [recoveryState.attempts, options]);
+  }, [recoveryState.recoveryAttempts, options]);
 
   return { recoveryState, recover };
 }

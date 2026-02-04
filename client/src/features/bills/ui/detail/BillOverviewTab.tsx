@@ -81,7 +81,7 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <div className="flex items-center justify-between">
               <span className="font-medium">Last Updated:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.timeline?.[bill.timeline.length - 1]?.timestamp || bill.introductionDate).toLocaleDateString()}
+                {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introductionDate || '').toLocaleDateString()}
               </span>
             </div>
           </div>

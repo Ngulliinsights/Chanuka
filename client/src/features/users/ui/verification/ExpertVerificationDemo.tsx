@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';
@@ -13,9 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-sys
 import {
   Expert,
   CredibilityMetrics,
-  CommunityValidation as CommunityValidationType,
-  VerificationWorkflow as VerificationWorkflowType,
+  VerificationWorkflowType,
   ExpertConsensus as ExpertConsensusType,
+  CommunityValidationType,
 } from '@client/lib/types';
 
 import {
@@ -151,21 +152,26 @@ export function ExpertVerificationDemo() {
   };
 
   const mockCommunityValidation: CommunityValidationType = {
+    id: 'validation-001',
+    contentId: 'contrib-001',
+    contentType: 'contribution',
     upvotes: 127,
     downvotes: 8,
-    comments: 23,
-    userVote: null,
     validationScore: 0.89,
+    flagCount: 0,
+    lastUpdated: '2024-01-15T10:30:00Z',
+    userVote: null,
+    comments: 23,
   };
 
   const mockVerificationWorkflow: VerificationWorkflowType = {
     id: 'workflow-001',
     contributionId: 'contrib-001',
-    expertId: 'expert-001',
-    reviewerId: 'reviewer-001',
     status: 'in_review',
-    reviewNotes: undefined,
-    reviewDate: undefined,
+    reviewerId: 1001,
+    submittedAt: '2024-01-14T10:00:00Z',
+    reviewedAt: undefined,
+    feedback: [],
     communityFeedback: [
       {
         userId: 'user-001',
@@ -181,8 +187,8 @@ export function ExpertVerificationDemo() {
         timestamp: '2024-01-14T16:45:00Z',
       },
     ],
-    createdAt: '2024-01-14T10:00:00Z',
-    updatedAt: '2024-01-14T16:45:00Z',
+    currentStep: 2,
+    totalSteps: 4,
   };
 
   const mockExpertConsensus: ExpertConsensusType = {
@@ -310,7 +316,20 @@ export function ExpertVerificationDemo() {
 
         <TabsContent value="credibility" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <CredibilityScoring metrics={mockCredibilityMetrics} />
+            <Card>
+              <CardHeader>
+                <CardTitle>Credibility Breakdown</CardTitle>
+                <CardDescription>Component-level credibility analysis</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {mockCredibilityMetrics.components && (
+                  <CredibilityBreakdown 
+                    components={mockCredibilityMetrics.components} 
+                    methodology={mockCredibilityMetrics.methodology}
+                  />
+                )}
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>

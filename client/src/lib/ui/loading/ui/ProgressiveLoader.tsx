@@ -109,7 +109,7 @@ export const ProgressiveLoader = React.memo<ProgressiveLoaderProps>(
           <div className="flex space-x-3">
             {showRetryButton && currentStageData.retryable !== false && (
               <button
-                onClick={() => onRetryStage?.(currentStageData.id)}
+                onClick={() => onRetryStage?.(currentStage)}
                 className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
               >
                 Retry
@@ -117,7 +117,7 @@ export const ProgressiveLoader = React.memo<ProgressiveLoaderProps>(
             )}
             {allowSkip && (
               <button
-                onClick={() => onSkipStage?.(currentStageData.id)}
+                onClick={() => onSkipStage?.(currentStage)}
                 className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
               >
                 Skip

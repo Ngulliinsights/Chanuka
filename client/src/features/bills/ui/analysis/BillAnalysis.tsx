@@ -1,10 +1,33 @@
+import { useState } from 'react';
 import {
   EXPERT_PROFILES,
   getConstitutionalArticle,
   getCaseLaw,
 } from '@client/lib/data/mock/real-kenya-data';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/lib/design-system';
+import {
+  AlertTriangle,
+  FileText,
+  Scale,
+  Shield,
+  Star,
+  Users,
+} from 'lucide-react';
+import type { ExtendedBill } from '@client/lib/types';
 
-// ... (imports remain)
+interface BillAnalysisProps {
+  bill: ExtendedBill;
+}
 
 function BillAnalysis({ bill }: BillAnalysisProps) {
   const [activeAnalysisTab, setActiveAnalysisTab] = useState('overview');

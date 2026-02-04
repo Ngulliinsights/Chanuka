@@ -113,7 +113,7 @@ export default function BillsPortalPage() {
 
     return {
       total: totalBills,
-      active: bills.filter(bill => bill.status !== BillStatus.FAILED && bill.status !== BillStatus.VETOED).length,
+      active: bills.filter(bill => bill.status !== BillStatus.LOST && bill.status !== BillStatus.WITHDRAWN).length,
       urgent: bills.filter(bill => {
         const urgency = bill.urgency;
         return urgency === UrgencyLevel.HIGH || urgency === UrgencyLevel.CRITICAL;
@@ -439,7 +439,7 @@ export default function BillsPortalPage() {
 
           <div className="flex border rounded-md">
             <Button
-              variant={currentFilters.viewMode === 'grid' ? 'primary' : 'ghost'}
+              variant={currentFilters.viewMode === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => handleViewModeChange('grid')}
               className="rounded-r-none"
@@ -447,7 +447,7 @@ export default function BillsPortalPage() {
               <Grid className="h-4 w-4" />
             </Button>
             <Button
-              variant={currentFilters.viewMode === 'list' ? 'primary' : 'ghost'}
+              variant={currentFilters.viewMode === 'list' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => handleViewModeChange('list')}
               className="rounded-l-none"

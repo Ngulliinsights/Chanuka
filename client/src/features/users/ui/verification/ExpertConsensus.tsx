@@ -34,6 +34,65 @@ interface ExpertConsensusProps {
   className?: string;
 }
 
+const getAgreementColor = (level: number) => {
+  if (level >= 0.8) return 'text-green-600';
+  if (level >= 0.6) return 'text-blue-600';
+  if (level >= 0.4) return 'text-amber-600';
+  return 'text-red-600';
+};
+
+const getAgreementLabel = (level: number) => {
+  if (level >= 0.8) return 'Strong Consensus';
+  if (level >= 0.6) return 'Moderate Consensus';
+  if (level >= 0.4) return 'Mixed Views';
+  return 'High Disagreement';
+};
+
+const getControversyConfig = (level: string) => {
+  switch (level) {
+    case 'low':
+      return {
+        icon: CheckCircle,
+        label: 'Low Controversy',
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        description: 'Experts generally agree on this topic',
+      };
+    case 'medium':
+      return {
+        icon: AlertTriangle,
+        label: 'Moderate Controversy',
+        color: 'text-amber-600',
+        bgColor: 'bg-amber-50',
+        description: 'Some disagreement among experts',
+      };
+    case 'high':
+      return {
+        icon: XCircle,
+        label: 'High Controversy',
+        color: 'text-red-600',
+        bgColor: 'bg-red-50',
+        description: 'Significant disagreement among experts',
+      };
+    default:
+      return {
+        icon: Info,
+        label: 'Unknown',
+        color: 'text-gray-600',
+        bgColor: 'bg-gray-50',
+        description: 'Controversy level not determined',
+      };
+  }
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
 /**
  * ExpertConsensus - Displays expert consensus tracking and disagreement analysis
  *
@@ -51,65 +110,6 @@ export function ExpertConsensus({
   className,
 }: ExpertConsensusProps) {
   const [showPositionDetails, setShowPositionDetails] = useState(showDetails);
-
-  const getAgreementColor = (level: number) => {
-    if (level >= 0.8) return 'text-green-600';
-    if (level >= 0.6) return 'text-blue-600';
-    if (level >= 0.4) return 'text-amber-600';
-    return 'text-red-600';
-  };
-
-  const getAgreementLabel = (level: number) => {
-    if (level >= 0.8) return 'Strong Consensus';
-    if (level >= 0.6) return 'Moderate Consensus';
-    if (level >= 0.4) return 'Mixed Views';
-    return 'High Disagreement';
-  };
-
-  const getControversyConfig = (level: string) => {
-    switch (level) {
-      case 'low':
-        return {
-          icon: CheckCircle,
-          label: 'Low Controversy',
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
-          description: 'Experts generally agree on this topic',
-        };
-      case 'medium':
-        return {
-          icon: AlertTriangle,
-          label: 'Moderate Controversy',
-          color: 'text-amber-600',
-          bgColor: 'bg-amber-50',
-          description: 'Some disagreement among experts',
-        };
-      case 'high':
-        return {
-          icon: XCircle,
-          label: 'High Controversy',
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
-          description: 'Significant disagreement among experts',
-        };
-      default:
-        return {
-          icon: Info,
-          label: 'Unknown',
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-50',
-          description: 'Controversy level not determined',
-        };
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   const controversyConfig = getControversyConfig(consensus.controversyLevel);
   const ControversyIcon = controversyConfig.icon;

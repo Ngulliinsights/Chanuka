@@ -25,7 +25,7 @@ export type RequestBody = Record<string, unknown> | FormData | string | null;
 /**
  * API request configuration
  */
-export interface ApiRequest {
+export interface BaseClientRequest {
   url: string;
   method: HttpMethod;
   headers?: Record<string, string>;
@@ -37,7 +37,7 @@ export interface ApiRequest {
 /**
  * Standardized API response
  */
-export interface ApiResponse<T = unknown> {
+export interface BaseClientResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -65,14 +65,14 @@ export interface ApiClientConfig {
  * Request interceptor interface
  */
 export interface RequestInterceptor {
-  (request: ApiRequest): Promise<ApiRequest> | ApiRequest;
+  (request: BaseClientRequest): Promise<BaseClientRequest> | BaseClientRequest;
 }
 
 /**
  * Response interceptor interface
  */
 export interface ResponseInterceptor {
-  <T>(response: ApiResponse<T>): Promise<ApiResponse<T>> | ApiResponse<T>;
+  <T>(response: BaseClientResponse<T>): Promise<BaseClientResponse<T>> | BaseClientResponse<T>;
 }
 
 /**
@@ -175,7 +175,7 @@ export class BaseApiClient {
   /**
    * Main request method
    */
-  async request<T = unknown>(request: ApiRequest): Promise<ApiResponse<T>> {
+  async request<T = unknown>(request: BaseClientRequest): Promise<BaseClientResponse<T>> {
     const startTime = Date.now();
 
     try {
@@ -266,7 +266,7 @@ export class BaseApiClient {
   /**
    * GET request
    */
-  async get<T = unknown>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  async get<T = unknown>(url: string, headers?: Record<string, string>): Promise<BaseClientResponse<T>> {
     return this.request<T>({ url, method: 'GET', headers });
   }
 
@@ -277,7 +277,7 @@ export class BaseApiClient {
     url: string,
     body?: RequestBody,
     headers?: Record<string, string>
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BaseClientResponse<T>> {
     return this.request<T>({ url, method: 'POST', body, headers });
   }
 
@@ -288,7 +288,7 @@ export class BaseApiClient {
     url: string,
     body?: RequestBody,
     headers?: Record<string, string>
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BaseClientResponse<T>> {
     return this.request<T>({ url, method: 'PUT', body, headers });
   }
 
@@ -298,7 +298,7 @@ export class BaseApiClient {
   async delete<T = unknown>(
     url: string,
     headers?: Record<string, string>
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BaseClientResponse<T>> {
     return this.request<T>({ url, method: 'DELETE', headers });
   }
 
@@ -309,14 +309,14 @@ export class BaseApiClient {
     url: string,
     body?: RequestBody,
     headers?: Record<string, string>
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BaseClientResponse<T>> {
     return this.request<T>({ url, method: 'PATCH', body, headers });
   }
 
   /**
    * Executes a single HTTP request
    */
-  private async executeRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
+  private async executeRequest<T>(request: BaseClientRequest): Promise<BaseClientResponse<T>> {
     const url = request.url.startsWith('http')
       ? request.url
       : `${this.config.baseURL}${request.url}`;

@@ -13,9 +13,19 @@
 
 import React, { useState } from 'react';
 
-import { useArgumentsForBill } from '@/features/community';
+import { useArgumentsForBill } from '@client/features/community';
+import { ArgumentPosition } from '@shared/types/enums';
 
-import type { Argument, ArgumentPosition } from '@/types/domains/arguments';
+// Local Argument type compatible with community types
+interface BillArgument {
+  id: string;
+  position: ArgumentPosition;
+  argumentText: string;
+  strengthScore?: number;
+  confidenceScore?: number;
+  summary?: string;
+  createdAt?: string;
+}
 
 interface ArgumentsTabProps {
   billId: string;
@@ -56,33 +66,34 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   let filtered = argumentsList;
   
   if (positionFilter !== 'all') {
-    filtered = filtered.filter(arg => arg.position === positionFilter);
+    filtered = filtered.filter((arg: any) => (arg.position || arg.type) === positionFilter);
   }
 
   if (searchTerm) {
-    filtered = filtered.filter(arg =>
-      arg.argument_text?.toLowerCase().includes(searchTerm.toLowerCase())
+    filtered = filtered.filter((arg: any) =>
+      (arg.argumentText || arg.argument_text)?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 
   // Sort arguments
-  const sorted = [...filtered].sort((a, b) => {
+  const sorted = [...filtered].sort((a: any, b: any) => {
     switch (sortBy) {
       case 'strength':
-        return (b.strength_score || 0) - (a.strength_score || 0);
+        return ((b.strengthScore ?? b.strength_score) || 0) - ((a.strengthScore ?? a.strength_score) || 0);
       case 'confidence':
-        return (b.confidence_score || 0) - (a.confidence_score || 0);
+        return ((b.confidenceScore ?? b.confidence_score) || 0) - ((a.confidenceScore ?? a.confidence_score) || 0);
       case 'newest':
-        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        return new Date((b.createdAt ?? b.created_at) || 0).getTime() - new Date((a.createdAt ?? a.created_at) || 0).getTime();
       default:
         return 0;
     }
   });
 
-  // Count by position
-  const supportCount = argumentsList.filter(a => a.position === 'support').length;
-  const opposeCount = argumentsList.filter(a => a.position === 'oppose').length;
-  const neutralCount = argumentsList.filter(a => a.position === 'neutral').length;
+  // Count by position - use fallback for different property names
+  const getPosition = (a: any) => a.position || a.type || 'neutral';
+  const supportCount = argumentsList.filter((a: any) => getPosition(a) === 'support').length;
+  const opposeCount = argumentsList.filter((a: any) => getPosition(a) === 'oppose').length;
+  const neutralCount = argumentsList.filter((a: any) => getPosition(a) === 'neutral').length;
   const total = argumentsList.length;
 
   return (
@@ -161,7 +172,7 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
           </div>
         ) : (
           sorted.map((arg) => (
-            <ArgumentCard key={arg.id} argument={arg} billId={billId} />
+            <ArgumentCard key={arg.id} argument={arg as unknown as BillArgument} billId={billId} />
           ))
         )}
       </div>
@@ -172,7 +183,7 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
 /**
  * ArgumentCard Component - Displays a single argument
  */
-function ArgumentCard({ argument, billId }: { argument: Argument; billId: string }) {
+function ArgumentCard({ argument, billId }: { argument: BillArgument; billId: string }) {
   const [expanded, setExpanded] = useState(false);
 
   const positionColors: Record<ArgumentPosition, string> = {
@@ -209,15 +220,15 @@ function ArgumentCard({ argument, billId }: { argument: Argument; billId: string
               {positionLabel[position]}
             </span>
             <span className="text-xs text-gray-600">
-              Strength: {Math.round((argument.strength_score || 0) * 100)}%
+              Strength: {Math.round((argument.strengthScore || 0) * 100)}%
             </span>
             <span className="text-xs text-gray-600">
-              Confidence: {Math.round((argument.confidence_score || 0) * 100)}%
+              Confidence: {Math.round((argument.confidenceScore || 0) * 100)}%
             </span>
           </div>
           
           <p className="text-gray-800 font-medium line-clamp-2">
-            {argument.argument_text}
+            {argument.argumentText}
           </p>
         </div>
 
@@ -231,7 +242,7 @@ function ArgumentCard({ argument, billId }: { argument: Argument; billId: string
           <div>
             <h4 className="font-semibold text-sm text-gray-700 mb-2">Full Argument</h4>
             <p className="text-gray-700 text-sm leading-relaxed">
-              {argument.argument_text}
+              {argument.argumentText}
             </p>
           </div>
 
@@ -249,13 +260,13 @@ function ArgumentCard({ argument, billId }: { argument: Argument; billId: string
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white bg-opacity-50 p-2 rounded">
                 <div className="text-2xl font-bold text-gray-800">
-                  {Math.round((argument.strength_score || 0) * 100)}%
+                  {Math.round((argument.strengthScore || 0) * 100)}%
                 </div>
                 <div className="text-xs text-gray-600">Argument Strength</div>
               </div>
               <div className="bg-white bg-opacity-50 p-2 rounded">
                 <div className="text-2xl font-bold text-gray-800">
-                  {Math.round((argument.confidence_score || 0) * 100)}%
+                  {Math.round((argument.confidenceScore || 0) * 100)}%
                 </div>
                 <div className="text-xs text-gray-600">Confidence</div>
               </div>

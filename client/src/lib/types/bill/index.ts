@@ -27,11 +27,9 @@
 export type {
   Bill,
   // BillStatus, // Enum exported by value below
-  BillStatusType,
   // UrgencyLevel, // Enum exported by value below
-  UrgencyLevelType,
   // ComplexityLevel, // Enum exported by value below
-  ComplexityLevelType,
+  // Note: Use BillStatusValue, UrgencyLevelValue, ComplexityLevelValue from @shared/types/enums
   Sponsor,
   ExtendedBill,
   BillAmendment,
@@ -56,7 +54,6 @@ export {
   isBill,
   isBillAnalysis,
   isExtendedBill,
-  isExtendedBill,
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
@@ -70,7 +67,7 @@ export type {
   BillAnalytics,
   DemographicsAnalysis,
   AnalyticsTimeline,
-  AnalyticsSummary,
+  AnalyticsSummary as BillAnalyticsSummary,
   CategoryAnalytics,
   TrendingBill,
   UserEngagementSummary,
@@ -84,9 +81,9 @@ export type {
   ShareTimelineEntry,
   VoteAnalytics,
   VoteTimelineEntry,
-  AnalyticsFilters,
-  AnalyticsQueryParams,
-  AnalyticsResponse,
+  AnalyticsFilters as BillAnalyticsFilters,
+  AnalyticsQueryParams as BillAnalyticsQueryParams,
+  AnalyticsResponse as BillAnalyticsResponse,
   PaginatedAnalyticsResponse,
 } from './bill-analytics';
 

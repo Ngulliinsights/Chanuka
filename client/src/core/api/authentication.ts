@@ -9,8 +9,7 @@ import { logger } from '@client/lib/utils/logger';
 
 import { tokenManager } from '../auth';
 
-import { ApiError } from './base-client';
-import { ApiRequest } from './types';
+import { ApiError, BaseClientRequest } from './base-client';
 
 /**
  * Authentication configuration for API clients
@@ -26,7 +25,7 @@ export interface AuthConfig {
  * Authentication interceptor that adds bearer tokens to requests
  */
 export class AuthenticationInterceptor {
-  async intercept(request: ApiRequest): Promise<ApiRequest> {
+  async intercept(request: BaseClientRequest): Promise<BaseClientRequest> {
     const token = await tokenManager.getAccessToken();
     if (token) {
       return {

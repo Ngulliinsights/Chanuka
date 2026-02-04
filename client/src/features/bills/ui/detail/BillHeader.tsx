@@ -21,7 +21,7 @@ export function BillHeader({ bill }: BillHeaderProps) {
     identifier: bill.billNumber,
     description: bill.summary,
     dateCreated: bill.introductionDate,
-    dateModified: bill.timeline?.[bill.timeline.length - 1]?.timestamp,
+    dateModified: bill.timeline?.[bill.timeline.length - 1]?.date,
     legislativeStatus: bill.status,
     sponsor: bill.sponsors?.map(sponsor => ({
       '@type': 'Person',
@@ -72,7 +72,7 @@ export function BillHeader({ bill }: BillHeaderProps) {
               <Badge variant="outline" className="font-mono">
                 {bill.billNumber}
               </Badge>
-              <Badge variant="default" style={{ backgroundColor: getStatusColor(bill.status) }}>
+              <Badge variant="default" className={getStatusColor(bill.status) === 'hsl(var(--status-introduced))' ? 'bg-blue-500' : 'bg-gray-500'}>
                 {bill.status}
               </Badge>
             </div>
@@ -86,12 +86,12 @@ export function BillHeader({ bill }: BillHeaderProps) {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>Introduced: {new Date(bill.introductionDate).toLocaleDateString()}</span>
+                <span>Introduced: {new Date(bill.introductionDate ?? '').toLocaleDateString()}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Updated: {new Date(bill.timeline?.[bill.timeline.length - 1]?.timestamp || bill.introductionDate).toLocaleDateString()}</span>
+                <span>Updated: {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introductionDate || '').toLocaleDateString()}</span>
               </div>
 
               <div className="flex items-center gap-2">

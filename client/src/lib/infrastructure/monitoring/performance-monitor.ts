@@ -491,13 +491,34 @@ class PerformanceMonitoring {
   }
 
   private sendMetricsToService(payload: MetricsPayload): void {
+    // Skip sending metrics in development mode (backend not running)
+    if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
+      return;
+    }
+
+    // Simple circuit breaker to prevent flooding
+    if (this.consecutiveFailures > 3) {
+      if (Math.random() > 0.1) return; // 90% chance to skip if we kept failing
+    }
+
+    const endpoint = '/api/metrics';
+
     // Use sendBeacon when available - it's more reliable during page unload
     if (navigator.sendBeacon) {
       const data = JSON.stringify(payload);
-      navigator.sendBeacon('/api/metrics', data);
+      // sendBeacon returns false if it failed to queue (e.g. data too large)
+      // It does NOT return the status code of the request
+      try {
+        const result = navigator.sendBeacon(endpoint, data);
+        if (!result) {
+            console.debug('sendBeacon failed to queue data');
+        }
+      } catch (e) {
+        console.warn('sendBeacon error:', e);
+      }
     } else {
       // Fallback to fetch with keepalive for browsers without sendBeacon
-      fetch('/api/metrics', {
+      fetch(endpoint, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
@@ -505,10 +526,15 @@ class PerformanceMonitoring {
         },
         keepalive: true,
       }).catch(error => {
-        console.warn('Failed to send metrics:', error);
+        this.consecutiveFailures++;
+        if (this.consecutiveFailures < 3) {
+            console.warn('Failed to send metrics:', error);
+        }
       });
     }
   }
+
+  private consecutiveFailures = 0;
 
   // Utility methods
 

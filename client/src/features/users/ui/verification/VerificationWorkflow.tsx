@@ -25,13 +25,12 @@ import {
 import { Textarea } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import {
-  VerificationWorkflow as VerificationWorkflowType,
-  VerificationStatus,
+  VerificationWorkflowType,
 } from '@client/lib/types';
 
 interface VerificationWorkflowProps {
   workflow: VerificationWorkflowType;
-  onReview?: (workflowId: string, status: VerificationStatus, notes: string) => Promise<void>;
+  onReview?: (workflowId: string, status: VerificationWorkflowType['status'], notes: string) => Promise<void>;
   onCommunityFeedback?: (
     workflowId: string,
     feedback: string,
@@ -68,7 +67,7 @@ export function VerificationWorkflow({
   );
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
-  const getStatusConfig = (status: VerificationStatus) => {
+  const getStatusConfig = (status: VerificationWorkflowType['status']) => {
     switch (status) {
       case 'pending':
         return {
@@ -122,12 +121,12 @@ export function VerificationWorkflow({
   };
 
   const handleReview = useCallback(
-    async (status: VerificationStatus) => {
+    async (status: VerificationWorkflowType['status']) => {
       if (!onReview || !reviewNotes.trim()) return;
 
       setIsReviewing(true);
       try {
-        await onReview(workflow.id, status, reviewNotes.trim());
+        await onReview(String(workflow.id), status, reviewNotes.trim());
         setReviewNotes('');
       } catch (error) {
         console.error('Error submitting review:', error);
@@ -143,7 +142,7 @@ export function VerificationWorkflow({
 
     setIsSubmittingFeedback(true);
     try {
-      await onCommunityFeedback(workflow.id, communityFeedback.trim(), selectedVote);
+      await onCommunityFeedback(String(workflow.id), communityFeedback.trim(), selectedVote);
       setCommunityFeedback('');
       setSelectedVote(null);
     } catch (error) {
@@ -188,7 +187,7 @@ export function VerificationWorkflow({
           </Badge>
         </div>
         <CardDescription>
-          Contribution ID: {workflow.contributionId} • Created {formatDate(workflow.createdAt)}
+          Contribution ID: {workflow.contributionId} • Submitted {formatDate(workflow.submittedAt)}
         </CardDescription>
       </CardHeader>
 
@@ -196,8 +195,8 @@ export function VerificationWorkflow({
         {/* Review Information */}
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Expert ID:</span>
-            <span className="font-medium">{workflow.expertId}</span>
+            <span className="text-muted-foreground">Contribution ID:</span>
+            <span className="font-medium">{workflow.contributionId}</span>
           </div>
 
           {workflow.reviewerId && (
@@ -207,186 +206,193 @@ export function VerificationWorkflow({
             </div>
           )}
 
-          {workflow.reviewDate && (
+          {workflow.reviewedAt && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Review Date:</span>
-              <span className="font-medium">{formatDate(workflow.reviewDate)}</span>
+              <span className="text-muted-foreground">Reviewed:</span>
+              <span className="font-medium">{formatDate(workflow.reviewedAt)}</span>
             </div>
           )}
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Last Updated:</span>
-            <span className="font-medium">{formatDate(workflow.updatedAt)}</span>
+            {/* Keeping Last Updated empty or removing if not available, usually workflow.reviewedAt or submittedAt */}
+             <span className="font-medium">{formatDate(workflow.reviewedAt || workflow.submittedAt)}</span>
           </div>
-        </div>
 
-        {/* Review Notes */}
-        {workflow.reviewNotes && (
-          <div className="p-3 bg-muted/50 rounded-md">
-            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Review Notes
-            </h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">{workflow.reviewNotes}</p>
-          </div>
-        )}
-
-        {/* Review Actions (for reviewers) */}
-        {canReview && (workflow.status === 'pending' || workflow.status === 'in_review') && (
-          <div className="space-y-3 p-4 bg-blue-50 rounded-md border border-blue-200">
-            <h4 className="text-sm font-medium text-blue-900">Review This Contribution</h4>
-
-            <Textarea
-              placeholder="Add review notes (required)..."
-              value={reviewNotes}
-              onChange={e => setReviewNotes(e.target.value)}
-              className="min-h-[100px] text-sm"
-              maxLength={1000}
-            />
-
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">
-                {reviewNotes.length}/1000 characters
+          {/* Review Notes */}
+          {workflow.feedback && workflow.feedback.length > 0 && (
+            <div className="space-y-2 pt-2 border-t">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Review Feedback
               </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleReview('needs_revision')}
-                  disabled={!reviewNotes.trim() || isReviewing}
-                  className="text-xs"
-                >
-                  <RotateCcw className="h-3 w-3 mr-1" />
-                  Needs Revision
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleReview('rejected')}
-                  disabled={!reviewNotes.trim() || isReviewing}
-                  className="text-xs"
-                >
-                  <Circle className="h-3 w-3 mr-1" />
-                  Reject
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => handleReview('approved')}
-                  disabled={!reviewNotes.trim() || isReviewing}
-                  className="text-xs"
-                >
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Approve
-                </Button>
+              <div className="p-3 bg-muted rounded-md text-sm italic">
+                "{workflow.feedback[0]}"
+                {workflow.feedback.length > 1 && (
+                  <span className="text-xs text-muted-foreground block mt-1">
+                    +{workflow.feedback.length - 1} more notes
+                  </span>
+                )}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Community Feedback Section */}
-        {showCommunityFeedback && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Community Feedback ({workflow.communityFeedback.length})
-            </h4>
+          {/* Review Actions (for reviewers) */}
+          {canReview && (workflow.status === 'pending' || workflow.status === 'in_review') && (
+            <div className="space-y-3 p-4 bg-blue-50 rounded-md border border-blue-200">
+              <h4 className="text-sm font-medium text-blue-900">Review This Contribution</h4>
 
-            {/* Existing Community Feedback */}
-            {workflow.communityFeedback.length > 0 && (
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {workflow.communityFeedback.map((feedback, index) => (
-                  <div key={index} className="p-3 bg-muted/30 rounded-md text-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs">
-                            {feedback.userId.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{feedback.userId}</span>
-                        <Badge
-                          variant={
-                            feedback.vote === 'approve'
-                              ? 'default'
-                              : feedback.vote === 'reject'
-                                ? 'destructive'
-                                : 'secondary'
-                          }
-                          className="text-xs"
-                        >
-                          {feedback.vote.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(feedback.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed">{feedback.feedback}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+              <Textarea
+                placeholder="Add review notes (required)..."
+                value={reviewNotes}
+                onChange={(e) => setReviewNotes(e.target.value)}
+                className="min-h-[100px] text-sm bg-white"
+                maxLength={1000}
+              />
 
-            {/* Add Community Feedback */}
-            {workflow.status !== 'approved' && workflow.status !== 'rejected' && (
-              <div className="space-y-3 p-3 bg-gray-50 rounded-md">
-                <h5 className="text-sm font-medium">Add Your Feedback</h5>
-
-                <div className="flex gap-2 mb-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  {reviewNotes.length}/1000 characters
+                </span>
+                <div className="flex gap-2">
                   <Button
-                    variant={selectedVote === 'approve' ? 'default' : 'outline'}
+                    variant="outline"
                     size="sm"
-                    onClick={() => setSelectedVote('approve')}
-                    className="text-xs"
-                  >
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Approve
-                  </Button>
-                  <Button
-                    variant={selectedVote === 'needs_revision' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedVote('needs_revision')}
-                    className="text-xs"
+                    onClick={() => handleReview('needs_revision')}
+                    disabled={!reviewNotes.trim() || isReviewing}
+                    className="text-xs text-amber-700 hover:text-amber-800 hover:bg-amber-50 border-amber-200"
                   >
                     <RotateCcw className="h-3 w-3 mr-1" />
-                    Needs Work
+                    Needs Revision
                   </Button>
                   <Button
-                    variant={selectedVote === 'reject' ? 'destructive' : 'outline'}
+                    variant="destructive"
                     size="sm"
-                    onClick={() => setSelectedVote('reject')}
+                    onClick={() => handleReview('rejected')}
+                    disabled={!reviewNotes.trim() || isReviewing}
                     className="text-xs"
                   >
                     <Circle className="h-3 w-3 mr-1" />
                     Reject
                   </Button>
-                </div>
-
-                <Textarea
-                  placeholder="Explain your feedback..."
-                  value={communityFeedback}
-                  onChange={e => setCommunityFeedback(e.target.value)}
-                  className="min-h-[80px] text-sm"
-                  maxLength={500}
-                />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    {communityFeedback.length}/500 characters
-                  </span>
                   <Button
                     size="sm"
-                    onClick={handleCommunityFeedback}
-                    disabled={!communityFeedback.trim() || !selectedVote || isSubmittingFeedback}
+                    onClick={() => handleReview('approved')}
+                    disabled={!reviewNotes.trim() || isReviewing}
                     className="text-xs"
                   >
-                    Submit Feedback
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Approve
                   </Button>
                 </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+
+          {/* Community Feedback Section */}
+          {showCommunityFeedback && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Community Feedback ({workflow.communityFeedback?.length || 0})
+              </h4>
+
+              {/* Existing Community Feedback */}
+              {workflow.communityFeedback && workflow.communityFeedback.length > 0 && (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {workflow.communityFeedback.map((feedback, index) => (
+                    <div key={index} className="p-3 bg-muted/30 rounded-md text-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarFallback className="text-xs">
+                              {feedback.userId.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{feedback.userId}</span>
+                          <Badge
+                            variant={
+                              feedback.vote === 'approve'
+                                ? 'default'
+                                : feedback.vote === 'reject'
+                                ? 'destructive'
+                                : 'secondary'
+                            }
+                            className="text-xs"
+                          >
+                            {feedback.vote.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDate(feedback.timestamp)}
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed">{feedback.feedback}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Community Feedback */}
+              {workflow.status !== 'approved' && workflow.status !== 'rejected' && (
+                <div className="space-y-3 p-3 bg-gray-50 rounded-md">
+                  <h5 className="text-sm font-medium">Add Your Feedback</h5>
+
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      variant={selectedVote === 'approve' ? 'primary' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedVote('approve')}
+                      className="text-xs"
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Approve
+                    </Button>
+                    <Button
+                      variant={selectedVote === 'needs_revision' ? 'primary' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedVote('needs_revision')}
+                      className="text-xs"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Needs Work
+                    </Button>
+                    <Button
+                      variant={selectedVote === 'reject' ? 'destructive' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedVote('reject')}
+                      className="text-xs"
+                    >
+                      <Circle className="h-3 w-3 mr-1" />
+                      Reject
+                    </Button>
+                  </div>
+
+                  <Textarea
+                    placeholder="Explain your feedback..."
+                    value={communityFeedback}
+                    onChange={(e) => setCommunityFeedback(e.target.value)}
+                    className="min-h-[80px] text-sm"
+                    maxLength={500}
+                  />
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {communityFeedback.length}/500 characters
+                    </span>
+                    <Button
+                      size="sm"
+                      onClick={handleCommunityFeedback}
+                      disabled={!communityFeedback.trim() || !selectedVote || isSubmittingFeedback}
+                      className="text-xs"
+                    >
+                      Submit Feedback
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

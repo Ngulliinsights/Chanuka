@@ -156,7 +156,7 @@ export class ComprehensiveAnalyticsTracker {
   private static instance: ComprehensiveAnalyticsTracker;
 
   private journeyTracker: typeof userJourneyTracker;
-  private performanceMonitor: PerformanceMonitor;
+  private performanceMonitor: PerformanceMonitor | undefined;
   private errorAnalytics: ErrorAnalyticsService;
 
   private events: AnalyticsEvent[] = [];
@@ -231,7 +231,14 @@ export class ComprehensiveAnalyticsTracker {
 
   private constructor() {
     this.journeyTracker = userJourneyTracker;
-    this.performanceMonitor = PerformanceMonitor.getInstance();
+    
+    try {
+      this.performanceMonitor = PerformanceMonitor.getInstance();
+    } catch (error) {
+      logger.warn('Failed to initialize PerformanceMonitor in ComprehensiveAnalyticsTracker', { error });
+      // We can continue without performance monitoring, but need to handle null check
+    }
+    
     this.errorAnalytics = ErrorAnalyticsService.getInstance();
 
     this.initialize();
@@ -260,9 +267,48 @@ export class ComprehensiveAnalyticsTracker {
   }
 
   /**
+   * Start periodic flushing of analytics events
+   */
+  private startPeriodicFlush(): void {
+    if (typeof window === 'undefined') return;
+
+    // Flush every 30 seconds
+    setInterval(() => {
+      this.flush();
+    }, 30000);
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+      this.flush();
+    });
+  }
+
+  /**
+   * Flush accumulated events to the server
+   */
+  private async flush(): Promise<void> {
+    if (this.events.length === 0) return;
+
+    const eventsToFlush = [...this.events];
+    this.events = [];
+
+    try {
+      // TODO: Implement batch tracking in AnalyticsApiService
+      // await analyticsApiService.trackEvents(eventsToFlush);
+      logger.debug(`Flushing ${eventsToFlush.length} analytics events`, { events: eventsToFlush });
+    } catch (error) {
+      logger.error('Failed to flush analytics events', { error, count: eventsToFlush.length });
+      // Re-queue failed events (optional, depending on strategy)
+      // this.events = [...eventsToFlush, ...this.events];
+    }
+  }
+
+  /**
    * Setup performance tracking integration
    */
   private setupPerformanceTracking(): void {
+    if (!this.performanceMonitor) return;
+
     // Listen to Web Vitals metrics
     this.performanceMonitor.getWebVitalsMonitor().addListener((metric: WebVitalsMetric) => {
       this.trackPerformanceMetric(metric);
@@ -325,7 +371,7 @@ export class ComprehensiveAnalyticsTracker {
    */
   private recordPagePerformance(navEntry: PerformanceNavigationTiming): void {
     const pageId = window.location.pathname;
-    const webVitals = this.performanceMonitor.getWebVitalsMetrics();
+    const webVitals = this.performanceMonitor ? this.performanceMonitor.getWebVitalsMetrics() : [];
 
     const metrics: PagePerformanceMetrics = {
       pageId,
@@ -564,7 +610,9 @@ export class ComprehensiveAnalyticsTracker {
    */
   public async getAnalyticsDashboard(): Promise<AnalyticsDashboardData> {
     const journeyAnalytics = this.journeyTracker.getJourneyAnalytics();
-    const performanceStats = this.performanceMonitor.getPerformanceStats();
+    const performanceStats = this.performanceMonitor 
+      ? this.performanceMonitor.getPerformanceStats() 
+      : { averageLoadTime: 0 };
     const errorStats = this.errorAnalytics.getAnalytics();
 
     // Calculate overview metrics
@@ -606,7 +654,7 @@ export class ComprehensiveAnalyticsTracker {
       personaBreakdown,
       performanceMetrics: {
         averageLoadTime: performanceStats.averageLoadTime,
-        coreWebVitalsScore: this.performanceMonitor.getOverallScore(),
+        coreWebVitalsScore: this.performanceMonitor ? this.performanceMonitor.getOverallScore() : 0,
         errorRate: errorStats.totalErrors / Math.max(totalSessions, 1),
         performanceIssues: this.countPerformanceIssues(),
       },
@@ -736,7 +784,7 @@ export class ComprehensiveAnalyticsTracker {
    * Get system health status
    */
   private getSystemHealth(): 'healthy' | 'warning' | 'critical' {
-    const performanceScore = this.performanceMonitor.getOverallScore();
+    const performanceScore = this.performanceMonitor ? this.performanceMonitor.getOverallScore() : 100;
     const errorRate = this.calculateCurrentErrorRate();
 
     if (performanceScore < 50 || errorRate > 0.1) {

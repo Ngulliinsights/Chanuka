@@ -38,84 +38,84 @@ export type RequestAuthType =
  */
 export interface ApiRequest<T = unknown> extends BaseEntity {
   /**
-   * Unique request identifier
-   */
+    * Unique request identifier
+    */
   readonly requestId: string;
 
   /**
-   * API endpoint path
-   */
+    * API endpoint path
+    */
   readonly endpoint: string;
 
   /**
-   * HTTP method
-   */
+    * HTTP method
+    */
   readonly method: HttpMethod;
 
   /**
-   * Request headers
-   */
-  readonly headers?: Readonly<Record<string, string>>;
+    * Request headers
+    */
+  readonly headers?: Readonly<Record<string, string>> | undefined;
 
   /**
-   * Request body/payload
-   */
-  readonly body?: T;
+    * Request body/payload
+    */
+  readonly body?: T | undefined;
 
   /**
-   * Query parameters
-   */
-  readonly queryParams?: Readonly<Record<string, string | number | boolean>>;
+    * Query parameters
+    */
+  readonly queryParams?: Readonly<Record<string, string | number | boolean>> | undefined;
 
   /**
-   * Path parameters
-   */
-  readonly pathParams?: Readonly<Record<string, string>>;
+    * Path parameters
+    */
+  readonly pathParams?: Readonly<Record<string, string>> | undefined;
 
   /**
-   * Content type
-   */
-  readonly contentType?: RequestContentType;
+    * Content type
+    */
+  readonly contentType?: RequestContentType | undefined;
 
   /**
-   * Authentication type
-   */
-  readonly authType?: RequestAuthType;
+    * Authentication type
+    */
+  readonly authType?: RequestAuthType | undefined;
 
   /**
-   * Authentication token/credentials
-   */
-  readonly authToken?: string;
+    * Authentication token/credentials
+    */
+  readonly authToken?: string | undefined;
 
   /**
-   * Request timeout in milliseconds
-   */
-  readonly timeout?: number;
+    * Request timeout in milliseconds
+    */
+  readonly timeout?: number | undefined;
 
   /**
-   * Request priority
-   */
-  readonly priority?: 'low' | 'normal' | 'high' | 'critical';
+    * Request priority
+    */
+  readonly priority?: 'low' | 'normal' | 'high' | 'critical' | undefined;
 
   /**
-   * Request metadata
-   */
-  readonly metadata?: Readonly<Record<string, unknown>>;
+    * Request metadata
+    */
+  readonly metadata?: Readonly<Record<string, unknown>> | undefined;
 
   /**
-   * Timestamp when request was created
-   */
+    * Timestamp when request was created
+    */
   readonly createdAt: Date;
 
   /**
-   * Timestamp when request was last updated
-   */
+    * Timestamp when request was last updated
+    */
   readonly updatedAt: Date;
 
   /**
-   * Request version for backward compatibility
-   */
-  readonly version?: string;
+    * Request version for backward compatibility
+    */
+  readonly version?: string | undefined;
 }
 
 /**
@@ -124,34 +124,34 @@ export interface ApiRequest<T = unknown> extends BaseEntity {
  */
 export interface PaginatedApiRequest<T = unknown> extends ApiRequest<T> {
   /**
-   * Page number (1-based)
-   */
+    * Page number (1-based)
+    */
   readonly page?: number;
 
   /**
-   * Items per page
-   */
+    * Items per page
+    */
   readonly pageSize?: number;
 
   /**
-   * Sort field
-   */
-  readonly sortBy?: string;
+    * Sort field
+    */
+  readonly sortBy?: string | undefined;
 
   /**
-   * Sort direction
-   */
-  readonly sortDirection?: 'asc' | 'desc';
+    * Sort direction
+    */
+  readonly sortDirection?: 'asc' | 'desc' | undefined;
 
   /**
-   * Filter criteria
-   */
-  readonly filters?: Readonly<Record<string, unknown>>;
+    * Filter criteria
+    */
+  readonly filters?: Readonly<Record<string, unknown>> | undefined;
 
   /**
-   * Search query
-   */
-  readonly search?: string;
+    * Search query
+    */
+  readonly search?: string | undefined;
 }
 
 /**
@@ -160,39 +160,39 @@ export interface PaginatedApiRequest<T = unknown> extends ApiRequest<T> {
  */
 export interface FileUploadRequest extends ApiRequest<File | Blob> {
   /**
-   * File name
-   */
+    * File name
+    */
   readonly fileName: string;
 
   /**
-   * File type/MIME type
-   */
+    * File type/MIME type
+    */
   readonly fileType: string;
 
   /**
-   * File size in bytes
-   */
+    * File size in bytes
+    */
   readonly fileSize: number;
 
   /**
-   * Upload progress callback
-   */
-  readonly onProgress?: (progress: number) => void;
+    * Upload progress callback
+    */
+  readonly onProgress?: ((progress: number) => void) | undefined;
 
   /**
-   * Chunked upload configuration
-   */
-  readonly chunkSize?: number;
+    * Chunked upload configuration
+    */
+  readonly chunkSize?: number | undefined;
 
   /**
-   * Total chunks for chunked uploads
-   */
-  readonly totalChunks?: number;
+    * Total chunks for chunked uploads
+    */
+  readonly totalChunks?: number | undefined;
 
   /**
-   * Current chunk index for chunked uploads
-   */
-  readonly currentChunk?: number;
+    * Current chunk index for chunked uploads
+    */
+  readonly currentChunk?: number | undefined;
 }
 
 /**
@@ -201,24 +201,24 @@ export interface FileUploadRequest extends ApiRequest<File | Blob> {
  */
 export interface GraphQLRequest<T = unknown> extends ApiRequest<T> {
   /**
-   * GraphQL query string
-   */
+    * GraphQL query string
+    */
   readonly query: string;
 
   /**
-   * GraphQL variables
-   */
-  readonly variables?: Readonly<Record<string, unknown>>;
+    * GraphQL variables
+    */
+  readonly variables?: Readonly<Record<string, unknown>> | undefined;
 
   /**
-   * GraphQL operation name
-   */
-  readonly operationName?: string;
+    * GraphQL operation name
+    */
+  readonly operationName?: string | undefined;
 
   /**
-   * GraphQL extensions
-   */
-  readonly extensions?: Readonly<Record<string, unknown>>;
+    * GraphQL extensions
+    */
+  readonly extensions?: Readonly<Record<string, unknown>> | undefined;
 }
 
 /**
@@ -227,18 +227,18 @@ export interface GraphQLRequest<T = unknown> extends ApiRequest<T> {
  */
 export interface WebSocketRequest<T = unknown> extends ApiRequest<T> {
   /**
-   * WebSocket event type
-   */
+    * WebSocket event type
+    */
   readonly eventType: string;
 
   /**
-   * WebSocket connection state
-   */
+    * WebSocket connection state
+    */
   readonly connectionState?: 'connecting' | 'open' | 'closing' | 'closed';
 
   /**
-   * WebSocket message type
-   */
+    * WebSocket message type
+    */
   readonly messageType?: 'text' | 'binary' | 'ping' | 'pong';
 }
 
@@ -248,18 +248,18 @@ export interface WebSocketRequest<T = unknown> extends ApiRequest<T> {
  */
 export interface RequestValidationResult {
   /**
-   * Whether the request is valid
-   */
+    * Whether the request is valid
+    */
   readonly valid: boolean;
 
   /**
-   * Validation errors if any
-   */
+    * Validation errors if any
+    */
   readonly errors?: readonly string[];
 
   /**
-   * Validated request if successful
-   */
+    * Validated request if successful
+    */
   readonly validatedRequest?: ApiRequest<unknown>;
 }
 
@@ -269,35 +269,35 @@ export interface RequestValidationResult {
  */
 export interface RequestFactoryOptions<T = unknown> {
   /**
-   * Base endpoint URL
-   */
+    * Base endpoint URL
+    */
   readonly baseUrl?: string;
 
   /**
-   * Default headers
-   */
+    * Default headers
+    */
   readonly defaultHeaders?: Readonly<Record<string, string>>;
 
   /**
-   * Default authentication
-   */
+    * Default authentication
+    */
   readonly defaultAuth?: {
     readonly type: RequestAuthType;
     readonly token: string;
   };
 
   /**
-   * Default timeout
-   */
+    * Default timeout
+    */
   readonly defaultTimeout?: number;
 
   /**
-   * Request-specific data
-   */
-  readonly requestData: T;
+    * Request-specific data
+    */
+  readonly requestData?: Partial<ApiRequest<T>>;
 
   /**
-   * Request metadata
-   */
+    * Request metadata
+    */
   readonly metadata?: Readonly<Record<string, unknown>>;
 }

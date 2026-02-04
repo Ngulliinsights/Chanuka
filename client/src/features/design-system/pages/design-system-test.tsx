@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HybridDesignSystemTest from '@client/lib/design-system';
+// import HybridDesignSystemTest from '@client/lib/design-system';
 
 /**
  * Design System Test Page
@@ -12,7 +12,11 @@ import HybridDesignSystemTest from '@client/lib/design-system';
 const DesignSystemTestPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
-      <HybridDesignSystemTest />
+      {/* <HybridDesignSystemTest /> */}
+      <div className="container py-8">
+        <h1 className="text-2xl font-bold mb-4">Design System Test</h1>
+        <p>Test page is currently under maintenance during migration.</p>
+      </div>
     </div>
   );
 };

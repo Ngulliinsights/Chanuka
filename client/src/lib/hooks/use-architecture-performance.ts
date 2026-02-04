@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-import { architecturePerformanceMonitor } from '../core/performance/architecture-performance-monitor';
+import { architecturePerformanceMonitor } from '@client/core/performance/architecture-performance-monitor';
 
 interface UseArchitecturePerformanceOptions {
   componentName?: string;

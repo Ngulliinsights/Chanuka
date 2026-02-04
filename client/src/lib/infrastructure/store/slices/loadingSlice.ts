@@ -7,8 +7,18 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority } from '@client/lib/ui/loading';
+import { LoadingOperation, LoadingStats, LoadingType, LoadingPriority, AssetLoadingProgress } from '@client/lib/types/loading';
 import { logger } from '@client/lib/utils/logger';
+
+// Helper type to remove readonly modifiers for Redux state (Immer handles mutability)
+type MutableLoadingOperation = {
+  -readonly [K in keyof LoadingOperation]: LoadingOperation[K] extends ReadonlyArray<infer U> | undefined
+    ? U[] | undefined
+    : LoadingOperation[K];
+};
+
+// Extended LoadingOperation with mutable properties for Redux state
+export type ExtendedLoadingOperation = MutableLoadingOperation;
 
 // Extended type definitions
 interface ConnectionInfo {
@@ -27,19 +37,8 @@ interface AdaptiveSettings {
   connectionMultiplier: number;
 }
 
-interface AssetLoadingProgress {
-  loaded: number;
-  total: number;
-  phase: 'preload' | 'loading' | 'complete' | 'error';
-  currentAsset?: string;
-  percentage?: number;
-}
-
 // Extended types that augment the base loading types
-interface ExtendedLoadingOperation extends LoadingOperation {
-  cancelled?: boolean;
-  timeoutWarningShown?: boolean;
-}
+// Note: ExtendedLoadingOperation was removed as it clashed with LoadingOperation
 
 interface ExtendedLoadingStats extends LoadingStats {
   completedOperations: number;
@@ -48,13 +47,16 @@ interface ExtendedLoadingStats extends LoadingStats {
   averageLoadTime: number;
   activeOperations: number;
   retryRate: number;
+  successRate: number;
+  connectionImpact: 'low' | 'medium' | 'high';
   lastUpdate: number;
-  connectionImpact?: 'low' | 'medium' | 'high';
+  currentQueueLength: number;
+  peakQueueLength: number;
 }
 
 // Loading state interface for Redux store
 interface LoadingStateData {
-  operations: Record<string, ExtendedLoadingOperation>;
+  operations: Record<string, MutableLoadingOperation>;
   globalLoading: boolean;
   highPriorityLoading: boolean;
   connectionInfo: ConnectionInfo;
@@ -85,6 +87,7 @@ const initialState: LoadingStateData = {
     loaded: 0,
     total: 0,
     phase: 'preload',
+    status: 'pending',
   },
   stats: {
     loaded: 0,
@@ -97,14 +100,24 @@ const initialState: LoadingStateData = {
     averageLoadTime: 0,
     activeOperations: 0,
     retryRate: 0,
+    successRate: 0,
+    connectionImpact: 'low',
     lastUpdate: Date.now(),
+    currentQueueLength: 0,
+    peakQueueLength: 0,
   },
 };
 
 // Async thunks for loading operations
 export const startLoadingOperation = createAsyncThunk(
   'loading/startOperation',
-  async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>, { rejectWithValue }) => {
+  async (
+    operation: Omit<
+      LoadingOperation,
+      'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled' | 'state'
+    >,
+    { rejectWithValue }
+  ) => {
     try {
       // Validate operation
       if (!operation.id || !operation.type) {
@@ -245,11 +258,18 @@ const loadingSlice = createSlice({
     // Operation management
     updateOperation: (
       state,
-      action: PayloadAction<{ id: string; updates: Partial<ExtendedLoadingOperation> }>
+      action: PayloadAction<{ id: string; updates: Partial<LoadingOperation> }>
     ) => {
       const { id, updates } = action.payload;
       if (state.operations[id]) {
-        state.operations[id] = { ...state.operations[id], ...updates };
+        // Handle dependencies separately to convert readonly to mutable
+        const { dependencies, ...restUpdates } = updates;
+        state.operations[id] = { 
+          ...state.operations[id], 
+          ...restUpdates,
+          // Convert readonly dependencies to mutable if present
+          ...(dependencies !== undefined ? { dependencies: [...dependencies] } : {})
+        };
       }
     },
 
@@ -409,13 +429,30 @@ const loadingSlice = createSlice({
           return;
         }
 
-        const operation: ExtendedLoadingOperation = {
-          ...action.payload,
+        // Initialize full LoadingOperation with defaults, then merge payload
+        // We first create the defaults object, then spread both
+        const defaults: Partial<MutableLoadingOperation> = {
+          priority: 'medium',
+          retryStrategy: 'exponential',
+          retryDelay: 1000,
+          connectionAware: true,
           startTime: Date.now(),
           retryCount: 0,
           timeoutWarningShown: false,
           cancelled: false,
+          state: 'loading',
         };
+
+        // Merge defaults with payload, payload takes precedence
+        const operation: MutableLoadingOperation = {
+          ...defaults,
+          ...action.payload,
+        } as MutableLoadingOperation;
+
+        // Ensure dependencies is mutable array if present
+        if (action.payload.dependencies) {
+           operation.dependencies = [...action.payload.dependencies];
+        }
 
         state.operations[operationId] = operation;
 
@@ -591,7 +628,6 @@ export type {
   ConnectionInfo,
   AdaptiveSettings,
   AssetLoadingProgress,
-  ExtendedLoadingOperation,
   ExtendedLoadingStats,
   StatsUpdate,
   StatsUpdateType,

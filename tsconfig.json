@@ -49,7 +49,6 @@
       "@server": ["server"],
       "@server/*": ["server/*"],
       "@server/infrastructure/core/*": ["server/infrastructure/core/*"],
-      "@server/infrastructure/database/*": ["server/infrastructure/database/*"],
       "@server/infrastructure/persistence/*": ["server/infrastructure/database/persistence/*"],
       "@server/infrastructure/observability/*": ["server/infrastructure/observability/*"],
       "@client": ["client/src"],

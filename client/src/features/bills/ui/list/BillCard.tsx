@@ -80,7 +80,7 @@ export default function BillCard({
 
   // Check for conflicts of interest
   const hasConflicts = bill.sponsors?.some(
-    (sponsor: Sponsor) => sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0
+    (sponsor: Sponsor) => sponsor.conflictOfInterest === true
   );
 
   const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
@@ -124,10 +124,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onSave?.(bill.id)}
+            onClick={() => onSave?.(String(bill.id))}
             onFocus={() => setQuickActionFocus('save')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onSave?.(String(bill.id)))}
             aria-label={isSaved ? 'Remove from saved bills' : 'Save bill'}
           >
             {isSaved ? (
@@ -141,10 +141,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onShare?.(bill.id)}
+            onClick={() => onShare?.(String(bill.id))}
             onFocus={() => setQuickActionFocus('share')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onShare?.(String(bill.id)))}
             aria-label="Share bill"
           >
             <Share2 className="h-4 w-4" />
@@ -154,10 +154,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onComment?.(bill.id)}
+            onClick={() => onComment?.(String(bill.id))}
             onFocus={() => setQuickActionFocus('comment')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.id))}
+            onKeyDown={e => handleKeyDown(e, () => onComment?.(String(bill.id)))}
             aria-label="View comments"
           >
             <MessageCircle className="h-4 w-4" />
@@ -192,9 +192,9 @@ export default function BillCard({
             </CardTitle>
           </div>
 
-          {bill.billType && (
+          {(bill as any).billType && (
             <Badge variant="secondary" className="text-xs shrink-0">
-              {bill.billType}
+              {(bill as any).billType}
             </Badge>
           )}
         </div>

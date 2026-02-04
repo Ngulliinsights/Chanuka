@@ -25,6 +25,7 @@ import {
   ConnectionInfo,
   AssetLoadingProgress,
   LoadingStats,
+  LoadingMetrics,
   LoadingError,
   LoadingTimeoutError,
   LoadingRetryError,
@@ -376,7 +377,7 @@ export function LoadingProvider({
     [state.operations, state.adaptiveSettings.defaultTimeout]
   );
 
-  const getStats = useCallback((): LoadingStats => state.stats, [state.stats]);
+  const getStats = useCallback((): LoadingMetrics => state.stats, [state.stats]);
 
   // Type-specific convenience methods
   const startPageLoading = useCallback(

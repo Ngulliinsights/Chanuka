@@ -92,3 +92,15 @@ export interface UsePrivacySettingsReturn {
 export interface ErrorInfo {
   [key: string]: any;
 }
+
+// Re-export core dashboard types
+export type {
+  WidgetConfig,
+  DashboardConfig,
+  DashboardLayout,
+  DashboardSection,
+} from '@client/lib/types/dashboard';
+
+// Alias for legacy compatibility
+export type DashboardSectionConfig = any;
+

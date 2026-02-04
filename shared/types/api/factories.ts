@@ -5,7 +5,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { ApiRequest, PaginatedApiRequest, FileUploadRequest, GraphQLRequest, WebSocketRequest, RequestFactoryOptions } from './request-types';
-import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, ResponseFactoryOptions } from './response-types';
+import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, ResponseFactoryOptions, HttpStatusCode } from './response-types';
 import { ApiError, ApiErrorContext, ApiErrorFactory } from './error-types';
 import { Result, ValidationError } from '../core/errors';
 
@@ -436,7 +436,7 @@ export class ApiResponseFactory {
    * Get HTTP status code from API error
    */
   private static getHttpStatusFromError(error: ApiError): HttpStatusCode {
-    const statusCodeMap: Record<ApiError['code'], HttpStatusCode> = {
+    const statusCodeMap: Partial<Record<ApiError['code'], HttpStatusCode>> = {
       API_BAD_REQUEST: 400,
       API_UNAUTHORIZED: 401,
       API_FORBIDDEN: 403,

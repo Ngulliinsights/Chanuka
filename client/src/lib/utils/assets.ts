@@ -37,13 +37,7 @@ export interface AssetLoadResult {
   fromCache: boolean;
 }
 
-export interface LoadingProgress {
-  loaded: number;
-  total: number;
-  currentAsset?: string;
-  phase: 'preload' | 'critical' | 'lazy' | 'complete';
-  status: 'idle' | 'loading' | 'success' | 'error';
-}
+import { AssetLoadingProgress as LoadingProgress } from '@client/lib/types/loading';
 
 export interface AssetFallbackStrategy {
   primary: string;
@@ -890,7 +884,7 @@ export class AssetLoadingManager {
     loaded: 0,
     total: 0,
     phase: 'preload',
-    status: 'idle',
+    status: 'pending',
   };
 
   private progressCallbacks: Array<(progress: LoadingProgress) => void> = [];
@@ -1182,7 +1176,7 @@ export class AssetLoadingManager {
     assets: Array<{ url: string; type: AssetType; config?: Partial<AssetLoadConfig> }>,
     phase: LoadingProgress['phase'] = 'critical'
   ): Promise<AssetLoadResult[]> {
-    this.updateProgress({ total: assets.length, loaded: 0, phase });
+    this.updateProgress({ total: assets.length, loaded: 0, phase, status: 'loading' });
 
     // Filter assets based on connection
     const filteredAssets = this.filterAssetsByConnection(assets);
@@ -1214,7 +1208,7 @@ export class AssetLoadingManager {
       this.updateProgress({ loaded: results.length });
     }
 
-    this.updateProgress({ phase: 'complete' });
+    this.updateProgress({ phase: 'complete', status: 'complete' });
     return results;
   }
 
@@ -1418,7 +1412,7 @@ export function useAssetLoading(
     loaded: 0,
     total: 0,
     phase: 'preload',
-    status: 'idle',
+    status: 'pending',
   });
   const [errors, setErrors] = useState<Error[]>([]);
   const managerRef = useRef(null as AssetLoadingManager | null);

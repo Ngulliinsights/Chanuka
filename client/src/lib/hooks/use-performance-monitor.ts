@@ -8,13 +8,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logger } from '../utils/logger';
+import { PerformanceMonitor } from '@client/core/performance/monitor';
+import { PerformanceMetric } from '@client/core/performance/types';
 
-// Simple performance monitor stub
-const runtimePerformanceMonitor = {
-  startMeasurement: (name: string) => ({ name, startTime: performance.now() }),
-  endMeasurement: (measurement: any) => performance.now() - measurement.startTime,
-  recordMetric: (name: string, value: number) => console.debug(`Performance: ${name} = ${value}ms`),
-};
+const monitor = PerformanceMonitor.getInstance();
+
+// Removed local stub
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -65,7 +64,7 @@ export function usePerformanceMonitor(
   });
 
   const renderStartRef = useRef(0);
-  const renderTimesRef = useRef([]);
+  const renderTimesRef = useRef<number[]>([]);
 
   /**
    * Mark the start of a render
@@ -118,7 +117,14 @@ export function usePerformanceMonitor(
     // Track memory if enabled
     if (trackMemory && 'memory' in performance) {
       const memoryUsage = (performance as any).memory.usedJSHeapSize;
-      runtimePerformanceMonitor.addCustomMetric(`${componentName}_memory`, memoryUsage);
+      monitor.recordCustomMetric({
+        name: `${componentName}_memory`,
+        value: memoryUsage,
+        timestamp: new Date(),
+        category: 'memory',
+        url: window.location.href,
+        metadata: { component: componentName }
+      });
     }
 
     renderStartRef.current = 0;
@@ -145,7 +151,14 @@ export function usePerformanceMonitor(
    */
   const addCustomMetric = useCallback(
     (name: string, value: number) => {
-      runtimePerformanceMonitor.addCustomMetric(`${componentName}_${name}`, value);
+      monitor.recordCustomMetric({
+        name: `${componentName}_${name}`,
+        value,
+        timestamp: new Date(),
+        category: 'custom',
+        url: window.location.href,
+        metadata: { component: componentName }
+      });
     },
     [componentName]
   );
@@ -209,20 +222,18 @@ export function usePerformanceBudget(
    */
   const checkBudget = useCallback(async () => {
     try {
-      const metrics = runtimePerformanceMonitor.getMetrics();
-      const budgetResult = await import('../../../PerformanceDashboard').then(
-        ({ performanceBudgetChecker }) => performanceBudgetChecker.checkBudgets(metrics)
-      );
+      const budgetChecker = monitor.getBudgetChecker();
+      const failingMetrics = budgetChecker.getFailingMetrics();
 
-      const hasViolations = budgetResult.violations.length > 0;
+      const hasViolations = failingMetrics.length > 0;
       setIsWithinBudget(!hasViolations);
-      setViolations(budgetResult.violations.map(v => v.description));
+      setViolations(failingMetrics.map(m => `${m.metric}: ${m.value.toFixed(2)} > ${m.budget}`));
       setLastCheckTime(Date.now());
 
       if (enableAlerts && hasViolations) {
         logger.warn(`Performance budget violations detected in ${componentName}`, {
-          violations: budgetResult.violations.length,
-          warnings: budgetResult.warnings.length,
+          violations: failingMetrics.length,
+          metrics: failingMetrics.map(m => m.metric)
         });
       }
     } catch (error) {
@@ -266,20 +277,24 @@ export function useCoreWebVitals(): UseCoreWebVitalsReturn {
 
   useEffect(() => {
     const checkMetrics = () => {
-      const currentMetrics = runtimePerformanceMonitor.getMetrics();
+      const webVitals = monitor.getWebVitalsMetrics();
+      const metricsMap = webVitals.reduce((acc, m) => {
+        acc[m.name.toLowerCase()] = m.value;
+        return acc;
+      }, {} as Record<string, number>);
 
       const newMetrics = {
-        lcp: currentMetrics.coreWebVitals.lcp,
-        fid: currentMetrics.coreWebVitals.fid,
-        cls: currentMetrics.coreWebVitals.cls,
-        fcp: currentMetrics.coreWebVitals.fcp,
-        ttfb: currentMetrics.coreWebVitals.ttfb,
+        lcp: metricsMap['lcp'],
+        fid: metricsMap['fid'],
+        cls: metricsMap['cls'],
+        fcp: metricsMap['fcp'],
+        ttfb: metricsMap['ttfb'],
         allMetricsLoaded: !!(
-          currentMetrics.coreWebVitals.lcp &&
-          currentMetrics.coreWebVitals.fid &&
-          currentMetrics.coreWebVitals.cls &&
-          currentMetrics.coreWebVitals.fcp &&
-          currentMetrics.coreWebVitals.ttfb
+          metricsMap['lcp'] &&
+          metricsMap['fid'] &&
+          metricsMap['cls'] &&
+          metricsMap['fcp'] &&
+          metricsMap['ttfb']
         ),
       };
 
@@ -333,22 +348,14 @@ export function usePerformanceAlert(
       description: string,
       metrics: Record<string, any> = {}
     ) => {
-      try {
-        await import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
-          performanceAlerts.sendAlert({
-            type,
-            title: `${componentName}: ${title}`,
-            description,
-            metrics,
-            severity: type === 'violation' ? 'high' : type === 'regression' ? 'medium' : 'low',
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            timestamp: Date.now(),
-          })
-        );
-      } catch (error) {
-        logger.error(`Failed to send performance alert for ${componentName}`, { error });
-      }
+      // Manual alerting is not fully supported by core yet, logging for now
+      logger.warn(`Performance Alert: ${title}`, {
+        type,
+        description,
+        metrics,
+        component: componentName
+      });
+      // In future: monitor.getAlertsManager().createAlert(...) if exposed
     },
     [componentName]
   );
@@ -358,9 +365,10 @@ export function usePerformanceAlert(
    */
   const updateAlertConfig = useCallback(
     (config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => {
-      import('../../../PerformanceDashboard').then(({ performanceAlerts }) =>
-        performanceAlerts.updateConfig(config)
-      );
+       // Map to match PerformanceConfig['alerts'] structure if possible, or just pass safe subset
+       // The config types might not strictly match, so we cast or adapt as needed
+       // Assuming partial update is supported
+       monitor.getAlertsManager().updateConfig(config as any);
     },
     []
   );

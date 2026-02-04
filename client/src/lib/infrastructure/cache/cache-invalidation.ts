@@ -301,6 +301,11 @@ class CacheInvalidationManager<T = unknown> {
     this.emitEvent('clear', 'all');
   }
 
+  async invalidateAll(): Promise<void> {
+    this.clear();
+    return Promise.resolve();
+  }
+
   /**
    * Get cache statistics
    */

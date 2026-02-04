@@ -57,37 +57,37 @@ export interface ApiErrorContext {
   /**
    * Request identifier
    */
-  readonly requestId?: string;
+  readonly requestId?: string | undefined;
 
   /**
    * Response identifier
    */
-  readonly responseId?: string;
+  readonly responseId?: string | undefined;
 
   /**
    * API endpoint
    */
-  readonly endpoint?: string;
+  readonly endpoint?: string | undefined;
 
   /**
    * HTTP method
    */
-  readonly method?: string;
+  readonly method?: string | undefined;
 
   /**
    * HTTP status code
    */
-  readonly httpStatus?: number;
+  readonly httpStatus?: number | undefined;
 
   /**
    * Request body
    */
-  readonly requestBody?: unknown;
+  readonly requestBody?: unknown | undefined;
 
   /**
    * Response body
    */
-  readonly responseBody?: unknown;
+  readonly responseBody?: unknown | undefined;
 
   /**
    * Error timestamp
@@ -97,7 +97,7 @@ export interface ApiErrorContext {
   /**
    * Additional error details
    */
-  readonly details?: unknown;
+  readonly details?: unknown | undefined;
 }
 
 /**
@@ -368,7 +368,7 @@ export class ApiValidationError extends ApiError {
     readonly validationErrors: readonly {
       readonly field: string;
       readonly message: string;
-      readonly code?: string;
+      readonly code?: string | undefined;
     }[],
     context?: Readonly<Record<string, unknown>>
   ) {

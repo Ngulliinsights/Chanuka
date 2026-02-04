@@ -18,12 +18,13 @@ import type { Bill } from '@client/lib/types';
 
 interface BillSponsorsTabProps {
   bill: Bill;
+  onSponsorClick?: (id: string) => void;
 }
 
 /**
  * BillSponsorsTab - Sponsor information and conflict of interest analysis
  */
-function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
+function BillSponsorsTab({ bill, onSponsorClick }: BillSponsorsTabProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Mock additional sponsor data for demonstration
@@ -223,7 +224,7 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
         </TabsContent>
 
         <TabsContent value="network" className="min-h-[500px]">
-          <FinancialNetworkAnalysis bill_id={bill.id} isEmbedded={true} />
+          <FinancialNetworkAnalysis bill_id={String(bill.id)} />
         </TabsContent>
 
         <TabsContent value="cosponsors">
@@ -265,7 +266,8 @@ function BillSponsorsTab({ bill }: BillSponsorsTabProps) {
 
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">Co-sponsor</Badge>
-                        <Button variant="ghost" size="sm">
+                        {/* Assuming onSponsorClick is a prop passed to BillSponsorsTab */}
+                        <Button variant="ghost" size="sm" onClick={() => onSponsorClick?.(String(sponsor.id))}>
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>

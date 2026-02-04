@@ -399,7 +399,7 @@ export function createOperationFromScenario(
   scenario: LoadingScenario,
   instanceId: string,
   connectionInfo?: { connectionType?: string; isOnline?: boolean }
-): Omit<LoadingOperation, 'startTime' | 'retryCount'> {
+): Omit<LoadingOperation, 'startTime' | 'retryCount' | 'timeoutWarningShown' | 'cancelled' | 'state'> {
   const adjustedTimeout = getAdjustedTimeout(
     scenario.defaultTimeout,
     normalizeConnectionType(connectionInfo?.connectionType)
@@ -413,18 +413,18 @@ export function createOperationFromScenario(
     type: scenario.id.includes('page')
       ? 'page'
       : scenario.id.includes('component')
-        ? 'component'
-        : scenario.id.includes('api')
-          ? 'network-aware'
-          : 'inline',
+      ? 'component'
+      : scenario.id.includes('api')
+      ? 'network-aware'
+      : 'inline',
     message: scenario.description,
     priority: scenario.priority,
     timeout: adjustedTimeout,
     maxRetries: scenario.maxRetries,
     connectionAware: scenario.connectionAware,
     stage: stageId,
-    // retryStrategy removed - not part of LoadingOperation interface
-    // retryDelay removed - not part of LoadingOperation interface
+    retryStrategy: scenario.retryStrategy,
+    retryDelay: 1000, // Default delay, could be configurable
   };
 }
 

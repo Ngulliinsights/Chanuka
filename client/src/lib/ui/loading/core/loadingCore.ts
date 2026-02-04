@@ -4,12 +4,12 @@
  */
 
 import { DEFAULT_LOADING_CONFIG } from '../constants';
-import { LoadingOperation, LoadingConfig, LoadingStats } from '../types';
+import { LoadingOperation, LoadingConfig, LoadingStats, ExtendedLoadingConfig } from '../types';
 import { validateLoadingOperation } from '../validation';
 
 export class LoadingCore {
   private operations: Map<string, LoadingOperation> = new Map();
-  private config: LoadingConfig;
+  private config: ExtendedLoadingConfig;
   private stats: LoadingStats = {
     loaded: 0,
     failed: 0,
@@ -17,7 +17,7 @@ export class LoadingCore {
     isOnline: navigator.onLine,
   };
 
-  constructor(config: LoadingConfig = DEFAULT_LOADING_CONFIG) {
+  constructor(config: ExtendedLoadingConfig = DEFAULT_LOADING_CONFIG) {
     this.config = config;
   }
 
@@ -47,7 +47,7 @@ export class LoadingCore {
     return { ...this.stats };
   }
 
-  public updateConfig(newConfig: Partial<LoadingConfig>): void {
+  public updateConfig(newConfig: Partial<ExtendedLoadingConfig>): void {
     this.config = { ...this.config, ...newConfig };
   }
 

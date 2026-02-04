@@ -20,4 +20,23 @@ export type {
   LoadingStateData,
   AssetLoadingProgress,
   LoadingMetrics,
+  // Additional types for loading UI components
+  LoadingProps,
+  LoadingStats,
+  LoadingProgress,
+  LoadingStage,
+  LoadingStateProps,
+  UseLoadingResult,
+  RecoveryState,
+  LoadingRecoveryState,
+  ProgressiveLoaderProps,
+  SkeletonProps,
+  TimeoutAwareLoaderProps,
+  AssetLoadingIndicatorProps,
+  ExtendedLoadingConfig,
+  LoadingConfigValidation,
+  LoadingConfigErrorHandling,
+  ProgressiveStage,
+  LoadingComponentProps,
 } from '@client/lib/types/loading';
+

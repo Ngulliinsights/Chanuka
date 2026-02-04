@@ -15,6 +15,8 @@ import type {
 import { billsApiService } from '@client/core/api/bills';
 import { useToast } from '@client/lib/hooks/use-toast';
 
+import { BillsQueryParams } from './types';
+
 // ============================================================================
 // Query Keys Factory
 // ============================================================================
@@ -51,10 +53,10 @@ export const billsKeys = {
  * @param params - Search, filter, and pagination parameters
  * @returns Query result with paginated bills data
  */
-export function useBills(params: BillsSearchParams = {}) {
+export function useBills(params: BillsQueryParams = {}) {
   return useQuery({
-    queryKey: billsKeys.list(params),
-    queryFn: () => billsApiService.getBills(params),
+    queryKey: billsKeys.list(params as any), 
+    queryFn: () => billsApiService.getBills(params as any),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

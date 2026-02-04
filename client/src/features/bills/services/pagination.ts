@@ -169,7 +169,7 @@ class BillsPaginationService {
           billsCount: response.data.length,
         });
 
-        return response.bills;
+        return response.data;
       }
 
       this.state.isLoadingMore = false;
@@ -210,22 +210,14 @@ class BillsPaginationService {
       });
 
       return {
-        bills: cachedPage.bills,
+        data: cachedPage.bills,
         pagination: {
           page,
           limit: this.config.pageSize,
           total: this.state.totalItems,
           totalPages: this.state.totalPages,
-          hasNext: page < this.state.totalPages,
-          hasPrevious: page > 1,
         },
-        stats: {
-          totalBills: this.state.totalItems,
-          urgentCount: 0,
-          constitutionalFlags: 0,
-          trendingCount: 0,
-          lastUpdated: new Date().toISOString(),
-        },
+        generatedAt: new Date().toISOString(),
       };
     }
 
@@ -238,7 +230,7 @@ class BillsPaginationService {
       if (response) {
         this.pageCache.set(cacheKey, {
           page,
-          bills: response.bills,
+          bills: response.data,
           timestamp: Date.now(),
           searchParams,
           fromCache: false,
@@ -410,9 +402,7 @@ class BillsPaginationService {
       ...searchParams,
       status: searchParams.status?.sort(),
       urgency: searchParams.urgency?.sort(),
-      policyAreas: searchParams.policyAreas?.sort(),
       sponsors: searchParams.sponsors?.sort(),
-      controversyLevels: searchParams.controversyLevels?.sort(),
     });
 
     return `page:${page}:${btoa(paramsKey)}`;
@@ -434,8 +424,8 @@ class BillsPaginationService {
     this.state.currentPage = page;
     this.state.totalPages = response.pagination.totalPages;
     this.state.totalItems = response.pagination.total;
-    this.state.hasNextPage = response.pagination.hasNext;
-    this.state.hasPreviousPage = response.pagination.hasPrevious;
+    this.state.hasNextPage = page < response.pagination.totalPages;
+    this.state.hasPreviousPage = page > 1;
     this.state.lastLoadTime = Date.now();
   }
 

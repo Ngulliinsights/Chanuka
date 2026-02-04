@@ -152,8 +152,43 @@ export interface LoadingMetrics {
   peakQueueLength: number;
 }
 
-// Backward compatibility alias
-export type LoadingStats = LoadingMetrics;
+// ============================================================================
+// Extended LoadingConfig with validation & error handling 
+// ============================================================================
+
+export interface LoadingConfigValidation {
+  enabled?: boolean;
+  strict?: boolean;
+  maxDuration?: number;
+  minProgress?: number;
+  requireProgress?: boolean;
+}
+
+export interface LoadingConfigErrorHandling {
+  retryOnError?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
+  fallbackComponent?: React.ComponentType;
+  onError?: (error: Error) => void;
+}
+
+/**
+ * Extended configuration with validation and error handling
+ */
+export interface ExtendedLoadingConfig extends LoadingConfig {
+  validation?: LoadingConfigValidation;
+  errorHandling?: LoadingConfigErrorHandling;
+}
+
+/**
+ * Legacy LoadingStats interface for backward compatibility
+ */
+export interface LoadingStats {
+  loaded: number;
+  failed: number;
+  connectionType: ConnectionType;
+  isOnline: boolean;
+}
 
 // ============================================================================
 // State Management
@@ -581,3 +616,103 @@ export interface LoadingHookOptions extends LoadingOptions {
   onSuccess?: () => void;
   onStateChange?: (state: LoadingState) => void;
 }
+
+// ============================================================================
+// Additional Types for Loading UI Components
+// ============================================================================
+
+/**
+ * LoadingProgress - simplified progress tracking
+ * Backward compatibility alias for AssetLoadingProgress
+ */
+export type LoadingProgress = AssetLoadingProgress;
+
+/**
+ * LoadingStage type for progressive loading
+ */
+export type LoadingStage = ProgressiveStage;
+
+/**
+ * Props for LoadingIndicator component
+ */
+export interface LoadingStateProps {
+  className?: string;
+  size?: LoadingSize;
+  message?: string;
+  showMessage?: boolean;
+  color?: 'primary' | 'secondary' | 'accent' | 'muted';
+}
+
+/**
+ * Result type for useLoading hook - simplified version
+ */
+export interface UseLoadingResult<T = unknown> {
+  data: T | null;
+  error: Error | null;
+  isLoading: boolean;
+  execute: (operation: () => Promise<T>) => Promise<T | null>;
+  reset: () => void;
+}
+
+/**
+ * Recovery state for error handling
+ */
+export interface RecoveryState {
+  isRecovering: boolean;
+  canRecover: boolean;
+  recoveryAttempts: number;
+  maxRecoveryAttempts: number;
+  lastError?: Error | string;
+  suggestions: readonly string[];
+}
+
+/**
+ * Extended recovery state with retry tracking
+ */
+export interface LoadingRecoveryState extends RecoveryState {
+  // attempts removed - use recoveryAttempts from base interface
+  lastAttemptTime?: number;
+  recoveryStrategy?: RetryStrategy;
+}
+
+/**
+ * Props for ProgressiveLoader component
+ */
+export interface ProgressiveLoaderProps {
+  stages: readonly ProgressiveStage[];
+  currentStage: number;
+  className?: string;
+  showLabels?: boolean;
+  onStageComplete?: (stageIndex: number) => void;
+  onRetryStage?: (stageIndex: number) => void;
+  onError?: (error: Error, stageIndex: number) => void;
+  onSkipStage?: (stageIndex: number) => void;
+  showRetryButton?: boolean;
+  allowSkip?: boolean;
+}
+
+/**
+ * Props for Skeleton component
+ */
+export interface SkeletonProps {
+  className?: string;
+  width?: string | number;
+  height?: string | number;
+  variant?: 'text' | 'circular' | 'rectangular';
+  animation?: 'pulse' | 'wave' | 'none';
+}
+
+/**
+ * Props for TimeoutAwareLoader component
+ */
+export interface TimeoutAwareLoaderProps {
+  className?: string;
+  timeout?: number;
+  warningThreshold?: number;
+  onTimeout?: () => void;
+  onWarning?: () => void;
+  message?: string;
+  showElapsedTime?: boolean;
+}
+
+

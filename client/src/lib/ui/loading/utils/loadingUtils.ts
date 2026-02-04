@@ -34,7 +34,7 @@ export function safeValidateLoadingProgress(progress: LoadingProgress): Validati
     if (typeof progress.loaded !== 'number' || typeof progress.total !== 'number') {
       return {
         success: false,
-        data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined },
+        data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined, status: 'error' },
         error: new LoadingError('Invalid progress data: loaded and total must be numbers'),
       };
     }
@@ -42,7 +42,7 @@ export function safeValidateLoadingProgress(progress: LoadingProgress): Validati
     if (progress.loaded < 0 || progress.total < 0) {
       return {
         success: false,
-        data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined },
+        data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined, status: 'error' },
         error: new LoadingError('Invalid progress data: values cannot be negative'),
       };
     }
@@ -54,7 +54,7 @@ export function safeValidateLoadingProgress(progress: LoadingProgress): Validati
   } catch (err) {
     return {
       success: false,
-      data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined },
+      data: { loaded: 0, total: 0, phase: 'preload', currentAsset: undefined, status: 'error' },
       error: new LoadingError('Validation error', undefined, undefined, { originalError: err }),
     };
   }

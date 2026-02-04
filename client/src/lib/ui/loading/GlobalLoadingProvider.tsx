@@ -33,12 +33,28 @@ const convertToLoadingOperation = (extended: ExtendedLoadingOperation): LoadingO
   type: extended.type,
   priority: extended.priority,
   startTime: extended.startTime,
+  endTime: extended.endTime,
   timeout: extended.timeout,
+  estimatedTime: extended.estimatedTime,
+  
   retryCount: extended.retryCount,
   maxRetries: extended.maxRetries,
-  error: extended.error,
+  retryStrategy: extended.retryStrategy,
+  retryDelay: extended.retryDelay,
+  
+  state: extended.state,
   message: extended.message,
+  error: extended.error,
   progress: extended.progress,
+  stage: extended.stage,
+  
+  connectionAware: extended.connectionAware,
+  dependencies: extended.dependencies,
+  metadata: extended.metadata,
+  
+  timeoutWarningShown: extended.timeoutWarningShown || false,
+  cancelled: extended.cancelled || false,
+  description: extended.description,
 });
 
 /**

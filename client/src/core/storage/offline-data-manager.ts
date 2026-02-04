@@ -341,6 +341,37 @@ class OfflineDataManager {
       request.onerror = () => reject(request.error);
     });
   }
+  async getOfflineDataWithFallback<T>(key: string, fetchFn: () => Promise<T>, fallbackData?: T): Promise<T | null> {
+    try {
+      if (navigator.onLine) {
+        const data = await fetchFn();
+        await this.cacheData(key, data);
+        return data;
+      }
+      
+      const cached = await this.getCachedData<T>(key);
+      if (cached) return cached;
+      
+      return fallbackData ?? null;
+    } catch (error) {
+       // Try cache as hard fallback
+       const cached = await this.getCachedData<T>(key);
+       if (cached) return cached;
+       return fallbackData ?? null;
+    }
+  }
+
+  async setOfflineData(key: string, data: unknown): Promise<void> {
+    return this.cacheData(key, data);
+  }
+
+  async getOfflineData<T>(key: string): Promise<T | null> {
+    return this.getCachedData<T>(key);
+  }
+
+  async clearOfflineCache(): Promise<void> {
+    return this.clearAllData();
+  }
 }
 
 export const offlineDataManager = new OfflineDataManager();

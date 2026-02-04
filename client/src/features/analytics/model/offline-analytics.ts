@@ -173,6 +173,9 @@ class OfflineAnalyticsManager {
     this.events = [];
     localStorage.removeItem('offline-analytics');
   }
+  trackUserAction(action: string, data: Record<string, unknown> = {}): void {
+    this.trackEvent('user_action', { action, ...data });
+  }
 }
 
 export const offlineAnalyticsManager = new OfflineAnalyticsManager();

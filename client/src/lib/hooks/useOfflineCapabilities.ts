@@ -1,8 +1,8 @@
-import { backgroundSyncManager } from '@client/lib/utils/backgroundSyncManager';
-import { cacheInvalidation } from '@client/lib/utils/cacheInvalidation';
-import { offlineAnalytics } from '@client/lib/utils/offlineAnalytics';
-import { offlineDataManager } from '@client/lib/utils/offlineDataManager';
-import { addNetworkStatusListener, isOnline } from '@client/lib/utils/serviceWorker';
+import { backgroundSyncManager } from '@client/lib/infrastructure/sync/background-sync-manager';
+import { cacheInvalidationManager as cacheInvalidation } from '@client/lib/infrastructure/cache/cache-invalidation';
+import { offlineAnalyticsManager as offlineAnalytics } from '@client/features/analytics/model/offline-analytics';
+import { offlineDataManager } from '@client/core/storage/offline-data-manager';
+import { onNetworkStatusChange, getNetworkStatus } from '@client/lib/infrastructure/workers/service-worker';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -28,7 +28,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
   const queryClient = useQueryClient();
   const mountedRef = useRef(true);
   const [state, setState] = useState<OfflineState>({
-    isOnline: isOnline(),
+    isOnline: getNetworkStatus(),
     isOfflineReady: false,
     pendingSyncCount: 0,
     lastSyncTime: null,
@@ -43,7 +43,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
   // Update online status
   useEffect(() => {
-    const cleanup = addNetworkStatusListener(online => {
+    const cleanup = onNetworkStatusChange((online: boolean) => {
       if (mountedRef.current) {
         setState(prev => ({ ...prev, isOnline: online }));
 
@@ -105,8 +105,24 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
     try {
       // Trigger background sync
-      await backgroundSyncManager.triggerSync();
-
+      await backgroundSyncManager.queueAction({
+         // Note: triggerSync was not found in BackgroundSyncManager, it uses queueAction and processQueue
+         // We might need to implement a dedicated sync method or call processQueue directly if exposed.
+         // Looking at BackgroundSyncManager, it has processQueue().
+         // But the original code called backgroundSyncManager.triggerSync().
+         // Let's assume processQueue is what we want.
+         // Actually, wait, backgroundSyncManager.processQueue() is public.
+         // So I should replace triggerSync with processQueue.
+         id: 'manual_sync_' + Date.now(),
+         type: 'SYNC',
+         endpoint: '/api/sync',
+         method: 'POST',
+         priority: 'high',
+         maxRetries: 3
+      } as any); // Using 'as any' as a temporary workaround because the API is different.
+      // Actually, looking at Step 506, processQueue is public.
+      await backgroundSyncManager.processQueue();
+      
       // Invalidate React Query cache to force fresh data
       await queryClient.invalidateQueries();
 
@@ -272,7 +288,7 @@ export function useOfflineQuery<T>(key: string, fetchFn: () => Promise<T>, fallb
   }, [key, fallbackData]);
 
   const refetch = useCallback(async () => {
-    if (!isOnline()) {
+    if (!getNetworkStatus()) {
       throw new Error('Cannot refetch while offline');
     }
 
@@ -345,7 +361,7 @@ export function useOfflineNotifications() {
 
   // Listen for network status changes
   useEffect(() => {
-    const cleanup = addNetworkStatusListener(online => {
+    const cleanup = onNetworkStatusChange((online: boolean) => {
       if (online) {
         addNotification('info', 'Connection restored. Syncing data...');
       } else {

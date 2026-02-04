@@ -57,7 +57,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-xl font-bold text-gray-800">Citizens' Consensus Brief</h3>
+          <h3 className="text-xl font-bold text-gray-800">Public Input Summary</h3>
           <p className="text-sm text-gray-600 mt-1">
             Synthesized from {total} citizen comments
           </p>
@@ -80,29 +80,43 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
 
       {/* Position Breakdown */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-green-200">
+        <div className="bg-white rounded-lg p-4 border border-teal-200">
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-bold text-green-600">{brief.supportCount}</span>
-            <span className="text-sm text-green-600 font-medium">{supportPercent}%</span>
+            <span className="text-3xl font-bold text-teal-700">{brief.supportCount}</span>
+            <span className="text-sm text-teal-700 font-medium">{supportPercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Support</p>
-          <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="mt-3 w-full bg-gray-200 rounded-full h-2"
+            role="progressbar" 
+            aria-valuenow={supportPercent} 
+            aria-valuemin={0} 
+            aria-valuemax={100}
+            aria-label="Support percentage"
+          >
             <div
-              className="bg-green-500 h-2 rounded-full"
+              className="bg-teal-600 h-2 rounded-full"
               style={{ width: `${supportPercent}%` }}
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 border border-red-200">
+        <div className="bg-white rounded-lg p-4 border border-orange-200">
           <div className="flex items-baseline justify-between">
-            <span className="text-3xl font-bold text-red-600">{brief.opposeCount}</span>
-            <span className="text-sm text-red-600 font-medium">{opposePercent}%</span>
+            <span className="text-3xl font-bold text-orange-600">{brief.opposeCount}</span>
+            <span className="text-sm text-orange-600 font-medium">{opposePercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Oppose</p>
-          <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="mt-3 w-full bg-gray-200 rounded-full h-2"
+            role="progressbar" 
+            aria-valuenow={opposePercent} 
+            aria-valuemin={0} 
+            aria-valuemax={100}
+            aria-label="Opposition percentage"
+          >
             <div
-              className="bg-red-500 h-2 rounded-full"
+              className="bg-orange-500 h-2 rounded-full"
               style={{ width: `${opposePercent}%` }}
             />
           </div>
@@ -114,7 +128,14 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <span className="text-sm text-gray-600 font-medium">{neutralPercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Neutral</p>
-          <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="mt-3 w-full bg-gray-200 rounded-full h-2"
+            role="progressbar" 
+            aria-valuenow={neutralPercent} 
+            aria-valuemin={0} 
+            aria-valuemax={100}
+            aria-label="Neutral percentage"
+          >
             <div
               className="bg-gray-500 h-2 rounded-full"
               style={{ width: `${neutralPercent}%` }}
@@ -144,11 +165,11 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
 
           {/* Top Supporting Arguments */}
           {brief.topSupportingArguments && brief.topSupportingArguments.length > 0 && (
-            <div className="bg-white rounded-lg p-4 border border-green-100">
-              <h4 className="font-semibold text-gray-800 mb-3 text-green-700">✓ Top Supporting Arguments</h4>
+            <div className="bg-white rounded-lg p-4 border border-teal-100">
+              <h4 className="font-semibold text-gray-800 mb-3 text-teal-700">Top Reasons for Support</h4>
               <ul className="space-y-2">
                 {brief.topSupportingArguments.map((arg: string, idx: number) => (
-                  <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-green-300">
+                  <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-teal-300">
                     {arg}
                   </li>
                 ))}
@@ -158,11 +179,11 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
 
           {/* Top Opposing Arguments */}
           {brief.topOpposingArguments && brief.topOpposingArguments.length > 0 && (
-            <div className="bg-white rounded-lg p-4 border border-red-100">
-              <h4 className="font-semibold text-gray-800 mb-3 text-red-700">✗ Top Opposing Arguments</h4>
+            <div className="bg-white rounded-lg p-4 border border-orange-100">
+              <h4 className="font-semibold text-gray-800 mb-3 text-orange-700">Key Concerns Raised</h4>
               <ul className="space-y-2">
                 {brief.topOpposingArguments.map((arg: string, idx: number) => (
-                  <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-red-300">
+                  <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-orange-300">
                     {arg}
                   </li>
                 ))}
@@ -174,8 +195,8 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
           <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-sm text-blue-800">
             <p>
               <strong>How this brief is created:</strong> Using advanced AI analysis, citizen comments are automatically extracted 
-              into structured arguments, clustered by similarity, and synthesized into this brief. This helps lawmakers understand 
-              the full spectrum of citizen perspectives on this bill.
+              into structured perspectives, clustered by similarity, and synthesized into this brief. This helps lawmakers understand 
+              the full spectrum of citizens perspectives on this bill.
             </p>
           </div>
         </>

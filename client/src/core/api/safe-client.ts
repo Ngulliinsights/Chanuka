@@ -7,14 +7,14 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { BaseApiClient, ApiRequest, ApiResponse, RequestBody } from './base-client';
+import { BaseApiClient, BaseClientRequest, BaseClientResponse, RequestBody } from './base-client';
 import { ApiError } from './base-client';
 
 /**
  * Result type for safe API operations
  */
 export type SafeApiResult<T> =
-  | { success: true; data: T; response: ApiResponse<T> }
+  | { success: true; data: T; response: BaseClientResponse<T> }
   | { success: false; error: ApiError };
 
 /**
@@ -22,7 +22,7 @@ export type SafeApiResult<T> =
  */
 export class SafeApiClient {
   private client: BaseApiClient;
-  private requestQueue: Map<string, Promise<ApiResponse<unknown>>> = new Map();
+  private requestQueue: Map<string, Promise<BaseClientResponse<unknown>>> = new Map();
 
   constructor(client: BaseApiClient) {
     this.client = client;
@@ -31,7 +31,7 @@ export class SafeApiClient {
   /**
    * Makes a safe request that returns a result object
    */
-  async safeRequest<T = unknown>(request: ApiRequest): Promise<SafeApiResult<T>> {
+  async safeRequest<T = unknown>(request: BaseClientRequest): Promise<SafeApiResult<T>> {
     try {
       const response = await this.client.request<T>(request);
       return {
@@ -110,7 +110,7 @@ export class SafeApiClient {
   /**
    * Makes a deduplicated request to prevent multiple identical requests
    */
-  async deduplicatedRequest<T = unknown>(request: ApiRequest): Promise<ApiResponse<T>> {
+  async deduplicatedRequest<T = unknown>(request: BaseClientRequest): Promise<BaseClientResponse<T>> {
     const key = this.getRequestKey(request);
 
     // If an identical request is already in flight, return its promise
@@ -122,11 +122,11 @@ export class SafeApiClient {
         url: request.url,
         method: request.method,
       });
-      return existingRequest as Promise<ApiResponse<T>>;
+      return existingRequest as Promise<BaseClientResponse<T>>;
     }
 
     const promise = this.client.request<T>(request);
-    this.requestQueue.set(key, promise as Promise<ApiResponse<unknown>>);
+    this.requestQueue.set(key, promise as Promise<BaseClientResponse<unknown>>);
 
     try {
       const result = await promise;
@@ -143,7 +143,7 @@ export class SafeApiClient {
   /**
    * Safe deduplicated request
    */
-  async safeDeduplicatedRequest<T = unknown>(request: ApiRequest): Promise<SafeApiResult<T>> {
+  async safeDeduplicatedRequest<T = unknown>(request: BaseClientRequest): Promise<SafeApiResult<T>> {
     try {
       const response = await this.deduplicatedRequest<T>(request);
       return {
@@ -163,7 +163,7 @@ export class SafeApiClient {
   /**
    * Batch multiple requests and return results
    */
-  async batchRequests<T = unknown>(requests: ApiRequest[]): Promise<SafeApiResult<T>[]> {
+  async batchRequests<T = unknown>(requests: BaseClientRequest[]): Promise<SafeApiResult<T>[]> {
     const promises = requests.map(request => this.safeRequest<T>(request));
     return Promise.all(promises);
   }
@@ -172,7 +172,7 @@ export class SafeApiClient {
    * Batch requests with concurrency limit
    */
   async batchRequestsWithLimit<T = unknown>(
-    requests: ApiRequest[],
+    requests: BaseClientRequest[],
     concurrencyLimit: number = 5
   ): Promise<SafeApiResult<T>[]> {
     const results: SafeApiResult<T>[] = [];
@@ -190,7 +190,7 @@ export class SafeApiClient {
    * Makes a request with timeout
    */
   async requestWithTimeout<T = unknown>(
-    request: ApiRequest,
+    request: BaseClientRequest,
     timeoutMs: number
   ): Promise<SafeApiResult<T>> {
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -220,7 +220,7 @@ export class SafeApiClient {
    * Makes a request with fallback data
    */
   async requestWithFallback<T = unknown>(
-    request: ApiRequest,
+    request: BaseClientRequest,
     fallbackData: T
   ): Promise<SafeApiResult<T>> {
     const result = await this.safeRequest<T>(request);
@@ -253,7 +253,7 @@ export class SafeApiClient {
    * Retries a request with exponential backoff
    */
   async retryRequest<T = unknown>(
-    request: ApiRequest,
+    request: BaseClientRequest,
     maxRetries: number = 3,
     baseDelay: number = 1000
   ): Promise<SafeApiResult<T>> {
@@ -332,7 +332,7 @@ export class SafeApiClient {
   /**
    * Creates a unique key for request deduplication
    */
-  private getRequestKey(request: ApiRequest): string {
+  private getRequestKey(request: BaseClientRequest): string {
     const bodyKey = request.body
       ? typeof request.body === 'string'
         ? request.body

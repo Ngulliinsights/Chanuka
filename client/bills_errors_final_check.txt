@@ -1,0 +1,12 @@
+src/features/bills/BillHeader.tsx(94,42): error TS2769: No overload matches this call.
+src/features/bills/pages/BillsPortalPage.tsx(103,83): error TS2345: Argument of type 'BillsPortalFilters' is not assignable to parameter of type 'BillsQueryParams'.
+src/features/bills/ui/analysis/comments.tsx(609,32): error TS2322: Type '{ children: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { children: ReactNode; }'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictNetworkVisualization.tsx(167,41): error TS2339: Property 'size' does not exist on type 'SimulationNodeDatum'.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictOfInterestAnalysis.tsx(51,9): error TS2322: Type '{ sponsorId: string | number; sponsorName: string; financialInterests: ({ id: string; source: string; amount: number; industry: string; category: "investment"; date: string; description: string; verified: true; } | { ...; } | { ...; })[]; ... 4 more ...; summary: string; }' is not assignable to type 'ConflictAnalysis'.
+src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(103,5): error TS2322: Type 'string | number' is not assignable to type 'string'.
+src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(208,8): error TS2304: Cannot find name 'ConstitutionalComplianceScore'.
+src/features/bills/ui/detail/BillCommunityTab.tsx(50,5): error TS2739: Type '{ id: number; content: string; authorId: number; createdAt: string; updatedAt: string; votes: { up: number; down: number; userVote: null; }; replyCount: number; }' is missing the following properties from type 'Comment': threadId, billId, authorName, edited
+src/features/bills/ui/detail/BillCommunityTab.tsx(60,5): error TS2739: Type '{ id: number; content: string; authorId: number; createdAt: string; updatedAt: string; votes: { up: number; down: number; userVote: null; }; replyCount: number; }' is missing the following properties from type 'Comment': threadId, billId, authorName, edited
+src/features/bills/ui/detail/BillOverviewTab.tsx(77,27): error TS2769: No overload matches this call.
+src/features/bills/ui/detail/BillSponsorsTab.tsx(227,37): error TS2322: Type 'string | number' is not assignable to type 'string | undefined'.
+src/features/bills/ui/tracking/real-time-tracker.tsx(102,41): error TS2345: Argument of type 'BillTrackingPreferences' is not assignable to parameter of type 'LogContext'.

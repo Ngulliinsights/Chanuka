@@ -13,14 +13,13 @@
 export {
   BaseApiClient,
   DEFAULT_API_CONFIG,
-  type ApiRequest,
-  type ApiResponse,
+  type BaseClientRequest,
+  type BaseClientResponse,
   type ApiClientConfig,
   type RequestInterceptor,
   type ResponseInterceptor,
   type ErrorInterceptor,
   type ApiError,
-  type HttpMethod,
   type RequestBody,
 } from './base-client';
 

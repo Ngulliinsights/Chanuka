@@ -18,36 +18,18 @@ import { Comment as CommunityComment, DiscussionThread } from './community/commu
 // BILL TYPES
 // ============================================================================
 
-export interface Bill {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  dateIntroduced: string;
-  sponsors: readonly string[];
-  tags: readonly string[];
-}
+// Re-export from unified bill module to ensure consistency
+export type { Bill, BillAnalysis } from './bill/bill-base';
+// Compatibility alias if needed (BillAnalysis is already named correctly)
 
-export interface BillAnalysis {
-  id: string;
-  billId: string;
-  summary: string;
-  keyPoints: readonly string[];
-  impact: string;
-  score: number;
-}
 
 // ============================================================================
 // USER TYPES
 // ============================================================================
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-}
+// Re-export from unified auth module
+export type { User } from './bill/auth-types';
+
 
 // ============================================================================
 // COMMENT & DISCUSSION TYPES (UNIFIED)

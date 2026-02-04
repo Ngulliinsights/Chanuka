@@ -3,19 +3,28 @@
  * Consolidated type definitions for the bills feature
  */
 
-import { Bill, Comment, Sponsor as SharedSponsor } from '@client/lib/types';
+import { 
+  Bill, 
+  BillStatus,
+  UrgencyLevel,
+  BillAnalysis as SharedBillAnalysis,
+  Sponsor as SharedSponsor,
+  BillsQueryParams as SharedBillsQueryParams
+} from '@client/lib/types';
 
-// Re-export shared Sponsor to maintain import compatibility where possible,
-// but users will need to adapt to the new structure (e.g. name -> legislatorName)
+// Re-export shared types
+export type { Bill, BillStatus, UrgencyLevel };
+
+// Feature-specific Sponsor extension
 export type BillSponsor = SharedSponsor & {
-  // Augment with UI-specific fields if necessary, or strictly use shared type
   conflictOfInterest?: ConflictOfInterest[];
 };
 
-export interface BillAnalysis {
+// Feature-specific Analysis (augmenting shared type)
+export interface BillAnalysis extends Partial<SharedBillAnalysis> {
   summary: string;
   keyPoints: string[];
-  potentialImpact: string;
+  potentialImpact: string; // Mapped to 'impact' in shared type
   stakeholderAnalysis: StakeholderImpact[];
   generatedAt: string;
 }
@@ -42,20 +51,15 @@ export interface EngagementMetrics {
   last_engaged_at: string;
 }
 
-// Query parameters
-export interface BillsQueryParams {
-  query?: string;
-  status?: string[];
-  urgency?: string[];
+// Query parameters (Extending shared params)
+export interface BillsQueryParams extends Omit<SharedBillsQueryParams, 'sortBy' | 'sponsors'> {
   policyAreas?: string[];
-  sponsors?: string[];
   constitutionalFlags?: boolean;
   controversyLevels?: string[];
-  dateRange?: { start?: string; end?: string };
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
+  // Extended sort fields for UI - combines SortField plus additional UI options
+  sortBy?: 'date' | 'title' | 'status' | 'urgency' | 'engagement' | 'relevance' | 'complexity' | 'score';
+  // Allow string IDs for sponsors (matching Sponsor.id)
+  sponsors?: (string | number)[];
 }
 
 // Mutation payloads

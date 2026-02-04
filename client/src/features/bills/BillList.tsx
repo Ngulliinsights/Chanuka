@@ -20,7 +20,8 @@ import {
   DropdownMenuTrigger,
 } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
-import type { Bill, BillsQueryParams, BillStatus } from '@client/lib/types';
+import type { Bill, BillsQueryParams } from '@client/lib/types';
+import { BillStatus } from '@client/lib/types';
 
 import BillCard from './ui/list/BillCard';
 
@@ -210,7 +211,7 @@ export const BillList = ({
           {/* View mode toggle between grid and list layouts */}
           <div className="flex items-center gap-1 border rounded-md p-1">
             <Button
-              variant={view === 'card' ? 'primary' : 'ghost'}
+              variant={view === 'card' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => handleViewChange('card')}
               className="px-2"
@@ -220,7 +221,7 @@ export const BillList = ({
               <LayoutGrid className="h-4 w-4" />
             </Button>
             <Button
-              variant={view === 'list' ? 'primary' : 'ghost'}
+              variant={view === 'list' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => handleViewChange('list')}
               className="px-2"
@@ -242,13 +243,13 @@ export const BillList = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => handleExternalFilterChange(['introduced'])}>
+                <DropdownMenuItem onClick={() => handleExternalFilterChange([BillStatus.FIRST_READING])}>
                   Introduced Bills
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExternalFilterChange(['committee_review'])}>
+                <DropdownMenuItem onClick={() => handleExternalFilterChange([BillStatus.COMMITTEE_STAGE])}>
                   In Committee
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExternalFilterChange(['passed_chamber'])}>
+                <DropdownMenuItem onClick={() => handleExternalFilterChange([BillStatus.THIRD_READING])}>
                   Passed Bills
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onFiltersChange?.({})}>
@@ -266,7 +267,7 @@ export const BillList = ({
                 aria-label="Filter bills by status"
               >
                 <Button
-                  variant={localFilter === 'all' ? 'primary' : 'outline'}
+                  variant={localFilter === 'all' ? 'secondary' : 'outline'}
                   size="sm"
                   className="rounded-l-md rounded-r-none border-r-0"
                   onClick={() => handleLocalFilterChange('all')}
@@ -275,7 +276,7 @@ export const BillList = ({
                   All
                 </Button>
                 <Button
-                  variant={localFilter === 'introduced' ? 'primary' : 'outline'}
+                  variant={localFilter === 'introduced' ? 'secondary' : 'outline'}
                   size="sm"
                   className="rounded-none border-r-0"
                   onClick={() => handleLocalFilterChange('introduced')}
@@ -284,7 +285,7 @@ export const BillList = ({
                   Introduced
                 </Button>
                 <Button
-                  variant={localFilter === 'committee' ? 'primary' : 'outline'}
+                  variant={localFilter === 'committee' ? 'secondary' : 'outline'}
                   size="sm"
                   className="rounded-none border-r-0"
                   onClick={() => handleLocalFilterChange('committee')}
@@ -293,7 +294,7 @@ export const BillList = ({
                   Committee
                 </Button>
                 <Button
-                  variant={localFilter === 'passed' ? 'primary' : 'outline'}
+                  variant={localFilter === 'passed' ? 'secondary' : 'outline'}
                   size="sm"
                   className="rounded-r-md rounded-l-none"
                   onClick={() => handleLocalFilterChange('passed')}
@@ -351,7 +352,7 @@ export const BillList = ({
                     onSave={onSave}
                     onShare={onShare}
                     onComment={onComment}
-                    isSaved={savedBills.has(bill.id)}
+                    isSaved={savedBills.has(String(bill.id))}
                     showQuickActions={!!(onSave || onShare || onComment)}
                     viewMode="grid"
                   />
@@ -369,7 +370,7 @@ export const BillList = ({
                             {bill.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bill.introductionDate).toLocaleDateString()}
+                            {new Date(bill.introducedDate || bill.introductionDate || '').toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
@@ -397,11 +398,11 @@ export const BillList = ({
                             <>
                               <div className="flex items-center">
                                 <span className="mr-1">🔍</span>
-                                <span>{formatCount(bill.engagement.views, 'view')}</span>
+                                <span>{formatCount(bill.engagement.views ?? 0, 'view')}</span>
                               </div>
                               <div className="flex items-center">
                                 <span className="mr-1">💬</span>
-                                <span>{formatCount(bill.engagement.comments, 'comment')}</span>
+                                <span>{formatCount(bill.engagement.comments ?? 0, 'comment')}</span>
                               </div>
                             </>
                           )}

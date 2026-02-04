@@ -27,6 +27,14 @@ export interface NotificationAction {
   primary?: boolean;
 }
 
+export interface NotificationPreferences {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  billUpdates: boolean;
+  analyticsEmails: boolean;
+  digestFrequency: 'daily' | 'weekly' | 'monthly' | 'never';
+}
+
 export class NotificationService {
   private static instance: NotificationService;
   private notifications: Notification[] = [];
@@ -37,6 +45,10 @@ export class NotificationService {
       NotificationService.instance = new NotificationService();
     }
     return NotificationService.instance;
+  }
+
+  async initialize(): Promise<void> {
+    return Promise.resolve();
   }
 
   addNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): string {
@@ -56,6 +68,41 @@ export class NotificationService {
   removeNotification(id: string): void {
     this.notifications = this.notifications.filter(n => n.id !== id);
     this.notifyListeners();
+  }
+
+  deleteNotification(id: string): Promise<void> {
+    this.removeNotification(id);
+    return Promise.resolve();
+  }
+
+  loadNotifications(filter: any, page: number, limit: number): Promise<void> {
+    return Promise.resolve();
+  }
+
+  getUserPreferences(userId: string): Promise<NotificationPreferences> {
+    return Promise.resolve({
+      emailNotifications: true,
+      pushNotifications: true,
+      billUpdates: true,
+      analyticsEmails: false,
+      digestFrequency: 'daily'
+    });
+  }
+
+  updatePreferences(prefs: NotificationPreferences, userId: string): Promise<void> {
+    return Promise.resolve();
+  }
+
+  on(event: string, callback: (data: any) => void): () => void {
+    if (event === 'notification:received') {
+      const listener = (notifications: Notification[]) => {
+        if (notifications.length > 0) {
+          callback(notifications[0]);
+        }
+      };
+      return this.subscribe(listener);
+    }
+    return () => {};
   }
 
   markAsRead(id: string): void {

@@ -48,7 +48,7 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
           ErrorSeverity.HIGH,
           error.message,
           {
-            context,
+            context: context as any, // Cast due to index signature mismatch
             details: { originalError: error }
           }
         )
@@ -86,11 +86,11 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
         ErrorSeverity.MEDIUM,
         `Slow security operation: ${metrics.operation}`,
         {
-          details: metrics,
+          details: metrics as unknown as Record<string, unknown>,
           context: {
             component: 'SecurityMonitoring',
             operation: 'performance_tracking'
-          }
+          } as any
         }
       );
 
@@ -122,7 +122,7 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
 
       existing.errors.push(err);
       // Assume recovery if error was resolved (simplified logic)
-      if (err.error.recoverySuccess) {
+      if ((err.error as any).recoverySuccess) {
         existing.recoveryCount++;
       }
       existing.totalImpact += this.calculateErrorImpact(err.error);
@@ -313,7 +313,8 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
       [ErrorSeverity.LOW]: 1,
       [ErrorSeverity.MEDIUM]: 2,
       [ErrorSeverity.HIGH]: 3,
-      [ErrorSeverity.CRITICAL]: 4
+      [ErrorSeverity.CRITICAL]: 4,
+      [ErrorSeverity.BLOCKER]: 5
     };
 
     return severityMultiplier[error.severity] || 1;
@@ -370,9 +371,9 @@ class SecurityMonitoringMiddleware implements ErrorMonitoringMiddleware {
                 context
               });
 
-              this.monitoring.reportError(error, context);
+              this.monitoring.reportError(error as Error, context);
               throw error;
-            }) as T;
+            }) as unknown as T;
         }
 
         // Handle synchronous functions
@@ -396,7 +397,7 @@ class SecurityMonitoringMiddleware implements ErrorMonitoringMiddleware {
           context
         });
 
-        this.monitoring.reportError(error, context);
+        this.monitoring.reportError(error as Error, context);
         throw error;
       }
     }) as T;

@@ -30,7 +30,7 @@ export type ModerationTriggerType =
 
 export type ModerationPriority = 1 | 2 | 3 | 4 | 5;
 
-export type ModerationStatus =
+export type ModerationQueueStatus =
   | 'pending'
   | 'in_review'
   | 'resolved'
@@ -137,7 +137,7 @@ export interface ModerationDecision extends BaseEntity {
   readonly peerReviewCount: number;
   readonly isAppealable: boolean;
   readonly isPublic: boolean;
-  readonly status: ModerationStatus;
+  readonly status: ModerationQueueStatus;
   readonly metadata: Readonly<Record<string, unknown>>;
 }
 
@@ -151,7 +151,7 @@ export interface ModerationAppeal extends BaseEntity {
   readonly appealReasoning: string;
   readonly appealGrounds?: readonly string[];
   readonly supportingEvidence?: Readonly<Record<string, unknown>>;
-  readonly status: ModerationStatus;
+  readonly status: ModerationQueueStatus;
   readonly assignedToBoardMember?: UserId;
   readonly boardDecision?: string;
   readonly decisionReason?: string;
@@ -347,7 +347,7 @@ export function createModerationContext(context: Omit<ModerationContext, 'id' | 
 /**
  * Create a standardized moderation decision
  */
-export function createModerationDecision(decision: Partial<ModerationDecision> & { queueItemId: ModerationId; moderatorId: UserId; actionTaken: string; decisionReason: string; status: ModerationStatus }): ModerationDecision {
+export function createModerationDecision(decision: Partial<ModerationDecision> & { queueItemId: ModerationId; moderatorId: UserId; actionTaken: string; decisionReason: string; status: ModerationQueueStatus }): ModerationDecision {
   const now = new Date();
   return {
     id: decision.id ?? crypto.randomUUID(),

@@ -4,13 +4,13 @@
  */
 
 import { LoadingError, LoadingTimeoutError, LoadingNetworkError, isRetryableError } from './errors';
-import { LoadingConfig, ConnectionType } from './types';
+import { LoadingConfig, ExtendedLoadingConfig, ConnectionType } from './types';
 
 export interface RecoveryContext {
   operationId: string;
   error: LoadingError;
   retryCount: number;
-  config: LoadingConfig;
+  config: ExtendedLoadingConfig;
   connectionInfo: {
     isOnline: boolean;
     connectionType: ConnectionType;
@@ -27,7 +27,7 @@ export function createRecoveryContext(
   operationId: string,
   error: LoadingError,
   retryCount: number,
-  config: LoadingConfig,
+  config: ExtendedLoadingConfig,
   connectionInfo: { isOnline: boolean; connectionType: ConnectionType }
 ): RecoveryContext {
   return {
@@ -115,7 +115,7 @@ export class LoadingRecoveryManager {
   }
 }
 
-export function useLoadingRecovery(_config: LoadingConfig) {
+export function useLoadingRecovery(_config: ExtendedLoadingConfig) {
   const manager = new LoadingRecoveryManager();
 
   return {
