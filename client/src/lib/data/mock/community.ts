@@ -181,11 +181,11 @@ export const generateTrendingTopics = (count: number = 15): TrendingTopic[] => {
     const expertCount = faker.number.int({ min: 2, max: 25 });
 
     // Generate geographic distribution
-    const states = ['California', 'Texas', 'Florida', 'New York', 'Pennsylvania'];
-    const geographicDistribution = states.map(state => {
+    const counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu'];
+    const geographicDistribution = counties.map(county => {
       const count = faker.number.int({ min: 5, max: 100 });
       return {
-        state,
+        state: county, // Keeping key as 'state' for compatibility
         count,
         percentage: faker.number.float({ min: 5, max: 35, fractionDigits: 1 }),
       };
@@ -395,11 +395,11 @@ export const generatePetitions = (count: number = 8): Petition[] => {
           : faker.number.int({ min: 0, max: Math.floor(goal * 0.6) });
 
     // Generate signatures by location
-    const states = ['California', 'Texas', 'Florida', 'New York', 'Pennsylvania'];
-    const signaturesByLocation = states.map(state => {
+    const counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu'];
+    const signaturesByLocation = counties.map(county => {
       const count = faker.number.int({ min: 100, max: Math.floor(currentSignatures * 0.3) });
       return {
-        state,
+        state: county, // Keeping key as 'state' for compatibility but value is county
         count,
         percentage: faker.number.float({ min: 5, max: 30, fractionDigits: 1 }),
       };
@@ -415,16 +415,16 @@ export const generatePetitions = (count: number = 8): Petition[] => {
       ),
       policyAreas,
       targetOfficial: faker.helpers.arrayElement([
-        'Senator John Smith',
-        'Representative Jane Doe',
-        'Governor Mike Johnson',
-        'Secretary of Health',
+        'Senator Kiptoo',
+        'Hon. Amina Mohamed',
+        'Governor Omondi',
+        'Cabinet Secretary for Health',
       ]),
       targetOffice: faker.helpers.arrayElement([
-        'U.S. Senate',
-        'House of Representatives',
-        "Governor's Office",
-        'Department of Health',
+        'The Senate',
+        'National Assembly',
+        "Council of Governors",
+        'Ministry of Health',
       ]),
       goal,
       currentSignatures,

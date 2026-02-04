@@ -222,7 +222,15 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
         <TabsContent value="experts" className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Expert Insights</h3>
-            <Badge variant="secondary">{mockExpertInsights.length} verified experts</Badge>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a href="/community/expert-verification">
+                  <Award className="h-4 w-4 mr-2" />
+                  Are you an expert? Get verified
+                </a>
+              </Button>
+              <Badge variant="secondary">{mockExpertInsights.length} verified experts</Badge>
+            </div>
           </div>
 
           <div className="space-y-4">

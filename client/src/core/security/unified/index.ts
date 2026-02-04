@@ -43,7 +43,7 @@ export {
 } from './csp-config';
 
 // Migration utilities
-import { SecurityCompatibilityLayer } from '../migration/compatibility-layer';
+
 import { SecurityMigrationUtils } from '../migration/migration-utils';
 
 import {
@@ -97,7 +97,7 @@ export class UnifiedSecuritySystem {
   public errorHandler: SecurityErrorHandler;
   public errorMiddleware: SecurityErrorMiddleware;
   public rateLimiter: UnifiedRateLimiter;
-  public compatibilityLayer: SecurityCompatibilityLayer;
+
 
   constructor(config?: Partial<UnifiedSecurityConfig>) {
     const finalConfig = { ...DEFAULT_UNIFIED_CONFIG, ...config } as UnifiedSecurityConfig;
@@ -125,7 +125,7 @@ export class UnifiedSecuritySystem {
       maxRequests: finalConfig.rateLimiting.maxRequests,
     });
 
-    this.compatibilityLayer = new SecurityCompatibilityLayer();
+
   }
 
   async initialize(config?: Partial<UnifiedSecurityConfig>): Promise<void> {
@@ -145,7 +145,7 @@ export class UnifiedSecuritySystem {
       this.errorHandler.shutdown(),
       this.errorMiddleware.shutdown(),
       this.rateLimiter.shutdown(),
-      this.compatibilityLayer.shutdown(),
+
     ]);
   }
 
@@ -271,7 +271,6 @@ export default {
   UnifiedInputSanitizer,
   SecurityErrorHandler,
   SecurityErrorMiddleware,
-  SecurityCompatibilityLayer,
   SecurityMigrationUtils,
   STANDARD_CSP_CONFIG,
   DEFAULT_UNIFIED_CONFIG,

@@ -28,15 +28,6 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
     section: 'legislative',
   },
   {
-    id: 'analysis',
-    label: 'Bill Analysis',
-    path: '/bill-sponsorship-analysis',
-    href: '/bill-sponsorship-analysis',
-    icon: 'BarChart3',
-    section: 'legislative',
-    allowedRoles: ['citizen', 'expert', 'admin', 'journalist', 'advocate'],
-  },
-  {
     id: 'community',
     label: 'Community Input',
     path: '/community',
@@ -47,8 +38,8 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
   {
     id: 'expert',
     label: 'Expert Verification',
-    path: '/expert-verification',
-    href: '/expert-verification',
+    path: '/community/expert-verification',
+    href: '/community/expert-verification',
     icon: 'Shield',
     section: 'community',
     allowedRoles: ['expert', 'admin'],

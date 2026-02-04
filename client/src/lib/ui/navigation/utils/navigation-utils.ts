@@ -1,5 +1,5 @@
 import { InvalidNavigationPathError } from '@client/core/error';
-import { validateNavigationPath } from '@client/core/validation';
+import { validateNavigationPath } from '../validation';
 import type { NavigationItem, UserRole } from '@client/lib/types/navigation';
 
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
@@ -21,6 +21,7 @@ function convertUserRole(role: SharedUserRole): UserRole {
   const roleMap: Record<SharedUserRole, UserRole> = {
     public: 'public',
     citizen: 'citizen',
+    user: 'user', // Added missing user role mapping
     expert: 'expert',
     admin: 'admin',
     journalist: 'journalist',

@@ -8,12 +8,19 @@
  */
 
 // Language Switcher Components
-export {
+import {
   LanguageSwitcher,
   LanguageToggle,
   LanguageStatus,
   default as LanguageSwitcherDefault,
 } from './LanguageSwitcher';
+
+export {
+  LanguageSwitcher,
+  LanguageToggle,
+  LanguageStatus,
+  LanguageSwitcherDefault,
+};
 
 // Re-export i18n hook for convenience
 export { useI18n } from '@client/lib/hooks/use-i18n';
@@ -62,12 +69,7 @@ export const isRTLLanguage = (language: string): boolean => {
   return rtlLanguages.includes(language);
 };
 
-// Placeholder components - TODO: Implement proper i18n components
-const LanguageSwitcher = () => null;
-const LanguageToggle = () => null;
-const LanguageStatus = () => null;
-
-export default {
+const i18nComponents = {
   LanguageSwitcher,
   LanguageToggle,
   LanguageStatus,
@@ -75,3 +77,5 @@ export default {
   getLanguageFlag,
   isRTLLanguage,
 };
+
+export default i18nComponents;

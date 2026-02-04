@@ -45,6 +45,9 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
+      immutableCheck: {
+        warnAfter: 128,
+      },
     }),
   devTools: process.env.NODE_ENV !== 'production',
 });

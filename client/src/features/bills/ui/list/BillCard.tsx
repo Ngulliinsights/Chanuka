@@ -39,12 +39,12 @@ const statusLabels = {
   introduced: 'Introduced',
   committee: 'Committee',
   floor_debate: 'Floor Debate',
-  passed_house: 'Passed House',
+  passed_house: 'Passed National Assembly',
   passed_senate: 'Passed Senate',
   passed: 'Passed',
   failed: 'Failed',
-  signed: 'Signed',
-  vetoed: 'Vetoed',
+  signed: 'Assented',
+  vetoed: 'Referred Back',
   override_attempt: 'Override Attempt',
   rejected: 'Rejected',
 };
@@ -124,10 +124,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onSave?.(bill.billId)}
+            onClick={() => onSave?.(bill.id)}
             onFocus={() => setQuickActionFocus('save')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.billId))}
+            onKeyDown={e => handleKeyDown(e, () => onSave?.(bill.id))}
             aria-label={isSaved ? 'Remove from saved bills' : 'Save bill'}
           >
             {isSaved ? (
@@ -141,10 +141,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onShare?.(bill.billId)}
+            onClick={() => onShare?.(bill.id)}
             onFocus={() => setQuickActionFocus('share')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.billId))}
+            onKeyDown={e => handleKeyDown(e, () => onShare?.(bill.id))}
             aria-label="Share bill"
           >
             <Share2 className="h-4 w-4" />
@@ -154,10 +154,10 @@ export default function BillCard({
             size="sm"
             variant="secondary"
             className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
-            onClick={() => onComment?.(bill.billId)}
+            onClick={() => onComment?.(bill.id)}
             onFocus={() => setQuickActionFocus('comment')}
             onBlur={() => setQuickActionFocus(null)}
-            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.billId))}
+            onKeyDown={e => handleKeyDown(e, () => onComment?.(bill.id))}
             aria-label="View comments"
           >
             <MessageCircle className="h-4 w-4" />
@@ -183,7 +183,7 @@ export default function BillCard({
 
             <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
               <Link
-                to={`/bills/${bill.billId}`}
+                to={`/bills/${bill.id}`}
                 className="hover:underline focus:underline focus:outline-none"
                 tabIndex={0}
               >
@@ -253,7 +253,7 @@ export default function BillCard({
           </div>
 
           <Link
-            to={`/bills/${bill.billId}`}
+            to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors text-sm"
             tabIndex={0}
           >

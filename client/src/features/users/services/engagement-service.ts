@@ -45,6 +45,9 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
   private sessionStartTime: number = 0;
   private pageViews: number = 0;
   private actions: number = 0;
+  private sessionTrackingInterval: NodeJS.Timeout | null = null;
+  private visibilityHandler: (() => void) | null = null;
+  private unloadHandler: (() => void) | null = null;
 
   constructor() {
     this.cache = new CacheService({
@@ -65,6 +68,20 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
   }
 
   async dispose(): Promise<void> {
+    // Clear interval
+    if (this.sessionTrackingInterval) {
+      clearInterval(this.sessionTrackingInterval);
+      this.sessionTrackingInterval = null;
+    }
+    // Remove event listeners
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = null;
+    }
+    if (this.unloadHandler) {
+      window.removeEventListener('beforeunload', this.unloadHandler);
+      this.unloadHandler = null;
+    }
     await this.endSession();
     await this.cache.clear();
     logger.info('EngagementService disposed');
@@ -309,19 +326,21 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
   private startSessionTracking(): void {
     // Track page visibility changes
-    document.addEventListener('visibilitychange', () => {
+    this.visibilityHandler = () => {
       if (document.hidden) {
         this.updateSessionActivity();
       }
-    });
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
 
     // Track page unload
-    window.addEventListener('beforeunload', () => {
+    this.unloadHandler = () => {
       this.endSession();
-    });
+    };
+    window.addEventListener('beforeunload', this.unloadHandler);
 
     // Track periodic session updates
-    setInterval(() => {
+    this.sessionTrackingInterval = setInterval(() => {
       this.updateSessionActivity();
     }, 60000); // Every minute
   }

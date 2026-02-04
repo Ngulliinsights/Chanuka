@@ -8,7 +8,7 @@
  */
 
 import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/monitoring/model/performance-benchmarking';
 import {
@@ -87,13 +87,22 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   onOptimizationNeeded,
 }) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
-  const [isMonitoring, setIsMonitoring] = useState(false);
+  const isMonitoringRef = useRef(false);
   const [issues, setIssues] = useState<string[]>([]);
 
-  const thresholds = {
+  const thresholds = React.useMemo(() => ({
     ...(DEFAULT_THRESHOLDS[pageName] || DEFAULT_THRESHOLDS.default),
     ...customThresholds,
-  };
+  }), [pageName, customThresholds]);
+
+  // Use refs for dependencies that might change on every render but shouldn't trigger monitoring restart
+  const thresholdsRef = useRef(thresholds);
+  const onOptimizationNeededRef = useRef(onOptimizationNeeded);
+
+  useEffect(() => {
+    thresholdsRef.current = thresholds;
+    onOptimizationNeededRef.current = onOptimizationNeeded;
+  }, [thresholds, onOptimizationNeeded]);
 
   // Create a wrapper to adapt the performanceBenchmarking object to the expected hook interface
   const performanceMonitor = PerformanceMonitoring.getInstance();
@@ -128,7 +137,8 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
    * Start performance monitoring
    */
   const startMonitoring = useCallback(() => {
-    setIsMonitoring(true);
+    if (isMonitoringRef.current) return; // Already monitoring
+    isMonitoringRef.current = true;
 
     // Set up a callback to receive metrics updates
     performanceMonitor.onMetricsChange(updatedMetrics => {
@@ -148,13 +158,13 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     });
 
     logger.info(`Performance monitoring started for ${pageName}`);
-  }, [pageName]);
+  }, [pageName, performanceMonitor]);
 
   /**
    * Stop performance monitoring and collect metrics
    */
   const stopMonitoring = useCallback(() => {
-    if (!isMonitoring) return;
+    if (!isMonitoringRef.current) return;
 
     // Get current metrics from the performance monitor
     const currentMetrics = performanceMonitor.getMetrics();
@@ -178,21 +188,21 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     };
 
     setMetrics(collectedMetrics);
-    setIsMonitoring(false);
+    isMonitoringRef.current = false;
 
-    // Analyze performance issues
-    const detectedIssues = analyzePerformanceIssues(collectedMetrics, thresholds);
+    // Analyze performance issues using the latest thresholds from ref
+    const detectedIssues = analyzePerformanceIssues(collectedMetrics, thresholdsRef.current);
     setIssues(detectedIssues);
 
-    if (detectedIssues.length > 0 && onOptimizationNeeded) {
-      onOptimizationNeeded(detectedIssues);
+    if (detectedIssues.length > 0 && onOptimizationNeededRef.current) {
+      onOptimizationNeededRef.current(detectedIssues);
     }
 
     logger.info(`Performance monitoring completed for ${pageName}`, {
       metrics: collectedMetrics,
       issues: detectedIssues,
     });
-  }, [pageName, isMonitoring, thresholds, onOptimizationNeeded]);
+  }, [pageName, performanceMonitor]);
 
   /**
    * Analyze performance metrics for issues
@@ -279,11 +289,11 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   useEffect(() => {
     startMonitoring();
     return () => {
-      if (isMonitoring) {
+      if (isMonitoringRef.current) {
         stopMonitoring();
       }
     };
-  }, [startMonitoring, stopMonitoring, isMonitoring]);
+  }, [startMonitoring, stopMonitoring]);
 
   // Stop monitoring when page is fully loaded
   useEffect(() => {
@@ -330,7 +340,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         </CardHeader>
 
         <CardContent>
-          {isMonitoring && !metrics && (
+          {isMonitoringRef.current && !metrics && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               <span>Monitoring performance...</span>

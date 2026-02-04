@@ -813,6 +813,12 @@ export class ComprehensiveAnalyticsTracker {
    * Send event to analytics service
    */
   private async sendEventToAnalytics(event: AnalyticsEvent): Promise<void> {
+    // In development/mock mode, just log the event
+    if (process.env.NODE_ENV === 'development' || process.env.VITE_USE_MOCK_DATA === 'true') {
+      logger.debug('[MOCK] Sending analytics event', { eventId: event.id, type: event.type });
+      return;
+    }
+
     try {
       // Send to analytics API service
       await fetch('/api/analytics/events', {
@@ -827,18 +833,8 @@ export class ComprehensiveAnalyticsTracker {
     }
   }
 
-  /**
-   * Start periodic flush of analytics data
-   */
-  private startPeriodicFlush(): void {
-    this.flushInterval = setInterval(() => {
-      this.flushAnalyticsData();
-    }, this.FLUSH_INTERVAL);
-  }
+  // ...
 
-  /**
-   * Flush analytics data to server
-   */
   private async flushAnalyticsData(): Promise<void> {
     if (this.events.length === 0) return;
 
@@ -849,6 +845,18 @@ export class ComprehensiveAnalyticsTracker {
         pageId,
         metrics: metrics.slice(-5), // Send last 5 metrics per page
       }));
+
+      // In development/mock mode, just log
+      if (process.env.NODE_ENV === 'development' || process.env.VITE_USE_MOCK_DATA === 'true') {
+        logger.info('[MOCK] Flushing analytics data', {
+          eventCount: eventsToFlush.length,
+          engagementCount: engagementToFlush.length,
+          metricsCount: metricsToFlush.length,
+        });
+        // Clear flushed data
+        this.events = [];
+        return;
+      }
 
       await fetch('/api/analytics/batch', {
         method: 'POST',

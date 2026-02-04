@@ -78,68 +78,75 @@ interface ConstitutionalAnalysisPanelProps {
  * ConstitutionalAnalysisPanel - Main constitutional analysis overview
  * Features: Severity indicators, expert analysis display, constitutional compatibility assessment
  */
+import {
+  KENYA_CONSTITUTION,
+  KENYA_CASE_LAW,
+  getConstitutionalArticle,
+} from '@client/lib/data/mock/real-kenya-data';
+
+// ... (component definition starts)
+
 export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview']));
 
-  // Mock constitutional analysis data
+  // Get real data references
+  const devolutionArticle = getConstitutionalArticle(189);
+  const equalityArticle = getConstitutionalArticle(27);
+  const healthArticle = getConstitutionalArticle(43);
+  
+  // Use real precedents
+  const devolutionCases = KENYA_CASE_LAW.devolution;
+  const healthCases = KENYA_CASE_LAW.health;
+
+  // Mock constitutional analysis data populated with REAL Kenyan context
   const analysisData: ConstitutionalAnalysisData = {
     billId: bill.id,
     overallAssessment: {
-      constitutionalityScore: 0.75,
+      constitutionalityScore: 0.78,
       riskLevel: 'medium',
-      summary: `${bill.title} shows strong constitutional foundation but raises moderate concerns regarding federal-state authority balance and implementation requirements.`,
+      summary: `${bill.title} shows strong grounding in Article 43 (${healthArticle.title}) but raises moderate concerns regarding Article 189 (${devolutionArticle.title}) and implementation requirements.`,
       keyFindings: [
-        'Strong constitutional basis under Commerce Clause',
-        'Potential federal overreach concerns in state jurisdiction',
-        'Equal protection considerations require careful implementation',
-        'Implementation timeline aligns with constitutional requirements',
+        `Strong constitutional basis under Article 43: Right to Health`,
+        `Potential friction with Article 189 on National-County cooperation`,
+        `Equal benefit considerations under Article 27 require careful implementation`,
+        'Implementation timeline aligns with Public Finance Management Act principles',
       ],
     },
     flags: [
       {
         id: 'flag-1',
         severity: 'moderate',
-        title: 'Federal-State Authority Balance',
+        title: 'National-County Authority Balance',
         description:
-          'This provision may exceed federal authority under the current constitutional framework',
-        article: 'Article I, Section 8',
-        precedents: ['United States v. Lopez (1995)', 'NFIB v. Sebelius (2012)'],
+          'This provision may exceed national authority under the Fourth Schedule distribution of functions',
+        article: `Article ${devolutionArticle.number}: ${devolutionArticle.title}`,
+        precedents: devolutionCases.map(c => `${c.name} ${c.citation}`),
         recommendation:
-          'Consider state implementation partnerships to address jurisdictional concerns',
+          'Consider Intergovernmental Relations Technical Committee (IGRTC) mediation mechanisms',
       },
       {
         id: 'flag-2',
         severity: 'low',
         title: 'Equal Protection Implementation',
-        description: 'Income-based eligibility criteria may require equal protection analysis',
-        article: '14th Amendment',
-        precedents: ['San Antonio v. Rodriguez (1973)', 'Plyler v. Doe (1982)'],
+        description: 'Income-based eligibility criteria requires Art. 27 analysis',
+        article: `Article ${equalityArticle.number}: ${equalityArticle.title}`,
+        precedents: ['FIDA-Kenya v Attorney General', 'Coalition for Reform and Democracy v Republic'],
         recommendation: 'Ensure clear, objective criteria for eligibility determinations',
       },
     ],
     precedentAnalysis: {
-      supportingCases: [
-        {
-          name: 'Wickard v. Filburn',
-          year: 1942,
-          relevance: 85,
-          summary: 'Established broad interpretation of Commerce Clause authority',
-        },
-        {
-          name: 'Heart of Atlanta Motel v. United States',
-          year: 1964,
-          relevance: 78,
-          summary: 'Upheld federal regulation of local activities affecting interstate commerce',
-        },
-      ],
-      challengingCases: [
-        {
-          name: 'United States v. Lopez',
-          year: 1995,
-          relevance: 72,
-          summary: 'Limited federal authority under Commerce Clause for non-economic activities',
-        },
-      ],
+      supportingCases: healthCases.map(c => ({
+        name: c.name,
+        year: c.year,
+        relevance: c.relevance,
+        summary: c.summary,
+      })),
+      challengingCases: devolutionCases.map(c => ({
+        name: c.name,
+        year: c.year,
+        relevance: c.relevance * 0.9, // Slightly adjust for challenging context
+        summary: c.summary,
+      })),
     },
     expertConsensus: {
       supportPercentage: 68,

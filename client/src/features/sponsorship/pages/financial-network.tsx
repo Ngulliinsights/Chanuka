@@ -36,7 +36,7 @@ interface NetworkData {
   }>;
 }
 
-export default function FinancialNetworkAnalysis({ bill_id }: FinancialNetworkProps) {
+export default function FinancialNetworkAnalysis({ bill_id, isEmbedded = false }: FinancialNetworkProps) {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -149,40 +149,43 @@ export default function FinancialNetworkAnalysis({ bill_id }: FinancialNetworkPr
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      {/* Navigation */}
-      <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary">
-          Home
-        </Link>
-        <span>›</span>
-        <Link to={`/bills/${bill_id}`} className="hover:text-primary">
-          Bills
-        </Link>
-        <span>›</span>
-        <Link to={`/bills/${bill_id}/sponsorship-analysis`} className="hover:text-primary">
-          Sponsorship Analysis
-        </Link>
-        <span>›</span>
-        <span className="text-foreground">Financial Network</span>
-      </nav>
+      {/* Navigation - Only show if not embedded */}
+      {!isEmbedded && (
+        <>
+          <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
+            <Link to="/" className="hover:text-primary">
+              Home
+            </Link>
+            <span>›</span>
+            <Link to={`/bills/${bill_id}`} className="hover:text-primary">
+              Bills
+            </Link>
+            <span>›</span>
+            <Link to={`/bills/${bill_id}/sponsorship-analysis`} className="hover:text-primary">
+              Sponsorship Analysis
+            </Link>
+            <span>›</span>
+            <span className="text-foreground">Financial Network</span>
+          </nav>
 
-      {/* Header */}
-      <div className="mb-6">
-        <Link
-          to={`/bills/${bill_id}/sponsorship-analysis`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Analysis Navigation
-        </Link>
+          <div className="mb-6">
+            <Link
+              to={`/bills/${bill_id}/sponsorship-analysis`}
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back to Analysis Navigation
+            </Link>
 
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Financial Network & Influence Mapping
-        </h1>
-        <p className="text-muted-foreground">
-          Comprehensive analysis of financial relationships and industry influence
-        </p>
-      </div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Financial Network & Influence Mapping
+            </h1>
+            <p className="text-muted-foreground">
+              Comprehensive analysis of financial relationships and industry influence
+            </p>
+          </div>
+        </>
+      )}
 
       {/* Network Overview */}
       <Card className="mb-6">

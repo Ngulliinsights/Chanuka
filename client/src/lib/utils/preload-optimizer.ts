@@ -172,6 +172,8 @@ export const smartPreloads: PreloadConfig[] = [
 ];
 
 // Initialize smart preloading
+let routeCheckInterval: NodeJS.Timeout | null = null;
+
 export function initializeSmartPreloading() {
   // Wait for DOM to be ready
   if (document.readyState === 'loading') {
@@ -184,10 +186,18 @@ export function initializeSmartPreloading() {
 
   // Re-optimize on route changes
   let lastPath = window.location.pathname;
-  setInterval(() => {
+  routeCheckInterval = setInterval(() => {
     if (window.location.pathname !== lastPath) {
       lastPath = window.location.pathname;
       preloadOptimizer.optimizePreloads(smartPreloads);
     }
   }, 1000);
+}
+
+// Cleanup function to prevent memory leaks
+export function cleanupSmartPreloading() {
+  if (routeCheckInterval) {
+    clearInterval(routeCheckInterval);
+    routeCheckInterval = null;
+  }
 }

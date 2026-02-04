@@ -61,13 +61,14 @@ const BillDetail = createLazyComponent(
   () => import('@client/features/bills/pages/bill-detail'),
   'Bill Detail'
 );
-const BillAnalysis = createLazyComponent(
-  () => import('@client/features/bills/pages/bill-analysis'),
-  'Bill Analysis'
-);
+
 const CommunityHub = createLazyComponent(
   () => import('@client/features/community/pages/community-input'),
   'Community Hub'
+);
+const ExpertVerificationPage = createLazyComponent(
+  () => import('@client/features/expert/pages/expert-verification'),
+  'Expert Verification'
 );
 const UniversalSearchPage = createLazyComponent(
   () => import('@client/features/search/pages/UniversalSearchPage'),
@@ -243,15 +244,16 @@ const routes: RouteConfig[] = [
     path: '/bills/:id',
     element: <BillDetail />,
   },
-  {
-    id: 'bill-analysis',
-    path: '/bills/:id/analysis',
-    element: <BillAnalysis />,
-  },
+
   {
     id: 'community',
     path: '/community',
     element: <CommunityHub />,
+  },
+  {
+    id: 'expert-verification',
+    path: '/community/expert-verification',
+    element: <ExpertVerificationPage />,
   },
   // Consolidated search route - main search interface
   {

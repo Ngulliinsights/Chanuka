@@ -1,5 +1,6 @@
 // Modern web-vitals v3+ uses 'on' prefix instead of 'get' prefix
-import { onCLS, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
+// Note: onFID was replaced by onINP (Interaction to Next Paint) in v3+
+import { onCLS, onFCP, onLCP, onTTFB, onINP, type Metric } from 'web-vitals';
 
 interface PerformanceMetrics {
   coreWebVitals: CoreWebVitals;
@@ -182,13 +183,19 @@ class PerformanceMonitoring {
       this.notifyMetricsUpdate();
     });
 
-    // First Input Delay - measures time from first user interaction to browser response
-    // Good: < 100ms, Needs Improvement: 100-300ms, Poor: > 300ms
-    onFID((metric: Metric) => {
-      this.metrics.coreWebVitals.fid = metric.value;
-      this.reportMetric('FID', metric.value, 100);
-      this.notifyMetricsUpdate();
-    });
+    // Interaction to Next Paint (replaces First Input Delay in web-vitals v3+)
+    // Good: < 200ms, Needs Improvement: 200-500ms, Poor: > 500ms
+    try {
+      onINP((metric: Metric) => {
+        // Store as 'fid' for backward compatibility with existing dashboards
+        this.metrics.coreWebVitals.fid = metric.value;
+        this.reportMetric('INP', metric.value, 200);
+        this.notifyMetricsUpdate();
+      });
+    } catch (error) {
+      // INP may not be available in all browsers
+      console.debug('INP metric not available:', error);
+    }
 
     // Cumulative Layout Shift - measures visual stability (unexpected layout movements)
     // Good: < 0.1, Needs Improvement: 0.1-0.25, Poor: > 0.25

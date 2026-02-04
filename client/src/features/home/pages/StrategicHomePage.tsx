@@ -27,8 +27,10 @@ import {
   BarChart3,
   CheckCircle,
   ChevronRight,
+  Clock,
   Eye,
   FileText,
+  MessageSquare,
   Search,
   Shield,
   Target,
@@ -76,9 +78,125 @@ const PlatformStats: React.FC<{ stats: StatItem[] }> = ({ stats }) => (
 );
 
 const RecentActivity: React.FC = () => (
-  <div className="text-center">
-    <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Activity</h2>
-    <p className="text-gray-600">Recent activity will be displayed here</p>
+  <div className="max-w-4xl mx-auto">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-bold text-gray-900 mb-4">Recent Activity</h2>
+      <p className="text-xl text-gray-600">
+        Stay updated with the latest legislative developments
+      </p>
+    </div>
+
+    <Card className="border-0 shadow-xl">
+      <CardContent className="p-8">
+        <div className="space-y-6">
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl hover:shadow-md transition-all duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-semibold text-gray-900">
+                  New Bill: Climate Action Framework
+                </h4>
+                <Badge variant="secondary" className="text-xs">
+                  New
+                </Badge>
+              </div>
+              <p className="text-gray-600 text-sm mb-2">
+                Comprehensive climate legislation introduced for public review
+              </p>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />2 hours ago
+                </span>
+                <span className="flex items-center gap-1">
+                  <Eye className="w-3 h-3" />
+                  1,247 views
+                </span>
+              </div>
+            </div>
+            <Link to="/bills">
+              <Button variant="ghost" size="sm">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl hover:shadow-md transition-all duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-semibold text-gray-900">
+                  Workaround Alert: Tax Reform Implementation
+                </h4>
+                <Badge variant="destructive" className="text-xs">
+                  Alert
+                </Badge>
+              </div>
+              <p className="text-gray-600 text-sm mb-2">
+                Potential bypass mechanism detected in regulatory implementation
+              </p>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />4 hours ago
+                </span>
+                <span className="flex items-center gap-1">
+                  <Activity className="w-3 h-3" />
+                  High Priority
+                </span>
+              </div>
+            </div>
+            <Link to="/bills">
+              <Button variant="ghost" size="sm">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl hover:shadow-md transition-all duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <MessageSquare className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-semibold text-gray-900">
+                  Community Discussion: Healthcare Access
+                </h4>
+                <Badge className="text-xs bg-green-100 text-green-800">Active</Badge>
+              </div>
+              <p className="text-gray-600 text-sm mb-2">
+                Active discussion on proposed healthcare legislation changes
+              </p>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />6 hours ago
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  23 participants
+                </span>
+              </div>
+            </div>
+            <Link to="/community">
+              <Button variant="ghost" size="sm">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="text-center mt-8">
+          <Link to="/dashboard">
+            <Button size="lg" variant="outline">
+              View All Activity
+              <ChevronRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   </div>
 );
 
@@ -627,7 +745,7 @@ export default function StrategicHomePage() {
                     AI-powered detection of implementation workarounds and constitutional bypass
                     tactics in legislation.
                   </CardDescription>
-                  <Link to="/search">
+                  <Link to="/bills">
                     <Button
                       variant="ghost"
                       className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300"
@@ -691,31 +809,6 @@ export default function StrategicHomePage() {
                 </CardContent>
               </Card>
 
-              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100">
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Search className="w-8 h-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-gray-900">
-                    Intelligent Search
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                    AI-powered search across bills, debates, and analysis. Find relevant legislation
-                    with natural language queries.
-                  </CardDescription>
-                  <Link to="/search">
-                    <Button
-                      variant="ghost"
-                      className="group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300"
-                    >
-                      Search Now
-                      <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
 
               <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-teal-50 to-teal-100">
                 <CardHeader className="text-center pb-4">

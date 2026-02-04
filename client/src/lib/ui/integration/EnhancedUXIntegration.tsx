@@ -9,7 +9,7 @@
  * - Accessibility features
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
@@ -29,86 +29,117 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
   const { isMobile } = useDeviceInfo();
 
   const [isInitialized, setIsInitialized] = useState(false);
+  const performanceObserverRef = useRef<PerformanceObserver | null>(null);
 
-  const initializeEnhancedUX = useCallback(async () => {
-    const setupAccessibilityAnnouncements = () => {
-      // Create or get the announcements element
-      let announcements = document.getElementById('accessibility-announcements');
-      if (!announcements) {
-        announcements = document.createElement('div');
-        announcements.id = 'accessibility-announcements';
-        announcements.setAttribute('aria-live', 'polite');
-        announcements.setAttribute('aria-atomic', 'true');
-        announcements.className = 'sr-only';
-        document.body.appendChild(announcements);
+  // Screen reader announcement helper
+  const announceToScreenReader = useCallback((message: string) => {
+    const announcements = document.getElementById('accessibility-announcements');
+    if (announcements) {
+      announcements.textContent = message;
+      setTimeout(() => {
+        announcements.textContent = '';
+      }, 1000);
+    }
+  }, []);
+
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Skip to main content (Alt + M)
+    if (event.altKey && event.key === 'm') {
+      event.preventDefault();
+      const main = document.querySelector('main');
+      if (main) {
+        (main as HTMLElement).focus();
+        announceToScreenReader('Skipped to main content');
       }
+    }
 
-      // TODO: Listen for state changes that should be announced
-      // This would need to be implemented with Redux subscriptions or React Query
-    };
+    // Open search (Alt + S)
+    if (event.altKey && event.key === 's') {
+      event.preventDefault();
+      const searchInput = document.querySelector(
+        'input[type="search"], input[placeholder*="search" i]'
+      ) as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+        announceToScreenReader('Search focused');
+      }
+    }
 
-    const announceToScreenReader = (message: string) => {
-      const announcements = document.getElementById('accessibility-announcements');
-      if (announcements) {
-        announcements.textContent = message;
-        // Clear after a delay to allow for re-announcements
-        setTimeout(() => {
-          announcements.textContent = '';
-        }, 1000);
+    // Open navigation (Alt + N)
+    if (event.altKey && event.key === 'n') {
+      event.preventDefault();
+      const navButton = document.querySelector(
+        '[aria-label*="navigation" i], [aria-label*="menu" i]'
+      ) as HTMLButtonElement;
+      if (navButton) {
+        navButton.click();
+        announceToScreenReader('Navigation opened');
+      }
+    }
+  }, [announceToScreenReader]);
+
+  // Error handlers
+  const handleUnhandledRejection = useCallback((event: PromiseRejectionEvent) => {
+    logger.error('Unhandled promise rejection', { error: event.reason });
+  }, []);
+
+  const handleError = useCallback((event: ErrorEvent) => {
+    logger.error('Unhandled error', {
+      error: event.error,
+      filename: event.filename,
+      lineno: event.lineno,
+    });
+  }, []);
+
+  // Setup accessibility announcements element
+  useEffect(() => {
+    let announcements = document.getElementById('accessibility-announcements');
+    if (!announcements) {
+      announcements = document.createElement('div');
+      announcements.id = 'accessibility-announcements';
+      announcements.setAttribute('aria-live', 'polite');
+      announcements.setAttribute('aria-atomic', 'true');
+      announcements.className = 'sr-only';
+      document.body.appendChild(announcements);
+    }
+
+    return () => {
+      // Only remove if we created it
+      const el = document.getElementById('accessibility-announcements');
+      if (el && el.parentNode) {
+        el.parentNode.removeChild(el);
       }
     };
+  }, []);
 
-    const setupKeyboardNavigation = () => {
-      // Enhanced keyboard navigation
-      document.addEventListener('keydown', event => {
-        // Skip to main content (Alt + M)
-        if (event.altKey && event.key === 'm') {
-          event.preventDefault();
-          const main = document.querySelector('main');
-          if (main) {
-            main.focus();
-            announceToScreenReader('Skipped to main content');
-          }
-        }
-
-        // Open search (Alt + S)
-        if (event.altKey && event.key === 's') {
-          event.preventDefault();
-          const searchInput = document.querySelector(
-            'input[type="search"], input[placeholder*="search" i]'
-          ) as HTMLInputElement;
-          if (searchInput) {
-            searchInput.focus();
-            announceToScreenReader('Search focused');
-          }
-        }
-
-        // Open navigation (Alt + N)
-        if (event.altKey && event.key === 'n') {
-          event.preventDefault();
-          const navButton = document.querySelector(
-            '[aria-label*="navigation" i], [aria-label*="menu" i]'
-          ) as HTMLButtonElement;
-          if (navButton) {
-            navButton.click();
-            announceToScreenReader('Navigation opened');
-          }
-        }
-      });
+  // Setup keyboard navigation with cleanup
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
     };
+  }, [handleKeyDown]);
 
-    const setupPerformanceMonitoring = () => {
-      // Monitor Core Web Vitals
-      if ('web-vital' in window) {
-        // This would integrate with the existing web vitals monitoring
-        logger.info('Performance monitoring active');
-      }
+  // Setup error recovery with cleanup
+  useEffect(() => {
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('error', handleError);
 
-      // Monitor component render times
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('error', handleError);
+    };
+  }, [handleUnhandledRejection, handleError]);
+
+  // Setup performance monitoring (dev only) with cleanup
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+
+    try {
       const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.duration > 100) {
-            // Log slow renders
             logger.warn('Slow component render detected', {
               name: entry.name,
               duration: entry.duration,
@@ -119,49 +150,23 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
       });
 
       observer.observe({ entryTypes: ['measure'] });
-    };
+      performanceObserverRef.current = observer;
+    } catch (error) {
+      // PerformanceObserver not supported
+    }
 
-    const setupErrorRecovery = () => {
-      // Enhanced error recovery with user-friendly messages
-      window.addEventListener('unhandledrejection', event => {
-        logger.error('Unhandled promise rejection', { error: event.reason });
-
-        // TODO: Implement notification system with Redux or React Query
-        // For now, just log the error
-      });
-
-      window.addEventListener('error', event => {
-        logger.error('Unhandled error', {
-          error: event.error,
-          filename: event.filename,
-          lineno: event.lineno,
-        });
-
-        // TODO: Implement notification system with Redux or React Query
-        // Don't show notifications for script loading errors (likely extensions)
-        if (!event.filename?.includes('extension')) {
-          // For now, just log the error
-        }
-      });
-    };
-
-    try {
-      // Initialize accessibility announcements
-      setupAccessibilityAnnouncements();
-
-      // Initialize keyboard navigation
-      setupKeyboardNavigation();
-
-      // Initialize performance monitoring
-      if (process.env.NODE_ENV === 'development') {
-        setupPerformanceMonitoring();
+    return () => {
+      if (performanceObserverRef.current) {
+        performanceObserverRef.current.disconnect();
+        performanceObserverRef.current = null;
       }
+    };
+  }, []);
 
-      // Initialize error recovery
-      setupErrorRecovery();
-
+  // Log initialization
+  useEffect(() => {
+    if (!isInitialized) {
       setIsInitialized(true);
-
       logger.info('Enhanced UX integration initialized', {
         component: 'EnhancedUXIntegration',
         userId: user?.id,
@@ -175,15 +180,8 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
           'personalization',
         ],
       });
-    } catch (error) {
-      logger.error('Failed to initialize enhanced UX', { error });
     }
-  }, [user?.id, isMobile, isOnline]);
-
-  // Initialize enhanced UX features
-  useEffect(() => {
-    initializeEnhancedUX();
-  }, [initializeEnhancedUX]);
+  }, [isInitialized, user?.id, isMobile, isOnline]);
 
   // Handle online/offline state changes
   useEffect(() => {

@@ -92,29 +92,29 @@ export const generateTrendingMetrics = () => {
  */
 export const generateLocation = () => {
   const states = [
-    'California',
-    'Texas',
-    'Florida',
-    'New York',
-    'Pennsylvania',
-    'Illinois',
-    'Ohio',
-    'Georgia',
-    'North Carolina',
-    'Michigan',
-    'New Jersey',
-    'Virginia',
-    'Washington',
-    'Arizona',
-    'Massachusetts',
+    'Nairobi',
+    'Mombasa',
+    'Kisumu',
+    'Nakuru',
+    'Uasin Gishu',
+    'Kiambu',
+    'Turkana',
+    'Kilifi',
+    'Kakamega',
+    'Meru',
+    'Machakos',
+    'Kisii',
+    'Kajiado',
+    'Murang\'a',
+    'Nyeri',
   ];
 
   const state = faker.helpers.arrayElement(states);
 
   return {
     state,
-    district: `${state} ${faker.number.int({ min: 1, max: 15 })}`,
-    county: faker.location.county(),
+    district: `${state} Constituency ${faker.number.int({ min: 1, max: 15 })}`,
+    county: state, // In Kenya, the primary subdivision is the County
   };
 };
 
@@ -152,7 +152,7 @@ export const generatePolicyAreas = (count: number = 2): string[] => {
  * Generate bill number in realistic format
  */
 export const generateBillNumber = (): string => {
-  const chamber = faker.helpers.arrayElement(['H.R.', 'S.']);
+  const chamber = faker.helpers.arrayElement(['N.A.B.', 'Sen. Bill']);
   const number = faker.number.int({ min: 1, max: 9999 });
   return `${chamber} ${number}`;
 };
@@ -234,8 +234,8 @@ export const generateCommentContent = (isExpert: boolean = false): string => {
   if (isExpert) {
     const expertTemplates = [
       'Based on my analysis of similar legislation, this bill addresses key concerns in {area}. The proposed framework aligns with established best practices and includes necessary safeguards.',
-      'From a policy perspective, this legislation represents a significant step forward in {area}. However, implementation will require careful coordination between federal and state agencies.',
-      'The constitutional implications of this bill are generally sound, though Section {section} may face challenges under current precedent. I recommend reviewing the Commerce Clause analysis.',
+      'From a policy perspective, this legislation represents a significant step forward in {area}. However, implementation will require careful coordination between national and county agencies.',
+      'The constitutional implications of this bill are generally sound, though Section {section} may face challenges under current precedent. I recommend reviewing the trade regulation analysis.',
       "This bill's approach to {area} is well-researched and evidence-based. The funding mechanisms are realistic and the timeline for implementation is achievable.",
     ];
 

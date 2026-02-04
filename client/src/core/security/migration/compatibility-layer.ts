@@ -41,7 +41,7 @@ export interface LegacySecurityConfig {
 
 export class SecurityCompatibilityLayer {
   private legacySecurity: LegacySecuritySystem;
-  private unifiedSecurity: UnifiedSecuritySystem;
+  private _unifiedSecurity?: UnifiedSecuritySystem;
   private featureFlags: Record<string, boolean>;
   private config: UnifiedSecurityConfig;
 
@@ -50,7 +50,14 @@ export class SecurityCompatibilityLayer {
     this.config = this.getDefaultConfig();
 
     this.legacySecurity = new LegacySecuritySystem();
-    this.unifiedSecurity = new UnifiedSecuritySystem(this.config);
+    // Validated: unifiedSecurity is initialized lazily to avoid circular dependency ReferenceErrors
+  }
+
+  private get unifiedSecurity(): UnifiedSecuritySystem {
+    if (!this._unifiedSecurity) {
+      this._unifiedSecurity = new UnifiedSecuritySystem(this.config);
+    }
+    return this._unifiedSecurity;
   }
 
   async initialize(config: LegacySecurityConfig | UnifiedSecurityConfig): Promise<void> {
@@ -65,6 +72,7 @@ export class SecurityCompatibilityLayer {
 
     // Initialize both systems during transition period
     await this.legacySecurity.initialize(config as LegacySecurityConfig);
+    // Accessing getter triggers initialization
     await this.unifiedSecurity.initialize(this.config);
   }
 
@@ -321,5 +329,4 @@ class LegacySecuritySystem {
 }
 
 
-// Export singleton instance
-export const securityCompatibilityLayer = new SecurityCompatibilityLayer();
+

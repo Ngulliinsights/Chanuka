@@ -42,6 +42,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
   };
 
   public cache: CacheService;
+  private progressMonitoringInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     this.cache = new CacheService({
@@ -60,6 +61,11 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
   }
 
   async dispose(): Promise<void> {
+    // Clear interval to prevent memory leak
+    if (this.progressMonitoringInterval) {
+      clearInterval(this.progressMonitoringInterval);
+      this.progressMonitoringInterval = null;
+    }
     await this.cache.clear();
     logger.info('AchievementService disposed');
   }
@@ -323,7 +329,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
   private startProgressMonitoring(): void {
     // Check achievement progress periodically
-    setInterval(async () => {
+    this.progressMonitoringInterval = setInterval(async () => {
       try {
         await this.checkAllAchievementProgress();
       } catch (error) {

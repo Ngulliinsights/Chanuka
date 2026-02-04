@@ -1,4 +1,4 @@
-import { validateNavigationPath, validateUserRole, validateRelatedPage } from '@client/core/validation';
+import { validateNavigationPath, validateUserRole, validateRelatedPage } from '../validation';
 import type { UserRole, RelatedPage } from '@client/lib/types';
 
 import type { UserRole as SharedUserRole } from '../types';
@@ -14,6 +14,7 @@ function convertUserRoleArray(roles: SharedUserRole[] | undefined): UserRole[] |
   const roleMap: Record<SharedUserRole, UserRole> = {
     public: 'public',
     citizen: 'citizen',
+    user: 'user', // Added missing user role mapping
     expert: 'expert',
     admin: 'admin',
     journalist: 'journalist',
@@ -151,7 +152,7 @@ export const getPageRelationships = (
           title: navItem?.label || path,
           path,
           description: navItem?.description || '',
-          category: navItem?.section || 'tools',
+          category: (navItem?.section === 'system' ? 'tools' : navItem?.section) || 'tools' as const,
           type: rel.type as 'parent' | 'child' | 'sibling' | 'related',
           weight: rel.weight,
           context: rel.context,
@@ -238,7 +239,7 @@ export const generateBreadcrumbRelationships = (
             title: navItem.label,
             path: currentPathBuilder,
             description: navItem.description || '',
-            category: navItem.section,
+            category: (navItem.section === 'system' ? 'tools' : navItem.section) || 'tools' as const,
             type: 'parent',
             weight: 8,
             context: `Return to ${navItem.label}`,

@@ -106,7 +106,7 @@ const navigationUtils = {
 };
 
 export const DesktopSidebar = React.memo(() => {
-  const { items, user_role, isAuthenticated } = useNav();
+  const { items, userRole, isAuthenticated } = useNav();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,8 +121,8 @@ export const DesktopSidebar = React.memo(() => {
    */
   const validatedItems = useMemo(() => {
     const validated = navigationUtils.validateNavigationItems(items);
-    return navigationUtils.filterNavigationByAccess(validated, user_role, isAuthenticated);
-  }, [items, user_role, isAuthenticated]);
+    return navigationUtils.filterNavigationByAccess(validated, userRole, isAuthenticated);
+  }, [items, userRole, isAuthenticated]);
 
   /**
    * Applies search filter to validated items.
@@ -345,12 +345,12 @@ export const DesktopSidebar = React.memo(() => {
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
-                    {user_role?.charAt(0).toUpperCase() || 'U'}
+                    {userRole?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">User</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {user_role || 'Member'}
+                      {userRole || 'Member'}
                     </p>
                   </div>
                 </div>

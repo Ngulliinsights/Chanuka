@@ -72,11 +72,11 @@ interface UserAchievement {
 // cspell: disable-next-line
 export const mockUserProfile: any = {
   id: 'user-123',
-  email: 'john.doe@example.com',
-  name: 'John Doe',
-  username: 'johndoe',
-  first_name: 'John',
-  last_name: 'Doe',
+  email: 'kamau.otieno@example.com',
+  name: 'Kamau Otieno',
+  username: 'kamau',
+  first_name: 'Kamau',
+  last_name: 'Otieno',
   role: 'citizen',
   verification_status: 'verified',
   is_active: true,
@@ -129,10 +129,10 @@ export const mockUserProfile: any = {
   },
   bio: 'Passionate advocate for environmental policy and sustainable governance. Active in local community initiatives.',
   location: 'Nairobi, Kenya',
-  website: 'https://johndoe.example.com',
+  website: 'https://kamau.example.com',
   // cspell: disable-next-line
-  twitter: '@johndoe_env',
-  linkedin: 'https://linkedin.com/in/johndoe',
+  twitter: '@kamau_env',
+  linkedin: 'https://linkedin.com/in/kamauotieno',
   avatar_url:
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
   cover_image_url: null,
@@ -376,7 +376,7 @@ export const mockDashboardData = {
     {
       id: 'rec-2',
       type: 'expert',
-      title: 'Dr. Sarah Johnson - Environmental Policy Expert',
+      title: 'Dr. Amina Hassan - Environmental Policy Expert',
       reason: 'Matches your expertise area',
       confidence: 0.78,
     },
@@ -395,7 +395,7 @@ export const mockDashboardData = {
       id: 'notif-2',
       type: 'comment_reply',
       title: 'New reply to your comment',
-      message: 'Jane Smith replied to your comment on Water Resources Management',
+      message: 'Wanjiku Mwangi replied to your comment on Water Resources Management',
       timestamp: '2024-11-09T18:30:00Z',
       read: false,
     },

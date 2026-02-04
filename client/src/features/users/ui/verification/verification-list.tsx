@@ -39,17 +39,17 @@ export const VerificationsList = () => {
       {
         id: 1,
         bill_id: 1,
-        billTitle: 'H.R. 1234: Education Reform Act',
+        billTitle: 'N.A.B. 1234: Education Reform Act',
         claimType: 'constitutional',
         claimText:
-          'The federal funding provisions are consistent with South Dakota v. Dole precedent',
+          'The national funding provisions are consistent with Council of Governors v. National Government precedent',
         status: 'verified',
         dateSubmitted: '2023-04-15T10:30:00Z',
       },
       {
         id: 2,
         bill_id: 1,
-        billTitle: 'H.R. 1234: Education Reform Act',
+        billTitle: 'N.A.B. 1234: Education Reform Act',
         claimType: 'economic',
         claimText: 'Implementation costs will be offset by long-term economic benefits',
         status: 'pending',
@@ -58,9 +58,9 @@ export const VerificationsList = () => {
       {
         id: 3,
         bill_id: 2,
-        billTitle: 'S. 789: Healthcare Accessibility Act',
+        billTitle: 'Sen. Bill 789: Healthcare Accessibility Act',
         claimType: 'legal',
-        claimText: 'New regulations comply with existing HIPAA framework',
+        claimText: 'New regulations comply with existing Data Protection Act framework',
         status: 'disputed',
         dateSubmitted: '2023-04-10T09:15:00Z',
       },

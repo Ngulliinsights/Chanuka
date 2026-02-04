@@ -52,11 +52,11 @@ faker.seed(12345);
  */
 const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low') => {
   const flagTypes = [
-    { category: 'Commerce Clause', description: 'May exceed federal commerce power' },
-    { category: 'Due Process', description: 'Potential due process concerns' },
-    { category: 'Equal Protection', description: 'May create unequal treatment' },
-    { category: 'First Amendment', description: 'Potential free speech implications' },
-    { category: 'Tenth Amendment', description: 'May infringe on state powers' },
+    { category: 'Trade Regulation', description: 'May exceed national trade regulation power' },
+    { category: 'Fair Administrative Action', description: 'Potential fair administrative action concerns' },
+    { category: 'Equality and Freedom from Discrimination', description: 'May create unequal treatment' },
+    { category: 'Bill of Rights', description: 'Potential human rights implications' },
+    { category: 'Devolved Government Powers', description: 'May infringe on county powers' },
     { category: 'Separation of Powers', description: 'Executive authority concerns' },
   ];
 
@@ -79,7 +79,7 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
     type: flag.category,
     description: flag.description,
     severity: faker.helpers.arrayElement(severityLevels),
-    article: faker.helpers.maybe(() => `Article ${faker.number.int({ min: 1, max: 7 })}`, {
+    article: faker.helpers.maybe(() => `Article ${faker.number.int({ min: 1, max: 260 })}`, {
       probability: 0.7,
     }),
     clause: faker.helpers.maybe(() => `Section ${faker.number.int({ min: 1, max: 10 })}`, {
@@ -92,8 +92,8 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
  * Generate sponsors for a bill
  */
 const generateSponsors = (count: number = 3) => {
-  const parties = ['Republican', 'Democratic', 'Independent'];
-  const positions = ['Senator', 'Representative', 'Delegate'];
+  const parties = ['UDA', 'ODM', 'Jubilee', 'Wiper'];
+  const positions = ['Senator', 'MP', 'Representative'];
 
   const sponsors = [];
 
@@ -102,7 +102,7 @@ const generateSponsors = (count: number = 3) => {
     id: faker.number.int({ min: 1, max: 1000 }),
     name: faker.person.fullName(),
     party: faker.helpers.arrayElement(parties),
-    district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
+    district: 'Constituency ' + faker.number.int({ min: 1, max: 290 }),
     position: faker.helpers.arrayElement(positions),
     isPrimary: true,
   });
@@ -113,7 +113,7 @@ const generateSponsors = (count: number = 3) => {
       id: faker.number.int({ min: 1, max: 1000 }),
       name: faker.person.fullName(),
       party: faker.helpers.arrayElement(parties),
-      district: faker.location.state() + '-' + faker.number.int({ min: 1, max: 50 }),
+      district: 'Constituency ' + faker.number.int({ min: 1, max: 290 }),
       position: faker.helpers.arrayElement(positions),
       role: 'co-sponsor',
       isPrimary: false,

@@ -5,8 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 // Feature Imports
 import { AnalysisDashboard } from '@client/features/analysis/ui/dashboard';
-import { BillHeader } from '@client/features/bills';
-import { useBill } from '@client/features/bills/hooks';
+import { BillHeader, useBill } from '@client/features/bills';
 import BillCommunityTab from '@client/features/bills/ui/detail/BillCommunityTab';
 import BillFullTextTab from '@client/features/bills/ui/detail/BillFullTextTab';
 import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';

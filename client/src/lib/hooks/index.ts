@@ -99,13 +99,21 @@ export { useMobileMenu as useMobileMenuFSD } from '@client/core/navigation/hooks
 export { useSecurity, useSecureForm, useRateLimit } from './useSecurity';
 
 // Shared UI Hooks - Re-exports for convenience (excluding duplicates)
-// TODO: Fix circular reference - useI18n should be imported differently
-// export { useI18n } from '../lib/hooks';
+export { useI18n, I18nProvider } from './use-i18n';
 export { useToast } from './use-toast';
 export { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from './useNavigationSlice';
 export { useMobile, useTablet, useDesktop } from './use-mobile';
 export { useSystemOverview } from './use-system';
 // export { useSystem } from './use-system'; // Deprecated/Removed
+
+// Analytics hooks - re-exported from features
+export * from './useAnalytics';
+
+// Search hooks - re-exported from features  
+export * from './useSearch';
+
+// Notification history export
+export { useNotificationHistory } from './useNotifications';
 
 // Mobile hooks from shared - Re-exports for convenience (excluding duplicates)
 // TODO: Uncomment when mobile hooks module is created

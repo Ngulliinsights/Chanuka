@@ -99,8 +99,16 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
             ) {
               fallbackValue = (fallbackValue as Record<string, unknown>)[fallbackKey];
             } else {
-              // Return key if not found in fallback either (helps debugging)
-              console.warn(`Translation key not found: ${key}`);
+              // Only log each missing key once per session to avoid flooding
+              if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+                const warnedKeysKey = '__i18n_warned_keys__';
+                const warnedKeys = (window as any)[warnedKeysKey] || new Set();
+                if (!warnedKeys.has(key)) {
+                  warnedKeys.add(key);
+                  (window as any)[warnedKeysKey] = warnedKeys;
+                  console.debug(`[i18n] Missing translation key: ${key}`);
+                }
+              }
               return key;
             }
           }

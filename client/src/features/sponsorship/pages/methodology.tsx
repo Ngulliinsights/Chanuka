@@ -185,8 +185,7 @@ export default function MethodologyPage({ bill_id }: MethodologyProps) {
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
                           Systematically monitors financial disclosures, property records, business
-                          registrations, and other official government databases across federal,
-                          state, and local levels.
+                          registrations, and other official government databases across national and county levels.
                         </p>
                         <div className="text-xs text-blue-600">
                           Coverage: 1.2M+ entities | Update frequency: Daily | Accuracy rate: 98.7%

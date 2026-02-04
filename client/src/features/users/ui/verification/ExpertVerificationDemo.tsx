@@ -41,48 +41,35 @@ import {
  * - Verification workflows
  * - Expert consensus tracking
  */
+import { EXPERT_PROFILES } from '@client/lib/data/mock/real-kenya-data';
+
+// ... (imports remain)
+
 export function ExpertVerificationDemo() {
   const [selectedTab, setSelectedTab] = useState('badges');
 
-  // Mock data for demonstration
+  // Get real expert profile
+  const realExpert = EXPERT_PROFILES[0];
+
+  // Mock data for demonstration using Real Profile
   const mockExpert: Expert = {
-    id: 'expert-001',
-    name: 'Dr. Sarah Johnson',
+    id: realExpert.id,
+    name: realExpert.name,
     avatar: undefined,
     verificationType: 'official',
-    credentials: [
-      {
-        id: 'cred-1',
-        type: 'education',
-        title: 'Ph.D. in Constitutional Law',
-        institution: 'Harvard Law School',
-        year: 2010,
-        verified: true,
-        verificationDate: '2023-01-15T00:00:00Z',
-      },
-      {
-        id: 'cred-2',
-        type: 'certification',
-        title: 'Licensed Attorney',
-        institution: 'State Bar of Massachusetts',
-        year: 2011,
-        verified: true,
-        verificationDate: '2023-01-15T00:00:00Z',
-      },
-      {
-        id: 'cred-3',
-        type: 'experience',
-        title: 'Senior Legal Counsel',
-        institution: 'Department of Justice',
-        year: 2015,
-        verified: true,
-        verificationDate: '2023-01-15T00:00:00Z',
-      },
-    ],
+    credentials: realExpert.credentials.map((cred, i) => ({
+      id: `cred-${i}`,
+      type: cred.type as 'education' | 'experience' | 'certification',
+      title: cred.title,
+      institution: cred.institution,
+      year: 2010 + i * 2,
+      verified: true,
+      verificationDate: '2023-01-15T00:00:00Z',
+    })),
     affiliations: [
       {
         id: 'aff-1',
-        organization: 'Harvard Law School',
+        organization: 'University of Nairobi School of Law',
         role: 'Professor of Constitutional Law',
         type: 'academic',
         current: true,
@@ -91,7 +78,7 @@ export function ExpertVerificationDemo() {
       },
       {
         id: 'aff-2',
-        organization: 'American Bar Association',
+        organization: 'East African Law Society',
         role: 'Constitutional Law Committee Member',
         type: 'ngo',
         current: true,
@@ -100,9 +87,9 @@ export function ExpertVerificationDemo() {
       },
     ],
     specializations: [
-      'Constitutional Law',
+      realExpert.specialization,
       'Civil Rights',
-      'Federal Legislation',
+      'National Legislation',
       'Supreme Court Cases',
     ],
     credibilityScore: 0.92,
@@ -110,11 +97,11 @@ export function ExpertVerificationDemo() {
     avgCommunityRating: 4.7,
     verified: true,
     verificationDate: '2023-01-15T00:00:00Z',
-    bio: 'Professor of Constitutional Law at Harvard Law School with expertise in federal legislation analysis and civil rights. Former Senior Legal Counsel at the Department of Justice.',
+    bio: realExpert.bio,
     contactInfo: {
-      email: 'sarah.johnson@harvard.edu',
-      website: 'https://hls.harvard.edu/faculty/sarah-johnson',
-      linkedin: 'https://linkedin.com/in/sarah-johnson-law',
+      email: 'expert@uon.ac.ke',
+      website: 'https://law.uonbi.ac.ke/faculty/expert',
+      linkedin: 'https://linkedin.com/in/expert-law',
     },
   };
 
@@ -200,17 +187,18 @@ export function ExpertVerificationDemo() {
 
   const mockExpertConsensus: ExpertConsensusType = {
     billId: 1234,
-    topic: 'Constitutional implications of federal education funding requirements',
+    topic: 'Constitutional implications of national education funding requirements',
     totalExperts: 15,
     agreementLevel: 0.73,
     majorityPosition:
-      'The federal funding provisions are consistent with established precedent under South Dakota v. Dole, as they represent conditional spending rather than coercive mandates.',
+      'The national funding provisions are consistent with established precedent under Article 189, as they enhance consultation rather than impose coercive mandates.',
     minorityPositions: [
       {
         position:
-          'The funding requirements may exceed federal authority by effectively coercing state compliance through financial pressure.',
+          'The funding requirements may exceed national authority by effectively coercing county compliance through financial pressure.',
         expertCount: 3,
         experts: ['expert-002', 'expert-003', 'expert-004'],
+        // ... rest of file
       },
       {
         position:

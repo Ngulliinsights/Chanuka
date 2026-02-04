@@ -28,62 +28,67 @@ interface EducationalFrameworkProps {
  * EducationalFramework - Comprehensive educational context for bills
  * Features: Plain language summaries, constitutional context, historical precedents, process education
  */
+import {
+  REAL_BILLS,
+  KENYA_CONSTITUTION,
+  KENYA_CASE_LAW,
+} from '@client/lib/data/mock/real-kenya-data';
+
+// ... (component definition)
+
 export function EducationalFramework({ bill, className = '' }: EducationalFrameworkProps) {
   const [activeTab, setActiveTab] = useState('plain-language');
 
-  // Mock data for demonstration - in real implementation, this would come from the backend
+  // Use real bill data
+  const digitalHealthBill = REAL_BILLS[0];
+  const financeBill = REAL_BILLS[1];
+  const art43 = KENYA_CONSTITUTION.articles[43];
+  
+  // Real cases
+  const healthCase = KENYA_CASE_LAW.health[0];
+  const ipCase = KENYA_CASE_LAW.health[2];
+
+  // Mock data for demonstration - using REAL Kenyan Bill Content
   const mockPlainLanguageSections = [
     {
       id: 'section-1',
-      title: 'Healthcare Coverage Expansion',
-      legalText:
-        'Section 3(a): The Secretary shall establish a comprehensive healthcare coverage program that provides essential health benefits to all eligible individuals as defined in subsection (b), subject to the availability of appropriated funds and in accordance with the implementation timeline specified in Section 7.',
+      title: digitalHealthBill.title,
+      legalText: digitalHealthBill.summary,
       plainLanguage:
-        'The government will create a new healthcare program that covers basic medical services for people who qualify. The program will start based on the schedule in Section 7, but only if Congress provides the money for it.',
-      keyPoints: [
-        'Creates a new government healthcare program',
-        'Covers essential medical services like doctor visits and prescriptions',
-        'Only available to people who meet certain requirements',
-        'Depends on Congress approving funding',
-      ],
+        'The government is creating a new digital system to manage health records and services. This will help hospitals share information securely and improve how patients get care.',
+      keyPoints: digitalHealthBill.keyProvisions,
       impact: {
-        who: ['Uninsured adults', 'Low-income families', 'Small business employees'],
+        who: ['Patients', 'Healthcare Providers', 'Insurance Companies'],
         what: [
-          'Access to preventive care',
-          'Prescription drug coverage',
-          'Emergency medical services',
-          'Mental health support',
+          'Electronic health records for all',
+          'Better data privacy protections',
+          'Faster access to medical history',
+          'Improved telemedicine services',
         ],
-        when: 'Implementation begins January 2025, full rollout by 2027',
-        cost: 'Estimated $50 billion over 5 years, funded through new healthcare tax',
+        when: 'Implementation starts upon assent, with 3-year rollout',
+        cost: 'Estimated KSh 5 billion for infrastructure setup',
       },
       complexity: 'medium' as const,
       importance: 'high' as const,
     },
     {
       id: 'section-2',
-      title: 'Funding Mechanism',
-      legalText:
-        'Section 5(c): To finance the program established under Section 3, there is hereby imposed a tax equal to 2.5 percent of the adjusted gross income of individuals whose adjusted gross income exceeds $400,000 for the taxable year, with such tax to be collected in the same manner as other federal income taxes.',
+      title: financeBill.title,
+      legalText: financeBill.summary,
       plainLanguage:
-        'To pay for this healthcare program, people who earn more than $400,000 per year will pay an extra 2.5% tax on their income. This tax will be collected the same way as regular income taxes.',
-      keyPoints: [
-        'New 2.5% tax on high earners',
-        'Only affects people making over $400,000/year',
-        'Collected through existing tax system',
-        'Revenue goes directly to healthcare program',
-      ],
+        'This annual law sets out how the government will raise money through taxes. It proposes changes to income tax, VAT, and other duties to fund the national budget.',
+      keyPoints: financeBill.keyProvisions,
       impact: {
-        who: ['High-income individuals', 'Wealthy families', 'Some small business owners'],
+        who: ['Taxpayers', 'Businesses', 'Importers'],
         what: [
-          'Additional tax burden of 2.5%',
-          'Increased tax compliance requirements',
-          'Potential impact on investment decisions',
+          'Changes to tax rates',
+          'New levies on eco-unfriendly products',
+          'Adjustments to deductibles',
         ],
-        when: 'Tax begins January 1, 2025',
-        cost: 'Average $10,000-25,000 additional tax for affected individuals',
+        when: 'Effective July 1st, 2024',
+        cost: 'Aims to raise KSh 300 billion in additional revenue',
       },
-      complexity: 'low' as const,
+      complexity: 'high' as const,
       importance: 'critical' as const,
     },
   ];
@@ -91,40 +96,40 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
   const mockConstitutionalProvisions = [
     {
       id: 'provision-1',
-      sectionNumber: '3',
-      title: 'Healthcare Coverage Expansion',
-      summary: 'Establishes comprehensive healthcare coverage program for eligible individuals',
+      sectionNumber: '4',
+      title: 'Right to Health',
+      summary: 'Ensures digital health interventions align with the constitutional guarantee of highest attainable standard of health.',
       constitutionalBasis: [
         {
           id: 'cb-1',
-          article: 'Article 43',
-          section: '1',
-          title: 'Right to Health',
-          text: 'Every person has the right to the highest attainable standard of health, which includes the right to health care services, including reproductive health care.',
+          article: `Article ${art43.number}`,
+          section: '1(a)',
+          title: art43.title,
+          text: art43.content,
           relevance: 'direct' as const,
           impact: 'supports' as const,
           explanation:
-            'This provision directly supports the constitutional right to healthcare by expanding access to essential health services for underserved populations.',
+            'This provision mandates the state to use progressive technologies to ensure the delivery of quality healthcare services to all Citizens.',
         },
         {
           id: 'cb-2',
-          article: 'Article 21',
-          section: '1',
-          title: 'Fundamental Rights and Freedoms',
-          text: 'We, the people of Kenya, acknowledge the supremacy of the Almighty God of all creation and honour those who heroically struggled to bring freedom and justice to our land.',
+          article: 'Article 31',
+          section: 'c',
+          title: 'Privacy',
+          text: 'Every person has the right to privacy, which includes the right not to have information relating to their family or private affairs unnecessarily required or revealed.',
           relevance: 'contextual' as const,
-          impact: 'supports' as const,
+          impact: 'mixed' as const,
           explanation:
-            "The preamble's commitment to justice aligns with ensuring equitable healthcare access for all citizens.",
+            "Digital health systems must balance accessibility with the strict privacy protections guaranteed by the Constitution.",
         },
       ],
       concerns: [
-        'Funding mechanism may face constitutional challenges regarding tax equity',
-        'Implementation timeline may conflict with devolved healthcare responsibilities',
+        'Data sovereignty and storage of sensitive health info',
+        'Equitable access for those without digital devices (digital divide)',
       ],
       precedents: [
-        'Okwanda v. Minister of Health [2014] eKLR - Right to healthcare access',
-        'Patricia Asero Ochieng & 2 others v. Attorney General [2012] eKLR - Healthcare funding obligations',
+        `${healthCase.name} ${healthCase.citation} - ${healthCase.summary}`,
+        `${ipCase.name} ${ipCase.citation} - ${ipCase.summary}`,
       ],
     },
   ];
@@ -132,51 +137,51 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
   const mockHistoricalPrecedents = [
     {
       id: 'precedent-1',
-      title: 'Universal Health Coverage Act 2018',
+      title: 'Universal Health Coverage (UHC) Pilot',
       year: 2018,
       jurisdiction: 'Kenya',
-      status: 'passed' as const,
+      status: 'implemented' as const,
       similarity: 'high' as const,
       keyProvisions: [
-        'Established National Health Insurance Fund expansion',
-        'Created universal healthcare coverage framework',
-        'Introduced healthcare financing mechanisms',
+        'Removal of user fees in public hospitals',
+        'Focus on primary healthcare',
+        'Pilot in 4 counties (Kisumu, Nyeri, Isiolo, Machakos)',
       ],
       outcome: {
         result: 'mixed' as const,
         impact:
-          'Expanded healthcare access to 2.5 million additional Kenyans, but faced implementation challenges due to insufficient funding and administrative capacity.',
+          'Increased utilization of services by 40%, but faced challenges with drug stockouts and staff shortages.',
         lessons: [
-          'Strong political support is essential for successful implementation',
-          'Adequate funding mechanisms must be established before rollout',
-          'Stakeholder engagement improves public acceptance',
+          'Input financing must match demand financing',
+          'Community health volunteers are critical for success',
+          'Digital systems were fragmented and hampered reporting',
         ],
         challenges: [
-          'Insufficient initial funding led to service delivery gaps',
-          'Administrative systems were not ready for scale',
-          'Resistance from private healthcare providers',
+          'Budgetary constraints',
+          'Intergovernmental coordination issues',
+          'Weak supply chain management',
         ],
       },
       constitutionalChallenges: {
-        filed: true,
-        outcome: 'upheld' as const,
+        filed: false,
+        outcome: 'n/a' as const,
         details:
-          'High Court upheld the Act, ruling that universal healthcare access aligns with constitutional rights under Article 43.',
+          'No direct challenge, but questions raised about equity between pilot and non-pilot counties.',
       },
       publicSupport: {
-        initial: 72,
-        final: 58,
+        initial: 85,
+        final: 60,
         keyFactors: [
-          'Initial enthusiasm for universal coverage',
-          'Concerns about tax increases',
-          'Implementation delays reduced confidence',
+          'Free services were popular',
+          'Drug shortages caused frustration',
+          'Long waiting times reduced satisfaction',
         ],
       },
       timeline: {
-        introduced: '2018-03-15',
-        passed: '2018-07-20',
+        introduced: '2018-06-01',
+        passed: '2018-12-12',
         implemented: '2019-01-01',
-        challenged: '2018-09-10',
+        challenged: 'N/A',
       },
     },
   ];

@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 3, 2026 at 12:14 PM
+**Generated:** February 4, 2026 at 04:16 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,452
+**Total Items:** 3,451
 
 ```
 .
@@ -503,6 +503,7 @@
 │   │   │   │   │   │   └── timeline.tsx
 │   │   │   │   │   ├── components/
 │   │   │   │   │   │   ├── implementation-workarounds.tsx
+│   │   │   │   │   │   ├── ImplementationWorkarounds.tsx
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── detail/
 │   │   │   │   │   │   ├── BillActionsPanel.tsx
@@ -516,7 +517,6 @@
 │   │   │   │   │   ├── education/
 │   │   │   │   │   │   └── README.md
 │   │   │   │   │   ├── implementation/
-│   │   │   │   │   │   └── workarounds.tsx
 │   │   │   │   │   ├── list/
 │   │   │   │   │   │   └── BillCard.tsx
 │   │   │   │   │   ├── tracking/
@@ -529,7 +529,6 @@
 │   │   │   │   │   ├── BillRealTimeIndicator.tsx
 │   │   │   │   │   ├── bills-dashboard.tsx
 │   │   │   │   │   ├── filter-panel.tsx
-│   │   │   │   │   ├── implementation-workarounds.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── LegislativeBriefDisplay.tsx
 │   │   │   │   │   ├── MobileBillDetail.tsx
@@ -802,6 +801,7 @@
 │   │   │   │       ├── generators.ts
 │   │   │   │       ├── index.ts
 │   │   │   │       ├── loaders.ts
+│   │   │   │       ├── real-kenya-data.ts
 │   │   │   │       ├── realtime.ts
 │   │   │   │       └── users.ts
 │   │   │   ├── demo/
@@ -1461,7 +1461,6 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── connection-status.tsx
 │   │   │   │   ├── database-status.tsx
-│   │   │   │   ├── dropdown-menu.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── utils/

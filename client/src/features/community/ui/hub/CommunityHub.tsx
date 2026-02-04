@@ -61,9 +61,9 @@ export function CommunityHub({ className }: CommunityHubProps) {
     setExpertInsights([
       {
         id: 1,
-        expert: 'Dr. Sarah Chen',
+        expert: 'Dr. Amina Hassan',
         title: 'Constitutional Analysis',
-        insight: 'This bill raises important questions about federal vs state jurisdiction...',
+        insight: 'This bill raises important questions about national vs county jurisdiction...',
         billId: 123,
         timestamp: '2 hours ago',
         likes: 24,

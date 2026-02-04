@@ -17,7 +17,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import { BillCard } from '@client/features/bills';
-import { useBills } from '@client/features/bills/hooks';
+import { useBills } from '@client/features/bills';
 import { FilterPanel } from '@client/features/bills/ui/filter-panel';
 import VirtualBillGrid from '@client/features/bills/ui/virtual-bill-grid';
 import { BillStatus, UrgencyLevel } from '@client/lib/types/bill/bill-base';
