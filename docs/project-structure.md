@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 4, 2026 at 06:04 PM
+**Generated:** February 6, 2026 at 02:52 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,451
+**Total Items:** 3,428
 
 ```
 .
@@ -372,7 +372,8 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── input-sanitizer.ts
 │   │   │   │   │   ├── rate-limiter.ts
-│   │   │   │   │   └── security-interface.ts
+│   │   │   │   │   ├── security-interface.ts
+│   │   │   │   │   └── system.ts
 │   │   │   │   ├── csp-manager.ts
 │   │   │   │   ├── csp-nonce.ts
 │   │   │   │   ├── csrf-protection.ts
@@ -423,6 +424,8 @@
 │   │   │   │   │   │   ├── conflict-detection.ts
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── WorkaroundAnalysisPage.tsx
 │   │   │   │   ├── types/
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
@@ -459,8 +462,7 @@
 │   │   │   │   │   ├── metrics/
 │   │   │   │   │   │   └── CivicScoreCard.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── auth/
 │   │   │   │   └── pages/
 │   │   │   │       ├── auth-page.tsx
@@ -472,7 +474,6 @@
 │   │   │   │       └── SecurityPage.tsx
 │   │   │   ├── bills/
 │   │   │   │   ├── model/
-│   │   │   │   │   └── types.ts
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── bill-analysis.tsx
 │   │   │   │   │   ├── bill-detail.tsx
@@ -502,7 +503,6 @@
 │   │   │   │   │   │   ├── stats.tsx
 │   │   │   │   │   │   └── timeline.tsx
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── implementation-workarounds.tsx
 │   │   │   │   │   │   ├── ImplementationWorkarounds.tsx
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── detail/
@@ -1327,14 +1327,12 @@
 │   │   │   │   │   ├── AssetLoadingIndicator.tsx
 │   │   │   │   │   ├── constants.ts
 │   │   │   │   │   ├── errors.ts
-│   │   │   │   │   ├── FINAL_STATUS.md
 │   │   │   │   │   ├── FontFallback.tsx
 │   │   │   │   │   ├── GlobalLoadingIndicator.tsx
 │   │   │   │   │   ├── GlobalLoadingProvider.tsx
 │   │   │   │   │   ├── ImageFallback.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── integration-test.ts
-│   │   │   │   │   ├── LOADING_SYSTEM_STATUS.md
 │   │   │   │   │   ├── LoadingDemo.tsx
 │   │   │   │   │   ├── LoadingSpinner.tsx
 │   │   │   │   │   ├── LoadingStates.tsx
@@ -1515,6 +1513,15 @@
 │   │   ├── main.tsx
 │   │   ├── test-styles.html
 │   │   └── vite-env.d.ts
+│   ├── all_errors.txt
+│   ├── bills_errors_complete.txt
+│   ├── bills_errors_final_check_2.txt
+│   ├── bills_errors_final_check_3.txt
+│   ├── bills_errors_final_check.txt
+│   ├── bills_errors_final.txt
+│   ├── bills_errors.txt
+│   ├── bills_errors2.txt
+│   ├── bills_errors3.txt
 │   ├── BUG_FIXES_SUMMARY.md
 │   ├── fix-import-syntax.mjs
 │   ├── index.html
@@ -1527,33 +1534,17 @@
 │   ├── project.json
 │   ├── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   ├── tailwind.config.ts
-│   ├── ts2307_full.txt
-│   ├── ts2307_remaining.txt
-│   ├── tsc_2307_errors.txt
-│   ├── tsc_all_errors.txt
-│   ├── tsc_bills.txt
-│   ├── tsc_community_2.txt
-│   ├── tsc_community.txt
+│   ├── top_errors.txt
+│   ├── ts_errors_v2.log
+│   ├── ts_errors.log
+│   ├── tsc_errors_current.txt
+│   ├── tsc_errors_final.txt
+│   ├── tsc_errors.log
 │   ├── tsc_errors.txt
-│   ├── tsc_output_2.txt
-│   ├── tsc_output_3.txt
-│   ├── tsc_output_4.txt
-│   ├── tsc_output.txt
-│   ├── tsc_remaining.txt
-│   ├── tsc_sample.txt
-│   ├── tsc_users.txt
+│   ├── tsc_verification_2.log
+│   ├── tsc_verification.log
 │   ├── tsconfig.json
 │   ├── tsconfig.tsbuildinfo
-│   ├── typecheck_error_2.log
-│   ├── typecheck_error_3.log
-│   ├── typecheck_error.log
-│   ├── typecheck_fix_1.log
-│   ├── typecheck_fix_2.log
-│   ├── typecheck_fix_3.log
-│   ├── typecheck_fix_4.log
-│   ├── typecheck_fix_5.log
-│   ├── typecheck_fix_6.log
-│   ├── typecheck_new.log
 │   ├── validate-fixes.cjs
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
@@ -3265,6 +3256,7 @@
 │   │   │   ├── index.ts
 │   │   │   ├── type-generation.ts
 │   │   │   └── validation-schemas.ts
+│   │   ├── enums.ts
 │   │   ├── index.ts
 │   │   └── performance.ts
 │   ├── utils/
@@ -3408,10 +3400,6 @@
 ├── archive-docs.sh
 ├── CHANGELOG.md
 ├── clear-sw.html
-├── community_errors_after.txt
-├── community_errors_final.txt
-├── community_errors_v2.txt
-├── community_errors.txt
 ├── COMPLETION_STRATEGY.ts
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
@@ -3420,12 +3408,6 @@
 ├── Dockerfile
 ├── Dockerfile.client
 ├── drizzle.config.ts
-├── ERROR_EXTRACTION_SUMMARY.txt
-├── errors-comprehensive.json
-├── errors.json
-├── expert_profile_errors.txt
-├── final_tsc_check.txt
-├── full_tsc_errors.txt
 ├── generate-structure.mjs
 ├── knip.config.ts
 ├── knip.json
@@ -3438,22 +3420,17 @@
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
 ├── QUICK_START_FOR_NEXT_SESSION.ts
-├── QUICK_STATS.txt
 ├── README.md
-├── REFACTORING_SUMMARY.txt
 ├── run_codebase_stats.bat
 ├── SESSION_2_COMPLETION_SUMMARY.ts
 ├── start-dev.js
 ├── tailwind.config.js
 ├── test_api_integration.js
 ├── tsc_output.txt
-├── tsc_remaining.txt
-├── tsc_search.txt
 ├── tsconfig.json
 ├── tsconfig.server.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
-├── type-errors.txt
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
 └── vitest.workspace.ts

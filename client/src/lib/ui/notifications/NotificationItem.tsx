@@ -4,7 +4,7 @@
  * Individual notification display with actions and metadata
  */
 
-import { Notification, NotificationType } from '@client/services/notification-service';
+import { Notification, NotificationType } from '@client/lib/services/notification-service';
 import { formatDistanceToNow } from 'date-fns';
 import {
   MessageCircle,

@@ -15,6 +15,16 @@ import { mockUsers } from './users';
 // Seed faker for consistent data
 faker.seed(12345);
 
+const getIntId = (id: string | number): number => {
+  return typeof id === 'string' ? parseInt(id, 10) || faker.number.int() : id;
+};
+
+const getUserName = (user: any): string => {
+  if (user.name) return user.name;
+  if (user.first_name && user.last_name) return `${user.first_name} ${user.last_name}`;
+  return 'User';
+};
+
 /**
  * Real-time update event types
  */
@@ -37,7 +47,7 @@ export interface RealTimeEvent {
   type: RealTimeEventType;
   timestamp: string;
   data: any;
-  userId?: string;
+  userId?: string | number;
   billId?: number;
   priority: 'low' | 'medium' | 'high';
 }
@@ -59,10 +69,10 @@ export const generateBillStatusChangeEvent = (): RealTimeEvent => {
     id: generateId('event'),
     type: 'bill_status_change',
     timestamp: new Date().toISOString(),
-    billId: bill.id,
+    billId: getIntId(bill.id),
     priority: 'high',
     data: {
-      bill_id: bill.id,
+      bill_id: getIntId(bill.id),
       billNumber: bill.billNumber,
       billTitle: bill.title,
       oldStatus: bill.status,
@@ -86,23 +96,23 @@ export const generateBillEngagementUpdateEvent = (): RealTimeEvent => {
   const engagementType = faker.helpers.arrayElement(['view', 'save', 'comment', 'share']);
 
   const updates: any = {
-    bill_id: bill.id,
+    bill_id: getIntId(bill.id),
     billNumber: bill.billNumber,
     billTitle: bill.title,
   };
 
   switch (engagementType) {
     case 'view':
-      updates.viewCount = bill.viewCount + faker.number.int({ min: 1, max: 10 });
+      updates.viewCount = (bill.viewCount || 0) + faker.number.int({ min: 1, max: 10 });
       break;
     case 'save':
-      updates.saveCount = bill.saveCount + faker.number.int({ min: 1, max: 5 });
+      updates.saveCount = (bill.trackingCount || 0) + faker.number.int({ min: 1, max: 5 });
       break;
     case 'comment':
-      updates.commentCount = bill.commentCount + faker.number.int({ min: 1, max: 3 });
+      updates.commentCount = (bill.commentCount || 0) + faker.number.int({ min: 1, max: 3 });
       break;
     case 'share':
-      updates.shareCount = bill.shareCount + faker.number.int({ min: 1, max: 2 });
+      updates.shareCount = (bill.engagement?.shares || 0) + faker.number.int({ min: 1, max: 2 });
       break;
   }
 
@@ -110,7 +120,7 @@ export const generateBillEngagementUpdateEvent = (): RealTimeEvent => {
     id: generateId('event'),
     type: 'bill_engagement_update',
     timestamp: new Date().toISOString(),
-    billId: bill.id,
+    billId: typeof bill.id === 'string' ? parseInt(bill.id, 10) || 0 : bill.id,
     priority: 'medium',
     data: updates,
   };
@@ -130,14 +140,14 @@ export const generateNewCommentEvent = (): RealTimeEvent => {
     type: 'new_comment',
     timestamp: new Date().toISOString(),
     userId: user.id,
-    billId: bill.id,
+    billId: typeof bill.id === 'string' ? parseInt(bill.id, 10) || 0 : bill.id,
     priority: isExpert ? 'high' : 'medium',
     data: {
       commentId: generateId('comment'),
-      billId: bill.id,
+      billId: typeof bill.id === 'string' ? parseInt(bill.id, 10) || 0 : bill.id,
       billTitle: bill.title,
       authorId: user.id,
-      authorName: user.name || `${user.first_name} ${user.last_name}`,
+      authorName: getUserName(user),
       authorAvatar: (user as any).avatar,
       isExpert,
       content: faker.lorem.paragraph(2),
@@ -186,7 +196,7 @@ export const generateExpertContributionEvent = (): RealTimeEvent => {
     type: 'expert_contribution',
     timestamp: new Date().toISOString(),
     userId: expert.id,
-    billId: bill.id,
+    billId: typeof bill.id === 'string' ? parseInt(bill.id, 10) || 0 : bill.id,
     priority: 'high',
     data: {
       contributionId: generateId('contribution'),
@@ -194,7 +204,7 @@ export const generateExpertContributionEvent = (): RealTimeEvent => {
       expertName: expert.name,
       expertVerification: expert.verificationType,
       credibilityScore: expert.credibilityScore,
-      billId: bill.id,
+      billId: typeof bill.id === 'string' ? parseInt(bill.id, 10) || 0 : bill.id,
       billTitle: bill.title,
       contributionType,
       title: faker.helpers.arrayElement([
@@ -284,7 +294,7 @@ export const generateModerationActionEvent = (): RealTimeEvent => {
     priority: 'medium',
     data: {
       moderatorId: moderator.id,
-      moderatorName: moderator.name || `${moderator.first_name} ${moderator.last_name}`,
+      moderatorName: getUserName(moderator),
       action,
       targetId: generateId('target'),
       reason: faker.helpers.arrayElement([

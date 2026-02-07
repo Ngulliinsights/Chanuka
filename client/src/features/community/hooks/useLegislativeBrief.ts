@@ -7,7 +7,17 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { LegislativeBrief } from '@/server/features/argument-intelligence';
+// Type definition moved to shared types to avoid server imports in client
+interface LegislativeBrief {
+  billId: string;
+  summary: string;
+  keyPoints: string[];
+  arguments: {
+    for: string[];
+    against: string[];
+  };
+  generatedAt: Date;
+}
 
 export function useLegislativeBrief(billId: string) {
   return useQuery({

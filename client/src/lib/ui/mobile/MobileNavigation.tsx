@@ -5,13 +5,13 @@
  * Supports drawer and bottom navigation modes with swipe gestures and accessibility.
  */
 
-import type { NavigationItem } from '@client/config';
+import type { NavigationItem } from '@client/lib/config';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart3, Search, User, Settings, ArrowLeft, Bell } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { useAuth } from '@client/hooks';
+import { useAuth } from '@client/lib/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';

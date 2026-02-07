@@ -9,5 +9,6 @@ export { notificationService } from './notification-service';
 export type {
   NotificationPreferences,
   Notification,
+  NotificationData,
   NotificationEvent,
 } from './notification-service';

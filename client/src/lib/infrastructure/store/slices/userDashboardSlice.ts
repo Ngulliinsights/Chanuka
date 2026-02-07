@@ -33,7 +33,7 @@ interface UserDashboardState {
 
   // Filters and preferences
   timeFilter: TemporalFilter;
-  preferences: DashboardPreferences;
+  preferences: UserDashboardPreferences;
   privacyControls: PrivacyControls;
 
   // Real-time updates
@@ -122,7 +122,7 @@ const initialTimeFilter: TemporalFilter = {
   period: 'month',
 };
 
-const initialPreferences: DashboardPreferences = {
+const initialPreferences: UserDashboardPreferences = {
   layout: 'cards',
   showWelcomeMessage: true,
   defaultTimeFilter: 'month',

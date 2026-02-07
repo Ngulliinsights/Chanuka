@@ -18,7 +18,7 @@ import {
 export type Severity = 'low' | 'medium' | 'high' | 'critical';
 
 export interface ConstitutionalFlag {
-  id: number;
+  id: string;
   type: string;
   description: string;
   severity: Severity;
@@ -75,7 +75,7 @@ const generateConstitutionalFlags = (severity: 'low' | 'medium' | 'high' = 'low'
         : faker.number.int({ min: 0, max: 1 });
 
   return faker.helpers.arrayElements(flagTypes, flagCount).map(flag => ({
-    id: faker.number.int({ min: 1, max: 1000 }),
+    id: faker.string.uuid(),
     type: flag.category,
     description: flag.description,
     severity: faker.helpers.arrayElement(severityLevels),

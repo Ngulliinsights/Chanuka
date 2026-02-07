@@ -745,7 +745,8 @@ export default function StrategicHomePage() {
                     AI-powered detection of implementation workarounds and constitutional bypass
                     tactics in legislation.
                   </CardDescription>
-                  <Link to="/bills">
+                  <Link to="/workarounds">
+                
                     <Button
                       variant="ghost"
                       className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300"

@@ -7,16 +7,16 @@
 import React from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
-import type { DashboardSectionConfig } from '@client/lib/types/dashboard';
+import type { DashboardSection } from '@client/lib/types/dashboard';
 
 interface DashboardStackProps {
-  sections: DashboardSectionConfig[];
-  onUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
+  sections: DashboardSection[];
+  onUpdate?: (sectionId: string, updates: Partial<DashboardSection>) => void;
 }
 
 interface SectionRendererProps {
-  section: DashboardSectionConfig;
-  onUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
+  section: DashboardSection;
+  onUpdate?: (sectionId: string, updates: Partial<DashboardSection>) => void;
 }
 
 /**

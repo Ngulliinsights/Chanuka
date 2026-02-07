@@ -5,8 +5,8 @@
  * It safely integrates high-value orphaned modules with proper error handling and rollback.
  */
 
-import { PrivacyAnalyticsService } from '@client/services/privacyAnalyticsService';
-import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/utils/security';
+import { PrivacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
+import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/lib/utils/security';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { DeviceDetector } from '@client/core/mobile';

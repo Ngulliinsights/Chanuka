@@ -26,18 +26,18 @@ export const billsKeys = {
   lists: () => [...billsKeys.all, 'list'] as const,
   list: (params: BillsSearchParams) => [...billsKeys.lists(), params] as const,
   details: () => [...billsKeys.all, 'detail'] as const,
-  detail: (id: string | number) => [...billsKeys.details(), id] as const,
-  comments: (billId: string | number) => [...billsKeys.detail(billId), 'comments'] as const,
-  sponsors: (billId: string | number) => [...billsKeys.detail(billId), 'sponsors'] as const,
-  polls: (billId: string | number) => [...billsKeys.detail(billId), 'polls'] as const,
-  analysis: (billId: string | number) => [...billsKeys.detail(billId), 'analysis'] as const,
-  sponsorshipAnalysis: (billId: string | number) =>
+  detail: (id: string) => [...billsKeys.details(), id] as const,
+  comments: (billId: string) => [...billsKeys.detail(billId), 'comments'] as const,
+  sponsors: (billId: string) => [...billsKeys.detail(billId), 'sponsors'] as const,
+  polls: (billId: string) => [...billsKeys.detail(billId), 'polls'] as const,
+  analysis: (billId: string) => [...billsKeys.detail(billId), 'analysis'] as const,
+  sponsorshipAnalysis: (billId: string) =>
     [...billsKeys.detail(billId), 'sponsorship-analysis'] as const,
-  primarySponsorAnalysis: (billId: string | number) =>
+  primarySponsorAnalysis: (billId: string) =>
     [...billsKeys.detail(billId), 'primary-sponsor-analysis'] as const,
-  coSponsorsAnalysis: (billId: string | number) =>
+  coSponsorsAnalysis: (billId: string) =>
     [...billsKeys.detail(billId), 'co-sponsors-analysis'] as const,
-  financialAnalysis: (billId: string | number) =>
+  financialAnalysis: (billId: string) =>
     [...billsKeys.detail(billId), 'financial-analysis'] as const,
   metadata: () => [...billsKeys.all, 'metadata'] as const,
   categories: () => [...billsKeys.metadata(), 'categories'] as const,
@@ -67,7 +67,7 @@ export function useBills(params: BillsQueryParams = {}) {
  * @param id - Bill ID
  * @returns Query result with full bill data
  */
-export function useBill(id: string | number | undefined) {
+export function useBill(id: string | undefined) {
   return useQuery({
     queryKey: billsKeys.detail(id!),
     queryFn: () => billsApiService.getBillById(id!),
@@ -86,7 +86,7 @@ export function useBill(id: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with comments array
  */
-export function useBillComments(billId: string | number | undefined) {
+export function useBillComments(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.comments(billId!),
     queryFn: () => billsApiService.getBillComments(billId!),
@@ -105,7 +105,7 @@ export function useBillComments(billId: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with polls array
  */
-export function useBillPolls(billId: string | number | undefined) {
+export function useBillPolls(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.polls(billId!),
     queryFn: () => billsApiService.getBillPolls(billId!),
@@ -124,7 +124,7 @@ export function useBillPolls(billId: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with sponsors array
  */
-export function useBillSponsors(billId: string | number | undefined) {
+export function useBillSponsors(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.sponsors(billId!),
     queryFn: () => billsApiService.getBillSponsors(billId!),
@@ -139,7 +139,7 @@ export function useBillSponsors(billId: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with comprehensive bill analysis
  */
-export function useBillAnalysis(billId: string | number | undefined) {
+export function useBillAnalysis(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.analysis(billId!),
     queryFn: () => billsApiService.getBillAnalysis(billId!),
@@ -155,7 +155,7 @@ export function useBillAnalysis(billId: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with sponsorship analysis
  */
-export function useBillSponsorshipAnalysis(billId: string | number | undefined) {
+export function useBillSponsorshipAnalysis(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.sponsorshipAnalysis(billId!),
     queryFn: () => billsApiService.getBillSponsorshipAnalysis(billId!),
@@ -170,7 +170,7 @@ export function useBillSponsorshipAnalysis(billId: string | number | undefined) 
  * @param billId - Bill ID
  * @returns Query result with primary sponsor analysis
  */
-export function useBillPrimarySponsorAnalysis(billId: string | number | undefined) {
+export function useBillPrimarySponsorAnalysis(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.primarySponsorAnalysis(billId!),
     queryFn: () => billsApiService.getBillPrimarySponsorAnalysis(billId!),
@@ -185,7 +185,7 @@ export function useBillPrimarySponsorAnalysis(billId: string | number | undefine
  * @param billId - Bill ID
  * @returns Query result with co-sponsors analysis
  */
-export function useBillCoSponsorsAnalysis(billId: string | number | undefined) {
+export function useBillCoSponsorsAnalysis(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.coSponsorsAnalysis(billId!),
     queryFn: () => billsApiService.getBillCoSponsorsAnalysis(billId!),
@@ -200,7 +200,7 @@ export function useBillCoSponsorsAnalysis(billId: string | number | undefined) {
  * @param billId - Bill ID
  * @returns Query result with financial network data
  */
-export function useBillFinancialNetworkAnalysis(billId: string | number | undefined) {
+export function useBillFinancialNetworkAnalysis(billId: string | undefined) {
   return useQuery({
     queryKey: billsKeys.financialAnalysis(billId!),
     queryFn: () => billsApiService.getBillFinancialNetworkAnalysis(billId!),
@@ -249,7 +249,7 @@ export function useBillStatuses() {
  * @param billId - Bill ID
  * @returns Mutation object with trackBill function
  */
-export function useTrackBill(billId: string | number) {
+export function useTrackBill(billId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -283,7 +283,7 @@ export function useTrackBill(billId: string | number) {
  * @param billId - Bill ID
  * @returns Mutation object with recordEngagement function
  */
-export function useRecordBillEngagement(billId: string | number) {
+export function useRecordBillEngagement(billId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -314,7 +314,7 @@ export function useRecordBillEngagement(billId: string | number) {
  * @param billId - Bill ID
  * @returns Mutation object with addComment function
  */
-export function useAddBillComment(billId: string | number) {
+export function useAddBillComment(billId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -412,7 +412,7 @@ export function useEndorseComment() {
  * @param billId - Bill ID
  * @returns Mutation object with createPoll function
  */
-export function useCreateBillPoll(billId: string | number) {
+export function useCreateBillPoll(billId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

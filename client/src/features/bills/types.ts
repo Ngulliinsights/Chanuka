@@ -21,7 +21,7 @@ export type BillSponsor = SharedSponsor & {
 };
 
 // Feature-specific Analysis (augmenting shared type)
-export interface BillAnalysis extends Partial<SharedBillAnalysis> {
+export interface BillAnalysisResult extends Partial<SharedBillAnalysis> {
   summary: string;
   keyPoints: string[];
   potentialImpact: string; // Mapped to 'impact' in shared type

@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '@client/lib/hooks/store';
 import { selectNavigationUIState } from '@client/lib/infrastructure/store/slices/navigationSlice';
-import { navigationUtils } from '@client/lib/services/navigation';
+import { navigationService } from '@client/lib/services/navigation';
 import { logger } from '@client/lib/utils/logger';
 
 interface OptimizedNavigationOptions {
@@ -59,7 +59,7 @@ export function useOptimizedNavigation(options: OptimizedNavigationOptions = {})
   const analyticsRef = useRef<Map<string, number>>(new Map());
 
   // Memoized navigation utilities
-  const utils = useMemo(() => navigationUtils, []);
+  const utils = useMemo(() => navigationService, []);
 
   /**
    * Analytics tracking helper

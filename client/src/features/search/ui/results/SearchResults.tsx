@@ -363,7 +363,7 @@ export function SearchResults({
 
             {/* Content excerpt with search term highlighting */}
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {highlightText(result.excerpt || result.content, result.highlights)}
+              {highlightText(result.excerpt || result.content || '', result.highlights)}
             </p>
 
             {/* Metadata row showing date, views, comments, and status */}
@@ -493,28 +493,36 @@ export function SearchResults({
           {availableTypes.length > 1 && (
             <Select
               value={selectedTypes[0] || 'all'}
-              onChange={e => handleTypeFilterChange(e.target.value)}
-              className="w-32"
+              onValueChange={value => handleTypeFilterChange(value)}
             >
-              <SelectItem value="all">All Types</SelectItem>
-              {availableTypes.map(type => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label} ({type.count})
-                </SelectItem>
-              ))}
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {availableTypes.map(type => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label} ({type.count})
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           )}
 
           {/* Sort criteria selector */}
           <Select
             value={sortBy}
-            onChange={e => setSortBy(e.target.value as SortOption)}
-            className="w-32"
+            onValueChange={value => setSortBy(value as SortOption)}
           >
-            <SelectItem value="relevance">Relevance</SelectItem>
-            <SelectItem value="date">Date</SelectItem>
-            <SelectItem value="title">Title</SelectItem>
-            <SelectItem value="engagement">Engagement</SelectItem>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Relevance" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="relevance">Relevance</SelectItem>
+              <SelectItem value="date">Date</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="engagement">Engagement</SelectItem>
+            </SelectContent>
           </Select>
 
           {/* Sort direction toggle button */}
@@ -534,7 +542,7 @@ export function SearchResults({
           {/* View mode toggle between list and grid layouts */}
           <div className="flex border rounded-md">
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
+              variant={viewMode === 'list' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setViewMode('list')}
               className="rounded-r-none"
@@ -543,7 +551,7 @@ export function SearchResults({
               <LayoutList className="h-4 w-4" />
             </Button>
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              variant={viewMode === 'grid' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setViewMode('grid')}
               className="rounded-l-none"

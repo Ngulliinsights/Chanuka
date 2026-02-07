@@ -42,6 +42,9 @@ export interface NotificationData {
   metadata?: Record<string, unknown>;
 }
 
+// Backward compatibility alias
+export type Notification = NotificationData;
+
 export interface NotificationEvent {
   type:
     | 'notification_received'

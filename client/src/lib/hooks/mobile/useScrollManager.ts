@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { GESTURE_CONFIG } from '@client/lib/config/gestures';
+import { gestureConfig } from '@client/lib/config/gestures';
 
 interface UseScrollManagerOptions {
   isEnabled: boolean;
@@ -17,8 +17,8 @@ interface UseScrollManagerOptions {
 export function useScrollManager({
   isEnabled,
   showScrollToTop,
-  scrollTopThreshold = GESTURE_CONFIG.SCROLL.scrollTopButtonThreshold,
-  headerToggleThreshold = GESTURE_CONFIG.SCROLL.headerToggleThreshold,
+  scrollTopThreshold = gestureConfig.SCROLL.scrollTopButtonThreshold,
+  headerToggleThreshold = gestureConfig.SCROLL.headerToggleThreshold,
 }: UseScrollManagerOptions) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);

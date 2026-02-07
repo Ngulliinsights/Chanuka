@@ -98,6 +98,10 @@ const AnalyticsDashboard = createLazyComponent(
   'Analytics Dashboard'
 );
 const NotFoundPage = createLazyComponent(() => import('@client/lib/pages/not-found'), 'Not Found');
+const WorkaroundAnalysisPage = createLazyComponent(
+  () => import('@client/features/analysis/pages/WorkaroundAnalysisPage'),
+  'Workaround Analysis'
+);
 
 interface RouteConfig {
   path: string;
@@ -348,6 +352,13 @@ const routes: RouteConfig[] = [
     protected: true,
     roles: ['admin', 'super_admin'],
     requireVerification: true,
+  },
+
+  // Workaround Analysis - Strategic Dashboard
+  {
+    id: 'workaround-analysis',
+    path: '/workarounds',
+    element: <WorkaroundAnalysisPage />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility

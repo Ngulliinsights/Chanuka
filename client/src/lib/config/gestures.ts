@@ -1,25 +1,23 @@
 /**
- * Centralized gesture configuration constants
- * Single source of truth for all touch interaction thresholds
+ * Gestures Configuration
+ * Defines gesture recognition settings for mobile interactions
  */
 
-export const GESTURE_CONFIG = {
-  SWIPE: {
-    minDistance: 50,
-    maxVerticalDeviation: 0.5,
-    velocityThreshold: 0.3,
-    maxDuration: 1000,
-  },
-  PULL_TO_REFRESH: {
-    threshold: 80,
-    maxPullDistance: 120,
-    resistance: 0.5,
-  },
-  SCROLL: {
-    headerToggleThreshold: 10,
-    scrollTopButtonThreshold: 300,
-    velocitySmoothing: 0.2,
-  },
-} as const;
+export interface GestureConfig {
+  swipeThreshold: number;
+  swipeVelocity: number;
+  pullToRefreshThreshold: number;
+  longPressDelay: number;
+}
 
-export type GestureConfig = typeof GESTURE_CONFIG;
+export const gestureConfig: GestureConfig = {
+  swipeThreshold: 50,
+  swipeVelocity: 0.3,
+  pullToRefreshThreshold: 80,
+  longPressDelay: 500,
+};
+
+export default gestureConfig;
+
+
+export const GESTURE_CONFIG = gestureConfig;

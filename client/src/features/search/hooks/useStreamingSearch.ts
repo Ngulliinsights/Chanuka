@@ -29,8 +29,8 @@ interface SearchQuery {
 import type {
   StreamingSearchOptions,
   StreamingSearchSession,
-  SearchProgress,
 } from '../services/streaming-search';
+import type SearchProgress from '../services/streaming-search';
 
 interface UseStreamingSearchOptions
   extends Omit<StreamingSearchOptions, 'onResult' | 'onProgress' | 'onComplete' | 'onError'> {

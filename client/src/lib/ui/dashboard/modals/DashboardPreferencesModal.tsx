@@ -28,12 +28,12 @@ import {
   CardTitle,
 } from '@client/lib/design-system/typography/Card';
 import { Label } from '@client/lib/design-system/typography/Label';
-import { DashboardPreferences } from '@client/lib/types/user-dashboard';
+import { UserDashboardPreferences } from '@client/lib/types/user-dashboard';
 
 interface DashboardPreferencesModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  preferences: DashboardPreferences;
+  preferences: UserDashboardPreferences;
   onUpdate: (preferences: Partial<DashboardPreferences>) => void;
 }
 
@@ -42,7 +42,7 @@ export function DashboardPreferencesModal({
   onOpenChange,
   preferences,
   onUpdate,
-}: DashboardPreferencesModalProps) {
+}: UserDashboardPreferencesModalProps) {
   const [localPreferences, setLocalPreferences] = useState<DashboardPreferences>(preferences);
 
   const layoutOptions = [
@@ -88,11 +88,11 @@ export function DashboardPreferencesModal({
     { id: 'achievements', label: 'Achievements', description: 'Your civic engagement milestones' },
   ];
 
-  const handleLayoutChange = (layout: DashboardPreferences['layout']) => {
+  const handleLayoutChange = (layout: UserDashboardPreferences['layout']) => {
     setLocalPreferences(prev => ({ ...prev, layout }));
   };
 
-  const handleTimeFilterChange = (defaultTimeFilter: DashboardPreferences['defaultTimeFilter']) => {
+  const handleTimeFilterChange = (defaultTimeFilter: UserDashboardPreferences['defaultTimeFilter']) => {
     setLocalPreferences(prev => ({ ...prev, defaultTimeFilter }));
   };
 
@@ -133,7 +133,7 @@ export function DashboardPreferencesModal({
   };
 
   const handleReset = () => {
-    const defaultPreferences: DashboardPreferences = {
+    const defaultPreferences: UserDashboardPreferences = {
       layout: 'cards',
       showWelcomeMessage: true,
       defaultTimeFilter: 'month',

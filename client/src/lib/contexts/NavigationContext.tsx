@@ -4,12 +4,12 @@
  */
 
 // Re-export everything from the core navigation system
-export * from '../core/navigation/context';
-export * from '../core/navigation/types';
+export * from '../../core/navigation/context';
+export * from '../../core/navigation/types';
 export * from '@client/core/navigation/hooks';
 
 // For components that need the provider factory
-export { createNavigationProvider } from '../core/navigation/context';
+export { createNavigationProvider } from '../../core/navigation/context';
 
 // Deprecated warning for old imports
 console.warn(

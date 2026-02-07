@@ -417,7 +417,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
    * server and automatically invalidate cached queries that include this bill.
    */
   const handleSave = useCallback(
-    async (billId: string | number) => {
+    async (billId: string) => {
       try {
         const id = String(billId);
         // TODO: Implement with useSaveBill mutation hook
@@ -454,7 +454,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
    * a native, platform-appropriate sharing experience for users.
    */
   const handleShare = useCallback(
-    async (billId: string | number) => {
+    async (billId: string) => {
       try {
         const id = String(billId);
         const bill = bills.find(b => String(b.id) === id);
@@ -521,7 +521,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
    * uses a hash fragment to scroll to and focus the comments area, improving
    * the user experience by taking them directly to where they can engage.
    */
-  const handleComment = useCallback((billId: string | number) => {
+  const handleComment = useCallback((billId: string) => {
     const id = String(billId);
     window.location.href = `/bills/${id}#comments`;
   }, []);

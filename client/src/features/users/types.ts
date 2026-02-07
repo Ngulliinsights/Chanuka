@@ -204,7 +204,7 @@ export interface Milestone {
   reward?: string;
 }
 
-export interface Notification {
+export interface UserNotification {
   id: string;
   type: 'bill_status' | 'new_comment' | 'expert_analysis' | 'system';
   title: string;
@@ -220,7 +220,7 @@ export interface DashboardData {
   saved_bills: Bill[];
   trending_bills: Bill[];
   recommendations: BillRecommendation[];
-  notifications: Notification[];
+  notifications: UserNotification[];
   civic_score_trend: Array<{ date: string; score: number }>;
   achievements_progress: {
     recent_badges: Achievement[];

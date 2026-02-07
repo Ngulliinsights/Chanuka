@@ -5,7 +5,7 @@
  * and real-time updates integration.
  */
 
-import { dataLoaders } from '@client/data/mock/loaders';
+import { dataLoaders } from '@client/lib/data/mock/loaders';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { mockDataService, RealTimeEvent } from '@client/lib/testing/mock-data';

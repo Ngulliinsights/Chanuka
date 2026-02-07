@@ -84,3 +84,23 @@ export * from './analytics';
 // - UI types (component prop types)
 // - API types (network/REST types)
 
+
+
+export const personaDetector = {
+  detect: (userData: any) => {
+    // Persona detection logic
+    return 'default';
+  },
+};
+
+
+export type UserRole = 'admin' | 'user' | 'guest';
+export type UserStatus = 'active' | 'inactive' | 'suspended';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+}

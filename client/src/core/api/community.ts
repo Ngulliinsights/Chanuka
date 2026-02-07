@@ -39,7 +39,6 @@ import type {
   DiscussionThreadMetadata,
   ExpertInsight,
   LocalImpactMetrics,
-  TrendingTopic,
   VoteRequest,
   VoteResponse,
   Attachment,
@@ -64,12 +63,14 @@ import type {
   ExtendedLocalImpactMetrics,
   InsightSubmission,
   SearchOptions,
-  SearchResult,
   CommentsResponse,
   ThreadsResponse,
   ThreadEvent,
   UserEvent,
 } from '@client/lib/types/community';
+
+import type { TrendingTopic } from '@client/lib/types/analytics';
+import type { SearchResult } from '@client/lib/types/search';
 import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';

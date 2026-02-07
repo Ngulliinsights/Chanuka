@@ -337,8 +337,8 @@ export interface ExpertContribution {
  * Expert consensus on a bill or topic
  */
 export interface ExpertConsensus {
-  readonly id?: string | number;
-  readonly billId: string | number;
+  readonly id?: string;
+  readonly billId: string;
   readonly topic: string;
   readonly totalExperts: number;
   readonly agreementLevel: number;

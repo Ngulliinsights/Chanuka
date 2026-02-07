@@ -3,7 +3,7 @@
  * Handles authentication state changes, token refresh, and security monitoring
  */
 
-import { securityMonitor } from '@client/utils/security';
+import { securityMonitor } from '@client/lib/utils/security';
 import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
 import { authApiService as authService } from '@client/core/api';

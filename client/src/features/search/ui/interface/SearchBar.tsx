@@ -9,11 +9,7 @@ import { Card, CardContent } from '@client/lib/design-system';
 import { Input } from '@client/lib/design-system';
 
 
-// Define SearchSuggestion type locally
-interface SearchSuggestion {
-  text: string;
-  type: string;
-}
+import type { SearchSuggestion } from '@client/lib/types/search';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -40,6 +36,60 @@ export function SearchBar({
   const { data: liveResults } = useLiveSearch(query, undefined, showSuggestions && isFocused);
   const { history } = useSearchHistory();
 
+  // Handle search execution
+  const performSearch = () => {
+    if (query.trim()) {
+      onSearch(query.trim());
+      setIsFocused(false);
+      setSelectedIndex(-1);
+    }
+  };
+
+  // Handle item selection
+  const handleSelect = (index: number) => {
+    let currentIndex = 0;
+
+    // Check suggestions
+    if (suggestions && index < suggestions.length && suggestions[index]) {
+      setQuery(suggestions[index].text);
+      onSearch(suggestions[index].text);
+      setIsFocused(false);
+      return;
+    }
+    currentIndex += suggestions?.length || 0;
+
+    // Check live results
+    if (liveResults && index < currentIndex + liveResults.length) {
+      const resultIndex = index - (suggestions?.length || 0);
+      const result = liveResults[resultIndex];
+      if (result) {
+        setQuery(result.text); // SearchSuggestion has text, not title/content
+        onSearch(result.text);
+        setIsFocused(false);
+        return;
+      }
+    }
+    currentIndex += liveResults?.length || 0;
+
+    // Check history
+    if (showHistory && history?.data && index < currentIndex + history.data.length) {
+      const historyIndex = index - currentIndex;
+      const historyItem = history.data[historyIndex];
+      if (historyItem) {
+        setQuery(historyItem.query);
+        onSearch(historyItem.query);
+        setIsFocused(false);
+        return;
+      }
+    }
+  };
+
+  const clearSearch = () => {
+    setQuery('');
+    setSelectedIndex(-1);
+    inputRef.current?.focus();
+  };
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -47,7 +97,7 @@ export function SearchBar({
 
       const totalItems =
         (suggestions?.length || 0) +
-        (liveResults?.results?.length || 0) +
+        (liveResults?.length || 0) +
         (showHistory ? history?.data?.length || 0 : 0);
 
       switch (e.key) {
@@ -84,8 +134,7 @@ export function SearchBar({
     liveResults,
     history,
     showHistory,
-    handleSelect,
-    performSearch,
+    // dependencies for handlers are essentially captured if they are defined inside component
   ]);
 
   // Close dropdown when clicking outside
@@ -106,63 +155,11 @@ export function SearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const performSearch = () => {
-    if (query.trim()) {
-      onSearch(query.trim());
-      setIsFocused(false);
-      setSelectedIndex(-1);
-    }
-  };
-
-  const handleSelect = (index: number) => {
-    let currentIndex = 0;
-
-    // Check suggestions
-    if (suggestions && index < suggestions.length && suggestions[index]) {
-      setQuery(suggestions[index].text);
-      onSearch(suggestions[index].text);
-      setIsFocused(false);
-      return;
-    }
-    currentIndex += suggestions?.length || 0;
-
-    // Check live results
-    if (liveResults?.results && index < currentIndex + liveResults.results.length) {
-      const resultIndex = index - (suggestions?.length || 0);
-      const result = liveResults.results[resultIndex];
-      if (result) {
-        setQuery(result.title || result.content);
-        onSearch(result.title || result.content);
-        setIsFocused(false);
-        return;
-      }
-    }
-    currentIndex += liveResults?.results?.length || 0;
-
-    // Check history
-    if (showHistory && history?.data && index < currentIndex + history.data.length) {
-      const historyIndex = index - currentIndex;
-      const historyItem = history.data[historyIndex];
-      if (historyItem) {
-        setQuery(historyItem.query);
-        onSearch(historyItem.query);
-        setIsFocused(false);
-        return;
-      }
-    }
-  };
-
-  const clearSearch = () => {
-    setQuery('');
-    setSelectedIndex(-1);
-    inputRef.current?.focus();
-  };
-
   const renderDropdown = () => {
     if (
       !isFocused ||
       (!suggestions?.length &&
-        !liveResults?.results?.length &&
+        !liveResults?.length &&
         (!showHistory || !history?.data?.length))
     ) {
       return null;
@@ -198,10 +195,10 @@ export function SearchBar({
             )}
 
             {/* Live Results */}
-            {liveResults?.results && liveResults.results.length > 0 && (
+            {liveResults && liveResults.length > 0 && (
               <div className="p-2">
                 <div className="text-xs font-medium text-muted-foreground mb-2">Results</div>
-                {liveResults.results.slice(0, 3).map((result: any, index: number) => {
+                {liveResults.slice(0, 3).map((result: any, index: number) => {
                   const actualIndex = (suggestions?.length || 0) + index;
                   return (
                     <button
@@ -211,21 +208,16 @@ export function SearchBar({
                       }`}
                       onClick={() => handleSelect(actualIndex)}
                     >
-                      <div className="font-medium">{result.title}</div>
+                      <div className="font-medium">{result.text}</div>
                       <div className="text-xs text-muted-foreground truncate">
-                        {result.excerpt || result.content}
+                        {result.type}
                       </div>
                       <Badge variant="outline" className="mt-1 text-xs">
-                        {result.type}
+                        {result.category || result.type}
                       </Badge>
                     </button>
                   );
                 })}
-                {liveResults.total > 3 && (
-                  <div className="text-xs text-muted-foreground px-3 py-1">
-                    +{liveResults.total - 3} more results...
-                  </div>
-                )}
               </div>
             )}
 
@@ -238,7 +230,7 @@ export function SearchBar({
                 </div>
                 {history.data.slice(0, 3).map((item: any, index: number) => {
                   const actualIndex =
-                    (suggestions?.length || 0) + (liveResults?.results?.length || 0) + index;
+                    (suggestions?.length || 0) + (liveResults?.length || 0) + index;
                   return (
                     <button
                       key={`history-${index}`}

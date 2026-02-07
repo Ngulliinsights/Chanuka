@@ -7,7 +7,7 @@
  */
 
 export interface TrackedBill {
-  id: number;
+  id: string;
   billNumber: string;
   title: string;
   status: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed' | 'vetoed';
@@ -30,7 +30,7 @@ export interface TrackedBill {
 export interface EngagementHistoryItem {
   id: string;
   type: 'view' | 'comment' | 'share' | 'save' | 'vote' | 'expert_contribution';
-  billId?: number;
+  billId?: string;
   billTitle?: string;
   timestamp: string;
   metadata?: {
@@ -71,7 +71,7 @@ export interface CivicImpactMetrics {
 
 export interface BillRecommendation {
   bill: {
-    id: number;
+    id: string;
     billNumber: string;
     title: string;
     summary: string;
@@ -146,3 +146,6 @@ export interface UserDashboardPreferences {
   hiddenSections: string[];
   refreshInterval: number; // in minutes
 }
+
+// Backward compatibility alias
+export type DashboardPreferences = UserDashboardPreferences;

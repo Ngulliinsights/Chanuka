@@ -14,7 +14,7 @@ import {
   useRenderTracker,
   withRenderTracking,
   usePerformanceMeasurement,
-} from '../features/analytics/hooks/use-render-tracker';
+} from '../../features/analytics/hooks/use-render-tracker';
 
 // Example 1: Manual render tracking in a component
 export function ManualRenderTrackingExample() {

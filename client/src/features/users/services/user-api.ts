@@ -18,7 +18,8 @@ import type {
   EngagementHistoryFilters,
   EngagementHistoryResponse,
   EngagementAction,
-  DashboardData
+  DashboardData,
+  UserNotification
 } from '../types';
 
 /**

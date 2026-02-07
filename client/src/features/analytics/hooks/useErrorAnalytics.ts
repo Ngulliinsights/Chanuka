@@ -30,22 +30,9 @@ import {
   selectTrendData,
   setActiveTab,
   updateFilters,
+  type DashboardFilters,
 } from '@client/lib/infrastructure/store/slices/errorAnalyticsSlice';
 import type { ErrorPattern } from '@client/lib/services';
-
-// Type definitions
-interface TimeRange {
-  start: number;
-  end: number;
-  preset: string;
-}
-
-interface DashboardFilters {
-  timeRange?: TimeRange;
-  severity?: string[];
-  domain?: string[];
-  component?: string[];
-}
 
 type ActiveTab = 'overview' | 'trends' | 'patterns' | 'recovery' | 'realtime';
 
@@ -102,7 +89,7 @@ interface ErrorAnalyticsReturn {
 
   // Filter actions
   updateFilters: (newFilters: Partial<DashboardFilters>) => void;
-  updateTimeRange: (timeRange: TimeRange) => void;
+  updateTimeRange: (timeRange: DashboardFilters['timeRange']) => void;
   updateSeverityFilter: (severity: string[]) => void;
   updateDomainFilter: (domain: string[]) => void;
   updateComponentFilter: (component: string[]) => void;
@@ -227,7 +214,7 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}): Error
   );
 
   const updateTimeRange = useCallback(
-    (timeRange: TimeRange) => {
+    (timeRange: DashboardFilters['timeRange']) => {
       dispatch(updateFilters({ timeRange }));
     },
     [dispatch]

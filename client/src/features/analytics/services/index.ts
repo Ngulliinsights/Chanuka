@@ -9,4 +9,5 @@
 export { analysisService } from './analysis';
 
 // Export types
-export type { BillAnalysis, ConflictAnalysisResult } from './analysis';
+export type { BillAnalysis } from './analysis';
+export type { default as ConflictAnalysisResult } from './analysis';

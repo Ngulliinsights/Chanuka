@@ -39,17 +39,17 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              {(bill as any).readingTime || '5'} min read
+              {bill.readingTime || '5'} min read
             </span>
             <Badge
               variant="outline"
               className={`
-                ${(bill as any).complexity === 'high' ? 'border-red-300 text-red-700' : ''}
-                ${(bill as any).complexity === 'medium' ? 'border-yellow-300 text-yellow-700' : ''}
-                ${(bill as any).complexity === 'low' ? 'border-green-300 text-green-700' : ''}
+                ${bill.complexity === 'high' ? 'border-red-300 text-red-700' : ''}
+                ${bill.complexity === 'medium' ? 'border-yellow-300 text-yellow-700' : ''}
+                ${bill.complexity === 'low' ? 'border-green-300 text-green-700' : ''}
               `}
             >
-              {(bill as any).complexity || 'medium'} complexity
+              {bill.complexity || 'medium'} complexity
             </Badge>
           </div>
         </CardContent>
@@ -74,14 +74,14 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <div className="flex items-center justify-between">
               <span className="font-medium">Introduced:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.introductionDate).toLocaleDateString()}
+                {bill.introducedDate ? new Date(bill.introducedDate).toLocaleDateString() : 'N/A'}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <span className="font-medium">Last Updated:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introductionDate || '').toLocaleDateString()}
+                {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introducedDate || new Date()).toLocaleDateString()}
               </span>
             </div>
           </div>

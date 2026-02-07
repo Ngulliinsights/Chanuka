@@ -10,9 +10,9 @@
 
 export type {
   Bill,
-  BillStatusType,
-  UrgencyLevelType,
-  ComplexityLevelType,
+  BillStatus,
+  UrgencyLevel,
+  ComplexityLevel,
   Sponsor,
   BillAnalysis,
   BillsQueryParams,

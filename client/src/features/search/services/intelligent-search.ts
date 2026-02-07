@@ -199,7 +199,7 @@ class IntelligentSearchService {
         engines: engines.map(e => ({
           engine: e.engine,
           resultCount: e.results.length,
-          quality: e.quality.toFixed(2),
+          quality: (e.quality || 0).toFixed(2),
         })),
       });
 
@@ -407,8 +407,6 @@ class IntelligentSearchService {
       // Safely extract array data
       const data = response;
       return Array.isArray(data) ? data : [];
-
-      return [];
     } catch (error) {
       logger.warn('Failed to fetch Fuse search data', {
         type,
@@ -814,7 +812,7 @@ class IntelligentSearchService {
 
     const queryTermsFound = results.some(
       r =>
-        r.title.toLowerCase().includes(queryLower) || r.content.toLowerCase().includes(queryLower)
+        r.title.toLowerCase().includes(queryLower) || (r.content || '').toLowerCase().includes(queryLower)
     );
 
     // Weighted quality calculation
@@ -871,40 +869,40 @@ class IntelligentSearchService {
   private generateHighlights(matches: readonly any[] | undefined): SearchHighlight[] {
     if (!matches || matches.length === 0) return [];
 
-    return matches
-      .map(match => {
-        if (!match.value || !match.indices) return null;
+    const highlights: (SearchHighlight | null)[] = matches.map(match => {
+      if (!match.value || !match.indices) return null;
 
-        const { value, indices } = match;
-        let highlighted = value;
+      const { value, indices } = match;
+      let highlighted = value;
 
-        // Apply highlighting in reverse order to maintain correct positions
-        indices
-          .slice()
-          .reverse()
-          .forEach(([start, end]: readonly [number, number]) => {
-            const before = highlighted.substring(0, start);
-            const matchText = highlighted.substring(start, end + 1);
-            const after = highlighted.substring(end + 1);
-            highlighted = `${before}<mark>${matchText}</mark>${after}`;
-          });
+      // Apply highlighting in reverse order to maintain correct positions
+      indices
+        .slice()
+        .reverse()
+        .forEach(([start, end]: readonly [number, number]) => {
+          const before = highlighted.substring(0, start);
+          const matchText = highlighted.substring(start, end + 1);
+          const after = highlighted.substring(end + 1);
+          highlighted = `${before}<mark>${matchText}</mark>${after}`;
+        });
 
-        return {
-          field: match.key || 'content',
-          snippet: highlighted,
-          positions: indices.map(([start, end]: readonly [number, number]) => ({
-            start,
-            end,
-          })),
-        };
-      })
-      .filter((h): h is SearchHighlight => h !== null);
+      return {
+        field: match.key || 'content',
+        snippet: highlighted,
+        positions: indices.map(([start, end]: readonly [number, number]) => ({
+          start,
+          end,
+        })),
+      };
+    });
+
+    return highlights.filter((h): h is SearchHighlight => h !== null);
   }
 
   /**
    * Generate intelligent search suggestions from results
    */
-  private async generateSuggestions(query: string, results: SearchResult[]): Promise<string[]> {
+  private async generateSuggestions(query: string, results: SearchResult[]): Promise<SearchSuggestion[]> {
     const suggestions = new Set<string>();
     const queryLower = query.toLowerCase();
     const queryWords = new Set(queryLower.split(/\s+/));
@@ -924,7 +922,11 @@ class IntelligentSearchService {
       });
     });
 
-    return Array.from(suggestions).slice(0, SEARCH_CONFIG.SUGGESTION_LIMIT);
+    return Array.from(suggestions).slice(0, SEARCH_CONFIG.SUGGESTION_LIMIT).map(text => ({
+      text,
+      type: 'related',
+      score: 0.8
+    }));
   }
 
   /**
@@ -969,18 +971,20 @@ class IntelligentSearchService {
 
     results.forEach(result => {
       // Count by type
-      facets.types[result.type] = (facets.types[result.type] || 0) + 1;
+      if (result.type) {
+        facets.types![result.type] = (facets.types![result.type] || 0) + 1;
+      }
 
       // Count by category if available
       if (result.metadata?.category) {
         const category = result.metadata.category;
-        facets.categories[category] = (facets.categories[category] || 0) + 1;
+        facets.categories![category] = (facets.categories![category] || 0) + 1;
       }
 
       // Count by status if available
       if (result.metadata?.status) {
         const status = result.metadata.status;
-        facets.statuses[status] = (facets.statuses[status] || 0) + 1;
+        facets.statuses![status] = (facets.statuses![status] || 0) + 1;
       }
     });
 

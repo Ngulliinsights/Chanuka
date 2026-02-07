@@ -14,7 +14,7 @@ import {
   ExpertContribution,
   ExpertConsensus,
   CredibilityMetrics,
-  CommunityValidation,
+  CommunityValidationType,
 } from '@client/lib/types';
 
 import {
@@ -292,7 +292,7 @@ export const generateExpertContributions = (
     const type = faker.helpers.arrayElement(contributionTypes);
     const voting = generateVotingMetrics();
 
-    const communityValidation: CommunityValidation = {
+    const communityValidation: CommunityValidationType = {
       upvotes: voting.upvotes,
       downvotes: voting.downvotes,
       comments: faker.number.int({ min: 0, max: 25 }),

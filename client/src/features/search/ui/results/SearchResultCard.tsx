@@ -26,8 +26,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@clien
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { cn } from '@client/lib/design-system';
-import { useToast } from '@client/lib/hooks/use-toast.ts';
-import type { SearchResult, SearchHighlight } from '@client/lib/types';
+import { useToast } from '@client/lib/hooks/use-toast';
+import type { SearchResult, SearchHighlight } from '@client/lib/types/search';
 
 interface SearchResultCardProps {
   result: SearchResult;
@@ -295,7 +295,7 @@ export function SearchResultCard({
                         </Button>
                         {isExpanded && (
                           <div className="mt-2 p-3 bg-muted rounded-md">
-                            <p className="text-sm">{highlightText(result.content)}</p>
+                            <p className="text-sm">{highlightText(result.content || '')}</p>
                           </div>
                         )}
                       </div>

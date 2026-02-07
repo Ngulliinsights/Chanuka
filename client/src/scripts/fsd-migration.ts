@@ -5,7 +5,7 @@
  * This script analyzes component usage and moves them to appropriate locations.
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '../../../shared/dist/core/observability/logging/logger';
 
 interface ComponentMapping {
   source: string;

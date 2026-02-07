@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@client/lib/hooks/use-toast';
 
 import { analyticsService } from '../services/analytics';
-import type { AnalyticsFilters } from '../types';
+import type { AnalyticsFilters } from '@client/lib/types/analytics';
 
 /**
  * Hook for analytics dashboard data

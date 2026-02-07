@@ -3,7 +3,7 @@
  * Provides native-like refresh experience with visual feedback
  */
 
-import { GESTURE_CONFIG } from '@client/config/gestures';
+import { gestureConfig } from '@client/lib/config/gestures';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { PullToRefreshConfig } from '@client/lib/types/mobile';
@@ -35,7 +35,7 @@ export function PullToRefresh({
   const isDragging = useRef(false);
 
   const config = useMemo(
-    () => ({ ...GESTURE_CONFIG.PULL_TO_REFRESH, ...customConfig }),
+    () => ({ ...gestureConfig.PULL_TO_REFRESH, ...customConfig }),
     [customConfig]
   );
 

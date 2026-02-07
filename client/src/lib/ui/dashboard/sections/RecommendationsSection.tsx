@@ -101,11 +101,11 @@ export function RecommendationsSection({
   };
 
   // Fixed type mismatch: id should be string to match recommendation.bill.id
-  const handleAcceptRecommendation = (billId: string | number) => {
+  const handleAcceptRecommendation = (billId: string) => {
     acceptRecommendation(String(billId));
   };
 
-  const handleDismissRecommendation = (billId: string | number) => {
+  const handleDismissRecommendation = (billId: string) => {
     dismissRecommendation(String(billId));
   };
 
@@ -272,7 +272,7 @@ export function RecommendationsSection({
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  onClick={() => handleAcceptRecommendation(recommendation.bill.id)}
+                  onClick={() => handleAcceptRecommendation(String(recommendation.bill.id))}
                   className="flex-1"
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
@@ -282,7 +282,7 @@ export function RecommendationsSection({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDismissRecommendation(recommendation.bill.id)}
+                  onClick={() => handleDismissRecommendation(String(recommendation.bill.id))}
                 >
                   <X className="h-4 w-4" />
                 </Button>

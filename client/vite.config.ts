@@ -178,6 +178,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         '@utils': path.resolve(rootDir, './src/lib/utils'),
 
         // Workspace-level modules
+        '@shared': path.resolve(rootDir, '../shared'),
         '@workspace': path.resolve(rootDir, '../shared'),
         '@workspace/types': path.resolve(rootDir, '../shared/types'),
         '@workspace/core': path.resolve(rootDir, '../shared/core'),

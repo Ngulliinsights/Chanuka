@@ -3,7 +3,7 @@
  * Provides accessible alternatives to swipe gestures for all users
  */
 
-import { GESTURE_CONFIG } from '@client/config/gestures';
+import { gestureConfig } from '@client/lib/config/gestures';
 import React, { useCallback, useEffect, useRef } from 'react';
 
 import type { SwipeGestureData } from '@client/lib/types/mobile';
@@ -40,9 +40,9 @@ export function SwipeGestures({
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
-  minDistance = GESTURE_CONFIG.SWIPE.minDistance,
-  minVelocity = GESTURE_CONFIG.SWIPE.velocityThreshold,
-  maxDuration = GESTURE_CONFIG.SWIPE.maxDuration,
+  minDistance = gestureConfig.SWIPE.minDistance,
+  minVelocity = gestureConfig.SWIPE.velocityThreshold,
+  maxDuration = gestureConfig.SWIPE.maxDuration,
   disabled = false,
 }: SwipeGesturesProps): JSX.Element {
   const elementRef = useRef<HTMLElement>(null);

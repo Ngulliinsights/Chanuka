@@ -31,7 +31,7 @@
  * ```
  */
 
-import { GESTURE_CONFIG } from '@client/config/gestures';
+import { gestureConfig } from '@client/lib/config/gestures';
 import { useCallback, useRef, useState } from 'react';
 
 import type { PullToRefreshConfig } from '@client/lib/types/mobile';
@@ -53,8 +53,8 @@ interface UsePullToRefreshReturn {
 export function usePullToRefresh(config: PullToRefreshConfig): UsePullToRefreshReturn {
   const {
     onRefresh,
-    threshold = GESTURE_CONFIG.PULL_TO_REFRESH.threshold,
-    maxDistance = GESTURE_CONFIG.PULL_TO_REFRESH.maxPullDistance,
+    threshold = gestureConfig.PULL_TO_REFRESH.threshold,
+    maxDistance = gestureConfig.PULL_TO_REFRESH.maxPullDistance,
     refreshing,
     disabled,
   } = config;
@@ -87,7 +87,7 @@ export function usePullToRefresh(config: PullToRefreshConfig): UsePullToRefreshR
       // Only handle downward pulls from top
       if (deltaY > 0 && window.scrollY === 0) {
         isPulling.current = true;
-        const distance = Math.min(deltaY * GESTURE_CONFIG.PULL_TO_REFRESH.resistance, maxDistance);
+        const distance = Math.min(deltaY * gestureConfig.PULL_TO_REFRESH.resistance, maxDistance);
         setPullDistance(distance);
       }
     },

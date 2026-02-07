@@ -35,7 +35,7 @@ interface BillCardProps {
   viewMode?: 'grid' | 'list';
 }
 
-const statusLabels = {
+const statusLabels: Record<string, string> = {
   introduced: 'Introduced',
   committee: 'Committee',
   floor_debate: 'Floor Debate',
@@ -47,9 +47,18 @@ const statusLabels = {
   vetoed: 'Referred Back',
   override_attempt: 'Override Attempt',
   rejected: 'Rejected',
+  // Add mapping for new BillStatus enum values if needed
+  first_reading: 'First Reading',
+  second_reading: 'Second Reading',
+  third_reading: 'Third Reading',
+  committee_stage: 'Committee Stage',
+  enacted: 'Enacted',
+  presidential_assent: 'Assented',
+  withdrawn: 'Withdrawn',
+  lost: 'Lost',
 };
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   introduced: 'bg-blue-100 text-blue-800',
   committee: 'bg-yellow-100 text-yellow-800',
   floor_debate: 'bg-orange-100 text-orange-800',
@@ -61,6 +70,15 @@ const statusColors = {
   vetoed: 'bg-red-100 text-red-800',
   override_attempt: 'bg-purple-100 text-purple-800',
   rejected: 'bg-red-100 text-red-800',
+  // New statuses
+  first_reading: 'bg-blue-100 text-blue-800',
+  second_reading: 'bg-orange-100 text-orange-800',
+  third_reading: 'bg-green-100 text-green-800',
+  committee_stage: 'bg-yellow-100 text-yellow-800',
+  enacted: 'bg-emerald-100 text-emerald-800',
+  presidential_assent: 'bg-emerald-100 text-emerald-800',
+  withdrawn: 'bg-gray-100 text-gray-800',
+  lost: 'bg-red-100 text-red-800',
 };
 
 export default function BillCard({
@@ -76,7 +94,7 @@ export default function BillCard({
   const [quickActionFocus, setQuickActionFocus] = useState<string | null>(null);
 
   const statusColor =
-    statusColors[bill.status as keyof typeof statusColors] || statusColors.introduced;
+    statusColors[bill.status] || statusColors.introduced;
 
   // Check for conflicts of interest
   const hasConflicts = bill.sponsors?.some(
@@ -192,9 +210,9 @@ export default function BillCard({
             </CardTitle>
           </div>
 
-          {(bill as any).billType && (
+          {bill.billType && (
             <Badge variant="secondary" className="text-xs shrink-0">
-              {(bill as any).billType}
+              {bill.billType}
             </Badge>
           )}
         </div>
@@ -210,7 +228,7 @@ export default function BillCard({
         {/* Status Badge */}
         <div className="flex flex-wrap gap-2">
           <Badge className={statusColor}>
-            {statusLabels[bill.status as keyof typeof statusLabels] || bill.status}
+            {statusLabels[bill.status] || bill.status}
           </Badge>
 
           {hasConflicts && (

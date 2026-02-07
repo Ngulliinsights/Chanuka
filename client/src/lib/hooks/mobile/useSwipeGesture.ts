@@ -22,7 +22,7 @@
 
 import React, { useCallback, useRef } from 'react';
 
-import { GESTURE_CONFIG } from '@client/lib/config/gestures';
+import { gestureConfig } from '@client/lib/config/gestures';
 import type { SwipeGestureData } from '@client/lib/types/mobile';
 
 interface SwipeEvent extends SwipeGestureData {}
@@ -45,9 +45,9 @@ export function useSwipeGesture({
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
-  minDistance = GESTURE_CONFIG.SWIPE.minDistance,
-  minVelocity = GESTURE_CONFIG.SWIPE.velocityThreshold,
-  maxDuration = GESTURE_CONFIG.SWIPE.maxDuration,
+  minDistance = gestureConfig.SWIPE.minDistance,
+  minVelocity = gestureConfig.SWIPE.velocityThreshold,
+  maxDuration = gestureConfig.SWIPE.maxDuration,
   disabled = false,
 }: UseSwipeGestureOptions) {
   const elementRef = useRef<HTMLElement>(null);

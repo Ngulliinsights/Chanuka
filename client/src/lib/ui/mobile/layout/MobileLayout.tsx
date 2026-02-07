@@ -4,7 +4,7 @@
  */
 
 
-import type { NavigationItem } from '@client/config/navigation';
+import type { NavigationItem } from '@client/lib/config/navigation';
 import React from 'react';
 
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';

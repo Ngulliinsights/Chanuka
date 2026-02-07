@@ -1,7 +1,7 @@
 import { ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 // Feature Imports
 import { AnalysisDashboard } from '@client/features/analysis/ui/dashboard';
@@ -10,13 +10,24 @@ import BillCommunityTab from '@client/features/bills/ui/detail/BillCommunityTab'
 import BillFullTextTab from '@client/features/bills/ui/detail/BillFullTextTab';
 import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
 import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
+import { ImplementationWorkarounds } from '@client/features/bills/ui/components/ImplementationWorkarounds';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize tab from URL or default to overview
+  const initialTab = searchParams.get('tab') || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Update URL when tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value }, { replace: true });
+  };
 
   // ✅ Use the React Query Hook (The Brain)
   const { data: bill, isLoading, isError, error } = useBill(id);
@@ -63,8 +74,8 @@ export default function BillDetail() {
       <BillHeader bill={bill} />
 
       {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto">
           <TabsTrigger value="overview" className="py-3">
             Overview
           </TabsTrigger>
@@ -76,6 +87,9 @@ export default function BillDetail() {
           </TabsTrigger>
           <TabsTrigger value="analysis" className="py-3">
             Analysis
+          </TabsTrigger>
+          <TabsTrigger value="workarounds" className="py-3">
+            Workarounds
           </TabsTrigger>
           <TabsTrigger value="community" className="py-3">
             Community
@@ -96,6 +110,10 @@ export default function BillDetail() {
 
         <TabsContent value="analysis">
           <AnalysisDashboard bill={bill} />
+        </TabsContent>
+
+        <TabsContent value="workarounds">
+          <ImplementationWorkarounds bill_id={bill.id} />
         </TabsContent>
 
         <TabsContent value="community">

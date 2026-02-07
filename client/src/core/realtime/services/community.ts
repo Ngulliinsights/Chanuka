@@ -9,7 +9,7 @@ import { logger } from '@client/lib/utils/logger';
 
 import { UnifiedWebSocketManager } from '../manager';
 import {
-  CommunityUpdate,
+  CommentUpdate,
   TypingIndicator,
   CommentUpdate,
   VoteUpdate,
@@ -285,7 +285,7 @@ export class CommunityService {
       switch (message.type) {
         case 'community_update':
         case 'communityUpdate':
-          this.handleCommunityUpdateMessage(message);
+          this.handleCommentUpdateMessage(message);
           break;
         case 'typing_indicator':
         case 'typingIndicator':
@@ -328,7 +328,7 @@ export class CommunityService {
   private handleDiscussionMessage(discussionId: string, message: WebSocketMessage): void {
     try {
       // Process discussion-specific messages
-      const update: CommunityUpdate = {
+      const update: CommentUpdate = {
         type: message.type || 'update',
         discussionId,
         data: (message as any).data || message,
@@ -353,10 +353,10 @@ export class CommunityService {
     }
   }
 
-  private handleCommunityUpdateMessage(message: WebSocketMessage): void {
+  private handleCommentUpdateMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
-      const update: CommunityUpdate = {
+      const update: CommentUpdate = {
         type: data.type || 'update',
         discussionId: data.discussion_id || data.discussionId || 'general',
         data: data.data || data,

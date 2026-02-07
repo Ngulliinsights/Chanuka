@@ -115,7 +115,7 @@ export interface TrendingBill {
  * User engagement summary
  */
 export interface UserEngagementSummary {
-  readonly userId: number;
+  readonly userId: string;
   readonly totalBillsViewed: number;
   readonly totalCommentsMade: number;
   readonly totalVotes: number;
@@ -132,7 +132,7 @@ export interface UserEngagementSummary {
  * Engagement analytics for a bill
  */
 export interface EngagementAnalytics {
-  readonly billId: number;
+  readonly billId: string;
   readonly views: number;
   readonly uniqueVisitors: number;
   readonly avgTimeOnPage: number;
@@ -179,7 +179,7 @@ export interface DemographicSegmentAnalytics {
  * Comment analytics
  */
 export interface CommentAnalytics {
-  readonly billId: number;
+  readonly billId: string;
   readonly totalComments: number;
   readonly averageCommentLength: number;
   readonly averageSentiment: number;
@@ -193,8 +193,8 @@ export interface CommentAnalytics {
  * Comment statistic entry
  */
 export interface CommentStat {
-  readonly id: number;
-  readonly authorId: number;
+  readonly id: string;
+  readonly authorId: string;
   readonly content: string;
   readonly upvotes: number;
   readonly downvotes: number;
@@ -216,7 +216,7 @@ export interface CommentTimelineEntry {
  * Share analytics
  */
 export interface ShareAnalytics {
-  readonly billId: number;
+  readonly billId: string;
   readonly totalShares: number;
   readonly sharesByPlatform: Record<string, number>;
   readonly shareTimeline: readonly ShareTimelineEntry[];
@@ -236,7 +236,7 @@ export interface ShareTimelineEntry {
  * Vote analytics
  */
 export interface VoteAnalytics {
-  readonly billId: number;
+  readonly billId: string;
   readonly totalVotes: number;
   readonly supportVotes: number;
   readonly opposeVotes: number;
@@ -348,7 +348,7 @@ export function isUserEngagementSummary(value: unknown): value is UserEngagement
   if (typeof value !== 'object' || value === null) return false;
   const obj = value as Record<string, unknown>;
   return (
-    typeof obj.userId === 'number' &&
+    typeof obj.userId === 'string' &&
     typeof obj.totalBillsViewed === 'number' &&
     typeof obj.engagementScore === 'number'
   );

@@ -243,9 +243,9 @@ export interface BillTrackingPreference {
  * Bill notification
  */
 export interface BillNotification {
-  readonly id: number;
-  readonly userId: number;
-  readonly billId: number;
+  readonly id: string;
+  readonly userId: string;
+  readonly billId: string;
   readonly type: 'status_update' | 'new_analysis' | 'comment' | 'vote_change';
   readonly message: string;
   readonly read: boolean;
@@ -283,7 +283,7 @@ export interface BatchOperationResponse<T> {
  * Search result for bills
  */
 export interface BillSearchResult {
-  readonly id: number;
+  readonly id: string;
   readonly billNumber: string;
   readonly title: string;
   readonly summary: string;

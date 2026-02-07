@@ -25,9 +25,9 @@ import {
   CredibilityIndicator,
   CredibilityBreakdown,
   ExpertProfileCard,
-  CommunityValidation,
+  CommunityValidationType,
   ValidationSummary,
-  VerificationWorkflow,
+  VerificationWorkflowType,
   ExpertConsensus,
   ConsensusIndicator,
 } from './index';
@@ -151,7 +151,7 @@ export function ExpertVerificationDemo() {
     lastCalculated: '2024-01-15T10:30:00Z',
   };
 
-  const mockCommunityValidation: CommunityValidationType = {
+  const mockCommunityValidationType: CommunityValidationType = {
     id: 'validation-001',
     contentId: 'contrib-001',
     contentType: 'contribution',
@@ -164,7 +164,7 @@ export function ExpertVerificationDemo() {
     comments: 23,
   };
 
-  const mockVerificationWorkflow: VerificationWorkflowType = {
+  const mockVerificationWorkflowType: VerificationWorkflowType = {
     id: 'workflow-001',
     contributionId: 'contrib-001',
     status: 'in_review',
@@ -378,8 +378,8 @@ export function ExpertVerificationDemo() {
 
         <TabsContent value="validation" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <CommunityValidation
-              validation={mockCommunityValidation}
+            <CommunityValidationType
+              validation={mockCommunityValidationType}
               contributionId="contrib-001"
               onVote={handleVote}
               onComment={handleComment}
@@ -396,11 +396,11 @@ export function ExpertVerificationDemo() {
                   <h4 className="text-sm font-medium mb-2">Different Validation Scores</h4>
                   <div className="space-y-2">
                     <ValidationSummary
-                      validation={{ ...mockCommunityValidation, validationScore: 0.89 }}
+                      validation={{ ...mockCommunityValidationType, validationScore: 0.89 }}
                     />
                     <ValidationSummary
                       validation={{
-                        ...mockCommunityValidation,
+                        ...mockCommunityValidationType,
                         upvotes: 45,
                         downvotes: 12,
                         validationScore: 0.65,
@@ -408,7 +408,7 @@ export function ExpertVerificationDemo() {
                     />
                     <ValidationSummary
                       validation={{
-                        ...mockCommunityValidation,
+                        ...mockCommunityValidationType,
                         upvotes: 15,
                         downvotes: 28,
                         validationScore: 0.32,
@@ -419,8 +419,8 @@ export function ExpertVerificationDemo() {
 
                 <div>
                   <h4 className="text-sm font-medium mb-2">Compact Version</h4>
-                  <CommunityValidation
-                    validation={mockCommunityValidation}
+                  <CommunityValidationType
+                    validation={mockCommunityValidationType}
                     contributionId="contrib-002"
                     compact={true}
                     onVote={handleVote}
@@ -432,8 +432,8 @@ export function ExpertVerificationDemo() {
         </TabsContent>
 
         <TabsContent value="workflow" className="space-y-4">
-          <VerificationWorkflow
-            workflow={mockVerificationWorkflow}
+          <VerificationWorkflowType
+            workflow={mockVerificationWorkflowType}
             onReview={handleReview}
             onCommunityFeedback={handleCommunityFeedback}
             canReview={true}

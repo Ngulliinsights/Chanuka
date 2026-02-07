@@ -437,3 +437,11 @@ export const trackPerformance = (metrics: PerformanceMetrics) =>
 
 export const getSystemHealth = () =>
   monitoringIntegration.getSystemHealthOverview();
+
+
+export interface MonitoringConfig {
+  enabled: boolean;
+  sampleRate: number;
+  environment: string;
+  release?: string;
+}

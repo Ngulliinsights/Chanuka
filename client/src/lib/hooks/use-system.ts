@@ -203,3 +203,11 @@ export function useSystemOverview(options?: SystemQueryOptions) {
     error: health.error || stats.error || activity.error || schema.error || environment.error,
   };
 }
+
+/**
+ * Legacy useSystem hook for backward compatibility
+ * @deprecated Use useSystemOverview instead
+ */
+export function useSystem(options?: SystemQueryOptions) {
+  return useSystemOverview(options);
+}

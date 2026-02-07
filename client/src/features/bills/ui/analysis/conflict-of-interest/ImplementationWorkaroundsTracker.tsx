@@ -105,15 +105,15 @@ export function ImplementationWorkaroundsTracker({
   const analysisData = useMemo(() => {
     // Group by effectiveness levels
     const effectivenessGroups = {
-      high: allWorkarounds.filter(w => w.effectiveness >= 0.7),
-      medium: allWorkarounds.filter(w => w.effectiveness >= 0.4 && w.effectiveness < 0.7),
-      low: allWorkarounds.filter(w => w.effectiveness < 0.4),
+      high: allWorkarounds.filter(w => (w.effectiveness || 0) >= 0.7),
+      medium: allWorkarounds.filter(w => (w.effectiveness || 0) >= 0.4 && (w.effectiveness || 0) < 0.7),
+      low: allWorkarounds.filter(w => (w.effectiveness || 0) < 0.4),
     };
 
     // Group by related interests
     const interestGroups = allWorkarounds.reduce(
       (acc, workaround) => {
-        workaround.relatedInterests.forEach(interest => {
+        (workaround.relatedInterests || []).forEach(interest => {
           if (!acc[interest]) {
             acc[interest] = {
               interest,
@@ -134,20 +134,21 @@ export function ImplementationWorkaroundsTracker({
     Object.values(interestGroups).forEach((group: any) => {
       group.avgEffectiveness =
         group.workarounds.reduce(
-          (sum: number, w: ImplementationWorkaround) => sum + w.effectiveness,
+          (sum: number, w: ImplementationWorkaround) => sum + (w.effectiveness || 0),
           0
         ) / group.workarounds.length;
     });
 
     // Timeline data
     const timelineData = allWorkarounds
+      .filter(w => w.implementationDate) // Filter out missing dates
       .sort(
         (a, b) =>
-          new Date(a.implementationDate).getTime() - new Date(b.implementationDate).getTime()
+          new Date(a.implementationDate!).getTime() - new Date(b.implementationDate!).getTime()
       )
       .map((workaround, index) => ({
         index: index + 1,
-        date: workaround.implementationDate,
+        date: workaround.implementationDate!,
         effectiveness: workaround.effectiveness,
         provision: workaround.originalProvision,
         method: workaround.workaroundMethod,

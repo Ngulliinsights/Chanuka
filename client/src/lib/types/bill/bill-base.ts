@@ -128,7 +128,7 @@ export interface BillEngagement {
  * }
  */
 export interface ConstitutionalFlag {
-  readonly id?: string | number;
+  readonly id?: string;
   readonly type?: string;
   readonly severity: ConstitutionalSeverity;
   readonly description: string;
@@ -154,7 +154,7 @@ export interface ConstitutionalFlag {
  * }
  */
 export interface Sponsor {
-  readonly id: number | string;
+  readonly id: string;
   readonly name: string;
   /** @deprecated Use 'name' instead */
   readonly legislatorName?: string;
@@ -188,8 +188,8 @@ export interface Sponsor {
  * }
  */
 export interface BillAction {
-  readonly id: number;
-  readonly billId: number;
+  readonly id: string;
+  readonly billId: string;
   readonly action: string;
   readonly date: string;
   readonly chamber?: ChamberType;
@@ -220,8 +220,8 @@ export interface BillAction {
  * }
  */
 export interface BillAmendment {
-  readonly id: number;
-  readonly billId: number;
+  readonly id: string;
+  readonly billId: string;
   readonly number: string;
   readonly title: string;
   readonly description: string;
@@ -240,7 +240,7 @@ export interface BillAmendment {
  * Reference to a related bill
  */
 export interface RelatedBill {
-  readonly id: number;
+  readonly id: string;
   readonly billNumber: string;
   readonly title: string;
   readonly relationship: BillRelationship;
@@ -272,18 +272,19 @@ export interface RelatedBill {
  */
 export interface Bill {
   // Core identifiers
-  readonly id: string | number;
+  readonly id: string;
   readonly billNumber: string;
 
   // Content
   readonly title: string;
   readonly summary: string;
   readonly fullText?: string;
+  readonly billType?: string;
 
   // Status & Classification
-  readonly status: BillStatus | string;
-  readonly urgency: UrgencyLevel | string;
-  readonly complexity: ComplexityLevel | string;
+  readonly status: BillStatus;
+  readonly urgency: UrgencyLevel;
+  readonly complexity: ComplexityLevel;
 
   // Dates
   readonly introducedDate: string;
@@ -325,7 +326,7 @@ export interface Bill {
 
   // Legacy compatibility (snake_case)
   /** @deprecated Use id instead */
-  readonly bill_id?: string | number;
+  readonly bill_id?: string;
   /** @deprecated Use billNumber instead */
   readonly bill_number?: string;
   /** @deprecated Use introducedDate instead */
@@ -470,9 +471,9 @@ export interface CommitteeAssignment {
  * Individual legislator vote record
  */
 export interface VoteRecord {
-  readonly id: number;
-  readonly billId: number;
-  readonly legislatorId: number;
+  readonly id: string;
+  readonly billId: string;
+  readonly legislatorId: string;
   readonly legislatorName: string;
   readonly vote: VoteType;
   readonly voteDate: string;
@@ -488,8 +489,8 @@ export interface VoteRecord {
  * Bill version tracking for amendments and revisions
  */
 export interface BillVersion {
-  readonly id: number;
-  readonly billId: number;
+  readonly id: string;
+  readonly billId: string;
   readonly versionNumber: number;
   readonly description: string;
   readonly url: string;

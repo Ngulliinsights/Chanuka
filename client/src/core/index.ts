@@ -270,3 +270,16 @@ export type {
 // ============================================================================
 
 export default {};
+
+
+export const measureAsync = async <T>(fn: () => Promise<T>): Promise<T> => {
+  const start = performance.now();
+  const result = await fn();
+  const duration = performance.now() - start;
+  console.log(`Async operation took ${duration}ms`);
+  return result;
+};
+
+export const recordMetric = (name: string, value: number) => {
+  console.log(`Metric ${name}: ${value}`);
+};

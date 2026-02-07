@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import type { ImplementationWorkaround } from '@client/features/analysis/types';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -27,111 +28,6 @@ import {
 } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
-
-// Enhanced interface to support multiple workaround types in Kenyan context
-interface ImplementationWorkaround {
-  id: string;
-  originalBillId: string;
-  workaroundBillId: string;
-  originalBillTitle: string;
-  workaroundBillTitle: string;
-  detectionReason: string;
-  similarityScore: number;
-
-  // Enhanced workaround type classification for Kenyan context
-  workaroundType:
-    | 'legislative_repackaging'
-    | 'executive_directive'
-    | 'regulatory_implementation'
-    | 'budget_allocation'
-    | 'emergency_powers'
-    | 'administrative_circular'
-    | 'judicial_interpretation'
-    | 'county_bypass'
-    | 'multi_ministry_coordination'
-    | 'statutory_instrument';
-
-  // Enhanced bypass mechanism details for Kenyan governance
-  bypassMechanism: {
-    primaryTactic: string;
-    institutionalLevel: 'national' | 'county' | 'sub_county' | 'multi_level';
-    branchOfGovernment: 'legislature' | 'executive' | 'judiciary' | 'multi_branch';
-    timingStrategy: 'immediate' | 'delayed' | 'phased' | 'conditional';
-    scopeReduction: boolean; // Whether scope was narrowed to avoid opposition
-    languageObfuscation: boolean; // Whether technical language was used to obscure intent
-    proceduralWorkaround: boolean; // Whether normal procedures were bypassed
-  };
-
-  similarityAnalysis: {
-    textSimilarity: number;
-    structuralSimilarity: number;
-    intentSimilarity: number;
-    keyDifferences: string[];
-    commonElements: string[];
-
-    // New analysis dimensions for executive and administrative tactics
-    policyObjectiveSimilarity: number;
-    implementationPathSimilarity: number;
-    stakeholderImpactSimilarity: number;
-    enforcementMechanismSimilarity: number;
-  };
-
-  verification_status: 'pending' | 'verified' | 'rejected';
-  alertStatus: 'active' | 'resolved' | 'dismissed';
-  publicNotificationSent: boolean;
-
-  // Enhanced evidence tracking for Kenyan context
-  evidenceDocuments: Array<{
-    type:
-      | 'parliamentary_hansard'
-      | 'executive_directive'
-      | 'regulatory_notice'
-      | 'budget_document'
-      | 'administrative_circular'
-      | 'court_ruling'
-      | 'ministry_guidance'
-      | 'gazette_notice'
-      | 'statutory_instrument';
-    url: string;
-    description: string;
-    dateIssued: string;
-    issuingAuthority: string;
-  }>;
-
-  // Enhanced tracking of circumvention patterns in Kenyan context
-  circumventionPattern: {
-    previousRejectionDetails: {
-      rejectionType:
-        | 'parliamentary_defeat'
-        | 'public_opposition'
-        | 'constitutional_challenge'
-        | 'regulatory_review'
-        | 'presidential_assent_delay'
-        | 'high_court_ruling'
-        | 'senate_rejection';
-      rejectionDate: string;
-      rejectionReason: string;
-      oppositionSources: string[];
-    };
-
-    workaroundStrategy: {
-      authorityUsed: string; // Which executive authority, ministry power, etc.
-      justificationProvided: string;
-      publicParticipationBypassed: boolean;
-      parliamentaryOversightBypassed: boolean;
-      constitutionalConcerns: string[];
-    };
-  };
-
-  communityConfirmations: number;
-  reportedBy: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  created_at: string;
-  updated_at: string;
-}
 
 interface ImplementationWorkaroundsProps {
   bill_id: string;

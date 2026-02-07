@@ -213,17 +213,15 @@ export function useSearchExport() {
       searchApi.exportSearchResults(request, format),
     onSuccess: (data, { format }) => {
       // Create download link (assuming data is blob or similar)
-      const blob = new Blob([data], {
-        type: format === 'csv' ? 'text/csv' : 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
+      // Use the download URL provided by the backend
+      const url = data.downloadUrl;
       const link = document.createElement('a');
       link.href = url;
-      link.download = `search-results.${format}`;
+      link.setAttribute('download', `search-results.${format}`); // Hint filename
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // No need to revoke object URL as it's a remote URL
 
       toast({
         title: 'Export successful',

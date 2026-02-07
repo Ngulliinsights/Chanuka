@@ -51,8 +51,8 @@ export type {
   ExpertInsightSubmissionResponse,
   ActivityItem,
   ActivityType,
-  TrendingTopic,
-  TrendingTopic as CommunityTrendingTopic,
+  // TrendingTopic (Exported from @client/lib/types/analytics)
+  // TrendingTopic as CommunityTrendingTopic (Exported from @client/lib/types/analytics)
   TopicCategory as CommunityTopicCategory,
   CommunityStats,
   LocalImpactMetrics,
@@ -69,7 +69,7 @@ export type {
   Campaign,
   Petition,
   SearchOptions,
-  SearchResult,
+  // SearchResult (Exported from @client/lib/types/search)
   ExtendedCommunityStats,
   ExtendedLocalImpactMetrics,
   InsightSubmission,

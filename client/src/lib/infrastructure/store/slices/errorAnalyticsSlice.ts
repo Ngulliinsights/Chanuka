@@ -48,9 +48,8 @@ export interface ErrorPattern {
   id: string;
   pattern: string;
   frequency: number;
-  affectedComponents: string[];
-  firstSeen: number;
-  lastSeen: number;
+  impact: string;
+  trend: 'increasing' | 'decreasing' | 'stable';
 }
 
 export interface RecoveryAnalytics {
@@ -164,7 +163,7 @@ export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
   async (filters: DashboardFilters) => {
     const metrics = errorAnalyticsBridge.getMetrics();
-    
+
     // Transform top errors to patterns
     return metrics.topErrors.map((error, index) => ({
       id: `pattern-${index}`,
@@ -173,6 +172,8 @@ export const fetchPatterns = createAsyncThunk(
       affectedComponents: [],
       firstSeen: Date.now() - 3600000,
       lastSeen: Date.now(),
+      impact: 'medium',
+      trend: 'stable',
     })) as ErrorPattern[];
   }
 );
