@@ -20,10 +20,47 @@ export interface ConflictOfInterest {
   evidence: string[];
 }
 
+export interface FinancialInterestDetail {
+  id: string;
+  source: string;
+  amount: number;
+  industry: string;
+  category: string;
+  date: string;
+  description: string;
+  verified: boolean;
+}
+
+export interface OrganizationalConnectionDetail {
+  id: string;
+  organizationName: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  transparencyScore: number;
+}
+
+export interface VotingPatternDetail {
+  billId: string;
+  billTitle: string;
+  vote: 'yes' | 'no' | 'abstain';
+  date: string;
+  alignment: number;
+  financialCorrelation?: number;
+}
+
 export interface ConflictAnalysis {
   conflicts: ConflictOfInterest[];
   score: number;
   summary: string;
+  // Extended properties for UI components
+  sponsorId?: string;
+  sponsorName?: string;
+  financialInterests?: FinancialInterestDetail[];
+  organizationalConnections?: OrganizationalConnectionDetail[];
+  votingPatterns?: VotingPatternDetail[];
+  transparencyScore?: number;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface FinancialInterest {
@@ -40,6 +77,7 @@ export interface VotingPattern {
   vote: 'yes' | 'no' | 'abstain';
   date: Date;
   alignment: number;
+  financialCorrelation?: number;
 }
 
 export interface TransparencyScore {
@@ -51,9 +89,20 @@ export interface TransparencyScore {
 
 export interface NetworkNode {
   id: string;
-  type: 'sponsor' | 'organization' | 'bill';
+  type: 'sponsor' | 'organization' | 'bill' | 'industry';
   name: string;
   connections: string[];
+  // D3 simulation properties
+  x?: number;
+  y?: number;
+  fx?: number | null;
+  fy?: number | null;
+  vx?: number;
+  vy?: number;
+  index?: number;
+  // Visual properties
+  size?: number;
+  color?: string;
 }
 
 export interface TransparencyAnalysis {
@@ -102,6 +151,9 @@ export interface NetworkLink {
   target: string;
   type: 'financial' | 'political' | 'organizational';
   strength: number;
+  // Extended properties for visualization
+  description?: string;
+  amount?: number;
 }
 
 export interface NetworkData {
@@ -117,14 +169,8 @@ export interface OrganizationalConnection {
   endDate?: Date;
 }
 
-export interface ImplementationWorkaround {
-  id: string;
-  type: string;
-  description: string;
-  reason: string;
-  impact: 'low' | 'medium' | 'high';
-  createdAt: Date;
-}
+// Re-export the comprehensive ImplementationWorkaround from types/index.ts
+export type { ImplementationWorkaround } from './types/index';
 
 export interface ConflictVisualizationProps {
   data: NetworkData;
@@ -136,4 +182,10 @@ export interface AccessibilityFallbackData {
   summary: string;
   details: string[];
   recommendations: string[];
+  // Extended for network visualization
+  connections?: Array<{
+    from: string;
+    to: string;
+    relationship: string;
+  }>;
 }

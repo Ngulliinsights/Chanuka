@@ -19,9 +19,4 @@ export type {
   BillsSearchParams,
 } from '@client/lib/types/bill';
 
-// Re-export types
-export type {
-  BillStatus,
-  UrgencyLevel,
-  ComplexityLevel,
-} from '@client/lib/types/bill';
+

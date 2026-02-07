@@ -6,7 +6,7 @@
  * drill-down capabilities to individual bill analysis.
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -14,7 +14,6 @@ import {
   FileText,
   Shield,
   ArrowRight,
-  Filter,
   Calendar,
 } from 'lucide-react';
 import {
@@ -43,20 +42,89 @@ import {
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
-import type { ImplementationWorkaround } from '@client/features/analysis/types';
+
+
+
+interface WorkaroundWithMetadata {
+  id: string;
+  // UI-specific fields
+  similarity: number;
+  billTitle: string;
+  billId: string;
+  originalBillReference?: {
+    billId: string;
+    billTitle: string;
+    rejectionDate: string;
+    rejectionType: string;
+    rejectionDetails: string;
+  };
+  reason: string;
+  type: string;
+  mechanism: {
+    primaryTactic?: string;
+    institutionalLevel?: string;
+    branchOfGovernment: 'legislature' | 'executive' | 'judiciary';
+    timingStrategy?: string;
+    scopeReduction?: boolean;
+    languageObfuscation?: boolean;
+    proceduralWorkaround?: boolean;
+  };
+  analysis: {
+    textSimilarity: number;
+    structuralSimilarity: number;
+    intentSimilarity: number;
+    keyDifferences: string[];
+    commonElements: string[];
+    policyObjectiveSimilarity: number;
+    implementationPathSimilarity: number;
+    stakeholderImpactSimilarity: number;
+    enforcementMechanismSimilarity: number;
+  };
+  verificationStatus: 'verified' | 'pending';
+  alertStatus?: string;
+  publicNotificationSent?: boolean;
+  evidenceDocuments?: Array<{
+    type: string;
+    url: string;
+    description: string;
+    dateIssued: string;
+    issuingAuthority: string;
+  }>;
+  pattern: {
+    authorityUsed?: string;
+    justificationProvided?: string;
+    publicParticipationBypassed: boolean;
+    parliamentaryOversightBypassed: boolean;
+    constitutionalConcerns?: string[];
+    oppositionSources?: string[];
+  };
+  confirmations: number;
+  reportedBy?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // Mock data for the strategic dashboard
-const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
+const MOCK_WORKAROUNDS: WorkaroundWithMetadata[] = [
   {
     id: 'wa-fb-001',
-    originalBillId: 'bill-fb-rejected-2023',
-    workaroundBillId: 'bill-fb-002',
-    originalBillTitle: 'Finance Bill 2023 (Rejected Provisions)',
-    workaroundBillTitle: 'Finance Bill 2024 - Tax Amendments',
-    detectionReason: 'Reintroduction of previously rejected VAT provisions on digital services',
-    similarityScore: 85,
-    workaroundType: 'legislative_repackaging',
-    bypassMechanism: {
+    billId: 'bill-fb-002',
+    billTitle: 'Finance Bill 2024 - Tax Amendments',
+    originalBillReference: {
+      billId: 'bill-fb-rejected-2023',
+      billTitle: 'Finance Bill 2023 (Rejected Provisions)',
+      rejectionDate: '2023-06-25',
+      rejectionType: 'public_opposition',
+      rejectionDetails: 'Mass public protests against cost of living increases',
+    },
+    reason: 'Reintroduction of previously rejected VAT provisions on digital services',
+    similarity: 85,
+    type: 'legislative_repackaging',
+    mechanism: {
       primaryTactic: 'Splitting provisions across multiple budget lines',
       institutionalLevel: 'national',
       branchOfGovernment: 'legislature',
@@ -65,7 +133,7 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       languageObfuscation: true,
       proceduralWorkaround: false,
     },
-    similarityAnalysis: {
+    analysis: {
       textSimilarity: 72,
       structuralSimilarity: 88,
       intentSimilarity: 95,
@@ -76,7 +144,7 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       stakeholderImpactSimilarity: 89,
       enforcementMechanismSimilarity: 75,
     },
-    verification_status: 'verified',
+    verificationStatus: 'verified',
     alertStatus: 'active',
     publicNotificationSent: true,
     evidenceDocuments: [
@@ -88,43 +156,34 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
         issuingAuthority: 'National Assembly',
       },
     ],
-    circumventionPattern: {
-      previousRejectionDetails: {
-        rejectionType: 'public_opposition',
-        rejectionDate: '2023-06-25',
-        rejectionReason: 'Mass public protests against cost of living increases',
-        oppositionSources: ['Civil Society', 'Youth Organizations', 'Business Community'],
-      },
-      workaroundStrategy: {
-        authorityUsed: 'Budget Process - Treasury',
-        justificationProvided: 'Revenue mobilization for development',
-        publicParticipationBypassed: true,
-        parliamentaryOversightBypassed: false,
-        constitutionalConcerns: ['Article 201 - Public Finance Principles'],
-      },
+    pattern: {
+      authorityUsed: 'Budget Process - Treasury',
+      justificationProvided: 'Revenue mobilization for development',
+      publicParticipationBypassed: true,
+      parliamentaryOversightBypassed: false,
+      constitutionalConcerns: ['Article 201 - Public Finance Principles'],
+      oppositionSources: ['Civil Society', 'Youth Organizations', 'Business Community'],
     },
-    communityConfirmations: 156,
+    confirmations: 156,
     reportedBy: { id: 'sys-001', name: 'AI Detection System', role: 'Automated Analysis' },
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-02-01T14:30:00Z',
-    // Legacy fields for chart compatibility
-    originalProvision: 'VAT on digital services',
-    workaroundMethod: 'Legislative repackaging in Finance Bill 2024',
-    implementationDate: '2024-01-15',
-    effectiveness: 0.85,
-    relatedInterests: ['Technology', 'Digital Economy', 'Taxation'],
-    description: 'Previously rejected tax provisions reintroduced with minor modifications',
+    createdAt: new Date('2024-01-15T10:00:00Z'),
+    updatedAt: new Date('2024-02-01T14:30:00Z'),
   },
   {
     id: 'wa-exec-001',
-    originalBillId: 'bill-housing-2022',
-    workaroundBillId: 'exec-order-housing-2023',
-    originalBillTitle: 'Affordable Housing Levy Bill 2022',
-    workaroundBillTitle: 'Executive Order on Housing Fund Contributions',
-    detectionReason: 'Implementation via executive directive after court challenge',
-    similarityScore: 78,
-    workaroundType: 'executive_directive',
-    bypassMechanism: {
+    billId: 'exec-order-housing-2023',
+    billTitle: 'Executive Order on Housing Fund Contributions',
+    originalBillReference: {
+      billId: 'bill-housing-2022',
+      billTitle: 'Affordable Housing Levy Bill 2022',
+      rejectionDate: '2023-07-15',
+      rejectionType: 'high_court_ruling',
+      rejectionDetails: 'Mandatory levy declared unconstitutional without proper legislation',
+    },
+    reason: 'Implementation via executive directive after court challenge',
+    similarity: 78,
+    type: 'executive_directive',
+    mechanism: {
       primaryTactic: 'Presidential Directive under Article 132',
       institutionalLevel: 'national',
       branchOfGovernment: 'executive',
@@ -133,7 +192,7 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       languageObfuscation: false,
       proceduralWorkaround: true,
     },
-    similarityAnalysis: {
+    analysis: {
       textSimilarity: 65,
       structuralSimilarity: 70,
       intentSimilarity: 92,
@@ -144,7 +203,7 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       stakeholderImpactSimilarity: 88,
       enforcementMechanismSimilarity: 45,
     },
-    verification_status: 'verified',
+    verificationStatus: 'verified',
     alertStatus: 'active',
     publicNotificationSent: true,
     evidenceDocuments: [
@@ -156,42 +215,34 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
         issuingAuthority: 'High Court of Kenya',
       },
     ],
-    circumventionPattern: {
-      previousRejectionDetails: {
-        rejectionType: 'high_court_ruling',
-        rejectionDate: '2023-07-15',
-        rejectionReason: 'Mandatory levy declared unconstitutional without proper legislation',
-        oppositionSources: ['COTU', 'Business Associations', 'Civil Liberties Organizations'],
-      },
-      workaroundStrategy: {
-        authorityUsed: 'Presidential Executive Authority - Article 132',
-        justificationProvided: 'Urgent housing development needs',
-        publicParticipationBypassed: true,
-        parliamentaryOversightBypassed: true,
-        constitutionalConcerns: ['Article 210 - Taxation requires legislation'],
-      },
+    pattern: {
+      authorityUsed: 'Presidential Executive Authority - Article 132',
+      justificationProvided: 'Urgent housing development needs',
+      publicParticipationBypassed: true,
+      parliamentaryOversightBypassed: true,
+      constitutionalConcerns: ['Article 210 - Taxation requires legislation'],
+      oppositionSources: ['COTU', 'Business Associations', 'Civil Liberties Organizations'],
     },
-    communityConfirmations: 89,
+    confirmations: 89,
     reportedBy: { id: 'expert-003', name: 'Legal Analyst', role: 'Expert Contributor' },
-    created_at: '2023-08-01T08:00:00Z',
-    updated_at: '2024-01-20T11:00:00Z',
-    originalProvision: 'Housing Levy deduction',
-    workaroundMethod: 'Executive directive implementation',
-    implementationDate: '2023-08-01',
-    effectiveness: 0.78,
-    relatedInterests: ['Housing', 'Employment', 'Social Security'],
-    description: 'Housing contribution implemented via executive order after court struck down levy',
+    createdAt: new Date('2023-08-01T08:00:00Z'),
+    updatedAt: new Date('2024-01-20T11:00:00Z'),
   },
   {
     id: 'wa-reg-001',
-    originalBillId: 'bill-data-2019',
-    workaroundBillId: 'reg-data-2022',
-    originalBillTitle: 'Data Protection (Amendment) Bill 2019',
-    workaroundBillTitle: 'Data Protection Regulations 2022',
-    detectionReason: 'Controversial provisions implemented through subsidiary legislation',
-    similarityScore: 72,
-    workaroundType: 'regulatory_implementation',
-    bypassMechanism: {
+    billId: 'reg-data-2022',
+    billTitle: 'Data Protection Regulations 2022',
+    originalBillReference: {
+      billId: 'bill-data-2019',
+      billTitle: 'Data Protection (Amendment) Bill 2019',
+      rejectionDate: '2020-03-10',
+      rejectionType: 'parliamentary_defeat',
+      rejectionDetails: 'Privacy concerns from MPs and civil society',
+    },
+    reason: 'Controversial provisions implemented through subsidiary legislation',
+    similarity: 72,
+    type: 'regulatory_implementation',
+    mechanism: {
       primaryTactic: 'Subsidiary legislation under existing Data Protection Act',
       institutionalLevel: 'national',
       branchOfGovernment: 'executive',
@@ -200,7 +251,7 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       languageObfuscation: true,
       proceduralWorkaround: false,
     },
-    similarityAnalysis: {
+    analysis: {
       textSimilarity: 55,
       structuralSimilarity: 68,
       intentSimilarity: 82,
@@ -211,35 +262,22 @@ const MOCK_WORKAROUNDS: ImplementationWorkaround[] = [
       stakeholderImpactSimilarity: 78,
       enforcementMechanismSimilarity: 65,
     },
-    verification_status: 'pending',
+    verificationStatus: 'pending',
     alertStatus: 'active',
     publicNotificationSent: false,
     evidenceDocuments: [],
-    circumventionPattern: {
-      previousRejectionDetails: {
-        rejectionType: 'parliamentary_defeat',
-        rejectionDate: '2020-03-10',
-        rejectionReason: 'Privacy concerns from MPs and civil society',
-        oppositionSources: ['Privacy Advocates', 'Tech Industry', 'Human Rights Organizations'],
-      },
-      workaroundStrategy: {
-        authorityUsed: 'Regulatory Authority of Data Commissioner',
-        justificationProvided: 'Implementation of existing Data Protection Act',
-        publicParticipationBypassed: false,
-        parliamentaryOversightBypassed: true,
-        constitutionalConcerns: ['Article 31 - Right to Privacy'],
-      },
+    pattern: {
+      authorityUsed: 'Regulatory Authority of Data Commissioner',
+      justificationProvided: 'Implementation of existing Data Protection Act',
+      publicParticipationBypassed: false,
+      parliamentaryOversightBypassed: true,
+      constitutionalConcerns: ['Article 31 - Right to Privacy'],
+      oppositionSources: ['Privacy Advocates', 'Tech Industry', 'Human Rights Organizations'],
     },
-    communityConfirmations: 34,
+    confirmations: 34,
     reportedBy: { id: 'user-456', name: 'Anonymous Contributor', role: 'Community Member' },
-    created_at: '2022-11-01T09:00:00Z',
-    updated_at: '2023-12-15T16:00:00Z',
-    originalProvision: 'Data localization mandate',
-    workaroundMethod: 'Regulatory implementation',
-    implementationDate: '2022-11-01',
-    effectiveness: 0.72,
-    relatedInterests: ['Technology', 'Privacy', 'Business'],
-    description: 'Data localization requirements implemented through regulations',
+    createdAt: new Date('2022-11-01T09:00:00Z'),
+    updatedAt: new Date('2023-12-15T16:00:00Z'),
   },
 ];
 
@@ -262,7 +300,7 @@ export default function WorkaroundAnalysisPage() {
   const stats = useMemo(() => {
     const byType = MOCK_WORKAROUNDS.reduce(
       (acc, w) => {
-        acc[w.workaroundType] = (acc[w.workaroundType] || 0) + 1;
+        acc[w.type] = (acc[w.type] || 0) + 1;
         return acc;
       },
       {} as Record<string, number>
@@ -270,16 +308,15 @@ export default function WorkaroundAnalysisPage() {
 
     const byBranch = MOCK_WORKAROUNDS.reduce(
       (acc, w) => {
-        acc[w.bypassMechanism.branchOfGovernment] =
-          (acc[w.bypassMechanism.branchOfGovernment] || 0) + 1;
+        acc[w.mechanism.branchOfGovernment] = (acc[w.mechanism.branchOfGovernment] || 0) + 1;
         return acc;
       },
       {} as Record<string, number>
     );
 
-    const verified = MOCK_WORKAROUNDS.filter(w => w.verification_status === 'verified').length;
+    const verified = MOCK_WORKAROUNDS.filter(w => w.verificationStatus === 'verified').length;
     const avgSimilarity =
-      MOCK_WORKAROUNDS.reduce((sum, w) => sum + w.similarityScore, 0) / MOCK_WORKAROUNDS.length;
+      MOCK_WORKAROUNDS.reduce((sum, w) => sum + w.similarity, 0) / MOCK_WORKAROUNDS.length;
 
     return {
       total: MOCK_WORKAROUNDS.length,
@@ -289,7 +326,7 @@ export default function WorkaroundAnalysisPage() {
       byType,
       byBranch,
       publicParticipationBypassed: MOCK_WORKAROUNDS.filter(
-        w => w.circumventionPattern.workaroundStrategy.publicParticipationBypassed
+        w => w.pattern.publicParticipationBypassed
       ).length,
     };
   }, []);
@@ -312,10 +349,10 @@ export default function WorkaroundAnalysisPage() {
   }));
 
   const timelineData = MOCK_WORKAROUNDS.map(w => ({
-    date: w.created_at.split('T')[0],
-    similarity: w.similarityScore,
-    type: w.workaroundType,
-    title: w.workaroundBillTitle.substring(0, 30) + '...',
+    date: w.createdAt.toISOString().split('T')[0],
+    similarity: w.similarity,
+    type: w.type,
+    title: w.billTitle.substring(0, 30) + '...',
   })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
@@ -483,18 +520,42 @@ export default function WorkaroundAnalysisPage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">High Similarity Score (&gt;75%)</span>
                     <Badge variant="secondary">
-                      {MOCK_WORKAROUNDS.filter(w => w.similarityScore > 75).length} of {stats.total}
+                      {MOCK_WORKAROUNDS.filter(w => w.similarity > 75).length} of {stats.total}
                     </Badge>
                   </div>
                   <Progress
                     value={
-                      (MOCK_WORKAROUNDS.filter(w => w.similarityScore > 75).length / stats.total) *
-                      100
+                      (MOCK_WORKAROUNDS.filter(w => w.similarity > 75).length / stats.total) * 100
                     }
                     className="h-2"
                   />
                   <p className="text-sm text-muted-foreground mt-2">
                     Workarounds that closely match previously rejected provisions
+                  </p>
+                </div>
+
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Parliamentary Oversight Bypassed</span>
+                    <Badge variant="secondary">
+                      {
+                        MOCK_WORKAROUNDS.filter(w => w.pattern.parliamentaryOversightBypassed)
+                          .length
+                      }{' '}
+                      of {stats.total}
+                    </Badge>
+                  </div>
+                  <Progress
+                    value={
+                      (MOCK_WORKAROUNDS.filter(w => w.pattern.parliamentaryOversightBypassed)
+                        .length /
+                        stats.total) *
+                      100
+                    }
+                    className="h-2"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Implementations that circumvented legislative review processes
                   </p>
                 </div>
               </div>
@@ -555,34 +616,28 @@ export default function WorkaroundAnalysisPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <Badge
                             variant={
-                              workaround.verification_status === 'verified'
-                                ? 'default'
-                                : 'secondary'
+                              workaround.verificationStatus === 'verified' ? 'default' : 'secondary'
                             }
                           >
-                            {workaround.verification_status}
+                            {workaround.verificationStatus}
                           </Badge>
-                          <Badge variant="outline">
-                            {workaround.workaroundType.replace(/_/g, ' ')}
-                          </Badge>
+                          <Badge variant="outline">{workaround.type.replace(/_/g, ' ')}</Badge>
                           <span className="text-sm text-orange-600 font-semibold">
-                            {workaround.similarityScore}% match
+                            {workaround.similarity}% match
                           </span>
                         </div>
-                        <h4 className="font-medium">{workaround.workaroundBillTitle}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {workaround.detectionReason}
-                        </p>
+                        <h4 className="font-medium">{workaround.billTitle}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">{workaround.reason}</p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                           <span>
-                            Confirmations: <strong>{workaround.communityConfirmations}</strong>
+                            Confirmations: <strong>{workaround.confirmations}</strong>
                           </span>
                           <span>
-                            Detected: {new Date(workaround.created_at).toLocaleDateString()}
+                            Detected: {workaround.createdAt.toLocaleDateString()}
                           </span>
                         </div>
                       </div>
-                      <Link to={`/bills/${workaround.workaroundBillId}?tab=workarounds`}>
+                      <Link to={`/bills/${workaround.billId}?tab=workarounds`}>
                         <Button variant="outline" size="sm">
                           View Analysis
                           <ArrowRight className="h-4 w-4 ml-1" />

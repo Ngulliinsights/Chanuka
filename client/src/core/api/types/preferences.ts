@@ -66,12 +66,17 @@ export interface TemporalFilter {
 }
 
 export interface DashboardPreferences {
-  layout: 'compact' | 'detailed' | 'cards';
+  layout: 'compact' | 'detailed' | 'cards' | 'standard' | 'expanded';
   showWelcomeMessage: boolean;
   defaultTimeFilter: TemporalFilter['period'];
   pinnedSections: string[];
   hiddenSections: string[];
   refreshInterval: number; // in minutes
+  // Extended properties for compatibility with dashboard-base.ts
+  theme?: 'light' | 'dark' | 'auto';
+  defaultView?: 'list' | 'grid' | 'cards';
+  hiddenWidgets?: string[];
+  custom?: Record<string, unknown>;
 }
 
 export interface PrivacyControls {
