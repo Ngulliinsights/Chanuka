@@ -64,6 +64,7 @@ export interface NetworkNode {
   type: 'sponsor' | 'organization' | 'industry' | 'bill';
   size: number;
   color: string;
+  connections?: string[]; // Array of connected node IDs
   x?: number;
   y?: number;
   fx?: number | null;

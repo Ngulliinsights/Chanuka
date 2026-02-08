@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 
-import { ConflictAnalysis } from '@client/features/analysis/types';
+import { ConflictAnalysis } from '@client/features/analysis/types/index';
 
 /**
  * Hook for fetching and managing conflict analysis data
@@ -50,103 +50,80 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
   const currentYear = new Date().getFullYear();
 
   return {
-    billId,
-    sponsorId,
+    sponsorId: sponsorId,
     sponsorName: 'Senator Jane Smith',
-    analysisDate: new Date().toISOString(),
-    riskAssessment: {
-      overallRisk: 72,
-      conflictDetected: true,
-      riskLevel: 'high',
-      confidence: 0.85,
-    },
-    conflicts: [
+    financialInterests: [
       {
-        id: '1',
-        type: 'financial',
-        severity: 'high',
-        description: 'Significant financial interests in affected industries',
-        relatedInterests: ['Energy', 'Healthcare'],
-        financialExposures: [
-          {
-            id: 'exp1',
-            source: 'Energy Sector Holdings',
-            amount: 2500000,
-            year: currentYear - 1,
-            industry: 'Energy',
-            category: 'Stocks',
-            verificationStatus: 'verified',
-            description: 'Direct stock holdings in major energy companies',
-          },
-          {
-            id: 'exp2',
-            source: 'Healthcare Investments',
-            amount: 1800000,
-            year: currentYear - 1,
-            industry: 'Healthcare',
-            category: 'Bonds',
-            verificationStatus: 'verified',
-            description: 'Bond portfolio in healthcare sector',
-          },
-        ],
+        id: 'exp1',
+        source: 'Energy Sector Holdings',
+        amount: 2500000,
+        industry: 'Energy',
+        category: 'investment',
+        date: `${currentYear - 1}-12-31`,
+        description: 'Direct stock holdings in major energy companies',
+        verified: true,
+      },
+      {
+        id: 'exp2',
+        source: 'Healthcare Investments',
+        amount: 1800000,
+        industry: 'Healthcare',
+        category: 'investment',
+        date: `${currentYear - 1}-12-31`,
+        description: 'Bond portfolio in healthcare sector',
+        verified: true,
       },
     ],
-    votingHistory: [
+    organizationalConnections: [
       {
-        id: 'vote1',
-        billId: 1001,
-        vote: 'yes',
-        billTitle: 'Energy Deregulation Act',
-        date: new Date(currentYear - 1, 3, 15).toISOString(),
-        financialCorrelation: 0.92,
-        explanation: 'Supports energy sector interests',
+        id: 'org1',
+        organizationName: 'Energy Corp Inc',
+        organizationType: 'corporation',
+        connectionType: 'board_member',
+        strength: 0.9,
+        startDate: `${currentYear - 3}-01-01`,
+        description: 'Board member of major energy corporation',
+        verified: true,
       },
       {
-        id: 'vote2',
-        billId: 1002,
+        id: 'org2',
+        organizationName: 'HealthTech Systems',
+        organizationType: 'corporation',
+        connectionType: 'consultant',
+        strength: 0.85,
+        startDate: `${currentYear - 2}-06-01`,
+        description: 'Consulting role for healthcare technology company',
+        verified: true,
+      },
+    ],
+    votingPatterns: [
+      {
+        billId: '1001',
+        billTitle: 'Energy Deregulation Act',
         vote: 'yes',
+        date: new Date(currentYear - 1, 3, 15).toISOString(),
+        relatedIndustries: ['Energy'],
+        financialCorrelation: 0.92,
+      },
+      {
+        billId: '1002',
         billTitle: 'Healthcare Tax Incentives',
+        vote: 'yes',
         date: new Date(currentYear - 1, 5, 10).toISOString(),
+        relatedIndustries: ['Healthcare'],
         financialCorrelation: 0.88,
-        explanation: 'Supports healthcare investments',
       },
     ],
     transparencyScore: {
-      overallScore: 58,
-      components: {
-        financialDisclosure: { score: 65, weight: 0.4, details: 'Complete but late disclosure' },
-        votingHistory: { score: 52, weight: 0.35, details: 'Limited voting explanations' },
-        industryConnections: {
-          score: 48,
-          weight: 0.25,
-          details: 'Significant undisclosed connections',
-        },
-      },
+      overall: 58,
+      financialDisclosure: 65,
+      votingHistory: 52,
+      industryConnections: 48,
       methodology: 'Multi-factor transparency scoring',
+      lastUpdated: new Date().toISOString(),
     },
-    implementationWorkarounds: [
-      {
-        id: 'work1',
-        originalProvision: 'Strict energy company regulation limits',
-        rejectionReason: 'lobbying_pressure',
-        workaround: 'Exemption for companies with <1000 employees',
-        implemented: true,
-        successRate: 0.75,
-        timeline: `Q2 ${currentYear}`,
-      },
-    ],
-    networkNodes: [
-      { id: 'sponsor', label: 'Senator Jane Smith', type: 'sponsor', value: 10 },
-      { id: 'company1', label: 'Energy Corp Inc', type: 'company', value: 8 },
-      { id: 'company2', label: 'HealthTech Systems', type: 'company', value: 7 },
-      { id: 'org1', label: 'Industry Coalition', type: 'organization', value: 6 },
-    ],
-    networkLinks: [
-      { source: 'sponsor', target: 'company1', type: 'financial', strength: 0.9 },
-      { source: 'sponsor', target: 'company2', type: 'financial', strength: 0.85 },
-      { source: 'sponsor', target: 'org1', type: 'membership', strength: 0.7 },
-      { source: 'company1', target: 'org1', type: 'association', strength: 0.8 },
-    ],
+    riskLevel: 'high',
+    summary: 'Significant financial interests in affected industries with high correlation to voting patterns',
   };
 }
 

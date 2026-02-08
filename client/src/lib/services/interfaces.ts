@@ -34,7 +34,12 @@ export interface BaseService extends ServiceLifecycleInterface {
   /** Health check for service status */
   healthCheck(): Promise<boolean>;
   /** Get service information */
-  getInfo(): ServiceConfig;
+  getInfo(): {
+    name: string;
+    version?: string;
+    description?: string;
+    dependencies?: string[];
+  };
   /** Get service statistics */
   getStatistics(): Promise<Record<string, unknown>>;
 }

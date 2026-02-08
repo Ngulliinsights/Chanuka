@@ -70,6 +70,11 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
   readonly data?: T;
 
   /**
+    * Response message
+    */
+  readonly message?: string;
+
+  /**
     * Response metadata
     */
   readonly metadata?: Readonly<Record<string, unknown>>;

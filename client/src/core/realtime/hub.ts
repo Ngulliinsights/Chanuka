@@ -238,11 +238,11 @@ export class RealTimeHub {
   }
 
   isConnected(): boolean {
-    return this.wsManager.getConnectionState() === ConnectionState.CONNECTED;
+    return this.wsManager.getConnectionState() === 'connected';
   }
 
   getConnectionState(): ConnectionState {
-    return this.wsManager.getConnectionState();
+    return this.wsManager.getConnectionState() as ConnectionState;
   }
 
   // ============================================================================
@@ -276,7 +276,7 @@ export class RealTimeHub {
           }
           break;
         }
-        case 'user_notifications':
+        case 'notification':
           state.connection.notification_subscriptions = true;
           break;
       }
@@ -307,14 +307,16 @@ export class RealTimeHub {
 
   addBillUpdate(update: BillRealTimeUpdate): void {
     this.updateState(state => {
-      const billId = update.bill_id;
+      const billId = update.billId;
       const existing = state.billUpdates[billId] || [];
 
       // Keep only last 50 updates per bill
       const updates = [...existing, update].slice(-50);
       state.billUpdates[billId] = updates;
 
-      state.lastUpdateTimestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
+        ? update.timestamp 
+        : new Date(update.timestamp).toISOString();
     });
 
     this.handlers.onBillUpdate?.(update);
@@ -329,7 +331,9 @@ export class RealTimeHub {
       const updates = [...existing, update].slice(-100);
       state.communityUpdates[discussionId] = updates;
 
-      state.lastUpdateTimestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string'
+        ? update.timestamp
+        : new Date(update.timestamp).toISOString();
     });
 
     this.handlers.onCommunityUpdate?.(update);
@@ -337,8 +341,10 @@ export class RealTimeHub {
 
   updateEngagementMetrics(metrics: EngagementMetricsUpdate): void {
     this.updateState(state => {
-      state.engagementMetrics[metrics.bill_id] = metrics;
-      state.lastUpdateTimestamp = metrics.timestamp;
+      state.engagementMetrics[metrics.billId] = metrics;
+      state.lastUpdateTimestamp = typeof metrics.timestamp === 'string'
+        ? metrics.timestamp
+        : new Date(metrics.timestamp).toISOString();
     });
 
     this.handlers.onEngagementUpdate?.(metrics);
@@ -348,7 +354,9 @@ export class RealTimeHub {
     this.updateState(state => {
       // Keep only last 200 expert activities
       state.expertActivities = [...state.expertActivities, activity].slice(-200);
-      state.lastUpdateTimestamp = activity.timestamp;
+      state.lastUpdateTimestamp = typeof activity.timestamp === 'string'
+        ? activity.timestamp
+        : new Date(activity.timestamp).toISOString();
     });
 
     this.handlers.onExpertActivity?.(activity);
@@ -362,7 +370,7 @@ export class RealTimeHub {
       // Update unread count
       state.notificationCount = state.notifications.filter(n => !n.read).length;
 
-      state.lastUpdateTimestamp = notification.created_at;
+      state.lastUpdateTimestamp = notification.created_at || null;
     });
 
     this.handlers.onNotification?.(notification);
@@ -495,11 +503,11 @@ export class RealTimeHub {
     this.wsManager.on('error', (error: unknown) => {
       const err = error instanceof Error ? error : new Error(String(error));
       this.updateState(state => {
-        state.connection.error = err.message;
+        state.connection.error = err;
         state.connection.isConnecting = false;
       });
 
-      this.handlers.onError?.(err.message);
+      this.handlers.onError?.(err);
       this.eventEmitter.emit('error', err);
     });
   }
@@ -527,7 +535,7 @@ export class RealTimeHub {
         case 'community':
           this.communityService.handleMessage(wsMessage);
           break;
-        case 'user_notifications':
+        case 'notification':
           this.notificationService.handleMessage(wsMessage);
           break;
         default:

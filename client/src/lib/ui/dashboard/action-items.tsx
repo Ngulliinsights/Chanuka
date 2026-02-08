@@ -5,12 +5,12 @@ import { Button } from '../../design-system';
 import { Card, CardContent, CardHeader } from '../../design-system';
 
 import { useDashboard, useDashboardActions } from './hooks';
-import type { DashboardComponentProps, ActionPriority } from './types';
+import type { DashboardComponentProps, ActionPriority, DashboardAppConfig } from './types';
 import { validateActionItem } from './validation';
 
 export const ActionItems = React.memo<DashboardComponentProps>(
   ({ className = '', config, onError, onDataChange }) => {
-    const { data, loading, error, actions, recovery } = useDashboard(config);
+    const { data, loading, error, actions, recovery } = useDashboard(config as Partial<DashboardAppConfig>);
     useDashboardActions(data.actionItems);
     const [showCompleted, setShowCompleted] = React.useState(
       (config as any)?.showCompletedActions ?? false

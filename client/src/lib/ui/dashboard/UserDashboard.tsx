@@ -23,7 +23,7 @@ import type {
   EngagementHistoryItem as ImportedEngagementHistoryItem,
   UserDashboardData,
   PrivacyControls as ImportedPrivacyControls,
-  DashboardPreferences,
+  UserDashboardPreferences as DashboardPreferences,
 } from '@client/lib/types/user-dashboard';
 
 import { ActivitySection } from './sections/ActivitySection';

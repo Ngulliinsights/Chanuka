@@ -29,9 +29,13 @@ export function usePretextAnalysis(options: PretextAnalysisOptions = {}) {
   // Query for pretext analysis data
   const { data, isLoading, error, refetch } = useSafeQuery<PretextAnalysisResult>({
     queryKey: ['pretext-analysis', billId, content],
-    endpoint: billId ? `/api/bills/${billId}/pretext-analysis` : undefined,
+    queryFn: async () => {
+      if (!billId) throw new Error('Bill ID required');
+      const response = await fetch(`/api/bills/${billId}/pretext-analysis`);
+      if (!response.ok) throw new Error('Failed to fetch pretext analysis');
+      return response.json();
+    },
     enabled: enabled && (!!billId || !!content),
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Manual analysis function for custom content

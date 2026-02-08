@@ -6,32 +6,10 @@ import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 
 import { usePretextAnalysis } from '../hooks/usePretextAnalysis';
+import type { CivicAction, RightsCard } from '../types';
 
 import { CivicActionToolbox } from './CivicActionToolbox';
 import { PretextWatchCard } from './PretextWatchCard';
-
-// Define types locally to match the CivicActionToolbox expectations
-interface CivicAction {
-  id: string;
-  type: 'foi' | 'petition' | 'complaint' | 'public_participation';
-  title: string;
-  description: string;
-  estimatedTime: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  successRate?: number;
-  localContacts: unknown[];
-}
-
-interface RightsCard {
-  id: string;
-  scenario: string;
-  title: string;
-  description: string;
-  steps: unknown[];
-  contacts: unknown[];
-  lastUpdated: Date;
-  language: 'en' | 'sw' | 'other';
-}
 
 interface PretextDetectionPanelProps {
   billId: string;
@@ -61,13 +39,12 @@ const isPretextIndicator = (value: unknown): value is PretextIndicator => {
 export const PretextDetectionPanel = React.memo<PretextDetectionPanelProps>(({ billId }) => {
   // Destructure with the correct property names from the hook
   const {
-    analysis: hookAnalysis,
-    loading,
+    data: hookAnalysis,
+    isLoading: loading,
     error,
-    civicActions: hookCivicActions,
-    rightsCards: hookRightsCards,
+    analyzeContent,
     refetch,
-  } = usePretextAnalysis(billId);
+  } = usePretextAnalysis({ billId });
 
   // Transform hook data to match component expectations
   const analysis = hookAnalysis
@@ -98,23 +75,17 @@ export const PretextDetectionPanel = React.memo<PretextDetectionPanelProps>(({ b
             evidence: ['Connection mapping'],
           },
         },
-        rationale: hookAnalysis.rationale,
+        rationale: hookAnalysis.recommendations || [],
         sources: [],
         reviewStatus: 'pending' as const,
       }
     : null;
 
   // Transform civic actions to match expected interface
-  const civicActions: CivicAction[] = hookCivicActions.map(action => ({
-    ...action,
-    type: action.type as 'foi' | 'petition' | 'complaint' | 'public_participation',
-  }));
+  const civicActions: CivicAction[] = [];
 
   // Transform rights cards to match expected interface
-  const rightsCards: RightsCard[] = hookRightsCards.map(card => ({
-    ...card,
-    language: (card.language || 'en') as 'en' | 'sw' | 'other',
-  }));
+  const rightsCards: RightsCard[] = [];
 
   const [showDetails, setShowDetails] = useState(false);
 
@@ -175,7 +146,7 @@ export const PretextDetectionPanel = React.memo<PretextDetectionPanelProps>(({ b
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Analysis failed: {error || 'An unexpected error occurred'}
+              Analysis failed: {error?.message || 'An unexpected error occurred'}
             </AlertDescription>
           </Alert>
           <Button onClick={handleAnalyze} className="mt-4">

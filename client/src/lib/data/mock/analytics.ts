@@ -213,7 +213,7 @@ export const generateExpertVerificationMetrics = (): ExpertVerificationMetrics =
 export const generateEngagementStatistics = (): EngagementStatistics => {
   const leaderboard = faker.helpers.arrayElements(mockUsers, 10).map((user, index) => ({
     userId: user.id,
-    username: user.username,
+    username: user.username || user.name,
     score: faker.number.int({ min: 1000, max: 10000 }) - index * 200,
     rank: index + 1,
     badge: faker.helpers.arrayElement([
@@ -289,7 +289,7 @@ export const generateEngagementStatistics = (): EngagementStatistics => {
 export const generateTemporalAnalyticsData = (): TemporalAnalyticsData => {
   return {
     hourly: generateHourlyData(24).map(({ hour, value }) => ({
-      hour,
+      hour: String(hour),
       engagement: value,
       participants: Math.floor(value * 0.3),
       sentiment: faker.number.float({ min: -1, max: 1, fractionDigits: 2 }),

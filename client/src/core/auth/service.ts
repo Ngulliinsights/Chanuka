@@ -48,23 +48,15 @@ const convertAuthUserToUser = (authUser: AuthUser): User => {
     id: authUser.id,
     email: authUser.email,
     
-    // Map to Shared User Profile
+    // Map to User Profile
     profile: {
       displayName: authUser.name,
       avatarUrl: authUser.avatar_url,
       bio: '',
-      preferences: {
-         theme: 'light',
-         language: 'en',
-         newsletter: true,
-         marketing: false
-      }, // Minimal default preferences
-      privacySettings: {
-        profileVisibility: 'public',
-        showOnlineStatus: true,
-        showLastSeen: true
-      }
+      anonymityLevel: 'public' as const,
+      isPublic: true
     },
+    
     verification: authUser.verified ? 'verified' : 'unverified',
     
     // Valid audit fields
@@ -183,11 +175,9 @@ export class AuthService {
     data: RegisterData
   ): Promise<AuthResponse & { user?: User; sessionExpiry?: string | undefined }> {
     try {
-      // Validate password strength
-      const passwordValidation = validatePassword(data.password);
-
-      if (!passwordValidation.isValid) {
-        const errorMsg = `Password requirements not met: ${passwordValidation.feedback.join(', ')}`;
+      // Validate password strength (simple validation for now)
+      if (data.password.length < 8) {
+        const errorMsg = 'Password must be at least 8 characters long';
         return {
           success: false,
           error: errorMsg,

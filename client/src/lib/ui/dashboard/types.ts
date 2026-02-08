@@ -233,6 +233,7 @@ export interface DashboardConfig {
   maxTrackedTopics?: number;
   enableAutoRefresh?: boolean;
   showCompletedActions?: boolean;
+  defaultView?: DashboardSection;
   // Navigation configuration
   navigation?: {
     breadcrumbs?: {
@@ -247,6 +248,16 @@ export interface DashboardConfig {
   theme?: {
     colorScheme: 'light' | 'dark' | 'auto';
   };
+}
+
+// Simplified config for app-level dashboard usage
+export interface DashboardAppConfig {
+  refreshInterval: number;
+  maxActionItems: number;
+  maxTrackedTopics: number;
+  enableAutoRefresh: boolean;
+  showCompletedActions: boolean;
+  defaultView: DashboardSection;
 }
 
 export interface PermissionConfig {

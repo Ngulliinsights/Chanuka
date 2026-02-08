@@ -251,13 +251,11 @@ export default function ExpertVerification() {
                 expert={{
                   id: expert.id.toString(),
                   name: expert.name,
-                  title: expert.title,
-                  institution: expert.institution,
                   credentials: [
                     {
                       id: '1',
                       type: 'degree',
-                      title: 'PhD in Constitutional Law',
+                      title: expert.title, // Use title in credential instead
                       institution: expert.institution,
                       year: 2010,
                       verified: true,
@@ -276,18 +274,15 @@ export default function ExpertVerification() {
                   specializations: expert.specializations,
                   verificationType: expert.verificationType,
                   credibilityScore: expert.credibilityScore,
-                  contributions: [],
                   bio: `Experienced ${expert.title.toLowerCase()} with extensive background in ${expert.specializations.join(' and ')}.`,
                   contactInfo: {
                     email: `${expert.name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
                     website: `https://example.com/experts/${expert.id}`,
                   },
                   verificationDate: new Date().toISOString(),
-                  lastActive: new Date().toISOString(),
                 }}
                 showFullProfile={false}
                 onViewProfile={() => window.open(`/experts/${expert.id}`, '_blank')}
-                onViewContributions={() => window.open(`/experts/${expert.id}/analyses`, '_blank')}
               />
             ))}
           </div>
@@ -308,20 +303,17 @@ export default function ExpertVerification() {
                   billId: 'bill-456',
                   topic: 'Constitutional Compliance of Healthcare Bill 2024',
                   totalExperts: 12,
-                  participatingExperts: 9,
                   agreementLevel: 78,
                   positions: [
                     {
                       stance: 'support',
                       count: 7,
                       percentage: 78,
-                      reasoning: 'Aligns with constitutional healthcare provisions',
                     },
                     {
                       stance: 'oppose',
                       count: 2,
                       percentage: 22,
-                      reasoning: 'Potential conflicts with existing legislation',
                     },
                   ],
                   keyPoints: [
@@ -332,7 +324,6 @@ export default function ExpertVerification() {
                   lastUpdated: new Date().toISOString(),
                 }}
                 showDetails={true}
-                onViewDetails={() => console.log('View consensus details')}
               />
             </CardContent>
           </Card>
@@ -351,6 +342,9 @@ export default function ExpertVerification() {
                   contributionId: 'contribution-123',
                   expertId: 'expert-123',
                   status: 'pending',
+                  submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                  currentStep: 2,
+                  totalSteps: 4,
                   communityFeedback: [
                     {
                       userId: 'user-123',

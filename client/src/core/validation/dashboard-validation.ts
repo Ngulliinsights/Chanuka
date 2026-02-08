@@ -134,9 +134,9 @@ export function validateDashboardConfig(config: DashboardAppConfig): void {
   }
 }
 
-export function safeValidateDashboardConfig(config: DashboardConfig): {
+export function safeValidateDashboardConfig(config: DashboardAppConfig): {
   success: boolean;
-  data: DashboardConfig;
+  data: DashboardAppConfig;
   error?: string;
 } {
   try {

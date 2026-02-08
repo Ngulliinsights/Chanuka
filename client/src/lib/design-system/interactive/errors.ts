@@ -35,7 +35,7 @@ export class UIComponentError extends DashboardError {
         ...options?.context,
       },
     });
-    this.name = 'UIComponentError';
+    Object.defineProperty(this, 'name', { value: 'UIComponentError', writable: true });
     this.componentName = componentName;
     this.operation = operation;
     this.timestamp = new Date();
@@ -70,7 +70,7 @@ export class UIDateError extends UIComponentError {
     }
   ) {
     super(componentName, 'date', message, options);
-    this.name = 'UIDateError';
+    Object.defineProperty(this, 'name', { value: 'UIDateError', writable: true });
     this.date = date;
   }
 }
@@ -90,7 +90,7 @@ export class UIDialogError extends UIComponentError {
     }
   ) {
     super(componentName, operation, message, options);
-    this.name = 'UIDialogError';
+    Object.defineProperty(this, 'name', { value: 'UIDialogError', writable: true });
   }
 }
 

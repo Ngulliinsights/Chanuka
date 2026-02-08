@@ -11,7 +11,6 @@ import { UnifiedWebSocketManager } from '../manager';
 import {
   CommentUpdate,
   TypingIndicator,
-  CommentUpdate,
   VoteUpdate,
   WebSocketMessage,
 } from '../types';
@@ -328,17 +327,25 @@ export class CommunityService {
   private handleDiscussionMessage(discussionId: string, message: WebSocketMessage): void {
     try {
       // Process discussion-specific messages
+      const data = message as any;
       const update: CommentUpdate = {
-        type: message.type || 'update',
-        discussionId,
-        data: (message as any).data || message,
-        timestamp: (message as any).timestamp || new Date().toISOString(),
+        id: data.comment_id || data.commentId || `comment_${Date.now()}`,
+        billId: data.bill_id || data.billId,
+        parentId: data.parent_id || data.parentId,
+        userId: data.user_id || data.userId || 'unknown',
+        content: data.content || '',
+        timestamp: new Date(data.timestamp || Date.now()),
+        action: data.action || 'created',
       };
+
+      // Keep only recent comments (last 100)
+      this.recentComments = [update, ...this.recentComments].slice(0, 100);
 
       logger.debug('Received discussion update', {
         component: 'CommunityService',
         discussionId,
-        updateType: update.type,
+        updateType: update.action,
+        commentId: update.id,
       });
     } catch (error) {
       logger.error(
@@ -353,32 +360,6 @@ export class CommunityService {
     }
   }
 
-  private handleCommentUpdateMessage(message: WebSocketMessage): void {
-    try {
-      const data = message as any;
-      const update: CommentUpdate = {
-        type: data.type || 'update',
-        discussionId: data.discussion_id || data.discussionId || 'general',
-        data: data.data || data,
-        timestamp: data.timestamp || new Date().toISOString(),
-      };
-
-      logger.debug('Processed community update', {
-        component: 'CommunityService',
-        updateType: update.type,
-        discussionId: update.discussionId,
-      });
-    } catch (error) {
-      logger.error(
-        'Error handling community update message',
-        {
-          component: 'CommunityService',
-        },
-        error
-      );
-    }
-  }
-
   private handleTypingIndicatorMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
@@ -387,7 +368,7 @@ export class CommunityService {
         billId: data.bill_id || data.billId,
         parentId: data.parent_id || data.parentId,
         isTyping: data.is_typing !== false, // Default to true
-        timestamp: data.timestamp || new Date().toISOString(),
+        timestamp: new Date(data.timestamp || Date.now()),
       };
 
       const key = `${indicator.billId}_${indicator.parentId || 'root'}`;
@@ -424,12 +405,13 @@ export class CommunityService {
     try {
       const data = message as any;
       const update: CommentUpdate = {
-        commentId: data.comment_id || data.commentId || `comment_${Date.now()}`,
+        id: data.comment_id || data.commentId || `comment_${Date.now()}`,
         billId: data.bill_id || data.billId,
         parentId: data.parent_id || data.parentId,
+        userId: data.user_id || data.userId || 'unknown',
+        content: data.content || '',
+        timestamp: new Date(data.timestamp || Date.now()),
         action: data.action || 'created',
-        data: data.data || data,
-        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       // Keep only recent comments (last 100)
@@ -437,7 +419,7 @@ export class CommunityService {
 
       logger.debug('Processed comment update', {
         component: 'CommunityService',
-        commentId: update.commentId,
+        commentId: update.id,
         billId: update.billId,
         action: update.action,
       });
@@ -455,11 +437,14 @@ export class CommunityService {
   private handleVoteUpdateMessage(message: WebSocketMessage): void {
     try {
       const data = message as any;
+      const voteType = data.vote_type || data.voteType || data.vote || 'abstain';
       const update: VoteUpdate = {
+        id: data.id || `vote_${Date.now()}`,
         billId: data.bill_id || data.billId,
         userId: data.user_id || data.userId || 'unknown',
-        voteType: data.vote_type || data.voteType || 'neutral',
-        timestamp: data.timestamp || new Date().toISOString(),
+        vote: voteType === 'neutral' ? 'abstain' : voteType,
+        voteType: voteType,
+        timestamp: new Date(data.timestamp || Date.now()),
       };
 
       // Keep only recent votes (last 100)

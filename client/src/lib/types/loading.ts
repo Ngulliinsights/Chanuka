@@ -713,6 +713,16 @@ export interface TimeoutAwareLoaderProps {
   onWarning?: () => void;
   message?: string;
   showElapsedTime?: boolean;
+  
+  // Additional properties for enhanced loader functionality
+  /** Size of the loader */
+  size?: LoadingSize;
+  /** Whether to show loading message */
+  showMessage?: boolean;
+  /** Whether to show timeout warning */
+  showTimeoutWarning?: boolean;
+  /** Custom timeout message */
+  timeoutMessage?: string;
 }
 
 

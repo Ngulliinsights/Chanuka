@@ -147,7 +147,7 @@ class MonitoringIntegrationService {
    * Report an error to all relevant monitoring systems
    */
   async reportError(error: any, context: ErrorContext): Promise<void> {
-    const system = context.system;
+    const system = (context.system as ClientSystem) || 'web';
 
     // Update system activity
     const status = this.systemStatus.get(system);
@@ -172,7 +172,7 @@ class MonitoringIntegrationService {
    * Track performance metrics across systems
    */
   async trackPerformance(metrics: PerformanceMetrics): Promise<void> {
-    const system = metrics.context?.system || ClientSystem.SERVICE_ARCHITECTURE;
+    const system = (metrics.context?.system as ClientSystem) || 'service_architecture';
 
     // Update system activity
     const status = this.systemStatus.get(system);
@@ -228,16 +228,23 @@ class MonitoringIntegrationService {
     trends: any[];
     predictions: any[];
   }> {
-    const aggregation = await this.aggregationService.aggregateErrors();
+    const errors = await this.aggregationService.getAggregatedErrors();
     const trends = await this.trendService.analyzeTrends(timeRange || {
       start: Date.now() - 24 * 60 * 60 * 1000,
       end: Date.now()
     });
     const predictions = await this.trendService.predictIssues(7 * 24 * 60 * 60 * 1000); // 7 days
 
+    // Calculate aggregation from errors
+    const bySystem: Record<string, number> = {};
+    errors.forEach((error: any) => {
+      const system = error.system || 'unknown';
+      bySystem[system] = (bySystem[system] || 0) + 1;
+    });
+
     return {
-      totalErrors: aggregation.totalErrors,
-      bySystem: aggregation.bySystem as Record<ClientSystem, number>,
+      totalErrors: errors.length,
+      bySystem: bySystem as Record<ClientSystem, number>,
       trends: trends.trends,
       predictions
     };

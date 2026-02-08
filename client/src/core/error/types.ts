@@ -157,6 +157,7 @@ export interface ErrorMetadata {
 export class AppError extends Error {
   public readonly id: string;
   public readonly type: ErrorDomain;
+  public readonly domain: ErrorDomain; // Alias for type for compatibility
   public readonly severity: ErrorSeverity;
   public readonly code: string;
   public readonly statusCode?: number;
@@ -188,6 +189,7 @@ export class AppError extends Error {
     this.id = options.correlationId || crypto.randomUUID?.() || Math.random().toString(36);
     this.code = code;
     this.type = domain;
+    this.domain = domain; // Set both type and domain for compatibility
     this.severity = severity;
     this.timestamp = Date.now();
     this.statusCode = options.statusCode;

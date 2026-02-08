@@ -2,13 +2,8 @@
  * API-related utility types
  */
 
-// Standard API response wrapper
-export type ApiResponse<T> = {
-  data: T;
-  success: boolean;
-  message?: string;
-  timestamp?: number;
-};
+// API response types - re-exported from common.ts to avoid duplication
+export type { ApiResponse } from './common';
 
 // API error structure
 export type ApiError = {

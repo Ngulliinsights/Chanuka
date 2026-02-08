@@ -126,6 +126,7 @@ export interface SavedSearch {
   createdAt: string; // Maintain both for compat or standardize on one (using camelCase preferred)
   updatedAt: string;
   useCount: number;
+  lastUsed?: string; // Added for UI display
   lastExecuted?: string;
   emailAlerts?: {
     enabled: boolean;
@@ -144,6 +145,7 @@ export interface SearchHistory {
 
 export interface SearchSuggestion {
   text: string;
+  term?: string; // Alias for text for backward compatibility
   type: 'query' | 'filter' | 'entity' | 'completion' | 'correction' | 'related' | 'recent' | 'popular' | 'bill_title';
   category?: string;
   count?: number;

@@ -346,14 +346,15 @@ export class BillTrackingService {
    */
   private handleBillMessage(billId: number, message: WebSocketMessage): void {
     try {
-      if (message.type === 'bill_update' && isBillUpdateMessage(message)) {
+      if (message.type === 'bill_update' && isBillUpdateMessage(message.data)) {
         const update: BillUpdate = {
-          type: message.update?.type || 'update',
+          billId,
+          type: (message.data.update?.type || 'update') as 'status' | 'content' | 'vote' | 'engagement',
           data: {
             billId,
-            ...message.update?.data,
+            ...message.data.update?.data,
           },
-          timestamp: message.timestamp || new Date().toISOString(),
+          timestamp: message.data.timestamp || new Date().toISOString(),
         };
 
         this.addBillUpdate(billId, update);
@@ -392,8 +393,15 @@ export class BillTrackingService {
         return;
       }
 
+      const updateType = message.update?.type || message.type || 'engagement';
+      const validType: 'status' | 'content' | 'vote' | 'engagement' = 
+        ['status', 'content', 'vote', 'engagement'].includes(updateType) 
+          ? updateType as 'status' | 'content' | 'vote' | 'engagement'
+          : 'engagement';
+
       const update: BillUpdate = {
-        type: message.update?.type || message.type || 'update',
+        billId,
+        type: validType,
         data: {
           billId,
           ...(message.update?.data || message.data || {}),
@@ -418,14 +426,15 @@ export class BillTrackingService {
    */
   private handleEngagementMetricsMessage(message: WebSocketMessage): void {
     try {
-      if (!isEngagementMetricsMessage(message)) {
+      if (!message.data || !isEngagementMetricsMessage(message.data)) {
         logger.warn('Invalid engagement metrics message structure', {
           component: 'BillTrackingService',
         });
         return;
       }
 
-      const billId = message.bill_id || message.billId;
+      const data = message.data as EngagementMetricsMessageData;
+      const billId = data.bill_id || data.billId;
 
       if (!billId) {
         logger.warn('Engagement metrics message missing bill ID', {
@@ -435,12 +444,13 @@ export class BillTrackingService {
       }
 
       const metrics: BillEngagementUpdate = {
+        billId,
         bill_id: billId,
-        viewCount: message.metrics?.view_count || message.viewCount || 0,
-        saveCount: message.metrics?.save_count || message.saveCount || 0,
-        commentCount: message.metrics?.comment_count || message.commentCount || 0,
-        shareCount: message.metrics?.share_count || message.shareCount || 0,
-        timestamp: message.timestamp || new Date().toISOString(),
+        viewCount: data.metrics?.view_count || data.viewCount || 0,
+        saveCount: data.metrics?.save_count || data.saveCount || 0,
+        commentCount: data.metrics?.comment_count || data.commentCount || 0,
+        shareCount: data.metrics?.share_count || data.shareCount || 0,
+        timestamp: data.timestamp || new Date().toISOString(),
       };
 
       this.engagementMetrics.set(billId, metrics);
@@ -466,20 +476,22 @@ export class BillTrackingService {
    */
   private handleBatchedUpdatesMessage(message: WebSocketMessage): void {
     try {
-      if (!isBatchedUpdatesMessage(message)) {
+      if (!message.data || !isBatchedUpdatesMessage(message.data)) {
         logger.warn('Invalid batched updates message structure', {
           component: 'BillTrackingService',
         });
         return;
       }
 
-      const updates = message.updates || [];
+      const data = message.data as BatchedUpdatesMessageData;
+      const updates = data.updates || [];
 
       for (const update of updates) {
         const billId = update.bill_id || update.billId;
         if (billId) {
           const billUpdate: BillUpdate = {
-            type: update.type || 'update',
+            billId,
+            type: (update.type || 'update') as 'status' | 'content' | 'vote' | 'engagement',
             data: {
               billId,
               ...(update.data || {}),
@@ -581,7 +593,7 @@ export class BillTrackingService {
     const updatesByBill = new Map<number, BillRealTimeUpdate[]>();
 
     for (const update of updates) {
-      const billId = update.bill_id;
+      const billId = update.bill_id || update.billId;
       if (!updatesByBill.has(billId)) {
         updatesByBill.set(billId, []);
       }
@@ -592,9 +604,9 @@ export class BillTrackingService {
     for (const [billId, billUpdates] of updatesByBill) {
       for (const update of billUpdates) {
         const billUpdate: BillUpdate = {
+          billId: update.bill_id || update.billId,
           type: this.getBillUpdateType(update),
           data: {
-            billId: update.bill_id,
             ...update,
           },
           timestamp: update.timestamp || new Date().toISOString(),
@@ -615,20 +627,20 @@ export class BillTrackingService {
   /**
    * Determine the type of update based on its properties
    */
-  private getBillUpdateType(update: BillRealTimeUpdate): string {
+  private getBillUpdateType(update: BillRealTimeUpdate): 'status' | 'content' | 'vote' | 'engagement' {
     if ('oldStatus' in update && 'newStatus' in update) {
-      return 'status_change';
+      return 'status';
     }
     if ('viewCount' in update || 'commentCount' in update) {
       return 'engagement';
     }
     if ('amendment_id' in update) {
-      return 'amendment';
+      return 'content';
     }
     if ('voting_date' in update) {
-      return 'voting_scheduled';
+      return 'vote';
     }
-    return 'update';
+    return 'engagement';
   }
 
   // ============================================================================

@@ -159,10 +159,11 @@ export function useErrorRecovery(
     }
 
     const currentOperation = getOperation(operationId);
-    const error = currentOperation?.error || new Error('Unknown error');
+    const errorValue = currentOperation?.error;
+    const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
     const retryCount = currentOperation?.retryCount || 0;
     const timeElapsed = currentOperation ? Date.now() - currentOperation.startTime : 0;
-    const connectionType = state.connectionInfo?.connectionType || 'unknown';
+    const connectionType = state.connectionInfo?.type || 'unknown';
     const isOnline = state.isOnline;
 
     const strategies = getApplicableStrategies(
@@ -264,7 +265,7 @@ export function useErrorRecovery(
     getApplicableStrategies,
     retryOperation,
     getOperation,
-    state.connectionInfo?.connectionType,
+    state.connectionInfo?.type,
     state.isOnline,
   ]);
 
@@ -291,10 +292,11 @@ export function useErrorRecovery(
   // Update suggestions when error changes
   useEffect(() => {
     if (operation?.error && !recoveryState.isRecovering) {
-      const error = operation.error;
+      const errorValue = operation.error;
+      const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
       const retryCount = operation.retryCount || 0;
       const timeElapsed = Date.now() - operation.startTime;
-      const connectionType = state.connectionInfo?.connectionType || 'unknown';
+      const connectionType = state.connectionInfo?.type || 'unknown';
       const isOnline = state.isOnline;
 
       const strategies = getApplicableStrategies(
@@ -318,7 +320,7 @@ export function useErrorRecovery(
     operation?.startTime,
     recoveryState.isRecovering,
     getApplicableStrategies,
-    state.connectionInfo?.connectionType,
+    state.connectionInfo?.type,
     state.isOnline,
   ]);
 
@@ -360,8 +362,11 @@ export function useAutoRecovery(
   useEffect(() => {
     if (!options.autoRecover || !operation?.error || recoveryState.isRecovering) return;
 
+    const errorValue = operation.error;
+    const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue));
+
     const shouldAutoRecover = options.triggerConditions.some(condition =>
-      condition(operation.error!)
+      condition(error)
     );
 
     if (shouldAutoRecover && autoAttemptsRef.current < options.maxAutoAttempts) {
@@ -418,7 +423,7 @@ export function usePredictiveRecovery(operationId: string) {
         probability: 0.9,
         suggestedStrategy: 'cache-fallback',
       });
-    } else if (state.connectionInfo?.connectionType === 'slow') {
+    } else if (state.connectionInfo?.type === 'slow') {
       newPredictions.push({
         type: 'slow-connection',
         probability: 0.7,

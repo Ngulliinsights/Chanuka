@@ -34,10 +34,15 @@ export interface FinancialInterestDetail {
 export interface OrganizationalConnectionDetail {
   id: string;
   organizationName: string;
-  role: string;
+  organizationType?: string;
+  role?: string;
+  connectionType?: string;
   startDate: string;
   endDate?: string;
-  transparencyScore: number;
+  transparencyScore?: number;
+  strength?: number; // Connection strength (0-1)
+  description?: string;
+  verified?: boolean;
 }
 
 export interface VotingPatternDetail {
@@ -45,21 +50,23 @@ export interface VotingPatternDetail {
   billTitle: string;
   vote: 'yes' | 'no' | 'abstain';
   date: string;
-  alignment: number;
+  alignment?: number;
   financialCorrelation?: number;
+  relatedIndustries?: string[]; // Industries related to the vote
+  industries?: string[]; // Alternative property name for industries
 }
 
 export interface ConflictAnalysis {
-  conflicts: ConflictOfInterest[];
-  score: number;
+  conflicts?: ConflictOfInterest[];
+  score?: number;
   summary: string;
   // Extended properties for UI components
-  sponsorId?: string;
+  sponsorId?: string | number;
   sponsorName?: string;
   financialInterests?: FinancialInterestDetail[];
   organizationalConnections?: OrganizationalConnectionDetail[];
   votingPatterns?: VotingPatternDetail[];
-  transparencyScore?: number;
+  transparencyScore?: number | TransparencyScore;
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';
 }
 
@@ -82,9 +89,14 @@ export interface VotingPattern {
 
 export interface TransparencyScore {
   overall: number;
-  disclosure: number;
-  funding: number;
-  voting: number;
+  disclosure?: number;
+  funding?: number;
+  voting?: number;
+  financialDisclosure?: number;
+  votingHistory?: number;
+  industryConnections?: number;
+  methodology?: string;
+  lastUpdated?: string;
 }
 
 export interface NetworkNode {
@@ -179,13 +191,28 @@ export interface ConflictVisualizationProps {
 }
 
 export interface AccessibilityFallbackData {
-  summary: string;
-  details: string[];
-  recommendations: string[];
+  summary: string | {
+    totalConnections: number;
+    highRiskConnections: number;
+    averageTransparencyScore: number;
+    topIndustries: string[];
+  };
+  details?: string[];
+  recommendations?: string[];
+  sponsors?: Array<{
+    name?: string;
+    riskLevel?: string;
+    financialInterests?: number;
+    organizationalConnections?: number;
+    transparencyScore?: number;
+  }>;
   // Extended for network visualization
   connections?: Array<{
     from: string;
     to: string;
-    relationship: string;
+    relationship?: string;
+    type?: string;
+    strength?: number;
+    description?: string;
   }>;
 }

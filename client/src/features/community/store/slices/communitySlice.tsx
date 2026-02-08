@@ -118,19 +118,20 @@ interface ExtendedExpertInsight extends Omit<ExpertInsight, 'communityValidation
 /**
  * Extended Campaign type with status tracking.
  * The status property enables filtering for active versus completed campaigns.
+ * Note: Campaign already has status, so we just ensure id is present
  */
-interface ExtendedCampaign extends Campaign {
+interface ExtendedCampaign extends Omit<Campaign, 'status'> {
   id: string;
-  status: 'active' | 'completed' | 'pending';
+  status: 'active' | 'completed' | 'pending' | 'cancelled';
 }
 
 /**
  * Extended Petition type with status and signature tracking.
  * These properties enable real-time signature count updates and status filtering.
  */
-interface ExtendedPetition extends Petition {
+interface ExtendedPetition extends Omit<Petition, 'status'> {
   id: string;
-  status: 'active' | 'closed' | 'successful';
+  status: 'active' | 'closed' | 'successful' | 'open' | 'submitted';
   currentSignatures: number;
 }
 
@@ -677,7 +678,15 @@ export function useCommunityStats(): UseQueryResult<CommunityStats, ApiError> {
   return useQuery({
     queryKey: communityKeys.stats(),
     queryFn: () =>
-      Promise.resolve({ members: 0, activeThreads: 0, postsToday: 0 }) as Promise<CommunityStats>, // Method not implemented yet
+      Promise.resolve({ 
+        totalUsers: 0, 
+        activeUsers: 0, 
+        totalComments: 0, 
+        totalThreads: 0,
+        totalExperts: 0,
+        averageCommentLength: 0,
+        engagementRate: 0
+      }) as Promise<CommunityStats>, // Method not implemented yet
 
     refetchInterval: query =>
       isRealTimeEnabled && !query.state.error ? REFETCH_INTERVALS.STATS : false,

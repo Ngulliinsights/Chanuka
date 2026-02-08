@@ -20,7 +20,7 @@ const STORAGE_KEYS = {
 interface PersistedNavigationState {
   preferences: NavigationState['preferences'];
   sidebarOpen: boolean;
-  user_role: NavigationState['user_role'];
+  userRole: NavigationState['userRole'];
   lastSavedAt: string;
   version: string;
 }
@@ -55,6 +55,7 @@ function sanitizePreferences(preferences: unknown): NavigationState['preferences
     compactMode: false,
     showBreadcrumbs: true,
     autoExpand: false,
+    sidebarCollapsed: false,
   };
 
   // Early return if preferences is not a valid object
@@ -97,6 +98,11 @@ function sanitizePreferences(preferences: unknown): NavigationState['preferences
       typeof preferences.autoExpand === 'boolean'
         ? preferences.autoExpand
         : defaultPreferences.autoExpand,
+
+    sidebarCollapsed:
+      typeof preferences.sidebarCollapsed === 'boolean'
+        ? preferences.sidebarCollapsed
+        : defaultPreferences.sidebarCollapsed,
   };
 }
 
@@ -143,7 +149,7 @@ function saveNavigationState(state: NavigationState): void {
       const stateToSave: PersistedNavigationState = {
         preferences: sanitizePreferences(state.preferences),
         sidebarOpen: state.sidebarOpen,
-        user_role: state.user_role,
+        userRole: state.userRole,
         lastSavedAt: new Date().toISOString(),
         version: CONFIG.VERSION,
       };
@@ -208,7 +214,7 @@ function loadNavigationState(): Partial<NavigationState> | null {
     }
 
     // Validate and assign user role
-    if (typeof parsed.user_role === 'string') {
+    if (typeof parsed.userRole === 'string') {
       const validRoles: UserRole[] = [
         'public',
         'citizen',
@@ -218,8 +224,8 @@ function loadNavigationState(): Partial<NavigationState> | null {
         'journalist',
         'advocate',
       ];
-      if (validRoles.includes(parsed.user_role as UserRole)) {
-        safeState.user_role = parsed.user_role as UserRole;
+      if (validRoles.includes(parsed.userRole as UserRole)) {
+        safeState.userRole = parsed.userRole as UserRole;
       }
     }
 

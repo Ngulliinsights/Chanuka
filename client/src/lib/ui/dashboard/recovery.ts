@@ -28,7 +28,10 @@ export interface RecoveryContext {
 export function getRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
   const { error } = context;
 
-  switch (error.type) {
+  // Check if it's a DashboardError with dashboardType property
+  const errorType = 'dashboardType' in error ? error.dashboardType : null;
+
+  switch (errorType) {
     case DashboardErrorType.DASHBOARD_DATA_FETCH_ERROR:
       return getDataFetchRecoveryStrategy(context);
 

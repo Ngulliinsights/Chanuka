@@ -41,6 +41,9 @@ export interface BaseErrorOptions {
   recoverable?: boolean;
   context?: ErrorContext;
   cause?: Error | unknown;
+  zodError?: unknown; // ZodError from zod validation
+  config?: unknown; // Configuration that caused the error
+  retryCount?: number; // Number of retry attempts
 }
 
 // ============================================================================

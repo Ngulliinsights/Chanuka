@@ -188,7 +188,7 @@ export function SavedSearches({ onExecuteSearch, className = '' }: SavedSearches
                       </p>
 
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                        <span>Created {format(new Date(search.created_at), 'MMM d, yyyy')}</span>
+                        <span>Created {format(new Date(search.created_at || search.createdAt), 'MMM d, yyyy')}</span>
                         <span>Used {search.useCount} times</span>
                         {search.lastUsed && (
                           <span>Last used {format(new Date(search.lastUsed), 'MMM d')}</span>

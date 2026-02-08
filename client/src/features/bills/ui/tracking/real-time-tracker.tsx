@@ -69,7 +69,9 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   // Effect to process recent activity into bill updates
   useEffect(() => {
-    const activity = getRecentActivity(20);
+    if (!getRecentActivity) return;
+    
+    const activity = getRecentActivity();
     const updates = activity
       .filter(a => a.type === 'bill_updated' && (!billId || a.bill_id === String(billId)))
       .map(a => ({
@@ -115,7 +117,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   // Connect to WebSocket when component mounts
   useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected && connect) {
       try {
         connect();
       } catch (error: any) {
@@ -131,7 +133,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
     }
 
     return () => {
-      if (isConnected) {
+      if (isConnected && disconnect) {
         disconnect();
       }
     };
@@ -220,7 +222,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
                 {billId ? `Tracking Bill #${billId}` : 'No specific bill selected'}
               </p>
               <p className="text-xs text-muted-foreground">
-                Updates: {updates.length} | Notifications: {notifications.length}
+                Updates: {updates.length} | Notifications: {notifications?.length ?? 0}
               </p>
             </div>
             <div className="flex gap-2">
@@ -404,7 +406,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
       )}
 
       {/* Recent Notifications */}
-      {notifications.length > 0 && (
+      {notifications && notifications.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle>Recent Notifications</CardTitle>
@@ -444,7 +446,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
                   connectionQuality,
                   error: error,
                   billUpdatesCount: billUpdates.length,
-                  notificationsCount: notifications.length,
+                  notificationsCount: notifications?.length ?? 0,
                   updatesCount: updates.length,
                 },
                 null,

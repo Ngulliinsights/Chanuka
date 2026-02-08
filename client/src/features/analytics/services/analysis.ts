@@ -94,17 +94,22 @@ class AnalysisService {
    * Validates that the analysis data has all required fields
    */
   private validateAnalysisData(data: unknown): BillAnalysis {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid analysis data from API: data must be an object');
+    }
+
+    const dataObj = data as Record<string, unknown>;
     const required = ['id', 'bill_id', 'conflictScore', 'transparencyRating'];
-    const missing = required.filter(field => !(field in data));
+    const missing = required.filter(field => !(field in dataObj));
 
     if (missing.length > 0) {
       throw new Error(`Invalid analysis data from API: missing fields ${missing.join(', ')}`);
     }
 
     return {
-      ...data,
-      timestamp: new Date(data.timestamp || Date.now()),
-    };
+      ...dataObj,
+      timestamp: new Date((dataObj.timestamp as string | number) || Date.now()),
+    } as BillAnalysis;
   }
 
   /**

@@ -16,19 +16,29 @@ import {
   ModuleRelocationMap,
   PathMigrationMap,
   FSDLocation,
-  FixPhase
+  FixPhase,
+  MigrationPattern
 } from '../types';
 import { RemediationConfig } from '../config';
 
 export class ErrorAnalyzer {
-  private project: Project;
+  private project: Project | null = null;
   private config: RemediationConfig;
 
   constructor(config: RemediationConfig) {
     this.config = config;
-    this.project = new Project({
-      tsConfigFilePath: config.tsconfigPath
-    });
+  }
+
+  /**
+   * Get or create the ts-morph Project
+   */
+  private getProject(): Project {
+    if (!this.project) {
+      this.project = new Project({
+        tsConfigFilePath: this.config.tsconfigPath
+      });
+    }
+    return this.project;
   }
 
   /**
@@ -36,7 +46,7 @@ export class ErrorAnalyzer {
    */
   async analyzeErrors(): Promise<ErrorReport> {
     // Get all source files from the project
-    const sourceFiles = this.project.getSourceFiles();
+    const sourceFiles = this.getProject().getSourceFiles();
     
     // Collect all diagnostics
     const allDiagnostics: any[] = [];
@@ -44,7 +54,7 @@ export class ErrorAnalyzer {
     // Get pre-emit diagnostics for each source file
     for (const sourceFile of sourceFiles) {
       const compilerNode = sourceFile.compilerNode;
-      const program = this.project.getProgram().compilerObject;
+      const program = this.getProject().getProgram().compilerObject;
       
       // Get semantic diagnostics
       const semanticDiagnostics = program.getSemanticDiagnostics(compilerNode);
@@ -56,7 +66,7 @@ export class ErrorAnalyzer {
     }
     
     // Also get global diagnostics
-    const program = this.project.getProgram().compilerObject;
+    const program = this.getProject().getProgram().compilerObject;
     const globalDiagnostics = program.getGlobalDiagnostics();
     allDiagnostics.push(...globalDiagnostics);
     
@@ -479,5 +489,673 @@ export class ErrorAnalyzer {
     }
     
     return bestMatch;
+  }
+
+  /**
+   * Analyze ID usage patterns across codebase
+   * Returns the canonical ID type based on 60%+ usage threshold
+   */
+  analyzeIdTypes(idUsages?: Array<{ file: string; idType: 'string' | 'number'; occurrences: number }>): {
+    canonicalType: 'string' | 'number' | null;
+    stringOccurrences: number;
+    numberOccurrences: number;
+    totalOccurrences: number;
+    stringFrequency: number;
+    numberFrequency: number;
+    usagesByFile: Map<string, { string: number; number: number }>;
+  } {
+    // If test data is provided, use it
+    if (idUsages) {
+      const totalOccurrences = idUsages.reduce((sum, u) => sum + u.occurrences, 0);
+      const stringOccurrences = idUsages
+        .filter(u => u.idType === 'string')
+        .reduce((sum, u) => sum + u.occurrences, 0);
+      const numberOccurrences = totalOccurrences - stringOccurrences;
+      
+      const stringFreq = totalOccurrences > 0 ? stringOccurrences / totalOccurrences : 0;
+      const numberFreq = totalOccurrences > 0 ? numberOccurrences / totalOccurrences : 0;
+      
+      let canonicalType: 'string' | 'number' | null = null;
+      if (stringFreq >= 0.6) {
+        canonicalType = 'string';
+      } else if (numberFreq >= 0.6) {
+        canonicalType = 'number';
+      }
+      
+      const usagesByFile = new Map<string, { string: number; number: number }>();
+      for (const usage of idUsages) {
+        if (!usagesByFile.has(usage.file)) {
+          usagesByFile.set(usage.file, { string: 0, number: 0 });
+        }
+        const fileUsage = usagesByFile.get(usage.file)!;
+        if (usage.idType === 'string') {
+          fileUsage.string += usage.occurrences;
+        } else {
+          fileUsage.number += usage.occurrences;
+        }
+      }
+      
+      return {
+        canonicalType,
+        stringOccurrences,
+        numberOccurrences,
+        totalOccurrences,
+        stringFrequency: stringFreq,
+        numberFrequency: numberFreq,
+        usagesByFile
+      };
+    }
+    
+    // Analyze actual codebase
+    let stringOccurrences = 0;
+    let numberOccurrences = 0;
+    const usagesByFile = new Map<string, { string: number; number: number }>();
+    
+    const sourceFiles = this.getProject().getSourceFiles();
+    
+    for (const sourceFile of sourceFiles) {
+      const filePath = sourceFile.getFilePath();
+      
+      // Skip test files and node_modules
+      if (filePath.includes('node_modules') || 
+          filePath.includes('.test.') || 
+          filePath.includes('.spec.')) {
+        continue;
+      }
+      
+      const fileUsage = { string: 0, number: 0 };
+      
+      // Find all interface and type declarations with 'id' properties
+      const interfaces = sourceFile.getInterfaces();
+      for (const iface of interfaces) {
+        const idProp = iface.getProperty('id');
+        if (idProp) {
+          const typeNode = idProp.getTypeNode();
+          if (typeNode) {
+            const typeText = typeNode.getText();
+            if (typeText === 'string' || typeText.includes('string')) {
+              fileUsage.string++;
+              stringOccurrences++;
+            } else if (typeText === 'number' || typeText.includes('number')) {
+              fileUsage.number++;
+              numberOccurrences++;
+            }
+          }
+        }
+      }
+      
+      // Find all type aliases with 'id' in the name
+      const typeAliases = sourceFile.getTypeAliases();
+      for (const typeAlias of typeAliases) {
+        const name = typeAlias.getName().toLowerCase();
+        if (name.includes('id')) {
+          const typeNode = typeAlias.getTypeNode();
+          if (typeNode) {
+            const typeText = typeNode.getText();
+            if (typeText === 'string' || typeText.includes('string')) {
+              fileUsage.string++;
+              stringOccurrences++;
+            } else if (typeText === 'number' || typeText.includes('number')) {
+              fileUsage.number++;
+              numberOccurrences++;
+            }
+          }
+        }
+      }
+      
+      if (fileUsage.string > 0 || fileUsage.number > 0) {
+        usagesByFile.set(filePath, fileUsage);
+      }
+    }
+    
+    const totalOccurrences = stringOccurrences + numberOccurrences;
+    const stringFreq = totalOccurrences > 0 ? stringOccurrences / totalOccurrences : 0;
+    const numberFreq = totalOccurrences > 0 ? numberOccurrences / totalOccurrences : 0;
+    
+    let canonicalType: 'string' | 'number' | null = null;
+    if (stringFreq >= 0.6) {
+      canonicalType = 'string';
+    } else if (numberFreq >= 0.6) {
+      canonicalType = 'number';
+    }
+    
+    return {
+      canonicalType,
+      stringOccurrences,
+      numberOccurrences,
+      totalOccurrences,
+      stringFrequency: stringFreq,
+      numberFrequency: numberFreq,
+      usagesByFile
+    };
+  }
+
+  /**
+   * Generate ID type standardization fixes
+   */
+  generateIdTypeStandardizationFixes(
+    canonicalType: 'string' | 'number',
+    usagesByFile: Map<string, { string: number; number: number }>
+  ): Array<{
+    file: string;
+    conversionsNeeded: number;
+    fromType: 'string' | 'number';
+    toType: 'string' | 'number';
+  }> {
+    const fixes: Array<{
+      file: string;
+      conversionsNeeded: number;
+      fromType: 'string' | 'number';
+      toType: 'string' | 'number';
+    }> = [];
+    
+    for (const [file, usage] of usagesByFile.entries()) {
+      if (canonicalType === 'string' && usage.number > 0) {
+        fixes.push({
+          file,
+          conversionsNeeded: usage.number,
+          fromType: 'number',
+          toType: 'string'
+        });
+      } else if (canonicalType === 'number' && usage.string > 0) {
+        fixes.push({
+          file,
+          conversionsNeeded: usage.string,
+          fromType: 'string',
+          toType: 'number'
+        });
+      }
+    }
+    
+    return fixes;
+  }
+
+  /**
+   * Create migration pattern for ID type standardization
+   */
+  createIdTypeMigrationPattern(
+    fromType: 'string' | 'number',
+    toType: 'string' | 'number'
+  ): MigrationPattern {
+    if (fromType === 'number' && toType === 'string') {
+      return {
+        name: 'ID Type Standardization: Number to String',
+        description: 'Convert number IDs to string IDs for consistency',
+        before: `interface Bill {
+  id: number;
+}
+const billId: number = 123;
+const bill = bills.find(b => b.id === billId);`,
+        after: `interface Bill {
+  id: string;
+}
+const billId: string = "123";
+const bill = bills.find(b => b.id === billId);`,
+        automated: true
+      };
+    } else {
+      return {
+        name: 'ID Type Standardization: String to Number',
+        description: 'Convert string IDs to number IDs for consistency',
+        before: `interface Bill {
+  id: string;
+}
+const billId: string = "123";
+const bill = bills.find(b => b.id === billId);`,
+        after: `interface Bill {
+  id: number;
+}
+const billId: number = 123;
+const bill = bills.find(b => b.id === Number(billId));`,
+        automated: true
+      };
+    }
+  }
+
+  /**
+   * Identify duplicate type definitions across the codebase
+   * Returns a map of type name to array of file paths where it's defined
+   */
+  identifyDuplicateTypes(typeNames?: string[]): Map<string, string[]> {
+    const duplicates = new Map<string, string[]>();
+    
+    // If specific type names are provided, search for those
+    const targetTypes = typeNames || [
+      'DashboardPreferences',
+      'UserDashboardPreferences',
+      'BillAnalytics',
+      'DashboardData',
+      'PerformanceMetrics',
+      'ApiResponse',
+      'ValidationResult',
+      'QueryParams'
+    ];
+    
+    const sourceFiles = this.getProject().getSourceFiles();
+    
+    for (const typeName of targetTypes) {
+      const locations: string[] = [];
+      
+      for (const sourceFile of sourceFiles) {
+        const filePath = sourceFile.getFilePath();
+        
+        // Skip test files and node_modules
+        if (filePath.includes('node_modules') || 
+            filePath.includes('.test.') || 
+            filePath.includes('.spec.')) {
+          continue;
+        }
+        
+        // Check for interface declarations
+        const interfaces = sourceFile.getInterfaces();
+        for (const iface of interfaces) {
+          if (iface.getName() === typeName) {
+            locations.push(filePath);
+            break;
+          }
+        }
+        
+        // Check for type alias declarations
+        const typeAliases = sourceFile.getTypeAliases();
+        for (const typeAlias of typeAliases) {
+          if (typeAlias.getName() === typeName) {
+            locations.push(filePath);
+            break;
+          }
+        }
+      }
+      
+      // Only add to duplicates if found in multiple locations
+      if (locations.length > 1) {
+        duplicates.set(typeName, locations);
+      }
+    }
+    
+    return duplicates;
+  }
+
+  /**
+   * Determine canonical location for a type based on FSD preferences
+   * Preference order: shared/types > client/src/lib/types > client/src/core
+   */
+  determineCanonicalLocation(
+    typeName: string,
+    locations: string[]
+  ): string {
+    const preference = this.config.typeStandardization.typeConsolidationPreference;
+    
+    // Check each preference level
+    for (const preferredLayer of preference) {
+      for (const location of locations) {
+        if (location.includes(`${preferredLayer}/types`) || 
+            location.includes(`${preferredLayer}\\types`)) {
+          return location;
+        }
+      }
+    }
+    
+    // If no preference match, return the first location in shared
+    for (const location of locations) {
+      if (location.includes('shared/') || location.includes('shared\\')) {
+        return location;
+      }
+    }
+    
+    // If no shared location, return first location in lib
+    for (const location of locations) {
+      if (location.includes('/lib/') || location.includes('\\lib\\')) {
+        return location;
+      }
+    }
+    
+    // If no lib location, return first location in core
+    for (const location of locations) {
+      if (location.includes('/core/') || location.includes('\\core\\')) {
+        return location;
+      }
+    }
+    
+    // Fallback to first location
+    return locations[0];
+  }
+
+  /**
+   * Generate type consolidation fixes
+   * Returns information about which types to consolidate and where
+   */
+  generateTypeConsolidationPlan(): Array<{
+    typeName: string;
+    canonicalLocation: string;
+    duplicateLocations: string[];
+    affectedImports: Array<{
+      file: string;
+      currentImportPath: string;
+      newImportPath: string;
+    }>;
+  }> {
+    const plan: Array<{
+      typeName: string;
+      canonicalLocation: string;
+      duplicateLocations: string[];
+      affectedImports: Array<{
+        file: string;
+        currentImportPath: string;
+        newImportPath: string;
+      }>;
+    }> = [];
+    
+    // Identify duplicate types
+    const duplicates = this.identifyDuplicateTypes();
+    
+    // For each duplicate type, create a consolidation plan
+    for (const [typeName, locations] of duplicates.entries()) {
+      const canonicalLocation = this.determineCanonicalLocation(typeName, locations);
+      const duplicateLocations = locations.filter(loc => loc !== canonicalLocation);
+      
+      // Find all files that import this type from duplicate locations
+      const affectedImports = this.findAffectedImports(typeName, duplicateLocations);
+      
+      plan.push({
+        typeName,
+        canonicalLocation,
+        duplicateLocations,
+        affectedImports
+      });
+    }
+    
+    return plan;
+  }
+
+  /**
+   * Find all files that import a type from specific locations
+   */
+  private findAffectedImports(
+    typeName: string,
+    sourceLocations: string[]
+  ): Array<{
+    file: string;
+    currentImportPath: string;
+    newImportPath: string;
+  }> {
+    const affectedImports: Array<{
+      file: string;
+      currentImportPath: string;
+      newImportPath: string;
+    }> = [];
+    
+    const sourceFiles = this.getProject().getSourceFiles();
+    
+    for (const sourceFile of sourceFiles) {
+      const filePath = sourceFile.getFilePath();
+      
+      // Skip test files and node_modules
+      if (filePath.includes('node_modules') || 
+          filePath.includes('.test.') || 
+          filePath.includes('.spec.')) {
+        continue;
+      }
+      
+      // Check all import declarations
+      const importDeclarations = sourceFile.getImportDeclarations();
+      
+      for (const importDecl of importDeclarations) {
+        const moduleSpecifier = importDecl.getModuleSpecifierValue();
+        
+        // Check if this import is from one of the duplicate locations
+        for (const sourceLocation of sourceLocations) {
+          // Convert file path to import path
+          const importPath = this.filePathToImportPath(sourceLocation);
+          
+          if (moduleSpecifier.includes(importPath) || 
+              this.resolveImportPath(filePath, moduleSpecifier) === sourceLocation) {
+            
+            // Check if this import includes the type we're looking for
+            const namedImports = importDecl.getNamedImports();
+            const hasType = namedImports.some(ni => ni.getName() === typeName);
+            
+            if (hasType) {
+              affectedImports.push({
+                file: filePath,
+                currentImportPath: moduleSpecifier,
+                newImportPath: '' // Will be filled in during consolidation
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    return affectedImports;
+  }
+
+  /**
+   * Convert file path to import path
+   */
+  private filePathToImportPath(filePath: string): string {
+    // Remove file extension
+    let importPath = filePath.replace(/\.(ts|tsx|js|jsx)$/, '');
+    
+    // Convert to relative path from client root
+    if (importPath.includes('client/src/')) {
+      importPath = importPath.substring(importPath.indexOf('client/src/') + 'client/src/'.length);
+      importPath = '@client/' + importPath;
+    } else if (importPath.includes('shared/')) {
+      importPath = importPath.substring(importPath.indexOf('shared/'));
+      importPath = '@/' + importPath;
+    }
+    
+    // Normalize path separators
+    importPath = importPath.replace(/\\/g, '/');
+    
+    return importPath;
+  }
+
+  /**
+   * Resolve import path to absolute file path
+   */
+  private resolveImportPath(fromFile: string, importPath: string): string {
+    // This is a simplified implementation
+    // In a real implementation, this would use TypeScript's module resolution
+    
+    if (importPath.startsWith('@client/')) {
+      const relativePath = importPath.replace('@client/', '');
+      return path.join(this.config.clientRoot, 'src', relativePath);
+    } else if (importPath.startsWith('@/')) {
+      const relativePath = importPath.replace('@/', '');
+      return path.join(this.config.clientRoot, '..', relativePath);
+    } else if (importPath.startsWith('.')) {
+      return path.resolve(path.dirname(fromFile), importPath);
+    }
+    
+    return importPath;
+  }
+
+  /**
+   * Identify pagination interface inconsistencies
+   * Returns files that use non-standard pagination interfaces
+   */
+  identifyPaginationInconsistencies(): Array<{
+    file: string;
+    interfaceName: string;
+    properties: string[];
+    isStandard: boolean;
+  }> {
+    const inconsistencies: Array<{
+      file: string;
+      interfaceName: string;
+      properties: string[];
+      isStandard: boolean;
+    }> = [];
+    
+    const sourceFiles = this.getProject().getSourceFiles();
+    
+    // Standard pagination property names
+    const standardParamProps = ['page', 'pageSize', 'total'];
+    const standardResponseProps = ['data', 'pagination'];
+    
+    for (const sourceFile of sourceFiles) {
+      const filePath = sourceFile.getFilePath();
+      
+      // Skip test files and node_modules
+      if (filePath.includes('node_modules') || 
+          filePath.includes('.test.') || 
+          filePath.includes('.spec.')) {
+        continue;
+      }
+      
+      // Check all interfaces
+      const interfaces = sourceFile.getInterfaces();
+      
+      for (const iface of interfaces) {
+        const name = iface.getName();
+        
+        // Check if this looks like a pagination interface
+        if (name.toLowerCase().includes('paginat') || 
+            name.toLowerCase().includes('page')) {
+          
+          const properties = iface.getProperties().map(p => p.getName());
+          
+          // Check if it matches standard pagination params
+          const hasStandardParams = standardParamProps.every(prop => 
+            properties.includes(prop)
+          );
+          
+          // Check if it matches standard pagination response
+          const hasStandardResponse = standardResponseProps.every(prop => 
+            properties.includes(prop)
+          );
+          
+          const isStandard = hasStandardParams || hasStandardResponse;
+          
+          if (!isStandard) {
+            inconsistencies.push({
+              file: filePath,
+              interfaceName: name,
+              properties,
+              isStandard: false
+            });
+          }
+        }
+      }
+    }
+    
+    return inconsistencies;
+  }
+
+  /**
+   * Generate canonical pagination interfaces
+   */
+  generateCanonicalPaginationInterfaces(): {
+    PaginationParams: string;
+    PaginatedResponse: string;
+  } {
+    return {
+      PaginationParams: `export interface PaginationParams {
+  page: number;
+  pageSize: number;
+  total?: number;
+}`,
+      PaginatedResponse: `export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}`
+    };
+  }
+
+  /**
+   * Identify HTTP status code type inconsistencies
+   * Returns files that use non-standard HttpStatusCode types
+   */
+  identifyHttpStatusCodeInconsistencies(): Array<{
+    file: string;
+    typeName: string;
+    currentType: string;
+    shouldBeType: string;
+  }> {
+    const inconsistencies: Array<{
+      file: string;
+      typeName: string;
+      currentType: string;
+      shouldBeType: string;
+    }> = [];
+    
+    const sourceFiles = this.getProject().getSourceFiles();
+    
+    for (const sourceFile of sourceFiles) {
+      const filePath = sourceFile.getFilePath();
+      
+      // Skip test files and node_modules
+      if (filePath.includes('node_modules') || 
+          filePath.includes('.test.') || 
+          filePath.includes('.spec.')) {
+        continue;
+      }
+      
+      // Check all type aliases
+      const typeAliases = sourceFile.getTypeAliases();
+      
+      for (const typeAlias of typeAliases) {
+        const name = typeAlias.getName();
+        
+        // Check if this is an HTTP status code type
+        if (name.toLowerCase().includes('httpstatus') || 
+            name.toLowerCase().includes('statuscode')) {
+          
+          const typeNode = typeAlias.getTypeNode();
+          if (typeNode) {
+            const typeText = typeNode.getText();
+            
+            // Check if it's not using number type
+            if (typeText !== 'number' && !typeText.includes('number')) {
+              inconsistencies.push({
+                file: filePath,
+                typeName: name,
+                currentType: typeText,
+                shouldBeType: 'number'
+              });
+            }
+          }
+        }
+      }
+      
+      // Check interfaces with status code properties
+      const interfaces = sourceFile.getInterfaces();
+      
+      for (const iface of interfaces) {
+        const statusProp = iface.getProperty('statusCode') || 
+                          iface.getProperty('status');
+        
+        if (statusProp) {
+          const typeNode = statusProp.getTypeNode();
+          if (typeNode) {
+            const typeText = typeNode.getText();
+            
+            // Check if it's not using number type
+            if (typeText !== 'number' && !typeText.includes('number')) {
+              inconsistencies.push({
+                file: filePath,
+                typeName: `${iface.getName()}.${statusProp.getName()}`,
+                currentType: typeText,
+                shouldBeType: 'number'
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    return inconsistencies;
+  }
+
+  /**
+   * Generate canonical HTTP status code type
+   */
+  generateCanonicalHttpStatusCodeType(): string {
+    return `export type HttpStatusCode = number;`;
   }
 }

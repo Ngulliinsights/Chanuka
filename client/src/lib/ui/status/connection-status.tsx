@@ -12,9 +12,10 @@ import { Badge } from '@client/lib/design-system';
 
 interface ConnectionStatusProps {
   className?: string;
+  showDetails?: boolean;
 }
 
-export default function ConnectionStatus({ className = '' }: ConnectionStatusProps) {
+export default function ConnectionStatus({ className = '', showDetails = false }: ConnectionStatusProps) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionType, setConnectionType] = useState<string>('unknown');
 

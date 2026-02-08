@@ -445,10 +445,11 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
 
   private calculateErrorImpact(error: AppError): number {
     const impactMap: Record<ErrorSeverity, number> = {
-      [ErrorSeverity.LOW]: 1,
-      [ErrorSeverity.MEDIUM]: 2,
-      [ErrorSeverity.HIGH]: 3,
-      [ErrorSeverity.CRITICAL]: 4
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+      blocker: 5
     };
     return impactMap[error.severity] ?? 2;
   }

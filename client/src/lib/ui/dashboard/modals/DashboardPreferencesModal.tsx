@@ -34,7 +34,7 @@ interface DashboardPreferencesModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   preferences: UserDashboardPreferences;
-  onUpdate: (preferences: Partial<DashboardPreferences>) => void;
+  onUpdate: (preferences: Partial<UserDashboardPreferences>) => void;
 }
 
 export function DashboardPreferencesModal({
@@ -42,8 +42,8 @@ export function DashboardPreferencesModal({
   onOpenChange,
   preferences,
   onUpdate,
-}: UserDashboardPreferencesModalProps) {
-  const [localPreferences, setLocalPreferences] = useState<DashboardPreferences>(preferences);
+}: DashboardPreferencesModalProps) {
+  const [localPreferences, setLocalPreferences] = useState<UserDashboardPreferences>(preferences);
 
   const layoutOptions = [
     {
@@ -113,15 +113,15 @@ export function DashboardPreferencesModal({
         // Add to pinned, remove from hidden
         return {
           ...prev,
-          pinnedSections: [...prev.pinnedSections.filter(id => id !== sectionId), sectionId],
-          hiddenSections: prev.hiddenSections.filter(id => id !== sectionId),
+          pinnedSections: [...prev.pinnedSections.filter((id: string) => id !== sectionId), sectionId],
+          hiddenSections: prev.hiddenSections.filter((id: string) => id !== sectionId),
         };
       } else {
         // Remove from pinned, add to hidden
         return {
           ...prev,
-          pinnedSections: prev.pinnedSections.filter(id => id !== sectionId),
-          hiddenSections: [...prev.hiddenSections.filter(id => id !== sectionId), sectionId],
+          pinnedSections: prev.pinnedSections.filter((id: string) => id !== sectionId),
+          hiddenSections: [...prev.hiddenSections.filter((id: string) => id !== sectionId), sectionId],
         };
       }
     });
@@ -173,7 +173,7 @@ export function DashboardPreferencesModal({
                 <select
                   value={localPreferences.layout}
                   onChange={e =>
-                    handleLayoutChange(e.target.value as DashboardPreferences['layout'])
+                    handleLayoutChange(e.target.value as UserDashboardPreferences['layout'])
                   }
                   className="w-full p-2 border border-gray-300 rounded-md"
                   aria-label="Dashboard layout style"
@@ -202,7 +202,7 @@ export function DashboardPreferencesModal({
                   value={localPreferences.defaultTimeFilter}
                   onChange={e =>
                     handleTimeFilterChange(
-                      e.target.value as DashboardPreferences['defaultTimeFilter']
+                      e.target.value as UserDashboardPreferences['defaultTimeFilter']
                     )
                   }
                   className="w-full p-2 border border-gray-300 rounded-md"

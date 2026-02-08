@@ -15,17 +15,12 @@ import {
   WebSocketSubscription,
   RealTimeHandlers,
   WebSocketMessage,
+  EventListener,
 } from '../types';
 
 import { BillTrackingService } from './bill-tracking';
 import { CommunityService } from './community';
 import { NotificationService } from './notifications';
-
-/**
- * Type for event listener callbacks
- * Used for connection and error event handlers
- */
-type EventCallback = (data: unknown) => void;
 
 export class RealTimeService {
   private static instance: RealTimeService | null = null;
@@ -181,11 +176,11 @@ export class RealTimeService {
     this.handlers = { ...handlers };
   }
 
-  on(event: string, listener: EventCallback): () => void {
+  on(event: string, listener: EventListener): () => void {
     return this.wsManager.on(event, listener);
   }
 
-  off(event: string, listener: EventCallback): void {
+  off(event: string, listener: EventListener): void {
     this.wsManager.off(event, listener);
   }
 
@@ -255,7 +250,7 @@ export class RealTimeService {
         case 'community':
           this.communityService.handleMessage(message);
           break;
-        case 'user_notifications':
+        case 'notification':
           this.notificationService.handleMessage(message);
           break;
         default:

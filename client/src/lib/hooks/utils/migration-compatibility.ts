@@ -3,7 +3,7 @@
  * Provides backward compatibility during the hooks architecture migration
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Legacy hook imports for backward compatibility
 import {
@@ -76,10 +76,10 @@ export function useDebounceShared() {
     'useDebounceShared is deprecated. Use useDebounce from @client/lib/hooks instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useDebounce();
+  return useDebounce(() => {}, 300);
 }
 
-export function useMediaQueryShared(query: string) {
+export function useMediaQueryShared(query: string = '(min-width: 768px)') {
   console.warn(
     'useMediaQueryShared is deprecated. Use useMediaQuery from @client/lib/hooks instead. ' +
     'This compatibility layer will be removed in a future version.'
@@ -87,29 +87,29 @@ export function useMediaQueryShared(query: string) {
   return useMediaQuery(query);
 }
 
-export function useCleanupShared() {
+export function useCleanupShared(cleanup?: () => void) {
   console.warn(
     'useCleanupShared is deprecated. Use useCleanup from @client/lib/hooks instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useCleanup();
+  return useCleanup(cleanup || (() => {}));
 }
 
-export function useProgressiveDisclosureShared() {
+export function useProgressiveDisclosureShared(options?: any) {
   console.warn(
     'useProgressiveDisclosureShared is deprecated. Use useProgressiveDisclosure from @client/lib/hooks instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useProgressiveDisclosure();
+  return useProgressiveDisclosure(options ?? {});
 }
 
 // Legacy mobile hooks compatibility
-export function useBottomSheetShared() {
+export function useBottomSheetShared(options?: any) {
   console.warn(
     'useBottomSheetShared is deprecated. Use useBottomSheet from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useBottomSheet();
+  return useBottomSheet(options);
 }
 
 export function useDeviceInfoShared() {
@@ -120,12 +120,14 @@ export function useDeviceInfoShared() {
   return useDeviceInfo();
 }
 
-export function useInfiniteScrollShared() {
+export function useInfiniteScrollShared(callback?: () => void) {
   console.warn(
     'useInfiniteScrollShared is deprecated. Use useInfiniteScroll from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useInfiniteScroll();
+  return useInfiniteScroll({ 
+    onLoadMore: callback ? async () => { callback(); return true; } : undefined 
+  });
 }
 
 export function useMobileNavigationShared() {
@@ -136,36 +138,39 @@ export function useMobileNavigationShared() {
   return useMobileNavigation();
 }
 
-export function useMobileTabsShared() {
+export function useMobileTabsShared(tabs?: any[]) {
   console.warn(
     'useMobileTabsShared is deprecated. Use useMobileTabs from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useMobileTabs();
+  return useMobileTabs((tabs && tabs.length > 0 ? tabs[0] : '') as string);
 }
 
-export function usePullToRefreshShared() {
+export function usePullToRefreshShared(onRefresh?: () => Promise<void>) {
   console.warn(
     'usePullToRefreshShared is deprecated. Use usePullToRefresh from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return usePullToRefresh();
+  return usePullToRefresh({ 
+    onRefresh: onRefresh ?? (async () => {}),
+    threshold: 80
+  });
 }
 
-export function useScrollManagerShared() {
+export function useScrollManagerShared(options?: any) {
   console.warn(
     'useScrollManagerShared is deprecated. Use useScrollManager from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useScrollManager();
+  return useScrollManager(options);
 }
 
-export function useSwipeGestureShared() {
+export function useSwipeGestureShared(handlers?: any) {
   console.warn(
     'useSwipeGestureShared is deprecated. Use useSwipeGesture from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
   );
-  return useSwipeGesture();
+  return useSwipeGesture(handlers ?? {});
 }
 
 // Legacy FSD hooks compatibility (placeholders)

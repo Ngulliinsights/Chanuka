@@ -41,7 +41,7 @@ interface HistoricalPatternAnalysisProps {
 export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatternAnalysisProps) {
   // Process voting patterns for analysis
   const analysisData = useMemo(() => {
-    const { votingPatterns, financialInterests } = conflictAnalysis;
+    const { votingPatterns = [], financialInterests = [] } = conflictAnalysis;
 
     // Group votes by year and calculate correlations
     const votesByYear = votingPatterns.reduce(
@@ -73,12 +73,12 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
     // Calculate average correlations and patterns
     Object.values(votesByYear).forEach((yearData: any) => {
       const correlations = yearData.votes.map((v: VotingPattern) =>
-        Math.abs(v.financialCorrelation)
+        Math.abs(v.financialCorrelation ?? 0)
       );
       yearData.avgCorrelation =
-        correlations.reduce((sum: number, c: number) => sum + c, 0) / correlations.length;
+        correlations.reduce((sum: number, c: number) => sum + c, 0) / (correlations.length || 1);
       yearData.highCorrelationVotes = yearData.votes.filter(
-        (v: VotingPattern) => Math.abs(v.financialCorrelation) > 0.5
+        (v: VotingPattern) => Math.abs(v.financialCorrelation ?? 0) > 0.5
       ).length;
     });
 
@@ -100,22 +100,22 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
 
         // Find votes related to this industry
         const relatedVotes = votingPatterns.filter(vote =>
-          vote.relatedIndustries.includes(interest.industry)
+          (vote.relatedIndustries ?? vote.industries ?? []).includes(interest.industry)
         );
 
         acc[interest.industry].relatedVotes = relatedVotes;
 
         if (relatedVotes.length > 0) {
           acc[interest.industry].avgCorrelation =
-            relatedVotes.reduce((sum, vote) => sum + vote.financialCorrelation, 0) /
+            relatedVotes.reduce((sum, vote) => sum + (vote.financialCorrelation ?? 0), 0) /
             relatedVotes.length;
 
           acc[interest.industry].favorableVotes = relatedVotes.filter(
-            vote => vote.financialCorrelation > 0.2
+            vote => (vote.financialCorrelation ?? 0) > 0.2
           ).length;
 
           acc[interest.industry].unfavorableVotes = relatedVotes.filter(
-            vote => vote.financialCorrelation < -0.2
+            vote => (vote.financialCorrelation ?? 0) < -0.2
           ).length;
         }
 
@@ -130,22 +130,24 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
       .map((vote, index) => ({
         index: index + 1,
         date: vote.date,
-        correlation: vote.financialCorrelation,
+        correlation: vote.financialCorrelation ?? 0,
         billTitle: vote.billTitle,
         vote: vote.vote,
-        industries: vote.relatedIndustries,
+        industries: vote.relatedIndustries ?? vote.industries ?? [],
       }));
 
     // Risk assessment
     const riskMetrics = {
       highCorrelationPercentage:
-        (votingPatterns.filter(v => Math.abs(v.financialCorrelation) > 0.5).length /
-          votingPatterns.length) *
-        100,
+        votingPatterns.length > 0
+          ? (votingPatterns.filter(v => Math.abs(v.financialCorrelation ?? 0) > 0.5).length /
+              votingPatterns.length) *
+            100
+          : 0,
       consistentPatternRisk: Object.values(industryPatterns).filter(
         (p: any) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3
       ).length,
-      recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation) > 0.4)
+      recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation ?? 0) > 0.4)
         .length,
     };
 
@@ -158,8 +160,10 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
       riskMetrics,
       totalVotes: votingPatterns.length,
       avgOverallCorrelation:
-        votingPatterns.reduce((sum, vote) => sum + Math.abs(vote.financialCorrelation), 0) /
-        votingPatterns.length,
+        votingPatterns.length > 0
+          ? votingPatterns.reduce((sum, vote) => sum + Math.abs(vote.financialCorrelation ?? 0), 0) /
+            votingPatterns.length
+          : 0,
     };
   }, [conflictAnalysis]);
 
@@ -318,7 +322,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
                             {new Date(vote.date).toLocaleDateString()} • Vote: {vote.vote}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            Industries: {vote.industries.join(', ')}
+                            Industries: {(vote.industries ?? []).join(', ')}
                           </div>
                         </div>
                         <Badge

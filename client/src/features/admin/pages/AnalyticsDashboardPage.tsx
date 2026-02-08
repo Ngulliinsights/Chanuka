@@ -156,7 +156,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Badge variant={isTrackingEnabled ? 'primary' : 'secondary'}>
+          <Badge variant={isTrackingEnabled ? 'default' : 'secondary'}>
             {isTrackingEnabled ? 'Tracking Enabled' : 'Tracking Disabled'}
           </Badge>
           <Button variant="outline" size="sm" onClick={() => setEnabled(!isTrackingEnabled)}>
@@ -189,7 +189,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
       </div>
 
       {/* Status Alert */}
-      {!isEnabled && (
+      {!isTrackingEnabled && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Analytics Tracking Disabled</AlertTitle>
@@ -470,7 +470,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <strong>Current Session:</strong> {currentMetrics.eventCount} events tracked
                   </p>
                   <p>
-                    <strong>Status:</strong> {isEnabled ? 'Active tracking' : 'Tracking disabled'}
+                    <strong>Status:</strong> {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}
                   </p>
                 </div>
               </div>

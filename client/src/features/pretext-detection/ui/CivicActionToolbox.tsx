@@ -15,42 +15,7 @@ import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
-// Define types locally
-interface CivicAction {
-  id: string;
-  type: 'foi' | 'petition' | 'complaint' | 'public_participation';
-  title: string;
-  description: string;
-  estimatedTime: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  successRate?: number;
-  localContacts: Array<{
-    id: string;
-    name: string;
-    role: string;
-    contact: string;
-  }>;
-}
-
-interface RightsCard {
-  id: string;
-  scenario: string;
-  title: string;
-  description: string;
-  steps: Array<{
-    id: string;
-    title: string;
-    description: string;
-    order: number;
-  }>;
-  contacts: Array<{
-    id: string;
-    name: string;
-    role: string;
-    contact: string;
-  }>;
-  lastUpdated: Date;
-}
+import type { CivicAction, RightsCard } from '../types';
 
 interface CivicActionToolboxProps {
   billId: string;

@@ -120,7 +120,7 @@ export function useTimeoutAwareLoading(
 
   const handleTimeout = useCallback(() => {
     const timeoutError = new LoadingTimeoutError(operationIdRef.current, currentTimeout, {
-      retryCount,
+      context: { retryCount },
     });
 
     setError(timeoutError);
@@ -245,7 +245,7 @@ export function useTimeoutAwareLoading(
               const timeoutError = new LoadingTimeoutError(
                 operationIdRef.current,
                 operationTimeout || currentTimeout,
-                { retryCount }
+                { context: { retryCount } }
               );
               handleTimeout();
               timeoutReject(timeoutError);

@@ -16,30 +16,9 @@ export interface AnalyticsFilters {
   tags?: string[];
 }
 
-export interface BillAnalytics {
-  bill_id: string;
-  title: string;
-  views: number;
-  engagement_score: number;
-  comments_count: number;
-  votes_count: number;
-  shares_count: number;
-  time_spent_avg: number;
-  bounce_rate: number;
-  conversion_rate: number;
-  trending_score: number;
-  sentiment_score: number;
-  demographics: {
-    age_groups: Record<string, number>;
-    locations: Record<string, number>;
-    political_affiliation: Record<string, number>;
-  };
-  timeline: Array<{
-    date: string;
-    views: number;
-    engagement: number;
-  }>;
-}
+// BillAnalytics is now imported from bill/bill-analytics.ts to avoid duplication
+import type { BillAnalytics } from './bill/bill-analytics';
+export type { BillAnalytics } from './bill/bill-analytics';
 
 export interface AnalyticsSummary {
   total_bills: number;
@@ -64,7 +43,9 @@ export interface AnalyticsSummary {
   };
 }
 
-export interface DashboardData {
+// DashboardData is now imported from dashboard/dashboard-base.ts to avoid duplication
+// This is the analytics-specific dashboard data
+export interface AnalyticsDashboardData {
   summary: AnalyticsSummary;
   top_bills: BillAnalytics[];
   recent_activity: UserActivity[];
@@ -76,6 +57,9 @@ export interface DashboardData {
     uptime: number;
   };
 }
+
+// Backward compatibility alias
+export type DashboardData = AnalyticsDashboardData;
 
 export interface EngagementReport {
   bill_id: string;
@@ -141,7 +125,7 @@ export interface UserActivity {
   session_id: string;
   timestamp: string;
   action: 'view' | 'comment' | 'vote' | 'share' | 'bookmark' | 'search';
-  target_type: 'bill' | 'comment' | 'user' | 'page';
+  target_type: 'bill' | 'comment' | 'user' | 'page' | 'analytics';
   target_id: string;
   metadata: Record<string, unknown>;
   duration?: number;
@@ -187,7 +171,9 @@ export interface AnalyticsResponse<T = unknown> {
   cache_expires?: string;
 }
 
-export interface PerformanceMetrics {
+// PerformanceMetrics is now imported from dashboard/dashboard-metrics.ts to avoid duplication
+// This is the analytics-specific performance metrics
+export interface AnalyticsPerformanceMetrics {
   page_load_time: number;
   api_response_time: number;
   database_query_time: number;
@@ -198,6 +184,9 @@ export interface PerformanceMetrics {
   cpu_usage: number;
   active_connections: number;
 }
+
+// Backward compatibility alias
+export type PerformanceMetrics = AnalyticsPerformanceMetrics;
 
 export interface TrendingTopic {
   topic: string;

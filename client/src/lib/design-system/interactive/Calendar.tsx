@@ -237,10 +237,11 @@ const EnhancedCalendar = React.forwardRef<HTMLDivElement, EnhancedCalendarProps>
         onValidationChange?.(newValidationState);
 
         if (newValidationState.isValid === false && newValidationState.error) {
+          const dateObj = date instanceof Date ? date : undefined;
           const error = new UIDateError(
             'enhanced-calendar',
-            date instanceof Date ? date.toISOString() : String(date),
-            newValidationState.error
+            newValidationState.error,
+            dateObj
           );
           handleValidationError(error);
         } else {
@@ -339,7 +340,7 @@ const EnhancedCalendar = React.forwardRef<HTMLDivElement, EnhancedCalendarProps>
           }}
           selected={selected instanceof Date ? selected : selected?.from}
           onSelect={handleSelect}
-          mode={selected && typeof selected === 'object' && 'from' in selected ? 'range' : 'single'}
+          mode={(selected && typeof selected === 'object' && 'from' in selected ? 'range' : 'single') as any}
           disabled={isDateDisabled}
           {...props}
         />

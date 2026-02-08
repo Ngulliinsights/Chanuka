@@ -606,7 +606,7 @@ export function Comments({
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle className="text-xl">Create a Public Poll</DialogTitle>
+                  <DialogTitle>Create a Public Poll</DialogTitle>
                   <p className="text-gray-600">
                     Gather community input on specific aspects of this legislation
                   </p>

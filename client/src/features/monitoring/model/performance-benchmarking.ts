@@ -73,10 +73,6 @@ class PerformanceBenchmarking {
   async benchmarkPage(pageName: string): Promise<PerformanceBenchmark> {
     const startTime = performance.now();
 
-    // Start monitoring
-    const performanceMonitor = PerformanceMonitor.getInstance();
-    performanceMonitor.markComponentStart(pageName);
-
     // Wait for page to be fully loaded
     await this.waitForPageLoad();
 
@@ -87,8 +83,6 @@ class PerformanceBenchmarking {
 
     const loadTime = performance.now() - startTime;
     const threshold = this.getThreshold(pageName);
-
-    performanceMonitor.markComponentEnd(pageName);
 
     const benchmark: PerformanceBenchmark = {
       pageName,

@@ -66,7 +66,7 @@ class PollingFallbackManager {
     this.stopPolling();
 
     // Poll for bill updates
-    if (this.subscriptions.bills.length > 0) {
+    if (this.subscriptions.bills.length > 0 && this.config.intervals?.bills) {
       const billTimer = window.setInterval(() => {
         this.pollBillUpdates();
       }, this.config.intervals.bills);
@@ -75,14 +75,16 @@ class PollingFallbackManager {
     }
 
     // Poll for engagement metrics
-    const engagementTimer = window.setInterval(() => {
-      this.pollEngagementMetrics();
-    }, this.config.intervals.engagement);
+    if (this.config.intervals?.engagement) {
+      const engagementTimer = window.setInterval(() => {
+        this.pollEngagementMetrics();
+      }, this.config.intervals.engagement);
 
-    this.pollingTimers.set('engagement', engagementTimer);
+      this.pollingTimers.set('engagement', engagementTimer);
+    }
 
     // Poll for notifications
-    if (this.subscriptions.notifications) {
+    if (this.subscriptions.notifications && this.config.intervals?.notifications) {
       const notificationTimer = window.setInterval(() => {
         this.pollNotifications();
       }, this.config.intervals.notifications);
@@ -93,7 +95,9 @@ class PollingFallbackManager {
 
   stopPolling() {
     this.pollingTimers.forEach(timer => {
-      window.clearInterval(timer);
+      if (timer) {
+        window.clearInterval(timer);
+      }
     });
     this.pollingTimers.clear();
 

@@ -21,7 +21,9 @@ export type SecurityEventType =
   | 'script_injection'
   | 'iframe_injection'
   | 'session_hijack_attempt'
-  | 'brute_force_attack';
+  | 'brute_force_attack'
+  | 'vulnerability_detected'
+  | 'vulnerability_fixed';
 
 export interface SecurityAlert {
   id: string;
@@ -506,32 +508,13 @@ export class SecurityMonitor {
     }
 
     return {
-      // Properties from SecurityMetrics
-      totalIncidents: this.events.filter(e => e.severity === 'high' || e.severity === 'critical')
-        .length,
-      incidentsBySeverity: {
-        low: eventsBySeverity.low || 0,
-        medium: eventsBySeverity.medium || 0,
-        high: eventsBySeverity.high || 0,
-        critical: eventsBySeverity.critical || 0,
-      } as Record<ThreatLevel, number>,
-      averageResolutionTime: 0, // Would be calculated from resolved incidents
-      complianceScore: Math.max(0, 100 - criticalEvents * 20 - highEvents * 5),
-      lastAuditDate: new Date(),
-      vulnerabilitiesCount:
-        eventsByType['xss_attempt'] || 0 + eventsByType['script_injection'] || 0,
-      activeThreats: this.events.filter(
-        e => !e.resolved && (e.severity === 'high' || e.severity === 'critical')
-      ).length,
-
-      // Extended properties
       totalEvents: this.events.length,
       eventsByType,
       eventsBySeverity,
-      vulnerabilitiesFound: 0, // Would be populated by vulnerability scanner
-      vulnerabilitiesFixed: 0,
-      rateLimitViolations: eventsByType['rate_limit_exceeded'] || 0,
-      cspViolations: eventsByType['csp_violation'] || 0,
+      vulnerabilitiesFound: this.events.filter(e => e.type === 'vulnerability_detected').length,
+      vulnerabilitiesFixed: this.events.filter(e => e.type === 'vulnerability_fixed').length,
+      rateLimitViolations: this.events.filter(e => e.type === 'rate_limit_exceeded').length,
+      cspViolations: this.events.filter(e => e.type === 'csp_violation').length,
       lastScanTime: new Date(),
       systemHealth,
     };

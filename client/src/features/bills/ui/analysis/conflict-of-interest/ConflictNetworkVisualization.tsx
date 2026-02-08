@@ -27,7 +27,13 @@ import {
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
-interface ConflictNetworkVisualizationProps extends ConflictVisualizationProps {
+interface ConflictNetworkVisualizationProps {
+  conflictAnalysis: any; // ConflictAnalysis type
+  onNodeClick?: (node: NetworkNode) => void;
+  onLinkClick?: (link: NetworkLink) => void;
+  width?: number;
+  height?: number;
+  interactive?: boolean;
   showAccessibilityFallback?: boolean;
 }
 
@@ -48,71 +54,75 @@ export function ConflictNetworkVisualization({
 
   // Generate network data from conflict analysis
   const generateNetworkData = useCallback((): NetworkData => {
-    const nodes: NetworkNode[] = [];
-    const links: NetworkLink[] = [];
+      const nodes: NetworkNode[] = [];
+      const links: NetworkLink[] = [];
 
-    // Add sponsor node
-    nodes.push({
-      id: `sponsor-${conflictAnalysis.sponsorId}`,
-      name: conflictAnalysis.sponsorName,
-      type: 'sponsor',
-      size: 20,
-      color: 'hsl(var(--civic-constitutional))',
-    });
-
-    // Add organization nodes and links
-    conflictAnalysis.organizationalConnections.forEach((connection, index) => {
-      const orgId = `org-${index}`;
+      // Add sponsor node
+      const sponsorId = `sponsor-${conflictAnalysis.sponsorId}`;
       nodes.push({
-        id: orgId,
-        name: connection.organizationName,
-        type: 'organization',
-        size: 10 + connection.strength * 10,
-        color: getOrganizationColor(connection.organizationType),
+        id: sponsorId,
+        name: conflictAnalysis.sponsorName ?? 'Sponsor',
+        type: 'sponsor',
+        connections: [], // Will be populated after links are created
+        size: 20,
+        color: 'hsl(var(--civic-constitutional))',
       });
 
-      links.push({
-        source: `sponsor-${conflictAnalysis.sponsorId}`,
-        target: orgId,
-        strength: connection.strength,
-        type: 'organizational',
-        description: `${connection.connectionType} - ${connection.description}`,
-      });
-    });
+      // Add organization nodes and links
+      (conflictAnalysis.organizationalConnections ?? []).forEach((connection: any, index: number) => {
+        const orgId = `org-${index}`;
+        nodes.push({
+          id: orgId,
+          name: connection.organizationName,
+          type: 'organization',
+          connections: [], // Will be populated after links are created
+          size: 10 + (connection.strength ?? 0) * 10,
+          color: getOrganizationColor(connection.organizationType),
+        });
 
-    // Add industry nodes from financial interests
-    const industries = new Set<string>();
-    conflictAnalysis.financialInterests.forEach(interest => {
-      industries.add(interest.industry);
-    });
-
-    industries.forEach(industry => {
-      const industryId = `industry-${industry.replace(/\s+/g, '-').toLowerCase()}`;
-      const relatedInterests = conflictAnalysis.financialInterests.filter(
-        interest => interest.industry === industry
-      );
-      const totalAmount = relatedInterests.reduce((sum, interest) => sum + interest.amount, 0);
-
-      nodes.push({
-        id: industryId,
-        name: industry,
-        type: 'industry',
-        size: Math.min(5 + Math.log10(totalAmount + 1) * 2, 15),
-        color: 'hsl(var(--civic-transparency))',
+        links.push({
+          source: sponsorId,
+          target: orgId,
+          strength: connection.strength ?? 0,
+          type: 'organizational',
+          description: `${connection.connectionType ?? 'connection'} - ${connection.description ?? ''}`,
+        });
       });
 
-      links.push({
-        source: `sponsor-${conflictAnalysis.sponsorId}`,
-        target: industryId,
-        strength: Math.min(totalAmount / 100000, 1), // Normalize to 0-1
-        type: 'financial',
-        amount: totalAmount,
-        description: `Financial interests totaling $${totalAmount.toLocaleString()}`,
+      // Add industry nodes from financial interests
+      const industries = new Set<string>();
+      (conflictAnalysis.financialInterests ?? []).forEach((interest: any) => {
+        industries.add(interest.industry);
       });
-    });
 
-    return { nodes, links };
-  }, [conflictAnalysis]);
+      industries.forEach(industry => {
+        const industryId = `industry-${industry.replace(/\s+/g, '-').toLowerCase()}`;
+        const relatedInterests = (conflictAnalysis.financialInterests ?? []).filter(
+          (interest: any) => interest.industry === industry
+        );
+        const totalAmount = relatedInterests.reduce((sum: number, interest: any) => sum + interest.amount, 0);
+
+        nodes.push({
+          id: industryId,
+          name: industry,
+          type: 'industry',
+          connections: [], // Will be populated after links are created
+          size: Math.min(5 + Math.log10(totalAmount + 1) * 2, 15),
+          color: 'hsl(var(--civic-transparency))',
+        });
+
+        links.push({
+          source: `sponsor-${conflictAnalysis.sponsorId}`,
+          target: industryId,
+          strength: Math.min(totalAmount / 100000, 1), // Normalize to 0-1
+          type: 'financial',
+          amount: totalAmount,
+          description: `Financial interests totaling ${totalAmount.toLocaleString()}`,
+        });
+      });
+
+      return { nodes, links };
+    }, [conflictAnalysis])
 
   // Get color for organization type
   const getOrganizationColor = (type: string): string => {
@@ -164,7 +174,7 @@ export function ConflictNetworkVisualization({
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force(
         'collision',
-        d3.forceCollide().radius(d => d.size + 5)
+        d3.forceCollide<NetworkNode>().radius(d => (d.size ?? 10) + 5)
       );
 
     // Create links
@@ -188,8 +198,8 @@ export function ConflictNetworkVisualization({
       .data(data.nodes)
       .enter()
       .append('circle')
-      .attr('r', d => d.size)
-      .attr('fill', d => d.color)
+      .attr('r', d => d.size ?? 10)
+      .attr('fill', d => d.color ?? 'hsl(var(--muted-foreground))')
       .attr('stroke', '#fff')
       .attr('stroke-width', 2)
       .style('cursor', interactive ? 'pointer' : 'default');
@@ -207,7 +217,7 @@ export function ConflictNetworkVisualization({
       .attr('font-family', 'system-ui, sans-serif')
       .attr('fill', 'hsl(var(--foreground))')
       .attr('text-anchor', 'middle')
-      .attr('dy', d => d.size + 15)
+      .attr('dy', d => (d.size ?? 10) + 15)
       .style('pointer-events', 'none');
 
     // Add interactivity
@@ -297,14 +307,26 @@ export function ConflictNetworkVisualization({
     // Update positions on simulation tick
     simulation.on('tick', () => {
       link
-        .attr('x1', d => (d.source as NetworkNode).x!)
-        .attr('y1', d => (d.source as NetworkNode).y!)
-        .attr('x2', d => (d.target as NetworkNode).x!)
-        .attr('y2', d => (d.target as NetworkNode).y!);
+        .attr('x1', d => {
+          const source = (d.source as unknown) as NetworkNode;
+          return source.x ?? 0;
+        })
+        .attr('y1', d => {
+          const source = (d.source as unknown) as NetworkNode;
+          return source.y ?? 0;
+        })
+        .attr('x2', d => {
+          const target = (d.target as unknown) as NetworkNode;
+          return target.x ?? 0;
+        })
+        .attr('y2', d => {
+          const target = (d.target as unknown) as NetworkNode;
+          return target.y ?? 0;
+        });
 
-      node.attr('cx', d => d.x!).attr('cy', d => d.y!);
+      node.attr('cx', d => d.x ?? 0).attr('cy', d => d.y ?? 0);
 
-      labels.attr('x', d => d.x!).attr('y', d => d.y!);
+      labels.attr('x', d => d.x ?? 0).attr('y', d => d.y ?? 0);
     });
 
     // Cleanup
@@ -352,47 +374,51 @@ export function ConflictNetworkVisualization({
 
   // Generate accessibility fallback data
   const generateFallbackData = (): AccessibilityFallbackData => {
-    return {
-      sponsors: [
-        {
-          name: conflictAnalysis.sponsorName,
-          riskLevel: conflictAnalysis.riskLevel,
-          financialInterests: conflictAnalysis.financialInterests.length,
-          organizationalConnections: conflictAnalysis.organizationalConnections.length,
-          transparencyScore: conflictAnalysis.transparencyScore.overall,
+      const transparencyOverall = typeof conflictAnalysis.transparencyScore === 'number'
+        ? conflictAnalysis.transparencyScore
+        : conflictAnalysis.transparencyScore?.overall ?? 0;
+
+      return {
+        sponsors: [
+          {
+            name: conflictAnalysis.sponsorName,
+            riskLevel: conflictAnalysis.riskLevel,
+            financialInterests: conflictAnalysis.financialInterests?.length ?? 0,
+            organizationalConnections: conflictAnalysis.organizationalConnections?.length ?? 0,
+            transparencyScore: transparencyOverall,
+          },
+        ],
+        connections: [
+          ...(conflictAnalysis.organizationalConnections ?? []).map((conn: any) => ({
+            from: conflictAnalysis.sponsorName ?? 'Sponsor',
+            to: conn.organizationName,
+            type: conn.connectionType,
+            strength: conn.strength ?? 0,
+            description: conn.description,
+          })),
+          ...(conflictAnalysis.financialInterests ?? []).map((interest: any) => ({
+            from: conflictAnalysis.sponsorName ?? 'Sponsor',
+            to: interest.industry,
+            type: interest.category,
+            strength: Math.min(interest.amount / 100000, 1),
+            description: `${interest.amount.toLocaleString()} - ${interest.description}`,
+          })),
+        ],
+        summary: {
+          totalConnections:
+            (conflictAnalysis.organizationalConnections?.length ?? 0) +
+            (conflictAnalysis.financialInterests?.length ?? 0),
+          highRiskConnections: (conflictAnalysis.organizationalConnections ?? []).filter(
+            (c: any) => (c.strength ?? 0) > 0.7
+          ).length,
+          averageTransparencyScore: transparencyOverall,
+          topIndustries: [...new Set((conflictAnalysis.financialInterests ?? []).map((f: any) => f.industry).filter((industry: any): industry is string => typeof industry === 'string'))].slice(
+            0,
+            3
+          ) as string[],
         },
-      ],
-      connections: [
-        ...conflictAnalysis.organizationalConnections.map(conn => ({
-          from: conflictAnalysis.sponsorName,
-          to: conn.organizationName,
-          type: conn.connectionType,
-          strength: conn.strength,
-          description: conn.description,
-        })),
-        ...conflictAnalysis.financialInterests.map(interest => ({
-          from: conflictAnalysis.sponsorName,
-          to: interest.industry,
-          type: interest.category,
-          strength: Math.min(interest.amount / 100000, 1),
-          description: `$${interest.amount.toLocaleString()} - ${interest.description}`,
-        })),
-      ],
-      summary: {
-        totalConnections:
-          conflictAnalysis.organizationalConnections.length +
-          conflictAnalysis.financialInterests.length,
-        highRiskConnections: conflictAnalysis.organizationalConnections.filter(
-          c => c.strength > 0.7
-        ).length,
-        averageTransparencyScore: conflictAnalysis.transparencyScore.overall,
-        topIndustries: [...new Set(conflictAnalysis.financialInterests.map(f => f.industry))].slice(
-          0,
-          3
-        ),
-      },
-    };
-  };
+      };
+    }
 
   const fallbackData = generateFallbackData();
 
@@ -511,24 +537,26 @@ export function ConflictNetworkVisualization({
               {/* Summary */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{fallbackData.summary.totalConnections}</div>
+                  <div className="text-2xl font-bold">
+                    {typeof fallbackData.summary === 'string' ? 0 : fallbackData.summary.totalConnections}
+                  </div>
                   <div className="text-sm text-muted-foreground">Total Connections</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">
-                    {fallbackData.summary.highRiskConnections}
+                    {typeof fallbackData.summary === 'string' ? 0 : fallbackData.summary.highRiskConnections}
                   </div>
                   <div className="text-sm text-muted-foreground">High Risk</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">
-                    {fallbackData.summary.averageTransparencyScore}%
+                    {typeof fallbackData.summary === 'string' ? 0 : fallbackData.summary.averageTransparencyScore}%
                   </div>
                   <div className="text-sm text-muted-foreground">Transparency</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">
-                    {fallbackData.summary.topIndustries.length}
+                    {typeof fallbackData.summary === 'string' ? 0 : fallbackData.summary.topIndustries.length}
                   </div>
                   <div className="text-sm text-muted-foreground">Industries</div>
                 </div>
@@ -547,7 +575,7 @@ export function ConflictNetworkVisualization({
                     </tr>
                   </thead>
                   <tbody>
-                    {fallbackData.connections.map((connection, index) => (
+                    {fallbackData.connections?.map((connection, index) => (
                       <tr key={index} className="hover:bg-muted/50">
                         <td className="border border-border p-2">{connection.from}</td>
                         <td className="border border-border p-2">{connection.to}</td>
@@ -559,11 +587,11 @@ export function ConflictNetworkVisualization({
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-primary rounded-full"
-                                style={{ width: `${connection.strength * 100}%` }}
+                                style={{ width: `${(connection.strength ?? 0) * 100}%` }}
                               ></div>
                             </div>
                             <span className="text-sm">
-                              {(connection.strength * 100).toFixed(1)}%
+                              {((connection.strength ?? 0) * 100).toFixed(1)}%
                             </span>
                           </div>
                         </td>

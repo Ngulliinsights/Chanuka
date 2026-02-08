@@ -41,7 +41,7 @@ import { logger } from '@client/lib/utils/logger';
 // Types for the portal
 interface BillsPortalFilters {
   searchQuery?: string;
-  status?: string[];
+  status?: BillStatus[];
   sortBy?: 'date' | 'title' | 'status' | 'urgency' | 'engagement';
   sortOrder?: 'asc' | 'desc';
   viewMode?: 'grid' | 'list';
@@ -84,7 +84,7 @@ export default function BillsPortalPage() {
   const currentFilters = useMemo<BillsPortalFilters>(
     () => ({
       searchQuery: searchParams.get('search') || '',
-      status: searchParams.get('status')?.split(',') || undefined,
+      status: searchParams.get('status')?.split(',') as BillStatus[] | undefined || undefined,
       sortBy: (searchParams.get('sortBy') as BillsPortalFilters['sortBy']) || 'date',
       sortOrder: (searchParams.get('sortOrder') as BillsPortalFilters['sortOrder']) || 'desc',
       viewMode: (searchParams.get('view') as BillsPortalFilters['viewMode']) || 'grid',

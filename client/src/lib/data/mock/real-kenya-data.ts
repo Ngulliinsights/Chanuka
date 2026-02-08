@@ -28,6 +28,13 @@ export const KENYA_CONSTITUTION = {
       content: "Every person is equal before the law and has the right to equal protection and equal benefit of the law. The State shall not discriminate directly or indirectly against any person on any ground, including race, sex, pregnancy, marital status, health status, ethnic or social origin, colour, age, disability, religion, conscience, belief, culture, dress, language or birth.",
       relevance: "Critical for bills involving eligibility criteria or social benefits"
     },
+    31: {
+      id: "art-31",
+      number: "31",
+      title: "Privacy",
+      content: "Every person has the right to privacy, which includes the right not to have information relating to their family or private affairs unnecessarily required or revealed, or the privacy of their communications infringed.",
+      relevance: "Essential for data protection and privacy legislation"
+    },
     43: {
       id: "art-43",
       number: "43",
@@ -35,12 +42,33 @@ export const KENYA_CONSTITUTION = {
       content: "Every person has the right to the highest attainable standard of health, which includes the right to health care services, including reproductive health care; to accessible and adequate housing, and to reasonable standards of sanitation; to be free from hunger, and to have adequate food of acceptable quality; to clean and safe water in adequate quantities; to social security; and to education.",
       relevance: "Central to healthcare, housing, and social legislation"
     },
+    73: {
+      id: "art-73",
+      number: "73",
+      title: "Leadership and Integrity",
+      content: "Authority assigned to a State officer is a public trust to be exercised in a manner that is consistent with the purposes and objects of this Constitution; demonstrates respect for the people; brings honour to the nation and dignity to the office; and promotes public confidence in the integrity of the office.",
+      relevance: "Foundation for ethics and anti-corruption legislation"
+    },
+    75: {
+      id: "art-75",
+      number: "75",
+      title: "Conduct of State Officers",
+      content: "A State officer shall behave, whether in public and official life, in private life, or in association with other persons, in a manner that avoids any conflict between personal interests and public or official duties.",
+      relevance: "Key for conflict of interest legislation"
+    },
     189: {
       id: "art-189",
       number: "189",
       title: "Cooperation between National and County Governments",
       content: "Government at either level shall perform its functions, and exercise its powers, in a manner that respects the functional and institutional integrity of government at the other level, and respects the constitutional status and institutions of government at the other level and, in the case of county government, within the county level.",
       relevance: "Key for legislation affecting devolution"
+    },
+    201: {
+      id: "art-201",
+      number: "201",
+      title: "Principles of Public Finance",
+      content: "There shall be openness and accountability, including public participation in financial matters. The public finance system shall promote an equitable society, and in particular the burden of taxation shall be shared fairly.",
+      relevance: "Foundation for finance and taxation legislation"
     }
   },
   schedules: {

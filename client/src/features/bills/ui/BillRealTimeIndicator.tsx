@@ -111,8 +111,8 @@ export function BillRealTimeIndicator({
   };
 
   // Convert timestamps to relative time strings (e.g., "5m ago", "2h ago")
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
+  const formatTimestamp = (timestamp: string | Date) => {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);

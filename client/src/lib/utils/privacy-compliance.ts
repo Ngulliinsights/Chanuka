@@ -183,6 +183,32 @@ class PrivacyComplianceManager {
       processing: this.getUserProcessingRecords(userId),
     };
   }
+
+  /**
+   * Generates a privacy policy summary
+   */
+  generatePrivacyPolicySummary(): {
+    totalConsents: number;
+    totalProcessingRecords: number;
+    consentTypes: string[];
+    dataTypes: string[];
+  } {
+    const allConsents: ConsentRecord[] = [];
+    const allProcessing: DataProcessingRecord[] = [];
+
+    this.consentRecords.forEach(records => allConsents.push(...records));
+    this.processingRecords.forEach(records => allProcessing.push(...records));
+
+    const consentTypes = [...new Set(allConsents.map(c => c.consentType))];
+    const dataTypes = [...new Set(allProcessing.map(p => p.dataType))];
+
+    return {
+      totalConsents: allConsents.length,
+      totalProcessingRecords: allProcessing.length,
+      consentTypes,
+      dataTypes,
+    };
+  }
 }
 
 // Export singleton instance

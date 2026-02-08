@@ -3,7 +3,7 @@
  * Implements unified error monitoring for the Security system
  */
 
-import { createError } from '@client/core/error';
+import { createError, ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '@client/core/error';
 import { CrossSystemErrorAnalytics } from '@client/lib/infrastructure/monitoring/cross-system-error-analytics';
 import { ErrorAggregationService } from '@client/lib/infrastructure/monitoring/error-aggregation-service';
 import {
@@ -44,8 +44,8 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
 
     const appError = error instanceof Error && !(error as any).type
       ? createError(
-          ErrorDomain.SECURITY,
-          ErrorSeverity.HIGH,
+          CoreErrorDomain.SECURITY,
+          CoreErrorSeverity.HIGH,
           error.message,
           {
             context: context as any, // Cast due to index signature mismatch
@@ -62,7 +62,7 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
     };
 
     // Report to aggregation service
-    this.aggregationService.addError(ClientSystem.SECURITY, appError, enhancedContext);
+    this.aggregationService.addError(ClientSystem.SECURITY, appError as AppError, enhancedContext);
 
     // Check error patterns
     this.checkErrorPatterns(appError);
@@ -82,8 +82,8 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
     // Check for performance issues specific to security operations
     if (metrics.duration > 5000 && metrics.operation.includes('scan')) {
       const perfError = createError(
-        ErrorDomain.PERFORMANCE,
-        ErrorSeverity.MEDIUM,
+        CoreErrorDomain.PERFORMANCE,
+        CoreErrorSeverity.MEDIUM,
         `Slow security operation: ${metrics.operation}`,
         {
           details: metrics as unknown as Record<string, unknown>,
@@ -176,7 +176,7 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
     else if (errorRate > 5) status = 'degraded';
 
     return {
-      system: ClientSystem.SECURITY,
+      system: ClientSystem.SECURITY as ClientSystem,
       status,
       errorRate,
       performanceScore,
@@ -276,8 +276,8 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
 
   private triggerErrorAlert(pattern: string, count: number, error: AppError): void {
     const alertError = createError(
-      ErrorDomain.SECURITY,
-      ErrorSeverity.CRITICAL,
+      CoreErrorDomain.SECURITY,
+      CoreErrorSeverity.CRITICAL,
       `Security error pattern threshold exceeded: ${pattern}`,
       {
         details: {

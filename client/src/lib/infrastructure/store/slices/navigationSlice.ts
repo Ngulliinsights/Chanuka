@@ -182,7 +182,8 @@ const navigationSlice = createSlice({
         delete updates.favoritePages;
       }
       
-      state.preferences = { ...state.preferences, ...updates };
+      // Spread the updates to avoid readonly issues
+      Object.assign(state.preferences, updates);
       logger.debug('Navigation preferences updated', {
         updated: Object.keys(action.payload),
       });

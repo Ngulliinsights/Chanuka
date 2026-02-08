@@ -296,7 +296,7 @@ const ActivityFeedComponent = ({
                   )}
 
                   {/* Trending Indicator */}
-                  {activity.trendingScore > 0.7 && (
+                  {activity.trendingScore && activity.trendingScore > 0.7 && (
                     <div className="flex items-center gap-1 mb-2">
                       <TrendingUp className="h-4 w-4 text-orange-500" />
                       <Badge variant="secondary" className="text-xs">

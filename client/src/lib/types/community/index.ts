@@ -83,6 +83,7 @@ export type {
   ExpertContribution,
   ExpertConsensus,
   CredibilityMetrics,
+  CommunityValidation,
   CommunityValidation as CommunityValidationType,
   VerificationWorkflow as VerificationWorkflowType,
   ExpertVerificationType,

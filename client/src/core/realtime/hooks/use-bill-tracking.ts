@@ -156,7 +156,7 @@ export function useBillTracking(): BillTrackingHookReturn {
   useEffect(() => {
     // Set up listeners for bill updates
     const handleBillUpdate = (update: BillUpdate) => {
-      const billId = update.data.billId;
+      const billId = update.billId;
 
       setBillUpdates(prev => {
         const newMap = new Map(prev);
@@ -168,7 +168,7 @@ export function useBillTracking(): BillTrackingHookReturn {
     };
 
     const handleEngagementUpdate = (metrics: BillEngagementUpdate) => {
-      const billId = metrics.bill_id;
+      const billId = metrics.billId;
 
       setEngagementMetrics(prev => {
         const newMap = new Map(prev);

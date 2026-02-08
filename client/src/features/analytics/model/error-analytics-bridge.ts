@@ -577,6 +577,7 @@ class ErrorAnalyticsBridge {
       [ErrorSeverity.HIGH]: 0,
       [ErrorSeverity.MEDIUM]: 0,
       [ErrorSeverity.LOW]: 0,
+      [ErrorSeverity.BLOCKER]: 0,
     };
 
     for (const error of errors) {

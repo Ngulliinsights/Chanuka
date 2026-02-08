@@ -7,16 +7,20 @@
 import React, { useState } from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
-import type { DashboardSection } from '@client/lib/types/dashboard';
+import type { DashboardSectionConfig } from '@client/lib/ui/dashboard/types';
 
 interface DashboardTabsProps {
-  sections: DashboardSection[];
-  onUpdate?: (sectionId: string, updates: Partial<DashboardSection>) => void;
+  sections: DashboardSectionConfig[];
+  defaultTab?: string;
+  className?: string;
+  onTabChange?: (tabId: string) => void;
+  onUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
+  onSectionUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
 }
 
 interface SectionRendererProps {
-  section: DashboardSection;
-  onUpdate?: (sectionId: string, updates: Partial<DashboardSection>) => void;
+  section: DashboardSectionConfig;
+  onUpdate?: (sectionId: string, updates: Partial<DashboardSectionConfig>) => void;
 }
 
 /**

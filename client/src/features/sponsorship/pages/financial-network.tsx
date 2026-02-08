@@ -21,6 +21,7 @@ import { logger } from '@client/lib/utils/logger';
 
 interface FinancialNetworkProps {
   bill_id?: string;
+  isEmbedded?: boolean;
 }
 
 interface NetworkData {

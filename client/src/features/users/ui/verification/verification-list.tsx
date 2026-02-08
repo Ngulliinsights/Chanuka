@@ -133,28 +133,28 @@ export const VerificationsList = () => {
     <div className="space-y-4">
       <div className="flex space-x-2 mb-4">
         <Button
-          variant={activeFilter === 'all' ? 'default' : 'outline'}
+          variant={activeFilter === 'all' ? 'primary' : 'outline'}
           size="sm"
           onClick={() => setActiveFilter('all')}
         >
           All
         </Button>
         <Button
-          variant={activeFilter === 'pending' ? 'default' : 'outline'}
+          variant={activeFilter === 'pending' ? 'primary' : 'outline'}
           size="sm"
           onClick={() => setActiveFilter('pending')}
         >
           Pending
         </Button>
         <Button
-          variant={activeFilter === 'verified' ? 'default' : 'outline'}
+          variant={activeFilter === 'verified' ? 'primary' : 'outline'}
           size="sm"
           onClick={() => setActiveFilter('verified')}
         >
           Verified
         </Button>
         <Button
-          variant={activeFilter === 'disputed' ? 'default' : 'outline'}
+          variant={activeFilter === 'disputed' ? 'primary' : 'outline'}
           size="sm"
           onClick={() => setActiveFilter('disputed')}
         >

@@ -21,13 +21,13 @@ import {
 import { useBills } from '@client/features/bills';
 import type {
   DashboardData,
-  DashboardConfig,
+  DashboardAppConfig,
   UseDashboardResult,
   ActionItem,
   TrackedTopic,
 } from '@client/lib/types';
 
-const DEFAULT_CONFIG: DashboardConfig = {
+const DEFAULT_CONFIG: DashboardAppConfig = {
   refreshInterval: 30000, // 30 seconds
   maxActionItems: 10,
   maxTrackedTopics: 20,
@@ -36,10 +36,10 @@ const DEFAULT_CONFIG: DashboardConfig = {
   defaultView: 'activity',
 };
 
-export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardResult {
+export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboardResult {
   const billsQuery = useBills();
 
-  const [dashboardConfig] = useState<DashboardConfig>(() => {
+  const [dashboardConfig] = useState<DashboardAppConfig>(() => {
     const configValidation = safeValidateDashboardConfig({ ...DEFAULT_CONFIG, ...config });
     return configValidation.success ? configValidation.data : DEFAULT_CONFIG;
   });

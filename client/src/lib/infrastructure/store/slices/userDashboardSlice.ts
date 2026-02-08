@@ -18,7 +18,7 @@ import type {
   PrivacyControls,
   DataExportRequest,
   TemporalFilter,
-  DashboardPreferences,
+  UserDashboardPreferences,
 } from '@client/lib/types/user-dashboard';
 
 import type { RootState } from '../index';
@@ -53,7 +53,7 @@ export const refreshRecommendations = createAsyncThunk(
       const mockRecommendations: BillRecommendation[] = [
         {
           bill: {
-            id: Math.floor(Math.random() * 1000),
+            id: `bill-${Math.floor(Math.random() * 1000)}`,
             billNumber: 'HB-2024-001',
             title: 'Digital Privacy Protection Act',
             summary: 'Enhances digital privacy protections for citizens',
@@ -163,7 +163,7 @@ const userDashboardSlice = createSlice({
 
     updateTrackedBill: (
       state,
-      action: PayloadAction<{ billId: number; updates: Partial<TrackedBill> }>
+      action: PayloadAction<{ billId: string; updates: Partial<TrackedBill> }>
     ) => {
       const { billId, updates } = action.payload;
       if (!state.dashboardData) return;
@@ -201,7 +201,7 @@ const userDashboardSlice = createSlice({
     // Bill tracking
     trackBill: (
       state,
-      action: PayloadAction<{ billId: number; notifications?: TrackedBill['notifications'] }>
+      action: PayloadAction<{ billId: string; notifications?: TrackedBill['notifications'] }>
     ) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
@@ -236,7 +236,7 @@ const userDashboardSlice = createSlice({
       }
     },
 
-    untrackBill: (state, action: PayloadAction<number>) => {
+    untrackBill: (state, action: PayloadAction<string>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
 
@@ -249,7 +249,7 @@ const userDashboardSlice = createSlice({
 
     updateBillNotifications: (
       state,
-      action: PayloadAction<{ billId: number; notifications: TrackedBill['notifications'] }>
+      action: PayloadAction<{ billId: string; notifications: TrackedBill['notifications'] }>
     ) => {
       const { billId, notifications } = action.payload;
       if (!state.dashboardData) return;
@@ -261,7 +261,7 @@ const userDashboardSlice = createSlice({
     },
 
     // Recommendations
-    dismissRecommendation: (state, action: PayloadAction<number>) => {
+    dismissRecommendation: (state, action: PayloadAction<string>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
 
@@ -270,7 +270,7 @@ const userDashboardSlice = createSlice({
       );
     },
 
-    acceptRecommendation: (state, action: PayloadAction<number>) => {
+    acceptRecommendation: (state, action: PayloadAction<string>) => {
       const billId = action.payload;
       if (!state.dashboardData) return;
 
@@ -292,7 +292,7 @@ const userDashboardSlice = createSlice({
       state.timeFilter = action.payload;
     },
 
-    updatePreferences: (state, action: PayloadAction<Partial<DashboardPreferences>>) => {
+    updatePreferences: (state, action: PayloadAction<Partial<UserDashboardPreferences>>) => {
       state.preferences = { ...state.preferences, ...action.payload };
     },
 
@@ -534,14 +534,14 @@ export const useUserDashboardStore = () => {
   const dispatch = useAppDispatch();
 
   return {
-    trackBill: (billId: number, notifications?: TrackedBill['notifications']) =>
+    trackBill: (billId: string, notifications?: TrackedBill['notifications']) =>
       dispatch(trackBill({ billId, notifications })),
-    untrackBill: (billId: number) => dispatch(untrackBill(billId)),
-    updateBillNotifications: (billId: number, notifications: TrackedBill['notifications']) =>
+    untrackBill: (billId: string) => dispatch(untrackBill(billId)),
+    updateBillNotifications: (billId: string, notifications: TrackedBill['notifications']) =>
       dispatch(updateBillNotifications({ billId, notifications })),
     addEngagementItem: (item: EngagementHistoryItem) => dispatch(addEngagementItem(item)),
-    dismissRecommendation: (billId: number) => dispatch(dismissRecommendation(billId)),
-    updatePreferences: (preferences: Partial<DashboardPreferences>) =>
+    dismissRecommendation: (billId: string) => dispatch(dismissRecommendation(billId)),
+    updatePreferences: (preferences: Partial<UserDashboardPreferences>) =>
       dispatch(updatePreferences(preferences)),
     updatePrivacyControls: (controls: Partial<PrivacyControls>) =>
       dispatch(updatePrivacyControls(controls)),

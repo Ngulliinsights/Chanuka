@@ -112,7 +112,11 @@ export class WebSocketClient {
       this.emit('disconnected', event.code, event.reason);
 
       // Auto-reconnect logic based on client config
-      if (this.config.reconnect?.enabled !== false) {
+      const shouldReconnect = typeof this.config.reconnect === 'boolean' 
+        ? this.config.reconnect 
+        : this.config.reconnect?.enabled !== false;
+      
+      if (shouldReconnect) {
         this.attemptReconnect();
       }
     };
@@ -201,9 +205,13 @@ export class WebSocketClient {
   }
 
   private attemptReconnect() {
-    if (this.reconnectAttempts < (this.config.reconnect?.maxAttempts || 5)) {
+    const reconnectConfig = typeof this.config.reconnect === 'boolean' 
+      ? { enabled: this.config.reconnect, maxAttempts: 5, delay: 1000 }
+      : this.config.reconnect || { enabled: true, maxAttempts: 5, delay: 1000 };
+
+    if (this.reconnectAttempts < reconnectConfig.maxAttempts) {
       const reconnectDelay = Math.min(
-        (this.config.reconnect?.delay || 1000) * Math.pow(2, this.reconnectAttempts),
+        reconnectConfig.delay * Math.pow(2, this.reconnectAttempts),
         30000
       );
 

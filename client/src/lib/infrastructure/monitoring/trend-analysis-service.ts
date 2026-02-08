@@ -5,7 +5,6 @@
 
 import { ErrorAggregationService } from './error-aggregation-service';
 import {
-  TrendAnalysisService as ITrendAnalysisService,
   ClientSystem,
   ErrorSeverity
 } from './unified-error-monitoring-interface';
@@ -26,7 +25,7 @@ interface AlertRule {
   lastTriggered: number;
 }
 
-class TrendAnalysisService implements ITrendAnalysisService {
+class TrendAnalysisService {
   private static instance: TrendAnalysisService;
   private aggregationService: ErrorAggregationService;
   private trendData: TrendDataPoint[] = [];
@@ -126,13 +125,14 @@ class TrendAnalysisService implements ITrendAnalysisService {
     }, 5 * 60 * 1000); // Analyze every 5 minutes
   }
 
-  private collectTrendData(): void {
+  private async collectTrendData(): Promise<void> {
     const now = Date.now();
     const fiveMinutesAgo = now - 5 * 60 * 1000;
 
     // Get error data from the last 5 minutes
+    const errors = await this.aggregationService.getAggregatedErrors();
     Object.values(ClientSystem).forEach(system => {
-      const systemErrors = (await this.aggregationService.aggregateErrors()).errors.filter(
+      const systemErrors = errors.filter(
         (err: any) => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
       );
 
@@ -301,10 +301,13 @@ class TrendAnalysisService implements ITrendAnalysisService {
 
     // Check for threshold exceeded
     const systemErrorCounts: Record<ClientSystem, number> = {
-      [ClientSystem.SECURITY]: 0,
-      [ClientSystem.HOOKS]: 0,
-      [ClientSystem.LIBRARY_SERVICES]: 0,
-      [ClientSystem.SERVICE_ARCHITECTURE]: 0
+      security: 0,
+      hooks: 0,
+      library_services: 0,
+      service_architecture: 0,
+      mobile: 0,
+      desktop: 0,
+      web: 0
     };
 
     recentData.forEach(d => {
@@ -390,7 +393,7 @@ class TrendAnalysisService implements ITrendAnalysisService {
     crossSystemAnalytics.systems.forEach(systemHealth => {
       if (systemHealth.status === 'critical') {
         predictions.push({
-          system: systemHealth.system,
+          system: systemHealth.system as ClientSystem,
           issue: `Critical system health in ${systemHealth.system}`,
           probability: 0.95,
           impact: 90,

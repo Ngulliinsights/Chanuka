@@ -28,6 +28,7 @@ export interface VoteUpdate {
   billId: number;
   userId: string;
   vote: 'yes' | 'no' | 'abstain';
+  voteType?: 'yes' | 'no' | 'abstain' | 'neutral'; // For backward compatibility
   timestamp: Date;
 }
 
@@ -48,29 +49,47 @@ export interface BillUpdate {
   billId: number;
   type: 'status' | 'content' | 'vote' | 'engagement';
   data: any;
-  timestamp: Date;
+  timestamp: Date | string;
 }
 
-export interface BillRealTimeUpdate extends BillUpdate {}
+export interface BillRealTimeUpdate extends BillUpdate {
+  bill_id: number; // Server uses snake_case
+  oldStatus?: string;
+  newStatus?: string;
+  viewCount?: number;
+  commentCount?: number;
+  amendment_id?: string;
+  voting_date?: string;
+}
 
 export interface BillEngagementUpdate {
   billId: number;
-  likes: number;
-  comments: number;
-  shares: number;
-  views: number;
-  timestamp: Date;
+  bill_id?: number; // For backward compatibility with server messages
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  views?: number;
+  viewCount?: number;
+  saveCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  timestamp: Date | string;
 }
 
 export interface BillTrackingHookReturn {
   isConnected: boolean;
-  trackedBills: Set<number>;
-  subscribedBills?: Set<number>;
+  trackedBills?: Set<number>;
+  subscribedBills: Set<number>;
   billUpdates: Map<number, BillUpdate[]>;
-  engagementData: Map<number, BillEngagementUpdate>;
-  trackBill: (billId: number) => void;
-  untrackBill: (billId: number) => void;
-  getLatestUpdate: (billId: number) => BillUpdate | undefined;
+  engagementData?: Map<number, BillEngagementUpdate>;
+  engagementMetrics: Map<number, BillEngagementUpdate>;
+  trackBill?: (billId: number) => void;
+  untrackBill?: (billId: number) => void;
+  subscribeToBill: (billId: number) => void;
+  unsubscribeFromBill: (billId: number) => void;
+  getBillUpdates: (billId: number) => BillUpdate[];
+  getEngagementMetrics: (billId: number) => BillEngagementUpdate | null;
+  getLatestUpdate?: (billId: number) => BillUpdate | undefined;
 }
 
 export interface HeartbeatConfig {
@@ -83,12 +102,19 @@ export interface SecurityConfig {
   encryption: boolean;
   tokenRefresh?: boolean;
   maxConnectionAge?: number;
+  validateOrigin?: boolean;
+  allowedOrigins?: string[];
 }
 
 export interface MessageConfig {
   maxSize: number;
   compression?: boolean;
   batchEnabled?: boolean;
+  batching?: {
+    enabled: boolean;
+    maxSize: number;
+    flushInterval: number;
+  };
 }
 
 export interface ReconnectConfig {
@@ -109,10 +135,6 @@ export interface WebSocketConfig {
   security?: SecurityConfig;
   message?: MessageConfig;
   protocols?: string[];
-  // Extended properties for direct access
-  delay?: number;
-  validateOrigin?: boolean;
-  batchSize?: number;
 }
 
 export interface RealTimeConfig {
@@ -124,14 +146,17 @@ export interface RealTimeConfig {
   bills?: {
     pollingInterval: number;
     batchUpdates?: boolean;
+    autoReconnect?: boolean;
   };
 }
 
+// Import from shared types for consistency
 export interface WebSocketMessage {
   type: string;
-  payload: any;
-  timestamp: Date;
-  data?: any; // For backwards compatibility
+  data?: any;
+  payload?: any; // For backwards compatibility
+  messageId?: string;
+  timestamp?: number;
 }
 
 export interface RealtimeConnection {
@@ -238,17 +263,18 @@ export interface WebSocketSubscription {
   handler: (data: any) => void;
   createdAt: Date;
   // Extended properties
-  type?: 'bill' | 'community' | 'expert' | 'notification';
+  type?: 'bill' | 'community' | 'expert' | 'notification' | 'user_notifications';
   topic?: string;
   callback?: (data: any) => void;
   filters?: Record<string, any>;
+  priority?: number;
 }
 
 export type Subscription = WebSocketSubscription;
 
 export interface RealTimeHandlers {
   onMessage?: (message: WebSocketMessage) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: Error | string) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
   // Extended handlers for specific update types
@@ -257,7 +283,7 @@ export interface RealTimeHandlers {
   onEngagementUpdate?: (update: any) => void;
   onExpertActivity?: (update: any) => void;
   onNotification?: (notification: RealTimeNotification) => void;
-  onConnectionChange?: (state: ConnectionState) => void;
+  onConnectionChange?: (state: boolean | ConnectionState) => void;
 }
 
 export type MessageHandler = (message: WebSocketMessage) => void;
@@ -283,6 +309,14 @@ export interface BatchMessage {
 
 export interface PollingFallbackConfig {
   enabled: boolean;
-  interval: number;
-  maxRetries: number;
+  interval?: number; // For simple polling
+  intervals?: { // For granular polling per feature
+    bills?: number;
+    engagement?: number;
+    notifications?: number;
+    community?: number;
+  };
+  maxRetries?: number;
+  max_retries?: number; // Alias
+  backoff_multiplier?: number;
 }

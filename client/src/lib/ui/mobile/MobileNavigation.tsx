@@ -58,25 +58,25 @@ const DEFAULT_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     id: 'home',
     label: 'Home',
-    href: '/',
+    path: '/',
     icon: 'BarChart3',
   },
   {
     id: 'bills',
     label: 'Bills',
-    href: '/bills',
+    path: '/bills',
     icon: 'User',
   },
   {
     id: 'search',
     label: 'Search',
-    href: '/search',
+    path: '/search',
     icon: 'Search',
   },
   {
     id: 'dashboard',
     label: 'Dashboard',
-    href: '/dashboard',
+    path: '/dashboard',
     icon: 'Settings',
   },
 ];
@@ -290,13 +290,14 @@ export const MobileNavigation = React.memo<MobileNavigationProps>(
               <nav className="flex-1 overflow-y-auto py-2">
                 <div className="space-y-1 px-2">
                   {visibleItems.map(item => {
-                    const isActive = isActivePath(item.href);
+                    const itemPath = item.href || item.path;
+                    const isActive = isActivePath(itemPath);
                     const icon = getIcon(item.icon);
 
                     return (
                       <Link
                         key={item.id}
-                        to={item.href}
+                        to={itemPath}
                         onClick={closeDrawer}
                         className={cn(
                           'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium',
@@ -389,13 +390,14 @@ export const MobileNavigation = React.memo<MobileNavigationProps>(
         >
           <div className="flex items-center justify-around">
             {bottomNavItems.map(item => {
-              const isActive = isActivePath(item.href);
+              const itemPath = item.href || item.path;
+              const isActive = isActivePath(itemPath);
               const icon = getIcon(item.icon);
 
               return (
                 <Link
                   key={item.id}
-                  to={item.href}
+                  to={itemPath}
                   className={cn(
                     'flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px]',
                     'focus:outline-none focus:ring-2 focus:ring-ring',

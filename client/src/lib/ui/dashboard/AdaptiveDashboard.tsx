@@ -190,8 +190,18 @@ export function AdaptiveDashboard({
         performanceMonitor.markPersonaDetectionStart();
         performanceMonitor.markDataFetchStart();
 
+        // Convert UserProfile to User type for persona detection
+        const userForDetection = userProfile ? {
+          id: userProfile.id,
+          name: userProfile.name,
+          email: userProfile.email,
+          role: userProfile.role,
+          profile: userProfile,
+          verification: { verified: userProfile.verified || false }
+        } : null;
+
         const classification = await personaDetector.detectPersona(
-          userProfile,
+          userForDetection as any,
           userActivity,
           existingProfile
         );

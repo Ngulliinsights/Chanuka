@@ -70,25 +70,13 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         // Step 1: Initialize Security Utilities (Low Risk, High Impact)
         setStatus(prev => ({ ...prev, security: 'loading' }));
 
-        const cspManager = CSPManager.getInstance();
         const domSanitizer = DOMSanitizer.getInstance();
         const inputValidator = InputValidator.getInstance();
         const passwordValidator = PasswordValidator.getInstance();
 
-        // Configure CSP for current environment
-        const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-        const cspHeader = cspManager.generateCSPHeader(environment);
-
-        // Apply CSP header if we're in a context that supports it
-        if (typeof document !== 'undefined' && document.head) {
-          const existingMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-          if (!existingMeta) {
-            const meta = document.createElement('meta');
-            meta.httpEquiv = 'Content-Security-Policy';
-            meta.content = cspHeader;
-            document.head.appendChild(meta);
-          }
-        }
+        // CSP is now handled server-side via HTTP headers
+        // Client-side CSP management is disabled to avoid conflicts
+        logger.info('Security utilities initialized - using server-side CSP headers');
 
         if (isCancelled) return;
         setStatus(prev => ({ ...prev, security: 'success' }));
@@ -159,7 +147,6 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         // Update services
         if (!isCancelled) {
           setServices({
-            cspManager,
             domSanitizer,
             inputValidator,
             passwordValidator,

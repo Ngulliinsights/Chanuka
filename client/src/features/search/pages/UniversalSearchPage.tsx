@@ -21,7 +21,7 @@ import type {
   SavedSearch,
   SearchFilters as SearchFiltersType,
   SearchHistory,
-  SearchResult as ApiSearchResult,
+  SearchResult,
 } from '@client/features/search/types';
 import { SearchFilters } from '@client/features/search/ui/filters/SearchFilters';
 import {
@@ -57,20 +57,14 @@ import {
 import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
 
-// Define SearchResult interface for streaming search
-interface SearchResult {
-  id: string;
-  title: string;
-  type: string;
-  content: string;
-  score: number;
-}
+// Use SearchResult from lib/types/search for consistency
+// The streaming search already uses this type
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
-type DisplayableSearchResult = ApiSearchResult & {
+type DisplayableSearchResult = SearchResult & {
   type: 'bill' | 'comment' | 'sponsor';
   excerpt: string;
   relevanceScore: number;
@@ -93,14 +87,14 @@ interface SearchState {
 /**
  * Type guard to check if a search result can be displayed
  */
-const isDisplayableResult = (result: ApiSearchResult): result is DisplayableSearchResult => {
+const isDisplayableResult = (result: SearchResult): result is DisplayableSearchResult => {
   return ['bill', 'comment', 'sponsor'].includes(result.type);
 };
 
 /**
  * Normalizes API search result to displayable format
  */
-const normalizeResult = (result: ApiSearchResult): DisplayableSearchResult | null => {
+const normalizeResult = (result: SearchResult): DisplayableSearchResult | null => {
   if (!isDisplayableResult(result)) {
     logger.debug('Filtering non-displayable result', { type: result.type, id: result.id });
     return null;
@@ -117,7 +111,7 @@ const normalizeResult = (result: ApiSearchResult): DisplayableSearchResult | nul
 /**
  * Filters and normalizes results for display
  */
-const getDisplayableResults = (results: ApiSearchResult[]): DisplayableSearchResult[] => {
+const getDisplayableResults = (results: SearchResult[]): DisplayableSearchResult[] => {
   return results
     .map(normalizeResult)
     .filter((result): result is DisplayableSearchResult => result !== null);
@@ -243,9 +237,9 @@ const ResultsGrid = React.memo<{
   isLoading: boolean;
   hasSearched: boolean;
   error: Error | null;
-  onResultClick: (result: DisplayableSearchResult) => void;
-  onSaveResult: (result: DisplayableSearchResult) => void;
-  onShareResult: (result: DisplayableSearchResult) => void;
+  onResultClick: (result: SearchResult) => void;
+  onSaveResult: (result: SearchResult) => void;
+  onShareResult: (result: SearchResult) => void;
 }>(
   ({
     results,
@@ -427,7 +421,13 @@ export function UniversalSearchPage() {
     [search]
   );
 
-  const handleResultClick = useCallback((result: DisplayableSearchResult) => {
+  const handleResultClick = useCallback((result: SearchResult) => {
+    // Type guard to ensure we only handle displayable results
+    if (!['bill', 'sponsor', 'comment'].includes(result.type)) {
+      logger.warn('Unhandled result type', { type: result.type, id: result.id });
+      return;
+    }
+
     const routes: Record<string, string> = {
       bill: `/bills/${result.id}`,
       sponsor: `/sponsors/${result.id}`,
@@ -439,13 +439,11 @@ export function UniversalSearchPage() {
     const route = routes[result.type];
     if (route) {
       window.location.href = route;
-    } else {
-      logger.warn('Unhandled result type', { type: result.type, id: result.id });
     }
   }, []);
 
   const handleSaveResult = useCallback(
-    (result: DisplayableSearchResult) => {
+    (result: SearchResult) => {
       Promise.resolve()
         .then(() => {
           toast({
@@ -465,7 +463,7 @@ export function UniversalSearchPage() {
   );
 
   const handleShareResult = useCallback(
-    (result: DisplayableSearchResult) => {
+    (result: SearchResult) => {
       const shareContent = async () => {
         try {
           const shareData = {

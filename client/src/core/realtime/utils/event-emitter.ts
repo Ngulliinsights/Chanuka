@@ -30,7 +30,7 @@ export class EventEmitter {
     }
   }
 
-  emit(event: string, ...args: unknown[]): void {
+  emit(event: string, ...args: any[]): void {
     const listeners = this.events.get(event);
     if (!listeners || listeners.size === 0) return;
 
@@ -43,7 +43,7 @@ export class EventEmitter {
       setTimeout(() => {
         listenerArray.forEach(callback => {
           try {
-            callback(...args);
+            callback(...(args as [any]));
           } catch (error) {
             console.error(`Error in event listener for '${event}':`, error);
           }
@@ -53,7 +53,7 @@ export class EventEmitter {
       // For small listener counts, use microtasks
       listenerArray.forEach(callback => {
         try {
-          queueMicrotask(() => callback(...args));
+          queueMicrotask(() => callback(...(args as [any])));
         } catch (error) {
           console.error(`Error in event listener for '${event}':`, error);
         }

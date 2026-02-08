@@ -40,6 +40,9 @@ export interface BaseErrorOptions {
   retryable?: boolean;
   recoverable?: boolean;
   context?: ErrorContext;
+  zodError?: unknown; // ZodError from zod validation
+  config?: unknown; // Configuration that caused the error
+  retryCount?: number; // Number of retry attempts
 }
 
 // ============================================================================
@@ -221,6 +224,8 @@ export class DashboardValidationError extends ValidationError {
     options?: {
       details?: Record<string, unknown>;
       context?: ErrorContext;
+      zodError?: unknown; // ZodError from zod validation
+      config?: unknown; // Configuration that caused the error
     }
   ) {
     super(
@@ -250,6 +255,11 @@ export class DashboardConfigurationError extends BaseError {
     options?: {
       details?: Record<string, unknown>;
       context?: ErrorContext;
+      config?: unknown; // Configuration that caused the error
+      baseConfig?: unknown; // Base configuration for comparison
+      configJson?: unknown; // JSON configuration string
+      overrides?: unknown; // Configuration overrides
+      merged?: unknown; // Merged configuration result
     }
   ) {
     super(message, {

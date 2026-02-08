@@ -152,11 +152,11 @@ function handleLoginSuccess(
 
     // Record security event
     if (config.enableSecurityMonitoring && payload.user) {
-      const securityEvent = securityMonitor.createSecurityEvent(payload.user.id, 'login', {
+      securityMonitor.trackSecurityEvent('login', {
+        userId: payload.user.id,
         method: payload.method || 'password',
         timestamp: new Date().toISOString(),
       });
-      securityMonitor.logSecurityEvent(securityEvent);
     }
 
     // Clear any cached permissions for fresh start
@@ -181,7 +181,11 @@ function handleLoginFailure(error: LoginRejectedPayload, _config: AuthMiddleware
     // Record failed login attempt for security monitoring
     if (_config.enableSecurityMonitoring) {
       const currentIP = '0.0.0.0'; // Would be provided by server in production
-      securityMonitor.recordLoginAttempt(currentIP, navigator.userAgent, false);
+      securityMonitor.trackSecurityEvent('login_failed', {
+        ip: currentIP,
+        userAgent: navigator.userAgent,
+        success: false,
+      });
     }
 
     // Clear any stale tokens

@@ -1,11 +1,11 @@
 /**
  * Utility types index
  * Re-exports all utility types organized by domain
+ * Note: types.ts already re-exports from common.ts, so we only need to export types once
  */
 
-// Core utility types
+// Core utility types (includes common.ts via re-export)
 export * from './types';
-export * from './common';
 
 // Domain-specific utility types
 export * from './react';

@@ -156,18 +156,24 @@ class PerformanceImpactMonitor {
     };
 
     const systemImpacts: Record<ClientSystem, PerformanceImpact[]> = {
-      [ClientSystem.SECURITY]: [],
-      [ClientSystem.HOOKS]: [],
-      [ClientSystem.LIBRARY_SERVICES]: [],
-      [ClientSystem.SERVICE_ARCHITECTURE]: []
+      security: [],
+      hooks: [],
+      library_services: [],
+      service_architecture: [],
+      mobile: [],
+      desktop: [],
+      web: []
     };
 
     // Get unique operations per system
     const systemOperations: Record<ClientSystem, Set<string>> = {
-      [ClientSystem.SECURITY]: new Set(),
-      [ClientSystem.HOOKS]: new Set(),
-      [ClientSystem.LIBRARY_SERVICES]: new Set(),
-      [ClientSystem.SERVICE_ARCHITECTURE]: new Set()
+      security: new Set(),
+      hooks: new Set(),
+      library_services: new Set(),
+      service_architecture: new Set(),
+      mobile: new Set(),
+      desktop: new Set(),
+      web: new Set()
     };
 
     this.performanceData.forEach(d => {

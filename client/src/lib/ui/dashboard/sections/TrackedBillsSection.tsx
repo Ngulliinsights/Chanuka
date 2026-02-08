@@ -36,12 +36,12 @@ export function TrackedBillsSection({
   compact = false,
 }: TrackedBillsSectionProps) {
   // Mock store functions since userDashboardSlice doesn't exist yet
-  const untrackBill = (billId: number) => {
+  const untrackBill = (billId: string) => {
     console.log('Untrack bill:', billId);
   };
 
   const updateBillNotifications = (
-    billId: number,
+    billId: string,
     notifications: Partial<TrackedBill['notifications']>
   ) => {
     console.log('Update bill notifications:', billId, notifications);
@@ -82,7 +82,7 @@ export function TrackedBillsSection({
   };
 
   const handleToggleNotifications = (
-    billId: number,
+    billId: string,
     notificationType: keyof TrackedBill['notifications']
   ) => {
     const bill = bills.find(b => b.id === billId);
@@ -96,7 +96,7 @@ export function TrackedBillsSection({
     updateBillNotifications(billId, updatedNotifications);
   };
 
-  const handleUntrackBill = (billId: number) => {
+  const handleUntrackBill = (billId: string) => {
     if (confirm('Are you sure you want to stop tracking this bill?')) {
       untrackBill(billId);
     }

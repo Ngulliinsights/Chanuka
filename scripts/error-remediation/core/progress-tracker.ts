@@ -13,6 +13,7 @@ import {
   ProgressReport,
   ErrorCategory
 } from '../types';
+import { RemediationConfig } from '../config';
 
 export class ProgressTracker {
   private phaseProgress: Map<FixPhase, PhaseStatus>;
@@ -20,8 +21,10 @@ export class ProgressTracker {
   private errorsByCategory: Map<ErrorCategory, number>;
   private startTime: Date;
   private currentPhase: FixPhase | null;
+  private config: RemediationConfig;
 
-  constructor() {
+  constructor(config: RemediationConfig) {
+    this.config = config;
     this.phaseProgress = new Map();
     this.filesModified = new Set();
     this.errorsByCategory = new Map();

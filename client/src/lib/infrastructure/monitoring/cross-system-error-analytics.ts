@@ -39,6 +39,8 @@ export class CrossSystemErrorAnalytics {
       trends: [] as any[],
       insights: [] as any[],
       timestamp: new Date(),
+      overallHealth: 'healthy' as 'healthy' | 'degraded' | 'critical',
+      correlations: [] as any[],
       systems: [] as Array<{
         system: string;
         status: 'healthy' | 'degraded' | 'critical';
@@ -47,6 +49,10 @@ export class CrossSystemErrorAnalytics {
         lastUpdated: number;
       }>,
     };
+  }
+  
+  identifyCrossSystemPatterns() {
+    return [] as any[];
   }
 }
 

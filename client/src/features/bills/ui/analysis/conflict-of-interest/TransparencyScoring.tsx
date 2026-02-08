@@ -44,16 +44,21 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
     const { transparencyScore, financialInterests, organizationalConnections, votingPatterns } =
       conflictAnalysis;
 
+    // Normalize transparencyScore to object format
+    const scoreObj = typeof transparencyScore === 'number' 
+      ? { overall: transparencyScore, financialDisclosure: 0, votingHistory: 0, industryConnections: 0 }
+      : transparencyScore;
+
     // Financial Disclosure Score (0-100)
     const financialScore = {
-      score: transparencyScore.financialDisclosure,
+      score: scoreObj?.financialDisclosure ?? 0,
       factors: [
         {
           name: 'Disclosure Completeness',
           score: Math.min(
             100,
-            (financialInterests.filter(f => f.verified).length /
-              Math.max(1, financialInterests.length)) *
+            ((financialInterests?.filter(f => f.verified).length ?? 0) /
+              Math.max(1, financialInterests?.length ?? 1)) *
               100
           ),
           weight: 0.4,
@@ -63,12 +68,12 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Timeliness',
           score: Math.min(
             100,
-            (financialInterests.filter(f => {
+            ((financialInterests?.filter(f => {
               const daysSinceDisclosure =
                 (Date.now() - new Date(f.date).getTime()) / (1000 * 60 * 60 * 24);
               return daysSinceDisclosure <= 90; // Within 90 days
-            }).length /
-              Math.max(1, financialInterests.length)) *
+            }).length ?? 0) /
+              Math.max(1, financialInterests?.length ?? 1)) *
               100
           ),
           weight: 0.3,
@@ -78,8 +83,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Detail Level',
           score: Math.min(
             100,
-            (financialInterests.filter(f => f.description && f.description.length > 20).length /
-              Math.max(1, financialInterests.length)) *
+            ((financialInterests?.filter(f => f.description && f.description.length > 20).length ?? 0) /
+              Math.max(1, financialInterests?.length ?? 1)) *
               100
           ),
           weight: 0.3,
@@ -90,14 +95,14 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
 
     // Voting History Score (0-100)
     const votingScore = {
-      score: transparencyScore.votingHistory,
+      score: scoreObj?.votingHistory ?? 0,
       factors: [
         {
           name: 'Vote Consistency',
           score: Math.min(
             100,
-            (votingPatterns.filter(v => Math.abs(v.financialCorrelation) < 0.3).length /
-              Math.max(1, votingPatterns.length)) *
+            ((votingPatterns?.filter(v => Math.abs(v.financialCorrelation ?? 0) < 0.3).length ?? 0) /
+              Math.max(1, votingPatterns?.length ?? 1)) *
               100
           ),
           weight: 0.5,
@@ -113,8 +118,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Attendance Rate',
           score: Math.min(
             100,
-            (votingPatterns.filter(v => v.vote !== 'absent').length /
-              Math.max(1, votingPatterns.length)) *
+            ((votingPatterns?.filter(v => v.vote !== 'abstain').length ?? 0) /
+              Math.max(1, votingPatterns?.length ?? 1)) *
               100
           ),
           weight: 0.2,
@@ -125,14 +130,14 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
 
     // Industry Connections Score (0-100)
     const connectionsScore = {
-      score: transparencyScore.industryConnections,
+      score: scoreObj?.industryConnections ?? 0,
       factors: [
         {
           name: 'Connection Disclosure',
           score: Math.min(
             100,
-            (organizationalConnections.filter(c => c.verified).length /
-              Math.max(1, organizationalConnections.length)) *
+            ((organizationalConnections?.filter(c => c.verified).length ?? 0) /
+              Math.max(1, organizationalConnections?.length ?? 1)) *
               100
           ),
           weight: 0.4,
@@ -142,8 +147,8 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Conflict Management',
           score: Math.min(
             100,
-            (organizationalConnections.filter(c => c.endDate !== undefined).length /
-              Math.max(1, organizationalConnections.length)) *
+            ((organizationalConnections?.filter(c => c.endDate !== undefined).length ?? 0) /
+              Math.max(1, organizationalConnections?.length ?? 1)) *
               100
           ),
           weight: 0.4,
@@ -159,11 +164,11 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
     };
 
     return {
-      overall: transparencyScore.overall,
+      overall: scoreObj?.overall ?? 0,
       financial: financialScore,
       voting: votingScore,
       connections: connectionsScore,
-      lastUpdated: transparencyScore.lastUpdated,
+      lastUpdated: scoreObj?.lastUpdated ?? new Date().toISOString(),
     };
   }, [conflictAnalysis]);
 

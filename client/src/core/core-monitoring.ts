@@ -3,7 +3,7 @@
  * Implements unified error monitoring for the Service Architecture system
  */
 
-import { createError } from '@client/core/error';
+import { createError, ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '@client/core/error';
 import { CrossSystemErrorAnalytics } from '@client/lib/infrastructure/monitoring/cross-system-error-analytics';
 import { ErrorAggregationService } from '@client/lib/infrastructure/monitoring/error-aggregation-service';
 import {
@@ -50,8 +50,8 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
 
     const appError = error instanceof Error && !(error as any).type
       ? createError(
-          ErrorDomain.SYSTEM,
-          ErrorSeverity.HIGH,
+          CoreErrorDomain.SYSTEM,
+          CoreErrorSeverity.HIGH,
           error.message,
           {
             details: { originalError: error, coreOperation: context.operation },
@@ -74,10 +74,10 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     };
 
     // Track core-specific error
-    this.trackCoreError(context.operation || 'unknown', appError);
+    this.trackCoreError(context.operation || 'unknown', appError as AppError);
 
     // Report to aggregation service
-    this.aggregationService.addError(ClientSystem.SERVICE_ARCHITECTURE, appError, enhancedContext);
+    this.aggregationService.addError(ClientSystem.SERVICE_ARCHITECTURE, appError as AppError, enhancedContext);
 
     // Check error patterns
     this.checkErrorPatterns(appError);
@@ -100,8 +100,8 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     // Check for performance issues specific to core operations
     if (metrics.duration > 1000 && (metrics.operation.includes('API') || metrics.operation.includes('State'))) {
       const perfError = createError(
-        ErrorDomain.SYSTEM,
-        ErrorSeverity.MEDIUM,
+        CoreErrorDomain.PERFORMANCE,
+        CoreErrorSeverity.MEDIUM,
         `Slow core operation: ${metrics.operation}`,
         {
           details: { ...metrics },
@@ -193,7 +193,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     else if (errorRate > 5 || performanceScore < 85) status = 'degraded';
 
     return {
-      system: ClientSystem.SERVICE_ARCHITECTURE,
+      system: ClientSystem.SERVICE_ARCHITECTURE as ClientSystem,
       status,
       errorRate,
       performanceScore,
@@ -337,8 +337,8 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
 
   private triggerErrorAlert(pattern: string, count: number, error: AppError): void {
     const alertError = createError(
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.CRITICAL,
+      CoreErrorDomain.SYSTEM,
+      CoreErrorSeverity.CRITICAL,
       `Service Architecture error pattern threshold exceeded: ${pattern}`,
       {
         details: {
@@ -411,8 +411,8 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
 
     if (!success) {
       const error = createError(
-        ErrorDomain.SYSTEM,
-        ErrorSeverity.MEDIUM,
+        CoreErrorDomain.SYSTEM,
+        CoreErrorSeverity.MEDIUM,
         `Core operation failed: ${operationName}`,
         {
           details: { executionTime, operationName },

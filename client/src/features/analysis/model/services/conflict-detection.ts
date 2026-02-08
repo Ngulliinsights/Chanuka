@@ -1,4 +1,4 @@
-import { ConflictAnalysis, FinancialInterest } from '@client/features/analysis/types';
+import { ConflictAnalysis, FinancialInterest } from '@client/features/analysis/types/index';
 
 /**
  * Service interface for conflict detection
@@ -30,34 +30,21 @@ export class MockConflictDetectionService implements ConflictDetectionService {
     await new Promise(resolve => setTimeout(resolve, 300));
 
     return {
-      billId: 1,
-      sponsorId: parseInt(sponsorId),
-      sponsorName: `Sponsor ${sponsorId}`,
-      analysisDate: new Date().toISOString(),
-      riskAssessment: {
-        overallRisk: 72,
-        conflictDetected: true,
-        riskLevel: 'high',
-        confidence: 0.85,
-      },
-      conflicts: [],
-      votingHistory: [],
+      sponsorId: parseInt(_sponsorId),
+      sponsorName: `Sponsor ${_sponsorId}`,
+      financialInterests: _financialInterests,
+      organizationalConnections: [],
+      votingPatterns: [],
       transparencyScore: {
-        overallScore: 58,
-        components: {
-          financialDisclosure: { score: 65, weight: 0.4, details: 'Complete but late disclosure' },
-          votingHistory: { score: 52, weight: 0.35, details: 'Limited voting explanations' },
-          industryConnections: {
-            score: 48,
-            weight: 0.25,
-            details: 'Significant undisclosed connections',
-          },
-        },
+        overall: 58,
+        financialDisclosure: 65,
+        votingHistory: 52,
+        industryConnections: 48,
         methodology: 'Multi-factor transparency scoring',
+        lastUpdated: new Date().toISOString(),
       },
-      implementationWorkarounds: [],
-      networkNodes: [],
-      networkLinks: [],
+      riskLevel: 'high',
+      summary: 'Conflict analysis based on financial interests and voting patterns',
     };
   }
 

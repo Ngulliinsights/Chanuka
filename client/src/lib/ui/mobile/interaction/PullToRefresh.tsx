@@ -35,7 +35,11 @@ export function PullToRefresh({
   const isDragging = useRef(false);
 
   const config = useMemo(
-    () => ({ ...gestureConfig.PULL_TO_REFRESH, ...customConfig }),
+    () => ({ 
+      threshold: customConfig?.threshold || gestureConfig.pullToRefreshThreshold,
+      maxDistance: customConfig?.maxDistance || 120,
+      ...customConfig 
+    }),
     [customConfig]
   );
 
@@ -86,7 +90,7 @@ export function PullToRefresh({
       const deltaY = currentY - startY.current;
 
       if (deltaY > 0) {
-        const resistedDistance = Math.min(deltaY * config.resistance, config.maxPullDistance);
+        const resistedDistance = Math.min(deltaY * 0.5, config.maxDistance);
 
         setPullDistance(resistedDistance);
         setState(resistedDistance >= config.threshold ? 'ready' : 'pulling');

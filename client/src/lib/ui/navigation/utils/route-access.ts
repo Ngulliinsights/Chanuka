@@ -34,11 +34,15 @@ interface RouteAccessResult {
 /**
  * Extended navigation item with access control properties
  */
-interface NavigationItemWithAccess extends NavigationItem {
+interface NavigationItemWithAccess {
+  path: string;
+  label: string;
+  icon?: string;
   requiresAuth?: boolean;
   adminOnly?: boolean;
   allowedRoles?: UserRole[];
   condition?: (userRole: UserRole, user: User | null) => boolean;
+  children?: NavigationItemWithAccess[];
 }
 
 /**

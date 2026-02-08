@@ -41,7 +41,7 @@ interface FinancialExposureTrackerProps {
 export function FinancialExposureTracker({ conflictAnalysis }: FinancialExposureTrackerProps) {
   // Process financial data for visualization
   const financialData = useMemo(() => {
-    const { financialInterests } = conflictAnalysis;
+    const { financialInterests = [] } = conflictAnalysis;
 
     // Group by industry
     const byIndustry = financialInterests.reduce(
@@ -244,7 +244,7 @@ export function FinancialExposureTracker({ conflictAnalysis }: FinancialExposure
                       : 'default'
                 }
               >
-                {conflictAnalysis.riskLevel.toUpperCase()}
+                {(conflictAnalysis.riskLevel ?? 'low').toUpperCase()}
               </Badge>
             </div>
             <div className="text-xs text-muted-foreground">Based on exposure patterns</div>
@@ -491,7 +491,7 @@ export function FinancialExposureTracker({ conflictAnalysis }: FinancialExposure
                     </tr>
                   </thead>
                   <tbody>
-                    {conflictAnalysis.financialInterests
+                    {(conflictAnalysis.financialInterests ?? [])
                       .sort((a, b) => b.amount - a.amount)
                       .map((interest, index) => (
                         <tr key={interest.id} className="hover:bg-muted/50">

@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { UserPreferences } from '@client/lib/types';
+import { BillStatus } from '@shared/types/enums';
 
 // ... (existing imports)
 
@@ -177,7 +177,10 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
         (now.getTime() - introducedDate.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      return bill.status === 'active' && daysSinceIntroduction < URGENT_BILL_DAYS_THRESHOLD;
+      return (bill.status === BillStatus.FIRST_READING || 
+              bill.status === BillStatus.SECOND_READING || 
+              bill.status === BillStatus.COMMITTEE_STAGE) && 
+             daysSinceIntroduction < URGENT_BILL_DAYS_THRESHOLD;
     }).length;
 
     // Identify bills that might have constitutional implications by searching

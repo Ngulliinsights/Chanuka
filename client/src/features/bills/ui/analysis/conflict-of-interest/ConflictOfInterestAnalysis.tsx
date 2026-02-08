@@ -51,7 +51,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
   const conflictAnalysis: ConflictAnalysis = useMemo(() => {
     // Mock comprehensive data - in real implementation, this would come from API
     return {
-      sponsorId: bill.sponsors[0]?.id || 1,
+      sponsorId: Number(bill.sponsors[0]?.id) || 1,
       sponsorName: bill.sponsors[0]?.name || 'Rep. Jane Smith',
       financialInterests: [
         {
@@ -179,15 +179,15 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
 
   // Calculate overall risk assessment
   const riskAssessment = useMemo(() => {
-    const totalFinancialExposure = conflictAnalysis.financialInterests.reduce(
+    const totalFinancialExposure = (conflictAnalysis.financialInterests || []).reduce(
       (sum, interest) => sum + interest.amount,
       0
     );
-    const highCorrelationVotes = conflictAnalysis.votingPatterns.filter(
-      vote => Math.abs(vote.financialCorrelation) > 0.5
+    const highCorrelationVotes = (conflictAnalysis.votingPatterns || []).filter(
+      vote => Math.abs(vote.financialCorrelation ?? 0) > 0.5
     ).length;
-    const strongConnections = conflictAnalysis.organizationalConnections.filter(
-      conn => conn.strength > 0.6
+    const strongConnections = (conflictAnalysis.organizationalConnections || []).filter(
+      conn => (conn.strength ?? 0) > 0.6
     ).length;
 
     let riskScore = 0;
@@ -199,7 +199,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
 
     // Voting correlation risk (0-35 points)
     const correlationPercentage =
-      (highCorrelationVotes / conflictAnalysis.votingPatterns.length) * 100;
+      ((highCorrelationVotes / (conflictAnalysis.votingPatterns?.length ?? 1)) * 100);
     if (correlationPercentage > 50) riskScore += 35;
     else if (correlationPercentage > 30) riskScore += 25;
     else if (correlationPercentage > 15) riskScore += 15;
@@ -317,7 +317,11 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
             </div>
 
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold">{conflictAnalysis.transparencyScore.overall}</div>
+              <div className="text-2xl font-bold">
+                {typeof conflictAnalysis.transparencyScore === 'number'
+                  ? conflictAnalysis.transparencyScore
+                  : conflictAnalysis.transparencyScore?.overall ?? 0}
+              </div>
               <div className="text-sm text-muted-foreground">Transparency Score</div>
             </div>
           </div>
@@ -364,19 +368,19 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
                     <div>
                       <div className="font-medium">Financial Interests</div>
                       <div className="text-muted-foreground">
-                        {conflictAnalysis.financialInterests.length} disclosed
+                        {conflictAnalysis.financialInterests?.length ?? 0} disclosed
                       </div>
                     </div>
                     <div>
                       <div className="font-medium">Organizations</div>
                       <div className="text-muted-foreground">
-                        {conflictAnalysis.organizationalConnections.length} connections
+                        {conflictAnalysis.organizationalConnections?.length ?? 0} connections
                       </div>
                     </div>
                     <div>
                       <div className="font-medium">Voting Records</div>
                       <div className="text-muted-foreground">
-                        {conflictAnalysis.votingPatterns.length} analyzed
+                        {conflictAnalysis.votingPatterns?.length ?? 0} analyzed
                       </div>
                     </div>
                     <div>

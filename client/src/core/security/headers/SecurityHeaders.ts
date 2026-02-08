@@ -5,4 +5,3 @@
  */
 
 import type { SecurityEvent } from '@client/lib/types';
-impo;

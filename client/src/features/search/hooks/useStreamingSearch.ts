@@ -12,25 +12,11 @@ import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
 
 import { streamingSearchService } from '../services/streaming-search';
-
-// Define types locally
-interface SearchResult {
-  id: string;
-  title: string;
-  type: string;
-  content: string;
-  score: number;
-}
-
-interface SearchQuery {
-  q: string;
-  filters?: Record<string, any>;
-}
+import type { SearchResult, SearchRequest as SearchQuery, SearchProgress } from '@client/lib/types/search';
 import type {
   StreamingSearchOptions,
   StreamingSearchSession,
 } from '../services/streaming-search';
-import type SearchProgress from '../services/streaming-search';
 
 interface UseStreamingSearchOptions
   extends Omit<StreamingSearchOptions, 'onResult' | 'onProgress' | 'onComplete' | 'onError'> {

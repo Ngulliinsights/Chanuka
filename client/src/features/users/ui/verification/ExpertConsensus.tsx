@@ -48,7 +48,7 @@ const getAgreementLabel = (level: number) => {
   return 'High Disagreement';
 };
 
-const getControversyConfig = (level: string) => {
+const getControversyConfig = (level: string | undefined) => {
   switch (level) {
     case 'low':
       return {
@@ -111,7 +111,7 @@ export function ExpertConsensus({
 }: ExpertConsensusProps) {
   const [showPositionDetails, setShowPositionDetails] = useState(showDetails);
 
-  const controversyConfig = getControversyConfig(consensus.controversyLevel);
+  const controversyConfig = getControversyConfig(consensus.controversyLevel ?? 'low');
   const ControversyIcon = controversyConfig.icon;
   const agreementPercentage = Math.round(consensus.agreementLevel * 100);
 
@@ -200,7 +200,7 @@ export function ExpertConsensus({
               <Badge variant="secondary" className="text-xs">
                 {Math.round(
                   ((consensus.totalExperts -
-                    consensus.minorityPositions.reduce((sum, pos) => sum + pos.expertCount, 0)) /
+                    (consensus.minorityPositions?.reduce((sum, pos) => sum + pos.expertCount, 0) ?? 0)) /
                     consensus.totalExperts) *
                     100
                 )}
@@ -212,7 +212,7 @@ export function ExpertConsensus({
         </div>
 
         {/* Minority Positions */}
-        {consensus.minorityPositions.length > 0 && (
+        {consensus.minorityPositions && consensus.minorityPositions.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-medium">Alternative Positions</h4>
@@ -237,7 +237,7 @@ export function ExpertConsensus({
             </div>
 
             <div className="space-y-2">
-              {consensus.minorityPositions.map((position, index) => {
+              {consensus.minorityPositions?.map((position, index) => {
                 const percentage = Math.round(
                   (position.expertCount / consensus.totalExperts) * 100
                 );
@@ -308,14 +308,14 @@ export function ExpertConsensus({
 
             <div>
               <div className="text-lg font-bold text-muted-foreground">
-                {consensus.minorityPositions.length + 1}
+                {(consensus.minorityPositions?.length ?? 0) + 1}
               </div>
               <div className="text-xs text-muted-foreground">Positions</div>
             </div>
 
             <div>
               <div className={cn('text-lg font-bold', controversyConfig.color)}>
-                {consensus.controversyLevel.toUpperCase()}
+                {(consensus.controversyLevel ?? 'low').toUpperCase()}
               </div>
               <div className="text-xs text-muted-foreground">Controversy</div>
             </div>

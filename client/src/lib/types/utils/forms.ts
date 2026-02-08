@@ -21,12 +21,9 @@ export type ValidationRule<T> = {
   message: string;
 };
 
-// Validation result
-export type ValidationResult = {
-  isValid: boolean;
-  errors: string[];
-  warnings?: string[];
-};
+// Validation result types - re-exported from common.ts to avoid duplication
+import type { ValidationResult, FieldValidationResult } from './common';
+export type { ValidationResult, FieldValidationResult } from './common';
 
 // Validator function
 export type Validator<T> = (value: T) => ValidationResult;

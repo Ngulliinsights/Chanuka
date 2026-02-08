@@ -147,5 +147,5 @@ export interface UserDashboardPreferences {
   refreshInterval: number; // in minutes
 }
 
-// Backward compatibility alias
-export type DashboardPreferences = UserDashboardPreferences;
+// Note: DashboardPreferences is now defined in dashboard/dashboard-base.ts
+// Use UserDashboardPreferences for user-specific preferences

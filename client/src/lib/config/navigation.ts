@@ -6,10 +6,13 @@ export interface NavigationItem {
   id: string;
   label: string;
   path: string;
+  href?: string; // Alias for path
   icon?: string;
   children?: NavigationItem[];
   requiresAuth?: boolean;
   roles?: string[];
+  disabled?: boolean;
+  badge?: string | number;
 }
 
 export const navigationItems: NavigationItem[] = [

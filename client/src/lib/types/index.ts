@@ -14,8 +14,40 @@ export type {
   BrowserCompatibility,
 } from '../types/browser';
 
-// Dashboard types
-export * from './dashboard';
+// Dashboard types - explicit exports to avoid conflicts
+export type {
+  WidgetPosition,
+  WidgetSize,
+  WidgetConfig,
+  DashboardLayout,
+  ResponsiveLayout,
+  BreakpointConfig,
+  DashboardPreferences,
+  DashboardConfig,
+  DashboardState,
+  WidgetData,
+  WidgetTypeDef,
+  ActionItem,
+  ActionPriority,
+  TrackedTopic,
+  TopicCategory,
+  DashboardData,
+  DashboardAppConfig,
+  DashboardSection,
+  UseDashboardResult,
+  DateRange,
+  Metric,
+  TimeSeriesPoint,
+  TimeSeries,
+  CategoryMetric,
+  DemographicData,
+  EngagementMetrics,
+  PerformanceMetrics,
+  AnalyticsMetrics,
+  MetricsComparison,
+  MetricsSummary,
+  KPIDefinition,
+} from './dashboard';
 
 // User dashboard types
 export * from './user-dashboard';
@@ -32,31 +64,45 @@ export * from './loading';
 // Community types (unified module)
 export * from './community';
 
-// Bill types (unified module)
-export * from './bill';
+// Bill types - re-exported from shared type system
+export type {
+  BillType,
+  BillPriority,
+  Committee,
+  BillCommitteeAssignment,
+  BillTimelineEvent,
+  BillEngagementMetrics,
+  LegislativeActionType,
+  Chamber,
+  SponsorType,
+  CommitteeType,
+} from '@shared/types/domains/legislative';
+
+// Export enums as values (not types)
+export { BillStatus, UrgencyLevel } from '@shared/types/enums';
+export type { BillStatusValue, UrgencyLevelValue } from '@shared/types/enums';
+
+// Bill extended types from local bill module (client-specific extensions)
+export type {
+  Bill,
+  Sponsor,
+  BillAnalysis,
+  ExtendedBill,
+  BillsQueryParams,
+  User,
+} from './bill';
+
+// Authentication types
+export type {
+  User as AuthUser,
+  VerificationStatus,
+} from '@shared/types/domains/authentication';
 
 // Security types
 export * from './security';
 
 // Argument types
 export * from './arguments';
-
-// Core types (re-exported from shared type system using @shared alias)
-export type {
-  Committee,
-  BillPriority,
-  BillType,
-  Chamber,
-  LegislativeActionType,
-  BillTimelineEvent,
-  BillCommitteeAssignment,
-} from '@shared/types/domains/legislative';
-
-export type {
-  User as AuthUser,
-  UserProfile,
-  VerificationStatus,
-} from '@shared/types/domains/authentication';
 
 // Core types - explicit exports to avoid conflicts with community/bill/search modules
 export type {
@@ -84,23 +130,9 @@ export * from './analytics';
 // - UI types (component prop types)
 // - API types (network/REST types)
 
+// Re-export persona detector from core
+export { personaDetector, PersonaDetector, createPersonaDetector } from '../../core/personalization';
 
-
-export const personaDetector = {
-  detect: (userData: any) => {
-    // Persona detection logic
-    return 'default';
-  },
-};
-
-
-export type UserRole = 'admin' | 'user' | 'guest';
+// Re-export UserRole from navigation for consistency
+export type { UserRole } from './navigation';
 export type UserStatus = 'active' | 'inactive' | 'suspended';
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  status: UserStatus;
-}

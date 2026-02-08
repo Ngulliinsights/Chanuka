@@ -228,7 +228,11 @@ export class ApiResponseFactory {
       timestamp: now,
       duration: options.metadata?.duration as number | undefined,
       cacheControl: options.cacheControl,
-      pagination: options.pagination,
+      pagination: options.pagination ? {
+        ...options.pagination,
+        hasNextPage: options.pagination.currentPage < options.pagination.totalPages,
+        hasPreviousPage: options.pagination.currentPage > 1,
+      } : undefined,
       version: '1.0',
       createdAt: now,
       updatedAt: now,

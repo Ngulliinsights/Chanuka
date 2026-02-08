@@ -171,7 +171,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
         searchTime: Date.now() - startTime,
         totalResults: response.results.length,
       },
-      suggestions: response.suggestions,
+      suggestions: response.suggestions?.map(s => typeof s === 'string' ? s : s.text || s.term || '') || [],
       facets: response.facets,
     };
   };
@@ -388,7 +388,6 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
       {showSuggestionsDropdown && query && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1">
           <IntelligentAutocomplete
-            query={query}
             onSelect={handleSuggestionSelect}
             onSearch={handleSearch}
             className="border rounded-lg shadow-lg bg-background"

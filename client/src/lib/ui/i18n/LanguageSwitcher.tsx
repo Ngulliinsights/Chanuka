@@ -20,7 +20,7 @@ import {
 } from '@client/lib/design-system';
 import { useI18n } from '@client/lib/hooks/use-i18n';
 
-import type { SupportedLanguage } from '../../utils/i18n';
+import type { SupportedLanguage } from '@client/lib/design-system/standards/multilingual-support';
 
 /**
  * Language information with display names and flags

@@ -16,10 +16,10 @@ export { CredibilityIndicator, CredibilityBreakdown } from './CredibilityScoring
 export { ExpertProfileCard } from './ExpertProfileCard';
 
 // Community validation components
-export { CommunityValidationType, ValidationSummary } from './CommunityValidationType';
+export { CommunityValidation } from './CommunityValidation';
 
 // Workflow and process components
-export { VerificationWorkflowType } from './VerificationWorkflowType';
+export { VerificationWorkflow } from './VerificationWorkflow';
 
 // Consensus and analytics components
 export { ExpertConsensus, ConsensusIndicator } from './ExpertConsensus';
@@ -34,8 +34,8 @@ export type {
   ExpertAffiliation,
   ExpertContribution,
   ExpertConsensus as ExpertConsensusType,
-  CommunityValidationType as CommunityValidationType,
-  VerificationWorkflowType as VerificationWorkflowType,
+  CommunityValidationType,
+  VerificationWorkflowType,
   CredibilityMetrics,
   ExpertVerificationType,
   ContributionType,

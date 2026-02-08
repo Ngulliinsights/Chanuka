@@ -3,32 +3,43 @@
  * Provides a unified interface for error monitoring across systems
  */
 
+// Import from single source of truth
+import { ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '../../../core/error/constants';
+
+// Re-export types for compatibility
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
-export type ErrorDomain = 'api' | 'ui' | 'auth' | 'data' | 'network' | 'unknown' | 'system' | 'cache' | 'security' | 'hooks' | 'library_services';
-export type ClientSystem = 'web' | 'mobile' | 'desktop' | 'service_architecture' | 'security';
+export type ErrorDomain = 
+  | 'authentication'
+  | 'authorization'
+  | 'permission'
+  | 'validation'
+  | 'network'
+  | 'database'
+  | 'external_service'
+  | 'cache'
+  | 'business_logic'
+  | 'security'
+  | 'session'
+  | 'system'
+  | 'resource'
+  | 'rate_limiting'
+  | 'ui'
+  | 'hooks'
+  | 'library_services'
+  | 'service_architecture'
+  | 'cross_system'
+  | 'user_input'
+  | 'configuration'
+  | 'integration'
+  | 'performance'
+  | 'file_system'
+  | 'unknown';
 
-// Const objects for runtime enum values
-export const ErrorSeverity = {
-  LOW: 'low' as const,
-  MEDIUM: 'medium' as const,
-  HIGH: 'high' as const,
-  CRITICAL: 'critical' as const,
-  BLOCKER: 'blocker' as const,
-} as const;
+export type ClientSystem = 'web' | 'mobile' | 'desktop' | 'service_architecture' | 'security' | 'library_services' | 'hooks';
 
-export const ErrorDomain = {
-  API: 'api' as const,
-  UI: 'ui' as const,
-  AUTH: 'auth' as const,
-  DATA: 'data' as const,
-  NETWORK: 'network' as const,
-  UNKNOWN: 'unknown' as const,
-  SYSTEM: 'system' as const,
-  CACHE: 'cache' as const,
-  SECURITY: 'security' as const,
-  HOOKS: 'hooks' as const,
-  LIBRARY_SERVICES: 'library_services' as const,
-} as const;
+// Const objects for runtime enum values - use core enums
+export const ErrorSeverity = CoreErrorSeverity;
+export const ErrorDomain = CoreErrorDomain;
 
 export const ClientSystem = {
   WEB: 'web' as const,
@@ -36,6 +47,8 @@ export const ClientSystem = {
   DESKTOP: 'desktop' as const,
   SERVICE_ARCHITECTURE: 'service_architecture' as const,
   SECURITY: 'security' as const,
+  LIBRARY_SERVICES: 'library_services' as const,
+  HOOKS: 'hooks' as const,
 } as const;
 
 export interface ErrorContext {
@@ -46,8 +59,14 @@ export interface ErrorContext {
   action?: string;
   metadata?: Record<string, any>;
   // Extended properties for monitoring
-  system?: ClientSystem;
+  system?: string; // Changed from ClientSystem to string for compatibility
   operation?: string;
+  // Component-specific context fields
+  serviceComponent?: string;
+  serviceName?: string;
+  coreComponent?: string;
+  coreOperation?: string;
+  securityComponent?: string;
 }
 
 export interface AppError extends Error {
@@ -55,35 +74,47 @@ export interface AppError extends Error {
   domain: ErrorDomain;
   severity: ErrorSeverity;
   context?: ErrorContext;
-  timestamp: Date;
+  timestamp: Date | number; // Support both Date and number (Unix timestamp)
+  type?: ErrorDomain; // Alias for domain
+  recovered?: boolean;
 }
 
 export interface PerformanceMetrics {
-  loadTime: number;
-  renderTime: number;
-  apiLatency: number;
-  memoryUsage: number;
+  loadTime?: number;
+  renderTime?: number;
+  apiLatency?: number;
+  memoryUsage?: number;
   // Extended properties for monitoring
-  operation?: string;
-  duration?: number;
-  success?: boolean;
+  operation: string;
+  duration: number;
+  success: boolean;
+  timestamp: number;
+  context?: ErrorContext;
 }
 
 export interface ErrorAnalytics {
-  totalErrors: number;
-  errorsByDomain: Record<ErrorDomain, number>;
-  errorsBySeverity: Record<ErrorSeverity, number>;
-  recentErrors: AppError[];
+  totalErrors?: number;
+  errorsByDomain?: Record<ErrorDomain, number>;
+  errorsBySeverity?: Record<ErrorSeverity, number>;
+  recentErrors?: AppError[];
   // Extended properties
-  errorId?: string;
-  frequency?: number;
+  errorId: string;
+  pattern: string;
+  frequency: number;
+  trend: 'increasing' | 'decreasing' | 'stable';
+  impact: number;
+  recoveryRate: number;
+  affectedUsers: number;
 }
 
 export interface SystemHealth {
-  status: 'healthy' | 'degraded' | 'down';
-  uptime: number;
+  system: string; // Changed from ClientSystem to string for compatibility
+  status: 'healthy' | 'degraded' | 'critical';
+  uptime?: number;
   errorRate: number;
-  performance: PerformanceMetrics;
+  performanceScore: number;
+  performance?: PerformanceMetrics;
+  lastUpdated: number;
 }
 
 export interface UnifiedErrorMonitor {
@@ -92,12 +123,28 @@ export interface UnifiedErrorMonitor {
   setContext(key: string, value: any): void;
 }
 
-export type UnifiedErrorMonitoring = UnifiedErrorMonitor;
+export interface UnifiedErrorMonitoring {
+  reportError(error: AppError | Error, context: ErrorContext): Promise<void>;
+  trackPerformance(metrics: PerformanceMetrics): Promise<void>;
+  getErrorAnalytics(timeRange?: { start: number; end: number }): Promise<ErrorAnalytics[]>;
+  getSystemHealth(): Promise<SystemHealth>;
+  registerErrorPattern(pattern: string, threshold: number): void;
+  setMonitoringEnabled(enabled: boolean, operations?: string[]): void;
+  getAggregatedMetrics(period: 'hour' | 'day' | 'week'): Promise<{
+    totalErrors: number;
+    errorRate: number;
+    topErrors: Array<{ message: string; count: number }>;
+    performanceImpact: number;
+  }>;
+}
 
 export interface ErrorMonitoringMiddleware {
-  onError: (error: AppError) => void;
-  onWarning: (message: string) => void;
-  onInfo: (message: string) => void;
+  wrap<T extends (...args: any[]) => any>(fn: T, context: ErrorContext): T;
+  wrapAsync<T extends (...args: any[]) => Promise<any>>(fn: T, context: ErrorContext): T;
+  createBoundary(context: ErrorContext): {
+    onError: (error: Error) => void;
+    trackPerformance: (operation: string, duration: number, success: boolean) => void;
+  };
 }
 
 export class UnifiedErrorMonitoringService implements UnifiedErrorMonitor {

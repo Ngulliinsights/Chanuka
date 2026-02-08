@@ -102,7 +102,7 @@ export function useNotifications() {
    */
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      await notificationService.markAsRead(notificationId);
+      notificationService.markAsRead(notificationId);
       // Update local state to reflect the change immediately
       setNotifications(prev => prev.map(n => (n.id === notificationId ? { ...n, read: true } : n)));
       setUnreadCount(prev => Math.max(0, prev - 1));
@@ -136,7 +136,7 @@ export function useNotifications() {
    */
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
-      await notificationService.deleteNotification(notificationId);
+      notificationService.dismissNotification(notificationId);
       // Remove from local state
       setNotifications(prev => {
         const deleted = prev.find(n => n.id === notificationId);
@@ -158,17 +158,7 @@ export function useNotifications() {
     async (options?: { limit?: number; type?: NotificationType; unreadOnly?: boolean }) => {
       try {
         setIsLoading(true);
-        // Calculate the current page based on loaded notifications
-        const page = Math.floor(notifications.length / 20) + 1;
-        const limit = options?.limit || 20;
-
-        await notificationService.loadNotifications(
-          { type: options?.type, unreadOnly: options?.unreadOnly },
-          page,
-          limit
-        );
-
-        // Get updated notifications from service
+        // Get current notifications from service (no pagination in current implementation)
         setNotifications(notificationService.getNotifications());
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load more notifications');
@@ -186,8 +176,7 @@ export function useNotifications() {
   const refresh = useCallback(async () => {
     try {
       setIsLoading(true);
-      // Load from the first page again
-      await notificationService.loadNotifications({}, 1, 20);
+      // Get current notifications from service
       setNotifications(notificationService.getNotifications());
       setUnreadCount(notificationService.getUnreadCount());
     } catch (err) {
@@ -241,7 +230,7 @@ export function useNotificationPreferences() {
         // The service expects a userId parameter. You'll need to get this from your auth context.
         // For now, we're using a placeholder that you should replace with your actual user ID.
         const userId = 'current-user'; // TODO: Replace with actual user ID from auth context
-        const prefs = await notificationService.getUserPreferences(userId);
+        const prefs = notificationService.getPreferences();
         setPreferences(prefs);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load preferences');
@@ -270,7 +259,7 @@ export function useNotificationPreferences() {
         const merged = (
           preferences ? { ...preferences, ...updates } : (updates as NotificationPreferences)
         ) as NotificationPreferences;
-        await notificationService.updatePreferences(merged, userId);
+        notificationService.updatePreferences(merged);
         // Update local state to reflect changes
         setPreferences(prev => (prev ? { ...prev, ...updates } : (merged ?? null)));
         setHasChanges(false);
@@ -304,7 +293,7 @@ export function useNotificationPreferences() {
     if (preferences) {
       try {
         const userId = 'current-user'; // TODO: Replace with actual user ID from auth context
-        const freshPrefs = await notificationService.getUserPreferences(userId);
+        const freshPrefs = notificationService.getPreferences();
         setPreferences(freshPrefs);
         setHasChanges(false);
       } catch (err) {
@@ -573,13 +562,7 @@ export function useNotificationHistory() {
 
         // For now, we'll use a workaround that gets notifications from the existing method
         // This won't support all the filtering options, but it won't cause TypeScript errors
-        const page = Math.floor((options.offset || 0) / (options.limit || 20)) + 1;
-        await notificationService.loadNotifications(
-          { type: options.type, unreadOnly: options.readStatus === 'unread' },
-          page,
-          options.limit || 20
-        );
-
+        // Get notifications from service (no pagination in current implementation)
         const notifications = notificationService.getNotifications();
 
         // Calculate basic statistics from the loaded notifications
@@ -625,7 +608,7 @@ export function useNotificationHistory() {
       // TODO: Implement bulkMarkAsRead in your notification service
       // For now, we'll mark them individually as a fallback
       // This is less efficient but functional
-      await Promise.all(notificationIds.map(id => notificationService.markAsRead(id)));
+      notificationIds.forEach(id => notificationService.markAsRead(id));
 
       // Update local state optimistically
       setHistory(prev =>
@@ -653,7 +636,7 @@ export function useNotificationHistory() {
     try {
       // TODO: Implement bulkDeleteNotifications in your notification service
       // For now, we'll delete them individually as a fallback
-      await Promise.all(notificationIds.map(id => notificationService.deleteNotification(id)));
+      notificationIds.forEach(id => notificationService.dismissNotification(id));
 
       // Update local state
       setHistory(prev => prev.filter(n => !notificationIds.includes(n.id)));

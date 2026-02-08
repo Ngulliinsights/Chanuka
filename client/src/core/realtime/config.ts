@@ -9,24 +9,26 @@ import { WebSocketConfig, RealTimeConfig } from './types';
 export const defaultWebSocketConfig: WebSocketConfig = {
   url: process.env.VITE_WS_URL || 'ws://localhost:3001/ws',
   protocols: ['civic-engagement-v1'],
+  reconnect: true,
+  reconnectInterval: 2000,
+  maxReconnectAttempts: 5,
+  heartbeatInterval: 30000,
   heartbeat: {
     enabled: true,
     interval: 30000, // 30 seconds
     timeout: 5000, // 5 seconds
   },
-  reconnect: {
-    enabled: true,
-    maxAttempts: 5,
-    delay: 2000, // 2 seconds
-    backoff: 'exponential',
-  },
   message: {
+    maxSize: 1024 * 1024, // 1MB
     compression: false, // Disable for now, can enable with proper implementation
-    batching: true,
-    batchSize: 10,
-    batchInterval: 1000, // 1 second
+    batching: {
+      enabled: true,
+      maxSize: 10,
+      flushInterval: 1000, // 1 second
+    },
   },
   security: {
+    encryption: false,
     validateOrigin: true,
     allowedOrigins: [
       'http://localhost:3000',
@@ -38,17 +40,14 @@ export const defaultWebSocketConfig: WebSocketConfig = {
 
 export const defaultRealTimeConfig: RealTimeConfig = {
   websocket: defaultWebSocketConfig,
+  enableBillTracking: true,
+  enableCommunityUpdates: true,
+  enableNotifications: true,
+  updateThrottleMs: 1000,
   bills: {
+    pollingInterval: 30000,
+    batchUpdates: true,
     autoReconnect: true,
-    maxReconnectAttempts: 5,
-    reconnectDelay: 2000,
-    heartbeatInterval: 30000,
-    batchUpdateInterval: 1000,
-    maxBatchSize: 50,
-  },
-  community: {
-    typingIndicatorTimeout: 3000, // 3 seconds
-    maxConcurrentSubscriptions: 20,
   },
 };
 
@@ -62,12 +61,8 @@ export const getWebSocketConfig = (): WebSocketConfig => {
   if (isDevelopment) {
     // Development-specific settings
     config.url = 'ws://localhost:3001/ws';
-    if (config.heartbeat) {
-      config.heartbeat.interval = 15000; // More frequent heartbeats in dev
-    }
-    if (config.reconnect) {
-      config.reconnect.delay = 1000; // Faster reconnection in dev
-    }
+    config.heartbeatInterval = 15000; // More frequent heartbeats in dev
+    config.reconnectInterval = 1000; // Faster reconnection in dev
     if (config.security) {
       config.security.validateOrigin = false; // Relaxed security in dev
     }

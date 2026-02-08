@@ -2,6 +2,8 @@
  * Configuration for the Error Remediation System
  */
 
+import * as path from 'path';
+
 export interface RemediationConfig {
   // Project paths
   clientRoot: string;
@@ -48,16 +50,19 @@ export interface RemediationConfig {
   };
 }
 
+// Get the workspace root (two levels up from scripts/error-remediation)
+const workspaceRoot = path.resolve(__dirname, '../..');
+
 export const defaultConfig: RemediationConfig = {
-  clientRoot: 'client',
-  tsconfigPath: 'client/tsconfig.json',
+  clientRoot: path.join(workspaceRoot, 'client'),
+  tsconfigPath: path.join(workspaceRoot, 'client/tsconfig.json'),
   
   fsdLayers: {
-    app: 'client/src/app',
-    features: 'client/src/features',
-    core: 'client/src/core',
-    lib: 'client/src/lib',
-    shared: 'shared'
+    app: path.join(workspaceRoot, 'client/src/app'),
+    features: path.join(workspaceRoot, 'client/src/features'),
+    core: path.join(workspaceRoot, 'client/src/core'),
+    lib: path.join(workspaceRoot, 'client/src/lib'),
+    shared: path.join(workspaceRoot, 'shared')
   },
   
   moduleResolution: {
@@ -82,7 +87,55 @@ export const defaultConfig: RemediationConfig = {
   },
   
   progressTracking: {
-    reportDirectory: 'scripts/error-remediation/reports',
+    reportDirectory: path.join(__dirname, 'reports'),
     generateDetailedReports: true
   }
 };
+
+/**
+ * RemediationConfig class for easy instantiation
+ */
+export class RemediationConfig implements RemediationConfig {
+  clientRoot: string;
+  tsconfigPath: string;
+  fsdLayers: {
+    app: string;
+    features: string;
+    core: string;
+    lib: string;
+    shared: string;
+  };
+  moduleResolution: {
+    fuzzyMatchThreshold: number;
+    searchDepth: number;
+  };
+  batchProcessing: {
+    maxBatchSize: number;
+    validateAfterEachBatch: boolean;
+    rollbackOnFailure: boolean;
+  };
+  typeStandardization: {
+    canonicalIdType: 'string' | 'number' | 'auto';
+    typeConsolidationPreference: ('shared' | 'lib' | 'core')[];
+  };
+  validation: {
+    runFullCompilationAfterPhase: boolean;
+    failOnNewErrors: boolean;
+  };
+  progressTracking: {
+    reportDirectory: string;
+    generateDetailedReports: boolean;
+  };
+
+  constructor(config?: Partial<RemediationConfig>) {
+    const merged = { ...defaultConfig, ...config };
+    this.clientRoot = merged.clientRoot;
+    this.tsconfigPath = merged.tsconfigPath;
+    this.fsdLayers = merged.fsdLayers;
+    this.moduleResolution = merged.moduleResolution;
+    this.batchProcessing = merged.batchProcessing;
+    this.typeStandardization = merged.typeStandardization;
+    this.validation = merged.validation;
+    this.progressTracking = merged.progressTracking;
+  }
+}

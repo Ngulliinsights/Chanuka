@@ -123,19 +123,19 @@ export function ExpertProfileCard({
 
               <CredibilityIndicator score={expert.credibilityScore} size="sm" className="mb-2" />
 
-              {expert.affiliations.length > 0 && (
+              {expert.affiliations && expert.affiliations.length > 0 && (
                 <p className="text-xs text-muted-foreground truncate">
                   {expert.affiliations[0].role} at {expert.affiliations[0].organization}
                 </p>
               )}
 
               <div className="flex flex-wrap gap-1 mt-2">
-                {expert.specializations.slice(0, 2).map((spec, index) => (
+                {expert.specializations?.slice(0, 2).map((spec, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {spec}
                   </Badge>
                 ))}
-                {expert.specializations.length > 2 && (
+                {expert.specializations && expert.specializations.length > 2 && (
                   <Badge variant="outline" className="text-xs">
                     +{expert.specializations.length - 2}
                   </Badge>
@@ -143,11 +143,11 @@ export function ExpertProfileCard({
               </div>
             </div>
 
-            {onViewProfile && (
+            {onViewProfile && expert.id && (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onViewProfile(expert.id)}
+                onClick={() => onViewProfile(expert.id!)}
                 className="text-xs"
               >
                 View Profile
@@ -185,7 +185,7 @@ export function ExpertProfileCard({
             )}
 
             <div className="flex flex-wrap gap-2 mb-3">
-              {expert.specializations.map((spec, index) => (
+              {expert.specializations?.map((spec, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
                   {spec}
                 </Badge>
@@ -197,18 +197,20 @@ export function ExpertProfileCard({
                 <User className="h-4 w-4" />
                 <span>{expert.contributionCount} contributions</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>Verified {formatDate(expert.verificationDate)}</span>
-              </div>
+              {expert.verificationDate && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>Verified {formatDate(expert.verificationDate)}</span>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            {onViewProfile && (
+            {onViewProfile && expert.id && (
               <Button
                 variant="outline"
-                onClick={() => onViewProfile(expert.id)}
+                onClick={() => onViewProfile(expert.id!)}
                 className="text-sm"
               >
                 <User className="h-4 w-4 mr-2" />
@@ -216,11 +218,11 @@ export function ExpertProfileCard({
               </Button>
             )}
 
-            {onContact && expert.contactInfo?.email && (
+            {onContact && expert.id && expert.contactInfo?.email && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onContact(expert.id)}
+                onClick={() => onContact(expert.id!)}
                 className="text-sm"
               >
                 <Mail className="h-4 w-4 mr-2" />
@@ -349,7 +351,7 @@ export function ExpertProfileCard({
         )}
 
         {/* Affiliations Section */}
-        {expert.affiliations.length > 0 && (
+        {expert.affiliations && expert.affiliations.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-medium">Affiliations ({expert.affiliations.length})</h4>
@@ -375,7 +377,7 @@ export function ExpertProfileCard({
 
             {showAffiliations ? (
               <div className="space-y-3">
-                {expert.affiliations.map(affiliation => {
+                {expert.affiliations?.map(affiliation => {
                   const IconComponent = getAffiliationIcon(affiliation.type);
                   return (
                     <div
@@ -418,7 +420,7 @@ export function ExpertProfileCard({
               </div>
             ) : (
               <div className="space-y-2">
-                {expert.affiliations.slice(0, 2).map(affiliation => {
+                {expert.affiliations?.slice(0, 2).map(affiliation => {
                   const IconComponent = getAffiliationIcon(affiliation.type);
                   return (
                     <div key={affiliation.id} className="flex items-center gap-2">
@@ -435,7 +437,7 @@ export function ExpertProfileCard({
                     </div>
                   );
                 })}
-                {expert.affiliations.length > 2 && (
+                {expert.affiliations && expert.affiliations.length > 2 && (
                   <p className="text-xs text-muted-foreground">
                     +{expert.affiliations.length - 2} more affiliations
                   </p>

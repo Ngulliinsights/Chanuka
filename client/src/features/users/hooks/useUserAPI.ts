@@ -146,7 +146,7 @@ export function useSaveBill() {
 
       // Update local store state if it's the current user
       if (user?.id === userId && dashboardStore.trackBill) {
-        dashboardStore.trackBill(billId);
+        dashboardStore.trackBill(billId.toString());
       }
 
       logger.info('Bill saved successfully', { billId, userId });
@@ -171,7 +171,7 @@ export function useUnsaveBill() {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.dashboard(userId) });
 
       if (user?.id === userId && dashboardStore.untrackBill) {
-        dashboardStore.untrackBill(billId);
+        dashboardStore.untrackBill(billId.toString());
       }
 
       logger.info('Bill unsaved successfully', { billId, userId });
@@ -202,7 +202,7 @@ export function useTrackBill() {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.dashboard(userId) });
 
       if (user?.id === userId && dashboardStore.trackBill) {
-        dashboardStore.trackBill(billId);
+        dashboardStore.trackBill(billId.toString());
       }
 
       logger.info('Bill tracking started', { billId, userId });
@@ -227,7 +227,7 @@ export function useUntrackBill() {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.dashboard(userId) });
 
       if (user?.id === userId && dashboardStore.untrackBill) {
-        dashboardStore.untrackBill(billId);
+        dashboardStore.untrackBill(billId.toString());
       }
 
       logger.info('Bill tracking stopped', { billId, userId });
@@ -280,7 +280,7 @@ export function useTrackEngagement() {
         dashboardStore.addEngagementItem({
           id: `${activity.action_type}_${activity.entity_id}_${Date.now()}`,
           type: engagementType,
-          billId: activity.entity_type === 'bill' ? parseInt(activity.entity_id) : undefined,
+          billId: activity.entity_type === 'bill' ? activity.entity_id : undefined,
           timestamp: new Date().toISOString(),
           metadata: activity.metadata,
         });
@@ -415,7 +415,7 @@ export function useDismissRecommendation() {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.recommendations(userId) });
 
       if (user?.id === userId && dashboardStore.dismissRecommendation) {
-        dashboardStore.dismissRecommendation(billId);
+        dashboardStore.dismissRecommendation(billId.toString());
       }
 
       logger.info('Recommendation dismissed', { billId, userId });

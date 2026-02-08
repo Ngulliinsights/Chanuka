@@ -22,6 +22,7 @@ interface RateLimitStatus {
   allowed: boolean;
   remaining: number;
   resetTime: number;
+  retryAfter?: number; // Time in seconds until retry is allowed
 }
 
 export interface UseSecurityOptions {

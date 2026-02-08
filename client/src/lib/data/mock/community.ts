@@ -9,13 +9,13 @@ import { faker } from '@faker-js/faker';
 
 import {
   ActivityItem,
-  TrendingTopic,
   ExpertInsight,
   Campaign,
   Petition,
   CommunityStats,
   LocalImpactMetrics,
 } from '@client/lib/types';
+import { TrendingTopic } from '@client/lib/types/community/community-base';
 
 import { mockExperts, mockOfficialExperts } from './experts';
 import {
@@ -102,7 +102,11 @@ export const generateActivityItems = (count: number = 50): ActivityItem[] => {
       userId: user.id,
       userName: user.name || `User ${user.id}`,
       userAvatar: (user as any).avatar || faker.image.avatar(),
-      expertInfo,
+      expertInfo: expertInfo ? {
+        isVerified: true,
+        specialty: expertInfo.specializations?.[0],
+        credibilityScore: expertInfo.credibilityScore,
+      } : undefined,
       title: titles[type],
       content,
       summary: content ? content.substring(0, 150) + '...' : undefined,
@@ -114,16 +118,15 @@ export const generateActivityItems = (count: number = 50): ActivityItem[] => {
         'Infrastructure Investment Bill',
         'Criminal Justice Reform Act',
       ]),
-      discussionId: type === 'discussion' ? generateId('discussion') : undefined,
-      campaignId: type === 'campaign_join' ? generateId('campaign') : undefined,
-      petitionId: type === 'petition_sign' ? generateId('petition') : undefined,
+      threadId: type === 'discussion' ? generateId('discussion') : undefined,
+      commentId: type === 'comment' ? generateId('comment') : undefined,
       timestamp: generateDateInRange(30, 0),
       location,
       likes: engagement.saveCount,
       replies: Math.floor(engagement.commentCount * 0.3),
       shares: engagement.shareCount,
       userHasLiked: faker.datatype.boolean({ probability: 0.2 }),
-      ...trending,
+      trendingScore: trending.trendingScore,
     };
   });
 };
@@ -170,49 +173,31 @@ export const generateTrendingTopics = (count: number = 15): TrendingTopic[] => {
     ],
   };
 
-  return Array.from({ length: count }, () => {
+  return Array.from({ length: count }, (): TrendingTopic => {
     const category = faker.helpers.arrayElement(categories);
     const title = faker.helpers.arrayElement(topicTitles[category]);
-    const policyAreas = generatePolicyAreas(faker.number.int({ min: 1, max: 3 }));
     const trending = generateTrendingMetrics();
-
-    const activityCount = faker.number.int({ min: 50, max: 1000 });
-    const participantCount = faker.number.int({ min: 20, max: 500 });
-    const expertCount = faker.number.int({ min: 2, max: 25 });
-
-    // Generate geographic distribution
-    const counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu'];
-    const geographicDistribution = counties.map(county => {
-      const count = faker.number.int({ min: 5, max: 100 });
-      return {
-        state: county, // Keeping key as 'state' for compatibility
-        count,
-        percentage: faker.number.float({ min: 5, max: 35, fractionDigits: 1 }),
-      };
-    });
 
     return {
       id: generateId('topic'),
-      title,
+      name: title,
+      category: faker.helpers.arrayElement([
+        'healthcare',
+        'education',
+        'environment',
+        'economy',
+        'security',
+        'infrastructure',
+        'social',
+        'other',
+      ] as const),
+      billCount: faker.number.int({ min: 1, max: 10 }),
+      isActive: faker.datatype.boolean({ probability: 0.7 }),
       description: faker.lorem.paragraph(2),
-      category,
-      billIds:
-        category === 'bill'
-          ? Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () =>
-              faker.number.int({ min: 1, max: 75 })
-            )
-          : [],
-      policyAreas,
-      activityCount,
-      participantCount,
-      expertCount,
-      ...trending,
-      hourlyActivity: Array.from({ length: 24 }, () => faker.number.int({ min: 0, max: 50 })),
-      dailyActivity: Array.from({ length: 7 }, () => faker.number.int({ min: 10, max: 200 })),
-      weeklyActivity: Array.from({ length: 4 }, () => faker.number.int({ min: 100, max: 800 })),
-      geographicDistribution,
-      timestamp: generateDateInRange(7, 0),
-      lastUpdated: generateDateInRange(1, 0),
+      keywords: generatePolicyAreas(faker.number.int({ min: 2, max: 5 })),
+      createdAt: generateDateInRange(30, 0),
+      updatedAt: generateDateInRange(7, 0),
+      trendingScore: trending.trendingScore,
     };
   });
 };
@@ -233,9 +218,6 @@ export const generateExpertInsights = (count: number = 20): ExpertInsight[] => {
       expertId: expert.id,
       expertName: expert.name,
       expertAvatar: expert.avatar,
-      verificationType: expert.verificationType,
-      credibilityScore: expert.credibilityScore,
-      specializations: expert.specializations,
       title: faker.helpers.arrayElement([
         'Constitutional Analysis of Recent Legislation',
         'Policy Impact Assessment and Recommendations',
@@ -264,8 +246,8 @@ export const generateExpertInsights = (count: number = 20): ExpertInsight[] => {
         'Environmental Protection Enhancement Bill',
         'Education Funding Reform Act',
       ]),
-      policyAreas,
-      likes: engagement.saveCount,
+      policyAreas: generatePolicyAreas(faker.number.int({ min: 1, max: 2 })),
+      specializations: expert.specializations,
       comments: engagement.commentCount,
       shares: engagement.shareCount,
       communityValidation: {
@@ -273,7 +255,9 @@ export const generateExpertInsights = (count: number = 20): ExpertInsight[] => {
         downvotes: faker.number.int({ min: 0, max: 20 }),
         validationScore: faker.number.float({ min: 0.6, max: 1.0, fractionDigits: 2 }),
       },
-      timestamp: generateDateInRange(30, 0),
+      published: true,
+      reviewStatus: 'approved' as const,
+      createdAt: generateDateInRange(30, 0),
       lastUpdated: generateDateInRange(7, 0),
     };
   });
@@ -308,46 +292,24 @@ export const generateCampaigns = (count: number = 12): Campaign[] => {
     'Veterans Benefits Protection',
   ];
 
-  return Array.from({ length: count }, () => {
+  return Array.from({ length: count }, (): Campaign => {
     const type = faker.helpers.arrayElement(campaignTypes);
-    const status = weightedRandom(statuses, [60, 20, 15, 5]);
+    const status = weightedRandom(statuses, [60, 20, 15, 5]) as 'active' | 'completed' | 'cancelled';
     const title = faker.helpers.arrayElement(campaignTitles);
-    const policyAreas = generatePolicyAreas(faker.number.int({ min: 1, max: 2 }));
 
     const goal = faker.number.int({ min: 1000, max: 50000 });
-    const currentCount =
+    const currentProgress =
       status === 'active'
         ? faker.number.int({ min: Math.floor(goal * 0.1), max: Math.floor(goal * 0.9) })
         : status === 'completed'
           ? goal
           : faker.number.int({ min: 0, max: Math.floor(goal * 0.5) });
 
-    const location = generateLocation();
-
     return {
       id: generateId('campaign'),
       title,
       description: faker.lorem.paragraph(3),
-      summary: faker.lorem.paragraph(1),
-      type,
-      status,
-      billIds: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () =>
-        faker.number.int({ min: 1, max: 75 })
-      ),
-      policyAreas,
       organizerId: faker.helpers.arrayElement(mockUsers).id,
-      organizerName: faker.person.fullName(),
-      organizerType: faker.helpers.arrayElement(['individual', 'organization', 'expert']),
-      goal,
-      currentCount,
-      progressPercentage: Math.round((currentCount / goal) * 100),
-      targetGeography: {
-        states: [location.state],
-        districts: [location.district],
-        counties: [location.county],
-      },
-      participantCount: faker.number.int({ min: 50, max: 2000 }),
-      shareCount: faker.number.int({ min: 10, max: 500 }),
       startDate: generateDateInRange(90, 0),
       endDate:
         status === 'active'
@@ -355,8 +317,10 @@ export const generateCampaigns = (count: number = 12): Campaign[] => {
               Date.now() + faker.number.int({ min: 30, max: 180 }) * 24 * 60 * 60 * 1000
             ).toISOString()
           : generateDateInRange(30, 0),
-      createdAt: generateDateInRange(120, 0),
-      updatedAt: generateDateInRange(7, 0),
+      goal,
+      currentProgress,
+      status,
+      tags: generatePolicyAreas(faker.number.int({ min: 1, max: 3 })),
     };
   });
 };
@@ -384,7 +348,6 @@ export const generatePetitions = (count: number = 8): Petition[] => {
   return Array.from({ length: count }, () => {
     const status = weightedRandom(statuses, [50, 25, 15, 10]);
     const title = faker.helpers.arrayElement(petitionTitles);
-    const policyAreas = generatePolicyAreas(faker.number.int({ min: 1, max: 2 }));
 
     const goal = faker.number.int({ min: 5000, max: 100000 });
     const currentSignatures =
@@ -394,53 +357,31 @@ export const generatePetitions = (count: number = 8): Petition[] => {
           ? faker.number.int({ min: goal, max: goal * 1.5 })
           : faker.number.int({ min: 0, max: Math.floor(goal * 0.6) });
 
-    // Generate signatures by location
-    const counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu'];
-    const signaturesByLocation = counties.map(county => {
-      const count = faker.number.int({ min: 100, max: Math.floor(currentSignatures * 0.3) });
-      return {
-        state: county, // Keeping key as 'state' for compatibility but value is county
-        count,
-        percentage: faker.number.float({ min: 5, max: 30, fractionDigits: 1 }),
-      };
-    });
+    // Map status to match Petition interface
+    const petitionStatus: 'open' | 'closed' | 'submitted' =
+      status === 'active' ? 'open' : status === 'successful' ? 'submitted' : 'closed';
 
     return {
       id: generateId('petition'),
       title,
-      description: faker.lorem.paragraph(3),
       summary: faker.lorem.paragraph(1),
-      billIds: Array.from({ length: faker.number.int({ min: 1, max: 2 }) }, () =>
-        faker.number.int({ min: 1, max: 75 })
-      ),
-      policyAreas,
-      targetOfficial: faker.helpers.arrayElement([
+      target: faker.helpers.arrayElement([
         'Senator Kiptoo',
         'Hon. Amina Mohamed',
         'Governor Omondi',
         'Cabinet Secretary for Health',
       ]),
-      targetOffice: faker.helpers.arrayElement([
-        'The Senate',
-        'National Assembly',
-        "Council of Governors",
-        'Ministry of Health',
-      ]),
-      goal,
-      currentSignatures,
-      progressPercentage: Math.round((currentSignatures / goal) * 100),
-      creatorId: faker.helpers.arrayElement(mockUsers).id,
-      creatorName: faker.person.fullName(),
-      signaturesByLocation,
-      status,
-      createdAt: generateDateInRange(120, 0),
+      signatureCount: currentSignatures,
+      signatureGoal: goal,
       deadline:
-        status === 'active'
+        petitionStatus === 'open'
           ? new Date(
               Date.now() + faker.number.int({ min: 30, max: 90 }) * 24 * 60 * 60 * 1000
             ).toISOString()
           : undefined,
-      updatedAt: generateDateInRange(7, 0),
+      status: petitionStatus,
+      creatorId: faker.helpers.arrayElement(mockUsers).id,
+      createdAt: generateDateInRange(120, 0),
     };
   });
 };
@@ -449,24 +390,20 @@ export const generatePetitions = (count: number = 8): Petition[] => {
  * Generate community statistics
  */
 export const generateCommunityStats = (): CommunityStats => {
-  const totalMembers = faker.number.int({ min: 10000, max: 100000 });
+  const totalUsers = faker.number.int({ min: 10000, max: 100000 });
+  const activeUsers = faker.number.int({
+    min: Math.floor(totalUsers * 0.01),
+    max: Math.floor(totalUsers * 0.05),
+  });
 
   return {
-    totalMembers,
-    activeToday: faker.number.int({
-      min: Math.floor(totalMembers * 0.01),
-      max: Math.floor(totalMembers * 0.05),
-    }),
-    activeThisWeek: faker.number.int({
-      min: Math.floor(totalMembers * 0.1),
-      max: Math.floor(totalMembers * 0.3),
-    }),
-    totalDiscussions: faker.number.int({ min: 500, max: 5000 }),
+    totalUsers,
+    activeUsers,
     totalComments: faker.number.int({ min: 2000, max: 25000 }),
-    expertContributions: faker.number.int({ min: 100, max: 1000 }),
-    activeCampaigns: faker.number.int({ min: 5, max: 20 }),
-    activePetitions: faker.number.int({ min: 3, max: 15 }),
-    lastUpdated: new Date().toISOString(),
+    totalThreads: faker.number.int({ min: 500, max: 5000 }),
+    totalExperts: faker.number.int({ min: 100, max: 1000 }),
+    averageCommentLength: faker.number.int({ min: 100, max: 500 }),
+    engagementRate: faker.number.float({ min: 0.1, max: 0.5, fractionDigits: 2 }),
   };
 };
 
@@ -478,31 +415,16 @@ export const generateLocalImpactMetrics = (location?: {
   district?: string;
   county?: string;
 }): LocalImpactMetrics => {
-  const defaultLocation = location || generateLocation();
+  const billId = faker.number.int({ min: 1, max: 75 });
+  const region = location?.state || faker.location.state();
 
   return {
-    ...defaultLocation,
-    totalActivity: faker.number.int({ min: 100, max: 2000 }),
-    uniqueParticipants: faker.number.int({ min: 50, max: 800 }),
-    expertParticipants: faker.number.int({ min: 5, max: 50 }),
-    billsDiscussed: faker.number.int({ min: 10, max: 75 }),
-    billsSaved: faker.number.int({ min: 50, max: 500 }),
-    billsShared: faker.number.int({ min: 20, max: 200 }),
-    campaignsActive: faker.number.int({ min: 2, max: 10 }),
-    petitionsActive: faker.number.int({ min: 1, max: 8 }),
-    averageEngagement: faker.number.float({ min: 0.3, max: 0.8, fractionDigits: 2 }),
-    topTopics: Array.from({ length: 5 }, () => ({
-      title: faker.helpers.arrayElement([
-        'Healthcare Reform',
-        'Education Funding',
-        'Infrastructure Investment',
-        'Environmental Protection',
-        'Criminal Justice Reform',
-      ]),
-      score: faker.number.float({ min: 0.5, max: 1.0, fractionDigits: 2 }),
-      category: faker.helpers.arrayElement(['bill', 'policy_area', 'campaign']),
-    })),
-    lastUpdated: new Date().toISOString(),
+    billId,
+    region,
+    communityReach: faker.number.int({ min: 100, max: 10000 }),
+    engagementLevel: faker.helpers.arrayElement(['low', 'medium', 'high', 'very_high'] as const),
+    sentimentScore: faker.number.float({ min: -1, max: 1, fractionDigits: 2 }),
+    topicsRaised: generatePolicyAreas(faker.number.int({ min: 3, max: 7 })),
   };
 };
 

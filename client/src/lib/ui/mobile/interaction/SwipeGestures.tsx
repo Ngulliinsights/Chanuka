@@ -40,9 +40,9 @@ export function SwipeGestures({
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
-  minDistance = gestureConfig.SWIPE.minDistance,
-  minVelocity = gestureConfig.SWIPE.velocityThreshold,
-  maxDuration = gestureConfig.SWIPE.maxDuration,
+  minDistance = gestureConfig.swipeThreshold,
+  minVelocity = gestureConfig.swipeVelocity,
+  maxDuration = 1000,
   disabled = false,
 }: SwipeGesturesProps): JSX.Element {
   const elementRef = useRef<HTMLElement>(null);

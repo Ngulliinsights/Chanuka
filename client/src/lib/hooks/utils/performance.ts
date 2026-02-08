@@ -3,7 +3,7 @@
  * Provides utilities for memoization, debouncing, throttling, and performance monitoring
  */
 
-import { useCallback, useMemo, useRef, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
 // 1. Performance Monitoring Interface
 export interface PerformanceMetrics {
@@ -114,7 +114,8 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     if (trailing && lastArgsRef.current) {
       return invokeFunc(time);
     }
-    lastArgsRef.current = lastThisRef.current = undefined;
+    lastArgsRef.current = [];
+    lastThisRef.current = null;
     return resultRef.current;
   }, [trailing]);
 
@@ -204,7 +205,7 @@ export function useThrottledCallback<T extends (...args: any[]) => any>(
     const timeSinceLastCall = time - lastCallTimeRef.current;
 
     lastArgsRef.current = args;
-    lastThisRef.current = this;
+    lastThisRef.current = null;
 
     if (lastCallTimeRef.current === 0 && !leading) {
       lastCallTimeRef.current = time;
@@ -216,14 +217,16 @@ export function useThrottledCallback<T extends (...args: any[]) => any>(
         timeoutRef.current = null;
       }
       lastCallTimeRef.current = time;
-      resultRef.current = callback.apply(lastThisRef.current, lastArgsRef.current);
-      lastArgsRef.current = lastThisRef.current = undefined;
+      resultRef.current = callback.apply(null, lastArgsRef.current);
+      lastArgsRef.current = [];
+      lastThisRef.current = null;
     } else if (!timeoutRef.current && trailing) {
       timeoutRef.current = setTimeout(() => {
         lastCallTimeRef.current = leading ? Date.now() : 0;
         timeoutRef.current = null;
-        resultRef.current = callback.apply(lastThisRef.current, lastArgsRef.current);
-        lastArgsRef.current = lastThisRef.current = undefined;
+        resultRef.current = callback.apply(null, lastArgsRef.current);
+        lastArgsRef.current = [];
+        lastThisRef.current = null;
       }, delay - timeSinceLastCall);
     }
 
@@ -231,23 +234,28 @@ export function useThrottledCallback<T extends (...args: any[]) => any>(
   }, [callback, delay, leading, trailing]);
 
   // Cancel method
-  throttled.cancel = useCallback(() => {
-    if (timeoutRef.current !== undefined) {
+  (throttled as any).cancel = useCallback(() => {
+    if (timeoutRef.current !== null) {
       clearTimeout(timeoutRef.current);
     }
     lastCallTimeRef.current = 0;
-    lastArgsRef.current = lastThisRef.current = timeoutRef.current = undefined;
+    lastArgsRef.current = [];
+    lastThisRef.current = null;
+    timeoutRef.current = null;
   }, []);
 
   // Flush method
-  throttled.flush = useCallback(() => {
-    if (timeoutRef.current === undefined) {
+  (throttled as any).flush = useCallback(() => {
+    if (timeoutRef.current === null) {
       return resultRef.current;
     }
-    resultRef.current = callback.apply(lastThisRef.current, lastArgsRef.current);
+    resultRef.current = callback.apply(null, lastArgsRef.current);
     lastCallTimeRef.current = 0;
-    lastArgsRef.current = lastThisRef.current = undefined;
-    clearTimeout(timeoutRef.current);
+    lastArgsRef.current = [];
+    lastThisRef.current = null;
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
     timeoutRef.current = null;
     return resultRef.current;
   }, [callback]);

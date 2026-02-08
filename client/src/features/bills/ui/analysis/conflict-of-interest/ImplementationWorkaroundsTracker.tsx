@@ -44,9 +44,20 @@ import {
 import { Progress } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
+// Local type for workaround display (different from analysis ImplementationWorkaround)
+interface WorkaroundDisplay {
+  id: string;
+  originalProvision: string;
+  workaroundMethod: string;
+  implementationDate: string;
+  effectiveness?: number;
+  relatedInterests?: string[];
+  description: string;
+}
+
 interface ImplementationWorkaroundsTrackerProps {
   conflictAnalysis: ConflictAnalysis;
-  workarounds?: ImplementationWorkaround[];
+  workarounds?: WorkaroundDisplay[];
 }
 
 export function ImplementationWorkaroundsTracker({
@@ -54,7 +65,7 @@ export function ImplementationWorkaroundsTracker({
   workarounds = [],
 }: ImplementationWorkaroundsTrackerProps) {
   // Generate mock workaround data if none provided
-  const mockWorkarounds: ImplementationWorkaround[] = useMemo(
+  const mockWorkarounds: WorkaroundDisplay[] = useMemo(
     () => [
       {
         id: 'wa-1',
@@ -149,7 +160,7 @@ export function ImplementationWorkaroundsTracker({
       .map((workaround, index) => ({
         index: index + 1,
         date: workaround.implementationDate!,
-        effectiveness: workaround.effectiveness,
+        effectiveness: workaround.effectiveness ?? 0,
         provision: workaround.originalProvision,
         method: workaround.workaroundMethod,
       }));
@@ -158,7 +169,7 @@ export function ImplementationWorkaroundsTracker({
     const riskMetrics = {
       totalWorkarounds: allWorkarounds.length,
       avgEffectiveness:
-        allWorkarounds.reduce((sum, w) => sum + w.effectiveness, 0) / allWorkarounds.length,
+        allWorkarounds.reduce((sum, w) => sum + (w.effectiveness ?? 0), 0) / allWorkarounds.length,
       highRiskWorkarounds: effectivenessGroups.high.length,
       recentWorkarounds: allWorkarounds.filter(w => {
         const monthsAgo =
@@ -559,7 +570,7 @@ export function ImplementationWorkaroundsTracker({
             <CardContent>
               <div className="space-y-4">
                 {allWorkarounds
-                  .sort((a, b) => b.effectiveness - a.effectiveness)
+                  .sort((a, b) => (b.effectiveness ?? 0) - (a.effectiveness ?? 0))
                   .map((workaround, index) => (
                     <div key={workaround.id} className="p-4 border rounded-lg">
                       <div className="flex items-start justify-between mb-3">
@@ -579,10 +590,10 @@ export function ImplementationWorkaroundsTracker({
 
                         <div className="flex-shrink-0 ml-4 text-right">
                           <Badge
-                            variant={getEffectivenessBadge(workaround.effectiveness)}
+                            variant={getEffectivenessBadge(workaround.effectiveness ?? 0)}
                             className="mb-2"
                           >
-                            {formatPercentage(workaround.effectiveness)}
+                            {formatPercentage(workaround.effectiveness ?? 0)}
                           </Badge>
                           <div className="text-xs text-muted-foreground">
                             {new Date(workaround.implementationDate).toLocaleDateString()}
@@ -592,7 +603,7 @@ export function ImplementationWorkaroundsTracker({
 
                       <div className="flex items-center justify-between">
                         <div className="flex flex-wrap gap-1">
-                          {workaround.relatedInterests.map((interest, idx) => (
+                          {(workaround.relatedInterests ?? []).map((interest, idx) => (
                             <Badge key={idx} variant="outline" className="text-xs">
                               {interest}
                             </Badge>
@@ -600,11 +611,11 @@ export function ImplementationWorkaroundsTracker({
                         </div>
 
                         <div className="text-xs text-muted-foreground">
-                          {getRiskLevel(workaround.effectiveness)}
+                          {getRiskLevel(workaround.effectiveness ?? 0)}
                         </div>
                       </div>
 
-                      {workaround.effectiveness > 0.7 && (
+                      {(workaround.effectiveness ?? 0) > 0.7 && (
                         <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-sm">
                           <AlertTriangle className="h-4 w-4 inline mr-2 text-red-600" />
                           <span className="text-red-800">

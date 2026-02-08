@@ -441,8 +441,8 @@ export class NotificationService {
 
     this.notifications.forEach(notification => {
       notificationsByType[notification.type] = (notificationsByType[notification.type] || 0) + 1;
-      notificationsByPriority[notification.priority] =
-        (notificationsByPriority[notification.priority] || 0) + 1;
+      const priority = notification.priority || 'medium';
+      notificationsByPriority[priority] = (notificationsByPriority[priority] || 0) + 1;
     });
 
     return {

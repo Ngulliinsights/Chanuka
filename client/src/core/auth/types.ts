@@ -5,17 +5,26 @@
  * Consolidated from client/src/types/auth.ts into core/auth module
  */
 
-import { User as SharedUser, UserProfile as SharedUserProfile, VerificationStatus } from '@client/lib/types';
+import { VerificationStatus } from '@shared/types/domains/authentication';
+
+// Define a local UserProfile that matches our needs
+export interface UserProfile {
+  displayName: string;
+  bio?: string;
+  avatarUrl?: string;
+  anonymityLevel: 'public' | 'semi-private' | 'private' | 'anonymous';
+  isPublic: boolean;
+}
 
 export interface User {
   id: string;
   email: string;
   
-  // Shared Type Structure
-  profile: SharedUserProfile;
+  // Profile structure
+  profile: UserProfile;
   verification: VerificationStatus;
-  preferences: UserPreferences; // Note: Check consistency with Shared UserPreferences later
-  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator'; // Map to Shared UserRole if possible
+  preferences: UserPreferences;
+  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
 
   // Audit (String for JSON)
   createdAt: string;

@@ -4,7 +4,7 @@
  */
 
 import { ApiRequest, PaginatedApiRequest, FileUploadRequest, GraphQLRequest, WebSocketRequest } from './request-types';
-import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse } from './response-types';
+import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, HttpStatusCode } from './response-types';
 import { ApiError, ApiErrorContext } from './error-types';
 import { Result, ValidationError } from '../core/errors';
 
@@ -184,7 +184,7 @@ export class ApiSerializer {
           responseId: serialized.responseId,
           requestId: serialized.requestId,
           status: serialized.status as ApiResponse['status'],
-          httpStatus: serialized.httpStatus,
+          httpStatus: serialized.httpStatus as HttpStatusCode,
           data: serialized.data,
           metadata: serialized.metadata,
           headers: serialized.headers,

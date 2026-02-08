@@ -38,7 +38,7 @@ export interface UseProgressiveDisclosureOptions {
 
 export const useProgressiveDisclosure = ({
   sections,
-  _readingPaths = [],
+  readingPaths = [],
   autoSave = true,
   storageKey = 'progressive-disclosure-state',
   onSectionChange,

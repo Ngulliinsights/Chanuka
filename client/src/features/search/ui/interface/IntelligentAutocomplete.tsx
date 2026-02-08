@@ -363,15 +363,19 @@ export function IntelligentAutocomplete({
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="font-medium truncate">{suggestion.text}</div>
-              {suggestion.metadata?.description && (
-                <div className="text-xs text-muted-foreground truncate mt-0.5">
-                  {suggestion.metadata.description}
-                </div>
-              )}
+              {(() => {
+                const description = suggestion.metadata?.description;
+                return description && typeof description === 'string' ? (
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {description}
+                  </div>
+                ) : null;
+              })()}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               {suggestion.count && suggestion.count > 1 && (
                 <Badge variant="secondary" className="text-xs">
+                  {suggestion.count}
                 </Badge>
               )}
               <Badge variant="outline" className="text-xs">

@@ -158,7 +158,11 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-50);
       state.billUpdates[billId] = updates;
 
-      state.lastUpdateTimestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
+        ? update.timestamp 
+        : update.timestamp instanceof Date 
+          ? update.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     addCommunityUpdate: (state, action: PayloadAction<CommunityRealTimeUpdate>) => {
@@ -170,19 +174,28 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-100);
       state.communityUpdates[discussionId] = updates;
 
-      state.lastUpdateTimestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
+        ? update.timestamp 
+        : update.timestamp instanceof Date 
+          ? update.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     updateEngagementMetrics: (state, action: PayloadAction<EngagementMetricsUpdate>) => {
       const metrics = action.payload;
       state.engagementMetrics[metrics.bill_id] = metrics;
-      state.lastUpdateTimestamp = metrics.timestamp;
+      state.lastUpdateTimestamp = typeof metrics.timestamp === 'string' 
+        ? metrics.timestamp 
+        : metrics.timestamp instanceof Date 
+          ? metrics.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     addExpertActivity: (state, action: PayloadAction<ExpertActivityUpdate>) => {
       // Keep only last 200 expert activities
       state.expertActivities = [...state.expertActivities, action.payload].slice(-200);
-      state.lastUpdateTimestamp = action.payload.timestamp;
+      const timestamp = action.payload.timestamp;
+      state.lastUpdateTimestamp = timestamp instanceof Date ? timestamp.toISOString() : timestamp;
     },
 
     addNotification: (state, action: PayloadAction<RealTimeNotification>) => {
@@ -193,7 +206,12 @@ export const realTimeSlice = createSlice({
       // Update unread count
       state.notificationCount = state.notifications.filter(n => !n.read).length;
 
-      state.lastUpdateTimestamp = notification.created_at;
+      const createdAt = notification.created_at;
+      state.lastUpdateTimestamp = typeof createdAt === 'string' 
+        ? createdAt 
+        : (createdAt && typeof createdAt === 'object' && 'toISOString' in createdAt)
+          ? (createdAt as Date).toISOString() 
+          : new Date().toISOString();
     },
 
     // Notification management

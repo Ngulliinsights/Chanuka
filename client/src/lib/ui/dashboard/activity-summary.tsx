@@ -51,15 +51,10 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(
     }, [data.summary]);
 
     const handleRefresh = async () => {
-      await measureAsync('activity-summary-refresh', async () => {
+      await measureAsync(async () => {
         try {
           await actions.refresh();
-          await recordMetric({
-            name: 'activity-summary-refresh-success',
-            value: 1,
-            timestamp: new Date(),
-            category: 'custom',
-          });
+          recordMetric('activity-summary-refresh-success', 1);
         } catch (refreshError) {
           const appError = {
             message: refreshError instanceof Error ? refreshError.message : 'Refresh failed',
@@ -73,15 +68,10 @@ export const ActivitySummary = React.memo<DashboardComponentProps>(
     };
 
     const handleRecovery = async () => {
-      await measureAsync('activity-summary-recovery', async () => {
+      await measureAsync(async () => {
         try {
           await recovery.recover();
-          await recordMetric({
-            name: 'activity-summary-recovery-success',
-            value: 1,
-            timestamp: new Date(),
-            category: 'custom',
-          });
+          recordMetric('activity-summary-recovery-success', 1);
         } catch (recoveryError) {
           const appError = {
             message: recoveryError instanceof Error ? recoveryError.message : 'Recovery failed',

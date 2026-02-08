@@ -11,7 +11,6 @@ import { logger } from '@client/lib/utils/logger';
 import type {
   WebSocketHookReturn,
   RealTimeNotification,
-  ConnectionState,
   WebSocketMessage,
 } from '../types';
 
@@ -159,12 +158,10 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
 
     wsClientRef.current = createWebSocketClient({
       url,
-      reconnect: {
-        enabled: true,
-        maxAttempts: reconnectAttempts,
-        delay: reconnectInterval,
-        backoff: 'exponential',
-      },
+      reconnect: true,
+      reconnectInterval,
+      maxReconnectAttempts: reconnectAttempts,
+      heartbeatInterval: 30000,
       heartbeat: {
         enabled: true,
         interval: 30000,
@@ -265,12 +262,9 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     return wsClientRef.current?.send(message) || false;
   }, []);
 
-  const getRecentActivity = useCallback(
-    (limit: number) => {
-      return recentActivity.slice(0, limit);
-    },
-    [recentActivity]
-  );
+  const getRecentActivity = useCallback(() => {
+    return recentActivity.slice(0, 20);
+  }, [recentActivity]);
 
   const markNotificationRead = useCallback((id: string) => {
     setNotifications(prev =>
@@ -297,16 +291,17 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
   return {
     isConnected,
     isConnecting,
-    connectionQuality,
-    error,
-    notifications,
-    notificationCount,
-    getRecentActivity,
-    markNotificationRead,
+    connectionState: isConnected ? 'connected' : isConnecting ? 'connecting' : 'disconnected',
+    lastMessage: null,
+    sendMessage: send,
+    subscribe: (channel: string) => subscribe(channel),
+    unsubscribe: (channel: string) => unsubscribe(channel),
     connect,
     disconnect,
-    subscribe,
-    unsubscribe,
-    send,
+    notifications,
+    connectionQuality: connectionQuality as 'good' | 'fair' | 'poor',
+    error: error ? new Error(error) : null,
+    getRecentActivity,
+    markNotificationRead,
   };
 }

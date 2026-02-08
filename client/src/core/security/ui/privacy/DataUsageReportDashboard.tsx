@@ -32,7 +32,7 @@ import {
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { dataRetentionService, retentionUtils } from '@client/lib/services/dataRetentionService';
-import { PrivacyAnalyticsService } from '@client/lib/services/PrivacyAnalyticsService';
+import { privacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
 import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@client/lib/ui/dashboard/hooks';
 import { logger } from '@client/lib/utils/logger';
 import { privacyCompliance } from '@client/lib/utils/privacy-compliance';
@@ -90,14 +90,14 @@ export function DataUsageReportDashboard() {
       const retentionSummary = await dataRetentionService.getUserDataSummary(auth.user.id);
 
       // Load analytics metrics with fallback to empty metrics
-      const analyticsMetrics = PrivacyAnalyticsService.getAnalyticsMetrics() || {
+      const analyticsMetrics = privacyAnalyticsService.getAnalyticsMetrics() || {
         totalEvents: 0,
         anonymizedEvents: 0,
         consentedEvents: 0,
       };
 
       // Load privacy compliance data
-      privacyCompliance.generatePrivacyPolicySummary();
+      const privacyPolicySummary = privacyCompliance.generatePrivacyPolicySummary();
 
       // Transform data for display with safe fallbacks
       const transformedCategories: DataCategory[] = Object.entries(

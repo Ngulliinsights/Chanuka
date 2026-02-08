@@ -14,7 +14,7 @@ import {
   ExpertContribution,
   ExpertConsensus,
   CredibilityMetrics,
-  CommunityValidationType,
+  CommunityValidation,
 } from '@client/lib/types';
 
 import {
@@ -291,17 +291,23 @@ export const generateExpertContributions = (
     const billId = faker.helpers.arrayElement(billIds);
     const type = faker.helpers.arrayElement(contributionTypes);
     const voting = generateVotingMetrics();
+    const contributionId = generateId('contrib');
 
-    const communityValidation: CommunityValidationType = {
+    const communityValidation: CommunityValidation = {
+      id: generateId('validation'),
+      contentId: contributionId,
+      contentType: 'contribution' as const,
       upvotes: voting.upvotes,
       downvotes: voting.downvotes,
       comments: faker.number.int({ min: 0, max: 25 }),
       userVote: voting.userVote,
       validationScore: faker.number.float({ min: 0.3, max: 1.0, fractionDigits: 2 }),
+      flagCount: faker.number.int({ min: 0, max: 5 }),
+      lastUpdated: generateDateInRange(7, 0),
     };
 
     return {
-      id: generateId('contrib'),
+      id: contributionId,
       expertId,
       billId,
       type,
@@ -336,7 +342,7 @@ export const generateExpertContributions = (
 /**
  * Generate expert consensus data
  */
-export const generateExpertConsensus = (billId: number, topic: string): ExpertConsensus => {
+export const generateExpertConsensus = (billId: string, topic: string): ExpertConsensus => {
   const totalExperts = faker.number.int({ min: 5, max: 25 });
   const agreementLevel = faker.number.float({ min: 0.3, max: 0.95, fractionDigits: 2 });
 
@@ -412,7 +418,7 @@ export const mockOfficialExperts = generateMockOfficialExperts(8);
  * Generate credibility metrics for all experts
  */
 export const mockExpertCredibilityMetrics = [...mockExperts, ...mockOfficialExperts].map(expert =>
-  generateCredibilityMetrics(expert.id)
+  generateCredibilityMetrics(String(expert.id))
 );
 
 /**
@@ -428,7 +434,7 @@ export const getMockExpertById = (id: string): Expert | null => {
  */
 export const getMockExpertsBySpecialization = (specialization: string): Expert[] => {
   const allExperts = [...mockExperts, ...mockOfficialExperts];
-  return allExperts.filter(expert => expert.specializations.includes(specialization));
+  return allExperts.filter(expert => expert.specializations?.includes(specialization) ?? false);
 };
 
 /**

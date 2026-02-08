@@ -7,9 +7,9 @@ import { useState, useCallback, useEffect } from 'react';
 
 import { DashboardConfigurationError } from '@client/core/error';
 import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/core/validation';
-import type { DashboardConfig, DashboardSection } from '@client/lib/types';
+import type { DashboardAppConfig, DashboardSection } from '@client/lib/types';
 
-const DEFAULT_CONFIG: DashboardConfig = {
+const DEFAULT_CONFIG: DashboardAppConfig = {
   refreshInterval: 30000, // 30 seconds
   maxActionItems: 10,
   maxTrackedTopics: 20,
@@ -21,11 +21,11 @@ const DEFAULT_CONFIG: DashboardConfig = {
 const CONFIG_STORAGE_KEY = 'dashboard-config';
 
 export interface UseDashboardConfigResult {
-  config: DashboardConfig;
+  config: DashboardAppConfig;
   loading: boolean;
   error: DashboardConfigurationError | null;
   operations: {
-    updateConfig: (updates: Partial<DashboardConfig>) => Promise<void>;
+    updateConfig: (updates: Partial<DashboardAppConfig>) => Promise<void>;
     resetConfig: () => Promise<void>;
     setRefreshInterval: (interval: number) => Promise<void>;
     setMaxItems: (maxActionItems: number, maxTrackedTopics: number) => Promise<void>;
@@ -38,9 +38,9 @@ export interface UseDashboardConfigResult {
 }
 
 export function useDashboardConfig(
-  initialConfig?: Partial<DashboardConfig>
+  initialConfig?: Partial<DashboardAppConfig>
 ): UseDashboardConfigResult {
-  const [config, setConfig] = useState<DashboardConfig>(() => {
+  const [config, setConfig] = useState<DashboardAppConfig>(() => {
     // Try to load from localStorage first
     try {
       const savedConfig = localStorage.getItem(CONFIG_STORAGE_KEY);
@@ -75,7 +75,7 @@ export function useDashboardConfig(
   }, [config]);
 
   const updateConfig = useCallback(
-    async (updates: Partial<DashboardConfig>) => {
+    async (updates: Partial<DashboardAppConfig>) => {
       setLoading(true);
       setError(null);
 

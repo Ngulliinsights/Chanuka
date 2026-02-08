@@ -126,7 +126,8 @@ export class PersonaDetector {
       a =>
         a.metadata?.expert_analysis ||
         a.metadata?.verification_contribution ||
-        (a.action === 'share' && a.metadata?.expert_insight)
+        (a.action === 'share' && a.metadata?.expert_insight) ||
+        a.target_type === 'analytics'
     );
 
     return {

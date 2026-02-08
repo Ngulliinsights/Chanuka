@@ -184,6 +184,8 @@ export class ModerationService {
       copyright_violation: 'Unauthorized use of copyrighted material',
       hate_speech: 'Content promoting hatred or discrimination',
       duplicate_content: 'Repeated or duplicate posts',
+      offensive: 'Offensive or inappropriate content',
+      other: 'Other violations not covered by specific categories',
     };
   }
 
@@ -201,6 +203,8 @@ export class ModerationService {
       harassment: 'high',
       hate_speech: 'critical',
       copyright_violation: 'high',
+      offensive: 'medium',
+      other: 'low',
     };
 
     return severityMap[violationType] || 'medium';

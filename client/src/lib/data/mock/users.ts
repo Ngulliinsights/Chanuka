@@ -8,6 +8,7 @@
 import { faker } from '@faker-js/faker';
 
 import { User, PrivacySettings, SecurityEvent, ConsentRecord } from '@client/core/auth';
+import { UserRole } from '@client/lib/types';
 
 import { generateId, generateDateInRange, generateLocation } from './generators';
 
@@ -89,6 +90,9 @@ export const generateMockUser = (id?: string): User => {
     'Tax Policy',
   ];
 
+  const role = faker.helpers.arrayElement(roles) as 'citizen' | 'expert' | 'moderator' | 'admin';
+  const verificationStatus = faker.helpers.arrayElement(verificationStatuses) as 'pending' | 'verified' | 'rejected';
+
   return {
     id: id || generateId('user'),
     email,
@@ -96,10 +100,33 @@ export const generateMockUser = (id?: string): User => {
     username,
     first_name: firstName,
     last_name: lastName,
-    role: faker.helpers.arrayElement(roles),
-    verification_status: faker.helpers.arrayElement(verificationStatuses),
+    role,
+    
+    // Required properties
+    profile: {
+      displayName: `${firstName} ${lastName}`,
+      bio: faker.lorem.sentence(),
+      avatarUrl: faker.image.avatar(),
+      anonymityLevel: 'public',
+      isPublic: true,
+    },
+    verification: verificationStatus === 'verified' ? 'verified' : verificationStatus === 'pending' ? 'pending' : 'unverified',
+    preferences: {
+      notifications: faker.datatype.boolean({ probability: 0.8 }),
+      emailAlerts: faker.datatype.boolean({ probability: 0.6 }),
+      theme: faker.helpers.arrayElement(['light', 'dark', 'system']),
+      language: 'en',
+    },
+    lastLogin: generateDateInRange(7, 0),
+    
+    // Legacy fields
+    verified: verificationStatus === 'verified',
+    twoFactorEnabled: faker.datatype.boolean({ probability: 0.3 }),
+    permissions: role === 'admin' ? ['read', 'write', 'delete', 'admin'] : ['read', 'write'],
+    
+    verification_status: verificationStatus,
     is_active: faker.datatype.boolean({ probability: 0.9 }),
-    created_at: generateDateInRange(730, 1),
+    createdAt: generateDateInRange(730, 1),
     reputation: faker.number.int({ min: 0, max: 10000 }),
     expertise: faker.helpers.arrayElement(expertiseAreas),
     two_factor_enabled: faker.datatype.boolean({ probability: 0.3 }),
@@ -122,50 +149,47 @@ export const generateMockUser = (id?: string): User => {
  * Generate security events for a user
  */
 export const generateSecurityEvents = (userId: string, count: number = 10): SecurityEvent[] => {
-  const eventTypes: Array<
-    | 'login'
-    | 'logout'
-    | 'password_change'
-    | 'failed_login'
-    | 'suspicious_activity'
-    | 'account_locked'
-    | 'two_factor_enabled'
-    | 'two_factor_disabled'
-  > = [
+  const eventTypes: Array<'login' | 'logout' | 'password_change' | 'permission_change' | 'suspicious_activity'> = [
     'login',
     'logout',
     'password_change',
-    'failed_login',
     'suspicious_activity',
-    'account_locked',
-    'two_factor_enabled',
-    'two_factor_disabled',
   ];
 
   return Array.from({ length: count }, () => {
     const eventType = faker.helpers.arrayElement(eventTypes);
     const location = generateLocation();
 
+    const descriptions = {
+      login: 'User logged in successfully',
+      logout: 'User logged out',
+      password_change: 'Password was changed',
+      permission_change: 'User permissions were modified',
+      suspicious_activity: 'Suspicious activity detected',
+    };
+
+    const severities = {
+      login: 'low' as const,
+      logout: 'low' as const,
+      password_change: 'medium' as const,
+      permission_change: 'high' as const,
+      suspicious_activity: 'critical' as const,
+    };
+
     return {
       id: generateId('event'),
-      user_id: userId,
-      event_type: eventType,
-      ip_address: faker.internet.ip(),
-      user_agent: faker.internet.userAgent(),
-      location: `${location.state}, ${location.county}`,
+      type: eventType,
+      description: descriptions[eventType],
+      severity: severities[eventType],
       timestamp: generateDateInRange(30, 0),
-      risk_score: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
-      details: {
-        success: eventType !== 'failed_login' && eventType !== 'suspicious_activity',
+      metadata: {
+        userId,
+        ipAddress: faker.internet.ip(),
+        userAgent: faker.internet.userAgent(),
+        location: `${location.state}, ${location.county}`,
+        riskScore: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
         device: faker.helpers.arrayElement(['Desktop', 'Mobile', 'Tablet']),
         browser: faker.helpers.arrayElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
-        ...(eventType === 'failed_login' && {
-          reason: faker.helpers.arrayElement([
-            'Invalid password',
-            'Account locked',
-            'Invalid email',
-          ]),
-        }),
       },
     };
   });
@@ -192,15 +216,15 @@ export const generateMockExpertUsers = (count: number = 10): User[] => {
     const user = generateMockUser();
     return {
       ...user,
-      role: 'expert',
-      verification_status: 'verified',
+      role: 'expert' as const,
+      verification_status: 'verified' as const,
       reputation: faker.number.int({ min: 5000, max: 10000 }),
       two_factor_enabled: true,
-      privacy_settings: {
+      privacy_settings: user.privacy_settings ? {
         ...user.privacy_settings,
-        profile_visibility: 'public',
+        profile_visibility: 'public' as const,
         analytics_consent: true,
-      },
+      } : undefined,
     };
   });
 };
@@ -213,15 +237,15 @@ export const generateMockModeratorUsers = (count: number = 3): User[] => {
     const user = generateMockUser();
     return {
       ...user,
-      role: 'moderator',
-      verification_status: 'verified',
+      role: 'moderator' as const,
+      verification_status: 'verified' as const,
       reputation: faker.number.int({ min: 8000, max: 10000 }),
       two_factor_enabled: true,
       account_locked: false,
-      privacy_settings: {
+      privacy_settings: user.privacy_settings ? {
         ...user.privacy_settings,
-        profile_visibility: 'public',
-      },
+        profile_visibility: 'public' as const,
+      } : undefined,
     };
   });
 };

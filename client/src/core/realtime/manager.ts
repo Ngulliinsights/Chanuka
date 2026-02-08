@@ -31,7 +31,7 @@ export class UnifiedWebSocketManager {
   private batchTimer: NodeJS.Timeout | null = null;
   private messageQueue: WebSocketMessage[] = [];
   private maxQueueSize = 100;
-  private connectionState: ConnectionState = ConnectionState.DISCONNECTED;
+  private connectionState: ConnectionState = 'disconnected';
   private eventEmitter = new EventEmitter();
   private reconnectTimer: NodeJS.Timeout | null = null;
   private connectionPromise: Promise<void> | null = null;
@@ -79,7 +79,7 @@ export class UnifiedWebSocketManager {
 
     // Create and store connection promise for reuse
     this.connectionPromise = new Promise((resolve, reject) => {
-      this.connectionState = ConnectionState.CONNECTING;
+      this.connectionState = 'connecting';
 
       try {
         const wsUrl = token
@@ -89,7 +89,7 @@ export class UnifiedWebSocketManager {
 
         // Connection timeout to prevent hanging
         const connectionTimeout = setTimeout(() => {
-          if (this.connectionState === ConnectionState.CONNECTING) {
+          if (this.connectionState === 'connecting') {
             this.ws?.close();
             reject(new Error('Connection timeout'));
           }
@@ -107,12 +107,12 @@ export class UnifiedWebSocketManager {
           clearTimeout(connectionTimeout);
           this.onError(error);
 
-          if (this.connectionState === ConnectionState.CONNECTING) {
+          if (this.connectionState === 'connecting') {
             reject(error);
           }
         };
       } catch (error) {
-        this.connectionState = ConnectionState.DISCONNECTED;
+        this.connectionState = 'disconnected';
         reject(error);
       }
     });
@@ -124,7 +124,7 @@ export class UnifiedWebSocketManager {
     this.cleanup(true);
     this.currentToken = null;
     this.messageQueue = [];
-    this.connectionState = ConnectionState.DISCONNECTED;
+    this.connectionState = 'disconnected';
     this.eventEmitter.emit('disconnected');
   }
 
@@ -152,10 +152,13 @@ export class UnifiedWebSocketManager {
 
     const subscription: Subscription = {
       id: subscriptionId,
+      channel: topic,
       topic,
-      filters: options?.filters,
+      handler: callback,
       callback,
-      priority: options?.priority || 'medium',
+      filters: options?.filters,
+      priority: options?.priority === 'high' ? 3 : options?.priority === 'low' ? 1 : 2,
+      createdAt: new Date(),
     };
 
     this.subscriptions.set(subscriptionId, subscription);
@@ -248,7 +251,7 @@ export class UnifiedWebSocketManager {
   // ============================================================================
 
   private onConnected(): void {
-    this.connectionState = ConnectionState.CONNECTED;
+    this.connectionState = 'connected';
     this.reconnectAttempts = 0;
     this._connectedAt = Date.now();
     this.lastPongTime = Date.now();
@@ -283,7 +286,7 @@ export class UnifiedWebSocketManager {
 
       // Handle heartbeat
       if (message.type === 'heartbeat' || message.type === 'pong') {
-        this.handleHeartbeat(message as HeartbeatMessage);
+        this.handleHeartbeat(message as unknown as HeartbeatMessage);
         return;
       }
 
@@ -301,24 +304,28 @@ export class UnifiedWebSocketManager {
   }
 
   private onDisconnected(event: CloseEvent): void {
-    const wasConnected = this.connectionState === ConnectionState.CONNECTED;
+    const wasConnected = this.connectionState === 'connected';
     this.connectionState =
-      event.code === 1000 ? ConnectionState.DISCONNECTED : ConnectionState.RECONNECTING;
+      event.code === 1000 ? 'disconnected' : 'reconnecting';
 
     this.stopHeartbeat();
     this.stopBatchProcessing();
     this.ws = null;
 
+    const reconnectConfig = typeof this.config.reconnect === 'boolean' 
+      ? { enabled: this.config.reconnect, maxAttempts: 5 }
+      : this.config.reconnect;
+
     // Attempt reconnection if enabled and not a clean close
     if (
-      this.config.reconnect?.enabled &&
+      reconnectConfig.enabled &&
       event.code !== 1000 &&
       wasConnected &&
-      this.reconnectAttempts < (this.config.reconnect.maxAttempts || 5)
+      this.reconnectAttempts < reconnectConfig.maxAttempts
     ) {
       this.scheduleReconnect();
-    } else if (this.reconnectAttempts >= (this.config.reconnect?.maxAttempts || 5)) {
-      this.connectionState = ConnectionState.FAILED;
+    } else if (this.reconnectAttempts >= reconnectConfig.maxAttempts) {
+      this.connectionState = 'error';
       logger.error('Max reconnection attempts reached', {
         component: 'UnifiedWebSocketManager',
       });
@@ -334,7 +341,7 @@ export class UnifiedWebSocketManager {
   }
 
   private onError(error: Event | Error): void {
-    this.connectionState = ConnectionState.FAILED;
+    this.connectionState = 'error';
 
     const errorObj = error instanceof Error ? error : new Error('WebSocket connection error');
 
@@ -377,7 +384,7 @@ export class UnifiedWebSocketManager {
 
   private matchesSubscription(subscription: Subscription, message: WebSocketMessage): boolean {
     // Check topic match
-    if ((subscription.topic !== (message as any).topic) && subscription.topic !== '*') {
+    if (subscription.topic && (subscription.topic !== (message as any).topic) && subscription.topic !== '*') {
       return false;
     }
 
@@ -408,10 +415,8 @@ export class UnifiedWebSocketManager {
   private sendSubscriptionMessage(subscription: Subscription): void {
     const message: SubscriptionMessage = {
       type: 'subscribe',
-      topic: subscription.topic,
-      filters: subscription.filters,
-      // subscriptionId: subscription.id, // Removed as not in type
-      timestamp: Date.now(),
+      channel: subscription.topic || '',
+      timestamp: new Date(),
     };
     // If invalid types, cast as any for now to resolve
     this.send(message as any); 
@@ -420,9 +425,8 @@ export class UnifiedWebSocketManager {
   private sendUnsubscriptionMessage(subscription: Subscription): void {
     const message: SubscriptionMessage = {
       type: 'unsubscribe',
-      topic: subscription.topic,
-      // subscriptionId: subscription.id,
-      timestamp: Date.now(),
+      channel: subscription.topic || '',
+      timestamp: new Date(),
     };
      // If invalid types, cast as any for now to resolve
      this.send(message as any);
@@ -491,6 +495,7 @@ export class UnifiedWebSocketManager {
       if (
         this.lastPongTime &&
         this.config.heartbeat &&
+        this.config.heartbeat.timeout &&
         Date.now() - this.lastPongTime > this.config.heartbeat.timeout + 15000
       ) {
         logger.warn('No pong received, connection appears dead', {
@@ -516,11 +521,12 @@ export class UnifiedWebSocketManager {
   }
 
   private startBatchProcessing(): void {
+    const batchInterval = this.config.message?.batching?.flushInterval || 1000;
     this.batchTimer = setInterval(() => {
       if (this.messageQueue.length > 0) {
         this.processBatch();
       }
-    }, this.config.message?.batchInterval || 1000);
+    }, batchInterval);
   }
 
   private stopBatchProcessing(): void {
@@ -531,14 +537,14 @@ export class UnifiedWebSocketManager {
   }
 
   private processBatch(): void {
-    const batchSize = this.config.message?.batchSize || 50;
+    const batchSize = this.config.message?.batching?.maxSize || 50;
     const batch = this.messageQueue.splice(0, batchSize);
 
     if (batch.length > 0) {
       const batchMessage: BatchMessage = {
         type: 'batch',
         messages: batch,
-        timestamp: Date.now(),
+        timestamp: new Date(),
       };
       this.send(batchMessage as any);
     }
@@ -550,10 +556,15 @@ export class UnifiedWebSocketManager {
     }
 
     this.reconnectAttempts++;
+    
+    const reconnectConfig = typeof this.config.reconnect === 'boolean'
+      ? { enabled: this.config.reconnect, maxAttempts: 5, delay: 1000, backoff: 'exponential' as const }
+      : this.config.reconnect;
+
     const delay =
-      this.config.reconnect?.backoff === 'exponential'
-        ? (this.config.reconnect.delay || 1000) * Math.pow(2, this.reconnectAttempts - 1)
-        : (this.config.reconnect?.delay || 1000) * this.reconnectAttempts;
+      reconnectConfig.backoff === 'exponential'
+        ? reconnectConfig.delay * Math.pow(2, this.reconnectAttempts - 1)
+        : reconnectConfig.delay * this.reconnectAttempts;
 
     logger.info('Scheduling WebSocket reconnection', {
       component: 'UnifiedWebSocketManager',

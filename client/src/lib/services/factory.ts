@@ -13,6 +13,9 @@ import { logger } from '@client/lib/utils/logger';
 
 import { ServiceError, DependencyError, ConfigurationError, ServiceErrorFactory } from './errors';
 
+// Re-export ServiceError for external use
+export { ServiceError } from './errors';
+
 // ============================================================================
 // SERVICE LIFECYCLE AND REGISTRATION
 // ============================================================================
@@ -582,7 +585,7 @@ export interface ServiceLifecycleInterface {
     name: string;
     version?: string;
     description?: string;
-    dependencies: string[];
+    dependencies?: string[];
   };
 }
 

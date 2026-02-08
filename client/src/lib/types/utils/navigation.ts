@@ -4,7 +4,8 @@
 
 // Route utilities
 export type RouteParams = Record<string, string>;
-export type QueryParams = Record<string, string | string[] | undefined>;
+// QueryParams is re-exported from common.ts to avoid duplication
+export type { QueryParams } from './common';
 export type NavigationState = Record<string, any>;
 
 // Authorization utilities

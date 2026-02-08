@@ -750,7 +750,7 @@ export default function AdminPage() {
             {/* Database Status */}
             <div>
               <h2 className="text-2xl font-bold mb-4">Database Status</h2>
-              <DatabaseStatus {...useDatabaseStatus()} />
+              <DatabaseStatus />
             </div>
 
             <Card className="border-0 shadow-lg">

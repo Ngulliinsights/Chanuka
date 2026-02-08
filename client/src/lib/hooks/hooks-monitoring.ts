@@ -370,11 +370,12 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
   }
 
   private calculateErrorImpact(error: AppError): number {
-    const severityMultiplier = {
+    const severityMultiplier: Record<ErrorSeverity, number> = {
       [ErrorSeverity.LOW]: 1,
       [ErrorSeverity.MEDIUM]: 2,
       [ErrorSeverity.HIGH]: 3,
-      [ErrorSeverity.CRITICAL]: 4
+      [ErrorSeverity.CRITICAL]: 4,
+      [ErrorSeverity.BLOCKER]: 5,
     };
 
     return severityMultiplier[error.severity] || 1;

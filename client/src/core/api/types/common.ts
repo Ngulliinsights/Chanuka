@@ -127,6 +127,7 @@ export interface ApiResponse<T = unknown> {
   readonly duration: number;
   readonly cached: boolean;
   readonly fromFallback: boolean;
+  readonly message?: string; // Optional message for error responses
 }
 
 export interface RequestOptions {

@@ -118,7 +118,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
           title: 'Privacy',
           text: 'Every person has the right to privacy, which includes the right not to have information relating to their family or private affairs unnecessarily required or revealed.',
           relevance: 'contextual' as const,
-          impact: 'mixed' as const,
+          impact: 'unclear' as const,
           explanation:
             "Digital health systems must balance accessibility with the strict privacy protections guaranteed by the Constitution.",
         },
@@ -140,7 +140,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
       title: 'Universal Health Coverage (UHC) Pilot',
       year: 2018,
       jurisdiction: 'Kenya',
-      status: 'implemented' as const,
+      status: 'passed' as const,
       similarity: 'high' as const,
       keyProvisions: [
         'Removal of user fees in public hospitals',
@@ -164,7 +164,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
       },
       constitutionalChallenges: {
         filed: false,
-        outcome: 'n/a' as const,
+        outcome: undefined,
         details:
           'No direct challenge, but questions raised about equity between pilot and non-pilot counties.',
       },
@@ -181,7 +181,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
         introduced: '2018-06-01',
         passed: '2018-12-12',
         implemented: '2019-01-01',
-        challenged: 'N/A',
+        challenged: undefined,
       },
     },
   ];

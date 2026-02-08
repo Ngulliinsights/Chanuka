@@ -255,6 +255,16 @@ export interface DashboardConfig {
   theme?: any;
   refreshInterval?: number;
   enableAutoRefresh?: boolean;
+  
+  // Dashboard application configuration properties
+  /** Maximum number of action items to display */
+  maxActionItems?: number;
+  /** Maximum number of tracked topics to display */
+  maxTrackedTopics?: number;
+  /** Whether to show completed actions */
+  showCompletedActions?: boolean;
+  /** Default view section */
+  defaultView?: DashboardSection;
 }
 
 /**
