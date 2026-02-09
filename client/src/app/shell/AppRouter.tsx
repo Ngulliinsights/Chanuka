@@ -81,6 +81,22 @@ const AuthPage = createLazyComponent(
 const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
 const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
+const SupportPage = createLazyComponent(() => import('@client/features/legal/pages/support'), 'Support');
+const DocumentationPage = createLazyComponent(() => import('@client/features/legal/pages/documentation'), 'Documentation');
+const ContactPage = createLazyComponent(() => import('@client/features/legal/pages/contact'), 'Contact');
+const AboutPage = createLazyComponent(() => import('@client/features/legal/pages/about'), 'About');
+const CareersPage = createLazyComponent(() => import('@client/features/legal/pages/careers'), 'Careers');
+const PressPage = createLazyComponent(() => import('@client/features/legal/pages/press'), 'Press');
+const BlogPage = createLazyComponent(() => import('@client/features/legal/pages/blog'), 'Blog');
+const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
+const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility'), 'Accessibility');
+const CivicEducationPage = createLazyComponent(() => import('@client/features/civic/pages/civic-education'), 'Civic Education');
+const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
+const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
+const ApiAccessPage = createLazyComponent(() => import('@client/features/api/pages/api-access'), 'API Access');
+const SystemStatusPage = createLazyComponent(() => import('@client/features/status/pages/system-status'), 'System Status');
+const SitemapPage = createLazyComponent(() => import('@client/features/sitemap/pages/sitemap'), 'Sitemap');
+const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
 const UserProfile = createLazyComponent(
   () => import('@client/features/users/pages/UserAccountPage'),
   'User Account'
@@ -291,6 +307,91 @@ const routes: RouteConfig[] = [
     id: 'privacy',
     path: '/privacy',
     element: <PrivacyPage />,
+  },
+  {
+    id: 'support',
+    path: '/support',
+    element: <SupportPage />,
+  },
+  {
+    id: 'documentation',
+    path: '/documentation',
+    element: <DocumentationPage />,
+  },
+  {
+    id: 'docs',
+    path: '/docs',
+    element: <DocumentationPage />,
+  },
+  {
+    id: 'contact',
+    path: '/contact',
+    element: <ContactPage />,
+  },
+  {
+    id: 'about',
+    path: '/about',
+    element: <AboutPage />,
+  },
+  {
+    id: 'careers',
+    path: '/careers',
+    element: <CareersPage />,
+  },
+  {
+    id: 'press',
+    path: '/press',
+    element: <PressPage />,
+  },
+  {
+    id: 'blog',
+    path: '/blog',
+    element: <BlogPage />,
+  },
+  {
+    id: 'cookies',
+    path: '/cookies',
+    element: <CookiePolicyPage />,
+  },
+  {
+    id: 'accessibility',
+    path: '/accessibility',
+    element: <AccessibilityPage />,
+  },
+  {
+    id: 'civic-education',
+    path: '/civic-education',
+    element: <CivicEducationPage />,
+  },
+  {
+    id: 'analysis-tools',
+    path: '/analysis',
+    element: <AnalysisToolsPage />,
+  },
+  {
+    id: 'expert-insights',
+    path: '/expert',
+    element: <ExpertInsightsPage />,
+  },
+  {
+    id: 'api-access',
+    path: '/api',
+    element: <ApiAccessPage />,
+  },
+  {
+    id: 'system-status',
+    path: '/status',
+    element: <SystemStatusPage />,
+  },
+  {
+    id: 'sitemap',
+    path: '/sitemap',
+    element: <SitemapPage />,
+  },
+  {
+    id: 'security',
+    path: '/security',
+    element: <SecurityPage />,
   },
 
   // Protected routes - require authentication

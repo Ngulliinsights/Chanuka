@@ -1,10 +1,10 @@
 import type { Preview } from '@storybook/react'
-import { DARK_MODE_EVENT_NAME } from 'storybook-addon-dark-mode'
+import type { StoryContext } from '@storybook/react'
+import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode'
 import '../src/lib/design-system/theme/light.css'
 import '../src/lib/design-system/theme/dark.css'
 import '../src/lib/design-system/theme/high-contrast.css'
 import '../src/styles/globals.css'
-import { ThemeProvider } from '../src/lib/design-system/theme/theme-provider'
 import React from 'react'
 
 // Default theme
@@ -12,8 +12,9 @@ const theme = 'light'
 
 // Global dark mode listener
 if (typeof window !== 'undefined') {
-  window.addEventListener(DARK_MODE_EVENT_NAME, ({ detail }) => {
-    const isDark = detail.theme === 'dark'
+  window.addEventListener(DARK_MODE_EVENT_NAME, (event: Event) => {
+    const customEvent = event as CustomEvent<{ theme: string }>
+    const isDark = customEvent.detail.theme === 'dark'
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
   })
 }
@@ -91,8 +92,8 @@ const preview: Preview = {
     }
   },
   decorators: [
-    (Story, { parameters }) => {
-      const isDark = parameters.darkMode?.current === 'dark'
+    (Story: React.ComponentType, context: StoryContext) => {
+      const isDark = context.parameters.darkMode?.current === 'dark'
       
       React.useEffect(() => {
         document.documentElement.setAttribute(
@@ -101,12 +102,10 @@ const preview: Preview = {
         )
       }, [isDark])
 
-      return (
-        <ThemeProvider initialTheme={isDark ? 'dark' : 'light'}>
-          <div className="p-4">
-            <Story />
-          </div>
-        </ThemeProvider>
+      return React.createElement(
+        'div',
+        { className: 'p-4' },
+        React.createElement(Story)
       )
     }
   ]

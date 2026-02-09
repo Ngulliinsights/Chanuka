@@ -22,9 +22,9 @@ const config: StorybookConfig = {
   typescript: {
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: {
-      shouldExtractLiteralValuesAsTypes: true,
+      shouldExtractLiteralValuesFromEnum: true,
       shouldRemoveUndefinedFromOptional: true,
-      propFilter: (prop) => {
+      propFilter: (prop: { name: string; parent?: { fileName: string } }) => {
         if (prop.name.startsWith('aria-')) {
           return true
         }
@@ -35,10 +35,7 @@ const config: StorybookConfig = {
       }
     }
   },
-  docs: {
-    autodocs: 'tag'
-  },
-  viteFinal: async (config) => {
+  viteFinal: async (config: Record<string, any>) => {
     return {
       ...config,
       resolve: {

@@ -60,7 +60,7 @@ const DashboardFooterComponent = ({ config, content, className }: DashboardFoote
             <ul className="flex flex-wrap items-center space-x-6 text-sm">
               <li>
                 <a
-                  href="#"
+                  href="/privacy"
                   className="text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-accent))] focus:ring-offset-2 rounded-sm"
                 >
                   Privacy Policy
@@ -68,7 +68,7 @@ const DashboardFooterComponent = ({ config, content, className }: DashboardFoote
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/terms"
                   className="text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-accent))] focus:ring-offset-2 rounded-sm"
                 >
                   Terms of Service
@@ -76,7 +76,7 @@ const DashboardFooterComponent = ({ config, content, className }: DashboardFoote
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/support"
                   className="text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-accent))] focus:ring-offset-2 rounded-sm"
                 >
                   Support
@@ -84,7 +84,7 @@ const DashboardFooterComponent = ({ config, content, className }: DashboardFoote
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/documentation"
                   className="text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-accent))] focus:ring-offset-2 rounded-sm"
                 >
                   Documentation
