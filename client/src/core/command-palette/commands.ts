@@ -15,6 +15,7 @@ import {
   Bell,
   BookOpen,
   HelpCircle,
+  X,
 } from 'lucide-react';
 
 import type { Command, CommandSection } from './types';
@@ -166,7 +167,7 @@ export const createQuickActionCommands = (actions: {
       id: 'action-logout',
       label: 'Sign Out',
       description: 'Sign out of your account',
-      icon: undefined,
+      icon: X,
       action: actions.logout,
       keywords: ['logout', 'signout', 'exit'],
       section: 'actions',

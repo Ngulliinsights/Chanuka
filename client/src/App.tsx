@@ -3,6 +3,7 @@ import React, { Suspense, useEffect } from 'react';
 import { AppProviders } from '@client/app/providers/AppProviders';
 import { AppRouter } from '@client/app/shell/AppRouter'; // Connect the real router
 import { AppShell } from '@client/app/shell/AppShell';
+import { BrandedFooter } from '@client/app/shell/BrandedFooter';
 import { ErrorBoundary } from '@client/core/error/components';
 import { Toaster } from '@client/lib/design-system';
 import { LoadingStates } from '@client/lib/ui/loading/LoadingStates';

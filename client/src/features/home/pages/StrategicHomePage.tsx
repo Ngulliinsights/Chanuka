@@ -651,8 +651,8 @@ export default function StrategicHomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Performance Monitor - Development Only */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* Performance Monitor - Hidden in production */}
+      {process.env.NODE_ENV === 'development' && false && (
         <div className="fixed top-4 right-4 z-50 w-80">
           <PerformanceMonitor pageName="home" showRealTime={true} showOptimizations={true} />
         </div>

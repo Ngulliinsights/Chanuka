@@ -25,6 +25,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  ChanukaLogo,
+  ChanukaSymbol,
+  ChanukaSidemark,
+  ChanukaSmallLogo,
 } from '../../lib/design-system';
 import { useMobileMenu } from '../../lib/hooks/useNavigationSlice';
 import { LanguageSwitcher } from '../../lib/ui/i18n/LanguageSwitcher';
@@ -290,7 +294,7 @@ export const NavigationBar = memo<NavigationBarProps>(
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Left: Logo and mobile menu */}
+              {/* Left: Logo and mobile menu */}
             <div className="flex items-center">
               {isMobile && (
                 <Button
@@ -310,11 +314,15 @@ export const NavigationBar = memo<NavigationBarProps>(
 
               <Link
                 to="/"
-                className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1"
+                className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1 transition-transform hover:scale-105"
                 aria-label="Chanuka home"
               >
-                <LucideIcons.Home className="h-6 w-6" />
-                <span className="hidden sm:block">Chanuka</span>
+                <div className="md:hidden">
+                  <ChanukaSmallLogo size="sm" className="w-12 h-12" />
+                </div>
+                <div className="hidden md:block">
+                  <ChanukaSidemark size="md" className="h-16 w-auto" />
+                </div>
               </Link>
             </div>
 

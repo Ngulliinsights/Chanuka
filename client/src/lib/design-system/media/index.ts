@@ -21,3 +21,20 @@ export { Avatar, AvatarImage, AvatarFallback, avatarVariants, type AvatarProps }
 
 export { OptimizedImage } from './OptimizedImage';
 export { Logo } from './Logo';
+export { ChanukaLogo, ChanukaSymbol } from './ChanukaBrand';
+
+// ════════════════════════════════════════════════════════════════════
+// BRAND ASSETS (Centralized SVG brand components)
+// ════════════════════════════════════════════════════════════════════
+
+export {
+  ChanukaFullLogo,
+  ChanukaSidemark,
+  ChanukaWordmark,
+  DocumentShieldIcon,
+  ChanukaSmallLogo,
+  AnimatedChanukaLogo,
+  BrandAssetGrid,
+  HeroBrandElement,
+  FloatingBrandAccent,
+} from './BrandAssets';

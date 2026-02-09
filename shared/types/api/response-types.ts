@@ -4,7 +4,6 @@
  */
 
 import { BaseEntity } from '../core/base';
-import { Result } from '../core/errors';
 
 /**
  * Response Status codes
@@ -67,27 +66,27 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
   /**
     * Response data payload
     */
-  readonly data?: T;
+  readonly data?: T | undefined;
 
   /**
     * Response message
     */
-  readonly message?: string;
+  readonly message?: string | undefined;
 
   /**
     * Response metadata
     */
-  readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly metadata?: Readonly<Record<string, unknown>> | undefined;
 
   /**
     * Response headers
     */
-  readonly headers?: Readonly<Record<string, string>>;
+  readonly headers?: Readonly<Record<string, string>> | undefined;
 
   /**
     * Content type
     */
-  readonly contentType?: ResponseContentType;
+  readonly contentType?: ResponseContentType | undefined;
 
   /**
     * Response timestamp
@@ -97,7 +96,7 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
   /**
     * Processing duration in milliseconds
     */
-  readonly duration?: number;
+  readonly duration?: number | undefined;
 
   /**
     * Cache control information
@@ -109,7 +108,7 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
     readonly mustRevalidate?: boolean;
     readonly noCache?: boolean;
     readonly noStore?: boolean;
-  };
+  } | undefined;
 
   /**
     * Pagination information for paginated responses
@@ -121,7 +120,7 @@ export interface ApiResponse<T = unknown> extends BaseEntity {
     readonly pageSize: number;
     readonly hasNextPage: boolean;
     readonly hasPreviousPage: boolean;
-  };
+  } | undefined;
 
   /**
     * Response version for backward compatibility

@@ -289,7 +289,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   )}
                   disabled={command.disabled}
                 >
-                  {Icon && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                  {Icon && typeof Icon === 'function' && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
 
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">{command.label}</div>

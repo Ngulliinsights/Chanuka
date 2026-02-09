@@ -26,6 +26,7 @@ import { NavigationConsistency } from '../../core/navigation/NavigationConsisten
 import { NavigationPerformance } from '../../core/navigation/NavigationPerformance';
 
 import { AppRouter } from './AppRouter';
+import { BrandedFooter } from './BrandedFooter';
 import { NavigationBar } from './NavigationBar';
 import { SkipLinks } from './SkipLinks';
 
@@ -341,6 +342,9 @@ export function AppShell({
                         {/* Either render the router (for full app) or children (for testing) */}
                         {enableRouter ? <AppRouter /> : children}
                       </main>
+
+                      {/* Footer */}
+                      <BrandedFooter />
                     </div>
 
                     {/* Toast notification system for user feedback */}

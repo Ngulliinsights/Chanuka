@@ -4,50 +4,49 @@
  */
 
 export const colorTokens = {
-  // Primary brand colors - Chanuka Design System
-  // Updated per brand roadmap for institutional authority and trust
+  // Primary brand colors - Chanuka Design System (from SVG brand assets)
   primary: {
-    // Deep Blue (#0d3b66) - Primary institutional authority
-    50: '#f0f5fb',
-    100: '#d9e5f0',
-    200: '#b3cce1',
-    300: '#8cb3d2',
-    400: '#6699c3',
-    500: '#4080b4', // Brand primary
-    600: '#0d3b66', // Deepest - matches roadmap
-    700: '#0a2f54',
-    800: '#072642',
-    900: '#051c30',
+    // Navy Blue (#1a2e49) - Primary institutional authority and trust
+    50: '#f0f3f7',
+    100: '#dce2ea',
+    200: '#b9c5d5',
+    300: '#96a8c0',
+    400: '#738bab',
+    500: '#506e96',
+    600: '#1a2e49', // Brand primary from SVG
+    700: '#152538',
+    800: '#101c2a',
+    900: '#0b131c',
   },
 
-  // Secondary colors - Transparency & Clarity
+  // Secondary colors - Civic transparency
   secondary: {
-    // Teal (#084c61) - Transparency and clarity
-    50: '#f0fafb',
-    100: '#d9eef2',
-    200: '#b3dde5',
-    300: '#8cccd8',
-    400: '#66bbcb',
-    500: '#40aabe',
-    600: '#084c61', // Matches roadmap
-    700: '#06414f',
-    800: '#04363d',
-    900: '#022b2b',
+    // Teal (#11505c) - Transparency and modern civic tech
+    50: '#f0f7f8',
+    100: '#dceef0',
+    200: '#b9dde1',
+    300: '#96ccd2',
+    400: '#73bbc3',
+    500: '#50aab4',
+    600: '#11505c', // Brand secondary from SVG
+    700: '#0e404a',
+    800: '#0a3038',
+    900: '#072026',
   },
 
   // Accent colors - Energy & Optimism
   accent: {
-    // Orange (#f38a1f) - Energy encouraging participation
-    50: '#fff8f0',
-    100: '#ffebd9',
-    200: '#ffd7b3',
-    300: '#ffc38c',
-    400: '#ffaf66',
-    500: '#ff9b40',
-    600: '#f38a1f', // Matches roadmap
-    700: '#e67a0f',
-    800: '#d96a00',
-    900: '#cc5a00',
+    // Orange (#f29b06) - Energy encouraging participation
+    50: '#fff8ed',
+    100: '#ffefd4',
+    200: '#ffdfa9',
+    300: '#ffcf7e',
+    400: '#ffbf53',
+    500: '#ffaf28',
+    600: '#f29b06', // Brand accent from SVG
+    700: '#c27c05',
+    800: '#915d04',
+    900: '#613e03',
   },
 
   // Neutral colors - Professional balance and readability

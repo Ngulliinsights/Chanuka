@@ -1,3 +1,0 @@
-src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(207,6): error TS17008: JSX element 'div' has no corresponding closing tag.
-src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(453,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-src/features/bills/ui/analysis/ConstitutionalAnalysisPanel.tsx(456,1): error TS1005: '</' expected.
