@@ -124,3 +124,7 @@ Thumbs.db
 test-results/
 playwright-report/
 playwright/.cache/client/src/components/Sidebar.tsx
+
+# Strategic/Business documents (don't commit)
+docs/strategy/
+client/logs/
