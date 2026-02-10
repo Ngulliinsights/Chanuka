@@ -97,7 +97,7 @@ function DashboardSidebarComponent({
         aria-hidden={!isOpen && isMobile}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[hsl(var(--color-background))]/95 backdrop-blur border-b border-[hsl(var(--color-border))]">
+        <div className="sticky top-0 z-10 glass-panel border-b-0 border-[hsl(var(--color-border))]">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-lg font-semibold text-[hsl(var(--color-foreground))]">
               {config.title}

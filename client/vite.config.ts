@@ -85,6 +85,25 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // PLUGINS - Extend Vite's functionality with various build-time tools
     // ============================================================================
     plugins: [
+      // Resource hints plugin for better loading performance
+      {
+        name: 'resource-hints',
+        transformIndexHtml(html: string) {
+          // Add preconnect hints for external resources
+          const preconnectHints = [
+            '<link rel="preconnect" href="https://fonts.googleapis.com">',
+            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+          ].join('\n')
+
+          // Add DNS prefetch for potential external resources
+          const dnsPrefetch = [
+            '<link rel="dns-prefetch" href="https://www.google-analytics.com">',
+          ].join('\n')
+
+          // Insert hints in the head
+          return html.replace('</head>', `${preconnectHints}\n${dnsPrefetch}\n</head>`)
+        }
+      },
       // CSP Plugin for environment-aware Content Security Policy
       {
         name: 'csp-plugin',
@@ -280,8 +299,13 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             if (id.includes('node_modules')) {
               // React core is used everywhere, so it gets its own chunk
               // This chunk is highly cacheable since React updates infrequently
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-core'
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react/jsx-runtime')) {
+                return 'react-vendor'
+              }
+
+              // React Router for navigation
+              if (id.includes('react-router')) {
+                return 'router-vendor'
               }
 
               // UI libraries are grouped together because they're often used together
@@ -289,20 +313,29 @@ export default defineConfig(({ mode }: ConfigEnv) => {
               if (id.includes('@radix-ui') || id.includes('lucide-react') ||
                   id.includes('clsx') || id.includes('tailwind-merge') ||
                   id.includes('class-variance-authority')) {
-                return 'ui-core'
+                return 'ui-vendor'
               }
 
               // Data fetching and form libraries power interactive features
               // Grouping them means they load together when needed
               if (id.includes('@tanstack/react-query') || id.includes('axios') ||
                   id.includes('react-hook-form') || id.includes('zod')) {
-                return 'data-forms'
+                return 'data-vendor'
               }
 
-              // Heavy libraries are isolated so they can be lazy loaded
-              // This prevents them from blocking initial page render
-              if (id.includes('recharts') || id.includes('date-fns')) {
-                return 'heavy-libs'
+              // Chart and visualization libraries (heavy)
+              if (id.includes('recharts') || id.includes('d3') || id.includes('chart')) {
+                return 'charts-vendor'
+              }
+
+              // Date utilities
+              if (id.includes('date-fns') || id.includes('dayjs')) {
+                return 'date-vendor'
+              }
+
+              // Redux and state management
+              if (id.includes('redux') || id.includes('@reduxjs')) {
+                return 'state-vendor'
               }
 
               // Catch-all for remaining vendor code
@@ -312,33 +345,52 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             // Application code splitting by feature improves code organization
             if (id.includes('src/')) {
               // Core infrastructure is needed everywhere, so load it upfront
-              if (id.includes('src/components/layout') ||
-                  id.includes('src/components/navigation') ||
-                  id.includes('src/hooks/use-') ||
-                  id.includes('src/utils/browser-') ||
-                  id.includes('src/store/')) {
+              if (id.includes('src/app/') || 
+                  id.includes('src/core/') ||
+                  id.includes('src/lib/design-system/') ||
+                  id.includes('src/lib/utils/') ||
+                  id.includes('src/lib/hooks/')) {
                 return 'app-core'
+              }
+
+              // Infrastructure layer
+              if (id.includes('src/lib/infrastructure/')) {
+                return 'infrastructure'
               }
 
               // Feature-specific code gets its own chunk per feature
               // This enables route-based code splitting for optimal loading
-              if (id.includes('src/pages/') ||
-                  id.includes('src/features/') ||
-                  id.includes('src/components/bills/') ||
-                  id.includes('src/components/analysis/')) {
-                const pathParts = id.split('/')
-                const featureIndex = pathParts.findIndex(part =>
-                  part === 'pages' || part === 'features' || part === 'bills' || part === 'analysis'
-                )
-                if (featureIndex !== -1 && pathParts[featureIndex + 1]) {
-                  return `feature-${pathParts[featureIndex + 1]}`
+              if (id.includes('src/features/')) {
+                const match = id.match(/src\/features\/([^/]+)/)
+                if (match && match[1]) {
+                  return `feature-${match[1]}`
                 }
                 return 'features'
               }
 
-              // Mobile-specific code can be lazy loaded on mobile devices only
-              if (id.includes('src/components/mobile/')) {
-                return 'mobile'
+              // UI components by category
+              if (id.includes('src/lib/ui/')) {
+                const match = id.match(/src\/lib\/ui\/([^/]+)/)
+                if (match && match[1]) {
+                  // Group related UI components
+                  const category = match[1]
+                  if (['dashboard', 'navigation', 'layout'].includes(category)) {
+                    return 'ui-core'
+                  }
+                  if (['loading', 'offline', 'status'].includes(category)) {
+                    return 'ui-feedback'
+                  }
+                  if (['mobile', 'accessibility'].includes(category)) {
+                    return 'ui-adaptive'
+                  }
+                  return `ui-${category}`
+                }
+                return 'ui'
+              }
+
+              // Services layer
+              if (id.includes('src/lib/services/')) {
+                return 'services'
               }
 
               return 'app'
@@ -401,7 +453,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
       // Chunk size limit enforces discipline around bundle size
       // If exceeded, you need to improve code splitting or remove dependencies
-      chunkSizeWarningLimit: 500, // 500KB per chunk
+      chunkSizeWarningLimit: 400, // Reduced from 500KB to 400KB for better performance
 
       // Terser minification produces smaller bundles than esbuild
       // The tradeoff is slightly slower builds, but worth it for production
@@ -416,10 +468,19 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             drop_debugger: true,
             pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
             // Multiple compression passes find more optimization opportunities
-            passes: 2,
+            passes: 2, // Balanced: 2 passes for good compression without excessive build time
             // These unsafe optimizations work in modern browsers
             unsafe_arrows: true, // Convert functions to arrow functions
             unsafe_methods: true, // Optimize method calls
+            unsafe_comps: true, // Optimize comparisons
+            // Remove unused code more aggressively
+            dead_code: true,
+            unused: true,
+            // Reduce function calls
+            reduce_funcs: true,
+            reduce_vars: true,
+            // Collapse single-use variables
+            collapse_vars: true,
           },
           mangle: {
             // Safari 10+ has specific requirements for variable naming
@@ -459,10 +520,26 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         'react',
         'react-dom',
         'react/jsx-runtime',
+        'react-router-dom',
+        '@tanstack/react-query',
+        'axios',
+        'zod',
+        'clsx',
+        'tailwind-merge',
       ],
-      exclude: [],
+      exclude: [
+        // Exclude large libraries that should be lazy loaded
+        'recharts',
+      ],
       // Force re-optimization when dependencies change but cache seems stale
       force: env.FORCE_OPTIMIZE === 'true',
+      // Enable esbuild optimizations
+      esbuildOptions: {
+        target: 'es2020',
+        supported: {
+          'top-level-await': true,
+        },
+      },
     },
 
     // ============================================================================

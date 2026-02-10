@@ -16,9 +16,16 @@ export const Logo = React.memo<LogoProps>(
     // Map legacy variant 'dark' to 'default' or handle effectively
     const brandVariant = variant === 'dark' ? 'default' : variant; // 'dark' usually means dark text on light bg, which is our default
 
+    const sizeMap = {
+      sm: 32,
+      md: 48,
+      lg: 64,
+      xl: 96,
+    };
+
     return (
       <div className={cn("flex items-center", className)}>
-        <ChanukaLogo size={size} variant={brandVariant as any} />
+        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant as any} />
       </div>
     );
   }

@@ -61,7 +61,7 @@ const PRELOAD_CONFIG: RoutePreloadConfig[] = [
  * Route import map for dynamic imports
  */
 const ROUTE_IMPORTS: Record<string, () => Promise<RouteModule>> = {
-  '/': () => import('../../features/home/pages/StrategicHomePage'),
+  '/': () => import('../../features/home/pages/home'),
   '/bills': () => import('../../features/bills/pages/BillsPortalPage'),
   '/search': () => import('../../features/search/pages/UniversalSearchPage'),
   '/dashboard': () => import('../../features/users/pages/UserAccountPage'),

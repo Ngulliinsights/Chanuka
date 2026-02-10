@@ -1,103 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes"
     />
     <title>Chanuka Legislative Transparency Platform</title>
     <meta
       name="description"
-      content="A comprehensive legislative transparency platform providing access to bill information, sponsorship analysis, community input, and expert verification for informed civic engagement."
+      content="Comprehensive legislative transparency platform providing real-time bill tracking, AI-powered workaround detection, and civic engagement tools for informed democratic participation."
     />
 
-    <!-- PWA Configuration -->
+    <!-- ========================================
+         PWA CONFIGURATION (Production-Grade)
+         ======================================== -->
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#1a2e49" />
-    <meta name="msapplication-TileColor" content="#1a2e49" />
+    <meta name="theme-color" content="#0d3b66" />
+    <meta name="background-color" content="#ffffff" />
+    <meta name="msapplication-TileColor" content="#0d3b66" />
     <meta name="msapplication-starturl" content="/" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="application-name" content="Chanuka Platform" />
 
-    <!-- Apple PWA Configuration -->
+    <!-- ========================================
+         APPLE PWA CONFIGURATION
+         ======================================== -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-
-    <!-- Enhanced Mobile Configuration -->
-    <meta
-      name="format-detection"
-      content="telephone=no, date=no, email=no, address=no"
-    />
+    <meta name="apple-mobile-web-app-title" content="Chanuka" />
     <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-orientation" content="portrait" />
+
+    <!-- Apple Touch Icons - Multiple Sizes -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+
+    <!-- Apple Splash Screens - iOS 15+ -->
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="/splash/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="/splash/iPhone_11__iPhone_XR_portrait.png"
+    />
+
+    <!-- ========================================
+         MOBILE CONFIGURATION
+         ======================================== -->
+    <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
     <meta name="HandheldFriendly" content="true" />
     <meta name="MobileOptimized" content="width" />
-    <meta name="apple-mobile-web-app-orientation" content="portrait" />
-    <meta name="apple-mobile-web-app-title" content="Chanuka Platform" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/apple-touch-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/apple-touch-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/apple-touch-icon-120x120.png"
-    />
 
-    <!-- Favicon Configuration - Using Chanuka Brand Assets -->
+    <!-- ========================================
+         FAVICON CONFIGURATION (Multi-format)
+         ======================================== -->
     <link rel="icon" type="image/svg+xml" href="/SVG/alternative_small.svg" />
-    <link rel="icon" type="image/svg+xml" sizes="32x32" href="/SVG/alternative_small.svg" />
-    <link rel="icon" type="image/svg+xml" sizes="16x16" href="/SVG/alternative_small.svg" />
-    <link rel="shortcut icon" href="/SVG/alternative_small.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0d3b66" />
 
-    <!-- Performance Optimizations -->
+    <!-- ========================================
+         PERFORMANCE OPTIMIZATIONS
+         ======================================== -->
+    <!-- DNS Prefetch for External Resources -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    
+    <!-- Preconnect for Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="//api.chanuka-platform.com" />
+    <link rel="preconnect" href="https://api.chanuka-platform.com" crossorigin />
 
-    <!-- Vite handles preloading automatically - removed manual preloads to prevent warnings -->
+    <!-- Font Preloading (Web Font Loading Strategy) -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@300;400;500;600;700;800&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
-    <!-- Security Headers - CSP is now set via HTTP headers -->
+    <!-- ========================================
+         SECURITY HEADERS
+         ======================================== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta
       http-equiv="Referrer-Policy"
       content="strict-origin-when-cross-origin"
     />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="camera=(), microphone=(), geolocation=(self), interest-cohort=()"
+    />
+    
+    <!-- Content Security Policy Hint (Full CSP via HTTP headers) -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com;"
+    />
 
-    <!-- Social Media Meta Tags -->
+    <!-- ========================================
+         OPEN GRAPH / SOCIAL MEDIA
+         ======================================== -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chanuka-platform.com/" />
     <meta
       property="og:title"
       content="Chanuka Legislative Transparency Platform"
     />
     <meta
       property="og:description"
-      content="A comprehensive legislative transparency platform for informed civic engagement"
+      content="Real-time legislative tracking, AI-powered workaround detection, and civic engagement tools for informed democratic participation."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://chanuka-platform.com/" />
     <meta property="og:image" content="/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Chanuka Legislative Transparency Platform Logo"
+      content="Chanuka Platform - Democracy in Your Hands"
     />
     <meta property="og:site_name" content="Chanuka Platform" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Twitter Card Configuration -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -105,52 +181,308 @@
     />
     <meta
       name="twitter:description"
-      content="A comprehensive legislative transparency platform for informed civic engagement"
+      content="Real-time legislative tracking and civic engagement tools"
     />
     <meta name="twitter:image" content="/twitter-card.png" />
     <meta
       name="twitter:image:alt"
-      content="Chanuka Legislative Transparency Platform"
+      content="Chanuka Platform - Democracy in Your Hands"
     />
+    <meta name="twitter:creator" content="@ChanukaP latform" />
 
-    <!-- Additional SEO Meta Tags -->
-    <meta name="robots" content="index, follow" />
+    <!-- ========================================
+         SEO OPTIMIZATION
+         ======================================== -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="author" content="Chanuka Platform Team" />
-    <meta name="generator" content="Vite + React + TypeScript" />
+    <meta name="generator" content="Vite 5.x + React 18 + TypeScript" />
+    <meta
+      name="keywords"
+      content="legislative tracking, bill tracking, civic engagement, transparency, democracy, government, legislation, policy analysis, workaround detection"
+    />
     <link rel="canonical" href="https://chanuka-platform.com/" />
+    
+    <!-- Alternate Languages (if applicable) -->
+    <link rel="alternate" hreflang="en" href="https://chanuka-platform.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://chanuka-platform.com/" />
 
-    <!-- Structured Data for Better SEO -->
+    <!-- ========================================
+         STRUCTURED DATA (Enhanced SEO)
+         ======================================== -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Chanuka Legislative Transparency Platform",
-        "description": "A comprehensive legislative transparency platform providing access to bill information, sponsorship analysis, community input, and expert verification for informed civic engagement.",
-        "url": "https://chanuka-platform.com/",
-        "applicationCategory": "GovernmentApplication",
-        "operatingSystem": "Web",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "creator": {
-          "@type": "Organization",
-          "name": "Chanuka Platform Team"
-        }
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "@id": "https://chanuka-platform.com/#webapp",
+            "name": "Chanuka Legislative Transparency Platform",
+            "alternateName": "Chanuka Platform",
+            "description": "Comprehensive legislative transparency platform providing real-time bill tracking, AI-powered workaround detection, and civic engagement tools for informed democratic participation.",
+            "url": "https://chanuka-platform.com/",
+            "applicationCategory": "GovernmentApplication",
+            "operatingSystem": "Web, iOS, Android",
+            "browserRequirements": "Requires JavaScript, Modern Browser",
+            "softwareVersion": "1.0.0",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            },
+            "featureList": [
+              "Real-time Legislative Tracking",
+              "AI-Powered Workaround Detection",
+              "Community Engagement Forums",
+              "Expert Verification System",
+              "Impact Analysis Tools"
+            ],
+            "screenshot": "https://chanuka-platform.com/og-image.png",
+            "creator": {
+              "@type": "Organization",
+              "@id": "https://chanuka-platform.com/#organization",
+              "name": "Chanuka Platform Team",
+              "url": "https://chanuka-platform.com/"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://chanuka-platform.com/#organization",
+            "name": "Chanuka Platform",
+            "url": "https://chanuka-platform.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://chanuka-platform.com/SVG/alternative_small.svg",
+              "width": "512",
+              "height": "512"
+            },
+            "sameAs": [
+              "https://twitter.com/ChanukaP latform",
+              "https://github.com/chanuka-platform"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://chanuka-platform.com/#website",
+            "url": "https://chanuka-platform.com/",
+            "name": "Chanuka Legislative Transparency Platform",
+            "publisher": {
+              "@id": "https://chanuka-platform.com/#organization"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://chanuka-platform.com/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
       }
     </script>
+
+    <!-- ========================================
+         INLINE CRITICAL STYLES (Loading State)
+         ======================================== -->
+    <style>
+      /* Critical CSS for instant paint */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+          'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+          'Helvetica Neue', sans-serif;
+        background-color: #ffffff;
+        color: #1a1a1a;
+        min-height: 100vh;
+        overscroll-behavior-y: none;
+      }
+
+      /* Skip to content link - accessible */
+      .skip-to-content {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 999;
+        padding: 1rem 1.5rem;
+        background-color: #0d3b66;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 0 0 0.5rem 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .skip-to-content:focus {
+        left: 0;
+        outline: 3px solid #f38a1f;
+        outline-offset: 2px;
+      }
+
+      /* Enhanced loading screen */
+      #app-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e8f0f7 0%, #ffffff 50%, #fef6ed 100%);
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+
+      #app-loader.loaded {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loader-logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 2rem;
+        animation: logoFloat 3s ease-in-out infinite;
+      }
+
+      .loader-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(13, 59, 102, 0.1);
+        border-top-color: #0d3b66;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loader-text {
+        margin-top: 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #0d3b66;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes logoFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      /* Reduce motion for accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        #app-loader,
+        .loader-logo,
+        .loader-spinner,
+        .loader-text {
+          animation: none !important;
+        }
+      }
+
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        body {
+          color: #000000;
+          background-color: #ffffff;
+        }
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #1a1a1a;
+          color: #ffffff;
+        }
+
+        #app-loader {
+          background: linear-gradient(135deg, #1a2e49 0%, #0d1b2a 50%, #1a1a1a 100%);
+        }
+
+        .loader-text {
+          color: #ffffff;
+        }
+
+        .loader-spinner {
+          border-color: rgba(255, 255, 255, 0.1);
+          border-top-color: #ffffff;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Skip navigation link for accessibility -->
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded"
-    >
+    <!-- ========================================
+         ACCESSIBILITY: Skip Navigation
+         ======================================== -->
+    <a href="#main-content" class="skip-to-content">
       Skip to main content
     </a>
 
-    <!-- Main application container -->
+    <!-- ========================================
+         LOADING SCREEN (Instant Visual Feedback)
+         ======================================== -->
+    <div id="app-loader" aria-live="polite" aria-label="Loading application">
+      <svg
+        class="loader-logo"
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <!-- Simplified Chanuka logo for loading screen -->
+        <rect width="512" height="512" rx="128" fill="#0d3b66" opacity="0.1" />
+        <path
+          d="M256 128L320 192L256 256L192 192L256 128Z"
+          fill="#0d3b66"
+          opacity="0.8"
+        />
+        <path
+          d="M256 256L320 320L256 384L192 320L256 256Z"
+          fill="#f38a1f"
+        />
+      </svg>
+      <div class="loader-spinner" role="status" aria-label="Loading"></div>
+      <div class="loader-text">Loading Chanuka Platform...</div>
+    </div>
+
+    <!-- ========================================
+         MAIN APPLICATION CONTAINER
+         ======================================== -->
     <div
       id="root"
       role="application"
@@ -158,92 +490,303 @@
       class="min-h-screen"
     ></div>
 
-    <!-- Simple preload cleanup to prevent warnings -->
+    <!-- ========================================
+         ERROR HANDLING (Improved & Targeted)
+         ======================================== -->
     <script>
-      // Simple preload cleanup to prevent unused resource warnings
-      setTimeout(() => {
-        const preloadLinks = document.querySelectorAll('link[rel="preload"], link[rel="prefetch"], link[rel="modulepreload"]');
-        preloadLinks.forEach(link => {
-          const href = link.getAttribute('href');
-          if (href && !document.querySelector(`script[src="${href}"], link[href="${href}"][rel="stylesheet"]`)) {
-            // Check if resource was actually used
-            const resourceUsed = performance.getEntriesByName(href).length > 0;
-            if (!resourceUsed) {
-              console.debug('Removing unused preload:', href);
-              link.remove();
+      (function () {
+        'use strict';
+
+        // Configuration
+        const ERROR_CONFIG = {
+          suppressExtensions: true,
+          suppressChromeBugs: true,
+          logSuppressed: false, // Set to true for debugging
+        };
+
+        // Extension patterns to suppress
+        const EXTENSION_PATTERNS = [
+          /chrome-extension:\/\//i,
+          /moz-extension:\/\//i,
+          /safari-extension:\/\//i,
+          /gpcWindowSetting/i,
+          /message channel closed/i,
+          /Extension context invalidated/i,
+        ];
+
+        // Check if error should be suppressed
+        function shouldSuppress(message, filename) {
+          if (!ERROR_CONFIG.suppressExtensions) return false;
+
+          const text = `${message} ${filename}`.toLowerCase();
+          return EXTENSION_PATTERNS.some((pattern) => pattern.test(text));
+        }
+
+        // Enhanced error handler
+        window.addEventListener(
+          'error',
+          function (event) {
+            const message = event.message || '';
+            const filename = event.filename || '';
+
+            if (shouldSuppress(message, filename)) {
+              event.preventDefault();
+              if (ERROR_CONFIG.logSuppressed) {
+                console.debug('[Extension Error Suppressed]:', message);
+              }
+              return false;
             }
-          }
-        });
-      }, 5000); // Check after 5 seconds
-    </script>
+          },
+          true
+        );
 
-    <!-- Main application script -->
-    
-    <!-- Error Suppression for Development -->
-    <script>
-      // Suppress extension errors early
-      window.addEventListener('error', (e) => {
-        const msg = e.message || '';
-        const filename = e.filename || '';
-        
-        if (msg.includes('chrome-extension://') || 
-            msg.includes('gpcWindowSetting.js') ||
-            filename.includes('chrome-extension://') ||
-            msg.includes('message channel closed')) {
-          e.preventDefault();
-          console.debug('[Extension] Suppressed:', msg);
-          return false;
-        }
-      }, true);
-      
-      // Suppress promise rejections from extensions
-      window.addEventListener('unhandledrejection', (e) => {
-        const reason = String(e.reason || '');
-        if (reason.includes('chrome-extension://') ||
-            reason.includes('message channel closed')) {
-          e.preventDefault();
-          console.debug('[Extension] Suppressed rejection:', reason);
-          return false;
-        }
-      }, true);
-    </script>
-    <script type="module" src="/src/main.tsx"></script>
+        // Enhanced promise rejection handler
+        window.addEventListener(
+          'unhandledrejection',
+          function (event) {
+            const reason = String(event.reason || '');
 
-    <!-- Service Worker Registration - DISABLED FOR DEVELOPMENT -->
-    <script>
-      // Service worker disabled for development stability
-      // Unregister any existing service workers
-      (function() {
-        try {
-          if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.getRegistrations().then(regs => {
-              regs.forEach(r => {
-                r.unregister();
-                console.log('Unregistered service worker:', r.scope);
-              });
-            }).catch(() => {});
-          }
-        } catch (e) {
-          console.warn('Service worker cleanup failed', e);
+            if (shouldSuppress(reason, '')) {
+              event.preventDefault();
+              if (ERROR_CONFIG.logSuppressed) {
+                console.debug('[Extension Rejection Suppressed]:', reason);
+              }
+              return false;
+            }
+          },
+          true
+        );
+
+        // Performance monitoring
+        if (window.performance && performance.mark) {
+          performance.mark('app-init-start');
         }
       })();
     </script>
 
-    <!-- Fallback for JavaScript disabled -->
+    <!-- ========================================
+         MAIN APPLICATION SCRIPT (Vite Entry)
+         ======================================== -->
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ========================================
+         SERVICE WORKER MANAGEMENT
+         ======================================== -->
+    <script>
+      (function () {
+        'use strict';
+
+        // Service Worker configuration
+        const SW_CONFIG = {
+          enabled: false, // Set to true for production
+          scope: '/',
+          updateCheckInterval: 60000, // Check for updates every 60 seconds
+        };
+
+        // Register service worker (production only)
+        if (SW_CONFIG.enabled && 'serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker
+              .register('/sw.js', { scope: SW_CONFIG.scope })
+              .then(function (registration) {
+                console.log('SW registered:', registration.scope);
+
+                // Check for updates periodically
+                setInterval(function () {
+                  registration.update();
+                }, SW_CONFIG.updateCheckInterval);
+
+                // Handle updates
+                registration.addEventListener('updatefound', function () {
+                  const newWorker = registration.installing;
+                  newWorker.addEventListener('statechange', function () {
+                    if (
+                      newWorker.state === 'installed' &&
+                      navigator.serviceWorker.controller
+                    ) {
+                      // New version available
+                      console.log('New version available! Refresh to update.');
+                      // You can show a toast/banner here
+                    }
+                  });
+                });
+              })
+              .catch(function (error) {
+                console.warn('SW registration failed:', error);
+              });
+          });
+        } else if (!SW_CONFIG.enabled && 'serviceWorker' in navigator) {
+          // Unregister existing service workers in development
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            registrations.forEach(function (registration) {
+              registration.unregister();
+              console.log('SW unregistered:', registration.scope);
+            });
+          });
+        }
+      })();
+    </script>
+
+    <!-- ========================================
+         APP INITIALIZATION & CLEANUP
+         ======================================== -->
+    <script>
+      (function () {
+        'use strict';
+
+        // Hide loader when app is ready
+        window.addEventListener('load', function () {
+          const loader = document.getElementById('app-loader');
+          if (loader) {
+            // Small delay for smoother transition
+            setTimeout(function () {
+              loader.classList.add('loaded');
+              // Remove from DOM after transition
+              setTimeout(function () {
+                loader.remove();
+              }, 500);
+            }, 300);
+          }
+
+          // Mark performance
+          if (window.performance && performance.mark) {
+            performance.mark('app-init-end');
+            performance.measure(
+              'app-initialization',
+              'app-init-start',
+              'app-init-end'
+            );
+          }
+        });
+
+        // Cleanup unused preload links (performance optimization)
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            const preloadLinks = document.querySelectorAll(
+              'link[rel="preload"], link[rel="prefetch"], link[rel="modulepreload"]'
+            );
+
+            preloadLinks.forEach(function (link) {
+              const href = link.getAttribute('href');
+              if (!href) return;
+
+              // Check if resource was actually used
+              const entries = performance.getEntriesByName(href);
+              if (entries.length === 0) {
+                // Resource wasn't used, remove link
+                link.remove();
+                if (window.console && console.debug) {
+                  console.debug('[Cleanup] Removed unused preload:', href);
+                }
+              }
+            });
+          }, 5000); // Check after 5 seconds
+        });
+
+        // Install prompt for PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function (event) {
+          event.preventDefault();
+          deferredPrompt = event;
+          // You can show a custom install button here
+          console.log('PWA install prompt available');
+        });
+
+        // Track installation
+        window.addEventListener('appinstalled', function () {
+          console.log('PWA installed successfully');
+          deferredPrompt = null;
+        });
+
+        // Network status monitoring (optional)
+        window.addEventListener('online', function () {
+          console.log('Network: Online');
+        });
+
+        window.addEventListener('offline', function () {
+          console.log('Network: Offline');
+        });
+      })();
+    </script>
+
+    <!-- ========================================
+         FALLBACK FOR JAVASCRIPT DISABLED
+         ======================================== -->
     <noscript>
       <div
         style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
           text-align: center;
           padding: 2rem;
-          font-family: system-ui, sans-serif;
+          font-family: system-ui, -apple-system, sans-serif;
+          background: linear-gradient(135deg, #e8f0f7 0%, #ffffff 50%, #fef6ed 100%);
         "
       >
-        <h1>JavaScript Required</h1>
-        <p>
-          This application requires JavaScript to function properly. Please
-          enable JavaScript in your browser settings.
+        <svg
+          width="80"
+          height="80"
+          viewBox="0 0 512 512"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style="margin-bottom: 2rem"
+        >
+          <rect width="512" height="512" rx="128" fill="#0d3b66" opacity="0.1" />
+          <path
+            d="M256 128L320 192L256 256L192 192L256 128Z"
+            fill="#0d3b66"
+          />
+          <path
+            d="M256 256L320 320L256 384L192 320L256 256Z"
+            fill="#f38a1f"
+          />
+        </svg>
+        <h1 style="color: #0d3b66; font-size: 2rem; margin-bottom: 1rem">
+          JavaScript Required
+        </h1>
+        <p style="color: #666; font-size: 1.125rem; max-width: 600px; line-height: 1.6">
+          The Chanuka Legislative Transparency Platform requires JavaScript to
+          function properly. Please enable JavaScript in your browser settings
+          to access all features.
+        </p>
+        <p style="color: #999; font-size: 0.875rem; margin-top: 2rem">
+          Need help?
+          <a
+            href="https://enable-javascript.com/"
+            style="color: #0d3b66; text-decoration: underline"
+            >Learn how to enable JavaScript</a
+          >
         </p>
       </div>
     </noscript>
+
+    <!-- ========================================
+         BROWSER COMPATIBILITY WARNING
+         ======================================== -->
+    <script>
+      (function () {
+        'use strict';
+
+        // Check for critical browser features
+        const features = {
+          es6: typeof Symbol !== 'undefined',
+          promises: typeof Promise !== 'undefined',
+          fetch: typeof fetch !== 'undefined',
+          customElements: 'customElements' in window,
+        };
+
+        const unsupported = Object.keys(features).filter(
+          (key) => !features[key]
+        );
+
+        if (unsupported.length > 0) {
+          console.warn('Unsupported browser features:', unsupported);
+          // You could show a banner here for very old browsers
+        }
+      })();
+    </script>
   </body>
 </html>

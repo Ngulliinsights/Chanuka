@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger,
   ChanukaLogo,
   ChanukaSymbol,
-  ChanukaSidemark,
+  ChanukaWordmark,
   ChanukaSmallLogo,
 } from '../../lib/design-system';
 import { useMobileMenu } from '../../lib/hooks/useNavigationSlice';
@@ -321,7 +321,7 @@ export const NavigationBar = memo<NavigationBarProps>(
                   <ChanukaSmallLogo size="sm" className="w-12 h-12" />
                 </div>
                 <div className="hidden md:block">
-                  <ChanukaSidemark size="md" className="h-16 w-auto" />
+                  <ChanukaWordmark size="full" className="h-7 w-auto" />
                 </div>
               </Link>
             </div>

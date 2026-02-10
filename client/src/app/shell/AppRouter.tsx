@@ -46,8 +46,8 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 
 // Lazy-loaded page components with enhanced error handling
 const HomePage = createLazyComponent(
-  () => import('@client/features/home/pages/StrategicHomePage'),
-  'Strategic Home Page'
+  () => import('@client/features/home/pages/home'),
+  'Home Page'
 );
 const BillsPortal = createLazyComponent(
   () => import('@client/features/bills/pages/BillsPortalPage'),
@@ -491,9 +491,9 @@ const routes: RouteConfig[] = [
  * Map of route IDs to their import functions for preloading.
  * This allows us to trigger imports before navigation occurs.
  */
-type PreloadMapEntry = () => Promise<{ default: React.ComponentType<unknown> }>;
+type PreloadMapEntry = () => Promise<{ default: React.ComponentType<any> }>;
 const preloadMap: Record<string, PreloadMapEntry> = {
-  home: () => import('@client/features/home/pages/StrategicHomePage'),
+  home: () => import('@client/features/home/pages/home'),
   'bills-portal': () => import('@client/features/bills/pages/BillsPortalPage'),
   search: () => import('@client/features/search/pages/UniversalSearchPage'),
 };

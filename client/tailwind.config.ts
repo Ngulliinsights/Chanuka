@@ -7,6 +7,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['"DM Serif Display"', 'serif'],
+        body: ['"Work Sans"', 'sans-serif'],
+        sans: ['"Work Sans"', 'sans-serif'],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -23,6 +28,11 @@ const config: Config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         border: "hsl(var(--border))",
+        brand: {
+          navy: "#1a2e49",
+          teal: "#11505c",
+          gold: "#f29b06",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

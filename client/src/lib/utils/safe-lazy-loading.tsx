@@ -29,7 +29,7 @@ function createSafeLazyComponent<P extends object>(
       logger.error(`Failed to load component ${componentName}:`, { error });
 
       // Return a simple error fallback
-      const ErrorFallback: ComponentType<P> = () => (
+      const ErrorFallback: ComponentType<P> = (props: P) => (
         <div className="p-4 text-center">
           <p className="text-red-600">Failed to load {componentName}</p>
           <button
@@ -44,7 +44,7 @@ function createSafeLazyComponent<P extends object>(
 
       return { default: ErrorFallback };
     }
-  });
+  }) as unknown as LazyExoticComponent<ComponentType<P>>;
 }
 
 /**
@@ -82,7 +82,7 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
     }
   };
 
-  return createSafeLazyComponent(importFn, componentName);
+  return createSafeLazyComponent(importFn, componentName) as unknown as LazyExoticComponent<ComponentType<P>>;
 }
 
 /**

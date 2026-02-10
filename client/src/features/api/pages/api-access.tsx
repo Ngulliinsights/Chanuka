@@ -64,7 +64,7 @@ export default function ApiAccessPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-16 border-b border-brand-gold/10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -268,7 +268,7 @@ export default function ApiAccessPage() {
       </section>
 
       {/* Request Access */}
-      <section id="request-access" className="bg-gradient-to-r from-blue-600 to-purple-600 py-12">
+      <section id="request-access" className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center text-white">
             <Lock className="w-12 h-12 mx-auto mb-4" />

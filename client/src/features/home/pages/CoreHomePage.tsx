@@ -1,5 +1,5 @@
 /**
- * Strategic Home Page with Progressive Disclosure
+ * Core Home Page (Basic Requirements)
  *
  * Implements progressive disclosure for home page content based on authentication status
  * and user persona. Provides different experiences for anonymous vs authenticated users.
@@ -89,8 +89,8 @@ const RecentActivity: React.FC = () => (
     <Card className="border-0 shadow-xl">
       <CardContent className="p-8">
         <div className="space-y-6">
-          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl hover:shadow-md transition-all duration-300">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-brand-navy/5 to-brand-navy/10 rounded-xl hover:shadow-md transition-all duration-300 border border-brand-navy/10">
+            <div className="w-12 h-12 bg-gradient-to-br from-brand-navy to-blue-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               <FileText className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -116,14 +116,14 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/bills">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="hover:bg-brand-navy/10 hover:text-brand-navy">
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
 
-          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl hover:shadow-md transition-all duration-300">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-brand-gold/5 to-brand-gold/10 rounded-xl hover:shadow-md transition-all duration-300 border border-brand-gold/10">
+            <div className="w-12 h-12 bg-gradient-to-br from-brand-gold to-yellow-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               <AlertTriangle className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -149,14 +149,14 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/bills">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="hover:bg-brand-gold/10 hover:text-brand-gold">
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
 
-          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl hover:shadow-md transition-all duration-300">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-brand-teal/5 to-brand-teal/10 rounded-xl hover:shadow-md transition-all duration-300 border border-brand-teal/10">
+            <div className="w-12 h-12 bg-gradient-to-br from-brand-teal to-cyan-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               <MessageSquare className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -164,7 +164,7 @@ const RecentActivity: React.FC = () => (
                 <h4 className="font-semibold text-gray-900">
                   Community Discussion: Healthcare Access
                 </h4>
-                <Badge className="text-xs bg-green-100 text-green-800">Active</Badge>
+                <Badge className="text-xs bg-brand-teal/20 text-brand-teal border-brand-teal/20">Active</Badge>
               </div>
               <p className="text-gray-600 text-sm mb-2">
                 Active discussion on proposed healthcare legislation changes
@@ -180,7 +180,7 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/community">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="hover:bg-brand-teal/10 hover:text-brand-teal">
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -333,20 +333,20 @@ const AnonymousHero: React.FC<{
 }> = ({ onSearch, stats, currentStat }) => {
   return (
     <div className="text-center" data-testid="home-hero">
-      <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" aria-hidden="true"></div>
+      <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
+        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true"></div>
         <span>Platform Active • Real-time Updates</span>
       </div>
 
-      <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-        <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-          Democracy
-        </span>
+      <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-tight text-white drop-shadow-2xl">
+        Democracy
         <br />
-        <span className="text-gray-900">in Your Hands</span>
+        <span className="text-yellow-400 drop-shadow-md filter shadow-black/50">
+          in Your Hands
+        </span>
       </h1>
 
-      <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 leading-relaxed">
+      <p className="text-lg md:text-2xl text-gray-50 max-w-4xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg px-4">
         {copySystem.platformMission.short}
       </p>
 
@@ -355,11 +355,11 @@ const AnonymousHero: React.FC<{
         <Link to="/bills" className="inline-block">
           <Button
             size="lg"
-            className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="text-xl font-bold px-10 py-7 shadow-2xl hover:shadow-brand-gold/50 transition-all duration-300 hover:scale-105 bg-gradient-to-r from-brand-gold to-yellow-500 hover:to-yellow-400 text-white border-none ring-2 ring-white/20"
           >
-            <FileText className="mr-2 h-5 w-5" />
+            <FileText className="mr-3 h-6 w-6" />
             Explore Bills
-            <ChevronRight className="ml-2 h-5 w-5" />
+            <ChevronRight className="ml-2 h-6 w-6" />
           </Button>
         </Link>
 
@@ -367,7 +367,7 @@ const AnonymousHero: React.FC<{
           <Button
             variant="outline"
             size="lg"
-            className="text-lg px-8 py-6 border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            className="text-lg px-8 py-6 border-2 border-white/30 text-white hover:bg-white hover:text-brand-navy transition-all duration-300 backdrop-blur-sm bg-white/5"
           >
             <Users className="mr-2 h-5 w-5" />
             Join Community
@@ -394,25 +394,23 @@ const AnonymousHero: React.FC<{
       </div>
 
       {/* Statistics carousel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-16">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className={`text-center transition-all duration-500 ${
-                currentStat === index ? 'scale-110 opacity-100' : 'scale-100 opacity-70'
-              }`}
+              className="text-center transition-all duration-500 bg-slate-900/40 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg hover:bg-slate-900/60 hover:scale-105"
             >
               <div
-                className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg mb-2 ${stat.color}`}
+                className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-xl mb-3 ${stat.color}`}
               >
                 <Icon className="h-6 w-6" />
               </div>
-              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
+              <div className="text-2xl font-bold text-white mb-1 drop-shadow-md">{stat.value}</div>
+              <div className="text-sm text-gray-100 font-medium drop-shadow-sm">{stat.label}</div>
               {stat.trend && (
-                <div className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
+                <div className="text-xs text-green-300 mt-2 flex items-center justify-center gap-1 font-semibold bg-green-900/30 py-1 px-2 rounded-full border border-green-500/30">
                   <TrendingUp className="w-3 h-3" />
                   {stat.trend}
                 </div>
@@ -470,10 +468,10 @@ const AuthenticatedHero: React.FC<{
   return (
     <div className="text-center" data-testid="home-hero">
       <div className="mb-6">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-xl">
           Welcome back, {user.name?.split(' ')[0]}!
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6 leading-relaxed">
+        <p className="text-xl md:text-2xl text-gray-50 max-w-3xl mx-auto mb-8 leading-relaxed drop-shadow-md">
           {getPersonaMessage(persona)}
         </p>
         <div
@@ -509,7 +507,11 @@ const AuthenticatedHero: React.FC<{
               <Button
                 size="lg"
                 variant={index === 0 ? 'primary' : 'outline'}
-                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className={`text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
+                  index === 0 
+                    ? 'bg-brand-gold hover:bg-brand-gold/90 text-white border-none' 
+                    : 'border-2 border-white/30 text-white hover:bg-white hover:text-brand-navy backdrop-blur-sm bg-white/5'
+                }`}
               >
                 <Icon className="mr-2 h-5 w-5" />
                 {action.label}
@@ -545,7 +547,7 @@ const AuthenticatedHero: React.FC<{
  * Strategic Home Page Component
  * Main component implementing progressive disclosure based on authentication status
  */
-export default function StrategicHomePage() {
+export default function CoreHomePage() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const { data: userProfile } = useUserProfile() as { data: ExtendedUserProfile | undefined };
@@ -563,13 +565,6 @@ export default function StrategicHomePage() {
    */
   useEffect(() => {
     setIsVisible(true);
-
-    // Rotating statistics for anonymous users
-    const interval = setInterval(() => {
-      setCurrentStat(prev => (prev + 1) % 4);
-    }, 3000);
-
-    return () => clearInterval(interval);
   }, []);
 
   /**
@@ -642,7 +637,7 @@ export default function StrategicHomePage() {
         label: 'Expert Reviews',
         value: '156',
         icon: CheckCircle,
-        color: 'text-purple-600',
+        color: 'text-brand-navy',
         trend: '+5 this week',
       },
     ],
@@ -659,10 +654,20 @@ export default function StrategicHomePage() {
       )}
 
       {/* Hero Section with Progressive Disclosure */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
+        {/* Background Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/Chanuka_hero_parliament.png" 
+            alt="Parliament Building" 
+            className="w-full h-full object-cover"
+          />
+          {/* Brand Overlay - Navy tint for readability */}
+          <div className="absolute inset-0 bg-slate-900/80 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50" />
+        </div>
 
-        <div className="container mx-auto px-4 py-20">
+        <div className="container mx-auto px-4 py-20 relative z-10">
           <div
             className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
           >
@@ -784,9 +789,9 @@ export default function StrategicHomePage() {
                 </CardContent>
               </Card>
 
-              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100">
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-brand-navy/5 to-brand-navy/10">
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-brand-navy to-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md">
                     <Shield className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl font-bold text-gray-900">
@@ -801,7 +806,7 @@ export default function StrategicHomePage() {
                   <Link to="/community">
                     <Button
                       variant="ghost"
-                      className="group-hover:bg-purple-600 group-hover:text-white transition-all duration-300"
+                      className="group-hover:bg-brand-navy group-hover:text-white transition-all duration-300"
                     >
                       View Experts
                       <ChevronRight className="ml-2 w-4 h-4" />
@@ -811,9 +816,9 @@ export default function StrategicHomePage() {
               </Card>
 
 
-              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-teal-50 to-teal-100">
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-brand-teal/5 to-brand-teal/10">
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-brand-teal to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md">
                     <BarChart3 className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl font-bold text-gray-900">
@@ -828,7 +833,7 @@ export default function StrategicHomePage() {
                   <Link to="/dashboard">
                     <Button
                       variant="ghost"
-                      className="group-hover:bg-teal-600 group-hover:text-white transition-all duration-300"
+                      className="group-hover:bg-brand-teal group-hover:text-white transition-all duration-300"
                     >
                       View Dashboard
                       <ChevronRight className="ml-2 w-4 h-4" />

@@ -192,7 +192,7 @@ export const CivicEducationHub: React.FC<{ className?: string }> = ({ className 
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">68</div>
+            <div className="text-2xl font-bold text-brand-navy">68</div>
             <div className="text-sm text-gray-600">
               {language === 'sw' ? 'Maseneta' : 'Senators'}
             </div>

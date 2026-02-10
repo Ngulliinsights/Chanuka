@@ -13,6 +13,7 @@ import {
   addToRecentPages,
   setUserRole,
 } from '@client/lib/infrastructure/store/slices/navigationSlice';
+import { LogoPattern } from '@client/lib/design-system/layout/LogoPattern';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@client/lib/ui/navigation/BreadcrumbNavigation';
 import { useBreadcrumbNavigation } from '@client/lib/ui/navigation/hooks/useBreadcrumbNavigation';
@@ -314,7 +315,9 @@ export function AppShell({
                     {enableAccessibility && <SkipLinks links={skipLinks} />}
 
                     {/* Main Application Layout */}
-                    <div id="app-shell" className="min-h-screen bg-gray-50">
+                    <div id="app-shell" className="min-h-screen bg-gray-50 bg-noise relative">
+                      <LogoPattern opacity={0.03} scale={1.5} className="fixed inset-0 pointer-events-none" />
+
                       {/* Top Navigation Bar */}
                       {enableNavigation && (
                         <NavigationBar

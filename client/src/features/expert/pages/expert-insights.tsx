@@ -65,7 +65,7 @@ export default function ExpertInsightsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-16 border-b border-brand-gold/10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -168,7 +168,7 @@ export default function ExpertInsightsPage() {
       {/* Become an Expert CTA */}
       <section className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white text-center">
+          <div className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold rounded-xl p-8 text-white text-center">
             <MessageSquare className="w-12 h-12 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">Share Your Expertise</h2>
             <p className="text-blue-100 mb-6">

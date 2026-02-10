@@ -28,6 +28,7 @@ import React, { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Badge, Button } from '@client/lib/design-system';
+import { ChanukaWordmark } from '@client/lib/design-system/media/ChanukaWordmark';
 import { cn } from '@client/lib/utils/cn';
 
 // Navigation item interface
@@ -139,9 +140,7 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
             {showLogo && (
               <div className="flex items-center">
                 {logo || (
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">C</span>
-                  </div>
+                  <ChanukaWordmark size={100} className="text-primary" />
                 )}
               </div>
             )}

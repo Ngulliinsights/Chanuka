@@ -181,7 +181,7 @@ export const BrandAssetGrid: React.FC<{ className?: string }> = ({ className = '
 export const HeroBrandElement: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div className={`relative ${className}`}>
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/10 to-brand-gold/10 blur-3xl" />
       <ChanukaFullLogo size="xl" className="relative z-10 drop-shadow-2xl" />
     </div>
   );
@@ -194,7 +194,7 @@ export const HeroBrandElement: React.FC<{ className?: string }> = ({ className =
 export const FloatingBrandAccent: React.FC<{
   className?: string;
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-}> = ({ className = '', position = 'top-right' }) => {
+} & React.HTMLAttributes<HTMLDivElement>> = ({ className = '', position = 'top-right', style, ...props }) => {
   const positionClasses = {
     'top-left': 'top-0 left-0 -translate-x-1/2 -translate-y-1/2',
     'top-right': 'top-0 right-0 translate-x-1/2 -translate-y-1/2',
@@ -205,7 +205,9 @@ export const FloatingBrandAccent: React.FC<{
   return (
     <div
       className={`absolute ${positionClasses[position]} opacity-5 pointer-events-none ${className}`}
+      style={style}
       aria-hidden="true"
+      {...props}
     >
       <ChanukaFullLogo size="full" className="w-96 h-96" />
     </div>

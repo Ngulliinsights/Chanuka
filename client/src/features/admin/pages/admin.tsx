@@ -148,7 +148,7 @@ export default function AdminPage() {
         {/* Enhanced Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold bg-clip-text text-transparent">
               Admin Dashboard
             </h1>
             <p className="text-gray-600 mt-2 text-lg">
@@ -178,7 +178,7 @@ export default function AdminPage() {
 
             <Button
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold hover:opacity-90 transition-opacity"
             >
               <Bell className="w-4 h-4 mr-2" />
               Alerts

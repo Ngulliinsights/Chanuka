@@ -33,7 +33,7 @@ export default function PrivacyCenterPage() {
     <>
       <ErrorBoundary>
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-8 space-y-6">
+          <div className="container mx-auto px-4 py-8 space-y-6 bg-gradient-to-b from-brand-navy/5 to-transparent rounded-b-3xl">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>

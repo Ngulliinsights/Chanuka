@@ -176,7 +176,7 @@ const SokoHaki = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-navy/5 to-brand-gold/5 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
@@ -216,7 +216,7 @@ const SokoHaki = () => {
             </div>
 
             {/* Info Card */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg p-6">
+            <div className="bg-gradient-to-r from-brand-navy to-blue-900 text-white rounded-xl shadow-lg p-6">
               <div className="flex items-start gap-4">
                 <Info className="h-6 w-6 flex-shrink-0 mt-1" />
                 <div>
@@ -337,7 +337,7 @@ const SokoHaki = () => {
               <button
                 onClick={handleVerifyPrice}
                 disabled={!enteredPrice || loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+                className="w-full bg-gradient-to-r from-brand-navy to-brand-teal text-white py-4 rounded-xl font-bold text-lg hover:from-brand-navy/90 hover:to-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

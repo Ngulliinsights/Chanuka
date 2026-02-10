@@ -48,10 +48,10 @@ const PlatformStats: React.FC<PlatformStatsProps> = ({ stats }) => {
                       index === 0
                         ? 'from-blue-500 to-blue-600'
                         : index === 1
-                          ? 'from-green-500 to-green-600'
-                          : index === 2
-                            ? 'from-orange-500 to-orange-600'
-                            : 'from-purple-500 to-purple-600'
+                          ? 'from-brand-navy to-blue-900'
+                        : stat.trend === 'down'
+                          ? 'from-red-500 to-red-600'
+                          : 'from-brand-gold to-yellow-600'
                     } shadow-lg group-hover:scale-110 transition-transform duration-300`}
                   >
                     <Icon className="w-8 h-8 text-white" />

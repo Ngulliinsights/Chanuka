@@ -154,7 +154,7 @@ function ImpactMetrics({ userLevel }: { userLevel: User['persona'] }) {
   const currentLevel = levelMessages[userLevel];
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+    <Card className="bg-gradient-to-br from-brand-navy/5 to-brand-gold/5 border-brand-gold/20">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Home className="w-5 h-5 text-red-500" />
@@ -396,7 +396,7 @@ export function SmartDashboard({ className }: SmartDashboardProps) {
   return (
     <div className={`space-y-6 ${className || ''}`}>
       {/* Personalized Welcome Banner */}
-      <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white border-0">
+      <Card className="bg-gradient-to-r from-brand-navy to-blue-900 border-0 text-white">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>

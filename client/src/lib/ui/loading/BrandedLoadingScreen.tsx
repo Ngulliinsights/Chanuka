@@ -43,7 +43,7 @@ export const BrandedLoadingScreen: React.FC<BrandedLoadingScreenProps> = ({
         {showProgress && (
           <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-brand-navy to-brand-gold transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -54,11 +54,11 @@ export const BrandedLoadingScreen: React.FC<BrandedLoadingScreenProps> = ({
 
   // Full screen variant
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gradient-to-br from-brand-navy/5 via-white to-brand-gold/5 flex items-center justify-center z-50">
       <div className="text-center space-y-6">
         {/* Animated logo */}
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/20 to-brand-gold/20 blur-3xl animate-pulse" />
           <AnimatedChanukaLogo size="xl" animate={true} className="relative z-10" />
         </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Shield, FileText, AlertCircle } from 'lucide-react';
 
 export default function TermsPage() {
@@ -16,6 +17,24 @@ export default function TermsPage() {
             <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
             <p className="text-gray-600 dark:text-gray-400">
               Last updated: {lastUpdated}
+            </p>
+          </div>
+
+          {/* TL;DR Summary */}
+          <div className="bg-[#f29b06]/10 border border-[#f29b06]/30 rounded-xl p-6 mb-8">
+            <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+              <span className="text-2xl">📋</span> TL;DR - Quick Summary
+            </h2>
+            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <li>✓ You must be 13+ to use Chanuka</li>
+              <li>✓ We provide legislative info "as is" - always verify with official sources</li>
+              <li>✓ Be respectful - no harassment, spam, or illegal content</li>
+              <li>✓ You own your content, but we can display it on the platform</li>
+              <li>✓ We comply with Kenya Data Protection Act 2019</li>
+              <li>✓ Governed by Kenyan law - disputes resolved in Kenyan courts</li>
+            </ul>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
+              This summary is for convenience only. Please read the full terms below.
             </p>
           </div>
 
@@ -98,9 +117,9 @@ export default function TermsPage() {
               <h2>7. Privacy</h2>
               <p>
                 Your use of the Service is also governed by our{' '}
-                <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <Link to="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
                   Privacy Policy
-                </a>
+                </Link>
                 . Please review it to understand our data practices.
               </p>
 
@@ -167,18 +186,18 @@ export default function TermsPage() {
           {/* Footer Links */}
           <div className="mt-8 text-center">
             <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+              <Link to="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Privacy Policy
-              </a>
-              <a href="/cookies" className="text-blue-600 dark:text-blue-400 hover:underline">
+              </Link>
+              <Link to="/cookies" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Cookie Policy
-              </a>
-              <a href="/accessibility" className="text-blue-600 dark:text-blue-400 hover:underline">
+              </Link>
+              <Link to="/accessibility" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Accessibility
-              </a>
-              <a href="/contact" className="text-blue-600 dark:text-blue-400 hover:underline">
+              </Link>
+              <Link to="/contact" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>

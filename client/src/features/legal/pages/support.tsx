@@ -1,14 +1,16 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Mail, MessageSquare, HelpCircle, Clock, Phone, MapPin } from 'lucide-react';
 
 export default function SupportPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <section className="bg-[#11505c] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Support Center</h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-gray-200">
               We're here to help you navigate Kenya's legislative landscape with confidence.
             </p>
           </div>
@@ -21,7 +23,7 @@ export default function SupportPage() {
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-8">
             <h2 className="text-xl font-semibold mb-3">Need Quick Help?</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Check our <a href="/help" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Help Center</a> for
+              Check our <Link to="/help" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Help Center</Link> for
               guides, tutorials, and answers to common questions about using Chanuka.
             </p>
           </div>
@@ -97,12 +99,12 @@ export default function SupportPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Join discussions and get help from the community
               </p>
-              <a 
-                href="/community" 
+              <Link 
+                to="/community" 
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 Visit Community Hub →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -224,12 +226,12 @@ export default function SupportPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Can't find what you're looking for?
             </p>
-            <a
-              href="/help"
+            <Link
+              to="/help"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               Visit Full Help Center
-            </a>
+            </Link>
           </div>
         </div>
       </section>

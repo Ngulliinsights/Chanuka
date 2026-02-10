@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Briefcase, MapPin, Clock, DollarSign, Users, Heart, Zap, Globe } from 'lucide-react';
+import { Building, MapPin, Clock, DollarSign, Users, Heart, Zap, Globe } from 'lucide-react';
 
 interface JobListing {
   id: string;
@@ -87,7 +87,7 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-16 border-b border-brand-gold/10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Join Our Mission</h1>
@@ -193,7 +193,7 @@ export default function CareersPage() {
                     <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
                     <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center space-x-1">
-                        <Briefcase className="w-4 h-4" />
+                        <Building className="w-4 h-4" />
                         <span>{job.department}</span>
                       </div>
                       <div className="flex items-center space-x-1">

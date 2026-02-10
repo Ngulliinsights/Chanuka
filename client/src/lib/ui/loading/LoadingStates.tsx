@@ -13,6 +13,9 @@ interface LoadingStateManagerProps {
   onRetry?: () => void;
 }
 
+// Import Chanuka assets
+import { ChanukaShield } from '@client/lib/design-system/media/ChanukaShield';
+
 export function LoadingStateManager({
   type,
   state,
@@ -23,28 +26,29 @@ export function LoadingStateManager({
   showDetails = false,
   onRetry,
 }: LoadingStateManagerProps) {
+  // ... Error and Timeout states remain the same ...
   if (state === 'error') {
-    return (
-      <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
-        <div className="text-red-500 text-xl mb-4">⚠️</div>
-        <h3 className="text-lg font-semibold text-red-600 mb-2">Loading Error</h3>
-        <p className="text-gray-600 text-center mb-4">
-          {error?.message || 'Failed to load content'}
-        </p>
-        <button
-          onClick={onRetry || (() => window.location.reload())}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          {onRetry ? 'Retry' : 'Reload Page'}
-        </button>
-        {showDetails && error && (
-          <details className="mt-4 text-xs text-gray-500">
-            <summary>Error Details</summary>
-            <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">{error.stack}</pre>
-          </details>
-        )}
-      </div>
-    );
+     return (
+       <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
+         <div className="text-red-500 text-xl mb-4">⚠️</div>
+         <h3 className="text-lg font-semibold text-red-600 mb-2">Loading Error</h3>
+         <p className="text-gray-600 text-center mb-4">
+           {error?.message || 'Failed to load content'}
+         </p>
+         <button
+           onClick={onRetry || (() => window.location.reload())}
+           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+         >
+           {onRetry ? 'Retry' : 'Reload Page'}
+         </button>
+         {showDetails && error && (
+           <details className="mt-4 text-xs text-gray-500">
+             <summary>Error Details</summary>
+             <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">{error.stack}</pre>
+           </details>
+         )}
+       </div>
+     );
   }
 
   if (state === 'timeout') {
@@ -87,12 +91,27 @@ export function LoadingStateManager({
     );
   }
 
-  // Loading state
+  // Branded Loading State for 'page' type
+  if (type === 'page') {
+    return (
+      <div className={`fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 z-50 ${className}`}>
+        <div className="relative mb-8 animate-pulse">
+           <ChanukaShield size={120} className="filter drop-shadow-xl" />
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-brand-navy/10 border-t-brand-navy rounded-full animate-spin mb-4" />
+          <p className="text-brand-navy font-medium text-lg animate-pulse">{message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Default / Component loading state
   return (
     <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
-      <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
+      <Loader2 className="h-8 w-8 animate-spin text-brand-teal mb-4" />
       <p className="text-gray-600">{message}</p>
-      {showDetails && <p className="text-xs text-gray-400 mt-2">Loading {type} content...</p>}
+      {showDetails && <p className="text-xs text-gray-400 mt-2">Loading...</p>}
     </div>
   );
 }

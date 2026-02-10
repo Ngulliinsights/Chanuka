@@ -1,20 +1,23 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Users, Target, Heart, Shield, Globe, Zap } from 'lucide-react';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            About Chanuka
-          </h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
-            Empowering Kenyan citizens with transparent access to legislative information and civic engagement tools.
-            We believe democracy thrives when information is accessible to all, and we're committed to strengthening
-            Kenya's democratic institutions through technology.
-          </p>
+      <section className="bg-[#1a2e49] text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              About Chanuka
+            </h1>
+            <p className="text-xl text-gray-200 leading-relaxed">
+              Empowering Kenyan citizens with transparent access to legislative information and civic engagement tools.
+              We believe democracy thrives when information is accessible to all, and we're committed to strengthening
+              Kenya's democratic institutions through technology.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -153,29 +156,29 @@ export default function AboutPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               We're always looking for talented people who share our mission.
             </p>
-            <a
-              href="/careers"
+            <Link
+              to="/careers"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               View Open Positions
-            </a>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Contact CTA */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-12">
+      <section className="bg-[#11505c] text-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Get in Touch</h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
+          <p className="text-gray-200 mb-6 max-w-2xl mx-auto">
             Have questions, feedback, or want to partner with us? We'd love to hear from you.
           </p>
-          <a
-            href="/contact"
-            className="inline-block bg-white text-blue-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+          <Link
+            to="/contact"
+            className="inline-block bg-[#f29b06] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#f29b06]/90 transition-colors"
           >
             Contact Us
-          </a>
+          </Link>
         </div>
       </section>
     </div>
