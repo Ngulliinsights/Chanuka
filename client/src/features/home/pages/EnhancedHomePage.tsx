@@ -807,7 +807,7 @@ const FeatureCards = React.memo(() => {
       icon: Activity,
       title: 'Real-time Monitoring',
       description: 'Stay informed with live updates on legislative sessions, committee votes, and floor activities as they happen.',
-      link: '/monitoring',
+      link: '/status',
       color: COLORS.secondary,
     },
   ];
