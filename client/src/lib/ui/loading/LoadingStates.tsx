@@ -98,10 +98,7 @@ export function LoadingStateManager({
         <div className="relative mb-8 animate-pulse">
            <ChanukaShield size={120} className="filter drop-shadow-xl" />
         </div>
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-brand-navy/10 border-t-brand-navy rounded-full animate-spin mb-4" />
-          <p className="text-brand-navy font-medium text-lg animate-pulse">{message}</p>
-        </div>
+        <p className="text-brand-navy font-medium text-lg animate-pulse">{message}</p>
       </div>
     );
   }

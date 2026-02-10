@@ -292,8 +292,8 @@ export const NavigationBar = memo<NavigationBarProps>(
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="flex justify-between items-center h-14">
               {/* Left: Logo and mobile menu */}
             <div className="flex items-center">
               {isMobile && (
@@ -301,7 +301,7 @@ export const NavigationBar = memo<NavigationBarProps>(
                   variant="ghost"
                   size="sm"
                   onClick={handleMobileMenuToggle}
-                  className="mr-2 p-2"
+                  className="mr-1 p-1.5"
                   aria-label={mobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
                 >
                   {mobileMenuOpen ? (
@@ -314,14 +314,14 @@ export const NavigationBar = memo<NavigationBarProps>(
 
               <Link
                 to="/"
-                className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1 transition-transform hover:scale-105"
+                className="flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded transition-transform hover:scale-105"
                 aria-label="Chanuka home"
               >
                 <div className="md:hidden">
-                  <ChanukaSmallLogo size="sm" className="w-10 h-10" />
+                  <ChanukaSmallLogo size="sm" className="w-6 h-6" />
                 </div>
                 <div className="hidden md:block">
-                  <ChanukaWordmark size="full" className="h-5 w-auto" />
+                  <ChanukaWordmark size="full" className="h-3 w-auto" />
                 </div>
               </Link>
             </div>
