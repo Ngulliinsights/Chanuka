@@ -565,7 +565,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
   return (
     <section 
-      className="relative overflow-hidden min-h-[90vh] flex items-center py-32 diagonal-accent"
+      className="relative overflow-hidden min-h-[80vh] flex items-center py-24 diagonal-accent"
     >
       {/* Background Image with Overlay - Restored */}
       <div className="absolute inset-0 z-0">
@@ -608,7 +608,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
           {/* Main Headline */}
           <h1 
-            className="text-7xl md:text-8xl font-display font-bold mb-8 leading-tight"
+            className="text-6xl md:text-7xl font-display font-bold mb-6 leading-tight"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.8s ease-out 0.4s both',
             }}
@@ -626,7 +626,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
           </h1>
 
           <p 
-            className="text-2xl font-body text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed font-light"
+            className="text-xl font-body text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed font-light"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeIn 0.6s ease-out 0.6s both',
             }}
@@ -636,7 +636,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
           {/* CTA Buttons */}
           <div 
-            className="flex flex-col sm:flex-row gap-5 justify-center mb-16"
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.6s ease-out 0.8s both',
             }}
@@ -644,7 +644,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
             <Link to="/bills">
               <Button
                 size="lg"
-                className="text-lg font-body font-semibold px-10 py-7 shadow-2xl hover:shadow-[0_20px_50px_rgba(243,138,31,0.4)] transition-all duration-500 hover:scale-105 text-white relative overflow-hidden group ripple-container"
+                className="text-base font-body font-semibold px-8 py-6 shadow-2xl hover:shadow-[0_20px_50px_rgba(243,138,31,0.4)] transition-all duration-500 hover:scale-105 text-white relative overflow-hidden group ripple-container"
                 style={{ backgroundColor: COLORS.accent }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = COLORS.accentHover;
@@ -665,7 +665,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
               <Button
                 variant="outline"
                 size="lg"
-                className="text-lg font-body font-semibold px-10 py-7 border-2 transition-all duration-500 bg-white shadow-lg hover:shadow-xl"
+                className="text-base font-body font-semibold px-8 py-6 border-2 transition-all duration-500 bg-white shadow-lg hover:shadow-xl"
                 style={{ 
                   borderColor: COLORS.primary,
                   color: COLORS.primary,
@@ -689,13 +689,13 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
           {/* Enhanced Search Box with Glass Effect */}
           <div 
-            className="max-w-3xl mx-auto"
+            className="max-w-2xl mx-auto"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.6s ease-out 1s both',
             }}
           >
             <div 
-              className="glass rounded-3xl p-8 shadow-2xl transition-all duration-500"
+              className="glass rounded-3xl p-6 shadow-2xl transition-all duration-500"
               style={{
                 transform: isSearchFocused ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: isSearchFocused 
@@ -703,11 +703,11 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
                   : undefined,
               }}
             >
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-display font-bold text-gray-900 mb-2">
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-display font-bold text-gray-900 mb-2">
                   Search Legislation
                 </h3>
-                <p className="font-body text-gray-600">
+                <p className="font-body text-gray-600 text-sm">
                   Find bills, analyze policy impacts, and detect implementation workarounds
                 </p>
               </div>
@@ -813,7 +813,7 @@ const FeatureCards = React.memo(() => {
   ];
 
   return (
-    <section ref={ref} className="py-32 bg-white relative overflow-hidden">
+    <section ref={ref} className="py-20 bg-white relative overflow-hidden">
       {/* Subtle brand watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.015] pointer-events-none">
         <ChanukaShield size={800} variant="brand" className="w-[1000px] h-auto" />
@@ -821,9 +821,9 @@ const FeatureCards = React.memo(() => {
 
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <h2 
-            className="text-6xl font-display font-bold text-gray-900 mb-6"
+            className="text-5xl font-display font-bold text-gray-900 mb-4"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
@@ -833,7 +833,7 @@ const FeatureCards = React.memo(() => {
             Powerful Tools for Civic Engagement
           </h2>
           <p 
-            className="text-2xl font-body font-light text-gray-600 max-w-3xl mx-auto"
+            className="text-xl font-body font-light text-gray-600 max-w-3xl mx-auto"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
@@ -1026,26 +1026,6 @@ const CallToAction = React.memo(() => {
       className="py-32 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #f9fafb 0%, #fef6ed 100%)' }}
     >
-      {/* Decorative brand elements */}
-      <div 
-        className="absolute left-0 top-0 opacity-[0.03]"
-        style={{
-          transform: isVisible ? 'rotate(0deg)' : 'rotate(-45deg)',
-          transition: prefersReducedMotion ? 'none' : 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
-      >
-        <ChanukaWordmark className="w-[400px] h-auto" />
-      </div>
-      <div 
-        className="absolute right-0 bottom-0 opacity-[0.03]"
-        style={{
-          transform: isVisible ? 'rotate(0deg)' : 'rotate(45deg)',
-          transition: prefersReducedMotion ? 'none' : 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s',
-        }}
-      >
-        <ChanukaWordmark className="w-[600px] h-auto" />
-      </div>
-
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           <div 

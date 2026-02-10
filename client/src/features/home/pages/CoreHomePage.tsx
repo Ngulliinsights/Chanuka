@@ -338,7 +338,7 @@ const AnonymousHero: React.FC<{
         <span>Platform Active • Real-time Updates</span>
       </div>
 
-      <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-tight text-white drop-shadow-2xl">
+      <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight tracking-tight text-white drop-shadow-2xl">
         Democracy
         <br />
         <span className="text-yellow-400 drop-shadow-md filter shadow-black/50">
@@ -654,7 +654,7 @@ export default function CoreHomePage() {
       )}
 
       {/* Hero Section with Progressive Disclosure */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
+      <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center">
         {/* Background Overlay */}
         <div className="absolute inset-0 z-0">
           <img 

@@ -318,10 +318,10 @@ export const NavigationBar = memo<NavigationBarProps>(
                 aria-label="Chanuka home"
               >
                 <div className="md:hidden">
-                  <ChanukaSmallLogo size="sm" className="w-12 h-12" />
+                  <ChanukaSmallLogo size="sm" className="w-10 h-10" />
                 </div>
                 <div className="hidden md:block">
-                  <ChanukaWordmark size="full" className="h-7 w-auto" />
+                  <ChanukaWordmark size="full" className="h-5 w-auto" />
                 </div>
               </Link>
             </div>
