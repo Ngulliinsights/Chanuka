@@ -21,7 +21,7 @@ import {
   userProfileDomainToApi,
   userPreferencesDbToDomain,
   userPreferencesDomainToApi,
-} from '../../shared/utils/transformers/entities/user/user';
+} from '@shared/utils/transformers/entities/user';
 import {
   billDbToDomain,
   billDomainToApi,
@@ -36,8 +36,8 @@ import {
   committeeDomainToApi,
   billCommitteeAssignmentDbToDomain,
   billCommitteeAssignmentDomainToApi,
-} from '../../shared/utils/transformers/entities/bill/bill';
-import type { UserTable, UserProfileTable, UserPreferencesTable } from '../../shared/types/database/tablesables';
+} from '@shared/utils/transformers/entities/bill';
+import type { UserTable, UserProfileTable, UserPreferencesTable } from '@shared/types/database/tables';
 import type {
   BillTable,
   BillTimelineEventTable,
@@ -45,8 +45,8 @@ import type {
   SponsorTable,
   CommitteeTable,
   BillCommitteeAssignmentTable,
-} from '../../shared/types/database/tablesables';
-import type { UserId, BillId, CommitteeId, SponsorId, ActionId, BillTimelineEventId, BillCommitteeAssignmentId, LegislatorId } from '../../shared/types/core/brandedanded';
+} from '@shared/types/database/tables';
+import type { UserId, BillId, CommitteeId, SponsorId, ActionId, BillTimelineEventId, BillCommitteeAssignmentId, LegislatorId } from '@shared/types/core/branded';
 
 // ============================================================================
 // Arbitrary Generators for Database Types

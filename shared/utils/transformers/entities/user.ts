@@ -78,6 +78,8 @@ export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfile> =
       avatarUrl: dbProfile.avatar_url ?? undefined,
       anonymityLevel: dbProfile.anonymity_level as AnonymityLevel,
       isPublic: dbProfile.is_public,
+      createdAt: dbProfile.created_at,
+      updatedAt: dbProfile.updated_at,
     };
   },
 
@@ -91,8 +93,8 @@ export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfile> =
       avatar_url: profile.avatarUrl ?? null,
       anonymity_level: profile.anonymityLevel,
       is_public: profile.isPublic,
-      created_at: new Date(),
-      updated_at: new Date(),
+      created_at: profile.createdAt,
+      updated_at: profile.updatedAt,
     };
   },
 };
@@ -103,24 +105,27 @@ export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfile> =
 export const userPreferencesDbToDomain: Transformer<UserPreferencesTable, UserPreferences> = {
   transform(dbPreferences: UserPreferencesTable): UserPreferences {
     return {
+      userId: dbPreferences.user_id,
       theme: (dbPreferences.theme as 'light' | 'dark' | 'system') ?? undefined,
       language: dbPreferences.language ?? undefined,
       notificationsEnabled: dbPreferences.notifications_enabled,
       emailNotifications: dbPreferences.email_notifications,
       pushNotifications: dbPreferences.push_notifications,
+      createdAt: dbPreferences.created_at,
+      updatedAt: dbPreferences.updated_at,
     };
   },
 
   reverse(preferences: UserPreferences): UserPreferencesTable {
     return {
-      user_id: '' as UserId, // Will be set by caller
+      user_id: preferences.userId,
       theme: preferences.theme ?? null,
       language: preferences.language ?? null,
       notifications_enabled: preferences.notificationsEnabled ?? true,
       email_notifications: preferences.emailNotifications ?? true,
       push_notifications: preferences.pushNotifications ?? false,
-      created_at: new Date(),
-      updated_at: new Date(),
+      created_at: preferences.createdAt,
+      updated_at: preferences.updatedAt,
     };
   },
 };
@@ -162,17 +167,22 @@ export interface ApiUserProfile {
   readonly avatarUrl?: string;
   readonly anonymityLevel: string;
   readonly isPublic: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
 }
 
 /**
  * API representation of UserPreferences
  */
 export interface ApiUserPreferences {
+  readonly userId: string;
   readonly theme?: 'light' | 'dark' | 'system';
   readonly language?: string;
   readonly notificationsEnabled?: boolean;
   readonly emailNotifications?: boolean;
   readonly pushNotifications?: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
 }
 
 /**
@@ -234,6 +244,8 @@ export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = 
       avatarUrl: profile.avatarUrl,
       anonymityLevel: profile.anonymityLevel,
       isPublic: profile.isPublic,
+      createdAt: dateToStringTransformer.transform(profile.createdAt),
+      updatedAt: dateToStringTransformer.transform(profile.updatedAt),
     };
   },
 
@@ -247,6 +259,8 @@ export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = 
       avatarUrl: apiProfile.avatarUrl,
       anonymityLevel: apiProfile.anonymityLevel as AnonymityLevel,
       isPublic: apiProfile.isPublic,
+      createdAt: dateToStringTransformer.reverse(apiProfile.createdAt),
+      updatedAt: dateToStringTransformer.reverse(apiProfile.updatedAt),
     };
   },
 };
@@ -257,21 +271,27 @@ export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = 
 export const userPreferencesDomainToApi: Transformer<UserPreferences, ApiUserPreferences> = {
   transform(preferences: UserPreferences): ApiUserPreferences {
     return {
+      userId: preferences.userId,
       theme: preferences.theme,
       language: preferences.language,
       notificationsEnabled: preferences.notificationsEnabled,
       emailNotifications: preferences.emailNotifications,
       pushNotifications: preferences.pushNotifications,
+      createdAt: dateToStringTransformer.transform(preferences.createdAt),
+      updatedAt: dateToStringTransformer.transform(preferences.updatedAt),
     };
   },
 
   reverse(apiPreferences: ApiUserPreferences): UserPreferences {
     return {
+      userId: apiPreferences.userId as UserId,
       theme: apiPreferences.theme,
       language: apiPreferences.language,
       notificationsEnabled: apiPreferences.notificationsEnabled,
       emailNotifications: apiPreferences.emailNotifications,
       pushNotifications: apiPreferences.pushNotifications,
+      createdAt: dateToStringTransformer.reverse(apiPreferences.createdAt),
+      updatedAt: dateToStringTransformer.reverse(apiPreferences.updatedAt),
     };
   },
 };

@@ -27,8 +27,10 @@ export interface GeographicLocation {
 
 /**
  * User Preferences
+ * Includes userId and audit timestamps for proper data tracking
  */
 export interface UserPreferences {
+  readonly userId: UserId;
   readonly theme?: 'light' | 'dark' | 'system';
   readonly language?: string;
   readonly notificationsEnabled?: boolean;
@@ -38,11 +40,14 @@ export interface UserPreferences {
     readonly reducedMotion?: boolean;
     readonly highContrast?: boolean;
   };
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 }
 
 /**
  * User Profile with Anonymity Controls
  * Follows the design document specification for proper anonymity controls
+ * Includes audit timestamps for proper data tracking
  */
 export interface UserProfile {
   readonly userId: UserId;
@@ -55,6 +60,8 @@ export interface UserProfile {
   readonly anonymityLevel: AnonymityLevel;
   readonly socialLinks?: Readonly<Record<string, string>>;
   readonly isPublic: boolean;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 }
 
 /**

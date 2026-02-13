@@ -19,24 +19,53 @@ export function createIdentityTransformer<T>(): Transformer<T, T> {
 }
 
 /**
+ * Helper function to validate if a Date object is valid
+ */
+function isValidDate(date: Date): boolean {
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
+/**
  * Date serialization transformer
  * Converts Date objects to ISO strings and vice versa
+ * Validates dates to prevent Invalid Date errors
  */
 export const dateToStringTransformer: Transformer<Date, string> = {
-  transform: (date: Date): string => date.toISOString(),
-  reverse: (str: string): Date => new Date(str),
+  transform: (date: Date): string => {
+    if (!isValidDate(date)) {
+      throw new Error(`Cannot transform invalid date: ${date}`);
+    }
+    return date.toISOString();
+  },
+  reverse: (str: string): Date => {
+    const date = new Date(str);
+    if (!isValidDate(date)) {
+      throw new Error(`Cannot parse invalid date string: ${str}`);
+    }
+    return date;
+  },
 };
 
 /**
  * Optional date serialization transformer
  * Handles null/undefined dates
+ * Validates dates to prevent Invalid Date errors
  */
 export const optionalDateToStringTransformer: Transformer<Date | null | undefined, string | null> = {
   transform: (date: Date | null | undefined): string | null => {
-    return date ? date.toISOString() : null;
+    if (!date) return null;
+    if (!isValidDate(date)) {
+      throw new Error(`Cannot transform invalid date: ${date}`);
+    }
+    return date.toISOString();
   },
   reverse: (str: string | null): Date | null => {
-    return str ? new Date(str) : null;
+    if (!str) return null;
+    const date = new Date(str);
+    if (!isValidDate(date)) {
+      throw new Error(`Cannot parse invalid date string: ${str}`);
+    }
+    return date;
   },
 };
 
