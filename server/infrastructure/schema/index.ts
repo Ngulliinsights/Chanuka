@@ -263,7 +263,7 @@ export {
   type BillVoteUpdate,
   type BillEngagementCreate,
   type BillEngagementUpdate,
-} from '@server/infrastructure/core/validation/schemas";
+} from '@server/infrastructure/core/validation/schemas';
 
 // ============================================================================
 // WEBSOCKET TYPES - Unified WebSocket type system

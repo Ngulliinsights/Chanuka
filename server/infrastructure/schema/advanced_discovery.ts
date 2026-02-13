@@ -212,8 +212,6 @@ export type NewSearchQuery = typeof searchQueries.$inferInsert;
 
 export type DiscoveryPattern = typeof discoveryPatterns.$inferSelect;
 export type NewDiscoveryPattern = typeof discoveryPatterns.$inferInsert;
-
-export type BillRelationship = typeof billRelationships.$inferSelect;
 export type NewBillRelationship = typeof billRelationships.$inferInsert;
 
 export type SearchAnalytics = typeof searchAnalytics.$inferSelect;

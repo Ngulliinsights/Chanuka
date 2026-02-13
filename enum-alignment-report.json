@@ -1,0 +1,433 @@
+{
+  "timestamp": "2026-02-11T16:54:22.500Z",
+  "totalEnums": 50,
+  "alignedEnums": 62,
+  "misalignedEnums": 23,
+  "mismatches": [
+    {
+      "enumName": "chamberEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "national_assembly",
+        "senate",
+        "county_assembly"
+      ],
+      "typeValues": [
+        "national_assembly",
+        "senate",
+        "county_assembly",
+        "both"
+      ],
+      "missingInDatabase": [
+        "both"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "partyEnum",
+      "issue": "Database enum has no corresponding type enum",
+      "databaseValues": [
+        "uda",
+        "odm",
+        "jubilee",
+        "wiper",
+        "anc",
+        "ford_kenya",
+        "kanu",
+        "independent",
+        "other",
+        "safina",
+        "nark_kenya",
+        "dap_ke",
+        "paa",
+        "mcc",
+        "kdu",
+        "cck",
+        "kupa",
+        "gdcp",
+        "tsp"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "userRoleEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "citizen",
+        "verified_citizen",
+        "ambassador",
+        "expert_verifier",
+        "mp_staff",
+        "clerk",
+        "admin",
+        "auditor",
+        "journalist"
+      ],
+      "typeValues": [
+        "public",
+        "citizen",
+        "verified_citizen",
+        "ambassador",
+        "expert",
+        "expert_verifier",
+        "mp_staff",
+        "clerk",
+        "moderator",
+        "admin",
+        "auditor",
+        "journalist"
+      ],
+      "missingInDatabase": [
+        "public",
+        "expert",
+        "moderator"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "billStatusEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "first_reading",
+        "second_reading",
+        "committee_stage",
+        "third_reading",
+        "presidential_assent",
+        "gazetted",
+        "withdrawn",
+        "lost",
+        "enacted"
+      ],
+      "typeValues": [
+        "draft",
+        "introduced",
+        "first_reading",
+        "second_reading",
+        "in_committee",
+        "committee_stage",
+        "third_reading",
+        "scheduled_for_vote",
+        "passed",
+        "presidential_assent",
+        "enacted",
+        "gazetted",
+        "rejected",
+        "lost",
+        "vetoed",
+        "withdrawn"
+      ],
+      "missingInDatabase": [
+        "draft",
+        "introduced",
+        "in_committee",
+        "scheduled_for_vote",
+        "passed",
+        "rejected",
+        "vetoed"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "commodityCategoryEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "food_security",
+        "Unga",
+        "Milk",
+        "Sugar\n  transport",
+        "Fuel\n  administrative",
+        "Licenses",
+        "IDs\n  healthcare",
+        "Medicine\n  education",
+        "Uniforms\n  housing",
+        "Utilities\n  communication",
+        "Airtime\n  agriculture",
+        "Seeds"
+      ],
+      "typeValues": [
+        "food_security",
+        "transport",
+        "administrative",
+        "healthcare",
+        "education",
+        "housing",
+        "communication",
+        "agriculture"
+      ],
+      "missingInDatabase": [
+        "transport",
+        "administrative",
+        "healthcare",
+        "education",
+        "housing",
+        "communication",
+        "agriculture"
+      ],
+      "missingInTypes": [
+        "Unga",
+        "Milk",
+        "Sugar\n  transport",
+        "Fuel\n  administrative",
+        "Licenses",
+        "IDs\n  healthcare",
+        "Medicine\n  education",
+        "Uniforms\n  housing",
+        "Utilities\n  communication",
+        "Airtime\n  agriculture",
+        "Seeds"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "reliabilityScoreEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "unverified",
+        "single source\n  low"
+      ],
+      "typeValues": [
+        "unverified",
+        "low",
+        "medium",
+        "high",
+        "verified_oracle"
+      ],
+      "missingInDatabase": [
+        "low",
+        "medium",
+        "high",
+        "verified_oracle"
+      ],
+      "missingInTypes": [
+        "single source\n  low"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "violationTypeEnum",
+      "issue": "Enum values mismatch between database and types",
+      "databaseValues": [
+        "bribery",
+        "nothing built\n  nepotism"
+      ],
+      "typeValues": [
+        "bribery",
+        "inflated_procurement",
+        "ghost_project",
+        "nepotism",
+        "regulatory_extortion",
+        "budget_diversion",
+        "false_promises",
+        "conflict_of_interest"
+      ],
+      "missingInDatabase": [
+        "inflated_procurement",
+        "ghost_project",
+        "nepotism",
+        "regulatory_extortion",
+        "budget_diversion",
+        "false_promises",
+        "conflict_of_interest"
+      ],
+      "missingInTypes": [
+        "nothing built\n  nepotism"
+      ],
+      "severity": "error"
+    },
+    {
+      "enumName": "UserStatus",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "active",
+        "inactive",
+        "suspended",
+        "pending"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "VerificationStatus",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "unverified",
+        "pending",
+        "in_progress",
+        "needs_review",
+        "verified",
+        "approved",
+        "failed",
+        "rejected",
+        "disputed"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "BillType",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "public",
+        "private",
+        "money",
+        "constitutional"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "CommitteeStatus",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "assigned",
+        "reviewed",
+        "reported",
+        "completed"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "ArgumentPosition",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "support",
+        "oppose",
+        "neutral",
+        "conditional"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "CommentStatus",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "active",
+        "flagged",
+        "hidden",
+        "deleted"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "NotificationChannel",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "email",
+        "sms",
+        "push",
+        "in_app"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "LoadingState",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "idle",
+        "loading",
+        "success",
+        "error"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "Size",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "Variant",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "primary",
+        "secondary",
+        "outline",
+        "ghost"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "Theme",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "light",
+        "dark",
+        "auto"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "UrgencyLevel",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "ComplexityLevel",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "low",
+        "medium",
+        "high",
+        "expert"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "ErrorClassification",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "validation",
+        "authorization",
+        "server",
+        "network"
+      ],
+      "severity": "warning"
+    },
+    {
+      "enumName": "ErrorCode",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [],
+      "severity": "warning"
+    },
+    {
+      "enumName": "PoliticalParty",
+      "issue": "Type enum has no corresponding database enum",
+      "typeValues": [
+        "uda",
+        "odm",
+        "jubilee",
+        "wiper",
+        "anc",
+        "ford_kenya",
+        "kanu",
+        "independent",
+        "other",
+        "safina",
+        "nark_kenya",
+        "dap_ke",
+        "paa",
+        "mcc",
+        "udp",
+        "kdu",
+        "cck",
+        "kupa",
+        "gdcp",
+        "tsp"
+      ],
+      "severity": "warning"
+    }
+  ],
+  "summary": {
+    "errors": 7,
+    "warnings": 16,
+    "info": 0
+  }
+}

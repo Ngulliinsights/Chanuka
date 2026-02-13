@@ -56,13 +56,9 @@ export interface ExtendedVerificationTask extends VerificationTask {
   processedAt?: string | null;
 }
 
-export enum VerificationStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  DISPUTED = 'disputed'
-}
+// Import VerificationStatus from shared types
+import { VerificationStatus } from '@shared/types';
+export { VerificationStatus };
 
 export interface NotificationPreferences {
   email: boolean;
@@ -76,12 +72,9 @@ export interface ServiceExpertError extends Error {
   details?: any;
 }
 
-export enum NotificationChannel {
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
-  IN_APP = 'in_app'
-}
+// Import NotificationChannel from shared types
+import { NotificationChannel } from '@shared/types';
+export { NotificationChannel };
 
 export class ExpertError extends Error {
   constructor(message: string, public code?: string) {

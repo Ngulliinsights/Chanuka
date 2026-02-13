@@ -155,21 +155,6 @@ export interface SearchSuggestion {
   metadata?: Record<string, unknown>;
 }
 
-export interface SearchAnalytics {
-  totalSearches: number;
-  uniqueUsers: number;
-  averageResultsPerSearch: number;
-  searchSuccessRate?: number;
-  topQueries?: Array<{ query: string; count: number }>;
-  mostPopularQueries: Array<{ query: string; count: number }>;
-  searchTrends: Array<{ date: string; count: number }>;
-  noResultsQueries?: string[];
-  performanceMetrics: {
-    averageExecutionTime: number;
-    slowestQueries: Array<{ query: string; time: number }>;
-  };
-}
-
 export interface SearchExportResponse {
   downloadUrl: string;
   format: 'csv' | 'json';

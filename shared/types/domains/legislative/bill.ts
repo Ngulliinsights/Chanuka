@@ -4,32 +4,26 @@
  */
 
 import { BaseEntity, UserTrackableEntity } from '../../core/base';
-import { BillId } from '../../core/common';
-
-// Import canonical enums from shared enums (single source of truth)
+import { BillId, CommitteeId, UserId, AmendmentId, ActionId, SponsorId } from '../../core/branded';
 import { 
   BillStatus, 
   Chamber, 
-  UrgencyLevel as BillPriority,
-  type BillStatusValue,
-  type ChamberValue 
-} from '../../enums';
+  BillType,
+  CommitteeStatus
+} from '../../core/enums';
 
 // Re-export for convenience
-export { BillStatus, Chamber, BillPriority };
-export type { BillStatusValue, ChamberValue };
+export { BillStatus, Chamber, BillType, CommitteeStatus };
 
 /**
- * Bill Type Classification
+ * Bill Priority Level
  */
-export type BillType =
-  | 'bill'
-  | 'resolution'
-  | 'amendment'
-  | 'appropriation'
-  | 'budget'
-  | 'treaty'
-  | 'nomination';
+export enum BillPriority {
+  Low = 'low',
+  Medium = 'medium',
+  High = 'high',
+  Urgent = 'urgent',
+}
 
 /**
  * Sponsor Type
@@ -69,7 +63,8 @@ export type LegislativeActionType =
  * Bill Timeline Event
  */
 export interface BillTimelineEvent {
-  readonly id: string;
+  readonly id: ActionId;
+  readonly billId: BillId;
   readonly actionType: LegislativeActionType;
   readonly timestamp: Date;
   readonly description: string;
@@ -82,6 +77,7 @@ export interface BillTimelineEvent {
  * Bill Engagement Metrics
  */
 export interface BillEngagementMetrics {
+  readonly billId: BillId;
   readonly views: number;
   readonly comments: number;
   readonly shares: number;
@@ -94,8 +90,9 @@ export interface BillEngagementMetrics {
  * Sponsor Entity
  */
 export interface Sponsor extends BaseEntity {
+  readonly id: SponsorId;
   readonly billId: BillId;
-  readonly legislatorId: string;
+  readonly legislatorId: UserId;
   readonly legislatorName: string;
   readonly party: string;
   readonly state: string;
@@ -111,12 +108,13 @@ export interface Sponsor extends BaseEntity {
  * Committee Entity
  */
 export interface Committee extends BaseEntity {
+  readonly id: CommitteeId;
   readonly name: string;
   readonly committeeType: CommitteeType;
   readonly chamber: Chamber;
   readonly jurisdiction: string;
   readonly chairperson?: string;
-  readonly members?: readonly string[];
+  readonly members?: readonly UserId[];
   readonly contactInfo?: Readonly<Record<string, unknown>>;
 }
 
@@ -125,9 +123,9 @@ export interface Committee extends BaseEntity {
  */
 export interface BillCommitteeAssignment extends BaseEntity {
   readonly billId: BillId;
-  readonly committeeId: string;
+  readonly committeeId: CommitteeId;
   readonly assignmentDate: Date;
-  readonly status: 'referred' | 'discharged' | 'reporting' | 'completed';
+  readonly status: CommitteeStatus;
   readonly actionTaken?: string;
   readonly reportDate?: Date;
 }
@@ -136,7 +134,7 @@ export interface BillCommitteeAssignment extends BaseEntity {
  * Bill Entity - Comprehensive legislative entity
  */
 export interface Bill extends UserTrackableEntity {
-  readonly billId: BillId;
+  readonly id: BillId;
   readonly billNumber: string;
   readonly title: string;
   readonly officialTitle?: string;
@@ -151,7 +149,7 @@ export interface Bill extends UserTrackableEntity {
   readonly session: number;
 
   // Relationships
-  readonly primarySponsorId: string;
+  readonly sponsorId: UserId;
   readonly sponsors?: readonly Sponsor[];
   readonly committees?: readonly Committee[];
   readonly committeeAssignments?: readonly BillCommitteeAssignment[];

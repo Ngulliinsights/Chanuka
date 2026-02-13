@@ -4,6 +4,7 @@
  */
 
 export * from './bill';
+export * from './comment';
 export * from './actions';
 
 /**

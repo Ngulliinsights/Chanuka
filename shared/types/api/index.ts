@@ -4,6 +4,7 @@
  * Follows the type system standardization requirements
  */
 
+export * from './contracts';
 export * from './request-types';
 export * from './response-types';
 export * from './error-types';

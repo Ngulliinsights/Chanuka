@@ -7,24 +7,23 @@
  * @module shared/types/bill
  */
 
+import { UserRole as SharedUserRole } from '../../../shared/types/core/enums';
+
 // ============================================================================
 // User Role Types
 // ============================================================================
 
 /**
- * User role enumeration
- * Defines different permission levels in the system
+ * User role type - imported from shared enums
+ * @deprecated Use UserRole from shared/types/core/enums instead
  */
-export enum UserRoleEnum {
-  ADMIN = 'admin',
-  EXPERT = 'expert',
-  CITIZEN = 'citizen',
-  GUEST = 'guest',
-  LEGISLATOR = 'legislator',
-  STAFF = 'staff',
-}
+export type UserRole = `${SharedUserRole}`;
 
-export type UserRole = keyof typeof UserRoleEnum | 'public';
+/**
+ * User role enum - re-exported from shared layer
+ * @deprecated Import UserRole directly from shared/types/core/enums
+ */
+export const UserRoleEnum = SharedUserRole;
 
 /**
  * User permission type

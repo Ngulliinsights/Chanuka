@@ -6,9 +6,34 @@
  *
  * This module consolidates performance-related utilities from performance-monitoring-utils.ts
  * and other sources into a unified, framework-agnostic interface.
+ *
+ * CLIENT-SAFE: This module is safe for use in both client and server contexts.
  */
 
-import { logger } from '../observability/logging';
+// ==================== Client-Safe Logging Helper ====================
+
+const safeLog = {
+  debug: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.debug) {
+      console.debug(message, data);
+    }
+  },
+  info: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.info) {
+      console.info(message, data);
+    }
+  },
+  warn: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn(message, data);
+    }
+  },
+  error: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.error) {
+      console.error(message, data);
+    }
+  }
+};
 
 // ==================== Type Definitions ====================
 
@@ -108,7 +133,7 @@ export class PerformanceMonitor {
     // Check thresholds and log warnings
     this.checkThresholds(metric);
 
-    logger.debug('Performance metric tracked', { metric });
+    safeLog.debug('Performance metric tracked', { metric });
   }
 
   /**
@@ -141,7 +166,7 @@ export class PerformanceMonitor {
 
     // Check for slow responses
     if (responseTime > this.thresholds.responseTime) {
-      logger.warn('Slow API response detected', {
+      safeLog.warn('Slow API response detected', {
         component: 'performance',
         method,
         endpoint,
@@ -150,7 +175,7 @@ export class PerformanceMonitor {
       });
     }
 
-    logger.debug('API metric tracked', { metric });
+    safeLog.debug('API metric tracked', { metric });
   }
 
   /**
@@ -171,7 +196,7 @@ export class PerformanceMonitor {
 
       const heapUsedMB = memoryMetric.heapUsed / 1024 / 1024;
       if (heapUsedMB > this.thresholds.memoryUsage) {
-        logger.warn('High memory usage detected', {
+        safeLog.warn('High memory usage detected', {
           component: 'performance',
           heapUsedMB,
           threshold: this.thresholds.memoryUsage
@@ -197,7 +222,7 @@ export class PerformanceMonitor {
       // Calculate CPU percentage (simplified)
       const totalUsage = (cpuMetric.user + cpuMetric.system) / 1000000; // Convert to seconds
       if (totalUsage > this.thresholds.cpuUsage) {
-        logger.warn('High CPU usage detected', {
+        safeLog.warn('High CPU usage detected', {
           component: 'performance',
           totalUsage,
           threshold: this.thresholds.cpuUsage
@@ -335,7 +360,7 @@ export async function benchmark<T>(
     timestamp: Date.now()
   };
 
-  logger.info('Benchmark completed', { benchmark: result });
+  safeLog.info('Benchmark completed', { benchmark: result });
 
   return result;
 }
@@ -374,7 +399,7 @@ export function timed(metricName?: string) {
 export function forceGarbageCollection(): void {
   if (typeof global !== 'undefined' && (global as any).gc) {
     (global as any).gc();
-    logger.debug('Forced garbage collection', { component: 'performance' });
+    safeLog.debug('Forced garbage collection', { component: 'performance' });
   }
 }
 
@@ -410,7 +435,7 @@ export const performanceMonitor = new PerformanceMonitor();
  */
 export function initializeMonitoring(thresholds?: Partial<PerformanceThresholds>): PerformanceMonitor {
   const monitor = new PerformanceMonitor(thresholds);
-  logger.info('Performance monitoring initialized', { component: 'performance' });
+  safeLog.info('Performance monitoring initialized', { component: 'performance' });
   return monitor;
 }
 

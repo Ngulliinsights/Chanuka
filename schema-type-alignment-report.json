@@ -1,0 +1,4936 @@
+{
+  "timestamp": "2026-02-12T23:29:09.288Z",
+  "totalEntities": 182,
+  "alignedEntities": 0,
+  "misalignedEntities": 182,
+  "entitiesWithoutSchema": 10,
+  "entitiesWithoutTypes": 172,
+  "entities": [
+    {
+      "entityName": "public_promises",
+      "schemaTable": "public_promises",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "public_promises",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'public_promises' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "shadow_ledger_entries",
+      "schemaTable": "shadow_ledger_entries",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "shadow_ledger_entries",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'shadow_ledger_entries' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "promise_accountability_tracking",
+      "schemaTable": "promise_accountability_tracking",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "promise_accountability_tracking",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'promise_accountability_tracking' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "searchQueries",
+      "schemaTable": "searchQueries",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "searchQueries",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'searchQueries' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "discoveryPatterns",
+      "schemaTable": "discoveryPatterns",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "discoveryPatterns",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'discoveryPatterns' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "billRelationships",
+      "schemaTable": "billRelationships",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 4,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "billRelationships",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'billRelationships' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "searchAnalytics",
+      "schemaTable": "searchAnalytics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 10,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "searchAnalytics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'searchAnalytics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "trendingTopics",
+      "schemaTable": "trendingTopics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "trendingTopics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'trendingTopics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "userRecommendations",
+      "schemaTable": "userRecommendations",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "userRecommendations",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'userRecommendations' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "campaigns",
+      "schemaTable": "campaigns",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "campaigns",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'campaigns' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "action_items",
+      "schemaTable": "action_items",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "action_items",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'action_items' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "campaign_participants",
+      "schemaTable": "campaign_participants",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "campaign_participants",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'campaign_participants' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "action_completions",
+      "schemaTable": "action_completions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "action_completions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'action_completions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "campaign_impact_metrics",
+      "schemaTable": "campaign_impact_metrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "campaign_impact_metrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'campaign_impact_metrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "coalition_relationships",
+      "schemaTable": "coalition_relationships",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "coalition_relationships",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'coalition_relationships' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "analysis",
+      "schemaTable": "analysis",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "analysis",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'analysis' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "argumentTable",
+      "schemaTable": "argumentTable",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "argumentTable",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'argumentTable' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "claims",
+      "schemaTable": "claims",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "claims",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'claims' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "evidence",
+      "schemaTable": "evidence",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "evidence",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'evidence' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "argument_relationships",
+      "schemaTable": "argument_relationships",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "argument_relationships",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'argument_relationships' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "legislative_briefs",
+      "schemaTable": "legislative_briefs",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "legislative_briefs",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'legislative_briefs' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "synthesis_jobs",
+      "schemaTable": "synthesis_jobs",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "synthesis_jobs",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'synthesis_jobs' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_interests",
+      "schemaTable": "user_interests",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_interests",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_interests' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "sessions",
+      "schemaTable": "sessions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "sessions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'sessions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "comments",
+      "schemaTable": "comments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "comments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'comments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "comment_votes",
+      "schemaTable": "comment_votes",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "comment_votes",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'comment_votes' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_votes",
+      "schemaTable": "bill_votes",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_votes",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_votes' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_engagement",
+      "schemaTable": "bill_engagement",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_engagement",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_engagement' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_tracking_preferences",
+      "schemaTable": "bill_tracking_preferences",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_tracking_preferences",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_tracking_preferences' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "notifications",
+      "schemaTable": "notifications",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "notifications",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'notifications' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "alert_preferences",
+      "schemaTable": "alert_preferences",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "alert_preferences",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'alert_preferences' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_contact_methods",
+      "schemaTable": "user_contact_methods",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_contact_methods",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_contact_methods' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "constitutional_provisions",
+      "schemaTable": "constitutional_provisions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 4,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "constitutional_provisions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'constitutional_provisions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "constitutional_analyses",
+      "schemaTable": "constitutional_analyses",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "constitutional_analyses",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'constitutional_analyses' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "legal_precedents",
+      "schemaTable": "legal_precedents",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "legal_precedents",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'legal_precedents' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expert_review_queue",
+      "schemaTable": "expert_review_queue",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expert_review_queue",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expert_review_queue' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "analysis_audit_trail",
+      "schemaTable": "analysis_audit_trail",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "analysis_audit_trail",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'analysis_audit_trail' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "constitutional_vulnerabilities",
+      "schemaTable": "constitutional_vulnerabilities",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "constitutional_vulnerabilities",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'constitutional_vulnerabilities' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "underutilized_provisions",
+      "schemaTable": "underutilized_provisions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "underutilized_provisions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'underutilized_provisions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "elite_literacy_assessment",
+      "schemaTable": "elite_literacy_assessment",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "elite_literacy_assessment",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'elite_literacy_assessment' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "constitutional_loopholes",
+      "schemaTable": "constitutional_loopholes",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "constitutional_loopholes",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'constitutional_loopholes' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "elite_knowledge_scores",
+      "schemaTable": "elite_knowledge_scores",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "elite_knowledge_scores",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'elite_knowledge_scores' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expertCredentials",
+      "schemaTable": "expertCredentials",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expertCredentials",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expertCredentials' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expertDomains",
+      "schemaTable": "expertDomains",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expertDomains",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expertDomains' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "credibilityScores",
+      "schemaTable": "credibilityScores",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "credibilityScores",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'credibilityScores' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expertReviews",
+      "schemaTable": "expertReviews",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expertReviews",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expertReviews' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "peerValidations",
+      "schemaTable": "peerValidations",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 4,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "peerValidations",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'peerValidations' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expertActivity",
+      "schemaTable": "expertActivity",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expertActivity",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expertActivity' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "users",
+      "schemaTable": "users",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "users",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'users' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_profiles",
+      "schemaTable": "user_profiles",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_profiles",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_profiles' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "sponsors",
+      "schemaTable": "sponsors",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "sponsors",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'sponsors' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "governors",
+      "schemaTable": "governors",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "governors",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'governors' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "committees",
+      "schemaTable": "committees",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "committees",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'committees' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "committee_members",
+      "schemaTable": "committee_members",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "committee_members",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'committee_members' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "parliamentary_sessions",
+      "schemaTable": "parliamentary_sessions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "parliamentary_sessions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'parliamentary_sessions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "parliamentary_sittings",
+      "schemaTable": "parliamentary_sittings",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "parliamentary_sittings",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'parliamentary_sittings' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bills",
+      "schemaTable": "bills",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bills",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bills' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "county_bill_assents",
+      "schemaTable": "county_bill_assents",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "county_bill_assents",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'county_bill_assents' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "oauth_providers",
+      "schemaTable": "oauth_providers",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "oauth_providers",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'oauth_providers' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_sessions",
+      "schemaTable": "user_sessions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_sessions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_sessions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "oauth_tokens",
+      "schemaTable": "oauth_tokens",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "oauth_tokens",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'oauth_tokens' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "graph_sync_status",
+      "schemaTable": "graph_sync_status",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "graph_sync_status",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'graph_sync_status' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "graph_sync_relationships",
+      "schemaTable": "graph_sync_relationships",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "graph_sync_relationships",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'graph_sync_relationships' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "graph_sync_batches",
+      "schemaTable": "graph_sync_batches",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "graph_sync_batches",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'graph_sync_batches' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "participation_cohorts",
+      "schemaTable": "participation_cohorts",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "participation_cohorts",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'participation_cohorts' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "legislative_outcomes",
+      "schemaTable": "legislative_outcomes",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "legislative_outcomes",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'legislative_outcomes' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_implementation",
+      "schemaTable": "bill_implementation",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_implementation",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_implementation' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "attribution_assessments",
+      "schemaTable": "attribution_assessments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "attribution_assessments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'attribution_assessments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "success_stories",
+      "schemaTable": "success_stories",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "success_stories",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'success_stories' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "equity_metrics",
+      "schemaTable": "equity_metrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "equity_metrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'equity_metrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "demographic_impact_analysis",
+      "schemaTable": "demographic_impact_analysis",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "demographic_impact_analysis",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'demographic_impact_analysis' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "platform_performance_indicators",
+      "schemaTable": "platform_performance_indicators",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "platform_performance_indicators",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'platform_performance_indicators' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "legislative_impact_indicators",
+      "schemaTable": "legislative_impact_indicators",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "legislative_impact_indicators",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'legislative_impact_indicators' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "civic_engagement_indicators",
+      "schemaTable": "civic_engagement_indicators",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "civic_engagement_indicators",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'civic_engagement_indicators' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "financial_sustainability_indicators",
+      "schemaTable": "financial_sustainability_indicators",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "financial_sustainability_indicators",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'financial_sustainability_indicators' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "content_reports",
+      "schemaTable": "content_reports",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "content_reports",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'content_reports' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "moderation_queue",
+      "schemaTable": "moderation_queue",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "moderation_queue",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'moderation_queue' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expert_profiles",
+      "schemaTable": "expert_profiles",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expert_profiles",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expert_profiles' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_verification",
+      "schemaTable": "user_verification",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_verification",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_verification' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_activity_log",
+      "schemaTable": "user_activity_log",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_activity_log",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_activity_log' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "audit_payloads",
+      "schemaTable": "audit_payloads",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "audit_payloads",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'audit_payloads' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "system_audit_log",
+      "schemaTable": "system_audit_log",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "system_audit_log",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'system_audit_log' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "security_events",
+      "schemaTable": "security_events",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "security_events",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'security_events' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "market_sectors",
+      "schemaTable": "market_sectors",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "market_sectors",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'market_sectors' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "economic_impact_assessments",
+      "schemaTable": "economic_impact_assessments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "economic_impact_assessments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'economic_impact_assessments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "market_stakeholders",
+      "schemaTable": "market_stakeholders",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "market_stakeholders",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'market_stakeholders' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "stakeholder_positions",
+      "schemaTable": "stakeholder_positions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "stakeholder_positions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'stakeholder_positions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "market_trends",
+      "schemaTable": "market_trends",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "market_trends",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'market_trends' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_committee_assignments",
+      "schemaTable": "bill_committee_assignments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_committee_assignments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_committee_assignments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_amendments",
+      "schemaTable": "bill_amendments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_amendments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_amendments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_versions",
+      "schemaTable": "bill_versions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_versions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_versions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_readings",
+      "schemaTable": "bill_readings",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_readings",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_readings' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "parliamentary_votes",
+      "schemaTable": "parliamentary_votes",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "parliamentary_votes",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'parliamentary_votes' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_cosponsors",
+      "schemaTable": "bill_cosponsors",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_cosponsors",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_cosponsors' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "public_participation_events",
+      "schemaTable": "public_participation_events",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "public_participation_events",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'public_participation_events' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "public_submissions",
+      "schemaTable": "public_submissions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "public_submissions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'public_submissions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "public_hearings",
+      "schemaTable": "public_hearings",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "public_hearings",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'public_hearings' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "participation_quality_audits",
+      "schemaTable": "participation_quality_audits",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "participation_quality_audits",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'participation_quality_audits' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "data_sources",
+      "schemaTable": "data_sources",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "data_sources",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'data_sources' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "sync_jobs",
+      "schemaTable": "sync_jobs",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "sync_jobs",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'sync_jobs' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "external_bill_references",
+      "schemaTable": "external_bill_references",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "external_bill_references",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'external_bill_references' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "analytics_events",
+      "schemaTable": "analytics_events",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "analytics_events",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'analytics_events' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_impact_metrics",
+      "schemaTable": "bill_impact_metrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_impact_metrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_impact_metrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "county_engagement_stats",
+      "schemaTable": "county_engagement_stats",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 8,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "county_engagement_stats",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'county_engagement_stats' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "trending_analysis",
+      "schemaTable": "trending_analysis",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "trending_analysis",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'trending_analysis' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_engagement_summary",
+      "schemaTable": "user_engagement_summary",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_engagement_summary",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_engagement_summary' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "platform_health_metrics",
+      "schemaTable": "platform_health_metrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 6,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "platform_health_metrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'platform_health_metrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "content_performance",
+      "schemaTable": "content_performance",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "content_performance",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'content_performance' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "political_appointments",
+      "schemaTable": "political_appointments",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "political_appointments",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'political_appointments' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "infrastructure_tenders",
+      "schemaTable": "infrastructure_tenders",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "infrastructure_tenders",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'infrastructure_tenders' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "ethnic_advantage_scores",
+      "schemaTable": "ethnic_advantage_scores",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "ethnic_advantage_scores",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'ethnic_advantage_scores' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "strategic_infrastructure_projects",
+      "schemaTable": "strategic_infrastructure_projects",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "strategic_infrastructure_projects",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'strategic_infrastructure_projects' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "engagementEvents",
+      "schemaTable": "engagementEvents",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "engagementEvents",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'engagementEvents' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "liveMetricsCache",
+      "schemaTable": "liveMetricsCache",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "liveMetricsCache",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'liveMetricsCache' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "civicAchievements",
+      "schemaTable": "civicAchievements",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "civicAchievements",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'civicAchievements' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "userAchievements",
+      "schemaTable": "userAchievements",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "userAchievements",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'userAchievements' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "civicScores",
+      "schemaTable": "civicScores",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "civicScores",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'civicScores' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "engagementLeaderboards",
+      "schemaTable": "engagementLeaderboards",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "engagementLeaderboards",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'engagementLeaderboards' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "realTimeNotifications",
+      "schemaTable": "realTimeNotifications",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "realTimeNotifications",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'realTimeNotifications' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "engagementAnalytics",
+      "schemaTable": "engagementAnalytics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "engagementAnalytics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'engagementAnalytics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "userEngagementSummary",
+      "schemaTable": "userEngagementSummary",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "userEngagementSummary",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'userEngagementSummary' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "rateLimits",
+      "schemaTable": "rateLimits",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "rateLimits",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'rateLimits' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "rateLimitConfig",
+      "schemaTable": "rateLimitConfig",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 8,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "rateLimitConfig",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'rateLimitConfig' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "contentFlags",
+      "schemaTable": "contentFlags",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "contentFlags",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'contentFlags' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "moderationQueue",
+      "schemaTable": "moderationQueue",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "moderationQueue",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'moderationQueue' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "moderationDecisions",
+      "schemaTable": "moderationDecisions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "moderationDecisions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'moderationDecisions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "moderationAppeals",
+      "schemaTable": "moderationAppeals",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "moderationAppeals",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'moderationAppeals' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "expertModeratorEligibility",
+      "schemaTable": "expertModeratorEligibility",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "expertModeratorEligibility",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'expertModeratorEligibility' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "cibDetections",
+      "schemaTable": "cibDetections",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "cibDetections",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'cibDetections' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "behavioralAnomalies",
+      "schemaTable": "behavioralAnomalies",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "behavioralAnomalies",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'behavioralAnomalies' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "suspiciousActivityLogs",
+      "schemaTable": "suspiciousActivityLogs",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "suspiciousActivityLogs",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'suspiciousActivityLogs' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "reputationScores",
+      "schemaTable": "reputationScores",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "reputationScores",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'reputationScores' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "reputationHistory",
+      "schemaTable": "reputationHistory",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "reputationHistory",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'reputationHistory' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "identityVerification",
+      "schemaTable": "identityVerification",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "identityVerification",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'identityVerification' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "deviceFingerprints",
+      "schemaTable": "deviceFingerprints",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "deviceFingerprints",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'deviceFingerprints' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "safeguardConfigAudit",
+      "schemaTable": "safeguardConfigAudit",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "safeguardConfigAudit",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'safeguardConfigAudit' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "emergencySafeguardMode",
+      "schemaTable": "emergencySafeguardMode",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "emergencySafeguardMode",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'emergencySafeguardMode' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "rateLimitWhitelist",
+      "schemaTable": "rateLimitWhitelist",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "rateLimitWhitelist",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'rateLimitWhitelist' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "rateLimitBlacklist",
+      "schemaTable": "rateLimitBlacklist",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "rateLimitBlacklist",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'rateLimitBlacklist' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "moderationPriorityRules",
+      "schemaTable": "moderationPriorityRules",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "moderationPriorityRules",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'moderationPriorityRules' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "appealReviewBoard",
+      "schemaTable": "appealReviewBoard",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "appealReviewBoard",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'appealReviewBoard' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "safeguardMetrics",
+      "schemaTable": "safeguardMetrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "safeguardMetrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'safeguardMetrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "contentEmbeddings",
+      "schemaTable": "contentEmbeddings",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "contentEmbeddings",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'contentEmbeddings' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "corporate_entities",
+      "schemaTable": "corporate_entities",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "corporate_entities",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'corporate_entities' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "financial_interests",
+      "schemaTable": "financial_interests",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "financial_interests",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'financial_interests' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "lobbying_activities",
+      "schemaTable": "lobbying_activities",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "lobbying_activities",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'lobbying_activities' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "bill_financial_conflicts",
+      "schemaTable": "bill_financial_conflicts",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "bill_financial_conflicts",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'bill_financial_conflicts' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "cross_sector_ownership",
+      "schemaTable": "cross_sector_ownership",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "cross_sector_ownership",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'cross_sector_ownership' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "regulatory_capture_indicators",
+      "schemaTable": "regulatory_capture_indicators",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "regulatory_capture_indicators",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'regulatory_capture_indicators' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "financialDisclosures",
+      "schemaTable": "financialDisclosures",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 4,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "financialDisclosures",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'financialDisclosures' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "financialInterests",
+      "schemaTable": "financialInterests",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "financialInterests",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'financialInterests' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "conflictDetections",
+      "schemaTable": "conflictDetections",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 4,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "conflictDetections",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'conflictDetections' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "influenceNetworks",
+      "schemaTable": "influenceNetworks",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "influenceNetworks",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'influenceNetworks' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "implementationWorkarounds",
+      "schemaTable": "implementationWorkarounds",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "implementationWorkarounds",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'implementationWorkarounds' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "hidden_provisions",
+      "schemaTable": "hidden_provisions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "hidden_provisions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'hidden_provisions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "trojan_techniques",
+      "schemaTable": "trojan_techniques",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "trojan_techniques",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'trojan_techniques' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "detection_signals",
+      "schemaTable": "detection_signals",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "detection_signals",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'detection_signals' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "ambassadors",
+      "schemaTable": "ambassadors",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "ambassadors",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'ambassadors' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "communities",
+      "schemaTable": "communities",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "communities",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'communities' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "facilitation_sessions",
+      "schemaTable": "facilitation_sessions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "facilitation_sessions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'facilitation_sessions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "offline_submissions",
+      "schemaTable": "offline_submissions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "offline_submissions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'offline_submissions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "ussd_sessions",
+      "schemaTable": "ussd_sessions",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "ussd_sessions",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'ussd_sessions' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "localized_content",
+      "schemaTable": "localized_content",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 1,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "localized_content",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'localized_content' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "assistive_technology_compatibility",
+      "schemaTable": "assistive_technology_compatibility",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "assistive_technology_compatibility",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'assistive_technology_compatibility' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "accessibility_features",
+      "schemaTable": "accessibility_features",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "accessibility_features",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'accessibility_features' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "accessibility_audits",
+      "schemaTable": "accessibility_audits",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "accessibility_audits",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'accessibility_audits' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "accessibility_feedback",
+      "schemaTable": "accessibility_feedback",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "accessibility_feedback",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'accessibility_feedback' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "inclusive_design_metrics",
+      "schemaTable": "inclusive_design_metrics",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "inclusive_design_metrics",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'inclusive_design_metrics' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "user_accessibility_preferences",
+      "schemaTable": "user_accessibility_preferences",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 9,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "user_accessibility_preferences",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'user_accessibility_preferences' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "alternative_formats",
+      "schemaTable": "alternative_formats",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 2,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "alternative_formats",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'alternative_formats' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "offline_content_cache",
+      "schemaTable": "offline_content_cache",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "offline_content_cache",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'offline_content_cache' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "offline_sync_queue",
+      "schemaTable": "offline_sync_queue",
+      "typeDefinition": null,
+      "aligned": false,
+      "fieldCount": {
+        "schema": 3,
+        "type": 0,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "offline_sync_queue",
+          "field": "N/A",
+          "issue": "No corresponding type definition found",
+          "severity": "error",
+          "recommendation": "Create a type definition for table 'offline_sync_queue' in shared/types/database/"
+        }
+      ]
+    },
+    {
+      "entityName": "UserTable",
+      "schemaTable": null,
+      "typeDefinition": "UserTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 14,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "UserTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'UserTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "UserProfileTable",
+      "schemaTable": null,
+      "typeDefinition": "UserProfileTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 10,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "UserProfileTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'UserProfileTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "UserPreferencesTable",
+      "schemaTable": null,
+      "typeDefinition": "UserPreferencesTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 8,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "UserPreferencesTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'UserPreferencesTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "BillTable",
+      "schemaTable": null,
+      "typeDefinition": "BillTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 23,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "BillTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'BillTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "BillEngagementMetricsTable",
+      "schemaTable": null,
+      "typeDefinition": "BillEngagementMetricsTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 9,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "BillEngagementMetricsTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'BillEngagementMetricsTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "BillTimelineEventTable",
+      "schemaTable": null,
+      "typeDefinition": "BillTimelineEventTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 9,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "BillTimelineEventTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'BillTimelineEventTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "CommentTable",
+      "schemaTable": null,
+      "typeDefinition": "CommentTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 15,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "CommentTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'CommentTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "CommitteeTable",
+      "schemaTable": null,
+      "typeDefinition": "CommitteeTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 8,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "CommitteeTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'CommitteeTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "BillCommitteeAssignmentTable",
+      "schemaTable": null,
+      "typeDefinition": "BillCommitteeAssignmentTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 9,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "BillCommitteeAssignmentTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'BillCommitteeAssignmentTable' or remove the unused type definition"
+        }
+      ]
+    },
+    {
+      "entityName": "SponsorTable",
+      "schemaTable": null,
+      "typeDefinition": "SponsorTable",
+      "aligned": false,
+      "fieldCount": {
+        "schema": 0,
+        "type": 12,
+        "matched": 0
+      },
+      "issues": [
+        {
+          "entity": "SponsorTable",
+          "field": "N/A",
+          "issue": "Type definition has no corresponding schema",
+          "severity": "warning",
+          "recommendation": "Either create a schema table for 'SponsorTable' or remove the unused type definition"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "entity": "public_promises",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'public_promises' in shared/types/database/"
+    },
+    {
+      "entity": "shadow_ledger_entries",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'shadow_ledger_entries' in shared/types/database/"
+    },
+    {
+      "entity": "promise_accountability_tracking",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'promise_accountability_tracking' in shared/types/database/"
+    },
+    {
+      "entity": "searchQueries",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'searchQueries' in shared/types/database/"
+    },
+    {
+      "entity": "discoveryPatterns",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'discoveryPatterns' in shared/types/database/"
+    },
+    {
+      "entity": "billRelationships",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'billRelationships' in shared/types/database/"
+    },
+    {
+      "entity": "searchAnalytics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'searchAnalytics' in shared/types/database/"
+    },
+    {
+      "entity": "trendingTopics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'trendingTopics' in shared/types/database/"
+    },
+    {
+      "entity": "userRecommendations",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'userRecommendations' in shared/types/database/"
+    },
+    {
+      "entity": "campaigns",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'campaigns' in shared/types/database/"
+    },
+    {
+      "entity": "action_items",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'action_items' in shared/types/database/"
+    },
+    {
+      "entity": "campaign_participants",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'campaign_participants' in shared/types/database/"
+    },
+    {
+      "entity": "action_completions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'action_completions' in shared/types/database/"
+    },
+    {
+      "entity": "campaign_impact_metrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'campaign_impact_metrics' in shared/types/database/"
+    },
+    {
+      "entity": "coalition_relationships",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'coalition_relationships' in shared/types/database/"
+    },
+    {
+      "entity": "analysis",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'analysis' in shared/types/database/"
+    },
+    {
+      "entity": "argumentTable",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'argumentTable' in shared/types/database/"
+    },
+    {
+      "entity": "claims",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'claims' in shared/types/database/"
+    },
+    {
+      "entity": "evidence",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'evidence' in shared/types/database/"
+    },
+    {
+      "entity": "argument_relationships",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'argument_relationships' in shared/types/database/"
+    },
+    {
+      "entity": "legislative_briefs",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'legislative_briefs' in shared/types/database/"
+    },
+    {
+      "entity": "synthesis_jobs",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'synthesis_jobs' in shared/types/database/"
+    },
+    {
+      "entity": "user_interests",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_interests' in shared/types/database/"
+    },
+    {
+      "entity": "sessions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'sessions' in shared/types/database/"
+    },
+    {
+      "entity": "comments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'comments' in shared/types/database/"
+    },
+    {
+      "entity": "comment_votes",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'comment_votes' in shared/types/database/"
+    },
+    {
+      "entity": "bill_votes",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_votes' in shared/types/database/"
+    },
+    {
+      "entity": "bill_engagement",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_engagement' in shared/types/database/"
+    },
+    {
+      "entity": "bill_tracking_preferences",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_tracking_preferences' in shared/types/database/"
+    },
+    {
+      "entity": "notifications",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'notifications' in shared/types/database/"
+    },
+    {
+      "entity": "alert_preferences",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'alert_preferences' in shared/types/database/"
+    },
+    {
+      "entity": "user_contact_methods",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_contact_methods' in shared/types/database/"
+    },
+    {
+      "entity": "constitutional_provisions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'constitutional_provisions' in shared/types/database/"
+    },
+    {
+      "entity": "constitutional_analyses",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'constitutional_analyses' in shared/types/database/"
+    },
+    {
+      "entity": "legal_precedents",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'legal_precedents' in shared/types/database/"
+    },
+    {
+      "entity": "expert_review_queue",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expert_review_queue' in shared/types/database/"
+    },
+    {
+      "entity": "analysis_audit_trail",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'analysis_audit_trail' in shared/types/database/"
+    },
+    {
+      "entity": "constitutional_vulnerabilities",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'constitutional_vulnerabilities' in shared/types/database/"
+    },
+    {
+      "entity": "underutilized_provisions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'underutilized_provisions' in shared/types/database/"
+    },
+    {
+      "entity": "elite_literacy_assessment",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'elite_literacy_assessment' in shared/types/database/"
+    },
+    {
+      "entity": "constitutional_loopholes",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'constitutional_loopholes' in shared/types/database/"
+    },
+    {
+      "entity": "elite_knowledge_scores",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'elite_knowledge_scores' in shared/types/database/"
+    },
+    {
+      "entity": "expertCredentials",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expertCredentials' in shared/types/database/"
+    },
+    {
+      "entity": "expertDomains",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expertDomains' in shared/types/database/"
+    },
+    {
+      "entity": "credibilityScores",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'credibilityScores' in shared/types/database/"
+    },
+    {
+      "entity": "expertReviews",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expertReviews' in shared/types/database/"
+    },
+    {
+      "entity": "peerValidations",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'peerValidations' in shared/types/database/"
+    },
+    {
+      "entity": "expertActivity",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expertActivity' in shared/types/database/"
+    },
+    {
+      "entity": "users",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'users' in shared/types/database/"
+    },
+    {
+      "entity": "user_profiles",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_profiles' in shared/types/database/"
+    },
+    {
+      "entity": "sponsors",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'sponsors' in shared/types/database/"
+    },
+    {
+      "entity": "governors",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'governors' in shared/types/database/"
+    },
+    {
+      "entity": "committees",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'committees' in shared/types/database/"
+    },
+    {
+      "entity": "committee_members",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'committee_members' in shared/types/database/"
+    },
+    {
+      "entity": "parliamentary_sessions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'parliamentary_sessions' in shared/types/database/"
+    },
+    {
+      "entity": "parliamentary_sittings",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'parliamentary_sittings' in shared/types/database/"
+    },
+    {
+      "entity": "bills",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bills' in shared/types/database/"
+    },
+    {
+      "entity": "county_bill_assents",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'county_bill_assents' in shared/types/database/"
+    },
+    {
+      "entity": "oauth_providers",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'oauth_providers' in shared/types/database/"
+    },
+    {
+      "entity": "user_sessions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_sessions' in shared/types/database/"
+    },
+    {
+      "entity": "oauth_tokens",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'oauth_tokens' in shared/types/database/"
+    },
+    {
+      "entity": "graph_sync_status",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'graph_sync_status' in shared/types/database/"
+    },
+    {
+      "entity": "graph_sync_relationships",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'graph_sync_relationships' in shared/types/database/"
+    },
+    {
+      "entity": "graph_sync_batches",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'graph_sync_batches' in shared/types/database/"
+    },
+    {
+      "entity": "participation_cohorts",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'participation_cohorts' in shared/types/database/"
+    },
+    {
+      "entity": "legislative_outcomes",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'legislative_outcomes' in shared/types/database/"
+    },
+    {
+      "entity": "bill_implementation",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_implementation' in shared/types/database/"
+    },
+    {
+      "entity": "attribution_assessments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'attribution_assessments' in shared/types/database/"
+    },
+    {
+      "entity": "success_stories",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'success_stories' in shared/types/database/"
+    },
+    {
+      "entity": "equity_metrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'equity_metrics' in shared/types/database/"
+    },
+    {
+      "entity": "demographic_impact_analysis",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'demographic_impact_analysis' in shared/types/database/"
+    },
+    {
+      "entity": "platform_performance_indicators",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'platform_performance_indicators' in shared/types/database/"
+    },
+    {
+      "entity": "legislative_impact_indicators",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'legislative_impact_indicators' in shared/types/database/"
+    },
+    {
+      "entity": "civic_engagement_indicators",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'civic_engagement_indicators' in shared/types/database/"
+    },
+    {
+      "entity": "financial_sustainability_indicators",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'financial_sustainability_indicators' in shared/types/database/"
+    },
+    {
+      "entity": "content_reports",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'content_reports' in shared/types/database/"
+    },
+    {
+      "entity": "moderation_queue",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'moderation_queue' in shared/types/database/"
+    },
+    {
+      "entity": "expert_profiles",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expert_profiles' in shared/types/database/"
+    },
+    {
+      "entity": "user_verification",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_verification' in shared/types/database/"
+    },
+    {
+      "entity": "user_activity_log",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_activity_log' in shared/types/database/"
+    },
+    {
+      "entity": "audit_payloads",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'audit_payloads' in shared/types/database/"
+    },
+    {
+      "entity": "system_audit_log",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'system_audit_log' in shared/types/database/"
+    },
+    {
+      "entity": "security_events",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'security_events' in shared/types/database/"
+    },
+    {
+      "entity": "market_sectors",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'market_sectors' in shared/types/database/"
+    },
+    {
+      "entity": "economic_impact_assessments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'economic_impact_assessments' in shared/types/database/"
+    },
+    {
+      "entity": "market_stakeholders",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'market_stakeholders' in shared/types/database/"
+    },
+    {
+      "entity": "stakeholder_positions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'stakeholder_positions' in shared/types/database/"
+    },
+    {
+      "entity": "market_trends",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'market_trends' in shared/types/database/"
+    },
+    {
+      "entity": "bill_committee_assignments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_committee_assignments' in shared/types/database/"
+    },
+    {
+      "entity": "bill_amendments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_amendments' in shared/types/database/"
+    },
+    {
+      "entity": "bill_versions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_versions' in shared/types/database/"
+    },
+    {
+      "entity": "bill_readings",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_readings' in shared/types/database/"
+    },
+    {
+      "entity": "parliamentary_votes",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'parliamentary_votes' in shared/types/database/"
+    },
+    {
+      "entity": "bill_cosponsors",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_cosponsors' in shared/types/database/"
+    },
+    {
+      "entity": "public_participation_events",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'public_participation_events' in shared/types/database/"
+    },
+    {
+      "entity": "public_submissions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'public_submissions' in shared/types/database/"
+    },
+    {
+      "entity": "public_hearings",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'public_hearings' in shared/types/database/"
+    },
+    {
+      "entity": "participation_quality_audits",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'participation_quality_audits' in shared/types/database/"
+    },
+    {
+      "entity": "data_sources",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'data_sources' in shared/types/database/"
+    },
+    {
+      "entity": "sync_jobs",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'sync_jobs' in shared/types/database/"
+    },
+    {
+      "entity": "external_bill_references",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'external_bill_references' in shared/types/database/"
+    },
+    {
+      "entity": "analytics_events",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'analytics_events' in shared/types/database/"
+    },
+    {
+      "entity": "bill_impact_metrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_impact_metrics' in shared/types/database/"
+    },
+    {
+      "entity": "county_engagement_stats",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'county_engagement_stats' in shared/types/database/"
+    },
+    {
+      "entity": "trending_analysis",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'trending_analysis' in shared/types/database/"
+    },
+    {
+      "entity": "user_engagement_summary",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_engagement_summary' in shared/types/database/"
+    },
+    {
+      "entity": "platform_health_metrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'platform_health_metrics' in shared/types/database/"
+    },
+    {
+      "entity": "content_performance",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'content_performance' in shared/types/database/"
+    },
+    {
+      "entity": "political_appointments",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'political_appointments' in shared/types/database/"
+    },
+    {
+      "entity": "infrastructure_tenders",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'infrastructure_tenders' in shared/types/database/"
+    },
+    {
+      "entity": "ethnic_advantage_scores",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'ethnic_advantage_scores' in shared/types/database/"
+    },
+    {
+      "entity": "strategic_infrastructure_projects",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'strategic_infrastructure_projects' in shared/types/database/"
+    },
+    {
+      "entity": "engagementEvents",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'engagementEvents' in shared/types/database/"
+    },
+    {
+      "entity": "liveMetricsCache",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'liveMetricsCache' in shared/types/database/"
+    },
+    {
+      "entity": "civicAchievements",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'civicAchievements' in shared/types/database/"
+    },
+    {
+      "entity": "userAchievements",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'userAchievements' in shared/types/database/"
+    },
+    {
+      "entity": "civicScores",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'civicScores' in shared/types/database/"
+    },
+    {
+      "entity": "engagementLeaderboards",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'engagementLeaderboards' in shared/types/database/"
+    },
+    {
+      "entity": "realTimeNotifications",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'realTimeNotifications' in shared/types/database/"
+    },
+    {
+      "entity": "engagementAnalytics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'engagementAnalytics' in shared/types/database/"
+    },
+    {
+      "entity": "userEngagementSummary",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'userEngagementSummary' in shared/types/database/"
+    },
+    {
+      "entity": "rateLimits",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'rateLimits' in shared/types/database/"
+    },
+    {
+      "entity": "rateLimitConfig",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'rateLimitConfig' in shared/types/database/"
+    },
+    {
+      "entity": "contentFlags",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'contentFlags' in shared/types/database/"
+    },
+    {
+      "entity": "moderationQueue",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'moderationQueue' in shared/types/database/"
+    },
+    {
+      "entity": "moderationDecisions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'moderationDecisions' in shared/types/database/"
+    },
+    {
+      "entity": "moderationAppeals",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'moderationAppeals' in shared/types/database/"
+    },
+    {
+      "entity": "expertModeratorEligibility",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'expertModeratorEligibility' in shared/types/database/"
+    },
+    {
+      "entity": "cibDetections",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'cibDetections' in shared/types/database/"
+    },
+    {
+      "entity": "behavioralAnomalies",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'behavioralAnomalies' in shared/types/database/"
+    },
+    {
+      "entity": "suspiciousActivityLogs",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'suspiciousActivityLogs' in shared/types/database/"
+    },
+    {
+      "entity": "reputationScores",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'reputationScores' in shared/types/database/"
+    },
+    {
+      "entity": "reputationHistory",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'reputationHistory' in shared/types/database/"
+    },
+    {
+      "entity": "identityVerification",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'identityVerification' in shared/types/database/"
+    },
+    {
+      "entity": "deviceFingerprints",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'deviceFingerprints' in shared/types/database/"
+    },
+    {
+      "entity": "safeguardConfigAudit",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'safeguardConfigAudit' in shared/types/database/"
+    },
+    {
+      "entity": "emergencySafeguardMode",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'emergencySafeguardMode' in shared/types/database/"
+    },
+    {
+      "entity": "rateLimitWhitelist",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'rateLimitWhitelist' in shared/types/database/"
+    },
+    {
+      "entity": "rateLimitBlacklist",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'rateLimitBlacklist' in shared/types/database/"
+    },
+    {
+      "entity": "moderationPriorityRules",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'moderationPriorityRules' in shared/types/database/"
+    },
+    {
+      "entity": "appealReviewBoard",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'appealReviewBoard' in shared/types/database/"
+    },
+    {
+      "entity": "safeguardMetrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'safeguardMetrics' in shared/types/database/"
+    },
+    {
+      "entity": "contentEmbeddings",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'contentEmbeddings' in shared/types/database/"
+    },
+    {
+      "entity": "corporate_entities",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'corporate_entities' in shared/types/database/"
+    },
+    {
+      "entity": "financial_interests",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'financial_interests' in shared/types/database/"
+    },
+    {
+      "entity": "lobbying_activities",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'lobbying_activities' in shared/types/database/"
+    },
+    {
+      "entity": "bill_financial_conflicts",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'bill_financial_conflicts' in shared/types/database/"
+    },
+    {
+      "entity": "cross_sector_ownership",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'cross_sector_ownership' in shared/types/database/"
+    },
+    {
+      "entity": "regulatory_capture_indicators",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'regulatory_capture_indicators' in shared/types/database/"
+    },
+    {
+      "entity": "financialDisclosures",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'financialDisclosures' in shared/types/database/"
+    },
+    {
+      "entity": "financialInterests",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'financialInterests' in shared/types/database/"
+    },
+    {
+      "entity": "conflictDetections",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'conflictDetections' in shared/types/database/"
+    },
+    {
+      "entity": "influenceNetworks",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'influenceNetworks' in shared/types/database/"
+    },
+    {
+      "entity": "implementationWorkarounds",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'implementationWorkarounds' in shared/types/database/"
+    },
+    {
+      "entity": "hidden_provisions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'hidden_provisions' in shared/types/database/"
+    },
+    {
+      "entity": "trojan_techniques",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'trojan_techniques' in shared/types/database/"
+    },
+    {
+      "entity": "detection_signals",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'detection_signals' in shared/types/database/"
+    },
+    {
+      "entity": "ambassadors",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'ambassadors' in shared/types/database/"
+    },
+    {
+      "entity": "communities",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'communities' in shared/types/database/"
+    },
+    {
+      "entity": "facilitation_sessions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'facilitation_sessions' in shared/types/database/"
+    },
+    {
+      "entity": "offline_submissions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'offline_submissions' in shared/types/database/"
+    },
+    {
+      "entity": "ussd_sessions",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'ussd_sessions' in shared/types/database/"
+    },
+    {
+      "entity": "localized_content",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'localized_content' in shared/types/database/"
+    },
+    {
+      "entity": "assistive_technology_compatibility",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'assistive_technology_compatibility' in shared/types/database/"
+    },
+    {
+      "entity": "accessibility_features",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'accessibility_features' in shared/types/database/"
+    },
+    {
+      "entity": "accessibility_audits",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'accessibility_audits' in shared/types/database/"
+    },
+    {
+      "entity": "accessibility_feedback",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'accessibility_feedback' in shared/types/database/"
+    },
+    {
+      "entity": "inclusive_design_metrics",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'inclusive_design_metrics' in shared/types/database/"
+    },
+    {
+      "entity": "user_accessibility_preferences",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'user_accessibility_preferences' in shared/types/database/"
+    },
+    {
+      "entity": "alternative_formats",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'alternative_formats' in shared/types/database/"
+    },
+    {
+      "entity": "offline_content_cache",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'offline_content_cache' in shared/types/database/"
+    },
+    {
+      "entity": "offline_sync_queue",
+      "field": "N/A",
+      "issue": "No corresponding type definition found",
+      "severity": "error",
+      "recommendation": "Create a type definition for table 'offline_sync_queue' in shared/types/database/"
+    },
+    {
+      "entity": "UserTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'UserTable' or remove the unused type definition"
+    },
+    {
+      "entity": "UserProfileTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'UserProfileTable' or remove the unused type definition"
+    },
+    {
+      "entity": "UserPreferencesTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'UserPreferencesTable' or remove the unused type definition"
+    },
+    {
+      "entity": "BillTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'BillTable' or remove the unused type definition"
+    },
+    {
+      "entity": "BillEngagementMetricsTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'BillEngagementMetricsTable' or remove the unused type definition"
+    },
+    {
+      "entity": "BillTimelineEventTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'BillTimelineEventTable' or remove the unused type definition"
+    },
+    {
+      "entity": "CommentTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'CommentTable' or remove the unused type definition"
+    },
+    {
+      "entity": "CommitteeTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'CommitteeTable' or remove the unused type definition"
+    },
+    {
+      "entity": "BillCommitteeAssignmentTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'BillCommitteeAssignmentTable' or remove the unused type definition"
+    },
+    {
+      "entity": "SponsorTable",
+      "field": "N/A",
+      "issue": "Type definition has no corresponding schema",
+      "severity": "warning",
+      "recommendation": "Either create a schema table for 'SponsorTable' or remove the unused type definition"
+    }
+  ],
+  "summary": {
+    "errors": 172,
+    "warnings": 10,
+    "info": 0
+  },
+  "recommendations": [
+    "Generate type definitions for 172 tables without types",
+    "Review 10 type definitions without corresponding schemas",
+    "Fix 172 critical alignment errors before proceeding"
+  ]
+}

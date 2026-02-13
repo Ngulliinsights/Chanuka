@@ -1,4 +1,5 @@
 import { config } from '@server/config/index';
+import { correlationIdMiddleware } from '@server/middleware/error-management';
 import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
 import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
 import { performanceMonitor } from '@server/utils/missing-modules-fallback';
@@ -150,6 +151,9 @@ export function configureAppMiddleware(app: Express): void {
       }
     }
   }));
+
+  // Correlation ID middleware (must be early in the chain)
+  app.use(correlationIdMiddleware);
 
   // Request monitoring and logging pipeline
   app.use(requestLogger);

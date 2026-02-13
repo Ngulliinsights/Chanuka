@@ -7,6 +7,12 @@ import helmet from 'helmet';
 // 3. Core Logic wrappers
 import { boomErrorMiddleware } from './boom-error-middleware';
 import { requestLogger } from './logging-middleware'; // We will create this
+
+// API Contract Validation
+export * from './api-contract-validation';
+
+// Validation Middleware
+export * from './validation-middleware';
 // 2. Security & Intelligence// From previous step (Helmet/Firewall)
 import { privacyMiddleware } from './privacy-middleware';
 import { standardRateLimits } from './rate-limiter';

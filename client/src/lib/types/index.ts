@@ -79,8 +79,8 @@ export type {
 } from '@shared/types/domains/legislative';
 
 // Export enums as values (not types)
-export { BillStatus, UrgencyLevel } from '@shared/types/enums';
-export type { BillStatusValue, UrgencyLevelValue } from '@shared/types/enums';
+export { BillStatus, UrgencyLevel } from '@shared/types';
+export type { BillStatusValue, UrgencyLevelValue } from '@shared/types';
 
 // Bill extended types from local bill module (client-specific extensions)
 export type {

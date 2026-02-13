@@ -69,11 +69,6 @@ export enum UserGroup {
 }
 
 /**
- * Type-safe feature flag keys
- */
-export type FeatureFlagKey = keyof typeof FEATURE_FLAGS;
-
-/**
  * Type-safe rollout config keys
  */
 export type RolloutConfigKey = keyof typeof ROLLOUT_CONFIG;

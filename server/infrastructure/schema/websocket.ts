@@ -8,20 +8,14 @@
  * @version 2.0.0
  */
 
+import { ConnectionState } from '@shared/types/api/websocket/messages';
+
+// Re-export for convenience
+export { ConnectionState };
+
 // ============================================================================
 // Core Enums
 // ============================================================================
-
-/**
- * WebSocket connection lifecycle states
- */
-export enum ConnectionState {
-  DISCONNECTED = 'disconnected',
-  CONNECTING = 'connecting',
-  CONNECTED = 'connected',
-  RECONNECTING = 'reconnecting',
-  FAILED = 'failed'
-}
 
 /**
  * Standard WebSocket close codes (RFC 6455)

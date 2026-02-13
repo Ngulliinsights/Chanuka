@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { BillStatus } from '@shared/types/enums';
+import { BillStatus } from '@shared/types';
 
 // ... (existing imports)
 

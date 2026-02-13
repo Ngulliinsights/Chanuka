@@ -6,9 +6,9 @@
  *
  * This module consolidates data-related utilities from various sources
  * into a unified, framework-agnostic interface.
+ *
+ * CLIENT-SAFE: This module is safe for use in both client and server contexts.
  */
-
-import { logger } from '../observability/logging';
 
 // ==================== Type Definitions ====================
 
@@ -53,9 +53,12 @@ export function validateData<T>(
   try {
     return validator(data);
   } catch (error) {
-    logger.warn('Data validation failed', {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    // Client-safe logging
+    if (typeof console !== 'undefined') {
+      console.warn('Data validation failed', {
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
     return {
       isValid: false,
       errors: [error instanceof Error ? error.message : 'Validation failed']

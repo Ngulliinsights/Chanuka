@@ -11,14 +11,11 @@ if (!process.env.DATABASE_URL) {
 export default defineConfig({
   out: "./drizzle",
   schema: [
-    "./shared/schema/trojan_bill_detection.ts",
-    "./shared/schema/political_economy.ts",
-    "./shared/schema/market_intelligence.ts",
-    "./shared/schema/accountability_ledger.ts",
-    "./shared/schema/citizen_participation.ts",
-    "./shared/schema/participation_oversight.ts",
-    "./shared/schema/constitutional_intelligence.ts",
-    "./shared/schema/enum.ts"
+    "./server/infrastructure/schema/foundation.ts",
+    "./server/infrastructure/schema/citizen_participation.ts",
+    "./server/infrastructure/schema/parliamentary_process.ts",
+    "./server/infrastructure/schema/safeguards.ts",
+    "./server/infrastructure/schema/enum.ts"
   ],
   dialect: "postgresql",
   dbCredentials: {
@@ -34,6 +31,12 @@ export default defineConfig({
     table: '__drizzle_migrations__',
     schema: 'public',
   },
+  // Type generation configuration
+  introspect: {
+    casing: 'preserve', // Preserve snake_case from database
+  },
+  // Enable type generation output
+  // Types will be generated in shared/types/database via our custom script
 });
 
 

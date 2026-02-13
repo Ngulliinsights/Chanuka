@@ -9,7 +9,7 @@
  * - Security monitoring (events, suspicious activity)
  */
 
-import { authService } from '@server/infrastructure/core/auth/auth-service";
+import { authService } from '@server/infrastructure/core/auth/auth-service';
 import { errorTracker } from '@server/errors/error-tracker.js';
 import { securityAuditService } from '@server/features/security/security-audit-service';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter';

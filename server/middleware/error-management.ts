@@ -1,27 +1,47 @@
 /**
  * Unified Error Middleware
  *
- * Integrates @shared/core error management with server-specific configuration.
- * This replaces the boom-error-middleware with a more comprehensive system.
+ * Integrates StandardError format with server-specific configuration.
+ * Transforms all errors to StandardError format with correlation IDs.
  */
 
-// eslint-disable-next-line import/order
-import { ERROR_CODES } from '@shared/constants';
+import { ERROR_STATUS_CODES } from '@shared/constants';
 import { logger } from '@shared/core';
+import {
+  ErrorClassification,
+  getHttpStatusFromClassification,
+  isStandardError,
+  type StandardError,
+} from '@shared/types';
+import {
+  generateCorrelationId,
+  getCurrentCorrelationId,
+  setCurrentCorrelationId,
+  toStandardError,
+} from '@shared/utils/errors';
 import { NextFunction, Request, Response } from 'express';
-import { ZodError } from 'zod';
 
-class BaseError extends Error {
-  constructor(
-    message: string,
-    public details: any = {}
-  ) {
-    super(message);
-    this.name = 'BaseError';
-  }
-  statusCode = 500;
-  code = ERROR_CODES.INTERNAL_SERVER_ERROR;
-  override stack?: string;
+/**
+ * Middleware to set correlation ID for each request
+ * Should be added early in the middleware chain
+ */
+export function correlationIdMiddleware(req: Request, res: Response, next: NextFunction) {
+  // Get correlation ID from header or generate new one
+  const correlationId =
+    (req.headers['x-correlation-id'] as string) ||
+    (req.headers['x-request-id'] as string) ||
+    generateCorrelationId();
+
+  // Set correlation ID in context
+  setCurrentCorrelationId(correlationId);
+
+  // Add correlation ID to response headers
+  res.setHeader('X-Correlation-ID', correlationId);
+
+  // Store on request for easy access
+  (req as any).correlationId = correlationId;
+
+  next();
 }
 
 function createErrorContext(req: Request) {
@@ -29,12 +49,12 @@ function createErrorContext(req: Request) {
     method: req.method,
     url: req.url,
     ip: req.ip,
-    correlationId: req.headers['x-correlation-id'] || '',
+    correlationId: getCurrentCorrelationId() || (req as any).correlationId || '',
   };
 }
 
 /**
- * Create unified error middleware combining @shared/core with server configuration
+ * Create unified error middleware combining StandardError with server configuration
  */
 export function createUnifiedErrorMiddleware() {
   /**
@@ -49,106 +69,46 @@ export function createUnifiedErrorMiddleware() {
     try {
       const context = createErrorContext(req);
 
-      // Convert common error types to BaseError
-      let baseError: BaseError;
+      // Transform error to StandardError format
+      const standardError: StandardError = toStandardError(error);
 
-      if (error instanceof BaseError) {
-        baseError = error;
-      } else if (error instanceof ZodError) {
-        // Handle Zod validation errors
-        const fields = error.errors.reduce(
-          (acc, err) => {
-            const path = err.path.join('.');
-            if (!acc[path]) acc[path] = [];
-            acc[path].push(err.message);
-            return acc;
-          },
-          {} as Record<string, string[]>
-        );
+      // Get HTTP status code
+      const statusCode = ERROR_STATUS_CODES[standardError.code] || 
+                        getHttpStatusFromClassification(standardError.classification);
 
-        baseError = new BaseError('Validation failed', {
-          statusCode: 400,
-          code: ERROR_CODES.VALIDATION_ERROR,
-          domain: 'VALIDATION' as any,
-          severity: 'LOW' as any,
-          details: fields,
-          context,
-          correlationId: context.correlationId,
-        });
-      } else if (error.name === 'ValidationError') {
-        baseError = new BaseError(error.message || 'Validation failed', {
-          statusCode: 400,
-          code: ERROR_CODES.VALIDATION_ERROR,
-          domain: 'VALIDATION' as any,
-          severity: 'LOW' as any,
-          cause: error,
-          context,
-          correlationId: context.correlationId,
-        });
-      } else if (error.status === 401 || error.code === 'UNAUTHORIZED') {
-        baseError = new BaseError('Authentication required', {
-          statusCode: 401,
-          code: ERROR_CODES.NOT_AUTHENTICATED,
-          domain: 'AUTHENTICATION' as any,
-          severity: 'MEDIUM' as any,
-          cause: error,
-          context,
-          correlationId: context.correlationId,
-        });
-      } else if (error.status === 403 || error.code === 'FORBIDDEN') {
-        baseError = new BaseError('Access denied', {
-          statusCode: 403,
-          code: ERROR_CODES.ACCESS_DENIED,
-          domain: 'AUTHORIZATION' as any,
-          severity: 'MEDIUM' as any,
-          cause: error,
-          context,
-          correlationId: context.correlationId,
-        });
-      } else if (error.status === 404) {
-        baseError = new BaseError('Resource not found', {
-          statusCode: 404,
-          code: ERROR_CODES.BILL_NOT_FOUND,
-          domain: 'BUSINESS' as any,
-          severity: 'LOW' as any,
-          cause: error,
-          context,
-          correlationId: context.correlationId,
-        });
-      } else {
-        // Generic server error
-        const statusCode = error.status || error.statusCode || 500;
-        baseError = new BaseError(error.message || 'Internal server error', {
-          statusCode,
-          code: statusCode >= 500 ? ERROR_CODES.INTERNAL_SERVER_ERROR : ERROR_CODES.VALIDATION_ERROR,
-          domain: statusCode >= 500 ? 'INTERNAL' : 'VALIDATION',
-          severity: statusCode >= 500 ? 'HIGH' : 'LOW',
-          cause: error,
-          context,
-          correlationId: context.correlationId,
-        });
-      }
+      // Log error with structured logging
+      logger.error('Request failed', {
+        correlationId: standardError.correlationId,
+        code: standardError.code,
+        message: standardError.message,
+        classification: standardError.classification,
+        statusCode,
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        details: standardError.details,
+        stack: standardError.stack,
+      });
 
       // Build response
-      const statusCode = baseError.statusCode || 500;
-      const message = baseError.message;
-
-      res.status(statusCode).json({
+      const errorResponse: any = {
         success: false,
         error: {
-          code: baseError.code,
-          message,
-          statusCode,
-          correlationId: context.correlationId,
-          timestamp: new Date().toISOString(),
+          code: standardError.code,
+          message: standardError.message,
+          classification: standardError.classification,
+          correlationId: standardError.correlationId,
+          timestamp: standardError.timestamp.toISOString(),
         },
-        ...(process.env.NODE_ENV === 'development' && {
-          debug: {
-            details: baseError.details,
-            stack: baseError.stack,
-          },
-        }),
-      });
+      };
+
+      // Include details in development mode
+      if (process.env.NODE_ENV === 'development') {
+        errorResponse.error.details = standardError.details;
+        errorResponse.error.stack = standardError.stack;
+      }
+
+      res.status(statusCode).json(errorResponse);
     } catch (handlerError) {
       // Fallback error response if middleware fails
       logger.error('Error middleware failed', { error: handlerError });
@@ -159,7 +119,8 @@ export function createUnifiedErrorMiddleware() {
           error: {
             code: 'INTERNAL_SERVER_ERROR',
             message: 'An unexpected error occurred',
-            statusCode: 500,
+            classification: ErrorClassification.Server,
+            correlationId: getCurrentCorrelationId() || 'unknown',
             timestamp: new Date().toISOString(),
           },
         });

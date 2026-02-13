@@ -6,6 +6,13 @@
  */
 
 // ============================================================================
+// TYPE SYSTEM - SINGLE SOURCE OF TRUTH
+// ============================================================================
+
+// Export all types from the consolidated type system
+export * from './types/index';
+
+// ============================================================================
 // CORE INFRASTRUCTURE
 // ============================================================================
 
@@ -22,6 +29,12 @@ export * from './schema/index';
 export * from './platform/index';
 
 // ============================================================================
+// VALIDATION
+// ============================================================================
+
+export * from './validation/index';
+
+// ============================================================================
 // INTERNATIONALIZATION
 // ============================================================================
 
@@ -31,7 +44,7 @@ export * from './i18n/index';
 // VERSION AND METADATA
 // ============================================================================
 
-export const SHARED_MODULE_VERSION = '1.0.0';
+export const SHARED_MODULE_VERSION = '2.0.0';
 export const SUPPORTED_PLATFORMS = ['kenya'] as const;
 export const SUPPORTED_LANGUAGES = ['en', 'sw'] as const;
 
@@ -39,14 +52,34 @@ export const SUPPORTED_LANGUAGES = ['en', 'sw'] as const;
 // TYPE EXPORTS FOR CONVENIENCE
 // ============================================================================
 
-// Re-export commonly used types
+// Re-export commonly used types from the type system
 export type {
-  // Database types
+  // Core branded types
+  UserId,
+  BillId,
+  CommitteeId,
+  CommentId,
+  
+  // Domain types
   User,
+  UserProfile,
   Bill,
   Committee,
-  UserProfile
-} from './schema/index';
+  Comment,
+  
+  // API contract types
+  CreateUserRequest,
+  CreateUserResponse,
+  CreateBillRequest,
+  CreateBillResponse,
+  
+  // Enums
+  UserRole,
+  UserStatus,
+  BillStatus,
+  Chamber,
+  ErrorClassification,
+} from './types/index';
 
 export type {
   // Core types
@@ -108,7 +141,8 @@ export const healthCheck = async (): Promise<void> => {
         database: dbHealth.healthy ? 'healthy' : 'unhealthy',
         core: 'healthy',
         schema: 'healthy',
-        platform: 'healthy'
+        platform: 'healthy',
+        types: 'healthy'
       },
       details: {
         database: dbHealth

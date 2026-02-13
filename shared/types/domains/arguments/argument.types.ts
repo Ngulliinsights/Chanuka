@@ -5,6 +5,8 @@
  * Safe to use in both client and server code
  */
 
+import type { ArgumentId, ArgumentEvidenceId, BillId, UserId } from '../core/branded';
+
 /**
  * Argument position in bill debate
  */
@@ -15,9 +17,9 @@ export type ArgumentPosition = 'support' | 'oppose' | 'neutral' | 'conditional';
  * Safe for client-side consumption
  */
 export interface Argument {
-  id: string;
-  billId: string;
-  userId: string;
+  id: ArgumentId;
+  billId: BillId;
+  userId: UserId;
   position: ArgumentPosition;
   argument_text: string;
   strength_score?: number | null;
@@ -33,8 +35,8 @@ export interface Argument {
  * Evidence supporting an argument
  */
 export interface ArgumentEvidence {
-  id: string;
-  argumentId: string;
+  id: ArgumentEvidenceId;
+  argumentId: ArgumentId;
   text: string;
   source?: string | null;
   verified?: boolean;

@@ -15,9 +15,9 @@ export type {
 } from './types';
 
 // Enhanced middleware factory
-export { MiddlewareFactory } from './factory';
-import { MiddlewareFactory } from './factory';
-export { MiddlewareRegistry } from './registry';
+export { MiddlewareFactory } from '../../../server/middleware/middleware-factory';
+import { MiddlewareFactory } from '../../../server/middleware/middleware-factory';
+export { MiddlewareRegistry } from '../../../server/middleware/middleware-registry';
 
 // Individual middleware providers
 export { AuthMiddlewareProvider } from './auth/provider';
@@ -27,11 +27,11 @@ export { RateLimitMiddlewareProvider } from './rate-limit/provider';
 export { ErrorHandlerMiddlewareProvider } from './error-handler/provider';
 
 // Enhanced middleware integrations
-export { createUnifiedMiddleware } from './unified';
+export { createUnifiedMiddleware } from '../../../server/middleware/unified-middleware';
 // Middleware chain functionality removed by design during development
 
 // Utility functions
-export { applyMiddleware } from './registry';
+export { applyMiddleware } from '../../../server/middleware/middleware-registry';
 
 // Re-export specific middleware from core utilities
 export { rateLimitMiddleware } from '../rate-limiting';

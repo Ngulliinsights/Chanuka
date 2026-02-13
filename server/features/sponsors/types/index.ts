@@ -5,6 +5,9 @@
  * and sponsor-related functionality.
  */
 
+import { NotificationChannel } from '@shared/types';
+export { NotificationChannel };
+
 // Stakeholder Types (extracted from shared/types/expert.ts)
 export interface Stakeholder {
   id: string;
@@ -13,13 +16,6 @@ export interface Stakeholder {
   type: string;
   influence: number;
   notificationPreferences: NotificationChannel[];
-}
-
-export enum NotificationChannel {
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
-  IN_APP = 'in_app'
 }
 
 // Re-export common sponsor types from schema for convenience

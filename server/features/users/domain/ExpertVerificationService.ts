@@ -1,11 +1,7 @@
 import { logger  } from '@shared/core';
+import { VerificationStatus } from '@shared/types';
 
-export enum VerificationStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  NEEDS_REVIEW = 'needs_review'
-}
+export { VerificationStatus };
 
 export interface ExtendedExpert {
   id: string;

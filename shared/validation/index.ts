@@ -11,33 +11,14 @@
  * const result = validateBill(data);
  *
  * // In client
- * import { CommentValidationRules, validateComment } from '@shared/validation';
+ * import { COMMENT_VALIDATION_RULES, validateComment } from '@shared/validation';
  * const errors = validateComment(formData);
  */
 
-export {
-  BILL_VALIDATION_RULES,
-  BillSchema,
-  validateBill,
-  type BillValidationInput,
-  type Bill,
-} from './bill.validation';
+// Export all schemas and validation utilities from the schemas directory
+export * from './schemas';
 
-export {
-  COMMENT_VALIDATION_RULES,
-  CommentSchema,
-  validateComment,
-  type CommentValidationInput,
-  type Comment,
-} from './comment.validation';
-
-export {
-  USER_VALIDATION_RULES,
-  UserSchema,
-  UserRegistrationSchema,
-  validateUser,
-  validateUserRegistration,
-  type UserValidationInput,
-  type User,
-  type UserRegistrationInput,
-} from './user.validation';
+// Export validation helpers
+export { validateUser, validateUserRegistration } from './schemas/user.schema';
+export { validateBill } from './schemas/bill.schema';
+export { validateComment } from './schemas/comment.schema';

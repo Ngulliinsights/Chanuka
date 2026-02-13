@@ -18,15 +18,6 @@ export type {
 } from '@client/lib/types/search';
 
 // Feature-specific extensions
-export interface SearchQuery {
-  q: string;
-  type?: string; 
-  filters?: Record<string, any>;
-  sort?: string;
-  limit?: number;
-  offset?: number;
-}
-
 // Real-time search types
 export interface SearchEvent {
   type: 'search_started' | 'search_completed' | 'search_error';

@@ -39,7 +39,7 @@ import {
   ConferenceId,
   createBrandedId,
   isBrandedId
-} from "../types/core/common";
+} from "../../../shared/dist/core/src/validation/schemas/common";
 
 // Import validation utilities
 import { createValidatedType, ValidatedType } from "../types/core/validation";
@@ -764,5 +764,8 @@ export const SCHEMA_INTEGRATION_EXTENDED_CHANGELOG = {
   ✅ Backward compatibility maintained
   ✅ Performance-optimized indexes
   ✅ Data validation at database level
+  `,
+} as const;
+evel
   `,
 } as const;

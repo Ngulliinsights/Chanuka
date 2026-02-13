@@ -25,6 +25,7 @@ import { user_profiles,users } from '@server/infrastructure/schema';
 import type { SQLWrapper } from 'drizzle-orm';
 import { and, desc, eq, inArray,or, sql } from 'drizzle-orm';
 import type { PgDatabase } from 'drizzle-orm/pg-core';
+import { userDbToDomain, userProfileDbToDomain } from '@shared/utils/transformers';
 
 
 export class DrizzleUserRepository implements IUserRepository {
@@ -155,18 +156,19 @@ export class DrizzleUserRepository implements IUserRepository {
           .build(),
         async () => {
           const newUser = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
-            const [user] = await tx
+            const [dbUser] = await tx
               .insert(users)
               .values(validation.data)
               .returning();
-            return user;
+            return dbUser;
           });
 
           return {
             success: true,
             duration: 0, // Will be set by logger
             recordCount: 1,
-            affectedIds: [newUser.id]
+            affectedIds: [newUser.id],
+            data: userDbToDomain.transform(newUser) // Transform DB → Domain
           };
         }
       );
@@ -179,13 +181,13 @@ export class DrizzleUserRepository implements IUserRepository {
 
   async findById(id: string): Promise<Result<Maybe<User>, Error>> {
     try {
-      const [user] = await this.db
+      const [dbUser] = await this.db
         .select()
         .from(users)
         .where(eq(users.id, id))
         .limit(1);
 
-      return new Ok(user ? some(user) : none);
+      return new Ok(dbUser ? some(userDbToDomain.transform(dbUser)) : none);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find user by ID'));
     }
@@ -193,13 +195,13 @@ export class DrizzleUserRepository implements IUserRepository {
 
   async findByEmail(email: string): Promise<Result<Maybe<User>, Error>> {
     try {
-      const [user] = await this.db
+      const [dbUser] = await this.db
         .select()
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
 
-      return new Ok(user ? some(user) : none);
+      return new Ok(dbUser ? some(userDbToDomain.transform(dbUser)) : none);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find user by email'));
     }
@@ -214,8 +216,8 @@ export class DrizzleUserRepository implements IUserRepository {
     }
   ): Promise<Result<User[], Error>> {
     try {
-      const result = await this.buildUserQueryConditions(eq(users.role, role), options);
-      return new Ok(result);
+      const dbUsers = await this.buildUserQueryConditions(eq(users.role, role), options);
+      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find users by role'));
     }
@@ -230,8 +232,8 @@ export class DrizzleUserRepository implements IUserRepository {
     }
   ): Promise<Result<User[], Error>> {
     try {
-      const result = await this.buildUserQueryConditions(eq(users.county, county), options);
-      return new Ok(result);
+      const dbUsers = await this.buildUserQueryConditions(eq(users.county, county), options);
+      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find users by county'));
     }
@@ -257,8 +259,8 @@ export class DrizzleUserRepository implements IUserRepository {
           }
 
           const searchTerm = `%${searchValidation.query.toLowerCase()}%`;
-          const result = await this.buildUserSearchQuery(searchTerm, searchValidation.options);
-          return new Ok(result);
+          const dbUsers = await this.buildUserSearchQuery(searchTerm, searchValidation.options);
+          return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
         } catch (error) {
           return new Err(error instanceof Error ? error : new Error('Failed to search users'));
         }
@@ -273,8 +275,8 @@ export class DrizzleUserRepository implements IUserRepository {
     role?: string;
   }): Promise<Result<User[], Error>> {
     try {
-      const result = await this.buildUserQueryConditions(eq(users.is_active, true), options);
-      return new Ok(result);
+      const dbUsers = await this.buildUserQueryConditions(eq(users.is_active, true), options);
+      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find active users'));
     }
@@ -292,8 +294,8 @@ export class DrizzleUserRepository implements IUserRepository {
           .entityId(id)
           .build(),
         async () => {
-          const updatedUser = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
-            const [user] = await tx
+          const updatedDbUser = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+            const [dbUser] = await tx
               .update(users)
               .set({
                 ...updates,
@@ -302,11 +304,11 @@ export class DrizzleUserRepository implements IUserRepository {
               .where(eq(users.id, id))
               .returning();
 
-            if (!user) {
+            if (!dbUser) {
               throw new Error('User not found');
             }
 
-            return user;
+            return dbUser;
           });
 
           // Log audit trail for sensitive user updates
@@ -338,7 +340,8 @@ export class DrizzleUserRepository implements IUserRepository {
             success: true,
             duration: 0,
             recordCount: 1,
-            affectedIds: [updatedUser.id]
+            affectedIds: [updatedDbUser.id],
+            data: userDbToDomain.transform(updatedDbUser) // Transform DB → Domain
           };
         }
       );
@@ -363,7 +366,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(profileValidation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      const dbProfile = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
         const [updatedProfile] = await tx
           .update(user_profiles)
           .set({
@@ -389,7 +392,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return updatedProfile;
       });
 
-      return new Ok(result);
+      return new Ok(userProfileDbToDomain.transform(dbProfile));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to update user profile'));
     }
@@ -397,13 +400,13 @@ export class DrizzleUserRepository implements IUserRepository {
 
   async getProfileByUserId(userId: string): Promise<Result<Maybe<UserProfile>, Error>> {
     try {
-      const [profile] = await this.db
+      const [dbProfile] = await this.db
         .select()
         .from(user_profiles)
         .where(eq(user_profiles.user_id, userId))
         .limit(1);
 
-      return new Ok(profile ? some(profile) : none);
+      return new Ok(dbProfile ? some(userProfileDbToDomain.transform(dbProfile)) : none);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to get user profile'));
     }
@@ -663,7 +666,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} users`));
       }
 
-      const result = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      const dbUsers = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
         const newUsers = await tx
           .insert(users)
           .values(validations.map(v => v.data))
@@ -672,7 +675,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return newUsers;
       });
 
-      return new Ok(result);
+      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to create users in batch'));
     }
@@ -704,8 +707,8 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} updates`));
       }
 
-      const result = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
-        const updatedUsers: User[] = [];
+      const dbUsers = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+        const updatedUsers: typeof users.$inferSelect[] = [];
 
         // Process updates individually to handle potential conflicts
         for (const validation of validations) {
@@ -728,7 +731,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return updatedUsers;
       });
 
-      return new Ok(result);
+      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to update users in batch'));
     }
@@ -777,34 +780,37 @@ export class DrizzleUserRepository implements IUserRepository {
     is_active?: boolean;
   }): Promise<Result<Array<User & { loadProfile: () => Promise<Result<UserProfile, Error>> }>, Error>> {
     try {
-      const result = await this.buildUserQueryConditions(
+      const dbUsers = await this.buildUserQueryConditions(
         options?.role ? eq(users.role, options.role) : sql`true`,
         options
       );
 
-      // Transform users to include lazy profile loading
-      const usersWithLazyProfiles = result.map(user => ({
-        ...user,
-        loadProfile: async (): Promise<Result<UserProfile, Error>> => {
-          return performanceMonitor.monitorOperation(
-            'lazy_load_user_profile',
-            async () => {
-              const [profile] = await this.db
-                .select()
-                .from(user_profiles)
-                .where(eq(user_profiles.user_id, user.id))
-                .limit(1);
+      // Transform users to domain and include lazy profile loading
+      const usersWithLazyProfiles = dbUsers.map(dbUser => {
+        const domainUser = userDbToDomain.transform(dbUser);
+        return {
+          ...domainUser,
+          loadProfile: async (): Promise<Result<UserProfile, Error>> => {
+            return performanceMonitor.monitorOperation(
+              'lazy_load_user_profile',
+              async () => {
+                const [dbProfile] = await this.db
+                  .select()
+                  .from(user_profiles)
+                  .where(eq(user_profiles.user_id, dbUser.id))
+                  .limit(1);
 
-              if (!profile) {
-                return new Err(new Error('User profile not found'));
-              }
+                if (!dbProfile) {
+                  return new Err(new Error('User profile not found'));
+                }
 
-              return new Ok(profile);
-            },
-            { userId: user.id }
-          );
-        }
-      }));
+                return new Ok(userProfileDbToDomain.transform(dbProfile));
+              },
+              { userId: dbUser.id }
+            );
+          }
+        };
+      });
 
       return new Ok(usersWithLazyProfiles);
     } catch (error) {

@@ -26,6 +26,6 @@
       "@tests/*": ["../tests/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.d.ts"],
+  "include": ["**/*.ts", "**/*.d.ts", "../tests/properties/schema-type-sync.property.test.ts", "../server/utils/correlation-id.ts", "../server/utils/api-utils.ts", "../server/utils/response-helpers.ts", "../server/utils/cache-utils.ts", "../server/utils/anonymity-service.ts", "../server/middleware/ai-middleware.ts", "../server/middleware/middleware-factory.ts", "../server/middleware/ai-deduplication.ts", "../server/middleware/middleware-registry.ts", "../server/middleware/middleware-types.ts", "../server/middleware/unified-middleware.ts", "../server/middleware/middleware-config.ts", "../server/middleware/middleware-feature-flags.ts", "../tests/properties/transformation-pipeline-correctness.property.test.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

@@ -11,6 +11,7 @@ import { asyncHandler } from '@/middleware/error-management';
 import { BaseError, ValidationError } from '@shared/core/observability/error-management';
 import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { userDomainToApi } from '@shared/utils/transformers';
 
 export const router = Router();
 

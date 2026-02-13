@@ -93,6 +93,11 @@ export enum BillType {
   DELEGATION_BILL = 'Bill Concerning County Governments' // Requires both houses
 }
 
+/**
+ * Bill status enum for government data scraping
+ * Note: These are display values from external sources
+ * Internal system should use BillStatus from shared/types/core/enums
+ */
 export enum BillStatus {
   DRAFTED = 'Drafted',                            // Being prepared
   PUBLISHED = 'Published in Kenya Gazette',       // Officially published
@@ -107,6 +112,30 @@ export enum BillStatus {
   REJECTED = 'Rejected',
   WITHDRAWN = 'Withdrawn',
   LAPSED = 'Lapsed'                               // Died with parliament dissolution
+}
+
+/**
+ * Map external bill status to internal enum
+ * @param externalStatus - Status from government data source
+ * @returns Internal bill status value
+ */
+export function mapToInternalBillStatus(externalStatus: BillStatus): string {
+  const mapping: Record<BillStatus, string> = {
+    [BillStatus.DRAFTED]: 'draft',
+    [BillStatus.PUBLISHED]: 'introduced',
+    [BillStatus.FIRST_READING]: 'first_reading',
+    [BillStatus.SECOND_READING]: 'second_reading',
+    [BillStatus.COMMITTEE_STAGE]: 'committee_stage',
+    [BillStatus.REPORT_STAGE]: 'committee_stage',
+    [BillStatus.THIRD_READING]: 'third_reading',
+    [BillStatus.SENT_TO_OTHER_HOUSE]: 'passed',
+    [BillStatus.PRESIDENTIAL_ASSENT]: 'presidential_assent',
+    [BillStatus.ENACTED]: 'enacted',
+    [BillStatus.REJECTED]: 'rejected',
+    [BillStatus.WITHDRAWN]: 'withdrawn',
+    [BillStatus.LAPSED]: 'lost',
+  };
+  return mapping[externalStatus] || 'draft';
 }
 
 // Configuration for data sources

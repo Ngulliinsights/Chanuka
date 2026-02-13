@@ -7,11 +7,34 @@
  *
  * This module consolidates security-related utilities from various sources
  * into a unified, framework-agnostic interface.
+ *
+ * CLIENT-SAFE: Most functions are client-safe. Crypto-based functions
+ * are conditionally available (Node.js only).
  */
 
-import * as crypto from 'crypto';
+// Conditional crypto import (Node.js only)
+let crypto: typeof import('crypto') | null = null;
+try {
+  if (typeof require !== 'undefined') {
+    crypto = require('crypto');
+  }
+} catch {
+  // Crypto not available in browser
+}
 
-import { logger } from '../observability/logging';
+// Client-safe logging helper
+const safeLog = {
+  warn: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn(message, data);
+    }
+  },
+  error: (message: string, data?: any) => {
+    if (typeof console !== 'undefined' && console.error) {
+      console.error(message, data);
+    }
+  }
+};
 
 // ==================== Type Definitions ====================
 
@@ -463,7 +486,7 @@ export function logSecurityEvent(
   details: Record<string, any>,
   severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
 ): void {
-  logger.warn(`Security event: ${event}`, {
+  safeLog.warn(`Security event: ${event}`, {
     component: 'security',
     severity,
     ...details

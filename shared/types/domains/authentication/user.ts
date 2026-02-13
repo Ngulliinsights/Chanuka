@@ -4,22 +4,16 @@
  */
 
 import { BaseEntity, UserTrackableEntity } from '../../core/base';
-import { UserId } from '../../core/common';
+import { UserId } from '../../core/branded';
+import { 
+  UserRole, 
+  UserStatus, 
+  VerificationStatus, 
+  AnonymityLevel 
+} from '../../core/enums';
 
-/**
- * User Role Types
- */
-export type UserRole = 'admin' | 'moderator' | 'user' | 'guest' | 'anonymous';
-
-/**
- * User Verification Status
- */
-export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'banned';
-
-/**
- * Anonymity Level for User Profile
- */
-export type AnonymityLevel = 'public' | 'semi-private' | 'private' | 'anonymous';
+// Re-export enums for convenience
+export { UserRole, UserStatus, VerificationStatus, AnonymityLevel };
 
 /**
  * Geographic Location Type
@@ -51,7 +45,10 @@ export interface UserPreferences {
  * Follows the design document specification for proper anonymity controls
  */
 export interface UserProfile {
+  readonly userId: UserId;
   readonly displayName: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
   readonly bio?: string;
   readonly location?: GeographicLocation;
   readonly avatarUrl?: string;
@@ -67,8 +64,10 @@ export interface UserProfile {
 export interface User extends UserTrackableEntity {
   readonly id: UserId;
   readonly email: string;
+  readonly username: string;
   readonly role: UserRole;
-  readonly profile: UserProfile;
+  readonly status: UserStatus;
+  readonly profile: UserProfile | null;
   readonly preferences: UserPreferences;
   readonly verification: VerificationStatus;
   readonly lastLogin?: Date;
@@ -81,8 +80,10 @@ export interface User extends UserTrackableEntity {
  */
 export interface CreateUserPayload {
   email: string;
-  role: UserRole;
-  profile: Omit<UserProfile, 'isPublic'> & { isPublic?: boolean };
+  username: string;
+  password: string;
+  role?: UserRole;
+  profile?: Partial<Omit<UserProfile, 'userId'>>;
   preferences?: Partial<UserPreferences>;
   verification?: VerificationStatus;
   isActive?: boolean;
@@ -94,8 +95,10 @@ export interface CreateUserPayload {
  */
 export interface UpdateUserPayload {
   email?: string;
+  username?: string;
   role?: UserRole;
-  profile?: Partial<UserProfile>;
+  status?: UserStatus;
+  profile?: Partial<Omit<UserProfile, 'userId'>>;
   preferences?: Partial<UserPreferences>;
   verification?: VerificationStatus;
   isActive?: boolean;
@@ -111,8 +114,8 @@ export function isUser(value: unknown): value is User {
     value !== null &&
     'id' in value &&
     'email' in value &&
+    'username' in value &&
     'role' in value &&
-    'profile' in value &&
     'preferences' in value &&
     'verification' in value
   );

@@ -22,7 +22,7 @@ export const kenyanCountyEnum = pgEnum('kenyan_county', [
 
 // Parliamentary Chambers
 export const chamberEnum = pgEnum('chamber', [
-  'national_assembly', 'senate', 'county_assembly'
+  'national_assembly', 'senate', 'county_assembly', 'both'
 ]);
 
 // Political Parties (major parties + coalition logic)
@@ -36,8 +36,8 @@ export const partyEnum = pgEnum('political_party', [
 
 // User Roles
 export const userRoleEnum = pgEnum('user_role', [
-  'citizen', 'verified_citizen', 'ambassador', 'expert_verifier',
-  'mp_staff', 'clerk', 'admin', 'auditor', 'journalist'
+  'public', 'citizen', 'verified_citizen', 'ambassador', 'expert', 'expert_verifier',
+  'mp_staff', 'clerk', 'moderator', 'admin', 'auditor', 'journalist'
 ]);
 
 // Anonymity Levels
@@ -50,8 +50,10 @@ export const anonymityLevelEnum = pgEnum('anonymity_level', [
 // ============================================================================
 
 export const billStatusEnum = pgEnum('bill_status', [
-  'first_reading', 'second_reading', 'committee_stage', 'third_reading',
-  'presidential_assent', 'gazetted', 'withdrawn', 'lost', 'enacted'
+  'draft', 'introduced', 'first_reading', 'second_reading', 'in_committee',
+  'committee_stage', 'third_reading', 'scheduled_for_vote', 'passed',
+  'presidential_assent', 'enacted', 'gazetted', 'rejected', 'lost',
+  'vetoed', 'withdrawn'
 ]);
 
 export const voteTypeEnum = pgEnum('vote_type', [
@@ -211,6 +213,35 @@ export const participationMethodEnum = pgEnum('participation_method', [
 ]);
 
 // ============================================================================
+// ARGUMENT INTELLIGENCE
+// ============================================================================
+
+export const jobStatusEnum = pgEnum('job_status', [
+  'pending', 'processing', 'completed', 'failed'
+]);
+
+export const relationshipTypeEnum = pgEnum('relationship_type', [
+  'supports', 'contradicts', 'clarifies', 'expands'
+]);
+
+export const argumentPositionEnum = pgEnum('argument_position', [
+  'support', 'oppose', 'neutral', 'conditional'
+]);
+
+export const verificationStatusEnum = pgEnum('verification_status', [
+  'unverified', 'pending', 'in_progress', 'needs_review', 'verified',
+  'approved', 'failed', 'rejected', 'disputed'
+]);
+
+// ============================================================================
+// SYSTEM AUDIT
+// ============================================================================
+
+export const payloadTypeEnum = pgEnum('payload_type', [
+  'action_details', 'resource_usage'
+]);
+
+// ============================================================================
 // TYPE EXPORTS - TypeScript Type Safety
 // ============================================================================
 
@@ -249,3 +280,8 @@ export type ActionStatus = typeof actionStatusEnum.enumValues[number];
 export type AmbassadorStatus = typeof ambassadorStatusEnum.enumValues[number];
 export type SessionType = typeof sessionTypeEnum.enumValues[number];
 export type ParticipationMethod = typeof participationMethodEnum.enumValues[number];
+export type JobStatus = typeof jobStatusEnum.enumValues[number];
+export type RelationshipType = typeof relationshipTypeEnum.enumValues[number];
+export type ArgumentPosition = typeof argumentPositionEnum.enumValues[number];
+export type VerificationStatusDb = typeof verificationStatusEnum.enumValues[number];
+export type PayloadType = typeof payloadTypeEnum.enumValues[number];

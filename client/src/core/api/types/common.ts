@@ -13,20 +13,6 @@ import { ZodSchema } from 'zod';
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type SortOrder = 'asc' | 'desc';
-
-export type ErrorCode =
-  | string
-  | 'NETWORK_ERROR'
-  | 'TIMEOUT'
-  | 'VALIDATION_ERROR'
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'CONFLICT'
-  | 'SERVER_ERROR'
-  | 'RATE_LIMITED'
-  | 'UNKNOWN';
-
 // ============================================================================
 // Pagination Types
 // ============================================================================

@@ -21,7 +21,6 @@ export type APIErrorCode =
   | 'UNKNOWN';
 
 // Alias for backward compatibility with code that imports ErrorCode
-export type ErrorCode = APIErrorCode;
 
 export interface APIErrorDetails {
   code: APIErrorCode;

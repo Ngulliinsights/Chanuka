@@ -21,7 +21,7 @@ import {
   type UrgencyLevelValue,
   type ComplexityLevelValue,
   type ChamberValue,
-} from '@shared/types/enums';
+} from '@shared/types';
 
 export {
   BillStatus,

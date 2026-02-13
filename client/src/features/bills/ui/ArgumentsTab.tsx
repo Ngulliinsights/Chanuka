@@ -14,7 +14,7 @@
 import React, { useState } from 'react';
 
 import { useArgumentsForBill } from '@client/features/community';
-import { ArgumentPosition } from '@shared/types/enums';
+import { ArgumentPosition } from '@shared/types';
 
 // Local Argument type compatible with community types
 interface BillArgument {
