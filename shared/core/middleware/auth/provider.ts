@@ -59,8 +59,8 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
         };
 
         // Attach user to request
-        (req as any).user = user;
-        (req as any).token = token;
+        req.user = user;
+        req.token = token;
 
         next();
       } catch (error) {

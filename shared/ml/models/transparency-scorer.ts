@@ -608,9 +608,13 @@ export class TransparencyScorer {
   }
 
   private getDimensionRecommendation(dimension: string, entityType: string, score: number) {
-    const priority = score < 30 ? 'critical' : score < 50 ? 'high' : 'medium';
+    const priority: 'critical' | 'high' | 'medium' = score < 30 ? 'critical' : score < 50 ? 'high' : 'medium';
     
-    const recommendations: Record<string, any> = {
+    const recommendations: Record<string, {
+      action: string;
+      expectedImprovement: number;
+      implementationDifficulty: 'easy' | 'moderate' | 'hard';
+    }> = {
       accessibility: {
         action: 'Improve public access to information and documentation',
         expectedImprovement: 25,
@@ -639,7 +643,7 @@ export class TransparencyScorer {
     };
     
     const rec = recommendations[dimension];
-    return rec ? { priority: priority as any, ...rec } : null;
+    return rec ? { priority, ...rec } : null;
   }
 
   private performBenchmarking(input: TransparencyInput, score: number) {

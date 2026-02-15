@@ -1,23 +1,25 @@
 import { privacyService } from '@server/features/privacy/privacy-service';
 import { logger   } from '@shared/core';
 import { auditLogger } from '@shared/infrastructure/monitoring/audit-log';
-import { AuthenticatedRequest } from '@server/middleware/auth';
+import { AuthenticatedRequest, PrivacyRequest } from '@server/middleware/auth-types';
 import { NextFunction,Request, Response } from 'express';
 
-export interface PrivacyRequest extends AuthenticatedRequest {
-  privacyConsent?: {
-    analytics: boolean;
-    marketing: boolean;
-    research: boolean;
-    personalization: boolean;
-  };
+export interface PrivacyConsent {
+  analytics: boolean;
+  marketing: boolean;
+  research: boolean;
+  personalization: boolean;
+}
+
+export interface PrivacyRequestWithConsent extends AuthenticatedRequest {
+  privacyConsent?: PrivacyConsent;
 }
 
 /**
  * Middleware to check user consent for data processing
  */
-export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest['privacyConsent']) => {
-  return async (req: PrivacyRequest, res: Response, next: NextFunction) => {
+export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyConsent) => {
+  return async (req: PrivacyRequestWithConsent, res: Response, next: NextFunction) => {
     try {
       // Skip consent check for unauthenticated users
       if (!req.user) {
@@ -69,7 +71,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
  * Middleware to check user consent for data sharing
  */
 export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shareEngagement' | 'shareComments' | 'shareVotingHistory') => {
-  return async (req: PrivacyRequest, res: Response, next: NextFunction) => {
+  return async (req: PrivacyRequestWithConsent, res: Response, next: NextFunction) => {
     try {
       // Skip consent check for unauthenticated users
       if (!req.user) {
@@ -162,7 +164,7 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
  * Middleware to enforce cookie consent
  */
 export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'preferences') => {
-  return async (req: PrivacyRequest, res: Response, next: NextFunction) => {
+  return async (req: PrivacyRequestWithConsent, res: Response, next: NextFunction) => {
     try {
       // Check for cookie consent in request headers or cookies
       const cookieConsent = req.cookies?.cookieConsent;
@@ -237,7 +239,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
     const preferences = await privacyService.getPrivacyPreferences(user_id);
 
     // Add retention preferences to request for use by other middleware/routes
-    (req as any).dataRetentionPrefs = preferences.dataRetention;
+    (req as PrivacyRequest).dataRetentionPrefs = preferences.dataRetention;
 
     next();
   } catch (error) {
@@ -250,20 +252,30 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
  * Middleware to anonymize IP addresses for privacy
  */
 export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => {
-  const originalIP = req.ip || req.connection.remoteAddress || '';
+  const originalIP = req.ip || (req.connection as { remoteAddress?: string } | undefined)?.remoteAddress || '';
 
   // Anonymize IPv4 addresses (remove last octet)
   if (originalIP.includes('.')) {
     const parts = originalIP.split('.');
     if (parts.length === 4) {
-      (req as any).ip = `${parts[0]}.${parts[1]}.${parts[2]}.0`;
+      // Type-safe IP assignment
+      Object.defineProperty(req, 'ip', {
+        value: `${parts[0]}.${parts[1]}.${parts[2]}.0`,
+        writable: true,
+        configurable: true
+      });
     }
   }
   // Anonymize IPv6 addresses (remove last 64 bits)
   else if (originalIP.includes(':')) {
     const parts = originalIP.split(':');
     if (parts.length >= 4) {
-      (req as any).ip = `${parts.slice(0, 4).join(':')}::`;
+      // Type-safe IP assignment
+      Object.defineProperty(req, 'ip', {
+        value: `${parts.slice(0, 4).join(':')}::`,
+        writable: true,
+        configurable: true
+      });
     }
   }
 

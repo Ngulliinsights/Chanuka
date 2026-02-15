@@ -45,6 +45,39 @@ interface ContributorStats {
   totalConfidence: number;
 }
 
+// Define verification data structure for JSONB field
+interface VerificationData {
+  citizenId: string;
+  verification_status?: string;
+  endorsements?: Array<{
+    endorserId: string;
+    endorserName: string;
+    timestamp: Date;
+    comment?: string;
+  }>;
+  disputes?: Array<{
+    disputerId: string;
+    disputerName: string;
+    timestamp: Date;
+    reason: string;
+  }>;
+  verificationType?: string;
+  claim?: string;
+  evidence?: EvidenceData[];
+  expertiseLevel?: string;
+  submittedAt?: Date;
+  [key: string]: unknown; // Allow additional properties
+}
+
+/**
+ * Type guard to validate verification data structure
+ */
+function isVerificationData(data: unknown): data is VerificationData {
+  if (typeof data !== 'object' || data === null) return false;
+  const vData = data as Record<string, unknown>;
+  return typeof vData.citizenId === 'string';
+}
+
 export class UserVerificationDomainService {
   constructor(
     private profileService: ProfileDomainService,
@@ -215,7 +248,12 @@ export class UserVerificationDomainService {
       return { success: false, errors: ['Verification not found'] };
     }
 
-    const verificationData = verificationRow[0].verification_data as any;
+    const verificationDataRaw = verificationRow[0].verification_data;
+    if (!isVerificationData(verificationDataRaw)) {
+      return { success: false, errors: ['Invalid verification data structure'] };
+    }
+    
+    const verificationData: VerificationData = verificationDataRaw;
     if (verificationData.citizenId !== citizenId) {
       return { success: false, errors: ['Unauthorized to update this verification'] };
     }
@@ -320,7 +358,12 @@ export class UserVerificationDomainService {
       return { success: false, errors: ['Verification not found'] };
     }
 
-    const verificationData = verificationRow[0].verification_data as any;
+    const verificationDataRaw = verificationRow[0].verification_data;
+    if (!isVerificationData(verificationDataRaw)) {
+      return { success: false, errors: ['Invalid verification data structure'] };
+    }
+    
+    const verificationData: VerificationData = verificationDataRaw;
     const endorsements = verificationData.endorsements || [];
 
     // Check if user already endorsed
@@ -370,7 +413,12 @@ export class UserVerificationDomainService {
       return { success: false, errors: ['Verification not found'] };
     }
 
-    const verificationData = verificationRow[0].verification_data as any;
+    const verificationDataRaw = verificationRow[0].verification_data;
+    if (!isVerificationData(verificationDataRaw)) {
+      return { success: false, errors: ['Invalid verification data structure'] };
+    }
+    
+    const verificationData: VerificationData = verificationDataRaw;
     const disputes = verificationData.disputes || [];
 
     if (disputes.some((d: any) => d.user_id === disputerId)) {
@@ -422,7 +470,17 @@ export class UserVerificationDomainService {
       };
     }
 
-    const verificationData = verificationRow[0].verification_data as any;
+    const verificationDataRaw = verificationRow[0].verification_data;
+    if (!isVerificationData(verificationDataRaw)) {
+      return {
+        isValid: false,
+        confidence: 0,
+        errors: ['Invalid verification data structure'],
+        warnings: []
+      };
+    }
+    
+    const verificationData: VerificationData = verificationDataRaw;
     const verification = CitizenVerification.create({
       id: verificationRow[0].id,
       bill_id: verificationData.bill_id,
@@ -503,7 +561,11 @@ export class UserVerificationDomainService {
       .orderBy(desc(user_verification.created_at));
 
     const verifications = verificationRows.map((row: any) => {
-      const data = row.verification_data as any;
+      const dataRaw = row.verification_data;
+      if (!isVerificationData(dataRaw)) {
+        throw new Error(`Invalid verification data structure for verification ${row.id}`);
+      }
+      const data: VerificationData = dataRaw;
       return CitizenVerification.create({
         id: row.id,
         bill_id: data.bill_id,
@@ -578,7 +640,11 @@ export class UserVerificationDomainService {
       .orderBy(desc(user_verification.created_at));
 
     const verifications = verificationRows.map((row: any) => {
-      const data = row.verification_data as any;
+      const dataRaw = row.verification_data;
+      if (!isVerificationData(dataRaw)) {
+        throw new Error(`Invalid verification data structure for verification ${row.id}`);
+      }
+      const data: VerificationData = dataRaw;
       return CitizenVerification.create({
         id: row.id,
         bill_id: data.bill_id,

@@ -327,25 +327,25 @@ export class BrowserLogger implements LoggerChild {
     // For browser logger, we create a temporary child logger
     const childLogger = this.child(context);
     // Replace global logger temporarily (if available)
-    const originalLogger = (window as any).browserLogger;
-    (window as any).browserLogger = childLogger;
+    const originalLogger = window.browserLogger;
+    window.browserLogger = childLogger;
 
     try {
       return fn();
     } finally {
-      (window as any).browserLogger = originalLogger;
+      window.browserLogger = originalLogger;
     }
   }
 
   async withContextAsync<T>(context: LogContext, fn: () => Promise<T>): Promise<T> {
     const childLogger = this.child(context);
-    const originalLogger = (window as any).browserLogger;
-    (window as any).browserLogger = childLogger;
+    const originalLogger = window.browserLogger;
+    window.browserLogger = childLogger;
 
     try {
       return await fn();
     } finally {
-      (window as any).browserLogger = originalLogger;
+      window.browserLogger = originalLogger;
     }
   }
 
@@ -418,7 +418,7 @@ export class BrowserLogger implements LoggerChild {
       metadata = metadataOrError as Record<string, unknown>;
     } else if (typeof metadataOrError === 'object' && metadataOrError !== null) {
       // Check if metadataOrError is actually an error
-      if (metadataOrError instanceof Error || (metadataOrError as any).stack) {
+      if (metadataOrError instanceof Error || ('stack' in metadataOrError && typeof (metadataOrError as { stack: unknown }).stack === 'string')) {
         error = metadataOrError;
       } else {
         metadata = metadataOrError as Record<string, unknown>;
@@ -427,15 +427,16 @@ export class BrowserLogger implements LoggerChild {
 
     if (error) {
       const errorObj = error instanceof Error ? error : new Error(String(error));
+      const errorWithLocation = error as Error & { filename?: string; lineno?: number; colno?: number };
       return {
         ...metadata,
         error: {
           message: errorObj.message,
           name: errorObj.name,
           stack: errorObj.stack,
-          filename: (errorObj as any).filename,
-          lineno: (errorObj as any).lineno,
-          colno: (errorObj as any).colno,
+          filename: errorWithLocation.filename,
+          lineno: errorWithLocation.lineno,
+          colno: errorWithLocation.colno,
         },
         browser: {
           user_agent: navigator.userAgent,
@@ -481,8 +482,8 @@ export class BrowserLogger implements LoggerChild {
    * Get memory usage information
    */
   private getMemoryUsage(): Record<string, unknown> | undefined {
-    if ('memory' in performance) {
-      const mem = (performance as any).memory;
+    if ('memory' in performance && performance.memory) {
+      const mem = performance.memory;
       return {
         used: mem.usedJSHeapSize,
         total: mem.totalJSHeapSize,
@@ -496,8 +497,8 @@ export class BrowserLogger implements LoggerChild {
    * Get connection type information
    */
   private getConnectionType(): string | undefined {
-    if ('connection' in navigator) {
-      return (navigator as any).connection?.effectiveType || 'unknown';
+    if ('connection' in navigator && navigator.connection) {
+      return navigator.connection.effectiveType ?? 'unknown';
     }
     return undefined;
   }

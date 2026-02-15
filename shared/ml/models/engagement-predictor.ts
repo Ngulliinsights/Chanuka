@@ -467,7 +467,7 @@ export class EngagementPredictor {
   private recommendFormat(userSegment: keyof typeof this.USER_SEGMENTS, contentMetadata: any): 'full' | 'summary' | 'alert' | 'digest' {
     if (contentMetadata.urgency === 'critical') return 'alert';
     
-    const formatMap = {
+    const formatMap: Record<string, 'full' | 'summary' | 'alert' | 'digest'> = {
       casual: 'summary',
       engaged: 'full',
       expert: 'full',
@@ -475,7 +475,7 @@ export class EngagementPredictor {
       professional: 'digest',
     };
     
-    return (formatMap as any)[userSegment] || 'summary';
+    return formatMap[userSegment] ?? 'summary';
   }
 
   private generatePersonalizationSuggestions(userProfile: any, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {

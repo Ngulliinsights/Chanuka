@@ -182,15 +182,6 @@ export interface ActivityRecord {
   timestamp: string;
 }
 
-export interface ActionItem {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'High' | 'Medium' | 'Low';
-  due_date?: Date;
-  completed: boolean;
-}
-
 export interface UseDashboardResult {
   data: {
     stats?: DashboardStats;

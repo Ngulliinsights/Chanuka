@@ -34,10 +34,14 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
  * Get client IP address from request
  */
 function getClientIP(req: Request): string {
+  // Type-safe access to connection properties
+  const connection = req.connection as { remoteAddress?: string } | undefined;
+  const socket = req.socket as { remoteAddress?: string } | undefined;
+  
   return (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
          req.headers['x-real-ip'] as string ||
-         (req as any).connection?.remoteAddress ||
-         (req as any).socket?.remoteAddress ||
+         connection?.remoteAddress ||
+         socket?.remoteAddress ||
          req.ip ||
          'unknown';
 }

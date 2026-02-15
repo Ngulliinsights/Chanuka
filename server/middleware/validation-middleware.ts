@@ -151,7 +151,7 @@ export function validateRequest<T>(
 
       // Replace request data with validated data
       // This ensures type safety and strips unknown fields if configured
-      req[target] = result.data as any;
+      (req as Record<string, unknown>)[target] = result.data;
 
       next();
     } catch (error) {

@@ -63,10 +63,10 @@ const arbitraryUserTable = fc.record({
   role: fc.constantFrom('user', 'admin', 'moderator'),
   status: fc.constantFrom('active', 'inactive', 'suspended', 'pending'),
   verification_status: fc.constantFrom('unverified', 'pending', 'verified'),
-  last_login: fc.option(fc.date(), { nil: null }),
+  last_login: fc.option(fc.date().filter(d => !isNaN(d.getTime())), { nil: null }),
   is_active: fc.boolean(),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
   created_by: fc.option(fc.uuid().map(id => id as UserId), { nil: null }),
   updated_by: fc.option(fc.uuid().map(id => id as UserId), { nil: null }),
   metadata: fc.option(fc.dictionary(fc.string(), fc.anything()), { nil: null }),
@@ -84,8 +84,8 @@ const arbitraryUserProfileTable = fc.record({
   avatar_url: fc.option(fc.webUrl(), { nil: null }),
   anonymity_level: fc.constantFrom('public', 'pseudonymous', 'anonymous'),
   is_public: fc.boolean(),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -98,8 +98,8 @@ const arbitraryUserPreferencesTable = fc.record({
   notifications_enabled: fc.boolean(),
   email_notifications: fc.boolean(),
   push_notifications: fc.boolean(),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -116,7 +116,7 @@ const arbitraryBillTable = fc.record({
   chamber: fc.constantFrom('house', 'senate'),
   bill_type: fc.constantFrom('bill', 'resolution', 'joint_resolution', 'concurrent_resolution'),
   priority: fc.constantFrom('low', 'medium', 'high', 'critical'),
-  introduction_date: fc.date(),
+  introduction_date: fc.date().filter(d => !isNaN(d.getTime())),
   congress: fc.integer({ min: 1, max: 200 }),
   session: fc.integer({ min: 1, max: 2 }),
   sponsor_id: fc.uuid().map(id => id as SponsorId),
@@ -124,8 +124,8 @@ const arbitraryBillTable = fc.record({
   pdf_url: fc.option(fc.webUrl(), { nil: null }),
   is_active: fc.boolean(),
   version: fc.integer({ min: 1, max: 100 }),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
   created_by: fc.option(fc.uuid().map(id => id as UserId), { nil: null }),
   updated_by: fc.option(fc.uuid().map(id => id as UserId), { nil: null }),
   metadata: fc.option(fc.dictionary(fc.string(), fc.anything()), { nil: null }),
@@ -138,12 +138,12 @@ const arbitraryBillTimelineEventTable = fc.record({
   id: fc.uuid().map(id => id as BillTimelineEventId),
   bill_id: fc.uuid().map(id => id as BillId),
   action_type: fc.constantFrom('introduced', 'referred', 'reported', 'voted', 'passed', 'failed', 'signed', 'vetoed'),
-  timestamp: fc.date(),
+  timestamp: fc.date().filter(d => !isNaN(d.getTime())),
   description: fc.string({ minLength: 10, maxLength: 500 }),
   chamber: fc.option(fc.constantFrom('house', 'senate'), { nil: null }),
   result: fc.option(fc.string({ maxLength: 100 }), { nil: null }),
   metadata: fc.option(fc.dictionary(fc.string(), fc.anything()), { nil: null }),
-  created_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -156,9 +156,9 @@ const arbitraryBillEngagementMetricsTable = fc.record({
   shares: fc.integer({ min: 0, max: 10000 }),
   endorsements: fc.integer({ min: 0, max: 10000 }),
   oppositions: fc.integer({ min: 0, max: 10000 }),
-  last_engaged_at: fc.option(fc.date(), { nil: null }),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  last_engaged_at: fc.option(fc.date().filter(d => !isNaN(d.getTime())), { nil: null }),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -173,10 +173,10 @@ const arbitrarySponsorTable = fc.record({
   state: fc.string({ minLength: 2, maxLength: 2 }),
   district: fc.option(fc.string({ minLength: 1, maxLength: 10 }), { nil: null }),
   sponsor_type: fc.constantFrom('primary', 'cosponsor'),
-  sponsorship_date: fc.date(),
+  sponsorship_date: fc.date().filter(d => !isNaN(d.getTime())),
   is_primary: fc.boolean(),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -189,8 +189,8 @@ const arbitraryCommitteeTable = fc.record({
   chamber: fc.constantFrom('house', 'senate'),
   jurisdiction: fc.string({ minLength: 10, maxLength: 500 }),
   chairperson: fc.option(fc.string({ minLength: 3, maxLength: 100 }), { nil: null }),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 /**
@@ -200,12 +200,12 @@ const arbitraryBillCommitteeAssignmentTable = fc.record({
   id: fc.uuid().map(id => id as BillCommitteeAssignmentId),
   bill_id: fc.uuid().map(id => id as BillId),
   committee_id: fc.uuid().map(id => id as CommitteeId),
-  assignment_date: fc.date(),
+  assignment_date: fc.date().filter(d => !isNaN(d.getTime())),
   status: fc.constantFrom('assigned', 'in_review', 'reported', 'discharged'),
   action_taken: fc.option(fc.string({ maxLength: 500 }), { nil: null }),
-  report_date: fc.option(fc.date(), { nil: null }),
-  created_at: fc.date(),
-  updated_at: fc.date(),
+  report_date: fc.option(fc.date().filter(d => !isNaN(d.getTime())), { nil: null }),
+  created_at: fc.date().filter(d => !isNaN(d.getTime())),
+  updated_at: fc.date().filter(d => !isNaN(d.getTime())),
 });
 
 // ============================================================================
@@ -269,9 +269,15 @@ describe('Feature: full-stack-integration, Property 8: Transformation Pipeline C
           const domainUser2 = userDomainToApi.reverse(apiUser);
           const dbUser2 = userDbToDomain.reverse(domainUser2);
           
+          // Note: password_hash is excluded from comparison because it's intentionally
+          // not exposed in the API layer for security reasons. It cannot be preserved
+          // through a full round-trip that includes the API transformation.
+          const { password_hash: _, ...dbUserWithoutPassword } = dbUser;
+          const { password_hash: __, ...dbUser2WithoutPassword } = dbUser2;
+          
           // Normalize for comparison (handle undefined vs null)
-          const normalized1 = normalizeForComparison(dbUser);
-          const normalized2 = normalizeForComparison(dbUser2);
+          const normalized1 = normalizeForComparison(dbUserWithoutPassword);
+          const normalized2 = normalizeForComparison(dbUser2WithoutPassword);
           
           // Data should be equivalent after round trip
           expect(deepEqual(normalized1, normalized2)).toBe(true);
@@ -514,7 +520,6 @@ describe('Feature: full-stack-integration, Property 8: Transformation Pipeline C
             id: 'test-id' as UserId,
             email: 'test@example.com',
             username: 'testuser',
-            password_hash: 'hash',
             role: 'user',
             status: 'active',
             verification_status: 'verified',
@@ -562,7 +567,6 @@ describe('Feature: full-stack-integration, Property 8: Transformation Pipeline C
             id: 'test-id' as UserId,
             email: 'test@example.com',
             username: 'testuser',
-            password_hash: 'hash',
             role: 'user',
             status: 'active',
             verification_status: 'verified',
@@ -608,7 +612,6 @@ describe('Feature: full-stack-integration, Property 8: Transformation Pipeline C
             id: 'test-id' as UserId,
             email: 'test@example.com',
             username: 'testuser',
-            password_hash: 'hash',
             role,
             status,
             verification_status: verification,
@@ -648,7 +651,6 @@ describe('Feature: full-stack-integration, Property 8: Transformation Pipeline C
             id: userId as UserId,
             email: 'test@example.com',
             username: 'testuser',
-            password_hash: 'hash',
             role: 'user',
             status: 'active',
             verification_status: 'verified',

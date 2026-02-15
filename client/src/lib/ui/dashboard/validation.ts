@@ -76,7 +76,6 @@ export const DashboardDataSchema = z.object({
 });
 
 // Type definitions derived from schemas
-export type ActionItem = z.infer<typeof ActionItemSchema>;
 export type ActivitySummary = z.infer<typeof ActivitySummarySchema>;
 export type TrackedTopic = z.infer<typeof TrackedTopicSchema>;
 export type DashboardConfig = z.infer<typeof DashboardConfigSchema>;

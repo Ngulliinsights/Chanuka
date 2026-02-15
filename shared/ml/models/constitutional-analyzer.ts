@@ -163,11 +163,12 @@ export class ConstitutionalAnalyzer {
 
     // Pattern-based violation detection
     for (const [type, patterns] of Object.entries(this.VIOLATION_PATTERNS)) {
+      const violationType = type as 'procedural_fairness' | 'separation_powers' | 'bill_of_rights' | 'devolution' | 'public_finance';
       for (const { pattern, article, severity } of patterns) {
         if (pattern.test(input.billText)) {
           violations.push({
             provision: article,
-            violationType: type as any,
+            violationType,
             severity,
             explanation: this.generateViolationExplanation(pattern, article),
             recommendedAction: this.getRecommendedAction(severity, type),

@@ -599,7 +599,7 @@ export async function resolveConflict(
       .where(
         and(
           eq(graph_sync_status.entity_type, entityType),
-          eq(graph_sync_status.entity_id, entityId as any)
+          eq(graph_sync_status.entity_id, entityId)
         )
       );
 
@@ -638,15 +638,15 @@ async function fetchPostgresEntity(
     switch (entityType) {
       case 'User':
         return await db.query.users.findFirst({
-          where: (users, { eq }) => eq(users.id, entityId as any),
+          where: (users, { eq }) => eq(users.id, entityId),
         });
       case 'Person':
         return await db.query.sponsors.findFirst({
-          where: (sponsors, { eq }) => eq(sponsors.id, entityId as any),
+          where: (sponsors, { eq }) => eq(sponsors.id, entityId),
         });
       case 'Bill':
         return await db.query.bills.findFirst({
-          where: (bills, { eq }) => eq(bills.id, entityId as any),
+          where: (bills, { eq }) => eq(bills.id, entityId),
         });
       default:
         logger.warn('Unknown entity type', { entityType });

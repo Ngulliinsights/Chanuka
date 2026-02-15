@@ -37,14 +37,6 @@ export {
 // ============================================================================
 // Base Types
 // ============================================================================
-
-/** Base entity interface providing common audit fields */
-interface BaseEntity {
-  readonly id: string;
-  readonly createdAt?: string;
-  readonly updatedAt?: string;
-}
-
 /** Supported chamber types in the Kenyan legislative system */
 export type ChamberType = 'House' | 'Senate' | 'Both';
 

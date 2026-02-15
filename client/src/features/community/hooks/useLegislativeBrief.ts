@@ -9,34 +9,6 @@ import { useQuery } from '@tanstack/react-query';
 
 // Client-side type that matches what the API returns
 // Maps from server schema (legislative_briefs table) to client needs
-interface LegislativeBrief {
-  id: string;
-  billId: string;
-  briefType: string;
-  title: string;
-  executiveSummary: string;
-  keyArguments: {
-    support: string[];
-    oppose: string[];
-    neutral: string[];
-  };
-  stakeholderPositions: Record<string, unknown>;
-  publicSentiment: {
-    supportCount: number;
-    opposeCount: number;
-    neutralCount: number;
-  };
-  commonThemes?: string[];
-  topSupportingArguments?: string[];
-  topOpposingArguments?: string[];
-  constitutionalImplications?: string;
-  generatedBy: string;
-  dataCutoffDate: string | Date;
-  deliveredToCommittee: boolean;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-}
-
 // Convenience type for the component
 export interface LegislativeBriefWithCounts extends LegislativeBrief {
   supportCount: number;

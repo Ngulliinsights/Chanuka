@@ -319,8 +319,6 @@ export const synthesisJobsRelations = relations(synthesis_jobs, ({ one }) => ({
 // ============================================================================
 // TYPE EXPORTS
 // ============================================================================
-
-export type Argument = typeof argumentTable.$inferSelect;
 export type NewArgument = typeof argumentTable.$inferInsert;
 
 export type Claim = typeof claims.$inferSelect;

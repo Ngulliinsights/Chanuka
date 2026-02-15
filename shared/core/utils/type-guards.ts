@@ -274,6 +274,77 @@ export class TypeGuards {
   }
 }
 
+// ==================== Enum Converter Utilities ====================
+
+/**
+ * Interface for type-safe enum conversion
+ */
+export interface EnumConverter<T extends string> {
+  /**
+   * Converts an unknown value to a typed enum value
+   * @throws {TypeError} if value is not a string
+   * @throws {Error} if value is not a valid enum value
+   */
+  toEnum(value: unknown): T;
+  
+  /**
+   * Converts an enum value back to a string
+   */
+  fromEnum(value: T): string;
+  
+  /**
+   * Type guard to check if a value is a valid enum value
+   */
+  isValid(value: unknown): value is T;
+}
+
+/**
+ * Creates a type-safe enum converter for a given set of enum values
+ * 
+ * @param enumValues - Array of valid enum values
+ * @param enumName - Name of the enum for error messages
+ * @returns EnumConverter instance with type-safe conversion methods
+ * 
+ * @example
+ * ```typescript
+ * const statusConverter = createEnumConverter(
+ *   ['active', 'inactive', 'suspended'] as const,
+ *   'UserStatus'
+ * );
+ * 
+ * const status = statusConverter.toEnum(rawData.status); // Type-safe!
+ * ```
+ */
+export function createEnumConverter<T extends string>(
+  enumValues: readonly T[],
+  enumName: string
+): EnumConverter<T> {
+  const validValues = new Set(enumValues);
+  
+  return {
+    toEnum(value: unknown): T {
+      if (typeof value !== 'string') {
+        throw new TypeError(
+          `Expected string for ${enumName}, got ${typeof value}`
+        );
+      }
+      if (!validValues.has(value as T)) {
+        throw new Error(
+          `Invalid ${enumName}: "${value}". Expected one of: ${Array.from(enumValues).join(', ')}`
+        );
+      }
+      return value as T;
+    },
+    
+    fromEnum(value: T): string {
+      return value;
+    },
+    
+    isValid(value: unknown): value is T {
+      return typeof value === 'string' && validValues.has(value as T);
+    },
+  };
+}
 
 
 
@@ -321,3 +392,172 @@ export class TypeGuards {
 
 
 
+
+
+
+// ==================== Pre-configured Enum Converters ====================
+
+import {
+  UserRole,
+  UserStatus,
+  BillStatus,
+  Chamber,
+  VoteType,
+  ArgumentPosition,
+  BillVoteType,
+  CommentStatus,
+  ModerationStatus,
+  NotificationType,
+  VerificationStatus,
+  AnonymityLevel,
+  BillType,
+  CommitteeStatus,
+  UrgencyLevel,
+  ComplexityLevel,
+  KenyanCounty,
+  USER_ROLE_VALUES,
+} from '../../types/core/enums';
+
+/**
+ * Type-safe converter for UserRole enum
+ * 
+ * @example
+ * ```typescript
+ * const role = userRoleConverter.toEnum(rawData.role);
+ * if (userRoleConverter.isValid(someValue)) {
+ *   // someValue is UserRole
+ * }
+ * ```
+ */
+export const userRoleConverter = createEnumConverter(
+  Object.values(UserRole) as readonly UserRole[],
+  'UserRole'
+);
+
+/**
+ * Type-safe converter for UserStatus enum
+ */
+export const userStatusConverter = createEnumConverter(
+  Object.values(UserStatus) as readonly UserStatus[],
+  'UserStatus'
+);
+
+/**
+ * Type-safe converter for BillStatus enum
+ */
+export const billStatusConverter = createEnumConverter(
+  Object.values(BillStatus) as readonly BillStatus[],
+  'BillStatus'
+);
+
+/**
+ * Type-safe converter for Chamber enum
+ */
+export const chamberConverter = createEnumConverter(
+  Object.values(Chamber) as readonly Chamber[],
+  'Chamber'
+);
+
+/**
+ * Type-safe converter for VoteType enum
+ */
+export const voteTypeConverter = createEnumConverter(
+  Object.values(VoteType) as readonly VoteType[],
+  'VoteType'
+);
+
+/**
+ * Type-safe converter for ArgumentPosition enum
+ */
+export const argumentPositionConverter = createEnumConverter(
+  Object.values(ArgumentPosition) as readonly ArgumentPosition[],
+  'ArgumentPosition'
+);
+
+/**
+ * Type-safe converter for BillVoteType enum
+ */
+export const billVoteTypeConverter = createEnumConverter(
+  Object.values(BillVoteType) as readonly BillVoteType[],
+  'BillVoteType'
+);
+
+/**
+ * Type-safe converter for CommentStatus enum
+ */
+export const commentStatusConverter = createEnumConverter(
+  Object.values(CommentStatus) as readonly CommentStatus[],
+  'CommentStatus'
+);
+
+/**
+ * Type-safe converter for ModerationStatus enum
+ */
+export const moderationStatusConverter = createEnumConverter(
+  Object.values(ModerationStatus) as readonly ModerationStatus[],
+  'ModerationStatus'
+);
+
+/**
+ * Type-safe converter for NotificationType enum
+ */
+export const notificationTypeConverter = createEnumConverter(
+  Object.values(NotificationType) as readonly NotificationType[],
+  'NotificationType'
+);
+
+/**
+ * Type-safe converter for VerificationStatus enum
+ */
+export const verificationStatusConverter = createEnumConverter(
+  Object.values(VerificationStatus) as readonly VerificationStatus[],
+  'VerificationStatus'
+);
+
+/**
+ * Type-safe converter for AnonymityLevel enum
+ */
+export const anonymityLevelConverter = createEnumConverter(
+  Object.values(AnonymityLevel) as readonly AnonymityLevel[],
+  'AnonymityLevel'
+);
+
+/**
+ * Type-safe converter for BillType enum
+ */
+export const billTypeConverter = createEnumConverter(
+  Object.values(BillType) as readonly BillType[],
+  'BillType'
+);
+
+/**
+ * Type-safe converter for CommitteeStatus enum
+ */
+export const committeeStatusConverter = createEnumConverter(
+  Object.values(CommitteeStatus) as readonly CommitteeStatus[],
+  'CommitteeStatus'
+);
+
+/**
+ * Type-safe converter for UrgencyLevel enum
+ */
+export const urgencyLevelConverter = createEnumConverter(
+  Object.values(UrgencyLevel) as readonly UrgencyLevel[],
+  'UrgencyLevel'
+);
+
+/**
+ * Type-safe converter for ComplexityLevel enum
+ */
+export const complexityLevelConverter = createEnumConverter(
+  Object.values(ComplexityLevel) as readonly ComplexityLevel[],
+  'ComplexityLevel'
+);
+
+/**
+ * Type-safe converter for KenyanCounty enum
+ */
+export const kenyanCountyConverter = createEnumConverter(
+  Object.values(KenyanCounty) as readonly KenyanCounty[],
+  'KenyanCounty'
+);

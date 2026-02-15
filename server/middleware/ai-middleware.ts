@@ -11,13 +11,15 @@
 import { performance } from 'perf_hooks';
 
 import { Request, Response, NextFunction } from 'express';
+import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 
 import { getDefaultCache } from '../cache';
-// import { RateLimitMiddleware } from '../rate-limiting/middleware'; // Unused import
+// import { RateLimitMiddleware } from '../rate-limiting/middleware';
+ // Unused import
 import { logger } from '../observability/logging';
 import { RateLimitStore } from '../rate-limiting/types';
 
-export interface AIRequest extends Request { aiContext?: {
+export interface AIRequest extends AuthenticatedRequest { aiContext?: {
     service: string;
     operation: string;
     startTime: number;
@@ -56,7 +58,7 @@ export function aiRequestMiddleware(options: AIMiddlewareOptions) { return async
       operation: req.path.split('/').pop() || 'unknown',
       startTime,
       requestId,
-      user_id: (req as any).user?.id,
+      user_id: getUserId(req) || undefined,
       cached: false
      };
 
@@ -252,7 +254,7 @@ async function validateAIRequest(req: Request): Promise<{
 
   return {
     valid: errors.length === 0,
-    errors: errors.length > 0 ? errors : undefined as any
+    errors: errors.length > 0 ? errors : undefined
   };
 }
 

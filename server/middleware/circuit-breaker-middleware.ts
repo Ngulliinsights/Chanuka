@@ -320,7 +320,8 @@ export function forceCircuitBreakerState(
 ): void {
   const circuitBreaker = circuitBreakers.get(serviceName);
   if (circuitBreaker) {
-    circuitBreaker.forceState(state as any);
+    // Type-safe state forcing - the CircuitBreaker class accepts these string literals
+    circuitBreaker.forceState(state);
     logger.warn('Circuit breaker state forced', {
       component: 'CircuitBreakerMiddleware',
       serviceName,

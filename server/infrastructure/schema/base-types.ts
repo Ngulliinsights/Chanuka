@@ -138,29 +138,10 @@ export const codeField = (maxLength = 50) =>
 // ============================================================================
 
 /**
- * Base entity with UUID and audit timestamps
- */
-export interface BaseEntity {
-  id: string; // UUID
-  created_at: Date;
-  updated_at: Date;
-}
-
-/**
  * Soft-deletable entity
  */
 export interface SoftDeletable extends BaseEntity {
   deleted_at: Date | null;
-}
-
-/**
- * Full audit trail entity
- */
-export interface FullAuditEntity extends BaseEntity {
-  created_by: string;
-  updated_by: string;
-  deleted_at: Date | null;
-  deleted_by: string | null;
 }
 
 /**
@@ -169,13 +150,6 @@ export interface FullAuditEntity extends BaseEntity {
 export interface VersionedEntity extends BaseEntity {
   version: number;
   change_hash: string; // Hash of what changed
-}
-
-/**
- * Trackable entity with user reference
- */
-export interface UserTrackableEntity extends BaseEntity {
-  user_id: string;
 }
 
 /**
@@ -253,6 +227,14 @@ export const BaseTypeHelpers = {
 // ============================================================================
 // VERSION
 // ============================================================================
+export const BASE_TYPES_VERSION = "1.0.0";
+export const BASE_TYPES_CHANGELOG = {
+  "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",
+} as const;
+SE_TYPES_CHANGELOG = {
+  "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",
+} as const;
+=====
 export const BASE_TYPES_VERSION = "1.0.0";
 export const BASE_TYPES_CHANGELOG = {
   "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",

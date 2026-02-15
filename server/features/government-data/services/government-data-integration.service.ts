@@ -8,6 +8,11 @@ import { logger  } from '@shared/core';
 import { cache  } from '@shared/core';
 import { bills, sponsors } from '@shared/schema';
 import { and, desc, eq, isNull,sql } from 'drizzle-orm';
+import { 
+  billStatusConverter, 
+  chamberConverter, 
+  kenyanCountyConverter 
+} from '@shared/core/utils/type-guards';
 
 export interface DataSource {
   name: string;
@@ -560,6 +565,13 @@ export class GovernmentDataIntegrationService {
         .where(eq(bills.bill_number, billData.billNumber))
         .limit(1);
 
+      // Convert enum values using type-safe converters
+      const status = billStatusConverter.toEnum(billData.status);
+      const chamber = chamberConverter.toEnum(billData.chamber);
+      const affectedCounties = billData.affectedCounties?.map(county => 
+        kenyanCountyConverter.toEnum(county)
+      );
+
       if (existingBill.length > 0) {
         // Update existing bill
         await databaseService.db
@@ -568,11 +580,11 @@ export class GovernmentDataIntegrationService {
             title: billData.title,
             summary: billData.summary,
             full_text: billData.fullText,
-            status: billData.status as any,
+            status: status,
             introduced_date: billData.introduced_date,
             committee: billData.committee,
             tags: billData.tags,
-            affected_counties: billData.affectedCounties as any,
+            affected_counties: affectedCounties,
             updated_at: new Date()
           })
           .where(eq(bills.bill_number, billData.billNumber));
@@ -587,12 +599,12 @@ export class GovernmentDataIntegrationService {
             title: billData.title,
             summary: billData.summary,
             full_text: billData.fullText,
-            status: billData.status as any,
+            status: status,
             introduced_date: billData.introduced_date,
-            chamber: billData.chamber as any,
+            chamber: chamber,
             committee: billData.committee,
             tags: billData.tags,
-            affected_counties: billData.affectedCounties as any,
+            affected_counties: affectedCounties,
             created_at: new Date(),
             updated_at: new Date()
           });

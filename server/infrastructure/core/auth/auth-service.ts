@@ -5,6 +5,7 @@ import { logger } from '@shared/core';
 import { database as db } from '@server/infrastructure/database';
 import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@server/infrastructure/schema';
 import { inputValidationService } from '@shared/validation/input-validation-service.js';
+import { verifyJwtToken, verifyRefreshToken, JwtPayload, RefreshTokenPayload } from './jwt-types';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import { and, desc, eq, gt, isNotNull, lt, ne } from 'drizzle-orm';
@@ -386,7 +387,15 @@ export class AuthService {
     try {
       // Invalidate session by setting expiration to now
       // We need to find the session by user_id from the token
-      const decoded = jwt.verify(token, this.jwtSecret) as any;
+      const decoded = verifyJwtToken(token, this.jwtSecret);
+      
+      if (!decoded) {
+        return {
+          success: false,
+          error: 'Invalid token'
+        };
+      }
+
       await db
         .update(sessions)
         .set({ expires_at: new Date() })
@@ -412,7 +421,14 @@ export class AuthService {
   async refreshToken(refresh_token: string): Promise<AuthResult> {
     try {
       // Verify refresh token
-      const decoded = jwt.verify(refresh_token, this.refreshTokenSecret) as any;
+      const decoded = verifyRefreshToken(refresh_token, this.refreshTokenSecret);
+      
+      if (!decoded) {
+        return {
+          success: false,
+          error: 'Invalid refresh token'
+        };
+      }
 
       // Find session by user_id from decoded token
       const session = await db
@@ -690,7 +706,14 @@ export class AuthService {
    */
   async verifyToken(token: string): Promise<AuthResult> {
     try {
-      const decoded = jwt.verify(token, this.jwtSecret) as any;
+      const decoded = verifyJwtToken(token, this.jwtSecret);
+      
+      if (!decoded) {
+        return {
+          success: false,
+          error: 'Invalid token'
+        };
+      }
 
       // Check if session is still active
       const session = await db

@@ -445,11 +445,7 @@ export const coalitionRelationshipsRelations = relations(coalition_relationships
 // ============================================================================
 // TYPE EXPORTS
 // ============================================================================
-
-export type Campaign = typeof campaigns.$inferSelect;
 export type NewCampaign = typeof campaigns.$inferInsert;
-
-export type ActionItem = typeof action_items.$inferSelect;
 export type NewActionItem = typeof action_items.$inferInsert;
 
 export type CampaignParticipant = typeof campaign_participants.$inferSelect;

@@ -459,10 +459,11 @@ export class SentimentAnalyzer {
     const categories = new Set<'hate_speech' | 'harassment' | 'threat' | 'profanity' | 'spam'>();
 
     for (const [category, keywords] of Object.entries(this.TOXICITY_PATTERNS)) {
+      const toxicityCategory = category as 'hate_speech' | 'harassment' | 'threat' | 'profanity' | 'spam';
       for (const keyword of keywords) {
         if (tokens.includes(keyword) || text.includes(keyword)) {
           toxicityScore += 0.2;
-          categories.add(category as any);
+          categories.add(toxicityCategory);
         }
       }
     }

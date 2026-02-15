@@ -400,17 +400,6 @@ export type DashboardSection = 'activity' | 'actions' | 'topics' | 'analytics';
 
 export type ActionPriority = 'High' | 'Medium' | 'Low';
 
-export interface ActionItem {
-  id: string;
-  title: string;
-  description: string;
-  priority: ActionPriority;
-  due_date?: Date;
-  completed: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface ActivitySummary {
   billsTracked: number;
   actionsNeeded: number;

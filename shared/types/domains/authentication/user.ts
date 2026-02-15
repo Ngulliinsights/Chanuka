@@ -75,11 +75,12 @@ export interface User extends UserTrackableEntity {
   readonly role: UserRole;
   readonly status: UserStatus;
   readonly profile: UserProfile | null;
-  readonly preferences: UserPreferences;
+  readonly preferences: UserPreferences | Record<string, never>; // Can be empty object when not loaded
   readonly verification: VerificationStatus;
   readonly lastLogin?: Date;
   readonly isActive: boolean;
   readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly passwordHash?: string; // Internal field for round-trip preservation, never exposed to API
 }
 
 /**

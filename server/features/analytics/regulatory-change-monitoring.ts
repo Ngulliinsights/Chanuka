@@ -1,7 +1,7 @@
 import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
 import { cacheService } from '@shared/core/caching';
-import { logger   } from '@shared/core';
-import { database as db } from '@server/infrastructure/database/connection";
+import { logger } from '@shared/core';
+import { database as db } from '@server/infrastructure/database/connection';
 import { and, count, desc, eq, gt, gte, lte,or, sql } from "drizzle-orm";
 
 import {

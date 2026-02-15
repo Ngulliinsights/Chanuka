@@ -1,20 +1,3 @@
-/**
- * Argument Intelligence Types
- * 
- * Types for the argument extraction and clustering features.
- */
-
-export interface Argument {
-  id: string;
-  billId: string;
-  content: string;
-  stance: 'pro' | 'con' | 'neutral';
-  confidence?: number;
-  sources?: string[];
-  createdAt: string;
-  metadata?: Record<string, unknown>;
-}
-
 export interface ArgumentCluster {
   id: string;
   billId: string;

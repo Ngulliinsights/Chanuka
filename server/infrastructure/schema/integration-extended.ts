@@ -42,7 +42,7 @@ import {
 } from "../../../shared/dist/core/src/validation/schemas/common";
 
 // Import validation utilities
-import { createValidatedType, ValidatedType } from "../types/core/validation";
+import { createValidatedType, ValidatedType } from "../../../shared/dist/core/caching/validation.d";
 import { z } from "zod";
 
 // ============================================================================
@@ -764,8 +764,5 @@ export const SCHEMA_INTEGRATION_EXTENDED_CHANGELOG = {
   ✅ Backward compatibility maintained
   ✅ Performance-optimized indexes
   ✅ Data validation at database level
-  `,
-} as const;
-evel
   `,
 } as const;

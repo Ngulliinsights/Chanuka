@@ -9,6 +9,7 @@ import * as Boom from '@hapi/boom';
 import { logger  } from '@shared/core';
 import { errorAdapter } from '@shared/infrastructure/errors/error-adapter';
 import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization';
+import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 import { NextFunction,Request, Response } from 'express';
 import { ZodError } from 'zod';
 
@@ -50,7 +51,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -85,7 +86,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -105,7 +106,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -126,7 +127,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -146,7 +147,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -165,7 +166,7 @@ export function boomErrorMiddleware(
           service: 'api-middleware',
           operation: req.method + ' ' + req.path,
           requestId: req.headers['x-request-id'] as string,
-          user_id: (req as any).user?.id
+          user_id: getUserId(req) || undefined
         }
       );
 
@@ -210,7 +211,7 @@ export function boomErrorMiddleware(
         code: errorResponse.error.code,
         path: req.path,
         method: req.method,
-        user_id: (req as any).user?.id,
+        user_id: getUserId(req) || undefined,
         requestId: req.headers['x-request-id']
       });
     }
@@ -252,6 +253,7 @@ export function boomErrorMiddleware(
  * Create fallback error response when adapter methods fail
  */
 function createFallbackErrorResponse(boomError: Boom.Boom, req: Request): ErrorResponse {
+  const authReq = req as AuthenticatedRequest;
   return {
     success: false,
     error: {
@@ -264,7 +266,7 @@ function createFallbackErrorResponse(boomError: Boom.Boom, req: Request): ErrorR
     },
     metadata: {
       service: 'legislative-platform',
-      requestId: (req as any).requestId || req.headers['x-request-id'] as string
+      requestId: authReq.requestId || req.headers['x-request-id'] as string
     }
   };
 }
@@ -299,7 +301,7 @@ function logError(boomError: Boom.Boom, req: Request, originalError: any): void 
     statusCode,
     path: req.path,
     method: req.method,
-    user_id: (req as any).user?.id,
+    user_id: getUserId(req) || undefined,
     requestId: req.headers['x-request-id'],
     userAgent: req.headers['user-agent'],
     ip: req.ip,
@@ -335,18 +337,20 @@ export function errorContextMiddleware(
   res: Response,
   next: NextFunction
 ): void {
+  const authReq = req as AuthenticatedRequest;
+  
   // Add request ID if not present
   if (!req.headers['x-request-id']) {
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     req.headers['x-request-id'] = requestId;
     // Also set it as a property for easier access
-    (req as any).requestId = requestId;
+    authReq.requestId = requestId;
   } else {
-    (req as any).requestId = req.headers['x-request-id'];
+    authReq.requestId = req.headers['x-request-id'] as string;
   }
 
   // Add timestamp
-  (req as any).startTime = Date.now();
+  authReq.startTime = Date.now();
 
   next();
 }

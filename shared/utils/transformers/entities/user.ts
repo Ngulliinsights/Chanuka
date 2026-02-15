@@ -41,6 +41,7 @@ export const userDbToDomain: Transformer<UserTable, User> = {
       updatedAt: dbUser.updated_at,
       createdBy: dbUser.created_by ?? undefined,
       updatedBy: dbUser.updated_by ?? undefined,
+      passwordHash: dbUser.password_hash, // Preserve for round-trip
     };
   },
 
@@ -49,7 +50,7 @@ export const userDbToDomain: Transformer<UserTable, User> = {
       id: user.id,
       email: user.email,
       username: user.username,
-      password_hash: '', // Password hash is not part of domain model
+      password_hash: user.passwordHash ?? '', // Restore from domain model
       role: user.role,
       status: user.status,
       verification_status: user.verification,
@@ -121,8 +122,8 @@ export const userPreferencesDbToDomain: Transformer<UserPreferencesTable, UserPr
       user_id: preferences.userId,
       theme: preferences.theme ?? null,
       language: preferences.language ?? null,
-      notifications_enabled: preferences.notificationsEnabled ?? true,
-      email_notifications: preferences.emailNotifications ?? true,
+      notifications_enabled: preferences.notificationsEnabled ?? false,
+      email_notifications: preferences.emailNotifications ?? false,
       push_notifications: preferences.pushNotifications ?? false,
       created_at: preferences.createdAt,
       updated_at: preferences.updatedAt,
@@ -144,7 +145,7 @@ export interface ApiUser {
   readonly role: string;
   readonly status: string;
   readonly profile: ApiUserProfile | null;
-  readonly preferences: ApiUserPreferences;
+  readonly preferences: ApiUserPreferences | Record<string, never>; // Can be empty object when not loaded
   readonly verification: string;
   readonly lastLogin?: string;
   readonly isActive: boolean;
@@ -190,6 +191,9 @@ export interface ApiUserPreferences {
  */
 export const userDomainToApi: Transformer<User, ApiUser> = {
   transform(user: User): ApiUser {
+    // Check if preferences is a proper UserPreferences object or an empty object
+    const hasPreferences = 'userId' in user.preferences && 'createdAt' in user.preferences;
+    
     return {
       id: user.id,
       email: user.email,
@@ -197,7 +201,9 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
       role: user.role,
       status: user.status,
       profile: user.profile ? userProfileDomainToApi.transform(user.profile) : null,
-      preferences: userPreferencesDomainToApi.transform(user.preferences),
+      preferences: hasPreferences 
+        ? userPreferencesDomainToApi.transform(user.preferences as UserPreferences)
+        : {} as ApiUserPreferences,
       verification: user.verification,
       lastLogin: user.lastLogin ? dateToStringTransformer.transform(user.lastLogin) : undefined,
       isActive: user.isActive,
@@ -206,10 +212,14 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
       updatedAt: dateToStringTransformer.transform(user.updatedAt),
       createdBy: user.createdBy,
       updatedBy: user.updatedBy,
+      // passwordHash is intentionally NOT included in API representation for security
     };
   },
 
   reverse(apiUser: ApiUser): User {
+    // Check if preferences is a proper ApiUserPreferences object or an empty object
+    const hasPreferences = 'userId' in apiUser.preferences && 'createdAt' in apiUser.preferences;
+    
     return {
       id: apiUser.id as UserId,
       email: apiUser.email,
@@ -217,7 +227,9 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
       role: apiUser.role as UserRole,
       status: apiUser.status as UserStatus,
       profile: apiUser.profile ? userProfileDomainToApi.reverse(apiUser.profile) : null,
-      preferences: userPreferencesDomainToApi.reverse(apiUser.preferences),
+      preferences: hasPreferences
+        ? userPreferencesDomainToApi.reverse(apiUser.preferences as ApiUserPreferences)
+        : {},
       verification: apiUser.verification as VerificationStatus,
       lastLogin: apiUser.lastLogin ? dateToStringTransformer.reverse(apiUser.lastLogin) : undefined,
       isActive: apiUser.isActive,
@@ -226,6 +238,7 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
       updatedAt: dateToStringTransformer.reverse(apiUser.updatedAt),
       createdBy: apiUser.createdBy as UserId | undefined,
       updatedBy: apiUser.updatedBy as UserId | undefined,
+      // passwordHash is not in API, so it will be undefined here (lost in API round-trip)
     };
   },
 };

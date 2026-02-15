@@ -204,21 +204,21 @@ class DatabaseMonitoringService {
 
         // Record pool health metrics
         for (const [poolName, status] of Object.entries(healthStatuses)) {
-          pm.recordMetric('db.pool.connections.total', (status as any).totalConnections, {
+          pm.recordMetric('db.pool.connections.total', status.totalConnections, {
             pool: poolName,
             component: 'database_monitoring'
           });
-          pm.recordMetric('db.pool.connections.idle', (status as any).idleConnections, {
+          pm.recordMetric('db.pool.connections.idle', status.idleConnections, {
             pool: poolName,
             component: 'database_monitoring'
           });
-          pm.recordMetric('db.pool.connections.waiting', (status as any).waitingClients, {
+          pm.recordMetric('db.pool.connections.waiting', status.waitingClients, {
             pool: poolName,
             component: 'database_monitoring'
           });
 
           // Record health status
-          pm.recordMetric('db.pool.healthy', (status as any).isHealthy ? 1 : 0, {
+          pm.recordMetric('db.pool.healthy', status.isHealthy ? 1 : 0, {
             pool: poolName,
             component: 'database_monitoring'
           });
@@ -226,17 +226,17 @@ class DatabaseMonitoringService {
       }
 
       // Analyze health status and identify critical issues
-      const criticalIssues = this.analyzeHealthStatuses(healthStatuses as any);
+      const criticalIssues = this.analyzeHealthStatuses(healthStatuses);
 
       if (criticalIssues.length > 0) {
         this.handleCriticalIssues(criticalIssues);
       } else {
-        this.logHealthyStatus(healthStatuses as any);
+        this.logHealthyStatus(healthStatuses);
       }
 
       // Track health state changes for alerting
       if (this.config.alertOnHealthChange) {
-        this.detectHealthStateChanges(healthStatuses as any);
+        this.detectHealthStateChanges(healthStatuses);
       }
 
       // Track check duration for performance monitoring

@@ -560,23 +560,6 @@ export type ActivityType =
   | 'bill_share'
   | 'campaign_join'
   | 'petition_sign';
-
-/**
- * Trending topic in the community
- */
-export interface TrendingTopic {
-  readonly id: string;
-  readonly name: string;
-  readonly category: TopicCategory;
-  readonly billCount: number;
-  readonly isActive: boolean;
-  readonly description?: string;
-  readonly keywords?: string[];
-  readonly createdAt: string;
-  readonly updatedAt?: string;
-  readonly trendingScore?: number;
-}
-
 export type TopicCategory =
   | 'healthcare'
   | 'education'

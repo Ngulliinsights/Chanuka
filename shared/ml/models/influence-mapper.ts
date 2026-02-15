@@ -571,7 +571,7 @@ export class InfluenceMapper {
   }
 
   private determineFlowType(edge: EdgeData): 'financial' | 'informational' | 'political' | 'social' {
-    const mapping = {
+    const mapping: Record<string, 'financial' | 'informational' | 'political' | 'social'> = {
       financial: 'financial',
       employment: 'informational',
       business: 'financial',
@@ -579,7 +579,7 @@ export class InfluenceMapper {
       family: 'social',
       social: 'social',
     };
-    return (mapping as any)[edge.type as keyof typeof mapping] || 'informational';
+    return mapping[edge.type] ?? 'informational';
   }
 
   private detectLobbyingPatterns(network: NetworkGraph, input: InfluenceInput) {

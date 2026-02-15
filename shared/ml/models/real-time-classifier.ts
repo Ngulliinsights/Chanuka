@@ -539,7 +539,7 @@ export class RealTimeClassifier {
         if (tokens.includes(keyword) || text.includes(keyword)) {
           articleScore += 20;
           affectedArticles.add(article);
-          impactType = (impactType as any) || type;
+          impactType = impactType ?? (type as 'rights' | 'structure' | 'process' | 'values');
         }
       }
       
@@ -689,11 +689,14 @@ export class RealTimeClassifier {
   }
 
   private calculateOverallConfidence(classifications: any): number {
-    const confidenceValues = [];
+    const confidenceValues: number[] = [];
     
     for (const classification of Object.values(classifications)) {
       if (typeof classification === 'object' && classification !== null && 'confidence' in classification) {
-        confidenceValues.push((classification as any).confidence);
+        const conf = (classification as { confidence: unknown }).confidence;
+        if (typeof conf === 'number') {
+          confidenceValues.push(conf);
+        }
       }
     }
     

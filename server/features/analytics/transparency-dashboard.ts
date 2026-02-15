@@ -1,8 +1,8 @@
 import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
 import { cacheService } from '@shared/core/caching';
 import { financialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
-import { logger   } from '@shared/core';
-import { readDatabase } from '@server/infrastructure/database/connection";
+import { logger } from '@shared/core';
+import { readDatabase } from '@server/infrastructure/database/connection';
 import { and, count,desc, eq, gte, lte } from "drizzle-orm";
 
 import { 

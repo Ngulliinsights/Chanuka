@@ -14,6 +14,7 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, '../../shared'),
       'shared': path.resolve(__dirname, '../../shared'),
       'client': path.resolve(__dirname, '../../client'),
+      '@client': path.resolve(__dirname, '../../client/src'),
       'server': path.resolve(__dirname, '../../server'),
     },
   },

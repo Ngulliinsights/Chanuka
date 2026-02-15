@@ -1,4 +1,5 @@
 import { NextFunction,Request, Response } from 'express';
+import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 import { z } from 'zod';
 // Simple validation middleware without external dependencies
 // This provides basic validation functionality
@@ -107,7 +108,8 @@ export function validateRequest(schema: z.ZodSchema) {
 export function validateRateLimit(operation: string, maxRequests: number = 10, windowMs: number = 60000) {
   const requests = new Map<string, { count: number; resetTime: number }>();
 
-  return (req: Request, res: Response, next: NextFunction) => { const user_id = (req as any).user?.id || req.ip;
+  return (req: Request, res: Response, next: NextFunction) => { 
+    const user_id = getUserId(req) || req.ip || 'unknown';
     const now = Date.now();
     const userRequests = requests.get(user_id);
 
@@ -138,7 +140,8 @@ export function validateRateLimit(operation: string, maxRequests: number = 10, w
 
 // Authentication validation
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
-  if (!(req as any).user) {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user) {
     const startTime = Date.now();
     return res.status(401).json({
       success: false,
@@ -160,7 +163,7 @@ export function requireAuthentication(req: Request, res: Response, next: NextFun
 // Authorization validation
 export function requireRole(allowedRoles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user_role = (req as any).user?.role;
+    const user_role = getUserId(req) ? (req as AuthenticatedRequest).user?.role : undefined;
     if (!user_role || !allowedRoles.includes(user_role)) {
       const startTime = Date.now();
       return res.status(403).json({
@@ -183,10 +186,10 @@ export function requireRole(allowedRoles: string[]) {
 
 // Ownership validation
 export function requireOwnership(resourceIdParam: string) { return (req: Request, res: Response, next: NextFunction) => {
-    const user_id = (req as any).user?.id;
+    const user_id = getUserId(req);
     const resourceUserId = req.params[resourceIdParam];
 
-    if (user_id !== resourceUserId && (req as any).user?.role !== 'admin') {
+    if (user_id !== resourceUserId && (req as AuthenticatedRequest).user?.role !== 'admin') {
       const startTime = Date.now();
       return res.status(403).json({
         success: false,

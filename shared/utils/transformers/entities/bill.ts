@@ -382,6 +382,7 @@ export interface ApiCommittee {
 }
 
 export interface ApiBillCommitteeAssignment {
+  readonly id: string;
   readonly billId: string;
   readonly committeeId: string;
   readonly assignmentDate: string;
@@ -607,6 +608,7 @@ export const committeeDomainToApi: Transformer<Committee, ApiCommittee> = {
 export const billCommitteeAssignmentDomainToApi: Transformer<BillCommitteeAssignment, ApiBillCommitteeAssignment> = {
   transform(assignment: BillCommitteeAssignment): ApiBillCommitteeAssignment {
     return {
+      id: assignment.id,
       billId: assignment.billId,
       committeeId: assignment.committeeId,
       assignmentDate: dateToStringTransformer.transform(assignment.assignmentDate),
@@ -620,6 +622,7 @@ export const billCommitteeAssignmentDomainToApi: Transformer<BillCommitteeAssign
 
   reverse(apiAssignment: ApiBillCommitteeAssignment): BillCommitteeAssignment {
     return {
+      id: apiAssignment.id as BillCommitteeAssignmentId,
       billId: apiAssignment.billId as BillId,
       committeeId: apiAssignment.committeeId as CommitteeId,
       assignmentDate: dateToStringTransformer.reverse(apiAssignment.assignmentDate),
