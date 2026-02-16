@@ -712,7 +712,8 @@ export class ModerationService {
         const overdueItems = await tx.query(updateSlaQuery);
 
         // Return the number of affected rows (PostgreSQL returns rowCount in result)
-        return (overdueItems as any)?.rowCount || 0;
+        const queryResult = overdueItems as { rowCount?: number };
+        return queryResult?.rowCount || 0;
       });
 
       logger.info('Marked SLA violations', { count: result });

@@ -94,7 +94,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   const getAnalytics = useCallback(
     (start_date?: Date, end_date?: Date): JourneyAnalytics => {
       const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
-      return tracker.current.getJourneyAnalytics(timeRange as any);
+      return tracker.current.getJourneyAnalytics(timeRange);
     },
     []
   );
@@ -236,7 +236,7 @@ export function useJourneyAnalytics() {
   const getAnalytics = useCallback(
     (start_date?: Date, end_date?: Date): JourneyAnalytics => {
       const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
-      return tracker.current.getJourneyAnalytics(timeRange as any);
+      return tracker.current.getJourneyAnalytics(timeRange);
     },
     []
   );

@@ -15,6 +15,12 @@ interface ConnectionStatusProps {
   showDetails?: boolean;
 }
 
+interface NavigatorWithConnection extends Navigator {
+  connection?: {
+    effectiveType?: string;
+  };
+}
+
 export default function ConnectionStatus({ className = '', showDetails = false }: ConnectionStatusProps) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionType, setConnectionType] = useState<string>('unknown');
@@ -28,7 +34,7 @@ export default function ConnectionStatus({ className = '', showDetails = false }
 
     // Check connection type if available
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as NavigatorWithConnection).connection;
       setConnectionType(connection?.effectiveType || 'unknown');
     }
 

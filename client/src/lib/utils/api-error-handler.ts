@@ -8,18 +8,22 @@
 import type { ErrorClassification, StandardError } from '@shared/types';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/constants';
 
+interface StandardErrorResponse {
+  error: StandardError;
+}
+
 /**
  * Check if an error response is a StandardError from the server
  */
-export function isStandardErrorResponse(error: unknown): error is { error: StandardError } {
+export function isStandardErrorResponse(error: unknown): error is StandardErrorResponse {
   return (
     typeof error === 'object' &&
     error !== null &&
     'error' in error &&
-    typeof (error as any).error === 'object' &&
-    'code' in (error as any).error &&
-    'classification' in (error as any).error &&
-    'correlationId' in (error as any).error
+    typeof (error as StandardErrorResponse).error === 'object' &&
+    'code' in (error as StandardErrorResponse).error &&
+    'classification' in (error as StandardErrorResponse).error &&
+    'correlationId' in (error as StandardErrorResponse).error
   );
 }
 

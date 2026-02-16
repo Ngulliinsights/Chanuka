@@ -8,16 +8,6 @@ import { cn } from '@client/lib/utils/cn';
 
 // import { logger } from '@client/lib/utils/logger';
 
-interface Notification {
-  id: string;
-  type: 'bill_status_change' | 'new_comment' | 'system_alert' | 'test';
-  title: string;
-  message: string;
-  timestamp: Date;
-  data?: any;
-  read?: boolean;
-}
-
 interface RealTimeNotificationsProps {
   className?: string;
   maxNotifications?: number;

@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { z } from 'zod';
 
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
@@ -8,6 +8,34 @@ import { BaseError, ValidationError } from '@shared/core/observability/error-man
 import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
 import { notificationService } from './notification-service';
+
+// ============================================================================
+// TYPE AUGMENTATION FOR AUTHENTICATED REQUESTS
+// ============================================================================
+
+interface AuthenticatedUser {
+  id: string;
+  email?: string;
+  role?: string;
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: AuthenticatedUser;
+}
+
+function getUserId(req: Request): string {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user?.id) {
+    throw new BaseError('Authentication required', {
+      statusCode: 401,
+      code: ERROR_CODES.NOT_AUTHENTICATED,
+      domain: ErrorDomain.AUTHENTICATION,
+      severity: ErrorSeverity.MEDIUM,
+      details: { component: 'notification-routes' }
+    });
+  }
+  return authReq.user.id;
+}
 
 export const router: Router = Router();
 
@@ -56,17 +84,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res: Response) => {
   const context = createErrorContext(req, 'GET /api/notifications');
 
   try {
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     // Validate query parameters
     const queryResult = notificationFiltersSchema.safeParse(req.query);
@@ -93,7 +111,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res: Response) => {
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));
@@ -154,17 +172,7 @@ router.put('/:id/read', requireAuth, asyncHandler(async (req, res: Response) => 
 
   try {
     const notification_id = req.params.id;
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     if (!notification_id) {
       throw new ValidationError('Notification ID is required', [
@@ -210,17 +218,7 @@ router.put('/read-multiple', requireAuth, asyncHandler(async (req, res: Response
 
   try {
     const { notification_ids } = req.body;
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     if (!Array.isArray(notification_ids) || notification_ids.length === 0) {
       throw new ValidationError('Invalid notification IDs', [
@@ -243,7 +241,7 @@ router.put('/read-multiple', requireAuth, asyncHandler(async (req, res: Response
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));
@@ -256,17 +254,7 @@ router.put('/:id/dismiss', requireAuth, asyncHandler(async (req, res: Response) 
 
   try {
     const notification_id = req.params.id;
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     if (!notification_id) {
       throw new ValidationError('Notification ID is required', [
@@ -312,17 +300,7 @@ router.delete('/:id', requireAuth, asyncHandler(async (req, res: Response) => {
 
   try {
     const notification_id = req.params.id;
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     if (!notification_id) {
       throw new ValidationError('Notification ID is required', [
@@ -371,17 +349,7 @@ router.get('/stats', requireAuth, asyncHandler(async (req, res: Response) => {
   const context = createErrorContext(req, 'GET /api/notifications/stats');
 
   try {
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     const stats = await notificationService.getNotificationStats(user_id);
 
@@ -398,7 +366,7 @@ router.get('/stats', requireAuth, asyncHandler(async (req, res: Response) => {
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));
@@ -414,17 +382,7 @@ router.get('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
   const context = createErrorContext(req, 'GET /api/notifications/preferences');
 
   try {
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     const preferences = await notificationService.getUserAlertPreferences(user_id);
 
@@ -441,7 +399,7 @@ router.get('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));
@@ -453,18 +411,8 @@ router.put('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
   const context = createErrorContext(req, 'PUT /api/notifications/preferences');
 
   try {
-    const user_id = (req as any).user?.id;
+    const user_id = getUserId(req);
     const data = req.body;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
 
     // Validate input
     const result = updateAlertPreferencesSchema.safeParse(data);
@@ -491,7 +439,7 @@ router.put('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));
@@ -503,17 +451,7 @@ router.get('/contact-methods', requireAuth, asyncHandler(async (req, res: Respon
   const context = createErrorContext(req, 'GET /api/notifications/contact-methods');
 
   try {
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'notification-routes' }
-      });
-    }
+    const user_id = getUserId(req);
 
     const contactMethods = await notificationService.getUserContactMethods(user_id);
 
@@ -530,7 +468,7 @@ router.get('/contact-methods', requireAuth, asyncHandler(async (req, res: Respon
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
-      details: { component: 'notification-routes', userId: (req as any).user?.id }
+      details: { component: 'notification-routes' }
     });
   }
 }));

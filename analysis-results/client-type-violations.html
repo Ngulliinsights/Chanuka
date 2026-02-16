@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Type Safety Violations Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 10px; }
+    .subtitle { color: #666; font-size: 16px; margin-bottom: 5px; }
+    .timestamp { color: #666; font-size: 14px; margin-bottom: 30px; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card h2 { font-size: 16px; color: #666; margin-bottom: 10px; }
+    .card .value { font-size: 32px; font-weight: bold; color: #333; }
+    .priority-p0 { color: #dc2626; }
+    .priority-p1 { color: #ea580c; }
+    .priority-p2 { color: #f59e0b; }
+    .priority-p3 { color: #10b981; }
+    .chart {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .chart h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-item { display: flex; align-items: center; gap: 10px; }
+    .bar-label { min-width: 150px; font-size: 14px; color: #666; }
+    .bar-container { flex: 1; background: #e5e7eb; height: 24px; border-radius: 4px; position: relative; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+    .bar-value { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: bold; color: white; }
+    .violations-table {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .violations-table h2 { padding: 20px; font-size: 18px; color: #333; border-bottom: 1px solid #e5e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; color: #666; font-size: 14px; }
+    td { font-size: 13px; color: #333; }
+    .file-path { font-family: 'Courier New', monospace; font-size: 12px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-p0 { background: #fee2e2; color: #dc2626; }
+    .badge-p1 { background: #ffedd5; color: #ea580c; }
+    .badge-p2 { background: #fef3c7; color: #f59e0b; }
+    .badge-p3 { background: #d1fae5; color: #10b981; }
+    .context { font-family: 'Courier New', monospace; font-size: 11px; color: #666; white-space: pre-wrap; max-width: 400px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Client Type Safety Violations Report</h1>
+    <div class="subtitle">Phase 4: Remaining Type Safety - client/src/ Analysis</div>
+    <div class="timestamp">Generated: 2/15/2026, 11:14:04 PM</div>
+    
+    <div class="summary">
+      <div class="card">
+        <h2>Total Violations</h2>
+        <div class="value">311</div>
+      </div>
+      <div class="card">
+        <h2>P0 (Critical)</h2>
+        <div class="value priority-p0">0</div>
+      </div>
+      <div class="card">
+        <h2>P1 (High)</h2>
+        <div class="value priority-p1">7</div>
+      </div>
+      <div class="card">
+        <h2>P2 (Medium)</h2>
+        <div class="value priority-p2">278</div>
+      </div>
+      <div class="card">
+        <h2>P3 (Low)</h2>
+        <div class="value priority-p3">26</div>
+      </div>
+    </div>
+    
+    <div class="chart">
+      <h2>Violations by Feature</h2>
+      <div class="bar-chart">
+        
+      </div>
+    </div>
+    
+    <div class="chart">
+      <h2>Violations by Category</h2>
+      <div class="bar-chart">
+        
+              <div class="bar-item">
+                <div class="bar-label">enum conversion</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 41.157556270096464%; background: #8b5cf6;"></div>
+                  <div class="bar-value">128</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">other</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 30.54662379421222%; background: #8b5cf6;"></div>
+                  <div class="bar-value">95</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">dynamic property</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 14.469453376205788%; background: #8b5cf6;"></div>
+                  <div class="bar-value">45</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">test code</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 8.360128617363344%; background: #8b5cf6;"></div>
+                  <div class="bar-value">26</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">database operation</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.572347266881029%; background: #8b5cf6;"></div>
+                  <div class="bar-value">8</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">api response</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.2508038585209005%; background: #8b5cf6;"></div>
+                  <div class="bar-value">7</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label">type assertion</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 0.6430868167202572%; background: #8b5cf6;"></div>
+                  <div class="bar-value">2</div>
+                </div>
+              </div>
+            
+      </div>
+    </div>
+    
+    <div class="chart">
+      <h2>Top 15 Files with Most Violations</h2>
+      <div class="bar-chart">
+        
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">...ndling\error-context-metadata.test.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 3.536977491961415%; background: #ec4899;"></div>
+                  <div class="bar-value">11</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\lib\hooks\utils\performance.ts">...nt\src\lib\hooks\utils\performance.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 3.536977491961415%; background: #ec4899;"></div>
+                  <div class="bar-value">11</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.8938906752411575%; background: #ec4899;"></div>
+                  <div class="bar-value">9</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx">...ing\cross-system-propagation.test.tsx</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.8938906752411575%; background: #ec4899;"></div>
+                  <div class="bar-value">9</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\realtime\hooks\use-websocket.ts">...\core\realtime\hooks\use-websocket.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.8938906752411575%; background: #ec4899;"></div>
+                  <div class="bar-value">9</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 2.572347266881029%; background: #ec4899;"></div>
+                  <div class="bar-value">8</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\navigation\NavigationPerformance.test.tsx">...gation\NavigationPerformance.test.tsx</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.929260450160772%; background: #ec4899;"></div>
+                  <div class="bar-value">6</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\realtime\services\community.ts">...c\core\realtime\services\community.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.929260450160772%; background: #ec4899;"></div>
+                  <div class="bar-value">6</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\security\security-monitoring.ts">...\core\security\security-monitoring.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.607717041800643%; background: #ec4899;"></div>
+                  <div class="bar-value">5</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">...oring\cross-system-error-analytics.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.607717041800643%; background: #ec4899;"></div>
+                  <div class="bar-value">5</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\features\bills\services\tracking.ts">...c\features\bills\services\tracking.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.607717041800643%; background: #ec4899;"></div>
+                  <div class="bar-value">5</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\security\unified\csp-manager.ts">...\core\security\unified\csp-manager.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.607717041800643%; background: #ec4899;"></div>
+                  <div class="bar-value">5</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\core\error\middleware\hooks-middleware.ts">...\error\middleware\hooks-middleware.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.607717041800643%; background: #ec4899;"></div>
+                  <div class="bar-value">5</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\lib\utils\api-error-handler.ts">...nt\src\lib\utils\api-error-handler.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.2861736334405145%; background: #ec4899;"></div>
+                  <div class="bar-value">4</div>
+                </div>
+              </div>
+            
+              <div class="bar-item">
+                <div class="bar-label" title="client\src\lib\services\factory.ts">client\src\lib\services\factory.ts</div>
+                <div class="bar-container">
+                  <div class="bar-fill" style="width: 1.2861736334405145%; background: #ec4899;"></div>
+                  <div class="bar-value">4</div>
+                </div>
+              </div>
+            
+      </div>
+    </div>
+    
+    <div class="violations-table">
+      <h2>All Violations (Sorted by Priority)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Category</th>
+            <th>Feature</th>
+            <th>File</th>
+            <th>Line</th>
+            <th>Context</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\preload-optimizer.ts">client\src\lib\utils\preload-optimizer.ts</td>
+                <td>65:13</td>
+                <td><div class="context">    // Set priority if supported
+    if (config.priority && 'fetchPriority' in link) {
+      (link as any).fetchPriority = config.priority;
+    }
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useOfflineCapabilities.ts">client\src\lib\hooks\useOfflineCapabilities.ts</td>
+                <td>122:9</td>
+                <td><div class="context">         priority: 'high',
+         maxRetries: 3
+      } as any); // Using 'as any' as a temporary workaround because the API is different.
+      // ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useOfflineCapabilities.ts">client\src\lib\hooks\useOfflineCapabilities.ts</td>
+                <td>122:28</td>
+                <td><div class="context">         priority: 'high',
+         maxRetries: 3
+      } as any); // Using 'as any' as a temporary workaround because the API is different.
+      // ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\features\bills\hooks.ts">client\src\features\bills\hooks.ts</td>
+                <td>58:37</td>
+                <td><div class="context">export function useBills(params: BillsQueryParams = {}) {
+  return useQuery({
+    queryKey: billsKeys.list(params as any), 
+    queryFn: () => billsAp...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\features\bills\hooks.ts">client\src\features\bills\hooks.ts</td>
+                <td>59:52</td>
+                <td><div class="context">  return useQuery({
+    queryKey: billsKeys.list(params as any), 
+    queryFn: () => billsApiService.getBills(params as any),
+    staleTime: 5 * 60 * ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\features\community\hooks\useCommunityIntegration.ts">client\src\features\community\hooks\useCommunityIntegration.ts</td>
+                <td>123:27</td>
+                <td><div class="context">      return communityApiService.reportComment({
+        commentId: parseInt(data.commentId, 10),
+        reason: apiReason as any, 
+        details: ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p1">p1</span></td>
+                <td>api response</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\migration\compatibility-layer.ts">client\src\core\security\migration\compatibility-layer.ts</td>
+                <td>108:32</td>
+                <td><div class="context">        enabled: true,
+        reportOnly: false,
+        directives: directives as any || STANDARD_CSP_CONFIG.development,
+        reportUri: '/api/s...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\main.tsx">client\src\main.tsx</td>
+                <td>26:37</td>
+                <td><div class="context">function setupProcessEnvironment(): void {
+  try {
+    const globalWindow = globalThis as any;
+
+    if (typeof globalWindow.process === 'undefined') {</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\scripts\run-emergency-triage.ts">client\src\scripts\run-emergency-triage.ts</td>
+                <td>362:11</td>
+                <td><div class="context">if (typeof window !== 'undefined') {
+  // Make available globally for browser console usage
+  (window as any).EmergencyTriageRunner = EmergencyTriageR...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\scripts\run-emergency-triage.ts">client\src\scripts\run-emergency-triage.ts</td>
+                <td>363:11</td>
+                <td><div class="context">  // Make available globally for browser console usage
+  (window as any).EmergencyTriageRunner = EmergencyTriageRunner;
+  (window as any).startEmergen...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\core-monitoring.ts">client\src\core\core-monitoring.ts</td>
+                <td>51:56</td>
+                <td><div class="context">    if (!this.monitoringEnabled) return;
+
+    const appError = error instanceof Error && !(error as any).type
+      ? createError(
+          CoreError...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\core-monitoring.ts">client\src\core\core-monitoring.ts</td>
+                <td>562:68</td>
+                <td><div class="context">
+  private isOperationEnabled(operation: string): boolean {
+    const monitoring = ServiceArchitectureMonitoring.getInstance() as any;
+    return moni...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\investor-demo-enhancements.ts">client\src\lib\utils\investor-demo-enhancements.ts</td>
+                <td>136:52</td>
+                <td><div class="context">
+  getDemoUserType(): 'basic' | 'premium' | 'expert' {
+    return (localStorage.getItem('demo-user-type') as any) || 'basic';
+  }
+}</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\env-config.ts">client\src\lib\utils\env-config.ts</td>
+                <td>39:50</td>
+                <td><div class="context">  // Helper function to safely access environment variables
+  const getEnv = (key: string, defaultValue = ''): string => {
+    if (typeof window !== '...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\env-config.ts">client\src\lib\utils\env-config.ts</td>
+                <td>40:22</td>
+                <td><div class="context">  const getEnv = (key: string, defaultValue = ''): string => {
+    if (typeof window !== 'undefined' && (window as any).ENV) {
+      return (window as...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\env-config.ts">client\src\lib\utils\env-config.ts</td>
+                <td>44:27</td>
+                <td><div class="context">    // Fallback for build-time environment variables
+    try {
+      return (import.meta as any).env?.[key] || defaultValue;
+    } catch {
+      retur...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\emergency-triage.ts">client\src\lib\utils\emergency-triage.ts</td>
+                <td>433:30</td>
+                <td><div class="context">    const type = f.type;
+    if (typeof type === 'function') {
+      const maybeType = type as any;
+      const componentName = maybeType.displayName ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\emergency-triage.ts">client\src\lib\utils\emergency-triage.ts</td>
+                <td>442:22</td>
+                <td><div class="context">    while (child) {
+      this.traverseFiber(child);
+      child = (child as any).sibling as unknown;
+    }
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\api-error-handler.ts">client\src\lib\utils\api-error-handler.ts</td>
+                <td>19:19</td>
+                <td><div class="context">    error !== null &&
+    'error' in error &&
+    typeof (error as any).error === 'object' &&
+    'code' in (error as any).error &&
+    'classific...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\api-error-handler.ts">client\src\lib\utils\api-error-handler.ts</td>
+                <td>20:22</td>
+                <td><div class="context">    'error' in error &&
+    typeof (error as any).error === 'object' &&
+    'code' in (error as any).error &&
+    'classification' in (error as any...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\api-error-handler.ts">client\src\lib\utils\api-error-handler.ts</td>
+                <td>21:32</td>
+                <td><div class="context">    typeof (error as any).error === 'object' &&
+    'code' in (error as any).error &&
+    'classification' in (error as any).error &&
+    'correlat...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\utils\api-error-handler.ts">client\src\lib\utils\api-error-handler.ts</td>
+                <td>22:31</td>
+                <td><div class="context">    'code' in (error as any).error &&
+    'classification' in (error as any).error &&
+    'correlationId' in (error as any).error
+  );
+}</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\templates\component-templates.ts">client\src\lib\templates\component-templates.ts</td>
+                <td>620:31</td>
+                <td><div class="context">    } catch (err) {
+      const ${camelName}Error: ${pascalName}Error = {
+        type: 'RUNTIME_ERROR' as any,
+        message: err instanceof Error ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\templates\component-templates.ts">client\src\lib\templates\component-templates.ts</td>
+                <td>742:18</td>
+                <td><div class="context">    data !== null &&
+    'id' in data &&
+    typeof (data as any).id === 'string'
+  );
+}</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\services-monitoring.ts">client\src\lib\services\services-monitoring.ts</td>
+                <td>172:43</td>
+                <td><div class="context">  // Private helper methods
+  private ensureAppError(error: AppError | Error, context: ErrorContext): AppError {
+    if (error instanceof Error && !(e...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\services-monitoring.ts">client\src\lib\services\services-monitoring.ts</td>
+                <td>623:64</td>
+                <td><div class="context">
+  private isOperationEnabled(operation: string): boolean {
+    const monitoring = LibraryServicesMonitoring.getInstance() as any;
+    return monitori...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\factory.ts">client\src\lib\services\factory.ts</td>
+                <td>249:34</td>
+                <td><div class="context">   */
+  private async disposeService(service: ServiceInstance): Promise<void> {
+    if (typeof (service.instance as any).dispose === 'function') {
+   ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\factory.ts">client\src\lib\services\factory.ts</td>
+                <td>251:33</td>
+                <td><div class="context">    if (typeof (service.instance as any).dispose === 'function') {
+      try {
+        await (service.instance as any).dispose();
+      } catch (error...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\factory.ts">client\src\lib\services\factory.ts</td>
+                <td>305:36</td>
+                <td><div class="context">
+    try {
+      if (typeof (service.instance as any).healthCheck === 'function') {
+        const health = await (service.instance as any).healthCheck...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\services\factory.ts">client\src\lib\services\factory.ts</td>
+                <td>306:48</td>
+                <td><div class="context">    try {
+      if (typeof (service.instance as any).healthCheck === 'function') {
+        const health = await (service.instance as any).healthCheck(...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\recovery\index.ts">client\src\lib\recovery\index.ts</td>
+                <td>53:50</td>
+                <td><div class="context">
+    // Log to external service if available
+    if (typeof window !== 'undefined' && (window as any).errorReporting) {
+      (window as any).errorRep...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\recovery\index.ts">client\src\lib\recovery\index.ts</td>
+                <td>54:15</td>
+                <td><div class="context">    // Log to external service if available
+    if (typeof window !== 'undefined' && (window as any).errorReporting) {
+      (window as any).errorRepo...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useValidation.ts">client\src\lib\hooks\useValidation.ts</td>
+                <td>96:59</td>
+                <td><div class="context">  try {
+    // Create a partial schema for the field
+    const fieldSchema = schema.pick({ [fieldName]: true } as any);
+    const result = fieldSch...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useValidation.ts">client\src\lib\hooks\useValidation.ts</td>
+                <td>102:28</td>
+                <td><div class="context">      return {
+        success: true,
+        data: (result.data as any)[fieldName],
+      };
+    }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useOfflineDetection.tsx">client\src\lib\hooks\useOfflineDetection.tsx</td>
+                <td>52:39</td>
+                <td><div class="context">    debounceTimerRef.current = setTimeout(() => {
+      if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+        const connection ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\useOfflineDetection.tsx">client\src\lib\hooks\useOfflineDetection.tsx</td>
+                <td>193:37</td>
+                <td><div class="context">  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+      const connection = (navigator as any).connection;
+ ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-performance-monitor.ts">client\src\lib\hooks\use-performance-monitor.ts</td>
+                <td>119:40</td>
+                <td><div class="context">    // Track memory if enabled
+    if (trackMemory && 'memory' in performance) {
+      const memoryUsage = (performance as any).memory.usedJSHeapSize;...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-performance-monitor.ts">client\src\lib\hooks\use-performance-monitor.ts</td>
+                <td>371:55</td>
+                <td><div class="context">       // The config types might not strictly match, so we cast or adapt as needed
+       // Assuming partial update is supported
+       monitor.getAl...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-offline-detection.ts">client\src\lib\hooks\use-offline-detection.ts</td>
+                <td>51:39</td>
+                <td><div class="context">    debounceTimerRef.current = setTimeout(() => {
+      if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+        const connection ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-offline-detection.ts">client\src\lib\hooks\use-offline-detection.ts</td>
+                <td>192:37</td>
+                <td><div class="context">  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+      const connection = (navigator as any).connection;
+ ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-i18n.tsx">client\src\lib\hooks\use-i18n.tsx</td>
+                <td>105:44</td>
+                <td><div class="context">              if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+                const warnedKeysKey = '__i18n_warned_keys...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\use-i18n.tsx">client\src\lib\hooks\use-i18n.tsx</td>
+                <td>108:27</td>
+                <td><div class="context">                if (!warnedKeys.has(key)) {
+                  warnedKeys.add(key);
+                  (window as any)[warnedKeysKey] = warnedKeys;
+    ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\hooks-monitoring.ts">client\src\lib\hooks\hooks-monitoring.ts</td>
+                <td>51:56</td>
+                <td><div class="context">    if (!this.monitoringEnabled) return;
+
+    const appError = error instanceof Error && !(error as any).type
+      ? createError(
+          ErrorDoma...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\hooks-monitoring.ts">client\src\lib\hooks\hooks-monitoring.ts</td>
+                <td>531:54</td>
+                <td><div class="context">
+  private isOperationEnabled(operation: string): boolean {
+    const monitoring = HooksMonitoring.getInstance() as any;
+    return monitoring.enabled...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\demo\community-integration-demo.ts">client\src\lib\demo\community-integration-demo.ts</td>
+                <td>36:11</td>
+                <td><div class="context">if (typeof window !== 'undefined') {
+  const demo = new CommunityIntegrationDemo();
+  (window as any).communityDemo = demo;
+}
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\vulnerability-scanner.ts">client\src\core\security\vulnerability-scanner.ts</td>
+                <td>241:31</td>
+                <td><div class="context">  private checkCSP(): VulnerabilityResult {
+    const cspMeta = document.querySelector('meta[http-equiv*="Content-Security-Policy"]');
+    const cspHe...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\vulnerability-scanner.ts">client\src\core\security\vulnerability-scanner.ts</td>
+                <td>442:31</td>
+                <td><div class="context">    // This is a simplified check - in a real implementation,
+    // you'd check against a vulnerability database
+    const buildTime = (window as any...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\vulnerability-scanner.ts">client\src\core\security\vulnerability-scanner.ts</td>
+                <td>473:19</td>
+                <td><div class="context">
+    sensitiveGlobals.forEach(global => {
+      if ((window as any)[global] !== undefined) {
+        exposedGlobals.push(global);
+      }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\vulnerability-scanner.ts">client\src\core\security\vulnerability-scanner.ts</td>
+                <td>500:37</td>
+                <td><div class="context">  private checkConsoleExposure(): VulnerabilityResult {
+    // Check if console methods are overridden (indicating debug mode)
+    const originalConso...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\security-monitoring.ts">client\src\core\security\security-monitoring.ts</td>
+                <td>45:56</td>
+                <td><div class="context">    if (!this.monitoringEnabled) return;
+
+    const appError = error instanceof Error && !(error as any).type
+      ? createError(
+          CoreError...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>type assertion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\security-monitoring.ts">client\src\core\security\security-monitoring.ts</td>
+                <td>51:30</td>
+                <td><div class="context">          error.message,
+          {
+            context: context as any, // Cast due to index signature mismatch
+            details: { originalError...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\security-monitoring.ts">client\src\core\security\security-monitoring.ts</td>
+                <td>93:13</td>
+                <td><div class="context">            component: 'SecurityMonitoring',
+            operation: 'performance_tracking'
+          } as any
+        }
+      );</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\security-monitoring.ts">client\src\core\security\security-monitoring.ts</td>
+                <td>125:22</td>
+                <td><div class="context">      existing.errors.push(err);
+      // Assume recovery if error was resolved (simplified logic)
+      if ((err.error as any).recoverySuccess) {
+   ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\security-monitoring.ts">client\src\core\security\security-monitoring.ts</td>
+                <td>428:57</td>
+                <td><div class="context">
+  private isOperationEnabled(operation: string): boolean {
+    const monitoring = SecurityMonitoring.getInstance() as any;
+    return monitoring.enab...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\input-sanitizer.ts">client\src\core\security\input-sanitizer.ts</td>
+                <td>97:32</td>
+                <td><div class="context">    // Add hooks for threat detection with properly typed parameters
+    DOMPurify.addHook(
+      'beforeSanitizeElements' as any,
+      ((node: Eleme...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\input-sanitizer.ts">client\src\core\security\input-sanitizer.ts</td>
+                <td>100:10</td>
+                <td><div class="context">      ((node: Element, data: DOMPurifyHookData) => {
+        this.detectElementThreats(node, data);
+      }) as any
+    );
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\input-sanitizer.ts">client\src\core\security\input-sanitizer.ts</td>
+                <td>104:34</td>
+                <td><div class="context">
+    DOMPurify.addHook(
+      'beforeSanitizeAttributes' as any,
+      ((node: Element, data: DOMPurifyHookData) => {
+        this.detectAttributeThre...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\input-sanitizer.ts">client\src\core\security\input-sanitizer.ts</td>
+                <td>107:10</td>
+                <td><div class="context">      ((node: Element, data: DOMPurifyHookData) => {
+        this.detectAttributeThreats(node, data);
+      }) as any
+    );
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\index.ts">client\src\core\security\index.ts</td>
+                <td>193:31</td>
+                <td><div class="context">    };
+
+    return mockSecuritySystem as any;
+  }
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\csp-manager.ts">client\src\core\security\csp-manager.ts</td>
+                <td>64:13</td>
+                <td><div class="context">
+    // Store nonce for reference (scripts should already have nonces from server)
+    (window as any).__CSP_NONCE__ = this.nonce;
+
+    logger.info('C...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\csp-manager.ts">client\src\core\security\csp-manager.ts</td>
+                <td>135:15</td>
+                <td><div class="context">    // Set up reporting endpoint
+    if (typeof window !== 'undefined') {
+      (window as any).__reportCSPViolation__ = (violation: CSPViolation) => ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\csp-manager.ts">client\src\core\security\csp-manager.ts</td>
+                <td>262:13</td>
+                <td><div class="context">  refreshNonce(): string {
+    this.nonce = this.generateNonce();
+    (window as any).__CSP_NONCE__ = this.nonce;
+    this.setupCSP(); // Reapply CSP ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\security\csp-manager.ts">client\src\core\security\csp-manager.ts</td>
+                <td>286:28</td>
+                <td><div class="context">  isSourceAllowed(directive: string, source: string): boolean {
+    // This is a simplified check - in practice, you'd parse the full CSP
+    const po...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\search\UnifiedSearchInterface.tsx">client\src\core\search\UnifiedSearchInterface.tsx</td>
+                <td>106:38</td>
+                <td><div class="context">        const unifiedQuery: UnifiedSearchQuery = {
+          q: searchQuery,
+          strategy: selectedStrategy as any,
+          limit: strategySel...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\websocket-client.ts">client\src\core\realtime\websocket-client.ts</td>
+                <td>242:7</td>
+                <td><div class="context">      subscriptions, // Use the proper subscriptions array format based on SubscriptionMessage
+      timestamp: new Date().toISOString()
+    } as any)...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\websocket-client.ts">client\src\core\realtime\websocket-client.ts</td>
+                <td>242:24</td>
+                <td><div class="context">      subscriptions, // Use the proper subscriptions array format based on SubscriptionMessage
+      timestamp: new Date().toISOString()
+    } as any)...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\websocket-client.ts">client\src\core\realtime\websocket-client.ts</td>
+                <td>260:7</td>
+                <td><div class="context">      topic: topicList[0], // Simplified for single topic or first topic if array, protocol seems to require specific structure
+      timestamp: new D...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>387:64</td>
+                <td><div class="context">  private matchesSubscription(subscription: Subscription, message: WebSocketMessage): boolean {
+    // Check topic match
+    if (subscription.topic &&...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>401:36</td>
+                <td><div class="context">  private matchesFilters(message: WebSocketMessage, filters: Record<string, unknown>): boolean {
+    for (const [key, expectedValue] of Object.entries...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>421:31</td>
+                <td><div class="context">      timestamp: new Date(),
+    };
+    // If invalid types, cast as any for now to resolve
+    this.send(message as any); 
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>422:23</td>
+                <td><div class="context">    };
+    // If invalid types, cast as any for now to resolve
+    this.send(message as any); 
+  }
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>431:32</td>
+                <td><div class="context">      timestamp: new Date(),
+    };
+     // If invalid types, cast as any for now to resolve
+     this.send(message as any);
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>432:24</td>
+                <td><div class="context">    };
+     // If invalid types, cast as any for now to resolve
+     this.send(message as any);
+  }
+</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>508:34</td>
+                <td><div class="context">      }
+
+      this.send({ type: 'ping' } as any);
+    }, this.config.heartbeat?.interval || 30000);
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\realtime\manager.ts">client\src\core\realtime\manager.ts</td>
+                <td>549:30</td>
+                <td><div class="context">        timestamp: new Date(),
+      };
+      this.send(batchMessage as any);
+    }
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\personalization\persona-detector.test.tsx">client\src\core\personalization\persona-detector.test.tsx</td>
+                <td>225:21</td>
+                <td><div class="context">        confidence: 0.8,
+        lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+        metrics: {} as any,
+...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\personalization\persona-detector.test.tsx">client\src\core\personalization\persona-detector.test.tsx</td>
+                <td>226:25</td>
+                <td><div class="context">        lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+        metrics: {} as any,
+        preferences: {} a...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\performance\monitor.ts">client\src\core\performance\monitor.ts</td>
+                <td>472:47</td>
+                <td><div class="context">    try {
+      // Check for memory API support (Chromium-based browsers)
+      // Using type-safe approach instead of 'as any'
+      const perfWithMe...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\test-navigation.ts">client\src\core\navigation\test-navigation.ts</td>
+                <td>19:20</td>
+                <td><div class="context">  path: '/bills/test-bill',
+  href: '/bills/test-bill',
+  icon: 'document' as any, // Simplified for testing
+  section: 'legislative',
+  description: ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\test-navigation.ts">client\src\core\navigation\test-navigation.ts</td>
+                <td>31:18</td>
+                <td><div class="context">    path: '/',
+    href: '/',
+    icon: 'home' as any,
+    section: 'legislative',
+  },</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\test-navigation.ts">client\src\core\navigation\test-navigation.ts</td>
+                <td>40:19</td>
+                <td><div class="context">    path: '/community',
+    href: '/community',
+    icon: 'users' as any,
+    section: 'community',
+    requiresAuth: true,</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\route-preloading.ts">client\src\core\navigation\route-preloading.ts</td>
+                <td>72:34</td>
+                <td><div class="context">
+  constructor() {
+    this.connection = (navigator as any).connection || null;
+    this.initializePreloading();
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\NavigationPerformance.test.tsx">client\src\core\navigation\NavigationPerformance.test.tsx</td>
+                <td>250:22</td>
+                <td><div class="context">
+      // Check that optimized navigate function is available
+      expect((window as any).__optimizedNavigate).toBeDefined();
+      expect(typeof (wi...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\NavigationPerformance.test.tsx">client\src\core\navigation\NavigationPerformance.test.tsx</td>
+                <td>251:29</td>
+                <td><div class="context">      // Check that optimized navigate function is available
+      expect((window as any).__optimizedNavigate).toBeDefined();
+      expect(typeof (win...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\NavigationConsistency.tsx">client\src\core\navigation\NavigationConsistency.tsx</td>
+                <td>222:50</td>
+                <td><div class="context">
+    // Track page view for analytics (if analytics service is available)
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (wind...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\NavigationConsistency.tsx">client\src\core\navigation\NavigationConsistency.tsx</td>
+                <td>223:15</td>
+                <td><div class="context">    // Track page view for analytics (if analytics service is available)
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (windo...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\context.tsx">client\src\core\navigation\context.tsx</td>
+                <td>52:60</td>
+                <td><div class="context">
+    // Select navigation state from Redux store
+    const state = useSelector((state: RootState) => (state as any).navigation);
+
+    // Handle mounti...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\context.tsx">client\src\core\navigation\context.tsx</td>
+                <td>97:91</td>
+                <td><div class="context">          dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath)));
+           
+          dispatch(updateRelatedPages(calculateRelatedPages(curre...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\context.tsx">client\src\core\navigation\context.tsx</td>
+                <td>137:43</td>
+                <td><div class="context">      (pages: RelatedPage[]) => {
+         
+        dispatch(updateRelatedPages(pages as any));
+      },
+      [dispatch]</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\navigation\context.tsx">client\src\core\navigation\context.tsx</td>
+                <td>160:48</td>
+                <td><div class="context">      ) => {
+         
+        dispatch(updatePreferences(preferences as any));
+      },
+      [dispatch]</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\monitoring\monitoring-init.ts">client\src\core\monitoring\monitoring-init.ts</td>
+                <td>187:42</td>
+                <td><div class="context">        applicationId: this.config.datadog!.applicationId,
+        clientToken: this.config.datadog!.clientToken,
+        site: (this.config.datadog?....</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>45:106</td>
+                <td><div class="context">): boolean {
+  const dimensions = getWidgetDimensions(widget.size);
+  const position = typeof widget.position === 'number' ? { x: widget.position, y: ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>62:90</td>
+                <td><div class="context">  const dims2 = getWidgetDimensions(widget2.size);
+
+  const x1 = typeof widget1.position === 'number' ? widget1.position : (widget1.position as any).x...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>63:75</td>
+                <td><div class="context">
+  const x1 = typeof widget1.position === 'number' ? widget1.position : (widget1.position as any).x || 0;
+  const y1 = typeof widget1.position === 'nu...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>64:90</td>
+                <td><div class="context">  const x1 = typeof widget1.position === 'number' ? widget1.position : (widget1.position as any).x || 0;
+  const y1 = typeof widget1.position === 'num...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>65:75</td>
+                <td><div class="context">  const y1 = typeof widget1.position === 'number' ? 0 : (widget1.position as any).y || 0;
+  const x2 = typeof widget2.position === 'number' ? widget2....</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>104:87</td>
+                <td><div class="context">    ...existingWidgets.map(w => {
+      const dims = getWidgetDimensions(w.size);
+      const position = typeof w.position === 'object' ? w.position :...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>118:81</td>
+                <td><div class="context">export function optimizeLayout(layout: DashboardLayout, widgets: WidgetConfig[]): WidgetConfig[] {
+  const sortedWidgets = [...widgets].sort((a, b) =>...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>119:81</td>
+                <td><div class="context">  const sortedWidgets = [...widgets].sort((a, b) => {
+    const aPos = typeof a.position === 'object' ? a.position : { x: (a.position as any), y: 0 };...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\utils.ts">client\src\core\dashboard\utils.ts</td>
+                <td>149:87</td>
+                <td><div class="context">    ...widgets.map(w => {
+      const dims = getWidgetDimensions(w.size);
+      const position = typeof w.position === 'object' ? w.position : { x: (w...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\context.tsx">client\src\core\dashboard\context.tsx</td>
+                <td>118:21</td>
+                <td><div class="context">
+      state.widgets.forEach((widget: WidgetConfig) => {
+        if ((widget as any).refreshInterval && (widget as any).refreshInterval > 0) {
+       ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\context.tsx">client\src\core\dashboard\context.tsx</td>
+                <td>118:56</td>
+                <td><div class="context">
+      state.widgets.forEach((widget: WidgetConfig) => {
+        if ((widget as any).refreshInterval && (widget as any).refreshInterval > 0) {
+       ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\dashboard\context.tsx">client\src\core\dashboard\context.tsx</td>
+                <td>127:22</td>
+                <td><div class="context">              });
+            }
+          }, (widget as any).refreshInterval * 1000);
+          intervals.push(interval);
+        }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\browser\polyfill-manager.ts">client\src\core\browser\polyfill-manager.ts</td>
+                <td>201:17</td>
+                <td><div class="context">
+         
+        (window as any).Promise = class SimplePromise<T = unknown> {
+          private state: 'pending' | 'fulfilled' | 'rejected' = 'pendi...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\browser\polyfill-manager.ts">client\src\core\browser\polyfill-manager.ts</td>
+                <td>345:17</td>
+                <td><div class="context">
+         
+        (window as any).IntersectionObserver = class IntersectionObserverPolyfill {
+          private callback: (entries: IntersectionObser...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\browser\polyfill-manager.ts">client\src\core\browser\polyfill-manager.ts</td>
+                <td>520:17</td>
+                <td><div class="context">
+         
+        (window as any).ResizeObserver = class ResizeObserverPolyfill {
+          private callback: ResizeObserverCallback;
+          priva...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\browser\polyfill-manager.ts">client\src\core\browser\polyfill-manager.ts</td>
+                <td>725:20</td>
+                <td><div class="context">
+         
+        (navigator as any).clipboard = clipboardPolyfill;
+      }
+    );</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\browser\BrowserCompatibilityReport.tsx">client\src\core\browser\BrowserCompatibilityReport.tsx</td>
+                <td>37:50</td>
+                <td><div class="context">    // Check for issues on mount
+    if (compatibilityStatus) {
+      const criticalCount = (compatibilityStatus as any)?.score < 50 ? 1 : 0;
+      co...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\auth\service.ts">client\src\core\auth\service.ts</td>
+                <td>69:25</td>
+                <td><div class="context">    name: authUser.name,
+    verified: authUser.verified,
+    role: authUser.role as any, // Cast if necessary, or ensure 'citizen' matches
+    
+    /...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\auth\initialization.ts">client\src\core\auth\initialization.ts</td>
+                <td>249:34</td>
+                <td><div class="context">      logger.info('Existing session restored', {
+        component: 'AuthServiceInitializer',
+        userId: (tokenData?.user as any)?.id || 'unknown...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\api\system.ts">client\src\core\api\system.ts</td>
+                <td>600:24</td>
+                <td><div class="context">      operation: 'system_operation',
+      status: (errorResponse as AxiosErrorResponse)?.response?.status,
+      endpoint: (error as any)?.config?.ur...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\analytics\comprehensive-tracker.ts">client\src\core\analytics\comprehensive-tracker.ts</td>
+                <td>390:40</td>
+                <td><div class="context">
+    // Add memory usage if available
+    const perfWithMemory = performance as any;
+    if (perfWithMemory.memory) {
+      metrics.memoryUsage = perf...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\analytics\comprehensive-tracker.ts">client\src\core\analytics\comprehensive-tracker.ts</td>
+                <td>834:40</td>
+                <td><div class="context">        id: issue.id,
+        type: 'performance',
+        severity: (issue.data.severity as any) || 'medium',
+        message: (issue.data.message as...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\analytics\comprehensive-tracker.ts">client\src\core\analytics\comprehensive-tracker.ts</td>
+                <td>850:45</td>
+                <td><div class="context">        id: error.id,
+        type: 'error',
+        severity: (error.data.errorSeverity as any) || 'medium',
+        message: (error.data.errorMessag...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\analytics\comprehensive-tracker.ts">client\src\core\analytics\comprehensive-tracker.ts</td>
+                <td>975:27</td>
+                <td><div class="context">
+  private getConnectionType(): string | undefined {
+    const nav = navigator as any;
+    const connection = nav.connection || nav.mozConnection || n...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\core\analytics\AnalyticsIntegration.tsx">client\src\core\analytics\AnalyticsIntegration.tsx</td>
+                <td>59:82</td>
+                <td><div class="context">
+      // Start journey using the centralized tracker; it returns a session id
+      sessionId.current = journeyTracker.current.startJourney(user?.id,...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts</td>
+                <td>233:18</td>
+                <td><div class="context">
+    expect(json).toHaveProperty('timestamp');
+    expect((json as any).domain).toBe(ErrorDomain.NETWORK);
+    expect((json as any).severity).toBe(Err...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts</td>
+                <td>234:18</td>
+                <td><div class="context">    expect(json).toHaveProperty('timestamp');
+    expect((json as any).domain).toBe(ErrorDomain.NETWORK);
+    expect((json as any).severity).toBe(Erro...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts</td>
+                <td>429:27</td>
+                <td><div class="context">
+    expect(error.context?.component).toBe('CustomComponent');
+    expect((error.context as any)?.customField).toBe('customValue');
+    expect((error....</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts</td>
+                <td>430:27</td>
+                <td><div class="context">    expect(error.context?.component).toBe('CustomComponent');
+    expect((error.context as any)?.customField).toBe('customValue');
+    expect((error.c...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts">client\src\__tests__\strategic\error-handling\error-context-metadata.test.ts</td>
+                <td>431:27</td>
+                <td><div class="context">    expect((error.context as any)?.customField).toBe('customValue');
+    expect((error.context as any)?.nestedData).toEqual({ key: 'value' });
+    exp...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx">client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx</td>
+                <td>291:16</td>
+                <td><div class="context">      for (const errorInfo of errors) {
+        const error = new Error(errorInfo.message);
+        (error as any).type = errorInfo.type;
+        awai...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx">client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx</td>
+                <td>414:67</td>
+                <td><div class="context">      // Should handle null context
+      await expect(
+        propagationService.propagateToSystem('hooks', error, null as any)
+      ).rejects.toTh...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx">client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx</td>
+                <td>419:72</td>
+                <td><div class="context">      // Should handle undefined context
+      await expect(
+        propagationService.propagateToSystem('hooks', error, undefined as any)
+      ).re...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>database operation</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx">client\src\__tests__\strategic\error-handling\cross-system-propagation.test.tsx</td>
+                <td>439:70</td>
+                <td><div class="context">
+      await expect(
+        propagationService.propagateToSystem('hooks', malformedError as any, errorContext)
+      ).rejects.toThrow();
+    });</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\status\connection-status.tsx">client\src\lib\ui\status\connection-status.tsx</td>
+                <td>31:37</td>
+                <td><div class="context">    // Check connection type if available
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      setConnec...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\validation.ts">client\src\lib\ui\loading\validation.ts</td>
+                <td>294:17</td>
+                <td><div class="context">  ];
+  if (typeof type === 'string' && validTypes.includes(type)) {
+    return type as any;
+  }
+  return 'component'; // Default fallback</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\GlobalLoadingProvider.tsx">client\src\lib\ui\loading\GlobalLoadingProvider.tsx</td>
+                <td>167:70</td>
+                <td><div class="context">  const startOperation = useCallback(
+    async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>): Promise<string> => {
+      const resu...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\GlobalLoadingProvider.tsx">client\src\lib\ui\loading\GlobalLoadingProvider.tsx</td>
+                <td>178:71</td>
+                <td><div class="context">  const completeOperation = useCallback(
+    async (id: string, success: boolean = true, error?: string): Promise<void> => {
+      await dispatch(comp...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\errors.ts">client\src\lib\ui\loading\errors.ts</td>
+                <td>207:13</td>
+                <td><div class="context">    this.timeout = timeout;
+    if (options?.cause) {
+      (this as any).cause = options.cause;
+    }
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\errors.ts">client\src\lib\ui\loading\errors.ts</td>
+                <td>234:13</td>
+                <td><div class="context">    this.name = 'LoadingNetworkError';
+    if (options?.statusCode) {
+      (this as any).statusCode = options.statusCode;
+    }
+    if (options?.caus...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\errors.ts">client\src\lib\ui\loading\errors.ts</td>
+                <td>237:13</td>
+                <td><div class="context">    }
+    if (options?.cause) {
+      (this as any).cause = options.cause;
+    }
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\loading\errors.ts">client\src\lib\ui\loading\errors.ts</td>
+                <td>263:13</td>
+                <td><div class="context">    this.name = 'LoadingValidationError';
+    if (options?.cause) {
+      (this as any).cause = options.cause;
+    }
+  }</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\DashboardFramework.tsx">client\src\lib\ui\dashboard\DashboardFramework.tsx</td>
+                <td>229:66</td>
+                <td><div class="context">    // Cast layout to include potential missing properties from the type definition
+     
+    const layoutHook = useDashboardLayout(dashboardConfig.la...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\DashboardFramework.tsx">client\src\lib\ui\dashboard\DashboardFramework.tsx</td>
+                <td>291:42</td>
+                <td><div class="context">        const newTheme = { ...dashboardConfig.theme, ...updates };
+         
+        updateConfig?.({ theme: newTheme as any });
+        if (onThemeCh...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\DashboardFramework.tsx">client\src\lib\ui\dashboard\DashboardFramework.tsx</td>
+                <td>415:54</td>
+                <td><div class="context">                  // Cast extended sections to base sections type
+                   
+                  sections={dashboardConfig.sections as any}
+   ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\DashboardFramework.tsx">client\src\lib\ui\dashboard\DashboardFramework.tsx</td>
+                <td>428:54</td>
+                <td><div class="context">                  // Cast extended sections to base sections type
+                   
+                  sections={dashboardConfig.sections as any}
+   ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\AdaptiveDashboard.tsx">client\src\lib\ui\dashboard\AdaptiveDashboard.tsx</td>
+                <td>204:28</td>
+                <td><div class="context">
+        const classification = await personaDetector.detectPersona(
+          userForDetection as any,
+          userActivity,
+          existingProf...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>enum conversion</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\ui\dashboard\action-items.tsx">client\src\lib\ui\dashboard\action-items.tsx</td>
+                <td>16:15</td>
+                <td><div class="context">    useDashboardActions(data.actionItems);
+    const [showCompleted, setShowCompleted] = React.useState(
+      (config as any)?.showCompletedActions ?...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\monitoring-integration.ts">client\src\lib\infrastructure\monitoring\monitoring-integration.ts</td>
+                <td>417:33</td>
+                <td><div class="context">        return acc;
+      }, {} as Record<ClientSystem, boolean>),
+      memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
+      uptime: ...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts</td>
+                <td>38:26</td>
+                <td><div class="context">      errorsBySystem: {},
+      errorsByDomain: {},
+      criticalErrors: [] as any[],
+      trends: [] as any[],
+      insights: [] as any[],</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts</td>
+                <td>39:18</td>
+                <td><div class="context">      errorsByDomain: {},
+      criticalErrors: [] as any[],
+      trends: [] as any[],
+      insights: [] as any[],
+      timestamp: new Date(),</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts</td>
+                <td>40:20</td>
+                <td><div class="context">      criticalErrors: [] as any[],
+      trends: [] as any[],
+      insights: [] as any[],
+      timestamp: new Date(),
+      overallHealth: 'healthy'...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts</td>
+                <td>43:24</td>
+                <td><div class="context">      timestamp: new Date(),
+      overallHealth: 'healthy' as 'healthy' | 'degraded' | 'critical',
+      correlations: [] as any[],
+      systems: []...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts">client\src\lib\infrastructure\monitoring\cross-system-error-analytics.ts</td>
+                <td>55:15</td>
+                <td><div class="context">  
+  identifyCrossSystemPatterns() {
+    return [] as any[];
+  }
+}</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\utils\performance.ts">client\src\lib\hooks\utils\performance.ts</td>
+                <td>41:53</td>
+                <td><div class="context">
+    if ('memory' in performance) {
+      metricsRef.current.memoryUsage = (performance as any).memory.usedJSHeapSize;
+    }
+  }, [enabled]);</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\utils\performance.ts">client\src\lib\hooks\utils\performance.ts</td>
+                <td>107:58</td>
+                <td><div class="context">  const leadingEdge = useCallback((time: number) => {
+    lastInvokeTimeRef.current = time;
+    timeoutRef.current = setTimeout(timerExpired, delay) a...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\utils\performance.ts">client\src\lib\hooks\utils\performance.ts</td>
+                <td>129:66</td>
+                <td><div class="context">    const timeSinceLastCall = time - lastCallTimeRef.current;
+    const remainingWait = delay - timeSinceLastCall;
+    timeoutRef.current = setTimeout...</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>dynamic property</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\utils\performance.ts">client\src\lib\hooks\utils\performance.ts</td>
+                <td>136:30</td>
+                <td><div class="context">    const thisArg = lastThisRef.current;
+
+    lastArgsRef.current = [] as any;
+    lastThisRef.current = null;
+    lastInvokeTimeRef.current = time;</div></td>
+              </tr>
+            
+              <tr>
+                <td><span class="badge badge-p2">p2</span></td>
+                <td>other</td>
+                <td>-</td>
+                <td class="file-path" title="client\src\lib\hooks\utils\performance.ts">client\src\lib\hooks\utils\performance.ts</td>
+                <td>156:62</td>
+                <td><div class="context">      }
+      if (maxWait !== undefined) {
+        timeoutRef.current = setTimeout(timerExpired, delay) as any;
+        return invokeFunc(lastCallTime...</div></td>
+              </tr>
+            
+        </tbody>
+      </table>
+      <p style="padding: 20px; color: #666;">Showing first 150 of 311 violations. See JSON report for complete list.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -11,6 +11,10 @@ import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 
 import { ApiCacheManager, CacheKeyGenerator } from './cache-manager';
 import { RetryHandler } from './retry';
+import {
+  serializationRequestInterceptor,
+  deserializationResponseInterceptor,
+} from './serialization-interceptors';
 
 /**
  * HTTP methods supported by the API client
@@ -135,6 +139,11 @@ export class BaseApiClient {
     this.cache = new ApiCacheManager({
       defaultTTL: this.config.cache?.ttl || 5 * 60 * 1000,
     });
+
+    // Install serialization interceptors by default
+    // These handle Date serialization/deserialization automatically
+    this.addRequestInterceptor(serializationRequestInterceptor);
+    this.addResponseInterceptor(deserializationResponseInterceptor);
   }
 
   /**

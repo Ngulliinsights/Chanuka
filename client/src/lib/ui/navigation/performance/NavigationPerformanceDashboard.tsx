@@ -136,7 +136,7 @@ export function NavigationPerformanceDashboard({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={performanceStatus.color as any}>
+          <Badge variant={performanceStatus.color as 'destructive' | 'warning' | 'success'}>
             {performanceStatus.status.toUpperCase()}
           </Badge>
           <Button onClick={fetchMetrics} disabled={isLoading}>

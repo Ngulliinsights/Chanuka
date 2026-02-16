@@ -6,6 +6,8 @@
  */
 
 import type { Transformer, PartialTransformer, TransformationContext, TransformationOptions } from './types';
+import { ErrorContextBuilder } from '../errors/context';
+import { TransformationError } from '../errors/types';
 
 /**
  * Identity transformer - returns input unchanged
@@ -33,14 +35,36 @@ function isValidDate(date: Date): boolean {
 export const dateToStringTransformer: Transformer<Date, string> = {
   transform: (date: Date): string => {
     if (!isValidDate(date)) {
-      throw new Error(`Cannot transform invalid date: ${date}`);
+      const context = new ErrorContextBuilder()
+        .operation('dateToStringTransformer.transform')
+        .layer('transformation')
+        .field('date')
+        .value(date)
+        .severity('high')
+        .build();
+      
+      throw new TransformationError(
+        `Cannot transform invalid date: ${date}`,
+        context
+      );
     }
     return date.toISOString();
   },
   reverse: (str: string): Date => {
     const date = new Date(str);
     if (!isValidDate(date)) {
-      throw new Error(`Cannot parse invalid date string: ${str}`);
+      const context = new ErrorContextBuilder()
+        .operation('dateToStringTransformer.reverse')
+        .layer('transformation')
+        .field('date')
+        .value(str)
+        .severity('high')
+        .build();
+      
+      throw new TransformationError(
+        `Cannot parse invalid date string: ${str}`,
+        context
+      );
     }
     return date;
   },
@@ -55,7 +79,18 @@ export const optionalDateToStringTransformer: Transformer<Date | null | undefine
   transform: (date: Date | null | undefined): string | null => {
     if (!date) return null;
     if (!isValidDate(date)) {
-      throw new Error(`Cannot transform invalid date: ${date}`);
+      const context = new ErrorContextBuilder()
+        .operation('optionalDateToStringTransformer.transform')
+        .layer('transformation')
+        .field('date')
+        .value(date)
+        .severity('high')
+        .build();
+      
+      throw new TransformationError(
+        `Cannot transform invalid date: ${date}`,
+        context
+      );
     }
     return date.toISOString();
   },
@@ -63,7 +98,18 @@ export const optionalDateToStringTransformer: Transformer<Date | null | undefine
     if (!str) return null;
     const date = new Date(str);
     if (!isValidDate(date)) {
-      throw new Error(`Cannot parse invalid date string: ${str}`);
+      const context = new ErrorContextBuilder()
+        .operation('optionalDateToStringTransformer.reverse')
+        .layer('transformation')
+        .field('date')
+        .value(str)
+        .severity('high')
+        .build();
+      
+      throw new TransformationError(
+        `Cannot parse invalid date string: ${str}`,
+        context
+      );
     }
     return date;
   },
@@ -80,7 +126,19 @@ export function createEnumTransformer<TEnum extends string>(
     transform: (value: TEnum): string => value,
     reverse: (str: string): TEnum => {
       if (!enumValues.includes(str as TEnum)) {
-        throw new Error(`Invalid enum value: ${str}. Expected one of: ${enumValues.join(', ')}`);
+        const context = new ErrorContextBuilder()
+          .operation('createEnumTransformer.reverse')
+          .layer('transformation')
+          .field('enum')
+          .value(str)
+          .severity('medium')
+          .metadata({ validValues: enumValues as unknown as string[] })
+          .build();
+        
+        throw new TransformationError(
+          `Invalid enum value: ${str}. Expected one of: ${enumValues.join(', ')}`,
+          context
+        );
       }
       return str as TEnum;
     },
@@ -192,26 +250,58 @@ export function createValidatingTransformer<TSource, TTarget>(
   return {
     transform: (source: TSource): TTarget => {
       if (validateSource && !validateSource(source)) {
-        throw new Error('Source validation failed');
+        const context = new ErrorContextBuilder()
+          .operation('createValidatingTransformer.transform')
+          .layer('transformation')
+          .field('source')
+          .value(source)
+          .severity('medium')
+          .build();
+        
+        throw new TransformationError('Source validation failed', context);
       }
 
       const target = transformer.transform(source);
 
       if (validateTarget && !validateTarget(target)) {
-        throw new Error('Target validation failed');
+        const context = new ErrorContextBuilder()
+          .operation('createValidatingTransformer.transform')
+          .layer('transformation')
+          .field('target')
+          .value(target)
+          .severity('medium')
+          .build();
+        
+        throw new TransformationError('Target validation failed', context);
       }
 
       return target;
     },
     reverse: (target: TTarget): TSource => {
       if (validateTarget && !validateTarget(target)) {
-        throw new Error('Target validation failed');
+        const context = new ErrorContextBuilder()
+          .operation('createValidatingTransformer.reverse')
+          .layer('transformation')
+          .field('target')
+          .value(target)
+          .severity('medium')
+          .build();
+        
+        throw new TransformationError('Target validation failed', context);
       }
 
       const source = transformer.reverse(target);
 
       if (validateSource && !validateSource(source)) {
-        throw new Error('Source validation failed');
+        const context = new ErrorContextBuilder()
+          .operation('createValidatingTransformer.reverse')
+          .layer('transformation')
+          .field('source')
+          .value(source)
+          .severity('medium')
+          .build();
+        
+        throw new TransformationError('Source validation failed', context);
       }
 
       return source;

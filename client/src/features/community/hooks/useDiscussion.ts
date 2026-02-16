@@ -186,10 +186,10 @@ export function useDiscussion({
     reason: string,
     description?: string
   ) => {
-    // Cast strict typed parameters to any if needed or map them
-    const reportData: any = {
+    // Map legacy violation types to the unified system's report reasons
+    const reportData = {
       commentId,
-      reason: violationType as any, // Temporary mapping until ViolationType is standard
+      reason: violationType,
       description: description || reason
     };
 

@@ -186,15 +186,16 @@ export const ValidatedUserType: ValidatedType<ValidatedUser> = createValidatedTy
  * Ensures runtime type safety
  */
 export function isUser(value: unknown): value is typeof users.$inferSelect {
+  const record = value as Record<string, unknown>;
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).id === 'string' &&
-    typeof (value as any).email === 'string' &&
-    typeof (value as any).role === 'string' &&
-    typeof (value as any).is_verified === 'boolean' &&
-    typeof (value as any).created_at === 'object' &&
-    (value as any).created_at instanceof Date
+    typeof record.id === 'string' &&
+    typeof record.email === 'string' &&
+    typeof record.role === 'string' &&
+    typeof record.is_verified === 'boolean' &&
+    typeof record.created_at === 'object' &&
+    record.created_at instanceof Date
   );
 }
 

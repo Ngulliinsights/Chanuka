@@ -29,7 +29,7 @@ import {
   type NewUserBehaviorProfile,
   type SuspiciousActivityPattern,
   type UserBehaviorProfile,
-} from '@shared/schema/safeguards';
+} from '@server/infrastructure/schema/safeguards';
 
 // NEW (CORRECT):
 import {
@@ -42,7 +42,7 @@ import {
   type NewCIBDetection,
   type NewSuspiciousActivityLog,
   type SuspiciousActivityLog,
-} from '@shared/schema/safeguards';
+} from '@server/infrastructure/schema/safeguards';
 ```
 
 ### 2. Rate Limit Service - Field Name Corrections
@@ -134,7 +134,7 @@ import { reputationSourceEnum } from '@/shared/schema';
 // ✅ CORRECT:
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import { logger } from '@shared/core';
-import { reputationScores, reputationHistory, rateLimits, ...etc } from '@shared/schema/safeguards';
+import { reputationScores, reputationHistory, rateLimits, ...etc } from '@server/infrastructure/schema/safeguards';
 ```
 
 **Missing Package:**

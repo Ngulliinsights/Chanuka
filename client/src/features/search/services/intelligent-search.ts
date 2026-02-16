@@ -515,19 +515,24 @@ class IntelligentSearchService {
     response: unknown,
     query: string
   ): void {
-    const recentData = response as any[];
-    if (Array.isArray(recentData)) {
-      recentData.forEach((item: any) => {
-        if (item.query && item.query.toLowerCase().includes(query.toLowerCase())) {
-          suggestions.push({
-            text: item.query,
-            type: 'recent',
-            count: item.frequency || 1,
-            // score: 0.8, // score not in shared type
-          });
-        }
-      });
-    }
+    if (!Array.isArray(response)) return;
+    
+    response.forEach((item: unknown) => {
+      if (
+        item &&
+        typeof item === 'object' &&
+        'query' in item &&
+        typeof item.query === 'string' &&
+        item.query.toLowerCase().includes(query.toLowerCase())
+      ) {
+        suggestions.push({
+          text: item.query,
+          type: 'recent',
+          count: ('frequency' in item && typeof item.frequency === 'number') ? item.frequency : 1,
+          // score: 0.8, // score not in shared type
+        });
+      }
+    });
   }
 
   /**
@@ -538,19 +543,24 @@ class IntelligentSearchService {
     response: unknown,
     query: string
   ): void {
-    const popularData = response as any[];
-    if (Array.isArray(popularData)) {
-      popularData.forEach((item: any) => {
-        if (item.query && item.query.toLowerCase().includes(query.toLowerCase())) {
-          suggestions.push({
-            text: item.query,
-            type: 'popular',
-            count: item.count || 1,
-            // score: 0.9,
-          });
-        }
-      });
-    }
+    if (!Array.isArray(response)) return;
+    
+    response.forEach((item: unknown) => {
+      if (
+        item &&
+        typeof item === 'object' &&
+        'query' in item &&
+        typeof item.query === 'string' &&
+        item.query.toLowerCase().includes(query.toLowerCase())
+      ) {
+        suggestions.push({
+          text: item.query,
+          type: 'popular',
+          count: ('count' in item && typeof item.count === 'number') ? item.count : 1,
+          // score: 0.9,
+        });
+      }
+    });
   }
 
   /**

@@ -44,18 +44,6 @@ export interface Source {
   excerpt?: string;
 }
 
-export interface BillAnalysis {
-  billId: string;
-  title: string;
-  sponsor: string;
-  introducedDate: Date;
-  status: string;
-  pretextScore?: PretextScore;
-  timeline: TimelineEvent[];
-  stakeholders: Stakeholder[];
-  relatedEvents: RelatedEvent[];
-}
-
 export interface TimelineEvent {
   id: string;
   date: Date;

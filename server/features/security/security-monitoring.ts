@@ -1,7 +1,7 @@
 i// import { unifiedAlertPreferenceService } from '@shared/alert-preferences/domain/services/unified-alert-preference-service'; // TODO: Fix missing dependencies
 import { logger  } from '@shared/core';
 import { database as db } from '@server/infrastructure/database';
-import { bills, user_interests,users } from '@shared/schema'; // Fixed: Added user_interests import
+import { bills, user_interests,users } from '@server/infrastructure/schema'; // Fixed: Added user_interests import
 import { eq } from 'drizzle-orm';
 
 /**

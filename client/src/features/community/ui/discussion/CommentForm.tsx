@@ -143,10 +143,10 @@ export function CommentForm({
   );
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
-        handleSubmit(e as any);
+        handleSubmit(e as unknown as React.FormEvent);
       }
     },
     [handleSubmit]

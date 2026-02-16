@@ -5,7 +5,7 @@
  * Based on existing patterns from server/cache/CacheService.ts
  */
 
-import { logger as _logger } from '../observability/logging';
+import { logger as _logger } from '../observability';
 
 import type { CacheKeyGenerator } from './types';
 

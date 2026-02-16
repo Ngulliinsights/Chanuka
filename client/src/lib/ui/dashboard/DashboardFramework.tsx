@@ -226,7 +226,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
 
     // Cast layout to include potential missing properties from the type definition
      
-    const layoutHook = useDashboardLayout(dashboardConfig.layout as any);
+    const layoutHook = useDashboardLayout(dashboardConfig.layout as ExtendedDashboardLayout);
     const { layout, sidebarOpen, toggleSidebar, isMobile, breakpoint } = layoutHook;
 
     // Safe access to potentially missing properties via casting
@@ -288,7 +288,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
         // Ensure we preserve the colorScheme if not provided in updates, to match required type
         const newTheme = { ...dashboardConfig.theme, ...updates };
          
-        updateConfig?.({ theme: newTheme as any });
+        updateConfig?.({ theme: newTheme as DashboardThemeConfig & { customTokens?: Record<string, string> } });
         if (onThemeChange && typeof onThemeChange === 'function') {
           onThemeChange(updates);
         }
@@ -412,7 +412,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
                 <DashboardStack
                   // Cast extended sections to base sections type
                    
-                  sections={dashboardConfig.sections as any}
+                  sections={dashboardConfig.sections as ExtendedDashboardSection[]}
                   spacing="normal"
                   onSectionUpdate={(sectionId, updates) => {
                     // Handle section updates
@@ -425,7 +425,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
                 <DashboardTabs
                   // Cast extended sections to base sections type
                    
-                  sections={dashboardConfig.sections as any}
+                  sections={dashboardConfig.sections as ExtendedDashboardSection[]}
                   onTabChange={tabId => {
                     // Handle tab changes
                     console.log('Tab changed:', tabId);

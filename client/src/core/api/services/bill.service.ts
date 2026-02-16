@@ -39,7 +39,7 @@ export const billApiService = {
   async getById(billId: string): Promise<EndpointCallResult<GetBillResponse>> {
     return contractApiClient.callWithParams(
       BillEndpoints.getById,
-      { id: billId as any }, // Cast to branded type
+      { id: billId },
       undefined
     );
   },
@@ -53,7 +53,7 @@ export const billApiService = {
   ): Promise<EndpointCallResult<UpdateBillResponse>> {
     return contractApiClient.callWithParams(
       BillEndpoints.update,
-      { id: billId as any }, // Cast to branded type
+      { id: billId },
       request
     );
   },
@@ -74,7 +74,7 @@ export const billApiService = {
   async delete(billId: string): Promise<EndpointCallResult<DeleteBillResponse>> {
     return contractApiClient.callWithParams(
       BillEndpoints.delete,
-      { id: billId as any }, // Cast to branded type
+      { id: billId },
       undefined
     );
   },
@@ -85,7 +85,7 @@ export const billApiService = {
   async getEngagement(billId: string): Promise<EndpointCallResult<GetBillEngagementResponse>> {
     return contractApiClient.callWithParams(
       BillEndpoints.getEngagement,
-      { id: billId as any }, // Cast to branded type
+      { id: billId },
       undefined
     );
   },

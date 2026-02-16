@@ -141,8 +141,9 @@ class ContinuousPerformanceMonitor {
    */
   private checkMemoryUsage(): void {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      const usedMemory = memory.usedJSHeapSize;
+      // Type-safe access to Performance Memory API
+      const memory = (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory;
+      const usedMemory = memory?.usedJSHeapSize || 0;
 
       if (usedMemory > this.config.alertThresholds.memoryUsage) {
         this.createAlert({

@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { CacheService } from '../../caching/core/interfaces';
-import { CacheService } from '../../caching/core/interfaces';
-import { logger } from '../../observability/logging';
-import { MiddlewareProvider } from '../../types';
 import { MiddlewareProvider } from '../types';
+
+interface CacheService {
+  get(key: string): Promise<unknown>;
+  set(key: string, value: unknown, ttl: number): Promise<void>;
+}
 
 interface CacheOptions {
   ttl: number;
@@ -40,7 +41,7 @@ export class CacheMiddlewareProvider implements MiddlewareProvider {
         // Override json method to cache response
         res.json = (body: unknown) => {
           this.cacheService.set(cacheKey, body, ttl).catch(err => {
-            logger.error('Cache set error:', { component: 'Chanuka' }, err);
+            console.error('Cache set error:', err);
           });
           return originalJson(body);
         };

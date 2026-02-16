@@ -93,9 +93,9 @@ export class ConstitutionalAnalysisServiceComplete {
         .select()
         .from(constitutional_provisions)
         .where(eq(constitutional_provisions.id, id))
-        .limit(1) as any[];
+        .limit(1);
 
-      const provision = rows[0];
+      const provision = rows[0] as ConstitutionalProvision | undefined;
       return provision || null;
     } catch (error) {
       logger.error('Failed to find constitutional provision by ID', { ...logContext, error });
@@ -150,7 +150,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
+        query = query.where(and(...conditions)) as typeof query;
       }
 
       const results = await query
@@ -228,9 +228,9 @@ export class ConstitutionalAnalysisServiceComplete {
         .select()
         .from(legal_precedents)
         .where(eq(legal_precedents.id, id))
-        .limit(1) as any[];
+        .limit(1);
 
-      const precedent = rows[0];
+      const precedent = rows[0] as LegalPrecedent | undefined;
       return precedent || null;
     } catch (error) {
       logger.error('Failed to find legal precedent by ID', { ...logContext, error });
@@ -290,7 +290,13 @@ export class ConstitutionalAnalysisServiceComplete {
         if (minRelevanceScore >= 0.8) {
           conditions.push(eq(legal_precedents.precedent_strength, 'binding'));
         } else if (minRelevanceScore >= 0.6) {
-          conditions.push(or(eq(legal_precedents.precedent_strength, 'binding'), eq(legal_precedents.precedent_strength, 'persuasive')) as any);
+          const bindingOrPersuasive = or(
+            eq(legal_precedents.precedent_strength, 'binding'), 
+            eq(legal_precedents.precedent_strength, 'persuasive')
+          );
+          if (bindingOrPersuasive) {
+            conditions.push(bindingOrPersuasive);
+          }
         }
         // For lower thresholds we don't add a filter since schema lacks a numeric relevance_score
       }
@@ -308,7 +314,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
+        query = query.where(and(...conditions)) as typeof query;
       }
 
       const results = await query
@@ -500,7 +506,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .select()
         .from(expert_review_queue)
         .where(eq(expert_review_queue.analysis_id, request.analysis_id))
-        .limit(1) as any[];
+        .limit(1);
 
       const existing = existingRows[0];
 
@@ -598,9 +604,9 @@ export class ConstitutionalAnalysisServiceComplete {
           eq(constitutional_analyses.is_superseded, false)
         )
       )
-      .limit(1) as any[];
+      .limit(1);
 
-    const existing = rows[0];
+    const existing = rows[0] as ConstitutionalAnalysis | undefined;
     return existing || null;
   }
 
@@ -615,9 +621,9 @@ export class ConstitutionalAnalysisServiceComplete {
         created_at: new Date(),
         updated_at: new Date()
       })
-      .returning() as any[];
+      .returning();
 
-    return rows[0];
+    return rows[0] as ConstitutionalAnalysis;
   }
 
   /**

@@ -24,26 +24,14 @@ export {
 // Demo Data (server-specific)
 export { DemoDataService } from './demo-data';
 
-// Re-export shared core services for convenience
-export { 
-  logger,
-  createObservabilityStack,
-  createCacheService,
-  createCorrelationManager
-} from '@shared/core';
+// Re-export logger from observability (the canonical server logger)
+export { logger } from './observability';
 
 export {
   database,
   withTransaction,
   withReadConnection
 } from '@server/infrastructure/database/connection';
-
-// Legacy compatibility exports (from shared/core)
-export { 
-  performanceMonitor, 
-  measureAsync, 
-  measureSync 
-} from './observability';
 
 
 

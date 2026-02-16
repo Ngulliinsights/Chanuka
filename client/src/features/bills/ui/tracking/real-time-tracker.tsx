@@ -32,15 +32,6 @@ interface BillUpdate {
   };
 }
 
-interface Notification {
-  title: string;
-  message: string;
-  type: string;
-  data?: {
-    changeCount?: number;
-  };
-}
-
 type UpdateFrequency = 'immediate' | 'hourly' | 'daily';
 
 export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
@@ -101,7 +92,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   const updatePreferences = (prefs: BillTrackingPreferences) => {
     // In a real app, this would verify with backend
-    logger.info('Updating preferences', prefs as any);
+    logger.info('Updating preferences', prefs);
   };
     
   // Helper to get updates for specific bill
@@ -120,13 +111,13 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
     if (!isConnected && connect) {
       try {
         connect();
-      } catch (error: any) {
+      } catch (error) {
         logger.error(
           'Failed to connect to WebSocket:',
           {
             component: 'RealTimeBillTracker',
-            error: error?.message || String(error)
-          } as any
+            error: error instanceof Error ? error.message : String(error)
+          }
         );
         toast.error('Failed to connect to real-time updates');
       }
@@ -157,8 +148,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
 
   const handleUpdatePreferences = useCallback(() => {
     updatePreferences(preferences);
-    // Cast preferences to Record<string, unknown> to satisfy LogContext if needed, or just object
-    logger.info('Preferences updated', { ...preferences } as any);
+    logger.info('Preferences updated', { ...preferences });
     toast.success('Preferences updated successfully');
   }, [preferences, updatePreferences]);
 

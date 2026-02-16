@@ -6,18 +6,12 @@
  */
 
 // Core middleware types and interfaces
-export type {
-  RegularMiddleware,
-  ErrorMiddleware,
-  AnyMiddleware,
-  PerformanceMetrics,
-  MiddlewareProvider
-} from './types';
+export * from './types';
 
 // Enhanced middleware factory
-export { MiddlewareFactory } from '../../../server/middleware/middleware-factory';
-import { MiddlewareFactory } from '../../../server/middleware/middleware-factory';
-export { MiddlewareRegistry } from '../../../server/middleware/middleware-registry';
+export { MiddlewareFactory } from './middleware-factory';
+import { MiddlewareFactory } from './middleware-factory';
+export { MiddlewareRegistry } from './middleware-registry';
 
 // Individual middleware providers
 export { AuthMiddlewareProvider } from './auth/provider';
@@ -27,15 +21,16 @@ export { RateLimitMiddlewareProvider } from './rate-limit/provider';
 export { ErrorHandlerMiddlewareProvider } from './error-handler/provider';
 
 // Enhanced middleware integrations
-export { createUnifiedMiddleware } from '../../../server/middleware/unified-middleware';
+// Note: createUnifiedMiddleware is server-specific and should be imported from @server/middleware
 // Middleware chain functionality removed by design during development
 
 // Utility functions
-export { applyMiddleware } from '../../../server/middleware/middleware-registry';
+export { applyMiddleware } from './middleware-registry';
 
-// Re-export specific middleware from core utilities
-export { rateLimitMiddleware } from '../rate-limiting';
-export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
+// Re-export specific middleware - rate limiting is in server, not shared
+// export { rateLimitMiddleware } from '../rate-limiting';
+// TODO: Fix import path - observability is in server/infrastructure, not shared/core
+// export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
 // export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export
 
 // Convenience functions for common middleware setups

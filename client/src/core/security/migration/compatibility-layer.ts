@@ -105,7 +105,7 @@ export class SecurityCompatibilityLayer {
       const cspManager = new UnifiedCSPManager({
         enabled: true,
         reportOnly: false,
-        directives: directives as any || STANDARD_CSP_CONFIG.development,
+        directives: (directives as CSPDirectives) || STANDARD_CSP_CONFIG.development,
         reportUri: '/api/security/csp-violations',
       });
       return cspManager.generateCSPHeader();
@@ -234,7 +234,7 @@ export class SecurityCompatibilityLayer {
       csp: {
         enabled: legacyConfig.enableCSP,
         reportOnly: process.env.NODE_ENV === 'development',
-        directives: legacyConfig.csp?.directives as any || STANDARD_CSP_CONFIG.development,
+        directives: (legacyConfig.csp?.directives as CSPDirectives) || STANDARD_CSP_CONFIG.development,
         nonce: legacyConfig.csp?.nonce,
       },
       inputSanitization: {
@@ -264,7 +264,7 @@ class LegacySecuritySystem {
   async initialize(config: LegacySecurityConfig): Promise<void> {
     // Initialize legacy security utilities
     if (config.enableCSP) {
-      const cspHeader = securityUtils.generateCSPHeader(config.csp?.directives as any);
+      const cspHeader = securityUtils.generateCSPHeader(config.csp?.directives as CSPDirectives);
       // Apply CSP header (would be done via HTTP headers in real implementation)
       console.log('Legacy CSP initialized:', cspHeader);
     }
@@ -290,7 +290,7 @@ class LegacySecuritySystem {
   }
 
   generateCSPHeader(directives?: Record<string, string[]>): string {
-    return securityUtils.generateCSPHeader(directives as any);
+    return securityUtils.generateCSPHeader(directives as CSPDirectives);
   }
 
   validatePasswordStrength(password: string): {

@@ -37,7 +37,7 @@ const bills = await billStorage.getBills({ status: 'active' });
 
 ```typescript
 import { BaseStorage } from '@server/storage';
-import { sponsors, type Sponsor } from '@shared/schema';
+import { sponsors, type Sponsor } from '@server/infrastructure/schema';
 
 export class SponsorStorage extends BaseStorage<Sponsor> {
   constructor() {
@@ -142,4 +142,4 @@ If migrating from existing storage implementations:
 - `@server/infrastructure/database/pool` - Database connection
 - `@shared/core/observability/logging` - Logging functionality
 - `drizzle-orm` - Database ORM
-- `@shared/schema` - Database schema definitions
+- `@server/infrastructure/schema` - Database schema definitions

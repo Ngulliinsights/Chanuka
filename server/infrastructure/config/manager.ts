@@ -413,14 +413,35 @@ export class ConfigurationManager extends EventEmitter {
   /**
    * Cleanup resources
    */
-  destroy(): void {
-    this.removeAllListeners();
-    this._state.watchingFiles = [];
-    this.hotReloadConfig.enabled = false;
-    this.encryptedValues.clear();
+  /**
+     * Cleanup resources
+     */
+    destroy(): Result<void, ConfigurationError> {
+      try {
+        this.removeAllListeners();
+        this._state.watchingFiles = [];
+        this.hotReloadConfig.enabled = false;
+        this.encryptedValues.clear();
 
-    this.observability?.getLogger()?.info('Configuration manager destroyed');
-  }
+        // Clean up chokidar watchers
+        for (const file of this._state.watchingFiles) {
+          const watcher = (this as any)[`_watcher_${file}`];
+          if (watcher && typeof watcher.close === 'function') {
+            watcher.close();
+            delete (this as any)[`_watcher_${file}`];
+          }
+        }
+
+        this.observability?.getLogger()?.info('Configuration manager destroyed');
+        return ok(undefined);
+      } catch (error) {
+        return err(new ConfigurationError(
+          'Failed to destroy configuration manager',
+          error instanceof Error ? error : undefined
+        ));
+      }
+    }
+
 
   // ==================== Private Methods ====================
 
@@ -712,31 +733,70 @@ export class ConfigurationManager extends EventEmitter {
 
         let debounceTimer: NodeJS.Timeout;
 
-        const watcher = chokidar.watch(file, {
-          persistent: true,
-          ignoreInitial: true,
-          awaitWriteFinish: { stabilityThreshold: 100 },
-        });
+        // Try to use chokidar for better file watching (preferred)
+        try {
+          const watcher = chokidar.watch(file, {
+            persistent: true,
+            ignoreInitial: true,
+            awaitWriteFinish: { stabilityThreshold: 100 },
+          });
 
-        watcher.on('change', () => {
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(async () => {
-            try {
-              this.observability?.getLogger()?.info(`Configuration file ${file} changed, reloading...`);
-              await this.reload();
-            } catch (error) {
-              this.emit('config:error', error);
-            }
-          }, this.hotReloadConfig.debounceMs);
-        });
+          watcher.on('change', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+              try {
+                this.observability?.getLogger()?.info(`Configuration file ${file} changed, reloading...`);
+                await this.reload();
+              } catch (error) {
+                this.emit('config:error', error);
+              }
+            }, this.hotReloadConfig.debounceMs);
+          });
 
-        // Store watcher reference for cleanup
-        (this as any)[`_watcher_${file}`] = watcher;
+          watcher.on('error', (error) => {
+            this.observability?.getLogger()?.warn(`Chokidar watcher error for ${file}, falling back to watchFile`, {
+              error: error instanceof Error ? error.message : String(error)
+            });
+            // Fall back to watchFile on error
+            this.setupWatchFileFallback(file, debounceTimer);
+          });
+
+          // Store watcher reference for cleanup
+          (this as any)[`_watcher_${file}`] = watcher;
+          this.observability?.getLogger()?.debug(`Using chokidar for watching ${file}`);
+        } catch (error) {
+          // Fall back to Node.js watchFile if chokidar fails
+          this.observability?.getLogger()?.warn(`Failed to initialize chokidar for ${file}, using watchFile fallback`, {
+            error: error instanceof Error ? error.message : String(error)
+          });
+          this.setupWatchFileFallback(file, debounceTimer);
+        }
       }
     }
 
     this.hotReloadConfig.enabled = true;
     this.observability?.getLogger()?.info('Hot reload enabled for configuration files');
+  }
+
+  /**
+   * Fallback to Node.js watchFile when chokidar is unavailable
+   */
+  private setupWatchFileFallback(file: string, debounceTimer: NodeJS.Timeout): void {
+    const { watchFile } = require('fs');
+    
+    watchFile(file, () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        try {
+          this.observability?.getLogger()?.info(`Configuration file ${file} changed, reloading...`);
+          await this.reload();
+        } catch (error) {
+          this.emit('config:error', error);
+        }
+      }, this.hotReloadConfig.debounceMs);
+    });
+
+    this.observability?.getLogger()?.debug(`Using watchFile fallback for ${file}`);
   }
 
   private detectChanges(previous: AppConfig, current: AppConfig): ConfigChange[] {

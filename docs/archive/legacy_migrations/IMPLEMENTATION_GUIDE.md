@@ -86,7 +86,7 @@ if (isFeatureEnabled('ENABLE_COMMENTS')) {
 @shared/i18n
 @shared/utils
 @shared/core
-@shared/schema
+@server/infrastructure/schema
 @shared/database
 @shared/platform
 ```

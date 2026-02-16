@@ -89,11 +89,17 @@ export class CitizenVerificationService {
     const verification_status = confidence > 80 ? 'verified' :
       confidence > 60 ? 'pending' : 'needs_review';
 
+    // Validate verification type
+    const validTypes = ['fact_check', 'impact_assessment', 'source_validation', 'claim_verification'] as const;
+    if (!validTypes.includes(verification_data.verification_type as any)) {
+      throw new Error(`Invalid verification type: ${verification_data.verification_type}`);
+    }
+
     const verification: CitizenVerification = {
       id: `verification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       bill_id: verification_data.bill_id,
       citizenId: verification_data.citizenId,
-      verification_type: verification_data.verification_type as any,
+      verification_type: verification_data.verification_type as CitizenVerification['verification_type'],
       verification_status,
       confidence,
       evidence: verification_data.evidence,
@@ -358,7 +364,8 @@ export class CitizenVerificationService {
     const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
-    const data = (existing as any).verification_data || {};
+    
+    const data = (existing.verification_data as Record<string, any>) || {};
     const endorsements = (data.endorsements || 0) + 1;
     data.endorsements = endorsements;
 
@@ -378,7 +385,8 @@ export class CitizenVerificationService {
     const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
-    const data = (existing as any).verification_data || {};
+    
+    const data = (existing.verification_data as Record<string, any>) || {};
     const disputes = (data.disputes || 0) + 1;
     data.disputes = disputes;
     // Optionally append counterEvidence into verification_data
@@ -396,7 +404,8 @@ export class CitizenVerificationService {
     const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
-    const data = (existing as any).verification_data || {};
+    
+    const data = (existing.verification_data as Record<string, any>) || {};
 
     const endorsements = data.endorsements || 0;
     const disputes = data.disputes || 0;
@@ -419,7 +428,8 @@ export class CitizenVerificationService {
     const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
-    const data = (existing as any).verification_data || {};
+    
+    const data = (existing.verification_data as Record<string, any>) || {};
 
     if ((data.disputes || 0) > (data.endorsements || 0) && (data.disputes || 0) > 3) {
       await db
@@ -440,7 +450,7 @@ export class CitizenVerificationService {
 
     // Map DB rows into domain shape by pulling data out of verification_data
     return results.map((r: any) => {
-      const data = (r as any).verification_data || {};
+      const data = (r.verification_data as Record<string, any>) || {};
       return {
         id: r.id,
         bill_id: data.bill_id,
@@ -562,7 +572,7 @@ export class CitizenVerificationService {
       .orderBy(desc(user_verification.created_at));
 
     return results.map((r: any) => {
-      const data = (r as any).verification_data || {};
+      const data = (r.verification_data as Record<string, any>) || {};
       return {
         id: r.id,
         bill_id: data.bill_id,

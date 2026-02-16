@@ -16,12 +16,12 @@ import {
   validateUser,
   validateUserRegistration,
   USER_VALIDATION_RULES,
-} from './user.schema;
+} from './user.schema';
 import {
   BillSchema,
   validateBill,
   BILL_VALIDATION_RULES,
-} from './bill.schema;
+} from './bill.schema';
 import {
   CommentSchema,
   validateComment,

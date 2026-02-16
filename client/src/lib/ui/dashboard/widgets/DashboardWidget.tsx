@@ -266,11 +266,16 @@ export function DashboardWidget({
  * Hook for managing widget state
  */
 export function useWidgetState(_widgetId: string) {
-  const [state, setState] = useState({
+  const [state, setState] = useState<{
+    loading: boolean;
+    error: string | null;
+    data: unknown;
+    lastRefresh: Date | null;
+  }>({
     loading: false,
-    error: null as string | null,
-    data: null as any,
-    lastRefresh: null as Date | null,
+    error: null,
+    data: null,
+    lastRefresh: null,
   });
 
   const setLoading = (loading: boolean) => {
@@ -281,7 +286,7 @@ export function useWidgetState(_widgetId: string) {
     setState(prev => ({ ...prev, error, loading: false }));
   };
 
-  const setData = (data: any) => {
+  const setData = (data: unknown) => {
     setState(prev => ({
       ...prev,
       data,
@@ -291,7 +296,7 @@ export function useWidgetState(_widgetId: string) {
     }));
   };
 
-  const refresh = async (fetchFn: () => Promise<any>) => {
+  const refresh = async (fetchFn: () => Promise<unknown>) => {
     setLoading(true);
     try {
       const data = await fetchFn();

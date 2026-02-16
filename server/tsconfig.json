@@ -23,7 +23,7 @@
   "include": [
     "**/*.ts",
     "**/*.d.ts"
-  ],
+, "../shared/core/middleware/middleware-registry.ts", "../shared/core/middleware/middleware-factory.ts"  ],
   "exclude": [
     "node_modules",
     "dist",

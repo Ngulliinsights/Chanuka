@@ -235,11 +235,13 @@ export class WebSocketClient {
       timestamp: new Date().toISOString()
     }));
 
-    this.send({
+    // Send subscription message with proper typing
+    const subscriptionMessage: WebSocketMessage = {
       type: 'subscribe',
-      subscriptions, // Use the proper subscriptions array format based on SubscriptionMessage
-      timestamp: new Date().toISOString()
-    } as any); // Cast as any to avoid strict type checks against WebSocketMessage union for now if needed
+      data: { subscriptions },
+      timestamp: Date.now()
+    };
+    this.send(subscriptionMessage);
 
     return true;
   }
@@ -250,14 +252,13 @@ export class WebSocketClient {
     // Convert single topic to array
     const topicList = Array.isArray(topics) ? topics : [topics];
 
-    this.send({
+    // Send unsubscription message with proper typing
+    const unsubscriptionMessage: WebSocketMessage = {
       type: 'unsubscribe',
-       // We might need to send just topics or ids depending on the server implementation.
-       // Assuming topics for now based on typical patterns, but protocol says 'subscriptions' or 'topic'.
-       // Let's assume we can send a list of topics.
-      topic: topicList[0], // Simplified for single topic or first topic if array, protocol seems to require specific structure
-      timestamp: new Date().toISOString()
-    } as any);
+      data: { topics: topicList },
+      timestamp: Date.now()
+    };
+    this.send(unsubscriptionMessage);
 
     return true;
   }

@@ -225,7 +225,8 @@ export class ProfileDomainService {
     updatedData.created_at = existingProfile.created_at;
     updatedData.updated_at = new Date();
 
-    return UserProfile.create(updatedData as any);
+    // Type assertion is safe here because we've built the object with all required fields
+    return UserProfile.create(updatedData as Parameters<typeof UserProfile.create>[0]);
   }
 
   /**

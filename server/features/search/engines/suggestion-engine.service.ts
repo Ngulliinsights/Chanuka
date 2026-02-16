@@ -5,7 +5,7 @@ import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte,like, or, sql } from "drizzle-orm";
 
-import { cacheService } from '@/infrastructure/cache/cache-service';
+import { cacheService } from '@server/infrastructure/cache';
 import { databaseService } from '@/infrastructure/database/database-service';
 
 import { type RankingContext,suggestionRankingService } from "./suggestion-ranking.service";

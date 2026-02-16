@@ -5,7 +5,7 @@
  * Safe to use in both client and server code
  */
 
-import type { ArgumentId, ArgumentEvidenceId, BillId, UserId } from '../core/branded';
+import type { ArgumentId, ArgumentEvidenceId, BillId, UserId } from '@shared/types/core/branded';
 
 /**
  * Argument position in bill debate

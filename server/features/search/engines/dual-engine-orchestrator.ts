@@ -261,10 +261,16 @@ export class DualEngineOrchestrator {
 
       const searchPromise = this.postgresqlEngine.search({
         query,
-        filters: options.filters,
-        pagination: { limit: (options.limit || 20) * 2 }, // Get more for fusion
-        options: { searchType: 'fulltext-phase2' },
-      } as any);
+        filters: options.filters || {},
+        pagination: { 
+          page: 1,
+          limit: (options.limit || 20) * 2 // Get more for fusion
+        },
+        options: { 
+          searchType: 'fulltext-phase2' as const,
+          includeHighlights: false
+        },
+      });
 
       const results = await Promise.race([searchPromise, timeoutPromise]);
 

@@ -383,8 +383,9 @@ export class UnifiedWebSocketManager {
   }
 
   private matchesSubscription(subscription: Subscription, message: WebSocketMessage): boolean {
-    // Check topic match
-    if (subscription.topic && (subscription.topic !== (message as any).topic) && subscription.topic !== '*') {
+    // Check topic match - safely access topic property
+    const messageTopic = 'topic' in message ? (message as { topic?: string }).topic : undefined;
+    if (subscription.topic && messageTopic !== subscription.topic && subscription.topic !== '*') {
       return false;
     }
 
@@ -398,7 +399,8 @@ export class UnifiedWebSocketManager {
 
   private matchesFilters(message: WebSocketMessage, filters: Record<string, unknown>): boolean {
     for (const [key, expectedValue] of Object.entries(filters)) {
-      const actualValue = (message as any)[key];
+      // Safely access message properties
+      const actualValue = key in message ? (message as Record<string, unknown>)[key] : undefined;
 
       if (Array.isArray(expectedValue)) {
         if (!expectedValue.includes(actualValue)) {
@@ -418,8 +420,7 @@ export class UnifiedWebSocketManager {
       channel: subscription.topic || '',
       timestamp: new Date(),
     };
-    // If invalid types, cast as any for now to resolve
-    this.send(message as any); 
+    this.send(message);
   }
 
   private sendUnsubscriptionMessage(subscription: Subscription): void {
@@ -428,8 +429,7 @@ export class UnifiedWebSocketManager {
       channel: subscription.topic || '',
       timestamp: new Date(),
     };
-     // If invalid types, cast as any for now to resolve
-     this.send(message as any);
+    this.send(message);
   }
 
   private resubscribeAll(): void {
@@ -505,7 +505,8 @@ export class UnifiedWebSocketManager {
         return;
       }
 
-      this.send({ type: 'ping' } as any);
+      const pingMessage: HeartbeatMessage = { type: 'heartbeat', timestamp: new Date() };
+      this.send(pingMessage);
     }, this.config.heartbeat?.interval || 30000);
   }
 
@@ -546,7 +547,7 @@ export class UnifiedWebSocketManager {
         messages: batch,
         timestamp: new Date(),
       };
-      this.send(batchMessage as any);
+      this.send(batchMessage);
     }
   }
 

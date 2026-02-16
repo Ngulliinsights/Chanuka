@@ -18,7 +18,7 @@ import {
   ConferenceId,
   createBrandedId,
   isBrandedId,
-} from "../types/core/common";
+} from "../../../shared/dist/core/src/validation/schemas/common";
 import type { ValidatedType } from "../types/core/validation";
 import { createValidatedType } from "../types/core/validation";
 
@@ -123,7 +123,7 @@ export async function transformData<T, U>(
   data: T,
   config: SchemaTransformConfig<T>
 ): Promise<U> {
-  let transformed: any = { ...data as any };
+  let transformed: Record<string, unknown> = { ...(data as Record<string, unknown>) };
 
   // Apply field mapping
   if (config.fieldMap) {
@@ -251,7 +251,7 @@ export async function validateWithContext<T>(
     if (context?.fieldRules) {
       const fieldValidations = await Promise.all(
         Object.entries(context.fieldRules).map(async ([field, fieldSchema]) => {
-          const fieldValue = (data as any)?.[field];
+          const fieldValue = (data as Record<string, unknown>)?.[field];
           const result = await fieldSchema.parseAsync(fieldValue);
           return [field, result] as const;
         })
@@ -387,3 +387,4 @@ export const SCHEMA_GENERATORS_CHANGELOG = {
   ✅ Extensible architecture
   `,
 } as const;
+

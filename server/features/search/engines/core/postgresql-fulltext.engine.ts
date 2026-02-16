@@ -377,9 +377,11 @@ export class PostgreSQLFullTextEngine {
       );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (result.data.length > 0 && (result.data[0] as any)?.expanded_query) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (result.data[0] as any).expanded_query.split(' | ').slice(0, options.maxExpansions);
+      if (result.data.length > 0) {
+        const firstResult = result.data[0] as Record<string, any>;
+        if (firstResult?.expanded_query && typeof firstResult.expanded_query === 'string') {
+          return firstResult.expanded_query.split(' | ').slice(0, options.maxExpansions);
+        }
       }
     } catch (error) {
       logger.warn('Query expansion failed, using original query', {

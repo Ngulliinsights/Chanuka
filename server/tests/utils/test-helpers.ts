@@ -1,7 +1,7 @@
 import { logger } from '@shared/core';
 import database from '@server/infrastructure/database';
-import { bills, sponsors,users } from '@shared/schema';
-import { bill_engagement,comments, notifications } from '@shared/schema';
+import { bills, sponsors,users } from '@server/infrastructure/schema';
+import { bill_engagement,comments, notifications } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
@@ -67,29 +67,28 @@ export class TestDataManager {
     };
 
     try {
-      // TODO: Fix when schema imports are available
-      // const user = await db.insert(users).values(defaultUserData).returning();
+      const [user] = await database.insert(users).values(defaultUserData).returning();
 
       const token = jwt.sign(
         {
-          id: 'test-user-id',
-          email: defaultUserData.email,
-          role: defaultUserData.role,
-          verification_status: defaultUserData.verification_status,
-          is_active: defaultUserData.is_active
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          verification_status: user.verification_status,
+          is_active: user.is_active
         },
         process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '1h' }
       );
 
       const testUser: TestUser = {
-        id: 'test-user-id',
-        email: defaultUserData.email,
-        name: defaultUserData.name,
-        role: defaultUserData.role,
-        password_hash: defaultUserData.password_hash,
-        verification_status: defaultUserData.verification_status,
-        is_active: defaultUserData.is_active,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        password_hash: user.password_hash,
+        verification_status: user.verification_status,
+        is_active: user.is_active,
         token
       };
 
@@ -125,14 +124,14 @@ export class TestDataManager {
     };
 
     try {
-      // TODO: Fix when schema imports are available
-      // const bill = await db.insert(bills).values(defaultBillData).returning();
+      const [bill] = await database.insert(bills).values(defaultBillData).returning();
+      
       const testBill: TestBill = {
-        id: Math.floor(Math.random() * 10000),
-        title: defaultBillData.title,
-        bill_number: defaultBillData.bill_number,
-        status: defaultBillData.status,
-        category: defaultBillData.category
+        id: bill.id,
+        title: bill.title,
+        bill_number: bill.bill_number,
+        status: bill.status,
+        category: bill.category
       };
 
       this.createdBills.push(testBill);
@@ -157,14 +156,14 @@ export class TestDataManager {
     };
 
     try {
-      // TODO: Fix when schema imports are available
-      // const sponsor = await db.insert(sponsors).values(defaultSponsorData).returning();
+      const [sponsor] = await database.insert(sponsors).values(defaultSponsorData).returning();
+      
       const testSponsor: TestSponsor = {
-        id: Math.floor(Math.random() * 10000),
-        name: defaultSponsorData.name,
-        party: defaultSponsorData.party,
-        constituency: defaultSponsorData.constituency,
-        email: defaultSponsorData.email
+        id: sponsor.id,
+        name: sponsor.name,
+        party: sponsor.party,
+        constituency: sponsor.constituency,
+        email: sponsor.email
       };
 
       this.createdSponsors.push(testSponsor);
@@ -187,11 +186,11 @@ export class TestDataManager {
     };
 
     try {
-      // TODO: Fix when schema imports are available
-      // const notification = await db.insert(notifications).values(defaultNotificationData).returning();
+      const [notification] = await database.insert(notifications).values(defaultNotificationData).returning();
+      
       const testNotification = {
-        id: Math.floor(Math.random() * 10000),
-        ...defaultNotificationData
+        id: notification.id,
+        ...notification
       };
 
       this.createdNotifications.push(testNotification);
@@ -206,28 +205,27 @@ export class TestDataManager {
     try {
       // Clean up in reverse order to handle foreign key constraints
 
-      // TODO: Fix when schema imports are available
       // Clean up notifications
-      // for (const notification of this.createdNotifications) {
-      //   await db.delete(notifications).where(eq(notifications.id, notification.id));
-      // }
+      for (const notification of this.createdNotifications) {
+        await database.delete(notifications).where(eq(notifications.id, notification.id));
+      }
 
       // Clean up bill-related data
-      // for (const bill of this.createdBills) {
-      //   await db.delete(comments).where(eq(comments.bill_id, bills.id));
-      //   await db.delete(bill_engagement).where(eq(bill_engagement.bill_id, bills.id));
-      //   await db.delete(bills).where(eq(bills.id, bills.id));
-      // }
+      for (const bill of this.createdBills) {
+        await database.delete(comments).where(eq(comments.bill_id, bill.id));
+        await database.delete(bill_engagement).where(eq(bill_engagement.bill_id, bill.id));
+        await database.delete(bills).where(eq(bills.id, bill.id));
+      }
 
       // Clean up sponsors
-      // for (const sponsor of this.createdSponsors) {
-      //   await db.delete(sponsors).where(eq(sponsors.id, sponsors.id));
-      // }
+      for (const sponsor of this.createdSponsors) {
+        await database.delete(sponsors).where(eq(sponsors.id, sponsor.id));
+      }
 
       // Clean up users
-      // for (const user of this.createdUsers) {
-      //   await db.delete(users).where(eq(users.id, users.id));
-      // }
+      for (const user of this.createdUsers) {
+        await database.delete(users).where(eq(users.id, user.id));
+      }
 
       // Reset arrays
       this.createdUsers = [];
@@ -408,24 +406,50 @@ export class SecurityTestHelper {
 
   static validateXSSPrevention(input: string, output: string): void {
     // Check that dangerous scripts are not present in output
-    // TODO: Fix when Jest types are available
-    // expect(output).not.toContain('<script>');
-    // expect(output).not.toContain('javascript:');
-    // expect(output).not.toContain('onerror=');
-    // expect(output).not.toContain('onload=');
-    console.log('SecurityTestHelper.validateXSSPrevention called with:', { input, output });
+    if (output.includes('<script>')) {
+      throw new Error('XSS vulnerability detected: <script> tag found in output');
+    }
+    if (output.includes('javascript:')) {
+      throw new Error('XSS vulnerability detected: javascript: protocol found in output');
+    }
+    if (output.includes('onerror=')) {
+      throw new Error('XSS vulnerability detected: onerror= attribute found in output');
+    }
+    if (output.includes('onload=')) {
+      throw new Error('XSS vulnerability detected: onload= attribute found in output');
+    }
+    
+    logger.debug('XSS prevention validated successfully', {
+      component: 'security-test-helper',
+      inputLength: input.length,
+      outputLength: output.length
+    });
   }
 
   static validateSQLInjectionPrevention(response: any): void {
     // Response should not indicate SQL error or success
-    // TODO: Fix when Jest types are available
-    // expect(response.status).not.toBe(500);
-    // if (response.body.error) {
-    //   expect(response.body.error.toLowerCase()).not.toContain('sql');
-    //   expect(response.body.error.toLowerCase()).not.toContain('syntax');
-    //   expect(response.body.error.toLowerCase()).not.toContain('table');
-    // }
-    console.log('SecurityTestHelper.validateSQLInjectionPrevention called with:', { response });
+    if (response.status === 500) {
+      throw new Error('SQL injection test failed: Server returned 500 error');
+    }
+    
+    if (response.body && response.body.error) {
+      const errorLower = response.body.error.toLowerCase();
+      
+      if (errorLower.includes('sql')) {
+        throw new Error('SQL injection vulnerability detected: SQL error message exposed');
+      }
+      if (errorLower.includes('syntax')) {
+        throw new Error('SQL injection vulnerability detected: Syntax error message exposed');
+      }
+      if (errorLower.includes('table')) {
+        throw new Error('SQL injection vulnerability detected: Table information exposed');
+      }
+    }
+    
+    logger.debug('SQL injection prevention validated successfully', {
+      component: 'security-test-helper',
+      status: response.status
+    });
   }
 }
 
@@ -458,21 +482,28 @@ export class ConcurrencyTestHelper {
   }
 
   static validateConcurrentResponses(responses: any[], expectedStatus: number = 200): void {
-    // TODO: Fix when Jest types are available
-    // expect(responses.length).toBeGreaterThan(0);
+    if (responses.length === 0) {
+      throw new Error('Concurrent response validation failed: No responses received');
+    }
 
     const statusCodes = responses.map(r => r.status);
     const successCount = statusCodes.filter(s => s === expectedStatus).length;
+    const successRate = successCount / responses.length;
 
     // At least 80% should succeed
-    // TODO: Fix when Jest types are available
-    // expect(successCount / responses.length).toBeGreaterThanOrEqual(0.8);
+    if (successRate < 0.8) {
+      throw new Error(
+        `Concurrent response validation failed: Success rate ${(successRate * 100).toFixed(1)}% is below 80% threshold. ` +
+        `Expected ${expectedStatus}, got ${successCount}/${responses.length} successful responses`
+      );
+    }
 
-    console.log('ConcurrencyTestHelper.validateConcurrentResponses called with:', {
-      responses: responses.length,
+    logger.debug('Concurrent response validation passed', {
+      component: 'concurrency-test-helper',
+      totalResponses: responses.length,
       expectedStatus,
       successCount,
-      successRate: successCount / responses.length
+      successRate: `${(successRate * 100).toFixed(1)}%`
     });
   }
 }

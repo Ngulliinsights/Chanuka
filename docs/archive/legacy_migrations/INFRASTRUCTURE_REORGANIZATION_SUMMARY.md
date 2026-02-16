@@ -113,7 +113,7 @@ server/infrastructure/
 ```
 @shared/core        â†’ server/infrastructure/core
 @shared/database    â†’ server/infrastructure/database
-@shared/schema      â†’ server/infrastructure/schema
+@server/infrastructure/schema      â†’ server/infrastructure/schema
 @server/core        â†’ server/infrastructure/core
 ```
 
@@ -151,7 +151,7 @@ server/infrastructure/
 1. âœ… Reorganize directory structure
 2. âœ… Update import paths (171 files, 256+ replacements)
 3. âœ… Update tsconfig path aliases
-4. í´„ Verify TypeScript compilation
-5. í´„ Run tests to confirm functionality
-6. í´„ Delete shared/database and shared/schema
+4. ï¿½ï¿½ï¿½ Verify TypeScript compilation
+5. ï¿½ï¿½ï¿½ Run tests to confirm functionality
+6. ï¿½ï¿½ï¿½ Delete shared/database and shared/schema
 

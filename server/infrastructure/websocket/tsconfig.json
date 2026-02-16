@@ -14,8 +14,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@shared/schema": ["../../../shared/schema"],
-      "@shared/schema/*": ["../../../shared/schema/*"],
+      "@server/infrastructure/schema": ["../../../shared/schema"],
+      "@server/infrastructure/schema/*": ["../../../shared/schema/*"],
       "@shared/core": ["../../../shared/core"],
       "@shared/core/*": ["../../../shared/core/src/*"]
     }

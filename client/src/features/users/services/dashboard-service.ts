@@ -444,7 +444,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
       },
       // Shared Profile mapping (optional but good for future)
       // profile: { ... } - types don't require it yet in interfaces.ts
-    } as any; // Cast to any to avoid strict structural checks if interface definitions drift (e.g. AuthUser vs User)
+    };
   }
 
   private async fetchRecentActivity() {

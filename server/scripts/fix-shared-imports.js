@@ -54,12 +54,12 @@ function fixImportsInFile(filePath) {
     
     newContent = newContent.replace(
       /@shared\/schema\/foundation/g,
-      '@shared/schema'
+      '@server/infrastructure/schema'
     );
     
     newContent = newContent.replace(
       /@shared\/schema\/citizen_participation/g,
-      '@shared/schema'
+      '@server/infrastructure/schema'
     );
     
     if (newContent !== content) {

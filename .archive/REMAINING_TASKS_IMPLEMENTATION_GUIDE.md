@@ -236,7 +236,7 @@ export async function getUserById(id: UserId): Promise<User | null> {
 ```typescript
 // In server/infrastructure/database/validators/
 import { z } from 'zod';
-import type { User } from '@shared/schema';
+import type { User } from '@server/infrastructure/schema';
 
 export const UserSchema = z.object({
   id: z.string().uuid().brand<'UserId'>(),

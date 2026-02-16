@@ -5,7 +5,7 @@
 
 import { logger  } from '@shared/core';
 import { ExpertReviewQueueRepository } from '@shared/infrastructure/repositories/expert-review-queue-repository.js';
-import { ConstitutionalAnalysis } from '@shared/schema/index.js';
+import { ConstitutionalAnalysis } from '@server/infrastructure/schema/index.js';
 
 export interface ExpertReviewDecision {
   shouldFlag: boolean;

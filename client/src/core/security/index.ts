@@ -190,7 +190,7 @@ async function initializeLegacySecurity(config: SecurityConfig): Promise<Securit
       monitor: { initialize: async () => {} },
     };
 
-    return mockSecuritySystem as any;
+    return mockSecuritySystem as SecuritySystem;
   }
 
   // Initialize legacy components

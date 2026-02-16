@@ -43,7 +43,7 @@ export function processData(data: any) {
 export const unusedDatabaseImports = `
 import { databaseService } from '@server/infrastructure/database';
 import { eq, and, desc } from 'drizzle-orm';
-import { users, bills } from '@shared/schema';
+import { users, bills } from '@server/infrastructure/schema';
 
 export function getUserCount() {
   // Only using a simple query, other imports unused

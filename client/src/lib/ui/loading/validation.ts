@@ -291,7 +291,7 @@ export function normalizeLoadingType(
     'timeout-aware',
   ];
   if (typeof type === 'string' && validTypes.includes(type)) {
-    return type as any;
+    return type as 'page' | 'component' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware';
   }
   return 'component'; // Default fallback
 }

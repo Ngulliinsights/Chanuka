@@ -246,9 +246,13 @@ export class ServiceContainer {
    * Dispose service instance
    */
   private async disposeService(service: ServiceInstance): Promise<void> {
-    if (typeof (service.instance as any).dispose === 'function') {
+    interface DisposableService {
+      dispose?: () => Promise<void>;
+    }
+    
+    if (typeof (service.instance as DisposableService).dispose === 'function') {
       try {
-        await (service.instance as any).dispose();
+        await (service.instance as DisposableService).dispose!();
       } catch (error) {
         logger.warn('Service disposal failed', { serviceId: service.registration.id, error });
       }
@@ -301,9 +305,13 @@ export class ServiceContainer {
       return 'unknown';
     }
 
+    interface HealthCheckableService {
+      healthCheck?: () => Promise<boolean>;
+    }
+
     try {
-      if (typeof (service.instance as any).healthCheck === 'function') {
-        const health = await (service.instance as any).healthCheck();
+      if (typeof (service.instance as HealthCheckableService).healthCheck === 'function') {
+        const health = await (service.instance as HealthCheckableService).healthCheck!();
         service.health = health ? 'healthy' : 'unhealthy';
       }
     } catch (error) {

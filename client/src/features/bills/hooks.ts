@@ -55,8 +55,8 @@ export const billsKeys = {
  */
 export function useBills(params: BillsQueryParams = {}) {
   return useQuery({
-    queryKey: billsKeys.list(params as any), 
-    queryFn: () => billsApiService.getBills(params as any),
+    queryKey: billsKeys.list(params as BillsSearchParams), 
+    queryFn: () => billsApiService.getBills(params as BillsSearchParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

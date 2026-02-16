@@ -18,7 +18,7 @@ Based on comprehensive codebase analysis:
    - Eliminated ~100% duplication of core WebSocket types
 
 2. **✅ Unified Import Sources**
-   - All WebSocket types now import from `@shared/schema/websocket`
+   - All WebSocket types now import from `@server/infrastructure/schema/websocket`
    - Updated WebSocket client, real-time types, and middleware
    - Consistent import paths across codebase
 
@@ -49,7 +49,7 @@ Based on comprehensive codebase analysis:
 - **1 unified WebSocket type system** (`shared/schema/websocket.ts`)
 - **Consistent `data` field** usage (following majority pattern)
 - **Browser-compatible timer types**
-- **Unified import source** (`@shared/schema/websocket`)
+- **Unified import source** (`@server/infrastructure/schema/websocket`)
 
 ## 🎯 Validation Results
 

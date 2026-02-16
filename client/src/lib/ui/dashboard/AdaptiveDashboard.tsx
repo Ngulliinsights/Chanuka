@@ -201,7 +201,7 @@ export function AdaptiveDashboard({
         } : null;
 
         const classification = await personaDetector.detectPersona(
-          userForDetection as any,
+          userForDetection,
           userActivity,
           existingProfile
         );

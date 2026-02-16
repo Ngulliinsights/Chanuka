@@ -26,7 +26,14 @@ export class SecurityErrorMiddleware {
   async initialize(config?: Partial<ErrorHandlingConfig>): Promise<void> {
     if (config) {
       // Re-initialize handler with new config if needed
-      this.errorHandler = new SecurityErrorHandler({ ...this.errorHandler.getErrorStatistics(), ...config } as any);
+      const currentStats = this.errorHandler.getErrorStatistics();
+      const mergedConfig: ErrorHandlingConfig = { 
+        ...currentStats, 
+        ...config,
+        mode: config.mode || 'strict',
+        logLevel: config.logLevel || 'error'
+      };
+      this.errorHandler = new SecurityErrorHandler(mergedConfig);
       this.errorLogger = new SecurityLogger(config.logLevel || 'error');
     }
   }
@@ -65,7 +72,7 @@ export class SecurityErrorMiddleware {
     component: string
   ): SecurityError {
     // SecurityError is a type (not a runtime class). Detect by shape instead of instanceof.
-    if (error && typeof error === 'object' && 'type' in (error as any) && 'severity' in (error as any)) {
+    if (error && typeof error === 'object' && 'type' in error && 'severity' in error) {
       return error as SecurityError;
     }
 
@@ -116,7 +123,7 @@ export class SecurityErrorMiddleware {
 
   private shouldThrowError(error: SecurityError): boolean {
     // Don't throw for low-severity errors in permissive mode
-    const handlerMode = (this.errorHandler as any)?.config?.mode;
+    const handlerMode = this.errorHandler.getConfig().mode;
     return error.severity !== 'low' || handlerMode === 'strict';
   }
 

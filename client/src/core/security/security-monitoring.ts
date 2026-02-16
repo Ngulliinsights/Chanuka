@@ -42,17 +42,22 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
   async reportError(error: AppError | Error, context: ErrorContext): Promise<void> {
     if (!this.monitoringEnabled) return;
 
-    const appError = error instanceof Error && !(error as any).type
-      ? createError(
+    // Type guard to check if error is AppError
+    const isAppError = (err: unknown): err is AppError => {
+      return err !== null && typeof err === 'object' && 'type' in err;
+    };
+
+    const appError = isAppError(error)
+      ? error
+      : createError(
           CoreErrorDomain.SECURITY,
           CoreErrorSeverity.HIGH,
-          error.message,
+          error instanceof Error ? error.message : String(error),
           {
-            context: context as any, // Cast due to index signature mismatch
+            context: context,
             details: { originalError: error }
           }
-        )
-      : error as AppError;
+        );
 
     // Add system-specific context
     const enhancedContext = {
@@ -90,7 +95,7 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
           context: {
             component: 'SecurityMonitoring',
             operation: 'performance_tracking'
-          } as any
+          }
         }
       );
 
@@ -121,8 +126,9 @@ class SecurityMonitoring implements UnifiedErrorMonitoring {
       };
 
       existing.errors.push(err);
-      // Assume recovery if error was resolved (simplified logic)
-      if ((err.error as any).recoverySuccess) {
+      // Check if error has recovery success property
+      const errorWithRecovery = err.error as AppError & { recoverySuccess?: boolean };
+      if (errorWithRecovery.recoverySuccess) {
         existing.recoveryCount++;
       }
       existing.totalImpact += this.calculateErrorImpact(err.error);
@@ -425,7 +431,7 @@ class SecurityMonitoringMiddleware implements ErrorMonitoringMiddleware {
   }
 
   private isOperationEnabled(operation: string): boolean {
-    const monitoring = SecurityMonitoring.getInstance() as any;
+    const monitoring = SecurityMonitoring.getInstance();
     return monitoring.enabledOperations.has('*') || monitoring.enabledOperations.has(operation);
   }
 }

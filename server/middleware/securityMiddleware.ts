@@ -1,9 +1,7 @@
 /**
- * Security Middleware (STUB)
- * TODO: Full implementation in Phase 3
+ * Security Middleware
  * 
- * This is a stub implementation to resolve import errors.
- * The full implementation will include:
+ * Full implementation for comprehensive security middleware including:
  * - Rate limiting
  * - IP filtering
  * - Request validation
@@ -14,7 +12,8 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core';
+import type { AuthenticatedRequest } from './auth-types';
 
 export interface SecurityConfig {
   rateLimit?: {
@@ -27,85 +26,320 @@ export interface SecurityConfig {
   requireRole?: string[];
 }
 
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+
 /**
  * Security Middleware Factory
- * TODO: Implement comprehensive security middleware in Phase 3
  */
 export function createSecurityMiddleware(config?: SecurityConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    logger.info('Security middleware (stub)', {
-      path: req.path,
-      method: req.method,
-    });
+    try {
+      // IP filtering
+      if (config?.ipWhitelist || config?.ipBlacklist) {
+        const clientIp = getClientIp(req);
+        
+        if (config.ipWhitelist && !config.ipWhitelist.includes(clientIp)) {
+          logger.warn('IP not in whitelist', { ip: clientIp, path: req.path });
+          res.status(403).json({ error: 'Access denied' });
+          return;
+        }
 
-    // TODO: Implement security checks in Phase 3
-    // - Rate limiting
-    // - IP filtering
-    // - Request validation
-    // - Authentication
-    // - Authorization
+        if (config.ipBlacklist && config.ipBlacklist.includes(clientIp)) {
+          logger.warn('IP in blacklist', { ip: clientIp, path: req.path });
+          res.status(403).json({ error: 'Access denied' });
+          return;
+        }
+      }
 
-    next();
+      // Authentication check
+      if (config?.requireAuth) {
+        // Check if user is authenticated (assumes auth middleware has run)
+        const authReq = req as AuthenticatedRequest;
+        if (!authReq.user) {
+          logger.warn('Authentication required', { path: req.path });
+          res.status(401).json({ error: 'Authentication required' });
+          return;
+        }
+      }
+
+      // Authorization check
+      if (config?.requireRole && config.requireRole.length > 0) {
+        const authReq = req as AuthenticatedRequest;
+        const user = authReq.user;
+        if (!user || !user.role || !config.requireRole.includes(user.role)) {
+          logger.warn('Authorization failed', {
+            path: req.path,
+            userRole: user?.role,
+            requiredRoles: config.requireRole,
+          });
+          res.status(403).json({ error: 'Insufficient permissions' });
+          return;
+        }
+      }
+
+      logger.debug('Security middleware passed', {
+        path: req.path,
+        method: req.method,
+      });
+
+      next();
+    } catch (error) {
+      logger.error('Security middleware error', { error, path: req.path });
+      res.status(500).json({ error: 'Internal server error' });
+    }
   };
 }
 
 /**
  * Rate limiting middleware
- * TODO: Implement rate limiting in Phase 3
  */
 export function rateLimitMiddleware(
   windowMs: number = 60000,
   max: number = 100
 ) {
+  const rateLimitMap = new Map<string, RateLimitEntry>();
+
+  // Cleanup expired entries periodically
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of rateLimitMap.entries()) {
+      if (now > entry.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }, windowMs);
+
   return (req: Request, res: Response, next: NextFunction): void => {
-    logger.info('Rate limit middleware (stub)', { windowMs, max });
-    // TODO: Implement rate limiting
-    next();
+    try {
+      const clientIp = getClientIp(req);
+      const now = Date.now();
+
+      let entry = rateLimitMap.get(clientIp);
+
+      if (!entry || now > entry.resetTime) {
+        // Create new entry
+        entry = {
+          count: 1,
+          resetTime: now + windowMs,
+        };
+        rateLimitMap.set(clientIp, entry);
+      } else {
+        // Increment count
+        entry.count++;
+      }
+
+      // Set rate limit headers
+      res.setHeader('X-RateLimit-Limit', max.toString());
+      res.setHeader('X-RateLimit-Remaining', Math.max(0, max - entry.count).toString());
+      res.setHeader('X-RateLimit-Reset', new Date(entry.resetTime).toISOString());
+
+      // Check if rate limit exceeded
+      if (entry.count > max) {
+        logger.warn('Rate limit exceeded', {
+          ip: clientIp,
+          path: req.path,
+          count: entry.count,
+          max,
+        });
+
+        res.status(429).json({
+          error: 'Too many requests',
+          retryAfter: Math.ceil((entry.resetTime - now) / 1000),
+        });
+        return;
+      }
+
+      next();
+    } catch (error) {
+      logger.error('Rate limit middleware error', { error });
+      next();
+    }
   };
 }
 
 /**
  * IP filtering middleware
- * TODO: Implement IP filtering in Phase 3
  */
 export function ipFilterMiddleware(
   whitelist?: string[],
   blacklist?: string[]
 ) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    logger.info('IP filter middleware (stub)', { whitelist, blacklist });
-    // TODO: Implement IP filtering
-    next();
+    try {
+      const clientIp = getClientIp(req);
+
+      if (whitelist && whitelist.length > 0) {
+        if (!whitelist.includes(clientIp)) {
+          logger.warn('IP not in whitelist', { ip: clientIp, path: req.path });
+          res.status(403).json({ error: 'Access denied' });
+          return;
+        }
+      }
+
+      if (blacklist && blacklist.length > 0) {
+        if (blacklist.includes(clientIp)) {
+          logger.warn('IP in blacklist', { ip: clientIp, path: req.path });
+          res.status(403).json({ error: 'Access denied' });
+          return;
+        }
+      }
+
+      next();
+    } catch (error) {
+      logger.error('IP filter middleware error', { error });
+      next();
+    }
   };
 }
 
 /**
  * Security headers middleware
- * TODO: Implement security headers in Phase 3
  */
 export function securityHeadersMiddleware() {
   return (req: Request, res: Response, next: NextFunction): void => {
-    logger.info('Security headers middleware (stub)');
-    // TODO: Implement security headers
-    // - X-Content-Type-Options
-    // - X-Frame-Options
-    // - X-XSS-Protection
-    // - Strict-Transport-Security
-    // - Content-Security-Policy
-    next();
+    try {
+      // Prevent MIME type sniffing
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+
+      // Prevent clickjacking
+      res.setHeader('X-Frame-Options', 'DENY');
+
+      // Enable XSS protection
+      res.setHeader('X-XSS-Protection', '1; mode=block');
+
+      // Enforce HTTPS
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+      // Content Security Policy
+      res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
+      );
+
+      // Referrer Policy
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+      // Permissions Policy
+      res.setHeader(
+        'Permissions-Policy',
+        'geolocation=(), microphone=(), camera=()'
+      );
+
+      next();
+    } catch (error) {
+      logger.error('Security headers middleware error', { error });
+      next();
+    }
   };
 }
 
 /**
  * CORS middleware
- * TODO: Implement CORS configuration in Phase 3
  */
 export function corsMiddleware(allowedOrigins?: string[]) {
+  const defaultOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+  const origins = allowedOrigins || defaultOrigins;
+
   return (req: Request, res: Response, next: NextFunction): void => {
-    logger.info('CORS middleware (stub)', { allowedOrigins });
-    // TODO: Implement CORS configuration
+    try {
+      const origin = req.headers.origin;
+
+      if (origin && origins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, Authorization, X-Requested-With, X-CSRF-Token'
+        );
+        res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+      }
+
+      // Handle preflight requests
+      if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+      }
+
+      next();
+    } catch (error) {
+      logger.error('CORS middleware error', { error });
+      next();
+    }
+  };
+}
+
+/**
+ * Request size limit middleware
+ */
+export function requestSizeLimitMiddleware(maxSize: number = 10 * 1024 * 1024) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    try {
+      const contentLength = parseInt(req.headers['content-length'] || '0', 10);
+
+      if (contentLength > maxSize) {
+        logger.warn('Request size limit exceeded', {
+          contentLength,
+          maxSize,
+          path: req.path,
+        });
+        res.status(413).json({ error: 'Request entity too large' });
+        return;
+      }
+
+      next();
+    } catch (error) {
+      logger.error('Request size limit middleware error', { error });
+      next();
+    }
+  };
+}
+
+/**
+ * Request timeout middleware
+ */
+export function requestTimeoutMiddleware(timeout: number = 30000) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const timer = setTimeout(() => {
+      logger.warn('Request timeout', { path: req.path, timeout });
+      if (!res.headersSent) {
+        res.status(408).json({ error: 'Request timeout' });
+      }
+    }, timeout);
+
+    res.on('finish', () => {
+      clearTimeout(timer);
+    });
+
     next();
   };
+}
+
+/**
+ * Get client IP address
+ */
+function getClientIp(req: Request): string {
+  // Check X-Forwarded-For header (proxy/load balancer)
+  const forwardedFor = req.headers['x-forwarded-for'];
+  if (forwardedFor) {
+    const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+    return ips.split(',')[0].trim();
+  }
+
+  // Check X-Real-IP header
+  const realIp = req.headers['x-real-ip'];
+  if (realIp) {
+    return Array.isArray(realIp) ? realIp[0] : realIp;
+  }
+
+  // Fallback to socket address
+  return req.socket.remoteAddress || 'unknown';
 }
 
 /**

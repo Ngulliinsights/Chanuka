@@ -289,22 +289,19 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const hookContext = this.extractHookContext(error);
     const recoveryStrategies = this.getHookRecoveryStrategies(error, hookContext);
 
-    return new (AppError as any)(
-      error.message,
-      error.code,
-      error.type,
-      error.severity,
-      {
-        ...error,
-        context: {
-          ...error.context,
-          ...hookContext,
-        },
-        recoveryStrategies,
-        recoverable: this.isRecoverableHookError(error),
-        retryable: this.isRetryableHookError(error),
-      }
-    );
+    // Create a new AppError with enhanced context
+    const enhancedError = Object.create(AppError.prototype);
+    Object.assign(enhancedError, error, {
+      context: {
+        ...error.context,
+        ...hookContext,
+      },
+      recoveryStrategies,
+      recoverable: this.isRecoverableHookError(error),
+      retryable: this.isRetryableHookError(error),
+    });
+
+    return enhancedError;
   }
 
   /**
@@ -347,18 +344,20 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const errorCode = this.determineHookErrorCode(error, hookContext);
     const severity = this.determineHookErrorSeverity(errorCode, hookContext);
 
-    return new (AppError as any)(
-      error.message,
-      errorCode,
-      ErrorDomain.UI,
+    // Create a new AppError instance using Object.create
+    const appError = Object.create(AppError.prototype);
+    Object.assign(appError, {
+      message: error.message,
+      code: errorCode,
+      type: ErrorDomain.UI,
       severity,
-      {
-        context: hookContext,
-        cause: error,
-        recoverable: true,
-        retryable: this.isRetryableHookErrorCode(errorCode),
-      }
-    );
+      context: hookContext,
+      cause: error,
+      recoverable: true,
+      retryable: this.isRetryableHookErrorCode(errorCode),
+    });
+
+    return appError;
   }
 
   /**
@@ -524,15 +523,14 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
 
     // Check for performance degradation
     if (context.performanceMetrics.renderTime && context.performanceMetrics.renderTime > this.config.performanceThreshold * 2) {
-      const perfError = new (AppError as any)(
-        `Hook performance degradation detected: ${context.hookName}`,
-        HookErrorCode.HOOK_PERFORMANCE_DEGRADATION,
-        ErrorDomain.UI,
-        ErrorSeverity.MEDIUM,
-        {
-          context,
-        }
-      );
+      const perfError = Object.create(AppError.prototype);
+      Object.assign(perfError, {
+        message: `Hook performance degradation detected: ${context.hookName}`,
+        code: HookErrorCode.HOOK_PERFORMANCE_DEGRADATION,
+        type: ErrorDomain.UI,
+        severity: ErrorSeverity.MEDIUM,
+        context,
+      });
 
       await coreErrorHandler.handleError(perfError);
     }
@@ -549,15 +547,14 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
       return;
     }
 
-    const memoryError = new (AppError as any)(
-      `Potential memory leak detected in hook: ${context.hookName}`,
-      HookErrorCode.HOOK_MEMORY_LEAK,
-      ErrorDomain.UI,
-      ErrorSeverity.HIGH,
-      {
-        context,
-      }
-    );
+    const memoryError = Object.create(AppError.prototype);
+    Object.assign(memoryError, {
+      message: `Potential memory leak detected in hook: ${context.hookName}`,
+      code: HookErrorCode.HOOK_MEMORY_LEAK,
+      type: ErrorDomain.UI,
+      severity: ErrorSeverity.HIGH,
+      context,
+    });
 
     await coreErrorHandler.handleError(memoryError);
   }
@@ -573,15 +570,14 @@ export class HooksErrorMiddleware implements ErrorReporter, ErrorTransformer {
       return;
     }
 
-    const concurrentError = new (AppError as any)(
-      `Concurrent state updates detected in hook: ${context.hookName}`,
-      HookErrorCode.HOOK_CONCURRENT_UPDATE,
-      ErrorDomain.UI,
-      ErrorSeverity.MEDIUM,
-      {
-        context,
-      }
-    );
+    const concurrentError = Object.create(AppError.prototype);
+    Object.assign(concurrentError, {
+      message: `Concurrent state updates detected in hook: ${context.hookName}`,
+      code: HookErrorCode.HOOK_CONCURRENT_UPDATE,
+      type: ErrorDomain.UI,
+      severity: ErrorSeverity.MEDIUM,
+      context,
+    });
 
     await coreErrorHandler.handleError(concurrentError);
   }

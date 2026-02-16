@@ -16,7 +16,7 @@ import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 import { getDefaultCache } from '../cache';
 // import { RateLimitMiddleware } from '../rate-limiting/middleware';
  // Unused import
-import { logger } from '../observability/logging';
+import { logger } from '../infrastructure/observability';
 import { RateLimitStore } from '../rate-limiting/types';
 
 export interface AIRequest extends AuthenticatedRequest { aiContext?: {

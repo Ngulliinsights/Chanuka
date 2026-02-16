@@ -707,8 +707,8 @@ export class SearchDeploymentService {
   /**
    * Calculate overall deployment health
    */
-  private calculateOverallDeploymentHealth(status: any): 'healthy' | 'warning' | 'critical' {
-    const components = Object.values(status) as any[];
+  private calculateOverallDeploymentHealth(status: Record<string, { lastValidation?: ValidationResult }>): 'healthy' | 'warning' | 'critical' {
+    const components = Object.values(status);
     
     const criticalIssues = components.filter(c => 
       c.lastValidation?.recommendation === 'rollback'

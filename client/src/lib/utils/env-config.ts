@@ -30,18 +30,26 @@ interface EnvironmentConfig {
   };
 }
 
+interface WindowWithEnv extends Window {
+  ENV?: Record<string, string>;
+}
+
+interface ImportMetaWithEnv {
+  env?: Record<string, string>;
+}
+
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const isDevelopment = process.env.NODE_ENV === 'development';
   const isProduction = process.env.NODE_ENV === 'production';
 
   // Helper function to safely access environment variables
   const getEnv = (key: string, defaultValue = ''): string => {
-    if (typeof window !== 'undefined' && (window as any).ENV) {
-      return (window as any).ENV[key] || defaultValue;
+    if (typeof window !== 'undefined' && (window as WindowWithEnv).ENV) {
+      return (window as WindowWithEnv).ENV?.[key] || defaultValue;
     }
     // Fallback for build-time environment variables
     try {
-      return (import.meta as any).env?.[key] || defaultValue;
+      return (import.meta as ImportMetaWithEnv).env?.[key] || defaultValue;
     } catch {
       return defaultValue;
     }

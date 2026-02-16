@@ -133,7 +133,11 @@ export class DemoStateManager {
   }
 
   getDemoUserType(): 'basic' | 'premium' | 'expert' {
-    return (localStorage.getItem('demo-user-type') as any) || 'basic';
+    const stored = localStorage.getItem('demo-user-type');
+    if (stored === 'premium' || stored === 'expert') {
+      return stored;
+    }
+    return 'basic';
   }
 }
 

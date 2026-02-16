@@ -13,7 +13,7 @@ import {
   SearchQuery,
   SearchResponse,
   SearchResult} from '@shared/engines/types/search.types.js';
-import { bills, sponsors } from '@shared/schema';
+import { bills, sponsors } from '@server/infrastructure/schema';
 import { sql } from 'drizzle-orm';
 
 // ============================================================================

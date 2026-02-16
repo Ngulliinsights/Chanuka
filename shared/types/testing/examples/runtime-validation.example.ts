@@ -175,7 +175,7 @@ function validateStringArray(value: unknown): ValidationResult {
       }
       return null;
     })
-    .filter(Boolean) as any[];
+    .filter((error): error is NonNullable<typeof error> => error !== null);
 
   return {
     valid: errors.length === 0,

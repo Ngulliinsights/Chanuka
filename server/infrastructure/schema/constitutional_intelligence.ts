@@ -875,8 +875,6 @@ export const eliteKnowledgeScoresRelations = relations(elite_knowledge_scores, (
 // ============================================================================
 // TYPE EXPORTS - TypeScript Type Safety
 // ============================================================================
-
-export type ConstitutionalProvision = typeof constitutional_provisions.$inferSelect;
 export type NewConstitutionalProvision = typeof constitutional_provisions.$inferInsert;
 
 export type ConstitutionalAnalysis = typeof constitutional_analyses.$inferSelect;

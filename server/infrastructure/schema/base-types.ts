@@ -231,11 +231,17 @@ export const BASE_TYPES_VERSION = "1.0.0";
 export const BASE_TYPES_CHANGELOG = {
   "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",
 } as const;
-SE_TYPES_CHANGELOG = {
-  "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",
-} as const;
-=====
-export const BASE_TYPES_VERSION = "1.0.0";
-export const BASE_TYPES_CHANGELOG = {
-  "1.0.0": "Initial centralized base types module - DRY audit fields, PKs, common patterns",
-} as const;
+
+// ============================================================================
+// BASE ENTITY INTERFACE
+// ============================================================================
+
+/**
+ * Base entity with audit timestamps
+ */
+export interface BaseEntity {
+  id: string;
+  created_at: Date;
+  updated_at: Date;
+}
+

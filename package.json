@@ -71,6 +71,8 @@
     "migrate:status": "echo '⚠️ DEPRECATED: Use db:health instead' && npm run db:health",
     "// --- TYPE SAFETY SCANNING ---": "",
     "scan:type-violations": "tsx scripts/scan-type-violations.ts",
+    "scan:client-types": "tsx scripts/scan-client-type-violations.ts",
+    "scan:todos": "tsx scripts/scan-todos.ts",
     "fix:enum-conversions": "tsx scripts/fix-templates.ts --template=enum-conversions",
     "fix:enum-conversions:dry-run": "tsx scripts/fix-templates.ts --template=enum-conversions --dry-run",
     "fix:api-responses": "tsx scripts/fix-templates.ts --template=api-responses",

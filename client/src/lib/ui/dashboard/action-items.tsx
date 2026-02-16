@@ -13,7 +13,7 @@ export const ActionItems = React.memo<DashboardComponentProps>(
     const { data, loading, error, actions, recovery } = useDashboard(config as Partial<DashboardAppConfig>);
     useDashboardActions(data.actionItems);
     const [showCompleted, setShowCompleted] = React.useState(
-      (config as any)?.showCompletedActions ?? false
+      (config as { showCompletedActions?: boolean })?.showCompletedActions ?? false
     );
     const [priorityFilter, setPriorityFilter] = React.useState<ActionPriority | 'all'>('all');
 

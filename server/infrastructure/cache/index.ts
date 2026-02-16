@@ -5,9 +5,8 @@
  */
 
 // Unified caching service interface and implementation
-export type { ICachingService } from './icaching-service';
-export { CachingService } from './caching-service';
-export { CachingServiceRegistry } from './icaching-service';
+export type { ICachingService, CachingServiceFactory } from './caching-service';
+export { CachingService, CachingServiceRegistry } from './caching-service';
 export { createCachingService } from './caching-service';
 
 // Core interfaces and types
@@ -68,7 +67,26 @@ export {
 } from './cache-wrappers';
 
 // Convenience export for default cache service
-export { cacheService, createCacheService } from './simple-factory';
+export { createCacheService, createSimpleCacheService, getDefaultCache, initializeDefaultCache } from './factory';
+
+// Create a default cache service instance for convenience
+import { createSimpleCacheService } from './factory';
+export const cacheService = createSimpleCacheService();
+
+// Server-specific cache wrapper with convenience methods
+export { ServerCacheWrapper, serverCache } from './server-cache-wrapper';
+
+// Cache TTL constants for common use cases
+export const CACHE_TTL = {
+  SHORT: 60,              // 1 minute
+  MEDIUM: 300,            // 5 minutes
+  LONG: 900,              // 15 minutes
+  HOUR: 3600,             // 1 hour
+  DAY: 86400,             // 24 hours
+  RECOMMENDATIONS: 1800,  // 30 minutes
+  QUERIES: 300,           // 5 minutes
+  ANALYTICS: 900          // 15 minutes
+} as const;
 
 // Note: Advanced features like MultiTierAdapter, BrowserAdapter, and UnifiedCacheFactory
 // are available but may require additional configuration and dependencies

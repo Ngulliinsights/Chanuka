@@ -3,7 +3,7 @@ import { demoDataService } from '@server/infrastructure/demo-data.js';
 import { databaseService } from '@server/infrastructure/database/database.service';
 import { logger   } from '@shared/core';
 import { readDatabase } from '@server/infrastructure/database';
-import * as schema from "@shared/schema";
+import * as schema from "@server/infrastructure/schema";
 import { sql } from "drizzle-orm";
 
 // Search index health status

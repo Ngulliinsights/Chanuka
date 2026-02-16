@@ -78,40 +78,6 @@ export interface ThreadParticipant {
 // ============================================================================
 
 /**
- * A comment or reply in a discussion thread
- *
- * @example
- * const comment: Comment = {
- *   id: 456,
- *   threadId: 1,
- *   billId: 123,
- *   content: 'This is an important point...',
- *   authorId: 789,
- *   createdAt: '2026-01-13T10:05:00Z',
- *   votes: { up: 42, down: 3 }
- * };
- */
-export interface Comment {
-  readonly id: number;
-  readonly threadId: number;
-  readonly billId: number;
-  readonly content: string;
-  readonly authorId: number;
-  readonly authorName: string;
-  readonly authorAvatar?: string;
-  readonly isAuthorExpert?: boolean;
-  readonly parentId?: number;
-  readonly createdAt: string;
-  readonly updatedAt?: string;
-  readonly edited: boolean;
-  readonly deletedAt?: string | null;
-  readonly votes: CommentVotes;
-  readonly replyCount?: number;
-  readonly attachments?: Attachment[];
-  readonly mentions?: Mention[];
-}
-
-/**
  * Vote counts for a comment
  */
 export interface CommentVotes {

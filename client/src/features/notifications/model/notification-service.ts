@@ -43,7 +43,6 @@ export interface NotificationData {
 }
 
 // Backward compatibility alias
-export type Notification = NotificationData;
 
 export interface NotificationEvent {
   type:

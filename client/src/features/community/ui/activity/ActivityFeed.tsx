@@ -34,6 +34,7 @@ import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import { ActivityItem } from '@client/lib/types';
+import { VirtualList } from '@client/lib/ui/virtual-list';
 
 interface ActivityFeedProps {
   activities: ActivityItem[];
@@ -202,167 +203,175 @@ const ActivityFeedComponent = ({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {activities.map(activity => {
-        const IconComponent = getActivityIcon(activity.type || 'discussion');
-        const isExpanded = expandedItems.has(activity.id);
-        const shouldTruncate = activity.content && activity.content.length > 200;
-        const displayContent =
-          shouldTruncate && !isExpanded && activity.content
-            ? activity.content.slice(0, 200) + '...'
-            : activity.content || '';
+      <VirtualList
+        items={activities}
+        itemHeight={200}
+        containerHeight={800}
+        overscan={3}
+        renderItem={(activity, index) => {
+          const IconComponent = getActivityIcon(activity.type || 'discussion');
+          const isExpanded = expandedItems.has(activity.id);
+          const shouldTruncate = activity.content && activity.content.length > 200;
+          const displayContent =
+            shouldTruncate && !isExpanded && activity.content
+              ? activity.content.slice(0, 200) + '...'
+              : activity.content || '';
 
-        return (
-          <Card key={activity.id} className="chanuka-card hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                {/* User Avatar */}
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={activity.userAvatar} alt={activity.userName} />
-                  <AvatarFallback>{getInitials(activity.userName || '')}</AvatarFallback>
-                </Avatar>
+          return (
+            <Card key={activity.id} className="chanuka-card hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  {/* User Avatar */}
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={activity.userAvatar} alt={activity.userName} />
+                    <AvatarFallback>{getInitials(activity.userName || '')}</AvatarFallback>
+                  </Avatar>
 
-                <div className="flex-1 min-w-0">
-                  {/* Activity Header */}
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-sm">{activity.userName}</span>
+                  <div className="flex-1 min-w-0">
+                    {/* Activity Header */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm">{activity.userName}</span>
 
-                      {/* Expert Badge */}
-                      {activity.expertInfo && (
-                        <Badge variant="outline" className="text-xs">
-                          Expert
-                        </Badge>
-                      )}
+                        {/* Expert Badge */}
+                        {activity.expertInfo && (
+                          <Badge variant="outline" className="text-xs">
+                            Expert
+                          </Badge>
+                        )}
 
-                      {/* Activity Type */}
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <IconComponent
-                          className={cn('h-4 w-4', getActivityTypeColor(activity.type))}
-                        />
-                        <span>{getActivityTypeLabel(activity.type)}</span>
-                      </div>
-
-                      {/* Bill/Entity Link */}
-                      {activity.billTitle && (
-                        <Badge variant="outline" className="text-xs">
-                          {activity.billTitle}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Timestamp and Location */}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      {activity.location?.state && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          <span>{activity.location.state}</span>
+                        {/* Activity Type */}
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <IconComponent
+                            className={cn('h-4 w-4', getActivityTypeColor(activity.type))}
+                          />
+                          <span>{getActivityTypeLabel(activity.type)}</span>
                         </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatTimeAgo(activity.timestamp)}</span>
+
+                        {/* Bill/Entity Link */}
+                        {activity.billTitle && (
+                          <Badge variant="outline" className="text-xs">
+                            {activity.billTitle}
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Timestamp and Location */}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {activity.location?.state && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            <span>{activity.location.state}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{formatTimeAgo(activity.timestamp)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Activity Title */}
-                  <h3 className="font-medium text-sm mb-2 leading-tight">{activity.title}</h3>
+                    {/* Activity Title */}
+                    <h3 className="font-medium text-sm mb-2 leading-tight">{activity.title}</h3>
 
-                  {/* Activity Content */}
-                  {activity.content && (
-                    <div className="mb-3">
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {displayContent}
-                      </p>
-                      {shouldTruncate && (
+                    {/* Activity Content */}
+                    {activity.content && (
+                      <div className="mb-3">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {displayContent}
+                        </p>
+                        {shouldTruncate && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleExpanded(activity.id)}
+                            className="text-xs p-0 h-auto mt-1"
+                          >
+                            {isExpanded ? 'Show less' : 'Show more'}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Activity Summary (for expert contributions) */}
+                    {activity.summary && activity.type === 'expert_contribution' && (
+                      <div className="mb-3 p-3 bg-muted/50 rounded-md">
+                        <p className="text-sm font-medium mb-1">Key Insight:</p>
+                        <p className="text-sm text-muted-foreground">{activity.summary}</p>
+                      </div>
+                    )}
+
+                    {/* Trending Indicator */}
+                    {activity.trendingScore && activity.trendingScore > 0.7 && (
+                      <div className="flex items-center gap-1 mb-2">
+                        <TrendingUp className="h-4 w-4 text-orange-500" />
+                        <Badge variant="secondary" className="text-xs">
+                          Trending
+                        </Badge>
+                      </div>
+                    )}
+
+                    {/* Engagement Actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                      <div className="flex items-center gap-4">
+                        {/* Like Button */}
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => toggleExpanded(activity.id)}
-                          className="text-xs p-0 h-auto mt-1"
+                          onClick={() => handleLike(activity)}
+                          className={cn(
+                            'text-xs h-auto p-1 flex items-center gap-1',
+                            activity.userHasLiked && 'text-red-500'
+                          )}
                         >
-                          {isExpanded ? 'Show less' : 'Show more'}
+                          <Heart
+                            className={cn('h-4 w-4', activity.userHasLiked && 'fill-current')}
+                          />
+                          <span>{activity.likes}</span>
+                        </Button>
+
+                        {/* Reply Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleReply(activity)}
+                          className="text-xs h-auto p-1 flex items-center gap-1"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          <span>{activity.replies}</span>
+                        </Button>
+
+                        {/* Share Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleShare(activity)}
+                          className="text-xs h-auto p-1 flex items-center gap-1"
+                        >
+                          <Share2 className="h-4 w-4" />
+                          <span>{activity.shares}</span>
+                        </Button>
+                      </div>
+
+                      {/* External Link */}
+                      {activity.billId && (
+                        <Button variant="ghost" size="sm" asChild className="text-xs h-auto p-1">
+                          <a
+                            href={`/bills/${activity.billId}`}
+                            title={`View bill: ${activity.billTitle || activity.title}`}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
                         </Button>
                       )}
                     </div>
-                  )}
-
-                  {/* Activity Summary (for expert contributions) */}
-                  {activity.summary && activity.type === 'expert_contribution' && (
-                    <div className="mb-3 p-3 bg-muted/50 rounded-md">
-                      <p className="text-sm font-medium mb-1">Key Insight:</p>
-                      <p className="text-sm text-muted-foreground">{activity.summary}</p>
-                    </div>
-                  )}
-
-                  {/* Trending Indicator */}
-                  {activity.trendingScore && activity.trendingScore > 0.7 && (
-                    <div className="flex items-center gap-1 mb-2">
-                      <TrendingUp className="h-4 w-4 text-orange-500" />
-                      <Badge variant="secondary" className="text-xs">
-                        Trending
-                      </Badge>
-                    </div>
-                  )}
-
-                  {/* Engagement Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                    <div className="flex items-center gap-4">
-                      {/* Like Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(activity)}
-                        className={cn(
-                          'text-xs h-auto p-1 flex items-center gap-1',
-                          activity.userHasLiked && 'text-red-500'
-                        )}
-                      >
-                        <Heart className={cn('h-4 w-4', activity.userHasLiked && 'fill-current')} />
-                        <span>{activity.likes}</span>
-                      </Button>
-
-                      {/* Reply Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleReply(activity)}
-                        className="text-xs h-auto p-1 flex items-center gap-1"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                        <span>{activity.replies}</span>
-                      </Button>
-
-                      {/* Share Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleShare(activity)}
-                        className="text-xs h-auto p-1 flex items-center gap-1"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span>{activity.shares}</span>
-                      </Button>
-                    </div>
-
-                    {/* External Link */}
-                    {activity.billId && (
-                      <Button variant="ghost" size="sm" asChild className="text-xs h-auto p-1">
-                        <a
-                          href={`/bills/${activity.billId}`}
-                          title={`View bill: ${activity.billTitle || activity.title}`}
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+              </CardContent>
+            </Card>
+          );
+        }}
+      />
 
       {/* Load More Button */}
       {hasMore && (

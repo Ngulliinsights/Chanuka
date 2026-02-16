@@ -280,7 +280,7 @@ export class MigrationHelpers {
 
   static createMigrationError(
     message: string,
-    sourceItem: any,
+    sourceItem: unknown,
     targetType: string,
     cause?: Error
   ): Error {
@@ -291,7 +291,16 @@ export class MigrationHelpers {
     }
 
     // Add migration context
-    (error as any).migrationContext = {
+    const errorWithContext = error as Error & {
+      migrationContext?: {
+        sourceType: string;
+        targetType: string;
+        timestamp: string;
+        sourceItem: unknown;
+      };
+    };
+
+    errorWithContext.migrationContext = {
       sourceType: sourceItem?.constructor?.name || typeof sourceItem,
       targetType,
       timestamp: new Date().toISOString(),
@@ -301,12 +310,12 @@ export class MigrationHelpers {
     return error;
   }
 
-  private static sanitizeErrorContext(item: any): any {
+  private static sanitizeErrorContext(item: unknown): unknown {
     if (item === null || item === undefined) return item;
     if (typeof item !== 'object') return String(item);
 
     // Create a sanitized copy
-    const sanitized: Record<string, any> = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(item)) {
       if (typeof value === 'function') {
         sanitized[key] = '[Function]';

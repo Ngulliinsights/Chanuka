@@ -1,11 +1,38 @@
 /**
  * Simple Cache Factory
  * A minimal, working cache factory for basic use cases
+ * 
+ * @deprecated This file has been merged into './factory.ts'
+ * Use `createSimpleCacheService` from './factory' instead.
+ * This file will be removed in v2.0.0
+ * 
+ * Migration example:
+ * ```typescript
+ * // Old:
+ * import { cacheFactory } from './simple-factory';
+ * const cache = cacheFactory.createCache('myCache', { provider: 'memory' });
+ * 
+ * // New:
+ * import { createSimpleCacheService } from './factory';
+ * const cache = createSimpleCacheService({ defaultTtlSec: 3600 });
+ * ```
  */
+
+// Emit deprecation warning when this module is imported
+if (typeof console !== 'undefined' && console.warn) {
+  console.warn(
+    '[DEPRECATION WARNING] simple-factory.ts is deprecated and will be removed in v2.0.0. ' +
+    'Please use createSimpleCacheService from ./factory instead. ' +
+    'See migration guide: https://docs.example.com/cache-migration'
+  );
+}
 
 import { MemoryAdapter } from './adapters/memory-adapter';
 import type { CacheAdapter } from './core/interfaces';
 
+/**
+ * @deprecated Use createSimpleCacheService from './factory' instead
+ */
 export interface SimpleCacheConfig {
   provider: 'memory';
   defaultTtlSec?: number;
@@ -13,6 +40,9 @@ export interface SimpleCacheConfig {
   keyPrefix?: string;
 }
 
+/**
+ * @deprecated Use createSimpleCacheService from './factory' instead
+ */
 export class SimpleCacheFactory {
   private static instance: SimpleCacheFactory;
   private caches = new Map<string, CacheAdapter>();
@@ -28,6 +58,7 @@ export class SimpleCacheFactory {
 
   /**
    * Create a cache instance
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   createCache(name: string, config: SimpleCacheConfig): CacheAdapter {
     if (this.caches.has(name)) {
@@ -60,6 +91,7 @@ export class SimpleCacheFactory {
 
   /**
    * Get an existing cache instance
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   getCache(name: string): CacheAdapter | undefined {
     return this.caches.get(name);
@@ -67,6 +99,7 @@ export class SimpleCacheFactory {
 
   /**
    * Remove a cache instance
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   removeCache(name: string): boolean {
     return this.caches.delete(name);
@@ -74,6 +107,7 @@ export class SimpleCacheFactory {
 
   /**
    * Get all cache names
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   getCacheNames(): string[] {
     return Array.from(this.caches.keys());
@@ -81,6 +115,7 @@ export class SimpleCacheFactory {
 
   /**
    * Clear all caches
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   async clearAll(): Promise<void> {
     const promises = Array.from(this.caches.values()).map(cache => cache.clear?.() ?? Promise.resolve());
@@ -89,6 +124,7 @@ export class SimpleCacheFactory {
 
   /**
    * Shutdown all caches
+   * @deprecated Use createSimpleCacheService from './factory' instead
    */
   async shutdown(): Promise<void> {
     const caches = Array.from(this.caches.values());
@@ -102,6 +138,9 @@ export class SimpleCacheFactory {
 }
 
 // Export a default instance
+/**
+ * @deprecated Use createSimpleCacheService from './factory' instead
+ */
 export const cacheFactory = SimpleCacheFactory.getInstance();
 
 

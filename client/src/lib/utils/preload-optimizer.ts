@@ -62,7 +62,8 @@ class PreloadOptimizer {
 
     // Set priority if supported
     if (config.priority && 'fetchPriority' in link) {
-      (link as any).fetchPriority = config.priority;
+      // Type-safe property access for fetchPriority
+      (link as HTMLLinkElement & { fetchPriority?: string }).fetchPriority = config.priority;
     }
 
     document.head.appendChild(link);

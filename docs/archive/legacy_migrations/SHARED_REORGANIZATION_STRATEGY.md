@@ -589,7 +589,7 @@ Client                  Server
 ├─ types/          ├─ @shared/types/
 ├─ i18n/           ├─ @shared/i18n/
 ├─ utils/          ├─ @shared/core/
-├─ validation/     ├─ @shared/schema/  (unused by client)
+├─ validation/     ├─ @server/infrastructure/schema/  (unused by client)
 └─ constants/      └─ @server/infrastructure/database/ (unused by client)
 
 Result: Duplication, inconsistency, divergence

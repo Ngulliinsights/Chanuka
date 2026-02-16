@@ -5,7 +5,7 @@
  * for comprehensive observability and debugging.
  */
 
-import { logger } from '@shared/core';
+import { logger } from './logger';
 
 import { loggingConfig } from './logging-config';
 

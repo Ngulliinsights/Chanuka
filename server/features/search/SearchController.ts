@@ -17,6 +17,19 @@ import { BaseError, ValidationError } from '@shared/core/observability/error-man
 import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
 
+// Type guards for query parameters
+function isSortBy(value: unknown): value is 'relevance' | 'date' | 'title' | 'engagement' {
+  return typeof value === 'string' && ['relevance', 'date', 'title', 'engagement'].includes(value);
+}
+
+function isSortOrder(value: unknown): value is 'asc' | 'desc' {
+  return typeof value === 'string' && ['asc', 'desc'].includes(value);
+}
+
+function isSearchType(value: unknown): value is 'simple' | 'phrase' | 'boolean' {
+  return typeof value === 'string' && ['simple', 'phrase', 'boolean'].includes(value);
+}
+
 const router = Router();
 
 /**
@@ -52,14 +65,14 @@ router.get('/', asyncHandler(async (req, res: Response) => {
       pagination: {
         page: req.query.page ? Number(req.query.page) : 1,
         limit: req.query.limit ? Number(req.query.limit) : 10,
-        sortBy: (req.query.sortBy as any) ?? 'relevance',
-        sortOrder: (req.query.sortOrder as any) ?? 'desc',
+        sortBy: isSortBy(req.query.sortBy) ? req.query.sortBy : 'relevance',
+        sortOrder: isSortOrder(req.query.sortOrder) ? req.query.sortOrder : 'desc',
       },
       options: {
         includeSnippets: req.query.snippets === 'true',
         includeHighlights: req.query.highlights === 'true',
         minRelevanceScore: req.query.minScore ? Number(req.query.minScore) : undefined,
-        searchType: (req.query.searchType as any) ?? 'simple',
+        searchType: isSearchType(req.query.searchType) ? req.query.searchType : 'simple',
       },
     };
 
@@ -248,8 +261,8 @@ router.get('/stream', asyncHandler(async (req, res: Response) => {
       pagination: {
         page: req.query.page ? Number(req.query.page) : 1,
         limit: req.query.limit ? Number(req.query.limit) : 10,
-        sortBy: (req.query.sortBy as any) ?? 'relevance',
-        sortOrder: (req.query.sortOrder as any) ?? 'desc',
+        sortBy: isSortBy(req.query.sortBy) ? req.query.sortBy : 'relevance',
+        sortOrder: isSortOrder(req.query.sortOrder) ? req.query.sortOrder : 'desc',
       },
       options,
     };

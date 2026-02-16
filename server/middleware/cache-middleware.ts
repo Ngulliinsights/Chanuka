@@ -5,7 +5,7 @@
 
 import { NextFunction,Request, Response } from 'express';
 
-import { serverCache } from '../infrastructure/cache/cache-service';
+import { serverCache } from '../infrastructure/cache';
 
 export interface CacheOptions {
   ttl?: number; // TTL in seconds

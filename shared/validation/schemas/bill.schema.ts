@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { nonEmptyString, optionalNonEmptyString } from './common';
 
 /**
  * Bill Validation Rules
@@ -49,28 +50,12 @@ export const BILL_VALIDATION_RULES = {
  */
 export const BillSchema = z.object({
   id: z.string().uuid().optional(),
-  title: z
-    .string()
-    .min(BILL_VALIDATION_RULES.TITLE_MIN_LENGTH, 'Bill title must be at least 10 characters')
-    .max(BILL_VALIDATION_RULES.TITLE_MAX_LENGTH, 'Bill title must not exceed 500 characters'),
-  short_title: z
-    .string()
-    .min(BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH)
-    .max(BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH)
-    .optional(),
-  summary: z
-    .string()
-    .min(BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, 'Summary must be at least 20 characters')
-    .max(BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH, 'Summary must not exceed 1000 characters')
-    .optional(), // Updated: DB allows NULL
-  full_text: z
-    .string()
-    .min(BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, 'Bill content must be at least 50 characters')
-    .max(BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH, 'Bill content must not exceed 100000 characters')
-    .optional(), // Updated: DB allows NULL
-  bill_number: z
-    .string()
-    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)'), // Updated: required to match DB
+  title: nonEmptyString('title', BILL_VALIDATION_RULES.TITLE_MIN_LENGTH, BILL_VALIDATION_RULES.TITLE_MAX_LENGTH),
+  short_title: optionalNonEmptyString('short title', BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH, BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH),
+  summary: optionalNonEmptyString('summary', BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH),
+  full_text: optionalNonEmptyString('full text', BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH),
+  bill_number: nonEmptyString('bill number')
+    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)'),
   status: z.enum([
     'draft',
     'first_reading',
@@ -81,8 +66,8 @@ export const BillSchema = z.object({
     'rejected',
     'assented',
     'enacted',
-  ]).default('first_reading'), // Updated: matches DB enum and default
-  chamber: z.enum(['national_assembly', 'senate', 'joint']), // Updated: required to match DB
+  ]).default('first_reading'),
+  chamber: z.enum(['national_assembly', 'senate', 'joint']),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
@@ -94,27 +79,12 @@ export const BillSchema = z.object({
  */
 export const LegacyBillSchema = z.object({
   id: z.string().uuid().optional(),
-  title: z
-    .string()
-    .min(BILL_VALIDATION_RULES.TITLE_MIN_LENGTH, 'Bill title must be at least 10 characters')
-    .max(200, 'Bill title must not exceed 200 characters'),
-  short_title: z
-    .string()
-    .min(BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH)
-    .max(BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH)
-    .optional(),
-  summary: z
-    .string()
-    .min(BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, 'Summary must be at least 20 characters')
-    .max(BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH, 'Summary must not exceed 1000 characters'),
-  content: z
-    .string()
-    .min(BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, 'Bill content must be at least 50 characters')
-    .max(BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH, 'Bill content must not exceed 100000 characters'),
-  bill_number: z
-    .string()
-    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)')
-    .optional(),
+  title: nonEmptyString('title', BILL_VALIDATION_RULES.TITLE_MIN_LENGTH, 200),
+  short_title: optionalNonEmptyString('short title', BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH, BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH),
+  summary: nonEmptyString('summary', BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH),
+  content: nonEmptyString('content', BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH),
+  bill_number: optionalNonEmptyString('bill number')
+    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)'),
   status: z.enum([
     'draft',
     'introduced',

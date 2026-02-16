@@ -61,7 +61,7 @@ export class CSPManager {
     // Client-side CSP management is disabled to avoid conflicts
 
     // Store nonce for reference (scripts should already have nonces from server)
-    (window as any).__CSP_NONCE__ = this.nonce;
+    window.__CSP_NONCE__ = this.nonce;
 
     logger.info('CSP Manager initialized - using server-side CSP headers');
   }
@@ -132,7 +132,7 @@ export class CSPManager {
 
     // Set up reporting endpoint
     if (typeof window !== 'undefined') {
-      (window as any).__reportCSPViolation__ = (violation: CSPViolation) => {
+      window.__reportCSPViolation__ = (violation) => {
         this.handleCSPViolation(violation);
       };
     }
@@ -259,7 +259,7 @@ export class CSPManager {
    */
   refreshNonce(): string {
     this.nonce = this.generateNonce();
-    (window as any).__CSP_NONCE__ = this.nonce;
+    window.__CSP_NONCE__ = this.nonce;
     this.setupCSP(); // Reapply CSP with new nonce
     return this.nonce;
   }
@@ -283,7 +283,7 @@ export class CSPManager {
    */
   isSourceAllowed(directive: string, source: string): boolean {
     // This is a simplified check - in practice, you'd parse the full CSP
-    const policy = (window as any).__CSP_POLICY__;
+    const policy = window.__CSP_POLICY__;
     if (!policy) return false;
 
     const directiveMatch = policy.match(new RegExp(`${directive}\\s+([^;]+)`));

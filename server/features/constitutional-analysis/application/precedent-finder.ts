@@ -5,7 +5,7 @@
 
 import { logger  } from '@shared/core';
 import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
-import { LegalPrecedent } from '@shared/schema/index.js';
+import { LegalPrecedent } from '@server/infrastructure/schema/index.js';
 
 export interface PrecedentMatch {
   precedent: LegalPrecedent;

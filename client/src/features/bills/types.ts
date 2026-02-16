@@ -29,13 +29,6 @@ export interface BillAnalysisResult extends Partial<SharedBillAnalysis> {
   generatedAt: string;
 }
 
-export interface StakeholderImpact {
-  group: string;
-  impact: 'positive' | 'negative' | 'neutral';
-  description: string;
-  confidence: number;
-}
-
 export interface ConflictOfInterest {
   type: string;
   description: string;

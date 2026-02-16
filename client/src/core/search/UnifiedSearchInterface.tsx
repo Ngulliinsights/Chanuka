@@ -103,7 +103,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
 
         const unifiedQuery: UnifiedSearchQuery = {
           q: searchQuery,
-          strategy: selectedStrategy as any,
+          strategy: selectedStrategy as SearchStrategy,
           limit: strategySelector.getConfig().options.maxResults,
         };
 

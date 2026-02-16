@@ -207,42 +207,6 @@ export interface PerformanceMetrics {
 }
 
 /**
- * Comprehensive analytics metrics
- *
- * @example
- * const analytics: AnalyticsMetrics = {
- *   period: { start: new Date(...), end: new Date(...) },
- *   totalUsers: 5000,
- *   activeUsers: 1500,
- *   pageViews: 25000,
- *   engagement: { ... },
- *   performance: { ... }
- * };
- */
-export interface AnalyticsMetrics {
-  /** Reporting period */
-  period: DateRange;
-  /** Total users */
-  totalUsers: number;
-  /** Active users in period */
-  activeUsers: number;
-  /** Total page views */
-  pageViews: number;
-  /** Engagement metrics */
-  engagement: EngagementMetrics;
-  /** Performance metrics */
-  performance?: PerformanceMetrics;
-  /** Demographic breakdown */
-  demographics?: DemographicData;
-  /** Top pages */
-  topPages?: CategoryMetric[];
-  /** Traffic sources */
-  trafficSources?: CategoryMetric[];
-  /** Timestamp of metrics calculation */
-  timestamp: Date;
-}
-
-/**
  * Comparison data for before/after analysis
  *
  * @example

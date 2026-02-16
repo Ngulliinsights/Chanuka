@@ -19,19 +19,6 @@ export type {
   PaginatedBillsResponse,
 } from '@client/lib/types/bill';
 
-export interface Comment {
-  id: number;
-  billId: number;
-  userId: number;
-  content: string;
-  parentId?: number;
-  upvotes: number;
-  downvotes: number;
-  isEndorsed: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface CommentPayload {
   content: string;
   parentId?: number;

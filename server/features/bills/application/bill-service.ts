@@ -1,14 +1,13 @@
 // cSpell:ignore upvotes downvotes
-import { logger } from '@shared/core';
-import { Bill,bills, sponsors } from '@shared/schema.js';
-import { bill_engagement, comments } from '@shared/schema.js';
+import { logger } from '@server/infrastructure/observability/logger';
+import { Bill, bills, sponsors, BillStatus, isValidEnum } from '@server/infrastructure/schema';
+import { bill_engagement, comments } from '@server/infrastructure/schema';
 import { and, count, desc, eq, inArray,or, sql } from "drizzle-orm";
 
-import type { AsyncServiceResult } from '../../../../result-adapter';
-import { withResultHandling } from '../../../../result-adapter';
-import { serverCache } from '../../../infrastructure/cache/cache-service';
-import { Cached,CacheHelpers, QueryCache } from '../../../infrastructure/cache/query-cache';
-import { databaseService } from '../../../infrastructure/database/database-service';
+import type { AsyncServiceResult } from '@server/infrastructure/errors/result-adapter';
+import { withResultHandling } from '@server/infrastructure/errors/result-adapter';
+import { serverCache, CACHE_TTL as CACHE_TTL_CONSTANTS } from '@server/infrastructure/cache';
+import { databaseService } from '@server/infrastructure/database/database-service';
 
 // ============================================================================
 // Type Definitions
@@ -178,7 +177,7 @@ export class CachedBillService {
           concerns: ["First Amendment implications", "Commerce Clause considerations"],
           riskLevel: "medium"
         }
-      } as any)
+      } as unknown as BillWithEngagement)
     ];
   }
 
@@ -356,35 +355,37 @@ export class CachedBillService {
   async searchBills(query: string, filters: BillFilters = {}): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SEARCH}:${query}:${JSON.stringify(filters)}`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          const searchTerm = `%${query.toLowerCase()}%`;
-          const conditions = [
-            or(
-              sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
-              sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
-              sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`
-            )
-          ];
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<Bill[]>(cacheKey);
+      if (cached) return cached;
 
-          if (filters.status) conditions.push(eq(bills.status, filters.status as any));
-          if (filters.category) conditions.push(eq(bills.category, filters.category as any));
-          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));
+      // Execute query
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const conditions = [
+        or(
+          sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
+          sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
+          sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`
+        )
+      ];
 
-          const results = await this.db
-            .select()
-            .from(bills)
-            .where(and(...conditions))
-            .orderBy(desc(bills.created_at))
-            .limit(50);
+      if (filters.status) conditions.push(eq(bills.status, filters.status as BillStatus));
+      if (filters.category) conditions.push(eq(bills.category, filters.category));
+      if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
 
-          return results;
-        }, { service: 'CachedBillService', operation: 'searchBills' });
-      },
-      cacheKey,
-      CacheHelpers.search(CACHE_TTL.BILL_LIST)
-    );
+      const results = await this.db
+        .select()
+        .from(bills)
+        .where(and(...conditions))
+        .orderBy(desc(bills.created_at))
+        .limit(50);
+
+      // Cache the results
+      await cacheService.set(cacheKey, results, CACHE_TTL.BILL_LIST);
+
+      return results;
+    }, { service: 'CachedBillService', operation: 'searchBills' });
   }
 
   /**
@@ -393,19 +394,23 @@ export class CachedBillService {
   async getBillsByStatus(status: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.STATUS}:${status}`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          return await this.db
-            .select()
-            .from(bills)
-            .where(eq(bills.status, status as any))
-            .orderBy(desc(bills.created_at));
-        }, { service: 'CachedBillService', operation: 'getBillsByStatus' });
-      },
-      cacheKey,
-      { ttl: CACHE_TTL.BILL_LIST, keyPrefix: CACHE_KEYS.BILLS, tags: [CACHE_TAGS.BILL_LISTS] }
-    );
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<Bill[]>(cacheKey);
+      if (cached) return cached;
+
+      // Execute query
+      const results = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.status, status as BillStatus))
+        .orderBy(desc(bills.created_at));
+
+      // Cache the results
+      await cacheService.set(cacheKey, results, CACHE_TTL.BILL_LIST);
+
+      return results;
+    }, { service: 'CachedBillService', operation: 'getBillsByStatus' });
   }
 
   /**
@@ -414,19 +419,23 @@ export class CachedBillService {
   async getBillsByCategory(category: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.CATEGORY}:${category}`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          return await this.db
-            .select()
-            .from(bills)
-            .where(eq(bills.category, category as any))
-            .orderBy(desc(bills.created_at));
-        }, { service: 'CachedBillService', operation: 'getBillsByCategory' });
-      },
-      cacheKey,
-      { ttl: CACHE_TTL.BILL_LIST, keyPrefix: CACHE_KEYS.BILLS, tags: [CACHE_TAGS.BILL_LISTS] }
-    );
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<Bill[]>(cacheKey);
+      if (cached) return cached;
+
+      // Execute query
+      const results = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.category, category))
+        .orderBy(desc(bills.created_at));
+
+      // Cache the results
+      await cacheService.set(cacheKey, results, CACHE_TTL.BILL_LIST);
+
+      return results;
+    }, { service: 'CachedBillService', operation: 'getBillsByCategory' });
   }
 
   /**
@@ -435,19 +444,23 @@ export class CachedBillService {
   async getBillsBySponsor(sponsor_id: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SPONSOR}:${sponsor_id}`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          return await this.db
-            .select()
-            .from(bills)
-            .where(eq(bills.sponsor_id, sponsor_id))
-            .orderBy(desc(bills.created_at));
-        }, { service: 'CachedBillService', operation: 'getBillsBySponsor' });
-      },
-      cacheKey,
-      { ttl: CACHE_TTL.BILL_LIST, keyPrefix: CACHE_KEYS.BILLS, tags: [CACHE_TAGS.BILL_LISTS] }
-    );
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<Bill[]>(cacheKey);
+      if (cached) return cached;
+
+      // Execute query
+      const results = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.sponsor_id, sponsor_id))
+        .orderBy(desc(bills.created_at));
+
+      // Cache the results
+      await cacheService.set(cacheKey, results, CACHE_TTL.BILL_LIST);
+
+      return results;
+    }, { service: 'CachedBillService', operation: 'getBillsBySponsor' });
   }
 
   /**
@@ -474,80 +487,84 @@ export class CachedBillService {
   ): Promise<AsyncServiceResult<PaginatedBills>> {
     const cacheKey = `${CACHE_KEYS.BILLS}:${JSON.stringify(filters)}:${pagination.page}:${pagination.limit}`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          const conditions = [];
-          
-          if (filters.status) conditions.push(eq(bills.status, filters.status as any));
-          if (filters.category) conditions.push(eq(bills.category, filters.category as any));
-          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));
-          
-          if (filters.search) {
-            const searchTerm = `%${filters.search.toLowerCase()}%`;
-            conditions.push(
-              or(
-                sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
-                sql`LOWER(${bills.summary}) LIKE ${searchTerm}`
-              )
-            );
-          }
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<PaginatedBills>(cacheKey);
+      if (cached) return cached;
 
-          const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-          
-          // Get total count
-          const [{ count: total }] = await this.db
-            .select({ count: count() })
-            .from(bills)
-            .where(whereClause);
+      // Execute query
+      const conditions = [];
+      
+      if (filters.status) conditions.push(eq(bills.status, filters.status as BillStatus));
+      if (filters.category) conditions.push(eq(bills.category, filters.category));
+      if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
+      
+      if (filters.search) {
+        const searchTerm = `%${filters.search.toLowerCase()}%`;
+        conditions.push(
+          or(
+            sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
+            sql`LOWER(${bills.summary}) LIKE ${searchTerm}`
+          )
+        );
+      }
 
-          // Get paginated results
-          const offset = (pagination.page - 1) * pagination.limit;
-          const sortColumn = this.getSortColumn(pagination.sortBy);
-          const sortOrder = pagination.sortOrder === 'asc' ? sortColumn : desc(sortColumn);
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      
+      // Get total count
+      const [{ count: total }] = await this.db
+        .select({ count: count() })
+        .from(bills)
+        .where(whereClause);
 
-          const billResults = await this.db
-            .select({
-              id: bills.id,
-              title: bills.title,
-              summary: bills.summary,
-              status: bills.status,
-              category: bills.category,
-              introduced_date: bills.introduced_date,
-              bill_number: bills.bill_number,
-              full_text: bills.full_text,
-              sponsor_id: bills.sponsor_id,
-              tags: bills.tags,
-              last_action_date: bills.last_action_date,
-              created_at: bills.created_at,
-              updated_at: bills.updated_at,
-              // search_vector column may not exist in all schema versions; omit to keep queries portable
-              comment_count: count(comments.id),
-              view_count: sql<number>`COALESCE(SUM(${bill_engagement.view_count}), 0)::int`,
-              share_count: sql<number>`COALESCE(SUM(${bill_engagement.share_count}), 0)::int`,
-              engagement_score: sql<string>`COALESCE(AVG(${bill_engagement.engagement_score}), 0)::text`
-            })
-            .from(bills)
-            .leftJoin(comments, eq(bills.id, comments.bill_id))
-            .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
-            .where(whereClause)
-            .groupBy(bills.id)
-            .orderBy(sortOrder)
-            .limit(pagination.limit)
-            .offset(offset);
+      // Get paginated results
+      const offset = (pagination.page - 1) * pagination.limit;
+      const sortColumn = this.getSortColumn(pagination.sortBy);
+      const sortOrder = pagination.sortOrder === 'asc' ? sortColumn : desc(sortColumn);
 
-          return {
-            bills: billResults.map((b: any) => ({ ...b, complexity_score: 5 })),
-            total,
-            page: pagination.page,
-            limit: pagination.limit,
-            totalPages: Math.ceil(total / pagination.limit)
-          };
-        }, { service: 'CachedBillService', operation: 'getAllBills' });
-      },
-      cacheKey,
-      { ttl: CACHE_TTL.BILL_LIST, keyPrefix: CACHE_KEYS.BILLS, tags: [CACHE_TAGS.BILL_LISTS] }
-    );
+      const billResults = await this.db
+        .select({
+          id: bills.id,
+          title: bills.title,
+          summary: bills.summary,
+          status: bills.status,
+          category: bills.category,
+          introduced_date: bills.introduced_date,
+          bill_number: bills.bill_number,
+          full_text: bills.full_text,
+          sponsor_id: bills.sponsor_id,
+          tags: bills.tags,
+          last_action_date: bills.last_action_date,
+          created_at: bills.created_at,
+          updated_at: bills.updated_at,
+          // search_vector column may not exist in all schema versions; omit to keep queries portable
+          comment_count: count(comments.id),
+          view_count: sql<number>`COALESCE(SUM(${bill_engagement.view_count}), 0)::int`,
+          share_count: sql<number>`COALESCE(SUM(${bill_engagement.share_count}), 0)::int`,
+          engagement_score: sql<string>`COALESCE(AVG(${bill_engagement.engagement_score}), 0)::text`
+        })
+        .from(bills)
+        .leftJoin(comments, eq(bills.id, comments.bill_id))
+        .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
+        .where(whereClause)
+        .groupBy(bills.id)
+        .orderBy(sortOrder)
+        .limit(pagination.limit)
+        .offset(offset);
+
+      const result = {
+        bills: billResults.map((b) => ({ ...b, complexity_score: 5 } as BillWithEngagement)),
+        total,
+        page: pagination.page,
+        limit: pagination.limit,
+        totalPages: Math.ceil(total / pagination.limit)
+      };
+
+      // Cache the results
+      await cacheService.set(cacheKey, result, CACHE_TTL.BILL_LIST);
+
+      return result;
+    }, { service: 'CachedBillService', operation: 'getAllBills' });
   }
 
   // --------------------------------------------------------------------------
@@ -560,39 +577,43 @@ export class CachedBillService {
   async getBillStats(): Promise<AsyncServiceResult<BillStats>> {
     const cacheKey = `${CACHE_KEYS.STATS}:all`;
     
-    return await QueryCache.execute(
-      async () => {
-        return withResultHandling(async () => {
-          const [totalResult] = await this.db
-            .select({ count: count() })
-            .from(bills);
+    return withResultHandling(async () => {
+      // Try cache first
+      const cached = await cacheService.get<BillStats>(cacheKey);
+      if (cached) return cached;
 
-          const statusResults = await this.db
-            .select({ status: bills.status, count: count() })
-            .from(bills)
-            .groupBy(bills.status);
+      // Execute query
+      const [totalResult] = await this.db
+        .select({ count: count() })
+        .from(bills);
 
-          const categoryResults = await this.db
-            .select({ category: bills.category, count: count() })
-            .from(bills)
-            .groupBy(bills.category);
+      const statusResults = await this.db
+        .select({ status: bills.status, count: count() })
+        .from(bills)
+        .groupBy(bills.status);
 
-          return {
-            total: totalResult.count,
-            byStatus: statusResults.reduce((acc: Record<string, number>, { status, count }: { status: string; count: number }) => {
-              acc[status] = count;
-              return acc;
-            }, {} as Record<string, number>),
-            byCategory: categoryResults.reduce((acc: Record<string, number>, { category, count }: { category?: string; count: number }) => {
-              acc[category || 'uncategorized'] = count;
-              return acc;
-            }, {} as Record<string, number>)
-          };
-        }, { service: 'CachedBillService', operation: 'getBillStats' });
-      },
-      cacheKey,
-      CacheHelpers.analytics(CACHE_TTL.BILL_STATS)
-    );
+      const categoryResults = await this.db
+        .select({ category: bills.category, count: count() })
+        .from(bills)
+        .groupBy(bills.category);
+
+      const result = {
+        total: totalResult.count,
+        byStatus: statusResults.reduce((acc: Record<string, number>, { status, count }: { status: string; count: number }) => {
+          acc[status] = count;
+          return acc;
+        }, {} as Record<string, number>),
+        byCategory: categoryResults.reduce((acc: Record<string, number>, { category, count }: { category?: string; count: number }) => {
+          acc[category || 'uncategorized'] = count;
+          return acc;
+        }, {} as Record<string, number>)
+      };
+
+      // Cache the results with longer TTL for stats
+      await cacheService.set(cacheKey, result, CACHE_TTL.BILL_STATS);
+
+      return result;
+    }, { service: 'CachedBillService', operation: 'getBillStats' });
   }
 
   /**
@@ -602,9 +623,9 @@ export class CachedBillService {
     return withResultHandling(async () => {
       const conditions = [];
 
-          if (filters.status) conditions.push(eq(bills.status, filters.status as any));
-          if (filters.category) conditions.push(eq(bills.category, filters.category as any));
-          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));
+          if (filters.status) conditions.push(eq(bills.status, filters.status as BillStatus));
+          if (filters.category) conditions.push(eq(bills.category, filters.category));
+          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
       
       if (filters.search) {
         const searchTerm = `%${filters.search.toLowerCase()}%`;

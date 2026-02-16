@@ -11,12 +11,13 @@ import { unifiedErrorHandler } from '@shared/core/src/observability/error-manage
 import { Request, Response, NextFunction, Application } from 'express';
 
 // Import core utilities
-// import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting'; // Unused import
+// import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
+ // Unused import
 
 import { getDefaultCache } from '../cache';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 // Removed - module deleted by design during development
-import { logger } from '../observability/logging';
+import { logger } from '../infrastructure/observability';
 import { ValidationService } from '../validation';
 
 export interface UnifiedMiddlewareConfig {

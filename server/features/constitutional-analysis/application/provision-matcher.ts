@@ -5,7 +5,7 @@
 
 import { logger  } from '@shared/core';
 import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
-import { ConstitutionalProvision } from '@shared/schema/index.js';
+import { ConstitutionalProvision } from '@server/infrastructure/schema/index.js';
 
 export interface ProvisionMatch {
   provision: ConstitutionalProvision;

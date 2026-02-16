@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { GovernmentDataValidationService } from '@server/infrastructure/core/validation/data-validation.ts';
-import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/infrastructure/external-api/error-handler';
+import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/services/external-api-error-handler';
 import { ManagedGovernmentDataIntegrationService } from '@server/features/government-data/application/managed-integration.service';
 import { logger   } from '@shared/core';
 import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration.js';

@@ -251,15 +251,6 @@ export interface Recommendation {
   reason: string;
 }
 
-export interface Notification {
-  id: string;
-  type: 'bill_update' | 'comment' | 'recommendation' | 'system';
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-}
-
 export interface DashboardService extends BaseService {
   /** Get comprehensive dashboard data */
   getDashboardData(): Promise<DashboardData>;

@@ -239,10 +239,29 @@ export class KenyanGovernmentDataIntegrationService {
    * This provides visibility into which data sources are operational
    * and when they were last successfully synchronized
    */
-  async getIntegrationStatus(): Promise<any> {
+  async getIntegrationStatus(): Promise<{
+    overall: string;
+    sources: Array<{
+      name: string;
+      display_name: string;
+      enabled: boolean;
+      status: string;
+      priority: number;
+      rateLimit: any;
+    }>;
+    lastSync: Date;
+    nextScheduledSync: Date;
+  }> {
     const status = {
       overall: 'healthy',
-      sources: [] as any[],
+      sources: [] as Array<{
+        name: string;
+        display_name: string;
+        enabled: boolean;
+        status: string;
+        priority: number;
+        rateLimit: any;
+      }>,
       lastSync: new Date(),
       nextScheduledSync: new Date(Date.now() + 3600000) // 1 hour from now
     };

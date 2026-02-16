@@ -13,6 +13,12 @@ import {
   isStandardError,
   type StandardError,
 } from '@shared/types';
+import type { Request, Response, NextFunction } from 'express';
+
+// Extend Request interface to include correlationId
+interface RequestWithCorrelation extends Request {
+  correlationId?: string;
+}
 import {
   generateCorrelationId,
   getCurrentCorrelationId,
@@ -39,7 +45,7 @@ export function correlationIdMiddleware(req: Request, res: Response, next: NextF
   res.setHeader('X-Correlation-ID', correlationId);
 
   // Store on request for easy access
-  (req as any).correlationId = correlationId;
+  (req as RequestWithCorrelation).correlationId = correlationId;
 
   next();
 }
@@ -49,7 +55,7 @@ function createErrorContext(req: Request) {
     method: req.method,
     url: req.url,
     ip: req.ip,
-    correlationId: getCurrentCorrelationId() || (req as any).correlationId || '',
+    correlationId: getCurrentCorrelationId() || (req as RequestWithCorrelation).correlationId || '',
   };
 }
 

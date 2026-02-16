@@ -6,7 +6,8 @@
  * connection management across the platform.
  */
 
-import { logger, LoggerChild } from '../../core/src/observability/logging';
+import { logger } from '../../observability';
+import type { Logger } from '../../observability/logger';
 import { DatabaseOrchestrator } from '@server/infrastructure/core/database-orchestrator';
 import { DatabaseConfigManager } from '@server/infrastructure/core/unified-config';
 
@@ -44,7 +45,7 @@ export interface ScriptContext {
 // ============================================================================
 
 export class DatabaseScriptLogger {
-  private logger: LoggerChild;
+  private logger: Logger;
   private _scriptName: string = '';
   private verbose: boolean;
 

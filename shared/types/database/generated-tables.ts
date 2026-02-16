@@ -13,8 +13,9 @@
  * - *TableInsert: The insert type (from $inferInsert, omits auto-generated fields)
  */
 
-// Import all schema definitions
-import * as schema from '../../../server/infrastructure/schema';
+// Import all schema definitions from server
+// Note: Schema is defined in server but types are shared across client and server
+import * as schema from '@server/infrastructure/schema';
 
 // Import branded types for entity IDs
 import type {

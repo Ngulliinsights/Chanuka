@@ -124,12 +124,12 @@ export function PullToRefresh({
   const indicatorOpacity = Math.min(pullDistance / config.threshold, 1);
   const indicatorTransform = `translateY(${Math.max(pullDistance - config.threshold, -config.threshold)}px)`;
 
-  const pullStyle = {
+  const pullStyle: React.CSSProperties = {
     transform: `translateY(${pullDistance}px)`,
     transition: isDragging.current ? 'none' : 'transform 0.3s ease-out',
   };
 
-  const indicatorStyle = {
+  const indicatorStyle: React.CSSProperties = {
     height: `${config.threshold}px`,
     opacity: indicatorOpacity,
     transform: indicatorTransform,
@@ -144,7 +144,7 @@ export function PullToRefresh({
       onTouchEnd={handleTouchEnd}
       // Dynamic styles required for animation (cannot be moved to CSS)
        
-      style={pullStyle as any}
+      style={pullStyle}
     >
       {/* Hidden live region for screen reader announcements */}
       <div ref={liveRegionRef} aria-live="polite" aria-atomic="true" className="sr-only">
@@ -160,7 +160,7 @@ export function PullToRefresh({
         )}
         // Dynamic styles required for animation (cannot be moved to CSS)
          
-        style={indicatorStyle as any}
+        style={indicatorStyle}
         role="status"
         aria-label={state === 'refreshing' ? 'Refreshing content' : 'Pull to refresh'}
       >

@@ -9,7 +9,7 @@
 
 import { UnifiedConnectionManager } from '@server/infrastructure/database/core/connection-manager.ts';
 
-import { logger } from '../../core/src/observability/logging';
+import { logger } from '../../observability';
 
 
 // ============================================================================

@@ -86,7 +86,8 @@ export class UserManagementDomainService {
       const user = User.create(createPayload);
 
       // Attach password_hash temporarily so service can use it for DB insert
-      (user as any).password_hash = userData.password_hash;
+      const userWithPassword = user as User & { password_hash?: string };
+      userWithPassword.password_hash = userData.password_hash;
       await this.userService.save(user, userData.password_hash);
       return { success: true, user, errors: [] };
     } catch (error) {

@@ -5,14 +5,16 @@ import type { NavigationItem, UserRole } from '@client/lib/types/navigation';
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import type { NavigationItem as SharedNavigationItem, UserRole as SharedUserRole } from '../types';
 
+type IconType = React.ComponentType<any> | (() => null);
+
 // Type conversion helpers
 function convertNavigationItem(item: NavigationItem): SharedNavigationItem {
   return {
     ...item,
-    icon: typeof item.icon === 'string' ? ((() => null) as any) : (item.icon as any),
+    icon: typeof item.icon === 'string' ? (() => null) : (item.icon as IconType),
     section: (item.section === 'system' ? 'tools' : item.section) || 'tools', // Map system to tools, provide default
     badge: typeof item.badge === 'string' ? parseInt(item.badge, 10) || undefined : item.badge,
-    allowedRoles: item.allowedRoles as any, // Type assertion to resolve conflict
+    allowedRoles: item.allowedRoles as SharedUserRole[], // Type assertion to resolve conflict
   };
 }
 

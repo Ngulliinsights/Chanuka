@@ -50,8 +50,8 @@ export class UserService {
       ward: row.ward || undefined,
       avatar_url: row.avatar_url || undefined,
       website: row.website || undefined,
-      preferences: row.preferences as any || {},
-      privacy_settings: row.privacy_settings as any || {},
+      preferences: (row.preferences as Record<string, unknown>) || {},
+      privacy_settings: (row.privacy_settings as Record<string, unknown>) || {},
       created_at: row.created_at,
       updated_at: row.updated_at
     });

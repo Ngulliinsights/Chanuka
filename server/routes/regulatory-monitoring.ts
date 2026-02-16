@@ -389,8 +389,8 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     500,
     {
       source: 'database',
-      requestId: (req as any).traceId,
-      executionTime: Date.now() - (req as any).startTime
+      requestId: (req as Record<string, unknown>).traceId as string | undefined,
+      executionTime: Date.now() - ((req as Record<string, unknown>).startTime as number || Date.now())
     }
   );
 });

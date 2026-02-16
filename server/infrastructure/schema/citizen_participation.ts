@@ -718,8 +718,6 @@ export type NewUserInterest = typeof user_interests.$inferInsert;
 
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;
-
-export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
 
 export type CommentVote = typeof comment_votes.$inferSelect;
@@ -727,11 +725,7 @@ export type NewCommentVote = typeof comment_votes.$inferInsert;
 
 export type BillVote = typeof bill_votes.$inferSelect;
 export type NewBillVote = typeof bill_votes.$inferInsert;
-
-export type BillEngagement = typeof bill_engagement.$inferSelect;
 export type NewBillEngagement = typeof bill_engagement.$inferInsert;
-
-export type BillTrackingPreference = typeof bill_tracking_preferences.$inferSelect;
 export type NewBillTrackingPreference = typeof bill_tracking_preferences.$inferInsert;
 
 export type Notification = typeof notifications.$inferSelect;
@@ -742,3 +736,4 @@ export type NewAlertPreference = typeof alert_preferences.$inferInsert;
 
 export type UserContactMethod = typeof user_contact_methods.$inferSelect;
 export type NewUserContactMethod = typeof user_contact_methods.$inferInsert;
+

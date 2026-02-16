@@ -61,7 +61,7 @@ class InfrastructureFixer {
       if (content.includes("import * as schema from '@shared/types';")) {
         content = content.replace(
           "import * as schema from '@shared/types';",
-          "import * as schema from '@shared/schema';"
+          "import * as schema from '@server/infrastructure/schema';"
         );
         modified = true;
       }
@@ -69,7 +69,7 @@ class InfrastructureFixer {
       if (content.includes("export * from '@shared/types';")) {
         content = content.replace(
           "export * from '@shared/types';",
-          "export * from '@shared/schema';"
+          "export * from '@server/infrastructure/schema';"
         );
         modified = true;
       }

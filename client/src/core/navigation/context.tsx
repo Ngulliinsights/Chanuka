@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { RootState } from '../../lib/infrastructure/store';
+import { RootState } from '@client/lib/infrastructure/store';
 import {
   setCurrentPath,
   updateBreadcrumbs,
@@ -21,16 +21,16 @@ import {
   updatePreferences,
   addToRecentPages,
   clearPersistedState,
-} from '../../lib/infrastructure/store/slices/navigationSlice';
-import { UserRole } from '../../lib/types/navigation';
+} from '@client/lib/infrastructure/store/slices/navigationSlice';
+import { UserRole } from '@client/lib/types/navigation';
 
-import { NavigationContextValue, BreadcrumbItem, RelatedPage } from './types';
+import { NavigationContextValue, BreadcrumbItem, RelatedPage } from '@client/core/navigation/types';
 import {
   generateBreadcrumbs,
   calculateRelatedPages,
   determineNavigationSection,
   isNavigationPathActive,
-} from './utils';
+} from '@client/core/navigation/utils';
 // navigationPersistenceUtils intentionally unused here
 
 const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);

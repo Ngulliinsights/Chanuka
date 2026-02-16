@@ -13,6 +13,7 @@ import {
   sponsors,
   sponsorTransparency} from '@server/infrastructure/schema';
 import { desc,eq, inArray } from 'drizzle-orm';
+import { z } from 'zod';
 
 export interface SponsorAffiliation {
   id: number;
@@ -56,6 +57,102 @@ export interface SponsorshipData {
   affiliations: SponsorAffiliation[];
 }
 
+// ============================================================================
+// ZOD SCHEMAS FOR VALIDATION
+// ============================================================================
+
+const dbSponsorshipRowSchema = z.object({
+  sponsorshipId: z.number(),
+  sponsorshipType: z.string().nullable().optional(),
+  sponsorshipBillId: z.number(),
+  sponsorshipSponsorId: z.number(),
+  sponsorshipJoinedDate: z.string().nullable().optional(),
+  sponsor_id: z.number(),
+  sponsorName: z.string().nullable(),
+  sponsorRole: z.string().nullable().optional(),
+  sponsorParty: z.string().nullable().optional(),
+  sponsorConstituency: z.string().nullable().optional(),
+  sponsorConflictLevel: z.string().nullable().optional(),
+  sponsorFinancialExposure: z.union([z.number(), z.string()]).nullable().optional(),
+  sponsorVotingAlignment: z.union([z.number(), z.string()]).nullable().optional(),
+});
+
+const dbTransparencyRowSchema = z.object({
+  id: z.number(),
+  sponsor_id: z.number(),
+  description: z.string().nullable().optional(),
+  disclosure: z.string().nullable().optional(),
+  dateReported: z.string().nullable().optional(),
+  date_reported: z.string().nullable().optional(),
+  amount: z.union([z.number(), z.string()]).nullable().optional(),
+  is_verified: z.boolean().nullable().optional(),
+  isVerified: z.boolean().nullable().optional(),
+});
+
+const dbAffiliationRowSchema = z.object({
+  id: z.number(),
+  sponsor_id: z.number(),
+  sponsorId: z.number().optional(),
+  organization: z.string(),
+  role: z.string().nullable().optional(),
+  start_date: z.string().nullable().optional(),
+  startDate: z.string().nullable().optional(),
+  end_date: z.string().nullable().optional(),
+  endDate: z.string().nullable().optional(),
+  type: z.string().nullable().optional(),
+  conflict_type: z.string().nullable().optional(),
+  conflictType: z.string().nullable().optional(),
+});
+
+const dbSectionConflictRowSchema = z.object({
+  section_number: z.union([z.number(), z.string()]).optional(),
+  sectionNumber: z.union([z.number(), z.string()]).optional(),
+  conflict_severity: z.string().nullable().optional(),
+  severity: z.string().nullable().optional(),
+  impact_description: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+});
+
+// ============================================================================
+// HELPER FUNCTIONS FOR SAFE FIELD ACCESS
+// ============================================================================
+
+function getSponsorId(row: z.infer<typeof dbSponsorshipRowSchema>): number {
+  return row.sponsorshipSponsorId;
+}
+
+function mapTransparencyData(t: z.infer<typeof dbTransparencyRowSchema>): SponsorTransparencyData {
+  return {
+    id: t.id,
+    sponsor_id: t.sponsor_id,
+    disclosure: t.description ?? t.disclosure ?? null,
+    dateReported: t.dateReported ?? t.date_reported ?? null,
+    amount: t.amount ?? null,
+    is_verified: t.is_verified ?? t.isVerified ?? null,
+  };
+}
+
+function mapAffiliationData(a: z.infer<typeof dbAffiliationRowSchema>): SponsorAffiliation {
+  return {
+    id: a.id,
+    sponsor_id: a.sponsor_id ?? a.sponsorId ?? a.sponsor_id,
+    organization: a.organization,
+    role: a.role ?? null,
+    start_date: a.start_date ?? a.startDate ?? null,
+    end_date: a.end_date ?? a.endDate ?? null,
+    type: a.type ?? null,
+    conflictType: a.conflict_type ?? a.conflictType ?? null,
+  };
+}
+
+function mapSectionConflict(r: z.infer<typeof dbSectionConflictRowSchema>): { sectionNumber: number | string | null; severity: string | null; description: string | null } {
+  return {
+    sectionNumber: r.section_number ?? r.sectionNumber ?? null,
+    severity: r.conflict_severity ?? r.severity ?? null,
+    description: r.impact_description ?? r.description ?? null,
+  };
+}
+
 /**
  * Returns sponsorship rows for a bill using Drizzle-backed queries.
  * - Loads sponsorships joined with sponsor profiles
@@ -67,98 +164,90 @@ export async function getSponsorshipsByBill(bill_id: number, type?: 'primary' | 
   // Primary read path
   const rows = await readDatabase.select({
     sponsorshipId: bill_sponsorships.id,
-    sponsorshipType: (bill_sponsorships as any).sponsorshipType ?? (bill_sponsorships as any).type,
-    sponsorshipBillId: bill_sponsorships.bill_id ?? (bill_sponsorships as any).bill_id,
-    sponsorshipSponsorId: bill_sponsorships.sponsor_id ?? (bill_sponsorships as any).sponsor_id,
-    sponsorshipJoinedDate: (bill_sponsorships as any).joined_date ?? (bill_sponsorships as any).created_at,
+    sponsorshipType: bill_sponsorships.type,
+    sponsorshipBillId: bill_sponsorships.bill_id,
+    sponsorshipSponsorId: bill_sponsorships.sponsor_id,
+    sponsorshipJoinedDate: bill_sponsorships.created_at,
 
     sponsor_id: sponsors.id,
     sponsorName: sponsors.name,
     sponsorRole: sponsors.role,
     sponsorParty: sponsors.party,
     sponsorConstituency: sponsors.constituency,
-    sponsorConflictLevel: (sponsors as any).conflict_level ?? (sponsors as any).conflictLevel,
-    sponsorFinancialExposure: (sponsors as any).financial_exposure ?? (sponsors as any).financialExposure,
-    sponsorVotingAlignment: (sponsors as any).voting_alignment ?? (sponsors as any).votingAlignment
+    sponsorConflictLevel: sponsors.conflict_level,
+    sponsorFinancialExposure: sponsors.financial_exposure,
+    sponsorVotingAlignment: sponsors.voting_alignment
   })
     .from(sponsors)
-    .innerJoin(bill_sponsorships, eq(sponsors.id, (bill_sponsorships as any).sponsor_id ?? (bill_sponsorships as any).sponsor_id))
-    .where(eq((bill_sponsorships as any).bill_id ?? (bill_sponsorships as any).bill_id, billId));
+    .innerJoin(bill_sponsorships, eq(sponsors.id, bill_sponsorships.sponsor_id))
+    .where(eq(bill_sponsorships.bill_id, bill_id));
 
   if (!rows || rows.length === 0) return [];
 
+  // Validate rows with Zod
+  const validatedRows = rows.map(row => dbSponsorshipRowSchema.parse(row));
+
   // Collect sponsor ids for batch loading related data
-  const sponsorIds = Array.from(new Set(rows.map(r => (r as any).sponsorshipSponsorId || (r as any).sponsor_id || (r as any).sponsor_id)));
+  const sponsorIds = Array.from(new Set(validatedRows.map(r => getSponsorId(r))));
 
   // Batch load latest transparency per sponsor
   const transparencies = await readDatabase.select().from(sponsorTransparency)
-    .where(inArray((sponsorTransparency as any).sponsor_id ?? (sponsorTransparency as any).sponsor_id, sponsorIds))
-    .orderBy(desc((sponsorTransparency as any).dateReported ?? (sponsorTransparency as any).created_at));
+    .where(inArray(sponsorTransparency.sponsor_id, sponsorIds))
+    .orderBy(desc(sponsorTransparency.created_at));
 
-  const transparencyBySponsor = new Map<string | number, any>();
+  const transparencyBySponsor = new Map<number, z.infer<typeof dbTransparencyRowSchema>>();
   for (const t of transparencies) {
-    const sid = (t as any).sponsor_id ?? (t as any).sponsor_id;
-    if (!transparencyBySponsor.has(sid)) transparencyBySponsor.set(sid, t);
+    const validated = dbTransparencyRowSchema.parse(t);
+    const sid = validated.sponsor_id;
+    if (!transparencyBySponsor.has(sid)) {
+      transparencyBySponsor.set(sid, validated);
+    }
   }
 
   // Batch load affiliations for all sponsors
   const affiliations = await readDatabase.select().from(sponsorAffiliations)
-    .where(inArray((sponsorAffiliations as any).sponsor_id ?? (sponsorAffiliations as any).sponsor_id, sponsorIds))
-    .orderBy(desc((sponsorAffiliations as any).start_date ?? (sponsorAffiliations as any).created_at));
+    .where(inArray(sponsorAffiliations.sponsor_id, sponsorIds))
+    .orderBy(desc(sponsorAffiliations.start_date));
 
-  const affiliationsBySponsor = new Map<string | number, any[]>();
+  const affiliationsBySponsor = new Map<number, z.infer<typeof dbAffiliationRowSchema>[]>();
   for (const a of affiliations) {
-    const sid = (a as any).sponsor_id ?? (a as any).sponsor_id;
+    const validated = dbAffiliationRowSchema.parse(a);
+    const sid = validated.sponsor_id ?? validated.sponsorId ?? validated.sponsor_id;
     const list = affiliationsBySponsor.get(sid) ?? [];
-    list.push(a);
+    list.push(validated);
     affiliationsBySponsor.set(sid, list);
   }
 
   // Map rows into SponsorshipData
-  const result: SponsorshipData[] = rows.map((r: any) => {
-    const sponsor_id = r.sponsorshipSponsorId ?? r.sponsorId ?? r.sponsor_id;
+  const result: SponsorshipData[] = validatedRows.map((r) => {
+    const sponsorId = getSponsorId(r);
     const sponsorObj = {
-      id: Number(r.sponsorId ?? r.sponsor_id ?? sponsorId),
-      name: r.sponsorName ?? r.name,
-      role: r.sponsorRole ?? r.role,
-      party: r.sponsorParty ?? r.party,
-      constituency: r.sponsorConstituency ?? r.constituency,
+      id: r.sponsor_id,
+      name: r.sponsorName,
+      role: r.sponsorRole,
+      party: r.sponsorParty,
+      constituency: r.sponsorConstituency,
       conflictLevel: r.sponsorConflictLevel,
       financialExposure: r.sponsorFinancialExposure,
       votingAlignment: r.sponsorVotingAlignment
     };
 
-    const transparency = transparencyBySponsor.get(sponsorId) ?? null;
+    const transparencyData = transparencyBySponsor.get(sponsorId);
+    const transparency = transparencyData ? mapTransparencyData(transparencyData) : null;
 
     const affs = affiliationsBySponsor.get(sponsorId) ?? [];
-    const mappedAffs: SponsorAffiliation[] = affs.map((a: any) => ({
-      id: Number(a.id),
-      sponsor_id: Number(a.sponsor_id ?? a.sponsorId),
-      organization: a.organization,
-      role: a.role ?? null,
-      start_date: a.start_date ?? a.startDate ?? null,
-      end_date: a.end_date ?? a.endDate ?? null,
-      type: a.type ?? null,
-      conflictType: a.conflict_type ?? a.conflictType ?? null
-    }));
+    const mappedAffs: SponsorAffiliation[] = affs.map(mapAffiliationData);
 
     return {
       sponsorship: {
-        id: Number(r.sponsorshipId ?? r.id),
-        bill_id: Number(r.sponsorshipBillId ?? r.bill_id),
-        sponsor_id: Number(sponsorId),
-        type: r.sponsorshipType ?? r.type ?? null,
+        id: r.sponsorshipId,
+        bill_id: r.sponsorshipBillId,
+        sponsor_id: sponsorId,
+        type: r.sponsorshipType ?? null,
         joinedDate: r.sponsorshipJoinedDate ?? null
       },
       sponsor: sponsorObj,
-      transparency: transparency ? {
-        id: Number(transparency.id),
-        sponsor_id: Number(transparency.sponsor_id ?? transparency.sponsorId),
-        disclosure: transparency.description ?? transparency.disclosure ?? null,
-        dateReported: transparency.dateReported ?? transparency.date_reported ?? null,
-        amount: transparency.amount ?? null,
-        is_verified: transparency.is_verified ?? transparency.isVerified ?? null
-      } : null,
+      transparency,
       affiliations: mappedAffs
     };
   });
@@ -171,34 +260,27 @@ export async function getSponsorshipsByBill(bill_id: number, type?: 'primary' | 
  */
 export async function getSponsorAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
   const rows = await readDatabase.select().from(sponsorAffiliations)
-    .where(eq((sponsorAffiliations as any).sponsor_id ?? (sponsorAffiliations as any).sponsor_id, sponsorId))
-    .orderBy(desc((sponsorAffiliations as any).start_date ?? (sponsorAffiliations as any).created_at));
+    .where(eq(sponsorAffiliations.sponsor_id, sponsor_id))
+    .orderBy(desc(sponsorAffiliations.start_date));
 
-  return rows.map((a: any) => ({
-    id: a.id,
-    sponsor_id: a.sponsor_id ?? a.sponsorId,
-    organization: a.organization,
-    role: a.role ?? null,
-    start_date: a.start_date ?? a.startDate ?? null,
-    end_date: a.end_date ?? a.endDate ?? null,
-    type: a.type ?? null,
-    conflictType: a.conflict_type ?? a.conflictType ?? null
-  }));
+  return rows.map((a) => {
+    const validated = dbAffiliationRowSchema.parse(a);
+    return mapAffiliationData(validated);
+  });
 }
 
 /**
  * Returns section conflicts for a bill in a minimal shape.
  */
-export async function getSectionConflictsForBill(bill_id: number): Promise<any[]> {
+export async function getSectionConflictsForBill(bill_id: number): Promise<Array<{ sectionNumber: number | string | null; severity: string | null; description: string | null }>> {
   const rows = await readDatabase.select().from(billSectionConflicts)
-    .where(eq((billSectionConflicts as any).bill_id ?? (billSectionConflicts as any).bill_id, billId))
-    .orderBy((billSectionConflicts as any).section_number ?? (billSectionConflicts as any).sectionNumber);
+    .where(eq(billSectionConflicts.bill_id, bill_id))
+    .orderBy(billSectionConflicts.section_number);
 
-  return rows.map((r: any) => ({
-    sectionNumber: r.section_number ?? r.sectionNumber,
-    severity: r.conflict_severity ?? r.severity ?? null,
-    description: r.impact_description ?? r.description ?? null
-  }));
+  return rows.map((r) => {
+    const validated = dbSectionConflictRowSchema.parse(r);
+    return mapSectionConflict(validated);
+  });
 }
 
 

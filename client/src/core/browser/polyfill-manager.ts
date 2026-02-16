@@ -197,8 +197,15 @@ export class PolyfillManager {
       () => {
         if (typeof Promise !== 'undefined') return;
 
-         
-        (window as any).Promise = class SimplePromise<T = unknown> {
+        // Define a type-safe Promise polyfill
+        interface PromiseConstructor {
+          new <T>(executor: (resolve: (value: T) => void, reject: (reason: unknown) => void) => void): Promise<T>;
+          resolve<T>(value: T): Promise<T>;
+          reject<T>(reason: unknown): Promise<T>;
+          all<T>(promises: Promise<T>[]): Promise<T[]>;
+        }
+
+        const SimplePromise = class SimplePromise<T = unknown> {
           private state: 'pending' | 'fulfilled' | 'rejected' = 'pending';
           private value: T | undefined;
           private handlers: Array<{
@@ -326,6 +333,9 @@ export class PolyfillManager {
             });
           }
         };
+
+        // Assign to window with proper typing
+        (window as unknown as { Promise: PromiseConstructor }).Promise = SimplePromise as unknown as PromiseConstructor;
       }
     );
   }
@@ -341,8 +351,8 @@ export class PolyfillManager {
       () => {
         if ('IntersectionObserver' in window) return;
 
-         
-        (window as any).IntersectionObserver = class IntersectionObserverPolyfill {
+        // Define IntersectionObserver polyfill
+        const IntersectionObserverPolyfill = class IntersectionObserverPolyfill {
           private callback: (entries: IntersectionObserverEntry[]) => void;
           private elements: Set<Element> = new Set();
 
@@ -440,6 +450,9 @@ export class PolyfillManager {
             this.elements.clear();
           }
         };
+
+        // Assign to window with proper typing
+        (window as unknown as { IntersectionObserver: typeof IntersectionObserverPolyfill }).IntersectionObserver = IntersectionObserverPolyfill;
       }
     );
   }
@@ -516,8 +529,8 @@ export class PolyfillManager {
       () => {
         if ('ResizeObserver' in window) return;
 
-         
-        (window as any).ResizeObserver = class ResizeObserverPolyfill {
+        // Define ResizeObserver polyfill
+        const ResizeObserverPolyfill = class ResizeObserverPolyfill {
           private callback: ResizeObserverCallback;
           private elements: Set<Element> = new Set();
           private lastSizes: Map<Element, DOMRect> = new Map();
@@ -586,6 +599,9 @@ export class PolyfillManager {
             }
           }
         };
+
+        // Assign to window with proper typing
+        (window as unknown as { ResizeObserver: typeof ResizeObserverPolyfill }).ResizeObserver = ResizeObserverPolyfill;
       }
     );
   }
@@ -721,8 +737,8 @@ export class PolyfillManager {
           },
         };
 
-         
-        (navigator as any).clipboard = clipboardPolyfill;
+        // Assign to navigator with proper typing
+        (navigator as unknown as { clipboard: typeof clipboardPolyfill }).clipboard = clipboardPolyfill;
       }
     );
   }

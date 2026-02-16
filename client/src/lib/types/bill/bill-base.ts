@@ -370,41 +370,6 @@ export interface ImpactAssessment {
 }
 
 /**
- * Comprehensive bill analysis with AI-generated insights
- *
- * @example
- * {
- *   id: '456',
- *   billId: 12345,
- *   summary: 'Comprehensive education reform targeting K-12 curriculum...',
- *   keyPoints: [
- *     'Increases teacher salaries by 15%',
- *     'Expands STEM programs in rural areas',
- *     'Introduces competency-based assessment'
- *   ],
- *   impact: {
- *     economic: 'Estimated cost of KES 2.5B annually',
- *     social: 'Affects 150,000 students across 47 counties'
- *   },
- *   stakeholders: ['Teachers Service Commission', 'KICD', 'Parent Associations'],
- *   sentiment: { positive: 0.65, neutral: 0.25, negative: 0.10, overallSentiment: 'positive' },
- *   score: 7.8,
- *   confidence: 0.85
- * }
- */
-export interface BillAnalysis extends BaseEntity {
-  readonly billId: number;
-  readonly summary: string;
-  readonly keyPoints: readonly string[];
-  readonly impact: ImpactAssessment;
-  readonly stakeholders: readonly string[];
-  readonly sentiment: SentimentAnalysis;
-  readonly score: number;
-  readonly analyzedBy?: string;
-  readonly confidence?: number;
-}
-
-/**
  * Financial impact analysis with budget implications
  */
 export interface FinancialImpact {

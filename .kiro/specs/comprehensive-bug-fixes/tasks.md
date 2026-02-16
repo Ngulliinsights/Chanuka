@@ -285,173 +285,173 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
 
 ### Goal: Complete incomplete implementations, fix known bugs (191 TODO/FIXME/HACK comments)
 
-- [ ] 11. Scan and Categorize TODO/FIXME Comments
-  - [ ] 11.1 Create TODO scanner script
+- [x] 11. Scan and Categorize TODO/FIXME Comments
+  - [x] 11.1 Create TODO scanner script
     - Create `scripts/scan-todos.ts`
     - Find all TODO/FIXME/HACK/XXX comments
     - Categorize by type (missing feature, known bug, workaround, documentation)
     - Generate prioritized list
     - _Requirements: 17.1, 17.4, 17.5, 17.6_
 
-  - [ ] 11.2 Run scanner and generate report
+  - [x] 11.2 Run scanner and generate report
     - Run `npm run scan:todos`
     - Review report to identify bugs vs documentation TODOs
     - Prioritize: bugs > missing features > workarounds > documentation
     - _Requirements: 17.1_
 
-- [ ] 12. Implement Missing Services (Full Implementation)
-  - [ ] 12.1 Implement performanceMonitoring service
+- [x] 12. Implement Missing Services (Full Implementation)
+  - [x] 12.1 Implement performanceMonitoring service
     - Replace stub with full implementation
     - Integrate with metrics collection
     - _Requirements: 18.5_
 
-  - [ ] 12.2 Implement inputValidationService
+  - [x] 12.2 Implement inputValidationService
     - Replace stub with full implementation
     - Add comprehensive input validation
     - _Requirements: 18.5_
 
-  - [ ] 12.3 Implement secureSessionService
+  - [x] 12.3 Implement secureSessionService
     - Replace stub with full implementation
     - Add session management and security
     - _Requirements: 18.5_
 
-  - [ ] 12.4 Implement securityMiddleware
+  - [x] 12.4 Implement securityMiddleware
     - Replace stub with full implementation
     - Add security checks and rate limiting
     - _Requirements: 18.5_
 
-  - [ ] 12.5 Implement advancedCachingService
+  - [x] 12.5 Implement advancedCachingService
     - Replace stub with full implementation
     - Add caching strategies and invalidation
     - _Requirements: 18.5_
 
-  - [ ] 12.6 Implement enhancedNotificationService
+  - [x] 12.6 Implement enhancedNotificationService
     - Replace stub with full implementation
     - Add notification delivery and scheduling
     - _Requirements: 18.5_
 
-- [ ] 13. Fix Known Bugs (FIXME Comments)
-  - [ ] 13.1 Fix performance metrics aggregation
+- [x] 13. Fix Known Bugs (FIXME Comments)
+  - [x] 13.1 Fix performance metrics aggregation
     - Enable aggregation in `server/utils/metrics.ts`
     - Remove TODO comment
     - _Requirements: 17.5_
 
-  - [ ] 13.2 Complete security middleware setup
+  - [x] 13.2 Complete security middleware setup
     - Implement missing setup in `server/features/security/security-initialization-service.ts`
     - Remove TODO comments
     - _Requirements: 17.5_
 
-  - [ ] 13.3 Fix test helpers
+  - [x] 13.3 Fix test helpers
     - Uncomment schema imports in `server/tests/utils/test-helpers.ts`
     - Enable test data creation
     - _Requirements: 17.5_
 
-  - [ ] 13.4 Enable XSS validation tests
+  - [x] 13.4 Enable XSS validation tests
     - Enable tests in `server/tests/utils/test-helpers.ts`
     - Ensure tests pass
     - _Requirements: 17.5_
 
-  - [ ] 13.5 Enable SQL injection tests
+  - [x] 13.5 Enable SQL injection tests
     - Enable tests in `server/tests/utils/test-helpers.ts`
     - Ensure tests pass
     - _Requirements: 17.5_
 
-  - [ ] 13.6 Enable concurrent response validation
+  - [x] 13.6 Enable concurrent response validation
     - Enable validation in `server/tests/utils/test-helpers.ts`
     - Ensure validation works correctly
     - _Requirements: 17.5_
 
-  - [ ] 13.7 Fix cache stats and clear functionality
+  - [x] 13.7 Fix cache stats and clear functionality
     - Enable cache stats in `server/features/admin/admin-router.OLD.ts`
     - Enable cache clear in `server/features/admin/admin-router.OLD.ts`
     - Remove TODO comments
     - _Requirements: 17.5_
 
-- [ ] 14. Implement Missing Features (TODO Comments)
-  - [ ] 14.1 Complete analytics type definitions
+- [x] 14. Implement Missing Features (TODO Comments)
+  - [x] 14.1 Complete analytics type definitions
     - Update `client/src/features/analytics/types.ts`
     - Add all missing type definitions
     - Remove TODO comments
     - _Requirements: 3.7, 11.1, 17.4_
 
-  - [ ] 14.2 Complete telemetry type definitions
+  - [x] 14.2 Complete telemetry type definitions
     - Create `client/src/core/telemetry/types.ts`
     - Add all type definitions
     - Remove TODO comments
     - _Requirements: 11.2, 17.4_
 
-  - [ ] 14.3 Complete dashboard config validation
+  - [x] 14.3 Complete dashboard config validation
     - Implement missing validation in `client/src/lib/ui/dashboard/utils/dashboard-config-utils.ts`
     - Remove TODO comments
     - _Requirements: 7.4, 15.4, 17.4_
 
-- [ ] 15. Replace Workarounds (HACK Comments)
-  - [ ] 15.1 Scan for HACK comments
+- [x] 15. Replace Workarounds (HACK Comments)
+  - [x] 15.1 Scan for HACK comments
     - Find all HACK comments in codebase
     - Identify workarounds that need proper solutions
     - _Requirements: 17.6_
 
-  - [ ] 15.2 Replace workarounds with proper solutions
+  - [x] 15.2 Replace workarounds with proper solutions
     - For each HACK comment, implement proper solution
     - Remove HACK comments
     - Verify functionality still works
     - _Requirements: 17.6_
 
-- [ ] 16. Implement Error Handling Infrastructure
-  - [ ] 16.1 Create ErrorContext builder
+- [x] 16. Implement Error Handling Infrastructure
+  - [x] 16.1 Create ErrorContext builder
     - Create `shared/utils/errors/context.ts`
     - Implement `ErrorContext` interface
     - Implement `ErrorContextBuilder` class with fluent API
     - _Requirements: 6.1_
 
-  - [ ] 16.2 Create error type definitions
+  - [x] 16.2 Create error type definitions
     - Create `shared/utils/errors/types.ts`
     - Define `TransformationError`, `ValidationError`, `NetworkError` classes
     - Add `ErrorContext` to all error types
     - _Requirements: 11.3_
 
-  - [ ] 16.3 Update transformers to include error context
+  - [x] 16.3 Update transformers to include error context
     - Update all transformers to use `ErrorContextBuilder`
     - Include operation, layer, field, and value in errors
     - _Requirements: 1.4, 6.1_
 
-  - [ ] 16.4 Write property test for error context enrichment
+  - [x] 16.4 Write property test for error context enrichment
     - **Property 6: Error Context Enrichment**
     - **Validates: Requirements 1.4, 6.1**
 
-  - [ ] 16.5 Standardize validation error messages
+  - [x] 16.5 Standardize validation error messages
     - Create error message formatter in `shared/validation/errors.ts`
     - Format: "{field}: {rule} - {description}"
     - Update all validators to use consistent format
     - _Requirements: 5.4, 6.4_
 
-  - [ ] 16.6 Write property test for consistent error message format
+  - [x] 16.6 Write property test for consistent error message format
     - **Property 7: Consistent Error Message Format**
     - **Validates: Requirements 5.4, 6.4**
 
-  - [ ] 16.7 Create error logging utility
+  - [x] 16.7 Create error logging utility
     - Create `shared/utils/errors/logger.ts`
     - Implement logging with timestamp, severity, stack trace, and context
     - Integrate with error tracking service (if configured)
     - _Requirements: 6.5, 6.6_
 
-  - [ ]* 16.8 Write property test for error logging completeness
+  - [x] 16.8 Write property test for error logging completeness
     - **Property 8: Error Logging Completeness**
     - **Validates: Requirements 6.5**
 
-- [ ] 17. Implement Client-Side Enhancements
-  - [ ] 17.1 Create WebSocket manager with reconnection
+- [-] 17. Implement Client-Side Enhancements
+  - [x] 17.1 Create WebSocket manager with reconnection
     - Create `client/src/core/websocket/manager.ts`
     - Implement `WebSocketManager` interface
     - Add exponential backoff reconnection (1s, 2s, 4s, 8s, 16s, max 30s)
     - Add connection state tracking and error logging
     - _Requirements: 7.2, 13.1_
 
-  - [ ]* 17.2 Write property test for WebSocket reconnection
+  - [x] 17.2 Write property test for WebSocket reconnection
     - **Property 10: WebSocket Reconnection with Backoff**
     - **Validates: Requirements 7.2, 13.1**
 
-  - [ ] 17.3 Create API retry utility
+  - [x] 17.3 Create API retry utility
     - Create `client/src/core/api/retry.ts`
     - Implement `withRetry` function with configurable retry logic
     - Retry network errors up to 3 times
@@ -459,99 +459,98 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
     - Don't retry 4xx errors
     - _Requirements: 13.2, 13.3, 13.4_
 
-  - [ ]* 17.4 Write property test for API retry logic
+  - [x] 17.4 Write property test for API retry logic
     - **Property 13: API Retry Logic**
     - **Validates: Requirements 13.2, 13.3, 13.4**
 
-  - [ ] 17.5 Create VirtualList component
+  - [x] 17.5 Create VirtualList component
     - Create `client/src/lib/ui/virtual-list/VirtualList.tsx`
     - Implement virtual scrolling with configurable item height
     - Add overscan for smooth scrolling
     - _Requirements: 12.1, 12.2_
 
-  - [ ] 17.6 Update ActivityFeed to use VirtualList
+  - [x] 17.6 Update ActivityFeed to use VirtualList
     - Update `client/src/features/community/ui/activity/ActivityFeed.tsx`
     - Replace standard list rendering with VirtualList
     - _Requirements: 7.1, 12.1_
 
-  - [ ]* 17.7 Write property test for state synchronization
+  - [x] 17.7 Write property test for state synchronization
     - **Property 11: State Synchronization Without Conflicts**
     - **Validates: Requirements 7.3**
 
-  - [ ]* 17.8 Write property test for WebSocket message batching
+  - [x] 17.8 Write property test for WebSocket message batching
     - **Property 12: WebSocket Message Batching**
     - **Validates: Requirements 12.4**
 
-  - [ ] 17.9 Update bills-dashboard to use VirtualList
+  - [x] 17.9 Update bills-dashboard to use VirtualList
     - Update `client/src/features/bills/ui/bills-dashboard.tsx`
     - Replace standard list rendering with VirtualList
     - _Requirements: 12.2_
 
-  - [ ] 17.10 Create reusable ErrorBoundary component
+  - [x] 17.10 Create reusable ErrorBoundary component
     - Create `client/src/lib/ui/error-boundary/ErrorBoundary.tsx`
     - Implement React error boundary with fallback UI and "Try Again" button
     - Log errors to error tracking service
     - _Requirements: 7.5, 13.5_
 
-- [ ] 18. Implement Validation Improvements
-  - [ ] 18.1 Add empty string validation to Zod schemas
+- [-] 18. Implement Validation Improvements
+  - [x] 18.1 Add empty string validation to Zod schemas
     - Update all string schemas in `shared/validation/schemas/` to reject empty and whitespace-only strings
     - Use `.min(1)` and custom refinement for whitespace check
     - _Requirements: 5.1_
 
-  - [ ]* 18.2 Write property test for empty string validation
+  - [x] 18.2 Write property test for empty string validation
     - **Property 4: Empty String Validation**
     - **Validates: Requirements 5.1**
 
-  - [ ] 18.3 Create validation middleware for transformers
+  - [x] 18.3 Create validation middleware for transformers
     - Create `shared/utils/transformers/validation.ts`
     - Implement `createValidatingTransformer` wrapper
     - Add validation before transformation (both directions)
     - _Requirements: 5.2, 5.3_
 
-  - [ ]* 18.4 Write property test for validation before transformation
+  - [x] 18.4 Write property test for validation before transformation
     - **Property 5: Validation Before Transformation**
     - **Validates: Requirements 5.2, 5.3**
 
-  - [ ] 18.5 Update API endpoints to validate before processing
+  - [x] 18.5 Update API endpoints to validate before processing
     - Audit all API endpoints in `server/` and `client/src/core/api/`
     - Ensure Zod validation occurs before any processing
     - Add validation error handling
     - _Requirements: 5.6_
 
-- [ ] 19. Implement Serialization
-  - [ ] 19.1 Create JSON serialization utilities
+- [x] 19. Implement Serialization
+  - [x] 19.1 Create JSON serialization utilities
     - Create `shared/utils/serialization/json.ts`
     - Implement `serializeDomainModel` function (handles Date → ISO string)
     - Implement `deserializeDomainModel` function (validates structure, converts ISO string → Date)
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-  - [ ]* 19.2 Write property test for date serialization consistency
+  - [x] 19.2 Write property test for date serialization consistency
     - **Property 14: Date Serialization Consistency**
     - **Validates: Requirements 14.1, 14.3, 14.4, 14.5**
 
-  - [ ]* 19.3 Write property test for JSON deserialization validation
+  - [x] 19.3 Write property test for JSON deserialization validation
     - **Property 15: JSON Deserialization Validation**
     - **Validates: Requirements 14.2**
 
-  - [ ] 19.4 Update API client to use serialization utilities
+  - [x] 19.4 Update API client to use serialization utilities
     - Update request serialization to use `serializeDomainModel`
     - Update response deserialization to use `deserializeDomainModel`
     - Ensure consistent date handling (ISO 8601)
     - _Requirements: 14.3, 14.4_
 
-- [ ] 20. Implement Dashboard Config Validation
-  - [ ] 20.1 Create dashboard config validator
+- [x] 20. Implement Dashboard Config Validation
+  - [x] 20.1 Create dashboard config validator
     - Create `client/src/features/dashboard/validation/config.ts`
     - Implement Zod schema for dashboard configuration
     - Add validation for widget types, layout, and widget position references
     - _Requirements: 15.1, 15.2, 15.3_
-
-  - [ ]* 20.2 Write property test for dashboard config validation
+  - [x] 20.2 Write property test for dashboard config validation
     - **Property 16: Dashboard Config Validation**
     - **Validates: Requirements 15.1, 15.2, 15.3, 15.5**
 
-- [ ] 21. Checkpoint - Phase 3 Complete
+- [x] 21. Checkpoint - Phase 3 Complete
   - Ensure 0 TODO/FIXME comments indicating bugs (documentation TODOs acceptable)
   - Ensure all missing features implemented
   - Ensure all known bugs fixed
@@ -564,114 +563,114 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
 ### Goal: Achieve 100% type safety (~588 remaining `as any` instances)
 
 - [ ] 22. Fix Type Safety in client/src/ (~400 instances)
-  - [ ] 22.1 Scan client/ for type safety violations
+  - [x] 22.1 Scan client/ for type safety violations
     - Run type safety scanner on `client/src/`
     - Generate report grouped by category and file
     - Prioritize by severity
     - _Requirements: 16.1, 16.5_
 
-  - [ ] 22.2 Fix type safety in client/src/features/ (Week 5)
-    - [ ] 22.2.1 Fix analytics feature type safety
+  - [x] 22.2 Fix type safety in client/src/features/ (Week 5)
+    - [x] 22.2.1 Fix analytics feature type safety
       - Replace all `as any` in `client/src/features/analytics/`
       - Use Zod validation for API responses
       - _Requirements: 16.2, 16.3_
 
-    - [ ] 22.2.2 Fix bills feature type safety
+    - [x] 22.2.2 Fix bills feature type safety
       - Replace all `as any` in `client/src/features/bills/`
       - Use proper types for bill data
       - _Requirements: 16.2, 16.3_
 
-    - [ ] 22.2.3 Fix community feature type safety
+    - [x] 22.2.3 Fix community feature type safety
       - Replace all `as any` in `client/src/features/community/`
       - Use proper types for user interactions
       - _Requirements: 16.2, 16.3_
 
-    - [ ] 22.2.4 Fix other features type safety
+    - [x] 22.2.4 Fix other features type safety
       - Replace all `as any` in remaining features
       - Use proper types throughout
       - _Requirements: 16.2, 16.3_
 
-  - [ ] 22.3 Fix type safety in client/src/core/ (Week 6)
-    - [ ] 22.3.1 Fix API client type safety
+  - [-] 22.3 Fix type safety in client/src/core/ (Week 6)
+    - [x] 22.3.1 Fix API client type safety
       - Replace all `as any` in `client/src/core/api/`
       - Use Zod validation for all API responses
       - _Requirements: 16.2, 16.3_
 
-    - [ ] 22.3.2 Fix state management type safety
+    - [x] 22.3.2 Fix state management type safety
       - Replace all `as any` in state management code
       - Use proper types for Redux/Zustand stores
       - _Requirements: 16.2, 16.3_
 
-    - [ ] 22.3.3 Fix utilities type safety
+    - [x] 22.3.3 Fix utilities type safety
       - Replace all `as any` in `client/src/core/utils/`
       - Use proper type guards and validation
       - _Requirements: 16.2, 16.3_
 
-  - [ ] 22.4 Fix type safety in client/src/lib/ (Week 6)
+  - [x] 22.4 Fix type safety in client/src/lib/ (Week 6)
     - Replace all `as any` in `client/src/lib/`
     - Use proper types for UI components and utilities
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 22.5 Fix type safety in client/src/services/ (Week 6)
+  - [x] 22.5 Fix type safety in client/src/services/ (Week 6)
     - Replace all `as any` in `client/src/services/`
     - Use proper types for service interfaces
     - _Requirements: 16.2, 16.3_
 
-- [ ] 23. Fix Remaining Type Safety in server/ (~50 instances)
+- [x] 23. Fix Remaining Type Safety in server/ (~50 instances)
   - [ ] 23.1 Fix type safety in server/features/ (Week 7)
     - Replace all remaining `as any` in `server/features/`
     - Use Zod validation and type guards
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 23.2 Fix type safety in server/infrastructure/ (Week 7)
+  - [x] 23.2 Fix type safety in server/infrastructure/ (Week 7)
     - Replace all remaining `as any` in `server/infrastructure/`
     - Use proper types for infrastructure code
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 23.3 Fix type safety in server/middleware/ (Week 7)
+  - [x] 23.3 Fix type safety in server/middleware/ (Week 7)
     - Replace all remaining `as any` in `server/middleware/`
     - Use proper types for middleware
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 23.4 Fix type safety in server/tests/ (Week 7)
+  - [x] 23.4 Fix type safety in server/tests/ (Week 7)
     - Replace all remaining `as any` in `server/tests/`
     - Use proper types for test code (where necessary)
     - Note: Some `as any` in tests may be acceptable for mocking
     - _Requirements: 16.2, 16.3_
 
-- [ ] 24. Fix Remaining Type Safety in shared/ (~50 instances)
-  - [ ] 24.1 Fix type safety in shared/utils/ (Week 7)
+- [x] 24. Fix Remaining Type Safety in shared/ (~50 instances)
+  - [x] 24.1 Fix type safety in shared/utils/ (Week 7)
     - Replace all remaining `as any` in `shared/utils/`
     - Use proper types and type guards
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 24.2 Fix type safety in shared/types/ (Week 7)
+  - [x] 24.2 Fix type safety in shared/types/ (Week 7)
     - Replace all remaining `as any` in `shared/types/`
     - Ensure all type definitions are complete
     - _Requirements: 16.2, 16.3_
 
-  - [ ] 24.3 Fix type safety in shared/validation/ (Week 7)
+  - [x] 24.3 Fix type safety in shared/validation/ (Week 7)
     - Replace all remaining `as any` in `shared/validation/`
     - Use Zod schemas properly
     - _Requirements: 16.2, 16.3_
 
-- [ ] 25. Verify Zero Type Safety Violations
-  - [ ] 25.1 Run final type safety scan
+- [x] 25. Verify Zero Type Safety Violations
+  - [x] 25.1 Run final type safety scan
     - Run `npm run scan:type-violations`
     - Verify 0 `as any` in production code (excluding tests where absolutely necessary)
     - _Requirements: 16.1, 16.6_
 
-  - [ ] 25.2 Enable strict TypeScript settings
+  - [x] 25.2 Enable strict TypeScript settings
     - Update tsconfig.json to enable all strict settings
     - Fix any new errors that appear
     - _Requirements: 16.6_
 
-  - [ ] 25.3 Run TypeScript compilation with strict settings
+  - [x] 25.3 Run TypeScript compilation with strict settings
     - Run `tsc --noEmit` with strict settings
     - Verify 0 errors
     - _Requirements: 16.6_
 
-- [ ] 26. Checkpoint - Phase 4 Complete
+- [x] 26. Checkpoint - Phase 4 Complete
   - Ensure 0 `as any` in production code (all 788 instances fixed)
   - Ensure TypeScript compiles with strict settings
   - Ensure all tests pass

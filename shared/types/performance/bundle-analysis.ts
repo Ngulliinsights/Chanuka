@@ -685,30 +685,33 @@ export function createBundleAnalysisMonitor(
   config: BundleAnalysisConfig
 ): BundleAnalysisMonitor {
   const history: BundleAnalysisResult[] = [];
+  let baseline = config.baseline;
 
   return {
     config,
     history,
-    baseline: config.baseline,
+    get baseline() {
+      return baseline;
+    },
 
     analyzeBundle(newBundle: BundleMetrics): BundleAnalysisResult {
-      if (!this.baseline) {
+      if (!baseline) {
         throw new Error('No baseline set for bundle analysis');
       }
 
-      const result = analyzeBundleImpact(this.baseline, newBundle, this.config);
-      this.history.push(result);
+      const result = analyzeBundleImpact(baseline, newBundle, config);
+      history.push(result);
 
       // Keep history size manageable
-      if (this.history.length > 10) {
-        this.history.shift();
+      if (history.length > 10) {
+        history.shift();
       }
 
       return result;
     },
 
     updateBaseline(newBaseline: BundleMetrics): void {
-      (this as any).baseline = newBaseline;
+      baseline = newBaseline;
     },
 
     generateReport(): BundleAnalysisReport {

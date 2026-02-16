@@ -91,17 +91,17 @@ export class UnifiedInputSanitizer {
 
     // Add hooks for threat detection with properly typed parameters
     DOMPurify.addHook(
-      'beforeSanitizeElements' as any,
-      ((node: Element, data: DOMPurifyHookData) => {
+      'beforeSanitizeElements',
+      (node: Element, data: DOMPurifyHookData) => {
         this.detectElementThreats(node, data);
-      }) as any
+      }
     );
 
     DOMPurify.addHook(
-      'beforeSanitizeAttributes' as any,
-      ((node: Element, data: DOMPurifyHookData) => {
+      'beforeSanitizeAttributes',
+      (node: Element, data: DOMPurifyHookData) => {
         this.detectAttributeThreats(node, data);
-      }) as any
+      }
     );
   }
 

@@ -6,7 +6,7 @@
  */
 
 import { MemoryAdapter } from '../caching/adapters/memory-adapter';
-import { logger } from '../observability/logging';
+import { logger } from '../infrastructure/observability';
 // import { CacheAdapter } from '../caching/core/interfaces'; // Unused import
 
 // Cache metrics for monitoring

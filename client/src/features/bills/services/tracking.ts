@@ -6,11 +6,12 @@
  * real-time updates, and user preferences.
  */
 
-import { Bill } from '@client/lib/types/bill';
+import { Bill, BillStatus } from '@client/lib/types/bill';
 
 import type {
   BillUpdate,
-  BillEngagementMetrics as EngagementMetrics
+  BillEngagementMetrics as EngagementMetrics,
+  BillEngagement
 } from '@client/lib/types/bill';
 import type { BillTrackingPreferences } from '@client/core/api/types/preferences';
 import { logger } from '@client/lib/utils/logger';
@@ -76,24 +77,14 @@ export class BillTrackingService {
     switch (update.type) {
       case 'status_change':
         if (data.oldStatus && data.newStatus) {
-          (updates as any).status = data.newStatus as
-            | 'drafted'
-            | 'introduced'
-            | 'first_reading'
-            | 'second_reading'
-            | 'committee_stage'
-            | 'report_stage'
-            | 'third_reading'
-            | 'presidential_assent'
-            | 'act_of_parliament'
-            | 'withdrawn'
-            | 'lapsed';
+          // Type-safe status update
+          updates.status = data.newStatus as BillStatus;
         }
         break;
 
       case 'new_comment':
         if (data.commentCount !== undefined) {
-          (updates as any).commentCount = data.commentCount;
+          updates.commentCount = data.commentCount;
         }
         break;
 
@@ -110,19 +101,29 @@ export class BillTrackingService {
         break;
     }
 
-    // Handle engagement metrics
+    // Handle engagement metrics - update the engagement object
+    if (data.viewCount !== undefined || data.commentCount !== undefined || data.shareCount !== undefined) {
+      const engagement: Partial<BillEngagement> = {};
+      
+      if (data.viewCount !== undefined) {
+        engagement.views = data.viewCount;
+      }
+      if (data.commentCount !== undefined) {
+        engagement.comments = data.commentCount;
+      }
+      if (data.shareCount !== undefined) {
+        engagement.shares = data.shareCount;
+      }
+      
+      updates.engagement = engagement as BillEngagement;
+    }
+
+    // Also update top-level metrics for backward compatibility
     if (data.viewCount !== undefined) {
-      (updates as any).viewCount = data.viewCount;
+      updates.viewCount = data.viewCount;
     }
     if (data.commentCount !== undefined) {
-      (updates as any).commentCount = data.commentCount;
-    }
-    if (data.shareCount !== undefined) {
-      (updates as any).shares = data.shareCount; // Assuming 'shares' is the property name in Bill, or shareCount? Bill usually uses 'shares'? Checking Bill type later.
-      // Wait, Bill usually has `engagement` object or similar.
-      // But let's assume Bill has these props or I need to check.
-      // Bill interface in community-base.ts/bill-base.ts?
-      // I'll stick to camelCase first.
+      updates.commentCount = data.commentCount;
     }
 
     return updates;

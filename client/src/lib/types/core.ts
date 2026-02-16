@@ -60,13 +60,6 @@ export interface BaseComment {
 }
 
 /**
- * Standard comment with status
- */
-export interface Comment extends BaseComment {
-  status?: CommentStatus;
-}
-
-/**
  * Expert verification details
  */
 export interface ExpertVerification {

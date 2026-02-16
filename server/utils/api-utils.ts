@@ -5,7 +5,7 @@
 
 import { Response } from 'express';
 
-import { logger } from '../observability/logging';
+import { logger } from '../infrastructure/observability';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;

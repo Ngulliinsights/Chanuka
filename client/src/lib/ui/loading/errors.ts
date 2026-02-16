@@ -183,6 +183,7 @@ export class LoadingTimeoutError extends NetworkError {
   public readonly name: string;
   public readonly operation: string;
   public readonly timeout: number;
+  public override readonly cause?: Error | unknown;
 
   constructor(
     operationId: string,
@@ -204,7 +205,7 @@ export class LoadingTimeoutError extends NetworkError {
     this.operation = operationId;
     this.timeout = timeout;
     if (options?.cause) {
-      (this as any).cause = options.cause;
+      this.cause = options.cause;
     }
   }
 }
@@ -219,6 +220,8 @@ export class LoadingTimeoutError extends NetworkError {
  */
 export class LoadingNetworkError extends NetworkError {
   public readonly name: string;
+  public override readonly statusCode: number;
+  public override readonly cause?: Error | unknown;
 
   constructor(
     message: string,
@@ -230,11 +233,9 @@ export class LoadingNetworkError extends NetworkError {
   ) {
     super(message, options?.context);
     this.name = 'LoadingNetworkError';
-    if (options?.statusCode) {
-      (this as any).statusCode = options.statusCode;
-    }
+    this.statusCode = options?.statusCode ?? 503;
     if (options?.cause) {
-      (this as any).cause = options.cause;
+      this.cause = options.cause;
     }
   }
 }
@@ -249,6 +250,7 @@ export class LoadingNetworkError extends NetworkError {
  */
 export class LoadingValidationError extends ValidationError {
   public readonly name: string;
+  public override readonly cause?: Error | unknown;
 
   constructor(
     message: string,
@@ -260,7 +262,7 @@ export class LoadingValidationError extends ValidationError {
     super(message, { validation: [message] }, options?.context);
     this.name = 'LoadingValidationError';
     if (options?.cause) {
-      (this as any).cause = options.cause;
+      this.cause = options.cause;
     }
   }
 }

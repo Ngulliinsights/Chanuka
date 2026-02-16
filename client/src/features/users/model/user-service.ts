@@ -182,15 +182,6 @@ export interface Recommendation {
   reason: string;
 }
 
-export interface Notification {
-  id: string;
-  type: 'bill_update' | 'comment' | 'recommendation' | 'system';
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-}
-
 export interface DashboardData {
   profile: UserProfile;
   recent_activity: UserEngagementHistory[];

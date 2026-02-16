@@ -296,7 +296,7 @@ export class UserDomainService {
           profile: aggregate.profile || undefined,
           interests: interestEntities,
           verifications: aggregate.verifications
-        } as any);
+        });
 
         return updatedAggregate;
       }, 'interests_update');

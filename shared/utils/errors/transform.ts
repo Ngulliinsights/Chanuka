@@ -15,17 +15,71 @@ import { ZodError } from 'zod';
 import { generateCorrelationId, getCurrentCorrelationId } from './correlation-id';
 
 /**
+ * Type guard for PostgreSQL error
+ */
+interface PostgresError {
+  code: string;
+  constraint?: string;
+  table?: string;
+  detail?: string;
+  column?: string;
+}
+
+function isPostgresError(error: unknown): error is PostgresError {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    typeof (error as Record<string, unknown>).code === 'string'
+  );
+}
+
+/**
+ * Type guard for HTTP status error
+ */
+interface HttpStatusError {
+  status: number;
+  statusText?: string;
+}
+
+function isHttpStatusError(error: unknown): error is HttpStatusError {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'status' in error &&
+    typeof (error as Record<string, unknown>).status === 'number'
+  );
+}
+
+/**
+ * Type guard for error with code property
+ */
+interface ErrorWithCode {
+  code: string;
+  message?: string;
+  details?: Record<string, unknown>;
+}
+
+function isErrorWithCode(error: unknown): error is ErrorWithCode {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    typeof (error as Record<string, unknown>).code === 'string'
+  );
+}
+
+
+/**
  * Transform a database error to StandardError format
  */
 export function transformDatabaseError(error: unknown): StandardError {
   const correlationId = getCurrentCorrelationId() || generateCorrelationId();
 
   // PostgreSQL error
-  if (error && typeof error === 'object' && 'code' in error) {
-    const pgError = error as any;
-
+  if (isPostgresError(error)) {
     // Unique constraint violation
-    if (pgError.code === '23505') {
+    if (error.code === '23505') {
       return {
         code: ERROR_CODES.DUPLICATE_RESOURCE,
         message: ERROR_MESSAGES.DUPLICATE_RESOURCE,
@@ -33,15 +87,15 @@ export function transformDatabaseError(error: unknown): StandardError {
         correlationId,
         timestamp: new Date(),
         details: {
-          constraint: pgError.constraint,
-          table: pgError.table,
-          detail: pgError.detail,
+          constraint: error.constraint,
+          table: error.table,
+          detail: error.detail,
         },
       };
     }
 
     // Foreign key violation
-    if (pgError.code === '23503') {
+    if (error.code === '23503') {
       return {
         code: ERROR_CODES.INVALID_INPUT,
         message: 'Referenced resource does not exist',
@@ -49,15 +103,15 @@ export function transformDatabaseError(error: unknown): StandardError {
         correlationId,
         timestamp: new Date(),
         details: {
-          constraint: pgError.constraint,
-          table: pgError.table,
-          detail: pgError.detail,
+          constraint: error.constraint,
+          table: error.table,
+          detail: error.detail,
         },
       };
     }
 
     // Not null violation
-    if (pgError.code === '23502') {
+    if (error.code === '23502') {
       return {
         code: ERROR_CODES.MISSING_REQUIRED_FIELD,
         message: ERROR_MESSAGES.MISSING_REQUIRED_FIELD,
@@ -65,14 +119,14 @@ export function transformDatabaseError(error: unknown): StandardError {
         correlationId,
         timestamp: new Date(),
         details: {
-          column: pgError.column,
-          table: pgError.table,
+          column: error.column,
+          table: error.table,
         },
       };
     }
 
     // Check constraint violation
-    if (pgError.code === '23514') {
+    if (error.code === '23514') {
       return {
         code: ERROR_CODES.VALIDATION_ERROR,
         message: ERROR_MESSAGES.VALIDATION_ERROR,
@@ -80,8 +134,8 @@ export function transformDatabaseError(error: unknown): StandardError {
         correlationId,
         timestamp: new Date(),
         details: {
-          constraint: pgError.constraint,
-          table: pgError.table,
+          constraint: error.constraint,
+          table: error.table,
         },
       };
     }
@@ -154,9 +208,8 @@ export function transformNetworkError(error: unknown): StandardError {
   }
 
   // Service unavailable
-  if (error && typeof error === 'object' && 'status' in error) {
-    const statusError = error as any;
-    if (statusError.status === 503) {
+  if (isHttpStatusError(error)) {
+    if (error.status === 503) {
       return {
         code: ERROR_CODES.SERVICE_UNAVAILABLE,
         message: ERROR_MESSAGES.SERVICE_UNAVAILABLE,
@@ -164,8 +217,8 @@ export function transformNetworkError(error: unknown): StandardError {
         correlationId,
         timestamp: new Date(),
         details: {
-          status: statusError.status,
-          statusText: statusError.statusText,
+          status: error.status,
+          statusText: error.statusText,
         },
       };
     }
@@ -208,17 +261,15 @@ export function toStandardError(error: unknown): StandardError {
   }
 
   // Database error (check for PostgreSQL error codes)
-  if (error && typeof error === 'object' && 'code' in error && typeof (error as any).code === 'string') {
-    const code = (error as any).code;
-    if (code.startsWith('23') || code.startsWith('42')) {
+  if (isErrorWithCode(error)) {
+    if (error.code.startsWith('23') || error.code.startsWith('42')) {
       return transformDatabaseError(error);
     }
   }
 
   // HTTP error with status code
-  if (error && typeof error === 'object' && 'status' in error) {
-    const statusError = error as any;
-    const status = statusError.status;
+  if (isHttpStatusError(error)) {
+    const status = error.status;
 
     if (status === 401) {
       return {
@@ -262,16 +313,16 @@ export function toStandardError(error: unknown): StandardError {
   }
 
   // Error with code property
-  if (error && typeof error === 'object' && 'code' in error) {
-    const errorCode = (error as any).code as ErrorCode;
+  if (isErrorWithCode(error)) {
+    const errorCode = error.code as ErrorCode;
     if (errorCode in ERROR_CODES) {
       return {
         code: errorCode,
-        message: ERROR_MESSAGES[errorCode] || (error as any).message || 'An error occurred',
+        message: ERROR_MESSAGES[errorCode] || error.message || 'An error occurred',
         classification: getClassificationFromErrorCode(errorCode),
         correlationId,
         timestamp: new Date(),
-        details: (error as any).details,
+        details: error.details,
       };
     }
   }

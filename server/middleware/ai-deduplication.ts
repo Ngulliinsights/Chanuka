@@ -13,7 +13,7 @@ import { performance } from 'perf_hooks';
 import { Request, Response, NextFunction } from 'express';
 
 import { getDefaultCache } from '../cache';
-import { logger } from '../observability/logging';
+import { logger } from '../infrastructure/observability';
 
 export interface DeduplicationOptions {
   enabled?: boolean;

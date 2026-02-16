@@ -49,8 +49,8 @@ export async function initializeDatabase(): Promise<boolean> {
       operation: "initialize"
     }, {
       message: error instanceof Error ? error.message : String(error),
-      code: (error as any)?.code,
-      detail: (error as any)?.detail
+      code: (error as Record<string, unknown>)?.code,
+      detail: (error as Record<string, unknown>)?.detail
     });
 
     logger.info("Falling back to sample data mode", {
@@ -89,17 +89,18 @@ export async function validateDatabaseHealth() {
       message: "Database fully operational"
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Database health check failed', {
       component: 'database',
       operation: 'health_check'
     }, {
-      message: (error as any).message || 'Unknown error'
+      message: errorMessage
     });
     return {
       connected: false,
       tablesExist: false,
       canWrite: false,
-      message: `Database error: ${(error as any).message || 'Unknown error'}`
+      message: `Database error: ${errorMessage}`
     };
   }
 }
@@ -115,11 +116,12 @@ async function checkTablesExist(): Promise<boolean> {
 
     return tableCheck.rows.length >= 4; // At least the core tables should exist
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Error checking table existence', {
       component: 'database',
       operation: 'table_check'
     }, {
-      message: (error as any).message || 'Unknown error'
+      message: errorMessage
     });
     return false;
   }

@@ -88,6 +88,11 @@ class OfflineAnalyticsManager {
   }
 
   trackEvent(type: OfflineEvent['type'], data: Record<string, unknown> = {}): void {
+    // Type-safe access to Network Information API
+    const connection = 'connection' in navigator 
+      ? (navigator as Navigator & { connection?: { effectiveType?: string } }).connection
+      : undefined;
+
     const event: OfflineEvent = {
       id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -96,7 +101,7 @@ class OfflineAnalyticsManager {
       userAgent: navigator.userAgent,
       url: window.location.href,
       session_id: this.session_id,
-      connectionType: (navigator as any).connection?.effectiveType,
+      connectionType: connection?.effectiveType,
       isOffline: !navigator.onLine,
     };
 
@@ -107,7 +112,10 @@ class OfflineAnalyticsManager {
   private persistEvent(event: OfflineEvent): void {
     try {
       const stored = localStorage.getItem('offline-analytics') || '[]';
-      const events = JSON.parse(stored);
+      const parsed: unknown = JSON.parse(stored);
+      
+      // Type guard to ensure we have an array
+      const events = Array.isArray(parsed) ? parsed : [];
       events.push(event);
 
       // Keep only last 1000 events to prevent storage overflow

@@ -269,12 +269,10 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // ============================================================================
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
-      // Minimal process shims for libraries expecting Node.js environment
-      'process.env': JSON.stringify({}),
-      'process.versions': JSON.stringify({}),
-      'process.platform': JSON.stringify('browser'),
       // Build timestamp useful for cache busting and debugging production issues
       '__BUILD_TIME__': JSON.stringify(new Date().toISOString()),
+      // Note: Removed process.env, process.versions, and process.platform definitions
+      // as they cause issues with Vite's module system. Use import.meta.env instead.
     },
 
     // ============================================================================

@@ -151,13 +151,6 @@ export interface SponsorAnalysis {
   votingPatterns: VotingPattern[];
 }
 
-export interface BillAnalysis {
-  billId: string;
-  complexity: number;
-  impact: string[];
-  stakeholders: string[];
-}
-
 export interface NetworkLink {
   source: string;
   target: string;

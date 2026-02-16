@@ -33,7 +33,7 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
 
-    return checkRouteAccess(path, navUserRole, user as any);
+    return checkRouteAccess(path, navUserRole, user);
   } catch (error) {
     // Handle validation errors
     if (

@@ -33,22 +33,6 @@ import {
 import { Separator } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 
-interface Comment {
-  id: string;
-  author: {
-    name: string;
-    avatar?: string;
-    verified: boolean;
-    title?: string;
-  };
-  content: string;
-  timestamp: string;
-  likes: number;
-  dislikes: number;
-  replies: Comment[];
-  isExpert?: boolean;
-}
-
 interface BillInfo {
   id: string;
   title: string;

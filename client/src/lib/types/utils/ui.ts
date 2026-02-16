@@ -29,19 +29,6 @@ export type ToastConfig = {
 
 // Notification utilities
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
-export type Notification = {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message?: string;
-  duration?: number;
-  dismissible?: boolean;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-};
-
 // Accessibility utilities
 export type AriaProps = {
   'aria-label'?: string;

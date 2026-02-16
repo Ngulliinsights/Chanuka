@@ -2,7 +2,7 @@
 // This file contains intentional errors for testing the schema import detector
 
 // Missing imports that should be detected:
-// - users, bills from '@shared/schema/foundation'
+// - users, bills from '@server/infrastructure/schema/foundation'
 // - eq, and, desc from 'drizzle-orm'
 
 export async function getUserBills(user_id: string) {

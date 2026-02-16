@@ -164,7 +164,8 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   // Action creators
   const startOperation = useCallback(
     async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>): Promise<string> => {
-      const result = await dispatch(startLoadingOperation(operation) as any);
+      type StartLoadingOperationAction = ReturnType<typeof startLoadingOperation>;
+      const result = await dispatch(startLoadingOperation(operation) as unknown as StartLoadingOperationAction);
       if (startLoadingOperation.fulfilled.match(result)) {
         return result.payload.id;
       }
@@ -175,7 +176,8 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
 
   const completeOperation = useCallback(
     async (id: string, success: boolean = true, error?: string): Promise<void> => {
-      await dispatch(completeLoadingOperation({ id, success, error }) as any);
+      type CompleteLoadingOperationAction = ReturnType<typeof completeLoadingOperation>;
+      await dispatch(completeLoadingOperation({ id, success, error }) as unknown as CompleteLoadingOperationAction);
     },
     [dispatch]
   );

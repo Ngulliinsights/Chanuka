@@ -207,6 +207,13 @@ export class SecurityErrorHandler {
   }
 
   /**
+   * Get configuration
+   */
+  getConfig(): ErrorHandlingConfig {
+    return { ...this.config };
+  }
+
+  /**
    * Get error statistics summary
    */
   getErrorSummary(): {

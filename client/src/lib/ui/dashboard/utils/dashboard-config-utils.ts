@@ -5,7 +5,7 @@
 
 import { DashboardConfigurationError } from '../errors';
 import type { DashboardConfig, DashboardSection } from '../types';
-// import { validateDashboardConfig } from '../validation'; // Unused
+import { validateCompleteDashboardConfig } from '../validation';
 
 import { dashboardConstants } from './dashboard-constants';
 
@@ -45,8 +45,8 @@ export function createDashboardConfig(overrides: Partial<DashboardConfig> = {}):
   };
 
   try {
-    // TODO: Fix validation to handle complete DashboardConfig properly
-    return config as DashboardConfig;
+    // Validate the complete dashboard configuration
+    return validateCompleteDashboardConfig(config);
   } catch (error) {
     throw new DashboardConfigurationError(
       `Invalid dashboard configuration: ${error instanceof Error ? error.message : String(error)}`,
@@ -68,8 +68,8 @@ export function mergeDashboardConfigs(
   };
 
   try {
-    // TODO: Fix validation to handle complete DashboardConfig properly
-    return merged as DashboardConfig;
+    // Validate the merged dashboard configuration
+    return validateCompleteDashboardConfig(merged);
   } catch (error) {
     throw new DashboardConfigurationError(
       `Failed to merge dashboard configurations: ${error instanceof Error ? error.message : String(error)}`,
@@ -283,8 +283,8 @@ export function importDashboardConfig(configJson: string): DashboardConfig {
       throw new Error('Invalid configuration format - missing config object');
     }
 
-    // TODO: Fix validation to handle complete DashboardConfig properly
-    return importData.config as DashboardConfig;
+    // Validate the imported dashboard configuration
+    return validateCompleteDashboardConfig(importData.config);
   } catch (error) {
     throw new DashboardConfigurationError(
       `Failed to import configuration: ${error instanceof Error ? error.message : String(error)}`,

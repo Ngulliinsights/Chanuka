@@ -37,7 +37,7 @@ export const userApiService = {
   async getById(userId: string): Promise<EndpointCallResult<GetUserResponse>> {
     return contractApiClient.callWithParams(
       UserEndpoints.getById,
-      { id: userId as any }, // Cast to branded type
+      { id: userId },
       undefined
     );
   },
@@ -51,7 +51,7 @@ export const userApiService = {
   ): Promise<EndpointCallResult<UpdateUserResponse>> {
     return contractApiClient.callWithParams(
       UserEndpoints.update,
-      { id: userId as any }, // Cast to branded type
+      { id: userId },
       request
     );
   },
@@ -72,7 +72,7 @@ export const userApiService = {
   async delete(userId: string): Promise<EndpointCallResult<DeleteUserResponse>> {
     return contractApiClient.callWithParams(
       UserEndpoints.delete,
-      { id: userId as any }, // Cast to branded type
+      { id: userId },
       undefined
     );
   },

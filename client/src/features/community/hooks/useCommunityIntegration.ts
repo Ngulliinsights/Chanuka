@@ -117,10 +117,11 @@ export function useReportContent() {
       violationType: 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'off_topic';
       reason: string;
     }) => {
+      // Map violation types to API-compatible reasons
       const apiReason = data.violationType === 'off_topic' ? 'other' : data.violationType;
       return communityApiService.reportComment({
         commentId: parseInt(data.commentId, 10),
-        reason: apiReason as any, 
+        reason: apiReason as 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'other', 
         details: data.reason
       });
     },

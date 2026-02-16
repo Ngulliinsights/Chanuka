@@ -10,14 +10,14 @@ This guide documents the migration from the old schema structure to the new doma
 
 ```typescript
 // ✅ Import tables and types from centralized schema
-import { users, bills, sponsors, comments } from '@shared/schema';
-import type { User, Bill, Sponsor, Comment } from '@shared/schema';
+import { users, bills, sponsors, comments } from '@server/infrastructure/schema';
+import type { User, Bill, Sponsor, Comment } from '@server/infrastructure/schema';
 
 // ✅ Import database connections
-import { database, operationalDb, analyticsDb } from '@shared/schema';
+import { database, operationalDb, analyticsDb } from '@server/infrastructure/schema';
 
 // ✅ Import all schema items
-import * as schema from '@shared/schema';
+import * as schema from '@server/infrastructure/schema';
 
 // ✅ Import specific domain items
 import { 
@@ -29,7 +29,7 @@ import {
   
   // Parliamentary process domain
   bill_amendments, bill_versions, parliamentary_votes
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 ```
 
 ### ❌ Old Import Patterns (Now Deprecated)
@@ -164,7 +164,7 @@ import {
   database as db, // Default export (operational)
   checkDatabaseHealth,
   closeDatabaseConnections
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 ```
 
 ## Type Safety
@@ -177,13 +177,13 @@ import type {
   User, Bill, Sponsor, Comment,
   InsertUser, InsertBill, InsertSponsor,
   BillStatus, UserRole, Chamber
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 
 // ✅ Enum imports
 import type {
   KenyanCounty, BillStatus, UserRole,
   VerificationStatus, ModerationStatus
-} from '@shared/schema';
+} from '@server/infrastructure/schema';
 ```
 
 ## Error Handling
@@ -191,7 +191,7 @@ import type {
 If you encounter import errors after migration:
 
 1. **Check the table name mapping** - Many tables have been renamed
-2. **Verify the import path** - All imports should use `@shared/schema`
+2. **Verify the import path** - All imports should use `@server/infrastructure/schema`
 3. **Check for typos** - Table names are now consistent (no double 's' endings)
 4. **Verify TypeScript compilation** - Run `npm run type-check` to catch issues
 
@@ -216,7 +216,7 @@ If you encounter issues with the migration:
 
 1. Check this guide for the correct import patterns
 2. Verify table name mappings
-3. Ensure you're using `@shared/schema` for all imports
+3. Ensure you're using `@server/infrastructure/schema` for all imports
 4. Check the TypeScript compiler output for specific errors
 
 ## Future Considerations

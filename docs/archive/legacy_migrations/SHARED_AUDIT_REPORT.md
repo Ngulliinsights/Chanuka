@@ -58,7 +58,7 @@ Files excluded from analysis:
 ```
 FROM:
   @shared/core                      ~180 imports
-  @shared/schema                    ~200 imports
+  @server/infrastructure/schema                    ~200 imports
   @server/infrastructure/database                  ~80 imports
   @shared/types                     ~20 imports
   @shared/platform                  ~5 imports
@@ -97,7 +97,7 @@ Impact: CRITICAL (used everywhere)
 
 **Schema Definitions** (200+ imports)
 ```
-@shared/schema/
+@server/infrastructure/schema/
 ├─ argument_intelligence.ts    - Arguments, claims, evidence
 ├─ constitutional_intelligence.ts - Constitutional analysis
 ├─ foundation.ts               - Bills, users, comments
@@ -217,7 +217,7 @@ import { ... } from '@shared/...'  // NOT FOUND
 ```
 @shared imports in client:  0 instances
 @shared/types imports in client: 0 instances
-@shared/schema imports in client: 0 instances
+@server/infrastructure/schema imports in client: 0 instances
 @shared/i18n imports in client: 0 instances
 ```
 
@@ -309,7 +309,7 @@ Actual:            SHARED-SERVER-ONLY (Server ↔ Server)
 
 ```typescript
 // Pattern 1: Database & Schema (Most Common)
-import { bills, users, comments } from '@shared/schema';
+import { bills, users, comments } from '@server/infrastructure/schema';
 import { db, executeQuery } from '@server/infrastructure/database';
 // → 280+ imports of this type
 
@@ -352,7 +352,7 @@ import i18n from '@client/i18n';        // Local copy
 - Highly cohesive module
 
 **✅ Schema Definitions**
-- `@shared/schema` exports all tables
+- `@server/infrastructure/schema` exports all tables
 - Consistent structure
 - All queries reference it
 - Critical to application
@@ -398,7 +398,7 @@ import i18n from '@client/i18n';        // Local copy
 By Module (imports per 441 files):
 
 @server/infrastructure/database/          ████████░░ 80 imports (18%)
-@shared/schema/            █████████░ 200 imports (45%)
+@server/infrastructure/schema/            █████████░ 200 imports (45%)
 @shared/core/              ██████░░░░ 180 imports (41%)
 @shared/types/             ░░░░░░░░░░ 20 imports (5%)
 @shared/platform/          ░░░░░░░░░░ 5 imports (1%)
@@ -529,7 +529,7 @@ i18n ←────────── @shared/i18n ────────→ 
 utils ←────────── @shared/core ────────→ utils
                       ↓
                  @server/infrastructure/database (server-only)
-                 @shared/schema (server-only)
+                 @server/infrastructure/schema (server-only)
 
 RESULT: True sharing of types, i18n, utilities
 ```

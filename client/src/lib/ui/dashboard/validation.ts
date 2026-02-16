@@ -75,10 +75,100 @@ export const DashboardDataSchema = z.object({
   lastRefresh: z.date().nullable(),
 });
 
+// Widget and Layout Schemas for complete DashboardConfig validation
+export const WidgetPositionSchema = z.object({
+  x: z.number().int().nonnegative(),
+  y: z.number().int().nonnegative(),
+  z: z.number().int().optional(),
+});
+
+export const WidgetSizeSchema = z.object({
+  width: z.number().positive(),
+  height: z.number().positive(),
+  minWidth: z.number().positive().optional(),
+  minHeight: z.number().positive().optional(),
+  maxWidth: z.number().positive().optional(),
+  maxHeight: z.number().positive().optional(),
+});
+
+export const AppWidgetConfigSchema = z.object({
+  id: z.string().min(1, 'Widget ID cannot be empty'),
+  type: z.enum(['analytics', 'performance', 'engagement', 'metrics', 'chart', 'custom']),
+  title: z.string().min(1, 'Widget title cannot be empty'),
+  size: z.enum(['small', 'medium', 'large', 'full']),
+  position: WidgetPositionSchema,
+  props: z.record(z.unknown()),
+  permissions: z.array(z.string()).optional(),
+  refreshInterval: z.number().int().positive().optional(),
+  dataSource: z.string().optional(),
+});
+
+export const AppDashboardLayoutSchema = z.object({
+  id: z.string().min(1, 'Layout ID cannot be empty'),
+  name: z.string().min(1, 'Layout name cannot be empty'),
+  widgets: z.array(AppWidgetConfigSchema),
+  columns: z.number().int().positive(),
+  responsive: z.boolean(),
+});
+
+export const PermissionConfigSchema = z.object({
+  view: z.array(z.string()),
+  edit: z.array(z.string()),
+  admin: z.array(z.string()),
+});
+
+export const DashboardSettingsSchema = z.object({
+  autoRefresh: z.boolean(),
+  refreshInterval: z.number().int().positive(),
+  theme: z.enum(['light', 'dark', 'auto']),
+  compactMode: z.boolean(),
+  showTitles: z.boolean(),
+  enableAnimations: z.boolean(),
+});
+
+// Complete DashboardConfig schema matching the types.ts definition
+export const CompleteDashboardConfigSchema = z.object({
+  id: z.string().min(1, 'Dashboard ID cannot be empty'),
+  name: z.string().min(1, 'Dashboard name cannot be empty'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  layout: AppDashboardLayoutSchema,
+  permissions: PermissionConfigSchema,
+  settings: DashboardSettingsSchema,
+  refreshInterval: z.number().int().positive().optional(),
+  maxActionItems: z.number().int().positive().optional(),
+  maxTrackedTopics: z.number().int().positive().optional(),
+  enableAutoRefresh: z.boolean().optional(),
+  showCompletedActions: z.boolean().optional(),
+  defaultView: DashboardSectionSchema.optional(),
+  navigation: z
+    .object({
+      breadcrumbs: z
+        .object({
+          enabled: z.boolean(),
+          separator: z.string().optional(),
+        })
+        .optional(),
+      pageControls: z
+        .object({
+          enabled: z.boolean(),
+        })
+        .optional(),
+    })
+    .optional(),
+  theme: z
+    .object({
+      colorScheme: z.enum(['light', 'dark', 'auto']),
+    })
+    .optional(),
+});
+
 // Type definitions derived from schemas
 export type ActivitySummary = z.infer<typeof ActivitySummarySchema>;
 export type TrackedTopic = z.infer<typeof TrackedTopicSchema>;
+export type ActionItem = z.infer<typeof ActionItemSchema>;
 export type DashboardConfig = z.infer<typeof DashboardConfigSchema>;
+export type CompleteDashboardConfig = z.infer<typeof CompleteDashboardConfigSchema>;
 export type DashboardData = z.infer<typeof DashboardDataSchema>;
 export type ActionPriority = z.infer<typeof ActionPrioritySchema>;
 export type TopicCategory = z.infer<typeof TopicCategorySchema>;
@@ -144,6 +234,33 @@ export function validateDashboardConfig(config: unknown): DashboardConfig {
   }
 }
 
+export function validateCompleteDashboardConfig(config: unknown): CompleteDashboardConfig {
+  try {
+    const result = CompleteDashboardConfigSchema.parse(config);
+
+    // Additional validation: ensure all widget positions reference existing widgets
+    const widgetIds = new Set(result.layout.widgets.map((w) => w.id));
+    for (const widget of result.layout.widgets) {
+      if (!widgetIds.has(widget.id)) {
+        throw new Error(`Widget position references non-existent widget: ${widget.id}`);
+      }
+    }
+
+    return result;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const field = error.errors[0]?.path.join('.') || 'unknown';
+      const message = error.errors[0]?.message || 'Invalid dashboard configuration';
+      throw new DashboardValidationError(message, field, config, { zodError: error });
+    }
+    throw new DashboardValidationError(
+      'Complete dashboard configuration validation failed',
+      'config',
+      config
+    );
+  }
+}
+
 export function validateDashboardData(data: unknown): DashboardData {
   try {
     return DashboardDataSchema.parse(data);
@@ -194,6 +311,19 @@ export function safeValidateDashboardConfig(config: unknown): {
 } {
   try {
     const data = validateDashboardConfig(config);
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error as DashboardValidationError };
+  }
+}
+
+export function safeValidateCompleteDashboardConfig(config: unknown): {
+  success: boolean;
+  data?: CompleteDashboardConfig;
+  error?: DashboardValidationError;
+} {
+  try {
+    const data = validateCompleteDashboardConfig(config);
     return { success: true, data };
   } catch (error) {
     return { success: false, error: error as DashboardValidationError };

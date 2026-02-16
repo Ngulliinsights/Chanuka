@@ -11,7 +11,20 @@ import { Provider } from 'react-redux';
 import { GlobalLoadingProvider, GlobalLoadingIndicator, useGlobalLoadingIndicator } from '../index';
 
 // Mock store - replace with your actual store
-const mockStore = {
+interface MockStore {
+  getState: () => {
+    loading: {
+      operations: Record<string, unknown>;
+      isOnline: boolean;
+      globalLoading: boolean;
+      highPriorityLoading: boolean;
+    };
+  };
+  dispatch: () => void;
+  subscribe: () => () => void;
+}
+
+const mockStore: MockStore = {
   getState: () => ({
     loading: {
       operations: {},
@@ -100,7 +113,7 @@ const LoadingControlExample: React.FC = () => {
 
 const AppExample: React.FC = () => {
   return (
-    <Provider store={mockStore as any}>
+    <Provider store={mockStore as unknown as any}>
       <GlobalLoadingProvider>
         <div className="min-h-screen bg-gray-50">
           {/* Your app content */}

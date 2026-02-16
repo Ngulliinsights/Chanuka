@@ -51,13 +51,6 @@ interface UserProfile {
   email?: string;
 }
 
-interface Notification {
-  id: string;
-  title: string;
-  unread: boolean;
-  timestamp?: Date;
-}
-
 // Type guard for user profile
 function isUserProfile(user: unknown): user is UserProfile {
   return (

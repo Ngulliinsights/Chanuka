@@ -1,7 +1,7 @@
 
 import { Driver, Transaction, Result, SessionConfig } from 'neo4j-driver';
 
-import { logger } from '../../../core/observability';
+import { logger } from '../../../observability';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
 import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
 

@@ -66,7 +66,7 @@ export class SchemaImportDetector {
     ];
 
     for (const module of chanukaSchemaModules) {
-      this.schemaImportPaths.set(module, `@shared/schema/${module}`);
+      this.schemaImportPaths.set(module, `@server/infrastructure/schema/${module}`);
     }
 
     // Add specific known tables from Chanuka project
@@ -83,11 +83,11 @@ export class SchemaImportDetector {
       if (!this.schemaImportPaths.has(table)) {
         // Try to determine the most likely import path
         if (['users', 'user_profiles', 'sponsors', 'bills'].includes(table)) {
-          this.schemaImportPaths.set(table, '@shared/schema/foundation');
+          this.schemaImportPaths.set(table, '@server/infrastructure/schema/foundation');
         } else if (['sessions', 'comments', 'notifications'].includes(table)) {
-          this.schemaImportPaths.set(table, '@shared/schema/citizen_participation');
+          this.schemaImportPaths.set(table, '@server/infrastructure/schema/citizen_participation');
         } else {
-          this.schemaImportPaths.set(table, '@shared/schema');
+          this.schemaImportPaths.set(table, '@server/infrastructure/schema');
         }
       }
     }
@@ -123,7 +123,7 @@ export class SchemaImportDetector {
                 tableName: objectName,
                 propertyName,
                 suggestedImport: objectName,
-                suggestedImportPath: this.schemaImportPaths.get(objectName) || '@shared/schema',
+                suggestedImportPath: this.schemaImportPaths.get(objectName) || '@server/infrastructure/schema',
                 position,
                 context: this.getNodeContext(node, sourceFile)
               });
@@ -156,7 +156,7 @@ export class SchemaImportDetector {
     // Check for missing imports
     for (const tableName of usedTables) {
       if (!existingImports.has(tableName)) {
-        const importPath = this.schemaImportPaths.get(tableName) || '@shared/schema';
+        const importPath = this.schemaImportPaths.get(tableName) || '@server/infrastructure/schema';
         issues.push({
           type: 'missing_import',
           tableName,

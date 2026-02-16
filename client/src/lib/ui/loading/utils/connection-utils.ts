@@ -26,12 +26,23 @@ export interface NetworkAdapter {
  * Browser Network Information API utilities
  */
 
-export function getNetworkConnection(): any {
-  return (
-    (navigator as any).connection ||
-    (navigator as any).mozConnection ||
-    (navigator as any).webkitConnection
-  );
+interface NetworkConnection {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+  addEventListener?: (event: string, handler: () => void) => void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkConnection;
+  mozConnection?: NetworkConnection;
+  webkitConnection?: NetworkConnection;
+}
+
+export function getNetworkConnection(): NetworkConnection | undefined {
+  const nav = navigator as NavigatorWithConnection;
+  return nav.connection || nav.mozConnection || nav.webkitConnection;
 }
 
 export function hasNetworkAPI(): boolean {

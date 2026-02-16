@@ -655,41 +655,44 @@ export const ValidatedSponsorType: ValidatedType<ValidatedSponsor> = createValid
 // ============================================================================
 
 export function isBill(value: unknown): value is typeof bills.$inferSelect {
+  const record = value as Record<string, unknown>;
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).id === 'string' &&
-    typeof (value as any).bill_number === 'string' &&
-    typeof (value as any).title === 'string' &&
-    typeof (value as any).status === 'string' &&
-    typeof (value as any).chamber === 'string' &&
-    typeof (value as any).created_at === 'object' &&
-    (value as any).created_at instanceof Date
+    typeof record.id === 'string' &&
+    typeof record.bill_number === 'string' &&
+    typeof record.title === 'string' &&
+    typeof record.status === 'string' &&
+    typeof record.chamber === 'string' &&
+    typeof record.created_at === 'object' &&
+    record.created_at instanceof Date
   );
 }
 
 export function isSponsor(value: unknown): value is typeof sponsors.$inferSelect {
+  const record = value as Record<string, unknown>;
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).id === 'string' &&
-    typeof (value as any).name === 'string' &&
-    typeof (value as any).chamber === 'string' &&
-    typeof (value as any).is_active === 'boolean' &&
-    typeof (value as any).created_at === 'object' &&
-    (value as any).created_at instanceof Date
+    typeof record.id === 'string' &&
+    typeof record.name === 'string' &&
+    typeof record.chamber === 'string' &&
+    typeof record.is_active === 'boolean' &&
+    typeof record.created_at === 'object' &&
+    record.created_at instanceof Date
   );
 }
 
 export function isGovernor(value: unknown): value is typeof governors.$inferSelect {
+  const record = value as Record<string, unknown>;
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).id === 'string' &&
-    typeof (value as any).name === 'string' &&
-    typeof (value as any).county === 'string' &&
-    typeof (value as any).is_active === 'boolean' &&
-    typeof (value as any).created_at === 'object' &&
+    typeof record.id === 'string' &&
+    typeof record.name === 'string' &&
+    typeof record.county === 'string' &&
+    typeof record.is_active === 'boolean' &&
+    typeof record.created_at === 'object' &&
     (value as any).created_at instanceof Date
   );
 }

@@ -9,7 +9,7 @@
 
 import { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
-import { logger } from '../../../core/observability';
+import { logger } from '../../../observability';
 import { executeCypherSafely } from '../utils/session-manager';
 
 /**

@@ -4,6 +4,33 @@ import * as schema from '@server/infrastructure/schema';
 import { and, desc, eq, inArray,sql } from 'drizzle-orm';
 import { z } from 'zod';
 
+// Type augmentation for schema.users.preferences
+interface UserPreferencesData {
+  alertPreferences?: AlertPreference[];
+  deliveryLogs?: AlertDeliveryLog[];
+  [key: string]: unknown;
+}
+
+// Type guard for user preferences
+function isUserPreferencesData(data: unknown): data is UserPreferencesData {
+  if (!data || typeof data !== 'object') return false;
+  return true;
+}
+
+// Type for notification channel service
+interface NotificationChannelService {
+  sendMultiChannelNotification(params: {
+    user_id: string;
+    type: string;
+    subType?: string;
+    title: string;
+    message: string;
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    relatedBillId?: number;
+    metadata?: Record<string, unknown>;
+  }): Promise<void>;
+}
+
 import { cacheService } from '@/infrastructure/cache';
 import { databaseService } from '@/infrastructure/database/database-service';
 import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
@@ -1027,7 +1054,7 @@ export class UnifiedAlertPreferenceService {
     priority: Priority
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const notificationTypeMap: Record<AlertType, { type: any; subType?: any }> = {
+      const notificationTypeMap: Record<AlertType, { type: string; subType?: string }> = {
         'bill_status_change': { type: 'bill_update', subType: 'status_change' },
         'new_comment': { type: 'bill_update', subType: 'new_comment' },
         'amendment': { type: 'bill_update', subType: 'amendment' },
@@ -1038,14 +1065,23 @@ export class UnifiedAlertPreferenceService {
 
       const mapped = notificationTypeMap[alertType] || { type: 'system_alert' };
 
-      await (notificationChannelService as any).sendMultiChannelNotification({ user_id,
+      // Safely extract metadata
+      const metadata: Record<string, unknown> = {};
+      if (alertData && typeof alertData === 'object') {
+        Object.keys(alertData).forEach(key => {
+          metadata[key] = alertData[key];
+        });
+      }
+
+      await (notificationChannelService as NotificationChannelService).sendMultiChannelNotification({ 
+        user_id,
         type: mapped.type,
         subType: mapped.subType,
-        title: alertData.title || this.getDefaultTitle(alertType),
-        message: alertData.message || alertData.description || 'You have a new alert',
-        priority: priority as any,
-        relatedBillId: (alertData && alertData.bill_id) || undefined,
-        metadata: alertData as any
+        title: alertData?.title || this.getDefaultTitle(alertType),
+        message: alertData?.message || alertData?.description || 'You have a new alert',
+        priority,
+        relatedBillId: alertData?.bill_id,
+        metadata
        });
 
       return { success: true };
@@ -1143,16 +1179,18 @@ export class UnifiedAlertPreferenceService {
     try {
       // Fetch current user preferences
       const [user] = await this.db
-        .select({ preferences: (schema.users as any).preferences })
+        .select({ preferences: schema.users.preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
 
-      const currentPreferences = (user?.preferences as any) || {};
+      const currentPreferences: UserPreferencesData = isUserPreferencesData(user?.preferences) 
+        ? user.preferences 
+        : {};
       const alertPreferences = currentPreferences.alertPreferences || [];
       
       // Add or update the preference
-      const existingIndex = alertPreferences.findIndex((p: any) => p.id === preference.id);
+      const existingIndex = alertPreferences.findIndex(p => p.id === preference.id);
       if (existingIndex >= 0) {
         alertPreferences[existingIndex] = preference;
       } else {
@@ -1197,16 +1235,18 @@ export class UnifiedAlertPreferenceService {
   ): Promise<void> {
     try {
       const [user] = await this.db
-        .select({ preferences: (schema.users as any).preferences })
+        .select({ preferences: schema.users.preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
 
-      const currentPreferences = (user?.preferences as any) || {};
+      const currentPreferences: UserPreferencesData = isUserPreferencesData(user?.preferences) 
+        ? user.preferences 
+        : {};
       const alertPreferences = currentPreferences.alertPreferences || [];
       
       // Filter out the preference
-      const updatedPreferences = alertPreferences.filter((p: any) => p.id !== preferenceId);
+      const updatedPreferences = alertPreferences.filter(p => p.id !== preferenceId);
 
       // Update the database
       await this.db
@@ -1235,7 +1275,7 @@ export class UnifiedAlertPreferenceService {
   private async fetchPreferencesFromDatabase(user_id: string): Promise<AlertPreference[]> {
     try {
       const [user] = await this.db
-        .select({ preferences: (schema.users as any).preferences })
+        .select({ preferences: schema.users.preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1244,11 +1284,13 @@ export class UnifiedAlertPreferenceService {
         return [];
       }
 
-      const currentPreferences = (user?.preferences as any) || {};
+      const currentPreferences: UserPreferencesData = isUserPreferencesData(user?.preferences) 
+        ? user.preferences 
+        : {};
       const alertPreferences = currentPreferences.alertPreferences || [];
       
       // Convert stored data to AlertPreference objects with proper Date types
-      return alertPreferences.map((p: any) => ({
+      return alertPreferences.map(p => ({
         ...p,
         created_at: new Date(p.created_at),
         updated_at: new Date(p.updated_at)
@@ -1269,12 +1311,14 @@ export class UnifiedAlertPreferenceService {
     try {
       // Store in user preferences under deliveryLogs array
       const [user] = await this.db
-        .select({ preferences: (schema.users as any).preferences })
+        .select({ preferences: schema.users.preferences })
         .from(schema.users)
         .where(eq(schema.users.id, log.user_id))
         .limit(1);
 
-      const currentPreferences = (user?.preferences as any) || {};
+      const currentPreferences: UserPreferencesData = isUserPreferencesData(user?.preferences) 
+        ? user.preferences 
+        : {};
       const deliveryLogs = currentPreferences.deliveryLogs || [];
       
       // Add new log
@@ -1282,7 +1326,7 @@ export class UnifiedAlertPreferenceService {
       
       // Keep only the most recent 1000 logs per user
       if (deliveryLogs.length > 1000) {
-        deliveryLogs.sort((a: any, b: any) => 
+        deliveryLogs.sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         deliveryLogs.splice(1000);
@@ -1312,7 +1356,7 @@ export class UnifiedAlertPreferenceService {
   private async fetchDeliveryLogsFromDatabase(user_id: string): Promise<AlertDeliveryLog[]> {
     try {
       const [user] = await this.db
-        .select({ preferences: (schema.users as any).preferences })
+        .select({ preferences: schema.users.preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1321,11 +1365,13 @@ export class UnifiedAlertPreferenceService {
         return [];
       }
 
-      const currentPreferences = (user?.preferences as any) || {};
+      const currentPreferences: UserPreferencesData = isUserPreferencesData(user?.preferences) 
+        ? user.preferences 
+        : {};
       const deliveryLogs = currentPreferences.deliveryLogs || [];
       
       // Convert to proper types
-      return deliveryLogs.map((log: any) => ({
+      return deliveryLogs.map(log => ({
         ...log,
         created_at: new Date(log.created_at),
         lastAttempt: new Date(log.lastAttempt),
@@ -1396,16 +1442,22 @@ export class UnifiedAlertPreferenceService {
       }
 
       // Group alerts by type
-      const groupedAlerts = batch.reduce((acc: any, alert: any) => {
-        if (!acc[alert.alertType]) {
-          acc[alert.alertType] = [];
-        }
-        acc[alert.alertType].push(alert);
-        return acc;
-      }, {});
+      const groupedAlerts: Record<string, unknown[]> = {};
+      if (Array.isArray(batch)) {
+        batch.forEach((alert: unknown) => {
+          if (alert && typeof alert === 'object' && 'alertType' in alert) {
+            const alertType = (alert as { alertType: string }).alertType;
+            if (!groupedAlerts[alertType]) {
+              groupedAlerts[alertType] = [];
+            }
+            groupedAlerts[alertType].push(alert);
+          }
+        });
+      }
 
       // Send batch notification
-      await (notificationChannelService as any).sendMultiChannelNotification({ user_id,
+      await (notificationChannelService as NotificationChannelService).sendMultiChannelNotification({ 
+        user_id,
         type: 'digest',
         title: 'Alert Digest',
         message: `You have ${batch.length } new alerts`,
@@ -1413,7 +1465,7 @@ export class UnifiedAlertPreferenceService {
         metadata: {
           batch: groupedAlerts,
           preferenceId
-        } as any,
+        },
         relatedBillId: undefined
       });
 

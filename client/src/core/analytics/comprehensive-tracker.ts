@@ -52,28 +52,6 @@ export type AnalyticsEventType =
   | 'conversion_event';
 
 /**
- * Comprehensive analytics event structure
- */
-export interface AnalyticsEvent {
-  id: string;
-  type: AnalyticsEventType;
-  timestamp: Date;
-  userId?: string;
-  sessionId: string;
-  userRole: UserRole;
-  page: string;
-  section: NavigationSection;
-  data: Record<string, unknown>;
-  metadata: {
-    userAgent: string;
-    viewport: { width: number; height: number };
-    connectionType?: string;
-    deviceType: 'mobile' | 'tablet' | 'desktop';
-    referrer?: string;
-  };
-}
-
-/**
  * Performance metrics for key pages
  */
 export interface PagePerformanceMetrics {
@@ -387,7 +365,14 @@ export class ComprehensiveAnalyticsTracker {
     };
 
     // Add memory usage if available
-    const perfWithMemory = performance as any;
+    interface PerformanceWithMemory extends Performance {
+      memory?: {
+        usedJSHeapSize: number;
+        totalJSHeapSize: number;
+        jsHeapSizeLimit: number;
+      };
+    }
+    const perfWithMemory = performance as PerformanceWithMemory;
     if (perfWithMemory.memory) {
       metrics.memoryUsage = perfWithMemory.memory.usedJSHeapSize;
     }
@@ -666,8 +651,18 @@ export class ComprehensiveAnalyticsTracker {
   /**
    * Calculate persona breakdown
    */
-  private calculatePersonaBreakdown(): Record<UserRole, any> {
-    const breakdown: Record<UserRole, any> = {
+  private calculatePersonaBreakdown(): Record<UserRole, {
+    userCount: number;
+    averageEngagement: number;
+    topPages: string[];
+    conversionRate: number;
+  }> {
+    const breakdown: Record<UserRole, {
+      userCount: number;
+      averageEngagement: number;
+      topPages: string[];
+      conversionRate: number;
+    }> = {
       public: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
       citizen: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
       user: { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 },
@@ -828,10 +823,15 @@ export class ComprehensiveAnalyticsTracker {
     );
 
     performanceIssues.forEach(issue => {
+      const severity = typeof issue.data.severity === 'string' && 
+        ['low', 'medium', 'high', 'critical'].includes(issue.data.severity)
+        ? (issue.data.severity as 'low' | 'medium' | 'high' | 'critical')
+        : 'medium';
+      
       alerts.push({
         id: issue.id,
         type: 'performance',
-        severity: (issue.data.severity as any) || 'medium',
+        severity,
         message: (issue.data.message as string) || 'Performance issue detected',
         timestamp: issue.timestamp,
         acknowledged: false,
@@ -844,10 +844,15 @@ export class ComprehensiveAnalyticsTracker {
     );
 
     errorEvents.forEach(error => {
+      const severity = typeof error.data.errorSeverity === 'string' && 
+        ['low', 'medium', 'high', 'critical'].includes(error.data.errorSeverity)
+        ? (error.data.errorSeverity as 'low' | 'medium' | 'high' | 'critical')
+        : 'medium';
+      
       alerts.push({
         id: error.id,
         type: 'error',
-        severity: (error.data.errorSeverity as any) || 'medium',
+        severity,
         message: (error.data.errorMessage as string) || 'Error occurred',
         timestamp: error.timestamp,
         acknowledged: false,
@@ -972,7 +977,18 @@ export class ComprehensiveAnalyticsTracker {
   }
 
   private getConnectionType(): string | undefined {
-    const nav = navigator as any;
+    interface NavigatorWithConnection extends Navigator {
+      connection?: {
+        effectiveType?: string;
+      };
+      mozConnection?: {
+        effectiveType?: string;
+      };
+      webkitConnection?: {
+        effectiveType?: string;
+      };
+    }
+    const nav = navigator as NavigatorWithConnection;
     const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
     return connection?.effectiveType;
   }

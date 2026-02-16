@@ -10,7 +10,7 @@ import { logger  } from '@shared/core';
 import { ConstitutionalAnalysesRepository } from '@shared/infrastructure/repositories/constitutional-analyses-repository.js';
 import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
 import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
-import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@shared/schema/index.js';
+import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index.js';
 
 export interface AnalysisRequest {
   bill_id: string;

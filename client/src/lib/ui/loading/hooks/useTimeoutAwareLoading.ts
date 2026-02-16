@@ -394,8 +394,8 @@ export function useMultiTimeoutAwareLoading(
       };
 
       // Store the configuration instead of the hook result
-      setOperations(prev => ({ ...prev, [operationId]: operationConfig as any }));
-      return operationConfig as any;
+      setOperations(prev => ({ ...prev, [operationId]: operationConfig as unknown as UseTimeoutAwareLoadingResult }));
+      return operationConfig as unknown as UseTimeoutAwareLoadingResult;
     },
     [defaultTimeout, onAnyTimeout, onAllComplete, operations]
   );

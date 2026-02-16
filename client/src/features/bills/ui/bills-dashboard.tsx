@@ -49,6 +49,7 @@ import { cn } from '@client/lib/design-system/utils/cn';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
+import { VirtualList } from '@client/lib/ui/virtual-list';
 
 import { useBills } from '../hooks';
 import type { Bill, BillsQueryParams } from '../types';
@@ -723,7 +724,10 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
   }
 
   // Get user level for personalized content, with a safe default
-  const userLevel = (userPreferences as any)?.level || 'novice';
+  // Note: userPreferences may be null if preferences are managed elsewhere
+  const userLevel = (userPreferences && typeof userPreferences === 'object' && 'level' in userPreferences) 
+    ? (userPreferences as { level?: string }).level || 'novice'
+    : 'novice';
   const isNoviceUser = userLevel === 'novice';
 
   // Retrieve localized copy based on user level and preferences
@@ -1077,26 +1081,15 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
             <>
               {/* Bills display - mobile vs desktop */}
               {isMobile ? (
-                /* Mobile bills list */
-                <div className="space-y-4">
-                  {bills.map(renderMobileBillCard)}
-
-                  {/* Load more indicator for mobile */}
-                  {hasMultiplePages && (
-                    <div className="text-center py-4">
-                      <Button
-                        onClick={() => {
-                          // Load more functionality would go here
-                          console.log('Load more bills');
-                        }}
-                        variant="outline"
-                        className="touch-manipulation"
-                      >
-                        Load More Bills
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                /* Mobile bills list with virtual scrolling */
+                <VirtualList
+                  items={bills}
+                  itemHeight={280}
+                  containerHeight={800}
+                  overscan={2}
+                  renderItem={(bill, index) => renderMobileBillCard(bill)}
+                  className="space-y-4"
+                />
               ) : (
                 /* Desktop bills grid with virtualization */
                 <VirtualBillGrid

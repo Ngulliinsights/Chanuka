@@ -15,7 +15,7 @@ export const logger = {
     errorRate: 0,
     performanceMetrics: { averageResponseTime: 0, slowRequests: 0 }
   }),
-  queryLogs: (_filters?: any) => [] as any[],
+  queryLogs: (_filters?: unknown) => [] as unknown[],
   logPerformance: (_operation: string, _duration: number, _meta?: any) => {},
   logSecurity: (_event: string, _user_id?: string, _meta?: any) => {},
   logMetric: (_name: string, _value: number, _meta?: any) => {}

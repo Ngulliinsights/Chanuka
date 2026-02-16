@@ -7,7 +7,7 @@
  * @module shared/types/bill
  */
 
-import { UserRole as SharedUserRole } from '../../../shared/types/core/enums';
+import { UserRole as SharedUserRole } from '@shared/types/core/enums';
 
 // ============================================================================
 // User Role Types

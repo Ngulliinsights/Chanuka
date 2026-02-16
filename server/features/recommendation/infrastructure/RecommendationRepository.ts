@@ -93,7 +93,11 @@ export class RecommendationRepository {
         })
       .from(bill_engagement)
       .where(inArray(bill_engagement.user_id, user_ids));
-    return rows as any[];
+    return rows.map(r => ({
+      user_id: r.user_id,
+      bill_id: r.bill_id as number,
+      score: r.score ?? 0
+    }));
   }
 
   /*  ==========  Engagement tracking – atomic upsert  ==========  */
@@ -116,10 +120,15 @@ export class RecommendationRepository {
       if (type === 'view') updates.view_count++;
       if (type === 'comment') updates.comment_count++;
       if (type === 'share') updates.share_count++;
-      (updates as any).engagement_score = this.calcScore(updates.view_count, updates.comment_count, updates.share_count);
+      
+      const updatesWithScore = {
+        ...updates,
+        engagement_score: this.calcScore(updates.view_count, updates.comment_count, updates.share_count)
+      };
+      
       await db
         .update(bill_engagement)
-        .set(updates)
+        .set(updatesWithScore)
         .where(and(eq(bill_engagement.user_id, user_id), eq(bill_engagement.bill_id, bill_id)));
     } else { const view_count = type === 'view' ? 1 : 0;
       const comment_count = type === 'comment' ? 1 : 0;

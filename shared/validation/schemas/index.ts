@@ -62,3 +62,11 @@ export { CommentSchema } from './comment.schema';
 export { USER_VALIDATION_RULES } from './user.schema';
 export { BILL_VALIDATION_RULES } from './bill.schema';
 export { COMMENT_VALIDATION_RULES } from './comment.schema';
+
+// Re-export common validation utilities
+export {
+  nonEmptyString,
+  optionalNonEmptyString,
+  nullableNonEmptyString,
+  optionalNullableNonEmptyString,
+} from './common';

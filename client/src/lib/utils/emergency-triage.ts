@@ -430,7 +430,7 @@ class EmergencyTriageTool {
     const f = fiber as Record<string, unknown>;
     const type = f.type;
     if (typeof type === 'function') {
-      const maybeType = type as any;
+      const maybeType = type as { displayName?: string; name?: string };
       const componentName = maybeType.displayName || maybeType.name || 'Anonymous';
       this.trackRender(String(componentName));
     }
@@ -439,7 +439,7 @@ class EmergencyTriageTool {
     let child = f.child as unknown;
     while (child) {
       this.traverseFiber(child);
-      child = (child as any).sibling as unknown;
+      child = (child as { sibling?: unknown }).sibling;
     }
   }
 

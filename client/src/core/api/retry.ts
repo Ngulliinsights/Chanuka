@@ -327,3 +327,112 @@ export function createServiceRetryHandler(
     ...overrides,
   });
 }
+
+/**
+ * Simple retry utility with configurable retry logic
+ * 
+ * Requirements: 13.2, 13.3, 13.4
+ * - Retry network errors up to 3 times
+ * - Retry 5xx errors with exponential backoff
+ * - Don't retry 4xx errors
+ */
+
+export interface SimpleRetryConfig {
+  maxRetries: number;
+  retryableStatusCodes: number[];
+  backoffMultiplier: number;
+  initialDelay: number;
+}
+
+export interface RetryContextInfo {
+  attempt: number;
+  lastError: Error;
+  nextDelay: number;
+}
+
+/**
+ * Executes an operation with retry logic
+ * 
+ * @param operation - The async operation to execute
+ * @param config - Retry configuration
+ * @returns The result of the operation
+ * @throws The last error if all retries are exhausted
+ */
+export async function withRetry<T>(
+  operation: () => Promise<T>,
+  config: SimpleRetryConfig = {
+    maxRetries: 3,
+    retryableStatusCodes: [500, 502, 503, 504],
+    backoffMultiplier: 2,
+    initialDelay: 1000,
+  }
+): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry 4xx errors (client errors)
+      if (isClientError(error)) {
+        throw error;
+      }
+
+      // Don't retry if max attempts reached
+      if (attempt === config.maxRetries) {
+        throw error;
+      }
+
+      // Calculate backoff delay
+      const delay = config.initialDelay * Math.pow(config.backoffMultiplier, attempt);
+      
+      logger.info('Retrying operation', {
+        component: 'withRetry',
+        attempt: attempt + 1,
+        maxRetries: config.maxRetries,
+        delay,
+        error: lastError.message,
+      });
+
+      await sleep(delay);
+    }
+  }
+
+  throw lastError!;
+}
+
+/**
+ * Checks if an error is a client error (4xx status code)
+ */
+function isClientError(error: unknown): boolean {
+  if (error && typeof error === 'object' && 'status' in error) {
+    const status = (error as { status: number }).status;
+    return status >= 400 && status < 500;
+  }
+  
+  // Check error message for 4xx status codes
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    // Don't treat 408 (timeout) and 429 (rate limit) as non-retryable
+    if (message.includes('408') || message.includes('429')) {
+      return false;
+    }
+    // Check for other 4xx errors
+    for (let code = 400; code < 500; code++) {
+      if (message.includes(code.toString())) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Promise-based sleep utility
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

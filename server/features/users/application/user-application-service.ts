@@ -1,5 +1,5 @@
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
-import { CitizenVerification } from '../domain/entities/citizen-verification';
+import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
 import { User } from '../domain/entities/user';
 import { UserInterest,UserProfile } from '../domain/entities/user-profile';
 import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
@@ -28,7 +28,7 @@ export interface UserProfileData {
 }
 
 export interface UserVerificationData { bill_id: number;
-  verification_type: string;
+  verification_type: VerificationType;
   claim: string;
   evidence: Evidence[];
   expertise: ExpertiseLevel;
@@ -68,7 +68,7 @@ export class UserApplicationService {
     // VerificationOperationsUseCase updated to use direct service calls instead of repository pattern
     this.verificationOperationsUseCase = new VerificationOperationsUseCase(
       this.userService,
-      this.userVerificationDomainService as any
+      this.userVerificationDomainService
     );
   }
 
@@ -147,9 +147,9 @@ export class UserApplicationService {
 
     return users.map(user => ({
       id: user.id,
-      name: typeof user.name === 'string' ? user.name : (user.name as any).toString(),
-      role: typeof user.role === 'string' ? user.role : (user.role as any).toString(),
-      verification_status: typeof user.verification_status === 'string' ? user.verification_status : (user.verification_status as any).toString(),
+      name: String(user.name),
+      role: String(user.role),
+      verification_status: String(user.verification_status),
       reputation_score: user.reputation_score
     }));
   }
@@ -158,7 +158,7 @@ export class UserApplicationService {
   async submitVerification(user_id: string, verification_data: UserVerificationData): Promise<CitizenVerification> { const result = await this.verificationOperationsUseCase.submitVerification({
       user_id,
       bill_id: verification_data.bill_id,
-      verification_type: verification_data.verification_type as any,
+      verification_type: verification_data.verification_type,
       claim: verification_data.claim,
       evidence: verification_data.evidence,
       expertise: verification_data.expertise,

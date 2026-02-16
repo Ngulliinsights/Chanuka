@@ -1,4 +1,25 @@
-import { LogLevel, LogContext, LoggerChild } from '../observability/logging/types';
+// Type definitions for browser logger
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'critical';
+
+export interface LogContext {
+  component?: string;
+  operation?: string;
+  user_id?: string;
+  [key: string]: unknown;
+}
+
+export interface LoggerChild {
+  trace(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  debug(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  info(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  warn(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  error(message: string, context?: LogContext, metadataOrError?: Record<string, unknown> | unknown): void;
+  fatal(message: string, context?: LogContext, metadataOrError?: Record<string, unknown> | unknown): void;
+  critical(message: string, context?: LogContext, metadataOrError?: Record<string, unknown> | unknown): void;
+  child(bindings: Record<string, unknown>): LoggerChild;
+  withContext<T>(context: LogContext, fn: () => T): T;
+  withContextAsync<T>(context: LogContext, fn: () => Promise<T>): Promise<T>;
+}
 
 /**
  * Environment detection for adaptive logging behavior

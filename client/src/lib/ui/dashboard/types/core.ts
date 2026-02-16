@@ -67,24 +67,6 @@ export interface DashboardState {
 }
 
 // Widget-specific types
-export interface AnalyticsMetrics {
-  totalViews: number;
-  totalComments: number;
-  totalShares: number;
-  uniqueUsers: number;
-  averageEngagementScore: number;
-  engagementTrend: 'increasing' | 'decreasing' | 'stable';
-  topCategories: Array<{
-    category: string;
-    engagement_score: number;
-    billCount: number;
-  }>;
-  userSegments: {
-    highlyEngaged: number;
-    moderatelyEngaged: number;
-    lowEngaged: number;
-  };
-}
 
 export interface PerformanceMetrics {
   coreWebVitals: {

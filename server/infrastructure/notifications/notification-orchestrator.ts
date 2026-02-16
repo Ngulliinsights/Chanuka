@@ -4,7 +4,7 @@ import { type FilterCriteria, type FilterResult,smartNotificationFilterService }
 import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
 import { logger   } from '@shared/core';
 import { database as db, readDatabase } from '@server/infrastructure/database';
-import { bill_tracking_preferences, bills,notifications, users } from '@shared/schema';
+import { bill_tracking_preferences, bills,notifications, users } from '@server/infrastructure/schema';
 import { and,eq } from 'drizzle-orm';
 
 /**

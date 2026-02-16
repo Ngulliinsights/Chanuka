@@ -12,14 +12,6 @@ export type PerformanceMetric = {
 };
 
 // Analytics utilities
-export type AnalyticsEvent = {
-  name: string;
-  properties?: Record<string, any>;
-  timestamp?: number;
-  userId?: string;
-  sessionId?: string;
-};
-
 export type PageView = {
   path: string;
   title?: string;

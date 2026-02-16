@@ -11,8 +11,15 @@
 
 import * as Lucide from 'lucide-react';
 import React, { useState } from 'react';
-const { Target, Users, CheckCircle, Shield, ArrowLeft, Sparkles, ArrowRight } =
-  Lucide as any as Record<string, React.ComponentType<any>>;
+
+// Type-safe icon extraction from Lucide
+const Target = Lucide.Target;
+const Users = Lucide.Users;
+const CheckCircle = Lucide.CheckCircle;
+const Shield = Lucide.Shield;
+const ArrowLeft = Lucide.ArrowLeft;
+const Sparkles = Lucide.Sparkles;
+const ArrowRight = Lucide.ArrowRight;
 
 import {
   Card,

@@ -1,12 +1,10 @@
 /**
  * Loading Domain Types
- * Standardized loading types following the exemplary pattern
+ * Exports core loading types from shared and client-specific extensions
  */
 
-export * from '../../../../client/src/lib/types/loading';
+// Re-export core types from shared
+export * from './types';
 
-/**
- * Loading domain version and metadata
- */
-export const LOADING_DOMAIN_VERSION = '1.0.0' as const;
-export const LOADING_DOMAIN_DESCRIPTION = 'Standardized loading system types' as const;
+// Export client-specific types (React components, hooks, etc.)
+export * from './client-types';

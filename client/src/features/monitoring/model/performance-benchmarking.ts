@@ -347,8 +347,9 @@ class PerformanceBenchmarking {
    */
   private getMemoryUsage(): number {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      return memory.usedJSHeapSize || 0;
+      // Type-safe access to Performance Memory API
+      const memory = (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory;
+      return memory?.usedJSHeapSize || 0;
     }
     return 0;
   }

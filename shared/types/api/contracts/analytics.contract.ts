@@ -9,18 +9,6 @@ import { BillId, UserId } from '../../core/branded';
 // Domain Types
 // ============================================================================
 
-export interface AnalyticsMetrics {
-  totalViews: number;
-  uniqueVisitors: number;
-  averageSessionDuration: number;
-  bounceRate: number;
-  topPages: Array<{
-    path: string;
-    views: number;
-    uniqueVisitors: number;
-  }>;
-}
-
 export interface BillAnalytics {
   billId: BillId;
   views: number;

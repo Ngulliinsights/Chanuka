@@ -597,7 +597,7 @@ export class SystemApiService {
       component: 'SystemApiService',
       operation: 'system_operation',
       status: (errorResponse as AxiosErrorResponse)?.response?.status,
-      endpoint: (error as any)?.config?.url || 'unknown',
+      endpoint: (errorResponse as AxiosErrorResponse)?.config?.url || 'unknown',
     });
 
     return systemError;

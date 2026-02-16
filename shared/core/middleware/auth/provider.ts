@@ -2,7 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Services } from '../../types/services';
 import { MiddlewareProvider } from '../types';
-// import { logger } from '../observability/logging'; // Unused import
+
+// Extend Express Request type
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+        anonymityLevel: string;
+      };
+      token?: string;
+    }
+  }
+}
 
 export class AuthMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'auth';
@@ -13,7 +27,10 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
     return true; // Add validation logic
   }
 
-  create(_options: Record<string, any>) {
+  create(options: Record<string, any>) {
+    const skipPaths = options.skipPaths || [];
+    const requireAuth = options.requireAuth !== false;
+    
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         // Skip authentication for certain paths

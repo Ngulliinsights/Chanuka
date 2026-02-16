@@ -5,24 +5,6 @@
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'comment' | 'bill_update' | 'recommendation' | 'system';
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  timestamp: Date;
-  read?: boolean;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  category?: string;
-  actionUrl?: string;
-  createdAt?: Date | string;
-  data?: {
-    actionText?: string;
-    actionUrl?: string;
-    communityContext?: any;
-  };
-}
-
 export interface NotificationData extends Notification {}
 
 export class NotificationService {

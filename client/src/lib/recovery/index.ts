@@ -9,6 +9,12 @@ export interface RecoveryOptions {
   onError?: (error: Error) => void;
 }
 
+interface WindowWithErrorReporting extends Window {
+  errorReporting?: {
+    report: (error: Error, context?: { context?: string }) => void;
+  };
+}
+
 export class RecoveryManager {
   private static instance: RecoveryManager;
 
@@ -50,8 +56,8 @@ export class RecoveryManager {
     console.error(`Recovery triggered for ${context || 'unknown context'}:`, error);
 
     // Log to external service if available
-    if (typeof window !== 'undefined' && (window as any).errorReporting) {
-      (window as any).errorReporting.report(error, { context });
+    if (typeof window !== 'undefined' && (window as WindowWithErrorReporting).errorReporting) {
+      (window as WindowWithErrorReporting).errorReporting!.report(error, { context });
     }
   }
 

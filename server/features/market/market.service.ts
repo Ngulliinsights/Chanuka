@@ -16,10 +16,15 @@ export class MarketService {
       throw new Error("Invalid market data payload");
     }
 
+    // Validate and sanitize location
+    const sanitizedLocation = typeof location === 'string' && location.trim() 
+      ? location.trim() 
+      : 'nairobi';
+
     await db.insert(market_signals).values({
       commodity_id: productId, // Mapped to commodity_id
       price_reported: price.toString(),
-      location_county: (location as any) || 'nairobi', // Default or sanitized
+      location_county: sanitizedLocation, // Default or sanitized
       trust_weight: '1.0', // Default for anonymous
       created_at: new Date()
     });

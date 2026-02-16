@@ -137,7 +137,7 @@
     - _Requirements: 6.1, 6.3_
 - [x] 9. Fix import issues and TypeScript violations
   - [x] 9.1 Update all import statements
-    - Replace direct schema imports with `@shared/schema` imports
+    - Replace direct schema imports with `@server/infrastructure/schema` imports
     - Fix import order violations according to ESLint rules
     - Add missing module declarations for shared modules
     - _Requirements: 2.1, 2.2, 2.3_

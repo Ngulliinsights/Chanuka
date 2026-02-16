@@ -109,7 +109,8 @@ export function transformToStandardType<T, S>(
   // Apply field mapping
   for (const [legacyField, standardField] of Object.entries(fieldMapping)) {
     if (legacyField in (legacyInstance as object)) {
-      transformedData[standardField as keyof S] = (legacyInstance as any)[legacyField];
+      const legacyValue = (legacyInstance as Record<string, unknown>)[legacyField];
+      transformedData[standardField as keyof S] = legacyValue as S[keyof S];
     } else if (logWarnings) {
       console.warn(`Legacy field '${legacyField}' not found in source object`);
     }
@@ -118,8 +119,9 @@ export function transformToStandardType<T, S>(
   // Add audit fields if requested
   if (addAuditFields) {
     const now = new Date();
-    (transformedData as any).created_at = now;
-    (transformedData as any).updated_at = now;
+    const dataWithAudit = transformedData as Record<string, unknown>;
+    dataWithAudit.created_at = now;
+    dataWithAudit.updated_at = now;
   }
 
   // Create the standardized instance

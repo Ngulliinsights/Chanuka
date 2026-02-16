@@ -68,8 +68,8 @@ export class UnifiedCSPManager {
     this.applyMetaTagCSP(cspHeader);
 
     // Store nonce for reference
-    (window as any).__CSP_NONCE__ = this.nonce;
-    (window as any).__CSP_POLICY__ = cspHeader;
+    window.__CSP_NONCE__ = this.nonce;
+    window.__CSP_POLICY__ = cspHeader;
 
     logger.info('Unified CSP Manager initialized with policy');
   }
@@ -198,7 +198,7 @@ export class UnifiedCSPManager {
 
     // Set up reporting endpoint
     if (typeof window !== 'undefined') {
-      (window as any).__reportCSPViolation__ = (violation: CSPViolation) => {
+      window.__reportCSPViolation__ = (violation) => {
         this.handleCSPViolation(violation);
       };
     }
@@ -326,7 +326,7 @@ export class UnifiedCSPManager {
    */
   refreshNonce(): string {
     this.nonce = this.generateNonce();
-    (window as any).__CSP_NONCE__ = this.nonce;
+    window.__CSP_NONCE__ = this.nonce;
     this.setupCSP(); // Reapply CSP with new nonce
     return this.nonce;
   }
@@ -349,7 +349,7 @@ export class UnifiedCSPManager {
    * Check if a source is allowed by current policy
    */
   isSourceAllowed(directive: string, source: string): boolean {
-    const policy = (window as any).__CSP_POLICY__;
+    const policy = window.__CSP_POLICY__;
     if (!policy) return false;
 
     const directiveMatch = policy.match(new RegExp(`${directive}\\s+([^;]+)`));

@@ -67,22 +67,25 @@ export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboard
 
   // Transform bills data to dashboard data format
   const dashboardData: DashboardData = useMemo(
-    () => ({
-      summary: (billsQuery.data as any)?.summary || {
-        billsTracked: 0,
-        actionsNeeded: 0,
-        topicsCount: 0,
-        recentActivity: 0,
-        completedActions: 0,
-        pendingActions: 0,
-        lastUpdated: new Date(),
-      },
-      actionItems: ((billsQuery.data as any)?.actionItems as ActionItem[]) || [],
-      trackedTopics: ((billsQuery.data as any)?.trackedTopics as TrackedTopic[]) || [],
-      isLoading: billsQuery.isLoading,
-      error: billsQuery.error,
-      lastRefresh,
-    }),
+    () => {
+      const billsData = billsQuery.data as { summary?: any; actionItems?: ActionItem[]; trackedTopics?: TrackedTopic[] } | undefined;
+      return {
+        summary: billsData?.summary || {
+          billsTracked: 0,
+          actionsNeeded: 0,
+          topicsCount: 0,
+          recentActivity: 0,
+          completedActions: 0,
+          pendingActions: 0,
+          lastUpdated: new Date(),
+        },
+        actionItems: (billsData?.actionItems as ActionItem[]) || [],
+        trackedTopics: (billsData?.trackedTopics as TrackedTopic[]) || [],
+        isLoading: billsQuery.isLoading,
+        error: billsQuery.error,
+        lastRefresh,
+      };
+    },
     [billsQuery.data, billsQuery.isLoading, billsQuery.error, lastRefresh]
   );
 

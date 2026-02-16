@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from './logger';
 import { NextFunction,Request, Response } from 'express';
 
 import { databaseLogger } from '@server/infrastructure/observability/database-logger';

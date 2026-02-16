@@ -8,28 +8,13 @@
 
 import { globalApiClient } from '@client/core/api/client';
 import { logger } from '@client/lib/utils/logger';
+import { billAnalysisSchema } from '@shared/validation/schemas/analytics.schema';
+import type { BillAnalysis } from '@shared/validation/schemas/analytics.schema';
 
 /**
  * Core interfaces for bill analysis system
  */
-export interface BillAnalysis {
-  id: string;
-  bill_id: number;
-  conflictScore: number;
-  transparencyRating: number;
-  stakeholderAnalysis: StakeholderImpact[];
-  constitutionalConcerns: string[];
-  publicBenefit: number;
-  corporateInfluence: CorporateConnection[];
-  timestamp: Date;
-}
-
-interface StakeholderImpact {
-  group: string;
-  impactLevel: 'high' | 'medium' | 'low';
-  description: string;
-  affectedPopulation: number;
-}
+export type { BillAnalysis } from '@shared/validation/schemas/analytics.schema';
 
 interface CorporateConnection {
   organization: string;
@@ -91,25 +76,21 @@ class AnalysisService {
   }
 
   /**
-   * Validates that the analysis data has all required fields
+   * Validates that the analysis data has all required fields using Zod schema
    */
   private validateAnalysisData(data: unknown): BillAnalysis {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid analysis data from API: data must be an object');
+    try {
+      // Use Zod schema for type-safe validation
+      return billAnalysisSchema.parse(data);
+    } catch (error) {
+      logger.error('Invalid analysis data from API', {
+        component: 'AnalysisService',
+        error: error instanceof Error ? error.message : 'Unknown validation error',
+      });
+      throw new Error(
+        `Invalid analysis data from API: ${error instanceof Error ? error.message : 'validation failed'}`
+      );
     }
-
-    const dataObj = data as Record<string, unknown>;
-    const required = ['id', 'bill_id', 'conflictScore', 'transparencyRating'];
-    const missing = required.filter(field => !(field in dataObj));
-
-    if (missing.length > 0) {
-      throw new Error(`Invalid analysis data from API: missing fields ${missing.join(', ')}`);
-    }
-
-    return {
-      ...dataObj,
-      timestamp: new Date((dataObj.timestamp as string | number) || Date.now()),
-    } as BillAnalysis;
   }
 
   /**

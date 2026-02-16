@@ -182,7 +182,7 @@ export function setupVerificationRoutes() {
       if (verification_status !== undefined) updateData.verification_status = verification_status;
       // If claim or reasoning provided, merge into verification_data JSONB
       if (claim !== undefined || reasoning !== undefined) {
-        updateData.verification_data = {} as any;
+        updateData.verification_data = {} as Record<string, unknown>;
         if (claim !== undefined) updateData.verification_data.claim = claim;
         if (reasoning !== undefined) updateData.verification_data.reasoning = reasoning;
       }

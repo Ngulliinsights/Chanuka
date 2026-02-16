@@ -25,7 +25,7 @@ The WebSocket service currently exists as a monolithic 2,300+ line file with mix
 
 1. WHEN TypeScript issues are addressed THEN exactOptionalPropertyTypes violations SHALL be resolved
 2. WHEN import issues are fixed THEN all imports SHALL follow proper order and use correct module paths
-3. WHEN schema imports are updated THEN they SHALL use @shared/schema instead of direct schema imports
+3. WHEN schema imports are updated THEN they SHALL use @server/infrastructure/schema instead of direct schema imports
 4. WHEN type conversion issues are resolved THEN unsafe type conversions SHALL be replaced with proper type guards
 5. WHEN undefined object access is addressed THEN all object property access SHALL be safely handled
 

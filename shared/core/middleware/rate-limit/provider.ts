@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { RateLimitStore } from '../../rate-limiting/types';
 import { MiddlewareProvider } from '../types';
-// import { logger } from '../observability/logging'; // Unused import
+
+interface RateLimitStore {
+  increment(key: string, windowMs: number): Promise<number>;
+}
 
 export class RateLimitMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'rateLimit';
 
-  constructor(private readonly store: RateLimitStore) {}
+  constructor(private readonly store?: RateLimitStore) {}
 
   validate(options: Record<string, any>): boolean {
     const { windowMs, max } = options;
@@ -19,6 +21,11 @@ export class RateLimitMiddlewareProvider implements MiddlewareProvider {
 
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
+        if (!this.store) {
+          // No store configured, skip rate limiting
+          return next();
+        }
+
         const key = this.getKey(req);
         const current = await this.store.increment(key, windowMs);
         

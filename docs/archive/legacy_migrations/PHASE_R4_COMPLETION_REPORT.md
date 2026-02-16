@@ -288,12 +288,12 @@ server/infrastructure/
 // Before (Old Locations)
 "@shared/core": ["shared/core"],
 "@shared/database": ["shared/database/index.ts"],
-"@shared/schema": ["shared/schema"],
+"@server/infrastructure/schema": ["shared/schema"],
 
 // After (New Locations)
 "@shared/core": ["server/infrastructure/core"],
 "@shared/database": ["server/infrastructure/database/index.ts"],
-"@shared/schema": ["server/infrastructure/schema"],
+"@server/infrastructure/schema": ["server/infrastructure/schema"],
 
 // New Aliases Added
 "@server/infrastructure/core/*": ["server/infrastructure/core/*"],
@@ -315,8 +315,8 @@ from '@shared/database/pool'      → from '@server/infrastructure/database/pool
 from '@shared/database/connection'→ from '@server/infrastructure/database/connection'
 
 // Schema imports
-from '@shared/schema'             → from '@server/infrastructure/schema'
-from '@shared/schema/domains'     → from '@server/infrastructure/schema/domains'
+from '@server/infrastructure/schema'             → from '@server/infrastructure/schema'
+from '@server/infrastructure/schema/domains'     → from '@server/infrastructure/schema/domains'
 
 // Core imports (optional, for backward compatibility)
 from '@shared/core'               → from '@server/infrastructure/core'

@@ -44,30 +44,6 @@ const formatDistanceToNow = (date: Date) => {
   return date.toLocaleDateString();
 };
 
-interface Comment {
-  id: string;
-  user_id: number;
-  username: string;
-  userInitials: string;
-  expertise?: string;
-  content: string;
-  created_at: Date;
-  endorsements: number;
-  // cspell:ignore downvotes upvotes
-  downvotes: number;
-  upvotes: number;
-  parent_id?: number;
-  verifiedClaims: number;
-  isHighlighted: boolean;
-  replies?: Comment[];
-  pollData?: {
-    question: string;
-    options: Array<{ text: string; votes: number }>;
-    totalVotes: number;
-    userVote?: number;
-  };
-}
-
 interface Poll {
   question: string;
   options: string[];

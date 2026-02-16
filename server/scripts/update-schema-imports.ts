@@ -4,7 +4,7 @@
  * Schema Import Migration Script (Optimized)
  * 
  * This script modernizes import statements across your server codebase by:
- * - Converting relative schema imports to the new @shared/schema path alias
+ * - Converting relative schema imports to the new @server/infrastructure/schema path alias
  * - Updating deprecated table names to their current equivalents
  * - Standardizing database connection imports
  * - Providing detailed reporting and optional dry-run mode
@@ -21,24 +21,24 @@ import { extname, join, relative } from 'path';
 const IMPORT_MAPPINGS = {
   // Schema imports: captures various nesting levels of relative paths
   schema: [
-    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/shared\/schema['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@shared/schema'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@shared/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/schema\.js['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/shared\/schema['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@server/infrastructure/schema'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "from '@server/infrastructure/schema'" },
   ],
   
   // Namespace imports: handles import * as schema patterns
   namespaceSchema: [
-    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@shared/schema'" },
-    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@shared/schema'" },
-    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@shared/schema'" },
-    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@shared/schema'" },
+    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@server/infrastructure/schema'" },
+    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@server/infrastructure/schema'" },
+    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@server/infrastructure/schema'" },
+    { pattern: /import \* as schema from ['"]\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema['"]/g, replacement: "import * as schema from '@server/infrastructure/schema'" },
   ],
   
   // Database connection imports
@@ -51,9 +51,9 @@ const IMPORT_MAPPINGS = {
   
   // Validation schema imports
   validation: [
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@shared/schema/validation'" },
-    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@shared/schema/validation'" },
-    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@shared/schema/validation'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@server/infrastructure/schema/validation'" },
+    { pattern: /from ['"]\.\.\/\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@server/infrastructure/schema/validation'" },
+    { pattern: /from ['"]\.\.\/\.\.\/shared\/schema\/validation['"]/g, replacement: "from '@server/infrastructure/schema/validation'" },
   ],
 };
 

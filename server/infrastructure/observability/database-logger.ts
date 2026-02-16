@@ -6,7 +6,7 @@
  */
 
 import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
-import { logger } from '@shared/core';
+import { logger } from './index';
 
 export interface DatabaseOperationContext {
   operation: 'create' | 'read' | 'update' | 'delete' | 'search' | 'count' | 'batch';

@@ -557,8 +557,10 @@ export class UserProfileService {
             .values({
               user_id: sanitizedUserId,
               verification_type: 'identity',
-              verification_data: sanitizedVerificationData as any,
-              verification_documents: Array.isArray((sanitizedVerificationData as any).verificationDocuments) ? (sanitizedVerificationData as any).verificationDocuments : undefined,
+              verification_data: sanitizedVerificationData as Record<string, unknown>,
+              verification_documents: Array.isArray((sanitizedVerificationData as Record<string, unknown>).verificationDocuments) 
+                ? (sanitizedVerificationData as Record<string, unknown>).verificationDocuments as string[]
+                : undefined,
               verification_status: sanitizedVerificationData.verification_status,
               submitted_at: new Date(),
               created_at: new Date(),
@@ -772,7 +774,20 @@ export class UserProfileService {
 
   async updateUserEngagement(user_id: string, bill_id: string, engagement_type: 'view' | 'comment' | 'share') {
     const sanitizedUserId = this.sanitizeUserId(user_id);
-    const sanitizedBillId = typeof bill_id === 'string' ? bill_id.trim() : bill_id as any;
+    
+    // Validate and sanitize bill_id
+    let sanitizedBillId: number;
+    if (typeof bill_id === 'string') {
+      const parsed = parseInt(bill_id.trim(), 10);
+      if (isNaN(parsed)) {
+        throw new Error('Invalid bill ID');
+      }
+      sanitizedBillId = parsed;
+    } else if (typeof bill_id === 'number') {
+      sanitizedBillId = bill_id;
+    } else {
+      throw new Error('Invalid bill ID type');
+    }
 
     const result = await databaseService.withFallback(
       async () => {

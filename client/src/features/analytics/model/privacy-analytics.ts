@@ -253,8 +253,21 @@ class SafeApiService {
   private readonly api: IPrivacyAnalyticsApi;
 
   constructor() {
-    // Cast to unknown first to avoid overlap errors, then to the interface
-    this.api = privacyAnalyticsApiService as unknown as IPrivacyAnalyticsApi;
+    // Type-safe assignment with proper interface checking
+    this.api = this.createSafeApiWrapper(privacyAnalyticsApiService);
+  }
+
+  private createSafeApiWrapper(apiService: typeof privacyAnalyticsApiService): IPrivacyAnalyticsApi {
+    // Create a wrapper that safely handles optional methods
+    return {
+      updateUserConsent: apiService.updateUserConsent?.bind(apiService),
+      withdrawConsent: apiService.withdrawConsent?.bind(apiService),
+      getUserConsent: apiService.getUserConsent?.bind(apiService),
+      sendEvents: apiService.sendEvents?.bind(apiService),
+      trackBatch: apiService.trackBatch?.bind(apiService),
+      exportUserData: apiService.exportUserData?.bind(apiService),
+      deleteUserData: apiService.deleteUserData?.bind(apiService),
+    };
   }
 
   async updateUserConsent(userId: string, consent: UserConsent): Promise<UserConsent> {
@@ -593,10 +606,10 @@ export class PrivacyAnalyticsService {
     try {
       const apiResponse = await this.apiService.exportUserData(userId);
 
-      // Map from DataExportResponse to ExportedUserData
-      const events = (apiResponse.data?.events || []) as AnalyticsEvent[];
-      const summary = (apiResponse.data?.summary || this.getAnalyticsMetrics()) as AnalyticsMetrics;
-      const consent = (apiResponse.data?.consent || null) as UserConsent | null;
+      // Validate and safely extract data from API response
+      const events = this.validateEventsArray(apiResponse.data?.events);
+      const summary = this.validateMetrics(apiResponse.data?.summary);
+      const consent = this.validateConsent(apiResponse.data?.consent);
 
       logger.info('User data exported via API', {
         component: 'PrivacyAnalyticsService',
@@ -621,6 +634,59 @@ export class PrivacyAnalyticsService {
 
       return this.exportLocalUserData(userId);
     }
+  }
+
+  private validateEventsArray(data: unknown): AnalyticsEvent[] {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+    // Filter out invalid events
+    return data.filter((item): item is AnalyticsEvent => {
+      return (
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        'type' in item &&
+        'category' in item &&
+        'action' in item &&
+        'timestamp' in item
+      );
+    });
+  }
+
+  private validateMetrics(data: unknown): Partial<AnalyticsMetrics> {
+    if (!data || typeof data !== 'object') {
+      return {};
+    }
+    const metrics = data as Record<string, unknown>;
+    return {
+      totalEvents: typeof metrics.totalEvents === 'number' ? metrics.totalEvents : undefined,
+      anonymizedEvents: typeof metrics.anonymizedEvents === 'number' ? metrics.anonymizedEvents : undefined,
+      consentedEvents: typeof metrics.consentedEvents === 'number' ? metrics.consentedEvents : undefined,
+      categoriesTracked: Array.isArray(metrics.categoriesTracked) ? metrics.categoriesTracked : undefined,
+      retentionCompliance: typeof metrics.retentionCompliance === 'boolean' ? metrics.retentionCompliance : undefined,
+      lastFlush: typeof metrics.lastFlush === 'string' ? metrics.lastFlush : undefined,
+      queueSize: typeof metrics.queueSize === 'number' ? metrics.queueSize : undefined,
+      failedSends: typeof metrics.failedSends === 'number' ? metrics.failedSends : undefined,
+      circuitBreakerOpen: typeof metrics.circuitBreakerOpen === 'boolean' ? metrics.circuitBreakerOpen : undefined,
+    };
+  }
+
+  private validateConsent(data: unknown): UserConsent | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const consent = data as Record<string, unknown>;
+    if (
+      typeof consent.analytics === 'boolean' &&
+      typeof consent.performance === 'boolean' &&
+      typeof consent.functional === 'boolean' &&
+      typeof consent.timestamp === 'string' &&
+      typeof consent.version === 'string'
+    ) {
+      return consent as UserConsent;
+    }
+    return null;
   }
 
   async deleteUserData(userId: string): Promise<DeleteResult> {

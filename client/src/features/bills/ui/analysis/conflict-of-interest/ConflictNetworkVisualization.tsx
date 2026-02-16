@@ -359,17 +359,20 @@ export function ConflictNetworkVisualization({
   // Zoom controls
   const handleZoomIn = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1.5);
+    const zoom = d3.zoom<SVGSVGElement, unknown>();
+    svg.transition().call(zoom.scaleBy, 1.5);
   };
 
   const handleZoomOut = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1 / 1.5);
+    const zoom = d3.zoom<SVGSVGElement, unknown>();
+    svg.transition().call(zoom.scaleBy, 1 / 1.5);
   };
 
   const handleResetZoom = () => {
     const svg = d3.select(svgRef.current);
-    svg.transition().call(d3.zoom<SVGSVGElement, unknown>().transform as any, d3.zoomIdentity);
+    const zoom = d3.zoom<SVGSVGElement, unknown>();
+    svg.transition().call(zoom.transform, d3.zoomIdentity);
   };
 
   // Generate accessibility fallback data

@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { nonEmptyString } from './common';
 
 /**
  * Comment Validation Rules
@@ -31,16 +32,13 @@ export const COMMENT_VALIDATION_RULES = {
  */
 export const CommentSchema = z.object({
   id: z.string().uuid().optional(),
-  comment_text: z
-    .string()
-    .min(COMMENT_VALIDATION_RULES.MIN_LENGTH, `Comment must be at least ${COMMENT_VALIDATION_RULES.MIN_LENGTH} characters`)
-    .max(COMMENT_VALIDATION_RULES.MAX_LENGTH, `Comment must not exceed ${COMMENT_VALIDATION_RULES.MAX_LENGTH} characters`)
+  comment_text: nonEmptyString('comment', COMMENT_VALIDATION_RULES.MIN_LENGTH, COMMENT_VALIDATION_RULES.MAX_LENGTH)
     .refine(
       (val) => val.trim().split(/\s+/).length >= COMMENT_VALIDATION_RULES.MIN_WORDS,
       `Comment must contain at least ${COMMENT_VALIDATION_RULES.MIN_WORDS} words`
     ),
   user_id: z.string().uuid(),
-  bill_id: z.string().uuid(), // Required - matches DB NOT NULL constraint
+  bill_id: z.string().uuid(),
   parent_comment_id: z.string().uuid().optional().nullable(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -53,10 +51,7 @@ export const CommentSchema = z.object({
  */
 export const LegacyCommentSchema = z.object({
   id: z.string().uuid().optional(),
-  content: z
-    .string()
-    .min(COMMENT_VALIDATION_RULES.MIN_LENGTH, `Comment must be at least ${COMMENT_VALIDATION_RULES.MIN_LENGTH} characters`)
-    .max(COMMENT_VALIDATION_RULES.MAX_LENGTH, `Comment must not exceed ${COMMENT_VALIDATION_RULES.MAX_LENGTH} characters`)
+  content: nonEmptyString('content', COMMENT_VALIDATION_RULES.MIN_LENGTH, COMMENT_VALIDATION_RULES.MAX_LENGTH)
     .refine(
       (val) => val.trim().split(/\s+/).length >= COMMENT_VALIDATION_RULES.MIN_WORDS,
       `Comment must contain at least ${COMMENT_VALIDATION_RULES.MIN_WORDS} words`

@@ -118,8 +118,8 @@ export default function BillsPortalPage() {
         const urgency = bill.urgency;
         return urgency === UrgencyLevel.HIGH || urgency === UrgencyLevel.CRITICAL;
       }).length,
-      trending: bills.filter(bill => (bill as any).trending).length,
-      saved: bills.filter(bill => (bill as any).saved).length,
+      trending: bills.filter(bill => bill.engagement && bill.engagement.views && bill.engagement.views > 1000).length,
+      saved: bills.filter(bill => bill.trackingCount && bill.trackingCount > 0).length,
     };
   }, [bills, totalBills]);
 

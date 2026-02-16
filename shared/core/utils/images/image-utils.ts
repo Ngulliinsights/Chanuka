@@ -1,5 +1,18 @@
-import { BaseError, ErrorDomain, ErrorSeverity } from '../../observability/error-management';
+import { ErrorDomain, ErrorSeverity } from '../../index';
 // import { logger } from '../observability/logging'; // Unused import
+
+// Define BaseError locally since it's not exported from shared/core
+class BaseError extends Error {
+  constructor(
+    message: string,
+    public domain: ErrorDomain,
+    public severity: ErrorSeverity,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'BaseError';
+  }
+}
 
 const formatFileSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

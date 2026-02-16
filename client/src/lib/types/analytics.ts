@@ -244,28 +244,6 @@ export interface RealtimeMetrics {
 }
 
 // Privacy Analytics Types
-export interface UserConsent {
-  analytics: boolean;
-  performance: boolean;
-  functional: boolean;
-  timestamp: string;
-  version: string;
-}
-
-export interface AnalyticsEvent {
-  id: string;
-  type: 'track' | 'page_view' | 'engagement' | 'performance' | 'error';
-  category: string;
-  action: string;
-  label?: string;
-  value?: number;
-  timestamp: string;
-  sessionId: string;
-  userId?: string;
-  anonymized: boolean;
-  consentGiven: boolean;
-  metadata?: Record<string, unknown>;
-}
 
 export interface AnalyticsConfig {
   enabledCategories: ReadonlyArray<string>;

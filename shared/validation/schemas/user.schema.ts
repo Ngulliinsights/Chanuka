@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { nonEmptyString, optionalNonEmptyString, optionalNullableNonEmptyString } from './common';
 
 /**
  * User Validation Rules
@@ -34,12 +35,10 @@ export const USER_VALIDATION_RULES = {
  */
 export const UserSchema = z.object({
   id: z.string().uuid().optional(),
-  email: z
-    .string()
+  email: nonEmptyString('email')
     .email('Invalid email address')
     .regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid'),
-  username: z
-    .string()
+  username: nonEmptyString('username')
     .regex(USER_VALIDATION_RULES.USERNAME_PATTERN, 'Username must be 3-20 characters (alphanumeric, dash, underscore)'),
   role: z.enum(['citizen', 'representative', 'admin']).default('citizen'),
   is_active: z.boolean().default(true),
@@ -59,25 +58,10 @@ export const UserSchema = z.object({
 export const UserProfileSchema = z.object({
   id: z.string().uuid().optional(),
   user_id: z.string().uuid(),
-  first_name: z
-    .string()
-    .min(USER_VALIDATION_RULES.FIRST_NAME_MIN_LENGTH)
-    .max(100, 'First name must not exceed 100 characters') // Updated to match DB
-    .optional(),
-  last_name: z
-    .string()
-    .min(USER_VALIDATION_RULES.LAST_NAME_MIN_LENGTH)
-    .max(100, 'Last name must not exceed 100 characters') // Updated to match DB
-    .optional(),
-  display_name: z
-    .string()
-    .max(150, 'Display name must not exceed 150 characters')
-    .optional(),
-  bio: z
-    .string()
-    .max(USER_VALIDATION_RULES.BIO_MAX_LENGTH, 'Bio must not exceed 500 characters')
-    .optional()
-    .nullable(),
+  first_name: optionalNonEmptyString('first name', USER_VALIDATION_RULES.FIRST_NAME_MIN_LENGTH, 100),
+  last_name: optionalNonEmptyString('last name', USER_VALIDATION_RULES.LAST_NAME_MIN_LENGTH, 100),
+  display_name: optionalNonEmptyString('display name', 1, 150),
+  bio: optionalNullableNonEmptyString('bio', 1, USER_VALIDATION_RULES.BIO_MAX_LENGTH),
   phone_number: z
     .string()
     .regex(USER_VALIDATION_RULES.PHONE_PATTERN, 'Invalid phone number format')
@@ -101,14 +85,12 @@ export const UserWithProfileSchema = UserSchema.merge(
  * User Registration Schema - includes password validation
  */
 export const UserRegistrationSchema = UserSchema.extend({
-  password: z
-    .string()
-    .min(USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH, 'Password must be at least 8 characters')
+  password: nonEmptyString('password', USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH)
     .regex(
       USER_VALIDATION_RULES.PASSWORD_PATTERN,
       'Password must contain uppercase, lowercase, number, and special character'
     ),
-  password_confirm: z.string(),
+  password_confirm: nonEmptyString('password confirmation'),
 }).refine((data) => data.password === data.password_confirm, {
   message: 'Passwords do not match',
   path: ['password_confirm'],

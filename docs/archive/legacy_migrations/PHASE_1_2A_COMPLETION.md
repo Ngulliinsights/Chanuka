@@ -125,7 +125,7 @@ This session completed **Phase 1 & 2A** of the Shared Directory Reorganization p
 **File**: `shared/package.json`
 - ✅ Added exports for @shared/validation
 - ✅ Added exports for @shared/constants
-- ✅ Preserved existing exports (@shared/core, @shared/schema, etc.)
+- ✅ Preserved existing exports (@shared/core, @server/infrastructure/schema, etc.)
 
 **File**: `tsconfig.json`
 - ✅ Added path mappings for @shared/validation

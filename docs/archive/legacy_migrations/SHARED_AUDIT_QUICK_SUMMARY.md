@@ -26,7 +26,7 @@ I18n sharing:                   BROKEN ❌
 | Module | Files | Imports | Status | Shared? |
 |--------|-------|---------|--------|---------|
 | @shared/database | ~80 | 80 | ✅ Working | Server-only (correct) |
-| @shared/schema | ~150 | 200 | ✅ Working | Server-only (correct) |
+| @server/infrastructure/schema | ~150 | 200 | ✅ Working | Server-only (correct) |
 | @shared/core | ~120 | 180 | ✅ Working | Server-only (correct) |
 | @shared/types | ~40 | 20 | ❌ Unused by client | Should be shared |
 | @shared/i18n | ~21 | 3 | ❌ Unused by client | Should be shared |
@@ -61,7 +61,7 @@ RESULT: Client is ISOLATED from shared!
 
 ```
 ✅ @shared/database/        - Database pooling, transactions
-✅ @shared/schema/          - Table definitions, types
+✅ @server/infrastructure/schema/          - Table definitions, types
 ✅ @shared/core/            - Logging, error handling, utils
 ✅ Server cohesion          - 488 imports across features
 ```

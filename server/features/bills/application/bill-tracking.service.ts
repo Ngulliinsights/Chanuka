@@ -557,38 +557,42 @@ export class BillTrackingService {
     }
   }
 
-  private async clearUserTrackingCaches(user_id: string, bill_id?: number): Promise<void> { // Define patterns/keys more specifically using CACHE_KEYS
+  private async clearUserTrackingCaches(user_id: string, bill_id?: number): Promise<void> { 
+    // Define patterns/keys more specifically using CACHE_KEYS
     const patternsToDelete = [
       `user:tracked_bills:${user_id }:*`, // Pattern for paginated results
       `user:tracking_analytics:${ user_id }`,
       `user:recommended_tracking:${ user_id }:*`, // Pattern for different limits
     ];
-    if (bill_id) { patternsToDelete.push(`user:tracking:${user_id }:bill:${ bill_id }`);
+    if (bill_id) { 
+      patternsToDelete.push(`user:tracking:${user_id }:bill:${ bill_id }`);
     }
 
     logger.debug(`Clearing cache keys/patterns for user ${ user_id }: ${patternsToDelete.join(', ')}`);
     try {
       // Use Promise.all to clear concurrently
-    const clearPromises = patternsToDelete.map(async (keyOrPattern) => {
-      // Pattern-based invalidation
-      if (keyOrPattern.includes('*')) {
-        if (typeof (cacheService as any).invalidateByPattern === 'function') {
-          return (cacheService as any).invalidateByPattern(keyOrPattern);
+      const clearPromises = patternsToDelete.map(async (keyOrPattern) => {
+        // Pattern-based invalidation
+        if (keyOrPattern.includes('*')) {
+          // Try pattern-based invalidation if available
+          if (typeof cacheService.invalidateByPattern === 'function') {
+            return cacheService.invalidateByPattern(keyOrPattern);
+          }
+          // Fallback: just log warning since we can't resolve patterns without keys() method
+          logger.warn(`Pattern-based cache invalidation not supported, skipping pattern: ${keyOrPattern}`, {
+            component: 'BillTrackingService'
+          });
+          return Promise.resolve();
+        } else {
+          // Direct key deletion
+          return cacheService.del(keyOrPattern);
         }
-        // Fallback: resolve keys then delete
-        if (typeof (cacheService as any).keys === 'function') {
-          const keys: string[] = await (cacheService as any).keys(keyOrPattern);
-          return Promise.all(keys.map(k => (cacheService as any).del ? (cacheService as any).del(k) : (cacheService as any).delete ? (cacheService as any).delete(k) : Promise.resolve()));
-        }
-        return Promise.resolve();
-      } else {
-        return (cacheService as any).del ? (cacheService as any).del(keyOrPattern) : (cacheService as any).delete ? (cacheService as any).delete(keyOrPattern) : Promise.resolve();
-      }
-    });
-    await Promise.all(clearPromises);
+      });
+      await Promise.all(clearPromises);
 
       logger.debug(`Successfully cleared caches for user ${ user_id }`);
-    } catch (error) { logger.error(`Error clearing cache for user ${user_id }:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { 
+      logger.error(`Error clearing cache for user ${user_id }:`, { component: 'BillTrackingService' }, error);
       // Log error but don't fail the primary operation
     }
   }

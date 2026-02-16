@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { USER_VALIDATION_RULES } from '../../../validation/user.validation';
+import { USER_VALIDATION_RULES } from '@shared/validation/schemas/user.schema';
 
 // ============================================================================
 // Request Schemas

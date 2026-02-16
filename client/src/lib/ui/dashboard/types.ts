@@ -82,21 +82,6 @@ export interface BreakpointConfig {
   gap: number;
 }
 
-export interface AnalyticsMetrics {
-  totalUsers: number;
-  activeUsers: number;
-  pageViews: number;
-  sessionDuration: number;
-  bounceRate: number;
-  conversionRate: number;
-  topPages: PageMetric[];
-  userDemographics: DemographicData;
-  engagementMetrics: EngagementMetrics;
-  performanceMetrics: PerformanceMetrics;
-  timeRange: DateRange;
-  lastUpdated: Date;
-}
-
 export interface PageMetric {
   path: string;
   views: number;

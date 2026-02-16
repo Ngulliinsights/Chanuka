@@ -180,19 +180,6 @@ export interface UseCommunityNotificationsResult {
 }
 
 /**
- * Notification item
- */
-export interface Notification {
-  readonly id: string;
-  readonly type: 'reply' | 'mention' | 'expert_insight' | 'discussion_update';
-  readonly title: string;
-  readonly content?: string;
-  readonly relatedContentId?: number;
-  readonly createdAt: string;
-  readonly read: boolean;
-}
-
-/**
  * Notification action methods
  */
 export interface NotificationActions {

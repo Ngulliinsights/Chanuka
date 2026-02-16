@@ -314,9 +314,10 @@ export class ApiResponseFactory {
         stackTrace: apiError.stack,
         timestamp: new Date(),
       },
-      validationErrors: apiError instanceof ApiError && 'validationErrors' in apiError
-        ? (apiError as any).validationErrors
-        : undefined,
+      validationErrors: 
+        apiError instanceof ApiError && 'validationErrors' in apiError
+          ? (apiError as ApiError & { validationErrors?: unknown }).validationErrors
+          : undefined,
     };
   }
 

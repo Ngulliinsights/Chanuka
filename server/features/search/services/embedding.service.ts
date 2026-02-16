@@ -6,7 +6,7 @@
 
 import { logger } from '@shared/core';
 import { database } from '@server/infrastructure/database';
-import { cacheService } from '@shared/infrastructure/cache/cache-service';
+import { cacheService } from '@server/infrastructure/cache';
 import { content_embeddings, ContentType, ProcessingStatus } from '@server/infrastructure/schema/search_system';
 import crypto from 'crypto';
 import { and, eq, sql } from 'drizzle-orm';

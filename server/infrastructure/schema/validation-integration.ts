@@ -82,7 +82,7 @@ export function validateDatabaseBatch<T extends keyof typeof DatabaseValidationR
   items: unknown[]
 ): Result<typeof DatabaseValidationRegistry[T]['validatedType']['_type'][], ValidationError> {
   const validator = DatabaseValidationRegistry[entityType];
-  const validatedItems: any[] = [];
+  const validatedItems: typeof DatabaseValidationRegistry[T]['validatedType']['_type'][] = [];
   const errors: { index: number; error: string }[] = [];
 
   for (let i = 0; i < items.length; i++) {
@@ -100,7 +100,7 @@ export function validateDatabaseBatch<T extends keyof typeof DatabaseValidationR
   }
 
   if (errors.length === 0) {
-    return { success: true, data: validatedItems as any };
+    return { success: true, data: validatedItems };
   }
 
   return {

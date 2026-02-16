@@ -142,7 +142,7 @@ export function validateApiContractWithParams<TRequest, TResponse, TParams>(
       }
 
       // Attach validated params to request
-      req.params = paramsValidation.data as any;
+      req.params = paramsValidation.data as Record<string, string>;
 
       // Validate request body if not GET/DELETE
       if (req.method !== 'GET' && req.method !== 'DELETE') {
@@ -209,7 +209,7 @@ export function validateApiContractWithQuery<TRequest, TResponse, TQuery>(
       }
 
       // Attach validated query to request
-      req.query = queryValidation.data as any;
+      req.query = queryValidation.data as Record<string, unknown>;
 
       // Continue to next middleware
       next();
@@ -254,7 +254,7 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       }
 
       // Attach validated params to request
-      req.params = paramsValidation.data as any;
+      req.params = paramsValidation.data as Record<string, string>;
 
       // Validate query parameters
       const queryValidation = validateQuery(endpoint, req.query);
@@ -274,7 +274,7 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       }
 
       // Attach validated query to request
-      req.query = queryValidation.data as any;
+      req.query = queryValidation.data as Record<string, unknown>;
 
       // Validate request body if not GET/DELETE
       if (req.method !== 'GET' && req.method !== 'DELETE') {
