@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-02-16T04:36:02.768Z",
-  "totalViolations": 426,
+  "timestamp": "2026-02-16T22:58:37.972Z",
+  "totalViolations": 434,
   "byCategory": {
-    "enum_conversion": 156,
+    "enum_conversion": 163,
     "dynamic_property": 44,
-    "api_response": 10,
-    "database_operation": 21,
-    "type_assertion": 4,
-    "test_code": 51,
-    "other": 140
+    "api_response": 11,
+    "database_operation": 22,
+    "type_assertion": 3,
+    "test_code": 53,
+    "other": 138
   },
   "byFile": {
     "client\\src\\main.tsx": 1,
@@ -43,9 +43,6 @@
     "client\\src\\__tests__\\strategic\\monitoring\\monitoring-init.test.ts": 1,
     "client\\src\\__tests__\\strategic\\error-handling\\error-context-metadata.test.ts": 11,
     "client\\src\\__tests__\\strategic\\error-handling\\cross-system-propagation.test.tsx": 9,
-    "client\\src\\features\\dashboard\\validation\\run-property-tests.ts": 1,
-    "client\\src\\features\\dashboard\\validation\\config.property.test.ts": 1,
-    "client\\src\\features\\community\\hooks\\useDiscussion.ts": 1,
     "client\\src\\lib\\infrastructure\\monitoring\\monitoring-integration.ts": 1,
     "client\\src\\lib\\infrastructure\\monitoring\\cross-system-error-analytics.ts": 5,
     "client\\src\\lib\\hooks\\utils\\performance.ts": 11,
@@ -63,6 +60,9 @@
     "client\\src\\lib\\data\\mock\\bills.ts": 2,
     "client\\src\\lib\\components\\performance\\PerformanceMonitor.tsx": 1,
     "client\\src\\lib\\components\\home\\RecentActivity.tsx": 1,
+    "client\\src\\features\\dashboard\\validation\\run-property-tests.ts": 1,
+    "client\\src\\features\\dashboard\\validation\\config.property.test.ts": 1,
+    "client\\src\\features\\community\\hooks\\useDiscussion.ts": 1,
     "client\\src\\core\\security\\__tests__\\unified-security.test.ts": 3,
     "client\\src\\core\\realtime\\services\\notifications.ts": 3,
     "client\\src\\core\\realtime\\services\\community.ts": 6,
@@ -79,11 +79,10 @@
     "server\\storage\\bill-storage-with-transformers.example.ts": 7,
     "server\\config\\index.ts": 1,
     "server\\tests\\integration\\websocket-backward-compatibility.test.ts": 10,
-    "server\\infrastructure\\observability\\index.ts": 1,
-    "server\\infrastructure\\observability\\external-api-management.ts": 1,
-    "server\\infrastructure\\observability\\audit-log.ts": 5,
     "server\\infrastructure\\security\\input-validation-service.ts": 1,
     "server\\infrastructure\\security\\data-privacy-service.ts": 2,
+    "server\\infrastructure\\observability\\external-api-management.ts": 1,
+    "server\\infrastructure\\observability\\audit-log.ts": 5,
     "server\\infrastructure\\schema\\integration-extended.ts": 7,
     "server\\infrastructure\\notifications\\smart-notification-filter.ts": 1,
     "server\\infrastructure\\notifications\\notification-scheduler.ts": 1,
@@ -98,13 +97,15 @@
     "server\\infrastructure\\errors\\recovery-patterns.ts": 1,
     "server\\infrastructure\\errors\\migration-example.ts": 3,
     "server\\infrastructure\\errors\\error-configuration.ts": 8,
-    "server\\infrastructure\\config\\manager.ts": 1,
-    "server\\infrastructure\\config\\index.ts": 1,
+    "server\\infrastructure\\config\\manager.ts": 3,
     "server\\infrastructure\\cache\\single-flight-cache.ts": 2,
     "server\\infrastructure\\cache\\interfaces.ts": 1,
-    "server\\infrastructure\\cache\\factory.ts": 3,
-    "server\\infrastructure\\cache\\caching-service.ts": 1,
+    "server\\infrastructure\\cache\\factory.ts": 5,
+    "server\\infrastructure\\cache\\factory.test.ts": 1,
+    "server\\infrastructure\\cache\\caching-service.test.ts": 1,
+    "server\\infrastructure\\cache\\cache-wrappers.test.ts": 1,
     "server\\infrastructure\\cache\\cache-factory.ts": 6,
+    "server\\infrastructure\\cache\\adapters-factory-integration.test.ts": 14,
     "server\\features\\community\\social-integration.ts": 1,
     "server\\features\\community\\community.ts": 9,
     "server\\features\\community\\comment.ts": 1,
@@ -114,11 +115,11 @@
     "server\\features\\bills\\bills-router-migrated.ts": 3,
     "server\\features\\bills\\bill-tracking.routes.ts": 2,
     "server\\features\\argument-intelligence\\argument-intelligence-router.ts": 2,
-    "server\\features\\analysis\\analysis.routes.ts": 1,
     "server\\features\\analytics\\transparency-dashboard.ts": 5,
     "server\\features\\analytics\\regulatory-change-monitoring.ts": 6,
     "server\\features\\analytics\\ml-analysis.ts": 2,
     "server\\features\\analytics\\engagement-analytics.ts": 1,
+    "server\\features\\analysis\\analysis.routes.ts": 1,
     "server\\features\\admin\\external-api-dashboard.ts": 1,
     "server\\features\\admin\\admin.ts": 1,
     "server\\features\\accountability\\ledger.service.ts": 2,
@@ -135,14 +136,13 @@
     "server\\features\\bills\\infrastructure\\bill-storage.ts": 1,
     "server\\features\\bills\\application\\sponsorship-analysis.service.ts": 1,
     "server\\features\\bills\\application\\bills.ts": 1,
-    "server\\features\\bills\\application\\bill-service.ts": 12,
     "server\\features\\argument-intelligence\\application\\argument-processor.ts": 1,
-    "server\\features\\analysis\\application\\constitutional-analysis.service.ts": 3,
     "server\\features\\analytics\\services\\engagement.service.ts": 4,
-    "server\\features\\analytics\\middleware\\analytics-context.ts": 6,
     "server\\features\\analytics\\financial-disclosure\\monitoring.ts": 2,
     "server\\features\\analytics\\financial-disclosure\\index.ts": 5,
+    "server\\features\\analytics\\middleware\\analytics-context.ts": 6,
     "server\\features\\analytics\\config\\analytics.config.ts": 2,
+    "server\\features\\analysis\\application\\constitutional-analysis.service.ts": 3,
     "server\\features\\alert-preferences\\application\\alert-preferences-service.ts": 9,
     "server\\features\\advocacy\\application\\impact-tracker.ts": 1,
     "server\\features\\admin\\moderation\\moderation-orchestrator.service.ts": 1,
@@ -161,13 +161,14 @@
     "shared\\core\\utils\\concurrency-migration-router.ts": 1,
     "shared\\core\\utils\\common-utils.ts": 2,
     "shared\\platform\\kenya\\anonymity\\anonymity-helper.ts": 1,
-    "shared\\core\\primitives\\types\\branded.ts": 1
+    "shared\\core\\primitives\\types\\branded.ts": 1,
+    "shared\\core\\middleware\\error-handler\\provider.ts": 2
   },
   "bySeverity": {
     "critical": 0,
     "high": 0,
-    "medium": 375,
-    "low": 51
+    "medium": 381,
+    "low": 53
   },
   "violations": [
     {
@@ -803,30 +804,6 @@
       "severity": "medium"
     },
     {
-      "file": "client\\src\\features\\dashboard\\validation\\run-property-tests.ts",
-      "line": 82,
-      "column": 30,
-      "context": "      invalidWidgets[0] = {\r\n        ...invalidWidgets[0],\r\n        type: 'invalid-type' as any,\r\n      };\r\n    }\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "client\\src\\features\\dashboard\\validation\\config.property.test.ts",
-      "line": 93,
-      "column": 34,
-      "context": "          invalidWidgets[0] = {\r\n            ...invalidWidgets[0],\r\n            type: 'invalid-type' as any,\r\n          };\r\n        }\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "client\\src\\features\\community\\hooks\\useDiscussion.ts",
-      "line": 10,
-      "column": 38,
-      "context": " * - Resolves mock thread creation (lines 82-96)\n * - Implements complete moderation workflow (lines 217-240)\n * - Eliminates type casting issues (as any usage)\n * - Unifies React Query + WebSocket coordination\n */",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
       "file": "client\\src\\lib\\infrastructure\\monitoring\\monitoring-integration.ts",
       "line": 417,
       "column": 33,
@@ -1159,6 +1136,30 @@
       "line": 94,
       "column": 60,
       "context": "                    <div className=\"flex items-center gap-2 mb-2\">\n                      <h4 className=\"font-semibold text-gray-900\">{activity.title}</h4>\n                      <Badge variant={activity.statusColor as any} className=\"text-xs\">\n                        {activity.status}\n                      </Badge>",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "client\\src\\features\\dashboard\\validation\\run-property-tests.ts",
+      "line": 82,
+      "column": 30,
+      "context": "      invalidWidgets[0] = {\r\n        ...invalidWidgets[0],\r\n        type: 'invalid-type' as any,\r\n      };\r\n    }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "client\\src\\features\\dashboard\\validation\\config.property.test.ts",
+      "line": 93,
+      "column": 34,
+      "context": "          invalidWidgets[0] = {\r\n            ...invalidWidgets[0],\r\n            type: 'invalid-type' as any,\r\n          };\r\n        }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "client\\src\\features\\community\\hooks\\useDiscussion.ts",
+      "line": 10,
+      "column": 38,
+      "context": " * - Resolves mock thread creation (lines 82-96)\n * - Implements complete moderation workflow (lines 217-240)\n * - Eliminates type casting issues (as any usage)\n * - Unifies React Query + WebSocket coordination\n */",
       "category": "enum_conversion",
       "severity": "medium"
     },
@@ -1619,11 +1620,27 @@
       "severity": "medium"
     },
     {
-      "file": "server\\infrastructure\\observability\\index.ts",
-      "line": 272,
-      "column": 22,
-      "context": "export const getMonitoringService = () => MonitoringService.getInstance();\r\nexport const resetMonitoringService = () => {\r\n  (MonitoringService as any).instance = undefined;\r\n};\r\n\r",
-      "category": "other",
+      "file": "server\\infrastructure\\security\\input-validation-service.ts",
+      "line": 186,
+      "column": 12,
+      "context": "\r\n      // Replace the original input with validated/sanitized data\r\n      (req as any)[source] = validation.data;\r\n      next();\r\n    };\r",
+      "category": "dynamic_property",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\security\\data-privacy-service.ts",
+      "line": 427,
+      "column": 48,
+      "context": "    numericFields.forEach(field => {\r\n      if (!excludeFields.includes(field)) {\r\n        const values = items.map(item => (item as any)[field]).filter(v => typeof v === 'number');\r\n        if (values.length > 0) {\r\n          aggregated[`${field}_avg`] = values.reduce((a, b) => a + b, 0) / values.length;\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\security\\data-privacy-service.ts",
+      "line": 446,
+      "column": 25,
+      "context": "    const excludeFields = [...this.SENSITIVE_FIELDS, ...additionalExcludes];\r\n    \r\n    Object.entries(item as any).forEach(([key, value]) => {\r\n      if (!excludeFields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {\r\n        result[key] = value;\r",
+      "category": "dynamic_property",
       "severity": "medium"
     },
     {
@@ -1672,30 +1689,6 @@
       "column": 25,
       "context": "    user_agent: req?.get('User-Agent'),\r\n    session_id: (req as any)?.session?.id,\r\n    correlationId: (req as any)?.correlationId,\r\n    sensitive: true,\r\n    risk_level: 'high' as const,\r",
       "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\infrastructure\\security\\input-validation-service.ts",
-      "line": 186,
-      "column": 12,
-      "context": "\r\n      // Replace the original input with validated/sanitized data\r\n      (req as any)[source] = validation.data;\r\n      next();\r\n    };\r",
-      "category": "dynamic_property",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\infrastructure\\security\\data-privacy-service.ts",
-      "line": 427,
-      "column": 48,
-      "context": "    numericFields.forEach(field => {\r\n      if (!excludeFields.includes(field)) {\r\n        const values = items.map(item => (item as any)[field]).filter(v => typeof v === 'number');\r\n        if (values.length > 0) {\r\n          aggregated[`${field}_avg`] = values.reduce((a, b) => a + b, 0) / values.length;\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\infrastructure\\security\\data-privacy-service.ts",
-      "line": 446,
-      "column": 25,
-      "context": "    const excludeFields = [...this.SENSITIVE_FIELDS, ...additionalExcludes];\r\n    \r\n    Object.entries(item as any).forEach(([key, value]) => {\r\n      if (!excludeFields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {\r\n        result[key] = value;\r",
-      "category": "dynamic_property",
       "severity": "medium"
     },
     {
@@ -2052,18 +2045,26 @@
     },
     {
       "file": "server\\infrastructure\\config\\manager.ts",
-      "line": 734,
-      "column": 15,
-      "context": "\r\n        // Store watcher reference for cleanup\r\n        (this as any)[`_watcher_${file}`] = watcher;\r\n      }\r\n    }\r",
-      "category": "dynamic_property",
+      "line": 447,
+      "column": 33,
+      "context": "        // Clean up chokidar watchers\r\n        for (const file of this._state.watchingFiles) {\r\n          const watcher = (this as any)[`_watcher_${file}`];\r\n          if (watcher && typeof watcher.close === 'function') {\r\n            watcher.close();\r",
+      "category": "enum_conversion",
       "severity": "medium"
     },
     {
-      "file": "server\\infrastructure\\config\\index.ts",
-      "line": 75,
-      "column": 47,
-      "context": "\r\n        const errorMessage = `Configuration validation failed: ${errors.map(e => `${e.path}: ${e.message}`).join(', ')}`;\r\n        const error = new Error(errorMessage) as any;\r\n        error.validationErrors = errors;\r\n\r",
-      "category": "other",
+      "file": "server\\infrastructure\\config\\manager.ts",
+      "line": 450,
+      "column": 26,
+      "context": "          if (watcher && typeof watcher.close === 'function') {\r\n            watcher.close();\r\n            delete (this as any)[`_watcher_${file}`];\r\n          }\r\n        }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\config\\manager.ts",
+      "line": 798,
+      "column": 17,
+      "context": "\r\n          // Store watcher reference for cleanup\r\n          (this as any)[`_watcher_${file}`] = watcher;\r\n          this.observability?.getLogger()?.debug(`Using chokidar for watching ${file}`);\r\n        } catch (error) {\r",
+      "category": "dynamic_property",
       "severity": "medium"
     },
     {
@@ -2092,7 +2093,7 @@
     },
     {
       "file": "server\\infrastructure\\cache\\factory.ts",
-      "line": 140,
+      "line": 234,
       "column": 22,
       "context": "  // For now, return the base adapter directly to avoid interface conflicts\r\n  // TODO: Fix SingleFlightCache interface compatibility\r\n  return baseAdapter as any;\r\n}\r\n\r",
       "category": "other",
@@ -2100,7 +2101,7 @@
     },
     {
       "file": "server\\infrastructure\\cache\\factory.ts",
-      "line": 168,
+      "line": 344,
       "column": 60,
       "context": " */\r\nexport function resetDefaultCache(): void {\r\n  if (defaultCacheInstance && typeof (defaultCacheInstance as any).destroy === 'function') {\r\n    (defaultCacheInstance as any).destroy();\r\n  }\r",
       "category": "enum_conversion",
@@ -2108,19 +2109,51 @@
     },
     {
       "file": "server\\infrastructure\\cache\\factory.ts",
-      "line": 169,
+      "line": 345,
       "column": 27,
       "context": "export function resetDefaultCache(): void {\r\n  if (defaultCacheInstance && typeof (defaultCacheInstance as any).destroy === 'function') {\r\n    (defaultCacheInstance as any).destroy();\r\n  }\r\n  defaultCacheInstance = null;\r",
       "category": "enum_conversion",
       "severity": "medium"
     },
     {
-      "file": "server\\infrastructure\\cache\\caching-service.ts",
-      "line": 335,
+      "file": "server\\infrastructure\\cache\\factory.ts",
+      "line": 491,
       "column": 25,
-      "context": "\r\n      // For now, we'll cast it - this needs to be fixed in the factory\r\n      return ok(service as any as CacheAdapter);\r\n    } catch (error) {\r\n      return err(new CacheOperationError('Failed to create cache adapter', error as Error));\r",
-      "category": "type_assertion",
+      "context": "    const caches = Array.from(this.caches.values());\r\n    for (const cache of caches) {\r\n      if (typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
       "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\factory.ts",
+      "line": 492,
+      "column": 22,
+      "context": "    for (const cache of caches) {\r\n      if (typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\factory.test.ts",
+      "line": 46,
+      "column": 9,
+      "context": "        provider: 'unsupported',\r\n        defaultTtlSec: 3600\r\n      } as any;\r\n\r\n      expect(() => createCacheService(config)).toThrow('Unsupported cache provider');\r",
+      "category": "database_operation",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\caching-service.test.ts",
+      "line": 332,
+      "column": 28,
+      "context": "    // Test with invalid config\r\n    const result = await createCachingService({\r\n      type: 'invalid-type' as any,\r\n      defaultTtl: 3600\r\n    });\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\cache-wrappers.test.ts",
+      "line": 230,
+      "column": 9,
+      "context": "        get: vi.fn().mockResolvedValue(null),\r\n        set: vi.fn().mockResolvedValue(undefined)\r\n      } as any;\r\n\r\n      const service = new CacheWarmingService(minimalCache);\r",
+      "category": "test_code",
+      "severity": "low"
     },
     {
       "file": "server\\infrastructure\\cache\\cache-factory.ts",
@@ -2167,6 +2200,118 @@
       "line": 336,
       "column": 42,
       "context": "    for (const [name, cache] of this.cacheInstances) {\r\n      if (typeof (cache as any).getHealth === 'function') {\r\n        cacheHealth[name] = await (cache as any).getHealth();\r\n      }\r\n    }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 32,
+      "column": 34,
+      "context": "\r\n    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 33,
+      "column": 22,
+      "context": "    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    });\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 164,
+      "column": 34,
+      "context": "\r\n    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 165,
+      "column": 22,
+      "context": "    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    });\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 229,
+      "column": 34,
+      "context": "\r\n    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 230,
+      "column": 22,
+      "context": "    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    });\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 278,
+      "column": 34,
+      "context": "\r\n    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 279,
+      "column": 22,
+      "context": "    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    });\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 432,
+      "column": 11,
+      "context": "          maxMemoryMB: 100\r\n          // Missing redisUrl\r\n        } as any);\r\n      }).toThrow();\r\n    });\r",
+      "category": "database_operation",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 441,
+      "column": 35,
+      "context": "      expect(() => {\r\n        createCacheService({\r\n          provider: 'unsupported' as any,\r\n          defaultTtlSec: 3600\r\n        });\r",
+      "category": "test_code",
+      "severity": "low"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 497,
+      "column": 25,
+      "context": "      await cache.set('destroy-key', 'destroy-value');\r\n\r\n      if (typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 498,
+      "column": 22,
+      "context": "\r\n      if (typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 517,
+      "column": 34,
+      "context": "\r\n    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\cache\\adapters-factory-integration.test.ts",
+      "line": 518,
+      "column": 22,
+      "context": "    afterEach(async () => {\r\n      if (cache && typeof (cache as any).destroy === 'function') {\r\n        await (cache as any).destroy();\r\n      }\r\n    });\r",
       "category": "enum_conversion",
       "severity": "medium"
     },
@@ -2427,14 +2572,6 @@
       "severity": "medium"
     },
     {
-      "file": "server\\features\\analysis\\analysis.routes.ts",
-      "line": 180,
-      "column": 42,
-      "context": "    // Transform results for frontend consumption\r\n    const historyResults = historyRecords.map((record: any) => {\r\n      const resultsData = record.results as any;\r\n      return {\r\n        dbId: record.id,\r",
-      "category": "database_operation",
-      "severity": "medium"
-    },
-    {
       "file": "server\\features\\analytics\\transparency-dashboard.ts",
       "line": 114,
       "column": 27,
@@ -2547,6 +2684,14 @@
       "severity": "medium"
     },
     {
+      "file": "server\\features\\analysis\\analysis.routes.ts",
+      "line": 180,
+      "column": 42,
+      "context": "    // Transform results for frontend consumption\r\n    const historyResults = historyRecords.map((record: any) => {\r\n      const resultsData = record.results as any;\r\n      return {\r\n        dbId: record.id,\r",
+      "category": "database_operation",
+      "severity": "medium"
+    },
+    {
       "file": "server\\features\\admin\\external-api-dashboard.ts",
       "line": 53,
       "column": 19,
@@ -2604,9 +2749,9 @@
     },
     {
       "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
-      "line": 622,
+      "line": 623,
       "column": 19,
-      "context": "      try {\r\n        // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n        (listener as any)(...args);\r\n      } catch (error) {\r\n        this.logError(`Error in ${event} event listener:`, error);\r",
+      "context": "        // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n        (listener as any)(...args);\r\n      } catch (error) {\r\n        this.logError(`Error in ${event} event listener:`, error);\r",
       "category": "enum_conversion",
       "severity": "medium"
     },
@@ -2771,131 +2916,11 @@
       "severity": "medium"
     },
     {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 181,
-      "column": 9,
-      "context": "          riskLevel: \"medium\"\r\n        }\r\n      } as any)\r\n    ];\r\n  }\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 371,
-      "column": 79,
-      "context": "          ];\r\n\r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 372,
-      "column": 85,
-      "context": "\r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 373,
-      "column": 91,
-      "context": "          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n\r\n          const results = await this.db\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 402,
-      "column": 44,
-      "context": "            .select()\r\n            .from(bills)\r\n            .where(eq(bills.status, status as any))\r\n            .orderBy(desc(bills.created_at));\r\n        }, { service: 'CachedBillService', operation: 'getBillsByStatus' });\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 423,
-      "column": 48,
-      "context": "            .select()\r\n            .from(bills)\r\n            .where(eq(bills.category, category as any))\r\n            .orderBy(desc(bills.created_at));\r\n        }, { service: 'CachedBillService', operation: 'getBillsByCategory' });\r",
-      "category": "database_operation",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 482,
-      "column": 79,
-      "context": "          const conditions = [];\r\n          \r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 483,
-      "column": 85,
-      "context": "          \r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n          \r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 484,
-      "column": 91,
-      "context": "          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n          \r\n          if (filters.search) {\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 605,
-      "column": 79,
-      "context": "      const conditions = [];\r\n\r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 606,
-      "column": 85,
-      "context": "\r\n          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n      \r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\bills\\application\\bill-service.ts",
-      "line": 607,
-      "column": 91,
-      "context": "          if (filters.status) conditions.push(eq(bills.status, filters.status as any));\r\n          if (filters.category) conditions.push(eq(bills.category, filters.category as any));\r\n          if (filters.sponsor_id) conditions.push(eq(bills.sponsor_id, filters.sponsor_id as any));\r\n      \r\n      if (filters.search) {\r",
-      "category": "enum_conversion",
-      "severity": "medium"
-    },
-    {
       "file": "server\\features\\argument-intelligence\\application\\argument-processor.ts",
       "line": 203,
       "column": 83,
       "context": "      // Map DB arguments to Clustering arguments format\n      // Note: In a real scenario, you'd map the DB entity to the service DTO explicitly.\n      // Assuming billArguments are compatible enough for this context or passing as any for now\n      // to resolve the immediate flow, though strict mapping is better.\n      const argumentsForClustering = billArguments.map(arg => ({",
       "category": "database_operation",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
-      "line": 409,
-      "column": 31,
-      "context": "        // Map common strength values to a numeric proxy for relevance.\r\n        relevance: ((): number => {\r\n          const strength = (p as any).precedent_strength as string | undefined;\r\n          if (!strength) return 50;\r\n          if (strength === 'binding') return 90;\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
-      "line": 417,
-      "column": 41,
-      "context": "        })(),\r\n        outcome: p.legal_principle || p.case_summary || 'Holding not available',\r\n        applicability: Array.isArray((p as any).constitutional_provisions_involved) && (p as any).constitutional_provisions_involved.length > 0\r\n          ? 'Cites constitutional provisions'\r\n          : 'Summary not available',\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
-      "line": 417,
-      "column": 91,
-      "context": "        })(),\r\n        outcome: p.legal_principle || p.case_summary || 'Holding not available',\r\n        applicability: Array.isArray((p as any).constitutional_provisions_involved) && (p as any).constitutional_provisions_involved.length > 0\r\n          ? 'Cites constitutional provisions'\r\n          : 'Summary not available',\r",
-      "category": "other",
       "severity": "medium"
     },
     {
@@ -2927,54 +2952,6 @@
       "line": 619,
       "column": 11,
       "context": "    errorTracker.trackRequestError(\r\n      error instanceof Error ? error : new Error(String(error)),\r\n      req as any,\r\n      'high',\r\n      'business_logic'\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 71,
-      "column": 25,
-      "context": "\r\n    try {\r\n      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 72,
-      "column": 87,
-      "context": "    try {\r\n      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 73,
-      "column": 23,
-      "context": "      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r\n          req as any,\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 75,
-      "column": 15,
-      "context": "        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r\n          req as any,\r\n          'low',\r\n          'analytics_context'\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 79,
-      "column": 32,
-      "context": "          'analytics_context'\r\n        );\r\n      } else if ((errorTracker as any)?.capture) {\r\n        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), {\r\n          component: 'analytics-context',\r",
-      "category": "other",
-      "severity": "medium"
-    },
-    {
-      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
-      "line": 80,
-      "column": 23,
-      "context": "        );\r\n      } else if ((errorTracker as any)?.capture) {\r\n        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), {\r\n          component: 'analytics-context',\r\n        });\r",
       "category": "other",
       "severity": "medium"
     },
@@ -3035,6 +3012,54 @@
       "severity": "medium"
     },
     {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 71,
+      "column": 25,
+      "context": "\r\n    try {\r\n      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 72,
+      "column": 87,
+      "context": "    try {\r\n      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 73,
+      "column": 23,
+      "context": "      if ((errorTracker as any)?.trackRequestError) {\r\n        // Track with low severity; no request object context available yet, pass req as any\r\n        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r\n          req as any,\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 75,
+      "column": 15,
+      "context": "        (errorTracker as any).trackRequestError(\r\n          error instanceof Error ? error : new Error(String(error)),\r\n          req as any,\r\n          'low',\r\n          'analytics_context'\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 79,
+      "column": 32,
+      "context": "          'analytics_context'\r\n        );\r\n      } else if ((errorTracker as any)?.capture) {\r\n        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), {\r\n          component: 'analytics-context',\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analytics\\middleware\\analytics-context.ts",
+      "line": 80,
+      "column": 23,
+      "context": "        );\r\n      } else if ((errorTracker as any)?.capture) {\r\n        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), {\r\n          component: 'analytics-context',\r\n        });\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
       "file": "server\\features\\analytics\\config\\analytics.config.ts",
       "line": 335,
       "column": 25,
@@ -3047,6 +3072,30 @@
       "line": 336,
       "column": 23,
       "context": "    try {\r\n      if ((errorTracker as any)?.capture) {\r\n        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'analytics-config' });\r\n      }\r\n    } catch (reportErr) {\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
+      "line": 409,
+      "column": 31,
+      "context": "        // Map common strength values to a numeric proxy for relevance.\r\n        relevance: ((): number => {\r\n          const strength = (p as any).precedent_strength as string | undefined;\r\n          if (!strength) return 50;\r\n          if (strength === 'binding') return 90;\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
+      "line": 417,
+      "column": 41,
+      "context": "        })(),\r\n        outcome: p.legal_principle || p.case_summary || 'Holding not available',\r\n        applicability: Array.isArray((p as any).constitutional_provisions_involved) && (p as any).constitutional_provisions_involved.length > 0\r\n          ? 'Cites constitutional provisions'\r\n          : 'Summary not available',\r",
+      "category": "other",
+      "severity": "medium"
+    },
+    {
+      "file": "server\\features\\analysis\\application\\constitutional-analysis.service.ts",
+      "line": 417,
+      "column": 91,
+      "context": "        })(),\r\n        outcome: p.legal_principle || p.case_summary || 'Holding not available',\r\n        applicability: Array.isArray((p as any).constitutional_provisions_involved) && (p as any).constitutional_provisions_involved.length > 0\r\n          ? 'Cites constitutional provisions'\r\n          : 'Summary not available',\r",
       "category": "other",
       "severity": "medium"
     },
@@ -3576,6 +3625,22 @@
       "column": 86,
       "context": " */\r\nexport function isBranded<T, B extends string>(value: unknown, brand: B): value is Brand<T, B> {\r\n  return typeof value === 'object' && value !== null && '__brand' in value && (value as any).__brand === brand;\r\n}\r\n\r",
       "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "shared\\core\\middleware\\error-handler\\provider.ts",
+      "line": 18,
+      "column": 33,
+      "context": "      console.error('Error:', error);\r\n      \r\n      const statusCode = (error as any).statusCode || 500;\r\n      const response: any = {\r\n        error: error.message || 'Internal server error',\r",
+      "category": "enum_conversion",
+      "severity": "medium"
+    },
+    {
+      "file": "shared\\core\\middleware\\error-handler\\provider.ts",
+      "line": 21,
+      "column": 22,
+      "context": "      const response: any = {\r\n        error: error.message || 'Internal server error',\r\n        code: (error as any).code || 'INTERNAL_ERROR'\r\n      };\r\n\r",
+      "category": "api_response",
       "severity": "medium"
     }
   ]

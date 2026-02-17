@@ -143,7 +143,7 @@ export interface ErrorContext {
   session_id?: string;
   url?: string;
   user_agent?: string;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export interface RecoveryStrategy {
@@ -158,7 +158,7 @@ export interface RecoveryStrategy {
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ComponentType<ErrorFallbackProps>;
-  onError?: (error: AppError, errorInfo: any) => void;
+  onError?: (error: AppError, errorInfo: unknown) => void;
   isolate?: boolean;
   resetKeys?: Array<string | number>;
   resetOnPropsChange?: boolean;
@@ -238,8 +238,8 @@ export type ValidationError = ValidationErrorDetail;
 export interface ValidationSchema<T = any> {
   schema: z.ZodSchema<T>;
   errorMessages?: Record<string, string>;
-  transform?: (data: any) => T;
-  validate: (data: any) => ValidationResult;
+  transform?: (data: unknown) => T;
+  validate: (data: unknown) => ValidationResult;
 }
 
 export interface FormState<T = any> {
@@ -304,7 +304,7 @@ export interface UnifiedFormSystem {
     definition: z.ZodSchema<T>,
     options?: { errorMessages?: Record<string, string> }
   ) => ValidationSchema<T>;
-  validateField: (value: any, schema: ValidationSchema) => ValidationResult;
+  validateField: (value: unknown, schema: ValidationSchema) => ValidationResult;
   validateForm: <T>(values: Partial<T>, schema: ValidationSchema<T>) => ValidationResult;
 
   // Form hooks
@@ -312,22 +312,22 @@ export interface UnifiedFormSystem {
     schema: ValidationSchema<T>,
     options?: { initialValues?: Partial<T> }
   ) => FormState<T> & {
-    setValue: (name: keyof T, value: any) => void;
+    setValue: (name: keyof T, value: unknown) => void;
     setError: (name: keyof T, error: string) => void;
     clearError: (name: keyof T) => void;
     reset: (values?: Partial<T>) => void;
     submit: () => Promise<void>;
   };
   useFormField: (name: string) => FieldState & {
-    setValue: (value: any) => void;
+    setValue: (value: unknown) => void;
     setTouched: (touched: boolean) => void;
     setFocused: (focused: boolean) => void;
   };
 
   // Form utilities
   FormBuilder: {
-    createField: (config: any) => ComponentType<any>;
-    createForm: (config: any) => ComponentType<any>;
+    createField: (config: unknown) => ComponentType<any>;
+    createForm: (config: unknown) => ComponentType<any>;
   };
 }
 
@@ -431,12 +431,12 @@ export interface ConfigurationSchema {
 
 export interface ConfigurationManager {
   get: <T = any>(key: string, defaultValue?: T) => T;
-  set: (key: string, value: any) => void;
+  set: (key: string, value: unknown) => void;
   has: (key: string) => boolean;
   remove: (key: string) => void;
   clear: () => void;
-  validate: (config: any, schema: ConfigurationSchema) => ValidationResult;
-  subscribe: (key: string, callback: (value: any) => void) => () => void;
+  validate: (config: unknown, schema: ConfigurationSchema) => ValidationResult;
+  subscribe: (key: string, callback: (value: unknown) => void) => () => void;
 }
 
 // ============================================================================
@@ -498,7 +498,7 @@ export interface DesignTokens {
 
 export interface ThemeConfig {
   tokens: DesignTokens;
-  components: Record<string, any>;
+  components: Record<string, unknown>;
   utilities: Record<string, string>;
 }
 
@@ -507,7 +507,7 @@ export interface ThemeConfig {
 // ============================================================================
 
 export interface TestUtilities {
-  renderWithProviders: (component: ReactNode, options?: any) => any;
+  renderWithProviders: (component: ReactNode, options?: unknown) => any;
   createMockProps: <T>(overrides?: Partial<T>) => T;
   waitForElement: (selector: string, timeout?: number) => Promise<Element>;
   fireEvent: any;
@@ -516,8 +516,8 @@ export interface TestUtilities {
 }
 
 export interface MockFactories {
-  createMockUser: (overrides?: any) => any;
-  createMockError: (type: ErrorType, overrides?: any) => AppError;
+  createMockUser: (overrides?: unknown) => any;
+  createMockError: (type: ErrorType, overrides?: unknown) => AppError;
   createMockLoadingState: (overrides?: Partial<LoadingState>) => LoadingState;
   createMockNavigationItem: (overrides?: Partial<NavigationItem>) => NavigationItem;
 }

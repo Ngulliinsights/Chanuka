@@ -7,7 +7,7 @@
  * Format chart data for different chart types
  */
 export function formatChartData(
-    rawData: any[],
+    rawData: unknown[],
     chartType: 'line' | 'bar' | 'pie' | 'area',
     labelField: string,
     valueField: string
@@ -105,7 +105,7 @@ export function calculateWidgetPerformanceScore(
 /**
  * Validate dashboard configuration
  */
-export function validateDashboardConfig(config: any): { valid: boolean; errors: string[] } {
+export function validateDashboardConfig(config: unknown): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     if (!config.id) {

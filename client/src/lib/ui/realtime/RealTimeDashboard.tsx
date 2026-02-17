@@ -18,7 +18,6 @@ import {
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 
-// import { useWebSocket } from '@client/lib/hooks/use-websocket';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';

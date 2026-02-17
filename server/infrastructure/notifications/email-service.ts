@@ -461,7 +461,6 @@ export class SMTPService extends BaseEmailService {
       // Try to load nodemailer
       let nodemailer: any = null;
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         nodemailer = require('nodemailer');
       } catch (err) {
         logger.warn('Nodemailer package not available; falling back to mock mode', { error: err });
@@ -541,7 +540,7 @@ export class SMTPService extends BaseEmailService {
         success: true,
         messageId: info.messageId,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('❌ Failed to send email, using fallback', {
         error: error?.message,
         code: error?.code,
@@ -686,7 +685,7 @@ export class SMTPService extends BaseEmailService {
         connected: true,
         lastSync: new Date(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         connected: false,
         error: error?.message ?? 'Connection verification failed',

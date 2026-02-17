@@ -12,7 +12,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 // 1. Define Effect Configuration Interface
 export interface EffectConfig {
   enabled?: boolean;
-  dependencies?: any[];
+  dependencies?: unknown[];
   cleanup?: boolean;
   immediate?: boolean;
 }
@@ -171,7 +171,7 @@ export function useAdvancedEffect(
     id: string;
     enabled: boolean;
     effect: () => void | (() => void);
-    dependencies: any[];
+    dependencies: unknown[];
   }>,
   options: {
     parallel?: boolean;
@@ -294,7 +294,7 @@ export function useAdvancedEffect(
 export function useDebouncedEffect(
   effect: () => void,
   delay: number,
-  dependencies: any[] = []
+  dependencies: unknown[] = []
 ) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 

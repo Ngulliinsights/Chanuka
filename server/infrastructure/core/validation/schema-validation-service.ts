@@ -305,7 +305,7 @@ export class SchemaValidationService {
     }
   }
 
-  private async getTableColumns(tableName: string): Promise<any[]> {
+  private async getTableColumns(tableName: string): Promise<unknown[]> {
     try {
   const database = readDatabase;
       const result = await database.execute(sql`
@@ -368,7 +368,7 @@ export class SchemaValidationService {
     return result;
   }
 
-  private async validateSecurityAuditLogsTable(result: ValidationResult, columns: any[]): Promise<ValidationResult> {
+  private async validateSecurityAuditLogsTable(result: ValidationResult, columns: unknown[]): Promise<ValidationResult> {
     const columnNames = columns.map(col => col.column_name);
     const expectedColumns = ['id', 'event_type', 'user_id', 'ip_address', 'user_agent', 'resource', 'action', 'result', 'severity', 'details', 'session_id', 'timestamp', 'created_at'];
 
@@ -386,7 +386,7 @@ export class SchemaValidationService {
     return result;
   }
 
-  private async validateThreatIntelligenceTable(result: ValidationResult, columns: any[]): Promise<ValidationResult> {
+  private async validateThreatIntelligenceTable(result: ValidationResult, columns: unknown[]): Promise<ValidationResult> {
     const columnNames = columns.map(col => col.column_name);
     const expectedColumns = ['id', 'ip_address', 'threat_type', 'severity', 'source', 'description', 'first_seen', 'last_seen', 'occurrences', 'blocked', 'is_active', 'expires_at', 'metadata', 'created_at', 'updated_at'];
 
@@ -404,7 +404,7 @@ export class SchemaValidationService {
     return result;
   }
 
-  private async validateSecurityAlertsTable(result: ValidationResult, columns: any[]): Promise<ValidationResult> {
+  private async validateSecurityAlertsTable(result: ValidationResult, columns: unknown[]): Promise<ValidationResult> {
     const columnNames = columns.map(col => col.column_name);
     const expectedColumns = ['id', 'alert_type', 'severity', 'title', 'message', 'source', 'status', 'assigned_to', 'metadata', 'acknowledged_at', 'resolved_at', 'created_at', 'updated_at'];
 
@@ -418,7 +418,7 @@ export class SchemaValidationService {
     return result;
   }
 
-  private async validateSecurityConfigTable(result: ValidationResult, columns: any[]): Promise<ValidationResult> {
+  private async validateSecurityConfigTable(result: ValidationResult, columns: unknown[]): Promise<ValidationResult> {
     const columnNames = columns.map(col => col.column_name);
     const expectedColumns = ['id', 'config_key', 'config_value', 'description', 'updated_by', 'updated_at'];
 

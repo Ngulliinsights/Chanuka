@@ -50,10 +50,10 @@ export interface CacheStats {
  * Cache invalidation options
  */
 export interface InvalidationOptions {
-  tags?: string[];
-  pattern?: RegExp;
-  olderThan?: number;
-  force?: boolean;
+  tags?: string[] | undefined;
+  pattern?: RegExp | undefined;
+  olderThan?: number | undefined;
+  force?: boolean | undefined;
 }
 
 /**
@@ -394,9 +394,12 @@ export class ApiCacheManager {
     const evictCount = Math.max(1, Math.floor(this.config.maxEntries * 0.1));
 
     for (let i = 0; i < evictCount && i < entries.length; i++) {
-      const shortKey = entries[i].key.replace(this.config.keyPrefix, '');
-      await this.delete(shortKey);
-      this.stats.evictions++;
+      const entry = entries[i];
+      if (entry) {
+        const shortKey = entry.key.replace(this.config.keyPrefix, '');
+        await this.delete(shortKey);
+        this.stats.evictions++;
+      }
     }
 
     logger.debug('Cache eviction by count completed', {

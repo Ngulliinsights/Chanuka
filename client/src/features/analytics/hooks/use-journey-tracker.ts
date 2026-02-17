@@ -102,7 +102,7 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   /**
    * Get optimization recommendations
    */
-  const getOptimizations = useCallback((start_date?: Date, end_date?: Date): any[] => {
+  const getOptimizations = useCallback((start_date?: Date, end_date?: Date): unknown[] => {
     // No dedicated optimization API in the tracker; return an empty list for now.
     return [];
   }, []);
@@ -241,7 +241,7 @@ export function useJourneyAnalytics() {
     []
   );
 
-  const getOptimizations = useCallback((start_date?: Date, end_date?: Date): any[] => {
+  const getOptimizations = useCallback((start_date?: Date, end_date?: Date): unknown[] => {
     // No dedicated optimization API in the tracker; return an empty list for now.
     return [];
   }, []);

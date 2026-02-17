@@ -73,7 +73,7 @@ app.post('/test/:modelType', async (req, res) => {
     const { input, options = {} } = req.body;
 
     const result = await mlOrchestrator.processRequest({
-      modelType: modelType as any,
+      modelType: modelType as unknown,
       input,
       options: {
         async: false,
@@ -110,7 +110,7 @@ app.get('/quick-test/:modelType', async (req, res) => {
     }
 
     const result = await mlOrchestrator.processRequest({
-      modelType: modelType as any,
+      modelType: modelType as unknown,
       input: sampleInput,
       options: {
         async: false,
@@ -138,7 +138,7 @@ app.get('/quick-test/:modelType', async (req, res) => {
 
 // Sample input generator
 function getSampleInput(modelType: string) {
-  const sampleInputs: Record<string, any> = {
+  const sampleInputs: Record<string, unknown> = {
     'trojan-bill-detector': {
       billText: `The Kenya Finance Amendment Bill 2024
         

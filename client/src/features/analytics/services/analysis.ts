@@ -16,13 +16,6 @@ import type { BillAnalysis } from '@shared/validation/schemas/analytics.schema';
  */
 export type { BillAnalysis } from '@shared/validation/schemas/analytics.schema';
 
-interface CorporateConnection {
-  organization: string;
-  connectionType: 'financial' | 'advisory' | 'employment';
-  influenceLevel: number; // Scale of 1-10
-  potentialConflict: boolean;
-}
-
 /**
  * Result type for conflict analysis operations
  */

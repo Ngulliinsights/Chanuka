@@ -404,7 +404,7 @@ export class SecureSessionService {
         .where(gt(sessions.expires_at, new Date()));
 
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentSessions = activeSessions.filter((s: any) => s.created_at! > last24h);
+      const recentSessions = activeSessions.filter((s: unknown) => s.created_at! > last24h);
 
       return {
         totalActiveSessions: activeSessions.length,

@@ -341,7 +341,7 @@ export class PerformanceUtils {
   /**
    * Create performance metrics for analysis
    */
-  static createMetrics(operationId: string, additionalData?: Record<string, any>) {
+  static createMetrics(operationId: string, additionalData?: Record<string, unknown>) {
     return {
       operationId,
       duration: this.endTimer(operationId),

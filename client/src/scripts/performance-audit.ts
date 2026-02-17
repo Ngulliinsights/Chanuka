@@ -229,7 +229,7 @@ class PerformanceAuditor {
     };
   }
 
-  private generateRecommendations(bundleSize: any, codeMetrics: any): string[] {
+  private generateRecommendations(bundleSize: unknown, codeMetrics: unknown): string[] {
     const recommendations: string[] = [];
 
     // Bundle size recommendations

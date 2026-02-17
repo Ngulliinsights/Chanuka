@@ -104,7 +104,7 @@ export function getRecoverySuggestions(error: Error, context?: string): string[]
   return suggestions.length > 0 ? suggestions : ['Please try again or contact support'];
 }
 
-export function createRecoveryContext(error: Error, additionalInfo?: Record<string, any>) {
+export function createRecoveryContext(error: Error, additionalInfo?: Record<string, unknown>) {
   return {
     error: {
       name: error.name,

@@ -132,7 +132,7 @@ program
 /**
  * Creates a configuration object from command line options
  */
-function createConfiguration(options: any): Configuration {
+function createConfiguration(options: unknown): Configuration {
   const config = { ...DEFAULT_CONFIG };
   
   // Update project root
@@ -175,7 +175,7 @@ function createConfiguration(options: any): Configuration {
 /**
  * Prints a console report of the project analysis
  */
-function printConsoleReport(structure: any): void {
+function printConsoleReport(structure: unknown): void {
   console.log(chalk.blue('\n📊 Project Analysis Report'));
   console.log(chalk.gray('='.repeat(50)));
   
@@ -210,7 +210,7 @@ function printConsoleReport(structure: any): void {
 /**
  * Prints a markdown report of the project analysis
  */
-function printMarkdownReport(structure: any): void {
+function printMarkdownReport(structure: unknown): void {
   console.log('# Chanuka Project Analysis Report\n');
   
   console.log('## Project Structure\n');

@@ -103,7 +103,7 @@ export const calculateRelevanceScore = (
 
     // Recency adjustments
     const lastVisited = preferences?.recentlyVisited?.find(
-      (p: any) => p.path === relationship.context
+      (p: unknown) => p.path === relationship.context
     );
     if (lastVisited) {
       const daysSinceVisited =

@@ -1,11 +1,11 @@
 import * as LucideIcons from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { cn } from '@lib/utils';
 import { logger } from '@client/lib/utils/logger';
+import type { UserProfile } from '@shared/validation/schemas/user.schema';
 
 import { useAuth } from '../../core/auth';
 import { CommandPalette } from '../../core/command-palette/CommandPalette';
@@ -25,13 +25,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  ChanukaLogo,
-  ChanukaSymbol,
   ChanukaWordmark,
   ChanukaSmallLogo,
 } from '../../lib/design-system';
 import { useMobileMenu } from '../../lib/hooks/useNavigationSlice';
 import { LanguageSwitcher } from '../../lib/ui/i18n/LanguageSwitcher';
+
+// Local notification type for UI display
+interface NotificationItem {
+  id: string;
+  title: string;
+  unread: boolean;
+}
 
 
 // Type Definitions
@@ -44,19 +49,18 @@ interface NavigationBarProps {
   searchPlaceholder?: string;
 }
 
-interface UserProfile {
-  id?: string;
-  avatar?: string;
-  name?: string;
+// Extended user profile type for navigation bar
+interface ExtendedUserProfile extends UserProfile {
   email?: string;
+  avatar_url?: string;
 }
 
 // Type guard for user profile
-function isUserProfile(user: unknown): user is UserProfile {
+function isUserProfile(user: unknown): user is ExtendedUserProfile {
   return (
     typeof user === 'object' &&
     user !== null &&
-    ('name' in user || 'email' in user || 'avatar' in user)
+    ('display_name' in user || 'email' in user || 'avatar_url' in user)
   );
 }
 
@@ -66,11 +70,11 @@ function getUserDisplayData(user: unknown) {
     return { avatar: undefined, initial: 'U', name: 'User', email: '' };
   }
 
-  const initial = user.name?.charAt(0) || user.email?.charAt(0) || 'U';
+  const initial = user.display_name?.charAt(0) || user.email?.charAt(0) || 'U';
   return {
-    avatar: user.avatar,
+    avatar: user.avatar_url || undefined,
     initial: initial.toUpperCase(),
-    name: user.name || 'User',
+    name: user.display_name || 'User',
     email: user.email || '',
   };
 }
@@ -79,7 +83,7 @@ function getUserDisplayData(user: unknown) {
  * NotificationMenu Component - Extracted for better maintainability
  */
 const NotificationMenu = memo(
-  ({ notifications, unreadCount }: { notifications: Notification[]; unreadCount: number }) => (
+  ({ notifications, unreadCount }: { notifications: NotificationItem[]; unreadCount: number }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
@@ -228,7 +232,7 @@ export const NavigationBar = memo<NavigationBarProps>(
     });
 
     // Mock notifications - replace with useNotifications hook in production
-    const notifications = useMemo<Notification[]>(
+    const notifications = useMemo<NotificationItem[]>(
       () => [
         { id: '1', title: 'New bill requires attention', unread: true },
         { id: '2', title: 'Comment on HB-123 received reply', unread: true },
@@ -397,9 +401,9 @@ export const NavigationBar = memo<NavigationBarProps>(
         <CommandPalette
           isOpen={commandPalette.isOpen}
           onOpenChange={commandPalette.setIsOpen}
-          config={commandPalette.config}
-          customCommands={commandPalette.customCommands}
-          onCommandExecute={commandPalette.onCommandExecute}
+          {...(commandPalette.config && { config: commandPalette.config })}
+          {...(commandPalette.customCommands && { customCommands: commandPalette.customCommands })}
+          {...(commandPalette.onCommandExecute && { onCommandExecute: commandPalette.onCommandExecute })}
         />
       </nav>
     );

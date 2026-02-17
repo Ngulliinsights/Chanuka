@@ -40,10 +40,3 @@ export interface UpdateUserProfile {
   readonly bio?: string;
   readonly preferences?: Readonly<Record<string, unknown>>;
 }
-
-export interface AuthResult {
-  readonly user: unknown; // Imported from types, keeping flexible
-  readonly token: string;
-  readonly refreshToken: string;
-  readonly expiresAt: string;
-}

@@ -304,7 +304,7 @@ class ErrorHandlingSprawlAuditor {
     const consistencyScore = totalPatterns > 0 ? (consistentPatterns / totalPatterns) * 100 : 100;
 
     // Calculate categories
-    const categories: Record<ErrorCategory, any> = {} as any;
+    const categories: Record<ErrorCategory, any> = {} as unknown;
     const categoryStats = new Map<ErrorCategory, { patterns: number; consistency: string }>();
 
     for (const pattern of this.allPatterns) {

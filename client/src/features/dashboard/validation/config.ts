@@ -46,10 +46,22 @@ const WidgetTypeSchema = z.enum(['chart', 'table', 'metric', 'list'], {
   errorMap: () => ({ message: 'Widget type must be one of: chart, table, metric, list' }),
 });
 
+// Dangerous property names that should be rejected for security
+const DANGEROUS_PROPERTY_NAMES = ['__proto__', 'constructor', 'prototype'];
+
 const WidgetSchema = z.object({
   id: z.string().min(1, 'Widget ID cannot be empty'),
   type: WidgetTypeSchema,
-  config: z.record(z.unknown()),
+  config: z.record(z.unknown()).refine(
+    (config) => {
+      // Reject configs with dangerous property names
+      const keys = Object.keys(config);
+      return !keys.some(key => DANGEROUS_PROPERTY_NAMES.includes(key));
+    },
+    {
+      message: 'Widget config cannot contain dangerous property names (__proto__, constructor, prototype)',
+    }
+  ),
 });
 
 const WidgetPositionSchema = z.object({

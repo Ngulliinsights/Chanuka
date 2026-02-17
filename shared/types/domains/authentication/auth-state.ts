@@ -199,23 +199,6 @@ export type AuthAction =
     };
 
 /**
- * Authentication Result Type
- * For async authentication operations
- */
-export type AuthResult<T = User> =
-  | {
-      success: true;
-      data: T;
-      session: AuthSession;
-      timestamp: number;
-    }
-  | {
-      success: false;
-      error: AuthError;
-      timestamp: number;
-    };
-
-/**
  * Type guards for authentication state
  */
 export function isAuthenticated(state: AuthState): state is Extract<AuthState, { status: 'authenticated' }> {

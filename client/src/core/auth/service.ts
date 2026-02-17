@@ -66,7 +66,7 @@ const convertAuthUserToUser = (authUser: AuthUser): User => {
     // Legacy mapping (maintained for compatibility)
     name: authUser.name,
     verified: authUser.verified,
-    role: authUser.role as any, // Cast if necessary, or ensure 'citizen' matches
+    role: authUser.role as unknown, // Cast if necessary, or ensure 'citizen' matches
     
     // Other fields
     twoFactorEnabled: authUser.twoFactorEnabled,

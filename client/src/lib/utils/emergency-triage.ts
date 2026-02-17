@@ -385,7 +385,7 @@ class EmergencyTriageTool {
       typeof window !== 'undefined' &&
       (window as unknown as Record<string, unknown>).__REACT_DEVTOOLS_GLOBAL_HOOK__
     ) {
-      const hook = (window as unknown as Record<string, any>).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+      const hook = (window as unknown as Record<string, unknown>).__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
       // Monitor fiber commits for render tracking
       if (typeof hook.onCommitFiberRoot === 'function') {

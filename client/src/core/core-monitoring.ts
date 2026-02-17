@@ -470,7 +470,7 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
     this.monitoring = ServiceArchitectureMonitoring.getInstance();
   }
 
-  wrap<T extends (...args: any[]) => any>(fn: T, context: ErrorContext): T {
+  wrap<T extends (...args: unknown[]) => any>(fn: T, context: ErrorContext): T {
     return ((...args: Parameters<T>) => {
       if (!this.isOperationEnabled(context.operation || 'unknown')) {
         return fn(...args);
@@ -537,7 +537,7 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
     }) as T;
   }
 
-  wrapAsync<T extends (...args: any[]) => Promise<any>>(fn: T, context: ErrorContext): T {
+  wrapAsync<T extends (...args: unknown[]) => Promise<any>>(fn: T, context: ErrorContext): T {
     return this.wrap(fn, context);
   }
 
@@ -559,7 +559,7 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
   }
 
   private isOperationEnabled(operation: string): boolean {
-    const monitoring = ServiceArchitectureMonitoring.getInstance() as any;
+    const monitoring = ServiceArchitectureMonitoring.getInstance() as unknown;
     return monitoring.enabledOperations.has('*') || monitoring.enabledOperations.has(operation);
   }
 }

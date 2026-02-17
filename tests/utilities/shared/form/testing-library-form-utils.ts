@@ -3,9 +3,7 @@
  */
 
 // @testing-library/dom is not available in shared module - this would be used in client/server
-// import { screen, fireEvent, waitFor, queries } from '@testing-library/dom';
 import { BaseFormTestingUtils, FormField, FormTestConfig, FormTestResult } from './base-form-testing';
-// import { logger } from '../../observability/logging'; // Unused import
 
 // Mock type for when testing-library is not available
 type QueryMethods = {

@@ -1,0 +1,968 @@
+═══════════════════════════════════════════════════════════════
+                 ESLINT SUPPRESSION SCAN REPORT                
+═══════════════════════════════════════════════════════════════
+
+Scan Date: 2026-02-16T20:49:07.212Z
+Total Suppressions: 71
+
+───────────────────────────────────────────────────────────────
+SUPPRESSIONS BY TYPE
+───────────────────────────────────────────────────────────────
+  disable-next-line       68 instances
+  disable                  3 instances
+
+───────────────────────────────────────────────────────────────
+SUPPRESSIONS BY RULE
+───────────────────────────────────────────────────────────────
+  //  no-console                              37 instances
+  //  @typescript-eslint/no-explicit-any      18 instances
+  //  @typescript-eslint/no-var-requires       7 instances
+  //  react-hooks/exhaustive-deps              3 instances
+  /*  no-console */                            3 instances
+  //  complexity                               2 instances
+  //  @typescript-eslint/no-this-alias         1 instances
+
+───────────────────────────────────────────────────────────────
+TOP 20 FILES WITH MOST SUPPRESSIONS
+───────────────────────────────────────────────────────────────
+   12 | server\features\coverage\coverage-routes.ts
+    8 | server\features\search\engines\core\postgresql-fulltext.engine.ts
+    7 | server\features\argument-intelligence\application\argument-intelligence-service.ts
+    6 | server\infrastructure\websocket\core\message-handler.ts
+    5 | server\infrastructure\websocket\core\websocket-service.ts
+    4 | server\infrastructure\websocket\batching\batching-service.ts
+    4 | server\infrastructure\websocket\adapters\socketio-adapter.ts
+    4 | server\infrastructure\websocket\adapters\redis-adapter.ts
+    3 | server\infrastructure\schema\validate-static.ts
+    3 | server\infrastructure\websocket\monitoring\metrics-reporter.ts
+    3 | server\infrastructure\websocket\core\connection-manager.ts
+    2 | server\infrastructure\database\graph\utils\query-builder.ts
+    1 | client\src\core\security\csrf-protection.ts
+    1 | client\src\lib\ui\offline\offline-manager.tsx
+    1 | client\src\features\analytics\hooks\useErrorAnalytics.ts
+    1 | client\src\core\navigation\hooks\use-navigation-preferences.tsx
+    1 | server\infrastructure\schema\base-types.ts
+    1 | server\infrastructure\notifications\email-service.ts
+    1 | server\infrastructure\websocket\memory\leak-detector-handler.ts
+    1 | server\infrastructure\websocket\config\runtime-config.ts
+
+═══════════════════════════════════════════════════════════════
+DETAILED SUPPRESSION LIST
+═══════════════════════════════════════════════════════════════
+
+
+📄 client\src\core\navigation\hooks\use-navigation-preferences.tsx (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 105 | Type: disable-next-line
+Rules: //  react-hooks/exhaustive-deps
+Justification: Intentionally omitting dependencies to run effect only once on mount
+
+Context:
+   103 |     };
+   104 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+>  105 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   106 |   }, []); // Empty dependency array ensures this runs only once on mount
+   107 | 
+──────────────────────────────────────────────────────────────────────
+
+📄 client\src\core\security\csrf-protection.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 261 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-this-alias
+Justification: this-alias required for closure context preservation in XMLHttpRequest override
+
+Context:
+   259 |     const originalSend = XMLHttpRequest.prototype.send;
+   260 |     // JUSTIFICATION: this-alias required for closure context preservation in XMLHttpRequest override
+>  261 |     // eslint-disable-next-line @typescript-eslint/no-this-alias
+   262 |     const self = this;
+   263 | 
+──────────────────────────────────────────────────────────────────────
+
+📄 client\src\features\analytics\hooks\useErrorAnalytics.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 324 | Type: disable-next-line
+Rules: //  react-hooks/exhaustive-deps
+Justification: Intentionally omitting dependencies to run effect only once on mount
+
+Context:
+   322 |     loadAllData();
+   323 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+>  324 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   325 |   }, []); // Only run once on mount
+   326 | 
+──────────────────────────────────────────────────────────────────────
+
+📄 client\src\lib\ui\offline\offline-manager.tsx (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 479 | Type: disable-next-line
+Rules: //  react-hooks/exhaustive-deps
+Justification: Intentionally omitting dependencies to run effect only once on mount
+
+Context:
+   477 |     fetchData();
+   478 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+>  479 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   480 |   }, [fetchData, ...dependencies]);
+   481 | 
+──────────────────────────────────────────────────────────────────────
+
+📄 server\features\argument-intelligence\application\argument-intelligence-service.ts (7 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 97 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    95 |    */
+    96 |   // TODO: Replace 'any' with proper type definition
+>   97 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    98 |   async storeArgument(argumentData: any): Promise<Argument> {
+    99 |     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };
+──────────────────────────────────────────────────────────────────────
+
+Line 193 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   191 |    */
+   192 |   // TODO: Replace 'any' with proper type definition
+>  193 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   194 |   async storeClaims(claimsData: any[]): Promise<Claim[]> {
+   195 |     const logContext = {
+──────────────────────────────────────────────────────────────────────
+
+Line 261 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   259 |    */
+   260 |   // TODO: Replace 'any' with proper type definition
+>  261 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   262 |   async storeEvidence(evidenceData: any[]): Promise<Evidence[]> {
+   263 |     const logContext = {
+──────────────────────────────────────────────────────────────────────
+
+Line 329 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   327 |    */
+   328 |   // TODO: Replace 'any' with proper type definition
+>  329 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   330 |   async storeBrief(briefData: any): Promise<LegislativeBrief> {
+   331 |     const logContext = {
+──────────────────────────────────────────────────────────────────────
+
+Line 516 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   514 |    */
+   515 |   // TODO: Replace 'any' with proper type definition
+>  516 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   517 |   async storeArgumentRelationships(relationships: any[]): Promise<ArgumentRelationship[]> {
+   518 |     const logContext = {
+──────────────────────────────────────────────────────────────────────
+
+Line 595 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   593 |    */
+   594 |   // TODO: Replace 'any' with proper type definition
+>  595 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   596 |   async getArgumentStatistics(bill_id: string): Promise<any> {
+   597 |     const logContext = {
+──────────────────────────────────────────────────────────────────────
+
+Line 663 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   661 |    */
+   662 |   // TODO: Replace 'any' with proper type definition
+>  663 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   664 |   private parseJson(jsonString: string | null, fallback: any = null): any {
+   665 |     if (!jsonString) return fallback;
+──────────────────────────────────────────────────────────────────────
+
+📄 server\features\coverage\coverage-routes.ts (12 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 13 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    11 |   try {
+    12 |   // Create analyzer lazily to respect test mocks and avoid early module-side instantiation
+>   13 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+    14 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+    15 |   const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 46 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    44 |     } catch (e) {
+    45 |       // Fallback
+>   46 |       // eslint-disable-next-line no-console
+    47 |       console.error('Error generating coverage report:', error);
+    48 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 64 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    62 |   try {
+    63 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+>   64 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+    65 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+    66 |   const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 94 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    92 |       logger.error('Error analyzing server coverage:', { error });
+    93 |     } catch (e) {
+>   94 |       // eslint-disable-next-line no-console
+    95 |       console.error('Error analyzing server coverage:', error);
+    96 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 112 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   110 |   try {
+   111 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+>  112 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   113 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   114 |   const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 141 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   139 |       logger.error('Error analyzing client coverage:', { error });
+   140 |     } catch (e) {
+>  141 |       // eslint-disable-next-line no-console
+   142 |       console.error('Error analyzing client coverage:', error);
+   143 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 159 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   157 |   try {
+   158 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+>  159 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   160 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   161 |   const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 188 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   186 |       logger.error('Error analyzing integration coverage:', { error });
+   187 |     } catch (e) {
+>  188 |       // eslint-disable-next-line no-console
+   189 |       console.error('Error analyzing integration coverage:', error);
+   190 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 206 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   204 |   try {
+   205 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+>  206 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   207 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   208 |   const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 257 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   255 |       logger.error('Error analyzing coverage gaps:', { error });
+   256 |     } catch (e) {
+>  257 |       // eslint-disable-next-line no-console
+   258 |       console.error('Error analyzing coverage gaps:', error);
+   259 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 278 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   276 |     let result;
+   277 |     // Lazily instantiate analyzer to ensure tests that mock the class are used
+>  278 |     // eslint-disable-next-line @typescript-eslint/no-var-requires
+   279 |     const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   280 |     const coverageAnalyzer = new Analyzer();
+──────────────────────────────────────────────────────────────────────
+
+Line 325 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   323 |       logger.error('Error running coverage analysis:', { error });
+   324 |     } catch (e) {
+>  325 |       // eslint-disable-next-line no-console
+   326 |       console.error('Error running coverage analysis:', error);
+   327 |     }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\features\search\engines\core\postgresql-fulltext.engine.ts (8 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 114 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   112 |    */
+   113 |   // TODO: Replace 'any' with proper type definition
+>  114 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   115 |   private async searchBillsEnhanced(
+   116 |     queryComponents: any,
+──────────────────────────────────────────────────────────────────────
+
+Line 181 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   179 | 
+   180 |     // TODO: Replace 'any' with proper type definition
+>  181 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   182 |     return result.data.map((bill: any) => ({
+   183 |       id: bill.id,
+──────────────────────────────────────────────────────────────────────
+
+Line 205 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   203 |    */
+   204 |   // TODO: Replace 'any' with proper type definition
+>  205 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   206 |   private async searchSponsorsEnhanced(
+   207 |     queryComponents: any,
+──────────────────────────────────────────────────────────────────────
+
+Line 269 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   267 | 
+   268 |     // TODO: Replace 'any' with proper type definition
+>  269 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   270 |     return result.data.map((sponsor: any) => ({
+   271 |       id: sponsor.id,
+──────────────────────────────────────────────────────────────────────
+
+Line 292 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   290 |    */
+   291 |   // TODO: Replace 'any' with proper type definition
+>  292 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   293 |   private async searchCommentsEnhanced(
+   294 |     queryComponents: any,
+──────────────────────────────────────────────────────────────────────
+
+Line 350 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   348 | 
+   349 |     // TODO: Replace 'any' with proper type definition
+>  350 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   351 |     return result.data.map((comment: any) => ({
+   352 |       id: comment.id,
+──────────────────────────────────────────────────────────────────────
+
+Line 386 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   384 | 
+   385 |       // TODO: Replace 'any' with proper type definition
+>  386 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   387 |       if (result.data.length > 0) {
+   388 |         const firstResult = result.data[0] as Record<string, any>;
+──────────────────────────────────────────────────────────────────────
+
+Line 663 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   661 |    */
+   662 |   // TODO: Replace 'any' with proper type definition
+>  663 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   664 |   async getPerformanceStats(hoursBack: number = 24): Promise<any[]> {
+   665 |     const result = await databaseService.executeRawQuery(
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\database\graph\relationships.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 1 | Type: disable
+Rules: /*  no-console */
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+>    1 | /* eslint-disable no-console */
+     2 | /**
+     3 |  * Core Relationship Models (FULLY REFACTORED & OPTIMIZED)
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\database\graph\utils\query-builder.ts (2 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 404 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   402 |     const hasReturn = this.clauses.some(c => c.keyword === 'RETURN');
+   403 |     if (!hasReturn) {
+>  404 |       // eslint-disable-next-line no-console
+   405 |       console.warn('Warning: Query does not have a RETURN clause');
+   406 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 439 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   437 |       const rank = clauseRanks[clause] ?? 0;
+   438 |       if (rank < lastRank) {
+>  439 |         // eslint-disable-next-line no-console
+   440 |         console.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);
+   441 |       }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\notifications\email-service.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 464 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-var-requires
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   462 |       let nodemailer: any = null;
+   463 |       try {
+>  464 |         // eslint-disable-next-line @typescript-eslint/no-var-requires
+   465 |         nodemailer = require('nodemailer');
+   466 |       } catch (err) {
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\schema\base-types.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 94 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    92 |  */
+    93 | // TODO: Replace 'any' with proper type definition
+>   94 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    95 | export const statusField = (enumType: any, defaultValue: string) => {
+    96 |   const enumNameOrStatus = enumType.name ?? "status";
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\schema\validate-static.ts (3 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 15 | Type: disable
+Rules: /*  no-console */
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    13 | // - Fast: No compilation or import overhead
+    14 | 
+>   15 | /* eslint-disable no-console */
+    16 | 
+    17 | import fs from "fs";
+──────────────────────────────────────────────────────────────────────
+
+Line 189 | Type: disable-next-line
+Rules: //  complexity
+Justification: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+
+Context:
+   187 |  */
+   188 | // JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+>  189 | // eslint-disable-next-line complexity
+   190 | function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } {
+   191 |   const tables: TableDef[] = [];
+──────────────────────────────────────────────────────────────────────
+
+Line 253 | Type: disable-next-line
+Rules: //  complexity
+Justification: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+
+Context:
+   251 |  */
+   252 | // JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+>  253 | // eslint-disable-next-line complexity
+   254 | function findRelations(dir: string): RelationDef[] {
+   255 |   const relations: RelationDef[] = [];
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\adapters\native-websocket-adapter.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 15 | Type: disable
+Rules: /*  no-console */
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    13 | // Note: If @shared/core is unavailable, consider using a local logger implementation
+    14 | // or importing from a different path. For now, we'll create a fallback.
+>   15 | /* eslint-disable no-console */
+    16 | const logger = {
+    17 |   info: (message: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${message}`, meta),
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\adapters\redis-adapter.ts (4 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 15 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    13 | const logger = {
+    14 |   info: (message: string, context?: unknown) => {
+>   15 |     // eslint-disable-next-line no-console
+    16 |     console.log(`[INFO] ${message}`, context || '');
+    17 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 19 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    17 |   },
+    18 |   warn: (message: string, context?: unknown) => {
+>   19 |     // eslint-disable-next-line no-console
+    20 |     console.warn(`[WARN] ${message}`, context || '');
+    21 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 23 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    21 |   },
+    22 |   error: (message: string, context?: unknown, error?: Error) => {
+>   23 |     // eslint-disable-next-line no-console
+    24 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    25 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 27 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    25 |   },
+    26 |   debug: (message: string, context?: unknown) => {
+>   27 |     // eslint-disable-next-line no-console
+    28 |     console.log(`[DEBUG] ${message}`, context || '');
+    29 |   }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\adapters\socketio-adapter.ts (4 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 17 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    15 | const logger = {
+    16 |   info: (message: string, context?: unknown) => {
+>   17 |     // eslint-disable-next-line no-console
+    18 |     console.log(`[INFO] ${message}`, context || '');
+    19 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 21 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    19 |   },
+    20 |   warn: (message: string, context?: unknown) => {
+>   21 |     // eslint-disable-next-line no-console
+    22 |     console.warn(`[WARN] ${message}`, context || '');
+    23 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 25 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    23 |   },
+    24 |   error: (message: string, context?: unknown, error?: Error) => {
+>   25 |     // eslint-disable-next-line no-console
+    26 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    27 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 29 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    27 |   },
+    28 |   debug: (message: string, context?: unknown) => {
+>   29 |     // eslint-disable-next-line no-console
+    30 |     console.log(`[DEBUG] ${message}`, context || '');
+    31 |   }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\batching\batching-service.ts (4 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 14 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    12 | const logger = {
+    13 |   info: (message: string, context?: unknown) => {
+>   14 |     // eslint-disable-next-line no-console
+    15 |     console.log(`[INFO] ${message}`, context || '');
+    16 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 18 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    16 |   },
+    17 |   warn: (message: string, context?: unknown) => {
+>   18 |     // eslint-disable-next-line no-console
+    19 |     console.warn(`[WARN] ${message}`, context || '');
+    20 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 22 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    20 |   },
+    21 |   error: (message: string, context?: unknown, error?: Error) => {
+>   22 |     // eslint-disable-next-line no-console
+    23 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    24 |   },
+──────────────────────────────────────────────────────────────────────
+
+Line 26 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    24 |   },
+    25 |   debug: (message: string, context?: unknown) => {
+>   26 |     // eslint-disable-next-line no-console
+    27 |     console.log(`[DEBUG] ${message}`, context || '');
+    28 |   }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\config\runtime-config.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 267 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   265 |         // In production, this should use the application's logging system
+   266 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+>  267 |           // eslint-disable-next-line no-console
+   268 |           console.error('Error in configuration change listener:', error);
+   269 |         }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\core\connection-manager.ts (3 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 129 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   127 |       // Log error but don't throw to avoid disrupting cleanup
+   128 |       if (process.env.NODE_ENV !== 'production') {
+>  129 |         // eslint-disable-next-line no-console
+   130 |         console.error('Error removing connection:', error);
+   131 |       }
+──────────────────────────────────────────────────────────────────────
+
+Line 217 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   215 |       } catch (error) {
+   216 |         if (process.env.NODE_ENV !== 'production') {
+>  217 |           // eslint-disable-next-line no-console
+   218 |           console.error('Error cleaning up stale connection:', error);
+   219 |         }
+──────────────────────────────────────────────────────────────────────
+
+Line 336 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   334 |     ws.on('error', (error) => {
+   335 |       if (process.env.NODE_ENV !== 'production') {
+>  336 |         // eslint-disable-next-line no-console
+   337 |         console.error(`Connection error for ${ws.connectionId}:`, error);
+   338 |       }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\core\message-handler.ts (6 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 78 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    76 |       // Check for duplicate messages
+    77 |       if (this.isDuplicateMessage(message)) {
+>   78 |         // eslint-disable-next-line no-console
+    79 |         console.warn('Duplicate message detected, ignoring:', message.messageId);
+    80 |         return;
+──────────────────────────────────────────────────────────────────────
+
+Line 87 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+    85 | 
+    86 |     } catch (error) {
+>   87 |       // eslint-disable-next-line no-console
+    88 |       console.error('Error handling message:', error);
+    89 |       await this.sendErrorResponse(ws, message, error);
+──────────────────────────────────────────────────────────────────────
+
+Line 151 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   149 |       const queued = this.operationQueueManager.enqueue(operation);
+   150 |       if (!queued) {
+>  151 |         // eslint-disable-next-line no-console
+   152 |         console.warn('Failed to queue broadcast operation for bill:', billId);
+   153 |         // Fallback to direct broadcast
+──────────────────────────────────────────────────────────────────────
+
+Line 158 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   156 | 
+   157 |     } catch (error) {
+>  158 |       // eslint-disable-next-line no-console
+   159 |       console.error('Error broadcasting to subscribers:', error);
+   160 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 513 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   511 |       ws.send(responseStr);
+   512 |     } catch (error) {
+>  513 |       // eslint-disable-next-line no-console
+   514 |       console.error('Error sending response:', error);
+   515 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 555 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   553 |           ws.send(messageStr);
+   554 |         } catch (error) {
+>  555 |           // eslint-disable-next-line no-console
+   556 |           console.error('Error in direct broadcast:', error);
+   557 |         }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\core\websocket-service.ts (5 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 622 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   620 |       try {
+   621 |         // TODO: Replace 'any' with proper type definition
+>  622 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   623 |         (listener as any)(...args);
+   624 |       } catch (error) {
+──────────────────────────────────────────────────────────────────────
+
+Line 635 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   633 |   private logInfo(message: string): void {
+   634 |     if (process.env.NODE_ENV !== 'production') {
+>  635 |       // eslint-disable-next-line no-console
+   636 |       console.log(`[WebSocketService] ${message}`);
+   637 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 645 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   643 |   private logDebug(message: string): void {
+   644 |     if (process.env.NODE_ENV !== 'production') {
+>  645 |       // eslint-disable-next-line no-console
+   646 |       console.log(`[WebSocketService] ${message}`);
+   647 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 655 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   653 |   private logWarn(message: string): void {
+   654 |     if (process.env.NODE_ENV !== 'production') {
+>  655 |       // eslint-disable-next-line no-console
+   656 |       console.warn(`[WebSocketService] ${message}`);
+   657 |     }
+──────────────────────────────────────────────────────────────────────
+
+Line 665 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   663 |   private logError(message: string, error?: unknown): void {
+   664 |     if (process.env.NODE_ENV !== 'production') {
+>  665 |       // eslint-disable-next-line no-console
+   666 |       console.error(`[WebSocketService] ${message}`, error);
+   667 |     }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\memory\leak-detector-handler.ts (1 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 434 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   432 |         // Log error without using console directly in production
+   433 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+>  434 |           // eslint-disable-next-line no-console
+   435 |           console.error('Error in leak response listener:', error);
+   436 |         }
+──────────────────────────────────────────────────────────────────────
+
+📄 server\infrastructure\websocket\monitoring\metrics-reporter.ts (3 suppressions)
+──────────────────────────────────────────────────────────────────────
+
+Line 128 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   126 |     if (!this.logger) {
+   127 |       if (process.env.NODE_ENV !== 'production') {
+>  128 |         // eslint-disable-next-line no-console
+   129 |         console.warn('No logger configured for MetricsReporter');
+   130 |       }
+──────────────────────────────────────────────────────────────────────
+
+Line 143 | Type: disable-next-line
+Rules: //  no-console
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   141 |         // If logging the error also fails, just ignore it to prevent throwing
+   142 |         if (process.env.NODE_ENV !== 'production') {
+>  143 |           // eslint-disable-next-line no-console
+   144 |           console.error('Failed to log metrics error:', logError);
+   145 |         }
+──────────────────────────────────────────────────────────────────────
+
+Line 402 | Type: disable-next-line
+Rules: //  @typescript-eslint/no-explicit-any
+⚠️  NO JUSTIFICATION PROVIDED
+
+Context:
+   400 |    */
+   401 |   // TODO: Replace 'any' with proper type definition
+>  402 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   403 |   private roundNumbers(obj: any, precision: number): void {
+   404 |     for (const key in obj) {
+──────────────────────────────────────────────────────────────────────

@@ -8,7 +8,6 @@ declare module './types' {
 
 // This file creates a circular dependency with sample-issues.ts
 
-// import { validExport } from './sample-issues'; // Removed to break circular dependency
 
 export function helperFunction() {
   return `Helper using: ${validExport}`;

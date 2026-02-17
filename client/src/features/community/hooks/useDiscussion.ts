@@ -7,7 +7,7 @@
  * MIGRATION STATUS: ✅ COMPLETED
  * - Resolves mock thread creation (lines 82-96)
  * - Implements complete moderation workflow (lines 217-240)
- * - Eliminates type casting issues (as any usage)
+ * - Eliminates type casting issues (as unknown usage)
  * - Unifies React Query + WebSocket coordination
  */
 

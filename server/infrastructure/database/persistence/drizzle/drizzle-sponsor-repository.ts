@@ -133,7 +133,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(validation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const [newSponsor] = await tx
           .insert(sponsors)
           .values(validation.data)
@@ -277,7 +277,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(updateValidation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const [updatedSponsor] = await tx
           .update(sponsors)
           .set({
@@ -309,7 +309,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      await databaseService.withTransaction(async (tx: any) => {
+      await databaseService.withTransaction(async (tx: unknown) => {
         await tx
           .update(sponsors)
           .set({

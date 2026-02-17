@@ -63,7 +63,7 @@ const getErrorMessage = (error: unknown): string => {
 };
 
 // Helper function to create error details object for logging
-const createErrorDetails = (error: unknown): Record<string, any> => {
+const createErrorDetails = (error: unknown): Record<string, unknown> => {
   if (error instanceof Error) {
     return {
       message: error.message,

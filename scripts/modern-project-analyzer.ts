@@ -115,7 +115,7 @@ class ProjectAnalyzer {
       });
       
       console.log(`   Found ${Object.keys(cycles).length} circular dependencies\n`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(`   ⚠️  Error: ${error.message}\n`);
     }
   }
@@ -142,7 +142,7 @@ class ProjectAnalyzer {
       });
       
       console.log(`   Duplication: ${report.statistics?.total?.percentage || 0}%\n`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(`   ⚠️  Error: ${error.message}\n`);
     }
   }
@@ -169,7 +169,7 @@ class ProjectAnalyzer {
       
       console.log(`   Unused files: ${report.files?.length || 0}`);
       console.log(`   Unused exports: ${report.exports?.length || 0}\n`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Knip exits with non-zero when it finds issues
       console.log(`   ⚠️  Error or issues found\n`);
     }
@@ -185,7 +185,7 @@ class ProjectAnalyzer {
       
       console.log(`   Type locations: ${typeAnalysis.locations.length}`);
       console.log(`   Duplicate patterns: ${typeAnalysis.duplicatePatterns.length}\n`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(`   ⚠️  Error: ${error.message}\n`);
     }
   }
@@ -241,8 +241,8 @@ class ProjectAnalyzer {
     console.log(`   Issues detected: ${issues.length}\n`);
   }
 
-  private async detectArchitecturalIssues(): Promise<any[]> {
-    const issues: any[] = [];
+  private async detectArchitecturalIssues(): Promise<unknown[]> {
+    const issues: unknown[] = [];
 
     // Check for competing storage patterns (Chanuka-specific)
     const hasLegacyStorage = await this.directoryExists('server/storage');
@@ -364,7 +364,7 @@ class ProjectAnalyzer {
     return 'Critical';
   }
 
-  private generateRecommendations(): any[] {
+  private generateRecommendations(): unknown[] {
     const recommendations = [];
     
     const circular = this.results.get('circularDependencies');
@@ -405,7 +405,7 @@ class ProjectAnalyzer {
     return recommendations;
   }
 
-  private generateMarkdownReport(report: any): string {
+  private generateMarkdownReport(report: unknown): string {
     const md: string[] = [];
     
     md.push('# Project Analysis Report');
@@ -421,7 +421,7 @@ class ProjectAnalyzer {
     
     if (report.recommendations.length > 0) {
       md.push('## Recommendations\n');
-      report.recommendations.forEach((rec: any, i: number) => {
+      report.recommendations.forEach((rec: unknown, i: number) => {
         md.push(`### ${i + 1}. ${rec.category} (${rec.priority} priority)`);
         md.push(`**Issue:** ${rec.issue}`);
         md.push(`**Action:** ${rec.action}`);
@@ -449,7 +449,7 @@ class ProjectAnalyzer {
     // Architecture Issues
     if (report.details.architecture) {
       md.push('### Architecture Issues\n');
-      report.details.architecture.forEach((issue: any) => {
+      report.details.architecture.forEach((issue: unknown) => {
         md.push(`#### ${issue.category} (${issue.severity})`);
         md.push(`${issue.description}`);
         if (issue.locations) {
@@ -486,7 +486,7 @@ async function main() {
   
   try {
     await analyzer.analyze();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Analysis failed:', error.message);
     process.exit(1);
   }

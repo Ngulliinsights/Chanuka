@@ -144,7 +144,7 @@ async function validateDatabaseSecurity(): Promise<void> {
   }
 }
 
-function showSuccessSummary(environment: string, healthReport: any, duration: number): void {
+function showSuccessSummary(environment: string, healthReport: unknown, duration: number): void {
   console.log('\n🎉 STRATEGIC DATABASE INITIALIZATION COMPLETE!');
   console.log('================================================');
   console.log(`Environment: ${environment}`);
@@ -179,7 +179,7 @@ function showSuccessSummary(environment: string, healthReport: any, duration: nu
   console.log('   • npm run db:health --help');
 }
 
-function showTroubleshootingGuide(error: any, environment: string): void {
+function showTroubleshootingGuide(error: unknown, environment: string): void {
   console.log('\n❌ INITIALIZATION FAILED - TROUBLESHOOTING GUIDE');
   console.log('===============================================');
   console.log(`Error: ${error.message}`);

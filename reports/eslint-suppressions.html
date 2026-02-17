@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESLint Suppression Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0 0 10px 0;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #666;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+    }
+    .section {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+    tr:hover {
+      background: #f8f9fa;
+    }
+    .warning {
+      color: #f59e0b;
+    }
+    .error {
+      color: #ef4444;
+    }
+    .success {
+      color: #10b981;
+    }
+    .suppression-item {
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin: 15px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .suppression-item.no-justification {
+      border-left-color: #f59e0b;
+    }
+    .code-context {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
+    .code-context .highlight {
+      background: #264f78;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔍 ESLint Suppression Report</h1>
+    <p>Generated: 2026-02-17T01:09:12.169Z</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Total Suppressions</h3>
+      <div class="value error">72</div>
+    </div>
+    <div class="stat-card">
+      <h3>Target</h3>
+      <div class="value">&lt; 10</div>
+    </div>
+    <div class="stat-card">
+      <h3>With Justification</h3>
+      <div class="value">8.3%</div>
+    </div>
+    <div class="stat-card">
+      <h3>Files Affected</h3>
+      <div class="value">23</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Suppressions by Type</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+            <tr>
+              <td>disable-next-line</td>
+              <td>69</td>
+              <td>95.8%</td>
+            </tr>
+          
+            <tr>
+              <td>disable</td>
+              <td>3</td>
+              <td>4.2%</td>
+            </tr>
+          
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Suppressions by Rule</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Rule</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+            <tr>
+              <td><code>//  no-console</code></td>
+              <td>37</td>
+              <td>51.4%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  @typescript-eslint/no-explicit-any</code></td>
+              <td>18</td>
+              <td>25.0%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  @typescript-eslint/no-var-requires</code></td>
+              <td>7</td>
+              <td>9.7%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  react-hooks/exhaustive-deps</code></td>
+              <td>3</td>
+              <td>4.2%</td>
+            </tr>
+          
+            <tr>
+              <td><code>/*  no-console */</code></td>
+              <td>3</td>
+              <td>4.2%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  complexity</code></td>
+              <td>2</td>
+              <td>2.8%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  @typescript-eslint/no-this-alias</code></td>
+              <td>1</td>
+              <td>1.4%</td>
+            </tr>
+          
+            <tr>
+              <td><code>//  @typescript-eslint/no-unused-vars</code></td>
+              <td>1</td>
+              <td>1.4%</td>
+            </tr>
+          
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Top Files with Most Suppressions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+            <tr>
+              <td><code>server\features\coverage\coverage-routes.ts</code></td>
+              <td>12</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\features\search\engines\core\postgresql-fulltext.engine.ts</code></td>
+              <td>8</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\features\argument-intelligence\application\argument-intelligence-service.ts</code></td>
+              <td>7</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\core\message-handler.ts</code></td>
+              <td>6</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\core\websocket-service.ts</code></td>
+              <td>5</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\batching\batching-service.ts</code></td>
+              <td>4</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\adapters\socketio-adapter.ts</code></td>
+              <td>4</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\adapters\redis-adapter.ts</code></td>
+              <td>4</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\schema\validate-static.ts</code></td>
+              <td>3</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\monitoring\metrics-reporter.ts</code></td>
+              <td>3</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\core\connection-manager.ts</code></td>
+              <td>3</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\database\graph\utils\query-builder.ts</code></td>
+              <td>2</td>
+            </tr>
+          
+            <tr>
+              <td><code>client\src\core\security\csrf-protection.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>client\src\core\analytics\comprehensive-tracker.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>client\src\lib\ui\offline\offline-manager.tsx</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>client\src\features\analytics\hooks\useErrorAnalytics.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>client\src\core\navigation\hooks\use-navigation-preferences.tsx</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\schema\base-types.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\notifications\email-service.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+            <tr>
+              <td><code>server\infrastructure\websocket\memory\leak-detector-handler.ts</code></td>
+              <td>1</td>
+            </tr>
+          
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Detailed Suppressions</h2>
+    
+        <h3>📄 client\src\core\analytics\comprehensive-tracker.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 965</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-unused-vars</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   963 |    * @internal Reserved for future use when batch sending is implemented
+   964 |    */
+&gt;  965 |   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   966 |   private async _flushAnalyticsData(): Promise&lt;void&gt; {
+   967 |     if (this.events.length === 0) return;</pre></div>
+          </div>
+        
+      
+        <h3>📄 client\src\core\navigation\hooks\use-navigation-preferences.tsx</h3>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 105</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  react-hooks/exhaustive-deps</code></div>
+            <div class="success">✓ Justification: Intentionally omitting dependencies to run effect only once on mount</div>
+            <div class="code-context"><pre>   103 |     };
+   104 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+&gt;  105 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   106 |   }, []); // Empty dependency array ensures this runs only once on mount
+   107 | </pre></div>
+          </div>
+        
+      
+        <h3>📄 client\src\core\security\csrf-protection.ts</h3>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 261</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-this-alias</code></div>
+            <div class="success">✓ Justification: this-alias required for closure context preservation in XMLHttpRequest override</div>
+            <div class="code-context"><pre>   259 |     const originalSend = XMLHttpRequest.prototype.send;
+   260 |     // JUSTIFICATION: this-alias required for closure context preservation in XMLHttpRequest override
+&gt;  261 |     // eslint-disable-next-line @typescript-eslint/no-this-alias
+   262 |     const self = this;
+   263 | </pre></div>
+          </div>
+        
+      
+        <h3>📄 client\src\features\analytics\hooks\useErrorAnalytics.ts</h3>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 324</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  react-hooks/exhaustive-deps</code></div>
+            <div class="success">✓ Justification: Intentionally omitting dependencies to run effect only once on mount</div>
+            <div class="code-context"><pre>   322 |     loadAllData();
+   323 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+&gt;  324 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   325 |   }, []); // Only run once on mount
+   326 | </pre></div>
+          </div>
+        
+      
+        <h3>📄 client\src\lib\ui\offline\offline-manager.tsx</h3>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 479</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  react-hooks/exhaustive-deps</code></div>
+            <div class="success">✓ Justification: Intentionally omitting dependencies to run effect only once on mount</div>
+            <div class="code-context"><pre>   477 |     fetchData();
+   478 |     // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
+&gt;  479 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+   480 |   }, [fetchData, ...dependencies]);
+   481 | </pre></div>
+          </div>
+        
+      
+        <h3>📄 server\features\argument-intelligence\application\argument-intelligence-service.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 97</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    95 |    */
+    96 |   // TODO: Replace 'any' with proper type definition
+&gt;   97 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    98 |   async storeArgument(argumentData: unknown): Promise&lt;Argument&gt; {
+    99 |     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 193</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   191 |    */
+   192 |   // TODO: Replace 'any' with proper type definition
+&gt;  193 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   194 |   async storeClaims(claimsData: unknown[]): Promise&lt;Claim[]&gt; {
+   195 |     const logContext = {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 261</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   259 |    */
+   260 |   // TODO: Replace 'any' with proper type definition
+&gt;  261 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   262 |   async storeEvidence(evidenceData: unknown[]): Promise&lt;Evidence[]&gt; {
+   263 |     const logContext = {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 329</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   327 |    */
+   328 |   // TODO: Replace 'any' with proper type definition
+&gt;  329 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   330 |   async storeBrief(briefData: unknown): Promise&lt;LegislativeBrief&gt; {
+   331 |     const logContext = {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 516</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   514 |    */
+   515 |   // TODO: Replace 'any' with proper type definition
+&gt;  516 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   517 |   async storeArgumentRelationships(relationships: unknown[]): Promise&lt;ArgumentRelationship[]&gt; {
+   518 |     const logContext = {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 595</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   593 |    */
+   594 |   // TODO: Replace 'any' with proper type definition
+&gt;  595 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   596 |   async getArgumentStatistics(bill_id: string): Promise&lt;any&gt; {
+   597 |     const logContext = {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 663</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   661 |    */
+   662 |   // TODO: Replace 'any' with proper type definition
+&gt;  663 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   664 |   private parseJson(jsonString: string | null, fallback: unknown = null): unknown {
+   665 |     if (!jsonString) return fallback;</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\features\coverage\coverage-routes.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 13</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    11 |   try {
+    12 |   // Create analyzer lazily to respect test mocks and avoid early module-side instantiation
+&gt;   13 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+    14 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+    15 |   const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 46</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    44 |     } catch (e) {
+    45 |       // Fallback
+&gt;   46 |       // eslint-disable-next-line no-console
+    47 |       console.error('Error generating coverage report:', error);
+    48 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 64</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    62 |   try {
+    63 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+&gt;   64 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+    65 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+    66 |   const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 94</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    92 |       logger.error('Error analyzing server coverage:', { error });
+    93 |     } catch (e) {
+&gt;   94 |       // eslint-disable-next-line no-console
+    95 |       console.error('Error analyzing server coverage:', error);
+    96 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 112</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   110 |   try {
+   111 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+&gt;  112 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   113 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   114 |   const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 141</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   139 |       logger.error('Error analyzing client coverage:', { error });
+   140 |     } catch (e) {
+&gt;  141 |       // eslint-disable-next-line no-console
+   142 |       console.error('Error analyzing client coverage:', error);
+   143 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 159</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   157 |   try {
+   158 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+&gt;  159 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   160 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   161 |   const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 188</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   186 |       logger.error('Error analyzing integration coverage:', { error });
+   187 |     } catch (e) {
+&gt;  188 |       // eslint-disable-next-line no-console
+   189 |       console.error('Error analyzing integration coverage:', error);
+   190 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 206</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   204 |   try {
+   205 |   // Lazily instantiate analyzer to ensure tests that mock the class are used
+&gt;  206 |   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   207 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   208 |   const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 257</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   255 |       logger.error('Error analyzing coverage gaps:', { error });
+   256 |     } catch (e) {
+&gt;  257 |       // eslint-disable-next-line no-console
+   258 |       console.error('Error analyzing coverage gaps:', error);
+   259 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 278</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   276 |     let result;
+   277 |     // Lazily instantiate analyzer to ensure tests that mock the class are used
+&gt;  278 |     // eslint-disable-next-line @typescript-eslint/no-var-requires
+   279 |     const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+   280 |     const coverageAnalyzer = new Analyzer();</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 325</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   323 |       logger.error('Error running coverage analysis:', { error });
+   324 |     } catch (e) {
+&gt;  325 |       // eslint-disable-next-line no-console
+   326 |       console.error('Error running coverage analysis:', error);
+   327 |     }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\features\search\engines\core\postgresql-fulltext.engine.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 114</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   112 |    */
+   113 |   // TODO: Replace 'any' with proper type definition
+&gt;  114 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   115 |   private async searchBillsEnhanced(
+   116 |     queryComponents: any,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 181</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   179 | 
+   180 |     // TODO: Replace 'any' with proper type definition
+&gt;  181 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   182 |     return result.data.map((bill: unknown) =&gt; ({
+   183 |       id: bill.id,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 205</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   203 |    */
+   204 |   // TODO: Replace 'any' with proper type definition
+&gt;  205 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   206 |   private async searchSponsorsEnhanced(
+   207 |     queryComponents: any,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 269</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   267 | 
+   268 |     // TODO: Replace 'any' with proper type definition
+&gt;  269 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   270 |     return result.data.map((sponsor: unknown) =&gt; ({
+   271 |       id: sponsor.id,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 292</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   290 |    */
+   291 |   // TODO: Replace 'any' with proper type definition
+&gt;  292 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   293 |   private async searchCommentsEnhanced(
+   294 |     queryComponents: any,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 350</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   348 | 
+   349 |     // TODO: Replace 'any' with proper type definition
+&gt;  350 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   351 |     return result.data.map((comment: unknown) =&gt; ({
+   352 |       id: comment.id,</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 386</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   384 | 
+   385 |       // TODO: Replace 'any' with proper type definition
+&gt;  386 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   387 |       if (result.data.length &gt; 0) {
+   388 |         const firstResult = result.data[0] as Record&lt;string, unknown&gt;;</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 663</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   661 |    */
+   662 |   // TODO: Replace 'any' with proper type definition
+&gt;  663 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   664 |   async getPerformanceStats(hoursBack: number = 24): Promise&lt;unknown[]&gt; {
+   665 |     const result = await databaseService.executeRawQuery(</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\database\graph\relationships.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 1</strong> | Type: <code>disable</code> | Rules: <code>/*  no-console */</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>&gt;    1 | /* eslint-disable no-console */
+     2 | /**
+     3 |  * Core Relationship Models (FULLY REFACTORED & OPTIMIZED)</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\database\graph\utils\query-builder.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 404</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   402 |     const hasReturn = this.clauses.some(c =&gt; c.keyword === 'RETURN');
+   403 |     if (!hasReturn) {
+&gt;  404 |       // eslint-disable-next-line no-console
+   405 |       console.warn('Warning: Query does not have a RETURN clause');
+   406 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 439</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   437 |       const rank = clauseRanks[clause] ?? 0;
+   438 |       if (rank &lt; lastRank) {
+&gt;  439 |         // eslint-disable-next-line no-console
+   440 |         console.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);
+   441 |       }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\notifications\email-service.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 464</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-var-requires</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   462 |       let nodemailer: any = null;
+   463 |       try {
+&gt;  464 |         // eslint-disable-next-line @typescript-eslint/no-var-requires
+   465 |         nodemailer = require('nodemailer');
+   466 |       } catch (err) {</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\schema\base-types.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 94</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    92 |  */
+    93 | // TODO: Replace 'any' with proper type definition
+&gt;   94 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    95 | export const statusField = (enumType: unknown, defaultValue: string) =&gt; {
+    96 |   const enumNameOrStatus = enumType.name ?? "status";</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\schema\validate-static.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 15</strong> | Type: <code>disable</code> | Rules: <code>/*  no-console */</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    13 | // - Fast: No compilation or import overhead
+    14 | 
+&gt;   15 | /* eslint-disable no-console */
+    16 | 
+    17 | import fs from "fs";</pre></div>
+          </div>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 189</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  complexity</code></div>
+            <div class="success">✓ Justification: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability</div>
+            <div class="code-context"><pre>   187 |  */
+   188 | // JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+&gt;  189 | // eslint-disable-next-line complexity
+   190 | function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } {
+   191 |   const tables: TableDef[] = [];</pre></div>
+          </div>
+        
+          <div class="suppression-item ">
+            <div><strong>Line 253</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  complexity</code></div>
+            <div class="success">✓ Justification: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability</div>
+            <div class="code-context"><pre>   251 |  */
+   252 | // JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
+&gt;  253 | // eslint-disable-next-line complexity
+   254 | function findRelations(dir: string): RelationDef[] {
+   255 |   const relations: RelationDef[] = [];</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\adapters\native-websocket-adapter.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 15</strong> | Type: <code>disable</code> | Rules: <code>/*  no-console */</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    13 | // Note: If @shared/core is unavailable, consider using a local logger implementation
+    14 | // or importing from a different path. For now, we'll create a fallback.
+&gt;   15 | /* eslint-disable no-console */
+    16 | const logger = {
+    17 |   info: (message: string, meta?: Record&lt;string, unknown&gt;) =&gt; console.log(`[INFO] ${message}`, meta),</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\adapters\redis-adapter.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 15</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    13 | const logger = {
+    14 |   info: (message: string, context?: unknown) =&gt; {
+&gt;   15 |     // eslint-disable-next-line no-console
+    16 |     console.log(`[INFO] ${message}`, context || '');
+    17 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 19</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    17 |   },
+    18 |   warn: (message: string, context?: unknown) =&gt; {
+&gt;   19 |     // eslint-disable-next-line no-console
+    20 |     console.warn(`[WARN] ${message}`, context || '');
+    21 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 23</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    21 |   },
+    22 |   error: (message: string, context?: unknown, error?: Error) =&gt; {
+&gt;   23 |     // eslint-disable-next-line no-console
+    24 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    25 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 27</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    25 |   },
+    26 |   debug: (message: string, context?: unknown) =&gt; {
+&gt;   27 |     // eslint-disable-next-line no-console
+    28 |     console.log(`[DEBUG] ${message}`, context || '');
+    29 |   }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\adapters\socketio-adapter.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 17</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    15 | const logger = {
+    16 |   info: (message: string, context?: unknown) =&gt; {
+&gt;   17 |     // eslint-disable-next-line no-console
+    18 |     console.log(`[INFO] ${message}`, context || '');
+    19 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 21</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    19 |   },
+    20 |   warn: (message: string, context?: unknown) =&gt; {
+&gt;   21 |     // eslint-disable-next-line no-console
+    22 |     console.warn(`[WARN] ${message}`, context || '');
+    23 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 25</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    23 |   },
+    24 |   error: (message: string, context?: unknown, error?: Error) =&gt; {
+&gt;   25 |     // eslint-disable-next-line no-console
+    26 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    27 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 29</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    27 |   },
+    28 |   debug: (message: string, context?: unknown) =&gt; {
+&gt;   29 |     // eslint-disable-next-line no-console
+    30 |     console.log(`[DEBUG] ${message}`, context || '');
+    31 |   }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\batching\batching-service.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 14</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    12 | const logger = {
+    13 |   info: (message: string, context?: unknown) =&gt; {
+&gt;   14 |     // eslint-disable-next-line no-console
+    15 |     console.log(`[INFO] ${message}`, context || '');
+    16 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 18</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    16 |   },
+    17 |   warn: (message: string, context?: unknown) =&gt; {
+&gt;   18 |     // eslint-disable-next-line no-console
+    19 |     console.warn(`[WARN] ${message}`, context || '');
+    20 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 22</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    20 |   },
+    21 |   error: (message: string, context?: unknown, error?: Error) =&gt; {
+&gt;   22 |     // eslint-disable-next-line no-console
+    23 |     console.error(`[ERROR] ${message}`, context || '', error || '');
+    24 |   },</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 26</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    24 |   },
+    25 |   debug: (message: string, context?: unknown) =&gt; {
+&gt;   26 |     // eslint-disable-next-line no-console
+    27 |     console.log(`[DEBUG] ${message}`, context || '');
+    28 |   }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\config\runtime-config.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 267</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   265 |         // In production, this should use the application's logging system
+   266 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+&gt;  267 |           // eslint-disable-next-line no-console
+   268 |           console.error('Error in configuration change listener:', error);
+   269 |         }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\core\connection-manager.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 129</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   127 |       // Log error but don't throw to avoid disrupting cleanup
+   128 |       if (process.env.NODE_ENV !== 'production') {
+&gt;  129 |         // eslint-disable-next-line no-console
+   130 |         console.error('Error removing connection:', error);
+   131 |       }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 217</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   215 |       } catch (error) {
+   216 |         if (process.env.NODE_ENV !== 'production') {
+&gt;  217 |           // eslint-disable-next-line no-console
+   218 |           console.error('Error cleaning up stale connection:', error);
+   219 |         }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 336</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   334 |     ws.on('error', (error) =&gt; {
+   335 |       if (process.env.NODE_ENV !== 'production') {
+&gt;  336 |         // eslint-disable-next-line no-console
+   337 |         console.error(`Connection error for ${ws.connectionId}:`, error);
+   338 |       }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\core\message-handler.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 78</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    76 |       // Check for duplicate messages
+    77 |       if (this.isDuplicateMessage(message)) {
+&gt;   78 |         // eslint-disable-next-line no-console
+    79 |         console.warn('Duplicate message detected, ignoring:', message.messageId);
+    80 |         return;</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 87</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>    85 | 
+    86 |     } catch (error) {
+&gt;   87 |       // eslint-disable-next-line no-console
+    88 |       console.error('Error handling message:', error);
+    89 |       await this.sendErrorResponse(ws, message, error);</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 151</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   149 |       const queued = this.operationQueueManager.enqueue(operation);
+   150 |       if (!queued) {
+&gt;  151 |         // eslint-disable-next-line no-console
+   152 |         console.warn('Failed to queue broadcast operation for bill:', billId);
+   153 |         // Fallback to direct broadcast</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 158</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   156 | 
+   157 |     } catch (error) {
+&gt;  158 |       // eslint-disable-next-line no-console
+   159 |       console.error('Error broadcasting to subscribers:', error);
+   160 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 513</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   511 |       ws.send(responseStr);
+   512 |     } catch (error) {
+&gt;  513 |       // eslint-disable-next-line no-console
+   514 |       console.error('Error sending response:', error);
+   515 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 555</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   553 |           ws.send(messageStr);
+   554 |         } catch (error) {
+&gt;  555 |           // eslint-disable-next-line no-console
+   556 |           console.error('Error in direct broadcast:', error);
+   557 |         }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\core\websocket-service.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 622</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   620 |       try {
+   621 |         // TODO: Replace 'any' with proper type definition
+&gt;  622 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   623 |         (listener as any)(...args);
+   624 |       } catch (error) {</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 635</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   633 |   private logInfo(message: string): void {
+   634 |     if (process.env.NODE_ENV !== 'production') {
+&gt;  635 |       // eslint-disable-next-line no-console
+   636 |       console.log(`[WebSocketService] ${message}`);
+   637 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 645</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   643 |   private logDebug(message: string): void {
+   644 |     if (process.env.NODE_ENV !== 'production') {
+&gt;  645 |       // eslint-disable-next-line no-console
+   646 |       console.log(`[WebSocketService] ${message}`);
+   647 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 655</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   653 |   private logWarn(message: string): void {
+   654 |     if (process.env.NODE_ENV !== 'production') {
+&gt;  655 |       // eslint-disable-next-line no-console
+   656 |       console.warn(`[WebSocketService] ${message}`);
+   657 |     }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 665</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   663 |   private logError(message: string, error?: unknown): void {
+   664 |     if (process.env.NODE_ENV !== 'production') {
+&gt;  665 |       // eslint-disable-next-line no-console
+   666 |       console.error(`[WebSocketService] ${message}`, error);
+   667 |     }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\memory\leak-detector-handler.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 434</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   432 |         // Log error without using console directly in production
+   433 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+&gt;  434 |           // eslint-disable-next-line no-console
+   435 |           console.error('Error in leak response listener:', error);
+   436 |         }</pre></div>
+          </div>
+        
+      
+        <h3>📄 server\infrastructure\websocket\monitoring\metrics-reporter.ts</h3>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 128</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   126 |     if (!this.logger) {
+   127 |       if (process.env.NODE_ENV !== 'production') {
+&gt;  128 |         // eslint-disable-next-line no-console
+   129 |         console.warn('No logger configured for MetricsReporter');
+   130 |       }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 143</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  no-console</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   141 |         // If logging the error also fails, just ignore it to prevent throwing
+   142 |         if (process.env.NODE_ENV !== 'production') {
+&gt;  143 |           // eslint-disable-next-line no-console
+   144 |           console.error('Failed to log metrics error:', logError);
+   145 |         }</pre></div>
+          </div>
+        
+          <div class="suppression-item no-justification">
+            <div><strong>Line 402</strong> | Type: <code>disable-next-line</code> | Rules: <code>//  @typescript-eslint/no-explicit-any</code></div>
+            <div class="warning">⚠️ NO JUSTIFICATION PROVIDED</div>
+            <div class="code-context"><pre>   400 |    */
+   401 |   // TODO: Replace 'any' with proper type definition
+&gt;  402 | // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   403 |   private roundNumbers(obj: unknown, precision: number): void {
+   404 |     for (const key in obj) {</pre></div>
+          </div>
+        
+      
+  </div>
+</body>
+</html>

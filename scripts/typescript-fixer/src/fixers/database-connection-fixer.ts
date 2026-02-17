@@ -451,11 +451,11 @@ export class DatabaseConnectionFixer implements ErrorFixer {
 
     // Handle named imports
     if (importClause.namedBindings && importClause.namedBindings.kind === SyntaxKind.NamedImports) {
-      const namedImports = importClause.namedBindings as any;
+      const namedImports = importClause.namedBindings as unknown;
       const elements = namedImports.elements;
       
       // Check if utility is already imported
-      const alreadyImported = elements.some((element: any) => 
+      const alreadyImported = elements.some((element: unknown) => 
         element.name.text === utility
       );
       
@@ -494,10 +494,10 @@ export class DatabaseConnectionFixer implements ErrorFixer {
         const importClause = importDecl.importClause;
         
         if (importClause?.namedBindings?.kind === SyntaxKind.NamedImports) {
-          const namedImports = importClause.namedBindings as any;
+          const namedImports = importClause.namedBindings as unknown;
           const elements = namedImports.elements;
           
-          const isImported = elements.some((element: any) => 
+          const isImported = elements.some((element: unknown) => 
             element.name.text === utility
           );
           
@@ -576,11 +576,11 @@ export class DatabaseConnectionFixer implements ErrorFixer {
         const importClause = importDecl.importClause;
         
         if (importClause?.namedBindings?.kind === SyntaxKind.NamedImports) {
-          const namedImports = importClause.namedBindings as any;
+          const namedImports = importClause.namedBindings as unknown;
           const elements = namedImports.elements;
           
           // Find the unused import element
-          const unusedIndex = elements.findIndex((element: any) => 
+          const unusedIndex = elements.findIndex((element: unknown) => 
             element.name.text === unusedName
           );
           

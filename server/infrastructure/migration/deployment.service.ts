@@ -53,7 +53,7 @@ export interface DeploymentStatus {
     responseTime: number;
     statisticalSignificance: boolean;
   };
-  validationResults: any[];
+  validationResults: unknown[];
   issues: string[];
 }
 
@@ -347,10 +347,10 @@ export class DeploymentService {
   /**
    * Run data validation checkpoints
    */
-  async runDataValidationCheckpoints(): Promise<{ passed: boolean; results: any[] }> {
+  async runDataValidationCheckpoints(): Promise<{ passed: boolean; results: unknown[] }> {
     console.log('[Deployment] Running data validation checkpoints for Phase 1');
 
-    const results: any[] = [];
+    const results: unknown[] = [];
     let allPassed = true;
 
     // Run validation for each deployed component
@@ -398,10 +398,10 @@ export class DeploymentService {
   /**
    * Test rollback procedures
    */
-  async testRollbackProcedures(): Promise<{ success: boolean; results: any[] }> {
+  async testRollbackProcedures(): Promise<{ success: boolean; results: unknown[] }> {
     console.log('[Deployment] Testing rollback procedures for Phase 1 components');
 
-    const results: any[] = [];
+    const results: unknown[] = [];
     let allSuccessful = true;
 
     for (const component of ['utilities-concurrency-adapter', 'utilities-query-builder-migration']) {

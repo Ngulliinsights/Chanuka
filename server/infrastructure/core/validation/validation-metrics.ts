@@ -14,7 +14,7 @@ export interface ValidationMetric {
   success: boolean;
   errorType?: string;
   errorCategory?: 'security' | 'format' | 'business_logic' | 'system';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ValidationMetricsSummary {
@@ -98,7 +98,7 @@ export class ValidationMetricsCollector {
   /**
    * Record validation start time for duration calculation
    */
-  public startValidation(service: string, operation: string, metadata?: Record<string, any>): (success?: boolean, errorType?: string, errorCategory?: ValidationMetric['errorCategory']) => void {
+  public startValidation(service: string, operation: string, metadata?: Record<string, unknown>): (success?: boolean, errorType?: string, errorCategory?: ValidationMetric['errorCategory']) => void {
     const startTime = Date.now();
 
     return (success: boolean = true, errorType?: string, errorCategory?: ValidationMetric['errorCategory']) => {

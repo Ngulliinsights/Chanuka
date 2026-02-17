@@ -182,7 +182,7 @@ export const swaggerUiOptions = {
       theme: 'arta'
     },
     tryItOutEnabled: true,
-    requestInterceptor: (req: any) => {
+    requestInterceptor: (req: unknown) => {
       // Add auth header if token exists in localStorage
       const token = localStorage.getItem('authToken');
       if (token) {

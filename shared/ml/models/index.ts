@@ -252,7 +252,7 @@ export class ModelManager {
   /**
    * Get model instance from loaded module
    */
-  private getModelInstance(type: ModelType, module: any): any {
+  private getModelInstance(type: ModelType, module: unknown): unknown {
     const instanceMap: Record<string, string> = {
       'trojan-bill-detector': 'trojanBillDetector',
       'constitutional-analyzer': 'constitutionalAnalyzer',
@@ -337,7 +337,7 @@ export function getModelManager(): ModelManager {
  */
 export async function useModel<T = any>(
   type: ModelType,
-  operation: (model: any) => Promise<T> | T
+  operation: (model: unknown) => Promise<T> | T
 ): Promise<T> {
   const manager = getModelManager();
   const model = await manager.loadModel(type);
@@ -350,7 +350,7 @@ export async function useModel<T = any>(
 export async function batchProcess<T = any>(
   operations: Array<{
     modelType: ModelType;
-    operation: (model: any) => Promise<T> | T;
+    operation: (model: unknown) => Promise<T> | T;
   }>
 ): Promise<T[]> {
   const manager = getModelManager();

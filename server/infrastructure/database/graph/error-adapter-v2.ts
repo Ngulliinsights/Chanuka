@@ -53,14 +53,14 @@ export interface GraphErrorOptions {
   code: GraphErrorCode;
   message: string;
   cause?: Error;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   retryable?: boolean;
 }
 
 export class GraphError extends Error {
   public readonly code: GraphErrorCode;
   public readonly cause?: Error;
-  public readonly context?: Record<string, any>;
+  public readonly context?: Record<string, unknown>;
   public readonly retryable: boolean;
   public readonly timestamp: Date;
 
@@ -79,7 +79,7 @@ export class GraphError extends Error {
     }
   }
 
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return {
       name: this.name,
       code: this.code,
@@ -99,7 +99,7 @@ export class GraphErrorHandler {
   /**
    * Handle and log error with context.
    */
-  handle(error: Error, context?: Record<string, any>): void {
+  handle(error: Error, context?: Record<string, unknown>): void {
     if (error instanceof GraphError) {
       logger.error('Graph operation error', {
         code: error.code,
@@ -121,7 +121,7 @@ export class GraphErrorHandler {
   /**
    * Wrap native error in GraphError.
    */
-  wrap(error: Error, code: GraphErrorCode, context?: Record<string, any>): GraphError {
+  wrap(error: Error, code: GraphErrorCode, context?: Record<string, unknown>): GraphError {
     if (error instanceof GraphError) {
       return error;
     }
@@ -156,7 +156,7 @@ export class GraphErrorHandler {
   /**
    * Create error from Neo4j error.
    */
-  fromNeo4jError(error: any, context?: Record<string, any>): GraphError {
+  fromNeo4jError(error: unknown, context?: Record<string, unknown>): GraphError {
     // Neo4j error codes start with "Neo."
     const neo4jCode = error.code || '';
     
@@ -191,7 +191,7 @@ export class GraphErrorHandler {
 export function createGraphError(
   error: unknown,
   code: GraphErrorCode = GraphErrorCode.UNKNOWN_ERROR,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): GraphError {
   if (error instanceof GraphError) {
     return error;

@@ -55,7 +55,7 @@ if (updateFile('client/src/lib/infrastructure/monitoring/unified-error-monitorin
   if (c.includes('export class TrendAnalysisService')) return c;
   return c + `\n
 export class TrendAnalysisService {
-  analyzeTrends(data: any[]) {
+  analyzeTrends(data: unknown[]) {
     return { trends: [], insights: [] };
   }
 }
@@ -109,7 +109,7 @@ if (updateFile('client/src/features/analytics/services/analysis.ts', c => {
   if (c.includes('export default')) return c;
   return c + `\n
 export interface ConflictAnalysisResult {
-  conflicts: any[];
+  conflicts: unknown[];
   score: number;
   summary: string;
 }

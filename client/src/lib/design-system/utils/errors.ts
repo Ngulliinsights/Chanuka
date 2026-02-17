@@ -60,7 +60,7 @@ export class UIValidationError extends UIComponentError {
   public readonly field?: string;
   public readonly value?: any;
 
-  constructor(componentName: string, message: string, field?: string, value?: any) {
+  constructor(componentName: string, message: string, field?: string, value?: unknown) {
     super(componentName, 'validation', message, true);
     this.name = 'UIValidationError';
     this.field = field;

@@ -79,7 +79,7 @@ class ErrorBoundary extends React.Component<
   { hasError: boolean; error: Error | null }
 > {
    
-  constructor(props: any) {
+  constructor(props: unknown) {
     super(props);
     this.state = { hasError: false, error: null };
   }

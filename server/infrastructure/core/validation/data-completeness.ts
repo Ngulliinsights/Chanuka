@@ -1,8 +1,7 @@
 // TODO: Fix import when shared/core modules are available
-// import { apiRequest  } from '@shared/core/utils/api.js';
 
 // Stub for apiRequest
-function apiRequest(method: string, url: string, data?: any): Promise<any> {
+function apiRequest(method: string, url: string, data?: unknown): Promise<any> {
   return Promise.resolve({
     json: () => Promise.resolve({}),
   });
@@ -336,7 +335,7 @@ export class DataCompletenessService {
   /**
    * Determines if a field is incomplete based on its type and value
    */
-  private isFieldIncomplete(field: string, value: any): boolean {
+  private isFieldIncomplete(field: string, value: unknown): boolean {
     if (value === null || value === undefined) {
       return true;
     }
@@ -389,7 +388,7 @@ export class DataCompletenessService {
   /**
    * Calculates completeness percentage for a specific field
    */
-  private calculateFieldCompleteness(field: string, value: any): number {
+  private calculateFieldCompleteness(field: string, value: unknown): number {
     if (value === null || value === undefined) {
       return 0;
     }
@@ -441,7 +440,7 @@ export class DataCompletenessService {
   /**
    * Identifies specific issues with a field's data
    */
-  private identifyFieldIssues(field: string, value: any): string[] {
+  private identifyFieldIssues(field: string, value: unknown): string[] {
     const issues: string[] = [];
 
     if (value === null || value === undefined) {
@@ -519,7 +518,7 @@ export class DataCompletenessService {
   /**
    * Evaluates a condition string against entity data
    */
-  private evaluateCondition(condition: string, data: any): boolean {
+  private evaluateCondition(condition: string, data: unknown): boolean {
     try {
       // Create a safe evaluation context with only the data
       const context = { ...data };
@@ -652,7 +651,7 @@ export class DataCompletenessService {
       const entities = await response.json();
 
       // Verify each entity
-      const entity_ids = entities.map((entity: any) => entity.id);
+      const entity_ids = entities.map((entity: unknown) => entity.id);
       const verificationResults = await this.verifyMultipleEntities(entity_type, entity_ids);
 
       // Calculate overall statistics

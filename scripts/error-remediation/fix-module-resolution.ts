@@ -147,7 +147,7 @@ if (updateFile(
 export interface CommunityRealTimeHookReturn {
   isConnected: boolean;
   lastMessage: any;
-  sendMessage: (message: any) => void;
+  sendMessage: (message: unknown) => void;
   subscribe: (channel: string) => void;
   unsubscribe: (channel: string) => void;
 }
@@ -169,7 +169,7 @@ export interface ConflictOfInterestAnalysisProps {
   sponsorId: string;
   billId?: string;
   showDetails?: boolean;
-  onConflictDetected?: (conflicts: any[]) => void;
+  onConflictDetected?: (conflicts: unknown[]) => void;
 }
 `;
   }
@@ -228,7 +228,7 @@ if (updateFile(
     }
     return content + `\n
 export const personaDetector = {
-  detect: (userData: any) => {
+  detect: (userData: unknown) => {
     // Persona detection logic
     return 'default';
   },
@@ -248,7 +248,7 @@ if (applyFix(
  */
 
 export class CrossSystemErrorAnalytics {
-  trackError(error: Error, context: any) {
+  trackError(error: Error, context: unknown) {
     console.error('Cross-system error:', error, context);
   }
 
@@ -304,13 +304,13 @@ if (applyFix(
  */
 
 export interface UnifiedErrorMonitor {
-  captureError(error: Error, context?: any): void;
+  captureError(error: Error, context?: unknown): void;
   captureMessage(message: string, level?: 'info' | 'warning' | 'error'): void;
-  setContext(key: string, value: any): void;
+  setContext(key: string, value: unknown): void;
 }
 
 export class UnifiedErrorMonitoringService implements UnifiedErrorMonitor {
-  captureError(error: Error, context?: any) {
+  captureError(error: Error, context?: unknown) {
     console.error('Unified error:', error, context);
   }
 
@@ -318,7 +318,7 @@ export class UnifiedErrorMonitoringService implements UnifiedErrorMonitor {
     console.log(\`[\${level.toUpperCase()}] \${message}\`);
   }
 
-  setContext(key: string, value: any) {
+  setContext(key: string, value: unknown) {
     // Set context for error tracking
   }
 }
@@ -342,7 +342,7 @@ import { useEffect, useState, useCallback } from 'react';
 
 export interface UseWebSocketOptions {
   url: string;
-  onMessage?: (data: any) => void;
+  onMessage?: (data: unknown) => void;
   onError?: (error: Event) => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -354,7 +354,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
 
-  const sendMessage = useCallback((message: any) => {
+  const sendMessage = useCallback((message: unknown) => {
     // Send message implementation
     console.log('Sending message:', message);
   }, []);
@@ -468,7 +468,7 @@ if (applyFix(
  */
 
 export class PrivacyAnalyticsService {
-  trackEvent(event: string, data?: any) {
+  trackEvent(event: string, data?: unknown) {
     console.log('Privacy-compliant event:', event, data);
   }
 

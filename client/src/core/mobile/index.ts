@@ -15,7 +15,6 @@
 import { logger } from '@client/lib/utils/logger';
 
 import { DeviceDetector, deviceDetector } from './device-detector';
-// import { TouchHandler, touchHandler } from './touch-handler'; // Deprecated - use SwipeGestures instead
 import { MobileErrorHandler, mobileErrorHandler } from './error-handler';
 import { MobilePerformanceOptimizer, mobilePerformanceOptimizer } from './performance-optimizer';
 import { ResponsiveUtils, responsiveUtils } from './responsive-utils';

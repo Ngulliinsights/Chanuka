@@ -5,7 +5,6 @@
  */
 
 import type { AppConfig } from './schema';
-// import { logger } from '../observability/logging'; // Unused import
 
 // Re-export the main config type
 export type { AppConfig };
@@ -39,7 +38,7 @@ export interface FeatureFlagContext { user_id?: string;
   session_id?: string;
   ip_address?: string;
   user_agent?: string;
-  customAttributes?: Record<string, any>;
+  customAttributes?: Record<string, unknown>;
  }
 
 // Feature flag result
@@ -47,7 +46,7 @@ export interface FeatureFlagResult {
   enabled: boolean;
   reason: 'enabled' | 'disabled' | 'rollout' | 'user_targeting' | 'not_found';
   rolloutPercentage?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Configuration validation result
@@ -78,7 +77,7 @@ export interface DependencyValidationResult {
   dependency: string;
   status: 'healthy' | 'unhealthy' | 'unknown';
   message?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   latency?: number;
 }
 
@@ -143,7 +142,7 @@ export interface ConfigTransformation {
   path: string;
   operation: 'rename' | 'move' | 'transform' | 'remove';
   target?: string;
-  transformer?: (value: any) => any;
+  transformer?: (value: unknown) => any;
   condition?: (config: AppConfig) => boolean;
 }
 

@@ -170,7 +170,7 @@ export class DeprecationRegistry {
 // DEPRECATION WRAPPER UTILITIES
 // ============================================================================
 
-export function createDeprecatedTypeWrapper<T extends new (...args: any[]) => any>(
+export function createDeprecatedTypeWrapper<T extends new (...args: unknown[]) => any>(
   deprecatedType: T,
   warning: DeprecationWarning
 ): T {
@@ -178,21 +178,21 @@ export function createDeprecatedTypeWrapper<T extends new (...args: any[]) => an
   registry.registerDeprecation(warning);
 
   return class extends deprecatedType {
-    constructor(...args: any[]) {
+    constructor(...args: unknown[]) {
       registry.emitWarning(warning.typeName);
       super(...args);
     }
   } as T;
 }
 
-export function wrapDeprecatedFunction<F extends (...args: any[]) => any>(
+export function wrapDeprecatedFunction<F extends (...args: unknown[]) => any>(
   deprecatedFunction: F,
   warning: DeprecationWarning
 ): F {
   const registry = DeprecationRegistry.getInstance();
   registry.registerDeprecation(warning);
 
-  return function (this: any, ...args: Parameters<F>): ReturnType<F> {
+  return function (this: unknown, ...args: Parameters<F>): ReturnType<F> {
     registry.emitWarning(warning.typeName);
     return deprecatedFunction.apply(this, args);
   } as F;

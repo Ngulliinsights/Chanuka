@@ -65,7 +65,7 @@ export class MiddlewareFactory {
   }
 
   createCompositeMiddleware() {
-    const middlewares: any[] = [];
+    const middlewares: unknown[] = [];
     
     if (this.config.enableLogging) {
       middlewares.push(this.createLoggingMiddleware());
@@ -101,10 +101,10 @@ export class MiddlewareFactory {
 
   createMiddleware() {
     return [
-      (app: any) => app.use(this.createLoggingMiddleware()),
-      (app: any) => app.use(this.createMetricsMiddleware()),
-      (app: any) => app.use(this.createRateLimitMiddleware()),
-      (app: any) => app.use(this.createCachingMiddleware())
+      (app: unknown) => app.use(this.createLoggingMiddleware()),
+      (app: unknown) => app.use(this.createMetricsMiddleware()),
+      (app: unknown) => app.use(this.createRateLimitMiddleware()),
+      (app: unknown) => app.use(this.createCachingMiddleware())
     ];
   }
 }

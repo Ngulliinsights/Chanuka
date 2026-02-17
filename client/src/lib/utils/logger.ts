@@ -25,9 +25,9 @@ export { ErrorSeverity, ErrorDomain, BaseError };
 // ============================================================================
 
 export interface LogContext {
-  component?: string;
-  user_id?: string;
-  requestId?: string;
+  component?: string | undefined;
+  user_id?: string | undefined;
+  requestId?: string | undefined;
   [key: string]: unknown;
 }
 

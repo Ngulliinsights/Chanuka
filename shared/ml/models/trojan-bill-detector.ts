@@ -86,7 +86,7 @@ export class TrojanBillDetector {
       rights: ['Accountability', 'Parliamentary Oversight']
     },
     {
-      pattern: /notwithstanding\s+(?:any|the)\s+(?:\w+\s+){0,3}constitution/gi,
+      pattern: /notwithstanding\s+(?: unknown|the)\s+(?:\w+\s+){0,3}constitution/gi,
       severity: 'critical' as const,
       agenda: 'Overrides constitutional protections',
       rights: ['Constitutional Rights']
@@ -325,7 +325,7 @@ export class TrojanBillDetector {
     return techniques;
   }
 
-  private extractRedFlags(input: TrojanBillInput, _signals: any[], _normalizedText: string) {
+  private extractRedFlags(input: TrojanBillInput, _signals: unknown[], _normalizedText: string) {
     const flags = new Set<'rushed_process' | 'buried_provisions' | 'vague_language' | 'excessive_powers' | 'weak_oversight' | 'undefined_terms'>();
 
     if (input.consultationPeriod < 30) flags.add('rushed_process');
@@ -347,7 +347,7 @@ export class TrojanBillDetector {
     return Array.from(flags);
   }
 
-  private calculateRiskScore(signals: any[], provisions: any[], techniques: any[]): number {
+  private calculateRiskScore(signals: unknown[], provisions: unknown[], techniques: unknown[]): number {
     let score = 0;
 
     // Base score from signals
@@ -378,7 +378,7 @@ export class TrojanBillDetector {
     return Math.min(100, Math.max(0, score));
   }
 
-  private calculateConfidence(signals: any[], provisions: any[]): number {
+  private calculateConfidence(signals: unknown[], provisions: unknown[]): number {
     let confidence = 0.5;
     confidence += Math.min(0.25, signals.length * 0.05);
     confidence += Math.min(0.25, provisions.length * 0.08);

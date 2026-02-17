@@ -53,7 +53,7 @@ export interface ActionTemplate {
   customization: {
     requiredFields: string[];
     optionalFields: string[];
-    validationRules: Record<string, any>;
+    validationRules: Record<string, unknown>;
   };
 }
 

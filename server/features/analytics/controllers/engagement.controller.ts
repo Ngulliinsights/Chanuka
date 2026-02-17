@@ -115,7 +115,7 @@ export class EngagementController {
    *       500:
    *         description: Internal server error
    */
-  static async getEngagementMetrics(input: { body: any; query: z.infer<typeof getEngagementMetricsSchema>['query']; params: any }) {
+  static async getEngagementMetrics(input: { body: unknown; query: z.infer<typeof getEngagementMetricsSchema>['query']; params: unknown }) {
     const { query } = input;
     // For now, return a summary using the existing leaderboard method
     // This would need to be properly implemented in the service
@@ -185,7 +185,7 @@ export class EngagementController {
    *       500:
    *         description: Internal server error
    */
-  static async getEngagementTrends(input: { body: any; query: z.infer<typeof getEngagementTrendsSchema>['query']; params: any }) {
+  static async getEngagementTrends(input: { body: unknown; query: z.infer<typeof getEngagementTrendsSchema>['query']; params: unknown }) {
     const { query } = input;
     // For demonstration, get trends for bill ID 1 (this would need proper implementation)
     // The existing service method requires a bill_id, but the route expects global trends

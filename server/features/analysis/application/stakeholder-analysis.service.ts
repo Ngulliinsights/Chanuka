@@ -97,7 +97,7 @@ export class StakeholderAnalysisService {
      }
 
     /** Extracts stakeholder groups from ML results or uses fallback */
-    private extractStakeholderGroups(beneficiaryData?: any): { primaryBeneficiaries: StakeholderGroup[], negativelyAffected: StakeholderGroup[] } {
+    private extractStakeholderGroups(beneficiaryData?: unknown): { primaryBeneficiaries: StakeholderGroup[], negativelyAffected: StakeholderGroup[] } {
         logger.debug("Extracting stakeholder groups.");
         const primaryBeneficiaries: StakeholderGroup[] = [];
         const negativelyAffected: StakeholderGroup[] = [];

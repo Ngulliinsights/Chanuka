@@ -10,10 +10,10 @@ import { bills, comments,sponsors } from '@server/infrastructure/schema';
 import { desc,ilike, or, sql } from 'drizzle-orm';
 // Simple logger for search engine
 const logger = {
-  debug: (message: string, meta?: any) => console.log(`[DEBUG] ${message}`, meta || ''),
-  error: (message: string, meta?: any) => console.error(`[ERROR] ${message}`, meta || ''),
-  warn: (message: string, meta?: any) => console.warn(`[WARN] ${message}`, meta || ''),
-  info: (message: string, meta?: any) => console.log(`[INFO] ${message}`, meta || '')
+  debug: (message: string, meta?: unknown) => console.log(`[DEBUG] ${message}`, meta || ''),
+  error: (message: string, meta?: unknown) => console.error(`[ERROR] ${message}`, meta || ''),
+  warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta || ''),
+  info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta || '')
 };
 
 interface CacheEntry {

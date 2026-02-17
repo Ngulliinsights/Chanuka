@@ -4,6 +4,8 @@
  */
 
 import { IConnectionManager, IHealthChecker, IMetricsReporter, IOperationQueueManager,IStatisticsCollector, MetricsReport } from '../types';
+import { logger } from '@shared/core';
+
 
 /**
  * Report format options
@@ -125,8 +127,7 @@ export class MetricsReporter implements IMetricsReporter {
   logMetrics(level: string = 'info', options: Partial<ExportOptions> = {}): void {
     if (!this.logger) {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.warn('No logger configured for MetricsReporter');
+        logger.warn('No logger configured for MetricsReporter');
       }
       return;
     }
@@ -140,8 +141,7 @@ export class MetricsReporter implements IMetricsReporter {
       } catch (logError) {
         // If logging the error also fails, just ignore it to prevent throwing
         if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.error('Failed to log metrics error:', logError);
+          logger.error('Failed to log metrics error:', logError);
         }
       }
     }
@@ -398,8 +398,8 @@ export class MetricsReporter implements IMetricsReporter {
    * @param obj Object to process
    * @param precision Number of decimal places
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private roundNumbers(obj: any, precision: number): void {
+  // TODO: Replace 'any' with proper type definition
+  private roundNumbers(obj: unknown, precision: number): void {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const value = obj[key];

@@ -47,7 +47,7 @@ export interface AlertConditions {
 export interface NotificationChannel {
   type: string;
   enabled: boolean;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   priority: string;
   quietHours?: {
     start: string;
@@ -83,7 +83,7 @@ export interface AlertDeliveryLog {
   status: 'sent' | 'failed' | 'filtered' | 'queued';
   delivery_time?: Date;
   failure_reason?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: Date;
 }
 
@@ -138,7 +138,7 @@ export class AlertPreferencesService {
       const preferenceData = this.serializePreference(preference);
 
       // Add or update the preference
-      const existingIndex = alertPreferences.findIndex((p: any) => p.id === preference.id);
+      const existingIndex = alertPreferences.findIndex((p: unknown) => p.id === preference.id);
       if (existingIndex >= 0) {
         alertPreferences[existingIndex] = preferenceData;
       } else {
@@ -221,7 +221,7 @@ export class AlertPreferencesService {
       const currentPreferences = (user.preferences as any) || {};
       const alertPreferences = currentPreferences.alertPreferences || [];
 
-      const preferences = alertPreferences.map((p: any) => this.deserializePreference(p));
+      const preferences = alertPreferences.map((p: unknown) => this.deserializePreference(p));
 
       logger.debug('✅ Alert preferences retrieved', { 
         ...logContext, 
@@ -284,7 +284,7 @@ export class AlertPreferencesService {
       const alertPreferences = currentPreferences.alertPreferences || [];
 
       // Filter out the preference
-      const updatedPreferences = alertPreferences.filter((p: any) => p.id !== id);
+      const updatedPreferences = alertPreferences.filter((p: unknown) => p.id !== id);
 
       // Update the database
       await this.database
@@ -608,7 +608,7 @@ export class AlertPreferencesService {
   /**
    * Deserialize alert preference from storage
    */
-  private deserializePreference(data: any): AlertPreference {
+  private deserializePreference(data: unknown): AlertPreference {
     return {
       id: data.id,
       user_id: data.user_id,

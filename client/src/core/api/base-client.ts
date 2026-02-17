@@ -15,12 +15,7 @@ import {
   serializationRequestInterceptor,
   deserializationResponseInterceptor,
 } from './serialization-interceptors';
-
-/**
- * HTTP methods supported by the API client
- */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-
+import type { HttpMethod } from '@shared/types/api/request-types';
 /**
  * Request body types
  */
@@ -32,10 +27,10 @@ export type RequestBody = Record<string, unknown> | FormData | string | null;
 export interface BaseClientRequest {
   url: string;
   method: HttpMethod;
-  headers?: Record<string, string>;
-  body?: RequestBody;
-  timeout?: number;
-  retries?: number;
+  headers?: Record<string, string> | undefined;
+  body?: RequestBody | undefined;
+  timeout?: number | undefined;
+  retries?: number | undefined;
 }
 
 /**

@@ -657,7 +657,7 @@ class DatabaseMonitoringService {
   /**
    * Performs an immediate health check without waiting for the interval
    */
-  async checkNow(): Promise<Record<string, any>> {
+  async checkNow(): Promise<Record<string, unknown>> {
     logger.info('Performing on-demand health check');
     await this.performHealthCheck();
     return await monitorPoolHealth();

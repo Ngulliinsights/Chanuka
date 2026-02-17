@@ -60,9 +60,9 @@ export interface SponsorTransparencyInput {
  * Used when fetching complete sponsor profiles with relationships.
  */
 export interface SponsorWithRelations extends Sponsor {
-  affiliations: any[];
-  transparency: any[];
-  sponsorships: any[];
+  affiliations: unknown[];
+  transparency: unknown[];
+  sponsorships: unknown[];
 }
 
 // ============================================================================
@@ -575,7 +575,7 @@ export class SponsorService {
    * @param activeOnly - Whether to filter to only active affiliations
    * @returns Array of affiliation records
    */
-  async listAffiliations(sponsor_id: number, activeOnly: boolean = true): Promise<any[]> {
+  async listAffiliations(sponsor_id: number, activeOnly: boolean = true): Promise<unknown[]> {
     const logContext = { 
       component: 'SponsorService', 
       operation: 'listAffiliations', 
@@ -699,7 +699,7 @@ export class SponsorService {
    * @param sponsor_id - The sponsor whose records to fetch
    * @returns Array of transparency records
    */
-  async listTransparencyRecords(sponsor_id: number): Promise<any[]> {
+  async listTransparencyRecords(sponsor_id: number): Promise<unknown[]> {
     const logContext = { 
       component: 'SponsorService', 
       operation: 'listTransparencyRecords', 
@@ -817,7 +817,7 @@ export class SponsorService {
    * @param activeOnly - Whether to filter to only active sponsorships
    * @returns Array of sponsorship records
    */
-  async listBillSponsorshipsBySponsor(sponsor_id: number, activeOnly: boolean = true): Promise<any[]> {
+  async listBillSponsorshipsBySponsor(sponsor_id: number, activeOnly: boolean = true): Promise<unknown[]> {
     const logContext = { 
       component: 'SponsorService', 
       operation: 'listBillSponsorshipsBySponsor', 
@@ -853,7 +853,7 @@ export class SponsorService {
    * @param activeOnly - Whether to filter to only active sponsorships
    * @returns Array of sponsorship records
    */
-  async listSponsorsForBill(bill_id: number, activeOnly: boolean = true): Promise<any[]> {
+  async listSponsorsForBill(bill_id: number, activeOnly: boolean = true): Promise<unknown[]> {
     const logContext = { 
       component: 'SponsorService', 
       operation: 'listSponsorsForBill', 

@@ -34,7 +34,7 @@ export async function calculateInfluenceScore(driver: Driver, personId: string):
   }
 }
 
-export async function getInfluencers(driver: Driver, options: PaginationOptions = {}): Promise<any[]> {
+export async function getInfluencers(driver: Driver, options: PaginationOptions = {}): Promise<unknown[]> {
   const baseQuery = `
     MATCH (p:Person)
     WITH p, size((p)--()) as connections

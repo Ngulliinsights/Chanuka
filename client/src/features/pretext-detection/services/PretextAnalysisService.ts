@@ -138,7 +138,7 @@ export class PretextAnalysisService {
   /**
    * Analyze scope creep in bill text
    */
-  private analyzeScopeCreep(billData: any): {
+  private analyzeScopeCreep(billData: unknown): {
     score: number;
     description: string;
     evidence: string[];
@@ -210,7 +210,7 @@ export class PretextAnalysisService {
   /**
    * Calculate composite score from indicators
    */
-  private calculateCompositeScore(indicators: any): number {
+  private calculateCompositeScore(indicators: unknown): number {
     const { weights } = this.config;
 
     return Math.round(
@@ -224,7 +224,7 @@ export class PretextAnalysisService {
   /**
    * Calculate confidence based on data quality and quantity
    */
-  private calculateConfidence(indicators: any, timelineLength: number): number {
+  private calculateConfidence(indicators: unknown, timelineLength: number): number {
     let confidence = 0.5; // baseline
 
     // More timeline events = higher confidence
@@ -232,7 +232,7 @@ export class PretextAnalysisService {
 
     // Evidence count affects confidence
     const totalEvidence = Object.values(indicators).reduce(
-      (sum: number, indicator: any) => sum + indicator.evidence.length,
+      (sum: number, indicator: unknown) => sum + indicator.evidence.length,
       0
     );
     confidence += Math.min(totalEvidence * 0.02, 0.2);
@@ -243,7 +243,7 @@ export class PretextAnalysisService {
   /**
    * Generate human-readable rationale
    */
-  private generateRationale(indicators: any): string[] {
+  private generateRationale(indicators: unknown): string[] {
     const rationale: string[] = [];
 
     Object.entries(indicators).forEach(([key, indicator]: [string, any]) => {

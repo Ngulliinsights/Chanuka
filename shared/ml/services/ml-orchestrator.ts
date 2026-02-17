@@ -343,7 +343,7 @@ export class MLOrchestrator {
     }
   }
 
-  private async executeModel(modelType: ModelType, input: any, options: any): Promise<any> {
+  private async executeModel(modelType: ModelType, input: unknown, options: unknown): Promise<any> {
     const model = this.modelInstances.get(modelType);
     if (!model) {
       throw new Error(`Model ${modelType} not found`);
@@ -362,7 +362,7 @@ export class MLOrchestrator {
     return Promise.race([executionPromise, timeoutPromise]);
   }
 
-  private async callModelMethod(model: any, modelType: ModelType, input: any): Promise<any> {
+  private async callModelMethod(model: unknown, modelType: ModelType, input: unknown): Promise<any> {
     const methodMap: Record<ModelType, string> = {
       'trojan-bill-detector': 'analyze',
       'constitutional-analyzer': 'analyze',
@@ -422,12 +422,12 @@ export class MLOrchestrator {
   // CACHING
   // ============================================================================
 
-  private generateCacheKey(modelType: ModelType, input: any): string {
+  private generateCacheKey(modelType: ModelType, input: unknown): string {
     const inputHash = this.hashObject(input);
     return `${modelType}:${inputHash}`;
   }
 
-  private hashObject(obj: any): string {
+  private hashObject(obj: unknown): string {
     try {
       const str = JSON.stringify(obj, Object.keys(obj).sort());
       let hash = 0;
@@ -445,7 +445,7 @@ export class MLOrchestrator {
     }
   }
 
-  private getCachedResult(modelType: ModelType, input: any): any | null {
+  private getCachedResult(modelType: ModelType, input: unknown): unknown | null {
     const cacheKey = this.generateCacheKey(modelType, input);
     const entry = this.cache.get(cacheKey);
     
@@ -465,7 +465,7 @@ export class MLOrchestrator {
     return entry.result;
   }
 
-  private cacheResult(modelType: ModelType, input: any, result: any): void {
+  private cacheResult(modelType: ModelType, input: unknown, result: unknown): void {
     // Check cache size limits
     if (this.cache.size >= this.MAX_CACHE_SIZE) {
       this.evictLRUEntries(Math.floor(this.MAX_CACHE_SIZE * 0.1)); // Evict 10%
@@ -655,7 +655,7 @@ export class MLOrchestrator {
     return health as Record<ModelType, boolean>;
   }
 
-  private hasRequiredMethod(model: any, modelType: ModelType): boolean {
+  private hasRequiredMethod(model: unknown, modelType: ModelType): boolean {
     const requiredMethods: Record<ModelType, string> = {
       'trojan-bill-detector': 'analyze',
       'constitutional-analyzer': 'analyze',

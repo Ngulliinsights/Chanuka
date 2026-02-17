@@ -297,7 +297,7 @@ export class AnalysisService {
   /**
    * Record a failed analysis attempt for auditing and debugging purposes
    */
-  async recordFailedAnalysis(bill_id: string, errorDetails: any): Promise<void> {
+  async recordFailedAnalysis(bill_id: string, errorDetails: unknown): Promise<void> {
     const logContext = { 
       component: 'AnalysisService', 
       operation: 'recordFailedAnalysis',
@@ -610,7 +610,7 @@ export class AnalysisService {
   /**
    * Group stakeholders based on sentiment analysis of their engagement
    */
-  private groupStakeholders(stakeholderData: any[]): Array<{
+  private groupStakeholders(stakeholderData: unknown[]): Array<{
     group: string;
     size: number;
     sentiment: number;
@@ -650,7 +650,7 @@ export class AnalysisService {
   /**
    * Identify coalition opportunities between stakeholder groups with aligned interests
    */
-  private identifyCoalitionOpportunities(stakeholderGroups: any[]): Array<{
+  private identifyCoalitionOpportunities(stakeholderGroups: unknown[]): Array<{
     groups: string[];
     sharedInterests: string[];
     likelihood: number;
@@ -680,7 +680,7 @@ export class AnalysisService {
   /**
    * Identify conflict areas between opposing stakeholder groups
    */
-  private identifyConflictAreas(stakeholderGroups: any[]): Array<{
+  private identifyConflictAreas(stakeholderGroups: unknown[]): Array<{
     groups: string[];
     disagreements: string[];
     severity: number;

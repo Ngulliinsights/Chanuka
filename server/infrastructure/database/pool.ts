@@ -13,7 +13,7 @@ import * as schema from '../schema';
 
 
 // Common type imports for better type safety
-type AsyncFunction<T = void> = (...args: any[]) => Promise<T>;
+type AsyncFunction<T = void> = (...args: unknown[]) => Promise<T>;
 type SafeAny = unknown;
 type DatabaseConnection = any; // TODO: Replace with actual DB connection type
 type LoggerInstance = any; // TODO: Replace with actual logger type
@@ -86,7 +86,7 @@ export interface PoolCollection {
  */
 interface QueryExecutionOptions {
   text: string;
-  params?: unknown[] | Record<string, any>;
+  params?: unknown[] | Record<string, unknown>;
   pool?: EnhancedPool;
   context?: string;
 }
@@ -455,12 +455,12 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
   // Handle pool-level errors with contextual logging
   newPool.on('error', (err: Error) => {
     const pgError = err as unknown;
-    logger.error(`Pool error in ${name}`, {
+    logger.error/* TODO: Add type guard */ (`Pool error in ${name}`, {
       error: err.message,
       detail: pgError.detail,
       code: pgError.code,
       poolSize: (newPool as unknown).totalCount || 0,
-      waiting: (newPool as unknown).waitingCount || 0,
+      waiting: /* TODO: Add type guard */ (newPool as unknown).waitingCount || 0,
       circuitBreakerState: circuitBreaker.getState(),
       component: 'DatabasePool',
     });
@@ -502,7 +502,7 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
 
   // Attach enhanced methods to pool instance
   newPool.getMetrics = () =>
-    metricsTracker.getMetrics((newPool as unknown).totalCount || 0, (newPool as unknown).waitingCount || 0);
+    metricsTracker.getMetrics/* TODO: Add type guard */ ((newPool as unknown).totalCount || 0, /* TODO: Add type guard */ (newPool as unknown).waitingCount || 0);
   newPool.resetMetrics = () => metricsTracker.reset();
   newPool.trackQuery = (queryDuration: number) => metricsTracker.trackQuery(queryDuration);
   newPool.circuitBreaker = circuitBreaker;
@@ -711,9 +711,9 @@ export const checkPoolHealth = async (
   poolName: string
 ): Promise<PoolHealthStatus> => {
   try {
-    const maxConnections = (pool as unknown).options?.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
-    const totalConnections = (pool as unknown).totalCount || 0;
-    const waitingClients = (pool as unknown).waitingCount || 0;
+    const maxConnections = /* TODO: Add type guard */ (pool as unknown).options?.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
+    const totalConnections = /* TODO: Add type guard */ (pool as unknown).totalCount || 0;
+    const waitingClients = /* TODO: Add type guard */ (pool as unknown).waitingCount || 0;
     const utilizationPercentage = maxConnections > 0 
       ? (totalConnections / maxConnections) * 100 
       : 0;

@@ -35,7 +35,7 @@ export async function createEngagementNetwork(driver: Driver, billId: string): P
   }
 }
 
-export async function findSimilarUsers(driver: Driver, userId: string, limit: number = 10): Promise<any[]> {
+export async function findSimilarUsers(driver: Driver, userId: string, limit: number = 10): Promise<unknown[]> {
   if (!userId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'userId required' });
   
   try {

@@ -17,9 +17,9 @@ export interface LegacyValidationSchema {
     minLength?: number;
     maxLength?: number;
     pattern?: string;
-    customValidator?: (value: any) => boolean;
+    customValidator?: (value: unknown) => boolean;
   }>;
-  rules?: Array<(data: any) => boolean>;
+  rules?: Array<(data: unknown) => boolean>;
 }
 
 export interface StandardValidationSchema {
@@ -32,11 +32,11 @@ export interface StandardValidationSchema {
       pattern?: string;
       min?: number;
       max?: number;
-      custom?: (value: any) => boolean;
+      custom?: (value: unknown) => boolean;
     };
   }>;
   additionalRules?: Array<{
-    validator: (data: any) => boolean;
+    validator: (data: unknown) => boolean;
     message: string;
   }>;
 }
@@ -109,7 +109,7 @@ export class ValidationSchemaMigrator {
     return result;
   }
 
-  public validateMigratedSchema(schema: StandardValidationSchema, data: any): {
+  public validateMigratedSchema(schema: StandardValidationSchema, data: unknown): {
     isValid: boolean;
     errors: Record<string, string>;
   } {
@@ -147,7 +147,7 @@ export class ValidationSchemaMigrator {
     };
   }
 
-  private validateField(value: any, fieldConfig: StandardValidationSchema['properties'][string]): string | null {
+  private validateField(value: unknown, fieldConfig: StandardValidationSchema['properties'][string]): string | null {
     // Type validation
     switch (fieldConfig.type) {
       case 'string':
@@ -219,13 +219,13 @@ export class ValidationSchemaMigrator {
 // ============================================================================
 
 export interface LegacyValidationRule {
-  condition: string | ((data: any) => boolean);
+  condition: string | ((data: unknown) => boolean);
   errorMessage: string;
   severity?: 'warn' | 'error';
 }
 
 export interface StandardValidationRule {
-  validator: (data: any) => boolean;
+  validator: (data: unknown) => boolean;
   message: string;
   severity: 'warn' | 'error';
   code?: string;
@@ -237,13 +237,13 @@ export class ValidationRuleMigrator {
   }
 
   private migrateLegacyRule(legacyRule: LegacyValidationRule): StandardValidationRule {
-    let validator: (data: any) => boolean;
+    let validator: (data: unknown) => boolean;
 
     if (typeof legacyRule.condition === 'function') {
       validator = legacyRule.condition;
     } else {
       // Simple condition parsing (could be enhanced with a proper parser)
-      validator = (data: any) => {
+      validator = (data: unknown) => {
         try {
           // Simple evaluation - in production, use a proper expression parser
           return eval(legacyRule.condition);
@@ -270,11 +270,11 @@ export class ValidationRuleMigrator {
   }
 
   public createValidationRuleSet(rules: StandardValidationRule[]): {
-    validate: (data: any) => { isValid: boolean; errors: StandardValidationRule[] };
+    validate: (data: unknown) => { isValid: boolean; errors: StandardValidationRule[] };
     getRules: () => StandardValidationRule[];
   } {
     return {
-      validate: (data: any) => {
+      validate: (data: unknown) => {
         const failedRules = rules.filter(rule => !rule.validator(data));
         return {
           isValid: failedRules.length === 0,
@@ -319,8 +319,8 @@ export class ValidationMigrationUtils {
   public createMigratedValidator(
     schema: StandardValidationSchema,
     rules: StandardValidationRule[]
-  ): (data: any) => { isValid: boolean; errors: Record<string, string> } {
-    return (data: any) => {
+  ): (data: unknown) => { isValid: boolean; errors: Record<string, string> } {
+    return (data: unknown) => {
       const schemaValidation = this.schemaMigrator.validateMigratedSchema(schema, data);
       const ruleValidation = this.ruleMigrator.createValidationRuleSet(rules).validate(data);
 

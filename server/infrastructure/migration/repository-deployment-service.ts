@@ -98,7 +98,7 @@ export interface ValidationCheckpoint {
   status: 'passed' | 'failed' | 'warning';
   validationType: 'data_integrity' | 'performance' | 'functionality' | 'cross_phase';
   results: ValidationResult[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface ValidationResult {
@@ -106,7 +106,7 @@ export interface ValidationResult {
   passed: boolean;
   message: string;
   dataPoints: number;
-  inconsistencies?: any[];
+  inconsistencies?: unknown[];
   severity: 'low' | 'medium' | 'high' | 'critical';
   recommendation?: string;
 }
@@ -114,17 +114,17 @@ export interface ValidationResult {
 export interface CrossPhaseValidationResult {
   errorHandlingConsistency: {
     passed: boolean;
-    inconsistencies: any[];
+    inconsistencies: unknown[];
     score: number;
   };
   repositoryLayerConsistency: {
     passed: boolean;
-    inconsistencies: any[];
+    inconsistencies: unknown[];
     score: number;
   };
   dataFlowConsistency: {
     passed: boolean;
-    inconsistencies: any[];
+    inconsistencies: unknown[];
     score: number;
   };
   overallConsistency: number;
@@ -1118,7 +1118,7 @@ export class RepositoryDeploymentService {
     };
   }
 
-  private async handleDeploymentFailure(error: any): Promise<void> {
+  private async handleDeploymentFailure(error: unknown): Promise<void> {
     logger.error('Handling deployment failure', {
       component: 'RepositoryDeploymentService',
       error: error instanceof Error ? error.message : 'Unknown error'

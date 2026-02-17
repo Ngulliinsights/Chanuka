@@ -49,7 +49,7 @@ export interface SearchResult {
   content: string;
   snippet: string;
   relevanceScore: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface SearchResponse {

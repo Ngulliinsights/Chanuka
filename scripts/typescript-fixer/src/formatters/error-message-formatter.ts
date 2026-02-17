@@ -109,7 +109,7 @@ export class ErrorMessageFormatter {
   /**
    * Formats validation error messages
    */
-  formatValidationErrorMessage(errors: any): ErrorMessageFormat {
+  formatValidationErrorMessage(errors: unknown): ErrorMessageFormat {
     const issues: string[] = [];
     const suggestions: string[] = [];
     let isValid = true;
@@ -148,7 +148,7 @@ export class ErrorMessageFormatter {
   /**
    * Formats error object for ApiError calls
    */
-  formatErrorObject(errorObj: any): ErrorMessageFormat {
+  formatErrorObject(errorObj: unknown): ErrorMessageFormat {
     const issues: string[] = [];
     const suggestions: string[] = [];
     let isValid = true;
@@ -265,7 +265,7 @@ export class ErrorMessageFormatter {
     return 'INTERNAL_ERROR';
   }
 
-  private validateErrorArray(errors: any[]): { isValid: boolean, issues: string[], suggestions: string[] } {
+  private validateErrorArray(errors: unknown[]): { isValid: boolean, issues: string[], suggestions: string[] } {
     const issues: string[] = [];
     const suggestions: string[] = [];
     let isValid = true;
@@ -284,7 +284,7 @@ export class ErrorMessageFormatter {
     return { isValid, issues, suggestions };
   }
 
-  private validateErrorObject(error: any): { isValid: boolean, issues: string[], suggestions: string[] } {
+  private validateErrorObject(error: unknown): { isValid: boolean, issues: string[], suggestions: string[] } {
     const issues: string[] = [];
     const suggestions: string[] = [];
     let isValid = true;
@@ -311,7 +311,7 @@ export class ErrorMessageFormatter {
     return { isValid, issues, suggestions };
   }
 
-  private validateErrorObjectStructure(errorObj: any): { 
+  private validateErrorObjectStructure(errorObj: unknown): { 
     isValid: boolean, 
     issues: string[], 
     suggestions: string[], 

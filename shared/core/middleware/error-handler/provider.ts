@@ -5,11 +5,11 @@ import { MiddlewareProvider } from '../types';
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';
 
-  validate(_options: Record<string, any>): boolean {
+  validate(_options: Record<string, unknown>): boolean {
     return true;
   }
 
-  create(options: Record<string, any>): ErrorRequestHandler {
+  create(options: Record<string, unknown>): ErrorRequestHandler {
     const includeStackTrace = options?.includeStackTrace ?? process.env.NODE_ENV === 'development';
     
     return (error: Error, req: Request, res: Response, _next: NextFunction) => {

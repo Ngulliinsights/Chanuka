@@ -61,7 +61,7 @@ export class SecurityMigrationUtils {
     };
   }
 
-  private static convertCSPDirectives(legacyCSP: any): any {
+  private static convertCSPDirectives(legacyCSP: unknown): unknown {
     // Convert legacy CSP configuration to unified format
     return {
       'default-src': legacyCSP?.defaultSrc || ["'self'"],
@@ -112,7 +112,7 @@ export class SecurityMigrationUtils {
     };
   }
 
-  private static validateCSPConfig(csp: any): string[] {
+  private static validateCSPConfig(csp: unknown): string[] {
     const errors: string[] = [];
 
     if (!csp.directives) {
@@ -139,7 +139,7 @@ export class SecurityMigrationUtils {
     return errors;
   }
 
-  private static validateSanitizationConfig(sanitization: any): string[] {
+  private static validateSanitizationConfig(sanitization: unknown): string[] {
     const errors: string[] = [];
 
     if (!Array.isArray(sanitization.allowedTags)) {
@@ -157,7 +157,7 @@ export class SecurityMigrationUtils {
     return errors;
   }
 
-  private static validateRateLimitConfig(rateLimit: any): string[] {
+  private static validateRateLimitConfig(rateLimit: unknown): string[] {
     const errors: string[] = [];
 
     if (typeof rateLimit.windowMs !== 'number' || rateLimit.windowMs <= 0) {
@@ -171,7 +171,7 @@ export class SecurityMigrationUtils {
     return errors;
   }
 
-  private static validateErrorHandlingConfig(errorHandling: any): string[] {
+  private static validateErrorHandlingConfig(errorHandling: unknown): string[] {
     const errors: string[] = [];
 
     if (!['strict', 'permissive'].includes(errorHandling.mode)) {

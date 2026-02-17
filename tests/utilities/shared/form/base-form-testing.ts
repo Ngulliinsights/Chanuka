@@ -3,9 +3,7 @@
  * Provides the core interfaces and abstract classes for form testing
  */
 
-// import { ValidationType } from '@shared/core/src/types/validation-types.ts';
 import { ValidationRule as BaseValidationRule } from '@shared/core/src/types/validation-types.ts';
-// import { logger } from '../../observability/logging'; // Unused import
 
 // Re-export the base validation rule type with extensions for form testing
 export type ValidationRule = BaseValidationRule;

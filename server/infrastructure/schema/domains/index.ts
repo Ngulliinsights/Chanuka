@@ -7,7 +7,6 @@
 // USAGE PATTERNS:
 // ❌ OLD (Monolithic): import { users, bills, comments } from '@/shared/schema'
 // ✅ NEW (Granular): import { users, bills } from '@/shared/schema/domains/foundation'
-//                    import { comments } from '@/shared/schema/domains/citizen-participation'
 //
 // BENEFITS:
 // - Faster builds: Only import what you need
@@ -27,6 +26,5 @@ export * from "./safeguards";
 // FULL SCHEMA FALLBACK
 // ============================================================================
 // If you really need everything, import from main index:
-// import * as schema from '@/shared/schema'
 //
 // But prefer granular imports for better performance!

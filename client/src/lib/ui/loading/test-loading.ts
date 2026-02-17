@@ -2,7 +2,6 @@
  * Simple test to verify loading system works
  */
 
-// import { useLoading } from './hooks/useLoading';
 import { DEFAULT_LOADING_CONFIG } from './constants';
 import { createLoadingOperation } from './utils/loading-utils';
 

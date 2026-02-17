@@ -250,7 +250,7 @@ export class ContentAnalysisService {
     return null;
   }
 
-  private calculateOverallAssessment(detectedIssues: any[]): ContentAnalysisResult {
+  private calculateOverallAssessment(detectedIssues: unknown[]): ContentAnalysisResult {
     const severityWeights = {
       info: 0.5,
       low: 1,
@@ -292,7 +292,7 @@ export class ContentAnalysisService {
     };
   }
 
-  private generateRecommendations(detectedIssues: any[]): string[] {
+  private generateRecommendations(detectedIssues: unknown[]): string[] {
     const recommendations: string[] = [];
 
     if (detectedIssues.some(i => i.type === 'inappropriate')) {

@@ -9,7 +9,6 @@ import React, { useState, useCallback, Suspense } from 'react';
 import { useAuth } from '@client/core/auth';
 import { PrivacySettings, ConsentRecord } from '@client/core/auth';
 
-// import { ConsentModal } from '../../auth/ConsentModal';
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive/Tabs';
@@ -41,11 +40,11 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [consentType, setConsentType] = useState<ConsentRecord['consent_type']>('analytics');
   // Export and deletion requests state for future implementation
-  const [_exportRequests, setExportRequests] = useState<any[]>([]);
-  const [_deletionRequests, setDeletionRequests] = useState<any[]>([]);
+  const [_exportRequests, setExportRequests] = useState<unknown[]>([]);
+  const [_deletionRequests, setDeletionRequests] = useState<unknown[]>([]);
 
   const handleSettingChange = useCallback(
-    async (key: keyof PrivacySettings, value: any) => {
+    async (key: keyof PrivacySettings, value: unknown) => {
       if (!settings) return;
 
       const newSettings = { ...settings, [key]: value };
@@ -272,7 +271,7 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {cookieCategories.map((category: any) => (
+              {cookieCategories.map((category: unknown) => (
                 <div key={category.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -289,7 +288,7 @@ export const FullInterface = React.memo<FullInterfaceProps>(function FullInterfa
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{category.description}</p>
                   <div className="flex flex-wrap gap-1">
-                    {category.cookies.map((cookie: any) => (
+                    {category.cookies.map((cookie: unknown) => (
                       <Badge key={cookie} variant="outline" className="text-xs">
                         {cookie}
                       </Badge>

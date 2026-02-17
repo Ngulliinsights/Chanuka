@@ -13,7 +13,7 @@ export class CrossSystemErrorAnalytics {
     return CrossSystemErrorAnalytics.instance;
   }
 
-  trackError(error: Error, context: any) {
+  trackError(error: Error, context: unknown) {
     console.error('Cross-system error:', error, context);
   }
 
@@ -35,12 +35,12 @@ export class CrossSystemErrorAnalytics {
       totalErrors: 0,
       errorsBySystem: {},
       errorsByDomain: {},
-      criticalErrors: [] as any[],
-      trends: [] as any[],
-      insights: [] as any[],
+      criticalErrors: [] as unknown[],
+      trends: [] as unknown[],
+      insights: [] as unknown[],
       timestamp: new Date(),
       overallHealth: 'healthy' as 'healthy' | 'degraded' | 'critical',
-      correlations: [] as any[],
+      correlations: [] as unknown[],
       systems: [] as Array<{
         system: string;
         status: 'healthy' | 'degraded' | 'critical';
@@ -52,7 +52,7 @@ export class CrossSystemErrorAnalytics {
   }
   
   identifyCrossSystemPatterns() {
-    return [] as any[];
+    return [] as unknown[];
   }
 }
 

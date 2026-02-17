@@ -44,7 +44,7 @@ export type {
 // Utility functions
 export const ML_UTILS = {
   // Model validation helpers
-  validateInput: (modelType: string, input: any) => {
+  validateInput: (modelType: string, input: unknown) => {
     // Add input validation logic here
     return true;
   },
@@ -58,7 +58,7 @@ export const ML_UTILS = {
   },
   
   // Error handling
-  handleMLError: (error: any, context: string) => {
+  handleMLError: (error: unknown, context: string) => {
     console.error(`ML Error in ${context}:`, error);
     return {
       success: false,

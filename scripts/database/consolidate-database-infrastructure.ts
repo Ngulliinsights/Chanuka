@@ -221,13 +221,13 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Legacy connection exports (Phase One compatibility)
-export const database = null as any; // Will be initialized by unified system
-export const readDatabase = null as any;
-export const writeDatabase = null as any;
-export const operationalDb = null as any;
-export const analyticsDb = null as any;
-export const securityDb = null as any;
-export const pool = null as any;
+export const database = null as unknown; // Will be initialized by unified system
+export const readDatabase = null as unknown;
+export const writeDatabase = null as unknown;
+export const operationalDb = null as unknown;
+export const analyticsDb = null as unknown;
+export const securityDb = null as unknown;
+export const pool = null as unknown;
 
 /**
  * Initialize legacy compatibility layer

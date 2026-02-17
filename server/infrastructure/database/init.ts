@@ -1,6 +1,5 @@
 import { logger } from '@server/infrastructure/core/src/observability/logging';
 
-// import { databaseMonitor } from '../../MonitoringDashboard';
 // Monitoring handled via shared/core
 import { monitorPoolHealth } from './pool';
 
@@ -224,7 +223,7 @@ export async function shutdownDatabaseSafety(): Promise<void> {
 export async function getDatabaseSafetyStatus(): Promise<{
   initialized: boolean;
   monitoring: boolean;
-  poolHealth: Record<string, any>;
+  poolHealth: Record<string, unknown>;
   timestamp: Date;
   summary: {
     totalPools: number;
@@ -233,7 +232,7 @@ export async function getDatabaseSafetyStatus(): Promise<{
   };
 }> {
   // Attempt to get pool health with timeout protection
-  let poolHealth: Record<string, any> = {};
+  let poolHealth: Record<string, unknown> = {};
   let error: Error | null = null;
   
   try {

@@ -94,7 +94,7 @@ export type TreeShakingAnnotation = {
  * Pure function marker
  * Indicates a function has no side effects and can be safely tree-shaken
  */
-export type PureFunction<T extends (...args: any[]) => any> = T & {
+export type PureFunction<T extends (...args: unknown[]) => any> = T & {
   /** Pure function marker */
   readonly __pure: true;
 
@@ -516,7 +516,7 @@ export const ValidatedTreeShakeableConfig = createValidatedType(
 /**
  * Mark a function as pure for tree-shaking
  */
-export function markAsPure<T extends (...args: any[]) => any>(
+export function markAsPure<T extends (...args: unknown[]) => any>(
   fn: T,
   functionName: string
 ): PureFunction<T> {

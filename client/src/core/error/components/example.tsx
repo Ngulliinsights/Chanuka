@@ -31,10 +31,10 @@ const DetailedErrorFallback = React.memo<ErrorFallbackProps>(
     <div className="error-fallback p-6 border border-red-300 rounded bg-red-50 max-w-2xl">
       <h2 className="text-red-800 font-semibold text-lg">Application Error</h2>
       <p className="text-red-600 mt-2">{error.message}</p>
-      {process.env.NODE_ENV === 'development' && (error as any).stack && (
+      {process.env.NODE_ENV === 'development' && (error instanceof Error ? error.stack : String(error)) && (
         <details className="mt-4">
           <summary className="cursor-pointer text-red-700 font-medium">Stack Trace</summary>
-          <pre className="mt-2 text-xs bg-red-100 p-3 rounded overflow-auto">{(error as any).stack}</pre>
+          <pre className="mt-2 text-xs bg-red-100 p-3 rounded overflow-auto">{(error instanceof Error ? error.stack : String(error))}</pre>
         </details>
       )}
       <div className="mt-4 flex gap-2">
@@ -89,7 +89,7 @@ export const ErrorBoundaryExample = React.memo(() => {
 
       <ErrorBoundary
         fallback={SimpleErrorFallback}
-        onError={(error: any, errorInfo: any) => {
+        onError={(error: unknown, errorInfo: unknown) => {
           console.error('Error caught by boundary:', error, errorInfo);
         }}
       >
@@ -142,7 +142,7 @@ export const CompleteErrorExample = React.memo(() => (
       <h2 className="text-lg font-semibold mb-3">Hook-based Error Handling</h2>
       <ErrorBoundary
         fallback={DetailedErrorFallback}
-        onError={(error: any) => console.error('Hook error:', error)}
+        onError={(error: unknown) => console.error('Hook error:', error)}
       >
         <div>Hook-based error handling example (commented out)</div>
       </ErrorBoundary>

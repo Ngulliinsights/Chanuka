@@ -113,7 +113,7 @@ const LoadingControlExample: React.FC = () => {
 
 const AppExample: React.FC = () => {
   return (
-    <Provider store={mockStore as unknown as any}>
+    <Provider store={mockStore as unknown as unknown}>
       <GlobalLoadingProvider>
         <div className="min-h-screen bg-gray-50">
           {/* Your app content */}

@@ -10,12 +10,12 @@ import { z } from 'zod';
 export interface QueryValidationResult {
   isValid: boolean;
   errors: string[];
-  sanitizedParams?: Record<string, any>;
+  sanitizedParams?: Record<string, unknown>;
 }
 
 export interface SecureQuery {
   sql: SQL;
-  params: Record<string, any>;
+  params: Record<string, unknown>;
   queryId: string;
 }
 
@@ -37,7 +37,7 @@ export class SecureQueryBuilder {
    */
   public buildParameterizedQuery(
     template: string,
-    params: Record<string, any>
+    params: Record<string, unknown>
   ): SecureQuery {
     const queryId = `query_${++this.queryCounter}_${Date.now()}`;
     
@@ -77,7 +77,7 @@ export class SecureQueryBuilder {
    */
   public validateInputs(inputs: unknown[]): QueryValidationResult {
     const errors: string[] = [];
-    const sanitizedParams: Record<string, any> = {};
+    const sanitizedParams: Record<string, unknown> = {};
 
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
@@ -177,7 +177,7 @@ export class SecureQueryBuilder {
   /**
    * Build SQL from template with parameters
    */
-  private buildSqlFromTemplate(template: string, params: Record<string, any>): SQL {
+  private buildSqlFromTemplate(template: string, params: Record<string, unknown>): SQL {
     // Replace named parameters in template with Drizzle placeholders
     let processedTemplate = template;
     const placeholders: Placeholder[] = [];
@@ -204,7 +204,7 @@ export class SecureQueryBuilder {
   /**
    * Sanitize output data to prevent data leakage
    */
-  public sanitizeOutput(data: any): any {
+  public sanitizeOutput(data: unknown): unknown {
     if (data === null || data === undefined) {
       return data;
     }

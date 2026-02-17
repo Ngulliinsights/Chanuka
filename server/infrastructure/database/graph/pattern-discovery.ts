@@ -33,7 +33,7 @@ export async function detectVotingPatterns(driver: Driver, billId: string): Prom
   }
 }
 
-export async function findInfluentialNodes(driver: Driver, limit: number = 20): Promise<any[]> {
+export async function findInfluentialNodes(driver: Driver, limit: number = 20): Promise<unknown[]> {
   try {
     const result = await executeCypherSafely(
       driver,

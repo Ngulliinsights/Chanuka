@@ -298,7 +298,7 @@ export class ConflictDetector {
     return conflicts;
   }
 
-  private calculateRiskFactors(input: ConflictInput, conflicts: any[]) {
+  private calculateRiskFactors(input: ConflictInput, conflicts: unknown[]) {
     const factors = [
       {
         factor: 'High-value financial interests',
@@ -337,7 +337,7 @@ export class ConflictDetector {
     return factors;
   }
 
-  private calculateConflictScore(conflicts: any[], riskFactors: any[]): number {
+  private calculateConflictScore(conflicts: unknown[], riskFactors: unknown[]): number {
     let score = 0;
 
     // Base score from conflicts
@@ -378,7 +378,7 @@ export class ConflictDetector {
     }
   }
 
-  private generateRecommendations(conflicts: any[], disclosureQuality: string): string[] {
+  private generateRecommendations(conflicts: unknown[], disclosureQuality: string): string[] {
     const recommendations = new Set<string>();
 
     if (conflicts.length === 0) {
@@ -418,7 +418,7 @@ export class ConflictDetector {
     return Array.from(recommendations);
   }
 
-  private calculateConfidence(conflicts: any[], input: ConflictInput): number {
+  private calculateConfidence(conflicts: unknown[], input: ConflictInput): number {
     let confidence = 0.6;
     confidence += Math.min(0.2, input.sponsorFinancialInterests.length * 0.04);
     
@@ -467,7 +467,7 @@ export class ConflictDetector {
            false;
   }
 
-  private assessFinancialSeverity(interest: any, billText: string): 'low' | 'medium' | 'high' | 'critical' {
+  private assessFinancialSeverity(interest: unknown, billText: string): 'low' | 'medium' | 'high' | 'critical' {
     const value = interest.value || 0;
     const ownership = interest.ownershipPercentage || 0;
     
@@ -487,7 +487,7 @@ export class ConflictDetector {
     return Array.from(new Set(sections)).slice(0, 3);
   }
 
-  private findIndirectBenefits(normalizedText: string, interest: any, tokenSet: Set<string>): string[] {
+  private findIndirectBenefits(normalizedText: string, interest: unknown, tokenSet: Set<string>): string[] {
     const benefits = [];
     
     if (tokenSet.has('tax') && (tokenSet.has('reduction') || tokenSet.has('exemption') || tokenSet.has('credit'))) {

@@ -171,7 +171,7 @@ export class ConcurrencyMigrationRouter {
       return {
         withLock: async <T>(fn: () => Promise<T>) => legacyGlobalMutex.withLock(fn),
         withLimit: async <T>(fn: () => Promise<T>) => legacyApiSemaphore.withPermit(fn),
-        getMutex: () => legacyGlobalMutex as any,
+        getMutex: () => legacyGlobalMutex as unknown,
         getStats: () => ({
           isLocked: legacyGlobalMutex.isLocked(),
           waitingCount: legacyGlobalMutex.getWaitingCount(),

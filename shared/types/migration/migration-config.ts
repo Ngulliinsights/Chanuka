@@ -26,8 +26,8 @@ export interface TypeMigrationConfig extends MigrationConfig {
   sourceType: string;
   targetType: string;
   fieldMappings: Record<string, string>;
-  defaultValues?: Record<string, any>;
-  postMigrationHooks?: Array<(migratedItem: any) => any>;
+  defaultValues?: Record<string, unknown>;
+  postMigrationHooks?: Array<(migratedItem: unknown) => any>;
 }
 
 export interface GlobalMigrationSettings {

@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "../",
+    "rootDir": ".",
     "composite": true,
     "ignoreDeprecations": "5.0",
     "paths": {
@@ -23,7 +23,7 @@
   "include": [
     "**/*.ts",
     "**/*.d.ts"
-, "../shared/core/middleware/middleware-registry.ts", "../shared/core/middleware/middleware-factory.ts"  ],
+  ],
   "exclude": [
     "node_modules",
     "dist",

@@ -162,7 +162,7 @@ export class CoverageAnalyzer {
     }
   }
 
-  private processCoverageData(coverageData: any): CoverageReport {
+  private processCoverageData(coverageData: unknown): CoverageReport {
     let totalLines = 0, coveredLines = 0;
     let totalFunctions = 0, coveredFunctions = 0;
     let totalBranches = 0, coveredBranches = 0;
@@ -311,7 +311,7 @@ export class CoverageAnalyzer {
     }
   }
 
-  private generateRecommendations(gaps: CoverageGap[], overallCoverage: any): string[] {
+  private generateRecommendations(gaps: CoverageGap[], overallCoverage: unknown): string[] {
     const recommendations: string[] = [];
 
     if (overallCoverage.percentage < 80) {

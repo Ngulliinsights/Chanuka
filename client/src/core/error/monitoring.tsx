@@ -124,7 +124,7 @@ class ErrorMonitoringService {
   /**
    * Set feature context for error tracking
    */
-  setFeatureContext(feature: string, action?: string, metadata?: Record<string, any>) {
+  setFeatureContext(feature: string, action?: string, metadata?: Record<string, unknown>) {
     this.context.feature = feature;
     this.context.action = action;
     this.context.metadata = metadata;
@@ -176,7 +176,7 @@ class ErrorMonitoringService {
   captureMessage(
     message: string,
     level: 'debug' | 'info' | 'warning' | 'error' | 'fatal' = 'info',
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ) {
     Sentry.withScope(scope => {
       scope.setLevel(level);

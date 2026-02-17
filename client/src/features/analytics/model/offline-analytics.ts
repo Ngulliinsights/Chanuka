@@ -1,30 +1,3 @@
-/**
- * Offline Analytics - Analytics Feature
- *
- * Tracks offline usage patterns and reports errors for offline-first applications
- */
-
-export interface OfflineEvent {
-  id: string;
-  type:
-    | 'page_view'
-    | 'user_action'
-    | 'api_error'
-    | 'sync_error'
-    | 'connection_change'
-    | 'cache_hit'
-    | 'cache_miss'
-    | 'performance_metric'
-    | 'visibility_change';
-  timestamp: number;
-  data: Record<string, unknown>;
-  userAgent: string;
-  url: string;
-  session_id: string;
-  connectionType?: string;
-  isOffline: boolean;
-}
-
 export interface OfflineAnalyticsReport {
   period: {
     start: number;

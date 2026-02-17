@@ -4,7 +4,7 @@ import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } f
 import { NextFunction,Request, Response, Router } from 'express';
 
 // Helper functions using shared utilities
-const sendResponse = (res: any, data: any, message: string = 'Success') => {
+const sendResponse = (res: unknown, data: unknown, message: string = 'Success') => {
   return sendResponse(res, {
     success: true,
     data,
@@ -13,7 +13,7 @@ const sendResponse = (res: any, data: any, message: string = 'Success') => {
   });
 };
 
-const sendError = (res: any, message: string, statusCode: number = 500) => {
+const sendError = (res: unknown, message: string, statusCode: number = 500) => {
   return res.status(statusCode).json({
     success: false,
     error: {
@@ -80,7 +80,7 @@ const asyncHandler = (fn: (req: Request, res: Response) => Promise<any>) => {
  * Safely parse query parameters as integers with validation
  * Returns undefined if parsing fails, preventing NaN issues
  */
-const parseIntSafe = (value: any, defaultValue?: number): number | undefined => {
+const parseIntSafe = (value: unknown, defaultValue?: number): number | undefined => {
   if (value === undefined || value === null) {
     return defaultValue;
   }
@@ -92,7 +92,7 @@ const parseIntSafe = (value: any, defaultValue?: number): number | undefined => 
 /**
  * Validate that a source parameter is a non-empty string
  */
-const validateSource = (source: any): string | undefined => {
+const validateSource = (source: unknown): string | undefined => {
   return typeof source === 'string' && source.trim().length > 0 
     ? source.trim() 
     : undefined;

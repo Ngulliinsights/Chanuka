@@ -122,7 +122,7 @@ export class ConflictDetectionEngineService {
    */
   async analyzeVotingPatternInconsistencies(
     sponsor: Sponsor,
-    votingHistory: any[]
+    votingHistory: unknown[]
   ): Promise<VotingAnomaly[]> {
     try {
       const anomalies: VotingAnomaly[] = [];
@@ -369,7 +369,7 @@ export class ConflictDetectionEngineService {
     }
   }
 
-  private async getOrganizationFinancialInterests(organization: string): Promise<any[]> {
+  private async getOrganizationFinancialInterests(organization: string): Promise<unknown[]> {
     // Simplified implementation - would be more complex in reality
     return [];
   }

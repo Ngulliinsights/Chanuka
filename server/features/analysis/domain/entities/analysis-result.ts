@@ -91,7 +91,7 @@ export interface ConstitutionalConcern {
       totalFinancialExposureEstimate: number;
       directConflictCount: number;
       indirectConflictCount: number;
-      // relatedConflictDetails?: any[]; // Keep details out of domain entity if possible
+      // relatedConflictDetails?: unknown[]; // Keep details out of domain entity if possible
   }
   
   

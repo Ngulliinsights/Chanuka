@@ -327,7 +327,7 @@ export class CommunityService {
   private handleDiscussionMessage(discussionId: string, message: WebSocketMessage): void {
     try {
       // Process discussion-specific messages
-      const data = message as any;
+      const data = message as unknown;
       const update: CommentUpdate = {
         id: data.comment_id || data.commentId || `comment_${Date.now()}`,
         billId: data.bill_id || data.billId,
@@ -362,7 +362,7 @@ export class CommunityService {
 
   private handleTypingIndicatorMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
       const indicator: TypingIndicator = {
         userId: data.user_id || data.userId || 'unknown',
         billId: data.bill_id || data.billId,
@@ -403,7 +403,7 @@ export class CommunityService {
 
   private handleCommentUpdateMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
       const update: CommentUpdate = {
         id: data.comment_id || data.commentId || `comment_${Date.now()}`,
         billId: data.bill_id || data.billId,
@@ -436,7 +436,7 @@ export class CommunityService {
 
   private handleVoteUpdateMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
       const voteType = data.vote_type || data.voteType || data.vote || 'abstain';
       const update: VoteUpdate = {
         id: data.id || `vote_${Date.now()}`,
@@ -469,7 +469,7 @@ export class CommunityService {
 
   private handleExpertMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
 
       logger.debug('Processed expert activity', {
         component: 'CommunityService',
@@ -489,7 +489,7 @@ export class CommunityService {
 
   private handleModerationMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
 
       logger.debug('Processed moderation event', {
         component: 'CommunityService',

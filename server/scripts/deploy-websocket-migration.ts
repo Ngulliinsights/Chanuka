@@ -192,7 +192,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle new socket connection
    */
-  private handleConnection(socket: any): void {
+  private handleConnection(socket: unknown): void {
     const user_id = socket.data.user_id;
     const socketId = socket.id;
 
@@ -261,7 +261,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle bill subscription
    */
-  private handleSubscribe(socket: any, data: { bill_id: number }): void {
+  private handleSubscribe(socket: unknown, data: { bill_id: number }): void {
     const { bill_id } = data;
     const socketId = socket.id;
 
@@ -291,7 +291,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle bill unsubscription
    */
-  private handleUnsubscribe(socket: any, data: { bill_id: number }): void {
+  private handleUnsubscribe(socket: unknown, data: { bill_id: number }): void {
     const { bill_id } = data;
     const socketId = socket.id;
 
@@ -324,7 +324,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle batch subscription
    */
-  private handleBatchSubscribe(socket: any, data: { bill_ids: number[] }): void {
+  private handleBatchSubscribe(socket: unknown, data: { bill_ids: number[] }): void {
     const { bill_ids } = data;
     const results: Array<{ bill_id: number; success: boolean }> = [];
 
@@ -350,7 +350,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle batch unsubscription
    */
-  private handleBatchUnsubscribe(socket: any, data: { bill_ids: number[] }): void {
+  private handleBatchUnsubscribe(socket: unknown, data: { bill_ids: number[] }): void {
     const { bill_ids } = data;
     const results: Array<{ bill_id: number; success: boolean }> = [];
 
@@ -376,7 +376,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle socket disconnection
    */
-  private handleDisconnect(socket: any, reason: string): void {
+  private handleDisconnect(socket: unknown, reason: string): void {
     const socketId = socket.id;
     const user_id = this.socketUsers.get(socketId);
 
@@ -415,7 +415,7 @@ export class SocketIOWebSocketService {
   /**
    * Handle socket error
    */
-  private handleError(socket: any, error: Error): void {
+  private handleError(socket: unknown, error: Error): void {
     this.metrics.errors++;
     
     logger.error('Socket.IO connection error', {
@@ -428,7 +428,7 @@ export class SocketIOWebSocketService {
   /**
    * Send notification to specific user
    */
-  sendUserNotification(user_id: string, notification: any): boolean {
+  sendUserNotification(user_id: string, notification: unknown): boolean {
     const userSockets = this.userSockets.get(user_id);
     if (!userSockets || userSockets.size === 0) {
       return false;
@@ -445,7 +445,7 @@ export class SocketIOWebSocketService {
   /**
    * Broadcast to all subscribers of a bill
    */
-  broadcastToBillSubscribers(bill_id: number, message: any): number {
+  broadcastToBillSubscribers(bill_id: number, message: unknown): number {
     const room = `bill:${bill_id}`;
     this.io!.to(room).emit('bill_update', {
       bill_id,
@@ -681,7 +681,7 @@ export class WebSocketMigrationDeployer {
   /**
    * Handle deployment error
    */
-  private async handleDeploymentError(error: any): Promise<void> {
+  private async handleDeploymentError(error: unknown): Promise<void> {
     this.migrationState.phase = 'failed';
     this.migrationState.errors.push(error instanceof Error ? error.message : String(error));
 

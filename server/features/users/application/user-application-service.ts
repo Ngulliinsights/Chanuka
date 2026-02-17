@@ -193,7 +193,7 @@ export class UserApplicationService {
     }
   }
 
-  async performFactCheck(bill_id: number, claim: string): Promise<any[]> { const result = await this.verificationOperationsUseCase.performFactCheck({
+  async performFactCheck(bill_id: number, claim: string): Promise<unknown[]> { const result = await this.verificationOperationsUseCase.performFactCheck({
       bill_id,
       claim
      });

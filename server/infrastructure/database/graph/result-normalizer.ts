@@ -34,8 +34,8 @@ export function extractValue<T = any>(record: Neo4jRecord, key: string, defaultV
 /**
  * Extract all values from record as object.
  */
-export function extractRecord(record: Neo4jRecord): Record<string, any> {
-  const result: Record<string, any> = {};
+export function extractRecord(record: Neo4jRecord): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
 
   record.keys.forEach(key => {
     result[key] = extractValue(record, key);
@@ -47,7 +47,7 @@ export function extractRecord(record: Neo4jRecord): Record<string, any> {
 /**
  * Normalize Neo4j value to JavaScript type.
  */
-export function normalizeValue(value: any): any {
+export function normalizeValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return null;
   }
@@ -93,7 +93,7 @@ export function normalizeValue(value: any): any {
 /**
  * Normalize Neo4j Node.
  */
-export function normalizeNode(node: Node): Record<string, any> {
+export function normalizeNode(node: Node): Record<string, unknown> {
   return {
     id: node.identity.toNumber(),
     labels: node.labels,
@@ -104,7 +104,7 @@ export function normalizeNode(node: Node): Record<string, any> {
 /**
  * Normalize Neo4j Relationship.
  */
-export function normalizeRelationship(rel: Relationship): Record<string, any> {
+export function normalizeRelationship(rel: Relationship): Record<string, unknown> {
   return {
     id: rel.identity.toNumber(),
     type: rel.type,
@@ -117,7 +117,7 @@ export function normalizeRelationship(rel: Relationship): Record<string, any> {
 /**
  * Normalize Neo4j Path.
  */
-export function normalizePath(path: Path): Record<string, any> {
+export function normalizePath(path: Path): Record<string, unknown> {
   return {
     length: path.length,
     nodes: path.segments.flatMap(s => [normalizeNode(s.start), normalizeNode(s.end)]),
@@ -128,8 +128,8 @@ export function normalizePath(path: Path): Record<string, any> {
 /**
  * Normalize object properties.
  */
-function normalizeObject(obj: Record<string, any>): Record<string, any> {
-  const normalized: Record<string, any> = {};
+function normalizeObject(obj: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
 
   Object.keys(obj).forEach(key => {
     normalized[key] = normalizeValue(obj[key]);
@@ -141,15 +141,15 @@ function normalizeObject(obj: Record<string, any>): Record<string, any> {
 /**
  * Type guards
  */
-function isNode(value: any): value is Node {
+function isNode(value: unknown): value is Node {
   return value && typeof value === 'object' && 'labels' in value && 'properties' in value;
 }
 
-function isRelationship(value: any): value is Relationship {
+function isRelationship(value: unknown): value is Relationship {
   return value && typeof value === 'object' && 'type' in value && 'start' in value && 'end' in value;
 }
 
-function isPath(value: any): value is Path {
+function isPath(value: unknown): value is Path {
   return value && typeof value === 'object' && 'segments' in value && 'length' in value;
 }
 
@@ -190,7 +190,7 @@ export function count(records: Neo4jRecord[]): number {
 /**
  * Extract node properties.
  */
-export function extractNodeProperties(record: Neo4jRecord, key: string): Record<string, any> | null {
+export function extractNodeProperties(record: Neo4jRecord, key: string): Record<string, unknown> | null {
   const value = extractValue(record, key);
   
   if (isNode(value)) {
@@ -203,7 +203,7 @@ export function extractNodeProperties(record: Neo4jRecord, key: string): Record<
 /**
  * Batch extract records.
  */
-export function batchExtract(records: Neo4jRecord[]): Record<string, any>[] {
+export function batchExtract(records: Neo4jRecord[]): Record<string, unknown>[] {
   return records.map(extractRecord);
 }
 

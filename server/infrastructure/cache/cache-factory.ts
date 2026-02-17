@@ -1026,7 +1026,7 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
 
 // Export convenience functions
 
-export function createUnifiedCache(config: any): Promise<any> {
+export function createUnifiedCache(config: unknown): Promise<any> {
   // Create a simple factory instance for now
   const factory = new UnifiedCacheFactory(config);
   return factory.createCache('default');

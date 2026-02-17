@@ -9,7 +9,7 @@ import { logger } from '@/core/observability';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function discoverInfluenceNetwork(driver: Driver, personId: string, maxDepth: number = 2): Promise<any[]> {
+export async function discoverInfluenceNetwork(driver: Driver, personId: string, maxDepth: number = 2): Promise<unknown[]> {
   if (!personId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'personId required' });
   
   try {
@@ -27,7 +27,7 @@ export async function discoverInfluenceNetwork(driver: Driver, personId: string,
   }
 }
 
-export async function findCommunities(driver: Driver, threshold: number = 0.7): Promise<any[]> {
+export async function findCommunities(driver: Driver, threshold: number = 0.7): Promise<unknown[]> {
   try {
     const result = await executeCypherSafely(
       driver,

@@ -54,7 +54,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  async init(config?: any): Promise<void> {
+  async init(config?: unknown): Promise<void> {
     await this.cache.warmCache();
     this.startProgressMonitoring();
     logger.info('AchievementService initialized');

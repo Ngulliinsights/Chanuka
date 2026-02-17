@@ -12,13 +12,36 @@
 
 import { useCallback } from 'react';
 
-import { analyticsApiService } from '@client/core/api/analytics';
 import { ErrorAnalyticsService } from '@client/core/error/analytics';
 import { PerformanceMonitor } from '@client/core/performance/monitor';
-import type { PerformanceMetric, WebVitalsMetric } from '@client/core/performance/types';
-import { userJourneyTracker, JourneyAnalytics } from '@client/features/analytics/model/user-journey-tracker';
-import type { UserRole, NavigationSection } from '@client/lib/types/navigation';
+import type { WebVitalsMetric } from '@client/core/performance/types';
+import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
+import type { NavigationSection } from '@client/lib/types/navigation';
 import { logger } from '@client/lib/utils/logger';
+import { UserRole } from '@shared/types/core/enums';
+
+/**
+ * Extended analytics event with additional tracking properties
+ * This extends beyond the base schema to support comprehensive tracking
+ */
+export interface AnalyticsEvent {
+  id: string;
+  type: string; // More flexible than the base schema
+  category: string;
+  action: string;
+  label?: string;
+  value?: number;
+  timestamp: string | Date; // Support both formats
+  sessionId: string;
+  userId?: string;
+  userRole: UserRole | string;
+  page: string;
+  section?: NavigationSection;
+  anonymized: boolean;
+  consentGiven: boolean;
+  data?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
 
 /**
  * Persona-specific analytics configuration
@@ -72,9 +95,9 @@ export interface PagePerformanceMetrics {
  * User engagement metrics
  */
 export interface UserEngagementMetrics {
-  userId?: string;
+  userId?: string | undefined;
   sessionId: string;
-  userRole: UserRole;
+  userRole: UserRole | string;
   sessionDuration: number;
   pageViews: number;
   interactions: number;
@@ -97,7 +120,7 @@ export interface AnalyticsDashboardData {
     conversionRate: number;
   };
   personaBreakdown: Record<
-    UserRole,
+    string,
     {
       userCount: number;
       averageEngagement: number;
@@ -205,7 +228,6 @@ export class ComprehensiveAnalyticsTracker {
   private isEnabled: boolean = true;
   private flushInterval: NodeJS.Timeout | null = null;
   private readonly MAX_EVENTS = 1000;
-  private readonly FLUSH_INTERVAL = 30000; // 30 seconds
 
   private constructor() {
     this.journeyTracker = userJourneyTracker;
@@ -411,6 +433,12 @@ export class ComprehensiveAnalyticsTracker {
     const currentUserRole = this.getCurrentUserRole();
     const config = this.personaConfigs[currentUserRole];
 
+    // Skip if no config for this role
+    if (!config) {
+      logger.warn('No persona config found for role', { role: currentUserRole });
+      return;
+    }
+
     const alerts: Array<{
       type: string;
       message: string;
@@ -445,7 +473,9 @@ export class ComprehensiveAnalyticsTracker {
     // Track performance issues as events
     alerts.forEach(alert => {
       this.trackEvent({
-        type: 'performance_issue',
+        type: 'performance',
+        category: 'performance',
+        action: 'threshold_exceeded',
         data: {
           alertType: alert.type,
           message: alert.message,
@@ -465,16 +495,26 @@ export class ComprehensiveAnalyticsTracker {
     const currentUserRole = this.getCurrentUserRole();
     const config = this.personaConfigs[currentUserRole];
 
+    // Skip if no config for this role
+    if (!config) {
+      logger.warn('No persona config found for role', { role: currentUserRole });
+      return;
+    }
+
     if (!config.trackingEnabled) return;
 
     const event: AnalyticsEvent = {
       id: this.generateEventId(),
-      type: eventData.type || 'user_interaction',
-      timestamp: new Date(),
+      type: eventData.type || 'user_action',
+      category: eventData.category || 'general',
+      action: eventData.action || 'unknown',
+      timestamp: new Date().toISOString(),
       sessionId: this.getSessionId(),
       userRole: currentUserRole,
       page: window.location.pathname,
       section: this.getCurrentSection(),
+      anonymized: !eventData.userId,
+      consentGiven: true,
       data: eventData.data || {},
       metadata: {
         userAgent: navigator.userAgent,
@@ -485,6 +525,7 @@ export class ComprehensiveAnalyticsTracker {
         deviceType: this.getDeviceType(),
         referrer: document.referrer,
         connectionType: this.getConnectionType(),
+        ...(eventData.metadata || {}),
       },
       ...eventData,
     };
@@ -517,7 +558,9 @@ export class ComprehensiveAnalyticsTracker {
    */
   private trackPerformanceMetric(metric: WebVitalsMetric): void {
     this.trackEvent({
-      type: 'performance_issue',
+      type: 'performance',
+      category: 'performance',
+      action: 'metric_collected',
       data: {
         metricName: metric.name,
         metricValue: metric.value,
@@ -550,22 +593,26 @@ export class ComprehensiveAnalyticsTracker {
       this.userEngagement.set(key, engagement);
     }
 
+    // TypeScript assertion - engagement is guaranteed to be defined here
+    const currentEngagement = engagement;
+
     // Update metrics based on event type
     switch (event.type) {
       case 'page_view':
-        engagement.pageViews++;
+        currentEngagement.pageViews++;
         break;
+      case 'user_action':
       case 'user_interaction':
-        engagement.interactions++;
+        currentEngagement.interactions++;
         break;
       case 'conversion_event':
-        engagement.conversions++;
+        currentEngagement.conversions++;
         break;
     }
 
     // Calculate engagement score
-    engagement.engagementScore = this.calculateEngagementScore(engagement);
-    engagement.timestamp = new Date();
+    currentEngagement.engagementScore = this.calculateEngagementScore(currentEngagement);
+    currentEngagement.timestamp = new Date();
   }
 
   /**
@@ -651,13 +698,13 @@ export class ComprehensiveAnalyticsTracker {
   /**
    * Calculate persona breakdown
    */
-  private calculatePersonaBreakdown(): Record<UserRole, {
+  private calculatePersonaBreakdown(): Record<string, {
     userCount: number;
     averageEngagement: number;
     topPages: string[];
     conversionRate: number;
   }> {
-    const breakdown: Record<UserRole, {
+    const breakdown: Record<string, {
       userCount: number;
       averageEngagement: number;
       topPages: string[];
@@ -675,33 +722,42 @@ export class ComprehensiveAnalyticsTracker {
     };
 
     const personaMetrics = new Map<
-      UserRole,
+      string,
       { engagements: number[]; pages: string[]; conversions: number }
     >();
 
     this.userEngagement.forEach(engagement => {
-      if (!personaMetrics.has(engagement.userRole)) {
-        personaMetrics.set(engagement.userRole, { engagements: [], pages: [], conversions: 0 });
+      const roleKey = String(engagement.userRole);
+      if (!personaMetrics.has(roleKey)) {
+        personaMetrics.set(roleKey, { engagements: [], pages: [], conversions: 0 });
       }
 
-      const metrics = personaMetrics.get(engagement.userRole)!;
-      metrics.engagements.push(engagement.engagementScore);
-      metrics.conversions += engagement.conversions;
+      const metrics = personaMetrics.get(roleKey);
+      if (metrics) {
+        metrics.engagements.push(engagement.engagementScore);
+        metrics.conversions += engagement.conversions;
+      }
     });
 
     // Calculate page views by persona
-    const pagesByPersona = new Map<UserRole, Map<string, number>>();
+    const pagesByPersona = new Map<string, Map<string, number>>();
     this.events.forEach(event => {
       if (event.type === 'page_view') {
-        if (!pagesByPersona.has(event.userRole)) {
-          pagesByPersona.set(event.userRole, new Map());
+        const roleKey = String(event.userRole);
+        if (!pagesByPersona.has(roleKey)) {
+          pagesByPersona.set(roleKey, new Map());
         }
-        const pages = pagesByPersona.get(event.userRole)!;
-        pages.set(event.page, (pages.get(event.page) || 0) + 1);
+        const pages = pagesByPersona.get(roleKey);
+        if (pages) {
+          pages.set(event.page, (pages.get(event.page) || 0) + 1);
+        }
       }
     });
 
     personaMetrics.forEach((metrics, role) => {
+      if (!breakdown[role]) {
+        breakdown[role] = { userCount: 0, averageEngagement: 0, topPages: [], conversionRate: 0 };
+      }
       breakdown[role].userCount = metrics.engagements.length;
       breakdown[role].averageEngagement =
         metrics.engagements.length > 0
@@ -731,7 +787,8 @@ export class ComprehensiveAnalyticsTracker {
     const activeUsers = new Set<string>();
 
     this.events.forEach(event => {
-      if (event.timestamp > thirtyMinutesAgo) {
+      const eventTime = typeof event.timestamp === 'string' ? new Date(event.timestamp) : event.timestamp;
+      if (eventTime > thirtyMinutesAgo) {
         activeUsers.add(event.userId || event.sessionId);
       }
     });
@@ -767,7 +824,8 @@ export class ComprehensiveAnalyticsTracker {
     const activePages = new Set<string>();
 
     this.events.forEach(event => {
-      if (event.timestamp > fiveMinutesAgo && event.type === 'page_view') {
+      const eventTime = typeof event.timestamp === 'string' ? new Date(event.timestamp) : event.timestamp;
+      if (eventTime > fiveMinutesAgo && event.type === 'page_view') {
         activePages.add(event.page);
       }
     });
@@ -796,8 +854,11 @@ export class ComprehensiveAnalyticsTracker {
    */
   private calculateCurrentErrorRate(): number {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const recentEvents = this.events.filter(e => e.timestamp > oneHourAgo);
-    const errorEvents = recentEvents.filter(e => e.type === 'error_occurred');
+    const recentEvents = this.events.filter(e => {
+      const eventTime = typeof e.timestamp === 'string' ? new Date(e.timestamp) : e.timestamp;
+      return eventTime > oneHourAgo;
+    });
+    const errorEvents = recentEvents.filter(e => e.type === 'error' || e.type === 'error_occurred');
 
     return recentEvents.length > 0 ? errorEvents.length / recentEvents.length : 0;
   }
@@ -807,8 +868,10 @@ export class ComprehensiveAnalyticsTracker {
    */
   private countPerformanceIssues(): number {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    return this.events.filter(e => e.type === 'performance_issue' && e.timestamp > oneHourAgo)
-      .length;
+    return this.events.filter(e => {
+      const eventTime = typeof e.timestamp === 'string' ? new Date(e.timestamp) : e.timestamp;
+      return (e.type === 'performance' || e.type === 'performance_issue') && eventTime > oneHourAgo;
+    }).length;
   }
 
   /**
@@ -816,45 +879,52 @@ export class ComprehensiveAnalyticsTracker {
    */
   private async getActiveAlerts(): Promise<AnalyticsDashboardData['alerts']> {
     const alerts: AnalyticsDashboardData['alerts'] = [];
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     // Performance alerts
-    const performanceIssues = this.events.filter(
-      e => e.type === 'performance_issue' && e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
-    );
+    const performanceIssues = this.events.filter(e => {
+      const eventTime = typeof e.timestamp === 'string' ? new Date(e.timestamp) : e.timestamp;
+      return (e.type === 'performance' || e.type === 'performance_issue') && eventTime > oneHourAgo;
+    });
 
     performanceIssues.forEach(issue => {
-      const severity = typeof issue.data.severity === 'string' && 
+      const severity = issue.data && typeof issue.data.severity === 'string' && 
         ['low', 'medium', 'high', 'critical'].includes(issue.data.severity)
         ? (issue.data.severity as 'low' | 'medium' | 'high' | 'critical')
         : 'medium';
+      
+      const eventTime = typeof issue.timestamp === 'string' ? new Date(issue.timestamp) : issue.timestamp;
       
       alerts.push({
         id: issue.id,
         type: 'performance',
         severity,
-        message: (issue.data.message as string) || 'Performance issue detected',
-        timestamp: issue.timestamp,
+        message: (issue.data && typeof issue.data.message === 'string' ? issue.data.message : 'Performance issue detected'),
+        timestamp: eventTime,
         acknowledged: false,
       });
     });
 
     // Error alerts
-    const errorEvents = this.events.filter(
-      e => e.type === 'error_occurred' && e.timestamp > new Date(Date.now() - 60 * 60 * 1000)
-    );
+    const errorEvents = this.events.filter(e => {
+      const eventTime = typeof e.timestamp === 'string' ? new Date(e.timestamp) : e.timestamp;
+      return (e.type === 'error' || e.type === 'error_occurred') && eventTime > oneHourAgo;
+    });
 
     errorEvents.forEach(error => {
-      const severity = typeof error.data.errorSeverity === 'string' && 
+      const severity = error.data && typeof error.data.errorSeverity === 'string' && 
         ['low', 'medium', 'high', 'critical'].includes(error.data.errorSeverity)
         ? (error.data.errorSeverity as 'low' | 'medium' | 'high' | 'critical')
         : 'medium';
+      
+      const eventTime = typeof error.timestamp === 'string' ? new Date(error.timestamp) : error.timestamp;
       
       alerts.push({
         id: error.id,
         type: 'error',
         severity,
-        message: (error.data.errorMessage as string) || 'Error occurred',
-        timestamp: error.timestamp,
+        message: (error.data && typeof error.data.errorMessage === 'string' ? error.data.errorMessage : 'Error occurred'),
+        timestamp: eventTime,
         acknowledged: false,
       });
     });
@@ -888,7 +958,12 @@ export class ComprehensiveAnalyticsTracker {
 
   // ...
 
-  private async flushAnalyticsData(): Promise<void> {
+  /**
+   * Flush analytics data to server
+   * @internal Reserved for future use when batch sending is implemented
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async _flushAnalyticsData(): Promise<void> {
     if (this.events.length === 0) return;
 
     try {
@@ -952,7 +1027,7 @@ export class ComprehensiveAnalyticsTracker {
     return sessionId;
   }
 
-  private getCurrentUserRole(): UserRole {
+  private getCurrentUserRole(): string {
     // This should be integrated with your auth system
     // For now, return a default role
     return 'public';
@@ -1008,9 +1083,17 @@ export class ComprehensiveAnalyticsTracker {
   /**
    * Update persona configuration
    */
-  public updatePersonaConfig(role: UserRole, config: Partial<PersonaAnalyticsConfig>): void {
-    this.personaConfigs[role] = { ...this.personaConfigs[role], ...config };
-    logger.info('Persona analytics config updated', { role, config });
+  public updatePersonaConfig(role: UserRole | string, config: Partial<PersonaAnalyticsConfig>): void {
+    const roleKey = String(role);
+    const existingConfig = this.personaConfigs[roleKey];
+    
+    if (!existingConfig) {
+      logger.warn('Cannot update config for unknown role', { role: roleKey });
+      return;
+    }
+    
+    this.personaConfigs[roleKey] = { ...existingConfig, ...config };
+    logger.info('Persona analytics config updated', { role: roleKey, config });
   }
 
   /**

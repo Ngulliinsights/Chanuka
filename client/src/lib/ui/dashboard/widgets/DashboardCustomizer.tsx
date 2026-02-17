@@ -23,7 +23,6 @@ import {
 import { useState } from 'react';
 import React from 'react';
 
-// import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system'; // Unused
 import { Button } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Switch } from '@client/lib/design-system';
@@ -187,7 +186,7 @@ export function DashboardCustomizer({
     widget.availableFor.includes(persona)
   );
 
-  const handlePreferenceChange = (key: keyof PersonaPreferences, value: any) => {
+  const handlePreferenceChange = (key: keyof PersonaPreferences, value: unknown) => {
     onPreferencesUpdate({ [key]: value });
     setHasChanges(true);
   };

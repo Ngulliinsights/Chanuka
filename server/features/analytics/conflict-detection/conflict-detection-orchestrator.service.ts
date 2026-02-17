@@ -283,7 +283,7 @@ export class ConflictDetectionOrchestratorService {
     }
   }
 
-  private async getVotingHistory(sponsor_id: number): Promise<any[]> {
+  private async getVotingHistory(sponsor_id: number): Promise<unknown[]> {
     try {
       // This would be implemented based on your voting history schema
       // For now, return empty array

@@ -10,8 +10,8 @@ export interface VotingPattern {
   sponsorName: string;
   totalVotes: number;
   votingConsistency: number;
-  predictedVotes: any[];
-  anomalies: any[];
+  predictedVotes: unknown[];
+  anomalies: unknown[];
   alignmentScore?: number;
 }
 

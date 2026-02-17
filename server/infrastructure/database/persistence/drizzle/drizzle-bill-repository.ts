@@ -132,7 +132,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(validation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const [newBill] = await tx
           .insert(bills)
           .values(validation.data)
@@ -261,7 +261,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(updateValidation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const [updatedBill] = await tx
           .update(bills)
           .set({
@@ -296,7 +296,7 @@ export class DrizzleBillRepository implements IBillRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      await databaseService.withTransaction(async (tx: any) => {
+      await databaseService.withTransaction(async (tx: unknown) => {
         await tx
           .update(bills)
           .set({
@@ -368,7 +368,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} bills`));
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const newBills = await tx
           .insert(bills)
           .values(validations.map(v => v.data))
@@ -409,7 +409,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} updates`));
       }
 
-      const result = await databaseService.withTransaction(async (tx: any) => {
+      const result = await databaseService.withTransaction(async (tx: unknown) => {
         const updatedBills: Bill[] = [];
 
         // Process updates individually to handle potential conflicts
@@ -457,7 +457,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} bill IDs`));
       }
 
-      await databaseService.withTransaction(async (tx: any) => {
+      await databaseService.withTransaction(async (tx: unknown) => {
         await tx
           .delete(bills)
           .where(inArray(bills.id, validations.map(v => v.data)));

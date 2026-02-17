@@ -30,7 +30,7 @@ export class EventEmitter {
     }
   }
 
-  emit(event: string, ...args: any[]): void {
+  emit(event: string, ...args: unknown[]): void {
     const listeners = this.events.get(event);
     if (!listeners || listeners.size === 0) return;
 

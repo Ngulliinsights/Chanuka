@@ -26,7 +26,7 @@ export type DialogProps = z.infer<typeof BasicDialogPropsSchema>;
 /**
  * Safe date validation function
  */
-export function safeValidateDate(date: any): boolean {
+export function safeValidateDate(date: unknown): boolean {
   if (!date) return false;
   if (date instanceof Date) {
     return !isNaN(date.getTime());

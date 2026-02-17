@@ -10,7 +10,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { logger } from '../utils/logger';
 
 // TODO: Implement or import seamlessIntegration from the correct location
-// import { seamlessIntegration } from '../utils/seamlessIntegration';
 
 // Fallback seamless integration object for when the module is not available
 const seamlessIntegration = {

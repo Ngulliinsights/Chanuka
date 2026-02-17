@@ -143,7 +143,7 @@ class SecurityVerifier {
             // If audit passes (exit code 0), no high-severity vulnerabilities
             console.log('✅ No high-severity vulnerabilities found');
             return true;
-          } catch (error: any) {
+          } catch (error: unknown) {
             if (error.status === 1 && error.stdout) {
               // Check if there are high-severity vulnerabilities
               const output = error.stdout.toString();

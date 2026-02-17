@@ -123,18 +123,18 @@ export enum ErrorSeverity {
 
 // Simple logger
 export const logger = {
-  debug: (message: string, context?: any, meta?: any) => {
+  debug: (message: string, context?: unknown, meta?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.debug('[DEBUG]', message, context, meta);
     }
   },
-  info: (message: string, context?: any, meta?: any) => {
+  info: (message: string, context?: unknown, meta?: unknown) => {
     console.info('[INFO]', message, context, meta);
   },
-  warn: (message: string, context?: any, meta?: any) => {
+  warn: (message: string, context?: unknown, meta?: unknown) => {
     console.warn('[WARN]', message, context, meta);
   },
-  error: (message: string, context?: any, error?: any) => {
+  error: (message: string, context?: unknown, error?: unknown) => {
     console.error('[ERROR]', message, context, error);
   }
 };

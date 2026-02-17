@@ -587,7 +587,7 @@ export class CircularBuffer<T> {
   /**
    * Check if at least one item satisfies the test function.
    * 
-   * Returns true as soon as any item passes the test, without checking
+   * Returns true as soon as unknown item passes the test, without checking
    * the remaining items. This is more efficient than filter() when you
    * only need to know if any items match.
    * 
@@ -610,7 +610,7 @@ export class CircularBuffer<T> {
   /**
    * Check if all items satisfy the test function.
    * 
-   * Returns false as soon as any item fails the test, without checking
+   * Returns false as soon as unknown item fails the test, without checking
    * the remaining items. Returns true only if all items pass the test.
    * 
    * @param predicate Function to test each item (item, logicalIndex) => boolean

@@ -448,7 +448,7 @@ class ProjectStructureVerifier {
     return recommendations;
   }
 
-  private generateMarkdownReport(report: any): string {
+  private generateMarkdownReport(report: unknown): string {
     return `# Project Structure Verification Report
 
 Generated: ${report.timestamp}

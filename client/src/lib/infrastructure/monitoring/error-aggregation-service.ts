@@ -15,9 +15,9 @@ export class ErrorAggregationService {
     return ErrorAggregationService.instance;
   }
 
-  addError(system: string, error: any, context?: any): void;
+  addError(system: string, error: unknown, context?: unknown): void;
   addError(error: Error): void;
-  addError(errorOrSystem: Error | string, errorArg?: any, context?: any) {
+  addError(errorOrSystem: Error | string, errorArg?: unknown, context?: unknown) {
     if (typeof errorOrSystem === 'string') {
       const system = errorOrSystem;
       const errors = this.systemErrors.get(system) || [];

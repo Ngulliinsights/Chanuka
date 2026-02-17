@@ -44,6 +44,6 @@ export interface PerformanceMetrics {
  */
 export interface MiddlewareProvider {
   readonly name: string;
-  validate(options: Record<string, any>): boolean;
-  create(options: Record<string, any>): RegularMiddleware;
+  validate(options: Record<string, unknown>): boolean;
+  create(options: Record<string, unknown>): RegularMiddleware;
 }

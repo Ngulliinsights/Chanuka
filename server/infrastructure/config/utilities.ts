@@ -15,7 +15,7 @@ export type AssetsConfig = AppConfig['utilities']['assets'] & {
   getConfigForType: (type: 'critical' | 'script' | 'style' | 'image' | 'font') => any;
   isSlowConnection: (speedMbps: number) => boolean;
   isFastConnection: (speedMbps: number) => boolean;
-  adjustForConnection: (baseConfig: any, speedMbps: number) => any;
+  adjustForConnection: (baseConfig: unknown, speedMbps: number) => any;
 };
 
 export interface UtilityConfigUpdateEvent {
@@ -33,12 +33,23 @@ export interface UtilityConfigUpdateEvent {
  */
 export class UtilitiesConfigProvider extends EventEmitter {
   private static instance: UtilitiesConfigProvider;
-  private config: AppConfig;
+  private _config: AppConfig | undefined;
+
+  private get config(): AppConfig {
+    if (!this._config) {
+      this._config = getConfig();
+    }
+    return this._config;
+  }
+
+  private set config(value: AppConfig) {
+    this._config = value;
+  }
 
   constructor() {
     super();
-    this.config = getConfig();
-
+    // this.config will be loaded lazily or via event
+    
     // Listen for configuration changes
     configManager.on('config:changed', (event) => {
       const previousUtilities = event.previous.utilities;
@@ -104,7 +115,7 @@ export class UtilitiesConfigProvider extends EventEmitter {
         return speedMbps >= this.config.utilities.assets.connection.fastThreshold;
       },
 
-      adjustForConnection: (baseConfig: any, speedMbps: number) => {
+      adjustForConnection: (baseConfig: unknown, speedMbps: number) => {
         if (assets.isSlowConnection(speedMbps)) {
           return {
             ...baseConfig,
@@ -233,7 +244,7 @@ export class UtilitiesConfigProvider extends EventEmitter {
   /**
    * Update utility configuration at runtime
    */
-  updateUtilityConfig(utility: keyof AppConfig['utilities'], updates: any): void {
+  updateUtilityConfig(utility: keyof AppConfig['utilities'], updates: unknown): void {
     const currentConfig = { ...this.config.utilities[utility] };
     const newConfig = { ...currentConfig, ...updates };
 
@@ -274,7 +285,7 @@ export class UtilitiesConfigProvider extends EventEmitter {
   // Validation
   // ============================================================================
 
-  private validateUtilityConfig(utility: keyof AppConfig['utilities'], config: any): boolean {
+  private validateUtilityConfig(utility: keyof AppConfig['utilities'], config: unknown): boolean {
     // Basic validation - could be enhanced with Zod schemas
     try {
       switch (utility) {

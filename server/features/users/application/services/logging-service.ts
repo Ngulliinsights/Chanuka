@@ -8,7 +8,7 @@ export interface LogEntry { timestamp: string;
   operation: string;
   user_id?: string;
   targetId?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   ip?: string;
   user_agent?: string;
  }
@@ -40,7 +40,7 @@ export class LoggingService {
      });
   }
 
-  logSecurityEvent(operation: string, user_id: string, details: Record<string, any>): void {
+  logSecurityEvent(operation: string, user_id: string, details: Record<string, unknown>): void {
     this.logUserActivity({
       level: 'warn',
       operation: `security.${operation}`,
@@ -49,7 +49,7 @@ export class LoggingService {
     });
   }
 
-  logAuditEvent(operation: string, user_id: string, targetId: string, details?: Record<string, any>): void {
+  logAuditEvent(operation: string, user_id: string, targetId: string, details?: Record<string, unknown>): void {
     this.logUserActivity({
       level: 'info',
       operation: `audit.${operation}`,
@@ -59,7 +59,7 @@ export class LoggingService {
     });
   }
 
-  logError(operation: string, error: Error, user_id?: string, details?: Record<string, any>): void {
+  logError(operation: string, error: Error, user_id?: string, details?: Record<string, unknown>): void {
     this.logUserActivity({
       level: 'error',
       operation: `error.${operation}`,

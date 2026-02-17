@@ -167,7 +167,7 @@ export class DisclosureProcessingService {
    * Enriches raw disclosure data with calculated fields for completeness
    * scoring and risk assessment.
    */
-  private enrichDisclosure(raw: any): FinancialDisclosure {
+  private enrichDisclosure(raw: unknown): FinancialDisclosure {
     return {
       id: raw.id,
       sponsor_id: raw.sponsor_id,
@@ -187,7 +187,7 @@ export class DisclosureProcessingService {
    * Calculates a simple completeness score for an individual disclosure
    * based on presence of key fields.
    */
-  private calculateIndividualCompletenessScore(disclosure: any): number {
+  private calculateIndividualCompletenessScore(disclosure: unknown): number {
     let score = 40; // Base score for having a disclosure
     if (disclosure.is_verified) score += 30;
     if (disclosure.amount) score += 20;
@@ -199,7 +199,7 @@ export class DisclosureProcessingService {
    * Assesses risk level for an individual disclosure based on amount
    * and verification status.
    */
-  private assessIndividualRiskLevel(disclosure: any): FinancialDisclosure['riskLevel'] {
+  private assessIndividualRiskLevel(disclosure: unknown): FinancialDisclosure['riskLevel'] {
     const amount = Number(disclosure.amount) || 0;
     const verified = Boolean(disclosure.is_verified);
 

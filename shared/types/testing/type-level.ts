@@ -46,7 +46,7 @@ export type TypeIsObject<T> = T extends object
 
 export type TypeIsArray<T> = T extends Array<any> ? true : false;
 
-export type TypeIsTuple<T extends any[]> = T extends [...infer U]
+export type TypeIsTuple<T extends unknown[]> = T extends [...infer U]
   ? U extends T
     ? true
     : false

@@ -120,7 +120,7 @@ export function createDashboardProvider(dashboardService: {
             // Use a self-executing function to avoid closure issues
             const w = state.widgets.find((aw: WidgetConfig) => aw.id === widget.id);
             if (w) {
-              dashboardService.loadWidgetData(widget.id, w).catch((error: any) => {
+              dashboardService.loadWidgetData(widget.id, w).catch((error: unknown) => {
                 logger.error('Failed to refresh widget:', { widgetId: widget.id }, error);
               });
             }

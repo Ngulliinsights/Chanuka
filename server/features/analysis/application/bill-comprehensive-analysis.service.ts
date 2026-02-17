@@ -230,7 +230,7 @@ export class BillComprehensiveAnalysisService {
     }
 
     /** Stores the analysis results in the database */
-     private async storeAnalysisResults(bill_id: number, analysisData: any): Promise<void> { logger.debug(`Storing analysis results for bill ${bill_id }.`);
+     private async storeAnalysisResults(bill_id: number, analysisData: unknown): Promise<void> { logger.debug(`Storing analysis results for bill ${bill_id }.`);
          try { const insertData: schema.InsertAnalysis = {
                 bill_id,
                 analysis_type: 'comprehensive_v1', // Use a versioned type name
@@ -271,15 +271,15 @@ export class BillComprehensiveAnalysisService {
     }
 
      // --- Default result generators for error handling ---
-     private getDefaultConstitutionalResult(reason: any): ConstitutionalAnalysisResult {
+     private getDefaultConstitutionalResult(reason: unknown): ConstitutionalAnalysisResult {
          logger.warn(`Using default constitutional result due to error: ${reason}`);
          return { constitutionalityScore: 0, concerns: [], precedents: [], riskAssessment: 'high' };
      }
-     private getDefaultStakeholderResult(reason: any): StakeholderAnalysisResult {
+     private getDefaultStakeholderResult(reason: unknown): StakeholderAnalysisResult {
          logger.warn(`Using default stakeholder result due to error: ${reason}`);
          return { primaryBeneficiaries: [], negativelyAffected: [], affectedPopulations: [], economicImpact: { estimatedCost: 0, estimatedBenefit: 0, netImpact: 0, timeframe: 'N/A', confidence: 0 }, socialImpact: { equityEffect: 0, accessibilityEffect: 0, publicHealthEffect: 0, environmentalEffect: 0 } };
      }
-      private getDefaultConflictSummary(reason: any): ConflictSummary {
+      private getDefaultConflictSummary(reason: unknown): ConflictSummary {
          logger.warn(`Using default conflict summary due to error: ${reason}`);
          return { overallRisk: 'medium', affectedSponsorsCount: 0, totalFinancialExposureEstimate: 0, directConflictCount: 0, indirectConflictCount: 0 };
      }

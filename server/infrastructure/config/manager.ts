@@ -12,8 +12,9 @@ import { resolve } from 'path';
 import * as chokidar from 'chokidar';
 import * as dotenvExpand from 'dotenv-expand';
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '../observability/error-management';
-import { ObservabilityStack } from '../observability/stack';
+import { BaseError, ErrorDomain } from '../errors/base-error';
+import { ErrorSeverity } from '../errors/error-standardization';
+import { ObservabilityStack } from '../observability/types';
 import { Result, err, ok } from '../primitives/types/result';
 
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
@@ -31,12 +32,12 @@ import type {
 
 // Configuration Manager Error Classes
 export class ConfigurationError extends BaseError {
-  constructor(message: string, cause?: Error, metadata?: Record<string, any>) {
+  constructor(message: string, cause?: Error, metadata?: Record<string, unknown>) {
     super(message, {
       statusCode: 500,
       code: 'CONFIGURATION_ERROR',
-      cause,
-      details: metadata,
+      ...(cause ? { cause } : {}),
+      ...(metadata ? { details: metadata } : {}),
       isOperational: true,
       domain: ErrorDomain.SYSTEM,
       severity: ErrorSeverity.HIGH,
@@ -45,7 +46,7 @@ export class ConfigurationError extends BaseError {
 }
 
 export class ConfigurationValidationError extends ConfigurationError {
-  constructor(message: string, validationErrors: any[]) {
+  constructor(message: string, validationErrors: unknown[]) {
     super(message, undefined, { validationErrors });
   }
 }
@@ -104,7 +105,13 @@ export class ConfigurationManager extends EventEmitter {
       this.loadEnvironmentFiles();
 
       // Build configuration from multiple sources
-      const rawConfig = this.buildConfiguration();
+      const rawConfigResult = this.buildConfiguration();
+      if (rawConfigResult.isErr()) {
+        const error = rawConfigResult.error;
+        this.emit('config:error', error);
+        return err(error);
+      }
+      const rawConfig = rawConfigResult.value;
 
       // Validate configuration with Result types
       const validationResult = this.validateConfiguration(rawConfig);
@@ -152,9 +159,9 @@ export class ConfigurationManager extends EventEmitter {
         const dependencyResult = await this.validateRuntimeDependencies();
         if (dependencyResult.isErr()) {
           // Log warning but don't fail loading
-          this.observability?.getLogger()?.warn('Dependency validation failed', {
+          this.observability?.getLogger()?.warn({
             error: (dependencyResult.unwrap() as ConfigurationError).message
-          });
+          }, 'Dependency validation failed');
         }
       }
 
@@ -348,16 +355,17 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     try {
-      // Simple encryption using crypto module (in real implementation, use proper encryption)
+      // Secure encryption using regular crypto module
       const crypto = require('crypto');
-      const cipher = crypto.createCipher('aes-256-cbc', this.encryptionKey);
+      const iv = crypto.randomBytes(16);
+      const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.encryptionKey!), iv);
       let encrypted = cipher.update(value, 'utf8', 'hex');
       encrypted += cipher.final('hex');
 
       this.encryptedValues.add(path);
       this.observability?.getMetrics()?.counter('config.value.encrypted', 1);
 
-      return ok(`ENC:${encrypted}`);
+      return ok(`ENC:${iv.toString('hex')}:${encrypted}`);
     } catch (error) {
       return err(new ConfigurationEncryptionError(
         `Failed to encrypt value at path ${path}`,
@@ -380,9 +388,20 @@ export class ConfigurationManager extends EventEmitter {
 
     try {
       const crypto = require('crypto');
-      const decipher = crypto.createDecipher('aes-256-cbc', this.encryptionKey);
-      const encrypted = encryptedValue.slice(4); // Remove 'ENC:' prefix
-      let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+      const encryptedContent = encryptedValue.slice(4); // Remove 'ENC:' prefix
+      
+      // Parse IV and content
+      const parts = encryptedContent.split(':');
+      if (parts.length !== 2) {
+         // Fallback for legacy format (if any) or error
+         // Assuming new format ENC:iv:content
+         return err(new ConfigurationEncryptionError('Invalid encrypted value format'));
+      }
+      const [ivHex, contentHex] = parts;
+      const iv = Buffer.from(ivHex, 'hex');
+      
+      const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.encryptionKey!), iv);
+      let decrypted = decipher.update(contentHex, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
 
       this.observability?.getMetrics()?.counter('config.value.decrypted', 1);
@@ -453,24 +472,24 @@ export class ConfigurationManager extends EventEmitter {
 
     // Log configuration events
     this.on('config:loaded', (config) => {
-      logger.info('Configuration loaded successfully', {
+      logger.info({
         environment: config.app.environment,
         features: Object.keys(config.features).length
-      });
+      }, 'Configuration loaded successfully');
     });
 
     this.on('config:changed', (event) => {
-      logger.info('Configuration changed', {
+      logger.info({
         changes: event.changes.length,
         timestamp: event.timestamp
-      });
+      }, 'Configuration changed');
     });
 
     this.on('config:error', (error) => {
-      logger.error('Configuration error', {
+      logger.error({
         error: error.message,
         code: error.errorCode
-      });
+      }, 'Configuration error');
     });
 
     // Track feature flag evaluations
@@ -493,21 +512,35 @@ export class ConfigurationManager extends EventEmitter {
         });
 
         if (result.error) {
-          this.observability?.getLogger()?.warn(`Warning: Could not load ${file}`, {
+          this.observability?.getLogger()?.warn({
             error: result.error.message
-          });
+          }, `Warning: Could not load ${file}`);
         }
       } catch (error) {
-        this.observability?.getLogger()?.warn(`Warning: Error loading ${file}`, {
+        this.observability?.getLogger()?.warn({
           error: error instanceof Error ? error.message : String(error)
-        });
+        }, `Warning: Error loading ${file}`);
       }
     }
   }
 
   private buildConfiguration(): Result<Partial<AppConfig>, ConfigurationError> {
     try {
-      const config: Record<string, any> = {};
+      // Initialize with empty sections to allow Zod defaults to work
+      const config: Record<string, unknown> = {
+        app: {},
+        cache: {},
+        log: {},
+        rateLimit: {},
+        errors: {},
+        security: {},
+        storage: {},
+        database: {},
+        monitoring: {},
+        validation: {},
+        // features: {}, // Has default in schema, do not initialize empty
+        // utilities: {}, // Has default in schema, do not initialize empty
+      };
 
       // Apply environment variable mappings
       for (const [envVar, configPath] of Object.entries(envMapping)) {
@@ -541,7 +574,7 @@ export class ConfigurationManager extends EventEmitter {
     }
   }
 
-  private validateConfiguration(config: Record<string, any>): Result<AppConfig, ConfigurationValidationError> {
+  private validateConfiguration(config: Record<string, unknown>): Result<AppConfig, ConfigurationValidationError> {
     const parsed = configSchema.safeParse(config);
 
     if (!parsed.success) {
@@ -607,7 +640,7 @@ export class ConfigurationManager extends EventEmitter {
     return `${section}.${property}`;
   }
 
-  private setNestedValue(obj: Record<string, any>, path: string, value: any): void {
+  private setNestedValue(obj: Record<string, unknown>, path: string, value: unknown): void {
     const keys = path.split('.');
     let current = obj;
 
@@ -652,9 +685,9 @@ export class ConfigurationManager extends EventEmitter {
           this.emit('dependency:validated', result.value);
 
           if (result.value.status === 'unhealthy') {
-            this.observability?.getLogger()?.warn(`Dependency validation warning: ${result.value.dependency}`, {
+            this.observability?.getLogger()?.warn({
               message: result.value.message
-            });
+            }, `Dependency validation warning: ${result.value.dependency}`);
           }
         }
       }
@@ -754,11 +787,11 @@ export class ConfigurationManager extends EventEmitter {
           });
 
           watcher.on('error', (error) => {
-            this.observability?.getLogger()?.warn(`Chokidar watcher error for ${file}, falling back to watchFile`, {
+            this.observability?.getLogger()?.warn({
               error: error instanceof Error ? error.message : String(error)
-            });
+            }, `Chokidar watcher error for ${file}, falling back to watchFile`);
             // Fall back to watchFile on error
-            this.setupWatchFileFallback(file, debounceTimer);
+            this.setupWatchFileFallback(file);
           });
 
           // Store watcher reference for cleanup
@@ -766,10 +799,10 @@ export class ConfigurationManager extends EventEmitter {
           this.observability?.getLogger()?.debug(`Using chokidar for watching ${file}`);
         } catch (error) {
           // Fall back to Node.js watchFile if chokidar fails
-          this.observability?.getLogger()?.warn(`Failed to initialize chokidar for ${file}, using watchFile fallback`, {
+          this.observability?.getLogger()?.warn({
             error: error instanceof Error ? error.message : String(error)
-          });
-          this.setupWatchFileFallback(file, debounceTimer);
+          }, `Failed to initialize chokidar for ${file}, using watchFile fallback`);
+          this.setupWatchFileFallback(file);
         }
       }
     }
@@ -781,8 +814,9 @@ export class ConfigurationManager extends EventEmitter {
   /**
    * Fallback to Node.js watchFile when chokidar is unavailable
    */
-  private setupWatchFileFallback(file: string, debounceTimer: NodeJS.Timeout): void {
+  private setupWatchFileFallback(file: string): void {
     const { watchFile } = require('fs');
+    let debounceTimer: NodeJS.Timeout;
     
     watchFile(file, () => {
       clearTimeout(debounceTimer);
@@ -802,7 +836,7 @@ export class ConfigurationManager extends EventEmitter {
   private detectChanges(previous: AppConfig, current: AppConfig): ConfigChange[] {
     const changes: ConfigChange[] = [];
 
-    const compareObjects = (prev: any, curr: any, path: string = '') => {
+    const compareObjects = (prev: unknown, curr: unknown, path: string = '') => {
       const allKeys = new Set([...Object.keys(prev || {}), ...Object.keys(curr || {})]);
 
       for (const key of Array.from(allKeys)) {
@@ -892,7 +926,7 @@ export class ConfigurationManager extends EventEmitter {
     return Math.abs(hash);
   }
 
-  private deepMerge(target: any, source: any): any {
+  private deepMerge(target: unknown, source: unknown): unknown {
     const result = { ...target };
 
     for (const key in source) {

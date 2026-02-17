@@ -176,8 +176,8 @@ router.get('/bills/:bill_id/history', asyncHandler(async (req, res: Response) =>
     const historyRecords = await analysisService.findHistoryByBillId(bill_id, limit);
 
     // Transform results for frontend consumption
-    const historyResults = historyRecords.map((record: any) => {
-      const resultsData = record.results as any;
+    const historyResults = historyRecords.map((record: unknown) => {
+      const resultsData = record.results as unknown;
       return {
         dbId: record.id,
         analysis_id: resultsData?.analysis_id,

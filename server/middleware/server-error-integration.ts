@@ -19,7 +19,7 @@ export function configureErrorHandling(app: Express): void {
   app.use(errorContextMiddleware);
 
   // API-specific error handling middleware (updated to use Boom)
-  app.use('/api', (error: any, req: any, res: any, next: any) => {
+  app.use('/api', (error: unknown, req: unknown, res: unknown, next: unknown) => {
     logger.error('API Error:', error, { component: 'Chanuka' });
 
     // Let the Boom middleware handle the error
@@ -30,7 +30,7 @@ export function configureErrorHandling(app: Express): void {
   app.use(boomErrorMiddleware);
 
   // Fallback error handler for cases where Boom middleware fails
-  app.use((error: any, req: any, res: any, next: any) => {
+  app.use((error: unknown, req: unknown, res: unknown, next: unknown) => {
     logger.error('Fallback error handler triggered:', error, { component: 'Chanuka' });
 
     // If response already sent, delegate to default Express error handler
@@ -61,7 +61,7 @@ export function configureErrorHandling(app: Express): void {
  * Legacy error handler for backward compatibility
  * This can be removed once all routes are migrated
  */
-export const legacyErrorHandler = (err: any, req: any, res: any, next: any) => {
+export const legacyErrorHandler = (err: unknown, req: unknown, res: unknown, next: unknown) => {
   logger.error('Legacy error handler:', { error: err.message, path: req.path });
 
   const statusCode = err.statusCode || err.status || 500;

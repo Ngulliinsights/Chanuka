@@ -73,7 +73,7 @@ export async function initializeValidationServices(dbPool?: PoolType): Promise<V
       dbInstance = await getDbInstance();
       // Note: We'll need to get the pool from the database instance
       // This might need adjustment based on your database setup
-      pool = dbInstance as any; // Type assertion - adjust based on actual implementation
+      pool = dbInstance as unknown; // Type assertion - adjust based on actual implementation
     }
 
     // Step 4: Initialize schema validation service

@@ -11,8 +11,8 @@ import { useCallback, useMemo, useRef } from 'react';
 
 // 1. Define Input and Output Types
 export interface ExampleInput {
-  data: any[];
-  filters: Record<string, any>;
+  data: unknown[];
+  filters: Record<string, unknown>;
   options: {
     debounce?: number;
     cache?: boolean;
@@ -20,15 +20,15 @@ export interface ExampleInput {
 }
 
 export interface ExampleOutput {
-  processedData: any[];
+  processedData: unknown[];
   totalCount: number;
   hasMore: boolean;
 }
 
 // 2. Define Dependencies Interface
 export interface ExampleDependencies {
-  data: any[];
-  filters: Record<string, any>;
+  data: unknown[];
+  filters: Record<string, unknown>;
   options: ExampleInput['options'];
 }
 
@@ -73,7 +73,7 @@ export function useExampleCallback(input: ExampleInput) {
   }, [data, filters, options]);
 
   // 6. Create Memoized Callbacks
-  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, unknown>) => {
     // This callback is memoized and will only change if dependencies change
     return {
       ...input,
@@ -81,7 +81,7 @@ export function useExampleCallback(input: ExampleInput) {
     };
   }, [filters, input]);
 
-  const handleDataUpdate = useCallback((newData: any[]) => {
+  const handleDataUpdate = useCallback((newData: unknown[]) => {
     // Memoized callback for data updates
     return {
       ...input,

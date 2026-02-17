@@ -13,22 +13,22 @@
 // ==================== Client-Safe Logging Helper ====================
 
 const safeLog = {
-  debug: (message: string, data?: any) => {
+  debug: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.debug) {
       console.debug(message, data);
     }
   },
-  info: (message: string, data?: any) => {
+  info: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.info) {
       console.info(message, data);
     }
   },
-  warn: (message: string, data?: any) => {
+  warn: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.warn) {
       console.warn(message, data);
     }
   },
-  error: (message: string, data?: any) => {
+  error: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.error) {
       console.error(message, data);
     }
@@ -43,7 +43,7 @@ export interface PerformanceMetric {
   unit: string;
   timestamp: number;
   tags?: Record<string, string>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ApiPerformanceMetric extends PerformanceMetric {
@@ -117,7 +117,7 @@ export class PerformanceMonitor {
     value: number,
     unit: string,
     tags?: Record<string, string>,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     const metric: PerformanceMetric = {
       name,
@@ -369,11 +369,11 @@ export async function benchmark<T>(
  * Performance timing decorator.
  */
 export function timed(metricName?: string) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const name = metricName || `${target.constructor.name}.${propertyKey}`;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const start = performance.now();
       try {
         const result = await originalMethod.apply(this, args);
@@ -462,7 +462,7 @@ export function trackMetric(
   value: number,
   unit: string,
   tags?: Record<string, string>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   performanceMonitor.trackMetric(name, value, unit, tags, metadata);
 }

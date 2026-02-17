@@ -276,11 +276,11 @@ router.get('/:id/comments', asyncErrorHandler(async (req: Request, res: Response
 
   const sortKey = (sortBy as string) || 'recent';
   if (sortKey === 'recent') {
-    comments.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    comments.sort((a: unknown, b: unknown) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   } else if (sortKey === 'popular') {
-    comments.sort((a: any, b: any) => (b.likes || 0) - (a.likes || 0));
+    comments.sort((a: unknown, b: unknown) => (b.likes || 0) - (a.likes || 0));
   } else if (sortKey === 'endorsements') {
-    comments.sort((a: any, b: any) => (b.endorsements || 0) - (a.endorsements || 0));
+    comments.sort((a: unknown, b: unknown) => (b.endorsements || 0) - (a.endorsements || 0));
   }
 
   res.json({

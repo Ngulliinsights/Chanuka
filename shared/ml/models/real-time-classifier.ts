@@ -388,7 +388,7 @@ export class RealTimeClassifier {
     return { polarity, intensity, confidence };
   }
 
-  private classifyEngagement(content: any, tokens: string[], userContext?: any) {
+  private classifyEngagement(content: unknown, tokens: string[], userContext?: unknown) {
     let score = 50; // Base score
     const factors = [];
     
@@ -616,7 +616,7 @@ export class RealTimeClassifier {
     return { level, score, interestFactors };
   }
 
-  private classifyActionRequired(content: any, classifications: any) {
+  private classifyActionRequired(content: unknown, classifications: unknown) {
     let requiresAction = false;
     let actionType: 'alert' | 'investigation' | 'fact_check' | 'expert_review' | 'public_notice' | undefined;
     let priority: 'low' | 'medium' | 'high' | 'urgent' | undefined;
@@ -688,7 +688,7 @@ export class RealTimeClassifier {
     return Array.from(tags).slice(0, 10);
   }
 
-  private calculateOverallConfidence(classifications: any): number {
+  private calculateOverallConfidence(classifications: unknown): number {
     const confidenceValues: number[] = [];
     
     for (const classification of Object.values(classifications)) {
@@ -705,7 +705,7 @@ export class RealTimeClassifier {
       : 0.5;
   }
 
-  private generateRecommendations(input: ClassificationInput, classifications: any) {
+  private generateRecommendations(input: ClassificationInput, classifications: unknown) {
     const userRecommendations = [];
     const systemRecommendations = [];
     

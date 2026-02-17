@@ -12,7 +12,7 @@ import { SearchOptions, SearchResponse,semanticSearchEngine } from './semantic-s
 
 export interface EngineResult {
   engine: 'postgresql' | 'semantic';
-  results: any[];
+  results: unknown[];
   totalCount: number;
   processingTimeMs: number;
   error?: Error;
@@ -512,7 +512,7 @@ export class DualEngineOrchestrator {
       semantic: boolean;
     };
     config: OrchestratorConfig;
-    recentPerformance: any[];
+    recentPerformance: unknown[];
   }> {
     // Basic health check - in production this would be more comprehensive
     return {

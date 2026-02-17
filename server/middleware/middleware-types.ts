@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-// import { logger } from '../observability/logging'; // Unused import
 
 export type RegularMiddleware = (req: Request, res: Response, next: NextFunction) => void | Promise<void> | Response | Promise<Response | undefined>;
 export type ErrorMiddleware = (error: Error, req: Request, res: Response, next: NextFunction) => void | Promise<void> | Response | Promise<Response | undefined>;
@@ -30,7 +29,7 @@ export interface CacheService {
 }
 
 export interface ValidationService {
-  validate(data: any, schema: any): ValidationResult;
+  validate(data: unknown, schema: unknown): ValidationResult;
 }
 
 export interface ValidationResult {
@@ -51,39 +50,39 @@ export interface HealthChecker {
 
 export interface HealthStatus {
   status: 'healthy' | 'unhealthy';
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // Provider interfaces
 export interface MiddlewareProvider {
   readonly name: string;
-  validate?(options: Record<string, any>): boolean;
-  create(options: Record<string, any>): AnyMiddleware;
+  validate?(options: Record<string, unknown>): boolean;
+  create(options: Record<string, unknown>): AnyMiddleware;
 }
 
 export interface AuthMiddlewareProvider extends MiddlewareProvider {
   readonly name: 'auth';
-  create(options: Record<string, any>): RegularMiddleware;
+  create(options: Record<string, unknown>): RegularMiddleware;
 }
 
 export interface CacheMiddlewareProvider extends MiddlewareProvider {
   readonly name: 'cache';
-  create(options: Record<string, any>): RegularMiddleware;
+  create(options: Record<string, unknown>): RegularMiddleware;
 }
 
 export interface ValidationMiddlewareProvider extends MiddlewareProvider {
   readonly name: 'validation';
-  create(options: Record<string, any>): RegularMiddleware;
+  create(options: Record<string, unknown>): RegularMiddleware;
 }
 
 export interface RateLimitMiddlewareProvider extends MiddlewareProvider {
   readonly name: 'rateLimit';
-  create(options: Record<string, any>): RegularMiddleware;
+  create(options: Record<string, unknown>): RegularMiddleware;
 }
 
 export interface ErrorHandlerMiddlewareProvider extends MiddlewareProvider {
   readonly name: 'errorHandler';
-  create(options: Record<string, any>): ErrorMiddleware;
+  create(options: Record<string, unknown>): ErrorMiddleware;
 }
 
 

@@ -8,61 +8,6 @@
 import { VerificationStatus } from '@shared/types/domains/authentication';
 
 // Define a local UserProfile that matches our needs
-export interface UserProfile {
-  displayName: string;
-  bio?: string;
-  avatarUrl?: string;
-  anonymityLevel: 'public' | 'semi-private' | 'private' | 'anonymous';
-  isPublic: boolean;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  
-  // Profile structure
-  profile: UserProfile;
-  verification: VerificationStatus;
-  preferences: UserPreferences;
-  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
-
-  // Audit (String for JSON)
-  createdAt: string;
-  lastLogin: string;
-
-  // Legacy Fields (Deprecated)
-  /** @deprecated use profile.displayName */
-  name: string;
-  /** @deprecated use profile.displayName */
-  username?: string;
-  /** @deprecated use profile.displayName */
-  first_name?: string;
-  /** @deprecated use profile.displayName */
-  last_name?: string;
-  /** @deprecated use verification === 'verified' */
-  verified: boolean;
-  /** @deprecated use profile.avatarUrl */
-  avatar_url?: string;
-  
-  // Existing Core fields
-  twoFactorEnabled: boolean;
-  permissions: string[];
-  
-  // Feature fields (keep as optional)
-  verification_status?: 'pending' | 'verified' | 'rejected'; // This duplicates verification?
-  expertise?: string | string[];
-  is_active?: boolean;
-  reputation?: number;
-  two_factor_enabled?: boolean; // duplicate of twoFactorEnabled?
-  last_login?: string; // duplicate of lastLogin
-  login_count?: number;
-  account_locked?: boolean;
-  locked_until?: string | null;
-  password_changed_at?: string;
-  privacy_settings?: PrivacySettings;
-  consent_given?: ConsentRecord[];
-  data_retention_preference?: DataRetentionPreference;
-}
 
 export interface PrivacySettings {
   profile_visibility: 'public' | 'registered' | 'private';

@@ -13,7 +13,7 @@ import { Label } from '@client/lib/design-system/typography/Label';
 
 interface VisibilityControlsProps {
   settings: PrivacySettings;
-  onSettingChange: (key: keyof PrivacySettings, value: any) => void;
+  onSettingChange: (key: keyof PrivacySettings, value: unknown) => void;
   className?: string;
 }
 

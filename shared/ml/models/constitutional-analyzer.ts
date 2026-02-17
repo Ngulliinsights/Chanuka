@@ -229,7 +229,7 @@ export class ConstitutionalAnalyzer {
     return provisions;
   }
 
-  private findRelevantPrecedents(input: ConstitutionalInput, violations: any[], tokens: string[]) {
+  private findRelevantPrecedents(input: ConstitutionalInput, violations: unknown[], tokens: string[]) {
     const relevantPrecedents = [];
     const tokenSet = new Set(tokens);
 
@@ -263,7 +263,7 @@ export class ConstitutionalAnalyzer {
     return relevantPrecedents.sort((a, b) => b.relevance - a.relevance);
   }
 
-  private calculateAlignmentScore(violations: any[], provisions: any[]): number {
+  private calculateAlignmentScore(violations: unknown[], provisions: unknown[]): number {
     let score = 100;
 
     // Deduct points for violations
@@ -288,7 +288,7 @@ export class ConstitutionalAnalyzer {
     return Math.max(0, Math.min(100, score));
   }
 
-  private determineAlignment(score: number, violations: any[]): 'aligned' | 'concerning' | 'violates' | 'neutral' {
+  private determineAlignment(score: number, violations: unknown[]): 'aligned' | 'concerning' | 'violates' | 'neutral' {
     const criticalViolations = violations.filter(v => v.severity === 'critical');
     
     if (criticalViolations.length > 0) return 'violates';
@@ -298,7 +298,7 @@ export class ConstitutionalAnalyzer {
     return 'neutral';
   }
 
-  private generateRecommendations(violations: any[], provisions: any[]): string[] {
+  private generateRecommendations(violations: unknown[], provisions: unknown[]): string[] {
     const recommendations = new Set<string>();
 
     // Add specific recommendations for violations
@@ -323,7 +323,7 @@ export class ConstitutionalAnalyzer {
     return Array.from(recommendations);
   }
 
-  private calculateConfidence(violations: any[], provisions: any[]): number {
+  private calculateConfidence(violations: unknown[], provisions: unknown[]): number {
     let confidence = 0.7;
     confidence += Math.min(0.15, violations.length * 0.03);
     confidence += Math.min(0.15, provisions.length * 0.02);

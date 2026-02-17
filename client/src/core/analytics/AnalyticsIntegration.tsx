@@ -7,14 +7,13 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import React, { useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '@client/core/auth';
-import { useNavigation } from '@client/core/navigation/context';
 import { useComprehensiveAnalytics } from '@client/features/analytics/hooks/use-comprehensive-analytics';
 import { userJourneyTracker, type NavigationSection } from '@client/features/analytics/model/user-journey-tracker';
-import type { UserRole } from '@client/lib/types/navigation';
+import { UserRole } from '@shared/types/core/enums';
 import { logger } from '@client/lib/utils/logger';
 
 /**
@@ -24,9 +23,7 @@ import { logger } from '@client/lib/utils/logger';
  */
 export function useAnalyticsIntegration() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const navigation = useNavigation();
 
   const {
     trackEvent,
@@ -53,7 +50,7 @@ export function useAnalyticsIntegration() {
    */
   useEffect(() => {
     if (!sessionId.current) {
-      const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
+      const userRole = isAuthenticated ? (user?.role as UserRole) || UserRole.Citizen : UserRole.Public;
 
       // Start journey using the centralized tracker; it returns a session id
       sessionId.current = journeyTracker.current.startJourney(user?.id, userRole as any);
@@ -73,7 +70,7 @@ export function useAnalyticsIntegration() {
     if (!sessionId.current || !isEnabled) return;
 
     const currentSection = getCurrentSection(location.pathname);
-    const userRole: UserRole = isAuthenticated ? (user?.role as UserRole) || 'citizen' : 'public';
+    const userRole = isAuthenticated ? (user?.role as UserRole) || UserRole.Citizen : UserRole.Public;
 
     // Track journey step
     journeyTracker.current.trackPageVisit(location.pathname, currentSection, document.referrer);
@@ -167,7 +164,7 @@ export function useAnalyticsIntegration() {
    * Track performance metrics automatically
    */
   useEffect(() => {
-    if (!isEnabled) return;
+    if (!isEnabled) return undefined;
 
     const trackPagePerformance = () => {
       if (typeof window === 'undefined' || !window.performance) return;
@@ -198,6 +195,7 @@ export function useAnalyticsIntegration() {
     // Track performance after page load
     if (document.readyState === 'complete') {
       trackPagePerformance();
+      return undefined;
     } else {
       window.addEventListener('load', trackPagePerformance);
       return () => window.removeEventListener('load', trackPagePerformance);

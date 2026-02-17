@@ -238,7 +238,7 @@ export class CacheClusterManager extends EventEmitter {
   async shutdown(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = null as any;
+      this.healthCheckInterval = null as unknown;
     }
 
     this.emit('cluster:event', {

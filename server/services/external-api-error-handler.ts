@@ -207,7 +207,7 @@ export class ExternalAPIErrorHandler extends EventEmitter {
   /**
    * Determine error severity
    */
-  private determineSeverity(errorType: ExternalAPIErrorType, context: any): ErrorSeverity {
+  private determineSeverity(errorType: ExternalAPIErrorType, context: unknown): ErrorSeverity {
     // Critical errors that affect core functionality
     if ([
       ExternalAPIErrorType.AUTHENTICATION,
@@ -453,7 +453,7 @@ export class ExternalAPIErrorHandler extends EventEmitter {
   /**
    * Cache data for fallback use
    */
-  cacheData(source: string, data: any, ttl?: number): void {
+  cacheData(source: string, data: unknown, ttl?: number): void {
     const cacheTimeout = ttl || this.defaultFallbackConfig.cacheTimeout;
     
     this.fallbackCache.set(source, {

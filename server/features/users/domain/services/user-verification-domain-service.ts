@@ -421,7 +421,7 @@ export class UserVerificationDomainService {
     const verificationData: VerificationData = verificationDataRaw;
     const disputes = verificationData.disputes || [];
 
-    if (disputes.some((d: any) => d.user_id === disputerId)) {
+    if (disputes.some((d: unknown) => d.user_id === disputerId)) {
       return { success: false, errors: ['Already disputed this verification'] };
     }
 
@@ -560,7 +560,7 @@ export class UserVerificationDomainService {
       .where(sql`(user_verification.verification_data->>'bill_id')::int = ${bill_id}`)
       .orderBy(desc(user_verification.created_at));
 
-    const verifications = verificationRows.map((row: any) => {
+    const verifications = verificationRows.map((row: unknown) => {
       const dataRaw = row.verification_data;
       if (!isVerificationData(dataRaw)) {
         throw new Error(`Invalid verification data structure for verification ${row.id}`);
@@ -639,7 +639,7 @@ export class UserVerificationDomainService {
       .where(eq(user_verification.user_id, user_id))
       .orderBy(desc(user_verification.created_at));
 
-    const verifications = verificationRows.map((row: any) => {
+    const verifications = verificationRows.map((row: unknown) => {
       const dataRaw = row.verification_data;
       if (!isVerificationData(dataRaw)) {
         throw new Error(`Invalid verification data structure for verification ${row.id}`);

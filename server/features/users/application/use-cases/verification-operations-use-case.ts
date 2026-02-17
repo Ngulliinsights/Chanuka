@@ -29,7 +29,7 @@ export interface PerformFactCheckCommand { bill_id: number;
 export interface VerificationOperationResult {
   success: boolean;
   verification?: CitizenVerification;
-  factCheckResults?: any[];
+  factCheckResults?: unknown[];
   errors: string[];
   warnings?: string[];
 }

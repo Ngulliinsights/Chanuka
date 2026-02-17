@@ -22,7 +22,7 @@ export interface Strategy<TContext, TResult> {
 // 2. Define Context Interface
 export interface StrategyContext {
   data: any;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   timestamp: number;
   userId?: string;
 }
@@ -188,7 +188,7 @@ export function useStrategyManager<TContext, TResult>(
           attempts: strategyAttemptsRef.current[strategy.id] || 0,
         },
       };
-    }, {} as Record<string, any>);
+    }, {} as Record<string, unknown>);
 
     return stats;
   }, [strategies, executionHistory]);

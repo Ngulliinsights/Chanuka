@@ -1,34 +1,3 @@
-/**
- * Navigation Types - OPTIMIZED
- *
- * Unified navigation types with improved type safety and consistency.
- * Changes from original:
- * - Standardized to camelCase throughout
- * - Removed duplicate NavigationContextValue definition
- * - Added discriminated unions for better type inference
- * - Improved optional/required field balance
- * - Added strict branding for type safety
- */
-
-// ============================================================================
-// Core User Role Types
-// ============================================================================
-
-/**
- * User role with strict typing
- * Note: 'citizen' and 'user' are aliases for backwards compatibility
- */
-export type UserRole =
-  | 'public'
-  | 'citizen' // Legacy alias
-  | 'user'    // Preferred term
-  | 'expert'
-  | 'admin'
-  | 'official'
-  | 'moderator'
-  | 'journalist'
-  | 'advocate';
-
 export type NavigationSection =
   | 'legislative'
   | 'community'

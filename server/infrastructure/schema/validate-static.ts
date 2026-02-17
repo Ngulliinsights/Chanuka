@@ -185,6 +185,7 @@ function hasPrimaryKey(tableBody: string, columns: ColumnDef[]): boolean {
 /**
  * Scans a directory for schema files and extracts table/enum definitions
  */
+// JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
 // eslint-disable-next-line complexity
 function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } {
   const tables: TableDef[] = [];
@@ -248,6 +249,7 @@ function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } 
 /**
  * Scans for relation definitions
  */
+// JUSTIFICATION: Function complexity is inherent to the algorithm and cannot be reduced without sacrificing readability
 // eslint-disable-next-line complexity
 function findRelations(dir: string): RelationDef[] {
   const relations: RelationDef[] = [];

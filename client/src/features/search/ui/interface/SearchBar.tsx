@@ -176,7 +176,7 @@ export function SearchBar({
                   <TrendingUp className="h-3 w-3 mr-1" />
                   Suggestions
                 </div>
-                {suggestions.map((suggestion: any, index: number) => (
+                {suggestions.map((suggestion: unknown, index: number) => (
                   <button
                     key={`suggestion-${index}`}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm hover:bg-accent flex items-center ${
@@ -198,7 +198,7 @@ export function SearchBar({
             {liveResults && liveResults.length > 0 && (
               <div className="p-2">
                 <div className="text-xs font-medium text-muted-foreground mb-2">Results</div>
-                {liveResults.slice(0, 3).map((result: any, index: number) => {
+                {liveResults.slice(0, 3).map((result: unknown, index: number) => {
                   const actualIndex = (suggestions?.length || 0) + index;
                   return (
                     <button
@@ -228,7 +228,7 @@ export function SearchBar({
                   <Clock className="h-3 w-3 mr-1" />
                   Recent Searches
                 </div>
-                {history.data.slice(0, 3).map((item: any, index: number) => {
+                {history.data.slice(0, 3).map((item: unknown, index: number) => {
                   const actualIndex =
                     (suggestions?.length || 0) + (liveResults?.length || 0) + index;
                   return (

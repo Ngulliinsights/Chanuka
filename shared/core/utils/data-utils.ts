@@ -21,7 +21,7 @@ export interface DataValidationResult<T = any> {
 export interface DataTransformationOptions {
   deep?: boolean;
   preserveKeys?: boolean;
-  filterFn?: (key: string, value: any) => boolean;
+  filterFn?: (key: string, value: unknown) => boolean;
 }
 
 export interface PaginationOptions {
@@ -48,7 +48,7 @@ export interface PaginatedResult<T> {
  */
 export function validateData<T>(
   data: any,
-  validator: (data: any) => DataValidationResult<T>
+  validator: (data: unknown) => DataValidationResult<T>
 ): DataValidationResult<T> {
   try {
     return validator(data);
@@ -69,7 +69,7 @@ export function validateData<T>(
 /**
  * Validates that a value is not null or undefined.
  */
-export function validateRequired(value: any, fieldName: string): DataValidationResult {
+export function validateRequired(value: unknown, fieldName: string): DataValidationResult {
   if (value === null || value === undefined) {
     return {
       isValid: false,
@@ -179,7 +179,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Transforms object keys according to a mapping function.
  */
-export function transformKeys<T extends Record<string, any>>(
+export function transformKeys<T extends Record<string, unknown>>(
   obj: T,
   keyTransformer: (key: string) => string,
   options: DataTransformationOptions = {}
@@ -210,21 +210,21 @@ export function transformKeys<T extends Record<string, any>>(
 /**
  * Converts object keys from camelCase to snake_case.
  */
-export function camelToSnake<T extends Record<string, any>>(obj: T): T {
+export function camelToSnake<T extends Record<string, unknown>>(obj: T): T {
   return transformKeys(obj, key => key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`));
 }
 
 /**
  * Converts object keys from snake_case to camelCase.
  */
-export function snakeToCamel<T extends Record<string, any>>(obj: T): T {
+export function snakeToCamel<T extends Record<string, unknown>>(obj: T): T {
   return transformKeys(obj, key => key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()));
 }
 
 /**
  * Flattens a nested object into a single-level object with dot notation keys.
  */
-export function flattenObject(obj: any, prefix = '', result: Record<string, any> = {}): Record<string, any> {
+export function flattenObject(obj: unknown, prefix = '', result: Record<string, unknown> = {}): Record<string, unknown> {
   for (const [key, value] of Object.entries(obj)) {
     const newKey = prefix ? `${prefix}.${key}` : key;
 
@@ -241,7 +241,7 @@ export function flattenObject(obj: any, prefix = '', result: Record<string, any>
 /**
  * Unflattens a flattened object back to nested structure.
  */
-export function unflattenObject(obj: Record<string, any>): any {
+export function unflattenObject(obj: Record<string, unknown>): any {
   const result: any = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -370,7 +370,7 @@ export function paginateData<T>(
 /**
  * Performs a deep comparison between two values.
  */
-export function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
 
   if (a == null || b == null) return a === b;
@@ -404,12 +404,12 @@ export function deepEqual(a: any, b: any): boolean {
  * Computes the difference between two objects.
  */
 export function objectDiff(
-  obj1: Record<string, any>,
-  obj2: Record<string, any>
-): { added: Record<string, any>; removed: Record<string, any>; changed: Record<string, any> } {
-  const added: Record<string, any> = {};
-  const removed: Record<string, any> = {};
-  const changed: Record<string, any> = {};
+  obj1: Record<string, unknown>,
+  obj2: Record<string, unknown>
+): { added: Record<string, unknown>; removed: Record<string, unknown>; changed: Record<string, unknown> } {
+  const added: Record<string, unknown> = {};
+  const removed: Record<string, unknown> = {};
+  const changed: Record<string, unknown> = {};
 
   const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
 
@@ -446,7 +446,7 @@ export function sanitizeString(input: string): string {
 /**
  * Sanitizes an object by recursively sanitizing string values.
  */
-export function sanitizeObject(obj: any): any {
+export function sanitizeObject(obj: unknown): unknown {
   if (typeof obj === 'string') {
     return sanitizeString(obj);
   }

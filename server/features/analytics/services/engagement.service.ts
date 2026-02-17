@@ -308,7 +308,7 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
               votes: Number(trend.votes || 0)
             }));
 
-            return formattedTrends as any;
+            return formattedTrends as unknown;
           }
         );
       },
@@ -521,7 +521,7 @@ router.get('/user/:user_id/metrics', authenticateToken, async (req: Authenticate
 
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
-      req as any,
+      req as unknown,
       'high',
       'business_logic'
     );
@@ -556,7 +556,7 @@ router.get('/bill/:bill_id/metrics', authenticateToken, async (req: Authenticate
 
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
-      req as any,
+      req as unknown,
       'high',
       'business_logic'
     );
@@ -616,7 +616,7 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
 
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
-      req as any,
+      req as unknown,
       'high',
       'business_logic'
     );

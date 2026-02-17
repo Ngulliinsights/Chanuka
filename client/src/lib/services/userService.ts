@@ -70,19 +70,6 @@ export interface AuthSession {
   requiresTwoFactor?: boolean;
 }
 
-export interface UserProfile extends AuthUser {
-  bio?: string;
-  location?: string;
-  website?: string;
-  twitter?: string;
-  linkedin?: string;
-  cover_image_url?: string;
-  civic_engagement_score: number;
-  badges: UserBadge[];
-  achievements: UserAchievement[];
-  activity_summary: ActivitySummary;
-}
-
 export interface UserBadge {
   id: string;
   name: string;

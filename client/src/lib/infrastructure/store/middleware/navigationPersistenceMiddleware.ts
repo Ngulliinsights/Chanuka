@@ -183,7 +183,7 @@ function loadNavigationState(): Partial<NavigationState> | null {
     const stored = localStorage.getItem(STORAGE_KEYS.NAVIGATION_STATE);
     if (!stored) return null;
 
-    const parsed = JSON.parse(stored) as unknown;
+    const parsed = /* TODO: Add Zod validation */ JSON.parse(stored) as unknown;
 
     // Validate that parsed data is an object before accessing properties
     if (!isRecord(parsed)) {

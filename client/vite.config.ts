@@ -402,7 +402,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
           // Organized asset structure makes debugging and deployment easier
           // Different asset types go to different folders for clarity
-          assetFileNames: (assetInfo: any) => {
+          assetFileNames: (assetInfo: unknown) => {
             const name = assetInfo.name || ''
 
             if (/\.(png|jpe?g|svg|gif|webp|avif|tiff|bmp|ico)$/i.test(name)) {
@@ -440,7 +440,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
 
         // Warning filtering keeps your build output clean and actionable
-        onwarn(warning: any, warn: any) {
+        onwarn(warning: unknown, warn: unknown) {
           // Circular dependencies are common in React apps and usually harmless
           if (warning.code === 'CIRCULAR_DEPENDENCY') return
           // This warning appears with some libraries but doesn't affect functionality

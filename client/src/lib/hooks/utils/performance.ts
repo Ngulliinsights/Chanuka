@@ -72,7 +72,7 @@ export function usePerformanceMonitor(name: string, enabled: boolean = true) {
 }
 
 // 4. Debounced Callback Hook
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
+export function useDebouncedCallback<T extends (...args: unknown[]) => any>(
   callback: T,
   delay: number,
   options: {
@@ -86,7 +86,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastCallTimeRef = useRef<number>(0);
   const lastInvokeTimeRef = useRef<number>(0);
-  const lastArgsRef = useRef<any[]>([]);
+  const lastArgsRef = useRef<unknown[]>([]);
   const lastThisRef = useRef<any>(null);
   const resultRef = useRef<ReturnType<T>>();
 
@@ -104,7 +104,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 
   const leadingEdge = useCallback((time: number) => {
     lastInvokeTimeRef.current = time;
-    timeoutRef.current = setTimeout(timerExpired, delay) as any;
+    timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
     return leading ? invokeFunc(time) : resultRef.current;
   }, [delay, leading]);
 
@@ -126,14 +126,14 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     }
     const timeSinceLastCall = time - lastCallTimeRef.current;
     const remainingWait = delay - timeSinceLastCall;
-    timeoutRef.current = setTimeout(timerExpired, remainingWait) as any;
+    timeoutRef.current = setTimeout(timerExpired, remainingWait) as unknown;
   }, [shouldInvoke, trailingEdge]);
 
   const invokeFunc = useCallback((time: number) => {
     const args = lastArgsRef.current;
     const thisArg = lastThisRef.current;
 
-    lastArgsRef.current = [] as any;
+    lastArgsRef.current = [] as unknown;
     lastThisRef.current = null;
     lastInvokeTimeRef.current = time;
     resultRef.current = callback.apply(thisArg, args!);
@@ -153,15 +153,15 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
         return leadingEdge(lastCallTimeRef.current);
       }
       if (maxWait !== undefined) {
-        timeoutRef.current = setTimeout(timerExpired, delay) as any;
+        timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
         return invokeFunc(lastCallTimeRef.current);
       }
     }
     if (timeoutRef.current === null) {
-      timeoutRef.current = setTimeout(timerExpired, delay) as any;
+      timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
     }
     return resultRef.current;
-  }, [shouldInvoke, leadingEdge, timerExpired, invokeFunc, delay, maxWait]) as any;
+  }, [shouldInvoke, leadingEdge, timerExpired, invokeFunc, delay, maxWait]) as unknown;
 
   // Cancel method
   debounced.cancel = useCallback(() => {
@@ -184,7 +184,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 }
 
 // 5. Throttled Callback Hook
-export function useThrottledCallback<T extends (...args: any[]) => any>(
+export function useThrottledCallback<T extends (...args: unknown[]) => any>(
   callback: T,
   delay: number,
   options: {
@@ -196,7 +196,7 @@ export function useThrottledCallback<T extends (...args: any[]) => any>(
 
   const lastCallTimeRef = useRef<number>(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastArgsRef = useRef<any[]>([]);
+  const lastArgsRef = useRef<unknown[]>([]);
   const lastThisRef = useRef<any>(null);
   const resultRef = useRef<ReturnType<T>>();
 

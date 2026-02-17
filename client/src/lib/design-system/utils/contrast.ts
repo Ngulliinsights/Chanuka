@@ -178,7 +178,7 @@ export function generateAccessibleColors(
 /**
  * Validate theme colors for accessibility
  */
-export function validateThemeContrast(theme: Record<string, any>): {
+export function validateThemeContrast(theme: Record<string, unknown>): {
   isValid: boolean;
   issues: Array<{
     property: string;
@@ -238,7 +238,7 @@ export function validateThemeContrast(theme: Record<string, any>): {
 /**
  * CSS custom properties for dynamic contrast
  */
-export function generateContrastCSS(theme: any): string {
+export function generateContrastCSS(theme: unknown): string {
   return `
     /* Dynamic contrast utilities */
     .contrast-aa {

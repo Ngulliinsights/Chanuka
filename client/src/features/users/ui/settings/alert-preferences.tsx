@@ -288,7 +288,7 @@ const defaultPreferences: AlertPreferences = {
     }
   };
 
-  const updatePreference = (path: string, value: any) => {
+  const updatePreference = (path: string, value: unknown) => {
     if (!preferences) return;
 
     const keys = path.split('.');

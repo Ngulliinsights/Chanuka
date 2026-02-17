@@ -187,7 +187,7 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
     });
   };
 
-  const updateConfig = (section: keyof SecurityConfig, key: string, value: any) => {
+  const updateConfig = (section: keyof SecurityConfig, key: string, value: unknown) => {
     setConfig(prev => ({
       ...prev,
       [section]: {

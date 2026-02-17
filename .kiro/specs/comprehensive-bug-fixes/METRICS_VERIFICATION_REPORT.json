@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-02-17T01:11:45.320Z",
+  "overallPass": false,
+  "metrics": [
+    {
+      "name": "Type Safety Violations",
+      "current": 544,
+      "target": 0,
+      "baseline": 788,
+      "met": false,
+      "details": "Found 244 'as any' and 300 'as unknown' in production code"
+    },
+    {
+      "name": "TODO/FIXME Comments (bugs)",
+      "current": 10,
+      "target": 0,
+      "baseline": 191,
+      "met": false,
+      "details": "Found 10 TODO/FIXME comments indicating bugs"
+    },
+    {
+      "name": "ESLint Suppressions",
+      "current": 37,
+      "target": 10,
+      "baseline": 99,
+      "met": false,
+      "details": "Found 37 ESLint suppressions (target: <10)"
+    },
+    {
+      "name": "Commented Imports",
+      "current": 2,
+      "target": 0,
+      "baseline": 33,
+      "met": false,
+      "details": "Found 2 commented import statements"
+    },
+    {
+      "name": "TypeScript Suppressions",
+      "current": 0,
+      "target": 0,
+      "baseline": 3,
+      "met": true
+    },
+    {
+      "name": "Syntax Errors",
+      "current": 0,
+      "target": 0,
+      "baseline": 3,
+      "met": true
+    },
+    {
+      "name": "Property Test Pass Rate",
+      "current": 0,
+      "target": 100,
+      "baseline": 67,
+      "met": false,
+      "details": "Property tests failed to run"
+    }
+  ],
+  "summary": {
+    "totalMetrics": 7,
+    "metricsMet": 2,
+    "metricsFailed": 5
+  }
+}

@@ -9,10 +9,10 @@ import { ZodSchema } from 'zod';
 // ============================================================================
 // Common Enums and Types
 // ============================================================================
-
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type SortOrder = 'asc' | 'desc';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
+
 // ============================================================================
 // Pagination Types
 // ============================================================================
@@ -62,6 +62,33 @@ export interface BaseApiResponse<T = any> {
   headers: Record<string, string>;
 }
 
+export interface ApiResponse<T = any> {
+  data: T;
+  status: number;
+  statusText?: string;
+  headers: Headers | Record<string, string>;
+  correlationId?: string;
+  id?: string;
+  requestId?: string;
+  timestamp?: string;
+  duration?: number;
+  cached?: boolean;
+  fromFallback?: boolean;
+  message?: string;
+}
+
+export interface ApiRequest {
+  method: HttpMethod;
+  url: string;
+  data?: any;
+  body?: any;
+  headers?: Record<string, string>;
+  params?: Record<string, string | number | boolean>;
+  timeout?: number;
+  id?: string;
+  timestamp?: string;
+}
+
 export interface BaseWebSocketMessage<T = any> {
   type: string;
   data: T;
@@ -82,38 +109,6 @@ export interface ApiClient {
   put<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
   patch<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
   delete<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;
-}
-
-export interface ApiRequest<T = unknown> {
-  readonly id: string;
-  readonly method: HttpMethod;
-  readonly url: string;
-  readonly headers: Readonly<Record<string, string>>;
-  readonly body?: T;
-  readonly timeout: number;
-  readonly timestamp: string;
-  readonly metadata?: RequestMetadata;
-}
-
-interface RequestMetadata {
-  readonly correlationId?: string;
-  readonly userId?: string;
-  readonly sessionId?: string;
-  readonly retryCount?: number;
-}
-
-export interface ApiResponse<T = unknown> {
-  readonly id: string;
-  readonly requestId: string;
-  readonly data: T;
-  readonly status: number;
-  readonly statusText: string;
-  readonly headers: Readonly<Record<string, string>>;
-  readonly timestamp: string;
-  readonly duration: number;
-  readonly cached: boolean;
-  readonly fromFallback: boolean;
-  readonly message?: string; // Optional message for error responses
 }
 
 export interface RequestOptions {

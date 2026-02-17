@@ -49,12 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
 
   // Create wrapper selectors that work with the actual Redux state
-  const user = useAppSelector((state: any) => state.auth?.user || null);
-  const loading = useAppSelector((state: any) => state.auth?.isLoading || false);
-  const sessionExpiry = useAppSelector((state: any) => state.auth?.sessionExpiry || null);
-  const isInitialized = useAppSelector((state: any) => state.auth?.isInitialized || false);
-  const twoFactorRequired = useAppSelector((state: any) => state.auth?.twoFactorRequired || false);
-  const isAuthenticated = useAppSelector((state: any) => state.auth?.isAuthenticated || false);
+  const user = useAppSelector((state: unknown) => state.auth?.user || null);
+  const loading = useAppSelector((state: unknown) => state.auth?.isLoading || false);
+  const sessionExpiry = useAppSelector((state: unknown) => state.auth?.sessionExpiry || null);
+  const isInitialized = useAppSelector((state: unknown) => state.auth?.isInitialized || false);
+  const twoFactorRequired = useAppSelector((state: unknown) => state.auth?.twoFactorRequired || false);
+  const isAuthenticated = useAppSelector((state: unknown) => state.auth?.isAuthenticated || false);
 
   const mountedRef = useRef(true);
 
@@ -604,6 +604,6 @@ export function useAuth(): AuthContextType {
  */
  
 export function useAuthStore() {
-  const user = useAppSelector((state: any) => state.auth?.user || null);
+  const user = useAppSelector((state: unknown) => state.auth?.user || null);
   return { user } as const;
 }

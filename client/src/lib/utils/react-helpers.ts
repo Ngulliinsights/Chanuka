@@ -10,7 +10,7 @@ import React from 'react';
 // Ensure cloneElement is available
 export const cloneElement =
   React.cloneElement ||
-  ((element: React.ReactElement, props?: any) => {
+  ((element: React.ReactElement, props?: unknown) => {
     // Fallback implementation if cloneElement is not available
     return {
       ...element,

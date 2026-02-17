@@ -7,6 +7,8 @@
  */
 
 import { IncomingMessage,Server } from 'http';
+import { logger } from '@shared/core';
+
 import { WebSocketServer } from 'ws';
 
 import { BatchingService } from '../batching/batching-service';
@@ -618,7 +620,8 @@ export class WebSocketService {
     const listener = this.eventListeners[event];
     if (listener) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // TODO: Replace 'any' with proper type definition
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
         (listener as any)(...args);
       } catch (error) {
         this.logError(`Error in ${event} event listener:`, error);
@@ -631,8 +634,7 @@ export class WebSocketService {
    */
   private logInfo(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`[WebSocketService] ${message}`);
+      logger.info(`[WebSocketService] ${message}`);
     }
   }
 
@@ -641,8 +643,7 @@ export class WebSocketService {
    */
   private logDebug(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`[WebSocketService] ${message}`);
+      logger.info(`[WebSocketService] ${message}`);
     }
   }
 
@@ -651,8 +652,7 @@ export class WebSocketService {
    */
   private logWarn(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.warn(`[WebSocketService] ${message}`);
+      logger.warn(`[WebSocketService] ${message}`);
     }
   }
 
@@ -661,8 +661,7 @@ export class WebSocketService {
    */
   private logError(message: string, error?: unknown): void {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.error(`[WebSocketService] ${message}`, error);
+      logger.error(`[WebSocketService] ${message}`, error);
     }
   }
 }

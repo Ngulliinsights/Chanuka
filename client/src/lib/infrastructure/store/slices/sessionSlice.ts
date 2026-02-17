@@ -25,14 +25,6 @@ export interface SessionInfo {
   current: boolean;
 }
 
-export interface SessionConfig {
-  maxIdleTime: number; // milliseconds
-  warningTime: number; // milliseconds before expiry warning
-  checkInterval: number; // milliseconds between checks
-  enableActivityTracking: boolean;
-  enableSecurityMonitoring: boolean;
-}
-
 export type ActivityType = 'mouse' | 'keyboard' | 'touch' | 'api' | 'navigation';
 
 export interface SessionActivity {

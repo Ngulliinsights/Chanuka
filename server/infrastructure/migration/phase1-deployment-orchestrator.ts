@@ -133,9 +133,9 @@ export class Phase1DeploymentOrchestrator {
   /**
    * Calculate statistical significance across all components
    */
-  private async calculateStatisticalSignificance(): Promise<{ hasSignificantResults: boolean; results: any[] }> {
+  private async calculateStatisticalSignificance(): Promise<{ hasSignificantResults: boolean; results: unknown[] }> {
     const components = ['concurrency-adapter', 'query-builder', 'ml-service'];
-    const allResults: any[] = [];
+    const allResults: unknown[] = [];
     let hasSignificantResults = false;
 
     for (const component of components) {
@@ -191,10 +191,10 @@ export class Phase1DeploymentOrchestrator {
     const report = {
       deploymentId: this.deploymentId,
       executionTime: Date.now() - this.startTime.getTime(),
-      components: {} as any,
-      systemMetrics: {} as any,
-      abTestingResults: {} as any,
-      validationSummary: {} as any,
+      components: {} as unknown,
+      systemMetrics: {} as unknown,
+      abTestingResults: {} as unknown,
+      validationSummary: {} as unknown,
       timestamp: new Date()
     };
 
@@ -258,13 +258,13 @@ export class Phase1DeploymentOrchestrator {
   /**
    * Monitor deployment progress in real-time
    */
-  async monitorDeploymentProgress(callback: (progress: any) => void): Promise<void> {
+  async monitorDeploymentProgress(callback: (progress: unknown) => void): Promise<void> {
     const monitoringInterval = setInterval(async () => {
       try {
         const progress = {
           deploymentId: this.deploymentId,
           timestamp: new Date(),
-          components: {} as any,
+          components: {} as unknown,
           systemHealth: 'healthy',
           alerts: monitoringService.getActiveAlerts().length
         };

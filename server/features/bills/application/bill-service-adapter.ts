@@ -51,7 +51,7 @@ export class BillServiceAdapter {
   /**
    * Legacy-compatible createBill method
    */
-  async createBill(billData: any): Promise<any> {
+  async createBill(billData: unknown): Promise<any> {
     const result = await this.billService.createBill(billData);
     
     if (result.isErr()) {

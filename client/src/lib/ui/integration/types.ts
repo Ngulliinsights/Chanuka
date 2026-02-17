@@ -8,7 +8,6 @@ import type { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from
 
 import type { DeviceDetector } from '@client/core/mobile';
 // TouchHandler is deprecated - using SwipeGestures instead
-// import type { SwipeGestureConfig } from '@client/lib/hooks/mobile/useSwipeGesture'; // Module not found
 
 export interface IntegrationStatus {
   security: 'pending' | 'loading' | 'success' | 'error';

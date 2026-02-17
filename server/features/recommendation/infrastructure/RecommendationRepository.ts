@@ -160,7 +160,7 @@ export class RecommendationRepository {
     return v * WEIGHTS.VIEW + c * WEIGHTS.COMMENT + s * WEIGHTS.SHARE;
   }
 
-  private toPlain(row: any): PlainBill {
+  private toPlain(row: unknown): PlainBill {
     return { ...row };
   }
 }

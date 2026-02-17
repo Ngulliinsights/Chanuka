@@ -293,7 +293,7 @@ export class CoalitionBuilder {
   /**
    * Analyzes compatibility between two campaigns
    */
-  private async analyzeCompatibility(campaign1: any, campaign2: any): Promise<{
+  private async analyzeCompatibility(campaign1: unknown, campaign2: unknown): Promise<{
     alignmentScore: number;
     sharedConcerns: string[];
     complementaryStrengths: string[];
@@ -366,7 +366,7 @@ export class CoalitionBuilder {
   /**
    * Calculates estimated impact of coalition
    */
-  private calculateEstimatedImpact(campaign1: any, campaign2: any, compatibility: any): number {
+  private calculateEstimatedImpact(campaign1: unknown, campaign2: unknown, compatibility: unknown): number {
     let impact = 0;
 
     // Base impact from participant count
@@ -420,7 +420,7 @@ export class CoalitionBuilder {
   /**
    * Generates coordinated actions for coalition
    */
-  private async generateCoordinatedActions(initiatingCampaign: any, targetCampaigns: any[]): Promise<string[]> {
+  private async generateCoordinatedActions(initiatingCampaign: unknown, targetCampaigns: unknown[]): Promise<string[]> {
     const actions: string[] = [];
     
     // Standard coalition actions
@@ -438,7 +438,7 @@ export class CoalitionBuilder {
     // Geographic coordination
     const allCounties = [
       ...initiatingCampaign.targetCounties,
-      ...targetCampaigns.flatMap((c: any) => c.targetCounties)
+      ...targetCampaigns.flatMap((c: unknown) => c.targetCounties)
     ];
     const uniqueCounties = [...new Set(allCounties)];
     

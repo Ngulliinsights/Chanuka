@@ -184,7 +184,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
     startTime: number
   ): Promise<UnifiedSearchResult> => {
     return new Promise((resolve, reject) => {
-      const results: any[] = [];
+      const results: unknown[] = [];
 
       streamingSearchService.startStreamingSearch(
         {
@@ -231,7 +231,7 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
       filters: query.filters,
     });
 
-    const mappedResults: any[] = response.results.map((item: any) => ({
+    const mappedResults: unknown[] = response.results.map((item: unknown) => ({
       id: item.id,
       type: item.type,
       title: item.title,

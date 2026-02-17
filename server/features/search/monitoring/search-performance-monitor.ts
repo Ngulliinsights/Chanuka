@@ -502,7 +502,7 @@ export class SearchPerformanceMonitor {
   /**
    * Calculate relevance score based on expected results
    */
-  private calculateRelevanceScore(results: any[], expectedTerms: string[]): number {
+  private calculateRelevanceScore(results: unknown[], expectedTerms: string[]): number {
     if (results.length === 0) return 0;
 
     let score = 0;
@@ -608,7 +608,7 @@ export class SearchPerformanceMonitor {
   /**
    * Generate performance recommendations
    */
-  private generateRecommendations(summary: any, alerts: PerformanceAlert[]): string[] {
+  private generateRecommendations(summary: unknown, alerts: PerformanceAlert[]): string[] {
     const recommendations: string[] = [];
 
     // Check for critical alerts
@@ -635,7 +635,7 @@ export class SearchPerformanceMonitor {
   /**
    * Calculate overall health score
    */
-  private calculateOverallHealth(summary: any, alerts: PerformanceAlert[]): 'healthy' | 'warning' | 'critical' {
+  private calculateOverallHealth(summary: unknown, alerts: PerformanceAlert[]): 'healthy' | 'warning' | 'critical' {
     const criticalAlerts = alerts.filter(a => a.severity === 'critical').length;
     const highAlerts = alerts.filter(a => a.severity === 'high').length;
 

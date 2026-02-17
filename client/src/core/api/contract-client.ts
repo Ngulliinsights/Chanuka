@@ -95,7 +95,7 @@ export async function callEndpoint<TRequest, TResponse>(
       data: responseValidation.data,
       headers: response.headers,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('API call failed', {
       endpoint: endpoint.path,
       method: endpoint.method,
@@ -125,7 +125,7 @@ export async function callEndpointWithParams<TRequest, TResponse, TParams>(
   try {
     // Build URL with path parameters
     let url = endpoint.path;
-    for (const [key, value] of Object.entries(params as Record<string, any>)) {
+    for (const [key, value] of Object.entries(params as Record<string, unknown>)) {
       url = url.replace(`:${key}`, encodeURIComponent(String(value)));
     }
 
@@ -142,7 +142,7 @@ export async function callEndpointWithParams<TRequest, TResponse, TParams>(
 
     // For GET/DELETE, call without request body
     return callEndpoint(resolvedEndpoint, {} as TRequest);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('API call with params failed', {
       endpoint: endpoint.path,
       method: endpoint.method,
@@ -172,7 +172,7 @@ export async function callEndpointWithQuery<TRequest, TResponse, TQuery>(
   try {
     // Build URL with query parameters
     const queryString = new URLSearchParams(
-      Object.entries(query as Record<string, any>)
+      Object.entries(query as Record<string, unknown>)
         .filter(([_, value]) => value !== undefined && value !== null)
         .map(([key, value]) => [key, String(value)])
     ).toString();
@@ -187,7 +187,7 @@ export async function callEndpointWithQuery<TRequest, TResponse, TQuery>(
 
     // Call without request body (GET requests)
     return callEndpoint(resolvedEndpoint, {} as TRequest);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('API call with query failed', {
       endpoint: endpoint.path,
       method: endpoint.method,
@@ -219,13 +219,13 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
   try {
     // Build URL with path parameters
     let url = endpoint.path;
-    for (const [key, value] of Object.entries(params as Record<string, any>)) {
+    for (const [key, value] of Object.entries(params as Record<string, unknown>)) {
       url = url.replace(`:${key}`, encodeURIComponent(String(value)));
     }
 
     // Add query parameters
     const queryString = new URLSearchParams(
-      Object.entries(query as Record<string, any>)
+      Object.entries(query as Record<string, unknown>)
         .filter(([_, value]) => value !== undefined && value !== null)
         .map(([key, value]) => [key, String(value)])
     ).toString();
@@ -247,7 +247,7 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
 
     // For GET/DELETE, call without request body
     return callEndpoint(resolvedEndpoint, {} as TRequest);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('API call with params and query failed', {
       endpoint: endpoint.path,
       method: endpoint.method,

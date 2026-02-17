@@ -171,7 +171,7 @@ export const arrays = {
 // ============================================================================
 
 export const functions = {
-  debounce: <T extends (...args: any[]) => any>(
+  debounce: <T extends (...args: unknown[]) => any>(
     func: T,
     wait: number
   ): ((...args: Parameters<T>) => void) => {
@@ -182,7 +182,7 @@ export const functions = {
     };
   },
   
-  throttle: <T extends (...args: any[]) => any>(
+  throttle: <T extends (...args: unknown[]) => any>(
     func: T,
     limit: number
   ): ((...args: Parameters<T>) => void) => {
@@ -196,7 +196,7 @@ export const functions = {
     };
   },
   
-  memoize: <T extends (...args: any[]) => any>(func: T): T => {
+  memoize: <T extends (...args: unknown[]) => any>(func: T): T => {
     const cache = new Map();
     return ((...args: Parameters<T>) => {
       const key = JSON.stringify(args);
@@ -266,14 +266,14 @@ export const objects = {
       if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         result[key] = objects.deepMerge(result[key], source[key] as any);
       } else {
-        result[key] = source[key] as any;
+        result[key] = source[key] as unknown;
       }
     }
     
     return result;
   },
   
-  isEmpty: (obj: any): boolean => {
+  isEmpty: (obj: unknown): boolean => {
     if (obj == null) return true;
     if (Array.isArray(obj) || typeof obj === 'string') return obj.length === 0;
     if (obj instanceof Map || obj instanceof Set) return obj.size === 0;

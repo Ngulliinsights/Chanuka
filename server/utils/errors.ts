@@ -40,7 +40,7 @@ export {
 export class AuthError extends UnauthorizedError {
   constructor(
     message: string,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message, details);
     this.name = 'AuthError';

@@ -10,8 +10,6 @@
  * 5. Documentation is present
  */
 
-// import { readFileSync, existsSync } from 'fs'; // Unused
-// import { join } from 'path'; // Unused
 
 // ════════════════════════════════════════════════════════════════════════════
 // VALIDATION CATEGORIES

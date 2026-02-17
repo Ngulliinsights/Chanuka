@@ -32,7 +32,7 @@ export interface SearchResult {
   title: string;
   summary?: string;
   relevanceScore: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   highlights?: string[];
 }
 

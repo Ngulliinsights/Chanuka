@@ -82,7 +82,7 @@ export interface UseWidgetManagementResult {
 
   // Widget state
   toggleWidgetVisibility: (widgetId: string) => Promise<void>;
-  updateWidgetSettings: (widgetId: string, settings: Record<string, any>) => Promise<void>;
+  updateWidgetSettings: (widgetId: string, settings: Record<string, unknown>) => Promise<void>;
 }
 
 /**

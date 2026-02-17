@@ -7,6 +7,8 @@
  */
 
 import { verify } from 'jsonwebtoken';
+import { logger } from '@shared/core';
+
 
 import { BASE_CONFIG } from '../config/base-config';
 import { RuntimeConfig } from '../config/runtime-config';
@@ -126,8 +128,7 @@ export class ConnectionManager implements IConnectionManager {
     } catch (error) {
       // Log error but don't throw to avoid disrupting cleanup
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.error('Error removing connection:', error);
+        logger.error('Error removing connection:', error);
       }
     }
   }
@@ -214,8 +215,7 @@ export class ConnectionManager implements IConnectionManager {
         this.removeConnection(ws);
       } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.error('Error cleaning up stale connection:', error);
+          logger.error('Error cleaning up stale connection:', error);
         }
       }
     }
@@ -333,8 +333,7 @@ export class ConnectionManager implements IConnectionManager {
     // Handle connection errors
     ws.on('error', (error) => {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.error(`Connection error for ${ws.connectionId}:`, error);
+        logger.error(`Connection error for ${ws.connectionId}:`, error);
       }
       this.removeConnection(ws);
     });

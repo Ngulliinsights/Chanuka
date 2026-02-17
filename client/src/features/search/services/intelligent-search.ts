@@ -400,7 +400,7 @@ class IntelligentSearchService {
   /**
    * Fetch data for Fuse.js search with robust type handling
    */
-  private async getFuseSearchData(type?: string): Promise<any[]> {
+  private async getFuseSearchData(type?: string): Promise<unknown[]> {
     try {
       const response = await searchApiClient.getSearchData(type);
 
@@ -846,7 +846,7 @@ class IntelligentSearchService {
   /**
    * Generate contextual excerpt with query highlighting
    */
-  private generateExcerpt(item: any, query: string): string {
+  private generateExcerpt(item: unknown, query: string): string {
     const content = item.summary || item.content || item.title || '';
     const maxLength = 200;
     const contextWindow = 50;
@@ -876,7 +876,7 @@ class IntelligentSearchService {
   /**
    * Generate highlights from Fuse.js match data
    */
-  private generateHighlights(matches: readonly any[] | undefined): SearchHighlight[] {
+  private generateHighlights(matches: readonly unknown[] | undefined): SearchHighlight[] {
     if (!matches || matches.length === 0) return [];
 
     const highlights: (SearchHighlight | null)[] = matches.map(match => {

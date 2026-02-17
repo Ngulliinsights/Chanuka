@@ -10,9 +10,9 @@
 
 import { Server } from 'http';
 
-import { NativeWebSocketAdapter, RedisAdapter,SocketIOAdapter, WebSocketAdapter } from './adapters';
+import { logger } from '../observability/logger';
+import { RedisAdapter, SocketIOAdapter } from './adapters';
 // Import consolidated components
-import { BatchingService } from './batching/batching-service';
 import { BASE_CONFIG } from './config/base-config';
 import { RuntimeConfig } from './config/runtime-config';
 import { ConnectionManager } from './core/connection-manager';
@@ -25,7 +25,6 @@ import { LeakDetectorHandler } from './memory/leak-detector-handler';
 import { MemoryManager } from './memory/memory-manager';
 import { ProgressiveDegradation } from './memory/progressive-degradation';
 import { HealthChecker } from './monitoring/health-checker';
-import { MetricsReporter } from './monitoring/metrics-reporter';
 import { StatisticsCollector } from './monitoring/statistics-collector';
 // Import types
 import type {
@@ -36,11 +35,7 @@ import type {
   IMessageHandler,
   IStatisticsCollector,
   ISubscriptionManager,
-  QueueOperation,
 } from './types';
-import { CircularBuffer } from './utils/circular-buffer';
-import { LRUCache } from './utils/lru-cache';
-import { PriorityQueue } from './utils/priority-queue';
 
 // Main service
 export { WebSocketService } from './core/websocket-service';
@@ -229,7 +224,7 @@ class BackwardCompatibleWebSocketService {
    */
   isUserConnected(user_id: string): boolean {
     const connections = this.connectionManager.getConnectionsForUser(user_id);
-    return connections.length > 0 && connections.some((ws: any) => ws.readyState === ws.OPEN);
+    return connections.length > 0 && connections.some((ws: unknown) => ws.readyState === ws.OPEN);
   }
 
   /**
@@ -237,7 +232,7 @@ class BackwardCompatibleWebSocketService {
    */
   getConnectionCount(user_id: string): number {
     const connections = this.connectionManager.getConnectionsForUser(user_id);
-    return connections.filter((ws: any) => ws.readyState === ws.OPEN).length;
+    return connections.filter((ws: unknown) => ws.readyState === ws.OPEN).length;
   }
 
   /**
@@ -300,8 +295,7 @@ class BackwardCompatibleWebSocketService {
         } catch (error) {
           // Log error but continue with other connections
           if (process.env.NODE_ENV !== 'production') {
-            // eslint-disable-next-line no-console
-            console.error(`Failed to send notification to user ${user_id}:`, error);
+            logger.error(`Failed to send notification to user ${user_id}`, { error });
           }
         }
       }
@@ -348,8 +342,7 @@ class BackwardCompatibleWebSocketService {
     
     // This is a simplified implementation - in practice, we'd need access to all connections
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log('Broadcasting to all clients:', formattedMessage);
+      logger.info('Broadcasting to all clients', { message: formattedMessage });
     }
   }
 
@@ -357,6 +350,7 @@ class BackwardCompatibleWebSocketService {
    * Get service metrics grouped by category
    */
   getMetrics(): Record<string, Record<string, number>> {
+
     const stats = this.statisticsCollector.getMetrics();
     
     return {
@@ -395,10 +389,10 @@ export function createWebSocketService(): BackwardCompatibleWebSocketService {
   // Create all required components with default configurations
   const runtimeConfig = new RuntimeConfig();
   
-  // Create utility components
-  const priorityQueue = new PriorityQueue<QueueOperation>(BASE_CONFIG.MAX_QUEUE_SIZE);
-  const lruCache = new LRUCache<string, boolean>(runtimeConfig.get('DEDUPE_CACHE_SIZE'));
-  const circularBuffer = new CircularBuffer<number>(BASE_CONFIG.MAX_LATENCY_SAMPLES);
+  // Create utility components (currently unused but available for future use)
+  // const priorityQueue = new PriorityQueue<QueueOperation>(BASE_CONFIG.MAX_QUEUE_SIZE);
+  // const lruCache = new LRUCache<string, boolean>(runtimeConfig.get('DEDUPE_CACHE_SIZE'));
+  // const circularBuffer = new CircularBuffer<number>(BASE_CONFIG.MAX_LATENCY_SAMPLES);
   
   // Create core components
   const connectionManager = new ConnectionManager(runtimeConfig);
@@ -436,12 +430,13 @@ export function createWebSocketService(): BackwardCompatibleWebSocketService {
     connectionManager,
     operationQueueManager
   );
-  const metricsReporter = new MetricsReporter(
-    statisticsCollector,
-    healthChecker,
-    connectionManager,
-    operationQueueManager
-  );
+  // Metrics reporter created but not actively used yet
+  // const metricsReporter = new MetricsReporter(
+  //   statisticsCollector,
+  //   healthChecker,
+  //   connectionManager,
+  //   operationQueueManager
+  // );
   
   // Create the main service
   const webSocketService = new WebSocketService(
@@ -529,7 +524,7 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
 
     // Extend service with Redis capabilities
     const originalBroadcastBillUpdate = service.broadcastBillUpdate.bind(service);
-    service.broadcastBillUpdate = (billId: number, update: any) => {
+    service.broadcastBillUpdate = (billId: number, update: unknown) => {
       // Broadcast locally
       originalBroadcastBillUpdate(billId, update);
       // Broadcast to other servers via Redis
@@ -542,7 +537,7 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
     };
 
     const originalSendUserNotification = service.sendUserNotification.bind(service);
-    service.sendUserNotification = (userId: string, notification: any) => {
+    service.sendUserNotification = (userId: string, notification: unknown) => {
       // Send locally
       originalSendUserNotification(userId, notification);
       // Send to other servers via Redis
@@ -555,7 +550,7 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
     };
 
     const originalBroadcastToAll = service.broadcastToAll.bind(service);
-    service.broadcastToAll = (message: any) => {
+    service.broadcastToAll = (message: unknown) => {
       // Broadcast locally
       originalBroadcastToAll(message);
       // Broadcast to other servers via Redis
@@ -618,7 +613,7 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
 
     // Extend Socket.IO adapter with Redis capabilities
     const originalBroadcastBillUpdate = socketIOAdapter.broadcastBillUpdate.bind(socketIOAdapter);
-    socketIOAdapter.broadcastBillUpdate = (billId: number, update: any) => {
+    socketIOAdapter.broadcastBillUpdate = (billId: number, update: unknown) => {
       originalBroadcastBillUpdate(billId, update);
       redisAdapter.publishBillUpdate(billId, update).catch(error => {
         logger.error('Failed to publish bill update to Redis from Socket.IO', {
@@ -629,7 +624,7 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
     };
 
     const originalSendUserNotification = socketIOAdapter.sendUserNotification.bind(socketIOAdapter);
-    socketIOAdapter.sendUserNotification = (userId: string, notification: any) => {
+    socketIOAdapter.sendUserNotification = (userId: string, notification: unknown) => {
       originalSendUserNotification(userId, notification);
       redisAdapter.publishUserNotification(userId, notification).catch(error => {
         logger.error('Failed to publish user notification to Redis from Socket.IO', {

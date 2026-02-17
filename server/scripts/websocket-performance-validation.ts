@@ -584,7 +584,7 @@ export class WebSocketPerformanceValidator {
     }
   }
 
-  private async runTestGroup(groupType: 'control' | 'treatment', config: any): Promise<{
+  private async runTestGroup(groupType: 'control' | 'treatment', config: unknown): Promise<{
     deliveryRate: number;
     averageLatency: number;
     memoryUsage: number;

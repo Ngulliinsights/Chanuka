@@ -1,5 +1,4 @@
 // Real ML implementation using NLP libraries (TensorFlow.js optional due to native binding issues)
-// import * as tf from '@tensorflow/tfjs-node';
 import { logger  } from '@shared/core';
 import type {
     AnalysisResult,
@@ -485,7 +484,7 @@ export class RealMLAnalysisService {
     /**
      * Calculate confidence based on analysis quality
      */
-    private calculateConfidence(stakeholders: any[], influenceScores: number[]): number {
+    private calculateConfidence(stakeholders: unknown[], influenceScores: number[]): number {
         const hasStakeholders = stakeholders.length > 0;
         const hasScores = influenceScores.length > 0;
         const avgScore = influenceScores.reduce((sum, score) => sum + score, 0) / influenceScores.length;
@@ -511,7 +510,7 @@ export class RealMLAnalysisService {
     /**
      * Generate activity description
      */
-    private generateActivityDescription(stakeholder: any, score: number): string {
+    private generateActivityDescription(stakeholder: unknown, score: number): string {
         const activities = [
             'Active lobbying detected',
             'Increased engagement observed',
@@ -526,7 +525,7 @@ export class RealMLAnalysisService {
     /**
      * Analyze trends in stakeholder data
      */
-    private analyzeTrends(stakeholders: any[], sentiments: Record<string, string>): any {
+    private analyzeTrends(stakeholders: unknown[], sentiments: Record<string, string>): any {
         const positive = stakeholders.filter(s => sentiments[s.name] === 'positive');
         const negative = stakeholders.filter(s => sentiments[s.name] === 'negative');
 
@@ -543,7 +542,7 @@ export class RealMLAnalysisService {
     /**
      * Detect conflicts of interest using ML analysis
      */
-    async detectConflictsOfInterest(billContent: string, sponsorData: any): Promise<AnalysisResult> {
+    async detectConflictsOfInterest(billContent: string, sponsorData: unknown): Promise<AnalysisResult> {
         const startTime = Date.now();
 
         try {
@@ -650,7 +649,7 @@ export class RealMLAnalysisService {
     /**
      * Analyze relationships between bill content and sponsor data
      */
-    private analyzeRelationships(billContent: string, sponsorData: any): Array<{
+    private analyzeRelationships(billContent: string, sponsorData: unknown): Array<{
         type: string;
         severity: 'low' | 'medium' | 'high';
         description: string;
@@ -693,7 +692,7 @@ export class RealMLAnalysisService {
     /**
      * Calculate overall risk level
      */
-    private calculateOverallRisk(relationships: any[]): 'low' | 'medium' | 'high' {
+    private calculateOverallRisk(relationships: unknown[]): 'low' | 'medium' | 'high' {
         if (relationships.some(r => r.severity === 'high')) return 'high';
         if (relationships.some(r => r.severity === 'medium')) return 'medium';
         return 'low';
@@ -702,7 +701,7 @@ export class RealMLAnalysisService {
     /**
      * Generate recommendations based on analysis
      */
-    private generateRecommendations(relationships: any[]): string[] {
+    private generateRecommendations(relationships: unknown[]): string[] {
         const recommendations = ['Maintain transparency in all proceedings'];
 
         if (relationships.length > 0) {

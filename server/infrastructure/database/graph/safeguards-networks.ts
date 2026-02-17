@@ -31,7 +31,7 @@ export async function detectConflictOfInterest(driver: Driver, personId: string,
   }
 }
 
-export async function getFinancialDisclosures(driver: Driver, personId: string): Promise<any[]> {
+export async function getFinancialDisclosures(driver: Driver, personId: string): Promise<unknown[]> {
   if (!personId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'personId required' });
   
   try {

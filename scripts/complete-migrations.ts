@@ -371,7 +371,7 @@ class MigrationCompleter {
     console.log('\n📋 Migration report generated: MIGRATION_COMPLETION_REPORT.md');
   }
 
-  private generateMarkdownReport(report: any): string {
+  private generateMarkdownReport(report: unknown): string {
     return `# Migration Completion Report
 
 Generated: ${report.timestamp}

@@ -8,7 +8,6 @@
  * and other sources into a unified, framework-agnostic interface.
  */
 
-// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 
@@ -225,14 +224,14 @@ export class HttpClient {
   /**
    * Makes a POST request.
    */
-  async post<T = any>(url: string, data?: any, options: Omit<HttpRequestOptions, 'method'> = {}): Promise<HttpResponse<T>> {
+  async post<T = any>(url: string, data?: unknown, options: Omit<HttpRequestOptions, 'method'> = {}): Promise<HttpResponse<T>> {
     return this.request<T>(url, { ...options, method: 'POST', body: data });
   }
 
   /**
    * Makes a PUT request.
    */
-  async put<T = any>(url: string, data?: any, options: Omit<HttpRequestOptions, 'method'> = {}): Promise<HttpResponse<T>> {
+  async put<T = any>(url: string, data?: unknown, options: Omit<HttpRequestOptions, 'method'> = {}): Promise<HttpResponse<T>> {
     return this.request<T>(url, { ...options, method: 'PUT', body: data });
   }
 
@@ -322,7 +321,7 @@ export class HttpClient {
 /**
  * Builds a URL with query parameters.
  */
-export function buildUrl(baseUrl: string, params?: Record<string, any>): string {
+export function buildUrl(baseUrl: string, params?: Record<string, unknown>): string {
   if (!params || Object.keys(params).length === 0) {
     return baseUrl;
   }

@@ -28,7 +28,7 @@ export interface OperationMetrics {
   duration?: number;
   success: boolean;
   errorMessage?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   resourceUsage: {
     memoryBefore: NodeJS.MemoryUsage;
     memoryAfter?: NodeJS.MemoryUsage;
@@ -120,7 +120,7 @@ export class PerformanceMonitor {
   startOperation(
     service: string,
     operation: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ): string {
     const operationId = this.generateOperationId();
     const operationMetric: OperationMetrics = {
@@ -148,7 +148,7 @@ export class PerformanceMonitor {
     operationId: string,
     success: boolean = true,
     errorMessage?: string,
-    additionalMetadata: Record<string, any> = {}
+    additionalMetadata: Record<string, unknown> = {}
   ): OperationMetrics | null {
     const operation = this.operations.find(op => op.operationId === operationId);
     if (!operation) {
@@ -708,7 +708,7 @@ export function monitorOperation<T>(
   service: string,
   operation: string,
   fn: () => Promise<T>,
-  metadata: Record<string, any> = {}
+  metadata: Record<string, unknown> = {}
 ): Promise<T> {
   return new Promise(async (resolve, reject) => {
     const operationId = performanceMonitor.startOperation(service, operation, metadata);

@@ -57,7 +57,7 @@ export interface ErrorContext {
   route?: string;
   component?: string;
   action?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   // Extended properties for monitoring
   system?: string; // Changed from ClientSystem to string for compatibility
   operation?: string;
@@ -120,7 +120,7 @@ export interface SystemHealth {
 export interface UnifiedErrorMonitor {
   captureError(error: Error, context?: ErrorContext): void;
   captureMessage(message: string, level?: 'info' | 'warning' | 'error'): void;
-  setContext(key: string, value: any): void;
+  setContext(key: string, value: unknown): void;
 }
 
 export interface UnifiedErrorMonitoring {
@@ -139,8 +139,8 @@ export interface UnifiedErrorMonitoring {
 }
 
 export interface ErrorMonitoringMiddleware {
-  wrap<T extends (...args: any[]) => any>(fn: T, context: ErrorContext): T;
-  wrapAsync<T extends (...args: any[]) => Promise<any>>(fn: T, context: ErrorContext): T;
+  wrap<T extends (...args: unknown[]) => any>(fn: T, context: ErrorContext): T;
+  wrapAsync<T extends (...args: unknown[]) => Promise<any>>(fn: T, context: ErrorContext): T;
   createBoundary(context: ErrorContext): {
     onError: (error: Error) => void;
     trackPerformance: (operation: string, duration: number, success: boolean) => void;
@@ -156,7 +156,7 @@ export class UnifiedErrorMonitoringService implements UnifiedErrorMonitor {
     console.log(`[${level.toUpperCase()}] ${message}`);
   }
 
-  setContext(key: string, value: any) {
+  setContext(key: string, value: unknown) {
     // Set context for error tracking
   }
 }
@@ -166,7 +166,7 @@ export default unifiedErrorMonitor;
 
 
 export class TrendAnalysisService {
-  analyzeTrends(data: any[]) {
+  analyzeTrends(data: unknown[]) {
     return { trends: [], insights: [] };
   }
 }

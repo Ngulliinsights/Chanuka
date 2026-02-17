@@ -63,7 +63,7 @@ export class ServerErrorHandler implements ErrorHandler {
     const errorCode = (error as any).code || 'INTERNAL_SERVER_ERROR';
 
     // Don't recover from client errors (4xx)
-    if (ERROR_STATUS_CODES[errorCode as any] >= 400 && ERROR_STATUS_CODES[errorCode as any] < 500) {
+    if (ERROR_STATUS_CODES[errorCode as unknown] >= 400 && ERROR_STATUS_CODES[errorCode as unknown] < 500) {
       return { recovered: false, newError: error };
     }
 
@@ -120,7 +120,7 @@ export class ServiceCircuitBreaker extends CircuitBreaker {
  * Error Context Builder
  * Creates error context from Express request
  */
-export function createErrorContext(req: any, operation?: string): ErrorContext {
+export function createErrorContext(req: unknown, operation?: string): ErrorContext {
   return {
     correlationId: req.headers['x-correlation-id'] || req.id,
     userId: req.user?.id,
@@ -140,7 +140,7 @@ export function createErrorContext(req: any, operation?: string): ErrorContext {
  * Error Type Detection
  * Determines the error code based on error properties
  */
-export function detectErrorCode(error: any): string {
+export function detectErrorCode(error: unknown): string {
   // Check for specific error properties
   if (error.code) return error.code;
   if (error.name === 'ValidationError') return ERROR_CODES.VALIDATION_ERROR;
@@ -161,8 +161,8 @@ export function detectErrorCode(error: any): string {
  */
 export function buildErrorResponse(error: Error, context: ErrorContext) {
   const code = detectErrorCode(error);
-  const statusCode = ERROR_STATUS_CODES[code as any] || 500;
-  const message = ERROR_MESSAGES[code as any] || error.message;
+  const statusCode = ERROR_STATUS_CODES[code as unknown] || 500;
+  const message = ERROR_MESSAGES[code as unknown] || error.message;
 
   return {
     success: false,

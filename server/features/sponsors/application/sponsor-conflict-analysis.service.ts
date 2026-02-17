@@ -93,7 +93,7 @@ export interface ConflictNode {
   conflict_level: ConflictSeverity;
   size: number;
   color: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ConflictEdge {
@@ -345,7 +345,7 @@ export class SponsorConflictAnalysisService {
   calculateConflictSeverity(
     conflictType: ConflictType,
     financialImpact: number,
-    additionalFactors: Record<string, any> = {} // e.g., { leadershipRole: true, multipleAffiliations: 3 }
+    additionalFactors: Record<string, unknown> = {} // e.g., { leadershipRole: true, multipleAffiliations: 3 }
   ): ConflictSeverity {
     let score = this.conflictTypeWeights[conflictType] ?? 10; // Base score from type
 
@@ -385,7 +385,7 @@ export class SponsorConflictAnalysisService {
   }
 
   // Helper to normalize error messages
-  private getErrorMessage(error: any): string {
+  private getErrorMessage(error: unknown): string {
     if (!error) return 'unknown error';
     if (typeof error === 'string') return error;
     if (error.message) return error.message;
@@ -757,14 +757,14 @@ export class SponsorConflictAnalysisService {
     return days <= 90; // recent = within 90 days
   }
 
-  private parseNumeric(value: any): number {
+  private parseNumeric(value: unknown): number {
     if (value === undefined || value === null) return 0;
     if (typeof value === 'number') return value;
     const asNum = Number(String(value).replace(/[^0-9.-]+/g, ''));
     return Number.isFinite(asNum) ? asNum : 0;
   }
 
-  private formatDate(date: any): string {
+  private formatDate(date: unknown): string {
     if (!date) return '';
     try { return new Date(date).toISOString(); } catch { return String(date); }
   }

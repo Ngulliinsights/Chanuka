@@ -10,7 +10,6 @@
 
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';
-// import { advancedCachingService } from '@server/infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
 import { logger   } from '@shared/core';
 import { ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api-utils';
 import { Request, Response,Router } from 'express';
@@ -50,7 +49,7 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
     typeof error === 'object' &&
     error !== null &&
     'message' in error &&
-    typeof (error as any).message === 'string'
+    typeof (error instanceof Error ? error.message : String(error)) === 'string'
   );
 };
 

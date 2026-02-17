@@ -6,9 +6,6 @@
  */
 
 // Database imports commented out for now to avoid dependency issues
-// import { db } from '../../db';
-// import { migrationTables } from './migration-state.schema';
-// import { eq, and, desc } from 'drizzle-orm';
 
 export interface ValidationRule {
   name: string;
@@ -494,27 +491,27 @@ export class ValidationService {
     return { rows: [], count: 0 };
   }
 
-  private compareQueryResults(legacy: any, newResult: any): boolean {
+  private compareQueryResults(legacy: unknown, newResult: unknown): boolean {
     // Simulate query result comparison
     return JSON.stringify(legacy) === JSON.stringify(newResult);
   }
 
-  private async callMockMLService(input: any): Promise<any> {
+  private async callMockMLService(input: unknown): Promise<any> {
     // Simulate mock ML service call
     return { confidence: 0.8, categories: ['legislative'] };
   }
 
-  private async callRealMLService(input: any): Promise<any> {
+  private async callRealMLService(input: unknown): Promise<any> {
     // Simulate real ML service call
     return { confidence: 0.85, categories: ['legislative'] };
   }
 
-  private calculateMLVariance(mock: any, real: any): number {
+  private calculateMLVariance(mock: unknown, real: unknown): number {
     // Simulate ML variance calculation
     return Math.abs(mock.confidence - real.confidence);
   }
 
-  private async testAPIEndpoint(endpoint: string): Promise<{ compatible: boolean; issues?: any[] }> {
+  private async testAPIEndpoint(endpoint: string): Promise<{ compatible: boolean; issues?: unknown[] }> {
     // Simulate API endpoint testing
     return { compatible: true };
   }
@@ -556,7 +553,7 @@ export class ValidationService {
   /**
    * Get validation history for component
    */
-  async getValidationHistory(component: string, limit: number = 50): Promise<any[]> {
+  async getValidationHistory(component: string, limit: number = 50): Promise<unknown[]> {
     try {
       // In real implementation, would query database for validation history
       return [];

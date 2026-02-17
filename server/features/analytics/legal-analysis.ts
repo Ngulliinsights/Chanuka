@@ -215,7 +215,7 @@ export class LegalAnalysisService {
   /**
    * Helper method to validate the structure of analysis results
    */
-  private isValidAnalysisResult(result: any): result is AnalysisResult {
+  private isValidAnalysisResult(result: unknown): result is AnalysisResult {
     // Basic structural validation - adapt this based on your AnalysisResult interface
     return result && typeof result === 'object';
   }

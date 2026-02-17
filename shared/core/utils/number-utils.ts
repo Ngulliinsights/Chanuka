@@ -2,11 +2,11 @@
  * Number utility functions for validation and calculations
  */
 export class NumberUtils {
-  static parseNumber(value: any): number {
+  static parseNumber(value: unknown): number {
     return typeof value === 'string' ? parseFloat(value) : value;
   }
 
-  static isValidNumber(value: any): boolean {
+  static isValidNumber(value: unknown): boolean {
     const num = this.parseNumber(value);
     return typeof num === 'number' && !isNaN(num) && isFinite(num);
   }

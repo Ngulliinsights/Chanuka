@@ -561,7 +561,7 @@ export class BillDomainService {
   /**
    * Gets bills requiring stakeholder attention based on business rules
    */
-  async getBillsRequiringAttention(): Promise<any[]> {
+  async getBillsRequiringAttention(): Promise<unknown[]> {
     // Bills requiring attention: stalled for >30 days, high engagement but no recent action
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -617,7 +617,7 @@ export class BillDomainService {
     for (const bill_id of billIds) {
       await this.eventPublisher.publish(new BillStatusChangedEvent(
         bill_id,
-        'unknown' as any, // We don't know the old status in bulk operations
+        'unknown' as unknown, // We don't know the old status in bulk operations
         newStatus,
         updatedBy
       ));
@@ -626,7 +626,7 @@ export class BillDomainService {
 
   // Helper methods for analytics
 
-  private getUniqueCountiesFromVotesAndComments(votes: any[], comments: any[]): string[] {
+  private getUniqueCountiesFromVotesAndComments(votes: unknown[], comments: unknown[]): string[] {
     const counties = new Set<string>();
 
     votes.forEach(vote => {
@@ -640,7 +640,7 @@ export class BillDomainService {
     return Array.from(counties);
   }
 
-  private getUniqueConstituenciesFromVotesAndComments(votes: any[], comments: any[]): string[] {
+  private getUniqueConstituenciesFromVotesAndComments(votes: unknown[], comments: unknown[]): string[] {
     const constituencies = new Set<string>();
 
     votes.forEach(vote => {
@@ -654,7 +654,7 @@ export class BillDomainService {
     return Array.from(constituencies);
   }
 
-  private getLastActivityDate(comments: any[], votes: any[]): Date | null {
+  private getLastActivityDate(comments: unknown[], votes: unknown[]): Date | null {
     const dates = [
       ...comments.map(c => new Date(c.created_at)),
       ...votes.map(v => new Date(v.voted_at))
@@ -666,7 +666,7 @@ export class BillDomainService {
   /**
    * Validates permissions for status changes
    */
-  private async validateStatusChangePermission(bill: any, newStatus: BillStatus, user_id: string): Promise<void> {
+  private async validateStatusChangePermission(bill: unknown, newStatus: BillStatus, user_id: string): Promise<void> {
     const user = await this.userService.findById(user_id);
     if (!user) {
       throw new Error('User not found');
@@ -699,7 +699,7 @@ export class BillDomainService {
   /**
    * Validates permissions for content updates
    */
-  private async validateUpdatePermission(bill: any, user_id: string): Promise<void> {
+  private async validateUpdatePermission(bill: unknown, user_id: string): Promise<void> {
     const user = await this.userService.findById(user_id);
     if (!user) {
       throw new Error('User not found');
@@ -750,7 +750,7 @@ export class BillDomainService {
   /**
    * Gets all stakeholders for a bill (sponsor, trackers, interested parties)
    */
-  private async getBillStakeholders(bill: any): Promise<Array<{ id: string, role: string }>> {
+  private async getBillStakeholders(bill: unknown): Promise<Array<{ id: string, role: string }>> {
     const stakeholders = new Map<string, { id: string, role: string }>();
 
     // Add sponsor
@@ -794,7 +794,7 @@ export class BillDomainService {
     return mapping[eventType] || 'bill_notification';
   }
 
-  private generateNotificationTitle(bill: any, eventType: string): string {
+  private generateNotificationTitle(bill: unknown, eventType: string): string {
     const billNumber = bill.bill_number;
     const titles: Record<string, string> = {
       'created': `New Bill Introduced: ${billNumber}`,
@@ -805,7 +805,7 @@ export class BillDomainService {
     return titles[eventType] || `Bill Notification: ${billNumber}`;
   }
 
-  private generateNotificationMessage(bill: any, eventType: string, additionalData?: any): string {
+  private generateNotificationMessage(bill: unknown, eventType: string, additionalData?: unknown): string {
     const billTitle = bill.title;
 
     switch (eventType) {

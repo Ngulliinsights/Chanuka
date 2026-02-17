@@ -73,7 +73,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
       if (Math.random() > 0.8) {
         const newNotification: RealTimeNotification = {
           id: `notification_${Date.now()}`,
-          type: 'info' as any, // Simplified for fallback
+          type: 'info' as unknown, // Simplified for fallback
           title: 'Bill Update',
           message: "A bill you're following has been updated",
           priority: 'medium',
@@ -286,7 +286,7 @@ export function useWebSocket(options: WebSocketOptions = {}): WebSocketHookRetur
     };
   }, [autoConnect]); // Only depend on autoConnect to avoid recreating client
 
-  const notificationCount = notifications.filter((n: any) => !n.read).length;
+  const notificationCount = notifications.filter((n: unknown) => !n.read).length;
 
   return {
     isConnected,

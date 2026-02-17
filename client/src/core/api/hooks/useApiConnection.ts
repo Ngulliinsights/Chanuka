@@ -377,8 +377,8 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 
   // Track active intervals and cleanup functions to prevent memory leaks
   const intervalRefs = useRef<{
-    connectionInterval?: NodeJS.Timeout;
-    healthInterval?: NodeJS.Timeout;
+    connectionInterval?: NodeJS.Timeout | undefined;
+    healthInterval?: NodeJS.Timeout | undefined;
   }>({});
 
   // Track component mount state to prevent state updates after unmount

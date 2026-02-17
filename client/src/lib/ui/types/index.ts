@@ -61,7 +61,7 @@ export interface ErrorInfo {
   message: string;
   code?: string;
   type?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface ErrorProps extends BaseComponentProps {
@@ -91,7 +91,7 @@ export interface WidgetConfig {
   position: WidgetPosition;
   size: WidgetSize;
   visible?: boolean;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface WidgetProps extends BaseComponentProps {
@@ -132,8 +132,6 @@ export interface DashboardProps extends BaseComponentProps {
 // ============================================================================
 // Navigation Types (Simplified)
 // ============================================================================
-
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin';
 export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
 
 export interface NavigationItem {
@@ -260,9 +258,3 @@ export interface UseHookResult<T, E = Error> {
 }
 
 // Generic API response type
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-  errors?: string[];
-}

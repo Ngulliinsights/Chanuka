@@ -1301,7 +1301,7 @@ export class AuthService {
   /**
    * Get active sessions for a user
    */
-  async getUserSessions(userId: string): Promise<any[]> {
+  async getUserSessions(userId: string): Promise<unknown[]> {
     try {
       const userSessions = await db
         .select({
@@ -1438,7 +1438,7 @@ export class AuthService {
   /**
    * Create a new user session
    */
-  async createUserSession(userId: string, deviceInfo: any, ipAddress?: string, userAgent?: string): Promise<string> {
+  async createUserSession(userId: string, deviceInfo: unknown, ipAddress?: string, userAgent?: string): Promise<string> {
     try {
       const sessionToken = crypto.randomBytes(32).toString('hex');
 
@@ -1472,7 +1472,7 @@ export class AuthService {
   /**
    * Get security events for a user
    */
-  async getSecurityEvents(userId: string, _limit: number = 50): Promise<any[]> {
+  async getSecurityEvents(userId: string, _limit: number = 50): Promise<unknown[]> {
     try {
       // This would query security events from a security_events table
       // For now, return empty array as placeholder
@@ -1490,7 +1490,7 @@ export class AuthService {
   /**
    * Get suspicious activity alerts
    */
-  async getSuspiciousActivity(userId: string): Promise<any[]> {
+  async getSuspiciousActivity(userId: string): Promise<unknown[]> {
     try {
       // This would analyze user activity patterns and return alerts
       // For now, return empty array as placeholder

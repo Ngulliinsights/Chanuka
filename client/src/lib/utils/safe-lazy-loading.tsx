@@ -7,8 +7,8 @@ import React, { lazy, Suspense, ComponentType, LazyExoticComponent } from 'react
 
 // Simple logger fallback
 const logger = {
-  warn: (message: string, context?: any) => console.warn(message, context),
-  error: (message: string, context?: any) => console.error(message, context),
+  warn: (message: string, context?: unknown) => console.warn(message, context),
+  error: (message: string, context?: unknown) => console.error(message, context),
 };
 
 // Simple route preloader mock

@@ -45,45 +45,6 @@ export interface UserPreferences {
 }
 
 /**
- * User Profile with Anonymity Controls
- * Follows the design document specification for proper anonymity controls
- * Includes audit timestamps for proper data tracking
- */
-export interface UserProfile {
-  readonly userId: UserId;
-  readonly displayName: string;
-  readonly firstName?: string;
-  readonly lastName?: string;
-  readonly bio?: string;
-  readonly location?: GeographicLocation;
-  readonly avatarUrl?: string;
-  readonly anonymityLevel: AnonymityLevel;
-  readonly socialLinks?: Readonly<Record<string, string>>;
-  readonly isPublic: boolean;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
-
-/**
- * User Entity following BaseEntity pattern
- * Extends UserTrackableEntity for full audit trail
- */
-export interface User extends UserTrackableEntity {
-  readonly id: UserId;
-  readonly email: string;
-  readonly username: string;
-  readonly role: UserRole;
-  readonly status: UserStatus;
-  readonly profile: UserProfile | null;
-  readonly preferences: UserPreferences | Record<string, never>; // Can be empty object when not loaded
-  readonly verification: VerificationStatus;
-  readonly lastLogin?: Date;
-  readonly isActive: boolean;
-  readonly metadata?: Readonly<Record<string, unknown>>;
-  readonly passwordHash?: string; // Internal field for round-trip preservation, never exposed to API
-}
-
-/**
  * User Creation Payload (without audit fields)
  */
 export interface CreateUserPayload {
@@ -127,4 +88,19 @@ export function isUser(value: unknown): value is User {
     'preferences' in value &&
     'verification' in value
   );
+}
+
+/**
+ * Payload for updating a user
+ */
+export interface UpdateUserPayload {
+  email?: string;
+  username?: string;
+  role?: UserRole;
+  status?: UserStatus;
+  profile?: Partial<Omit<UserProfile, 'userId'>>;
+  preferences?: Partial<UserPreferences>;
+  verification?: VerificationStatus;
+  isActive?: boolean;
+  metadata?: Readonly<Record<string, unknown>>;
 }

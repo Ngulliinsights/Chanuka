@@ -133,7 +133,7 @@ export class FuseSearchEngine implements SearchEngine {
       .where(query.filters?.status ? sql`${bills.status} = ANY(${query.filters.status})` : undefined)
       .where(query.filters?.chamber ? sql`${bills.chamber} = ANY(${query.filters.chamber})` : undefined);
 
-    const searchableBills: SearchableBill[] = billsData.map((bill: any) => ({
+    const searchableBills: SearchableBill[] = billsData.map((bill: unknown) => ({
       id: bill.id.toString(),
       title: bill.title || '',
       summary: bill.summary || '',
@@ -185,7 +185,7 @@ export class FuseSearchEngine implements SearchEngine {
       .where(query.filters?.chamber ? sql`${sponsors.chamber} = ANY(${query.filters.chamber})` : undefined)
       .where(query.filters?.county ? sql`${sponsors.county} = ANY(${query.filters.county})` : undefined);
 
-    const searchableSponsors: SearchableSponsor[] = sponsorsData.map((sponsor: any) => ({
+    const searchableSponsors: SearchableSponsor[] = sponsorsData.map((sponsor: unknown) => ({
       id: sponsor.id.toString(),
       name: sponsor.name || '',
       party: sponsor.party || '',
@@ -236,7 +236,7 @@ export class FuseSearchEngine implements SearchEngine {
       .where(query.filters?.dateRange?.start ? sql`${comments.created_at} >= ${query.filters.dateRange.start}` : undefined)
       .where(query.filters?.dateRange?.end ? sql`${comments.created_at} <= ${query.filters.dateRange.end}` : undefined);
 
-    const searchableComments: SearchableComment[] = commentsData.map((comment: any) => ({
+    const searchableComments: SearchableComment[] = commentsData.map((comment: unknown) => ({
       id: comment.id.toString(),
       content: comment.content || '',
       bill_id: comment.bill_id?.toString() || '',

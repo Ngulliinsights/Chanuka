@@ -55,7 +55,7 @@ interface DeploymentResult {
 /**
  * Formats deployment progress updates in a readable format for console output
  */
-function formatProgressUpdate(progress: any): void {
+function formatProgressUpdate(progress: unknown): void {
   const timestamp = progress.timestamp.toISOString();
   const components: ComponentProgress[] = Object.keys(progress.components).map(comp => ({
     name: comp.replace('utilities-', ''),

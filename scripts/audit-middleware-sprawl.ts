@@ -679,7 +679,7 @@ class MiddlewareSprawlAuditor {
     const redundancyPercentage = totalMiddleware > 0 ? (duplicateMiddleware / totalMiddleware) * 100 : 0;
 
     // Calculate categories summary
-    const categories: Record<MiddlewareCategory, any> = {} as any;
+    const categories: Record<MiddlewareCategory, any> = {} as unknown;
     const categoryStats = new Map<MiddlewareCategory, { files: number; middleware: number; duplicates: number }>();
 
     for (const file of this.middlewareFiles) {

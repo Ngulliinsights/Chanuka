@@ -140,7 +140,7 @@ export interface ErrorResponse {
   error: {
     message: string;
     code?: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
   };
   metadata?: ResponseMetadata;
 }
@@ -168,7 +168,7 @@ export class UnifiedApiResponse {
   static error(
     message: string, 
     code?: string, 
-    details?: Record<string, any>,
+    details?: Record<string, unknown>,
     metadata?: Partial<ResponseMetadata>
   ): ErrorResponse {
     return {
@@ -192,7 +192,7 @@ export const ApiSuccess = UnifiedApiResponse.success;
 export const ApiError = UnifiedApiResponse.error;
 export const ApiNotFound = (message = 'Resource not found') => 
   UnifiedApiResponse.error(message, 'NOT_FOUND');
-export const ApiValidationError = (errors: any[]) => 
+export const ApiValidationError = (errors: unknown[]) => 
   UnifiedApiResponse.validation(errors);
 export const ApiForbidden = (message = 'Access forbidden') => 
   UnifiedApiResponse.error(message, 'FORBIDDEN');
@@ -223,7 +223,7 @@ export interface LogEntry {
   level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
   message: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   error?: Error;
 }
 
@@ -250,25 +250,25 @@ export abstract class BaseLogger {
 
   abstract log(entry: LogEntry): void;
 
-  debug(message: string, metadata?: Record<string, any>): void {
+  debug(message: string, metadata?: Record<string, unknown>): void {
     if (this.shouldLog('DEBUG')) {
       this.log({ level: 'DEBUG', message, timestamp: new Date(), metadata });
     }
   }
 
-  info(message: string, metadata?: Record<string, any>): void {
+  info(message: string, metadata?: Record<string, unknown>): void {
     if (this.shouldLog('INFO')) {
       this.log({ level: 'INFO', message, timestamp: new Date(), metadata });
     }
   }
 
-  warn(message: string, metadata?: Record<string, any>): void {
+  warn(message: string, metadata?: Record<string, unknown>): void {
     if (this.shouldLog('WARN')) {
       this.log({ level: 'WARN', message, timestamp: new Date(), metadata });
     }
   }
 
-  error(message: string, error?: Error, metadata?: Record<string, any>): void {
+  error(message: string, error?: Error, metadata?: Record<string, unknown>): void {
     if (this.shouldLog('ERROR')) {
       this.log({ level: 'ERROR', message, timestamp: new Date(), error, metadata });
     }
@@ -507,7 +507,7 @@ export const ApiSuccess = UnifiedApiResponse.success;
 export const ApiError = UnifiedApiResponse.error;
 export const ApiNotFound = (message = 'Resource not found') => 
   UnifiedApiResponse.error(message, 'NOT_FOUND');
-export const ApiValidationError = (errors: any[]) => 
+export const ApiValidationError = (errors: unknown[]) => 
   UnifiedApiResponse.validation(errors);
 
 export type { ApiResponse, ErrorResponse };
@@ -526,15 +526,15 @@ console.warn(
 );
 
 const serverLogger = UnifiedLogger.createServerLogger({
-  level: process.env.LOG_LEVEL as any || 'INFO'
+  level: process.env.LOG_LEVEL as unknown || 'INFO'
 });
 
 export const logger = {
-  info: (message: string, meta?: any) => serverLogger.info(message, meta),
-  error: (message: string, error?: Error, meta?: any) => serverLogger.error(message, error, meta),
-  warn: (message: string, meta?: any) => serverLogger.warn(message, meta),
-  debug: (message: string, meta?: any) => serverLogger.debug(message, meta),
-  log: (message: string, meta?: any) => serverLogger.info(message, meta)
+  info: (message: string, meta?: unknown) => serverLogger.info(message, meta),
+  error: (message: string, error?: Error, meta?: unknown) => serverLogger.error(message, error, meta),
+  warn: (message: string, meta?: unknown) => serverLogger.warn(message, meta),
+  debug: (message: string, meta?: unknown) => serverLogger.debug(message, meta),
+  log: (message: string, meta?: unknown) => serverLogger.info(message, meta)
 };
 
 export default logger;

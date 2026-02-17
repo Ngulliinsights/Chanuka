@@ -3,31 +3,13 @@
  * 
  * Manages connection state capture, restoration, and backup
  */
-// Temporary fallback logger until shared/core import is resolved
-const logger = {
-  info: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.log(`[INFO] ${message}`, context || '');
-  },
-  warn: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.warn(`[WARN] ${message}`, context || '');
-  },
-  error: (message: string, context?: unknown, error?: Error) => {
-    // eslint-disable-next-line no-console
-    console.error(`[ERROR] ${message}`, context || '', error || '');
-  },
-  debug: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.log(`[DEBUG] ${message}`, context || '');
-  }
-};
 
+import { logger } from '../../observability/logger';
 import { ConnectionState } from './types';
-
 
 export class StateManager {
   private connectionStates: Map<string, ConnectionState> = new Map();
+
   private stateBackups: Map<string, ConnectionState[]> = new Map();
 
   /**

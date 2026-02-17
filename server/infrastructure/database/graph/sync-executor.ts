@@ -404,7 +404,7 @@ async function ensureSyncTablesExist(): Promise<void> {
     // Tables are created by Drizzle migrations, just verify they exist
     await db.select().from(graph_sync_status).limit(1);
     logger.debug('Sync tables verified');
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error.message?.includes('does not exist')) {
       throw new GraphError({
         code: GraphErrorCode.CONFIGURATION_ERROR,
@@ -509,8 +509,8 @@ export async function detectConflicts(
 ): Promise<{
   hasConflict: boolean;
   conflictingFields: string[];
-  postgresValues: Record<string, any>;
-  neo4jValues: Record<string, any>;
+  postgresValues: Record<string, unknown>;
+  neo4jValues: Record<string, unknown>;
 }> {
   // Validate inputs
   if (!entityType || !entityId) {
@@ -705,8 +705,8 @@ async function fetchNeo4jEntity(
  * @param entity - Entity to normalize
  * @returns Normalized entity
  */
-function normalizeEntityValues(entity: Record<string, any>): Record<string, any> {
-  const normalized: Record<string, any> = {};
+function normalizeEntityValues(entity: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
 
   for (const key in entity) {
     const value = entity[key];

@@ -11,6 +11,7 @@ import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 
 import { processRequestInterceptors, processResponseInterceptors } from './interceptors';
 import { RetryHandler, createRetryHandler, RetryConfig } from './retry-handler';
+import type { ApiResponse } from './types/common';
 
 export interface CircuitBreakerClientConfig {
   serviceName: string;
@@ -27,13 +28,6 @@ export interface RequestConfig extends RequestInit {
   correlationId?: string;
   skipCircuitBreaker?: boolean;
   skipRetry?: boolean;
-}
-
-export interface ApiResponse<T = unknown> {
-  data: T;
-  status: number;
-  headers: Headers;
-  correlationId?: string;
 }
 
 /**
@@ -153,6 +147,12 @@ export class CircuitBreakerClient {
       // Parse response data
       const data = await this.parseResponseData<T>(processedResponse);
 
+      // Convert Headers to Record<string, string>
+      const headersRecord: Record<string, string> = {};
+      processedResponse.headers.forEach((value, key) => {
+        headersRecord[key] = value;
+      });
+
       logger.debug('API request successful', {
         component: 'CircuitBreakerClient',
         serviceName: this.config.serviceName,
@@ -164,7 +164,7 @@ export class CircuitBreakerClient {
       return {
         data,
         status: processedResponse.status,
-        headers: processedResponse.headers,
+        headers: headersRecord,
         correlationId,
       };
     } catch (error) {

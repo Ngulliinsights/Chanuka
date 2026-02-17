@@ -23,7 +23,7 @@ export const securityUtils = {
 };
 
 export const securityMonitor = {
-  trackSecurityEvent: (event: string, data?: any) => {
+  trackSecurityEvent: (event: string, data?: unknown) => {
     console.log('Security event:', event, data);
   },
 };

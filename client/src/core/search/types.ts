@@ -29,7 +29,7 @@ export interface UnifiedSearchQuery {
   type?: string;
   limit?: number;
   offset?: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   strategy?: SearchStrategy;
 }
 

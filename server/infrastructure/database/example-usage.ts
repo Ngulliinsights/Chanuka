@@ -34,7 +34,7 @@ export const safeReadExample = async (user_id: string): Promise<void> => {
   try {
     // Use read database for read operations
     const result = await readDatabase.query.users.findFirst({
-      where: (user: typeof users, { eq }: { eq: (left: any, right: any) => any }) => eq(user.id, user_id),
+      where: (user: typeof users, { eq }: { eq: (left: unknown, right: unknown) => any }) => eq(user.id, user_id),
     });
 
     return result;
@@ -47,9 +47,9 @@ export const safeReadExample = async (user_id: string): Promise<void> => {
 /**
  * Example: Safe write operation with transaction
  */
-export const safeWriteExample = async (userData: any): Promise<void> => {
+export const safeWriteExample = async (userData: unknown): Promise<void> => {
   try {
-    return await withTransaction(async (tx: any) => {
+    return await withTransaction(async (tx: unknown) => {
       // All operations within this transaction are protected
       // Note: tx should be a proper Drizzle transaction object
       const insertedUserRows = await tx.insert(userTable).values(userData).returning();

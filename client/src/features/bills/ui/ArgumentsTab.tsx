@@ -66,17 +66,17 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   let filtered = argumentsList;
   
   if (positionFilter !== 'all') {
-    filtered = filtered.filter((arg: any) => (arg.position || arg.type) === positionFilter);
+    filtered = filtered.filter((arg: unknown) => (arg.position || arg.type) === positionFilter);
   }
 
   if (searchTerm) {
-    filtered = filtered.filter((arg: any) =>
+    filtered = filtered.filter((arg: unknown) =>
       (arg.argumentText || arg.argument_text)?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 
   // Sort arguments
-  const sorted = [...filtered].sort((a: any, b: any) => {
+  const sorted = [...filtered].sort((a: unknown, b: unknown) => {
     switch (sortBy) {
       case 'strength':
         return ((b.strengthScore ?? b.strength_score) || 0) - ((a.strengthScore ?? a.strength_score) || 0);
@@ -90,10 +90,10 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   });
 
   // Count by position - use fallback for different property names
-  const getPosition = (a: any) => a.position || a.type || 'neutral';
-  const supportCount = argumentsList.filter((a: any) => getPosition(a) === 'support').length;
-  const opposeCount = argumentsList.filter((a: any) => getPosition(a) === 'oppose').length;
-  const neutralCount = argumentsList.filter((a: any) => getPosition(a) === 'neutral').length;
+  const getPosition = (a: unknown) => a.position || a.type || 'neutral';
+  const supportCount = argumentsList.filter((a: unknown) => getPosition(a) === 'support').length;
+  const opposeCount = argumentsList.filter((a: unknown) => getPosition(a) === 'oppose').length;
+  const neutralCount = argumentsList.filter((a: unknown) => getPosition(a) === 'neutral').length;
   const total = argumentsList.length;
 
   return (

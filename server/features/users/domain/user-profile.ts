@@ -269,7 +269,7 @@ export class UserProfileService {
           .limit(1);
 
         // Build a payload with only defined fields to satisfy exactOptionalPropertyTypes
-        const profilePayload: Record<string, any> = {};
+        const profilePayload: Record<string, unknown> = {};
         if (sanitizedProfileData.bio !== undefined) profilePayload.bio = sanitizedProfileData.bio;
         if (sanitizedProfileData.location !== undefined) profilePayload.location = sanitizedProfileData.location;
         if (sanitizedProfileData.organization !== undefined) profilePayload.website = sanitizedProfileData.organization; // store organization in website field when present
@@ -355,7 +355,7 @@ export class UserProfileService {
     const result = await databaseService.withFallback(
       async () => {
         // Persist basic profile fields into user_profiles (name/display)
-        const profileUpdates: Record<string, any> = {};
+        const profileUpdates: Record<string, unknown> = {};
         if (sanitizedData.first_name !== undefined) profileUpdates.first_name = sanitizedData.first_name;
         if (sanitizedData.last_name !== undefined) profileUpdates.last_name = sanitizedData.last_name;
         if (sanitizedData.name !== undefined) profileUpdates.display_name = sanitizedData.name;
@@ -432,7 +432,7 @@ export class UserProfileService {
         )
         .limit(limit);
 
-      return results.map((r: any) => ({
+      return results.map((r: unknown) => ({
         id: r.id,
         name: r.display_name || null,
         role: r.role,
@@ -707,12 +707,12 @@ export class UserProfileService {
 
           // Combine and sort recent activity
           const recentActivity = [
-            ...recentEngagement.map((item: any) => ({ type: 'track' as const,
+            ...recentEngagement.map((item: unknown) => ({ type: 'track' as const,
               bill_id: item.bill_id,
               billTitle: item.billTitle,
               timestamp: item.last_engaged_at || new Date()
              })),
-            ...recentComments.map((item: any) => ({ type: 'comment' as const,
+            ...recentComments.map((item: unknown) => ({ type: 'comment' as const,
               bill_id: item.bill_id,
               billTitle: item.billTitle,
               timestamp: item.created_at || new Date()
@@ -742,7 +742,7 @@ export class UserProfileService {
             totalComments: Number(commentStats?.totalComments || 0),
             totalEngagementScore: Number(engagementStats?.totalEngagementScore || 0),
             recentActivity,
-            topCategories: topCategories.map((cat: any) => ({
+            topCategories: topCategories.map((cat: unknown) => ({
               category: cat.category || 'Unknown',
               engagementCount: Number(cat.engagementCount)
             }))

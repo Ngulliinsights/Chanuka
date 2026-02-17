@@ -649,7 +649,7 @@ export class ConstitutionalAnalysisServiceComplete {
   private async logAuditTrail(
     analysis_id: string,
     changeType: 'created' | 'updated' | 'reviewed',
-    metadata: Record<string, any>
+    metadata: Record<string, unknown>
   ): Promise<void> {
     try {
       await this.database

@@ -102,7 +102,7 @@ export class UserEntityMapping implements EntityMapping<User, UserRow> {
     };
     
     // This type assertion bridges the gap between what TypeScript infers and what
-    // we know to be true. It's safer than 'as any' because we're being specific
+    // we know to be true. It's safer than 'as unknown' because we're being specific
     // about what type we're asserting to, and it matches the interface contract
     return result as Partial<UserRow>;
   }

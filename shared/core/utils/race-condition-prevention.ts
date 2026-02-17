@@ -22,7 +22,7 @@ export interface RaceConditionPreventionOptions {
  * until after wait milliseconds have elapsed since the last time
  * the debounced function was invoked.
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => any>(
   func: T,
   wait: number,
   options: { leading?: boolean; trailing?: boolean } = {}
@@ -60,7 +60,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * Creates a throttled version of a function that ensures the function
  * is called at most once per specified time period.
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => any>(
   func: T,
   limit: number,
   options: { leading?: boolean; trailing?: boolean } = {}

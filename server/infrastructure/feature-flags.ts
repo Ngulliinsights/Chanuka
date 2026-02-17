@@ -125,7 +125,7 @@ export class FeatureFlagService {
   /**
    * Check if a feature is enabled for a specific user
    */
-  isEnabled(flagName: string, user_id?: string, context?: any): boolean {
+  isEnabled(flagName: string, user_id?: string, context?: unknown): boolean {
     const flag = this.flags.get(flagName);
     if (!flag) {
       logger.warn(`Feature flag not found: ${flagName}`, {

@@ -174,7 +174,7 @@ export function useMockDataBatch(
 ) {
   const opts = { ...defaultOptions, ...options };
   const [state, setState] = useState<{
-    data: Record<string, any>;
+    data: Record<string, unknown>;
     loading: boolean;
     error: string | null;
     lastUpdated: string | null;

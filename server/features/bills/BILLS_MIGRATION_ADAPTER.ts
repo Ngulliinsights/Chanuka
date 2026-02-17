@@ -35,7 +35,7 @@ export class BillsRouterErrorAdapter {
   /**
    * Convert ApiNotFound response to proper error throw
    */
-  static notFound(res: Response, message: string, context: any): never {
+  static notFound(res: Response, message: string, context: unknown): never {
     throw new BaseError(message, {
       statusCode: 404,
       code: ERROR_CODES.BILL_NOT_FOUND,
@@ -48,7 +48,7 @@ export class BillsRouterErrorAdapter {
   /**
    * Convert ApiValidationError response to proper error throw
    */
-  static validationError(res: Response, message: string, fields: Record<string, string>, context: any): never {
+  static validationError(res: Response, message: string, fields: Record<string, string>, context: unknown): never {
     throw new ValidationError(message, {
       fields,
       context,
@@ -58,7 +58,7 @@ export class BillsRouterErrorAdapter {
   /**
    * Convert ApiError response to proper error throw
    */
-  static internalError(res: Response, message: string, context: any): never {
+  static internalError(res: Response, message: string, context: unknown): never {
     throw new BaseError(message, {
       statusCode: 500,
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
@@ -71,7 +71,7 @@ export class BillsRouterErrorAdapter {
   /**
    * Convert unauthorized response
    */
-  static unauthorized(res: Response, message: string, context: any): never {
+  static unauthorized(res: Response, message: string, context: unknown): never {
     throw new BaseError(message, {
       statusCode: 401,
       code: ERROR_CODES.NOT_AUTHENTICATED,
@@ -84,7 +84,7 @@ export class BillsRouterErrorAdapter {
   /**
    * Convert forbidden response
    */
-  static forbidden(res: Response, message: string, context: any): never {
+  static forbidden(res: Response, message: string, context: unknown): never {
     throw new BaseError(message, {
       statusCode: 403,
       code: ERROR_CODES.INSUFFICIENT_PERMISSIONS,

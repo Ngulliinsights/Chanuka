@@ -143,7 +143,7 @@ export interface FinancialAlert {
   severity: 'info' | 'warning' | 'critical';
   created_at: Date;
   isResolved: boolean;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**

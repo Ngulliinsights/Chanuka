@@ -35,8 +35,8 @@ export type OptionalKeys<T> = {
 }[keyof T];
 
 // Function utilities
-export type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
-export type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any;
+export type Parameters<T extends (...args: unknown) => any> = T extends (...args: infer P) => any ? P : never;
+export type ReturnType<T extends (...args: unknown) => any> = T extends (...args: unknown) => infer R ? R : unknown;
 
 // Array utilities
 export type ArrayElement<T> = T extends readonly (infer U)[] ? U : never;

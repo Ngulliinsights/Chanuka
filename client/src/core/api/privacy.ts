@@ -1,7 +1,7 @@
 import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from './client';
-import type { DataExportResponse, DataDeletionResponse } from './types/error-response';
+import type { DataExportResponse, DataDeletionResponse } from '@shared/validation/schemas/analytics.schema';
 
 // ... (Keep your interfaces: AnalyticsEvent, UserConsent, etc.)
 

@@ -365,7 +365,7 @@ export class CitizenVerificationService {
     const existing = row[0];
     if (!existing) return;
     
-    const data = (existing.verification_data as Record<string, any>) || {};
+    const data = (existing.verification_data as Record<string, unknown>) || {};
     const endorsements = (data.endorsements || 0) + 1;
     data.endorsements = endorsements;
 
@@ -386,7 +386,7 @@ export class CitizenVerificationService {
     const existing = row[0];
     if (!existing) return;
     
-    const data = (existing.verification_data as Record<string, any>) || {};
+    const data = (existing.verification_data as Record<string, unknown>) || {};
     const disputes = (data.disputes || 0) + 1;
     data.disputes = disputes;
     // Optionally append counterEvidence into verification_data
@@ -405,7 +405,7 @@ export class CitizenVerificationService {
     const existing = row[0];
     if (!existing) return;
     
-    const data = (existing.verification_data as Record<string, any>) || {};
+    const data = (existing.verification_data as Record<string, unknown>) || {};
 
     const endorsements = data.endorsements || 0;
     const disputes = data.disputes || 0;
@@ -429,7 +429,7 @@ export class CitizenVerificationService {
     const existing = row[0];
     if (!existing) return;
     
-    const data = (existing.verification_data as Record<string, any>) || {};
+    const data = (existing.verification_data as Record<string, unknown>) || {};
 
     if ((data.disputes || 0) > (data.endorsements || 0) && (data.disputes || 0) > 3) {
       await db
@@ -449,8 +449,8 @@ export class CitizenVerificationService {
       .orderBy(desc(user_verification.created_at));
 
     // Map DB rows into domain shape by pulling data out of verification_data
-    return results.map((r: any) => {
-      const data = (r.verification_data as Record<string, any>) || {};
+    return results.map((r: unknown) => {
+      const data = (r.verification_data as Record<string, unknown>) || {};
       return {
         id: r.id,
         bill_id: data.bill_id,
@@ -571,8 +571,8 @@ export class CitizenVerificationService {
       .where(eq(user_verification.user_id, citizenId))
       .orderBy(desc(user_verification.created_at));
 
-    return results.map((r: any) => {
-      const data = (r.verification_data as Record<string, any>) || {};
+    return results.map((r: unknown) => {
+      const data = (r.verification_data as Record<string, unknown>) || {};
       return {
         id: r.id,
         bill_id: data.bill_id,

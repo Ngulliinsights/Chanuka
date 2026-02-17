@@ -5,7 +5,6 @@ import { getRecoverySuggestions } from '../recovery';
 import { validateNavigationPath, validateUserRole } from '../validation';
 import type { UserRole, AccessDenialReason } from '@client/lib/types';
 
-// import type { AccessDenialReason } from '../types'; // Removed as per findings
 import { checkRouteAccess } from '../utils/route-access';
 
 export interface UseRouteAccessResult {

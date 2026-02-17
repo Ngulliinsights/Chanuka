@@ -2,7 +2,7 @@
 /**
  * Bulk Fix Templates for Type Safety Violations
  * 
- * Provides templates and utilities for fixing common `as any` patterns:
+ * Provides templates and utilities for fixing common `as unknown` patterns:
  * - Enum conversions
  * - API responses
  * - Database operations
@@ -96,13 +96,13 @@ function addImportIfNeeded(content: string, importStatement: string): string {
 
 /**
  * Fix Template: Enum Conversions
- * Replaces: value as any
+ * Replaces: value as unknown
  * With: enumConverter.toEnum(value)
  */
 const enumConversionTemplate: FixTemplate = {
   name: 'enum-conversions',
   category: 'enum_conversion',
-  description: 'Replace `as any` with proper enum converter for enum-like values',
+  description: 'Replace `as unknown` with proper enum converter for enum-like values',
   pattern: /(\w+)\s+as\s+any(?=\s*[,;)\]])/g,
   requiresImport: ["import { createEnumConverter } from '@/shared/utils/type-guards';"],
   replacement: (match, context) => {
@@ -129,13 +129,13 @@ const enumConversionTemplate: FixTemplate = {
 
 /**
  * Fix Template: API Response Validation
- * Replaces: response.data as any
+ * Replaces: response.data as unknown
  * With: apiResponseSchema.parse(response.data)
  */
 const apiResponseTemplate: FixTemplate = {
   name: 'api-responses',
   category: 'api_response',
-  description: 'Replace `as any` with Zod schema validation for API responses',
+  description: 'Replace `as unknown` with Zod schema validation for API responses',
   pattern: /([\w.]+)\s+as\s+any/g,
   requiresImport: ["import { z } from 'zod';"],
   replacement: (match, context) => {
@@ -155,13 +155,13 @@ const apiResponseTemplate: FixTemplate = {
 
 /**
  * Fix Template: Database Row Normalization
- * Replaces: row as any
+ * Replaces: row as unknown
  * With: normalizeRow(row, schema)
  */
 const databaseOperationTemplate: FixTemplate = {
   name: 'database-operations',
   category: 'database_operation',
-  description: 'Replace `as any` with proper type guards for database operations',
+  description: 'Replace `as unknown` with proper type guards for database operations',
   pattern: /(\w+)\s+as\s+any/g,
   replacement: (match, context) => {
     const varName = match[1];
@@ -180,13 +180,13 @@ const databaseOperationTemplate: FixTemplate = {
 
 /**
  * Fix Template: Dynamic Property Access
- * Replaces: obj[key] as any
+ * Replaces: obj[key] as unknown
  * With: proper type guard or Record type
  */
 const dynamicPropertyTemplate: FixTemplate = {
   name: 'dynamic-properties',
   category: 'dynamic_property',
-  description: 'Replace `as any` with proper type guards for dynamic property access',
+  description: 'Replace `as unknown` with proper type guards for dynamic property access',
   pattern: /([\w.]+\[[\w'"]+\])\s+as\s+any/g,
   replacement: (match, context) => {
     const expression = match[1];
@@ -196,7 +196,7 @@ const dynamicPropertyTemplate: FixTemplate = {
 
 /**
  * Fix Template: Type Assertions
- * Replaces: value as any as TargetType
+ * Replaces: value as unknown as TargetType
  * With: proper type guard or validation
  */
 const typeAssertionTemplate: FixTemplate = {
@@ -286,7 +286,7 @@ function applyTemplateToFile(
       fixesApplied,
       success: true,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       file: filePath,
       fixesApplied: 0,

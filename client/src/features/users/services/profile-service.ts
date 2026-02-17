@@ -55,7 +55,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  async init(config?: any): Promise<void> {
+  async init(config?: unknown): Promise<void> {
     await this.cache.warmCache();
     logger.info('UserProfileService initialized');
   }

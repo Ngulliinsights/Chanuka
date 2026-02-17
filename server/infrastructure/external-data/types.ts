@@ -27,7 +27,7 @@ export interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   description: string;
   dataType: 'bills' | 'sponsors' | 'votes' | 'committees' | 'amendments';
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   responseFormat: 'json' | 'xml' | 'csv';
   cacheTtl: number; // Cache time-to-live in seconds
   syncFrequency: 'real-time' | 'hourly' | 'daily' | 'weekly';

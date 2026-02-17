@@ -35,12 +35,6 @@ import { useDashboardData } from './useDashboardData';
 
 export type DashboardVariant = 'full-page' | 'section';
 
-interface UserProfile {
-  name: string;
-  avatar_url?: string;
-  verified?: boolean;
-}
-
 interface BadgeItem {
   id: string;
   icon: React.ReactNode;

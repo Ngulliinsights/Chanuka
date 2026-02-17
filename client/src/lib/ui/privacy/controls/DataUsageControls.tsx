@@ -14,7 +14,7 @@ import { Label } from '@client/lib/design-system/typography/Label';
 
 interface DataUsageControlsProps {
   settings: PrivacySettings;
-  onSettingChange: (key: keyof PrivacySettings, value: any) => void;
+  onSettingChange: (key: keyof PrivacySettings, value: unknown) => void;
   onConsentChange: (type: ConsentRecord['consent_type'], granted: boolean) => void;
   onOpenConsentModal: (type: ConsentRecord['consent_type']) => void;
   className?: string;

@@ -760,7 +760,7 @@ export class UnifiedAlertPreferenceService {
     // Try cache first
     try {
       const cached = await cacheService.get(cacheKey);
-      if (cached !== null && cached !== undefined) return cached as any;
+      if (cached !== null && cached !== undefined) return cached as unknown;
     } catch (err) { logger.warn('Cache read failed for alert stats', { component: 'AlertPreferenceService', user_id, error: err  });
     }
 
@@ -857,7 +857,7 @@ export class UnifiedAlertPreferenceService {
     return defaultPreference;
   }
 
-  private async calculateUserInterestScore(user_id: string, alertData: any): Promise<number> { try {
+  private async calculateUserInterestScore(user_id: string, alertData: unknown): Promise<number> { try {
       const user_profiles = await user_profileservice.getUserProfile(user_id);
       const user_interests = user_profiles.interests || [];
 
@@ -897,7 +897,7 @@ export class UnifiedAlertPreferenceService {
     }
   }
 
-  private async calculateEngagementHistoryScore(user_id: string, alertData: any): Promise<number> { try {
+  private async calculateEngagementHistoryScore(user_id: string, alertData: unknown): Promise<number> { try {
       const engagementHistory = await user_profileservice.getUserEngagementHistory(user_id);
       
       if (engagementHistory.totalBillsTracked === 0) return 0.5;
@@ -925,7 +925,7 @@ export class UnifiedAlertPreferenceService {
     }
   }
 
-  private async calculateTrendingScore(alertData: any): Promise<number> {
+  private async calculateTrendingScore(alertData: unknown): Promise<number> {
     // In production, this would analyze actual trending metrics
     // For now, use engagement count if available
     if (alertData.engagementCount && typeof alertData.engagementCount === 'number') {
@@ -971,7 +971,7 @@ export class UnifiedAlertPreferenceService {
     }
   }
 
-  private matchesConditions(alertData: any, conditions: AlertConditions): boolean {
+  private matchesConditions(alertData: unknown, conditions: AlertConditions): boolean {
     // Check bill categories
     if (conditions.billCategories && conditions.billCategories.length > 0) {
       if (!alertData.billCategory || 

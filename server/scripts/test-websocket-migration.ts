@@ -20,7 +20,7 @@ class SimpleSocketIOService {
     errors: 0
   };
 
-  async initialize(httpServer: any): Promise<void> {
+  async initialize(httpServer: unknown): Promise<void> {
     logger.info('Initializing simple Socket.IO service for testing');
 
     this.io = new Server(httpServer, {

@@ -42,5 +42,5 @@ export interface BillAnalysisRequest {
 
 export interface BillUpdateRequest {
   billId: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }

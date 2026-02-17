@@ -5,7 +5,7 @@
  * performance metrics, audit trails, and correlation tracking.
  */
 
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '../core/errors/error-tracker';
 import { logger } from './index';
 
 export interface DatabaseOperationContext {
@@ -73,7 +73,7 @@ export class DatabaseLogger {
 
     try {
       // Log operation start
-      logger.debug('Database operation started', {
+      logger.debug({
         component: 'database',
         operation: context.operation,
         table: context.table,
@@ -83,7 +83,7 @@ export class DatabaseLogger {
         correlationId: context.correlationId,
         operationId,
         ...additionalMetadata
-      });
+      }, 'Database operation started');
 
       const result = await operation();
       const duration = performance.now() - startTime;
@@ -114,15 +114,13 @@ export class DatabaseLogger {
       this.logOperationFailure(context, result, operationId, additionalMetadata);
 
       // Track error with error tracker
-      errorTracker.trackError(error as Error, {
-        endpoint: `database_${context.operation}_${context.table}`,
-        user_id: context.userId,
-        correlationId: context.correlationId,
-        operationId,
-        entityId: context.entityId,
-        table: context.table,
-        entityType: context.entityType
-      }, 'medium', 'database');
+      const errorContext: Record<string, string> = {
+        endpoint: `database_${context.operation}_${context.table}`
+      };
+      if (context.userId) errorContext.user_id = context.userId;
+      if (context.correlationId) errorContext.traceId = context.correlationId;
+      
+      errorTracker.trackError(error as Error, errorContext, 'medium', 'database');
 
       throw error;
     }
@@ -162,12 +160,12 @@ export class DatabaseLogger {
     }, `Security audit: ${operation.action} on ${operation.entityType} ${operation.entityId}`);
 
     // Log structured audit entry
-    logger.info('Audit trail entry', {
+    logger.info({
       component: 'audit',
       operation: 'security_event',
       audit: auditEntry,
       tags: ['audit', 'security', operation.sensitive ? 'sensitive' : 'normal']
-    });
+    }, 'Audit trail entry');
   }
 
   /**
@@ -202,7 +200,7 @@ export class DatabaseLogger {
 
     // Log detailed query analysis for very slow queries
     if (isVerySlow) {
-      logger.warn('Very slow database query detected', {
+      logger.warn({
         component: 'database',
         table,
         operation,
@@ -210,7 +208,7 @@ export class DatabaseLogger {
         queryDetails,
         recommendation: 'Consider query optimization, indexing, or caching',
         tags: ['performance', 'optimization-needed']
-      });
+      }, 'Very slow database query detected');
     }
   }
 
@@ -228,7 +226,7 @@ export class DatabaseLogger {
     const avgDuration = totalDuration / batchSize;
     const slowOperations = results.filter(r => r.slowQuery).length;
 
-    logger.info('Batch database operation completed', {
+    logger.info({
       component: 'database',
       operation: 'batch',
       table: context.table,
@@ -243,11 +241,11 @@ export class DatabaseLogger {
       userId: context.userId,
       correlationId: context.correlationId,
       tags: failed > 0 ? ['batch', 'partial-failure'] : ['batch', 'success']
-    });
+    }, 'Batch database operation completed');
 
     // Log individual failures in batch
     results.filter(r => !r.success).forEach((result, index) => {
-      logger.error('Batch operation item failed', {
+      logger.error({
         component: 'database',
         operation: context.operation,
         table: context.table,
@@ -255,7 +253,7 @@ export class DatabaseLogger {
         error: result.error?.message,
         duration: result.duration,
         correlationId: context.correlationId
-      });
+      }, 'Batch operation item failed');
     });
   }
 
@@ -274,7 +272,7 @@ export class DatabaseLogger {
   ): void {
     const logLevel = result.slowQuery ? 'warn' : 'info';
 
-    logger[logLevel](`Database operation completed: ${context.operation} ${context.table}`, {
+    logger[logLevel]({
       component: 'database',
       operation: context.operation,
       table: context.table,
@@ -289,7 +287,7 @@ export class DatabaseLogger {
       affectedIds: result.affectedIds,
       slowQuery: result.slowQuery,
       ...additionalMetadata
-    });
+    }, `Database operation completed: ${context.operation} ${context.table}`);
   }
 
   private logOperationFailure(
@@ -298,7 +296,7 @@ export class DatabaseLogger {
     operationId: string,
     additionalMetadata?: Record<string, unknown>
   ): void {
-    logger.error(`Database operation failed: ${context.operation} ${context.table}`, {
+    logger.error({
       component: 'database',
       operation: context.operation,
       table: context.table,
@@ -312,7 +310,7 @@ export class DatabaseLogger {
       stack: result.error?.stack,
       slowQuery: result.slowQuery,
       ...additionalMetadata
-    });
+    }, `Database operation failed: ${context.operation} ${context.table}`);
   }
 
   private logSlowQuery(
@@ -320,7 +318,7 @@ export class DatabaseLogger {
     result: DatabaseOperationResult,
     operationId: string
   ): void {
-    logger.warn('Slow database query detected', {
+    logger.warn({
       component: 'database',
       operation: context.operation,
       table: context.table,
@@ -334,15 +332,15 @@ export class DatabaseLogger {
       queryDetails: result.queryDetails,
       recommendation: 'Consider query optimization, indexing, or caching',
       tags: ['performance', 'slow-query']
-    });
+    }, 'Slow database query detected');
   }
 
   private generateOperationId(): string {
-    return `db_op_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `db_op_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   private generateCorrelationId(): string {
-    return `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `corr_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 }
 

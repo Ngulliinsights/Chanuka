@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 
 export interface UseWebSocketOptions {
   url: string;
-  onMessage?: (data: any) => void;
+  onMessage?: (data: unknown) => void;
   onError?: (error: Event) => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -19,7 +19,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
 
-  const sendMessage = useCallback((message: any) => {
+  const sendMessage = useCallback((message: unknown) => {
     // Send message implementation
     console.log('Sending message:', message);
   }, []);

@@ -7,7 +7,7 @@ export { useLoading } from './useLoading';
 export { useLoadingState } from './useLoadingState';
 
 // Placeholder hooks for demo compatibility
-export const useProgressiveLoading = (stages: any[]) => ({
+export const useProgressiveLoading = (stages: unknown[]) => ({
   currentStage: stages[0],
   progress: 0,
   isComplete: false,

@@ -84,7 +84,7 @@ export class SmartFilteringService { /**
   /**
    * Calculates user interest score based on user's explicit interests
    */
-  private async calculateUserInterestScore(user_id: string, alertData: any): Promise<number> { try {
+  private async calculateUserInterestScore(user_id: string, alertData: unknown): Promise<number> { try {
       // This would integrate with user profile service to get user interests
       // For now, return a default score
       const user_interests = await this.getUserInterests(user_id);
@@ -129,7 +129,7 @@ export class SmartFilteringService { /**
   /**
    * Calculates engagement history score based on past user behavior
    */
-  private async calculateEngagementHistoryScore(user_id: string, alertData: any): Promise<number> { try {
+  private async calculateEngagementHistoryScore(user_id: string, alertData: unknown): Promise<number> { try {
       // This would integrate with engagement tracking service
       // For now, return a default score
       const engagementHistory = await this.getUserEngagementHistory(user_id);
@@ -161,7 +161,7 @@ export class SmartFilteringService { /**
   /**
    * Calculates trending score based on current engagement levels
    */
-  private async calculateTrendingScore(alertData: any): Promise<number> {
+  private async calculateTrendingScore(alertData: unknown): Promise<number> {
     // Normalize engagement count to 0-1 scale
     if (alertData.engagementCount && typeof alertData.engagementCount === 'number') {
       // Assuming max engagement of 1000 for normalization
@@ -223,7 +223,7 @@ export class SmartFilteringService { /**
     return { totalBillsTracked: 0, topCategories: [] };
   }
 
-  private async getRecentAlerts(user_id: string, hours: number): Promise<any[]> {
+  private async getRecentAlerts(user_id: string, hours: number): Promise<unknown[]> {
     // TODO: Integrate with delivery log repository
     return [];
   }

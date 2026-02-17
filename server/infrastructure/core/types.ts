@@ -83,7 +83,7 @@ export interface Stakeholder { id: number;
   biography?: string | null;
   phone?: string | null;
   office?: string | null;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   votingHistory?: Array<{ bill_id: number; vote: 'yes' | 'no' | 'abstain'; date: string  }>;
   created_at: Date;
   updated_at: Date;
@@ -94,7 +94,7 @@ export interface InsertStakeholder {
   email?: string | null;
   organization?: string | null;
   sector?: string | null;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   influence?: string;
   biography?: string | null;
   phone?: string | null;
@@ -131,7 +131,7 @@ export interface SocialShare { id: number;
   bill_id: number;
   user_id: number;
   platform: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   shareDate?: Date;
   likes?: number;
   shares?: number;
@@ -142,7 +142,7 @@ export interface SocialShare { id: number;
 export interface InsertSocialShare { bill_id: number;
   user_id: number;
   platform: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   }
 
 // Database tables (mock for import compatibility)

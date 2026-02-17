@@ -91,7 +91,7 @@ const RecentActivity: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <h4 className="font-semibold text-gray-900">{activity.title}</h4>
-                      <Badge variant={activity.statusColor as any} className="text-xs">
+                      <Badge variant={activity.statusColor as unknown} className="text-xs">
                         {activity.status}
                       </Badge>
                     </div>

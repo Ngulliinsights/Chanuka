@@ -40,7 +40,7 @@ export async function getParliamentarySession(driver: Driver, sessionId: string)
   }
 }
 
-export async function getActiveMPs(driver: Driver, options: PaginationOptions = {}): Promise<any[]> {
+export async function getActiveMPs(driver: Driver, options: PaginationOptions = {}): Promise<unknown[]> {
   const baseQuery = `
     MATCH (p:Person {type: 'mp', is_active: true})
     RETURN p.id as id, p.name as name, p.constituency as constituency,

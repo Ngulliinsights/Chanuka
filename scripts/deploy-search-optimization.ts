@@ -15,10 +15,10 @@ dotenv.config();
 const { Pool } = pg;
 // Simple logger for deployment script
 const logger = {
-  info: (message: string, meta?: any) => console.log(`[INFO] ${message}`, meta || ''),
-  warn: (message: string, meta?: any) => console.warn(`[WARN] ${message}`, meta || ''),
-  error: (message: string, meta?: any) => console.error(`[ERROR] ${message}`, meta || ''),
-  debug: (message: string, meta?: any) => console.log(`[DEBUG] ${message}`, meta || '')
+  info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta || ''),
+  warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta || ''),
+  error: (message: string, meta?: unknown) => console.error(`[ERROR] ${message}`, meta || ''),
+  debug: (message: string, meta?: unknown) => console.log(`[DEBUG] ${message}`, meta || '')
 };
 
 interface DeploymentResult {

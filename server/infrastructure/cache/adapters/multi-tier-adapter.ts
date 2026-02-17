@@ -433,7 +433,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Warm up cache with critical data
    */
-  async warmUp(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void> {
+  async warmUp(entries: Array<{ key: string; value: unknown; options?: CacheOptions }>): Promise<void> {
     // Warm up L2 tier
     if (this.l2Cache.warmUp) {
       await this.l2Cache.warmUp(entries);

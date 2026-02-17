@@ -8,7 +8,6 @@
  * into a unified, framework-agnostic interface.
  */
 
-// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 
@@ -27,31 +26,31 @@ export interface SchemaValidationOptions {
 // ==================== Basic Type Guards ====================
 
 export class TypeGuards {
-  static isNullOrUndefined(value: any): value is null | undefined {
+  static isNullOrUndefined(value: unknown): value is null | undefined {
     return value === null || value === undefined;
   }
 
-  static isString(value: any): value is string {
+  static isString(value: unknown): value is string {
     return typeof value === 'string';
   }
 
-  static isNonEmptyString(value: any): value is string {
+  static isNonEmptyString(value: unknown): value is string {
     return this.isString(value) && value.trim().length > 0;
   }
 
-  static isNumber(value: any): value is number {
+  static isNumber(value: unknown): value is number {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
 
-  static isBoolean(value: any): value is boolean {
+  static isBoolean(value: unknown): value is boolean {
     return typeof value === 'boolean';
   }
 
-  static isArray(value: any): value is any[] {
+  static isArray(value: unknown): value is unknown[] {
     return Array.isArray(value);
   }
 
-  static isObject(value: any): value is object {
+  static isObject(value: unknown): value is object {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
@@ -60,7 +59,7 @@ export class TypeGuards {
   /**
    * Checks if value is a plain object (not a class instance).
    */
-  static isPlainObject(value: any): value is Record<string, any> {
+  static isPlainObject(value: unknown): value is Record<string, unknown> {
     if (!this.isObject(value)) return false;
     const prototype = Object.getPrototypeOf(value);
     return prototype === null || prototype === Object.prototype;
@@ -69,21 +68,21 @@ export class TypeGuards {
   /**
    * Checks if value is a function.
    */
-  static isFunction(value: any): value is Function {
+  static isFunction(value: unknown): value is Function {
     return typeof value === 'function';
   }
 
   /**
    * Checks if value is a class constructor.
    */
-  static isClass(value: any): boolean {
+  static isClass(value: unknown): boolean {
     return this.isFunction(value) && /^\s*class\s+/.test(value.toString());
   }
 
   /**
    * Checks if value is a Promise.
    */
-  static isPromise(value: any): value is Promise<any> {
+  static isPromise(value: unknown): value is Promise<any> {
     return value instanceof Promise ||
            (this.isObject(value) && typeof (value as any).then === 'function');
   }
@@ -91,14 +90,14 @@ export class TypeGuards {
   /**
    * Checks if value is a Date object.
    */
-  static isDate(value: any): value is Date {
+  static isDate(value: unknown): value is Date {
     return value instanceof Date && !isNaN(value.getTime());
   }
 
   /**
    * Checks if value is a valid JSON string.
    */
-  static isJsonString(value: any): boolean {
+  static isJsonString(value: unknown): boolean {
     if (!this.isString(value)) return false;
     try {
       JSON.parse(value);
@@ -111,7 +110,7 @@ export class TypeGuards {
   /**
    * Checks if value is a valid email string.
    */
-  static isEmail(value: any): boolean {
+  static isEmail(value: unknown): boolean {
     if (!this.isString(value)) return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(value);
@@ -120,7 +119,7 @@ export class TypeGuards {
   /**
    * Checks if value is a valid URL string.
    */
-  static isUrl(value: any): boolean {
+  static isUrl(value: unknown): boolean {
     if (!this.isString(value)) return false;
     try {
       new URL(value);
@@ -133,7 +132,7 @@ export class TypeGuards {
   /**
    * Checks if value is a valid UUID string.
    */
-  static isUuid(value: any): boolean {
+  static isUuid(value: unknown): boolean {
     if (!this.isString(value)) return false;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(value);
@@ -144,9 +143,9 @@ export class TypeGuards {
   /**
    * Validates an object against a schema.
    */
-  static validateSchema<T extends Record<string, any>>(
+  static validateSchema<T extends Record<string, unknown>>(
     obj: any,
-    schema: Record<string, (value: any) => boolean>,
+    schema: Record<string, (value: unknown) => boolean>,
     options: SchemaValidationOptions = {}
   ): TypeValidationResult<T> {
     const errors: string[] = [];
@@ -209,7 +208,7 @@ export class TypeGuards {
    */
   static isArrayOf<T>(
     value: any,
-    typeGuard: (item: any) => item is T
+    typeGuard: (item: unknown) => item is T
   ): value is T[] {
     if (!Array.isArray(value)) return false;
     return value.every(typeGuard);
@@ -218,21 +217,21 @@ export class TypeGuards {
   /**
    * Checks if value is an array of strings.
    */
-  static isStringArray(value: any): value is string[] {
+  static isStringArray(value: unknown): value is string[] {
     return this.isArrayOf(value, this.isString);
   }
 
   /**
    * Checks if value is an array of numbers.
    */
-  static isNumberArray(value: any): value is number[] {
+  static isNumberArray(value: unknown): value is number[] {
     return this.isArrayOf(value, this.isNumber);
   }
 
   /**
    * Checks if value is an array of booleans.
    */
-  static isBooleanArray(value: any): value is boolean[] {
+  static isBooleanArray(value: unknown): value is boolean[] {
     return this.isArrayOf(value, this.isBoolean);
   }
 
@@ -241,7 +240,7 @@ export class TypeGuards {
   /**
    * Safely gets the type name of a value.
    */
-  static getTypeName(value: any): string {
+  static getTypeName(value: unknown): string {
     if (value === null) return 'null';
     if (value === undefined) return 'undefined';
 
@@ -256,7 +255,7 @@ export class TypeGuards {
   /**
    * Checks if a value is of a specific type by name.
    */
-  static isType(value: any, typeName: string): boolean {
+  static isType(value: unknown, typeName: string): boolean {
     return this.getTypeName(value) === typeName;
   }
 
@@ -265,7 +264,7 @@ export class TypeGuards {
    */
   static assertType<T>(
     value: any,
-    typeGuard: (value: any) => value is T,
+    typeGuard: (value: unknown) => value is T,
     errorMessage?: string
   ): asserts value is T {
     if (!typeGuard(value)) {

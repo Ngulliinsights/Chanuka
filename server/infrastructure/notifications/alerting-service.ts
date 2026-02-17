@@ -35,7 +35,7 @@ export interface Alert {
   ruleName: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   triggeredAt: Date;
   resolvedAt?: Date;
   resolvedBy?: string;
@@ -377,7 +377,7 @@ class AlertingService {
   /**
    * Get metric value from APM metrics
    */
-  private getMetricValue(metrics: any, errorStats: any, metricName: string): number {
+  private getMetricValue(metrics: unknown, errorStats: unknown, metricName: string): number {
     switch (metricName) {
       case 'p95ResponseTime':
         return metrics.requestMetrics.p95ResponseTime;
@@ -415,7 +415,7 @@ class AlertingService {
   /**
    * Trigger an alert
    */
-  private triggerAlert(rule: AlertRule, metrics: any, errorStats: any): void {
+  private triggerAlert(rule: AlertRule, metrics: unknown, errorStats: unknown): void {
     const alertId = `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const alert: Alert = {
@@ -449,7 +449,7 @@ class AlertingService {
   /**
    * Generate alert message
    */
-  private generateAlertMessage(rule: AlertRule, metrics: any, errorStats: any): string {
+  private generateAlertMessage(rule: AlertRule, metrics: unknown, errorStats: unknown): string {
     const condition = rule.conditions[0]; // Use first condition for message
     const value = this.getMetricValue(metrics, errorStats, condition.metric);
     
@@ -459,8 +459,8 @@ class AlertingService {
   /**
    * Extract relevant metrics for alert details
    */
-  private extractRelevantMetrics(rule: AlertRule, metrics: any, errorStats: any): Record<string, any> {
-    const relevantMetrics: Record<string, any> = {};
+  private extractRelevantMetrics(rule: AlertRule, metrics: unknown, errorStats: unknown): Record<string, unknown> {
+    const relevantMetrics: Record<string, unknown> = {};
     
     rule.conditions.forEach(condition => {
       relevantMetrics[condition.metric] = this.getMetricValue(metrics, errorStats, condition.metric);

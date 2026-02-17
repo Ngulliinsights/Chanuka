@@ -5,6 +5,7 @@
  * and memory leak detection. Handles cleanup scheduling and memory pressure handling.
  */
 
+import { logger } from '../../observability/logger';
 import { BASE_CONFIG } from '../config/base-config';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
@@ -439,22 +440,20 @@ export class MemoryManager implements IMemoryManager {
   }
 
   /**
-   * Log debug messages (in production, use proper logging)
+   * Log debug messages
    */
   private logDebug(message: string): void {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`[MemoryManager] ${message}`);
+      logger.debug(`[MemoryManager] ${message}`);
     }
   }
 
   /**
-   * Log error messages (in production, use proper logging)
+   * Log error messages
    */
   private logError(message: string, error?: unknown): void {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.error(`[MemoryManager] ${message}`, error);
+      logger.error(`[MemoryManager] ${message}`, { error });
     }
   }
 }

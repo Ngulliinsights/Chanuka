@@ -104,7 +104,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to fetch notifications', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch notifications', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch notifications', {
       statusCode: 500,
@@ -152,7 +152,7 @@ router.post('/', requireAuth, asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to create notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to create notification', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to create notification', {
       statusCode: 500,
@@ -198,7 +198,7 @@ router.put('/:id/read', requireAuth, asyncHandler(async (req, res: Response) => 
       throw error;
     }
 
-    logger.error('Failed to mark notification as read', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to mark notification as read', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to mark notification as read', {
       statusCode: 500,
@@ -234,7 +234,7 @@ router.put('/read-multiple', requireAuth, asyncHandler(async (req, res: Response
       throw error;
     }
 
-    logger.error('Failed to mark multiple notifications as read', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to mark multiple notifications as read', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to mark notifications as read', {
       statusCode: 500,
@@ -280,7 +280,7 @@ router.put('/:id/dismiss', requireAuth, asyncHandler(async (req, res: Response) 
       throw error;
     }
 
-    logger.error('Failed to dismiss notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to dismiss notification', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to dismiss notification', {
       statusCode: 500,
@@ -326,7 +326,7 @@ router.delete('/:id', requireAuth, asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to delete notification', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to delete notification', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to delete notification', {
       statusCode: 500,
@@ -359,7 +359,7 @@ router.get('/stats', requireAuth, asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to fetch notification statistics', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch notification statistics', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch notification statistics', {
       statusCode: 500,
@@ -392,7 +392,7 @@ router.get('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
       throw error;
     }
 
-    logger.error('Failed to fetch alert preferences', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch alert preferences', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch alert preferences', {
       statusCode: 500,
@@ -432,7 +432,7 @@ router.put('/preferences', requireAuth, asyncHandler(async (req, res: Response) 
       throw error;
     }
 
-    logger.error('Failed to update alert preferences', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to update alert preferences', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to update alert preferences', {
       statusCode: 500,
@@ -461,7 +461,7 @@ router.get('/contact-methods', requireAuth, asyncHandler(async (req, res: Respon
       throw error;
     }
 
-    logger.error('Failed to fetch contact methods', { component: 'notification-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch contact methods', { component: 'notification-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch contact methods', {
       statusCode: 500,

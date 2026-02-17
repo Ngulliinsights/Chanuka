@@ -41,7 +41,7 @@ const argumentProcessor = new ArgumentProcessor(
   powerBalancer,
   argumentIntelligenceService,
   // Fix for missing 8th argument (briefRepo) required by ArgumentProcessor
-  {} as any
+  {} as unknown
 );
 
 // ============================================================================

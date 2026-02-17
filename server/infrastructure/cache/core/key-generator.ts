@@ -71,7 +71,7 @@ export class CacheKeyGenerator {
   /**
    * Generate cache key for method calls
    */
-  method(className: string, methodName: string, ...args: any[]): string {
+  method(className: string, methodName: string, ...args: unknown[]): string {
     const argsHash = this.hashArguments(args);
     return `method:${className}:${methodName}:${argsHash}`;
   }
@@ -79,7 +79,7 @@ export class CacheKeyGenerator {
   /**
    * Generate cache key for database queries
    */
-  query(table: string, conditions: Record<string, any>): string {
+  query(table: string, conditions: Record<string, unknown>): string {
     const conditionsStr = JSON.stringify(conditions, Object.keys(conditions).sort());
     return `query:${table}:${this.hashString(conditionsStr)}`;
   }
@@ -126,7 +126,7 @@ export class CacheKeyGenerator {
   /**
    * Hash arguments for cache key generation
    */
-  private hashArguments(args: any[]): string {
+  private hashArguments(args: unknown[]): string {
     const serialized = args.map(arg => {
       if (typeof arg === 'object' && arg !== null) {
         return JSON.stringify(arg, Object.keys(arg).sort());

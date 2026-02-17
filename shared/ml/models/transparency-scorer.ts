@@ -166,7 +166,7 @@ export class TransparencyScorer {
     const dimensions = this.calculateDimensionScores(validatedInput);
     
     // Calculate overall score using weighted average
-    const dimensionScores = Object.values(dimensions).map((d: any) => d.score);
+    const dimensionScores = Object.values(dimensions).map((d: unknown) => d.score);
     const weights = Object.values(this.DIMENSION_WEIGHTS);
     const overallScore = Math.round(Statistics.weightedAverage(dimensionScores, weights));
     
@@ -217,7 +217,7 @@ export class TransparencyScorer {
     }
   }
 
-  private scoreBillTransparency(billData: any) {
+  private scoreBillTransparency(billData: unknown) {
     // Accessibility scoring
     const accessibilityFactors = [];
     const accessibilityScores = [];
@@ -252,7 +252,7 @@ export class TransparencyScorer {
       completenessScores.push(30);
       completenessFactors.push('Amendment history documented');
       
-      const publicAmendments = billData.amendmentHistory.filter((a: any) => a.isPublic).length;
+      const publicAmendments = billData.amendmentHistory.filter((a: unknown) => a.isPublic).length;
       const amendmentTransparency = billData.amendmentHistory.length > 0 
         ? publicAmendments / billData.amendmentHistory.length 
         : 0;
@@ -336,7 +336,7 @@ export class TransparencyScorer {
       accountabilityFactors.push('Public impact assessment');
     }
     
-    if (billData.amendmentHistory.some((a: any) => a.isPublic)) {
+    if (billData.amendmentHistory.some((a: unknown) => a.isPublic)) {
       accountabilityScores.push(20);
       accountabilityFactors.push('Amendment transparency');
     }
@@ -352,7 +352,7 @@ export class TransparencyScorer {
     };
   }
 
-  private scoreSponsorTransparency(sponsorData: any) {
+  private scoreSponsorTransparency(sponsorData: unknown) {
     // Accessibility scoring
     const accessibilityFactors = [];
     const accessibilityScores = [];
@@ -450,7 +450,7 @@ export class TransparencyScorer {
     };
   }
 
-  private scoreProcessTransparency(processData: any) {
+  private scoreProcessTransparency(processData: unknown) {
     // Accessibility scoring
     const accessibilityFactors = [];
     const accessibilityScores = [];
@@ -572,7 +572,7 @@ export class TransparencyScorer {
     return 'F';
   }
 
-  private identifyStrengthsWeaknesses(dimensions: any) {
+  private identifyStrengthsWeaknesses(dimensions: unknown) {
     const strengths = [];
     const weaknesses = [];
     
@@ -588,7 +588,7 @@ export class TransparencyScorer {
     return { strengths, weaknesses };
   }
 
-  private generateRecommendations(input: TransparencyInput, dimensions: any) {
+  private generateRecommendations(input: TransparencyInput, dimensions: unknown) {
     const recommendations = [];
     
     for (const [dimension, data] of Object.entries(dimensions)) {
@@ -664,7 +664,7 @@ export class TransparencyScorer {
     };
   }
 
-  private calculateConfidence(input: TransparencyInput, dimensions: any): number {
+  private calculateConfidence(input: TransparencyInput, dimensions: unknown): number {
     let confidence = 0.7;
     
     // Check data completeness
@@ -675,7 +675,7 @@ export class TransparencyScorer {
     if (hasData) confidence += 0.1;
     
     // Check consistency of dimension scores
-    const scores = Object.values(dimensions).map((d: any) => d.score);
+    const scores = Object.values(dimensions).map((d: unknown) => d.score);
     const variance = Statistics.variance(scores);
     const consistencyBonus = Math.max(0, (1 - variance / 1000) * 0.2);
     confidence += consistencyBonus;

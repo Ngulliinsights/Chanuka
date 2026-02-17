@@ -24,12 +24,12 @@ try {
 
 // Client-safe logging helper
 const safeLog = {
-  warn: (message: string, data?: any) => {
+  warn: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.warn) {
       console.warn(message, data);
     }
   },
-  error: (message: string, data?: any) => {
+  error: (message: string, data?: unknown) => {
     if (typeof console !== 'undefined' && console.error) {
       console.error(message, data);
     }
@@ -483,7 +483,7 @@ export function shouldRateLimit(
  */
 export function logSecurityEvent(
   event: string,
-  details: Record<string, any>,
+  details: Record<string, unknown>,
   severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
 ): void {
   safeLog.warn(`Security event: ${event}`, {

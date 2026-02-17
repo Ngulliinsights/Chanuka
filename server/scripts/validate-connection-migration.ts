@@ -399,13 +399,13 @@ async function validateZeroDowntimeMigration(): Promise<boolean> {
 /**
  * Simple assertion helper for validation tests
  */
-function expect(actual: any): {
-  toBe: (expected: any) => void;
+function expect(actual: unknown): {
+  toBe: (expected: unknown) => void;
   toBeNull: () => void;
   toBeGreaterThan: (expected: number) => void;
 } {
   return {
-    toBe: (expected: any) => {
+    toBe: (expected: unknown) => {
       if (actual !== expected) {
         throw new Error(`Expected ${expected}, got ${actual}`);
       }

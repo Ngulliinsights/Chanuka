@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-02-16T23:19:14.341Z",
+  "summary": {
+    "total": 6,
+    "passed": 1,
+    "failed": 5
+  },
+  "results": [
+    {
+      "metric": "Type Safety Violations (as any)",
+      "target": "0 in production",
+      "production": 421,
+      "tests": 206,
+      "total": 627,
+      "passed": false,
+      "notes": "Test files may use \"as any\" for mocking"
+    },
+    {
+      "metric": "Commented Imports",
+      "target": "0",
+      "production": 43,
+      "tests": 2,
+      "total": 45,
+      "passed": false,
+      "notes": "Documentation comments like \"// Import all schemas\" are OK"
+    },
+    {
+      "metric": "TODO/FIXME Comments (bugs)",
+      "target": "0",
+      "production": 16,
+      "tests": 0,
+      "total": 16,
+      "passed": false,
+      "notes": "Documentation TODOs are acceptable"
+    },
+    {
+      "metric": "ESLint Suppressions",
+      "target": "<10 in production",
+      "production": 107,
+      "tests": 0,
+      "total": 107,
+      "passed": false,
+      "notes": "Test files may have more suppressions"
+    },
+    {
+      "metric": "TypeScript Suppressions",
+      "target": "0 in production",
+      "production": 12,
+      "tests": 0,
+      "total": 12,
+      "passed": false,
+      "notes": "Test files may use suppressions for mocking"
+    },
+    {
+      "metric": "TypeScript Compilation",
+      "target": "0 errors",
+      "production": 0,
+      "tests": 0,
+      "total": 0,
+      "passed": true
+    }
+  ],
+  "files": {
+    "total": 2565,
+    "production": 2385,
+    "tests": 180
+  }
+}

@@ -183,7 +183,7 @@ export class RecommendationValidator { private static readonly MAX_USER_ID_LENGT
   /**
    * Sanitize bill ID
    */
-  static sanitizeBillId(bill_id: any): number | null { if (typeof bill_id !== 'number' && typeof bill_id !== 'string') return null;
+  static sanitizeBillId(bill_id: unknown): number | null { if (typeof bill_id !== 'number' && typeof bill_id !== 'string') return null;
 
     const num = typeof bill_id === 'string' ? parseInt(bill_id, 10) : bill_id;
 
@@ -197,7 +197,7 @@ export class RecommendationValidator { private static readonly MAX_USER_ID_LENGT
   /**
    * Sanitize limit parameter
    */
-  static sanitizeLimit(limit: any, defaultValue: number = 10): number {
+  static sanitizeLimit(limit: unknown, defaultValue: number = 10): number {
     if (typeof limit !== 'number' && typeof limit !== 'string') {
       return Math.min(defaultValue, this.MAX_LIMIT);
     }
@@ -214,7 +214,7 @@ export class RecommendationValidator { private static readonly MAX_USER_ID_LENGT
   /**
    * Sanitize days parameter
    */
-  static sanitizeDays(days: any, defaultValue: number = 7): number {
+  static sanitizeDays(days: unknown, defaultValue: number = 7): number {
     if (typeof days !== 'number' && typeof days !== 'string') {
       return Math.min(defaultValue, this.MAX_DAYS);
     }

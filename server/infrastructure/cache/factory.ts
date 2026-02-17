@@ -231,7 +231,7 @@ export function createCacheService(config: CacheConfig): CacheService {
   // Wrap with SingleFlightCache for circuit breaker and request deduplication
   // For now, return the base adapter directly to avoid interface conflicts
   // TODO: Fix SingleFlightCache interface compatibility
-  return baseAdapter as any;
+  return baseAdapter as unknown;
 }
 
 /**

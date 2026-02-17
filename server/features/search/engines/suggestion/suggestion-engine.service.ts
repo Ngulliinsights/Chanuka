@@ -311,13 +311,13 @@ export class SuggestionEngineService {
     // the internal searchContext's popularTerms array into a Map to match
     // the RankingContext shape used by the ranking algorithms.
     const popularTermsMap = new Map<string, number>(
-      (context.searchContext.popularTerms || []).map((pt: any) => [pt.term, pt.frequency])
+      (context.searchContext.popularTerms || []).map((pt: unknown) => [pt.term, pt.frequency])
     );
 
     const rankingContext: RankingContext = {
       query: context.query,
       searchContext: context.searchContext,
-      userHistory: (context.searchContext.userHistory || []).map((h: any) => h.query),
+      userHistory: (context.searchContext.userHistory || []).map((h: unknown) => h.query),
       popularTerms: popularTermsMap
     };
 
@@ -1372,7 +1372,7 @@ export class SuggestionEngineService {
    * @param data - The data object from exportSearchData()
    * @param merge - If true, merge with existing data; if false, replace
    */
-  importSearchData(data: any, merge: boolean = false): void {
+  importSearchData(data: unknown, merge: boolean = false): void {
     try {
       if (!merge) {
         this.searchHistory.clear();
@@ -1381,7 +1381,7 @@ export class SuggestionEngineService {
 
       // Import search history
       if (data.searchHistory && Array.isArray(data.searchHistory)) {
-        data.searchHistory.forEach((item: any) => {
+        data.searchHistory.forEach((item: unknown) => {
           const entry: HistoryEntry = {
             query: item.query,
             timestamp: typeof item.timestamp === 'number' ? item.timestamp : new Date(item.timestamp).getTime(),
@@ -1394,7 +1394,7 @@ export class SuggestionEngineService {
 
       // Import popular terms
       if (data.popularTerms && Array.isArray(data.popularTerms)) {
-        data.popularTerms.forEach((item: any) => {
+        data.popularTerms.forEach((item: unknown) => {
           this.popularTerms.set(item.term, {
             count: item.count,
             lastUpdated: typeof item.lastUpdated === 'number' ? item.lastUpdated : new Date(item.lastUpdated).getTime()

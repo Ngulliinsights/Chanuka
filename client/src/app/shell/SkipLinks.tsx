@@ -187,7 +187,7 @@ export function SkipLinks({
         <SkipLink
           key={`${link.href}-${index}`}
           href={link.href}
-          onClick={link.onClick}
+          {...(link.onClick && { onClick: link.onClick })}
           className={cn(
             // Position skip links in a row
             index > 0 && 'ml-2',
@@ -250,7 +250,7 @@ export function withSkipLinks<P extends object>(
   return function SkipLinksWrapper(props: P) {
     return (
       <>
-        <SkipLinks links={customLinks} />
+        <SkipLinks {...(customLinks && { links: customLinks })} />
         <Component {...props} />
       </>
     );

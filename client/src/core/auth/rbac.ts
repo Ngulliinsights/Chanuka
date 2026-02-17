@@ -1,15 +1,3 @@
-/**
- * Role-Based Access Control (RBAC) System - Optimized
- *
- * Enterprise-grade permission management with caching, inheritance,
- * and advanced condition evaluation
- */
-
-// ============================================================================
-// Types and Interfaces
-// ============================================================================
-
-export type UserRole = 'admin' | 'expert' | 'citizen' | 'guest';
 export type PermissionAction =
   | 'read'
   | 'write'
@@ -50,12 +38,6 @@ export interface PermissionContext {
   action: string;
   metadata?: Record<string, unknown>;
   timestamp?: number;
-}
-
-export interface PermissionCheckResult {
-  granted: boolean;
-  reason?: string;
-  matchedPermission?: Permission;
 }
 
 export interface AuditLog {

@@ -23,7 +23,7 @@ const ROOT_ELEMENT_ID = 'root' as const;
  */
 function setupProcessEnvironment(): void {
   try {
-    const globalWindow = globalThis as any;
+    const globalWindow = globalThis as unknown;
 
     if (typeof globalWindow.process === 'undefined') {
       globalWindow.process = {

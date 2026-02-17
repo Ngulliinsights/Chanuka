@@ -5,7 +5,6 @@ import { eq } from 'drizzle-orm';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure
 // Note: ConflictSummary is defined locally in bill-comprehensive-analysis.service.ts, not exported from sponsor-conflict-analysis.service.ts
-// import type { ConflictSummary } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
 
 // Define ConflictSummary locally since it's not exported from sponsor-conflict-analysis.service.ts
 export interface ConflictSummary {
@@ -14,7 +13,7 @@ export interface ConflictSummary {
   totalFinancialExposureEstimate: number;
   directConflictCount: number;
   indirectConflictCount: number;
-  relatedConflictDetails?: any[]; // Optional: Include raw details
+  relatedConflictDetails?: unknown[]; // Optional: Include raw details
 }
 
 // --- Interface Definitions ---
@@ -134,7 +133,7 @@ export class TransparencyAnalysisService {
      }
 
     /** Calculates score based on public accessibility of bill information */
-    private calculatePublicAccessibilityScore(bill: any): number {
+    private calculatePublicAccessibilityScore(bill: unknown): number {
         // *** Needs refinement based on actual available data ***
         // Example: Check if full text URL, summary, sponsor info, vote records are available
         logger.debug("Calculating public accessibility score.");

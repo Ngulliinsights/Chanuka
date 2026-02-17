@@ -144,7 +144,7 @@ export interface ${pascalName}Props {
   loading?: boolean;
   error?: ${pascalName}Error;
   onError?: (error: ${pascalName}Error) => void;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
 }
 
 export interface ${pascalName}State {
@@ -170,7 +170,7 @@ export interface ${pascalName}Error {
   type: ${pascalName}ErrorType;
   message: string;
   field?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export enum ${pascalName}ErrorType {
@@ -330,14 +330,14 @@ export enum ${pascalName}ErrorType {
 export class ${pascalName}Error extends Error {
   public readonly type: ${pascalName}ErrorType;
   public readonly statusCode: number;
-  public readonly details?: Record<string, any>;
+  public readonly details?: Record<string, unknown>;
   public readonly isOperational: boolean;
 
   constructor(
     message: string,
     type: ${pascalName}ErrorType = ${pascalName}ErrorType.${pascalName.toUpperCase()}_ERROR,
     statusCode: number = 400,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message);
     this.name = '${pascalName}Error';
@@ -354,7 +354,7 @@ export class ${pascalName}Error extends Error {
 }
 
 export class ${pascalName}ValidationError extends ${pascalName}Error {
-  constructor(message: string, field: string, value: any, details?: Record<string, any>) {
+  constructor(message: string, field: string, value: unknown, details?: Record<string, unknown>) {
     super(
       message,
       ${pascalName}ErrorType.${pascalName.toUpperCase()}_VALIDATION_ERROR,
@@ -365,7 +365,7 @@ export class ${pascalName}ValidationError extends ${pascalName}Error {
 }
 
 export class ${pascalName}ConfigurationError extends ${pascalName}Error {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(
       message,
       ${pascalName}ErrorType.${pascalName.toUpperCase()}_CONFIGURATION_ERROR,
@@ -376,7 +376,7 @@ export class ${pascalName}ConfigurationError extends ${pascalName}Error {
 }
 
 export class ${pascalName}RuntimeError extends ${pascalName}Error {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(
       message,
       ${pascalName}ErrorType.${pascalName.toUpperCase()}_RUNTIME_ERROR,
@@ -617,7 +617,7 @@ export function use${pascalName}(options: Use${pascalName}Options = {}): Use${pa
       }
     } catch (err) {
       const ${camelName}Error: ${pascalName}Error = {
-        type: 'RUNTIME_ERROR' as any,
+        type: 'RUNTIME_ERROR' as unknown,
         message: err instanceof Error ? err.message : 'Unknown error',
         details: { originalError: err },
       };

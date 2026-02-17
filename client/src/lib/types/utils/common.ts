@@ -30,26 +30,6 @@ export interface UseHookResult<T, E = Error> {
 }
 
 /**
- * Generic API response type
- * Standardized pattern for API responses
- */
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-  errors?: string[];
-  metadata?: Record<string, unknown>;
-
-  // Pagination support
-  pagination?: {
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-  };
-}
-
-/**
  * Generic error response type
  * Standardized error handling
  */
@@ -296,8 +276,8 @@ export interface MetricsInterface {
 export interface FeatureFlagsInterface {
   isEnabled: (feature: string) => boolean;
   getValue: (feature: string) => any;
-  getAll: () => Record<string, any>;
-  onChange: (feature: string, callback: (value: any) => void) => () => void;
+  getAll: () => Record<string, unknown>;
+  onChange: (feature: string, callback: (value: unknown) => void) => () => void;
 }
 
 /**
@@ -305,7 +285,7 @@ export interface FeatureFlagsInterface {
  * Standardized i18n pattern
  */
 export interface I18nInterface {
-  t: (key: string, options?: Record<string, any>) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
   formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
   formatDate: (value: Date, options?: Intl.DateTimeFormatOptions) => string;
   formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) => string;
@@ -318,11 +298,11 @@ export interface I18nInterface {
  * Standardized analytics pattern
  */
 export interface AnalyticsInterface {
-  track: (event: string, properties?: Record<string, any>) => void;
-  identify: (userId: string, traits?: Record<string, any>) => void;
-  page: (name?: string, properties?: Record<string, any>) => void;
-  screen: (name: string, properties?: Record<string, any>) => void;
-  group: (groupId: string, traits?: Record<string, any>) => void;
+  track: (event: string, properties?: Record<string, unknown>) => void;
+  identify: (userId: string, traits?: Record<string, unknown>) => void;
+  page: (name?: string, properties?: Record<string, unknown>) => void;
+  screen: (name: string, properties?: Record<string, unknown>) => void;
+  group: (groupId: string, traits?: Record<string, unknown>) => void;
 }
 
 /**

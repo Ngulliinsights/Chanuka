@@ -274,7 +274,7 @@ export const commonZodSchemas = {
 };
 
 // Object structure validation helper
-function validateObjectStructure(obj: any, depth: number = 0): boolean {
+function validateObjectStructure(obj: unknown, depth: number = 0): boolean {
   if (depth > 10) {
     return false;
   }

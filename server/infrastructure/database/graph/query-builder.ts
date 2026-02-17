@@ -54,8 +54,8 @@ export function withPagination(
 export function buildMergeNode(
   label: string,
   idField: string,
-  properties: Record<string, any>
-): { query: string; params: Record<string, any> } {
+  properties: Record<string, unknown>
+): { query: string; params: Record<string, unknown> } {
   const query = `
     MERGE (n:${label} {${idField}: $id})
     SET n += $properties,
@@ -122,7 +122,7 @@ export function buildMergeRelationship(
   fromLabel: string,
   toLabel: string,
   relationshipType: string,
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ): string {
   const propsSet = properties
     ? `SET r += $properties, r.last_synced_at = timestamp()`
@@ -174,9 +174,9 @@ export function buildBatchMergeRelationships(
  */
 export function buildSearchQuery(
   label: string,
-  filters: Record<string, any>,
+  filters: Record<string, unknown>,
   options: PaginationOptions & { orderBy?: string; orderDirection?: 'ASC' | 'DESC' } = {}
-): { query: string; params: Record<string, any> } {
+): { query: string; params: Record<string, unknown> } {
   const whereClause = Object.keys(filters)
     .map(key => `n.${key} = $${key}`)
     .join(' AND ');
@@ -219,8 +219,8 @@ export function buildSearchQuery(
  */
 export function buildCountQuery(
   label: string,
-  filters?: Record<string, any>
-): { query: string; params: Record<string, any> } {
+  filters?: Record<string, unknown>
+): { query: string; params: Record<string, unknown> } {
   const whereClause = filters
     ? Object.keys(filters)
         .map(key => `n.${key} = $${key}`)
@@ -259,7 +259,7 @@ export function buildTraversalQuery(
   endLabel: string,
   direction: 'OUTGOING' | 'INCOMING' | 'BOTH' = 'OUTGOING',
   options: PaginationOptions = {}
-): { query: string; params: Record<string, any> } {
+): { query: string; params: Record<string, unknown> } {
   let relationshipPattern: string;
 
   switch (direction) {

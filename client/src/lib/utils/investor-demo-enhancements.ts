@@ -185,7 +185,7 @@ export function getEnhancedDemoMetrics() {
 /**
  * Demo-aware bill filtering
  */
-export function getDemoBills(filters: any = {}) {
+export function getDemoBills(filters: unknown = {}) {
   const demoManager = DemoStateManager.getInstance();
 
   if (demoManager.isDemoMode()) {

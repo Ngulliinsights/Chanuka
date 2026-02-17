@@ -23,14 +23,14 @@ export interface NetworkNode {
   id: string;
   type: 'person' | 'organization' | 'party';
   name: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
 export interface NetworkEdge {
   fromId: string;
   toId: string;
   relationshipType: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
 /**

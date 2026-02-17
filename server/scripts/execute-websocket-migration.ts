@@ -205,7 +205,7 @@ async function runValidationSuite(): Promise<Array<{ name: string; success: bool
 /**
  * Display migration summary
  */
-function displayMigrationSummary(deployer: WebSocketMigrationDeployer, migrationState: any, metrics: any): void {
+function displayMigrationSummary(deployer: WebSocketMigrationDeployer, migrationState: unknown, metrics: unknown): void {
   const duration = migrationState.completionTime ? 
     migrationState.completionTime - migrationState.startTime : 0;
 

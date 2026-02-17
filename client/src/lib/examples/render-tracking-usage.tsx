@@ -19,7 +19,7 @@ import {
 // Example 1: Manual render tracking in a component
 export function ManualRenderTrackingExample() {
   const [count, setCount] = useState(0);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<unknown[]>([]);
 
   const renderTracker = useRenderTracker({
     componentName: 'ManualRenderTrackingExample',

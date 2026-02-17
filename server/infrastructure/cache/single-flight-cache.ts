@@ -569,7 +569,7 @@ export class SingleFlightCache implements CacheService {
   /**
    * Store value in fallback cache for graceful degradation
    */
-  private storeFallbackValue(key: string, value: any, ttlSec: number): void {
+  private storeFallbackValue(key: string, value: unknown, ttlSec: number): void {
     if (!this.options.fallbackOptions.enableFallback) return;
 
     this.fallbackCache.set(key, {

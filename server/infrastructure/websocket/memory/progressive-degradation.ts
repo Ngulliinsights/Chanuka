@@ -5,6 +5,7 @@
  * Provides graceful degradation of service quality to maintain system stability under stress.
  */
 
+import { logger } from '../../observability/logger';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
   DegradationLevel,
@@ -18,6 +19,7 @@ import type {
 const DEGRADATION_THRESHOLDS = {
   light: 60,      // 60% memory usage
   moderate: 75,   // 75% memory usage  
+
   severe: 85,     // 85% memory usage
   critical: 95,   // 95% memory usage
 } as const;
@@ -195,10 +197,9 @@ export class ProgressiveDegradation implements IProgressiveDegradation {
     // Apply the degradation to runtime configuration
     this.runtimeConfig.applyDegradation(level);
 
-    // Log the degradation change (in production, use proper logging)
+    // Log the degradation change
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`WebSocket service degradation level changed: ${previousLevel} -> ${level}`);
+      logger.info(`WebSocket service degradation level changed: ${previousLevel} -> ${level}`);
     }
 
     // Notify listeners
@@ -208,15 +209,15 @@ export class ProgressiveDegradation implements IProgressiveDegradation {
   /**
    * Notify all change listeners
    */
+
   private notifyChangeListeners(level: DegradationLevel): void {
     this.changeListeners.forEach(listener => {
       try {
         listener(level);
       } catch (error) {
-        // Log error without using console directly in production
+        // Log error
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.error('Error in degradation level change listener:', error);
+          logger.error('Error in degradation level change listener', { error });
         }
       }
     });

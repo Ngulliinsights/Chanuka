@@ -70,7 +70,7 @@ interface StepResult {
 
 export interface PipelineResult {
   success: boolean;
-  results: Record<string, any>;
+  results: Record<string, unknown>;
   stepResults: StepResult[];
   totalProcessingTime: number;
   error?: string;
@@ -87,7 +87,7 @@ export interface PipelineResult {
 interface ExpressionContext {
   input: any;
   steps: Record<string, StepResult>;
-  env: Record<string, any>;
+  env: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -199,7 +199,7 @@ class SafeExpressionEvaluator {
     };
   }
 
-  private static deepCopy(obj: any): any {
+  private static deepCopy(obj: unknown): unknown {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -831,17 +831,17 @@ export class AnalysisPipeline {
     pipeline: PipelineConfig,
     stepOutputs: Record<string, StepResult>,
     pipelineInput: any
-  ): Record<string, any> {
+  ): Record<string, unknown> {
     if (!pipeline.outputMapping) {
       // Return all step results if no output mapping specified
-      const results: Record<string, any> = {};
+      const results: Record<string, unknown> = {};
       for (const [stepId, stepResult] of Object.entries(stepOutputs)) {
         results[stepId] = stepResult.result;
       }
       return results;
     }
 
-    const finalOutput: Record<string, any> = {};
+    const finalOutput: Record<string, unknown> = {};
     const context: ExpressionContext = {
       input: pipelineInput,
       steps: stepOutputs,

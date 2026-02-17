@@ -10,7 +10,6 @@ import type { DiscussionThread } from '@client/lib/types';
 import { logger } from '@client/lib/utils/logger';
 
 // Note: These imports would need to be updated based on actual mock data structure
-// import {
 //   dataLoaders,
 //   initializeEssentialData,
 //   preloadData,
@@ -18,7 +17,6 @@ import { logger } from '@client/lib/utils/logger';
 //   validateDataIntegrity,
 //   getCacheStats
 // } from '../data/mock/loaders';
-// import { mockRealTimeSimulator, RealTimeEvent } from '../data/mock/realtime';
 
 // Temporary interfaces until actual mock data is integrated
 interface RealTimeEvent {
@@ -193,12 +191,12 @@ class MockDataService {
   /**
    * Load multiple data types
    */
-  async loadBatchData(keys: string[]): Promise<Record<string, any>> {
+  async loadBatchData(keys: string[]): Promise<Record<string, unknown>> {
     if (!this.initialized) {
       throw new Error('Mock Data Service not initialized');
     }
 
-    const results: Record<string, any> = {};
+    const results: Record<string, unknown> = {};
     const promises = keys.map(async key => {
       try {
         results[key] = await this.loadData(key);

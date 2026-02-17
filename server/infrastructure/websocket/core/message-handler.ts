@@ -15,6 +15,8 @@ import type {
   QueueOperation,
   WebSocketMessage} from '../types';
 import { LRUCache } from '../utils';
+import { logger } from '@shared/core';
+
 import { OPERATION_PRIORITIES } from './operation-queue-manager';
 
 /**
@@ -75,8 +77,7 @@ export class MessageHandler implements IMessageHandler {
 
       // Check for duplicate messages
       if (this.isDuplicateMessage(message)) {
-        // eslint-disable-next-line no-console
-        console.warn('Duplicate message detected, ignoring:', message.messageId);
+        logger.warn('Duplicate message detected, ignoring:', message.messageId);
         return;
       }
 
@@ -84,8 +85,7 @@ export class MessageHandler implements IMessageHandler {
       await this.routeMessage(ws, message);
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error handling message:', error);
+      logger.error('Error handling message:', error);
       await this.sendErrorResponse(ws, message, error);
     }
   }
@@ -148,15 +148,13 @@ export class MessageHandler implements IMessageHandler {
       // Queue the broadcast operation
       const queued = this.operationQueueManager.enqueue(operation);
       if (!queued) {
-        // eslint-disable-next-line no-console
-        console.warn('Failed to queue broadcast operation for bill:', billId);
+        logger.warn('Failed to queue broadcast operation for bill:', billId);
         // Fallback to direct broadcast
         this.directBroadcast(subscribers, message);
       }
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error broadcasting to subscribers:', error);
+      logger.error('Error broadcasting to subscribers:', error);
     }
   }
 
@@ -510,8 +508,7 @@ export class MessageHandler implements IMessageHandler {
       const responseStr = JSON.stringify(response);
       ws.send(responseStr);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error sending response:', error);
+      logger.error('Error sending response:', error);
     }
   }
 
@@ -552,8 +549,7 @@ export class MessageHandler implements IMessageHandler {
         try {
           ws.send(messageStr);
         } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error('Error in direct broadcast:', error);
+          logger.error('Error in direct broadcast:', error);
         }
       }
     }

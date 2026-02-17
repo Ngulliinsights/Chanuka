@@ -18,7 +18,7 @@ interface ValidationResult {
   status: 'passed' | 'failed' | 'warning';
   details: string;
   timestamp: Date;
-  metrics?: Record<string, any>;
+  metrics?: Record<string, unknown>;
 }
 
 interface CrossPhaseValidation {
@@ -396,7 +396,7 @@ export class FinalMigrationValidator {
   /**
    * Add validation result
    */
-  private addValidationResult(phase: string, component: string, status: 'passed' | 'failed' | 'warning', details: string, metrics?: Record<string, any>): void {
+  private addValidationResult(phase: string, component: string, status: 'passed' | 'failed' | 'warning', details: string, metrics?: Record<string, unknown>): void {
     this.validationResults.push({
       phase,
       component,

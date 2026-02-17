@@ -11,13 +11,12 @@ import { unifiedErrorHandler } from '@shared/core/src/observability/error-manage
 import { Request, Response, NextFunction, Application } from 'express';
 
 // Import core utilities
-// import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
  // Unused import
 
 import { getDefaultCache } from '../cache';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 // Removed - module deleted by design during development
-import { logger } from '../infrastructure/observability';
+import { logger } from '@shared/core/observability';
 import { ValidationService } from '../validation';
 
 export interface UnifiedMiddlewareConfig {
@@ -235,7 +234,7 @@ export class UnifiedMiddleware {
       : `${req.method}:${req.url}`;
 
     // Try to get from cache
-    this.cache.get(cacheKey).then((cachedResponse: any) => {
+    this.cache.get(cacheKey).then((cachedResponse: unknown) => {
       if (cachedResponse) {
         this.updateMetrics('cacheHits', 1);
         res.json(cachedResponse);
@@ -246,7 +245,7 @@ export class UnifiedMiddleware {
 
       // Intercept response to cache it
       const originalSend = res.send;
-      res.send = function(body: any) {
+      res.send = function(body: unknown) {
         // Cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           this.cache.set(cacheKey, body, this.config.cache?.defaultTtl || 300);
@@ -281,7 +280,7 @@ export class UnifiedMiddleware {
       }
 
       // Add unified error handler middleware (should be last)
-      app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+      app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
         this.updateMetrics('totalErrors', 1);
         
         if (this.config.logging?.logErrors) {

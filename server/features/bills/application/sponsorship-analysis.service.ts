@@ -74,14 +74,14 @@ interface ComprehensiveAnalysis {
   coSponsors: FormattedSponsor[];
   totalFinancialExposure: number;
   industryAlignment: number;
-  sections: any[];
+  sections: unknown[];
   financialBreakdown: {
     primarySponsor: number;
     coSponsorsTotal: number;
     industryContributions: number;
     totalExposure: number;
   };
-  timeline: any[];
+  timeline: unknown[];
   methodology: any;
   analysisMetadata: {
     generatedAt: string;
@@ -146,7 +146,7 @@ export class SponsorshipAnalysisService {
       const rows = await getSponsorshipsByBill(bill_id, sponsorshipType);
       return rows as SponsorshipData[];
     } catch (error) {
-      logger.error('Error delegating getSponsorshipDataForBill to repository', { bill_id, sponsorshipType }, error as Record<string, any>);
+      logger.error('Error delegating getSponsorshipDataForBill to repository', { bill_id, sponsorshipType }, error as Record<string, unknown>);
       throw error;
     }
   }
@@ -236,7 +236,7 @@ export class SponsorshipAnalysisService {
         }
       };
     } catch (error) {
-      logger.error('Error in comprehensive analysis', { bill_id }, error as Record<string, any>);
+      logger.error('Error in comprehensive analysis', { bill_id }, error as Record<string, unknown>);
       throw new Error(`Failed to generate analysis for bill ${bill_id}: ${(error as Error).message}`);
     }
   }
@@ -293,7 +293,7 @@ export class SponsorshipAnalysisService {
         recommendations: riskProfile.recommendations
       };
     } catch (error) {
-      logger.error('Error analyzing primary sponsor', { bill_id }, error as Record<string, any>);
+      logger.error('Error analyzing primary sponsor', { bill_id }, error as Record<string, unknown>);
       throw new Error(`Failed to analyze primary sponsor: ${(error as Error).message}`);
     }
   }
@@ -328,7 +328,7 @@ export class SponsorshipAnalysisService {
         }
       };
     } catch (error) {
-      logger.error('Error analyzing co-sponsors', { bill_id }, error as Record<string, any>);
+      logger.error('Error analyzing co-sponsors', { bill_id }, error as Record<string, unknown>);
       throw new Error(`Failed to analyze co-sponsors: ${(error as Error).message}`);
     }
   }
@@ -356,7 +356,7 @@ export class SponsorshipAnalysisService {
         metrics
       };
     } catch (error) {
-      logger.error('Error analyzing financial network', { bill_id }, error as Record<string, any>);
+      logger.error('Error analyzing financial network', { bill_id }, error as Record<string, unknown>);
       throw new Error(`Failed to analyze financial network: ${(error as Error).message}`);
     }
   }
@@ -404,7 +404,7 @@ export class SponsorshipAnalysisService {
     return Math.round(total / sponsorships.length);
   }
 
-  private generateBillNumber(bill: any): string {
+  private generateBillNumber(bill: unknown): string {
     const year = new Date(bill.introduced_date || bill.introducedDate || bill.created_at || bill.createdAt).getFullYear();
     const title = bill.title || '';
 
@@ -416,7 +416,7 @@ export class SponsorshipAnalysisService {
     return `BILL${year}/${bill.id}`;
   }
 
-  private formatSectionConflicts(sectionConflicts: any[]) {
+  private formatSectionConflicts(sectionConflicts: unknown[]) {
     return sectionConflicts.map(section => ({
       number: section.sectionNumber,
       title: section.sectionNumber || section.description || 'Untitled Section',
@@ -426,7 +426,7 @@ export class SponsorshipAnalysisService {
     }));
   }
 
-  private calculateFinancialBreakdown(primarySponsor: any, coSponsors: any[]) {
+  private calculateFinancialBreakdown(primarySponsor: unknown, coSponsors: unknown[]) {
     const primaryExposure = primarySponsor
       ? this.parseNumeric(primarySponsor.sponsor?.financialExposure)
       : 0;
@@ -469,13 +469,13 @@ export class SponsorshipAnalysisService {
 
       return 'low';
     } catch (error) {
-      logger.error('Error determining risk level', { bill_id }, error as Record<string, any>);
+      logger.error('Error determining risk level', { bill_id }, error as Record<string, unknown>);
       return 'unknown';
     }
   }
 
-  private generateTimeline(bill: any, sponsorships: SponsorshipData[]) {
-    const timeline: any[] = [];
+  private generateTimeline(bill: unknown, sponsorships: SponsorshipData[]) {
+    const timeline: unknown[] = [];
     const billDate = new Date(bill.introduced_date || bill.created_at);
 
     const allAffiliations = sponsorships.flatMap(s => s.affiliations || []);
@@ -583,13 +583,13 @@ export class SponsorshipAnalysisService {
     };
   }
 
-  private async calculateBillImpact(bill_id: number, sponsor: any) {
+  private async calculateBillImpact(bill_id: number, sponsor: unknown) {
     const exposure = this.parseNumeric(sponsor.financialExposure);
     const alignment = this.parseNumeric(sponsor.votingAlignment);
 
     const sectionConflicts = await this.getSectionConflicts(bill_id);
 
-    const affectedSections = sectionConflicts.map((s: any) => ({
+    const affectedSections = sectionConflicts.map((s: unknown) => ({
       section: s.sectionNumber,
       description: s.sectionNumber || s.description || 'Untitled',
       impact: s.severity || 'medium'
@@ -635,7 +635,7 @@ export class SponsorshipAnalysisService {
         centralityRank: Math.max(1, Math.floor(10 - influenceScore * 9))
       };
     } catch (error) {
-      logger.error('Error calculating network connections', { sponsor_id }, error as Record<string, any>);
+      logger.error('Error calculating network connections', { sponsor_id }, error as Record<string, unknown>);
       return {
         directConnections: 0,
         indirectConnections: 0,
@@ -874,7 +874,7 @@ export class SponsorshipAnalysisService {
     const dominantSector = breakdown.length > 0
       ? breakdown.reduce((max, sector) =>
         sector.percentage > max.percentage ? sector : max,
-        breakdown[0] as any
+        breakdown[0] as unknown
       )
       : { sector: 'None', percentage: 0, amount: 0 };
 
@@ -926,7 +926,7 @@ export class SponsorshipAnalysisService {
     return 'Other';
   }
 
-  private calculateDiversityIndex(breakdown: any[]): number {
+  private calculateDiversityIndex(breakdown: unknown[]): number {
     if (breakdown.length === 0) return 0;
 
     const total = breakdown.reduce((sum, item) => sum + item.amount, 0);
@@ -981,7 +981,7 @@ export class SponsorshipAnalysisService {
   // UTILITY METHODS
   // ============================================================================
 
-  private parseNumeric(value: any): number {
+  private parseNumeric(value: unknown): number {
     if (typeof value === 'number') return value;
     if (typeof value === 'string') {
       const parsed = parseFloat(value.replace(/[^0-9.-]/g, ''));
@@ -990,7 +990,7 @@ export class SponsorshipAnalysisService {
     return 0;
   }
 
-  private formatDate(date: any): string {
+  private formatDate(date: unknown): string {
     // Normalize input and always return a string (guarding against TS indexing string[] -> possibly undefined)
     const toIsoDatePart = (d: Date) => {
       const iso = d.toISOString();

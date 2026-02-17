@@ -15,14 +15,14 @@ export enum NavigationErrorType {
 export class NavigationError extends Error {
   public readonly type: NavigationErrorType;
   public readonly statusCode: number;
-  public readonly details?: Record<string, any>;
+  public readonly details?: Record<string, unknown>;
   public readonly isOperational: boolean;
 
   constructor(
     message: string,
     type: NavigationErrorType = NavigationErrorType.NAVIGATION_ERROR,
     statusCode: number = 400,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'NavigationError';
@@ -39,7 +39,7 @@ export class NavigationError extends Error {
 }
 
 export class NavigationItemNotFoundError extends NavigationError {
-  constructor(path: string, details?: Record<string, any>) {
+  constructor(path: string, details?: Record<string, unknown>) {
     super(
       `Navigation item not found for path: ${path}`,
       NavigationErrorType.NAVIGATION_ITEM_NOT_FOUND,
@@ -50,7 +50,7 @@ export class NavigationItemNotFoundError extends NavigationError {
 }
 
 export class InvalidNavigationPathError extends NavigationError {
-  constructor(path: string, reason?: string, details?: Record<string, any>) {
+  constructor(path: string, reason?: string, details?: Record<string, unknown>) {
     super(
       `Invalid navigation path: ${path}${reason ? ` - ${reason}` : ''}`,
       NavigationErrorType.INVALID_NAVIGATION_PATH,
@@ -65,7 +65,7 @@ export class NavigationAccessDeniedError extends NavigationError {
     path: string,
     reason: string,
     requiredRole?: string[],
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(
       `Access denied to navigation path: ${path} - ${reason}`,
@@ -77,7 +77,7 @@ export class NavigationAccessDeniedError extends NavigationError {
 }
 
 export class NavigationValidationError extends NavigationError {
-  constructor(message: string, field: string, value: any, details?: Record<string, any>) {
+  constructor(message: string, field: string, value: unknown, details?: Record<string, unknown>) {
     super(message, NavigationErrorType.NAVIGATION_VALIDATION_ERROR, 422, {
       field,
       value,
@@ -87,7 +87,7 @@ export class NavigationValidationError extends NavigationError {
 }
 
 export class NavigationConfigurationError extends NavigationError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, NavigationErrorType.NAVIGATION_CONFIGURATION_ERROR, 500, details);
   }
 }

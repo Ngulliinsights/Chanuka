@@ -592,7 +592,7 @@ export class NotificationOrchestratorService {
                 'push': 'push',
                 'sms': 'sms'
               };
-              return channelMap[channel] || channel as any;
+              return channelMap[channel] || channel as unknown;
             }),
           _perBillSettingsApplied: false
         };
@@ -1033,7 +1033,7 @@ export class NotificationOrchestratorService {
         shouldNotify: true,
         recommendedChannels: Object.entries(currentCombinedPrefs.billTracking.notificationChannels)
           .filter(([, enabled]) => enabled)
-          .map(([channel]) => channel) as any,
+          .map(([channel]) => channel) as unknown,
         shouldBatch: false,
         reasons: ['Digest Delivery'],
         confidence: 1.0,

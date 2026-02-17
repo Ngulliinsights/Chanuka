@@ -152,7 +152,7 @@ export type TimeoutType = keyof typeof TIMEOUT_CONFIG;
 /**
  * Helper function to construct full URLs with type safety
  */
-export const buildApiUrl = (endpoint: string, config: any = defaultApiConfig): string => {
+export const buildApiUrl = (endpoint: string, config: unknown = defaultApiConfig): string => {
   const baseUrl = config.baseUrl.replace(/\/$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   return `${baseUrl}${cleanEndpoint}`;

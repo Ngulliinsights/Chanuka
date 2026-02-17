@@ -1,0 +1,96 @@
+{
+  "timestamp": "2026-02-16T22:54:22.740Z",
+  "overallStatus": "FAIL",
+  "results": [
+    {
+      "category": "Type Safety",
+      "metric": "Type Safety Violations (as any)",
+      "target": 0,
+      "actual": 425,
+      "passed": false,
+      "details": "Found 425 instances of 'as any' in production code"
+    },
+    {
+      "category": "Code Quality",
+      "metric": "TODO/FIXME Comments (bugs)",
+      "target": 0,
+      "actual": 19,
+      "passed": false,
+      "details": "Found 19 TODO/FIXME comments indicating bugs"
+    },
+    {
+      "category": "Code Quality",
+      "metric": "ESLint Suppressions",
+      "target": "<10",
+      "actual": 126,
+      "passed": false,
+      "details": "Found 126 ESLint suppressions (target: <10)"
+    },
+    {
+      "category": "Code Quality",
+      "metric": "TypeScript Suppressions",
+      "target": 0,
+      "actual": 3,
+      "passed": false,
+      "details": "Found 3 TypeScript suppressions"
+    },
+    {
+      "category": "Imports",
+      "metric": "Commented Imports",
+      "target": 0,
+      "actual": 85,
+      "passed": false,
+      "details": "Found 85 commented imports"
+    },
+    {
+      "category": "Syntax",
+      "metric": "Syntax Errors",
+      "target": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "category": "Tests",
+      "metric": "Test Files",
+      "target": ">0",
+      "actual": 140,
+      "passed": true,
+      "details": "Found 140 test files"
+    },
+    {
+      "category": "Build",
+      "metric": "Build Script",
+      "target": "EXISTS",
+      "actual": "EXISTS",
+      "passed": true
+    },
+    {
+      "category": "TypeScript",
+      "metric": "Configuration",
+      "target": "VALID",
+      "actual": "ERROR",
+      "passed": false,
+      "details": "Error checking TypeScript configuration: SyntaxError: Expected property name or '}' in JSON at position 247 (line 16 column 5)"
+    }
+  ],
+  "summary": {
+    "totalChecks": 9,
+    "passed": 3,
+    "failed": 6,
+    "passRate": 33.33333333333333
+  },
+  "criticalIssues": [
+    "425 type safety violations remain (target: 0)",
+    "3 TypeScript suppressions remain (target: 0)",
+    "85 commented imports remain (target: 0)"
+  ],
+  "minorIssues": [
+    "126 ESLint suppressions (target: <10)"
+  ],
+  "recommendations": [
+    "Run full test suite with: npm test",
+    "Verify 100% property test pass rate",
+    "Run production build with: npm run build",
+    "Verify build completes in <2 minutes"
+  ]
+}

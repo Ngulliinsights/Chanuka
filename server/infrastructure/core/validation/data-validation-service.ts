@@ -15,7 +15,7 @@ export interface ValidationResult {
   severity: 'error' | 'warning' | 'info';
   message: string;
   count?: number;
-  details?: any[];
+  details?: unknown[];
 }
 
 export interface ValidationSummary {

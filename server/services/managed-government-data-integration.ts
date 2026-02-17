@@ -78,7 +78,7 @@ export class ManagedGovernmentDataIntegrationService {
     offset?: number;
     since?: Date;
     status?: string[];
-  } = {}): Promise<any[]> {
+  } = {}): Promise<unknown[]> {
     const endpoint = this.buildBillsEndpoint(options);
     
     try {
@@ -107,7 +107,7 @@ export class ManagedGovernmentDataIntegrationService {
     limit?: number;
     offset?: number;
     since?: Date;
-  } = {}): Promise<any[]> {
+  } = {}): Promise<unknown[]> {
     const endpoint = this.buildSponsorsEndpoint(options);
     
     try {
@@ -289,7 +289,7 @@ export class ManagedGovernmentDataIntegrationService {
       },
       sources: healthStatuses.map(health => {
         const sourceMetrics = apiAnalytics.sources.find(s => s.source === health.source);
-        const baseSource = baseStatus.sources.find((s: any) => s.name === health.source);
+        const baseSource = baseStatus.sources.find((s: unknown) => s.name === health.source);
         
         return {
           ...baseSource,
@@ -317,7 +317,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Build bills endpoint with parameters
    */
-  private buildBillsEndpoint(options: any): string {
+  private buildBillsEndpoint(options: unknown): string {
     let endpoint = '/bills';
     const params = new URLSearchParams();
 
@@ -336,7 +336,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Build sponsors endpoint with parameters
    */
-  private buildSponsorsEndpoint(options: any): string {
+  private buildSponsorsEndpoint(options: unknown): string {
     let endpoint = '/sponsors';
     const params = new URLSearchParams();
 
@@ -354,7 +354,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Retry original request (used by error handler)
    */
-  private async retryOriginalRequest(source: string, context: any): Promise<any> {
+  private async retryOriginalRequest(source: string, context: unknown): Promise<any> {
     const { endpoint, options } = context;
     
     const result = await this.apiManager.makeRequest(source, endpoint, {
@@ -393,7 +393,7 @@ export class ManagedGovernmentDataIntegrationService {
   }
 
   // Data transformation pipeline for different government data formats
-  static transformParliamentData(rawData: any): any {
+  static transformParliamentData(rawData: unknown): unknown {
     if (!rawData) return null;
 
     // Handle different XML/JSON structures from Parliament API
@@ -419,7 +419,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual Parliament bill data
    */
-  private static transformParliamentBill(bill: any): any {
+  private static transformParliamentBill(bill: unknown): unknown {
     return {
       id: bill.BillId || bill.id,
       title: bill.Title || bill.LongTitle || bill.title,
@@ -442,7 +442,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual Parliament member data
    */
-  private static transformParliamentMember(member: any): any {
+  private static transformParliamentMember(member: unknown): unknown {
     return {
       id: member.PersonId || member.id,
       name: `${member.FirstName || ''} ${member.LastName || ''}`.trim() || member.name,
@@ -463,7 +463,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform Senate of Kenya data format
    */
-  static transformSenateKenyaData(rawData: any): any {
+  static transformSenateKenyaData(rawData: unknown): unknown {
     if (!rawData) return null;
 
     // Handle Senate of Kenya HTML/JSON format
@@ -485,7 +485,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual Senate of Kenya bill data
    */
-  private static transformSenateKenyaBill(bill: any): any {
+  private static transformSenateKenyaBill(bill: unknown): unknown {
     return {
       id: bill.bill_id || bill.id,
       title: bill.title || bill.long_title,
@@ -508,7 +508,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual Senate of Kenya member data
    */
-  private static transformSenateKenyaMember(member: any): any {
+  private static transformSenateKenyaMember(member: unknown): unknown {
     return {
       id: member.member_id || member.id,
       name: member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim(),
@@ -529,7 +529,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform County Assemblies data format
    */
-  static transformCountyAssembliesData(rawData: any): any {
+  static transformCountyAssembliesData(rawData: unknown): unknown {
     if (!rawData) return null;
 
     // Handle County Assemblies API format
@@ -552,7 +552,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual County Assembly bill data
    */
-  private static transformCountyAssemblyBill(bill: any): any {
+  private static transformCountyAssemblyBill(bill: unknown): unknown {
     return {
       id: bill.id,
       title: bill.name || bill.title,
@@ -581,7 +581,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Transform individual County Assembly member data
    */
-  private static transformCountyAssemblyMember(politician: any): any {
+  private static transformCountyAssemblyMember(politician: unknown): unknown {
     return {
       id: politician.id,
       name: politician.name,
@@ -665,8 +665,8 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Extract sponsors from Parliament bill data
    */
-  private static extractParliamentSponsors(bill: any): any[] {
-    const sponsors: any[] = [];
+  private static extractParliamentSponsors(bill: unknown): unknown[] {
+    const sponsors: unknown[] = [];
 
     if (bill.SponsorMember) {
       sponsors.push({
@@ -679,7 +679,7 @@ export class ManagedGovernmentDataIntegrationService {
     }
 
     if (bill.CoSponsors && Array.isArray(bill.CoSponsors)) {
-      sponsors.push(...bill.CoSponsors.map((cosponsor: any) => ({
+      sponsors.push(...bill.CoSponsors.map((cosponsor: unknown) => ({
         id: cosponsor.PersonId,
         name: `${cosponsor.FirstName} ${cosponsor.LastName}`,
         role: 'MP',
@@ -694,8 +694,8 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Extract sponsors from Senate of Kenya bill data
    */
-  private static extractSenateKenyaSponsors(bill: any): any[] {
-    const sponsors: any[] = [];
+  private static extractSenateKenyaSponsors(bill: unknown): unknown[] {
+    const sponsors: unknown[] = [];
 
     if (bill.sponsor) {
       sponsors.push({
@@ -713,8 +713,8 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Extract affiliations from member data
    */
-  private static extractAffiliations(member: any): any[] {
-    const affiliations: any[] = [];
+  private static extractAffiliations(member: unknown): unknown[] {
+    const affiliations: unknown[] = [];
 
     // Extract party affiliation
     if (member.Party || member.party) {
@@ -729,7 +729,7 @@ export class ManagedGovernmentDataIntegrationService {
 
     // Extract committee memberships
     if (member.Committees && Array.isArray(member.Committees)) {
-      affiliations.push(...member.Committees.map((committee: any) => ({
+      affiliations.push(...member.Committees.map((committee: unknown) => ({
         organization: committee.Name || committee.name,
         role: committee.Role || committee.role || 'Member',
         type: 'professional',
@@ -740,7 +740,7 @@ export class ManagedGovernmentDataIntegrationService {
 
     // Extract other affiliations
     if (member.Affiliations && Array.isArray(member.Affiliations)) {
-      affiliations.push(...member.Affiliations.map((affiliation: any) => ({
+      affiliations.push(...member.Affiliations.map((affiliation: unknown) => ({
         organization: affiliation.Organization || affiliation.organization,
         role: affiliation.Role || affiliation.role,
         type: affiliation.Type || affiliation.type || 'professional',
@@ -755,7 +755,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Extract and normalize tags
    */
-  private static extractTags(tags: any): string[] {
+  private static extractTags(tags: unknown): string[] {
     if (!tags) return [];
 
     if (typeof tags === 'string') {
@@ -773,17 +773,17 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Validate transformed data against schema
    */
-  static validateTransformedData(data: any, type: 'bills' | 'sponsors'): {
+  static validateTransformedData(data: unknown, type: 'bills' | 'sponsors'): {
     valid: boolean;
     errors: string[];
-    validRecords: any[];
-    invalidRecords: any[];
+    validRecords: unknown[];
+    invalidRecords: unknown[];
   } {
     const result: {
       valid: boolean;
       errors: string[];
-      validRecords: any[];
-      invalidRecords: any[];
+      validRecords: unknown[];
+      invalidRecords: unknown[];
     } = {
       valid: true,
       errors: [],
@@ -900,7 +900,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Parse bills data from API response
    */
-  private parseBillsData(data: any, sourceName: string): any {
+  private parseBillsData(data: unknown, sourceName: string): unknown {
     try {
       let transformedData;
       
@@ -950,7 +950,7 @@ export class ManagedGovernmentDataIntegrationService {
   /**
    * Parse sponsors data from API response
    */
-  private parseSponsorsData(data: any, sourceName: string): any {
+  private parseSponsorsData(data: unknown, sourceName: string): unknown {
     try {
       let transformedData;
       

@@ -18,7 +18,7 @@ export interface RetryOptions {
   initialDelayMs?: number;
   maxDelayMs?: number;
   backoffMultiplier?: number;
-  retryableErrors?: (error: any) => boolean;
+  retryableErrors?: (error: unknown) => boolean;
 }
 
 /**
@@ -120,8 +120,8 @@ export class BulkheadExecutor {
   private activeCount = 0;
   private queuedTasks: Array<{
     fn: () => Promise<any>;
-    resolve: (value: any) => void;
-    reject: (error: any) => void;
+    resolve: (value: unknown) => void;
+    reject: (error: unknown) => void;
   }> = [];
 
   constructor(
@@ -135,7 +135,7 @@ export class BulkheadExecutor {
     }
 
     return new Promise((resolve, reject) => {
-      this.queuedTasks.push({ fn: fn as any, resolve, reject });
+      this.queuedTasks.push({ fn: fn as unknown, resolve, reject });
     });
   }
 
@@ -169,7 +169,7 @@ export class BulkheadExecutor {
 /**
  * Determines if an error is retryable
  */
-function isRetryableError(error: any): boolean {
+function isRetryableError(error: unknown): boolean {
   // Network errors
   if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
     return true;

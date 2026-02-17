@@ -1,7 +1,7 @@
 import { logger } from './logger';
 import { NextFunction,Request, Response } from 'express';
 
-import { databaseLogger } from '@server/infrastructure/observability/database-logger';
+import { databaseLogger } from './database-logger';
 
 export interface AuditLogEntry {
   timestamp: Date;
@@ -39,7 +39,7 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
   const originalEnd = res.end;
 
   // Override end method to capture response details
-  res.end = function(chunk?: any, encoding?: any) {
+  res.end = function(chunk?: unknown, encoding?: unknown) {
     const duration = Date.now() - startTime;
 
     const auditEntry: AuditLogEntry = {

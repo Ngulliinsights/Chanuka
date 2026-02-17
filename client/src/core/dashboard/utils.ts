@@ -330,7 +330,7 @@ export function calculateWidgetPerformanceScore(
 /**
  * Generate widget export data
  */
-export function exportWidgetData(widget: WidgetConfig, data: any): string {
+export function exportWidgetData(widget: WidgetConfig, data: unknown): string {
   const exportData = {
     widget: {
       id: widget.id,

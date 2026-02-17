@@ -463,7 +463,7 @@ export default function BillsPortalPage() {
         <Card>
           <CardContent className="p-4">
             <FilterPanel
-              filters={currentFilters as Record<string, any>}
+              filters={currentFilters as Record<string, unknown>}
               onFiltersChange={newFilters => updateFilters(newFilters as Partial<BillsPortalFilters>)}
               resultCount={bills.length}
               totalCount={totalBills}

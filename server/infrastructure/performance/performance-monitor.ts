@@ -12,11 +12,11 @@ export interface PerformanceMetrics {
   duration: number;
   timestamp: Date;
   success: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface QueryPerformanceHook {
-  beforeQuery(operation: string, metadata?: Record<string, any>): void;
+  beforeQuery(operation: string, metadata?: Record<string, unknown>): void;
   afterQuery(metrics: PerformanceMetrics): void;
   onSlowQuery(metrics: PerformanceMetrics, threshold: number): void;
 }
@@ -57,7 +57,7 @@ export class PerformanceMonitor {
   async monitorOperation<T>(
     operation: string,
     fn: () => Promise<T>,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<T> {
     const startTime = Date.now();
     const timestamp = new Date();
@@ -202,7 +202,7 @@ export const performanceMonitor = PerformanceMonitor.getInstance();
 
 // Default logging hook
 class LoggingPerformanceHook implements QueryPerformanceHook {
-  beforeQuery(operation: string, metadata?: Record<string, any>): void {
+  beforeQuery(operation: string, metadata?: Record<string, unknown>): void {
     logger.debug(`Starting database operation: ${operation}`, { metadata });
   }
 

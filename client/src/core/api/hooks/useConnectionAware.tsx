@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import React from 'react';
 
 /**
  * Network Information API interface for connection monitoring
@@ -27,9 +26,9 @@ interface NavigatorWithConnection extends Navigator {
 export interface ConnectionInfo {
   isOnline: boolean;
   connectionType: 'slow' | 'fast' | 'offline';
-  effectiveType?: string;
-  downlink?: number;
-  rtt?: number;
+  effectiveType?: string | undefined;
+  downlink?: number | undefined;
+  rtt?: number | undefined;
 }
 
 /**

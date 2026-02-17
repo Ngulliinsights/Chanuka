@@ -190,7 +190,7 @@ export class EngagementPredictor {
     return result;
   }
 
-  private classifyUserSegment(userProfile: any): keyof typeof this.USER_SEGMENTS {
+  private classifyUserSegment(userProfile: unknown): keyof typeof this.USER_SEGMENTS {
     const history = userProfile.engagementHistory;
     const preferences = userProfile.preferences;
     
@@ -279,7 +279,7 @@ export class EngagementPredictor {
     return factors;
   }
 
-  private calculateEngagementScore(factors: any[], userSegment: keyof typeof this.USER_SEGMENTS): number {
+  private calculateEngagementScore(factors: unknown[], userSegment: keyof typeof this.USER_SEGMENTS): number {
     // Weighted sum of factors
     const factorScores = factors.map(f => this.impactToScore(f.impact) * f.weight);
     const weightedScore = Statistics.mean(factorScores) * 100;
@@ -331,7 +331,7 @@ export class EngagementPredictor {
     };
   }
 
-  private analyzeSegment(userSegment: keyof typeof this.USER_SEGMENTS, userProfile: any) {
+  private analyzeSegment(userSegment: keyof typeof this.USER_SEGMENTS, userProfile: unknown) {
     const segmentData = this.USER_SEGMENTS[userSegment];
     
     return {
@@ -344,7 +344,7 @@ export class EngagementPredictor {
     };
   }
 
-  private calculateConfidence(input: EngagementInput, factors: any[]): number {
+  private calculateConfidence(input: EngagementInput, factors: unknown[]): number {
     let confidence = 0.6;
     
     // More user history = higher confidence
@@ -372,7 +372,7 @@ export class EngagementPredictor {
     return TextProcessor.jaccardSimilarity(contentSet, userSet);
   }
 
-  private calculateHistoryScore(history: any): number {
+  private calculateHistoryScore(history: unknown): number {
     const totalActivity = history.totalViews + history.totalComments + history.totalShares;
     const recencyScore = DateUtils.recencyScore(history.lastActiveDate, 30); // 30-day half-life
     
@@ -389,7 +389,7 @@ export class EngagementPredictor {
     );
   }
 
-  private calculateTimingScore(contextualFactors: any): number {
+  private calculateTimingScore(contextualFactors: unknown): number {
     const { timeOfDay, isWeekend, platformActivity } = contextualFactors;
     
     // Check if current time is in peak hours
@@ -423,7 +423,7 @@ export class EngagementPredictor {
     return TextProcessor.jaccardSimilarity(contentSet, trendingSet);
   }
 
-  private predictTimeSpent(engagementScore: number, segmentData: any, contentLength: number): number {
+  private predictTimeSpent(engagementScore: number, segmentData: unknown, contentLength: number): number {
     const baseTime = segmentData.avgSessionDuration;
     const engagementMultiplier = engagementScore / 100;
     
@@ -434,7 +434,7 @@ export class EngagementPredictor {
     return baseTime * engagementMultiplier * lengthFactor;
   }
 
-  private calculateOptimalDeliveryTime(userProfile: any, contextualFactors: any): string {
+  private calculateOptimalDeliveryTime(userProfile: unknown, contextualFactors: unknown): string {
     const now = new Date();
     const currentHour = contextualFactors.timeOfDay;
     
@@ -464,7 +464,7 @@ export class EngagementPredictor {
     return optimalTime.toISOString();
   }
 
-  private recommendFormat(userSegment: keyof typeof this.USER_SEGMENTS, contentMetadata: any): 'full' | 'summary' | 'alert' | 'digest' {
+  private recommendFormat(userSegment: keyof typeof this.USER_SEGMENTS, contentMetadata: unknown): 'full' | 'summary' | 'alert' | 'digest' {
     if (contentMetadata.urgency === 'critical') return 'alert';
     
     const formatMap: Record<string, 'full' | 'summary' | 'alert' | 'digest'> = {
@@ -478,7 +478,7 @@ export class EngagementPredictor {
     return formatMap[userSegment] ?? 'summary';
   }
 
-  private generatePersonalizationSuggestions(userProfile: any, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
+  private generatePersonalizationSuggestions(userProfile: unknown, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
     const suggestions = [];
     
     if (userProfile.preferences.interestedTopics.length < 3) {
@@ -501,7 +501,7 @@ export class EngagementPredictor {
     return suggestions;
   }
 
-  private generateContentOptimizations(contentMetadata: any, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
+  private generateContentOptimizations(contentMetadata: unknown, userSegment: keyof typeof this.USER_SEGMENTS, score: number): string[] {
     const optimizations = [];
     
     if (contentMetadata.length > 1000 && userSegment === 'casual') {

@@ -226,7 +226,7 @@ export class MigrationInfrastructure {
   /**
    * Subscribe to real-time dashboard updates
    */
-  subscribeToDashboard(callback: (data: any) => void): () => void {
+  subscribeToDashboard(callback: (data: unknown) => void): () => void {
     return dashboardService.subscribe(callback);
   }
 

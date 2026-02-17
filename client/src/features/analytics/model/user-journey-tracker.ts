@@ -1,10 +1,3 @@
-/**
- * User Journey Tracker - Analytics Feature
- *
- * Tracks user navigation patterns and journey analytics
- */
-
-export type UserRole = 'admin' | 'expert' | 'citizen' | 'guest';
 export type NavigationSection = 'legislative' | 'community' | 'admin' | 'user' | 'tools';
 
 /**

@@ -9,7 +9,7 @@ import { GraphErrorHandler, GraphErrorCode, GraphError } from './error-adapter-v
 
 const errorHandler = new GraphErrorHandler();
 
-export async function getConnectedNodes(driver: Driver, nodeId: string, options: PaginationOptions = {}): Promise<any[]> {
+export async function getConnectedNodes(driver: Driver, nodeId: string, options: PaginationOptions = {}): Promise<unknown[]> {
   if (!nodeId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'nodeId required' });
   
   const baseQuery = `

@@ -148,7 +148,7 @@ export class ConflictSeverityAnalyzerService {
   /**
    * Calculates transparency score based on disclosures
    */
-  calculateTransparencyScore(disclosures: any[]): number {
+  calculateTransparencyScore(disclosures: unknown[]): number {
     if (disclosures.length === 0) return 0.1;
 
     let score = 0.3; // Base score for having any disclosures

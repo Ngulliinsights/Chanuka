@@ -403,7 +403,7 @@ export class MigrationOrchestrator {
   /**
    * Handle automatic rollback
    */
-  private async handleAutomaticRollback(componentName: string, alert: any): Promise<void> {
+  private async handleAutomaticRollback(componentName: string, alert: unknown): Promise<void> {
     console.error(`[Migration Orchestrator] Triggering automatic rollback for ${componentName}`);
     
     try {

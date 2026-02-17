@@ -3,7 +3,7 @@ import { Analysis, Bill, BillComment, BillEngagement, BillSectionConflict,BillSp
 import { QueryResult, QueryResultRow } from 'pg';
 
 export interface TransactionClient {
-  query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
+  query<T extends QueryResultRow>(queryText: string, values?: unknown[]): Promise<QueryResult<T>>;
   release(): void;
 }
 

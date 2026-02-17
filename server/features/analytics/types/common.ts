@@ -4,7 +4,7 @@ export interface TimeSeriesDataPoint {
   timestamp: Date;
   value: number;
   label?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DateRange {

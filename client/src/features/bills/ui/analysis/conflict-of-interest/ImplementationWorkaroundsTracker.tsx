@@ -138,11 +138,11 @@ export function ImplementationWorkaroundsTracker({
         });
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, unknown>
     );
 
     // Calculate average effectiveness by interest
-    Object.values(interestGroups).forEach((group: any) => {
+    Object.values(interestGroups).forEach((group: unknown) => {
       group.avgEffectiveness =
         group.workarounds.reduce(
           (sum: number, w: ImplementationWorkaround) => sum + (w.effectiveness || 0),
@@ -181,7 +181,7 @@ export function ImplementationWorkaroundsTracker({
     return {
       effectivenessGroups,
       interestGroups: Object.values(interestGroups).sort(
-        (a: any, b: any) => b.totalWorkarounds - a.totalWorkarounds
+        (a: unknown, b: unknown) => b.totalWorkarounds - a.totalWorkarounds
       ),
       timelineData,
       riskMetrics,
@@ -524,7 +524,7 @@ export function ImplementationWorkaroundsTracker({
 
               {/* Interest Details */}
               <div className="mt-6 space-y-3">
-                {analysisData.interestGroups.map((group: any, index: number) => (
+                {analysisData.interestGroups.map((group: unknown, index: number) => (
                   <div key={index} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div>

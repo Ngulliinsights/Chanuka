@@ -16,7 +16,7 @@ const testNavItem: NavigationItem = {
   label: 'Test Bill',
   path: '/bills/test-bill',
   href: '/bills/test-bill',
-  icon: 'document' as any, // Simplified for testing
+  icon: 'document' as unknown, // Simplified for testing
   section: 'legislative',
   description: 'A test bill for navigation',
   requiresAuth: false,
@@ -28,7 +28,7 @@ const testNavItems: NavigationItem[] = [
     label: 'Home',
     path: '/',
     href: '/',
-    icon: 'home' as any,
+    icon: 'home' as unknown,
     section: 'legislative',
   },
   testNavItem,
@@ -37,7 +37,7 @@ const testNavItems: NavigationItem[] = [
     label: 'Community',
     path: '/community',
     href: '/community',
-    icon: 'users' as any,
+    icon: 'users' as unknown,
     section: 'community',
     requiresAuth: true,
   },

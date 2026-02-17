@@ -90,8 +90,8 @@ export const descriptionField = () =>
 /**
  * Standard status field for state machines
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const statusField = (enumType: any, defaultValue: string) => {
+// TODO: Replace 'any' with proper type definition
+export const statusField = (enumType: unknown, defaultValue: string) => {
   const enumNameOrStatus = enumType.name ?? "status";
   return enumType(enumNameOrStatus).notNull().default(defaultValue);
 };

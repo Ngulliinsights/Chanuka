@@ -11,7 +11,7 @@ import { withPagination, type PaginationOptions } from '../utils/query-builder';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function getMostEngagedUsers(driver: Driver, options: PaginationOptions = {}): Promise<any[]> {
+export async function getMostEngagedUsers(driver: Driver, options: PaginationOptions = {}): Promise<unknown[]> {
   const baseQuery = `
     MATCH (u:User)
     RETURN u.id as id, u.email as email,
@@ -23,7 +23,7 @@ export async function getMostEngagedUsers(driver: Driver, options: PaginationOpt
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map((r: any) => ({
+    return result.records.map((r: unknown) => ({
       id: r.get('id'),
       email: r.get('email'),
       engagement_score: Number(r.get('engagement_score'))
@@ -34,7 +34,7 @@ export async function getMostEngagedUsers(driver: Driver, options: PaginationOpt
   }
 }
 
-export async function getTrendingBills(driver: Driver, limit: number = QUERY_CONFIG.DEFAULT_LIMIT): Promise<any[]> {
+export async function getTrendingBills(driver: Driver, limit: number = QUERY_CONFIG.DEFAULT_LIMIT): Promise<unknown[]> {
   try {
     const result = await executeCypherSafely(
       driver,

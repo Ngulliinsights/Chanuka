@@ -36,8 +36,8 @@ interface NestedComment extends Omit<Comment, 'id' | 'votes' | 'threadId' | 'men
   votes: CommentVotes;
   threadId: number;
   replies: NestedComment[];
-  mentions?: any[];
-  attachments?: any[];
+  mentions?: unknown[];
+  attachments?: unknown[];
 }
 
 interface MockDiscussionThread extends Omit<DiscussionThread, 'id' | 'tags'> {
@@ -175,7 +175,7 @@ export const generateDiscussionThread = (billId: number): MockDiscussionThread =
 export const generateCommentReports = (
   commentIds: string[],
   count: number = 10
-): any[] => {
+): unknown[] => {
   const violationTypes = [
     'spam',
     'harassment',
@@ -204,7 +204,7 @@ export const generateCommentReports = (
       commentId: commentIdNum,
       // reporterId: ... 
       // types might differentiate
-    } as any;
+    } as unknown;
   });
 };
 
@@ -243,10 +243,10 @@ export const mockDiscussionThreads = generateDiscussionThreads(billIds);
 export const mockComments = extractAllComments(mockDiscussionThreads);
 
 // Stubbing other exports to prevent build breakage
-export const mockCommentReports: any[] = [];
-export const mockModerationActions: any[] = [];
-export const mockModerationFlags: any[] = [];
-export const mockTypingIndicators: any[] = [];
+export const mockCommentReports: unknown[] = [];
+export const mockModerationActions: unknown[] = [];
+export const mockModerationFlags: unknown[] = [];
+export const mockTypingIndicators: unknown[] = [];
 
 export const getMockDiscussionThread = (billId: number): any => {
   return mockDiscussionThreads[billId] || null;

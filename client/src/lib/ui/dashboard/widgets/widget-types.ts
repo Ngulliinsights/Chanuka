@@ -47,13 +47,13 @@ export interface WidgetConfig {
   /** Custom position (overrides size preset) */
   position?: WidgetPosition;
   /** Widget-specific settings */
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   /** Data source configuration */
   dataSource?: {
     type: 'api' | 'static' | 'realtime';
     endpoint?: string;
     refreshInterval?: number;
-    params?: Record<string, any>;
+    params?: Record<string, unknown>;
   };
   /** Widget permissions */
   permissions?: string[];
@@ -84,7 +84,7 @@ export interface WidgetData {
   /** Last updated timestamp */
   lastUpdated?: Date;
   /** Data metadata */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Chart Widget Types
@@ -219,7 +219,7 @@ export interface CustomWidgetConfig extends WidgetConfig {
   type: 'custom';
   settings: {
     component: string; // Component name or path
-    props?: Record<string, any>;
+    props?: Record<string, unknown>;
   };
 }
 

@@ -182,7 +182,7 @@ export class CampaignService {
     campaign_id: string, 
     user_id: string,
     pagination?: PaginationOptions
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const campaign = await this.getCampaign(campaign_id, user_id);
     
     // Only organizers can see full participant list

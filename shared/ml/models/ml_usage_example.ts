@@ -27,14 +27,14 @@ interface BillAnalysisResult {
   // Constitutional analysis
   constitutional: {
     alignmentScore: number;
-    violations: any[];
+    violations: unknown[];
     recommendations: string[];
   };
   
   // Trojan bill detection
   trojanAnalysis: {
     riskScore: number;
-    hiddenProvisions: any[];
+    hiddenProvisions: unknown[];
     redFlags: string[];
   };
   
@@ -49,7 +49,7 @@ interface BillAnalysisResult {
   conflicts: {
     hasConflict: boolean;
     conflictScore: number;
-    conflicts: any[];
+    conflicts: unknown[];
   };
   
   // Sentiment analysis
@@ -230,7 +230,7 @@ export async function analyzeBill(billData: {
 /**
  * Generate overall assessment from all analyses
  */
-function generateOverallAssessment(results: any): {
+function generateOverallAssessment(results: unknown): {
   score: number;
   concerns: string[];
   recommendations: string[];
@@ -248,7 +248,7 @@ function generateOverallAssessment(results: any): {
   
   if (results.constitutional.violations.length > 0) {
     const criticalViolations = results.constitutional.violations.filter(
-      (v: any) => v.severity === 'critical'
+      (v: unknown) => v.severity === 'critical'
     );
     if (criticalViolations.length > 0) {
       score -= 30;
@@ -280,7 +280,7 @@ function generateOverallAssessment(results: any): {
   // Conflict of interest concerns
   if (results.conflicts.hasConflict) {
     const highConflicts = results.conflicts.conflicts.filter(
-      (c: any) => c.severity === 'high' || c.severity === 'critical'
+      (c: unknown) => c.severity === 'high' || c.severity === 'critical'
     );
     if (highConflicts.length > 0) {
       score -= 20;

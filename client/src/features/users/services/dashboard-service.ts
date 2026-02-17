@@ -59,7 +59,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     });
   }
 
-  async init(config?: any): Promise<void> {
+  async init(config?: unknown): Promise<void> {
     await this.cache.warmCache();
     logger.info('DashboardService initialized');
   }

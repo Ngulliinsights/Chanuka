@@ -265,7 +265,7 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
               Critical Issues ({testResults.criticalIssues.length})
             </h3>
             <ul className="space-y-2">
-              {testResults.criticalIssues.map((issue: any, index: number) => (
+              {testResults.criticalIssues.map((issue: unknown, index: number) => (
                 <li key={index} className="text-sm text-red-700">
                   <strong>{issue.testName}:</strong> {issue.recommendation}
                 </li>

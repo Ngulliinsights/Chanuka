@@ -107,7 +107,7 @@ export class NotificationService {
     };
   }
 
-  private emit(event: string, data: any) {
+  private emit(event: string, data: unknown) {
     this.eventListeners.get(event)?.forEach(callback => callback(data));
   }
 }

@@ -12,7 +12,7 @@ export interface ExtractedEntity {
   startIndex: number;
   endIndex: number;
   context: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
 }
 
 export type EntityType = 

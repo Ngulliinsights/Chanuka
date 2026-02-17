@@ -64,7 +64,7 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     });
   }
 
-  async init(config?: any): Promise<void> {
+  async init(config?: unknown): Promise<void> {
     // CacheService doesn't have init method, just use it directly
     await this.cache.warmCache();
 

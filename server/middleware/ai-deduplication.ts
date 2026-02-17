@@ -13,7 +13,7 @@ import { performance } from 'perf_hooks';
 import { Request, Response, NextFunction } from 'express';
 
 import { getDefaultCache } from '../cache';
-import { logger } from '../infrastructure/observability';
+import { logger } from '@shared/core/observability';
 
 export interface DeduplicationOptions {
   enabled?: boolean;
@@ -215,7 +215,7 @@ export class AIDeduplicationMiddleware {
   /**
    * Default duplicate handler
    */
-  private defaultOnDuplicate = (req: Request, _res: Response, originalResult: any): void => {
+  private defaultOnDuplicate = (req: Request, _res: Response, originalResult: unknown): void => {
     logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, { path: req.path,
       method: req.method,
       user_id: (req as { user?: { id: string } }).user?.id,

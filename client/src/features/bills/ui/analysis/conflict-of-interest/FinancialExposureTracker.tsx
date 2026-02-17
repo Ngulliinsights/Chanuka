@@ -69,7 +69,7 @@ export function FinancialExposureTracker({ conflictAnalysis }: FinancialExposure
 
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, unknown>
     );
 
     // Group by category
@@ -95,7 +95,7 @@ export function FinancialExposureTracker({ conflictAnalysis }: FinancialExposure
 
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, unknown>
     );
 
     // Group by year for trend analysis

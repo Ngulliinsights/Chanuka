@@ -23,7 +23,7 @@ export function BillHeader({ bill }: BillHeaderProps) {
     dateCreated: bill.introducedDate,
     dateModified: bill.lastUpdated,
     legislativeStatus: bill.status,
-    sponsor: bill.sponsors?.map((sponsor: any) => ({
+    sponsor: bill.sponsors?.map((sponsor: unknown) => ({
       '@type': 'Person',
       name: sponsor.name,
       affiliation: sponsor.party,

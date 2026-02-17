@@ -23,6 +23,6 @@ export type PageView = {
 export type FeatureFlag = {
   key: string;
   enabled: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   rollout?: number; // Percentage 0-100
 };

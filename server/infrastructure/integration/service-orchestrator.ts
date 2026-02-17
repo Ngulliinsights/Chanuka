@@ -18,7 +18,7 @@ export interface ServiceHealth {
   responseTime: number;
   lastChecked: Date;
   errorCount: number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface IntegrationEvent {
@@ -36,7 +36,7 @@ export interface CrossServiceOperation {
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   startTime: Date;
   endTime?: Date;
-  results: Record<string, any>;
+  results: Record<string, unknown>;
   errors: Record<string, string>;
 }
 
@@ -60,7 +60,7 @@ export class ServiceOrchestrator {
   /**
    * Orchestrate bill creation with all related services
    */
-  async orchestrateBillCreation(billData: any, user_id: string): Promise<{
+  async orchestrateBillCreation(billData: unknown, user_id: string): Promise<{
     bill: any;
     searchIndexed: boolean;
     analysisQueued: boolean;
@@ -320,9 +320,9 @@ export class ServiceOrchestrator {
       let argumentsExtracted = 0;
       try {
         const structureExtractor = new StructureExtractorService(
-          null as any, // Would be properly injected
-          null as any,
-          null as any
+          null as unknown, // Would be properly injected
+          null as unknown,
+          null as unknown
         );
 
         const extractedArguments = await structureExtractor.extractArguments(
@@ -514,25 +514,25 @@ export class ServiceOrchestrator {
     await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
   }
 
-  private async indexBillForSearch(bill: any): Promise<void> {
+  private async indexBillForSearch(bill: unknown): Promise<void> {
     // Index bill in search service
     logger.debug('Indexing bill for search', { bill_id: bill.id });
     // Implementation would call search service indexing
   }
 
-  private async queueConstitutionalAnalysis(bill: any): Promise<void> {
+  private async queueConstitutionalAnalysis(bill: unknown): Promise<void> {
     // Queue bill for constitutional analysis
     logger.debug('Queueing constitutional analysis', { bill_id: bill.id });
     // Implementation would queue analysis job
   }
 
-  private async updateRecommendationModels(bill: any): Promise<void> {
+  private async updateRecommendationModels(bill: unknown): Promise<void> {
     // Update recommendation models with new bill
     logger.debug('Updating recommendation models', { bill_id: bill.id });
     // Implementation would update ML models
   }
 
-  private async createDefaultCampaignActions(campaign: any): Promise<number> {
+  private async createDefaultCampaignActions(campaign: unknown): Promise<number> {
     // Create default actions based on campaign type and objectives
     const defaultActions = [
       {
@@ -551,23 +551,23 @@ export class ServiceOrchestrator {
     return defaultActions.length;
   }
 
-  private async indexCampaignForSearch(campaign: any): Promise<void> {
+  private async indexCampaignForSearch(campaign: unknown): Promise<void> {
     logger.debug('Indexing campaign for search', { campaign_id: campaign.id });
   }
 
-  private async notifyPotentialParticipants(campaign: any): Promise<void> {
+  private async notifyPotentialParticipants(campaign: unknown): Promise<void> {
     logger.debug('Notifying potential participants', { campaign_id: campaign.id });
   }
 
-  private async updateCampaignRecommendations(campaign: any): Promise<void> {
+  private async updateCampaignRecommendations(campaign: unknown): Promise<void> {
     logger.debug('Updating campaign recommendations', { campaign_id: campaign.id });
   }
 
-  private async indexCommentForSearch(comment: any): Promise<void> {
+  private async indexCommentForSearch(comment: unknown): Promise<void> {
     logger.debug('Indexing comment for search', { comment_id: comment.id });
   }
 
-  private async updateUserRecommendations(user_id: string, comment: any): Promise<void> {
+  private async updateUserRecommendations(user_id: string, comment: unknown): Promise<void> {
     logger.debug('Updating user recommendations', { user_id, comment_id: comment.id });
   }
 

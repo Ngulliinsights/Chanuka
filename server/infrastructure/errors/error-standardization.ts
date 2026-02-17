@@ -32,7 +32,7 @@ export interface ErrorContext {
   service: string;
   operation: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface StandardizedError {

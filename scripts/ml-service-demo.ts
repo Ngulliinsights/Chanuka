@@ -7,15 +7,12 @@
  * NOTE: This is a demo/test file - ML services are now handled via server/features/analytics
  */
 
-// import { MLServiceAdapter } from '../ml-adapter.service';
-// import { initializeMLFeatureFlag, enableMLServiceRollout, getMLServiceStatus } from '../ml-feature-flag.config';
-// import { realMLAnalysisService } from '../real-ml.service';
 
 // Mock logger for demo
 const logger = {
-  info: (msg: string, meta?: any) => console.log(`[INFO] ${msg}`, meta || ''),
-  warn: (msg: string, meta?: any) => console.warn(`[WARN] ${msg}`, meta || ''),
-  error: (msg: string, meta?: any) => console.error(`[ERROR] ${msg}`, meta || '')
+  info: (msg: string, meta?: unknown) => console.log(`[INFO] ${msg}`, meta || ''),
+  warn: (msg: string, meta?: unknown) => console.warn(`[WARN] ${msg}`, meta || ''),
+  error: (msg: string, meta?: unknown) => console.error(`[ERROR] ${msg}`, meta || '')
 };
 
 // Mock the logger import

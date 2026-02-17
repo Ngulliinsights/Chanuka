@@ -108,7 +108,7 @@ const exportQuerySchema = z.object({
  * environment, we can expose helpful debugging information in development while
  * keeping production responses secure and clean.
  */
-function getErrorDetails(error: unknown): Record<string, any> {
+function getErrorDetails(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
     return {
       message: error.message,
@@ -139,7 +139,7 @@ function formatValidationErrors(errors: z.ZodIssue[]): { field: string; message:
  * All our API errors follow a consistent structure with a code, message, and optional
  * details. This helper ensures we never accidentally pass inconsistent error formats.
  */
-function createErrorObject(code: string, message: string, details?: any): { code: string; message: string; details?: any } {
+function createErrorObject(code: string, message: string, details?: unknown): { code: string; message: string; details?: unknown } {
   return { code, message, details };
 }
 
@@ -149,7 +149,7 @@ function createErrorObject(code: string, message: string, details?: any): { code
  * Several endpoints require admin access. Centralizing this check makes the code
  * more maintainable and ensures consistent authorization behavior.
  */
-function requireAdmin(req: AuthenticatedRequest, res: any, startTime: number): boolean {
+function requireAdmin(req: AuthenticatedRequest, res: unknown, startTime: number): boolean {
   if (req.user!.role !== 'admin') {
     ApiError(res, 
       createErrorObject('INSUFFICIENT_PERMISSIONS', 'Admin access required'), 

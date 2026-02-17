@@ -6,10 +6,10 @@
 // ==================== Consolidated Utility Modules ====================
 
 // API utilities - response handling, error formatting, status codes
-export * from './api-utils';
+
 
 // Cache utilities - caching decorators, metrics, management
-export * from './cache-utils';
+
 
 // Async utilities - debouncing, throttling, retry logic, concurrency control
 export * from './async-utils';
@@ -63,7 +63,7 @@ export * from './formatting';
 export * from './images/image-utils';
 
 // Form testing utilities (only in test environment)
-export * as FormTesting from '../testing/form/form-testing-utils';
+
 
 // ==================== Backward Compatibility ====================
 
@@ -74,13 +74,13 @@ export * as FormTesting from '../testing/form/form-testing-utils';
 // Legacy utilities (consider migrating to consolidated modules)
 // Note: HTTP_STATUS from constants conflicts with http-utils, use explicit imports
 // export * from './constants';
-export * from './correlation-id';
+
 // Migration utilities removed by design during development
 export * from './number-utils';
 export * from './regex-patterns';
 
 // Response helpers (consider migrating to http-utils)
-export * from './response-helpers';
+
 
 // Race condition prevention (consider migrating to async-utils)
 // Note: These may conflict with async-utils exports, so use explicit imports if needed

@@ -21,13 +21,58 @@ import { globalErrorHandler } from './errors';
 
 export type {
   UserProfile,
-  UserBadge,
-  UserAchievement,
-  ActivitySummary,
-  SavedBill,
-  UserEngagementHistory,
-  UserPreferences,
-} from '@client/lib/services/userService';
+} from '@shared/validation/schemas/user.schema';
+
+// These types are defined locally as they don't exist in shared schemas yet
+export interface UserBadge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  earnedAt: string;
+}
+
+export interface UserAchievement {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  total: number;
+  completed: boolean;
+}
+
+export interface ActivitySummary {
+  totalActions: number;
+  recentActivity: Array<{
+    type: string;
+    timestamp: string;
+    description: string;
+  }>;
+}
+
+export interface SavedBill {
+  id: string;
+  billId: string;
+  notes?: string;
+  tags?: string[];
+  savedAt: string;
+}
+
+export interface UserEngagementHistory {
+  id: string;
+  actionType: string;
+  entityType: string;
+  entityId: string;
+  timestamp: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UserPreferences {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  theme: 'light' | 'dark' | 'auto';
+  language: string;
+}
 
 // ============================================================================
 // Request/Response Type Definitions

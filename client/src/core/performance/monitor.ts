@@ -469,7 +469,7 @@ export class PerformanceMonitor {
 
     try {
       // Check for memory API support (Chromium-based browsers)
-      // Using type-safe approach instead of 'as any'
+      // Using type-safe approach instead of 'as unknown'
       const perfWithMemory = window.performance as PerformanceWithMemory;
       const memory = perfWithMemory.memory;
 

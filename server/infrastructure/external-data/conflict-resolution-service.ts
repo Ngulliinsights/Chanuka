@@ -290,7 +290,7 @@ export class ConflictResolutionService {
   /**
    * Extract values for conflicting fields
    */
-  private extractConflictValues(data: any, conflictFields: string[]): any {
+  private extractConflictValues(data: unknown, conflictFields: string[]): unknown {
     const values: any = {};
     
     for (const field of conflictFields) {

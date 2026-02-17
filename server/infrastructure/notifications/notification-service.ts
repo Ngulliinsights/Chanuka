@@ -187,7 +187,7 @@ export class NotificationService extends NotificationChannelService {
    * Enhanced push notification sending via Firebase Admin SDK
    * Implements real Firebase functionality
    */
-  async sendPushViaFirebase(tokens: string[], payload: any): Promise<string> {
+  async sendPushViaFirebase(tokens: string[], payload: unknown): Promise<string> {
     if (!this.firebaseApp) {
       if (this.config.fallbackToMock) {
         // Fallback to mock implementation
@@ -309,7 +309,7 @@ export class NotificationService extends NotificationChannelService {
   /**
    * Sanitize Firebase data payload (all values must be strings)
    */
-  private sanitizeFirebaseData(data: Record<string, any>): Record<string, string> {
+  private sanitizeFirebaseData(data: Record<string, unknown>): Record<string, string> {
     const sanitized: Record<string, string> = {};
     
     for (const [key, value] of Object.entries(data)) {
@@ -324,7 +324,7 @@ export class NotificationService extends NotificationChannelService {
   /**
    * Check if AWS error is retryable
    */
-  private isAWSRetryableError(error: any): boolean {
+  private isAWSRetryableError(error: unknown): boolean {
     const retryableErrors = [
       'Throttling',
       'ServiceUnavailable',
@@ -340,7 +340,7 @@ export class NotificationService extends NotificationChannelService {
   /**
    * Check if Firebase error is retryable
    */
-  private isFirebaseRetryableError(error: any): boolean {
+  private isFirebaseRetryableError(error: unknown): boolean {
     const retryableErrors = [
       'messaging/internal-error',
       'messaging/server-unavailable',

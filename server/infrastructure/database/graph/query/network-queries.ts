@@ -10,7 +10,7 @@ import { withPagination, type PaginationOptions } from '../utils/query-builder';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function getConnectedNodes(driver: Driver, nodeId: string, options: PaginationOptions = {}): Promise<any[]> {
+export async function getConnectedNodes(driver: Driver, nodeId: string, options: PaginationOptions = {}): Promise<unknown[]> {
   if (!nodeId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'nodeId required' });
 
   const baseQuery = `
@@ -23,7 +23,7 @@ export async function getConnectedNodes(driver: Driver, nodeId: string, options:
 
   try {
     const result = await executeCypherSafely(driver, query, { ...params, nodeId }, { mode: 'READ' });
-    return result.records.map((r: any) => ({
+    return result.records.map((r: unknown) => ({
       id: r.get('id'),
       relationship_type: r.get('relationship_type'),
       node_type: r.get('node_type')

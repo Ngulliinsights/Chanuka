@@ -179,7 +179,7 @@ export class RateLimitError extends AdvocacyDomainError {
 }
 
 // Utility function to check if error is an advocacy domain error
-export function isAdvocacyDomainError(error: any): error is AdvocacyDomainError {
+export function isAdvocacyDomainError(error: unknown): error is AdvocacyDomainError {
   return error instanceof AdvocacyDomainError;
 }
 

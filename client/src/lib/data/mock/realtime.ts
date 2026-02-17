@@ -19,7 +19,7 @@ const getIntId = (id: string | number): number => {
   return typeof id === 'string' ? parseInt(id, 10) || faker.number.int() : id;
 };
 
-const getUserName = (user: any): string => {
+const getUserName = (user: unknown): string => {
   if (user.name) return user.name;
   if (user.first_name && user.last_name) return `${user.first_name} ${user.last_name}`;
   return 'User';

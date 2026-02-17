@@ -302,7 +302,7 @@ export class ModerationOrchestratorService {
         const reportResult = await this.createReport(
           content_type,
           content_id || 0, // In real implementation, this would be the actual content ID
-          analysis.detectedIssues[0]?.type as any || 'other',
+          analysis.detectedIssues[0]?.type as unknown || 'other',
           `Automated detection: ${analysis.detectedIssues.map(i => i.description).join(', ')}`,
           'system',
           true,

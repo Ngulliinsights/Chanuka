@@ -43,7 +43,7 @@ export class Neo4jClient {
    */
   async executeRead<T = any>(
     cypher: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<Result<T>> {
     return this.execute(cypher, params, 'READ');
   }
@@ -53,7 +53,7 @@ export class Neo4jClient {
    */
   async executeWrite<T = any>(
     cypher: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<Result<T>> {
     return this.execute(cypher, params, 'WRITE');
   }
@@ -63,7 +63,7 @@ export class Neo4jClient {
    */
   private async execute<T = any>(
     cypher: string,
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     mode: 'READ' | 'WRITE'
   ): Promise<Result<T>> {
     const sessionConfig: SessionConfig = {

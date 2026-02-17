@@ -365,12 +365,24 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Apply all response interceptors
   private async applyResponseInterceptors<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
+    // Convert Headers to Record<string, string> if needed
+    let headersRecord: Record<string, string> = {};
+    if (response.headers) {
+      if (response.headers instanceof Headers) {
+        response.headers.forEach((value, key) => {
+          headersRecord[key] = value;
+        });
+      } else {
+        headersRecord = response.headers;
+      }
+    }
+
     // Convert to BaseApiResponse for interceptors
     let baseResponse: BaseApiResponse<T> = {
       data: response.data,
       status: response.status,
       statusText: response.statusText || 'OK',
-      headers: response.headers || {},
+      headers: headersRecord,
     };
 
     // Apply response interceptors

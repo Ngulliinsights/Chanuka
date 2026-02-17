@@ -41,7 +41,7 @@ export async function getCommitteeNetwork(driver: Driver, committeeId: string): 
   }
 }
 
-export async function getPartyNetwork(driver: Driver, party: string, options: PaginationOptions = {}): Promise<any[]> {
+export async function getPartyNetwork(driver: Driver, party: string, options: PaginationOptions = {}): Promise<unknown[]> {
   if (!party) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'party required' });
   
   const baseQuery = `

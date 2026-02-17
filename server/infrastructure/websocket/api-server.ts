@@ -13,10 +13,10 @@ import { WebSocket, WebSocketServer } from 'ws';
 
 // Use server-side logger
 const logger = {
-  info: (message: string, meta?: any) => console.log(`[INFO] ${message}`, meta || ''),
-  warn: (message: string, meta?: any) => console.warn(`[WARN] ${message}`, meta || ''),
-  error: (message: string, meta?: any, error?: Error) => console.error(`[ERROR] ${message}`, meta || '', error || ''),
-  debug: (message: string, meta?: any) => console.debug(`[DEBUG] ${message}`, meta || '')
+  info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta || ''),
+  warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta || ''),
+  error: (message: string, meta?: unknown, error?: Error) => console.error(`[ERROR] ${message}`, meta || '', error || ''),
+  debug: (message: string, meta?: unknown) => console.debug(`[DEBUG] ${message}`, meta || '')
 };
 
 import type { WebSocketMessage } from '../types';

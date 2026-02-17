@@ -126,7 +126,7 @@ const generateSponsors = (count: number = 3) => {
     // Sponsor type has: id, name, party, role, district, avatarUrl, state, isPrimary.
     role: s.isPrimary ? ('primary' as const) : ('co-sponsor' as const),
     
-  })) as any; // Cast to avoid position mismatch issues for now, or refine Sponsor type
+  })) as unknown; // Cast to avoid position mismatch issues for now, or refine Sponsor type
 };
 
 /**
@@ -187,7 +187,7 @@ export const generateMockBill = (
     ),
     introducedDate,
     lastActionDate: lastUpdated, // Renamed from lastUpdated
-    sponsors: sponsors as any, // Cast sponsors to avoid strict check on 'position'
+    sponsors: sponsors as unknown, // Cast sponsors to avoid strict check on 'position'
     constitutionalIssues, // Mapped from flags
     ...engagement,
     policyAreas,

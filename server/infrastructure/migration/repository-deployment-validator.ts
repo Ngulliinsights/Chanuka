@@ -65,7 +65,7 @@ export interface ValidationResult {
   passed: boolean;
   message: string;
   dataPoints: number;
-  inconsistencies?: any[];
+  inconsistencies?: unknown[];
   metrics?: any;
 }
 
@@ -243,7 +243,7 @@ export class RepositoryDeploymentValidator {
    */
   async validateDataConsistency(): AsyncServiceResult<ValidationResult> {
     return withResultHandling(async () => {
-      const inconsistencies: any[] = [];
+      const inconsistencies: unknown[] = [];
 
       // Check user data consistency
       const userInconsistencies = await this.validateUserDataConsistency();
@@ -455,8 +455,8 @@ export class RepositoryDeploymentValidator {
     };
   }
 
-  private async validateUserDataConsistency(): Promise<any[]> {
-    const inconsistencies: any[] = [];
+  private async validateUserDataConsistency(): Promise<unknown[]> {
+    const inconsistencies: unknown[] = [];
     
     try {
       // Check for orphaned user profiles
@@ -479,8 +479,8 @@ export class RepositoryDeploymentValidator {
     return inconsistencies;
   }
 
-  private async validateBillDataConsistency(): Promise<any[]> {
-    const inconsistencies: any[] = [];
+  private async validateBillDataConsistency(): Promise<unknown[]> {
+    const inconsistencies: unknown[] = [];
     
     try {
       // Check for bills with invalid engagement counts
@@ -507,8 +507,8 @@ export class RepositoryDeploymentValidator {
     return inconsistencies;
   }
 
-  private async validateEngagementDataConsistency(): Promise<any[]> {
-    const inconsistencies: any[] = [];
+  private async validateEngagementDataConsistency(): Promise<unknown[]> {
+    const inconsistencies: unknown[] = [];
     
     try {
       // Check for engagement records with non-existent bills

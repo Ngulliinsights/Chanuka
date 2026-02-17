@@ -376,7 +376,7 @@ export class ExactOptionalPropertyFixer implements ErrorFixer {
     
     if (paramNode && paramNode.kind === SyntaxKind.Parameter) {
       // Handle optional middleware parameters
-      const parameter = paramNode as any; // Parameter type
+      const parameter = paramNode as unknown; // Parameter type
       if (parameter.questionToken && parameter.type) {
         const typeNode = parameter.type;
         

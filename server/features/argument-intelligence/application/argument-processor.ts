@@ -200,7 +200,7 @@ export class ArgumentProcessor {
 
       // Map DB arguments to Clustering arguments format
       // Note: In a real scenario, you'd map the DB entity to the service DTO explicitly.
-      // Assuming billArguments are compatible enough for this context or passing as any for now
+      // Assuming billArguments are compatible enough for this context or passing as unknown for now
       // to resolve the immediate flow, though strict mapping is better.
       const argumentsForClustering = billArguments.map(arg => ({
         id: arg.id,
@@ -419,9 +419,9 @@ export class ArgumentProcessor {
       return 'neutral';
   }
 
-  private async identifyStakeholderPositions(args: any[]): Promise<StakeholderPosition[]> {
+  private async identifyStakeholderPositions(args: unknown[]): Promise<StakeholderPosition[]> {
     // Group arguments by stakeholder and analyze positions
-    const stakeholderGroups = new Map<string, any[]>();
+    const stakeholderGroups = new Map<string, unknown[]>();
 
     args.forEach(arg => {
       arg.affectedGroups?.forEach((group: string) => {
@@ -437,11 +437,11 @@ export class ArgumentProcessor {
       position: this.determineGroupPosition(groupArgs),
       keyArguments: this.extractKeyArguments(groupArgs),
       evidenceProvided: this.extractEvidence(groupArgs),
-      participantCount: new Set(groupArgs.map((a: any) => a.user_id)).size
+      participantCount: new Set(groupArgs.map((a: unknown) => a.user_id)).size
     }));
   }
 
-  private determineGroupPosition(args: any[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
+  private determineGroupPosition(args: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
     const positions = args.map(arg => arg.position);
     const supportCount = positions.filter((p: string) => p === 'support').length;
     const opposeCount = positions.filter((p: string) => p === 'oppose').length;
@@ -452,17 +452,17 @@ export class ArgumentProcessor {
     return 'neutral';
   }
 
-  private extractKeyArguments(args: any[]): string[] {
+  private extractKeyArguments(args: unknown[]): string[] {
     return args
-      .filter((arg: any) => arg.type === 'claim' && (arg.confidence || 0) > 0.7)
-      .map((arg: any) => arg.normalizedText || arg.extractedText || '')
+      .filter((arg: unknown) => arg.type === 'claim' && (arg.confidence || 0) > 0.7)
+      .map((arg: unknown) => arg.normalizedText || arg.extractedText || '')
       .slice(0, 5); // Top 5 arguments
   }
 
-  private extractEvidence(args: any[]): string[] {
+  private extractEvidence(args: unknown[]): string[] {
     return args
-      .filter((arg: any) => arg.type === 'evidence' && arg.evidenceQuality !== 'none')
-      .map((arg: any) => arg.normalizedText || arg.extractedText || '')
+      .filter((arg: unknown) => arg.type === 'evidence' && arg.evidenceQuality !== 'none')
+      .map((arg: unknown) => arg.normalizedText || arg.extractedText || '')
       .slice(0, 3); // Top 3 pieces of evidence
   }
 

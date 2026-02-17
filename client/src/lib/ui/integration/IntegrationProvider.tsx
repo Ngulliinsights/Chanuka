@@ -13,7 +13,6 @@ import { DeviceDetector } from '@client/core/mobile';
 import { logger } from '@client/lib/utils/logger';
 
 // TouchHandler is deprecated - using SwipeGestures instead
-// import { useSwipeGesture } from '@client/lib/hooks/mobile/useSwipeGesture'; // Unused
 
 import { IntegrationContext } from './context/IntegrationContext';
 import { useIntegration } from './hooks/useIntegration';

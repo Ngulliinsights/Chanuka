@@ -540,7 +540,7 @@ export class GovernmentDataIntegrationService {
   /**
    * Build URL for fetching bills from a data source
    */
-  private buildBillsUrl(source: DataSourceConfig, options: any): string {
+  private buildBillsUrl(source: DataSourceConfig, options: unknown): string {
     // This would be customized for each data source
     // For now, return a placeholder URL
     let url = `${source.baseUrl}/bills`;
@@ -561,7 +561,7 @@ export class GovernmentDataIntegrationService {
   /**
    * Build URL for fetching sponsors from a data source
    */
-  private buildSponsorsUrl(source: DataSourceConfig, options: any): string {
+  private buildSponsorsUrl(source: DataSourceConfig, options: unknown): string {
     let url = `${source.baseUrl}/sponsors`;
     const params = new URLSearchParams();
 
@@ -633,7 +633,7 @@ export class GovernmentDataIntegrationService {
   /**
    * Parse bills data from different government sources
    */
-  public parseBillsData(rawData: any, sourceName: string): GovernmentBill[] {
+  public parseBillsData(rawData: unknown, sourceName: string): GovernmentBill[] {
     // This would be customized for each data source format
     // For now, assume a standard format and provide basic parsing
     
@@ -642,7 +642,7 @@ export class GovernmentDataIntegrationService {
       return [];
     }
 
-    return rawData.bills.map((item: any) => ({
+    return rawData.bills.map((item: unknown) => ({
       id: item.id || item.bill_id || item.bill_id,
       title: item.title || item.bill_title,
       description: item.description || item.summary,
@@ -664,13 +664,13 @@ export class GovernmentDataIntegrationService {
   /**
    * Parse sponsors data from different government sources
    */
-  public parseSponsorsData(rawData: any, sourceName: string): GovernmentSponsor[] {
+  public parseSponsorsData(rawData: unknown, sourceName: string): GovernmentSponsor[] {
     if (!rawData || !Array.isArray(rawData.sponsors)) {
       console.warn(`Unexpected sponsor data format from ${sourceName}`);
       return [];
     }
 
-    return rawData.sponsors.map((item: any) => ({
+    return rawData.sponsors.map((item: unknown) => ({
       id: item.id || item.sponsor_id || item.sponsor_id,
       name: item.name || item.full_name,
       role: item.role || item.position,

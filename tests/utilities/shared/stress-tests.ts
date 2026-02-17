@@ -1,6 +1,5 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-// import { LoadTester } from './load-tester'; // Unused import
 import type { CacheService } from '../../../interfaces';
 import { UnifiedLogger } from '../../../client/src/utils/logger';
 

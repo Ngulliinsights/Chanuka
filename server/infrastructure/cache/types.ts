@@ -91,7 +91,7 @@ export interface CacheAdapter extends CacheService {
   disconnect?(): Promise<void>;
   isConnected?(): boolean;
   getHealth?(): Promise<CacheHealthStatus>;
-  warmUp?(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void>;
+  warmUp?(entries: Array<{ key: string; value: unknown; options?: CacheOptions }>): Promise<void>;
 }
 
 // Cache health status (using the one from core/interfaces)
@@ -162,7 +162,7 @@ export interface SerializationOptions {
    dateHandling?: 'iso' | 'timestamp' | 'preserve';
    enableBinaryMode?: boolean;
    customSerializer?: {
-     serialize: (data: any) => string | Buffer;
+     serialize: (data: unknown) => string | Buffer;
      deserialize: (data: string | Buffer) => any;
    };
 }

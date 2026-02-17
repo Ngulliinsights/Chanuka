@@ -16,7 +16,7 @@ export interface RequestContext { /** Unique trace ID for request tracking */
   /** User ID if authenticated */
   user_id?: string;
   /** Additional metadata for the request */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
  }
 
 /**
@@ -69,10 +69,10 @@ export function analyticsContextMiddleware(
 
     try {
       if ((errorTracker as any)?.trackRequestError) {
-        // Track with low severity; no request object context available yet, pass req as any
+        // Track with low severity; no request object context available yet, pass req as unknown
         (errorTracker as any).trackRequestError(
           error instanceof Error ? error : new Error(String(error)),
-          req as any,
+          req as unknown,
           'low',
           'analytics_context'
         );

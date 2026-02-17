@@ -84,7 +84,7 @@ export interface WidgetConfig<T extends Record<string, unknown> = Record<string,
   /** Widget-specific settings and configuration */
   settings?: T;
   /** Widget-specific props or configuration */
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
   /** Optional data source identifier */
   dataSource?: string;
   /** Refresh interval in milliseconds */

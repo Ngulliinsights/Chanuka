@@ -98,7 +98,7 @@ export const Query = {
     _: any,
     { filters, pagination }: { filters?: BillFilters; pagination?: PaginationInput },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const whereClause = buildBillWhereClause(filters);
     
     const baseQuery = `
@@ -178,7 +178,7 @@ export const Query = {
     _: any,
     { filters, pagination }: { filters?: PersonFilters; pagination?: PaginationInput },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const whereClause = buildPersonWhereClause(filters);
     
     const baseQuery = `
@@ -219,7 +219,7 @@ export const Query = {
     _: any,
     { searchTerm, limit }: { searchTerm: string; limit?: number },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     if (!searchTerm) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -258,7 +258,7 @@ export const Query = {
     _: any,
     { billId }: { billId: string },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     if (!billId) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -344,7 +344,7 @@ export const Query = {
     _: any,
     { limit }: { limit?: number },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       const result = await executeCypherSafely(
         driver,
@@ -374,7 +374,7 @@ export const Query = {
     _: any,
     { userId, limit }: { userId: string; limit?: number },
     { driver }: GraphQLContext
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     if (!userId) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -497,17 +497,17 @@ export const Mutation = {
 // ============================================================================
 
 export const Bill = {
-  async sponsors(bill: any, _: any, { driver }: GraphQLContext): Promise<any[]> {
+  async sponsors(bill: unknown, _: unknown, { driver }: GraphQLContext): Promise<unknown[]> {
     return Query.billSponsors(null, { billId: bill.id }, { driver });
   },
 
-  async votingStats(bill: any, _: any, { driver }: GraphQLContext): Promise<any> {
+  async votingStats(bill: unknown, _: unknown, { driver }: GraphQLContext): Promise<any> {
     return Query.billVotingStats(null, { billId: bill.id }, { driver });
   },
 };
 
 export const Person = {
-  async sponsoredBills(person: any, { limit }: { limit?: number }, { driver }: GraphQLContext): Promise<any[]> {
+  async sponsoredBills(person: unknown, { limit }: { limit?: number }, { driver }: GraphQLContext): Promise<unknown[]> {
     try {
       const result = await executeCypherSafely(
         driver,

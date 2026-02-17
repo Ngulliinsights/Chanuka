@@ -20,8 +20,8 @@ export interface ValidationRule<T = any> {
   type: ValidationType;
   value?: T;
   message: string;
-  validate?: (value: any, formData?: Record<string, any>) => boolean | Promise<boolean>;
-  options?: Record<string, any>;
+  validate?: (value: unknown, formData?: Record<string, unknown>) => boolean | Promise<boolean>;
+  options?: Record<string, unknown>;
 }
 
 // Enhanced validation error with better debugging context
@@ -59,14 +59,14 @@ export type FormValidationRules = Record<string, ValidationRule[]>;
 
 // Advanced validation context for complex scenarios
 export interface ValidationContext {
-  formData: Record<string, any>;
+  formData: Record<string, unknown>;
   fieldName: string;
-  previousValues?: Record<string, any>;
-  metadata?: Record<string, any>;
+  previousValues?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 // Type-safe validator factory pattern
-export type ValidatorFactory<TOptions = Record<string, any>, TValue = any> = 
+export type ValidatorFactory<TOptions = Record<string, unknown>, TValue = any> = 
   (options?: TOptions) => ValidationRule<TValue>;
 
 // Utility types for better type inference in implementations
@@ -93,7 +93,7 @@ export type ConditionalValidationRule<T extends ValidationType> = ValidationRule
 
 // Helper type for async validation rules
 export type AsyncValidationRule = ValidationRule & {
-  validate: (value: any, formData?: Record<string, any>) => Promise<boolean>;
+  validate: (value: unknown, formData?: Record<string, unknown>) => Promise<boolean>;
 };
 
 // Type guard utilities for runtime type checking

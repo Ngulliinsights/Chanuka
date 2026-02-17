@@ -9,7 +9,7 @@ import { RECOMMENDATION_CONFIG } from './config/graph-config';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function recommendBills(driver: Driver, userId: string, limit: number = 10): Promise<any[]> {
+export async function recommendBills(driver: Driver, userId: string, limit: number = 10): Promise<unknown[]> {
   if (!userId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'userId required' });
   
   try {
@@ -36,7 +36,7 @@ export async function recommendBills(driver: Driver, userId: string, limit: numb
   }
 }
 
-export async function recommendUsers(driver: Driver, userId: string, limit: number = 10): Promise<any[]> {
+export async function recommendUsers(driver: Driver, userId: string, limit: number = 10): Promise<unknown[]> {
   if (!userId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'userId required' });
   
   try {

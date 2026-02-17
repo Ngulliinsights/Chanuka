@@ -62,11 +62,11 @@ export interface DataCleanupJob {
   status: JobStatus;
   recordsAffected: number;
   recordsProcessed: number;
-  completedAt?: Date;
-  error?: string;
+  completedAt?: Date | undefined;
+  error?: string | undefined;
   dryRun: boolean;
-  backupId?: string;
-  executionTime?: number; // milliseconds
+  backupId?: string | undefined;
+  executionTime?: number | undefined; // milliseconds
   retryCount: number;
   maxRetries: number;
 }
@@ -79,7 +79,7 @@ export interface CategoryData {
   canDelete: boolean;
   retentionExpiry: Date;
   hasExceptions: boolean;
-  lastCleanup?: Date;
+  lastCleanup?: Date | undefined;
 }
 
 export interface UserDataSummary {
@@ -151,8 +151,8 @@ export interface IDataAccessLayer {
 
 class MockDataAccessLayer implements IDataAccessLayer {
   async queryExpiredRecords(
-    category: DataCategory,
-    expiryDate: Date,
+    _category: DataCategory,
+    _expiryDate: Date,
     limit: number
   ): Promise<string[]> {
     // Simulate database query
@@ -160,7 +160,7 @@ class MockDataAccessLayer implements IDataAccessLayer {
     return Array.from({ length: count }, () => crypto.randomUUID());
   }
 
-  async deleteRecords(category: DataCategory, recordIds: string[]): Promise<number> {
+  async deleteRecords(_category: DataCategory, recordIds: string[]): Promise<number> {
     // Simulate deletion
     await this.delay(100);
     return recordIds.length;
@@ -168,15 +168,15 @@ class MockDataAccessLayer implements IDataAccessLayer {
 
   async createBackup(
     category: DataCategory,
-    recordIds: string[],
-    encrypted: boolean
+    _recordIds: string[],
+    _encrypted: boolean
   ): Promise<string> {
     // Simulate backup creation
     await this.delay(200);
     return `backup_${category}_${Date.now()}`;
   }
 
-  async getUserCategoryData(userId: string, category: DataCategory): Promise<CategoryData> {
+  async getUserCategoryData(_userId: string, _category: DataCategory): Promise<CategoryData> {
     const now = new Date();
     const oldestDate = new Date(now.getTime() - Math.random() * 365 * 24 * 60 * 60 * 1000);
 
@@ -197,7 +197,7 @@ class MockDataAccessLayer implements IDataAccessLayer {
     return callback();
   }
 
-  async logAudit(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
+  async logAudit(_entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
     // Simulate audit logging
     await this.delay(10);
   }
@@ -666,9 +666,9 @@ export class DataRetentionService {
       job.recordsAffected = result.recordsFound;
       job.recordsProcessed = result.recordsDeleted;
       job.completedAt = new Date();
-      job.backupId = result.backupId;
+      job.backupId = result.backupId || undefined;
       job.executionTime = result.executionTime;
-      job.error = result.errors[0];
+      job.error = result.errors[0] || undefined;
 
       return result;
     } catch (error) {

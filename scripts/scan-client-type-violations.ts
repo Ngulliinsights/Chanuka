@@ -101,7 +101,7 @@ async function scanClientViolations(): Promise<ClientViolation[]> {
         const content = fs.readFileSync(file, 'utf-8');
         const lines = content.split('\n');
         
-        // Search for `as any` in each line
+        // Search for `as unknown` in each line
         for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
           const line = lines[lineIndex];
           const regex = /\bas\s+any\b/g;
@@ -141,11 +141,11 @@ async function scanClientViolations(): Promise<ClientViolation[]> {
             violations.push(violation);
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`❌ Error reading file ${file}:`, error.message);
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`❌ Error scanning ${clientDir}:`, error.message);
   }
   
@@ -217,7 +217,7 @@ function categorizeViolation(context: string, filePath: string): any {
 /**
  * Assign severity based on location and category
  */
-function assignSeverity(filePath: string, category: any): any {
+function assignSeverity(filePath: string, category: unknown): unknown {
   if (category === 'test_code') {
     return 'low';
   }

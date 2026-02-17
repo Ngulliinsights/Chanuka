@@ -10,7 +10,7 @@ interface ValidationMiddlewareOptions {
 export class ValidationMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'validation';
 
-  constructor(private readonly validator?: any) {}
+  constructor(private readonly validator?: unknown) {}
 
   validate(options: ValidationMiddlewareOptions): boolean {
     const { schema, target } = options;

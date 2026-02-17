@@ -36,7 +36,7 @@ function formatMetric(value: number, unit: string): string {
 /**
  * Displays performance metrics in a structured, readable format
  */
-function displayPerformanceMetrics(metrics: Record<string, any>): void {
+function displayPerformanceMetrics(metrics: Record<string, unknown>): void {
   console.log('\n🎯 Performance Metrics:');
   
   for (const [component, componentMetrics] of Object.entries(metrics)) {
@@ -51,7 +51,7 @@ function displayPerformanceMetrics(metrics: Record<string, any>): void {
 /**
  * Displays code complexity reduction metrics and validates against target threshold
  */
-function displayComplexityReduction(complexity: any): boolean {
+function displayComplexityReduction(complexity: unknown): boolean {
   console.log('\n🧮 Code Complexity Reduction:');
   
   if (!complexity) {
@@ -81,7 +81,7 @@ function displayComplexityReduction(complexity: any): boolean {
 /**
  * Analyzes and displays validation checkpoint results with consistency metrics
  */
-function displayValidationCheckpoints(validationCheckpoints: Record<string, any[]>): {
+function displayValidationCheckpoints(validationCheckpoints: Record<string, unknown[]>): {
   totalCheckpoints: number;
   consistentCheckpoints: number;
   consistencyRate: number;

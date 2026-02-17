@@ -417,7 +417,7 @@ export class DrizzleAdapter<TEntity, TRow> {
   /**
    * Log performance metrics for monitoring
    */
-  private logPerformance(operation: string, startTime: number, metadata: any = {}) {
+  private logPerformance(operation: string, startTime: number, metadata: unknown = {}) {
     const duration = Date.now() - startTime;
     
     if (duration > 1000) { // Log slow queries
@@ -440,7 +440,7 @@ export class DrizzleAdapter<TEntity, TRow> {
   /**
    * Log errors with context
    */
-  private logError(operation: string, error: any, metadata: any = {}) {
+  private logError(operation: string, error: unknown, metadata: unknown = {}) {
     logger.error(`DrizzleAdapter error`, {
       table: this.tableName,
       operation,

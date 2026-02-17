@@ -238,7 +238,7 @@ export class SharedCoreUtilityDetector {
 
     const visitNode = (node: Node) => {
       if (node.kind === SyntaxKind.ImportDeclaration) {
-        const importDecl = node as any;
+        const importDecl = node as unknown;
         const moduleSpecifier = importDecl.moduleSpecifier?.text;
         
         if (this.isSharedCoreImport(moduleSpecifier)) {

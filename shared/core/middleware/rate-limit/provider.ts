@@ -11,12 +11,12 @@ export class RateLimitMiddlewareProvider implements MiddlewareProvider {
 
   constructor(private readonly store?: RateLimitStore) {}
 
-  validate(options: Record<string, any>): boolean {
+  validate(options: Record<string, unknown>): boolean {
     const { windowMs, max } = options;
     return typeof windowMs === 'number' && typeof max === 'number';
   }
 
-  create(options: Record<string, any>) {
+  create(options: Record<string, unknown>) {
     const { windowMs, max } = options;
 
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {

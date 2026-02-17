@@ -4,7 +4,7 @@
  * Consolidates useDiscussion.ts functionality while resolving:
  * - Mock thread creation from comments data (lines 82-96)
  * - Incomplete moderation implementations (lines 217-240)
- * - Type casting issues (as any usage)
+ * - Type casting issues (as unknown usage)
  * - React Query + WebSocket event coordination
  */
 

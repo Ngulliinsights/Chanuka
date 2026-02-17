@@ -20,7 +20,7 @@ export const validate = (fields: string | string[]): ValidationDecorator<any> =>
     const originalMethod = descriptor.value;
     const fieldsToValidate = Array.isArray(fields) ? fields : [fields];
 
-    descriptor.value = function (...args: any[]) {
+    descriptor.value = function (...args: unknown[]) {
       fieldsToValidate.forEach((field, index) => {
         if (args[index] === undefined || args[index] === null) {
           throw new Error(`Missing required field: ${field}`);

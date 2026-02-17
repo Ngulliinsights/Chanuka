@@ -22,7 +22,7 @@ export class PrivacyAnalyticsService {
     this.config = config || {};
   }
 
-  trackEvent(event: string, data?: any) {
+  trackEvent(event: string, data?: unknown) {
     console.log('Privacy-compliant event:', event, data);
   }
 

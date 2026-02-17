@@ -90,7 +90,7 @@ export class NotificationService {
     user_id: string,
     filters: NotificationFilters = {}
   ): Promise<{
-    notifications: any[];
+    notifications: unknown[];
     totalCount: number;
     hasMore: boolean;
   }> {
@@ -417,7 +417,7 @@ export class NotificationService {
   /**
    * Get user contact methods for delivery
    */
-  async getUserContactMethods(user_id: string): Promise<any[]> {
+  async getUserContactMethods(user_id: string): Promise<unknown[]> {
     try {
       const contactMethods = await db
         .select()

@@ -66,7 +66,6 @@ interface UserAchievement {
   reward_points: number;
 }
 
-// import { userProfileService } from './userProfileService'; // Module not found
 
 // Mock user profile data - types not available, using any for now
 // cspell: disable-next-line

@@ -4,13 +4,9 @@
  * Integrates with analyticsApiService from @/core/api
  */
 
-import type {
-  AnalyticsEvent,
-  AnalyticsPerformanceMetrics,
-  UserActivity,
-} from '@client/lib/types/analytics';
+import type { AnalyticsEvent } from '@shared/validation/schemas/analytics.schema';
+import type { AnalyticsPerformanceMetrics } from '@client/lib/types/analytics';
 import { logger } from '@client/lib/utils/logger';
-import { analyticsApiService } from '@/core/api';
 
 /**
  * Result types for analytics operations
@@ -88,10 +84,37 @@ class AnalyticsServiceImpl implements AnalyticsService {
   }
 
   /**
+   * Generate a valid ISO timestamp
+   * Validates the date before converting to ISO string
+   */
+  private generateTimestamp(): string {
+    const now = new Date();
+    
+    // Validate the date is valid
+    if (isNaN(now.getTime())) {
+      // Fallback to current timestamp if Date is somehow invalid
+      return new Date(Date.now()).toISOString();
+    }
+    
+    return now.toISOString();
+  }
+
+  /**
    * Track a custom analytics event
    */
   async trackEvent(event: AnalyticsEvent): Promise<TrackingResult> {
     try {
+      // Validate event timestamp if provided
+      if (event.timestamp) {
+        const eventDate = new Date(event.timestamp);
+        if (isNaN(eventDate.getTime())) {
+          // Replace invalid timestamp with current time
+          event.timestamp = this.generateTimestamp();
+        }
+      } else {
+        event.timestamp = this.generateTimestamp();
+      }
+
       // In a real implementation, this would call the analytics API
       // For now, we log and return success
       logger.info('Analytics event tracked', { event });
@@ -127,7 +150,7 @@ class AnalyticsServiceImpl implements AnalyticsService {
         category: 'navigation',
         action: 'page_view',
         label: pageView.path,
-        timestamp: new Date().toISOString(),
+        timestamp: this.generateTimestamp(),
         sessionId: this.sessionId,
         userId: this.userId,
         anonymized: !this.userId,
@@ -159,12 +182,12 @@ class AnalyticsServiceImpl implements AnalyticsService {
     try {
       const event: AnalyticsEvent = {
         id: this.generateEventId(),
-        type: 'engagement',
+        type: 'user_action',
         category: action.category,
         action: action.action,
         label: action.label,
         value: action.value,
-        timestamp: new Date().toISOString(),
+        timestamp: this.generateTimestamp(),
         sessionId: this.sessionId,
         userId: this.userId,
         anonymized: !this.userId,
@@ -194,12 +217,12 @@ class AnalyticsServiceImpl implements AnalyticsService {
         type: 'performance',
         category: 'performance',
         action: 'metrics_collected',
-        timestamp: new Date().toISOString(),
+        timestamp: this.generateTimestamp(),
         sessionId: this.sessionId,
         userId: this.userId,
         anonymized: !this.userId,
         consentGiven: true,
-        metadata: metrics,
+        metadata: { ...metrics } as Record<string, unknown>,
       };
 
       return await this.trackEvent(event);
@@ -225,7 +248,7 @@ class AnalyticsServiceImpl implements AnalyticsService {
         category: 'error',
         action: 'error_occurred',
         label: error.message,
-        timestamp: new Date().toISOString(),
+        timestamp: this.generateTimestamp(),
         sessionId: this.sessionId,
         userId: this.userId,
         anonymized: !this.userId,

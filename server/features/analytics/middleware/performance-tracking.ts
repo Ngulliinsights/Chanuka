@@ -23,7 +23,7 @@ export function performanceTrackingMiddleware(
   const originalEnd = res.end;
 
   // Override res.end to capture response completion
-  res.end = function(...args: any[]) {
+  res.end = function(...args: unknown[]) {
     const duration = Date.now() - startTime;
     const traceId = req.analyticsContext?.traceId || 'unknown';
 
@@ -74,7 +74,7 @@ export function performanceTrackingMiddleware(
 export function trackAnalyticsOperation(
   operation: string,
   duration: number,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   const tags = {
     operation,

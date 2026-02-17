@@ -301,7 +301,7 @@ export { ValidationSchemas } from '@client/core/security/security-service';
 /**
  * Optimized hook for form input validation and sanitization
  */
-export function useSecureForm<T extends Record<string, any>>(
+export function useSecureForm<T extends Record<string, unknown>>(
   schema: unknown,
   initialValues: T
 ) {

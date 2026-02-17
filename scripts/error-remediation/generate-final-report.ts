@@ -306,7 +306,7 @@ async function generateFinalReport() {
   // Check for errors that couldn't be automatically fixed
   if (report.summary.finalErrors > 0) {
     // Group remaining errors by file
-    const errorsByFile = new Map<string, any[]>();
+    const errorsByFile = new Map<string, unknown[]>();
     
     for (const [file, errors] of currentErrors.errorsByFile.entries()) {
       const relativePath = path.relative(process.cwd(), file);

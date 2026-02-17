@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
 import { MiddlewareFactory } from './middleware-factory';
-// import { logger } from '../observability/logging'; // Unused import
 
 export class MiddlewareRegistry {
-  private middlewares: ((app: any) => void)[] = [];
+  private middlewares: ((app: unknown) => void)[] = [];
 
   constructor(private factory: MiddlewareFactory) {
     // Correlation ID middleware should be added by the server
@@ -14,29 +13,29 @@ export class MiddlewareRegistry {
     this.middlewares.push(...this.factory.createMiddleware());
   }
 
-  applyMiddlewares(app: any): void {
+  applyMiddlewares(app: unknown): void {
     for (const middleware of this.middlewares) {
       middleware(app);
     }
   }
 
-  addMiddleware(middleware: (app: any) => void): void {
+  addMiddleware(middleware: (app: unknown) => void): void {
     this.middlewares.push(middleware);
   }
 }
 
-export const applyMiddleware = (middleware: any) => {
-  return (_target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+export const applyMiddleware = (middleware: unknown) => {
+  return (_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const req: Request = args[0];
       const res: Response = args[1];
       const next: NextFunction = args[2];
 
       try {
         await new Promise((resolve, reject) => {
-          middleware(req, res, (error: any) => {
+          middleware(req, res, (error: unknown) => {
             if (error) reject(error);
             else resolve(true);
           });

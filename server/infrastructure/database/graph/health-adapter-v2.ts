@@ -20,7 +20,7 @@ export interface HealthCheck {
   status: 'healthy' | 'degraded' | 'unhealthy';
   message?: string;
   responseTime?: number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export class HealthAdapterV2 {

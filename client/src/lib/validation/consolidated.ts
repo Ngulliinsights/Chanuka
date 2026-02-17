@@ -12,7 +12,7 @@ export class BaseValidationError extends Error {
   public readonly type: string;
   public readonly field: string;
   public readonly value: any;
-  public readonly details?: Record<string, any>;
+  public readonly details?: Record<string, unknown>;
   public readonly isOperational: boolean;
 
   constructor(
@@ -20,7 +20,7 @@ export class BaseValidationError extends Error {
     field: string,
     value: any,
     type: string = 'VALIDATION_ERROR',
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'BaseValidationError';

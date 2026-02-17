@@ -1,3 +1,5 @@
+import { logger } from '@shared/core';
+
 /**
  * Cypher Query Builder
  *
@@ -401,8 +403,7 @@ export class CypherQueryBuilder {
     // Ensure RETURN is present
     const hasReturn = this.clauses.some(c => c.keyword === 'RETURN');
     if (!hasReturn) {
-      // eslint-disable-next-line no-console
-      console.warn('Warning: Query does not have a RETURN clause');
+      logger.warn('Warning: Query does not have a RETURN clause');
     }
 
     // Validate clause order
@@ -436,8 +437,7 @@ export class CypherQueryBuilder {
     for (const clause of clauses) {
       const rank = clauseRanks[clause] ?? 0;
       if (rank < lastRank) {
-        // eslint-disable-next-line no-console
-        console.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);
+        logger.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);
       }
       lastRank = Math.max(lastRank, rank);
     }

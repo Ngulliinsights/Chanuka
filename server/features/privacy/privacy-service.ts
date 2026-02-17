@@ -556,7 +556,7 @@ class PrivacyService {
           deletedUserId: user_id,
           deletedRecords,
           auditTrailKept: keepAuditTrail
-         } as Record<string, any>,
+         } as Record<string, unknown>,
         ip_address: 'system',
         user_agent: 'privacy-service'
       });
@@ -588,7 +588,7 @@ class PrivacyService {
       }
 
       // Safely extract privacy preferences with fallback to empty object
-      const userPrefs = (users.preferences as unknown as Record<string, any>) || {};
+      const userPrefs = (users.preferences as unknown as Record<string, unknown>) || {};
       const privacyPrefs = userPrefs.privacy || {};
 
       // Merge user preferences with defaults to ensure all fields are present
@@ -649,7 +649,7 @@ class PrivacyService {
          .where(eq(users.id, user_id))
          .limit(1);
 
-      const currentUserPrefs = (userRecord?.preferences as unknown as Record<string, any>) || {};
+      const currentUserPrefs = (userRecord?.preferences as unknown as Record<string, unknown>) || {};
 
       // Update preferences in database
        await db
@@ -670,7 +670,7 @@ class PrivacyService {
         severity: 'low',
         details: { 
           updatedFields: Object.keys(preferences) 
-         } as Record<string, any>,
+         } as Record<string, unknown>,
         ip_address: 'system',
         user_agent: 'privacy-service'
       });
@@ -790,7 +790,7 @@ class PrivacyService {
         action: 'data.cleanup.completed',
         resource: 'system',
         severity: 'low',
-        details: { cleanupResults  } as Record<string, any>,
+        details: { cleanupResults  } as Record<string, unknown>,
         ip_address: 'system',
         user_agent: 'privacy-service'
       });

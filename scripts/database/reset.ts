@@ -101,7 +101,7 @@ async function confirmReset(): Promise<boolean> {
   });
 }
 
-async function createPreResetBackup(pool: any): Promise<void> {
+async function createPreResetBackup(pool: unknown): Promise<void> {
   logger.info('💾 Creating pre-reset backup...');
   
   try {
@@ -118,7 +118,7 @@ async function createPreResetBackup(pool: any): Promise<void> {
   }
 }
 
-async function performDatabaseReset(pool: any): Promise<void> {
+async function performDatabaseReset(pool: unknown): Promise<void> {
   logger.info('🗑️  Performing database reset...');
   
   try {
@@ -158,7 +158,7 @@ async function performDatabaseReset(pool: any): Promise<void> {
   }
 }
 
-async function runMigrationsAfterReset(pool: any): Promise<void> {
+async function runMigrationsAfterReset(pool: unknown): Promise<void> {
   logger.info('📦 Running migrations after reset...');
   
   try {
@@ -174,7 +174,7 @@ async function runMigrationsAfterReset(pool: any): Promise<void> {
       logger.info(`   ✅ Applied ${results.length} migrations`);
       
       // Show migration details
-      results.forEach((result: any) => {
+      results.forEach((result: unknown) => {
         if (result.success) {
           logger.info(`      ✓ ${result.version} (${result.executionTime}ms)`);
         } else {
@@ -220,7 +220,7 @@ async function createBasicSeedData(): Promise<void> {
   // This is a placeholder - implement based on your needs
 }
 
-async function validateResetDatabase(pool: any): Promise<void> {
+async function validateResetDatabase(pool: unknown): Promise<void> {
   logger.info('🔍 Validating reset database...');
   
   try {

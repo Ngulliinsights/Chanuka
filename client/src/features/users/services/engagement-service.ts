@@ -61,7 +61,7 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
     this.initializeSession();
   }
 
-  async init(config?: any): Promise<void> {
+  async init(config?: unknown): Promise<void> {
     await this.cache.warmCache();
     this.startSessionTracking();
     logger.info('EngagementService initialized');

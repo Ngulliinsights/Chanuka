@@ -1,7 +1,6 @@
 import { Book, Users, Shield, Target, ExternalLink } from 'lucide-react';
 import React from 'react';
 
-// import { useKenyanContext } from '@client/lib/context/KenyanContextProvider';
 import {
   Card,
   CardContent,

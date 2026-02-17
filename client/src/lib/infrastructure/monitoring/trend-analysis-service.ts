@@ -133,7 +133,7 @@ class TrendAnalysisService {
     const errors = await this.aggregationService.getAggregatedErrors();
     Object.values(ClientSystem).forEach(system => {
       const systemErrors = errors.filter(
-        (err: any) => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
+        (err: unknown) => err.system === system && err.timestamp >= fiveMinutesAgo && err.timestamp <= now
       );
 
       if (systemErrors.length > 0) {

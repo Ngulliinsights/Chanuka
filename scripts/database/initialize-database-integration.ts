@@ -68,7 +68,7 @@ async function initializeDatabaseIntegration() {
   }
 }
 
-async function testDatabaseOperations(dbIntegration: any) {
+async function testDatabaseOperations(dbIntegration: unknown) {
   logger.info('Testing database operations', {
     component: 'DatabaseInit'
   });
@@ -83,7 +83,7 @@ async function testDatabaseOperations(dbIntegration: any) {
     });
 
     // Test transaction
-    await dbIntegration.transaction(async (client: any) => {
+    await dbIntegration.transaction(async (client: unknown) => {
       await client.query('SELECT 1 as test');
       logger.info('Database transaction test successful', {
         component: 'DatabaseInit'

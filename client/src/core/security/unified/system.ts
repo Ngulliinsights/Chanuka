@@ -177,7 +177,7 @@ export const securityUtils = {
   /**
    * Sanitize input using unified sanitizer
    */
-  sanitizeInput: async (input: string, options?: any) => {
+  sanitizeInput: async (input: string, options?: unknown) => {
     const sanitizer = new UnifiedInputSanitizer({
       enabled: true,
       mode: 'comprehensive',
@@ -191,7 +191,7 @@ export const securityUtils = {
   /**
    * Generate CSP header using unified configuration
    */
-  generateCSPHeader: (directives?: any) => {
+  generateCSPHeader: (directives?: unknown) => {
     const cspManager = new UnifiedCSPManager({
       enabled: true,
       reportOnly: false,
@@ -204,7 +204,7 @@ export const securityUtils = {
   /**
    * Handle security errors consistently
    */
-  handleSecurityError: (error: any, config?: any) => {
+  handleSecurityError: (error: unknown, config?: unknown) => {
     const errorHandler = new SecurityErrorHandler(config || {
       mode: 'strict',
       logLevel: 'info',

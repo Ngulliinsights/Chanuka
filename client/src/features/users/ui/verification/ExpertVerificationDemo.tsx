@@ -230,12 +230,12 @@ export function ExpertVerificationDemo() {
     // In a real implementation, this would call an API
   };
 
-  const handleReview = async (workflowId: string, status: any, notes: string) => {
+  const handleReview = async (workflowId: string, status: unknown, notes: string) => {
     console.log(`Reviewing workflow ${workflowId} with status ${status}:`, notes);
     // In a real implementation, this would call an API
   };
 
-  const handleCommunityFeedback = async (workflowId: string, feedback: string, vote: any) => {
+  const handleCommunityFeedback = async (workflowId: string, feedback: string, vote: unknown) => {
     console.log(`Adding community feedback to workflow ${workflowId}:`, { feedback, vote });
     // In a real implementation, this would call an API
   };

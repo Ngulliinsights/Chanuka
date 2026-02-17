@@ -28,7 +28,7 @@ export interface FeatureFlag {
   createdBy: string;
   status: 'active' | 'inactive' | 'archived';
   tags: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface TargetingRule {
@@ -63,7 +63,7 @@ export interface UserContext {
   userType?: string;
   subscriptionTier?: string;
   registrationDate?: Date;
-  customAttributes?: Record<string, any>;
+  customAttributes?: Record<string, unknown>;
 }
 
 export interface FlagEvaluation {
@@ -547,7 +547,7 @@ export class FeatureFlagsService {
     }
   }
 
-  private evaluateCondition(attributeValue: any, condition: TargetingCondition): boolean {
+  private evaluateCondition(attributeValue: unknown, condition: TargetingCondition): boolean {
     switch (condition.operator) {
       case 'equals':
         return attributeValue === condition.value;

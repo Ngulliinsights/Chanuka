@@ -48,7 +48,7 @@ export class CreateAlertPreferenceUseCase {
     return alertPreference;
   }
 
-  private convertAlertTypeConfig(command: any): any {
+  private convertAlertTypeConfig(command: unknown): unknown {
     return {
       type: AlertType.fromString(command.type),
       enabled: command.enabled,
@@ -57,7 +57,7 @@ export class CreateAlertPreferenceUseCase {
     };
   }
 
-  private convertAlertConditions(command: any): AlertConditions {
+  private convertAlertConditions(command: unknown): AlertConditions {
     return new AlertConditions(
       command.billCategories,
       command.billStatuses,
@@ -73,7 +73,7 @@ export class CreateAlertPreferenceUseCase {
     );
   }
 
-  private convertAlertChannel(command: any): AlertChannel {
+  private convertAlertChannel(command: unknown): AlertChannel {
     const channelType = ChannelType.fromString(command.type);
     const priority = Priority.fromString(command.priority);
 
@@ -96,7 +96,7 @@ export class CreateAlertPreferenceUseCase {
     return new AlertChannel(channelType, command.enabled, config, priority, quietHours);
   }
 
-  private convertFrequencyConfig(command: any): FrequencyConfig {
+  private convertFrequencyConfig(command: unknown): FrequencyConfig {
     return new FrequencyConfig(
       command.type,
       command.batchInterval,
@@ -105,7 +105,7 @@ export class CreateAlertPreferenceUseCase {
     );
   }
 
-  private convertSmartFilteringConfig(command: any): SmartFilteringConfig {
+  private convertSmartFilteringConfig(command: unknown): SmartFilteringConfig {
     return new SmartFilteringConfig(
       command.enabled,
       command.user_interestWeight,

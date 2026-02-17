@@ -111,7 +111,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
 
   async getSystemHealth(): Promise<SystemHealth> {
     const analytics = await this.getCrossSystemAnalytics();
-    const servicesHealth = analytics.systems.find((s: any) => s.system === ClientSystem.LIBRARY_SERVICES);
+    const servicesHealth = analytics.systems.find((s: unknown) => s.system === ClientSystem.LIBRARY_SERVICES);
 
     return servicesHealth || this.calculateFallbackHealth();
   }
@@ -534,7 +534,7 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
     this.monitoring = LibraryServicesMonitoring.getInstance();
   }
 
-  wrap<T extends (...args: any[]) => any>(fn: T, context: ErrorContext): T {
+  wrap<T extends (...args: unknown[]) => any>(fn: T, context: ErrorContext): T {
     return ((...args: Parameters<T>) => {
       if (!this.isOperationEnabled(context.operation || 'unknown')) {
         return fn(...args);
@@ -558,7 +558,7 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
     }) as T;
   }
 
-  wrapAsync<T extends (...args: any[]) => Promise<any>>(fn: T, context: ErrorContext): T {
+  wrapAsync<T extends (...args: unknown[]) => Promise<any>>(fn: T, context: ErrorContext): T {
     return this.wrap(fn, context);
   }
 
@@ -620,7 +620,7 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
   }
 
   private isOperationEnabled(operation: string): boolean {
-    const monitoring = LibraryServicesMonitoring.getInstance() as any;
+    const monitoring = LibraryServicesMonitoring.getInstance() as unknown;
     return monitoring.enabledOperations.has('*') 
       || monitoring.enabledOperations.has(operation);
   }

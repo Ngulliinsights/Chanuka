@@ -27,8 +27,9 @@ import { globalErrorHandler } from './errors';
  */
 export type {
   Notification,
-  NotificationType,
-} from '@client/lib/services/notification-service';
+} from '@shared/types/api/contracts/notification.contract';
+
+export type { NotificationType } from '@shared/types/core/enums';
 
 export type {
   NotificationPreferences,

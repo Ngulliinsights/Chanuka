@@ -22,7 +22,7 @@ export interface RecoverySuggestion {
   priority: number;
   applicableDomains: ErrorDomain[];
   applicableSeverities: ErrorSeverity[];
-  condition?: (error: AppError, context?: any) => boolean;
+  condition?: (error: AppError, context?: unknown) => boolean;
   automatic?: boolean;
   estimatedSuccessRate?: number;
 }

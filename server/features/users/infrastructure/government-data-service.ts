@@ -5,7 +5,7 @@ import { ApiResponse, BillData, DataSource, SponsorData } from '@/infrastructure
 
 export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   priority?: 'low' | 'medium' | 'high';
  }
 
@@ -296,7 +296,7 @@ export class UserGovernmentDataService {
   /**
    * Transform bill search results
    */
-  private async transformBillResults(rawData: any, sourceId: string): Promise<BillData[]> {
+  private async transformBillResults(rawData: unknown, sourceId: string): Promise<BillData[]> {
     if (!Array.isArray(rawData)) {
       rawData = [rawData];
     }
@@ -311,7 +311,7 @@ export class UserGovernmentDataService {
   /**
    * Transform sponsor lookup results
    */
-  private async transformSponsorResults(rawData: any, sourceId: string): Promise<SponsorData[]> {
+  private async transformSponsorResults(rawData: unknown, sourceId: string): Promise<SponsorData[]> {
     if (!Array.isArray(rawData)) {
       rawData = [rawData];
     }

@@ -284,8 +284,8 @@ export async function retryWithCircuitBreaker<T>(
 /**
  * Get circuit breaker metrics for monitoring
  */
-export function getCircuitBreakerMetrics(): Record<string, any> {
-  const metrics: Record<string, any> = {};
+export function getCircuitBreakerMetrics(): Record<string, unknown> {
+  const metrics: Record<string, unknown> = {};
   
   for (const [serviceName, circuitBreaker] of circuitBreakers.entries()) {
     metrics[serviceName] = {

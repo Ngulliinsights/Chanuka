@@ -1,26 +1,26 @@
 {
-  "timestamp": "2026-02-15T19:04:35.189Z",
-  "totalComments": 147,
+  "timestamp": "2026-02-17T00:23:07.401Z",
+  "totalComments": 157,
   "byKeyword": {
-    "TODO": 146,
+    "TODO": 156,
     "FIXME": 0,
     "HACK": 0,
     "XXX": 1
   },
   "byType": {
-    "missing_feature": 79,
-    "known_bug": 13,
+    "missing_feature": 74,
+    "known_bug": 14,
     "workaround": 0,
     "documentation": 4,
     "refactor": 0,
-    "optimization": 10,
-    "other": 41
+    "optimization": 7,
+    "other": 58
   },
   "byPriority": {
     "critical": 0,
-    "high": 13,
-    "medium": 120,
-    "low": 14
+    "high": 14,
+    "medium": 132,
+    "low": 11
   },
   "byFile": {
     "client\\src\\lib\\hooks\\useSeamlessIntegration.ts": 1,
@@ -47,7 +47,7 @@
     "client\\src\\features\\community\\ui\\activity\\ActivityFeed.tsx": 3,
     "client\\src\\features\\bills\\ui\\detail\\BillCommunityTab.tsx": 1,
     "client\\src\\features\\analytics\\ui\\dashboard\\AnalyticsDashboard.tsx": 1,
-    "server\\utils\\metrics.ts": 9,
+    "server\\utils\\metrics.ts": 7,
     "server\\services\\enhancedNotificationService.ts": 3,
     "server\\scripts\\legacy-websocket-cleanup.ts": 2,
     "server\\middleware\\unified-middleware.ts": 2,
@@ -55,6 +55,7 @@
     "server\\features\\repository-cleanup.ts": 1,
     "server\\config\\index.ts": 1,
     "server\\infrastructure\\websocket\\api-server.ts": 2,
+    "server\\infrastructure\\schema\\base-types.ts": 1,
     "server\\infrastructure\\notifications\\smart-notification-filter.ts": 1,
     "server\\infrastructure\\notifications\\notification-service.ts": 1,
     "server\\infrastructure\\notifications\\notification-scheduler.ts": 1,
@@ -63,16 +64,14 @@
     "server\\infrastructure\\core\\types.ts": 1,
     "server\\infrastructure\\core\\index.ts": 1,
     "server\\infrastructure\\cache\\factory.ts": 1,
-    "server\\infrastructure\\cache\\caching-service.ts": 3,
-    "server\\features\\security\\security-monitoring.ts": 1,
     "server\\features\\search\\search-index-manager.ts": 1,
     "server\\features\\privacy\\privacy-routes.ts": 7,
     "server\\features\\notifications\\notification-service.ts": 1,
     "server\\features\\community\\community.ts": 4,
-    "server\\features\\community\\community.OLD.ts": 4,
-    "server\\features\\admin\\external-api-dashboard.ts": 2,
-    "server\\features\\admin\\admin.ts": 3,
-    "server\\features\\admin\\admin-router.OLD.ts": 1,
+    "server\\features\\admin\\external-api-dashboard.ts": 1,
+    "server\\features\\admin\\admin.ts": 2,
+    "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts": 1,
+    "server\\infrastructure\\websocket\\core\\websocket-service.ts": 1,
     "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts": 1,
     "server\\infrastructure\\database\\core\\database-orchestrator.ts": 1,
     "server\\infrastructure\\core\\validation\\data-completeness.ts": 1,
@@ -82,9 +81,12 @@
     "server\\features\\sponsors\\application\\sponsor-service-direct.ts": 5,
     "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts": 7,
     "server\\features\\search\\application\\SearchService.ts": 2,
+    "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts": 7,
     "server\\features\\analytics\\financial-disclosure\\index.ts": 3,
+    "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts": 8,
     "server\\features\\alert-preferences\\domain\\services\\smart-filtering-service.ts": 3,
-    "shared\\core\\middleware\\index.ts": 1,
+    "shared\\core\\types\\index.ts": 4,
+    "shared\\core\\middleware\\index.ts": 2,
     "shared\\core\\middleware\\auth\\provider.ts": 1
   },
   "comments": [
@@ -94,7 +96,7 @@
       "column": 4,
       "keyword": "TODO",
       "message": "Implement or import seamlessIntegration from the correct location",
-      "context": "import { logger } from '../utils/logger';\n\n// TODO: Implement or import seamlessIntegration from the correct location\n// import { seamlessIntegration } from '../utils/seamlessIntegration';\n",
+      "context": "import { logger } from '../utils/logger';\n\n// TODO: Implement or import seamlessIntegration from the correct location\n\n// Fallback seamless integration object for when the module is not available",
       "type": "missing_feature",
       "priority": "medium"
     },
@@ -540,7 +542,7 @@
     },
     {
       "file": "client\\src\\lib\\ui\\dashboard\\hooks\\useDashboard.ts",
-      "line": 162,
+      "line": 165,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement actual API call to add topic",
@@ -550,7 +552,7 @@
     },
     {
       "file": "client\\src\\lib\\ui\\dashboard\\hooks\\useDashboard.ts",
-      "line": 182,
+      "line": 185,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement actual API call to remove topic",
@@ -560,7 +562,7 @@
     },
     {
       "file": "client\\src\\lib\\ui\\dashboard\\hooks\\useDashboard.ts",
-      "line": 202,
+      "line": 205,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement actual API call to complete action",
@@ -570,7 +572,7 @@
     },
     {
       "file": "client\\src\\lib\\ui\\dashboard\\hooks\\useDashboard.ts",
-      "line": 230,
+      "line": 233,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement actual API call to add action",
@@ -580,7 +582,7 @@
     },
     {
       "file": "client\\src\\lib\\infrastructure\\store\\slices\\discussionSlice.ts",
-      "line": 195,
+      "line": 178,
       "column": 10,
       "keyword": "TODO",
       "message": "Replace with actual API call",
@@ -590,7 +592,7 @@
     },
     {
       "file": "client\\src\\lib\\infrastructure\\store\\slices\\discussionSlice.ts",
-      "line": 237,
+      "line": 220,
       "column": 10,
       "keyword": "TODO",
       "message": "Replace with actual API call",
@@ -600,7 +602,7 @@
     },
     {
       "file": "client\\src\\lib\\infrastructure\\store\\slices\\discussionSlice.ts",
-      "line": 275,
+      "line": 258,
       "column": 8,
       "keyword": "TODO",
       "message": "Replace with actual API call",
@@ -610,7 +612,7 @@
     },
     {
       "file": "client\\src\\lib\\infrastructure\\store\\slices\\discussionSlice.ts",
-      "line": 332,
+      "line": 315,
       "column": 10,
       "keyword": "TODO",
       "message": "Replace with actual API call",
@@ -690,27 +692,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 7,
-      "column": 91,
-      "keyword": "TODO",
-      "message": "Fix missing module",
-      "context": " */\r\n\r\n// import { performanceMonitoring } from '@server/services/performance-monitoring.ts'; // TODO: Fix missing module\r\nimport { logger   } from '@shared/core';\r\nimport { performance } from 'perf_hooks';\r",
-      "type": "known_bug",
-      "priority": "high"
-    },
-    {
-      "file": "server\\utils\\metrics.ts",
-      "line": 10,
-      "column": 66,
-      "keyword": "TODO",
-      "message": "Fix missing export",
-      "context": "import { logger   } from '@shared/core';\r\nimport { performance } from 'perf_hooks';\r\n// import { createObservabilityStack   } from '@shared/core'; // TODO: Fix missing export\r\n\r\ninterface MetricData {\r",
-      "type": "known_bug",
-      "priority": "high"
-    },
-    {
-      "file": "server\\utils\\metrics.ts",
-      "line": 69,
+      "line": 67,
       "column": 12,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -720,7 +702,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 116,
+      "line": 114,
       "column": 14,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -730,7 +712,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 145,
+      "line": 143,
       "column": 8,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -740,7 +722,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 164,
+      "line": 162,
       "column": 8,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -750,7 +732,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 204,
+      "line": 202,
       "column": 6,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -760,7 +742,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 210,
+      "line": 208,
       "column": 6,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -770,7 +752,7 @@
     },
     {
       "file": "server\\utils\\metrics.ts",
-      "line": 216,
+      "line": 214,
       "column": 6,
       "keyword": "TODO",
       "message": "Use the new performance monitoring service when available",
@@ -850,7 +832,7 @@
     },
     {
       "file": "server\\middleware\\ai-middleware.ts",
-      "line": 186,
+      "line": 185,
       "column": 6,
       "keyword": "TODO",
       "message": "Fix RateLimitMiddleware usage",
@@ -899,6 +881,16 @@
       "priority": "medium"
     },
     {
+      "file": "server\\infrastructure\\schema\\base-types.ts",
+      "line": 93,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": " * Standard status field for state machines\n */\n// TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\nexport const statusField = (enumType: any, defaultValue: string) => {",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
       "file": "server\\infrastructure\\notifications\\smart-notification-filter.ts",
       "line": 267,
       "column": 12,
@@ -920,7 +912,7 @@
     },
     {
       "file": "server\\infrastructure\\notifications\\notification-scheduler.ts",
-      "line": 136,
+      "line": 135,
       "column": 26,
       "keyword": "TODO",
       "message": "Use user's timezone",
@@ -1000,51 +992,11 @@
     },
     {
       "file": "server\\infrastructure\\cache\\factory.ts",
-      "line": 139,
+      "line": 233,
       "column": 6,
       "keyword": "TODO",
       "message": "Fix SingleFlightCache interface compatibility",
       "context": "  // Wrap with SingleFlightCache for circuit breaker and request deduplication\r\n  // For now, return the base adapter directly to avoid interface conflicts\r\n  // TODO: Fix SingleFlightCache interface compatibility\r\n  return baseAdapter as any;\r\n}\r",
-      "type": "known_bug",
-      "priority": "high"
-    },
-    {
-      "file": "server\\infrastructure\\cache\\caching-service.ts",
-      "line": 155,
-      "column": 10,
-      "keyword": "TODO",
-      "message": "Optimize with batch operations when available",
-      "context": "\r\n      // For now, implement with individual gets\r\n      // TODO: Optimize with batch operations when available\r\n      for (const key of keys) {\r\n        const valueResult = await this.adapter.get<T>(key);\r",
-      "type": "optimization",
-      "priority": "low"
-    },
-    {
-      "file": "server\\infrastructure\\cache\\caching-service.ts",
-      "line": 180,
-      "column": 10,
-      "keyword": "TODO",
-      "message": "Optimize with batch operations when available",
-      "context": "\r\n      // For now, implement with individual sets\r\n      // TODO: Optimize with batch operations when available\r\n      for (const [key, value] of entries) {\r\n        const result = await this.adapter.set(key, value, ttl);\r",
-      "type": "optimization",
-      "priority": "low"
-    },
-    {
-      "file": "server\\infrastructure\\cache\\caching-service.ts",
-      "line": 201,
-      "column": 10,
-      "keyword": "TODO",
-      "message": "Optimize with batch operations when available",
-      "context": "    try {\r\n      // For now, implement with individual deletes\r\n      // TODO: Optimize with batch operations when available\r\n      for (const key of keys) {\r\n        const result = await this.adapter.delete(key);\r",
-      "type": "optimization",
-      "priority": "low"
-    },
-    {
-      "file": "server\\features\\security\\security-monitoring.ts",
-      "line": 1,
-      "column": 132,
-      "keyword": "TODO",
-      "message": "Fix missing dependencies",
-      "context": "i// import { unifiedAlertPreferenceService } from '@shared/alert-preferences/domain/services/unified-alert-preference-service'; // TODO: Fix missing dependencies\r\nimport { logger  } from '@shared/core';\r\nimport { database as db } from '@server/infrastructure/database';\r",
       "type": "known_bug",
       "priority": "high"
     },
@@ -1179,58 +1131,8 @@
       "priority": "medium"
     },
     {
-      "file": "server\\features\\community\\community.OLD.ts",
-      "line": 416,
-      "column": 8,
-      "keyword": "TODO",
-      "message": "Implement actual highlight functionality",
-      "context": "  \r\n  try {\r\n    // TODO: Implement actual highlight functionality\r\n    return ApiSuccess(res, { success: true }, \r\n      ApiResponseWrapper.createMetadata(startTime, 'database'));\r",
-      "type": "missing_feature",
-      "priority": "medium"
-    },
-    {
-      "file": "server\\features\\community\\community.OLD.ts",
-      "line": 445,
-      "column": 8,
-      "keyword": "TODO",
-      "message": "Implement actual poll creation in database",
-      "context": "    }\r\n    \r\n    // TODO: Implement actual poll creation in database\r\n    const pollId = Date.now().toString();\r\n    \r",
-      "type": "missing_feature",
-      "priority": "medium"
-    },
-    {
-      "file": "server\\features\\community\\community.OLD.ts",
-      "line": 472,
-      "column": 8,
-      "keyword": "TODO",
-      "message": "Implement actual poll voting",
-      "context": "    }\r\n    \r\n    // TODO: Implement actual poll voting\r\n    return ApiSuccess(res, { success: true }, \r\n      ApiResponseWrapper.createMetadata(startTime, 'database'));\r",
-      "type": "missing_feature",
-      "priority": "medium"
-    },
-    {
-      "file": "server\\features\\community\\community.OLD.ts",
-      "line": 536,
-      "column": 8,
-      "keyword": "TODO",
-      "message": "Replace with actual database queries",
-      "context": "  \r\n  try {\r\n    // TODO: Replace with actual database queries\r\n    const recentActivity = [\r\n      {\r",
-      "type": "other",
-      "priority": "medium"
-    },
-    {
       "file": "server\\features\\admin\\external-api-dashboard.ts",
-      "line": 13,
-      "column": 98,
-      "keyword": "TODO",
-      "message": "Create advanced caching service",
-      "context": "import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager.js';\r\nimport { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';\r\n// import { advancedCachingService } from '@server/infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service\r\nimport { logger   } from '@shared/core';\r\nimport { ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api-utils';\r",
-      "type": "missing_feature",
-      "priority": "medium"
-    },
-    {
-      "file": "server\\features\\admin\\external-api-dashboard.ts",
-      "line": 306,
+      "line": 305,
       "column": 69,
       "keyword": "TODO",
       "message": "Implement advanced caching service",
@@ -1240,17 +1142,7 @@
     },
     {
       "file": "server\\features\\admin\\admin.ts",
-      "line": 1,
-      "column": 97,
-      "keyword": "TODO",
-      "message": "Create system health service",
-      "context": "// import { systemHealthService } from '@server/infrastructure/monitoring/system-health.js'; // TODO: Create system health service\r\nimport { alertingService, notificationSchedulerService } from '@server/infrastructure/notifications/index.js';\r\nimport { logger   } from '@shared/core';\r",
-      "type": "missing_feature",
-      "priority": "medium"
-    },
-    {
-      "file": "server\\features\\admin\\admin.ts",
-      "line": 40,
+      "line": 39,
       "column": 81,
       "keyword": "TODO",
       "message": "Create system health service",
@@ -1260,7 +1152,7 @@
     },
     {
       "file": "server\\features\\admin\\admin.ts",
-      "line": 41,
+      "line": 40,
       "column": 81,
       "keyword": "TODO",
       "message": "Create system health service",
@@ -1269,14 +1161,24 @@
       "priority": "medium"
     },
     {
-      "file": "server\\features\\admin\\admin-router.OLD.ts",
-      "line": 1,
-      "column": 4,
+      "file": "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts",
+      "line": 401,
+      "column": 6,
       "keyword": "TODO",
-      "message": "Fix bil",
-      "context": "// TODO: Fix bil\r\n//import { billService } from '@shared/bills/application/bill-service.js';\r\nimport { securityAuditService } from '@server/features/security/security-audit-service.ts';\r",
-      "type": "known_bug",
-      "priority": "high"
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * @param precision Number of decimal places\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  private roundNumbers(obj: any, precision: number): void {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 621,
+      "column": 12,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "    if (listener) {\r\n      try {\r\n        // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n        (listener as any)(...args);\r",
+      "type": "other",
+      "priority": "medium"
     },
     {
       "file": "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts",
@@ -1304,7 +1206,7 @@
       "column": 4,
       "keyword": "TODO",
       "message": "Fix import when shared/core modules are available",
-      "context": "// TODO: Fix import when shared/core modules are available\r\n// import { apiRequest  } from '@shared/core/utils/api.js';\r\n\r",
+      "context": "// TODO: Fix import when shared/core modules are available\r\n\r\n// Stub for apiRequest\r",
       "type": "known_bug",
       "priority": "high"
     },
@@ -1390,71 +1292,71 @@
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 414,
+      "line": 446,
       "column": 18,
       "keyword": "TODO",
       "message": "Implement bulk affiliation fetching",
-      "context": "          const [sponsors, affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([\r\n              this.sponsorService.findByIds(sponsor_ids),\r\n              // TODO: Implement bulk affiliation fetching\r\n              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\r\n              // TODO: Implement bulk transparency fetching  \r",
+      "context": "          const [sponsors, affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([\n              this.sponsorService.findByIds(sponsor_ids),\n              // TODO: Implement bulk affiliation fetching\n              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\n              // TODO: Implement bulk transparency fetching  ",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 416,
+      "line": 448,
       "column": 18,
       "keyword": "TODO",
       "message": "Implement bulk transparency fetching",
-      "context": "              // TODO: Implement bulk affiliation fetching\r\n              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\r\n              // TODO: Implement bulk transparency fetching  \r\n              new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),\r\n              // Fetch sponsorships initiated BY these sponsors\r",
+      "context": "              // TODO: Implement bulk affiliation fetching\n              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\n              // TODO: Implement bulk transparency fetching  \n              new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),\n              // Fetch sponsorships initiated BY these sponsors",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 445,
+      "line": 477,
       "column": 19,
       "keyword": "TODO",
       "message": "Implement bulk operations",
-      "context": "           // Fetch relations in bulk\r\n           const [affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([\r\n               // TODO: Implement bulk operations\r\n               new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\r\n               new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),\r",
+      "context": "           // Fetch relations in bulk\n           const [affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([\n               // TODO: Implement bulk operations\n               new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),\n               new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 482,
+      "line": 519,
       "column": 17,
       "keyword": "TODO",
       "message": "Implement findBillsMentioningOrganization",
-      "context": "         try {\r\n              // Use repository method to find relevant bills\r\n             // TODO: Implement findBillsMentioningOrganization\r\n             const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(affiliation.organization, bill_ids);\r\n\r",
+      "context": "         try {\n              // Use repository method to find relevant bills\n             // TODO: Implement findBillsMentioningOrganization\n             const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(affiliation.organization, bill_ids);\n",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 529,
+      "line": 566,
       "column": 14,
       "keyword": "TODO",
       "message": "Implement findBillsMentioningOrganization",
-      "context": "      for (const aff of leadershipRoles) {\r\n        try {\r\n          // TODO: Implement findBillsMentioningOrganization\r\n          const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(aff.organization, bill_ids);\r\n          if (affectedBills.length === 0) continue;\r",
+      "context": "      for (const aff of leadershipRoles) {\n        try {\n          // TODO: Implement findBillsMentioningOrganization\n          const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(aff.organization, bill_ids);\n          if (affectedBills.length === 0) continue;",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 563,
+      "line": 600,
       "column": 14,
       "keyword": "TODO",
       "message": "Implement getBill method",
-      "context": "        try {\r\n          // Fetch bill details using repository\r\n          // TODO: Implement getBill method\r\n          const bill = null; // await this.sponsorService.getBill(sponsorship.bill_id);\r\n          if (!bill || !bills.introduced_date) continue; // Skip if no bill or date\r",
+      "context": "        try {\n          // Fetch bill details using repository\n          // TODO: Implement getBill method\n          const bill = null; // await this.sponsorService.getBill(sponsorship.bill_id);\n          if (!bill || !bills.introduced_date) continue; // Skip if no bill or date",
       "type": "missing_feature",
       "priority": "medium"
     },
     {
       "file": "server\\features\\sponsors\\application\\sponsor-conflict-analysis.service.ts",
-      "line": 795,
+      "line": 843,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement getBill method",
-      "context": "    for (const bill_id of Array.from(billSet)) { let title = `Bill ${bill_id }`;\r\n      try { \r\n        // TODO: Implement getBill method\r\n        const b = null; // await this.sponsorService.getBill(bill_id as number);\r\n        if (b && (b as any).title) title = (b as any).title;\r",
+      "context": "      let title = `Bill ${bill_id}`;\n      try { \n        // TODO: Implement getBill method\n        const b = null; // await this.sponsorService.getBill(bill_id as number);\n        if (b && typeof (b as Record<string, unknown>).title === 'string') {",
       "type": "missing_feature",
       "priority": "medium"
     },
@@ -1475,6 +1377,76 @@
       "keyword": "TODO",
       "message": "aggregate from analytics table – placeholder returned",
       "context": "\r\nexport async function getSearchMetrics() {\r\n  // TODO aggregate from analytics table – placeholder returned\r\n  return { avgSearchTime: 0, cacheHitRate: 0, totalSearches: 0, failedSearches: 0 };\r\n}\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 96,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Store a processed argument in the database\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async storeArgument(argumentData: any): Promise<Argument> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 192,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Store extracted claims\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async storeClaims(claimsData: any[]): Promise<Claim[]> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 260,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Store evidence records\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async storeEvidence(evidenceData: any[]): Promise<Evidence[]> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 328,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Store a generated legislative brief\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async storeBrief(briefData: any): Promise<LegislativeBrief> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 515,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Store argument relationships (clustering, similarity, etc.)\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async storeArgumentRelationships(relationships: any[]): Promise<ArgumentRelationship[]> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 594,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Get argument statistics for a bill\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async getArgumentStatistics(bill_id: string): Promise<any> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 662,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Safely parse JSON with fallback\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  private parseJson(jsonString: string | null, fallback: any = null): any {\r",
       "type": "other",
       "priority": "medium"
     },
@@ -1509,6 +1481,86 @@
       "priority": "medium"
     },
     {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 113,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Enhanced bills search with Phase 2 capabilities\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  private async searchBillsEnhanced(\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 180,
+      "column": 8,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "    );\r\n\r\n    // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n    return result.data.map((bill: any) => ({\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 204,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Enhanced sponsors search with Phase 2 capabilities\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  private async searchSponsorsEnhanced(\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 268,
+      "column": 8,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "    );\r\n\r\n    // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n    return result.data.map((sponsor: any) => ({\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 291,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Enhanced comments search with Phase 2 capabilities\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  private async searchCommentsEnhanced(\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 349,
+      "column": 8,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "    );\r\n\r\n    // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n    return result.data.map((comment: any) => ({\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 385,
+      "column": 10,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "      );\r\n\r\n      // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n      if (result.data.length > 0) {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 662,
+      "column": 6,
+      "keyword": "TODO",
+      "message": "Replace 'any' with proper type definition",
+      "context": "   * Get search performance statistics for monitoring\r\n   */\r\n  // TODO: Replace 'any' with proper type definition\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n  async getPerformanceStats(hoursBack: number = 24): Promise<any[]> {\r",
+      "type": "other",
+      "priority": "medium"
+    },
+    {
       "file": "server\\features\\alert-preferences\\domain\\services\\smart-filtering-service.ts",
       "line": 217,
       "column": 8,
@@ -1539,18 +1591,68 @@
       "priority": "medium"
     },
     {
+      "file": "shared\\core\\types\\index.ts",
+      "line": 36,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Fix import path - observability is in server/infrastructure, not shared/core",
+      "context": "\r\n\r\n// TODO: Fix import path - observability is in server/infrastructure, not shared/core\r\n// export { CircuitBreakerState as ObservabilityCircuitBreakerState } from '../observability/error-management/patterns/circuit-breaker';\r\n// Database CircuitBreakerState is defined inline in connection-manager.ts, skip aliasing\r",
+      "type": "known_bug",
+      "priority": "high"
+    },
+    {
+      "file": "shared\\core\\types\\index.ts",
+      "line": 41,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Fix import path - observability is in server/infrastructure, not shared/core",
+      "context": "\r\n// HealthStatus conflicts resolved with aliases\r\n// TODO: Fix import path - observability is in server/infrastructure, not shared/core\r\n// export type { HealthStatus as ObservabilityHealthStatus } from '../observability/health/types';\r\n\r",
+      "type": "known_bug",
+      "priority": "high"
+    },
+    {
+      "file": "shared\\core\\types\\index.ts",
+      "line": 49,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Fix import path - observability is in server/infrastructure, not shared/core",
+      "context": "// ValidationError conflicts resolved with aliases\r\nexport * from './validation-types';\r\n// TODO: Fix import path - observability is in server/infrastructure, not shared/core\r\n// export { ValidationError as ErrorManagementValidationError } from '../observability/error-management/errors/specialized-errors';\r\nexport type { ValidationError as ValidationTypesAlias } from './validation-types';\r",
+      "type": "known_bug",
+      "priority": "high"
+    },
+    {
+      "file": "shared\\core\\types\\index.ts",
+      "line": 74,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Fix import paths - observability is in server/infrastructure, not shared/core",
+      "context": "\r\n// Observability types (excluding conflicting ones already aliased above)\r\n// TODO: Fix import paths - observability is in server/infrastructure, not shared/core\r\n// These types should be imported from @server/infrastructure/observability if needed\r\n/*\r",
+      "type": "known_bug",
+      "priority": "high"
+    },
+    {
       "file": "shared\\core\\middleware\\index.ts",
-      "line": 39,
+      "line": 32,
+      "column": 4,
+      "keyword": "TODO",
+      "message": "Fix import path - observability is in server/infrastructure, not shared/core",
+      "context": "// Re-export specific middleware - rate limiting is in server, not shared\r\n// export { rateLimitMiddleware } from '../rate-limiting';\r\n// TODO: Fix import path - observability is in server/infrastructure, not shared/core\r\n// export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';\r\n// export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export\r",
+      "type": "known_bug",
+      "priority": "high"
+    },
+    {
+      "file": "shared\\core\\middleware\\index.ts",
+      "line": 34,
       "column": 87,
       "keyword": "TODO",
       "message": "Fix missing export",
-      "context": "export { rateLimitMiddleware } from '../rate-limiting';\r\nexport { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';\r\n// export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export\r\n\r\n// Convenience functions for common middleware setups\r",
+      "context": "// TODO: Fix import path - observability is in server/infrastructure, not shared/core\r\n// export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';\r\n// export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export\r\n\r\n// Convenience functions for common middleware setups\r",
       "type": "known_bug",
       "priority": "high"
     },
     {
       "file": "shared\\core\\middleware\\auth\\provider.ts",
-      "line": 44,
+      "line": 61,
       "column": 12,
       "keyword": "TODO",
       "message": "Implement proper JWT validation",

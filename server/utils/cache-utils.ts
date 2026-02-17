@@ -6,8 +6,7 @@
  */
 
 import { MemoryAdapter } from '../caching/adapters/memory-adapter';
-import { logger } from '../infrastructure/observability';
-// import { CacheAdapter } from '../caching/core/interfaces'; // Unused import
+import { logger } from '@shared/core/observability';
 
 // Cache metrics for monitoring
 export interface CacheMetrics {
@@ -53,7 +52,7 @@ export const cache = Object.assign(
     ) => {
       const originalMethod = descriptor.value;
 
-      descriptor.value = async function (...args: any[]) {
+      descriptor.value = async function (...args: unknown[]) {
         const key = `${String(propertyKey)}:${JSON.stringify(args)}`;
         
         try {
@@ -203,7 +202,7 @@ export const cache = Object.assign(
     /**
      * Set a value in cache
      */
-    set: async (key: string, value: any, ttlSeconds: number = 3600) => {
+    set: async (key: string, value: unknown, ttlSeconds: number = 3600) => {
       try {
         await defaultAdapter.set(key, value, ttlSeconds);
         cacheMetrics.sets++;

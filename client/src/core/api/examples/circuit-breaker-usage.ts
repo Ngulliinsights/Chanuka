@@ -263,7 +263,7 @@ export async function businessLogicWithRetry() {
 // Utility Functions
 // ============================================================================
 
-async function sendAlert(message: string, event: any) {
+async function sendAlert(message: string, event: unknown) {
   // Implementation for sending alerts (email, Slack, etc.)
   console.warn('ALERT:', message, event);
 }
@@ -329,7 +329,7 @@ export function useApiWithCircuitBreaker() {
   // This would be implemented as a proper React hook in a React component file
   // Here's the logic that would go inside the hook:
 
-  const makeApiCall = async (endpoint: string, options: any = {}) => {
+  const makeApiCall = async (endpoint: string, options: unknown = {}) => {
     try {
       const response = await apiClients.internalApi.get(endpoint, options);
       return { data: response.data, error: null, loading: false };

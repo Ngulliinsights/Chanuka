@@ -370,7 +370,7 @@ function extractTypeDefinitions(sourceFile: SourceFile): Map<string, Map<string,
   return types;
 }
 
-function parseInterfaceFields(interfaceDecl: any): Map<string, TypeField> {
+function parseInterfaceFields(interfaceDecl: unknown): Map<string, TypeField> {
   const fields = new Map<string, TypeField>();
 
   for (const property of interfaceDecl.getProperties()) {

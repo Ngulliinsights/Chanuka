@@ -392,7 +392,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Test parallel error handling for a specific scenario
    */
-  private async testParallelErrorHandling(errorType: string, testData: any): Promise<void> {
+  private async testParallelErrorHandling(errorType: string, testData: unknown): Promise<void> {
     const startTime = Date.now();
 
     try {
@@ -443,7 +443,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Simulate legacy error handling for comparison
    */
-  private async simulateLegacyErrorHandling(errorType: string, testData: any): Promise<any> {
+  private async simulateLegacyErrorHandling(errorType: string, testData: unknown): Promise<any> {
     // Simulate legacy error response format
     switch (errorType) {
       case 'validation':
@@ -515,7 +515,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Simulate new error handling for comparison
    */
-  private async simulateNewErrorHandling(errorType: string, testData: any): Promise<any> {
+  private async simulateNewErrorHandling(errorType: string, testData: unknown): Promise<any> {
     const context = {
       service: 'legislative-platform',
       operation: 'test-validation',
@@ -575,7 +575,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Compare error responses for consistency
    */
-  private compareErrorResponses(legacy: any, migrated: any): boolean {
+  private compareErrorResponses(legacy: unknown, migrated: unknown): boolean {
     // Check essential fields for consistency
     const essentialFields = ['success', 'error.code', 'error.message', 'error.category', 'error.retryable'];
     
@@ -594,7 +594,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Find differences between error responses
    */
-  private findResponseDifferences(legacy: any, migrated: any): string[] {
+  private findResponseDifferences(legacy: unknown, migrated: unknown): string[] {
     const differences: string[] = [];
     const fieldsToCheck = ['error.id', 'error.code', 'error.message', 'error.category', 'error.retryable', 'error.timestamp'];
     
@@ -613,7 +613,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Get nested object value by dot notation
    */
-  private getNestedValue(obj: any, path: string): any {
+  private getNestedValue(obj: unknown, path: string): unknown {
     return path.split('.').reduce((current, key) => current?.[key], obj);
   }
 

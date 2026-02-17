@@ -66,7 +66,7 @@ export function createUnifiedErrorMiddleware() {
   /**
    * Error handling middleware
    */
-  return async (error: any, req: Request, res: Response, next: NextFunction) => {
+  return async (error: unknown, req: Request, res: Response, next: NextFunction) => {
     // Skip if response already sent
     if (res.headersSent) {
       return next(error);
@@ -149,7 +149,7 @@ export function asyncHandler(fn: (req: Request, res: Response, next: NextFunctio
  * Validation error middleware
  * Can be used before route handlers to validate request body/params/query
  */
-export function validationErrorHandler(error: any, _req: Request, _res: Response, next: NextFunction) {
+export function validationErrorHandler(error: unknown, _req: Request, _res: Response, next: NextFunction) {
   if (error.status === 400 || error.errors) {
     // JOI or other validation error
     next(error);

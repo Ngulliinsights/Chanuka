@@ -25,13 +25,6 @@ import type { DataExportResponse, DataDeletionResponse } from '@client/core/api/
 
 // Local types removed in favor of shared types
 
-interface ExportedUserData {
-  events: AnalyticsEvent[];
-  summary: AnalyticsMetrics;
-  consent: UserConsent | null;
-  exportDate: string;
-}
-
 interface DeleteResult {
   eventsDeleted: number;
   success: boolean;

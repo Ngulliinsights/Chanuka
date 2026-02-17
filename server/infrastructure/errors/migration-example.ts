@@ -48,7 +48,7 @@ export class LegacyUserService {
 
       // Create user...
       return { id: 'user-123', email: userData.email };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Convert to error response
       if (error.id) {
         // Already a standardized error
@@ -58,7 +58,7 @@ export class LegacyUserService {
       // Handle unexpected errors
       const standardizedError = legacyHandler.createError(
         error,
-        'system' as any,
+        'system' as unknown,
         serviceContext
       );
       return legacyHandler.toErrorResponse(standardizedError);
@@ -115,7 +115,7 @@ export class ModernUserService {
       return createValidationError(errors, serviceContext);
     }
 
-    return { ok: true, value: undefined } as any;
+    return { ok: true, value: undefined } as unknown;
   }
 
   private async checkUserExists(email: string): Promise<Result<boolean, Boom.Boom>> {
@@ -174,9 +174,9 @@ export async function demonstrateMigration() {
 // MIDDLEWARE INTEGRATION EXAMPLE
 // ============================================================================
 
-export function errorHandlingMiddleware(req: any, res: any, next: any) {
+export function errorHandlingMiddleware(req: unknown, res: unknown, next: unknown) {
   // Wrap the next function to catch and convert errors
-  const wrappedNext = (error?: any) => {
+  const wrappedNext = (error?: unknown) => {
     if (!error) {
       return next();
     }
@@ -187,7 +187,7 @@ export function errorHandlingMiddleware(req: any, res: any, next: any) {
     if (Boom.isBoom(error)) {
       boomError = error;
     } else if (error.name === 'ValidationError') {
-      const validationErrors = error.details?.map((detail: any) => ({
+      const validationErrors = error.details?.map((detail: unknown) => ({
         field: detail.path?.join('.') || 'unknown',
         message: detail.message
       })) || [];
@@ -222,7 +222,7 @@ export function errorHandlingMiddleware(req: any, res: any, next: any) {
 export class FeatureFlaggedErrorService {
   private useNewErrorHandling = process.env.USE_NEW_ERROR_HANDLING === 'true';
 
-  async handleError(error: any, context: Partial<ErrorContext>) {
+  async handleError(error: unknown, context: Partial<ErrorContext>) {
     if (this.useNewErrorHandling) {
       // Use new Boom + Neverthrow approach
       if (Boom.isBoom(error)) {
@@ -233,7 +233,7 @@ export class FeatureFlaggedErrorService {
       return errorAdapter.toErrorResponse(boomError);
     } else {
       // Use legacy approach
-      const standardizedError = legacyHandler.createError(error, 'system' as any, context);
+      const standardizedError = legacyHandler.createError(error, 'system' as unknown, context);
       return legacyHandler.toErrorResponse(standardizedError);
     }
   }

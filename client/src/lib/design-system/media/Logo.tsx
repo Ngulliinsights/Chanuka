@@ -25,7 +25,7 @@ export const Logo = React.memo<LogoProps>(
 
     return (
       <div className={cn("flex items-center", className)}>
-        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant as any} />
+        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant as unknown} />
       </div>
     );
   }

@@ -227,7 +227,7 @@ export class ConstitutionalAnalysisError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: Record<string, any>
+    public readonly details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'ConstitutionalAnalysisError';
@@ -235,21 +235,21 @@ export class ConstitutionalAnalysisError extends Error {
 }
 
 export class ProvisionMatchingError extends ConstitutionalAnalysisError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'PROVISION_MATCHING_ERROR', details);
     this.name = 'ProvisionMatchingError';
   }
 }
 
 export class PrecedentAnalysisError extends ConstitutionalAnalysisError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'PRECEDENT_ANALYSIS_ERROR', details);
     this.name = 'PrecedentAnalysisError';
   }
 }
 
 export class ExpertReviewError extends ConstitutionalAnalysisError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'EXPERT_REVIEW_ERROR', details);
     this.name = 'ExpertReviewError';
   }

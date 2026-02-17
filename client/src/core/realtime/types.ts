@@ -199,7 +199,7 @@ export interface WebSocketHookReturn {
   isConnecting?: boolean;
   connectionState: ConnectionState;
   lastMessage: WebSocketMessage | null;
-  sendMessage: (message: any) => void;
+  sendMessage: (message: unknown) => void;
   subscribe: (channel: string) => void;
   unsubscribe: (channel: string) => void;
   // Extended methods for UI components
@@ -208,7 +208,7 @@ export interface WebSocketHookReturn {
   notifications?: RealTimeNotification[];
   connectionQuality?: 'good' | 'fair' | 'poor';
   error?: Error | null;
-  getRecentActivity?: () => any[];
+  getRecentActivity?: () => unknown[];
   markNotificationRead?: (id: string) => void;
 }
 
@@ -260,13 +260,13 @@ export interface ExpertActivityUpdate {
 export interface WebSocketSubscription {
   id: string;
   channel: string;
-  handler: (data: any) => void;
+  handler: (data: unknown) => void;
   createdAt: Date;
   // Extended properties
   type?: 'bill' | 'community' | 'expert' | 'notification' | 'user_notifications';
   topic?: string;
-  callback?: (data: any) => void;
-  filters?: Record<string, any>;
+  callback?: (data: unknown) => void;
+  filters?: Record<string, unknown>;
   priority?: number;
 }
 
@@ -278,16 +278,16 @@ export interface RealTimeHandlers {
   onConnect?: () => void;
   onDisconnect?: () => void;
   // Extended handlers for specific update types
-  onBillUpdate?: (update: any) => void;
-  onCommunityUpdate?: (update: any) => void;
-  onEngagementUpdate?: (update: any) => void;
-  onExpertActivity?: (update: any) => void;
+  onBillUpdate?: (update: unknown) => void;
+  onCommunityUpdate?: (update: unknown) => void;
+  onEngagementUpdate?: (update: unknown) => void;
+  onExpertActivity?: (update: unknown) => void;
   onNotification?: (notification: RealTimeNotification) => void;
   onConnectionChange?: (state: boolean | ConnectionState) => void;
 }
 
 export type MessageHandler = (message: WebSocketMessage) => void;
-export type EventListener = (event: any) => void;
+export type EventListener = (event: unknown) => void;
 
 export interface HeartbeatMessage {
   type: 'heartbeat';

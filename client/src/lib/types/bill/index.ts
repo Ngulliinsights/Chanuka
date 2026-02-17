@@ -226,7 +226,7 @@ export function createUserDefaults(overrides?: Partial<any>): any {
  * @example
  * const formatted = formatBillForDisplay(bill);
  */
-export function formatBillForDisplay(bill: any): string {
+export function formatBillForDisplay(bill: unknown): string {
   return `${bill.billNumber}: ${bill.title}`;
 }
 
@@ -255,7 +255,7 @@ export function getUserRoleLabel(role: string): string {
  * @example
  * if (hasPermission(user, 'create:comment')) { ... }
  */
-export function hasPermission(user: any, permission: string): boolean {
+export function hasPermission(user: unknown, permission: string): boolean {
   const rolePermissions: Record<string, readonly string[]> = {
     admin: ['create:comment', 'edit:comment', 'delete:comment', 'create:analysis', 'moderate:content', 'view:analytics', 'manage:users', 'manage:system'],
     expert: ['create:comment', 'edit:comment', 'create:analysis', 'submit:insight', 'view:analytics'],
@@ -325,7 +325,7 @@ export function getUrgencyColor(urgency: string): string {
  * @example
  * const score = calculateEngagementScore(metrics);
  */
-export function calculateEngagementScore(metrics: any): number {
+export function calculateEngagementScore(metrics: unknown): number {
   if (!metrics) return 0;
   const views = metrics.views || 0;
   const comments = metrics.comments_count || 0;
@@ -342,7 +342,7 @@ export function calculateEngagementScore(metrics: any): number {
  * @example
  * if (canEditBill(currentUser, bill)) { ... }
  */
-export function canEditBill(user: any, bill: any): boolean {
+export function canEditBill(user: unknown, bill: unknown): boolean {
   return user.id === bill.ownerId || hasPermission(user, 'manage:system');
 }
 
@@ -352,7 +352,7 @@ export function canEditBill(user: any, bill: any): boolean {
  * @example
  * if (canDeleteBill(currentUser, bill)) { ... }
  */
-export function canDeleteBill(user: any, bill: any): boolean {
+export function canDeleteBill(user: unknown, bill: unknown): boolean {
   return hasPermission(user, 'manage:system');
 }
 
@@ -362,7 +362,7 @@ export function canDeleteBill(user: any, bill: any): boolean {
  * @example
  * const formatted = formatEngagementMetrics(metrics);
  */
-export function formatEngagementMetrics(metrics: any): Record<string, string> {
+export function formatEngagementMetrics(metrics: unknown): Record<string, string> {
   return {
     views: `${metrics.views?.toLocaleString() || '0'} views`,
     comments: `${metrics.comments_count || 0} comments`,

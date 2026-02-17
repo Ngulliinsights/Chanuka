@@ -27,7 +27,7 @@ export class ParallelQueryExecutor {
   /**
    * Execute multiple queries in parallel with timeout and fallback support
    */
-  async executeParallel<T extends Record<string, any>>(
+  async executeParallel<T extends Record<string, unknown>>(
     tasks: QueryTask[]
   ): Promise<Record<string, QueryResult>> {
     const startTime = Date.now();

@@ -49,7 +49,7 @@ export class ErrorAnalyzer {
     const sourceFiles = this.getProject().getSourceFiles();
     
     // Collect all diagnostics
-    const allDiagnostics: any[] = [];
+    const allDiagnostics: unknown[] = [];
     
     // Get pre-emit diagnostics for each source file
     for (const sourceFile of sourceFiles) {
@@ -188,7 +188,7 @@ export class ErrorAnalyzer {
     };
   }
 
-  private parseDiagnostics(diagnostics: any[]): TypeScriptError[] {
+  private parseDiagnostics(diagnostics: unknown[]): TypeScriptError[] {
     return diagnostics.map(diagnostic => {
       const file = diagnostic.file?.fileName || 'unknown';
       const position = diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start || 0);

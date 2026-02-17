@@ -1,0 +1,1019 @@
+{
+  "totalSuppressions": 97,
+  "byType": {
+    "disable-next-line": 94,
+    "disable": 3
+  },
+  "byRule": {
+    "//  @typescript-eslint/no-this-alias": 1,
+    "//  react-hooks/exhaustive-deps": 3,
+    "//  no-console": 57,
+    "/*  no-console */": 3,
+    "//  complexity": 2,
+    "//  @typescript-eslint/no-explicit-any": 18,
+    "//  @typescript-eslint/no-var-requires": 13
+  },
+  "byFile": {
+    "client\\src\\core\\security\\csrf-protection.ts": 1,
+    "client\\src\\lib\\ui\\offline\\offline-manager.tsx": 1,
+    "client\\src\\features\\analytics\\hooks\\useErrorAnalytics.ts": 1,
+    "client\\src\\core\\navigation\\hooks\\use-navigation-preferences.tsx": 1,
+    "server\\infrastructure\\websocket\\index.ts": 2,
+    "server\\infrastructure\\schema\\validate-static.ts": 3,
+    "server\\infrastructure\\schema\\base-types.ts": 1,
+    "server\\infrastructure\\notifications\\email-service.ts": 1,
+    "server\\features\\coverage\\coverage-routes.ts": 18,
+    "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts": 3,
+    "server\\infrastructure\\websocket\\migration\\traffic-controller.ts": 4,
+    "server\\infrastructure\\websocket\\migration\\state-manager.ts": 4,
+    "server\\infrastructure\\websocket\\migration\\connection-migrator.ts": 4,
+    "server\\infrastructure\\websocket\\memory\\progressive-degradation.ts": 2,
+    "server\\infrastructure\\websocket\\memory\\memory-manager.ts": 2,
+    "server\\infrastructure\\websocket\\memory\\leak-detector-handler.ts": 3,
+    "server\\infrastructure\\websocket\\core\\websocket-service.ts": 5,
+    "server\\infrastructure\\websocket\\core\\message-handler.ts": 6,
+    "server\\infrastructure\\websocket\\core\\connection-manager.ts": 3,
+    "server\\infrastructure\\websocket\\config\\runtime-config.ts": 1,
+    "server\\infrastructure\\websocket\\batching\\batching-service.ts": 4,
+    "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts": 4,
+    "server\\infrastructure\\websocket\\adapters\\redis-adapter.ts": 4,
+    "server\\infrastructure\\websocket\\adapters\\native-websocket-adapter.ts": 1,
+    "server\\infrastructure\\database\\graph\\relationships.ts": 1,
+    "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts": 7,
+    "server\\infrastructure\\database\\graph\\utils\\query-builder.ts": 2,
+    "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts": 8
+  },
+  "suppressions": [
+    {
+      "file": "client\\src\\core\\security\\csrf-protection.ts",
+      "line": 260,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-this-alias"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-this-alias",
+      "context": "   258 |     const originalOpen = XMLHttpRequest.prototype.open;\n   259 |     const originalSend = XMLHttpRequest.prototype.send;\n>  260 |     // eslint-disable-next-line @typescript-eslint/no-this-alias\n   261 |     const self = this;\n   262 | "
+    },
+    {
+      "file": "client\\src\\lib\\ui\\offline\\offline-manager.tsx",
+      "line": 478,
+      "type": "disable-next-line",
+      "rules": [
+        "//  react-hooks/exhaustive-deps"
+      ],
+      "comment": "// eslint-disable-next-line react-hooks/exhaustive-deps",
+      "context": "   476 |   useEffect(() => {\n   477 |     fetchData();\n>  478 |     // eslint-disable-next-line react-hooks/exhaustive-deps\n   479 |   }, [fetchData, ...dependencies]);\n   480 | "
+    },
+    {
+      "file": "client\\src\\features\\analytics\\hooks\\useErrorAnalytics.ts",
+      "line": 323,
+      "type": "disable-next-line",
+      "rules": [
+        "//  react-hooks/exhaustive-deps"
+      ],
+      "comment": "// eslint-disable-next-line react-hooks/exhaustive-deps",
+      "context": "   321 |   useEffect(() => {\n   322 |     loadAllData();\n>  323 |     // eslint-disable-next-line react-hooks/exhaustive-deps\n   324 |   }, []); // Only run once on mount\n   325 | "
+    },
+    {
+      "file": "client\\src\\core\\navigation\\hooks\\use-navigation-preferences.tsx",
+      "line": 104,
+      "type": "disable-next-line",
+      "rules": [
+        "//  react-hooks/exhaustive-deps"
+      ],
+      "comment": "// eslint-disable-next-line react-hooks/exhaustive-deps",
+      "context": "   102 |       mounted = false;\n   103 |     };\n>  104 |     // eslint-disable-next-line react-hooks/exhaustive-deps\n   105 |   }, []); // Empty dependency array ensures this runs only once on mount\n   106 | "
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\index.ts",
+      "line": 303,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   301 |           // Log error but continue with other connections\r\n   302 |           if (process.env.NODE_ENV !== 'production') {\r\n>  303 |             // eslint-disable-next-line no-console\r\n   304 |             console.error(`Failed to send notification to user ${user_id}:`, error);\r\n   305 |           }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\index.ts",
+      "line": 351,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   349 |     // This is a simplified implementation - in practice, we'd need access to all connections\r\n   350 |     if (process.env.NODE_ENV !== 'production') {\r\n>  351 |       // eslint-disable-next-line no-console\r\n   352 |       console.log('Broadcasting to all clients:', formattedMessage);\r\n   353 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\schema\\validate-static.ts",
+      "line": 15,
+      "type": "disable",
+      "rules": [
+        "/*  no-console */"
+      ],
+      "comment": "/* eslint-disable no-console */",
+      "context": "    13 | // - Fast: No compilation or import overhead\n    14 | \n>   15 | /* eslint-disable no-console */\n    16 | \n    17 | import fs from \"fs\";"
+    },
+    {
+      "file": "server\\infrastructure\\schema\\validate-static.ts",
+      "line": 188,
+      "type": "disable-next-line",
+      "rules": [
+        "//  complexity"
+      ],
+      "comment": "// eslint-disable-next-line complexity",
+      "context": "   186 |  * Scans a directory for schema files and extracts table/enum definitions\n   187 |  */\n>  188 | // eslint-disable-next-line complexity\n   189 | function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } {\n   190 |   const tables: TableDef[] = [];"
+    },
+    {
+      "file": "server\\infrastructure\\schema\\validate-static.ts",
+      "line": 251,
+      "type": "disable-next-line",
+      "rules": [
+        "//  complexity"
+      ],
+      "comment": "// eslint-disable-next-line complexity",
+      "context": "   249 |  * Scans for relation definitions\n   250 |  */\n>  251 | // eslint-disable-next-line complexity\n   252 | function findRelations(dir: string): RelationDef[] {\n   253 |   const relations: RelationDef[] = [];"
+    },
+    {
+      "file": "server\\infrastructure\\schema\\base-types.ts",
+      "line": 93,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "    91 |  * Standard status field for state machines\n    92 |  */\n>   93 | // eslint-disable-next-line @typescript-eslint/no-explicit-any\n    94 | export const statusField = (enumType: any, defaultValue: string) => {\n    95 |   const enumNameOrStatus = enumType.name ?? \"status\";"
+    },
+    {
+      "file": "server\\infrastructure\\notifications\\email-service.ts",
+      "line": 464,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   462 |       let nodemailer: any = null;\r\n   463 |       try {\r\n>  464 |         // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   465 |         nodemailer = require('nodemailer');\r\n   466 |       } catch (err) {\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 13,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "    11 |   try {\r\n    12 |   // Create analyzer lazily to respect test mocks and avoid early module-side instantiation\r\n>   13 |   // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n    14 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n    15 |   const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 42,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "    40 |     // Lazy-load logger to avoid initializing config during module import\r\n    41 |     try {\r\n>   42 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n    43 |       const { logger } = require('../../utils/logger');\r\n    44 |       logger.error('Error generating coverage report:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 47,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    45 |     } catch (e) {\r\n    46 |       // Fallback\r\n>   47 |       // eslint-disable-next-line no-console\r\n    48 |       console.error('Error generating coverage report:', error);\r\n    49 |     }\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 65,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "    63 |   try {\r\n    64 |   // Lazily instantiate analyzer to ensure tests that mock the class are used\r\n>   65 |   // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n    66 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n    67 |   const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 92,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "    90 |     } catch (error) {\r\n    91 |     try {\r\n>   92 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n    93 |       const { logger } = require('../../utils/logger');\r\n    94 |       logger.error('Error analyzing server coverage:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 96,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    94 |       logger.error('Error analyzing server coverage:', { error });\r\n    95 |     } catch (e) {\r\n>   96 |       // eslint-disable-next-line no-console\r\n    97 |       console.error('Error analyzing server coverage:', error);\r\n    98 |     }\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 114,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   112 |   try {\r\n   113 |   // Lazily instantiate analyzer to ensure tests that mock the class are used\r\n>  114 |   // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   115 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n   116 |   const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 140,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   138 |     } catch (error) {\r\n   139 |     try {\r\n>  140 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   141 |       const { logger } = require('../../utils/logger');\r\n   142 |       logger.error('Error analyzing client coverage:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 144,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   142 |       logger.error('Error analyzing client coverage:', { error });\r\n   143 |     } catch (e) {\r\n>  144 |       // eslint-disable-next-line no-console\r\n   145 |       console.error('Error analyzing client coverage:', error);\r\n   146 |     }\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 162,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   160 |   try {\r\n   161 |   // Lazily instantiate analyzer to ensure tests that mock the class are used\r\n>  162 |   // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   163 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n   164 |   const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 188,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   186 |     } catch (error) {\r\n   187 |     try {\r\n>  188 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   189 |       const { logger } = require('../../utils/logger');\r\n   190 |       logger.error('Error analyzing integration coverage:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 192,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   190 |       logger.error('Error analyzing integration coverage:', { error });\r\n   191 |     } catch (e) {\r\n>  192 |       // eslint-disable-next-line no-console\r\n   193 |       console.error('Error analyzing integration coverage:', error);\r\n   194 |     }\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 210,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   208 |   try {\r\n   209 |   // Lazily instantiate analyzer to ensure tests that mock the class are used\r\n>  210 |   // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   211 |   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n   212 |   const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 258,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   256 |   } catch (error) {\r\n   257 |     try {\r\n>  258 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   259 |       const { logger } = require('../../utils/logger');\r\n   260 |       logger.error('Error analyzing coverage gaps:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 262,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   260 |       logger.error('Error analyzing coverage gaps:', { error });\r\n   261 |     } catch (e) {\r\n>  262 |       // eslint-disable-next-line no-console\r\n   263 |       console.error('Error analyzing coverage gaps:', error);\r\n   264 |     }\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 283,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   281 |     let result;\r\n   282 |     // Lazily instantiate analyzer to ensure tests that mock the class are used\r\n>  283 |     // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   284 |     const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');\r\n   285 |     const coverageAnalyzer = new Analyzer();\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 327,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-var-requires"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-var-requires",
+      "context": "   325 |   } catch (error) {\r\n   326 |     try {\r\n>  327 |       // eslint-disable-next-line @typescript-eslint/no-var-requires\r\n   328 |       const { logger } = require('../../utils/logger');\r\n   329 |       logger.error('Error running coverage analysis:', { error });\r"
+    },
+    {
+      "file": "server\\features\\coverage\\coverage-routes.ts",
+      "line": 331,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   329 |       logger.error('Error running coverage analysis:', { error });\r\n   330 |     } catch (e) {\r\n>  331 |       // eslint-disable-next-line no-console\r\n   332 |       console.error('Error running coverage analysis:', error);\r\n   333 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts",
+      "line": 128,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   126 |     if (!this.logger) {\r\n   127 |       if (process.env.NODE_ENV !== 'production') {\r\n>  128 |         // eslint-disable-next-line no-console\r\n   129 |         console.warn('No logger configured for MetricsReporter');\r\n   130 |       }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts",
+      "line": 143,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   141 |         // If logging the error also fails, just ignore it to prevent throwing\r\n   142 |         if (process.env.NODE_ENV !== 'production') {\r\n>  143 |           // eslint-disable-next-line no-console\r\n   144 |           console.error('Failed to log metrics error:', logError);\r\n   145 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\monitoring\\metrics-reporter.ts",
+      "line": 401,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   399 |    * @param precision Number of decimal places\r\n   400 |    */\r\n>  401 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   402 |   private roundNumbers(obj: any, precision: number): void {\r\n   403 |     for (const key in obj) {\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\traffic-controller.ts",
+      "line": 10,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "     8 | const logger = {\r\n     9 |   info: (message: string, context?: unknown) => {\r\n>   10 |     // eslint-disable-next-line no-console\r\n    11 |     console.log(`[INFO] ${message}`, context || '');\r\n    12 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\traffic-controller.ts",
+      "line": 14,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    12 |   },\r\n    13 |   warn: (message: string, context?: unknown) => {\r\n>   14 |     // eslint-disable-next-line no-console\r\n    15 |     console.warn(`[WARN] ${message}`, context || '');\r\n    16 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\traffic-controller.ts",
+      "line": 18,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    16 |   },\r\n    17 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   18 |     // eslint-disable-next-line no-console\r\n    19 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    20 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\traffic-controller.ts",
+      "line": 22,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    20 |   },\r\n    21 |   debug: (message: string, context?: unknown) => {\r\n>   22 |     // eslint-disable-next-line no-console\r\n    23 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    24 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\state-manager.ts",
+      "line": 9,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "     7 | const logger = {\r\n     8 |   info: (message: string, context?: unknown) => {\r\n>    9 |     // eslint-disable-next-line no-console\r\n    10 |     console.log(`[INFO] ${message}`, context || '');\r\n    11 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\state-manager.ts",
+      "line": 13,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    11 |   },\r\n    12 |   warn: (message: string, context?: unknown) => {\r\n>   13 |     // eslint-disable-next-line no-console\r\n    14 |     console.warn(`[WARN] ${message}`, context || '');\r\n    15 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\state-manager.ts",
+      "line": 17,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    15 |   },\r\n    16 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   17 |     // eslint-disable-next-line no-console\r\n    18 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    19 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\state-manager.ts",
+      "line": 21,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    19 |   },\r\n    20 |   debug: (message: string, context?: unknown) => {\r\n>   21 |     // eslint-disable-next-line no-console\r\n    22 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    23 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\connection-migrator.ts",
+      "line": 10,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "     8 | const logger = {\r\n     9 |   info: (message: string, context?: unknown) => {\r\n>   10 |     // eslint-disable-next-line no-console\r\n    11 |     console.log(`[INFO] ${message}`, context || '');\r\n    12 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\connection-migrator.ts",
+      "line": 14,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    12 |   },\r\n    13 |   warn: (message: string, context?: unknown) => {\r\n>   14 |     // eslint-disable-next-line no-console\r\n    15 |     console.warn(`[WARN] ${message}`, context || '');\r\n    16 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\connection-migrator.ts",
+      "line": 18,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    16 |   },\r\n    17 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   18 |     // eslint-disable-next-line no-console\r\n    19 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    20 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\migration\\connection-migrator.ts",
+      "line": 22,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    20 |   },\r\n    21 |   debug: (message: string, context?: unknown) => {\r\n>   22 |     // eslint-disable-next-line no-console\r\n    23 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    24 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\progressive-degradation.ts",
+      "line": 200,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   198 |     // Log the degradation change (in production, use proper logging)\r\n   199 |     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  200 |       // eslint-disable-next-line no-console\r\n   201 |       console.log(`WebSocket service degradation level changed: ${previousLevel} -> ${level}`);\r\n   202 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\progressive-degradation.ts",
+      "line": 218,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   216 |         // Log error without using console directly in production\r\n   217 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  218 |           // eslint-disable-next-line no-console\r\n   219 |           console.error('Error in degradation level change listener:', error);\r\n   220 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\memory-manager.ts",
+      "line": 446,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   444 |   private logDebug(message: string): void {\r\n   445 |     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  446 |       // eslint-disable-next-line no-console\r\n   447 |       console.log(`[MemoryManager] ${message}`);\r\n   448 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\memory-manager.ts",
+      "line": 456,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   454 |   private logError(message: string, error?: unknown): void {\r\n   455 |     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  456 |       // eslint-disable-next-line no-console\r\n   457 |       console.error(`[MemoryManager] ${message}`, error);\r\n   458 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\leak-detector-handler.ts",
+      "line": 254,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   252 |     // Log the response (in production, use proper logging)\r\n   253 |     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  254 |       // eslint-disable-next-line no-console\r\n   255 |       console.log(`Memory leak response executed: ${data.severity} severity, ${response.actions.length} actions`);\r\n   256 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\leak-detector-handler.ts",
+      "line": 319,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   317 |     // Implementation depends on the connection manager interface\r\n   318 |     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  319 |       // eslint-disable-next-line no-console\r\n   320 |       console.log(`Applying connection limits: ${limits.maxConnectionsPerUser} per user, ${limits.maxTotalConnections} total`);\r\n   321 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\memory\\leak-detector-handler.ts",
+      "line": 435,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   433 |         // Log error without using console directly in production\r\n   434 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  435 |           // eslint-disable-next-line no-console\r\n   436 |           console.error('Error in leak response listener:', error);\r\n   437 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 621,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   619 |     if (listener) {\r\n   620 |       try {\r\n>  621 |         // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   622 |         (listener as any)(...args);\r\n   623 |       } catch (error) {\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 634,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   632 |   private logInfo(message: string): void {\r\n   633 |     if (process.env.NODE_ENV !== 'production') {\r\n>  634 |       // eslint-disable-next-line no-console\r\n   635 |       console.log(`[WebSocketService] ${message}`);\r\n   636 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 644,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   642 |   private logDebug(message: string): void {\r\n   643 |     if (process.env.NODE_ENV !== 'production') {\r\n>  644 |       // eslint-disable-next-line no-console\r\n   645 |       console.log(`[WebSocketService] ${message}`);\r\n   646 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 654,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   652 |   private logWarn(message: string): void {\r\n   653 |     if (process.env.NODE_ENV !== 'production') {\r\n>  654 |       // eslint-disable-next-line no-console\r\n   655 |       console.warn(`[WebSocketService] ${message}`);\r\n   656 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\websocket-service.ts",
+      "line": 664,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   662 |   private logError(message: string, error?: unknown): void {\r\n   663 |     if (process.env.NODE_ENV !== 'production') {\r\n>  664 |       // eslint-disable-next-line no-console\r\n   665 |       console.error(`[WebSocketService] ${message}`, error);\r\n   666 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 78,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    76 |       // Check for duplicate messages\r\n    77 |       if (this.isDuplicateMessage(message)) {\r\n>   78 |         // eslint-disable-next-line no-console\r\n    79 |         console.warn('Duplicate message detected, ignoring:', message.messageId);\r\n    80 |         return;\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 87,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    85 | \r\n    86 |     } catch (error) {\r\n>   87 |       // eslint-disable-next-line no-console\r\n    88 |       console.error('Error handling message:', error);\r\n    89 |       await this.sendErrorResponse(ws, message, error);\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 151,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   149 |       const queued = this.operationQueueManager.enqueue(operation);\r\n   150 |       if (!queued) {\r\n>  151 |         // eslint-disable-next-line no-console\r\n   152 |         console.warn('Failed to queue broadcast operation for bill:', billId);\r\n   153 |         // Fallback to direct broadcast\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 158,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   156 | \r\n   157 |     } catch (error) {\r\n>  158 |       // eslint-disable-next-line no-console\r\n   159 |       console.error('Error broadcasting to subscribers:', error);\r\n   160 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 513,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   511 |       ws.send(responseStr);\r\n   512 |     } catch (error) {\r\n>  513 |       // eslint-disable-next-line no-console\r\n   514 |       console.error('Error sending response:', error);\r\n   515 |     }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\message-handler.ts",
+      "line": 555,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   553 |           ws.send(messageStr);\r\n   554 |         } catch (error) {\r\n>  555 |           // eslint-disable-next-line no-console\r\n   556 |           console.error('Error in direct broadcast:', error);\r\n   557 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\connection-manager.ts",
+      "line": 129,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   127 |       // Log error but don't throw to avoid disrupting cleanup\r\n   128 |       if (process.env.NODE_ENV !== 'production') {\r\n>  129 |         // eslint-disable-next-line no-console\r\n   130 |         console.error('Error removing connection:', error);\r\n   131 |       }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\connection-manager.ts",
+      "line": 217,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   215 |       } catch (error) {\r\n   216 |         if (process.env.NODE_ENV !== 'production') {\r\n>  217 |           // eslint-disable-next-line no-console\r\n   218 |           console.error('Error cleaning up stale connection:', error);\r\n   219 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\core\\connection-manager.ts",
+      "line": 336,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   334 |     ws.on('error', (error) => {\r\n   335 |       if (process.env.NODE_ENV !== 'production') {\r\n>  336 |         // eslint-disable-next-line no-console\r\n   337 |         console.error(`Connection error for ${ws.connectionId}:`, error);\r\n   338 |       }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\config\\runtime-config.ts",
+      "line": 267,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   265 |         // In production, this should use the application's logging system\r\n   266 |         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {\r\n>  267 |           // eslint-disable-next-line no-console\r\n   268 |           console.error('Error in configuration change listener:', error);\r\n   269 |         }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\batching\\batching-service.ts",
+      "line": 14,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    12 | const logger = {\r\n    13 |   info: (message: string, context?: unknown) => {\r\n>   14 |     // eslint-disable-next-line no-console\r\n    15 |     console.log(`[INFO] ${message}`, context || '');\r\n    16 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\batching\\batching-service.ts",
+      "line": 18,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    16 |   },\r\n    17 |   warn: (message: string, context?: unknown) => {\r\n>   18 |     // eslint-disable-next-line no-console\r\n    19 |     console.warn(`[WARN] ${message}`, context || '');\r\n    20 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\batching\\batching-service.ts",
+      "line": 22,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    20 |   },\r\n    21 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   22 |     // eslint-disable-next-line no-console\r\n    23 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    24 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\batching\\batching-service.ts",
+      "line": 26,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    24 |   },\r\n    25 |   debug: (message: string, context?: unknown) => {\r\n>   26 |     // eslint-disable-next-line no-console\r\n    27 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    28 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts",
+      "line": 17,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    15 | const logger = {\r\n    16 |   info: (message: string, context?: unknown) => {\r\n>   17 |     // eslint-disable-next-line no-console\r\n    18 |     console.log(`[INFO] ${message}`, context || '');\r\n    19 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts",
+      "line": 21,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    19 |   },\r\n    20 |   warn: (message: string, context?: unknown) => {\r\n>   21 |     // eslint-disable-next-line no-console\r\n    22 |     console.warn(`[WARN] ${message}`, context || '');\r\n    23 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts",
+      "line": 25,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    23 |   },\r\n    24 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   25 |     // eslint-disable-next-line no-console\r\n    26 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    27 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\socketio-adapter.ts",
+      "line": 29,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    27 |   },\r\n    28 |   debug: (message: string, context?: unknown) => {\r\n>   29 |     // eslint-disable-next-line no-console\r\n    30 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    31 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\redis-adapter.ts",
+      "line": 15,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    13 | const logger = {\r\n    14 |   info: (message: string, context?: unknown) => {\r\n>   15 |     // eslint-disable-next-line no-console\r\n    16 |     console.log(`[INFO] ${message}`, context || '');\r\n    17 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\redis-adapter.ts",
+      "line": 19,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    17 |   },\r\n    18 |   warn: (message: string, context?: unknown) => {\r\n>   19 |     // eslint-disable-next-line no-console\r\n    20 |     console.warn(`[WARN] ${message}`, context || '');\r\n    21 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\redis-adapter.ts",
+      "line": 23,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    21 |   },\r\n    22 |   error: (message: string, context?: unknown, error?: Error) => {\r\n>   23 |     // eslint-disable-next-line no-console\r\n    24 |     console.error(`[ERROR] ${message}`, context || '', error || '');\r\n    25 |   },\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\redis-adapter.ts",
+      "line": 27,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "    25 |   },\r\n    26 |   debug: (message: string, context?: unknown) => {\r\n>   27 |     // eslint-disable-next-line no-console\r\n    28 |     console.log(`[DEBUG] ${message}`, context || '');\r\n    29 |   }\r"
+    },
+    {
+      "file": "server\\infrastructure\\websocket\\adapters\\native-websocket-adapter.ts",
+      "line": 15,
+      "type": "disable",
+      "rules": [
+        "/*  no-console */"
+      ],
+      "comment": "/* eslint-disable no-console */",
+      "context": "    13 | // Note: If @shared/core is unavailable, consider using a local logger implementation\r\n    14 | // or importing from a different path. For now, we'll create a fallback.\r\n>   15 | /* eslint-disable no-console */\r\n    16 | const logger = {\r\n    17 |   info: (message: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${message}`, meta),\r"
+    },
+    {
+      "file": "server\\infrastructure\\database\\graph\\relationships.ts",
+      "line": 1,
+      "type": "disable",
+      "rules": [
+        "/*  no-console */"
+      ],
+      "comment": "/* eslint-disable no-console */",
+      "context": ">    1 | /* eslint-disable no-console */\n     2 | /**\n     3 |  * Core Relationship Models (FULLY REFACTORED & OPTIMIZED)"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 96,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "    94 |    * Store a processed argument in the database\r\n    95 |    */\r\n>   96 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n    97 |   async storeArgument(argumentData: any): Promise<Argument> {\r\n    98 |     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 191,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   189 |    * Store extracted claims\r\n   190 |    */\r\n>  191 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   192 |   async storeClaims(claimsData: any[]): Promise<Claim[]> {\r\n   193 |     const logContext = {\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 258,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   256 |    * Store evidence records\r\n   257 |    */\r\n>  258 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   259 |   async storeEvidence(evidenceData: any[]): Promise<Evidence[]> {\r\n   260 |     const logContext = {\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 325,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   323 |    * Store a generated legislative brief\r\n   324 |    */\r\n>  325 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   326 |   async storeBrief(briefData: any): Promise<LegislativeBrief> {\r\n   327 |     const logContext = {\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 511,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   509 |    * Store argument relationships (clustering, similarity, etc.)\r\n   510 |    */\r\n>  511 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   512 |   async storeArgumentRelationships(relationships: any[]): Promise<ArgumentRelationship[]> {\r\n   513 |     const logContext = {\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 589,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   587 |    * Get argument statistics for a bill\r\n   588 |    */\r\n>  589 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   590 |   async getArgumentStatistics(bill_id: string): Promise<any> {\r\n   591 |     const logContext = {\r"
+    },
+    {
+      "file": "server\\features\\argument-intelligence\\application\\argument-intelligence-service.ts",
+      "line": 656,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   654 |    * Safely parse JSON with fallback\r\n   655 |    */\r\n>  656 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   657 |   private parseJson(jsonString: string | null, fallback: any = null): any {\r\n   658 |     if (!jsonString) return fallback;\r"
+    },
+    {
+      "file": "server\\infrastructure\\database\\graph\\utils\\query-builder.ts",
+      "line": 404,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   402 |     const hasReturn = this.clauses.some(c => c.keyword === 'RETURN');\n   403 |     if (!hasReturn) {\n>  404 |       // eslint-disable-next-line no-console\n   405 |       console.warn('Warning: Query does not have a RETURN clause');\n   406 |     }"
+    },
+    {
+      "file": "server\\infrastructure\\database\\graph\\utils\\query-builder.ts",
+      "line": 439,
+      "type": "disable-next-line",
+      "rules": [
+        "//  no-console"
+      ],
+      "comment": "// eslint-disable-next-line no-console",
+      "context": "   437 |       const rank = clauseRanks[clause] ?? 0;\n   438 |       if (rank < lastRank) {\n>  439 |         // eslint-disable-next-line no-console\n   440 |         console.warn(`Warning: Clause order may be incorrect. ${clause} appears after a lower-precedence clause`);\n   441 |       }"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 113,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   111 |    * Enhanced bills search with Phase 2 capabilities\r\n   112 |    */\r\n>  113 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   114 |   private async searchBillsEnhanced(\r\n   115 |     queryComponents: any,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 179,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   177 |     );\r\n   178 | \r\n>  179 |     // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   180 |     return result.data.map((bill: any) => ({\r\n   181 |       id: bill.id,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 202,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   200 |    * Enhanced sponsors search with Phase 2 capabilities\r\n   201 |    */\r\n>  202 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   203 |   private async searchSponsorsEnhanced(\r\n   204 |     queryComponents: any,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 265,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   263 |     );\r\n   264 | \r\n>  265 |     // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   266 |     return result.data.map((sponsor: any) => ({\r\n   267 |       id: sponsor.id,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 287,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   285 |    * Enhanced comments search with Phase 2 capabilities\r\n   286 |    */\r\n>  287 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   288 |   private async searchCommentsEnhanced(\r\n   289 |     queryComponents: any,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 344,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   342 |     );\r\n   343 | \r\n>  344 |     // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   345 |     return result.data.map((comment: any) => ({\r\n   346 |       id: comment.id,\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 379,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   377 |       );\r\n   378 | \r\n>  379 |       // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   380 |       if (result.data.length > 0) {\r\n   381 |         const firstResult = result.data[0] as Record<string, any>;\r"
+    },
+    {
+      "file": "server\\features\\search\\engines\\core\\postgresql-fulltext.engine.ts",
+      "line": 655,
+      "type": "disable-next-line",
+      "rules": [
+        "//  @typescript-eslint/no-explicit-any"
+      ],
+      "comment": "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
+      "context": "   653 |    * Get search performance statistics for monitoring\r\n   654 |    */\r\n>  655 |   // eslint-disable-next-line @typescript-eslint/no-explicit-any\r\n   656 |   async getPerformanceStats(hoursBack: number = 24): Promise<any[]> {\r\n   657 |     const result = await databaseService.executeRawQuery(\r"
+    }
+  ],
+  "timestamp": "2026-02-16T20:37:18.012Z"
+}

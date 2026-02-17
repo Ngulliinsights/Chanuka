@@ -426,7 +426,6 @@ class MonitoringInitializer {
    */
   private setupWebVitalsTracking(): void {
     // This is a simplified version. In production, use the web-vitals library
-    // import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
     this.log('info', 'Web Vitals tracking enabled');
   }
 

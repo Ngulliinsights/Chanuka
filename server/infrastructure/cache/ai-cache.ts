@@ -405,7 +405,7 @@ export class AICache {
     return Math.max(this.options.minTTL, Math.min(this.options.maxTTL, Math.floor(ttl)));
   }
 
-  private hashInput(inputData: any): string {
+  private hashInput(inputData: unknown): string {
     if (!inputData) return 'no-input';
     
     const str = JSON.stringify(inputData, Object.keys(inputData).sort());

@@ -286,11 +286,11 @@ export class BillsApplicationService {
     sponsor_id?: string;
     limit?: number;
     offset?: number;
-  }): Promise<Result<any[], BillServiceError>> {
+  }): Promise<Result<unknown[], BillServiceError>> {
     try {
       if (this.billRepository) {
         // Use repository pattern
-        let result: Result<any[], Error>;
+        let result: Result<unknown[], Error>;
 
         if (params.status) {
           result = await this.billRepository.findByStatus(params.status, {
@@ -317,7 +317,7 @@ export class BillsApplicationService {
         return new Ok(result.value);
       } else {
         // Fallback to direct database access
-        const conditions: any[] = [];
+        const conditions: unknown[] = [];
 
         if (params.status) {
           conditions.push(eq(bills.status, params.status));
@@ -330,7 +330,7 @@ export class BillsApplicationService {
         let query = this.db.select().from(bills);
 
         if (conditions.length > 0) {
-          query = query.where(and(...conditions)) as any;
+          query = query.where(and(...conditions)) as unknown;
         }
 
         const result = await query

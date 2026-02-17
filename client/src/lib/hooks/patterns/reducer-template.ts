@@ -11,7 +11,7 @@ import { useReducer, useCallback, useEffect } from 'react';
 
 // 1. Define State Interface
 export interface ExampleState {
-  data: any[];
+  data: unknown[];
   loading: boolean;
   error: Error | null;
   lastUpdated: number;
@@ -20,7 +20,7 @@ export interface ExampleState {
 // 2. Define Action Types
 export type ExampleAction =
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_DATA'; payload: any[] }
+  | { type: 'SET_DATA'; payload: unknown[] }
   | { type: 'SET_ERROR'; payload: Error | null }
   | { type: 'RESET_STATE' };
 
@@ -67,7 +67,7 @@ const reducer = (state: ExampleState, action: ExampleAction): ExampleState => {
 };
 
 // 5. Create Hook Implementation
-export function useExampleReducer(initialData?: any[]) {
+export function useExampleReducer(initialData?: unknown[]) {
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     data: initialData || [],
@@ -78,7 +78,7 @@ export function useExampleReducer(initialData?: any[]) {
     dispatch({ type: 'SET_LOADING', payload: loading });
   }, []);
 
-  const setData = useCallback((data: any[]) => {
+  const setData = useCallback((data: unknown[]) => {
     dispatch({ type: 'SET_DATA', payload: data });
   }, []);
 

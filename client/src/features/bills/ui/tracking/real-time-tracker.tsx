@@ -403,7 +403,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-60 overflow-y-auto">
-              {notifications.map((notification: any, index: number) => (
+              {notifications.map((notification: unknown, index: number) => (
                 <div key={index} className="border rounded-lg p-3">
                   <div className="flex items-center justify-between mb-1">
                     <h4 className="font-medium text-sm">{notification.title}</h4>

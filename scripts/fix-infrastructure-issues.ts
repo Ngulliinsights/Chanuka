@@ -116,8 +116,8 @@ class InfrastructureFixer {
         );
         
         content = content.replace(
-          /const prefs = user\.preferences as any;/g,
-          'const prefs = userData.preferences as any;'
+          /const prefs = user\.preferences as unknown;/g,
+          'const prefs = userData.preferences as unknown;'
         );
         
         modified = true;

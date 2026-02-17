@@ -116,7 +116,7 @@ async function migrateWithVerification(migrationName?: string): Promise<Migratio
     console.log(migrationOutput);
     console.log('\n✅ Migration applied successfully!\n');
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Migration failed:', error.message);
     
     return {

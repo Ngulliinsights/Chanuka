@@ -319,7 +319,7 @@ export class SocialIntegrationService {
 
       // Save the social profile connection to database
       await db.insert(userSocialProfile).values({
-        user_id: user_id as any, // UUID type
+        user_id: user_id as unknown, // UUID type
         provider: platform,
         providerId: profileData.id,
        });
@@ -408,11 +408,11 @@ export class SocialIntegrationService {
     // Share across each user's connected social networks
     const sharePromises = users.map(async user => {
       // Get user's connected social profiles
-      const profiles: any[] = []; // Would fetch from database in production
+      const profiles: unknown[] = []; // Would fetch from database in production
 
       // Share to each connected platform with optimized content
       return Promise.all(
-        profiles.map(async (profile: any) => {
+        profiles.map(async (profile: unknown) => {
           try {
             const optimizedContent = await this.optimizeContent(action.content, profile.platform);
             await this.shareToSocialPlatform(
@@ -521,7 +521,7 @@ export class SocialIntegrationService {
    * Processes social media mentions and conversations
    * Analyzes and stores mentions for reporting and response
    */
-  async processSocialMention(platform: string, mention: any): Promise<void> {
+  async processSocialMention(platform: string, mention: unknown): Promise<void> {
     const { text, author, url, sentiment } = mention;
 
     // Store mention data for analysis and reporting
@@ -544,7 +544,7 @@ export class SocialIntegrationService {
    * Determines if a mention requires immediate attention
    * Uses multiple criteria to assess mention priority
    */
-  private isHighPriorityMention(mention: any): boolean {
+  private isHighPriorityMention(mention: unknown): boolean {
     // High priority indicators: verified accounts, high follower counts, urgent keywords
     const highPriorityKeywords = ['urgent', 'breaking', 'important'];
     const hasHighPriorityKeyword = highPriorityKeywords.some(keyword =>
@@ -564,7 +564,7 @@ export class SocialIntegrationService {
    * Notifies team about important social mentions
    * Sends alerts through notification system for timely response
    */
-  private async notifyAboutMention(mention: any): Promise<void> {
+  private async notifyAboutMention(mention: unknown): Promise<void> {
     // Create notification for important mention (would integrate with notification service)
     logger.info('High priority social mention notification sent', {
       type: 'social_mention',

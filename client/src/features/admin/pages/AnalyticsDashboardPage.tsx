@@ -318,7 +318,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Popular User Paths</h3>
                     <div className="space-y-2">
-                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: any, index: number) => (
+                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: unknown, index: number) => (
                         <div
                           key={index}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded"
@@ -344,7 +344,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <div className="space-y-2">
                       {journeyAnalytics.dropOffPoints
                         .slice(0, 5)
-                        .map((dropOff: any, index: number) => (
+                        .map((dropOff: unknown, index: number) => (
                           <div
                             key={index}
                             className="flex items-center justify-between p-3 bg-red-50 rounded"
@@ -370,7 +370,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Conversion Funnels</h3>
                     <div className="space-y-4">
-                      {journeyAnalytics.conversionFunnels.map((funnel: any, index: number) => (
+                      {journeyAnalytics.conversionFunnels.map((funnel: unknown, index: number) => (
                         <Card key={index}>
                           <CardHeader>
                             <CardTitle className="text-base">{funnel.name}</CardTitle>

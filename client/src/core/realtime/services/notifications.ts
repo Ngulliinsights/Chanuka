@@ -146,7 +146,7 @@ export class NotificationService {
 
   private handleNotificationMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
 
       const notification: WebSocketNotification = {
         id: data.id || data.notification?.id || `notification_${Date.now()}`,
@@ -180,7 +180,7 @@ export class NotificationService {
 
   private handleNotificationReadMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
       const notificationId = data.notification_id || data.notificationId || data.id;
 
       if (notificationId) {
@@ -199,7 +199,7 @@ export class NotificationService {
 
   private handleNotificationClearMessage(message: WebSocketMessage): void {
     try {
-      const data = message as any;
+      const data = message as unknown;
 
       if (data.clear_all) {
         this.clearAllNotifications();

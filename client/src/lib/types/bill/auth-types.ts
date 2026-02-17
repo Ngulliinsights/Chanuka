@@ -12,13 +12,6 @@ import { UserRole as SharedUserRole } from '@shared/types/core/enums';
 // ============================================================================
 // User Role Types
 // ============================================================================
-
-/**
- * User role type - imported from shared enums
- * @deprecated Use UserRole from shared/types/core/enums instead
- */
-export type UserRole = `${SharedUserRole}`;
-
 /**
  * User role enum - re-exported from shared layer
  * @deprecated Import UserRole directly from shared/types/core/enums
@@ -45,32 +38,6 @@ export type UserPermission =
 // ============================================================================
 // User Types
 // ============================================================================
-
-/**
- * Basic user information
- *
- * @example
- * const user: User = {
- *   id: '12345',
- *   name: 'John Doe',
- *   email: 'john@example.com',
- *   role: 'citizen',
- *   avatar: 'https://...',
- *   createdAt: '2024-01-01T00:00:00Z'
- * };
- */
-export interface User {
-  readonly id: string;
-  readonly name: string;
-  readonly email: string;
-  readonly role: UserRole;
-  readonly avatar?: string;
-  readonly createdAt: string;
-  readonly updatedAt?: string;
-  readonly lastLogin?: string;
-  readonly isActive?: boolean;
-  readonly verifiedAt?: string;
-}
 
 /**
  * Extended user profile
@@ -197,17 +164,6 @@ export interface SessionInfo {
   readonly createdAt: string;
   readonly expiresAt: string;
   readonly lastActivity: string;
-}
-
-/**
- * OAuth provider configuration
- */
-export interface OAuthProvider {
-  readonly id: string;
-  readonly name: string;
-  readonly enabled: boolean;
-  readonly clientId?: string;
-  readonly scope?: string[];
 }
 
 // ============================================================================

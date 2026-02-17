@@ -1,5 +1,4 @@
 import { ErrorDomain, ErrorSeverity } from '../../index';
-// import { logger } from '../observability/logging'; // Unused import
 
 // Define BaseError locally since it's not exported from shared/core
 class BaseError extends Error {

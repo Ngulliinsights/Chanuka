@@ -25,7 +25,7 @@ export interface NotificationMessage {
   channels: ('email' | 'sms' | 'push' | 'ussd')[];
   scheduledAt?: Date;
   expires_at?: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationResult {

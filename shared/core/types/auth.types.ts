@@ -1,24 +1,13 @@
 import type { Request } from 'express';
 
 // User interface
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: UserRole;
-  trustScore: number;
-  password?: string;
-}
-
 // User role type for authorization
 export type UserRole = 'user' | 'agent' | 'admin';
 
 // Enhanced session interface with proper typing
 export interface CustomSession { user_id?: number;
   lastActivity?: string;
-  destroy: (callback: (err?: any) => void) => void;
+  destroy: (callback: (err?: unknown) => void) => void;
  }
 
 // Type-safe authenticated request interface
@@ -61,7 +50,7 @@ export interface AuthorizationContext {
   resource: string;
   action: string;
   ownerId?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Permission check result interface
@@ -80,17 +69,6 @@ export interface SessionConfig {
 }
 
 // OAuth and Social Profile Types (migrated from shared/types/auth.ts)
-export interface UserProfile {
-  id: string;
-  username?: string | null;
-  email: string;
-  role: 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
-  display_name?: string | null;
-  avatar_url?: string | null;
-  expertise?: string[] | null;
-  created_at: Date;
-  last_login_at?: Date | null;
-}
 
 export interface OAuthProvider {
   id: string;

@@ -191,7 +191,7 @@ async function runFinalValidation() {
     report.testResults.failedTests = 0;
     
     console.log('✅ All tests passed');
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('⚠️  Some tests failed or test command not available');
     console.log(error.message);
     

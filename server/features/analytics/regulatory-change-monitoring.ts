@@ -56,7 +56,7 @@ export interface RegulatoryAlert {
   isResolved: boolean;
   actionRequired: boolean;
   affectedSectors: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface StakeholderImpact {
@@ -438,7 +438,7 @@ export class RegulatoryChangeMonitoringService {
       expires_at?: Date;
       actionRequired?: boolean;
       affectedSectors?: string[];
-      metadata?: Record<string, any>;
+      metadata?: Record<string, unknown>;
     } = {}
   ): Promise<RegulatoryAlert> {
     const alert: RegulatoryAlert = {

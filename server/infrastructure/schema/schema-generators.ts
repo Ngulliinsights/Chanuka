@@ -110,7 +110,7 @@ export interface SchemaTransformConfig<T = any> {
   /** Field mapping from source to target */
   fieldMap?: Record<string, string>;
   /** Custom transformers for specific fields */
-  fieldTransformers?: Record<string, (value: any) => any>;
+  fieldTransformers?: Record<string, (value: unknown) => any>;
   /** Whether to strip unknown fields */
   stripUnknown?: boolean;
 }
@@ -231,7 +231,7 @@ export interface ValidationContext {
   /** Operation context (e.g., 'create', 'update', 'delete') */
   operation?: 'create' | 'update' | 'delete' | 'query' | string;
   /** Additional context metadata */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   /** Field-specific validation rules */
   fieldRules?: Record<string, z.ZodSchema>;
 }
@@ -287,7 +287,7 @@ export async function validateWithContext<T>(
  */
 export interface SchemaIntrospectionResult {
   /** Schema shape/fields */
-  shape: Record<string, any>;
+  shape: Record<string, unknown>;
   /** Required fields */
   requiredFields: string[];
   /** Optional fields */
@@ -301,7 +301,7 @@ export interface SchemaIntrospectionResult {
  * Useful for dynamic validation and documentation
  */
 export function introspectSchema(schema: z.ZodSchema): SchemaIntrospectionResult {
-  const shape: Record<string, any> = {};
+  const shape: Record<string, unknown> = {};
   const requiredFields: string[] = [];
   const optionalFields: string[] = [];
   const fieldTypes: Record<string, string> = {};
@@ -340,7 +340,7 @@ export function introspectSchema(schema: z.ZodSchema): SchemaIntrospectionResult
  * Compose multiple schemas into a single schema
  * Useful for combining validation rules from different sources
  */
-export function composeSchemas<T extends Record<string, any>>(
+export function composeSchemas<T extends Record<string, unknown>>(
   baseSchema: z.ZodSchema<T>,
   ...additionalSchemas: z.ZodSchema[]
 ): z.ZodSchema<T> {
@@ -351,7 +351,7 @@ export function composeSchemas<T extends Record<string, any>>(
  * Extend a schema with additional validation
  * Useful for adding runtime-specific rules
  */
-export function extendSchema<T extends Record<string, any>>(
+export function extendSchema<T extends Record<string, unknown>>(
   schema: z.ZodSchema<T>,
   rules: Record<string, z.ZodSchema>
 ): z.ZodSchema<T> {

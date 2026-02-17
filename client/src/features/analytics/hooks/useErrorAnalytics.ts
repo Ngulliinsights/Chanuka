@@ -320,6 +320,7 @@ export function useErrorAnalytics(options: UseErrorAnalyticsOptions = {}): Error
   // Initial data load
   useEffect(() => {
     loadAllData();
+    // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 

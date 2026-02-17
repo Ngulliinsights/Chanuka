@@ -113,7 +113,7 @@ async function executeAdvancedSQLMigrations() {
         successCount++;
 
       } catch (error) {
-        const errMsg = (error as any).message || String(error);
+        const errMsg = (error instanceof Error ? error.message : String(error)) || String(error);
         // Ignore certain errors
         if (errMsg.includes('already exists') ||
             errMsg.includes('NOTICE') ||

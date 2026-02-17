@@ -7,12 +7,12 @@ import { LoadingOperation, ProgressiveStage } from '@client/lib/types';
 
 export class LoadingValidationError extends Error {
   public readonly field?: string;
-  public readonly metadata?: Record<string, any>;
+  public readonly metadata?: Record<string, unknown>;
 
   constructor(
     message: string,
     field?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'LoadingValidationError';
@@ -24,7 +24,7 @@ export class LoadingValidationError extends Error {
 /**
  * Validate loading operation
  */
-export function validateLoadingOperation(operation: any): void {
+export function validateLoadingOperation(operation: unknown): void {
   if (!operation.id || typeof operation.id !== 'string') {
     throw new LoadingValidationError('Operation ID is required and must be a string', 'id');
   }
@@ -62,7 +62,7 @@ export function validateLoadingOperation(operation: any): void {
 /**
  * Safe validation that returns result instead of throwing
  */
-export function safeValidateLoadingOperation(operation: any): {
+export function safeValidateLoadingOperation(operation: unknown): {
   success: boolean;
   error?: LoadingValidationError;
 } {
@@ -83,7 +83,7 @@ export function safeValidateLoadingOperation(operation: any): {
 /**
  * Validate loading scenario
  */
-export function validateLoadingScenario(scenario: any): void {
+export function validateLoadingScenario(scenario: unknown): void {
   if (!scenario.id || typeof scenario.id !== 'string') {
     throw new LoadingValidationError('Scenario ID is required and must be a string', 'id');
   }
@@ -112,7 +112,7 @@ export function validateLoadingScenario(scenario: any): void {
   }
 
   if (scenario.stages && Array.isArray(scenario.stages)) {
-    scenario.stages.forEach((stage: any, index: number) => {
+    scenario.stages.forEach((stage: unknown, index: number) => {
       try {
         validateProgressiveStage(stage);
       } catch (error) {
@@ -128,7 +128,7 @@ export function validateLoadingScenario(scenario: any): void {
 /**
  * Validate progressive stage
  */
-export function validateProgressiveStage(stage: any): void {
+export function validateProgressiveStage(stage: unknown): void {
   // If stage is a string literal, skip validation
   if (typeof stage === 'string') {
     return;
@@ -154,7 +154,7 @@ export function validateProgressiveStage(stage: any): void {
 /**
  * Validate loading configuration
  */
-export function validateLoadingConfig(config: any): void {
+export function validateLoadingConfig(config: unknown): void {
   if (config.timeout !== undefined && config.timeout <= 0) {
     throw new LoadingValidationError('Timeout must be positive', 'timeout');
   }

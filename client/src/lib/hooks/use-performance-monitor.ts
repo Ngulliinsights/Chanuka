@@ -325,7 +325,7 @@ interface UsePerformanceAlertReturn {
     type: 'violation' | 'regression' | 'warning',
     title: string,
     description: string,
-    metrics?: Record<string, any>
+    metrics?: Record<string, unknown>
   ) => Promise<void>;
   updateAlertConfig: (config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => void;
 }
@@ -346,7 +346,7 @@ export function usePerformanceAlert(
       type: 'violation' | 'regression' | 'warning',
       title: string,
       description: string,
-      metrics: Record<string, any> = {}
+      metrics: Record<string, unknown> = {}
     ) => {
       // Manual alerting is not fully supported by core yet, logging for now
       logger.warn(`Performance Alert: ${title}`, {

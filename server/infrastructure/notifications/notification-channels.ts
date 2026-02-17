@@ -639,14 +639,14 @@ export class NotificationChannelService {
     return `mock-sms-${Date.now()}`;
   }
 
-  private async sendViaFirebase(tokens: string[], payload: any): Promise<string> {
+  private async sendViaFirebase(tokens: string[], payload: unknown): Promise<string> {
     // This method is now implemented in the NotificationService class
     // For backward compatibility, we'll use the enhanced implementation
     const { notificationService } = await import('@server/infrastructure/notifications/notification-service.ts');
     return notificationService['sendViaFirebase'](tokens, payload);
   }
 
-  private async sendViaOneSignal(tokens: string[], payload: any): Promise<string> {
+  private async sendViaOneSignal(tokens: string[], payload: unknown): Promise<string> {
     // TODO: Implement actual OneSignal integration
     // const OneSignal = require('onesignal-node');
     // const client = new OneSignal.Client(this.pushConfig.appId, this.pushConfig.serverKey);
@@ -663,7 +663,7 @@ export class NotificationChannelService {
     return `onesignal-${Date.now()}`;
   }
 
-  private sendViaMockPush(tokens: string[], payload: any): string {
+  private sendViaMockPush(tokens: string[], payload: unknown): string {
     logger.info(`[MOCK PUSH] Tokens: ${tokens.length}, Payload:`, { component: 'ChannelService' }, payload);
     return `mock-push-${Date.now()}`;
   }
@@ -691,7 +691,7 @@ export class NotificationChannelService {
     }
   }
 
-  private isRetryableError(error: any): boolean {
+  private isRetryableError(error: unknown): boolean {
     // Determine if error is transient and worth retrying
     const retryableErrors = [
       'ETIMEDOUT',

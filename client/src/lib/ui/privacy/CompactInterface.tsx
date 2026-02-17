@@ -15,7 +15,6 @@ import { Switch } from '@client/lib/design-system/interactive/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
 import { Label } from '@client/lib/design-system/typography/Label';
 
-// import { ConsentControls } from './controls/ConsentControls';
 import { DataUsageControls } from './controls/DataUsageControls';
 import { VisibilityControls } from './controls/VisibilityControls';
 

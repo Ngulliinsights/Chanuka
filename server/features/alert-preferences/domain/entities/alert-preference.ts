@@ -56,7 +56,7 @@ export class AlertPreference { constructor(
   /**
    * Checks if this preference should trigger for a given alert type
    */
-  shouldTriggerFor(alertType: AlertType, alertData: any, user_role?: string, currentTime?: Date): boolean {
+  shouldTriggerFor(alertType: AlertType, alertData: unknown, user_role?: string, currentTime?: Date): boolean {
     if (!this.is_active) {
       return false;
     }

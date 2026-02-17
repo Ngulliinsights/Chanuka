@@ -37,7 +37,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate bill data comprehensively
    */
-  static validateBill(bill: any): ValidationResult {
+  static validateBill(bill: unknown): ValidationResult {
     const endMetric = validationMetricsCollector.startValidation('GovernmentDataValidationService', 'validateBill');
 
     const result: ValidationResult = {
@@ -116,7 +116,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate sponsor data comprehensively
    */
-  static validateSponsor(sponsor: any): ValidationResult {
+  static validateSponsor(sponsor: unknown): ValidationResult {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
@@ -189,10 +189,10 @@ export class GovernmentDataValidationService {
   /**
    * Validate batch of records
    */
-  static validateBatch(records: any[], type: 'bills' | 'sponsors'): BatchValidationResult {
+  static validateBatch(records: unknown[], type: 'bills' | 'sponsors'): BatchValidationResult {
     const results: ValidationResult[] = [];
-    const validRecords: any[] = [];
-    const invalidRecords: any[] = [];
+    const validRecords: unknown[] = [];
+    const invalidRecords: unknown[] = [];
 
     for (const record of records) {
       const validation = type === 'bills' 
@@ -233,7 +233,7 @@ export class GovernmentDataValidationService {
   /**
    * Cross-validate data between sources for conflict detection
    */
-  static crossValidate(records: Array<{ data: any; source: string }>, type: 'bills' | 'sponsors'): CrossValidationResult {
+  static crossValidate(records: Array<{ data: unknown; source: string }>, type: 'bills' | 'sponsors'): CrossValidationResult {
     const conflicts: DataConflict[] = [];
     const groupedRecords = this.groupRecordsByIdentifier(records, type);
 
@@ -266,7 +266,7 @@ export class GovernmentDataValidationService {
   /**
    * Check for required fields
    */
-  private static checkRequiredFields(data: any, requiredFields: string[]): string[] {
+  private static checkRequiredFields(data: unknown, requiredFields: string[]): string[] {
     const missing: string[] = [];
     
     for (const field of requiredFields) {
@@ -281,7 +281,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate field lengths
    */
-  private static validateFieldLengths(data: any, maxLengths: Record<string, number>): string[] {
+  private static validateFieldLengths(data: unknown, maxLengths: Record<string, number>): string[] {
     const errors: string[] = [];
     
     for (const [field, maxLength] of Object.entries(maxLengths)) {
@@ -296,7 +296,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate date fields
    */
-  private static validateDates(data: any, dateFields: string[]): { errors: string[]; warnings: string[] } {
+  private static validateDates(data: unknown, dateFields: string[]): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
     
@@ -326,7 +326,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate completeness score (0-1)
    */
-  private static calculateCompleteness(data: any, allFields: string[]): number {
+  private static calculateCompleteness(data: unknown, allFields: string[]): number {
     const presentFields = allFields.filter(field => 
       data[field] && 
       (typeof data[field] !== 'string' || data[field].trim() !== '')
@@ -350,7 +350,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate consistency score
    */
-  private static calculateConsistency(data: any): number {
+  private static calculateConsistency(data: unknown): number {
     let score = 1.0;
     
     // Check for internal consistency issues
@@ -377,7 +377,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate timeliness score
    */
-  private static calculateTimeliness(data: any): number {
+  private static calculateTimeliness(data: unknown): number {
     if (!data.lastUpdated) return 0.5; // Neutral score if no update info
     
     const lastUpdate = new Date(data.lastUpdated);
@@ -512,7 +512,7 @@ interface BatchValidationResult {
   validationRate: number;
   averageScore: number;
   results: ValidationResult[];
-  validData: any[];
+  validData: unknown[];
   invalidData: Array<{ record: any; validation: ValidationResult }>;
   summary: {
     completeness: number;

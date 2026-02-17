@@ -90,7 +90,7 @@ router.get('/', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Search controller error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Search controller error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Search failed', {
       statusCode: 500,
@@ -124,7 +124,7 @@ router.get('/suggestions', asyncHandler(async (req, res: Response) => {
     const suggestions = await getSearchSuggestions(q, limit);
     res.json({ query: q, suggestions });
   } catch (error) {
-    logger.error('Search suggestions error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Search suggestions error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch search suggestions', {
       statusCode: 500,
@@ -150,7 +150,7 @@ router.get('/popular', asyncHandler(async (req, res: Response) => {
 
     res.json({ terms });
   } catch (error) {
-    logger.error('Popular search terms error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Popular search terms error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch popular search terms', {
       statusCode: 500,
@@ -189,7 +189,7 @@ router.post('/admin/rebuild-index', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Rebuild search index error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Rebuild search index error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to rebuild search indexes', {
       statusCode: 500,
@@ -214,7 +214,7 @@ router.get('/admin/index-health', asyncHandler(async (req, res: Response) => {
     const health = await getSearchIndexHealth();
     res.json(health);
   } catch (error) {
-    logger.error('Get index health error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Get index health error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch index health', {
       statusCode: 500,
@@ -281,7 +281,7 @@ router.get('/stream', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Streaming search error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Streaming search error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Streaming search failed', {
       statusCode: 500,
@@ -318,7 +318,7 @@ router.delete('/cancel/:searchId', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Cancel search error', { component: 'search-routes', context, searchId: req.params.searchId }, error as Record<string, any> | undefined);
+    logger.error('Cancel search error', { component: 'search-routes', context, searchId: req.params.searchId }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to cancel search', {
       statusCode: 500,
@@ -346,7 +346,7 @@ router.get('/analytics', asyncHandler(async (req, res: Response) => {
     const analytics = await getSearchAnalytics(startDate, endDate);
     res.json(analytics);
   } catch (error) {
-    logger.error('Search analytics error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Search analytics error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch search analytics', {
       statusCode: 500,
@@ -369,7 +369,7 @@ router.get('/analytics/metrics', asyncHandler(async (req, res: Response) => {
     const metrics = await getSearchMetrics();
     res.json(metrics);
   } catch (error) {
-    logger.error('Search metrics error', { component: 'search-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Search metrics error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch search metrics', {
       statusCode: 500,

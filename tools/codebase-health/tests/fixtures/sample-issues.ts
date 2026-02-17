@@ -30,7 +30,6 @@ export function getElement(): HTMLElement {
 // export const missingExport = 'This should be exported but is commented out';
 
 // Circular dependency setup - this file will import from circular-dep-b.ts
-// import { helperFunction } from './circular-dep-b'; // Removed to break circular dependency
 
 export function mainFunction() {
   return helperFunction();

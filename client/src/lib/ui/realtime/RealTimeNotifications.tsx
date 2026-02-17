@@ -1,12 +1,10 @@
 import { Bell, AlertCircle, Info, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-// import { useWebSocket } from '@client/lib/hooks/useWebSocket';
 
 import React from 'react';
 
 import { cn } from '@client/lib/utils/cn';
 
-// import { logger } from '@client/lib/utils/logger';
 
 interface RealTimeNotificationsProps {
   className?: string;

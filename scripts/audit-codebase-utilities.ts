@@ -734,7 +734,7 @@ class CodebaseUtilityAuditor {
     const redundancyPercentage = totalFunctions > 0 ? (duplicateFunctions / totalFunctions) * 100 : 0;
 
     // Calculate categories summary
-    const categories: Record<UtilityCategory, any> = {} as any;
+    const categories: Record<UtilityCategory, any> = {} as unknown;
     const categoryStats = new Map<UtilityCategory, { files: number; functions: number; duplicates: number }>();
 
     for (const file of this.utilityFiles) {

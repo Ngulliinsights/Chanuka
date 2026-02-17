@@ -439,7 +439,7 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
     this.monitoring = HooksMonitoring.getInstance();
   }
 
-  wrap<T extends (...args: any[]) => any>(fn: T, context: ErrorContext): T {
+  wrap<T extends (...args: unknown[]) => any>(fn: T, context: ErrorContext): T {
     return ((...args: Parameters<T>) => {
       if (!this.isOperationEnabled(context.operation || 'unknown')) {
         return fn(...args);
@@ -506,7 +506,7 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
     }) as T;
   }
 
-  wrapAsync<T extends (...args: any[]) => Promise<any>>(fn: T, context: ErrorContext): T {
+  wrapAsync<T extends (...args: unknown[]) => Promise<any>>(fn: T, context: ErrorContext): T {
     return this.wrap(fn, context);
   }
 
@@ -528,7 +528,7 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
   }
 
   private isOperationEnabled(operation: string): boolean {
-    const monitoring = HooksMonitoring.getInstance() as any;
+    const monitoring = HooksMonitoring.getInstance() as unknown;
     return monitoring.enabledOperations.has('*') || monitoring.enabledOperations.has(operation);
   }
 }

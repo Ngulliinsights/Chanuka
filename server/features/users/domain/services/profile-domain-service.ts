@@ -107,7 +107,7 @@ export class ProfileDomainService {
   /**
    * Calculates basic info completeness
    */
-  private calculateBasicInfoCompleteness(user: any): number {
+  private calculateBasicInfoCompleteness(user: unknown): number {
     let score = 0;
     const fields = ['first_name', 'last_name', 'name'];
 
@@ -188,7 +188,7 @@ export class ProfileDomainService {
     is_public: boolean;
   }>): UserProfile { // Create a new profile with updated values
     // Build the payload so no property is assigned `undefined` (exactOptionalPropertyTypes)
-    const updatedData: Record<string, any> = { user_id: existingProfile.user_id };
+    const updatedData: Record<string, unknown> = { user_id: existingProfile.user_id };
 
     if (updates.bio !== undefined) {
       // allow empty string to clear the bio (UserProfile.create treats falsy as null)

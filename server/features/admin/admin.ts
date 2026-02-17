@@ -1,4 +1,3 @@
-// import { systemHealthService } from '@server/infrastructure/monitoring/system-health.js'; // TODO: Create system health service
 import { alertingService, notificationSchedulerService } from '@server/infrastructure/notifications/index.js';
 import { logger   } from '@shared/core';
 import { database as db } from '@server/infrastructure/database';
@@ -146,7 +145,7 @@ export class AdminService {
   async getUserManagement(page = 1, limit = 20, filters?: { role?: string; status?: string; search?: string }) {
     try {
       const offset = (page - 1) * limit;
-      const conditions: any[] = [];
+      const conditions: unknown[] = [];
 
       if (filters?.role) {
         conditions.push(eq(users.role, filters.role));

@@ -202,7 +202,7 @@ export const BillDbToDomain: Transformer<BillTable, Bill> = {
 /**
  * Utility: Transform snake_case object keys to camelCase
  */
-export function snakeToCamel<T extends Record<string, any>>(obj: T): any {
+export function snakeToCamel<T extends Record<string, unknown>>(obj: T): any {
   const result: any = {};
   
   for (const [key, value] of Object.entries(obj)) {
@@ -216,7 +216,7 @@ export function snakeToCamel<T extends Record<string, any>>(obj: T): any {
 /**
  * Utility: Transform camelCase object keys to snake_case
  */
-export function camelToSnake<T extends Record<string, any>>(obj: T): any {
+export function camelToSnake<T extends Record<string, unknown>>(obj: T): any {
   const result: any = {};
   
   for (const [key, value] of Object.entries(obj)) {

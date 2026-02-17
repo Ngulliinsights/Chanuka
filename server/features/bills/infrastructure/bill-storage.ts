@@ -382,7 +382,7 @@ export class BillStorage extends BaseStorage<Bill> {
           enhancedError.stack = error.stack;
         }
 
-        logger.error('Database transaction error:', { component: 'Chanuka' }, error as Record<string, any>);
+        logger.error('Database transaction error:', { component: 'Chanuka' }, error as Record<string, unknown>);
 
         throw enhancedError;
       }

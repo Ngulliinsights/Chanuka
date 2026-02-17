@@ -5,6 +5,9 @@
  * based on leak severity. Integrates with the existing MemoryLeakDetector system.
  */
 
+import { logger } from '../../observability/logger';
+import { logger } from '@shared/core';
+
 import type { 
   DegradationLevel,
   IConnectionManager,
@@ -249,10 +252,9 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
     // Perform cleanup based on intensity
     this.performCleanup(response.cleanupIntensity);
 
-    // Log the response (in production, use proper logging)
+    // Log the response
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`Memory leak response executed: ${data.severity} severity, ${response.actions.length} actions`);
+      logger.info(`Memory leak response executed: ${data.severity} severity, ${response.actions.length} actions`);
     }
   }
 
@@ -316,8 +318,7 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
     // This would integrate with the connection manager to enforce limits
     // Implementation depends on the connection manager interface
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(`Applying connection limits: ${limits.maxConnectionsPerUser} per user, ${limits.maxTotalConnections} total`);
+      logger.info(`Applying connection limits: ${limits.maxConnectionsPerUser} per user, ${limits.maxTotalConnections} total`);
     }
   }
 
@@ -432,8 +433,7 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
       } catch (error) {
         // Log error without using console directly in production
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.error('Error in leak response listener:', error);
+          logger.error('Error in leak response listener:', error);
         }
       }
     });

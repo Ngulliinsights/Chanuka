@@ -76,7 +76,7 @@ router.get('/comments/:bill_id', asyncHandler(async (req, res: Response) => {
 
     // Fetch comments with applied filters
     const result = await commentService.getBillComments(bill_id, {
-      sort: sort as any,
+      sort: sort as unknown,
       expertOnly,
       commentType,
       limit,
@@ -89,7 +89,7 @@ router.get('/comments/:bill_id', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to fetch comments', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch comments', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch comments', {
       statusCode: 500,
@@ -158,7 +158,7 @@ router.post('/comments', requireAuth, asyncHandler(async (req, res: Response) =>
       throw error;
     }
 
-    logger.error('Failed to create comment', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to create comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to create comment', {
       statusCode: 500,
@@ -189,7 +189,7 @@ router.get('/comments/:id/replies', asyncHandler(async (req, res: Response) => {
     }
 
     const replies = await commentService.getCommentReplies(parent_id, {
-      sort: sort as any,
+      sort: sort as unknown,
       limit,
       offset
     });
@@ -200,7 +200,7 @@ router.get('/comments/:id/replies', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to fetch replies', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch replies', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch replies', {
       statusCode: 500,
@@ -258,7 +258,7 @@ router.put('/comments/:id', requireAuth, asyncHandler(async (req, res: Response)
       throw error;
     }
 
-    logger.error('Failed to update comment', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to update comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to update comment', {
       statusCode: 500,
@@ -304,7 +304,7 @@ router.delete('/comments/:id', requireAuth, asyncHandler(async (req, res: Respon
       throw error;
     }
 
-    logger.error('Failed to delete comment', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to delete comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to delete comment', {
       statusCode: 500,
@@ -339,7 +339,7 @@ router.get('/comments/:bill_id/stats', asyncHandler(async (req, res: Response) =
       throw error;
     }
 
-    logger.error('Failed to fetch comment statistics', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch comment statistics', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch comment statistics', {
       statusCode: 500,
@@ -376,7 +376,7 @@ router.get('/comments/:bill_id/trending', asyncHandler(async (req, res: Response
       throw error;
     }
 
-    logger.error('Failed to fetch trending comments', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch trending comments', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch trending comments', {
       statusCode: 500,
@@ -438,7 +438,7 @@ router.post('/comments/:id/vote', requireAuth, asyncHandler(async (req, res: Res
       throw error;
     }
 
-    logger.error('Failed to vote', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to vote', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to vote', {
       statusCode: 500,
@@ -508,7 +508,7 @@ router.post('/comments/:id/flag', requireAuth, asyncHandler(async (req, res: Res
       throw error;
     }
 
-    logger.error('Failed to flag comment', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to flag comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to flag comment', {
       statusCode: 500,
@@ -530,7 +530,7 @@ router.post('/comments/:id/highlight', requireAuth, asyncHandler(async (req, res
     // TODO: Implement actual highlight functionality
     res.json({ success: true });
   } catch (error) {
-    logger.error('Failed to highlight comment', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to highlight comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to highlight comment', {
       statusCode: 500,
@@ -574,7 +574,7 @@ router.post('/polls', requireAuth, asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Failed to create poll', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to create poll', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to create poll', {
       statusCode: 500,
@@ -612,7 +612,7 @@ router.post('/comments/:id/poll-vote', requireAuth, asyncHandler(async (req, res
       throw error;
     }
 
-    logger.error('Failed to vote on poll', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to vote on poll', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to vote on poll', {
       statusCode: 500,
@@ -666,7 +666,7 @@ router.get('/participation/stats', asyncHandler(async (req, res: Response) => {
       res.json(stats);
     }
   } catch (error) {
-    logger.error('Failed to fetch participation stats', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch participation stats', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch participation statistics', {
       statusCode: 500,
@@ -707,7 +707,7 @@ router.get('/engagement/recent', asyncHandler(async (req, res: Response) => {
 
     res.json(recentActivity);
   } catch (error) {
-    logger.error('Failed to fetch engagement data', { component: 'community-routes', context }, error as Record<string, any> | undefined);
+    logger.error('Failed to fetch engagement data', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
 
     throw new BaseError('Failed to fetch engagement data', {
       statusCode: 500,

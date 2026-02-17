@@ -21,8 +21,6 @@ import { OfflineProvider } from '@client/lib/ui/offline';
 import { logger } from '@client/lib/utils/logger';
 
 import { AnalyticsIntegration } from '../../core/analytics/AnalyticsIntegration';
-// import { DevelopmentMonitoringDashboard } from '../../core/monitoring/DevelopmentMonitoringDashboard';
-// import { RouteProfiler } from '../../core/monitoring/RouteProfiler';
 import { NavigationConsistency } from '../../core/navigation/NavigationConsistency';
 import { NavigationPerformance } from '../../core/navigation/NavigationPerformance';
 
@@ -163,9 +161,10 @@ function NavigationTracker({ children }: { children: React.ReactNode }) {
     ) {
       // Generate a title from the pathname
       const pathSegments = location.pathname.split('/').filter(Boolean);
+      const lastSegment = pathSegments[pathSegments.length - 1];
       const title =
-        pathSegments.length > 0
-          ? pathSegments[pathSegments.length - 1]
+        pathSegments.length > 0 && lastSegment
+          ? lastSegment
               .replace(/[-_]/g, ' ')
               .replace(/\b\w/g, l => l.toUpperCase())
           : 'Home';
@@ -211,7 +210,7 @@ export function AppShell({
    * that catch errors that slip through our error boundaries.
    */
   useEffect(() => {
-    const initializeShell = async () => {
+    const initializeShell = () => {
       try {
         logger.info('AppShell initializing...', { component: 'AppShell' });
 
@@ -269,10 +268,12 @@ export function AppShell({
           error
         );
         setIsInitialized(true);
+        // Return empty cleanup function
+        return () => {};
       }
     };
 
-    initializeShell();
+    return initializeShell();
   }, []); // Empty dependency array means this runs once on mount
 
   /**

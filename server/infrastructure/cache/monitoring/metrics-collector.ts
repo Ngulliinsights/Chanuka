@@ -42,7 +42,7 @@ export class CacheMetricsCollector extends EventEmitter {
   stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId);
-      this.intervalId = null as any;
+      this.intervalId = null as unknown;
     }
   }
 

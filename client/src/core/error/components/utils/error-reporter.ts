@@ -31,7 +31,7 @@ export interface FeedbackSubmission {
   errorId: string;
   comment: string;
   rating: number;
-  userContext?: Record<string, any>;
+  userContext?: Record<string, unknown>;
 }
 
 export function createErrorReporter(options: {

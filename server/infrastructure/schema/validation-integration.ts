@@ -155,7 +155,7 @@ export function validateBrandedIds<T extends string>(
 ): Result<(string & { readonly __brand: T })[], ValidationError> {
   const fieldName = context?.fieldName ?? 'ids';
   const entityType = context?.entityType ?? 'entities';
-  const validatedIds: any[] = [];
+  const validatedIds: unknown[] = [];
   const errors: { index: number; error: string }[] = [];
 
   for (let i = 0; i < values.length; i++) {
@@ -247,7 +247,7 @@ export function validateDatabaseConstraints<T extends keyof typeof DatabaseConst
  */
 export interface TransactionValidationResult {
   success: boolean;
-  validatedEntities: Record<string, any>;
+  validatedEntities: Record<string, unknown>;
   errors: Record<string, ValidationError>;
   errorCount: number;
 }
@@ -259,7 +259,7 @@ export interface TransactionValidationResult {
 export function validateDatabaseTransaction(
   transaction: { entityType: keyof typeof DatabaseValidationRegistry; data: unknown }[]
 ): TransactionValidationResult {
-  const validatedEntities: Record<string, any> = {};
+  const validatedEntities: Record<string, unknown> = {};
   const errors: Record<string, ValidationError> = {};
   let errorCount = 0;
 

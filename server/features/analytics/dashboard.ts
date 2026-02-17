@@ -70,11 +70,11 @@ type ValidStatus = typeof VALID_STATUSES[number];
  * Helper to safely capture errors with the error tracker.
  * This handles cases where the error tracker might not have the capture method.
  */
-function safeErrorCapture(error: Error, context: Record<string, any>): void {
+function safeErrorCapture(error: Error, context: Record<string, unknown>): void {
   try {
     // Type-safe check for the capture method
     if (errorTracker && typeof errorTracker === 'object' && 'capture' in errorTracker) {
-      const tracker = errorTracker as { capture: (error: Error, context: Record<string, any>) => void };
+      const tracker = errorTracker as { capture: (error: Error, context: Record<string, unknown>) => void };
       tracker.capture(error, context);
     }
   } catch (captureError) {
@@ -222,7 +222,7 @@ class DashboardStorageService {
       }
 
       // Build WHERE clause conditions dynamically based on provided filters
-      const whereConditions: any[] = [];
+      const whereConditions: unknown[] = [];
       
       if (status) {
         whereConditions.push(eq(evaluations.status, status));

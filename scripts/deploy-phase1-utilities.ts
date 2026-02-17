@@ -283,7 +283,7 @@ class Phase1DeploymentCLI {
   /**
    * Handle deployment failure
    */
-  private async handleDeploymentFailure(error: any): Promise<void> {
+  private async handleDeploymentFailure(error: unknown): Promise<void> {
     console.log('\n🚨 Handling deployment failure...');
 
     try {

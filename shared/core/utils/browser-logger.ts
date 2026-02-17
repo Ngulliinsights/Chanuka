@@ -659,13 +659,13 @@ export function setupGlobalErrorHandling(logger: BrowserLogger = browserLogger):
   // Handle console errors (override console methods) if console logging is enabled
   if (config.environment.features.consoleLogging) {
     const originalConsoleError = console.error;
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       originalConsoleError.apply(console, args);
       logger.error(args.join(' '), { component: 'console', operation: 'error' });
     };
 
     const originalConsoleWarn = console.warn;
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       originalConsoleWarn.apply(console, args);
       logger.warn(args.join(' '), { component: 'console', operation: 'warn' });
     };

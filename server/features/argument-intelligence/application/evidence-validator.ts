@@ -146,7 +146,7 @@ export class EvidenceValidatorService {
   /**
    * Assess evidence base for an entire bill
    */
-  async assessEvidenceBase(arguments: any[]): Promise<EvidenceAssessment> {
+  async assessEvidenceBase(arguments: unknown[]): Promise<EvidenceAssessment> {
     try {
       logger.info(`📊 Assessing evidence base`, {
         component: 'EvidenceValidator',
@@ -653,7 +653,7 @@ export class EvidenceValidatorService {
     return concerns;
   }
 
-  private extractEvidenceClaims(arguments: any[]): EvidenceClaim[] {
+  private extractEvidenceClaims(arguments: unknown[]): EvidenceClaim[] {
     const claims: EvidenceClaim[] = [];
 
     arguments.forEach(arg => {

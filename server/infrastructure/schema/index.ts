@@ -5,9 +5,7 @@
 //
 // PERFORMANCE OPTIMIZATION:
 // - Use granular domain imports for faster builds:
-//   import { users, bills } from '@/shared/schema/domains/foundation'
 // - Use this main index for full schema access (slower):
-//   import * from '@/shared/schema'
 //
 // See /domains/ folder for domain-specific exports
 

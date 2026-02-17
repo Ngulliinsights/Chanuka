@@ -1,5 +1,5 @@
 // cSpell:ignore upvotes downvotes
-import { logger } from '@server/infrastructure/observability/logger';
+import { logger } from '@shared/core/observability';
 import { Bill, bills, sponsors, BillStatus, isValidEnum } from '@server/infrastructure/schema';
 import { bill_engagement, comments } from '@server/infrastructure/schema';
 import { and, count, desc, eq, inArray,or, sql } from "drizzle-orm";
@@ -101,7 +101,7 @@ const cacheService = {
     }
   },
 
-  set: async (key: string, value: any, ttl?: number): Promise<void> => {
+  set: async (key: string, value: unknown, ttl?: number): Promise<void> => {
     try {
       await serverCache.cacheQuery(key, value, ttl);
     } catch (error) {
@@ -231,7 +231,7 @@ export class CachedBillService {
       } catch (error) {
         logger.warn('Database error in getBillById, using fallback', { error, id });
         const fallbackBills = this.getFallbackBills();
-        return fallbackBills.find((bill: any) => bill.id === id) || null;
+        return fallbackBills.find((bill: unknown) => bill.id === id) || null;
       }
     }, { service: 'CachedBillService', operation: 'getBillById' });
   }
@@ -753,9 +753,9 @@ export class CachedBillService {
 
       // Pre-load popular bills
       const popularBillsRes: any = await this.getAllBills({}, { page: 1, limit: 20 });
-      const billIds = (popularBillsRes?.data?.bills ?? []).map((b: any) => b.id);
+      const billIds = (popularBillsRes?.data?.bills ?? []).map((b: unknown) => b.id);
       if (billIds.length > 0) {
-        await Promise.all(billIds.map((id: any) => this.getBillById(id)));
+        await Promise.all(billIds.map((id: unknown) => this.getBillById(id)));
       }
 
       // Pre-load common searches

@@ -82,7 +82,7 @@ export class DataSynchronizationService extends EventEmitter {
   /**
    * Execute a synchronization job for a specific endpoint
    */
-  async executeSyncJob(dataSource: DataSource, endpoint: any): Promise<SyncJob> {
+  async executeSyncJob(dataSource: DataSource, endpoint: unknown): Promise<SyncJob> {
     const jobId = `${dataSource.id}-${endpoint.id}-${Date.now()}`;
     
     const syncJob: SyncJob = {
@@ -150,7 +150,7 @@ export class DataSynchronizationService extends EventEmitter {
   /**
    * Perform the actual data synchronization
    */
-  private async performDataSync(syncJob: SyncJob, dataSource: DataSource, endpoint: any): Promise<void> {
+  private async performDataSync(syncJob: SyncJob, dataSource: DataSource, endpoint: unknown): Promise<void> {
     const batchSize = 100;
     let offset = 0;
     let hasMoreData = true;
@@ -217,7 +217,7 @@ export class DataSynchronizationService extends EventEmitter {
   /**
    * Process individual record and handle conflicts
    */
-  private async processRecord(syncJob: SyncJob, record: any, dataType: string): Promise<void> {
+  private async processRecord(syncJob: SyncJob, record: unknown, dataType: string): Promise<void> {
     try {
       switch (dataType) {
         case 'bills':
@@ -312,7 +312,7 @@ export class DataSynchronizationService extends EventEmitter {
   /**
    * Detect conflicts between existing and new bill data
    */
-  private async detectBillConflicts(existingBill: any, newBillData: BillData): Promise<string[]> {
+  private async detectBillConflicts(existingBill: unknown, newBillData: BillData): Promise<string[]> {
     const conflicts: string[] = [];
 
     // Check for significant differences
@@ -457,7 +457,7 @@ export class DataSynchronizationService extends EventEmitter {
     console.log(`Queuing conflict for manual review: ${resolution.conflictId}`);
   }
 
-  private isCriticalError(error: any): boolean {
+  private isCriticalError(error: unknown): boolean {
     // Determine if error should stop the entire sync job
     return error?.code === 'ECONNREFUSED' || error?.status === 401;
   }
@@ -471,7 +471,7 @@ export class DataSynchronizationService extends EventEmitter {
       console.log(`✅ Sync job completed: ${job.id} - Processed: ${job.recordsProcessed}, Created: ${job.recordsCreated}, Updated: ${job.recordsUpdated}`);
     });
 
-    this.on('syncJobFailed', (job: SyncJob, error: any) => {
+    this.on('syncJobFailed', (job: SyncJob, error: unknown) => {
       console.error(`❌ Sync job failed: ${job.id} - ${error.message}`);
     });
   }

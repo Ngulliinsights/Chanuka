@@ -102,7 +102,7 @@ interface BillAnalysisInput {
   billText: string;
   billTitle: string;
   sponsorId: string;
-  sponsorFinancialInterests: any[];
+  sponsorFinancialInterests: unknown[];
   transparencyData?: any;
   contextualFactors?: any;
 }
@@ -122,10 +122,10 @@ interface SponsorAssessmentInput {
   billId: string;
   billText: string;
   billTitle: string;
-  sponsorFinancialInterests: any[];
+  sponsorFinancialInterests: unknown[];
   sponsorData: any;
-  networkEntities: any[];
-  networkRelationships: any[];
+  networkEntities: unknown[];
+  networkRelationships: unknown[];
   timeframe: { start: string; end: string };
   contextualFactors: any;
 }
@@ -135,7 +135,7 @@ interface AnalysisResult<T = any> {
   results?: T;
   error?: string;
   processingTime?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -389,7 +389,7 @@ export class MLIntegrationService {
     return transformed;
   }
 
-  private transformTrojanAnalysis(billId: string, analysis: any): TrojanBillAnalysisData {
+  private transformTrojanAnalysis(billId: string, analysis: unknown): TrojanBillAnalysisData {
     const data = {
       bill_id: billId,
       bill_name: this.sanitizeString(analysis.billTitle || 'Unknown Bill', 500),
@@ -401,7 +401,7 @@ export class MLIntegrationService {
       detection_confidence: this.clampNumber(analysis.confidence || 0, 0, 1),
       analysis_summary: this.generateTrojanSummary(analysis),
       detailed_analysis: this.generateTrojanDetailedAnalysis(analysis),
-      red_flags: Array.isArray(analysis.redFlags) ? analysis.redFlags.map((f: any) => 
+      red_flags: Array.isArray(analysis.redFlags) ? analysis.redFlags.map((f: unknown) => 
         this.sanitizeString(String(f), 500)
       ) : [],
       public_alert_issued: false,
@@ -416,7 +416,7 @@ export class MLIntegrationService {
     return TrojanBillAnalysisSchema.parse(data);
   }
 
-  private transformConstitutionalAnalysis(billId: string, analysis: any): ConstitutionalAnalysisData {
+  private transformConstitutionalAnalysis(billId: string, analysis: unknown): ConstitutionalAnalysisData {
     const alignment = this.normalizeAlignment(analysis.alignment);
     
     const data = {
@@ -424,7 +424,7 @@ export class MLIntegrationService {
       analysis_type: 'automated',
       confidence_score: this.clampNumber(analysis.confidence || 0, 0, 1),
       constitutional_provisions_cited: Array.isArray(analysis.citedProvisions)
-        ? analysis.citedProvisions.map((p: any) => p.article).filter((a: any) => a)
+        ? analysis.citedProvisions.map((p: unknown) => p.article).filter((a: unknown) => a)
         : [],
       potential_violations: Array.isArray(analysis.violations) ? analysis.violations : [],
       constitutional_alignment: alignment,
@@ -442,7 +442,7 @@ export class MLIntegrationService {
     return ConstitutionalAnalysisSchema.parse(data);
   }
 
-  private transformConflictAnalysis(billId: string, analysis: any): ConflictDetectionData {
+  private transformConflictAnalysis(billId: string, analysis: unknown): ConflictDetectionData {
     const conflicts = Array.isArray(analysis.conflicts) ? analysis.conflicts : [];
     const highestSeverityConflict = this.findHighestSeverityConflict(conflicts);
 
@@ -470,7 +470,7 @@ export class MLIntegrationService {
   // ANALYSIS GENERATORS
   // ============================================================================
 
-  private generateTrojanSummary(analysis: any): string {
+  private generateTrojanSummary(analysis: unknown): string {
     const riskScore = analysis.trojanRiskScore || 0;
     const riskLevel = riskScore > 70 ? 'HIGH' : riskScore > 40 ? 'MEDIUM' : 'LOW';
     const hiddenCount = Array.isArray(analysis.hiddenProvisions) ? analysis.hiddenProvisions.length : 0;
@@ -485,7 +485,7 @@ export class MLIntegrationService {
     );
   }
 
-  private generateTrojanDetailedAnalysis(analysis: any): string {
+  private generateTrojanDetailedAnalysis(analysis: unknown): string {
     let detailed = 'TROJAN BILL ANALYSIS REPORT\n\n';
     
     detailed += `Risk Score: ${analysis.trojanRiskScore || 0}/100\n`;
@@ -494,7 +494,7 @@ export class MLIntegrationService {
     const hiddenProvisions = Array.isArray(analysis.hiddenProvisions) ? analysis.hiddenProvisions : [];
     if (hiddenProvisions.length > 0) {
       detailed += 'HIDDEN PROVISIONS DETECTED:\n';
-      hiddenProvisions.forEach((provision: any, index: number) => {
+      hiddenProvisions.forEach((provision: unknown, index: number) => {
         detailed += `${index + 1}. ${provision.section || 'Unknown'}: ${provision.hiddenAgenda || 'N/A'}\n`;
         detailed += `   Severity: ${provision.severity || 'Unknown'}\n`;
         if (provision.constitutionalConcern) {
@@ -516,7 +516,7 @@ export class MLIntegrationService {
     const techniques = Array.isArray(analysis.deceptionTechniques) ? analysis.deceptionTechniques : [];
     if (techniques.length > 0) {
       detailed += 'DECEPTION TECHNIQUES:\n';
-      techniques.forEach((technique: any) => {
+      techniques.forEach((technique: unknown) => {
         detailed += `- ${technique.technique || 'Unknown'} (Effectiveness: ${technique.effectiveness || 0}/10)\n`;
         if (technique.example) {
           detailed += `  Example: ${technique.example}\n`;
@@ -527,7 +527,7 @@ export class MLIntegrationService {
     return this.sanitizeString(detailed, 50000);
   }
 
-  private generateConstitutionalSummary(analysis: any): string {
+  private generateConstitutionalSummary(analysis: unknown): string {
     const alignment = analysis.alignment || 'uncertain';
     const violationCount = Array.isArray(analysis.violations) ? analysis.violations.length : 0;
     const citationCount = Array.isArray(analysis.citedProvisions) ? analysis.citedProvisions.length : 0;
@@ -542,7 +542,7 @@ export class MLIntegrationService {
     );
   }
 
-  private generateConstitutionalDetailedAnalysis(analysis: any): string {
+  private generateConstitutionalDetailedAnalysis(analysis: unknown): string {
     let detailed = 'CONSTITUTIONAL ANALYSIS REPORT\n\n';
     
     detailed += `Overall Alignment: ${analysis.alignment || 'Unknown'}\n`;
@@ -551,7 +551,7 @@ export class MLIntegrationService {
     const violations = Array.isArray(analysis.violations) ? analysis.violations : [];
     if (violations.length > 0) {
       detailed += 'CONSTITUTIONAL VIOLATIONS:\n';
-      violations.forEach((violation: any, index: number) => {
+      violations.forEach((violation: unknown, index: number) => {
         detailed += `${index + 1}. ${violation.provision || 'Unknown'} - ${violation.violationType || 'Unspecified'}\n`;
         detailed += `   Severity: ${violation.severity || 'Unknown'}\n`;
         detailed += `   Explanation: ${violation.explanation || 'N/A'}\n`;
@@ -562,7 +562,7 @@ export class MLIntegrationService {
     const provisions = Array.isArray(analysis.citedProvisions) ? analysis.citedProvisions : [];
     if (provisions.length > 0) {
       detailed += 'RELEVANT CONSTITUTIONAL PROVISIONS:\n';
-      provisions.forEach((provision: any) => {
+      provisions.forEach((provision: unknown) => {
         detailed += `- ${provision.article || 'Unknown'}: ${provision.title || 'N/A'}\n`;
         detailed += `  Relevance: ${provision.relevance || 'N/A'}, Impact: ${provision.impact || 'N/A'}\n`;
       });
@@ -572,7 +572,7 @@ export class MLIntegrationService {
     const precedents = Array.isArray(analysis.precedents) ? analysis.precedents : [];
     if (precedents.length > 0) {
       detailed += 'RELEVANT LEGAL PRECEDENTS:\n';
-      precedents.forEach((precedent: any) => {
+      precedents.forEach((precedent: unknown) => {
         detailed += `- ${precedent.caseName || 'Unknown'} (${precedent.court || 'Unknown Court'})\n`;
         detailed += `  Relevance: ${Math.round((precedent.relevance || 0) * 100)}%\n`;
         detailed += `  Outcome: ${precedent.outcome || 'Unknown'}\n`;
@@ -586,7 +586,7 @@ export class MLIntegrationService {
   // HELPER METHODS
   // ============================================================================
 
-  private generateBillRecommendations(results: any): string[] {
+  private generateBillRecommendations(results: unknown): string[] {
     const recommendations: string[] = [];
     
     if ((results.trojanAnalysis?.trojanRiskScore || 0) > 70) {
@@ -608,7 +608,7 @@ export class MLIntegrationService {
     return recommendations;
   }
 
-  private generateSponsorRecommendations(results: any): string[] {
+  private generateSponsorRecommendations(results: unknown): string[] {
     const recommendations: string[] = [];
     const riskLevel = results.riskLevel || 'low';
     
@@ -632,7 +632,7 @@ export class MLIntegrationService {
     return recommendations;
   }
 
-  private determineModerationAction(results: any): string {
+  private determineModerationAction(results: unknown): string {
     const classification = results.classification?.classifications;
     
     if (classification?.misinformationRisk?.riskLevel === 'very_high') {
@@ -650,7 +650,7 @@ export class MLIntegrationService {
     return 'no_action';
   }
 
-  private determineExpertReviewRequirement(results: any): boolean {
+  private determineExpertReviewRequirement(results: unknown): boolean {
     if ((results.trojanAnalysis?.trojanRiskScore || 0) > 70) return true;
     if (results.constitutionalAnalysis?.alignment === 'violates') return true;
     if ((results.conflictAnalysis?.conflictScore || 0) > 70) return true;
@@ -658,11 +658,11 @@ export class MLIntegrationService {
     return false;
   }
 
-  private determinePublicAlertRequirement(results: any): boolean {
+  private determinePublicAlertRequirement(results: unknown): boolean {
     if ((results.trojanAnalysis?.trojanRiskScore || 0) > 80) return true;
     
     const violations = results.constitutionalAnalysis?.violations || [];
-    if (violations.some((v: any) => v.severity === 'critical')) return true;
+    if (violations.some((v: unknown) => v.severity === 'critical')) return true;
     
     return false;
   }
@@ -679,7 +679,7 @@ export class MLIntegrationService {
   // NORMALIZATION & VALIDATION
   // ============================================================================
 
-  private findHighestSeverityConflict(conflicts: any[]): any {
+  private findHighestSeverityConflict(conflicts: unknown[]): any {
     const severityOrder: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 };
     
     return conflicts.reduce((highest, current) => {

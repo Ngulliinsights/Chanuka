@@ -5,7 +5,7 @@ interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
   message: string;
   timestamp: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 interface HealthCheckProps {

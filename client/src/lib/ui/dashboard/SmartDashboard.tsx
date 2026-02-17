@@ -46,13 +46,6 @@ interface Activity {
   timestamp: string;
 }
 
-interface User {
-  id: string;
-  name?: string;
-  email: string;
-  persona: 'novice' | 'intermediate' | 'expert';
-}
-
 interface SavedBill {
   id: string;
   billId: string;

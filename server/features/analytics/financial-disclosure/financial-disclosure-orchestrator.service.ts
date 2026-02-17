@@ -276,7 +276,7 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Generates insights based on comprehensive analysis.
    */
-  private generateInsights(analysis: any): string[] {
+  private generateInsights(analysis: unknown): string[] {
     const insights: string[] = [];
 
     // Completeness insights
@@ -310,7 +310,7 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Generates actionable items based on analysis results.
    */
-  private generateActionItems(analysis: any): string[] {
+  private generateActionItems(analysis: unknown): string[] {
     const actions: string[] = [];
 
     // Add completeness recommendations

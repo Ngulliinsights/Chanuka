@@ -257,6 +257,7 @@ export class CSRFProtection {
   private interceptXHR(): void {
     const originalOpen = XMLHttpRequest.prototype.open;
     const originalSend = XMLHttpRequest.prototype.send;
+    // JUSTIFICATION: this-alias required for closure context preservation in XMLHttpRequest override
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 

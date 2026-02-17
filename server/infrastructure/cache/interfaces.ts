@@ -665,7 +665,7 @@ export interface CacheOperationOptions {
   /** Custom serialization options */
   serialization?: {
     /** Custom serializer function */
-    serialize?: (value: any) => string;
+    serialize?: (value: unknown) => string;
     
     /** Custom deserializer function */
     deserialize?: (data: string) => any;

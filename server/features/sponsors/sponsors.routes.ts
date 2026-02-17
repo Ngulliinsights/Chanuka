@@ -634,12 +634,12 @@ router.get('/conflicts/all', asyncHandler(async (req, res: Response) => {
   try {
     const allConflicts = await sponsorConflictAnalysisService.detectConflicts();
 
-    const sponsor_ids = Array.from(new Set(allConflicts.map((c: any) => c.sponsor_id)));
+    const sponsor_ids = Array.from(new Set(allConflicts.map((c: unknown) => c.sponsor_id)));
     const sponsors = await sponsorService.findByIds(sponsor_ids);
-    const sponsorMap = new Map(sponsors.map((s: any) => [s.id, { name: s.name, party: s.party }]));
+    const sponsorMap = new Map(sponsors.map((s: unknown) => [s.id, { name: s.name, party: s.party }]));
 
-    const conflictsBySponsor: Record<number, { sponsorInfo: any; conflicts: any[] }> = {};
-    allConflicts.forEach((conflict: any) => {
+    const conflictsBySponsor: Record<number, { sponsorInfo: any; conflicts: unknown[] }> = {};
+    allConflicts.forEach((conflict: unknown) => {
       if (!conflictsBySponsor[conflict.sponsor_id]) {
         conflictsBySponsor[conflict.sponsor_id] = {
           sponsorInfo: sponsorMap.get(conflict.sponsor_id) || { name: 'Unknown', party: null },
@@ -707,12 +707,12 @@ router.get('/:id/sponsored-bills', asyncHandler(async (req, res: Response) => {
     const activeOnly = req.query.activeOnly !== 'false';
 
     const sponsorships = await sponsorService.listBillSponsorshipsBySponsor(id, activeOnly);
-    const bill_ids = sponsorships.map((s: any) => s.bill_id);
+    const bill_ids = sponsorships.map((s: unknown) => s.bill_id);
 
     const bills = await sponsorService.getBillsByIds(bill_ids);
-    const billsMap = new Map(bills.map((b: any) => [b.id, b]));
+    const billsMap = new Map(bills.map((b: unknown) => [b.id, b]));
 
-    const sponsoredBillsData = sponsorships.map((sp: any) => ({
+    const sponsoredBillsData = sponsorships.map((sp: unknown) => ({
       sponsorshipId: sp.id,
       sponsorshipType: sp.sponsorshipType,
       sponsorshipDate: sp.sponsorshipDate,

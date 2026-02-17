@@ -8,7 +8,6 @@
  * into a unified, framework-agnostic interface.
  */
 
-// import { logger } from '../observability/logging'; // Unused import
 
 // ==================== Type Definitions ====================
 

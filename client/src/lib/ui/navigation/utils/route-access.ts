@@ -14,15 +14,6 @@ export type AccessDenialReason =
   | 'custom_condition';
 
 /**
- * User object interface
- */
-interface User {
-  id: string;
-  role: UserRole;
-  [key: string]: unknown;
-}
-
-/**
  * Result of a route access check
  */
 interface RouteAccessResult {

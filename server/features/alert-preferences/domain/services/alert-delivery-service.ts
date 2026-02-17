@@ -156,7 +156,7 @@ export class AlertDeliveryService {
     user_id: string,
     alertType: AlertType,
     alertData: any,
-    channels: any[], // AlertChannel[]
+    channels: unknown[], // AlertChannel[]
     priority: Priority
   ): Promise<DeliveryResult> { try {
       const notificationType = this.mapAlertTypeToNotificationType(alertType);
@@ -214,7 +214,7 @@ export class AlertDeliveryService {
       preference.id,
       alertType,
       [], // No channels for filtered alerts
-      'filtered' as any,
+      'filtered' as unknown,
       0,
       new Date(),
       {
@@ -232,7 +232,7 @@ export class AlertDeliveryService {
     user_id: string,
     preference: AlertPreference,
     alertType: AlertType,
-    channels: any[], // ChannelType[]
+    channels: unknown[], // ChannelType[]
     originalPriority: Priority,
     adjustedPriority: Priority,
     confidence: number,
@@ -243,7 +243,7 @@ export class AlertDeliveryService {
       preference.id,
       alertType,
       channels,
-      'pending' as any,
+      'pending' as unknown,
       0,
       new Date(),
       {
@@ -261,7 +261,7 @@ export class AlertDeliveryService {
     user_id: string,
     preference: AlertPreference,
     alertType: AlertType,
-    channels: any[], // ChannelType[]
+    channels: unknown[], // ChannelType[]
     success: boolean,
     originalPriority: Priority,
     adjustedPriority: Priority,
@@ -277,7 +277,7 @@ export class AlertDeliveryService {
       preference.id,
       alertType,
       channels,
-      status as any,
+      status as unknown,
       success ? 0 : 1,
       new Date(),
       {
@@ -330,7 +330,7 @@ export class AlertDeliveryService {
  * Interfaces for external dependencies
  */
 export interface INotificationService {
-  sendMultiChannelNotification(notification: any): Promise<void>;
+  sendMultiChannelNotification(notification: unknown): Promise<void>;
 }
 
 export interface IDeliveryLogRepository { save(log: AlertDeliveryLog): Promise<void>;

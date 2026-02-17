@@ -7,6 +7,8 @@
  */
 
 import type { DegradationLevel,RuntimeConfigType } from '../types';
+import { logger } from '@shared/core';
+
 
 /**
  * Default runtime configuration values.
@@ -264,8 +266,7 @@ export class RuntimeConfig {
         // Log error without using console directly
         // In production, this should use the application's logging system
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          // eslint-disable-next-line no-console
-          console.error('Error in configuration change listener:', error);
+          logger.error('Error in configuration change listener:', error);
         }
       }
     });

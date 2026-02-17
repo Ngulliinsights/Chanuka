@@ -134,7 +134,7 @@ export class AlertConditions {
   /**
    * Evaluates all conditions against the provided alert data
    */
-  matches(alertData: any, user_role?: string, currentTime?: Date): boolean {
+  matches(alertData: unknown, user_role?: string, currentTime?: Date): boolean {
     return (
       this.matchesBillCategory(alertData.billCategory) &&
       this.matchesBillStatus(alertData.billStatus) &&

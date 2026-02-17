@@ -6,25 +6,23 @@
  */
 
 import { CircularBuffer } from '../utils/circular-buffer';
+import { logger } from '@shared/core';
+
 import { PriorityQueue } from '../utils/priority-queue';
 
 // Temporary fallback logger until shared/core import is resolved
 const logger = {
   info: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.log(`[INFO] ${message}`, context || '');
+    logger.info(`[INFO] ${message}`, context || '');
   },
   warn: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.warn(`[WARN] ${message}`, context || '');
+    logger.warn(`[WARN] ${message}`, context || '');
   },
   error: (message: string, context?: unknown, error?: Error) => {
-    // eslint-disable-next-line no-console
-    console.error(`[ERROR] ${message}`, context || '', error || '');
+    logger.error(`[ERROR] ${message}`, context || '', error || '');
   },
   debug: (message: string, context?: unknown) => {
-    // eslint-disable-next-line no-console
-    console.log(`[DEBUG] ${message}`, context || '');
+    logger.info(`[DEBUG] ${message}`, context || '');
   }
 };
 

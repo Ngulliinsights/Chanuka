@@ -301,7 +301,7 @@ export class DeploymentMonitoringDashboard {
     };
   }
 
-  private aggregateInconsistencyTypes(inconsistencies: any[]): Array<{ type: string; count: number }> {
+  private aggregateInconsistencyTypes(inconsistencies: unknown[]): Array<{ type: string; count: number }> {
     const typeMap = new Map<string, number>();
     
     inconsistencies.forEach(inc => {

@@ -199,7 +199,7 @@ export class CommentService {
   /**
    * Build optimized comment query with proper sorting
    */
-  private buildCommentQuery(conditions: any[], sort: string) {
+  private buildCommentQuery(conditions: unknown[], sort: string) {
     const query = db
       .select({
         comment: {
@@ -239,7 +239,7 @@ export class CommentService {
   /**
    * Apply sorting with optimized SQL expressions
    */
-  private applySorting(query: any, sort: string) {
+  private applySorting(query: unknown, sort: string) {
     switch (sort) {
       case 'popular':
         return query.orderBy(
@@ -262,7 +262,7 @@ export class CommentService {
   /**
    * Get total count efficiently
    */
-  private async getTotalCount(bill_id: number, conditions: any[]): Promise<number> {
+  private async getTotalCount(bill_id: number, conditions: unknown[]): Promise<number> {
     try {
       const [{ count: totalCount }] = await db
         .select({ count: count() })
@@ -281,7 +281,7 @@ export class CommentService {
    * This reduces N+1 queries by fetching all reply counts at once
    */
   private async transformCommentsWithReplies(
-    comments: any[],
+    comments: unknown[],
     parent_id?: number
   ): Promise<CommentWithUser[]> {
     if (comments.length === 0) {
@@ -591,7 +591,7 @@ export class CommentService {
           netVotes: updatedComment.upvotes - updatedComment.downvotes
         };
       },
-      null as any,
+      null as unknown,
       `updateComment:${comment_id}`
     );
 
@@ -896,7 +896,7 @@ export class CommentService {
   /**
    * Generate stable cache key
    */
-  private generateCacheKey(prefix: string, bill_id: number, filters: any): string {
+  private generateCacheKey(prefix: string, bill_id: number, filters: unknown): string {
     const filterString = Object.keys(filters)
       .sort()
       .map(key => `${key}:${filters[key]}`)
@@ -908,7 +908,7 @@ export class CommentService {
   /**
    * Safe cache set with error handling
    */
-  private async safeCacheSet(key: string, value: any, ttl: number): Promise<void> {
+  private async safeCacheSet(key: string, value: unknown, ttl: number): Promise<void> {
     try {
       await cacheService.set(key, value, ttl);
     } catch (error) {

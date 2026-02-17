@@ -10,7 +10,7 @@ import { QUERY_CONFIG } from './config/graph-config';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function getMostEngagedUsers(driver: Driver, options: PaginationOptions = {}): Promise<any[]> {
+export async function getMostEngagedUsers(driver: Driver, options: PaginationOptions = {}): Promise<unknown[]> {
   const baseQuery = `
     MATCH (u:User)
     RETURN u.id as id, u.email as email,
@@ -33,7 +33,7 @@ export async function getMostEngagedUsers(driver: Driver, options: PaginationOpt
   }
 }
 
-export async function getTrendingBills(driver: Driver, limit: number = QUERY_CONFIG.DEFAULT_LIMIT): Promise<any[]> {
+export async function getTrendingBills(driver: Driver, limit: number = QUERY_CONFIG.DEFAULT_LIMIT): Promise<unknown[]> {
   try {
     const result = await executeCypherSafely(
       driver,

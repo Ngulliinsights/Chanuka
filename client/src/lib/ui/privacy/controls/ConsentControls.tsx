@@ -9,7 +9,6 @@ import React from 'react';
 
 import { PrivacySettings } from '@client/core/auth';
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
-// import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Switch } from '@client/lib/design-system/interactive/Switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';

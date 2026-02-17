@@ -6,7 +6,7 @@
  * using Redux Toolkit's Immer integration for safe state mutations.
  */
 
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector, castDraft } from '@reduxjs/toolkit';
 
 import {
   NavigationState,
@@ -174,11 +174,10 @@ const navigationSlice = createSlice({
      * existing preferences rather than replacing them entirely.
      */
     updatePreferences: (state, action: PayloadAction<Partial<NavigationPreferences>>) => {
-      // Cast readonly arrays to mutable for Immer
       const updates = { ...action.payload };
       if (updates.favoritePages) {
-        // @ts-ignore - Immer handles the mutation, this is a type clash between readonly and mutable draft
-        state.preferences.favoritePages = [...updates.favoritePages];
+        // Use castDraft to properly handle readonly to mutable conversion in Immer
+        state.preferences.favoritePages = castDraft([...updates.favoritePages]);
         delete updates.favoritePages;
       }
       

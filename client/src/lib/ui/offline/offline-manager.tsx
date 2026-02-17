@@ -475,6 +475,7 @@ export function useOfflineData<T>(
 
   useEffect(() => {
     fetchData();
+    // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchData, ...dependencies]);
 

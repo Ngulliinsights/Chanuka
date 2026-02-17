@@ -122,7 +122,7 @@ class CodebaseErrorAnalyzer {
       });
       
       console.log(`   ✅ No TypeScript errors found in ${context.displayName}!`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // The TypeScript compiler exits with error code when there are errors
       // This is expected behavior, so we capture the output
       const output = error.stdout || error.stderr || '';

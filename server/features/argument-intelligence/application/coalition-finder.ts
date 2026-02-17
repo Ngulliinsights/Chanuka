@@ -73,7 +73,7 @@ export class CoalitionFinderService {
    * Find potential coalitions for extracted arguments
    */
   async findPotentialCoalitions(
-    arguments: any[],
+    arguments: unknown[],
     userDemographics?: UserDemographics
   ): Promise<CoalitionMatch[]> {
     try {
@@ -238,8 +238,8 @@ export class CoalitionFinderService {
 
   // Private helper methods
 
-  private async buildStakeholderProfiles(arguments: any[]): Promise<StakeholderProfile[]> {
-    const stakeholderMap = new Map<string, any[]>();
+  private async buildStakeholderProfiles(arguments: unknown[]): Promise<StakeholderProfile[]> {
+    const stakeholderMap = new Map<string, unknown[]>();
 
     // Group arguments by stakeholder
     arguments.forEach(arg => {
@@ -261,7 +261,7 @@ export class CoalitionFinderService {
     return profiles;
   }
 
-  private async createStakeholderProfile(group: string, arguments: any[]): Promise<StakeholderProfile> {
+  private async createStakeholderProfile(group: string, arguments: unknown[]): Promise<StakeholderProfile> {
     // Extract primary concerns
     const primaryConcerns = this.extractPrimaryConcerns(arguments);
 
@@ -291,7 +291,7 @@ export class CoalitionFinderService {
     };
   }
 
-  private extractPrimaryConcerns(arguments: any[]): string[] {
+  private extractPrimaryConcerns(arguments: unknown[]): string[] {
     const concernCounts = new Map<string, number>();
 
     arguments.forEach(arg => {
@@ -333,7 +333,7 @@ export class CoalitionFinderService {
     return concerns;
   }
 
-  private determineGroupPosition(arguments: any[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
+  private determineGroupPosition(arguments: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
     const positions = arguments.map(arg => arg.position || 'neutral');
     const supportCount = positions.filter(p => p === 'support').length;
     const opposeCount = positions.filter(p => p === 'oppose').length;
@@ -346,7 +346,7 @@ export class CoalitionFinderService {
     return 'neutral';
   }
 
-  private extractKeyArguments(arguments: any[]): string[] {
+  private extractKeyArguments(arguments: unknown[]): string[] {
     return arguments
       .filter(arg => arg.type === 'claim' && arg.confidence > 0.7)
       .sort((a, b) => b.confidence - a.confidence)
@@ -354,7 +354,7 @@ export class CoalitionFinderService {
       .map(arg => arg.normalizedText);
   }
 
-  private buildDemographics(arguments: any[]): StakeholderProfile['demographics'] {
+  private buildDemographics(arguments: unknown[]): StakeholderProfile['demographics'] {
     const geographicDistribution = new Map<string, number>();
     const occupationalBreakdown = new Map<string, number>();
     const organizationalAffiliations: string[] = [];
@@ -387,7 +387,7 @@ export class CoalitionFinderService {
     };
   }
 
-  private calculateParticipationLevel(arguments: any[]): number {
+  private calculateParticipationLevel(arguments: unknown[]): number {
     const uniqueUsers = new Set(arguments.map(arg => arg.user_id)).size;
     const totalArguments = arguments.length;
     
@@ -395,7 +395,7 @@ export class CoalitionFinderService {
     return Math.min(100, (uniqueUsers * 10) + (totalArguments * 2));
   }
 
-  private calculateInfluenceScore(arguments: any[], group: string): number {
+  private calculateInfluenceScore(arguments: unknown[], group: string): number {
     let score = 50; // Base score
 
     // Boost for organized groups

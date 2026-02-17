@@ -69,7 +69,7 @@ export function ConflictNetworkVisualization({
       });
 
       // Add organization nodes and links
-      (conflictAnalysis.organizationalConnections ?? []).forEach((connection: any, index: number) => {
+      (conflictAnalysis.organizationalConnections ?? []).forEach((connection: unknown, index: number) => {
         const orgId = `org-${index}`;
         nodes.push({
           id: orgId,
@@ -91,16 +91,16 @@ export function ConflictNetworkVisualization({
 
       // Add industry nodes from financial interests
       const industries = new Set<string>();
-      (conflictAnalysis.financialInterests ?? []).forEach((interest: any) => {
+      (conflictAnalysis.financialInterests ?? []).forEach((interest: unknown) => {
         industries.add(interest.industry);
       });
 
       industries.forEach(industry => {
         const industryId = `industry-${industry.replace(/\s+/g, '-').toLowerCase()}`;
         const relatedInterests = (conflictAnalysis.financialInterests ?? []).filter(
-          (interest: any) => interest.industry === industry
+          (interest: unknown) => interest.industry === industry
         );
-        const totalAmount = relatedInterests.reduce((sum: number, interest: any) => sum + interest.amount, 0);
+        const totalAmount = relatedInterests.reduce((sum: number, interest: unknown) => sum + interest.amount, 0);
 
         nodes.push({
           id: industryId,
@@ -392,14 +392,14 @@ export function ConflictNetworkVisualization({
           },
         ],
         connections: [
-          ...(conflictAnalysis.organizationalConnections ?? []).map((conn: any) => ({
+          ...(conflictAnalysis.organizationalConnections ?? []).map((conn: unknown) => ({
             from: conflictAnalysis.sponsorName ?? 'Sponsor',
             to: conn.organizationName,
             type: conn.connectionType,
             strength: conn.strength ?? 0,
             description: conn.description,
           })),
-          ...(conflictAnalysis.financialInterests ?? []).map((interest: any) => ({
+          ...(conflictAnalysis.financialInterests ?? []).map((interest: unknown) => ({
             from: conflictAnalysis.sponsorName ?? 'Sponsor',
             to: interest.industry,
             type: interest.category,
@@ -412,10 +412,10 @@ export function ConflictNetworkVisualization({
             (conflictAnalysis.organizationalConnections?.length ?? 0) +
             (conflictAnalysis.financialInterests?.length ?? 0),
           highRiskConnections: (conflictAnalysis.organizationalConnections ?? []).filter(
-            (c: any) => (c.strength ?? 0) > 0.7
+            (c: unknown) => (c.strength ?? 0) > 0.7
           ).length,
           averageTransparencyScore: transparencyOverall,
-          topIndustries: [...new Set((conflictAnalysis.financialInterests ?? []).map((f: any) => f.industry).filter((industry: any): industry is string => typeof industry === 'string'))].slice(
+          topIndustries: [...new Set((conflictAnalysis.financialInterests ?? []).map((f: unknown) => f.industry).filter((industry: unknown): industry is string => typeof industry === 'string'))].slice(
             0,
             3
           ) as string[],

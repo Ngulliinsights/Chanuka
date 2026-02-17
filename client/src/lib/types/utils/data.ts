@@ -44,7 +44,7 @@ export type SearchOptions = {
   pageSize?: number;
   sortBy?: string;
   sortDirection?: SortDirection;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 };
 
 // Cache utilities

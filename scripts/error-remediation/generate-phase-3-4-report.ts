@@ -50,7 +50,7 @@ async function generatePhase34Report(): Promise<Phase34Report> {
       encoding: 'utf-8',
       stdio: 'pipe'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     tscOutput = error.stdout || '';
   }
 

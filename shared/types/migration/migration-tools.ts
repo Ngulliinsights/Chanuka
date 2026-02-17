@@ -191,7 +191,7 @@ export async function migrateBatch<T, S>(
 export function createBackwardCompatibleWrapper<T extends object>(
   standardInstance: T,
   legacyFieldMappings: Record<string, keyof T & string>
-): T & Record<string, any> {
+): T & Record<string, unknown> {
   const wrapper = { ...standardInstance };
 
   // Add legacy field accessors
@@ -208,7 +208,7 @@ export function createBackwardCompatibleWrapper<T extends object>(
     });
   }
 
-  return wrapper as T & Record<string, any>;
+  return wrapper as T & Record<string, unknown>;
 }
 
 // ============================================================================
@@ -217,11 +217,11 @@ export function createBackwardCompatibleWrapper<T extends object>(
 
 export function validateMigrationResult<T>(
   migratedItem: T,
-  validationSchema: Record<keyof T, (value: any) => boolean>
+  validationSchema: Record<keyof T, (value: unknown) => boolean>
 ): { isValid: boolean; validationErrors: Record<string, string> } {
   const validationErrors: Record<string, string> = {};
 
-  for (const [fieldName, validator] of Object.entries(validationSchema) as Array<[keyof T, (value: any) => boolean]>) {
+  for (const [fieldName, validator] of Object.entries(validationSchema) as Array<[keyof T, (value: unknown) => boolean]>) {
     if (!validator(migratedItem[fieldName])) {
       validationErrors[fieldName as string] = `Validation failed for field ${fieldName as string}`;
     }

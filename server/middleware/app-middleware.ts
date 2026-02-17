@@ -38,7 +38,7 @@ const requestLogger = (req: Request, res: Response, next: NextFunction): void =>
 };
 
 // Create performance middleware from performanceMonitor
-const performanceMiddleware = (req: any, res: any, next: any) => {
+const performanceMiddleware = (req: unknown, res: unknown, next: unknown) => {
   const operationId = performanceMonitor.startOperation?.('http', `${req.method} ${req.path}`, {
     method: req.method,
     path: req.path,

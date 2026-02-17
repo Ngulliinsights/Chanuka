@@ -154,7 +154,7 @@ export class CacheWarmer extends EventEmitter {
   stopBackgroundWarming(): void {
     if (this.backgroundTimer) {
       clearInterval(this.backgroundTimer);
-      this.backgroundTimer = null as any;
+      this.backgroundTimer = null as unknown;
       this.emit('background:stop');
     }
   }
@@ -323,7 +323,7 @@ export class CacheWarmer extends EventEmitter {
     }
   }
 
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     try {
       const serialized = JSON.stringify(data);
       return new Blob([serialized]).size;

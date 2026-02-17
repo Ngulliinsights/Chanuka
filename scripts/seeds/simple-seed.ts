@@ -38,7 +38,7 @@ export default async function seedSimple() {
 
     // Get the created user IDs
   const createdUsers = await db.execute('SELECT id FROM users ORDER BY id DESC LIMIT 5');
-  const user_ids = createdUsers.rows.map((row: any) => row.id);
+  const user_ids = createdUsers.rows.map((row: unknown) => row.id);
 
     // 2. Create comprehensive user profiles
     logger.info('📋 Creating user profiles...', { component: 'Chanuka' });
@@ -66,7 +66,7 @@ export default async function seedSimple() {
 
     // Get the created sponsor IDs
   const createdSponsors = await db.execute('SELECT id FROM sponsors ORDER BY id DESC LIMIT 5');
-  const sponsor_ids = createdSponsors.rows.map((row: any) => row.id);
+  const sponsor_ids = createdSponsors.rows.map((row: unknown) => row.id);
 
     // 4. Create comprehensive bills with varied complexity
     logger.info('📄 Creating bills...', { component: 'Chanuka' });
@@ -82,7 +82,7 @@ export default async function seedSimple() {
 
     // Get the created bill IDs
   const createdBills = await db.execute('SELECT id FROM bills ORDER BY id DESC LIMIT 5');
-  const bill_ids = createdBills.rows.map((row: any) => row.id);
+  const bill_ids = createdBills.rows.map((row: unknown) => row.id);
 
     // 5. Create bill comments
     logger.info('💬 Creating comments...', { component: 'Chanuka' });

@@ -4,7 +4,6 @@
  */
 
 import { LoadingStage } from '../types';
-// import { validateLoadingProgress } from '../validation';
 
 /**
  * Progress calculation utilities

@@ -66,7 +66,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error fetching verifications for bill',
         { component: 'verification-routes', context, billId: req.params.bill_id },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to fetch bill verifications', {
@@ -151,7 +151,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error creating verification',
         { component: 'verification-routes', context },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to create verification', {
@@ -178,7 +178,7 @@ export function setupVerificationRoutes() {
       const { verification_status, claim, reasoning } = req.body;
 
       // Build update object with only provided fields
-      const updateData: Record<string, any> = {};
+      const updateData: Record<string, unknown> = {};
       if (verification_status !== undefined) updateData.verification_status = verification_status;
       // If claim or reasoning provided, merge into verification_data JSONB
       if (claim !== undefined || reasoning !== undefined) {
@@ -261,7 +261,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error updating verification',
         { component: 'verification-routes', context, verificationId: req.params.id },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to update verification', {
@@ -315,7 +315,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error fetching verification stats',
         { component: 'verification-routes', context },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to fetch verification statistics', {
@@ -358,7 +358,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error fetching user verifications',
         { component: 'verification-routes', context, citizenId: req.params.citizen_id },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to fetch user verifications', {
@@ -414,7 +414,7 @@ export function setupVerificationRoutes() {
       logger.error(
         'Error deleting verification',
         { component: 'verification-routes', context, verificationId: req.params.id },
-        error as Record<string, any> | undefined
+        error as Record<string, unknown> | undefined
       );
 
       throw new BaseError('Failed to delete verification', {

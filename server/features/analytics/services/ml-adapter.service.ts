@@ -100,7 +100,7 @@ export class MLServiceAdapter {
     /**
      * Route conflict detection based on feature flag
      */
-    async detectConflictsOfInterest(billContent: string, sponsorData: any, user_id?: string): Promise<AnalysisResult> {
+    async detectConflictsOfInterest(billContent: string, sponsorData: unknown, user_id?: string): Promise<AnalysisResult> {
         const startTime = Date.now();
         const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', user_id);
 
@@ -289,7 +289,7 @@ export async function adaptiveAnalyzeStakeholderInfluence(billContent: string, u
     return mlServiceAdapter.analyzeStakeholderInfluence(billContent, user_id);
 }
 
-export async function adaptiveDetectConflictsOfInterest(billContent: string, sponsorData: any, user_id?: string): Promise<AnalysisResult> {
+export async function adaptiveDetectConflictsOfInterest(billContent: string, sponsorData: unknown, user_id?: string): Promise<AnalysisResult> {
     return mlServiceAdapter.detectConflictsOfInterest(billContent, sponsorData, user_id);
 }
 

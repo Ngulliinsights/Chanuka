@@ -101,6 +101,7 @@ export function useNavigationPreferences() {
     return () => {
       mounted = false;
     };
+    // JUSTIFICATION: Intentionally omitting dependencies to run effect only once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs only once on mount
 

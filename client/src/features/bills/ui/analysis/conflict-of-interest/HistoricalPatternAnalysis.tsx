@@ -71,7 +71,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
     );
 
     // Calculate average correlations and patterns
-    Object.values(votesByYear).forEach((yearData: any) => {
+    Object.values(votesByYear).forEach((yearData: unknown) => {
       const correlations = yearData.votes.map((v: VotingPattern) =>
         Math.abs(v.financialCorrelation ?? 0)
       );
@@ -121,7 +121,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
 
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, unknown>
     );
 
     // Correlation timeline data
@@ -145,16 +145,16 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
             100
           : 0,
       consistentPatternRisk: Object.values(industryPatterns).filter(
-        (p: any) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3
+        (p: unknown) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3
       ).length,
       recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation ?? 0) > 0.4)
         .length,
     };
 
     return {
-      yearlyData: Object.values(votesByYear).sort((a: any, b: any) => a.year - b.year),
+      yearlyData: Object.values(votesByYear).sort((a: unknown, b: unknown) => a.year - b.year),
       industryPatterns: Object.values(industryPatterns).sort(
-        (a: any, b: any) => b.totalAmount - a.totalAmount
+        (a: unknown, b: unknown) => b.totalAmount - a.totalAmount
       ),
       correlationTimeline,
       riskMetrics,
@@ -350,8 +350,8 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
             <CardContent>
               <div className="space-y-4">
                 {analysisData.industryPatterns
-                  .filter((pattern: any) => pattern.relatedVotes.length > 0)
-                  .map((pattern: any, index: number) => (
+                  .filter((pattern: unknown) => pattern.relatedVotes.length > 0)
+                  .map((pattern: unknown, index: number) => (
                     <div key={index} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
@@ -462,7 +462,7 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
 
               {/* Yearly Summary */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {analysisData.yearlyData.map((yearData: any) => (
+                {analysisData.yearlyData.map((yearData: unknown) => (
                   <div key={yearData.year} className="p-3 border rounded-lg">
                     <div className="font-medium mb-2">{yearData.year}</div>
                     <div className="space-y-1 text-sm">

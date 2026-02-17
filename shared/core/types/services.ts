@@ -7,12 +7,12 @@ export interface Services {
 
 export interface CacheService {
   get(key: string): Promise<any>;
-  set(key: string, value: any, ttl: number): Promise<void>;
+  set(key: string, value: unknown, ttl: number): Promise<void>;
   delete(key: string): Promise<void>;
 }
 
 export interface ValidationService {
-  validate(schema: any, data: any): ValidationResult;
+  validate(schema: unknown, data: unknown): ValidationResult;
 }
 
 export interface ValidationResult {
@@ -40,7 +40,7 @@ export interface HealthChecker {
 
 export interface HealthStatus {
   status: 'healthy' | 'unhealthy';
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 

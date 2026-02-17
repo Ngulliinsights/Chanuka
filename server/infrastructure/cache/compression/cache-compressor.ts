@@ -23,7 +23,7 @@ export class CacheCompressor {
   /**
    * Compress data if it meets the threshold
    */
-  compress(data: any): any {
+  compress(data: unknown): unknown {
     if (this.options.algorithm === 'none') {
       return data;
     }
@@ -54,7 +54,7 @@ export class CacheCompressor {
   /**
    * Decompress data
    */
-  decompress(data: any): any {
+  decompress(data: unknown): unknown {
     if (this.options.algorithm === 'none' || !this.isCompressed(data)) {
       return data;
     }
@@ -74,7 +74,7 @@ export class CacheCompressor {
   /**
    * Check if data is compressed
    */
-  private isCompressed(data: any): boolean {
+  private isCompressed(data: unknown): boolean {
     return data && typeof data === 'object' && data.__compressed === true;
   }
 
@@ -95,7 +95,7 @@ export class CacheCompressor {
   /**
    * Browser-based decompression (simplified)
    */
-  private browserDecompress(compressedData: any): any {
+  private browserDecompress(compressedData: unknown): unknown {
     if (compressedData.__compressed) {
       return compressedData.data; // Would be decompressed data
     }
@@ -126,7 +126,7 @@ export class CacheCompressor {
   /**
    * Node.js-based decompression
    */
-  private nodeDecompress(compressedData: any): any {
+  private nodeDecompress(compressedData: unknown): unknown {
     if (compressedData.__compressed) {
       try {
         // In a real implementation, you'd use zlib

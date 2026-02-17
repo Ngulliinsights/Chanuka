@@ -62,12 +62,12 @@ export interface TokenInfo {
 export interface CacheEntry<T = unknown> {
   data: T;
   timestamp: number;
-  ttl?: number;
-  accessCount?: number;
-  lastAccessed?: number;
-  size?: number;
-  tags?: string[];
-  metadata?: Record<string, unknown>;
+  ttl?: number | undefined;
+  accessCount?: number | undefined;
+  lastAccessed?: number | undefined;
+  size?: number | undefined;
+  tags?: string[] | undefined;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 /**

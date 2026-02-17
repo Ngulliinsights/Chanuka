@@ -111,7 +111,7 @@ interface MetricSamples {
 
 export class ABTestingService {
   private cohortMetrics: Map<string, CohortMetrics[]> = new Map();
-  private userBehaviorData: Map<string, any[]> = new Map();
+  private userBehaviorData: Map<string, unknown[]> = new Map();
   private metricSamples: Map<string, Map<'control' | 'treatment', MetricSamples>> = new Map();
 
   private readonly defaultConfig: StatisticalConfig = {
@@ -151,7 +151,7 @@ export class ABTestingService {
    * The method automatically determines the user's cohort and updates running statistics
    * for that cohort, enabling real-time monitoring of experiment progress.
    */
-  async trackCohortMetrics(component: string, user_id: string, metrics: any): Promise<void> {
+  async trackCohortMetrics(component: string, user_id: string, metrics: unknown): Promise<void> {
     try {
       const cohort = featureFlagsService.getUserCohort(user_id, component);
 
@@ -336,7 +336,7 @@ export class ABTestingService {
    * Records user behavior data for later analysis. This captures qualitative aspects
    * of user experience that complement quantitative performance metrics.
    */
-  async recordUserBehavior(component: string, user_id: string, behaviorData: any): Promise<void> {
+  async recordUserBehavior(component: string, user_id: string, behaviorData: unknown): Promise<void> {
     try {
       const existing = this.userBehaviorData.get(component) || [];
       existing.push({
@@ -642,7 +642,7 @@ export class ABTestingService {
   /**
    * Helper method to calculate average of a specific field from an array of objects.
    */
-  private calculateAverage(data: any[], field: string): number {
+  private calculateAverage(data: unknown[], field: string): number {
     const values = data.map(d => d[field]).filter(v => v !== undefined && v !== null);
     return values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
   }

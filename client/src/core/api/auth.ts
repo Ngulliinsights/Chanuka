@@ -5,6 +5,12 @@
  */
 
 import { logger } from '@client/lib/utils/logger';
+import type { 
+  DataExportResponse, 
+  DataDeletionResponse 
+} from '@shared/validation/schemas/analytics.schema';
+import { UserRole } from '@shared/types/core/enums';
+import type { PermissionCheckResult } from '@shared/core/types/auth.types';
 
 import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
 
@@ -94,25 +100,9 @@ export interface AuthResponse<T = unknown> {
   requires2FA?: boolean;
 }
 
-export interface ApiResponse<T = unknown> {
-  data: T;
-  status: number;
-  message?: string;
-}
-
 // ============================================================================
 // OAuth & Security Types
 // ============================================================================
-
-export interface OAuthProvider {
-  id: string;
-  name: string;
-  clientId: string;
-  redirectUri: string;
-  scope: string[];
-  authUrl: string;
-  tokenUrl: string;
-}
 
 export interface TwoFactorSetup {
   secret: string;
@@ -151,23 +141,11 @@ export interface SessionInfo {
   current: boolean;
 }
 
-export interface UserRole {
-  id: string;
-  name: string;
-  permissions: string[];
-  level: number;
-}
-
 export interface PermissionCheckContext {
   user_id: string;
   resource: string;
   action: string;
   conditions?: Record<string, unknown>;
-}
-
-export interface PermissionCheckResult {
-  granted: boolean;
-  reason?: string;
 }
 
 // ============================================================================
@@ -257,24 +235,6 @@ export interface PrivacySettings {
     allow_marketing: boolean;
     allow_third_party: boolean;
   };
-}
-
-export interface DataExportResponse {
-  id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  created_at: string;
-  expires_at?: string;
-  download_url?: string;
-  format: 'json' | 'csv';
-  size_bytes?: number;
-}
-
-export interface DataDeletionResponse {
-  id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  created_at: string;
-  scheduled_for?: string;
-  reason?: string;
 }
 
 export interface SocialLoginProvider {
@@ -836,6 +796,11 @@ export class AuthApiService {
    * Revoke a specific session by ID (alias for terminateSession).
    */
   async revokeSession(sessionId: string): Promise<void> {
+    return this.terminateSession(sessionId);
+  }
+
+  /**
+   * Revoke all sessions except void> {
     return this.terminateSession(sessionId);
   }
 

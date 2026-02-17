@@ -117,7 +117,7 @@ export class InputValidationService {
   /**
    * Validate file upload
    */
-  public validateFileUpload(file: any, options: FileValidationOptions): ValidationResult {
+  public validateFileUpload(file: unknown, options: FileValidationOptions): ValidationResult {
     const errors: ValidationError[] = [];
 
     if (!file) {
@@ -293,7 +293,7 @@ export class InputValidationService {
   /**
    * Check if file contains malicious content
    */
-  private containsMaliciousContent(file: any): boolean {
+  private containsMaliciousContent(file: unknown): boolean {
     // Check filename for suspicious patterns
     const suspiciousPatterns = [
       /\.exe$/i,

@@ -14,7 +14,7 @@ export interface FeatureFlagsService {
   /**
    * Update a feature flag configuration
    */
-  updateFlag(flagName: string, updates: any): void;
+  updateFlag(flagName: string, updates: unknown): void;
   
   /**
    * Enable gradual rollout for a feature
@@ -35,7 +35,7 @@ export interface FeatureFlagConfig {
   rolloutPercentage: number;
   userWhitelist?: string[];
   userBlacklist?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -44,7 +44,7 @@ export interface FeatureFlagConfig {
 export interface FeatureFlagResult {
   enabled: boolean;
   variant?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   reason?: string;
 }
 

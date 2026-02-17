@@ -121,7 +121,7 @@ export class MLAnalysisService {
     }
   }
 
-  static async detectConflictsOfInterest(billContent: string, sponsorData: any): Promise<AnalysisResult> {
+  static async detectConflictsOfInterest(billContent: string, sponsorData: unknown): Promise<AnalysisResult> {
     try {
       if (!this.validateBillContent(billContent)) {
         throw new Error('Invalid bill content provided for conflict analysis');

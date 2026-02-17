@@ -42,7 +42,7 @@ export class RateLimit {
   private static requests = new Map<string, number[]>();
 
   static create(options: { windowMs: number; max: number }) {
-    return (req: any, res: any, next: any) => {
+    return (req: unknown, res: unknown, next: unknown) => {
       const key = req.ip || 'unknown';
       const now = Date.now();
       const windowStart = now - options.windowMs;
@@ -95,7 +95,7 @@ export class ApiResponse {
 }
 
 // API Response functions for Express responses
-export const ApiSuccessResponse = (res: any, data: any, metadata?: any) => {
+export const ApiSuccessResponse = (res: unknown, data: unknown, metadata?: unknown) => {
   return res.status(200).json({
     success: true,
     data,
@@ -104,7 +104,7 @@ export const ApiSuccessResponse = (res: any, data: any, metadata?: any) => {
   });
 };
 
-export const ApiErrorResponse = (res: any, message: string, statusCode: number = 500, metadata?: any) => {
+export const ApiErrorResponse = (res: unknown, message: string, statusCode: number = 500, metadata?: unknown) => {
   return res.status(statusCode).json({
     success: false,
     error: { message, statusCode },
@@ -113,7 +113,7 @@ export const ApiErrorResponse = (res: any, message: string, statusCode: number =
   });
 };
 
-export const ApiValidationErrorResponse = (res: any, errors: any, metadata?: any) => {
+export const ApiValidationErrorResponse = (res: unknown, errors: unknown, metadata?: unknown) => {
   return res.status(400).json({
     success: false,
     error: { message: 'Validation failed', errors, statusCode: 400 },
@@ -122,7 +122,7 @@ export const ApiValidationErrorResponse = (res: any, errors: any, metadata?: any
   });
 };
 
-export const ApiNotFoundResponse = (res: any, message: string = 'Resource not found', metadata?: any) => {
+export const ApiNotFoundResponse = (res: unknown, message: string = 'Resource not found', metadata?: unknown) => {
   return res.status(404).json({
     success: false,
     error: { message, statusCode: 404 },
@@ -131,7 +131,7 @@ export const ApiNotFoundResponse = (res: any, message: string = 'Resource not fo
   });
 };
 
-export const ApiUnauthorizedResponse = (res: any, message: string = 'Unauthorized', metadata?: any) => {
+export const ApiUnauthorizedResponse = (res: unknown, message: string = 'Unauthorized', metadata?: unknown) => {
   return res.status(401).json({
     success: false,
     error: { message, statusCode: 401 },
@@ -140,7 +140,7 @@ export const ApiUnauthorizedResponse = (res: any, message: string = 'Unauthorize
   });
 };
 
-export const ApiForbiddenResponse = (res: any, message: string = 'Forbidden', metadata?: any) => {
+export const ApiForbiddenResponse = (res: unknown, message: string = 'Forbidden', metadata?: unknown) => {
   return res.status(403).json({
     success: false,
     error: { message, statusCode: 403 },
@@ -247,7 +247,7 @@ export const cacheService = {
     return null;
   },
 
-  async set(_key: string, _value: any, _ttl?: number): Promise<void> {
+  async set(_key: string, _value: unknown, _ttl?: number): Promise<void> {
     console.debug(`Cache set: ${_key} (fallback - no caching)`);
   },
 
@@ -291,12 +291,12 @@ export const cache = {
 
 // Database connection fallback
 export const database = {
-  execute: async (_query: string, _params?: any[]) => {
+  execute: async (_query: string, _params?: unknown[]) => {
     console.warn('Database execute called with fallback implementation');
     throw new Error('Database not available - using fallback mode');
   },
 
-  query: async (_query: string, _params?: any[]) => {
+  query: async (_query: string, _params?: unknown[]) => {
     console.warn('Database query called with fallback implementation');
     return { rows: [], rowCount: 0 };
   }

@@ -158,7 +158,7 @@ export class ConflictDetectionError extends Error { constructor(
 /**
  * Type guard for vote validation
  */
-export function isValidVote(vote: any): vote is ValidatedVote {
+export function isValidVote(vote: unknown): vote is ValidatedVote {
   return vote &&
     typeof vote === 'object' &&
     typeof vote.vote === 'string' &&

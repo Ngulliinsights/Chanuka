@@ -199,7 +199,7 @@ declare global { namespace Express {
         traceId: string;
         timestamp: Date;
         user_id?: string;
-        metadata?: Record<string, any>;
+        metadata?: Record<string, unknown>;
        };
     }
   }

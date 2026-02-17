@@ -1,15 +1,3 @@
-/**
- * Branded Types for Type Safety
- * Prevents accidental type mixing and provides compile-time safety
- */
-
-/**
- * Branded types prevent accidental type mixing
- * These types provide compile-time safety for entity identifiers
- */
-
-// User & Authentication
-export type UserId = string & { readonly __brand: 'UserId' };
 export type UserProfileId = string & { readonly __brand: 'UserProfileId' };
 export type SessionId = string & { readonly __brand: 'SessionId' };
 export type UserSessionId = string & { readonly __brand: 'UserSessionId' };

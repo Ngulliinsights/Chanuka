@@ -1,7 +1,6 @@
 // Migration wrapper for server middleware
 // Provides gradual migration from legacy middleware to modern middleware
 
-// import { createMiddlewareMigrationAdapter   } from '@shared/core';
 import { logger   } from '@shared/core';
 
 import { authenticateToken, requireRole } from './auth';
@@ -9,20 +8,20 @@ import { apiRateLimit, authRateLimit, createRateLimit, legacyPasswordResetRateLi
 
 // Legacy middleware factory interface
 interface LegacyMiddlewareFactory {
-  createAuth?(options?: any): any;
-  createRateLimit?(options?: any): any;
-  createValidation?(options?: any): any;
-  createCache?(options?: any): any;
-  createErrorHandler?(options?: any): any;
+  createAuth?(options?: unknown): unknown;
+  createRateLimit?(options?: unknown): unknown;
+  createValidation?(options?: unknown): unknown;
+  createCache?(options?: unknown): unknown;
+  createErrorHandler?(options?: unknown): unknown;
 }
 
 // Create legacy factory wrapper
 const legacyFactory: LegacyMiddlewareFactory = {
-  createAuth: (options?: any) => authenticateToken,
-  createRateLimit: (options?: any) => createRateLimit(options),
-  createValidation: () => (req: any, res: any, next: any) => next(), // Placeholder
-  createCache: () => (req: any, res: any, next: any) => next(), // Placeholder
-  createErrorHandler: () => (error: any, req: any, res: any, next: any) => next(error), // Placeholder
+  createAuth: (options?: unknown) => authenticateToken,
+  createRateLimit: (options?: unknown) => createRateLimit(options),
+  createValidation: () => (req: unknown, res: unknown, next: unknown) => next(), // Placeholder
+  createCache: () => (req: unknown, res: unknown, next: unknown) => next(), // Placeholder
+  createErrorHandler: () => (error: unknown, req: unknown, res: unknown, next: unknown) => next(error), // Placeholder
 };
 
 // Create service container for modern middleware
@@ -46,17 +45,17 @@ const serviceContainer = {
     check: async () => ({ status: 'healthy' as const })
   },
   logger: {
-    info: (message: string, context?: any, metadata?: any) => logger.info(message, context, metadata),
-    warn: (message: string, context?: any, metadata?: any) => logger.warn(message, context, metadata),
-    error: (message: string, context?: any, metadata?: any) => logger.error(message, context, metadata),
-    debug: (message: string, context?: any, metadata?: any) => logger.debug(message, context, metadata),
+    info: (message: string, context?: unknown, metadata?: unknown) => logger.info(message, context, metadata),
+    warn: (message: string, context?: unknown, metadata?: unknown) => logger.warn(message, context, metadata),
+    error: (message: string, context?: unknown, metadata?: unknown) => logger.error(message, context, metadata),
+    debug: (message: string, context?: unknown, metadata?: unknown) => logger.debug(message, context, metadata),
   }
 };
 
 // Create migration adapter (placeholder - migration not yet active)
 const middlewareMigrationAdapter = {
   createAuth: () => authenticateToken,
-  createRateLimit: (options?: any) => createRateLimit(options || { max: 100, windowMs: 15 * 60 * 1000 }),
+  createRateLimit: (options?: unknown) => createRateLimit(options || { max: 100, windowMs: 15 * 60 * 1000 }),
 };
 
 // Export migrated middleware functions (using legacy implementations for now)

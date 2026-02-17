@@ -315,24 +315,24 @@ export class SimpleTransparencyDashboardService {
     return sponsor[0] || null;
   }
 
-  private calculateVerificationScore(disclosures: any[]): number {
+  private calculateVerificationScore(disclosures: unknown[]): number {
     if (disclosures.length === 0) return 0;
     const verifiedCount = disclosures.filter(d => d.is_verified).length;
     return Math.round((verifiedCount / disclosures.length) * 100);
   }
 
-  private calculateConflictResolutionScore(relationshipMapping: any): number {
+  private calculateConflictResolutionScore(relationshipMapping: unknown): number {
     const totalRelationships = relationshipMapping.relationships.length;
     if (totalRelationships === 0) return 100;
     
     const highRiskCount = relationshipMapping.relationships.filter(
-      (r: any) => r.conflictPotential === 'high' || r.conflictPotential === 'critical'
+      (r: unknown) => r.conflictPotential === 'high' || r.conflictPotential === 'critical'
     ).length;
     
     return Math.max(100 - (highRiskCount / totalRelationships) * 100, 0);
   }
 
-  private calculateDataRecencyScore(disclosures: any[]): number {
+  private calculateDataRecencyScore(disclosures: unknown[]): number {
     if (disclosures.length === 0) return 0;
     
     const now = Date.now();
@@ -344,7 +344,7 @@ export class SimpleTransparencyDashboardService {
     return Math.round((recentDisclosures / disclosures.length) * 100);
   }
 
-  private calculatePublicAccessibilityScore(sponsor: any, disclosures: any[]): number {
+  private calculatePublicAccessibilityScore(sponsor: unknown, disclosures: unknown[]): number {
     let score = 50; // Base score
     
     if (sponsors.bio) score += 10;
@@ -612,7 +612,7 @@ export class SimpleTransparencyDashboardService {
     };
   }
 
-  private generateTrendRecommendations(trends: any[], analysis: any): string[] {
+  private generateTrendRecommendations(trends: unknown[], analysis: unknown): string[] {
     const recommendations: string[] = [];
 
     if (analysis.overallTrend === 'declining') {

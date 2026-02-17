@@ -726,7 +726,7 @@ export class SearchDeploymentService {
   /**
    * Generate deployment recommendations
    */
-  private generateRecommendations(status: any): string[] {
+  private generateRecommendations(status: unknown): string[] {
     const recommendations: string[] = [];
     
     for (const [component, componentStatus] of Object.entries(status) as [string, any][]) {
@@ -745,7 +745,7 @@ export class SearchDeploymentService {
   /**
    * Generate next steps
    */
-  private generateNextSteps(status: any): string[] {
+  private generateNextSteps(status: unknown): string[] {
     const nextSteps: string[] = [];
     
     const readyComponents = Object.entries(status)

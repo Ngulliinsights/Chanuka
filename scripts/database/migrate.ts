@@ -69,7 +69,7 @@ export async function runMigrations(options: MigrationOptions = {}): Promise<voi
   }
 }
 
-async function handleRollback(migrationManager: any, targetVersion: string, force?: boolean): Promise<void> {
+async function handleRollback(migrationManager: unknown, targetVersion: string, force?: boolean): Promise<void> {
   if (!force) {
     logger.warn('⚠️  ROLLBACK WARNING: This will undo database changes!');
     logger.warn(`   Rolling back to version: ${targetVersion}`);
@@ -81,7 +81,7 @@ async function handleRollback(migrationManager: any, targetVersion: string, forc
   const results = await migrationManager.rollbackToVersion(targetVersion);
   
   logger.info(`✅ Rollback completed: ${results.length} migrations rolled back`);
-  results.forEach((result: any) => {
+  results.forEach((result: unknown) => {
     if (result.success) {
       logger.info(`   ✓ Rolled back ${result.version} (${result.executionTime}ms)`);
     } else {
@@ -90,7 +90,7 @@ async function handleRollback(migrationManager: any, targetVersion: string, forc
   });
 }
 
-async function handleValidation(migrationManager: any): Promise<void> {
+async function handleValidation(migrationManager: unknown): Promise<void> {
   logger.info('🔍 Validating migrations...');
   
   const validation = await migrationManager.validateMigrations();
@@ -107,7 +107,7 @@ async function handleValidation(migrationManager: any): Promise<void> {
   }
 }
 
-async function handleDryRun(migrationManager: any): Promise<void> {
+async function handleDryRun(migrationManager: unknown): Promise<void> {
   logger.info('👀 Dry run - showing pending migrations...');
   
   const status = await migrationManager.getMigrationStatus();
@@ -126,7 +126,7 @@ async function handleDryRun(migrationManager: any): Promise<void> {
   }
 }
 
-async function handleTesting(migrationManager: any, includePerformance?: boolean): Promise<void> {
+async function handleTesting(migrationManager: unknown, includePerformance?: boolean): Promise<void> {
   logger.info('🧪 Running comprehensive migration tests...');
   
   // Test 1: Validation
@@ -155,8 +155,8 @@ async function handleTesting(migrationManager: any, includePerformance?: boolean
     logger.info(`   Applied ${results.length} migrations`);
     
     // Analyze performance
-    const avgTime = results.reduce((sum: number, r: any) => sum + r.executionTime, 0) / results.length;
-    const maxTime = Math.max(...results.map((r: any) => r.executionTime));
+    const avgTime = results.reduce((sum: number, r: unknown) => sum + r.executionTime, 0) / results.length;
+    const maxTime = Math.max(...results.map((r: unknown) => r.executionTime));
     
     logger.info(`   Average migration time: ${avgTime.toFixed(2)}ms`);
     logger.info(`   Slowest migration: ${maxTime}ms`);
@@ -169,7 +169,7 @@ async function handleTesting(migrationManager: any, includePerformance?: boolean
   logger.info('✅ All migration tests passed');
 }
 
-async function handleMigration(migrationManager: any): Promise<void> {
+async function handleMigration(migrationManager: unknown): Promise<void> {
   logger.info('📦 Running pending migrations...');
   
   const results = await migrationManager.runMigrations();
@@ -179,7 +179,7 @@ async function handleMigration(migrationManager: any): Promise<void> {
   } else {
     logger.info(`✅ Applied ${results.length} migrations successfully`);
     
-    results.forEach((result: any) => {
+    results.forEach((result: unknown) => {
       if (result.success) {
         logger.info(`   ✓ ${result.version} (${result.executionTime}ms)`);
       } else {
@@ -188,7 +188,7 @@ async function handleMigration(migrationManager: any): Promise<void> {
     });
     
     // Performance analysis
-    const totalTime = results.reduce((sum: number, r: any) => sum + r.executionTime, 0);
+    const totalTime = results.reduce((sum: number, r: unknown) => sum + r.executionTime, 0);
     const avgTime = totalTime / results.length;
     
     logger.info(`📊 Migration performance: ${totalTime}ms total, ${avgTime.toFixed(2)}ms average`);

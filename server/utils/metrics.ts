@@ -4,10 +4,8 @@
  * This maintains backward compatibility while leveraging the new observability system.
  */
 
-// import { performanceMonitoring } from '@server/services/performance-monitoring.ts'; // TODO: Fix missing module
 import { logger   } from '@shared/core';
 import { performance } from 'perf_hooks';
-// import { createObservabilityStack   } from '@shared/core'; // TODO: Fix missing export
 
 interface MetricData {
   count: number;
@@ -56,7 +54,7 @@ class Metrics {
     ): TypedPropertyDescriptor<any> | void => {
       const originalMethod = descriptor.value;
 
-      descriptor.value = function (...args: any[]) {
+      descriptor.value = function (...args: unknown[]) {
         // Execute the original method
         const result = originalMethod.apply(this, args);
 
@@ -102,7 +100,7 @@ class Metrics {
     ): TypedPropertyDescriptor<any> | void => {
       const originalMethod = descriptor.value;
 
-      descriptor.value = async function (...args: any[]) {
+      descriptor.value = async function (...args: unknown[]) {
         const start = performance.now();
         try {
           // Execute the original method and preserve its return value
@@ -199,19 +197,19 @@ class Metrics {
 export const metrics = new Metrics();
 
 // Additional functions for test compatibility
-export function incrementCounter(name: string, tags?: Record<string, any>, value?: number): void {
+export function incrementCounter(name: string, tags?: Record<string, unknown>, value?: number): void {
   metrics.trackValue(name, value || 1);
   // TODO: Use the new performance monitoring service when available
   // performanceMonitoring.recordMetric(name, value || 1, tags);
 }
 
-export function recordTiming(name: string, value: number, tags?: Record<string, any>, unit?: string): void {
+export function recordTiming(name: string, value: number, tags?: Record<string, unknown>, unit?: string): void {
   metrics.trackValue(`${name}.duration`, value);
   // TODO: Use the new performance monitoring service when available
   // performanceMonitoring.recordMetric(`${name}.duration`, value, { ...tags, unit: unit || 'ms' });
 }
 
-export function recordGauge(name: string, value: number, tags?: Record<string, any>): void {
+export function recordGauge(name: string, value: number, tags?: Record<string, unknown>): void {
   metrics.trackValue(name, value);
   // TODO: Use the new performance monitoring service when available
   // performanceMonitoring.recordMetric(name, value, tags);

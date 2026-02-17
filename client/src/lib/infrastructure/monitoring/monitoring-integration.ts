@@ -92,7 +92,7 @@ class MonitoringIntegrationService {
       // Get performance score from analytics
       try {
         const analytics = await this.analyticsService.getCrossSystemAnalytics();
-        const systemHealth = analytics.systems.find((s: any) => s.system === system);
+        const systemHealth = analytics.systems.find((s: unknown) => s.system === system);
         if (systemHealth) {
           status.performanceScore = systemHealth.performanceScore;
         }
@@ -146,7 +146,7 @@ class MonitoringIntegrationService {
   /**
    * Report an error to all relevant monitoring systems
    */
-  async reportError(error: any, context: ErrorContext): Promise<void> {
+  async reportError(error: unknown, context: ErrorContext): Promise<void> {
     const system = (context.system as ClientSystem) || 'web';
 
     // Update system activity
@@ -197,11 +197,11 @@ class MonitoringIntegrationService {
     overallHealth: 'healthy' | 'degraded' | 'critical';
     systems: MonitoringSystemStatus[];
     crossSystemInsights: {
-      correlations: any[];
-      patterns: any[];
-      bottlenecks: any[];
+      correlations: unknown[];
+      patterns: unknown[];
+      bottlenecks: unknown[];
     };
-    recommendations: any[];
+    recommendations: unknown[];
   }> {
     const analytics = await this.analyticsService.getCrossSystemAnalytics();
     const bottlenecks = this.performanceMonitor.identifyPerformanceBottlenecks();
@@ -225,8 +225,8 @@ class MonitoringIntegrationService {
   async getCrossSystemErrorAnalytics(timeRange?: { start: number; end: number }): Promise<{
     totalErrors: number;
     bySystem: Record<ClientSystem, number>;
-    trends: any[];
-    predictions: any[];
+    trends: unknown[];
+    predictions: unknown[];
   }> {
     const errors = await this.aggregationService.getAggregatedErrors();
     const trends = await this.trendService.analyzeTrends(timeRange || {
@@ -237,7 +237,7 @@ class MonitoringIntegrationService {
 
     // Calculate aggregation from errors
     const bySystem: Record<string, number> = {};
-    errors.forEach((error: any) => {
+    errors.forEach((error: unknown) => {
       const system = error.system || 'unknown';
       bySystem[system] = (bySystem[system] || 0) + 1;
     });
@@ -255,9 +255,9 @@ class MonitoringIntegrationService {
    */
   getPerformanceImpactAnalysis(timeRange?: { start: number; end: number }): {
     systemImpacts: any;
-    trends: any[];
-    bottlenecks: any[];
-    recommendations: any[];
+    trends: unknown[];
+    bottlenecks: unknown[];
+    recommendations: unknown[];
   } {
     const impacts = this.performanceMonitor.getSystemPerformanceImpacts(timeRange);
     const trends = this.performanceMonitor.getPerformanceDegradationTrends();
@@ -349,8 +349,8 @@ class MonitoringIntegrationService {
       version: string;
     };
     systemStatus: MonitoringSystemStatus[];
-    errorData: any[];
-    performanceData: any[];
+    errorData: unknown[];
+    performanceData: unknown[];
     analytics: any;
   } {
     const range = timeRange || {
@@ -436,7 +436,7 @@ export const monitoringIntegration = MonitoringIntegrationService.getInstance();
 export { MonitoringIntegrationService };
 
 // Export convenience functions
-export const reportError = (error: any, context: ErrorContext) =>
+export const reportError = (error: unknown, context: ErrorContext) =>
   monitoringIntegration.reportError(error, context);
 
 export const trackPerformance = (metrics: PerformanceMetrics) =>

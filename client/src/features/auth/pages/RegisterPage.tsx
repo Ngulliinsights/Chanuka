@@ -70,7 +70,7 @@ export default function RegisterPage() {
     setError(error);
   };
 
-  const handleSocialLoginSuccess = (data: any) => {
+  const handleSocialLoginSuccess = (data: unknown) => {
     logger.info('Social registration successful', {
       component: 'RegisterPage',
       provider: data.provider,

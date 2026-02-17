@@ -295,11 +295,11 @@ async function scanForTodos(): Promise<TodoComment[]> {
               }
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error(`❌ Error reading file ${file}:`, error.message);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`❌ Error scanning ${dir}:`, error.message);
     }
   }

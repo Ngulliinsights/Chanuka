@@ -64,7 +64,7 @@ export interface SecurityEvent {
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   resolved: boolean;
 }
 
@@ -74,7 +74,7 @@ export interface SecurityAlert {
   type: SecurityEventType;
   severity: SecuritySeverity;
   message: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   acknowledged: boolean;
   resolvedAt?: Date;
 }

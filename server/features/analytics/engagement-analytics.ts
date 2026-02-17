@@ -27,7 +27,7 @@ const buildTimeThreshold = (timeframe: string): Date => {
 };
 
 // Simple authentication middleware placeholder
-const authenticateToken = (req: any, res: any, next: any) => {
+const authenticateToken = (req: unknown, res: unknown, next: unknown) => {
   // This should be replaced with actual authentication logic
   req.user = { id: '1', role: 'user' }; // Mock user for now
   next();
@@ -55,7 +55,7 @@ interface EngagementOverview { totalUsers: number;
 interface EngagementEvent { user_id: string;
   bill_id?: number;
   event_type: 'view' | 'comment' | 'share' | 'vote_up' | 'vote_down';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   }
 
 /**
@@ -103,7 +103,7 @@ class EngagementAnalyticsRouter {
   /**
    * Get comprehensive engagement overview metrics
    */
-  private async getEngagementOverview(req: AuthenticatedRequest, res: any): Promise<any> {
+  private async getEngagementOverview(req: AuthenticatedRequest, res: unknown): Promise<any> {
     const startTime = Date.now();
 
     try {
@@ -164,7 +164,7 @@ class EngagementAnalyticsRouter {
   /**
    * Get engagement metrics for specific bill
    */
-  private async getBillEngagementMetrics(req: AuthenticatedRequest, res: any): Promise<any> {
+  private async getBillEngagementMetrics(req: AuthenticatedRequest, res: unknown): Promise<any> {
     const startTime = Date.now();
 
     try {
@@ -212,7 +212,7 @@ class EngagementAnalyticsRouter {
   /**
    * Get user engagement history
    */
-  private async getUserEngagementHistory(req: AuthenticatedRequest, res: any): Promise<any> { const startTime = Date.now();
+  private async getUserEngagementHistory(req: AuthenticatedRequest, res: unknown): Promise<any> { const startTime = Date.now();
 
     try {
       const { id: user_id  } = req.params;
@@ -289,7 +289,7 @@ class EngagementAnalyticsRouter {
   /**
    * Get engagement trends over time
    */
-  private async getEngagementTrends(req: AuthenticatedRequest, res: any): Promise<any> {
+  private async getEngagementTrends(req: AuthenticatedRequest, res: unknown): Promise<any> {
     const startTime = Date.now();
 
     try {
@@ -336,7 +336,7 @@ class EngagementAnalyticsRouter {
   /**
    * Track user engagement events
    */
-  private async trackEngagementEvent(req: AuthenticatedRequest, res: any): Promise<any> { const startTime = Date.now();
+  private async trackEngagementEvent(req: AuthenticatedRequest, res: unknown): Promise<any> { const startTime = Date.now();
 
     try {
       const eventSchema = z.object({
@@ -671,7 +671,7 @@ class EngagementAnalyticsRouter {
       votes: Number(trend.votes || 0)
     }));
 
-    return formattedTrends as any;
+    return formattedTrends as unknown;
   }
 
   /**

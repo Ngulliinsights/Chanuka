@@ -295,7 +295,7 @@ function isRetryableStatus(statusCode: number): boolean {
 /**
  * Log error with appropriate level based on severity
  */
-function logError(boomError: Boom.Boom, req: Request, originalError: any): void {
+function logError(boomError: Boom.Boom, req: Request, originalError: unknown): void {
   const statusCode = boomError.output.statusCode;
   const logData = {
     statusCode,

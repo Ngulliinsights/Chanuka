@@ -67,7 +67,7 @@ export interface SearchResult {
   excerpt?: string; // Alias for description often used in UI
   url?: string;
   relevanceScore: number;
-  metadata: Record<string, any>; // Flexible metadata
+  metadata: Record<string, unknown>; // Flexible metadata
   highlights?: SearchHighlight[]; // Standardized structure
 }
 

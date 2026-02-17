@@ -51,10 +51,10 @@ export const apmService = {
 
 // Fallback for missing shared websocket
 export const webSocketService = {
-  emit: (event: string, data: any) => {
+  emit: (event: string, data: unknown) => {
     console.debug('WebSocket emit:', event, data);
   },
-  broadcast: (event: string, data: any) => {
+  broadcast: (event: string, data: unknown) => {
     console.debug('WebSocket broadcast:', event, data);
   },
 };
@@ -79,7 +79,7 @@ export class UnifiedExternalAPIManagementService {
     return { hits: 0, misses: 0, size: 0 };
   }
 
-  async makeRequest(source: string, endpoint: string, options?: any) {
+  async makeRequest(source: string, endpoint: string, options?: unknown) {
     console.debug(`Mock API request: ${source}${endpoint}`);
     return {
       success: true,
@@ -103,18 +103,18 @@ export class UnifiedExternalAPIManagementService {
 
 // Fallback for missing shared monitoring
 export const performanceMonitor = {
-  startOperation: (type: string, name: string, metadata?: any) => {
+  startOperation: (type: string, name: string, metadata?: unknown) => {
     return `${type}-${name}-${Date.now()}`;
   },
-  endOperation: (id: string, success: boolean, error?: Error, metadata?: any) => {
+  endOperation: (id: string, success: boolean, error?: Error, metadata?: unknown) => {
     console.debug('Performance operation ended:', id, success);
   },
 };
 
 export const monitorOperation = (name: string) => {
-  return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const operationId = performanceMonitor.startOperation('method', name);
       try {
         const result = await originalMethod.apply(this, args);
@@ -131,12 +131,12 @@ export const monitorOperation = (name: string) => {
 
 // Fallback for missing shared errors
 export const errorAdapter = {
-  adaptError: (error: any) => error,
-  standardizeError: (error: any) => error,
+  adaptError: (error: unknown) => error,
+  standardizeError: (error: unknown) => error,
 };
 
 export const errorHandler = {
-  handleError: (error: any) => {
+  handleError: (error: unknown) => {
     console.error('Error handled:', error);
   },
 };
@@ -154,21 +154,21 @@ export const abTestingService = {
 
 // Fallback for missing shared utils
 export const httpUtils = {
-  createResponse: (data: any, status = 200) => ({ data, status }),
+  createResponse: (data: unknown, status = 200) => ({ data, status }),
   createErrorResponse: (message: string, status = 500) => ({ error: message, status }),
 };
 
 // Fallback for missing shared caching
 export const getDefaultCache = () => ({
   get: async (key: string) => null,
-  set: async (key: string, value: any, ttl?: number) => {},
+  set: async (key: string, value: unknown, ttl?: number) => {},
   delete: async (key: string) => {},
   clear: async () => {},
 });
 
 // Fallback for missing shared services
 export const validationService = {
-  validate: async (schema: any, data: any, options?: any, context?: any) => {
+  validate: async (schema: unknown, data: unknown, options?: unknown, context?: unknown) => {
     // Simple validation - just return the data
     return data;
   },
@@ -176,9 +176,9 @@ export const validationService = {
 
 // Fallback for missing enhanced security service
 export const enhancedSecurityService = {
-  csrfProtection: () => (req: any, res: any, next: any) => next(),
-  rateLimiting: () => (req: any, res: any, next: any) => next(),
-  vulnerabilityScanning: () => (req: any, res: any, next: any) => next(),
+  csrfProtection: () => (req: unknown, res: unknown, next: unknown) => next(),
+  rateLimiting: () => (req: unknown, res: unknown, next: unknown) => next(),
+  vulnerabilityScanning: () => (req: unknown, res: unknown, next: unknown) => next(),
   getSecurityStats: () => ({
     csrfTokensGenerated: 0,
     rateLimitHits: 0,
@@ -188,11 +188,11 @@ export const enhancedSecurityService = {
 };
 
 // Fallback for missing command injection prevention
-export const commandInjectionPrevention = (options: any) => (req: any, res: any, next: any) => next();
-export const fileUploadSecurity = (options: any) => (req: any, res: any, next: any) => next();
+export const commandInjectionPrevention = (options: unknown) => (req: unknown, res: unknown, next: unknown) => next();
+export const fileUploadSecurity = (options: unknown) => (req: unknown, res: unknown, next: unknown) => next();
 
 // Fallback for missing audit middleware
-export const auditMiddleware = (req: any, res: any, next: any) => next();
+export const auditMiddleware = (req: unknown, res: unknown, next: unknown) => next();
 
 // Export all fallbacks
 export default {

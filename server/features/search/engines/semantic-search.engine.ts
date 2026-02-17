@@ -495,7 +495,7 @@ export class SemanticSearchEngine {
    * Enrich search results with additional metadata
    */
   private async enrichSearchResults(
-    semanticResults: any[],
+    semanticResults: unknown[],
     filters: SearchOptions['filters']
   ): Promise<SearchResult[]> {
     // This is a simplified version. In production, you might want to batch these queries

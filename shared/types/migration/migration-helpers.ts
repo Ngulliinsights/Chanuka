@@ -18,8 +18,8 @@ export class MigrationHelpers {
   // ============================================================================
 
   static createFieldMapping<
-    T extends Record<string, any>,
-    S extends Record<string, any>
+    T extends Record<string, unknown>,
+    S extends Record<string, unknown>
   >(sourceFields: (keyof T)[], targetFields: (keyof S)[]): Record<string, string> {
     if (sourceFields.length !== targetFields.length) {
       throw new Error('Source and target field arrays must have the same length');
@@ -34,13 +34,13 @@ export class MigrationHelpers {
   }
 
   static createFieldMappingWithTransform<
-    T extends Record<string, any>,
-    S extends Record<string, any>
+    T extends Record<string, unknown>,
+    S extends Record<string, unknown>
   >(
     sourceFields: (keyof T)[],
     targetFields: (keyof S)[],
-    transforms?: Array<(value: any) => any>
-  ): Record<string, string | ((value: any) => any)> {
+    transforms?: Array<(value: unknown) => any>
+  ): Record<string, string | ((value: unknown) => any)> {
     if (sourceFields.length !== targetFields.length) {
       throw new Error('Source and target field arrays must have the same length');
     }
@@ -49,7 +49,7 @@ export class MigrationHelpers {
       throw new Error('Transforms array must have the same length as field arrays');
     }
 
-    const mapping: Record<string, string | ((value: any) => any)> = {};
+    const mapping: Record<string, string | ((value: unknown) => any)> = {};
     for (let i = 0; i < sourceFields.length; i++) {
       if (transforms && transforms[i]) {
         mapping[String(sourceFields[i])] = transforms[i];
@@ -83,14 +83,14 @@ export class MigrationHelpers {
     return String(value).trim();
   }
 
-  static normalizeBoolean(value: any, defaultValue: boolean = false): boolean {
+  static normalizeBoolean(value: unknown, defaultValue: boolean = false): boolean {
     if (value === null || value === undefined) return defaultValue;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'string') return value.toLowerCase() === 'true';
     return Boolean(value);
   }
 
-  static normalizeNumber(value: any, defaultValue: number = 0): number {
+  static normalizeNumber(value: unknown, defaultValue: number = 0): number {
     if (value === null || value === undefined) return defaultValue;
     const num = Number(value);
     return isNaN(num) ? defaultValue : num;
@@ -101,10 +101,10 @@ export class MigrationHelpers {
   // ============================================================================
 
   static createMigrationSafetyWrapper<T>(
-    migrationFn: (data: any) => T,
+    migrationFn: (data: unknown) => T,
     config: MigrationConfig
-  ): (data: any) => T | null {
-    return (data: any): T | null => {
+  ): (data: unknown) => T | null {
+    return (data: unknown): T | null => {
       try {
         if (config.logMigrationDetails) {
           console.log('Starting migration for:', typeof data);
@@ -200,7 +200,7 @@ export class MigrationHelpers {
   // TYPE COMPATIBILITY UTILITIES
   // ============================================================================
 
-  static checkTypeCompatibility(source: any, targetType: string): boolean {
+  static checkTypeCompatibility(source: unknown, targetType: string): boolean {
     // Simple type compatibility check
     // In a real implementation, this would be more sophisticated
     switch (targetType) {
@@ -217,7 +217,7 @@ export class MigrationHelpers {
     }
   }
 
-  static getTypeCompatibilityScore(source: any, targetType: string): number {
+  static getTypeCompatibilityScore(source: unknown, targetType: string): number {
     // Simple compatibility scoring
     // Higher score means better compatibility
     switch (targetType) {
@@ -251,7 +251,7 @@ export class MigrationHelpers {
   // MIGRATION METADATA UTILITIES
   // ============================================================================
 
-  static addMigrationMetadata<T extends object>(item: T, metadata: Record<string, any>): T {
+  static addMigrationMetadata<T extends object>(item: T, metadata: Record<string, unknown>): T {
     return {
       ...item,
       _migrationMetadata: {
@@ -262,9 +262,9 @@ export class MigrationHelpers {
     };
   }
 
-  static getMigrationMetadata<T extends object>(item: T): Record<string, any> | null {
+  static getMigrationMetadata<T extends object>(item: T): Record<string, unknown> | null {
     if ('_migrationMetadata' in item && typeof item._migrationMetadata === 'object') {
-      return item._migrationMetadata as Record<string, any>;
+      return item._migrationMetadata as Record<string, unknown>;
     }
     return null;
   }

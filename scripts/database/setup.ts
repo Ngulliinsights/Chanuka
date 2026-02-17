@@ -112,7 +112,7 @@ async function initializeConnectionManager(environment: string) {
   return connectionManager;
 }
 
-async function verifyDatabaseConnection(connectionManager: any): Promise<void> {
+async function verifyDatabaseConnection(connectionManager: unknown): Promise<void> {
   logger.info('🔍 Verifying database connection...');
 
   try {
@@ -129,7 +129,7 @@ async function verifyDatabaseConnection(connectionManager: any): Promise<void> {
   }
 }
 
-async function setupDatabaseSchema(pool: any): Promise<void> {
+async function setupDatabaseSchema(pool: unknown): Promise<void> {
   logger.info('📋 Setting up database schema and extensions...');
 
   try {
@@ -160,7 +160,7 @@ async function setupDatabaseSchema(pool: any): Promise<void> {
   }
 }
 
-async function createPerformanceIndexes(pool: any): Promise<void> {
+async function createPerformanceIndexes(pool: unknown): Promise<void> {
   logger.info('   Creating performance indexes...');
 
   try {
@@ -194,7 +194,7 @@ async function createPerformanceIndexes(pool: any): Promise<void> {
   }
 }
 
-async function initializeMigrationSystem(pool: any): Promise<void> {
+async function initializeMigrationSystem(pool: unknown): Promise<void> {
   logger.info('📦 Initializing migration system...');
 
   try {
@@ -208,7 +208,7 @@ async function initializeMigrationSystem(pool: any): Promise<void> {
   }
 }
 
-async function runInitialMigrations(pool: any): Promise<void> {
+async function runInitialMigrations(pool: unknown): Promise<void> {
   logger.info('🔄 Running initial migrations...');
 
   try {
@@ -219,8 +219,8 @@ async function runInitialMigrations(pool: any): Promise<void> {
       logger.info(`   ✅ Applied ${results.length} migrations`);
 
       // Show successful migrations
-      const successful = results.filter((r: any) => r.success);
-      const failed = results.filter((r: any) => !r.success);
+      const successful = results.filter((r: unknown) => r.success);
+      const failed = results.filter((r: unknown) => !r.success);
 
       if (successful.length > 0) {
         logger.info(`   Successful migrations: ${successful.length}`);
@@ -228,7 +228,7 @@ async function runInitialMigrations(pool: any): Promise<void> {
 
       if (failed.length > 0) {
         logger.error(`   Failed migrations: ${failed.length}`);
-        failed.forEach((result: any) => {
+        failed.forEach((result: unknown) => {
           logger.error(`      ✗ ${result.version}: ${result.error}`);
         });
         throw new Error('Some migrations failed');
@@ -273,7 +273,7 @@ async function createMinimalDevData(): Promise<void> {
   // You would implement this based on your specific schema needs
 }
 
-async function validateDatabaseSetup(pool: any): Promise<void> {
+async function validateDatabaseSetup(pool: unknown): Promise<void> {
   logger.info('✅ Validating database setup...');
 
   try {
@@ -285,7 +285,7 @@ async function validateDatabaseSetup(pool: any): Promise<void> {
       ORDER BY extname
     `);
 
-    const extensions = extensionsResult.rows.map((row: any) => row.extname);
+    const extensions = extensionsResult.rows.map((row: unknown) => row.extname);
     logger.info(`   ✅ Extensions verified: ${extensions.join(', ')}`);
 
     // Check migration system

@@ -162,7 +162,7 @@ class BillsCacheService {
   /**
    * Cache bills data with intelligent key generation
    */
-  async cacheBills(bills: Bill[], searchParams?: any): Promise<void> {
+  async cacheBills(bills: Bill[], searchParams?: unknown): Promise<void> {
     const key = this.generateBillsKey(searchParams);
     await this.set(key, bills, 10 * 60 * 1000); // 10 minutes TTL for bills list
   }
@@ -170,7 +170,7 @@ class BillsCacheService {
   /**
    * Get cached bills data
    */
-  async getCachedBills(searchParams?: any): Promise<Bill[] | null> {
+  async getCachedBills(searchParams?: unknown): Promise<Bill[] | null> {
     const key = this.generateBillsKey(searchParams);
     return await this.get<Bill[]>(key);
   }
@@ -335,7 +335,7 @@ class BillsCacheService {
   // Private Helper Methods
   // ============================================================================
 
-  private generateBillsKey(searchParams?: any): string {
+  private generateBillsKey(searchParams?: unknown): string {
     if (!searchParams) return 'bills:all';
 
     const normalized = {
@@ -354,24 +354,24 @@ class BillsCacheService {
     return Date.now() - entry.timestamp < entry.ttl;
   }
 
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     return new Blob([JSON.stringify(data)]).size;
   }
 
-  private shouldCompress(data: any): boolean {
+  private shouldCompress(data: unknown): boolean {
     return (
       this.config.enableCompression && this.calculateSize(data) > this.config.compressionThreshold
     );
   }
 
-  private compressData(data: any): any {
+  private compressData(data: unknown): unknown {
     if (this.shouldCompress(data)) {
       return JSON.stringify(data);
     }
     return data;
   }
 
-  private decompressData(data: any): any {
+  private decompressData(data: unknown): unknown {
     if (typeof data === 'string') {
       try {
         return JSON.parse(data);

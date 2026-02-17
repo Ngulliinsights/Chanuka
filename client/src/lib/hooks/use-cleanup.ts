@@ -13,7 +13,7 @@ export interface CleanupFunction {
 
 export interface CleanupOptions {
   immediate?: boolean;
-  dependencies?: any[];
+  dependencies?: unknown[];
 }
 
 export function useCleanup(

@@ -179,7 +179,7 @@ export class StructureExtractorService {
    * Identify argumentative components from classified sentences
    */
   private async identifyArguments(
-    classifiedSentences: any[],
+    classifiedSentences: unknown[],
     entities: any,
     context: ExtractionContext
   ): Promise<ExtractedArgument[]> {
@@ -331,7 +331,7 @@ export class StructureExtractorService {
     return 'neutral';
   }
 
-  private extractTopicTags(text: string, entities: any): string[] {
+  private extractTopicTags(text: string, entities: unknown): string[] {
     const tags = [];
     
     // Extract from entities
@@ -360,7 +360,7 @@ export class StructureExtractorService {
     return [...new Set(tags)]; // Remove duplicates
   }
 
-  private extractAffectedGroups(text: string, entities: any): string[] {
+  private extractAffectedGroups(text: string, entities: unknown): string[] {
     const groups = [];
 
     // Extract from entities

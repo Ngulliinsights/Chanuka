@@ -340,7 +340,7 @@ const EnhancedCalendar = React.forwardRef<HTMLDivElement, EnhancedCalendarProps>
           }}
           selected={selected instanceof Date ? selected : selected?.from}
           onSelect={handleSelect}
-          mode={(selected && typeof selected === 'object' && 'from' in selected ? 'range' : 'single') as any}
+          mode={(selected && typeof selected === 'object' && 'from' in selected ? 'range' : 'single') as unknown}
           disabled={isDateDisabled}
           {...props}
         />

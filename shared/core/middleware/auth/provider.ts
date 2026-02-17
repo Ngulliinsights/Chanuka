@@ -23,11 +23,11 @@ export class AuthMiddlewareProvider implements MiddlewareProvider {
 
   constructor(private readonly services: Services) {}
 
-  validate(_options: Record<string, any>): boolean {
+  validate(_options: Record<string, unknown>): boolean {
     return true; // Add validation logic
   }
 
-  create(options: Record<string, any>) {
+  create(options: Record<string, unknown>) {
     const skipPaths = options.skipPaths || [];
     const requireAuth = options.requireAuth !== false;
     

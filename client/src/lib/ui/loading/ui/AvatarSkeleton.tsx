@@ -2,7 +2,6 @@ import React from 'react';
 
 import { cn } from '@client/lib/design-system/lib/utils';
 
-// import { Skeleton } from './Skeleton';
 
 interface AvatarSkeletonProps {
   className?: string;

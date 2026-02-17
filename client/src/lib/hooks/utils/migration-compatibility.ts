@@ -95,7 +95,7 @@ export function useCleanupShared(cleanup?: () => void) {
   return useCleanup(cleanup || (() => {}));
 }
 
-export function useProgressiveDisclosureShared(options?: any) {
+export function useProgressiveDisclosureShared(options?: unknown) {
   console.warn(
     'useProgressiveDisclosureShared is deprecated. Use useProgressiveDisclosure from @client/lib/hooks instead. ' +
     'This compatibility layer will be removed in a future version.'
@@ -104,7 +104,7 @@ export function useProgressiveDisclosureShared(options?: any) {
 }
 
 // Legacy mobile hooks compatibility
-export function useBottomSheetShared(options?: any) {
+export function useBottomSheetShared(options?: unknown) {
   console.warn(
     'useBottomSheetShared is deprecated. Use useBottomSheet from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
@@ -138,7 +138,7 @@ export function useMobileNavigationShared() {
   return useMobileNavigation();
 }
 
-export function useMobileTabsShared(tabs?: any[]) {
+export function useMobileTabsShared(tabs?: unknown[]) {
   console.warn(
     'useMobileTabsShared is deprecated. Use useMobileTabs from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
@@ -157,7 +157,7 @@ export function usePullToRefreshShared(onRefresh?: () => Promise<void>) {
   });
 }
 
-export function useScrollManagerShared(options?: any) {
+export function useScrollManagerShared(options?: unknown) {
   console.warn(
     'useScrollManagerShared is deprecated. Use useScrollManager from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'
@@ -165,7 +165,7 @@ export function useScrollManagerShared(options?: any) {
   return useScrollManager(options);
 }
 
-export function useSwipeGestureShared(handlers?: any) {
+export function useSwipeGestureShared(handlers?: unknown) {
   console.warn(
     'useSwipeGestureShared is deprecated. Use useSwipeGesture from @client/lib/hooks/mobile instead. ' +
     'This compatibility layer will be removed in a future version.'

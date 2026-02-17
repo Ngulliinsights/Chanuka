@@ -5,7 +5,7 @@ import { Request } from 'express';
 class ErrorTrackingIntegrationManager {
   private integrations = new Map<string, any>();
 
-  registerIntegration(integration: any): void {
+  registerIntegration(integration: unknown): void {
     this.integrations.set(integration.name, integration);
   }
 
@@ -17,7 +17,7 @@ class ErrorTrackingIntegrationManager {
     return this.integrations.get(name);
   }
 
-  getAllIntegrations(): any[] {
+  getAllIntegrations(): unknown[] {
     return Array.from(this.integrations.values());
   }
 
@@ -41,7 +41,7 @@ function createConsoleIntegration(): any {
 }
 
 class BaseError {
-  constructor(_message: string, _options: any) {}
+  constructor(_message: string, _options: unknown) {}
 }
 
 interface SharedErrorContext {
@@ -765,7 +765,7 @@ class ErrorTracker {
   /**
    * Trigger alert
    */
-  private async triggerAlert(rule: AlertRule, stats: any): Promise<void> {
+  private async triggerAlert(rule: AlertRule, stats: unknown): Promise<void> {
     console.warn(`[ErrorTracker] ALERT TRIGGERED: ${rule.name}`, {
       rule: rule.name,
       condition: rule.condition,
@@ -815,8 +815,8 @@ class ErrorTracker {
       // Create alert error for integration
       const alertMessage = `Alert triggered: ${rule.name} - ${JSON.stringify(stats)}`;
       const baseError = new BaseError(alertMessage, {
-        domain: 'alert' as any,
-        severity: 'high' as any,
+        domain: 'alert' as unknown,
+        severity: 'high' as unknown,
         source: 'error-tracker',
         correlationId: `alert_${Date.now()}`,
         context: {
@@ -861,7 +861,7 @@ class ErrorTracker {
   /**
    * Sanitize request headers for logging
    */
-  private sanitizeHeaders(headers: any): Record<string, string> {
+  private sanitizeHeaders(headers: unknown): Record<string, string> {
     const sanitized: Record<string, string> = {};
     const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
 
@@ -879,7 +879,7 @@ class ErrorTracker {
   /**
    * Sanitize request body for logging
    */
-  private sanitizeBody(body: any): any {
+  private sanitizeBody(body: unknown): unknown {
     if (!body || typeof body !== 'object') return body;
 
     const sanitized = { ...body };
@@ -922,8 +922,8 @@ class ErrorTracker {
         try {
           // Convert to BaseError for integration
           const baseError = new BaseError(message, {
-            domain: 'system' as any,
-            severity: severity as any,
+            domain: 'system' as unknown,
+            severity: severity as unknown,
             source: category,
             correlationId: context.traceId,
             context: {
@@ -990,7 +990,7 @@ class ErrorTracker {
 
     // Get external analytics
     const externalAnalytics: Array<{ integration: string; analytics: any }> = [];
-    for (const integrationName of this.integrationManager.getAllIntegrations().map((i: any) => i.name)) {
+    for (const integrationName of this.integrationManager.getAllIntegrations().map((i: unknown) => i.name)) {
       const integration = this.integrationManager.getIntegration(integrationName);
       if (integration) {
         try {
@@ -1031,7 +1031,7 @@ class ErrorTracker {
     const topIssues: Array<{ source: string; message: string; count: number }> = [];
 
     // Add internal top patterns
-    internal.topPatterns.forEach((pattern: any) => {
+    internal.topPatterns.forEach((pattern: unknown) => {
       topIssues.push({
         source: 'internal',
         message: pattern.message,
@@ -1047,7 +1047,7 @@ class ErrorTracker {
 
       // Add external top issues if available
       if (analytics.topIssues) {
-        analytics.topIssues.forEach((issue: any) => {
+        analytics.topIssues.forEach((issue: unknown) => {
           topIssues.push({
             source: integration,
             message: issue.error || issue.title || 'Unknown',

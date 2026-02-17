@@ -23,7 +23,7 @@ export class CacheSerializer {
   /**
    * Serialize data for storage
    */
-  serialize(data: any): string {
+  serialize(data: unknown): string {
     try {
       switch (this.options.format) {
         case 'json':
@@ -63,7 +63,7 @@ export class CacheSerializer {
   /**
    * JSON serialization with type preservation
    */
-  private serializeJSON(data: any): string {
+  private serializeJSON(data: unknown): string {
     if (!this.options.preserveTypes) {
       return JSON.stringify(data);
     }
@@ -133,7 +133,7 @@ export class CacheSerializer {
   /**
    * MessagePack serialization (simplified implementation)
    */
-  private serializeMsgPack(data: any): string {
+  private serializeMsgPack(data: unknown): string {
     // In a real implementation, you'd use a msgpack library
     // For now, fall back to JSON
     return this.serializeJSON(data);
@@ -151,7 +151,7 @@ export class CacheSerializer {
   /**
    * Binary serialization (simplified implementation)
    */
-  private serializeBinary(data: any): string {
+  private serializeBinary(data: unknown): string {
     // In a real implementation, you'd use a binary format
     // For now, fall back to JSON with base64 encoding
     const json = this.serializeJSON(data);
@@ -178,7 +178,7 @@ export class CacheSerializer {
   /**
    * Test if data can be serialized
    */
-  canSerialize(data: any): boolean {
+  canSerialize(data: unknown): boolean {
     try {
       this.serialize(data);
       return true;

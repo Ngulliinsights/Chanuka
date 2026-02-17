@@ -273,7 +273,7 @@ export function validateConfig(): void {
  * 
  * @returns Configuration summary object
  */
-export function getConfigSummary(): Record<string, any> {
+export function getConfigSummary(): Record<string, unknown> {
   return {
     neo4j: {
       uri: NEO4J_CONFIG.URI,

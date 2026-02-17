@@ -526,7 +526,7 @@ export class ApiErrorFactory {
     message: string,
     apiContext: ApiErrorContext
   ): ApiError {
-    const errorCodeMap: Partial<Record<ApiErrorCode, new (message: string, apiContext: ApiErrorContext, ...args: any[]) => ApiError>> = {
+    const errorCodeMap: Partial<Record<ApiErrorCode, new (message: string, apiContext: ApiErrorContext, ...args: unknown[]) => ApiError>> = {
       API_BAD_REQUEST: ApiBadRequestError,
       API_UNAUTHORIZED: ApiUnauthorizedError,
       API_FORBIDDEN: ApiForbiddenError,

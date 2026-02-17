@@ -250,7 +250,7 @@ export class UserPreferencesService {
   }
 
   /** Helper to check if a value is a plain JavaScript object. */
-  private isObject(item: any): boolean {
+  private isObject(item: unknown): boolean {
     return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);
   }
 
@@ -262,7 +262,7 @@ export class UserPreferencesService {
    * @param source The object with properties to merge in.
    * @returns A new object representing the merged result.
    */
-  private deepMerge(target: any, source: any): any {
+  private deepMerge(target: unknown, source: unknown): unknown {
     // Start with a shallow clone of the target
     const output = { ...target };
 
@@ -294,12 +294,12 @@ export class UserPreferencesService {
   // --- Admin/Stat Methods (Keep implementations if needed) ---
 
   /** Batch updates preferences for multiple users (Admin functionality). */
-  async batchUpdatePreferences(updates: Array<{ user_id: string; preferences: Partial<UserNotificationPreferences>  }>): Promise<{ success: number; failed: number; errors: any[] }> {
+  async batchUpdatePreferences(updates: Array<{ user_id: string; preferences: Partial<UserNotificationPreferences>  }>): Promise<{ success: number; failed: number; errors: unknown[] }> {
     const logContext = { component: 'UserPreferencesService' };
     logger.info(`Starting batch preference update for ${updates.length} users.`, logContext);
     let success = 0;
     let failed = 0;
-    const errors: any[] = [];
+    const errors: unknown[] = [];
 
     // Process updates sequentially or in parallel batches
     for (const update of updates) {

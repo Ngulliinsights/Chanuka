@@ -1,7 +1,6 @@
 import { Response } from 'express';
 
 import { ErrorDomain } from '../observability/error-management';
-// import { logger } from '../observability/logging'; // Unused import
 
 interface ErrorResponse {
   statusCode: number;
@@ -12,7 +11,7 @@ interface ErrorResponse {
 }
 
 export class ResponseHelper {
-  static success(res: Response, data?: any, statusCode: number = 200) {
+  static success(res: Response, data?: unknown, statusCode: number = 200) {
     return res.status(statusCode).json({
       success: true,
       data

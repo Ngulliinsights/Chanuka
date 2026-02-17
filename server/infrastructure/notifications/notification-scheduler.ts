@@ -3,11 +3,10 @@ import { database as db } from '@server/infrastructure/database';
 import { bill_engagement,bills, notifications, users } from '@server/infrastructure/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
-// import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification';
 
 // Temporary stub implementation until enhanced-notification service is created
 const enhancedNotificationService = {
-  createEnhancedNotification: async (data: any) => {
+  createEnhancedNotification: async (data: unknown) => {
     console.log('[NOTIFICATION] Creating enhanced notification:', data);
   }
 };
@@ -417,7 +416,7 @@ export class NotificationSchedulerService {
         preferences: userData.preferences || { }
       }))
       .filter(userData => {
-        const prefs = userData.preferences as any;
+        const prefs = userData.preferences as unknown;
         return prefs?.billTracking?.advancedSettings?.digestSchedule?.enabled === true;
       });
   }

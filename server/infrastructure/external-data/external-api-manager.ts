@@ -13,7 +13,6 @@
 
 import { APICostMonitoringService, apiCostMonitoringService } from '@server/features/monitoring/application/api-cost-monitoring.service';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
-// import { Redis } from 'ioredis';
 import { ErrorSeverity, ExternalAPIErrorHandler } from '@server/services/external-api-error-handler';
 import { logger   } from '@shared/core';
 import { EventEmitter } from 'events';
@@ -136,7 +135,7 @@ interface OptimizationRule {
   type: 'caching' | 'batching' | 'compression' | 'prefetching';
   enabled: boolean;
   priority: number;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 interface APIRequestResult {
@@ -363,7 +362,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       body?: any;
       bypassCache?: boolean;
       priority?: 'low' | 'normal' | 'high';
-      params?: Record<string, any>;
+      params?: Record<string, unknown>;
     } = {}
   ): Promise<APIRequestResult> {
     const startTime = Date.now();
@@ -657,7 +656,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   // Caching
   // ========================================================================
 
-  private cacheResponse(source: string, endpoint: string, params: any, data: any, ttl: number): void {
+  private cacheResponse(source: string, endpoint: string, params: unknown, data: unknown, ttl: number): void {
     const cacheKey = this.generateCacheKey(source, endpoint, params);
     const dataSize = JSON.stringify(data).length;
 
@@ -673,7 +672,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     this.emit('cacheSet', { source, endpoint, size: dataSize });
   }
 
-  private getCachedResponse(source: string, endpoint: string, params: any): CacheEntry | null {
+  private getCachedResponse(source: string, endpoint: string, params: unknown): CacheEntry | null {
     const cacheKey = this.generateCacheKey(source, endpoint, params);
     const cached = this.responseCache.get(cacheKey);
 
@@ -695,7 +694,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     return cached;
   }
 
-  private generateCacheKey(source: string, endpoint: string, params: any): string {
+  private generateCacheKey(source: string, endpoint: string, params: unknown): string {
     const paramsStr = params ? JSON.stringify(params) : '';
     return `${source}:${endpoint}:${paramsStr}`;
   }

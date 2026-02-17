@@ -16,7 +16,7 @@ import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute'
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
   return lazy(() =>
      
-    importFn().catch((error: any) => {
+    importFn().catch((error: unknown) => {
       logger.error(`Failed to load ${componentName}:`, { component: 'AppRouter' }, error);
 
       // Return a fallback component that allows retry

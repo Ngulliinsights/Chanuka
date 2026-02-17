@@ -149,7 +149,7 @@ export interface CacheEvent {
   type: CacheEventType;
   key: string;
   timestamp: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   error?: Error;
   tier?: 'L1' | 'L2';
   size?: number;

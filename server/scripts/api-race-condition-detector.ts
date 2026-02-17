@@ -42,7 +42,7 @@ interface APICall {
   readonly lastModified: Date;
   readonly metadata?: {
     readonly patternMatched?: string;
-    readonly contextualFactors?: Record<string, any>;
+    readonly contextualFactors?: Record<string, unknown>;
     readonly complexity?: "low" | "medium" | "high";
     readonly testability?: "low" | "medium" | "high";
     readonly maintainability?: "low" | "medium" | "high";

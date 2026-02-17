@@ -268,14 +268,14 @@ export class BillServiceExample {
       billNumber: `H.R.${Date.now()}`,
       title: billData.title,
       summary: billData.summary,
-      status: billData.status as any,
-      chamber: 'house' as any,
-      billType: 'bill' as any,
-      priority: 'medium' as any,
+      status: billData.status as unknown,
+      chamber: 'house' as unknown,
+      billType: 'bill' as unknown,
+      priority: 'medium' as unknown,
       introductionDate: new Date(),
       congress: 118,
       session: 1,
-      sponsorId: billData.sponsorId as any,
+      sponsorId: billData.sponsorId as unknown,
       timeline: [],
       engagement: {
         billId: crypto.randomUUID() as BillId,
@@ -303,7 +303,7 @@ export class BillServiceExample {
 
     const updated: Bill = {
       ...bill,
-      status: status as any,
+      status: status as unknown,
       updatedAt: new Date(),
     };
 

@@ -40,7 +40,7 @@ export interface APIError extends Error, APIErrorDetails {
 export class NetworkError extends Error implements APIError {
   code: APIErrorCode = 'NETWORK_ERROR';
   status = 0;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();
@@ -69,7 +69,7 @@ export class NetworkError extends Error implements APIError {
 export class TimeoutError extends Error implements APIError {
   code: APIErrorCode = 'TIMEOUT';
   status = 408;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();
@@ -98,7 +98,7 @@ export class TimeoutError extends Error implements APIError {
 export class ValidationError extends Error implements APIError {
   code: APIErrorCode = 'VALIDATION_ERROR';
   status = 400;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
@@ -127,7 +127,7 @@ export class ValidationError extends Error implements APIError {
 export class UnauthorizedError extends Error implements APIError {
   code: APIErrorCode = 'UNAUTHORIZED';
   status = 401;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
@@ -156,7 +156,7 @@ export class UnauthorizedError extends Error implements APIError {
 export class ForbiddenError extends Error implements APIError {
   code: APIErrorCode = 'FORBIDDEN';
   status = 403;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
@@ -185,7 +185,7 @@ export class ForbiddenError extends Error implements APIError {
 export class NotFoundError extends Error implements APIError {
   code: APIErrorCode = 'NOT_FOUND';
   status = 404;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = false;
   timestamp = new Date();
@@ -214,7 +214,7 @@ export class NotFoundError extends Error implements APIError {
 export class ServerError extends Error implements APIError {
   code: APIErrorCode = 'SERVER_ERROR';
   status = 500;
-  message: string;
+  override message: string;
   details?: Record<string, unknown>;
   retryable = true;
   timestamp = new Date();

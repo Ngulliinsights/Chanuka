@@ -530,7 +530,7 @@ export function Service(config: {
     tags?: string[];
   };
 }) {
-  return function (target: any) {
+  return function (target: unknown) {
     const serviceId = config.id || target.name;
     const registration = ServiceFactory.createRegistration({
       id: serviceId,
@@ -558,7 +558,7 @@ export function Service(config: {
  * Inject decorator for dependency injection
  */
 export function Inject(serviceId: string) {
-  return function (target: any, propertyKey: string) {
+  return function (target: unknown, propertyKey: string) {
     const originalDescriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
 
     Object.defineProperty(target, propertyKey, {

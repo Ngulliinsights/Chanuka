@@ -54,7 +54,7 @@ export class BillEngagedEvent extends BillDomainEvent {
     public readonly bill_id: string,
     public readonly engagementType: EngagementType,
     public readonly user_id: string,
-    public readonly metadata?: Record<string, any>
+    public readonly metadata?: Record<string, unknown>
   ) {
     super(bill_id, 'BillEngaged');
   }
@@ -144,7 +144,7 @@ export class BillRequiresAttentionEvent extends BillDomainEvent {
     public readonly bill_id: string,
     public readonly reason: 'no_recent_activity' | 'stalled_in_committee' | 'public_deadline_approaching',
     public readonly severity: 'low' | 'medium' | 'high',
-    public readonly details?: Record<string, any>
+    public readonly details?: Record<string, unknown>
   ) {
     super(bill_id, 'BillRequiresAttention');
   }

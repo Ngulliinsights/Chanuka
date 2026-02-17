@@ -50,7 +50,7 @@ export function createCacheMiddleware(options: CacheOptions = {}) {
 
       // Intercept the response to cache it
       const originalJson = res.json;
-      res.json = function(data: any) {
+      res.json = function(data: unknown) {
         // Cache the response if condition is met
         if (condition(req, res)) {
           serverCache.cacheApiResponse(cacheKey, data, ttl).catch(err => {
@@ -109,7 +109,7 @@ export function createCacheInvalidationMiddleware(patterns: string[]) {
     // Store original end function
     const originalEnd = res.end;
     
-    res.end = function(chunk?: any, encoding?: any) {
+    res.end = function(chunk?: unknown, encoding?: unknown) {
       // Invalidate cache patterns after successful response
       if (res.statusCode >= 200 && res.statusCode < 300) {
         Promise.all(

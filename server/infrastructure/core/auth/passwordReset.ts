@@ -29,7 +29,7 @@ class PasswordResetService {
       .from(users)
       .where(eq(users.email, email))
       .limit(1)
-      .then((rows: any) => rows[0] || null);
+      .then((rows: unknown) => rows[0] || null);
 
     // If user not found or inactive, silently return to prevent email enumeration
     if (!user || !user.is_active) {
@@ -43,7 +43,7 @@ class PasswordResetService {
 
     // Store hashed token in users table
     const expiryDate = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx: unknown) => {
       await tx
         .update(users)
         .set({
@@ -95,7 +95,7 @@ class PasswordResetService {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Use a transaction to update password and clear reset token
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx: unknown) => {
       // Update user's password and clear reset token
       await tx
         .update(users)

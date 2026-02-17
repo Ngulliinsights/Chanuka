@@ -126,7 +126,7 @@ export function useServiceAvailable(serviceName: string): boolean {
  * Hook to get service health status
  */
 export function useServiceHealth() {
-  const [health, setHealth] = useState<Record<string, any>>({});
+  const [health, setHealth] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
     const checkHealth = async () => {

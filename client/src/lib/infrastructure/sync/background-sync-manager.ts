@@ -84,7 +84,7 @@ class BackgroundSyncManager {
     }
   }
 
-  private async executeAction(action: any): Promise<void> {
+  private async executeAction(action: unknown): Promise<void> {
     const response = await fetch(action.endpoint, {
       method: action.method,
       headers: {
@@ -98,7 +98,7 @@ class BackgroundSyncManager {
     }
   }
 
-  private getStoredActions(): any[] {
+  private getStoredActions(): unknown[] {
     try {
       const stored = localStorage.getItem('offline-actions');
       return stored ? JSON.parse(stored) : [];

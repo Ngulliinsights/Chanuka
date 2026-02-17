@@ -6,7 +6,6 @@
  */
 
 import { z } from 'zod';
-// import { logger } from '../observability/logging'; // Unused import
 
 // Enhanced schema with comprehensive validation
 export const configSchema = z.object({

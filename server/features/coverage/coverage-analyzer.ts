@@ -155,7 +155,7 @@ export class CoverageAnalyzer {
     };
   }
 
-  private parseCoverageData(coverageData: any, type: string): CoverageReport {
+  private parseCoverageData(coverageData: unknown, type: string): CoverageReport {
     // Parse coverage data from Jest/Vitest output
     const summary = coverageData.coverageMap || coverageData.summary || {};
     
@@ -198,7 +198,7 @@ export class CoverageAnalyzer {
     };
   }
 
-  private extractUncoveredFiles(coverageData: any): string[] {
+  private extractUncoveredFiles(coverageData: unknown): string[] {
     const files: string[] = [];
     if (coverageData.coverageMap) {
       Object.keys(coverageData.coverageMap).forEach(file => {
@@ -211,7 +211,7 @@ export class CoverageAnalyzer {
     return files;
   }
 
-  private extractUncoveredFunctions(coverageData: any): string[] {
+  private extractUncoveredFunctions(coverageData: unknown): string[] {
     const functions: string[] = [];
     if (coverageData.coverageMap) {
       Object.keys(coverageData.coverageMap).forEach(file => {
@@ -228,7 +228,7 @@ export class CoverageAnalyzer {
     return functions;
   }
 
-  private extractUncoveredLines(coverageData: any): { file: string; lines: number[] }[] {
+  private extractUncoveredLines(coverageData: unknown): { file: string; lines: number[] }[] {
     const uncoveredLines: { file: string; lines: number[] }[] = [];
     if (coverageData.coverageMap) {
       Object.keys(coverageData.coverageMap).forEach(file => {
@@ -319,7 +319,7 @@ export class CoverageAnalyzer {
     };
   }
 
-  private generateRecommendations(gaps: CoverageGap[], overallCoverage: any): string[] {
+  private generateRecommendations(gaps: CoverageGap[], overallCoverage: unknown): string[] {
     const recommendations: string[] = [];
 
     if (overallCoverage.lines < this.coverageThresholds.lines) {

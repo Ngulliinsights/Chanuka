@@ -10,7 +10,7 @@ import { QUERY_CONFIG } from './config/graph-config';
 
 const errorHandler = new GraphErrorHandler();
 
-export async function aggregateBillsByStatus(driver: Driver): Promise<any[]> {
+export async function aggregateBillsByStatus(driver: Driver): Promise<unknown[]> {
   try {
     const result = await executeCypherSafely(
       driver,
@@ -30,7 +30,7 @@ export async function aggregateBillsByStatus(driver: Driver): Promise<any[]> {
   }
 }
 
-export async function findRelatedBills(driver: Driver, billId: string, limit: number = 10): Promise<any[]> {
+export async function findRelatedBills(driver: Driver, billId: string, limit: number = 10): Promise<unknown[]> {
   if (!billId) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'billId required' });
 
   try {
@@ -56,7 +56,7 @@ export async function findRelatedBills(driver: Driver, billId: string, limit: nu
   }
 }
 
-export async function getNodeDegrees(driver: Driver, nodeType: string, options: PaginationOptions = {}): Promise<any[]> {
+export async function getNodeDegrees(driver: Driver, nodeType: string, options: PaginationOptions = {}): Promise<unknown[]> {
   if (!nodeType) throw new GraphError({ code: GraphErrorCode.INVALID_INPUT, message: 'nodeType required' });
 
   const baseQuery = `

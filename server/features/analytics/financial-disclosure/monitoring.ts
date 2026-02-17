@@ -383,7 +383,7 @@ export class FinancialDisclosureMonitoringService {
     sponsor_id: number,
     description: string,
     severity: FinancialAlert['severity'],
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ): Promise<FinancialAlert> {
     const sponsor = await this.getSponsorInfo(sponsor_id);
     
@@ -1104,7 +1104,7 @@ export class FinancialDisclosureMonitoringService {
    * Enhances raw disclosure data with computed fields.
    * Adds completeness scores, risk levels, and normalized timestamps.
    */
-  private enhanceDisclosure(raw: any): FinancialDisclosure {
+  private enhanceDisclosure(raw: unknown): FinancialDisclosure {
     return {
       id: raw.id,
       sponsor_id: raw.sponsor_id,
@@ -1124,7 +1124,7 @@ export class FinancialDisclosureMonitoringService {
    * Calculates a simple completeness score for an individual disclosure.
    * Based on presence of key fields: verification, amount, source.
    */
-  private calculateIndividualCompletenessScore(disclosure: any): number {
+  private calculateIndividualCompletenessScore(disclosure: unknown): number {
     let score = 40; // Base score for having a disclosure
     if (disclosure.is_verified) score += 30;
     if (disclosure.amount) score += 20;
@@ -1162,7 +1162,7 @@ export class FinancialDisclosureMonitoringService {
     sponsorName: string,
     description: string,
     severity: FinancialAlert['severity'],
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ): FinancialAlert {
     return {
       id: this.generateAlertId(type, sponsor_id),
@@ -1189,7 +1189,7 @@ export class FinancialDisclosureMonitoringService {
   /**
    * Formats a human-readable description for new disclosure alerts.
    */
-  private formatNewDisclosureDescription(disclosure: any): string {
+  private formatNewDisclosureDescription(disclosure: unknown): string {
     const parts = [`New ${disclosure.disclosureType} disclosure`];
 
     if (disclosure.amount) {

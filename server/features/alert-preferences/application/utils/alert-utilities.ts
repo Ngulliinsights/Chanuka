@@ -159,7 +159,7 @@ import type { AlertChannel } from '../../domain/services/unified-alert-preferenc
 /**
  * Helper to migrate channel configs from advanced alerts
  */
-function migrateChannelConfigs(channelConfigs: any): AlertChannel[] {
+function migrateChannelConfigs(channelConfigs: unknown): AlertChannel[] {
   const channels: AlertChannel[] = [];
 
   if (channelConfigs?.inApp?.enabled) {
@@ -242,7 +242,7 @@ function migrateChannelConfigs(channelConfigs: any): AlertChannel[] {
 /**
  * Helper to migrate frequency/scheduling config
  */
-function migrateFrequencyConfig(scheduling: any): any {
+function migrateFrequencyConfig(scheduling: unknown): unknown {
   if (!scheduling || !scheduling.digestScheduling?.enabled) {
     return { type: 'immediate' };
   }
@@ -260,7 +260,7 @@ function migrateFrequencyConfig(scheduling: any): any {
 /**
  * Helper to migrate smart filtering config
  */
-function migrateSmartFiltering(smartFiltering: any): any {
+function migrateSmartFiltering(smartFiltering: unknown): unknown {
   if (!smartFiltering) {
     return {
       enabled: true,
@@ -469,10 +469,10 @@ export function generateAlertMessage(
  * Generates a batched alert digest message
  */
 export function generateBatchDigest(
-  alerts: any[],
+  alerts: unknown[],
   preferenceId: string
 ): { title: string; message: string; html?: string } {
-  const groupedByType = alerts.reduce((acc: any, alert: any) => {
+  const groupedByType = alerts.reduce((acc: unknown, alert: unknown) => {
     if (!acc[alert.alertType]) {
       acc[alert.alertType] = [];
     }
@@ -485,7 +485,7 @@ export function generateBatchDigest(
   let message = `You have ${alerts.length} new alerts:\n\n`;
   let html = `<h2>Alert Digest</h2><p>You have ${alerts.length} new alerts:</p>`;
 
-  for (const [type, typeAlerts] of Object.entries(groupedByType) as [AlertType, any[]][]) {
+  for (const [type, typeAlerts] of Object.entries(groupedByType) as [AlertType, unknown[]][]) {
     message += `${getAlertTypeLabel(type)} (${typeAlerts.length}):\n`;
     html += `<h3>${getAlertTypeLabel(type)} (${typeAlerts.length})</h3><ul>`;
     
@@ -592,8 +592,8 @@ export async function generateUserAlertReport(
   days: number = 30
 ): Promise<{
   summary: any;
-  topAlertTypes: any[];
-  channelPerformance: any[];
+  topAlertTypes: unknown[];
+  channelPerformance: unknown[];
   recommendations: string[];
 }> { try {
     const start_date = new Date();

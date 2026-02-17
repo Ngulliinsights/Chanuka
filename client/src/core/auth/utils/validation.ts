@@ -336,7 +336,7 @@ export function validatePasswordComprehensive(
 export interface BatchValidationResult {
   isValid: boolean;
   errors: Record<string, string[]>;
-  fieldResults: Record<string, any>;
+  fieldResults: Record<string, unknown>;
 }
 
 /**
@@ -389,7 +389,7 @@ export function validateFormBatch(
 ): BatchValidationResult {
   const { strict = true, allowedDomains } = options;
   const errors: Record<string, string[]> = {};
-  const fieldResults: Record<string, any> = {};
+  const fieldResults: Record<string, unknown> = {};
 
   // Email validation
   if (formData.email) {

@@ -388,7 +388,7 @@ export class DashboardService {
   /**
    * Generate alert summary
    */
-  private generateAlertSummary(activeAlerts: any[]): AlertSummary {
+  private generateAlertSummary(activeAlerts: unknown[]): AlertSummary {
     const summary: AlertSummary = {
       total: activeAlerts.length,
       critical: 0,
@@ -502,7 +502,7 @@ export class DashboardService {
   /**
    * Generate rollback summary
    */
-  private generateRollbackSummary(rollbackHistory: any[]): RollbackSummary {
+  private generateRollbackSummary(rollbackHistory: unknown[]): RollbackSummary {
     const activeRollbacks = rollbackHistory.filter(r => r.status === 'in_progress');
     const completedRollbacks = rollbackHistory.filter(r => r.status === 'completed');
     const successRate = rollbackHistory.length > 0 
@@ -544,7 +544,7 @@ export class DashboardService {
   /**
    * Calculate overall health score (0-100)
    */
-  private calculateOverallHealth(current: any, baseline: any): number {
+  private calculateOverallHealth(current: unknown, baseline: unknown): number {
     let score = 100;
     
     // Response time impact (max -30 points)

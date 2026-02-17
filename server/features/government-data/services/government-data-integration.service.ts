@@ -636,7 +636,7 @@ export class GovernmentDataIntegrationService {
     await this.delay(60000 / source.rateLimit.requestsPerMinute);
   }
 
-  private async makeAPIRequest(source: DataSource, endpoint: string, params: any): Promise<any> {
+  private async makeAPIRequest(source: DataSource, endpoint: string, params: unknown): Promise<any> {
     // Simulate API request with realistic failure rates
     const failureRate = 1 - source.reliability.successRate;
     
@@ -658,7 +658,7 @@ export class GovernmentDataIntegrationService {
     };
   }
 
-  private transformAPIBillData(apiData: any[]): BillData[] {
+  private transformAPIBillData(apiData: unknown[]): BillData[] {
     return apiData.map(item => ({
       billNumber: item.bill_number,
       title: item.title,
@@ -669,7 +669,7 @@ export class GovernmentDataIntegrationService {
     }));
   }
 
-  private async performWebScraping(baseUrl: string, options: IntegrationOptions): Promise<any[]> {
+  private async performWebScraping(baseUrl: string, options: IntegrationOptions): Promise<unknown[]> {
     // Simulate web scraping
     await this.delay(2000); // Simulate scraping delay
     
@@ -683,7 +683,7 @@ export class GovernmentDataIntegrationService {
     ];
   }
 
-  private transformScrapedBillData(scrapedData: any[]): BillData[] {
+  private transformScrapedBillData(scrapedData: unknown[]): BillData[] {
     return scrapedData.map(item => ({
       billNumber: item.billNumber,
       title: item.title,
@@ -741,7 +741,7 @@ export class GovernmentDataIntegrationService {
     });
   }
 
-  private async getExpiredCacheData(type: string): Promise<any[]> {
+  private async getExpiredCacheData(type: string): Promise<unknown[]> {
     // Implementation to retrieve expired cache data
     return [];
   }

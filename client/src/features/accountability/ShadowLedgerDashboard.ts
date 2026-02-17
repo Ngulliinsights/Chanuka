@@ -10,7 +10,7 @@ export interface AuditEntry {
   action: string;
   resource: string;
   status: 'success' | 'failure';
-  details: Record<string, any>;
+  details: Record<string, unknown>;
 }
 
 export interface AuditFilter {

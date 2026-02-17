@@ -449,7 +449,7 @@ export class UserManagementService {
    * This centralizes filtering logic to ensure consistency across different operations.
    */
   private buildFilterConditions(filters?: UserManagementFilters) {
-    const conditions: any[] = [];
+    const conditions: unknown[] = [];
 
     if (filters?.role) {
       // Cast the role string to the proper enum type for type safety
@@ -484,7 +484,7 @@ export class UserManagementService {
    * Enriches basic user data with comprehensive stats and session information.
    * Uses parallel processing to fetch related data efficiently.
    */
-  private async enrichUsersWithDetails(userList: any[]): Promise<UserDetails[]> {
+  private async enrichUsersWithDetails(userList: unknown[]): Promise<UserDetails[]> {
     return Promise.all(
       userList.map(async (user) => {
         // Fetch stats and sessions in parallel for each user

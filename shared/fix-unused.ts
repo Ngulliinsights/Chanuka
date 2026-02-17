@@ -19,7 +19,7 @@ function runTSC(): TSError[] {
     // Filter for TS6133 and TS6192 errors
     const lines = output.split('\n').filter(line => line.includes('TS6133') || line.includes('TS6192'));
     return lines.map(parseTSCError).filter(Boolean) as TSError[];
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If tsc exits with errors, parse stdout
     if (error.stdout) {
       const lines = error.stdout.split('\n').filter((line: string) => line.includes('TS6133') || line.includes('TS6192'));

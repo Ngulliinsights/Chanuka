@@ -27,7 +27,7 @@ export interface TypeTransformer<T, S> {
 // ============================================================================
 
 export class BaseEntityTransformer implements TypeTransformer<any, BaseEntity> {
-  canTransform(source: any): boolean {
+  canTransform(source: unknown): boolean {
     return (
       source &&
       typeof source === 'object' &&
@@ -35,7 +35,7 @@ export class BaseEntityTransformer implements TypeTransformer<any, BaseEntity> {
     );
   }
 
-  transform(source: any): BaseEntity {
+  transform(source: unknown): BaseEntity {
     return {
       id: source.id || source.uuid || source._id || this.generateId(),
       created_at: this.parseDate(source.created_at || source.createdAt || new Date()),
@@ -64,7 +64,7 @@ export class BaseEntityTransformer implements TypeTransformer<any, BaseEntity> {
 }
 
 export class FullAuditTransformer implements TypeTransformer<any, FullAuditEntity> {
-  canTransform(source: any): boolean {
+  canTransform(source: unknown): boolean {
     return (
       source &&
       typeof source === 'object' &&
@@ -72,7 +72,7 @@ export class FullAuditTransformer implements TypeTransformer<any, FullAuditEntit
     );
   }
 
-  transform(source: any): FullAuditEntity {
+  transform(source: unknown): FullAuditEntity {
     const baseTransformer = new BaseEntityTransformer();
     const baseEntity = baseTransformer.transform(source);
 
@@ -109,7 +109,7 @@ export class FullAuditTransformer implements TypeTransformer<any, FullAuditEntit
 // ============================================================================
 
 export class LoadingOperationTransformer implements TypeTransformer<any, LoadingOperation> {
-  canTransform(source: any): boolean {
+  canTransform(source: unknown): boolean {
     return (
       source &&
       typeof source === 'object' &&
@@ -117,7 +117,7 @@ export class LoadingOperationTransformer implements TypeTransformer<any, Loading
     );
   }
 
-  transform(source: any): LoadingOperation {
+  transform(source: unknown): LoadingOperation {
     return {
       id: source.operationId || source.id || this.generateId(),
       type: this.mapLoadingType(source.type || 'api'),
@@ -272,21 +272,21 @@ export class TransformerRegistry {
 export interface ComplexTypeMapping {
   sourceType: string;
   targetType: string;
-  fieldMappings: Record<string, string | ((value: any) => any)>;
-  defaultValues?: Record<string, any>;
-  postProcessors?: Array<(target: any) => any>;
+  fieldMappings: Record<string, string | ((value: unknown) => any)>;
+  defaultValues?: Record<string, unknown>;
+  postProcessors?: Array<(target: unknown) => any>;
 }
 
 export class ComplexTypeTransformer {
   constructor(private mappings: ComplexTypeMapping[]) {}
 
-  public transform(source: any, targetType: string): any {
+  public transform(source: unknown, targetType: string): unknown {
     const mapping = this.mappings.find(m => m.targetType === targetType);
     if (!mapping) {
       throw new Error(`No mapping found for target type: ${targetType}`);
     }
 
-    const target: Record<string, any> = { ...mapping.defaultValues };
+    const target: Record<string, unknown> = { ...mapping.defaultValues };
 
     // Apply field mappings
     for (const [sourceField, targetFieldOrFn] of Object.entries(mapping.fieldMappings)) {
@@ -309,7 +309,7 @@ export class ComplexTypeTransformer {
     return target;
   }
 
-  public canTransform(source: any, targetType: string): boolean {
+  public canTransform(source: unknown, targetType: string): boolean {
     const mapping = this.mappings.find(m => m.targetType === targetType);
     return !!mapping && mapping.sourceType === source?.constructor?.name;
   }

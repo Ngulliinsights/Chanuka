@@ -94,7 +94,7 @@ export function buildTimeThreshold(timeframe: string): Date {
  * normalizeRowNumbers([{ id: 1, row_number: "5" }, { id: 2, row_number: null }])
  * // Returns: [{ id: 1, row_number: 5 }, { id: 2, row_number: null }]
  */
-export function normalizeRowNumbers<T extends Record<string, any>>(rows: T[]): T[] {
+export function normalizeRowNumbers<T extends Record<string, unknown>>(rows: T[]): T[] {
   return rows.map(row => {
     const normalized = { ...row };
 
@@ -135,7 +135,7 @@ export function normalizeRowNumbers<T extends Record<string, any>>(rows: T[]): T
  * @example
  * groupByTime([{ created_at: new Date(), value: 10 }], 'created_at', 'day')
  */
-export function groupByTime<T extends Record<string, any>>(
+export function groupByTime<T extends Record<string, unknown>>(
   data: T[],
   timestampField: keyof T,
   groupBy: 'hour' | 'day' | 'week' | 'month'
@@ -143,7 +143,7 @@ export function groupByTime<T extends Record<string, any>>(
   const groups: Record<string, T[]> = {};
 
   data.forEach(item => {
-    const timestamp = item[timestampField] as any;
+    const timestamp = item[timestampField] as unknown;
     if (!(timestamp instanceof Date)) {
       logger.warn('Invalid timestamp in groupByTime', {
         component: 'db-helpers',

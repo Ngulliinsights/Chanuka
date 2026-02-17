@@ -110,7 +110,7 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
     },
   ];
 
-  const handleAddComment = async (data: any) => {
+  const handleAddComment = async (data: unknown) => {
     console.log('Adding comment:', data);
     // Implementation would handle comment submission
   };
@@ -127,7 +127,7 @@ function BillCommunityTab({ bill }: BillCommunityTabProps) {
     console.log('Voting on comment:', commentId, voteType);
   };
 
-  const handleReportComment = async (commentId: string, violationType: any, reason: string) => {
+  const handleReportComment = async (commentId: string, violationType: unknown, reason: string) => {
     console.log('Reporting comment:', commentId, violationType, reason);
   };
 

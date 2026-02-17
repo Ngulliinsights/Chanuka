@@ -199,7 +199,7 @@ Examples:
     return report;
   }
 
-  private async checkOrchestrator(orchestrator: any, logger: any): Promise<ComponentHealth> {
+  private async checkOrchestrator(orchestrator: unknown, logger: unknown): Promise<ComponentHealth> {
     const startTime = Date.now();
     
     try {
@@ -244,7 +244,7 @@ Examples:
     }
   }
 
-  private async checkConnections(orchestrator: any, logger: any, detailed = false): Promise<ComponentHealth> {
+  private async checkConnections(orchestrator: unknown, logger: unknown, detailed = false): Promise<ComponentHealth> {
     const startTime = Date.now();
     
     try {
@@ -312,7 +312,7 @@ Examples:
     }
   }
 
-  private async checkPerformance(orchestrator: any, logger: any, detailed = false): Promise<ComponentHealth> {
+  private async checkPerformance(orchestrator: unknown, logger: unknown, detailed = false): Promise<ComponentHealth> {
     const startTime = Date.now();
     
     try {
@@ -375,7 +375,7 @@ Examples:
     }
   }
 
-  private async checkMonitoring(orchestrator: any, logger: any): Promise<ComponentHealth> {
+  private async checkMonitoring(orchestrator: unknown, logger: unknown): Promise<ComponentHealth> {
     const startTime = Date.now();
     
     try {
@@ -428,7 +428,7 @@ Examples:
     }
   }
 
-  private async calculateMetrics(report: HealthCheckReport, orchestrator: any): Promise<void> {
+  private async calculateMetrics(report: HealthCheckReport, orchestrator: unknown): Promise<void> {
     try {
       const metrics = await orchestrator.getMetrics();
       

@@ -336,7 +336,7 @@ export class CacheMigrationValidator {
   }
 
   // Helper methods
-  private deepEqual(a: any, b: any): boolean {
+  private deepEqual(a: unknown, b: unknown): boolean {
     if (a === b) return true;
     if (a == null || b == null) return a === b;
     if (typeof a !== typeof b) return false;

@@ -38,7 +38,7 @@ export async function teardownGraphTestEnvironment(): Promise<void> {
   }
 }
 
-export async function createTestData(driver: Driver, data: any): Promise<void> {
+export async function createTestData(driver: Driver, data: unknown): Promise<void> {
   await withSession(driver, async (session) => {
     for (const item of data.nodes || []) {
       await session.run(

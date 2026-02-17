@@ -284,7 +284,7 @@ export class CampaignDomainService {
   async optimizeCampaignStrategy(campaign_id: string): Promise<{
     recommendations: string[];
     priorityActions: string[];
-    targetAdjustments: Record<string, any>;
+    targetAdjustments: Record<string, unknown>;
   }> {
     try {
       const metrics = await this.calculateCampaignImpact(campaign_id);
@@ -296,7 +296,7 @@ export class CampaignDomainService {
 
       const recommendations: string[] = [];
       const priorityActions: string[] = [];
-      const targetAdjustments: Record<string, any> = {};
+      const targetAdjustments: Record<string, unknown> = {};
 
       // Analyze completion rates
       if (metrics.actionCompletionRate < 0.6) {
@@ -435,7 +435,7 @@ export class CampaignDomainService {
     }
   }
 
-  private calculateImpactScore(actionSummary: any, analytics: any): number {
+  private calculateImpactScore(actionSummary: unknown, analytics: unknown): number {
     if (!actionSummary) return 0;
     
     let score = 0;

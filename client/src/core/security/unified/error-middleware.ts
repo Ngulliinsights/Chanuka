@@ -150,7 +150,7 @@ export class SecurityErrorMiddleware {
   /**
    * Wrap a function with error handling
    */
-  wrap<T extends (...args: any[]) => Promise<any>>(
+  wrap<T extends (...args: unknown[]) => Promise<any>>(
     fn: T,
     operationName: string,
     component: string

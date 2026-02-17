@@ -203,14 +203,14 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     return 0;
   }
 
-  protected shouldCompress(data: any): boolean {
+  protected shouldCompress(data: unknown): boolean {
     if (!this.config.enableCompression) return false;
 
     const size = this.estimateSize(data);
     return size >= (this.config.compressionThreshold || 1024);
   }
 
-  protected estimateSize(data: any): number {
+  protected estimateSize(data: unknown): number {
     // Rough estimation of data size
     if (typeof data === 'string') return data.length;
     if (typeof data === 'number') return 8;
@@ -224,7 +224,7 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     }
   }
 
-  protected serialize(data: any): string {
+  protected serialize(data: unknown): string {
     try {
       return JSON.stringify(data);
     } catch (error) {

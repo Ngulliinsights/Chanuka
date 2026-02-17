@@ -26,23 +26,13 @@ export type {
   ValidationError,
   ValidationErrorDetail,
   ValidationResult,
-  ValidationContext,
-  ValidationOptions
+  ValidationContext
 } from './validation-types';
 
 // Export types from other modules with conflict resolution
 
-// Caching types - explicit exports to avoid conflicts
-export type {
-  CacheOptions,
-  CacheMetrics,
-  CacheHealthStatus,
-  CacheEvent,
-  SingleFlightOptions
-} from '../caching/types';
 
-// CircuitBreakerState conflicts resolved with aliases
-export type { CircuitBreakerState as CacheCircuitBreakerState } from '../caching/types';
+
 // TODO: Fix import path - observability is in server/infrastructure, not shared/core
 // export { CircuitBreakerState as ObservabilityCircuitBreakerState } from '../observability/error-management/patterns/circuit-breaker';
 // Database CircuitBreakerState is defined inline in connection-manager.ts, skip aliasing
@@ -50,25 +40,22 @@ export type { CircuitBreakerState as CacheCircuitBreakerState } from '../caching
 // HealthStatus conflicts resolved with aliases
 // TODO: Fix import path - observability is in server/infrastructure, not shared/core
 // export type { HealthStatus as ObservabilityHealthStatus } from '../observability/health/types';
-export type { HealthStatus as MiddlewareHealthStatus } from '../middleware/types';
 
-// RateLimitStore conflicts resolved with aliases
-export type { RateLimitStore as RateLimitingStore } from '../rate-limiting/types';
-export type { RateLimitStore as MiddlewareRateLimitStore } from '../middleware/types';
+
+
 
 // ValidationError conflicts resolved with aliases
-export { ValidationError as ValidationTypesError } from '../validation/types';
+export * from './validation-types';
 // TODO: Fix import path - observability is in server/infrastructure, not shared/core
 // export { ValidationError as ErrorManagementValidationError } from '../observability/error-management/errors/specialized-errors';
 export type { ValidationError as ValidationTypesAlias } from './validation-types';
-export { ValidationError as ModernizationValidationError } from '../modernization/types';
+
 
 // ValidationResult conflicts resolved with aliases
 // Note: Primary ValidationResult is from validation-types, others are aliased
 // Already exported above as primary ValidationResult from validation-types
 
-// Config types
-export * from '../config/types';
+
 
 // Middleware types (excluding conflicting ones already aliased above)
 export type {
@@ -76,42 +63,12 @@ export type {
   ErrorMiddleware,
   AnyMiddleware,
   PerformanceMetrics,
-  DetailedMetrics,
-  CacheService,
-  ValidationService,
-  HealthChecker,
   MiddlewareProvider
 } from '../middleware/types';
 
-// Modernization types (excluding conflicting ValidationError already aliased)
-export type {
-  ModernizationTask,
-  ModernizationPhase,
-  ModernizationConfig,
-  ValidationScope,
-  ValidationCheck,
-  BackupResult,
-  ProgressState,
-  ValidationResult as ModernizationValidationResult,
-  AnalysisResult,
-  Finding,
-  Recommendation
-} from '../modernization/types';
 
-export {
-  ValidationStatus,
-  ValidationType,
-  AnalysisType,
-  FindingType,
-  FindingSeverity,
-  RecommendedAction,
-  TaskPriority,
-  BackupStrategy,
-  BackupStatus,
-  BackupScope,
-  AnalysisError,
-  BackupError
-} from '../modernization/types';
+
+
 
 // Observability types (excluding conflicting ones already aliased above)
 // TODO: Fix import paths - observability is in server/infrastructure, not shared/core
@@ -136,30 +93,9 @@ export type {
 } from '../observability/error-management/types';
 */
 
-// Rate limiting types (excluding conflicting RateLimitStore already aliased)
-export type {
-  RateLimitOptions,
-  RateLimitResult,
-  RateLimitHeaders,
-  RateLimitBucket,
-  RateLimitData,
-  IRateLimitStore,
-  RateLimitConfig,
-  AIRateLimitOptions
-} from '../rate-limiting/types';
 
-// Validation types (excluding conflicting ones already aliased above)
-export type {
-  ValidationOptions,
-  BatchValidationResult,
-  CachedValidationResult,
-  SchemaRegistration,
-  ValidationContext,
-  ValidationMetrics,
-  ValidationServiceConfig,
-  ValidationErrorDetail,
-  LegacyValidationResult
-} from '../validation/types';
+
+
 
 
 

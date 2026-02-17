@@ -169,7 +169,7 @@ export class GovernmentDataService extends EventEmitter {
   async fetchData(
     dataSourceId: string,
     endpointId: string,
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<ApiResponse> {
     const dataSource = this.dataSources.get(dataSourceId);
     if (!dataSource) {
@@ -238,7 +238,7 @@ export class GovernmentDataService extends EventEmitter {
         }
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
@@ -290,7 +290,7 @@ export class GovernmentDataService extends EventEmitter {
   /**
    * Handle API errors and update health status
    */
-  private handleApiError(dataSourceId: string, error: any): void {
+  private handleApiError(dataSourceId: string, error: unknown): void {
     let status: 'healthy' | 'degraded' | 'down' = 'degraded';
     const issues: HealthIssue[] = [];
 
@@ -413,7 +413,7 @@ export class GovernmentDataService extends EventEmitter {
   /**
    * Transform raw API data to standardized format
    */
-  async transformBillData(rawData: any, sourceId: string): Promise<BillData> {
+  async transformBillData(rawData: unknown, sourceId: string): Promise<BillData> {
     // This would contain source-specific transformation logic
     // For now, returning a basic transformation
     return {
@@ -437,7 +437,7 @@ export class GovernmentDataService extends EventEmitter {
   /**
    * Transform raw sponsor data to standardized format
    */
-  async transformSponsorData(rawData: any, sourceId: string): Promise<SponsorData> {
+  async transformSponsorData(rawData: unknown, sourceId: string): Promise<SponsorData> {
     return {
       id: rawData.id || rawData.member_id || 'unknown',
       name: rawData.name || `${rawData.first_name} ${rawData.last_name}`,

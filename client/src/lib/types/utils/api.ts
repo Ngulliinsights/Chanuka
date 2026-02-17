@@ -9,7 +9,7 @@ export type { ApiResponse } from './common';
 export type ApiError = {
   message: string;
   code?: string | number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   statusCode?: number;
 };
 
@@ -25,8 +25,6 @@ export type PaginatedResponse<T> = {
 };
 
 // HTTP methods
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-
 // Async state utilities
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 

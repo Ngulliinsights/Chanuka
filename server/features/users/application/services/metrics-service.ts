@@ -73,8 +73,8 @@ export class MetricsService {
     });
   }
 
-  getMetricsSummary(): Record<string, any> {
-    const summary: Record<string, any> = {};
+  getMetricsSummary(): Record<string, unknown> {
+    const summary: Record<string, unknown> = {};
 
     // Group metrics by name
     const grouped = this.metrics.reduce((acc, metric) => {

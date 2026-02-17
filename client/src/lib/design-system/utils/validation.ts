@@ -230,7 +230,7 @@ export function validateSelectValue(
   }
 }
 
-export function validateFormData(data: Record<string, any>, schema: z.ZodSchema): any {
+export function validateFormData(data: Record<string, unknown>, schema: z.ZodSchema): any {
   try {
     return schema.parse(data);
   } catch (error) {
@@ -393,7 +393,7 @@ export function safeValidateSelectValue(
 }
 
 export function safeValidateFormData(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   schema: z.ZodSchema
 ): { success: boolean; data?: any; error?: UIFormError } {
   try {

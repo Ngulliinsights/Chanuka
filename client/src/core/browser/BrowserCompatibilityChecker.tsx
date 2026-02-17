@@ -62,7 +62,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
 
         // Check polyfill status - mock implementation for now
         const polyfillStatus = new Map();
-        polyfillStatus.forEach((status: any, feature: string) => {
+        polyfillStatus.forEach((status: unknown, feature: string) => {
           if (!status.loaded && status.error) {
             polyfillErrors.push(`Failed to load ${feature} polyfill: ${status.error.message}`);
           }

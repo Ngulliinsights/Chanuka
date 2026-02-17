@@ -110,7 +110,7 @@ export class PostgreSQLFullTextEngine {
   /**
    * Enhanced bills search with Phase 2 capabilities
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO: Replace 'any' with proper type definition
   private async searchBillsEnhanced(
     queryComponents: any,
     searchTerms: string[],
@@ -176,8 +176,8 @@ export class PostgreSQLFullTextEngine {
       'searchBillsEnhanced'
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return result.data.map((bill: any) => ({
+    // TODO: Replace 'any' with proper type definition
+    return result.data.map((bill: unknown) => ({
       id: bill.id,
       type: 'bill' as const,
       title: bill.title,
@@ -199,7 +199,7 @@ export class PostgreSQLFullTextEngine {
   /**
    * Enhanced sponsors search with Phase 2 capabilities
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO: Replace 'any' with proper type definition
   private async searchSponsorsEnhanced(
     queryComponents: any,
     searchTerms: string[],
@@ -262,8 +262,8 @@ export class PostgreSQLFullTextEngine {
       'searchSponsorsEnhanced'
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return result.data.map((sponsor: any) => ({
+    // TODO: Replace 'any' with proper type definition
+    return result.data.map((sponsor: unknown) => ({
       id: sponsor.id,
       type: 'sponsor' as const,
       title: sponsor.name,
@@ -284,7 +284,7 @@ export class PostgreSQLFullTextEngine {
   /**
    * Enhanced comments search with Phase 2 capabilities
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO: Replace 'any' with proper type definition
   private async searchCommentsEnhanced(
     queryComponents: any,
     searchTerms: string[],
@@ -341,8 +341,8 @@ export class PostgreSQLFullTextEngine {
       'searchCommentsEnhanced'
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return result.data.map((comment: any) => ({
+    // TODO: Replace 'any' with proper type definition
+    return result.data.map((comment: unknown) => ({
       id: comment.id,
       type: 'comment' as const,
       title: `Comment by ${comment.user_name}`,
@@ -376,9 +376,9 @@ export class PostgreSQLFullTextEngine {
         'expandQuery'
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // TODO: Replace 'any' with proper type definition
       if (result.data.length > 0) {
-        const firstResult = result.data[0] as Record<string, any>;
+        const firstResult = result.data[0] as Record<string, unknown>;
         if (firstResult?.expanded_query && typeof firstResult.expanded_query === 'string') {
           return firstResult.expanded_query.split(' | ').slice(0, options.maxExpansions);
         }
@@ -652,8 +652,8 @@ export class PostgreSQLFullTextEngine {
   /**
    * Get search performance statistics for monitoring
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getPerformanceStats(hoursBack: number = 24): Promise<any[]> {
+  // TODO: Replace 'any' with proper type definition
+  async getPerformanceStats(hoursBack: number = 24): Promise<unknown[]> {
     const result = await databaseService.executeRawQuery(
       `SELECT * FROM get_search_performance_stats($1)`,
       [hoursBack],

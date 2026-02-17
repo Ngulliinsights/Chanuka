@@ -169,7 +169,7 @@ class RealtimeOptimizer {
     }
   }
 
-  private calculateDelta(oldData: any, newData: any): any {
+  private calculateDelta(oldData: unknown, newData: unknown): unknown {
     const delta: any = {};
 
     for (const key in newData) {

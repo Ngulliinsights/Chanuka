@@ -332,7 +332,7 @@ export function validateApiResponse<TRequest, TResponse>(
     // Intercept res.json to validate response
     const originalJson = res.json.bind(res);
 
-    res.json = function (body: any): Response {
+    res.json = function (body: unknown): Response {
       try {
         // Validate response data
         const responseValidation = validateResponse(endpoint, body);

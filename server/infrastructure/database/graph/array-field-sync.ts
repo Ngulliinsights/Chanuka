@@ -13,7 +13,7 @@ export async function syncArrayField(
   driver: Driver,
   nodeId: string,
   fieldName: string,
-  values: any[]
+  values: unknown[]
 ): Promise<void> {
   if (!nodeId || !fieldName) {
     throw new GraphError({

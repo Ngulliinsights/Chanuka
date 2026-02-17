@@ -1,6 +1,4 @@
-// import React from 'react'; // Unused
 import { useToast } from '@client/lib/hooks/use-toast';
-// import { logger } from '@client/lib/utils/logger'; // Unused
 
 import {
   Toast,

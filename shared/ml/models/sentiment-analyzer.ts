@@ -532,7 +532,7 @@ export class SentimentAnalyzer {
     }
   }
 
-  private calculateConfidence(text: string, tokens: string[], aspects: any[], emotions: any): number {
+  private calculateConfidence(text: string, tokens: string[], aspects: unknown[], emotions: unknown): number {
     let confidence = 0.5; // Base confidence
 
     // Text length factor

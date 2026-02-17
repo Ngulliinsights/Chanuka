@@ -153,7 +153,7 @@ export async function withTransaction<T>(
 export async function executeCypherSafely(
   driver: Driver,
   cypher: string,
-  params: Record<string, any> = {},
+  params: Record<string, unknown> = {},
   options: {
     mode?: 'READ' | 'WRITE';
     retry?: boolean;

@@ -2,7 +2,7 @@
 /**
  * Type Safety Violation Scanner
  * 
- * Scans the codebase for `as any` type assertions and categorizes them by:
+ * Scans the codebase for `as unknown` type assertions and categorizes them by:
  * - Type (enum, dynamic property, API response, database, etc.)
  * - Severity (critical, high, medium, low)
  * - Location (file, line, column)
@@ -184,7 +184,7 @@ async function scanForViolations(): Promise<TypeViolation[]> {
           const content = fs.readFileSync(file, 'utf-8');
           const lines = content.split('\n');
           
-          // Search for `as any` in each line
+          // Search for `as unknown` in each line
           for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
             const line = lines[lineIndex];
             const regex = /\bas\s+any\b/g;
@@ -211,11 +211,11 @@ async function scanForViolations(): Promise<TypeViolation[]> {
               });
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error(`❌ Error reading file ${file}:`, error.message);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`❌ Error scanning ${dir}:`, error.message);
     }
   }

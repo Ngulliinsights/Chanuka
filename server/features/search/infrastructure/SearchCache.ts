@@ -7,22 +7,22 @@ const CACHE_TTL = {
   LONG: 3600 // 1 hour
 };
 
-const hash = (obj: any): string => Buffer.from(JSON.stringify(obj)).toString('base64url');
+const hash = (obj: unknown): string => Buffer.from(JSON.stringify(obj)).toString('base64url');
 
 export class SearchCache {
   /*  Keys mirror original search-service.ts namespaces  */
   private readonly KEY = {
-    RESULTS: (q: string, f: any, p: any) => `search:results:${hash(q)}:${hash(f)}:${hash(p)}`,
+    RESULTS: (q: string, f: unknown, p: unknown) => `search:results:${hash(q)}:${hash(f)}:${hash(p)}`,
     SUGGESTIONS: (q: string, l: number) => `search:suggestions:${hash(q)}:${l}`,
     POPULAR: 'search:popular',
     INDEX_HEALTH: 'search:index_health',
   } as const;
 
   /*  Low-level accessors  */
-  async getResults<T>(query: string, filters: any, pagination: any): Promise<T | null> {
+  async getResults<T>(query: string, filters: unknown, pagination: unknown): Promise<T | null> {
     return cacheService.get<T>(this.KEY.RESULTS(query, filters, pagination));
   }
-  async setResults<T>(query: string, filters: any, pagination: any, data: T): Promise<void> {
+  async setResults<T>(query: string, filters: unknown, pagination: unknown, data: T): Promise<void> {
     await cacheService.set(this.KEY.RESULTS(query, filters, pagination), data, CACHE_TTL.SEARCH_RESULTS);
   }
 

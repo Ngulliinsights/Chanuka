@@ -122,11 +122,11 @@ export class UserService {
     return dashboardService.getDashboardData();
   }
 
-  async getDashboardWidgets(): Promise<any[]> {
+  async getDashboardWidgets(): Promise<unknown[]> {
     return dashboardService.getDashboardWidgets();
   }
 
-  async updateDashboardLayout(layout: any): Promise<void> {
+  async updateDashboardLayout(layout: unknown): Promise<void> {
     return dashboardService.updateDashboardLayout(layout);
   }
 
@@ -212,7 +212,7 @@ export class UserService {
   // ACHIEVEMENT METHODS (Delegated to AchievementService)
   // ============================================================================
 
-  async getAchievementDefinitions(): Promise<any[]> {
+  async getAchievementDefinitions(): Promise<unknown[]> {
     return achievementService.getAchievementDefinitions();
   }
 

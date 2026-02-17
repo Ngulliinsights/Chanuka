@@ -162,7 +162,7 @@ export class UserNotificationService {
       unreadOnly?: boolean;
       type?: string;
     } = {}
-  ): Promise<any[]> { return notificationService.getUserNotifications(user_id, options);
+  ): Promise<unknown[]> { return notificationService.getUserNotifications(user_id, options);
    }
 
   /**

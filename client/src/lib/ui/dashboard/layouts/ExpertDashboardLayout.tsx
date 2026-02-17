@@ -5,7 +5,6 @@
  * professional tools, and comprehensive data access.
  */
 
-// import React from 'react';
 import type {
   PersonaType,
   PersonaClassification,

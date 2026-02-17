@@ -14,9 +14,8 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 
 import { getDefaultCache } from '../cache';
-// import { RateLimitMiddleware } from '../rate-limiting/middleware';
  // Unused import
-import { logger } from '../infrastructure/observability';
+import { logger } from '@shared/core/observability';
 import { RateLimitStore } from '../rate-limiting/types';
 
 export interface AIRequest extends AuthenticatedRequest { aiContext?: {
@@ -98,13 +97,13 @@ export function aiResponseMiddleware(options: AIMiddlewareOptions) {
     const originalJson = res.json;
 
     // Override send method
-    res.send = function(data: any) {
+    res.send = function(data: unknown) {
       logAIResponse(req, res, data, options);
       return originalSend.call(this, data);
     };
 
     // Override json method
-    res.json = function(data: any) {
+    res.json = function(data: unknown) {
       logAIResponse(req, res, data, options);
       return originalJson.call(this, data);
     };
@@ -149,7 +148,7 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
 
       // Cache miss - continue to AI service
       const originalJson = res.json;
-      res.json = function(data: any) {
+      res.json = function(data: unknown) {
         // Cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const ttl = options.cacheTtl || 300; // 5 minutes default
@@ -216,7 +215,7 @@ function generateCacheKey(req: Request, service: string): string {
   return `ai:${service}:${operation}:${bodyHash}:${queryHash}`;
 }
 
-function hashObject(obj: any): string {
+function hashObject(obj: unknown): string {
   const str = JSON.stringify(obj, Object.keys(obj).sort());
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

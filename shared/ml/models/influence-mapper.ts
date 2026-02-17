@@ -403,7 +403,7 @@ export class InfluenceMapper {
     return Math.min(100, score);
   }
 
-  private determineInfluenceType(centrality: any): 'broker' | 'hub' | 'authority' | 'connector' | 'isolate' {
+  private determineInfluenceType(centrality: unknown): 'broker' | 'hub' | 'authority' | 'connector' | 'isolate' {
     if (centrality.degree < 0.1) return 'isolate';
     if (centrality.betweenness > 0.3) return 'broker';
     if (centrality.degree > 0.5 && centrality.eigenvector > 0.3) return 'hub';
@@ -654,7 +654,7 @@ export class InfluenceMapper {
     return Math.min(1, (strength + lobbyistCentrality.degree + targetCentrality.degree) / 3);
   }
 
-  private identifyCoordinatedLobbying(network: NetworkGraph, input: InfluenceInput, activities: any[]) {
+  private identifyCoordinatedLobbying(network: NetworkGraph, input: InfluenceInput, activities: unknown[]) {
     const networks = [];
     const lobbyistGroups = new Map<string, Set<string>>();
     
@@ -716,7 +716,7 @@ export class InfluenceMapper {
     return Array.from(issues).slice(0, 3);
   }
 
-  private assessRisks(network: NetworkGraph, powerClusters: any[], lobbyingPatterns: any) {
+  private assessRisks(network: NetworkGraph, powerClusters: unknown[], lobbyingPatterns: unknown) {
     const corruptionRisk = this.assessCorruptionRisk(network, lobbyingPatterns);
     const captureRisk = this.assessCaptureRisk(powerClusters, network);
     const concentrationRisk = this.assessConcentrationRisk(network, powerClusters);
@@ -730,7 +730,7 @@ export class InfluenceMapper {
     };
   }
 
-  private assessCorruptionRisk(network: NetworkGraph, lobbyingPatterns: any): number {
+  private assessCorruptionRisk(network: NetworkGraph, lobbyingPatterns: unknown): number {
     let risk = 0;
     
     // High-value financial connections
@@ -744,7 +744,7 @@ export class InfluenceMapper {
     }
     
     // Lobbying intensity
-    const highIntensityLobbying = lobbyingPatterns.detectedLobbying.filter((l: any) => l.intensity > 0.7);
+    const highIntensityLobbying = lobbyingPatterns.detectedLobbying.filter((l: unknown) => l.intensity > 0.7);
     risk += highIntensityLobbying.length * 5;
     
     // Undisclosed connections
@@ -756,7 +756,7 @@ export class InfluenceMapper {
     return Math.min(100, risk);
   }
 
-  private assessCaptureRisk(powerClusters: any[], network: NetworkGraph): number {
+  private assessCaptureRisk(powerClusters: unknown[], network: NetworkGraph): number {
     let risk = 0;
     
     // High cohesion clusters with politicians
@@ -784,7 +784,7 @@ export class InfluenceMapper {
     return Math.min(100, risk);
   }
 
-  private assessConcentrationRisk(network: NetworkGraph, powerClusters: any[]): number {
+  private assessConcentrationRisk(network: NetworkGraph, powerClusters: unknown[]): number {
     let risk = 0;
     
     // Top 10% of nodes controlling large portion of connections
@@ -810,7 +810,7 @@ export class InfluenceMapper {
     return Math.min(100, risk);
   }
 
-  private identifyTransparencyGaps(network: NetworkGraph, powerClusters: any[]) {
+  private identifyTransparencyGaps(network: NetworkGraph, powerClusters: unknown[]) {
     const gaps = [];
     
     // Missing relationship metadata
@@ -841,7 +841,7 @@ export class InfluenceMapper {
     return gaps;
   }
 
-  private generateRecommendations(riskAssessment: any, powerClusters: any[]) {
+  private generateRecommendations(riskAssessment: unknown, powerClusters: unknown[]) {
     const recommendations = [];
     
     if (riskAssessment.corruptionRisk > this.RISK_THRESHOLDS.corruption.high) {

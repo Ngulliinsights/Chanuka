@@ -6,7 +6,6 @@ import React from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
 
-// import { logger } from '@client/lib/utils/logger'; // Unused
 
 const ToastProvider = Provider;
 

@@ -240,8 +240,8 @@ export function createFinancialDisclosureRouter(
       try {
         const options = {
           sponsor_id: req.query.sponsor_id ? Number(req.query.sponsor_id) : undefined,
-          severity: req.query.severity as any,
-          type: req.query.type as any,
+          severity: req.query.severity as unknown,
+          type: req.query.type as unknown,
           includeResolved: req.query.includeResolved === 'true',
           limit: req.query.limit ? Number(req.query.limit) : undefined
         };

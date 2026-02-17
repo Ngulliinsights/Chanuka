@@ -4,13 +4,13 @@ import type {
   SearchResponse,
   SearchSuggestion,
   SearchHistory,
-  SearchAnalytics,
   SearchMetadata,
   SearchResult,
   SavedSearch,
   SearchExportResponse,
   StreamingSearchResponse,
 } from '@client/lib/types/search';
+import type { SearchAnalytics } from '@client/lib/types/search-response';
 
 import { globalApiClient as api } from './client';
 

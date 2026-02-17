@@ -41,7 +41,7 @@ export class TypeValidator {
     });
 
     const program = this.project.getProgram().compilerObject;
-    const allDiagnostics: any[] = [];
+    const allDiagnostics: unknown[] = [];
 
     if (files && files.length > 0) {
       // Validate specific files
@@ -156,7 +156,7 @@ export class TypeValidator {
   /**
    * Parse diagnostics as TypeScript errors
    */
-  private parseDiagnosticsAsErrors(diagnostics: any[]): TypeScriptError[] {
+  private parseDiagnosticsAsErrors(diagnostics: unknown[]): TypeScriptError[] {
     return diagnostics.map(diagnostic => {
       const file = diagnostic.file?.fileName || 'unknown';
       const position = diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start || 0);
@@ -176,7 +176,7 @@ export class TypeValidator {
   /**
    * Parse diagnostics as TypeScript warnings
    */
-  private parseDiagnosticsAsWarnings(diagnostics: any[]): TypeScriptWarning[] {
+  private parseDiagnosticsAsWarnings(diagnostics: unknown[]): TypeScriptWarning[] {
     return diagnostics.map(diagnostic => {
       const file = diagnostic.file?.fileName || 'unknown';
       const position = diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start || 0);

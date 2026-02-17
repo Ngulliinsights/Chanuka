@@ -1,6 +1,5 @@
 import React from 'react';
 
-// import HybridDesignSystemTest from '@client/lib/design-system';
 
 /**
  * Design System Test Page

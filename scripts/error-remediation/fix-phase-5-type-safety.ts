@@ -35,10 +35,10 @@ class Phase5TypeSafetyFixer {
   private fixes: {
     typeAnnotations: TypeAnnotationFix[];
     indexSignatures: IndexSignatureFix[];
-    typeComparisons: any[];
-    interfaceCompatibility: any[];
-    undefinedSafety: any[];
-    enumLiterals: any[];
+    typeComparisons: unknown[];
+    interfaceCompatibility: unknown[];
+    undefinedSafety: unknown[];
+    enumLiterals: unknown[];
   };
 
   constructor() {
@@ -149,7 +149,7 @@ class Phase5TypeSafetyFixer {
   /**
    * Infer parameter type from context
    */
-  private inferParameterType(param: any, func: any): string | null {
+  private inferParameterType(param: unknown, func: unknown): string | null {
     const paramName = param.getName();
     const funcText = func.getText();
 

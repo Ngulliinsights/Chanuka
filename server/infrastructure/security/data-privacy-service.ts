@@ -114,7 +114,7 @@ export class DataPrivacyService {
   /**
    * Check if user has access to specific data types
    */
-  public checkDataAccess(user_id: string, dataType: string, requestContext?: any): AccessResult { try {
+  public checkDataAccess(user_id: string, dataType: string, requestContext?: unknown): AccessResult { try {
       // Define access rules based on data type and user context
       const accessRules = this.getAccessRules(dataType);
       
@@ -218,7 +218,7 @@ export class DataPrivacyService {
     data: T[],
     groupByField: keyof T,
     options: DataAggregationOptions
-  ): any[] {
+  ): unknown[] {
     try {
       // Group data by the specified field
       const groups = this.groupBy(data, groupByField);
@@ -311,7 +311,7 @@ export class DataPrivacyService {
   /**
    * Sanitize user preferences for analytics
    */
-  private sanitizePreferences(preferences: any): any {
+  private sanitizePreferences(preferences: unknown): unknown {
     if (!preferences || typeof preferences !== 'object') {
       return {};
     }
@@ -340,7 +340,7 @@ export class DataPrivacyService {
    * Get access rules for different data types
    */
   private getAccessRules(dataType: string): any {
-    const rules: Record<string, any> = {
+    const rules: Record<string, unknown> = {
       'user_profile': {
         requiresOwnership: true,
         minimumRole: 'citizen',
@@ -418,7 +418,7 @@ export class DataPrivacyService {
   /**
    * Anonymize aggregation results
    */
-  private anonymizeAggregation<T>(aggregated: any, items: T[], excludeFields: string[]): any {
+  private anonymizeAggregation<T>(aggregated: unknown, items: T[], excludeFields: string[]): unknown {
     // Add statistical measures without exposing individual records
     const numericFields = this.getNumericFields(items[0]);
     
@@ -455,7 +455,7 @@ export class DataPrivacyService {
   /**
    * Get numeric fields from an object
    */
-  private getNumericFields(item: any): string[] {
+  private getNumericFields(item: unknown): string[] {
     if (!item) return [];
     
     return Object.entries(item)

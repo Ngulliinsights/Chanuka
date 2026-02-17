@@ -93,8 +93,8 @@ export class ArgumentIntelligenceService {
   /**
    * Store a processed argument in the database
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async storeArgument(argumentData: any): Promise<Argument> {
+  // TODO: Replace 'any' with proper type definition
+  async storeArgument(argumentData: unknown): Promise<Argument> {
     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };
     logger.debug('Storing processed argument', logContext);
 
@@ -188,8 +188,8 @@ export class ArgumentIntelligenceService {
   /**
    * Store extracted claims
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async storeClaims(claimsData: any[]): Promise<Claim[]> {
+  // TODO: Replace 'any' with proper type definition
+  async storeClaims(claimsData: unknown[]): Promise<Claim[]> {
     const logContext = {
       component: 'ArgumentIntelligenceService',
       operation: 'storeClaims',
@@ -255,8 +255,8 @@ export class ArgumentIntelligenceService {
   /**
    * Store evidence records
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async storeEvidence(evidenceData: any[]): Promise<Evidence[]> {
+  // TODO: Replace 'any' with proper type definition
+  async storeEvidence(evidenceData: unknown[]): Promise<Evidence[]> {
     const logContext = {
       component: 'ArgumentIntelligenceService',
       operation: 'storeEvidence',
@@ -322,8 +322,8 @@ export class ArgumentIntelligenceService {
   /**
    * Store a generated legislative brief
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async storeBrief(briefData: any): Promise<LegislativeBrief> {
+  // TODO: Replace 'any' with proper type definition
+  async storeBrief(briefData: unknown): Promise<LegislativeBrief> {
     const logContext = {
       component: 'ArgumentIntelligenceService',
       operation: 'storeBrief',
@@ -508,8 +508,8 @@ export class ArgumentIntelligenceService {
   /**
    * Store argument relationships (clustering, similarity, etc.)
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async storeArgumentRelationships(relationships: any[]): Promise<ArgumentRelationship[]> {
+  // TODO: Replace 'any' with proper type definition
+  async storeArgumentRelationships(relationships: unknown[]): Promise<ArgumentRelationship[]> {
     const logContext = {
       component: 'ArgumentIntelligenceService',
       operation: 'storeArgumentRelationships',
@@ -586,7 +586,7 @@ export class ArgumentIntelligenceService {
   /**
    * Get argument statistics for a bill
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // TODO: Replace 'any' with proper type definition
   async getArgumentStatistics(bill_id: string): Promise<any> {
     const logContext = {
       component: 'ArgumentIntelligenceService',
@@ -653,8 +653,8 @@ export class ArgumentIntelligenceService {
   /**
    * Safely parse JSON with fallback
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private parseJson(jsonString: string | null, fallback: any = null): any {
+  // TODO: Replace 'any' with proper type definition
+  private parseJson(jsonString: string | null, fallback: unknown = null): unknown {
     if (!jsonString) return fallback;
 
     try {

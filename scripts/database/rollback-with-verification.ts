@@ -122,7 +122,7 @@ async function rollbackWithVerification(migrationName?: string): Promise<Rollbac
     console.log(rollbackOutput);
     console.log('\n✅ Rollback completed!\n');
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Rollback failed:', error.message);
     
     return {

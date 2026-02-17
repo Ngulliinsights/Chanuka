@@ -628,7 +628,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
     }
   }
 
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     try {
       const serialized = JSON.stringify(data);
       return new Blob([serialized]).size;

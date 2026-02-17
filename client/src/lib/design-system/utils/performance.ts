@@ -168,7 +168,7 @@ export const memoryManagement = {
    * Weak reference storage for components
    */
   createWeakStorage: <T extends object>(): {
-    set: (key: T, value: any) => void;
+    set: (key: T, value: unknown) => void;
     get: (key: T) => any;
     has: (key: T) => boolean;
     delete: (key: T) => boolean;
@@ -176,7 +176,7 @@ export const memoryManagement = {
     const storage = new WeakMap();
 
     return {
-      set: (key: T, value: any) => storage.set(key, value),
+      set: (key: T, value: unknown) => storage.set(key, value),
       get: (key: T) => storage.get(key),
       has: (key: T) => storage.has(key),
       delete: (key: T) => storage.delete(key),
@@ -191,7 +191,7 @@ export const bundleOptimization = {
   /**
    * Tree-shakeable design token imports
    */
-  createSelectiveImport: <T extends Record<string, any>>(
+  createSelectiveImport: <T extends Record<string, unknown>>(
     tokens: T,
     keys: (keyof T)[]
   ): Partial<T> => {
@@ -240,7 +240,7 @@ export const performanceMonitoring = {
    */
   monitorLayoutShifts: (callback: (entries: unknown[]) => void): PerformanceObserver => {
     const observer = new PerformanceObserver(list => {
-      const entries = list.getEntries() as any[];
+      const entries = list.getEntries() as unknown[];
       callback(entries);
     });
 
@@ -262,7 +262,7 @@ export const performanceMonitoring = {
 
     // Track Cumulative Layout Shift
     new PerformanceObserver(list => {
-      for (const entry of list.getEntries() as any[]) {
+      for (const entry of list.getEntries() as unknown[]) {
         if (!entry.hadRecentInput) {
           cls += entry.value;
         }

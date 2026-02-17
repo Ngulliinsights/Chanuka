@@ -1,4 +1,6 @@
 import { CoverageAnalyzer } from '@server/services/coverage-analyzer';
+import { logger } from '@shared/core';
+
 import { Router } from 'express';
 
 const router = Router();
@@ -16,7 +18,7 @@ router.get('/report', async (req, res) => {
   const report = await coverageAnalyzer.generateCoverageReport();
     // Ensure any Date objects are converted to ISO strings so JSON responses
     // and mocked objects remain consistent during tests
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -39,13 +41,11 @@ router.get('/report', async (req, res) => {
     } catch (error) {
     // Lazy-load logger to avoid initializing config during module import
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error generating coverage report:', { error });
     } catch (e) {
       // Fallback
-      // eslint-disable-next-line no-console
-      console.error('Error generating coverage report:', error);
+      logger.error('Error generating coverage report:', error);
     }
     res.status(500).json({
       success: false,
@@ -67,7 +67,7 @@ router.get('/server', async (req, res) => {
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeServerCoverage();
     // Normalize any Date instances
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -89,12 +89,10 @@ router.get('/server', async (req, res) => {
     });
     } catch (error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error analyzing server coverage:', { error });
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Error analyzing server coverage:', error);
+      logger.error('Error analyzing server coverage:', error);
     }
     res.status(500).json({
       success: false,
@@ -115,7 +113,7 @@ router.get('/client', async (req, res) => {
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeClientCoverage();
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -137,12 +135,10 @@ router.get('/client', async (req, res) => {
     });
     } catch (error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error analyzing client coverage:', { error });
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Error analyzing client coverage:', error);
+      logger.error('Error analyzing client coverage:', error);
     }
     res.status(500).json({
       success: false,
@@ -163,7 +159,7 @@ router.get('/integration', async (req, res) => {
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeIntegrationCoverage();
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -185,12 +181,10 @@ router.get('/integration', async (req, res) => {
     });
     } catch (error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error analyzing integration coverage:', { error });
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Error analyzing integration coverage:', error);
+      logger.error('Error analyzing integration coverage:', error);
     }
     res.status(500).json({
       success: false,
@@ -221,7 +215,7 @@ router.get('/gaps', async (req, res) => {
     ]);
     
     // Normalize Dates in the gaps and summary objects if present
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -255,12 +249,10 @@ router.get('/gaps', async (req, res) => {
     });
   } catch (error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error analyzing coverage gaps:', { error });
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Error analyzing coverage gaps:', error);
+      logger.error('Error analyzing coverage gaps:', error);
     }
     res.status(500).json({
       success: false,
@@ -300,7 +292,7 @@ router.post('/analyze', async (req, res) => {
     }
     
     // Ensure date normalization for returned result
-    const serializeDates = (obj: any) => {
+    const serializeDates = (obj: unknown) => {
       if (!obj || typeof obj !== 'object') return obj;
       for (const key of Object.keys(obj)) {
         const val = obj[key];
@@ -324,12 +316,10 @@ router.post('/analyze', async (req, res) => {
     });
   } catch (error) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { logger } = require('../../utils/logger');
+      import { logger } from '../../utils/logger';
       logger.error('Error running coverage analysis:', { error });
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Error running coverage analysis:', error);
+      logger.error('Error running coverage analysis:', error);
     }
     res.status(500).json({
       success: false,

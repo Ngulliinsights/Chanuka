@@ -29,7 +29,7 @@ interface UserFormValues {
 }
 
 interface SecureFormProps {
-  onSubmit?: (data: any) => void;
+  onSubmit?: (data: unknown) => void;
   className?: string;
 }
 
@@ -48,7 +48,7 @@ export function SecureForm({ onSubmit, className }: SecureFormProps) {
   const [securityWarnings, setSecurityWarnings] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: keyof UserFormValues, value: any) => {
+  const handleInputChange = (field: keyof UserFormValues, value: unknown) => {
     setValue(field, value);
 
     // Perform real-time security check for text inputs
