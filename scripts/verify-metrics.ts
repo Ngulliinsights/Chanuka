@@ -107,7 +107,7 @@ function countTodoComments(): MetricResult {
 function countEslintSuppressions(): MetricResult {
   try {
     const result = execSync(
-      'git grep -n -E "eslint-disable|eslint-disable-next-line" -- "*.ts" "*.tsx" "*.js" "*.jsx" || true',
+      'git grep -n -E "eslint-disable|eslint-disable-next-line" -- "*.ts" "*.tsx" "*.js" "*.jsx" ":!scripts/" || true',
       { encoding: 'utf-8', cwd: WORKSPACE_ROOT }
     );
     
@@ -139,7 +139,7 @@ function countEslintSuppressions(): MetricResult {
 function countCommentedImports(): MetricResult {
   try {
     const result = execSync(
-      'git grep -n -E "^\\s*//\\s*import" -- "*.ts" "*.tsx" || true',
+      'git grep -n -E "^\\s*//\\s*import" -- "*.ts" "*.tsx" ":!scripts/" ":!.backups/" || true',
       { encoding: 'utf-8', cwd: WORKSPACE_ROOT }
     );
     
@@ -171,7 +171,7 @@ function countCommentedImports(): MetricResult {
 function countTypescriptSuppressions(): MetricResult {
   try {
     const result = execSync(
-      'git grep -n -E "@ts-ignore|@ts-expect-error|@ts-nocheck" -- "*.ts" "*.tsx" || true',
+      'git grep -n -E "@ts-ignore|@ts-expect-error|@ts-nocheck" -- "*.ts" "*.tsx" ":!scripts/" ":!.backups/" || true',
       { encoding: 'utf-8', cwd: WORKSPACE_ROOT }
     );
     

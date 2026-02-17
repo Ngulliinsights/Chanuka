@@ -621,8 +621,7 @@ export class WebSocketService {
     if (listener) {
       try {
         // TODO: Replace 'any' with proper type definition
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (listener as any)(...args);
+(listener as (...args: unknown[]) => void)(...args);
       } catch (error) {
         this.logError(`Error in ${event} event listener:`, error);
       }

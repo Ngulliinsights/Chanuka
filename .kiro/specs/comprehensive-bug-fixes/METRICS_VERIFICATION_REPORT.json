@@ -1,45 +1,46 @@
 {
-  "timestamp": "2026-02-17T01:11:45.320Z",
+  "timestamp": "2026-02-17T04:27:33.700Z",
   "overallPass": false,
   "metrics": [
     {
       "name": "Type Safety Violations",
-      "current": 544,
+      "current": 580,
       "target": 0,
       "baseline": 788,
       "met": false,
-      "details": "Found 244 'as any' and 300 'as unknown' in production code"
+      "details": "Found 252 'as any' and 328 'as unknown' in production code"
     },
     {
       "name": "TODO/FIXME Comments (bugs)",
-      "current": 10,
+      "current": 30,
       "target": 0,
       "baseline": 191,
       "met": false,
-      "details": "Found 10 TODO/FIXME comments indicating bugs"
+      "details": "Found 30 TODO/FIXME comments indicating bugs"
     },
     {
       "name": "ESLint Suppressions",
-      "current": 37,
+      "current": 11,
       "target": 10,
       "baseline": 99,
       "met": false,
-      "details": "Found 37 ESLint suppressions (target: <10)"
+      "details": "Found 11 ESLint suppressions (target: <10)"
     },
     {
       "name": "Commented Imports",
-      "current": 2,
+      "current": 3,
       "target": 0,
       "baseline": 33,
       "met": false,
-      "details": "Found 2 commented import statements"
+      "details": "Found 3 commented import statements"
     },
     {
       "name": "TypeScript Suppressions",
-      "current": 0,
+      "current": 4,
       "target": 0,
       "baseline": 3,
-      "met": true
+      "met": false,
+      "details": "Found 4 TypeScript suppression directives"
     },
     {
       "name": "Syntax Errors",
@@ -59,7 +60,7 @@
   ],
   "summary": {
     "totalMetrics": 7,
-    "metricsMet": 2,
-    "metricsFailed": 5
+    "metricsMet": 1,
+    "metricsFailed": 6
   }
 }
