@@ -2,16 +2,16 @@
 // API Router for Financial Disclosure System
 // Provides REST endpoints for monitoring, analytics, and data export
 
-import { FinancialDisclosureMonitoringService } from "@server/features/analytics/financial-disclosure/monitoring.ts";
+import { FinancialDisclosureMonitoringService } from "@server/features/analytics/financial-disclosure/monitoring";
 import { FinancialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
-import { logger } from '@shared/core/observability/logging/logger.js';
-import { ApiError,ApiSuccess  } from '@shared/core/utils/api-utils.js';
+import { logger } from '@shared/core/observability/logging/logger';
+import { ApiError,ApiSuccess  } from '@shared/core/utils/api-utils';
 import * as crypto from 'crypto';
 import { NextFunction,Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
 
-import { errorTracker } from '@/core/errors/error-tracker.js';
-import { BaseError,SponsorNotFoundError, ValidationError as InvalidInputError } from '@/utils/errors.js';
+import { errorTracker } from '@/core/errors/error-tracker';
+import { BaseError,SponsorNotFoundError, ValidationError as InvalidInputError } from '@/utils/errors';
 
 // ============================================================================
 // API Validation Schemas & Middleware

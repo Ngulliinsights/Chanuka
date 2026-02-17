@@ -15,7 +15,7 @@ import type {
   QueueOperation,
   WebSocketMessage} from '../types';
 import { LRUCache } from '../utils';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { OPERATION_PRIORITIES } from './operation-queue-manager';
 

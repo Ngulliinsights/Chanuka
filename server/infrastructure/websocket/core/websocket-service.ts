@@ -7,7 +7,7 @@
  */
 
 import { IncomingMessage,Server } from 'http';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { WebSocketServer } from 'ws';
 

@@ -5,7 +5,7 @@
  * while maintaining backward compatibility.
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Express } from 'express';
 
 import { boomErrorMiddleware, errorContextMiddleware } from '../../boom-error-middleware';

@@ -4,7 +4,7 @@
  * This maintains backward compatibility while leveraging the new observability system.
  */
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { performance } from 'perf_hooks';
 
 interface MetricData {

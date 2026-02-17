@@ -11,7 +11,7 @@
  * - Legacy cleanup validation
  */
 
-import { WebSocketPerformanceValidator } from '@server/scripts/websocket-performance-validation.ts';
+import { WebSocketPerformanceValidator } from '@server/scripts/websocket-performance-validation';
 import { logger } from '@shared/core/observability/logging';
 
 import { FinalMigrationValidator } from '../../final-migration-validation';

@@ -11,11 +11,11 @@
  * - Application logging
  */
 
-import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { commonSchemas, inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
-import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder.js';
-import { authenticateToken, requireRole } from '@server/middleware/auth.js';
-import { logger } from '@shared/core';
+import { securityAuditService } from '@server/features/security/security-audit-service';
+import { commonSchemas, inputValidationService } from '@server/infrastructure/security/input-validation-service';
+import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
+import { authenticateToken, requireRole } from '@server/middleware/auth';
+import { logger } from '@server/infrastructure/observability';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';

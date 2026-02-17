@@ -1,10 +1,10 @@
-import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from '@server/features/analytics/controllers/engagement.controller.ts';
-import { analyticsContextMiddleware } from '@server/features/analytics/middleware/analytics-context.ts';
-import { performanceTrackingMiddleware } from '@server/features/analytics/middleware/performance-tracking.ts';
-import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
+import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from '@server/features/analytics/controllers/engagement.controller';
+import { analyticsContextMiddleware } from '@server/features/analytics/middleware/analytics-context';
+import { performanceTrackingMiddleware } from '@server/features/analytics/middleware/performance-tracking';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
 import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
-import { controllerWrapper } from '@server/utils/analytics-controller-wrapper.ts';
-import { logger   } from '@shared/core';
+import { controllerWrapper } from '@server/utils/analytics-controller-wrapper';
+import { logger } from '@server/infrastructure/observability';
 import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
 import { Router } from 'express';
 import { z } from 'zod';

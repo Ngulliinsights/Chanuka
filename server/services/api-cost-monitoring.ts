@@ -5,7 +5,7 @@
  * Part of task 12.3 - Build External API Management
  */
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { EventEmitter } from 'events';
 
 // Dynamic import to avoid circular dependencies

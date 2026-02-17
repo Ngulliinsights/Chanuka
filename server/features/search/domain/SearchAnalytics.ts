@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { searchAnalytics,searchQueries } from '@server/infrastructure/schema/advanced_discovery';
 

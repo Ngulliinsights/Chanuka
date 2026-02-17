@@ -1,10 +1,10 @@
-import { encryptionService } from '@server/features/security/encryption-service.ts';
-import { securityAuditService } from '@server/features/security/security-audit-service.ts';
+import { encryptionService } from '@server/features/security/encryption-service';
+import { securityAuditService } from '@server/features/security/security-audit-service';
 import { getEmailService } from '@server/infrastructure/notifications/email-service';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@server/infrastructure/schema';
-import { inputValidationService } from '@shared/validation/input-validation-service.js';
+import { inputValidationService } from '@shared/validation/input-validation-service';
 import { verifyJwtToken, verifyRefreshToken, JwtPayload, RefreshTokenPayload } from './jwt-types';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';

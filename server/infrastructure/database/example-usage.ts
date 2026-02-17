@@ -6,7 +6,7 @@
  * with all safety mechanisms in place.
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { users } from '../schema/foundation';
 

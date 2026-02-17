@@ -4,7 +4,7 @@ import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
 import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
 import { performanceMonitor } from '@server/utils/missing-modules-fallback';
 import { Performance } from '@server/utils/shared-core-fallback';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import cors from 'cors';
 import express, { Express,NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';

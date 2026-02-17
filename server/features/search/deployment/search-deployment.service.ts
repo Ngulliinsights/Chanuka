@@ -5,12 +5,18 @@
  * detailed A/B testing framework, performance monitoring, and rollback capabilities.
  */
 
-import { searchService } from '@shared/application/search-service.js';
-import { logger  } from '@shared/core';
+import { searchBills } from '@server/features/search/application/SearchService';
 
-import { abTestingService } from '@/infrastructure/migration/ab-testing.service.js';
-import { dashboardService } from '@/infrastructure/migration/dashboard.service.js';
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
+const searchService = {
+  async search(opts: { query: string; pagination: { page: number; limit: number } }) {
+    const dto = await searchBills({ text: opts.query, pagination: opts.pagination });
+    return { results: (dto.results ?? []).map((r: Record<string, unknown>) => ({ ...r, relevanceScore: (r as { relevanceScore?: number }).relevanceScore ?? 0 })), totalCount: dto.totalResults ?? 0 };
+  }
+};
+import { logger } from '@server/infrastructure/observability/logger';
+
+
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
 
 export interface SearchDeploymentConfig {
   component: string;
@@ -420,7 +426,7 @@ export class SearchDeploymentService {
 
           // Calculate relevance score based on results
           if (results.results.length > 0) {
-            const avgRelevance = results.results.reduce((sum, r) => sum + r.relevanceScore, 0) / results.results.length;
+            const avgRelevance = results.results.reduce((sum: number, r: { relevanceScore: number }) => sum + r.relevanceScore, 0) / results.results.length;
             relevanceScores.push(avgRelevance);
           }
         } catch (error) {
@@ -468,11 +474,11 @@ export class SearchDeploymentService {
     const upper = Math.ceil(index);
     
     if (lower === upper) {
-      return sortedArray[lower];
+      return sortedArray[lower] ?? 0;
     }
     
     const weight = index - lower;
-    return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+    return (sortedArray[lower] ?? 0) * (1 - weight) + (sortedArray[upper] ?? 0) * weight;
   }
 
   /**
@@ -729,7 +735,7 @@ export class SearchDeploymentService {
   private generateRecommendations(status: unknown): string[] {
     const recommendations: string[] = [];
     
-    for (const [component, componentStatus] of Object.entries(status) as [string, any][]) {
+    for (const [component, componentStatus] of Object.entries(status as Record<string, any>)) {
       if (componentStatus.rolloutPercentage === 0) {
         recommendations.push(`Consider starting rollout for ${component}`);
       } else if (componentStatus.rolloutPercentage < 100 && componentStatus.lastValidation?.passed) {
@@ -748,7 +754,7 @@ export class SearchDeploymentService {
   private generateNextSteps(status: unknown): string[] {
     const nextSteps: string[] = [];
     
-    const readyComponents = Object.entries(status)
+    const readyComponents = Object.entries(status as Record<string, any>)
       .filter(([_, s]: [string, any]) => s.rolloutPercentage < 100 && s.lastValidation?.passed)
       .map(([name, _]) => name);
 

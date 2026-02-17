@@ -1,5 +1,5 @@
 import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { createObservabilityStack  } from '@shared/core/observability';
 import { apmService } from '@shared/monitoring';
 

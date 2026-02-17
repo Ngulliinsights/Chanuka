@@ -1,4 +1,4 @@
-import { logger } from "@shared/core";
+import { logger } from '@server/infrastructure/observability';
 import express, { type Express, type NextFunction,type Request, type Response } from "express";
 import fs from "fs";
 import path from "path";

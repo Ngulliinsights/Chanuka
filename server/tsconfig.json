@@ -9,12 +9,23 @@
       "@/*": ["./*"],
       "@server": ["."],
       "@server/*": ["./*"],
+      "@server/middleware/*": ["./middleware/*"],
+      "@server/infrastructure/*": ["./infrastructure/*"],
+      "@server/infrastructure/errors/*": ["./infrastructure/errors/*"],
+      "@server/infrastructure/observability/*": ["./infrastructure/observability/*"],
+      "@server/infrastructure/schema/*": ["./infrastructure/schema/*"],
+      "@server/infrastructure/database/*": ["./infrastructure/database/*"],
+      "@server/infrastructure/core/*": ["./infrastructure/core/*"],
+      "@server/features/*": ["./features/*"],
       "@client": ["../client/src"],
       "@client/*": ["../client/src/*"],
       "@tests": ["../tests"],
       "@tests/*": ["../tests/*"],
-
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../shared/*"],
+      "@shared/constants": ["../shared/constants"],
+      "@shared/constants/*": ["../shared/constants/*"],
+      "@shared/core": ["./infrastructure/core"],
+      "@shared/core/*": ["./infrastructure/core/*"]
     }
   },
   "references": [

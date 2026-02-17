@@ -5,14 +5,14 @@
  * and assessing confidence in conflict detection results.
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import {
   ConflictAnalysis,
   ConflictDetectionConfig,
   FinancialConflict,
   ProfessionalConflict,
-  VotingAnomaly} from './types.js';
+  VotingAnomaly} from './types';
 
 export class ConflictSeverityAnalyzerService {
   private static instance: ConflictSeverityAnalyzerService;

@@ -3,7 +3,7 @@
 // ============================================================================
 // Shared types and interfaces for the constitutional analysis feature
 
-import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index.js';
+import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index';
 
 // ============================================================================
 // Analysis Request & Response Types

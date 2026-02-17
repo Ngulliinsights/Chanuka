@@ -1,4 +1,4 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { RecommendationEngine } from '@shared/domain/RecommendationEngine';
 import { RecommendationValidator } from '@shared/domain/RecommendationValidator';

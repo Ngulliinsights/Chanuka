@@ -6,7 +6,7 @@ import {
   ApiErrorResponse as ErrorResponse,
   ApiResponse,
   ApiSuccessResponse as sendApiResponse
- } from './shared-core-fallback.js';
+ } from './shared-core-fallback';
 
 // For backward compatibility
 export const UnifiedApiResponse = ApiResponse;

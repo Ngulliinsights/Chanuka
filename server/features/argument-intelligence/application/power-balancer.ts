@@ -3,7 +3,7 @@
 // ============================================================================
 // Ensures minority voices remain visible and prevents coordinated campaigns from drowning out legitimate concerns
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface PowerBalancingResult {
   balancedPositions: BalancedStakeholderPosition[];

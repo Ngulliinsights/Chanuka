@@ -1,4 +1,4 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { bill_cosponsors, bills, sponsors as sponsorAffiliations,sponsors } from '@server/infrastructure/schema';
 import { and, eq, or } from 'drizzle-orm';

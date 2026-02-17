@@ -1,5 +1,5 @@
-import { authService } from '@server/infrastructure/core/auth/auth-service.ts';
-import { logger  } from '@shared/core';
+import { authService } from '@server/infrastructure/core/auth/auth-service';
+import { logger } from '@server/infrastructure/observability';
 
 export class SessionCleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;

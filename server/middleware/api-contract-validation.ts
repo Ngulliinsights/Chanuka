@@ -15,7 +15,7 @@ import {
   validateParams,
   validateQuery,
 } from '@shared/types/api/contracts';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Validation error details

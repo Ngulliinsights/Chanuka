@@ -68,19 +68,19 @@ export { notificationChannelService } from './notification-channels.js';
  * MIGRATION GUIDE:
  * 
  * BEFORE (Old imports):
- * import { NotificationService } from './notification.js';           // ❌ DEPRECATED
- * import { router } from './notifications.js';                      // ❌ DEPRECATED  
- * import { EmailService } from './email.js';                        // ❌ DEPRECATED
- * import { router as enhancedRouter } from './enhanced-notifications.js'; // ❌ DEPRECATED
+ * import { NotificationService } from './notification';           // ❌ DEPRECATED
+ * import { router } from './notifications';                      // ❌ DEPRECATED  
+ * import { EmailService } from './email';                        // ❌ DEPRECATED
+ * import { router as enhancedRouter } from './enhanced-notifications'; // ❌ DEPRECATED
  * 
  * AFTER (New imports):
- * import { notificationService, notificationRoutes } from './index.js'; // NOTE: emailService is currently missing
+ * import { notificationService, notificationRoutes } from './index'; // NOTE: emailService is currently missing
  * 
  * // For advanced features:
- * import { advancedNotificationService } from './index.js';
+ * import { advancedNotificationService } from './index';
  * 
  * // For specialized functionality:
- * import { notificationSchedulerService, smartNotificationFilterService } from './index.js';
+ * import { notificationSchedulerService, smartNotificationFilterService } from './index';
  */
 
 // ===== DEFAULT EXPORTS FOR BACKWARD COMPATIBILITY =====
@@ -88,7 +88,7 @@ export { notificationChannelService } from './notification-channels.js';
 // Export the core service as default for simple use cases
 export { notificationService as default } from './notification-service.js';
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'Chanuka' });
 

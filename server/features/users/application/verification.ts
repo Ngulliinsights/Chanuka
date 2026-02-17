@@ -5,9 +5,9 @@ import { database as db } from '@server/infrastructure/database';
 import { user_verification, users } from '@server/infrastructure/schema';
 import { asyncHandler } from '@/middleware/error-management';
 import { BaseError, ValidationError } from '@shared/core/observability/error-management';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 const router = Router();
 

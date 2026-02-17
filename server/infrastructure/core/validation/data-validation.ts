@@ -1,5 +1,5 @@
-import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics.ts';
-import { logger   } from '@shared/core';
+import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 
 // Comprehensive data validation service for government data integration

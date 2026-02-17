@@ -8,9 +8,9 @@
  * and detailed configuration management for all external API integrations.
  */
 
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager.js';
-import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor.js';
-import { logger   } from '@shared/core';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@server/infrastructure/external-data/external-api-manager';
+import { performanceMonitor } from '@server/infrastructure/monitoring/performance-monitor';
+import { logger } from '@server/infrastructure/observability';
 import { ApiResponseWrapper,ApiSuccess  } from '@shared/core/utils/api-utils';
 import { Request, Response,Router } from 'express';
 

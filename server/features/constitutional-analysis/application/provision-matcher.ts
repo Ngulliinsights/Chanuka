@@ -3,9 +3,9 @@
 // ============================================================================
 // Service that identifies which constitutional provisions are relevant to a bill
 
-import { logger  } from '@shared/core';
-import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
-import { ConstitutionalProvision } from '@server/infrastructure/schema/index.js';
+import { logger } from '@server/infrastructure/observability';
+import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository';
+import { ConstitutionalProvision } from '@server/infrastructure/schema/index';
 
 export interface ProvisionMatch {
   provision: ConstitutionalProvision;

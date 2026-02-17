@@ -4,8 +4,8 @@
  * Handles decision processing, action application, and content modification.
  */
 
-import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
-import { logger  } from '@shared/core';
+import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { comments, 
   content_report, 
@@ -19,7 +19,7 @@ import {
   ModerationActionRecord, 
   ModerationItem, 
   PaginationInfo
-} from './types.js';
+} from './types';
 
 export class ModerationDecisionService {
   private static instance: ModerationDecisionService;

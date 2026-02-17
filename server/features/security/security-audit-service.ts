@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import {
   audit_payloads,

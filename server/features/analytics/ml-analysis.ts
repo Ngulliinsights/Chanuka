@@ -1,5 +1,5 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
-import { logger  } from '@shared/core';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { bills } from '@server/infrastructure/schema';
 import { argumentTable } from '@server/infrastructure/schema/argument_intelligence';

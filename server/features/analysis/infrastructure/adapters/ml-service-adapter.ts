@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 // Replace with actual import/client for your ML service
 // Import the types expected by your application services

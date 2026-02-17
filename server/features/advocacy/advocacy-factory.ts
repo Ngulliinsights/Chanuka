@@ -2,17 +2,17 @@
 // ADVOCACY COORDINATION - Service Factory
 // ============================================================================
 
-import { ActionCoordinator } from '@server/features/advocacy/application/action-coordinator.ts';
-import { CampaignService } from '@server/features/advocacy/application/campaign-service.ts';
-import { CoalitionBuilder } from '@server/features/advocacy/application/coalition-builder.ts';
-import { ImpactTracker } from '@server/features/advocacy/application/impact-tracker.ts';
-import { getAdvocacyConfig } from '@server/features/advocacy/config/advocacy-config.ts';
-import { InMemoryAdvocacyEventPublisher } from '@server/features/advocacy/domain/events/advocacy-events.ts';
-import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
+import { ActionCoordinator } from '@server/features/advocacy/application/action-coordinator';
+import { CampaignService } from '@server/features/advocacy/application/campaign-service';
+import { CoalitionBuilder } from '@server/features/advocacy/application/coalition-builder';
+import { ImpactTracker } from '@server/features/advocacy/application/impact-tracker';
+import { getAdvocacyConfig } from '@server/features/advocacy/config/advocacy-config';
+import { InMemoryAdvocacyEventPublisher } from '@server/features/advocacy/domain/events/advocacy-events';
+import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service';
 // Repository implementations removed - using direct service calls
-import { NotificationService } from '@server/features/advocacy/infrastructure/services/notification-service.ts';
-import { RepresentativeContactService } from '@server/features/advocacy/infrastructure/services/representative-contact-service.ts';
-import { database } from '@shared/core';
+import { NotificationService } from '@server/features/advocacy/infrastructure/services/notification-service';
+import { RepresentativeContactService } from '@server/features/advocacy/infrastructure/services/representative-contact-service';
+import { pool as db } from '@server/infrastructure/database/pool';
 
 export interface AdvocacyServiceDependencies {
   campaignService: CampaignService;

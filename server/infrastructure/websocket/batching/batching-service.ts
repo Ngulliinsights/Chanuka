@@ -6,7 +6,7 @@
  */
 
 import { CircularBuffer } from '../utils/circular-buffer';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { PriorityQueue } from '../utils/priority-queue';
 

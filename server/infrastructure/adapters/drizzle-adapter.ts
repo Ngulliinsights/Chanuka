@@ -12,7 +12,7 @@
  * - Edge case validation
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { databaseService } from '@server/infrastructure/database/database-service';
 import { and, asc, count, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';

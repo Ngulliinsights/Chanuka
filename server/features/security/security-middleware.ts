@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import cors from 'cors';
 import { NextFunction,Request, Response } from 'express';
 import helmet from 'helmet';

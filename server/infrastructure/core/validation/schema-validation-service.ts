@@ -1,6 +1,6 @@
-import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics.ts';
-import { getDbInstance, readDatabase } from '@server/infrastructure/database/index.js';
-import { logger   } from '@shared/core';
+import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { getDbInstance, readDatabase } from '@server/infrastructure/database/index';
+import { logger } from '@server/infrastructure/observability';
 import { sql } from 'drizzle-orm';
 
 import {

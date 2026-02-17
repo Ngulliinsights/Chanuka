@@ -7,13 +7,13 @@
 
 import { Request, Response,Router } from 'express';
 
-import { 
-  dashboardService,
-  featureFlagsService,
-  migrationOrchestrator,
-  monitoringService,
-  rollbackService,
-  validationService} from './index';
+// Import services directly to avoid circular dependency
+import { dashboardService } from './dashboard.service';
+import { featureFlagsService } from './feature-flags.service';
+import { migrationOrchestrator } from './orchestrator.service';
+import { monitoringService } from './monitoring.service';
+import { rollbackService } from './rollback.service';
+import { validationService } from './validation.service';
 
 const router = Router();
 

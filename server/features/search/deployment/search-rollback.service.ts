@@ -5,10 +5,10 @@
  * for search system components during deployment validation failures.
  */
 
-import { logger  } from '@shared/core';
-import { searchPerformanceMonitor } from '@shared/monitoring/search-performance-monitor.js';
+import { logger } from '@server/infrastructure/observability/logger';
+import { searchPerformanceMonitor } from '@server/features/search/monitoring/search-performance-monitor';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 export interface RollbackPlan {
   component: string;
@@ -365,7 +365,7 @@ export class SearchRollbackService {
   /**
    * Test search functionality after rollback
    */
-  private async testSearchFunctionality(component: string): Promise<void> {
+  private async testSearchFunctionality(_component: string): Promise<void> {
     const testQueries = ['healthcare', 'budget', 'education'];
     
     for (const query of testQueries) {
@@ -373,10 +373,10 @@ export class SearchRollbackService {
       
       try {
         // Import search service dynamically to avoid circular dependencies
-        const { searchService } = await import('@server/features/search/application/search-service-direct.ts');
+        const { searchBills } = await import('@server/features/search/application/SearchService');
         
-        const results = await searchService.search({
-          query,
+        const results = await searchBills({
+          text: query,
           pagination: { page: 1, limit: 5 }
         });
 
@@ -506,7 +506,7 @@ export class SearchRollbackService {
     const recentHistory = this.getRollbackHistory(20);
 
     const successfulRollbacks = recentHistory.filter(r => r.status === 'completed').length;
-    const failedRollbacks = recentHistory.filter(r => r.status === 'failed').length;
+    const _failedRollbacks = recentHistory.filter(r => r.status === 'failed').length;
     const successRate = recentHistory.length > 0 ? (successfulRollbacks / recentHistory.length) * 100 : 100;
 
     const avgRollbackDuration = recentHistory.length > 0

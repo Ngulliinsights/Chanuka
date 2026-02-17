@@ -1,7 +1,7 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
-import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service.js';
-import { ApiResponse, BillData, DataSource, SponsorData } from '@/infrastructure/external-data/types.js';
+import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service';
+import { ApiResponse, BillData, DataSource, SponsorData } from '@/infrastructure/external-data/types';
 
 export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';

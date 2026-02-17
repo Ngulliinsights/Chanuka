@@ -12,7 +12,7 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import type { AuthenticatedRequest } from './auth-types';
 
 export interface SecurityConfig {

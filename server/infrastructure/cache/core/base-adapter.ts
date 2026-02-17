@@ -14,7 +14,7 @@ import {
   CacheEvent,
   CacheEventType,
   CacheEventEmitter
-} from './interfaces.js';
+} from './interfaces';
 
 export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdapter, CacheEventEmitter {
   public readonly name: string;

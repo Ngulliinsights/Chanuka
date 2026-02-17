@@ -6,7 +6,7 @@
  */
 
 import * as Boom from '@hapi/boom';
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { errorAdapter } from '@shared/infrastructure/errors/error-adapter';
 import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization';
 import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';

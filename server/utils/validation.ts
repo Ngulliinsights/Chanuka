@@ -1,5 +1,5 @@
 import { ValidationError } from '@shared/core';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { NextFunction, Request, Response } from 'express';
 import DOMPurify from 'isomorphic-dompurify';
 import { z,ZodError } from 'zod';

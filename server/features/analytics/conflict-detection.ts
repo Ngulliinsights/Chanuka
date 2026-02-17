@@ -8,7 +8,7 @@
  * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index.js' instead
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import {
   ConflictAnalysis,
@@ -18,7 +18,7 @@ import {
   FinancialConflict,
   ProfessionalConflict,
   Stakeholder,
-  VotingAnomaly} from './conflict-detection/index.js';
+  VotingAnomaly} from './conflict-detection/index';
 
 // Re-export types for backward compatibility
 export type {

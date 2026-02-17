@@ -9,8 +9,8 @@
  */
 
 import { APICostMonitoringService, apiCostMonitoringService } from '@server/features/monitoring/application/api-cost-monitoring.service';
-import { logger   } from '@shared/core';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/infrastructure/external-data/external-api-manager.js';
+import { logger } from '@server/infrastructure/observability';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/infrastructure/external-data/external-api-manager';
 
 async function verifyExternalAPIManagement() {
   logger.info('🔍 Verifying External API Management Implementation (Task 12.3)...\n', { component: 'Chanuka' });

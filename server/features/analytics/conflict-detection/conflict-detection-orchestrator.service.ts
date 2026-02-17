@@ -5,12 +5,12 @@
  * This service acts as the primary interface for conflict detection operations.
  */
 
-import { conflictDetectionEngineService } from '@server/features/analytics/conflict-detection/conflict-detection-engine.service.ts';
-import { conflictResolutionRecommendationService } from '@server/features/analytics/conflict-detection/conflict-resolution-recommendation.service.ts';
-import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service.ts';
-import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service.ts';
-import { logger  } from '@shared/core';
-import { getDefaultCache } from '@shared/core/caching/index.js';
+import { conflictDetectionEngineService } from '@server/features/analytics/conflict-detection/conflict-detection-engine.service';
+import { conflictResolutionRecommendationService } from '@server/features/analytics/conflict-detection/conflict-resolution-recommendation.service';
+import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service';
+import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service';
+import { logger } from '@server/infrastructure/observability';
+import { getDefaultCache } from '@shared/core/caching/index';
 import { database as db } from '@server/infrastructure/database';
 import { eq } from 'drizzle-orm';
 
@@ -23,7 +23,7 @@ import {
   ConflictAnalysis,
   ConflictDetectionError,
   Stakeholder
-} from './types.js';
+} from './types';
 
 export class ConflictDetectionOrchestratorService {
   private static instance: ConflictDetectionOrchestratorService;

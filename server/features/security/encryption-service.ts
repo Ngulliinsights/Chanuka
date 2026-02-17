@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as fs from 'fs';

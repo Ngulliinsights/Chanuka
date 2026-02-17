@@ -1,6 +1,6 @@
 // Assuming ML service exists and is properly typed
-import { MLAnalysisService, MLBeneficiaryResult,MLStakeholderResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter.ts'; // Adjust path and types
-import { logger  } from '@shared/core';
+import { MLAnalysisService, MLBeneficiaryResult,MLStakeholderResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter'; // Adjust path and types
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { eq } from 'drizzle-orm';
 

@@ -1,4 +1,4 @@
-import { logger } from '@server/utils/shared-core-fallback.ts';
+import { logger } from '@server/utils/shared-core-fallback';
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 

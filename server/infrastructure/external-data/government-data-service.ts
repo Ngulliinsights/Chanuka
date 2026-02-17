@@ -6,7 +6,7 @@
  */
 
 import { circuitBreakerRequest, retryWithCircuitBreaker } from '@server/middleware/circuit-breaker-middleware';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { httpUtils } from '@shared/core/utils/http-utils';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { EventEmitter } from 'events';

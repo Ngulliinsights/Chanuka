@@ -6,7 +6,7 @@
  */
 
 import { logger } from '../../observability/logger';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import type { 
   DegradationLevel,

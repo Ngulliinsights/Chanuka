@@ -1,4 +1,4 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import {
   type InsertUser,
   type InsertUserProfile,
@@ -13,8 +13,8 @@ import {
   writeDatabase} from '@shared/shared/database/connection';
 import { and, eq, or, sql } from 'drizzle-orm';
 
-import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage.js';
-import { BaseStorage } from '@/infrastructure/database/base/BaseStorage.js';
+import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage';
+import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

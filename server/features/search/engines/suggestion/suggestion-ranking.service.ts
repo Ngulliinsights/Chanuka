@@ -1,4 +1,4 @@
-import { SearchContext,SearchSuggestion } from "@server/types/search.types";
+import { SearchContext, SearchSuggestion } from "../types/search.types";
 
 export interface RankingWeights {
   exactMatch: number;
@@ -172,7 +172,7 @@ export class SuggestionRankingService {
         ...suggestion,
         mlScore: scores[index]
       }))
-      .sort((a, b) => b.mlScore - a.mlScore)
+      .sort((a, b) => (b.mlScore ?? 0) - (a.mlScore ?? 0))
       .map(({ mlScore, ...suggestion }) => suggestion);
   }
 
@@ -272,7 +272,7 @@ export class SuggestionRankingService {
    * Calculate type-specific boost
    */
   private calculateTypeBoost(type: SearchSuggestion['type']): number {
-    const typeBoosts = {
+    const typeBoosts: Record<string, number> = {
       'bill_title': 2.0,
       'sponsor': 1.5,
       'category': 1.2,
@@ -352,25 +352,38 @@ export class SuggestionRankingService {
    * Calculate string similarity using Levenshtein distance
    */
   private calculateStringSimilarity(str1: string, str2: string): number {
-    const matrix = Array(str2.length + 1).fill(null).map(() =>
-      Array(str1.length + 1).fill(null)
+    const rows = str2.length + 1;
+    const cols = str1.length + 1;
+    const matrix: number[][] = Array.from({ length: rows }, () =>
+      new Array<number>(cols).fill(0)
     );
 
-    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
-    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+    for (let i = 0; i <= str1.length; i++) {
+      const row = matrix[0];
+      if (row) row[i] = i;
+    }
+    for (let j = 0; j <= str2.length; j++) {
+      const row = matrix[j];
+      if (row) row[0] = j;
+    }
 
     for (let j = 1; j <= str2.length; j++) {
       for (let i = 1; i <= str1.length; i++) {
         const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        matrix[j][i] = Math.min(
-          matrix[j][i - 1] + 1,     // deletion
-          matrix[j - 1][i] + 1,     // insertion
-          matrix[j - 1][i - 1] + indicator // substitution
-        );
+        const currentRow = matrix[j];
+        const prevRow = matrix[j - 1];
+        if (currentRow && prevRow) {
+          currentRow[i] = Math.min(
+            (currentRow[i - 1] ?? 0) + 1,         // deletion
+            (prevRow[i] ?? 0) + 1,                // insertion
+            (prevRow[i - 1] ?? 0) + indicator     // substitution
+          );
+        }
       }
     }
 
-    const distance = matrix[str2.length][str1.length];
+    const lastRow = matrix[str2.length];
+    const distance = lastRow?.[str1.length] ?? 0;
     const maxLength = Math.max(str1.length, str2.length);
 
     return maxLength === 0 ? 1 : 1 - (distance / maxLength);
@@ -378,5 +391,3 @@ export class SuggestionRankingService {
 }
 
 export const suggestionRankingService = new SuggestionRankingService();
-
-

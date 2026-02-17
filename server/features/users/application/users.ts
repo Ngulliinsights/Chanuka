@@ -3,7 +3,7 @@ import {
   AsyncServiceResult,
   ResultAdapter,
   withResultHandling
-} from '@/infrastructure/errors/result-adapter.js';
+} from '@/infrastructure/errors/result-adapter';
 
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';

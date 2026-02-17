@@ -3,7 +3,7 @@
 // ============================================================================
 // Main orchestration service for processing citizen comments into structured arguments
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { ArgumentIntelligenceService } from './argument-intelligence-service';
 import { BriefGeneratorService, GeneratedBrief } from './brief-generator';

@@ -127,7 +127,7 @@ async function replaceRepositoryReferences(content: string): Promise<string> {
 async function simplifyServiceImplementation(content: string, filePath: string): Promise<string> {
   if (filePath.includes('ExpertVerificationService.ts')) {
     // Create a simplified version of ExpertVerificationService
-    return `import { logger  } from '@shared/core';
+    return `import { logger } from '@server/infrastructure/observability';
 
 export enum VerificationStatus {
   PENDING = 'pending',

@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
 
-import { logger   } from '../../../shared/core/src/index.js';
+import { logger   } from '../../../shared/core/src/index';
 
 const execAsync = promisify(exec);
 

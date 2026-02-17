@@ -4,8 +4,9 @@
 // Express router for constitutional analysis endpoints
 
 import { createAnalysisServices } from '@server/features/constitutional-analysis/application/constitutional-analysis-factory';
-import { ApiResponse,logger  } from '@shared/core';
-import { ConstitutionalAnalysis } from '@server/infrastructure/schema/index.js';
+import { ApiResponse } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
+import { ConstitutionalAnalysis } from '@server/infrastructure/schema/index';
 import { Router } from 'express';
 import { z } from 'zod';
 

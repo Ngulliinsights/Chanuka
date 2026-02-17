@@ -1,5 +1,5 @@
-import { AnalysisResult } from '@shared/analysis/types/index.js';
-import { logger  } from '@shared/core';
+import { AnalysisResult } from '@shared/analysis/types/index';
+import { logger } from '@server/infrastructure/observability';
 import { spawn } from 'child_process';
 import path from 'path';
 

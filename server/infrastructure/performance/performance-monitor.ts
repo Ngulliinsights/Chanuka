@@ -5,7 +5,7 @@
  * across database operations.
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface PerformanceMetrics {
   operation: string;

@@ -13,7 +13,7 @@ import {
   errorHandler, 
   ErrorResponse, 
   ErrorSeverity,
-  StandardizedError} from './error-standardization.js';
+  StandardizedError} from './error-standardization';
 
 // Re-export Result types for convenience
 export { Result, ok, err } from 'neverthrow';

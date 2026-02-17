@@ -7,7 +7,7 @@
  */
 
 import type { DegradationLevel,RuntimeConfigType } from '../types';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 
 /**

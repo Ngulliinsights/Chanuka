@@ -6,7 +6,7 @@
  * Implements task 3.4 requirements for Phase 2 search system deployment.
  */
 
-import { searchDeploymentService } from '@server/features/search/deployment/search-deployment.service.ts';
-import { searchPerformanceMonitor } from '@server/features/search/monitoring/search-performance-monitor.ts';
+import { searchDeploymentService } from '@server/features/search/deployment/search-deployment.service';
+import { searchPerformanceMonitor } from '@server/features/search/monitoring/search-performance-monitor';
 
 

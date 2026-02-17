@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@server/infrastructure/database/pool.js';
+import { db } from '@server/infrastructure/database/pool';
 import {
 type Bill,
 bill_cosponsors, bills, type InsertSponsor,   type Sponsor, sponsor_affiliations, sponsor_transparency,

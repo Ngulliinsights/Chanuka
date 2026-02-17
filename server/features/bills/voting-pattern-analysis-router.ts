@@ -1,8 +1,8 @@
-import { securityAuditService } from '@server/feature/security/security-audit-service.js';
-import { votingPatternAnalysisService } from '@server/features/bills/voting-pattern-analysis-router.ts';
-import type { AuthenticatedRequest } from '@server/middleware/auth.js';
-import { authenticateToken } from '@server/middleware/auth.js';
-import { logger   } from '@shared/core';
+import { securityAuditService } from '@server/feature/security/security-audit-service';
+import { votingPatternAnalysisService } from '@server/features/bills/voting-pattern-analysis-router';
+import type { AuthenticatedRequest } from '@server/middleware/auth';
+import { authenticateToken } from '@server/middleware/auth';
+import { logger } from '@server/infrastructure/observability';
 import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
 import { NextFunction,Request, Response, Router } from 'express';
 

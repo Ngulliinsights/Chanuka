@@ -5,10 +5,10 @@
 // Implements intelligent query classification, failover, and result fusion
 
 import { PostgreSQLFullTextEngine } from '@server/features/search/engines/core/postgresql-fulltext.engine';
-import { ParsedQuery,searchSyntaxParser } from '@server/features/search/utils/search-syntax-parser.ts';
-import { logger } from '@shared/core';
+import { ParsedQuery,searchSyntaxParser } from '@server/features/search/utils/search-syntax-parser';
+import { logger } from '@server/infrastructure/observability';
 
-import { SearchOptions, SearchResponse,semanticSearchEngine } from './semantic-search-engine';
+import { SearchOptions, SearchResponse,semanticSearchEngine } from './semantic-search.engine';
 
 export interface EngineResult {
   engine: 'postgresql' | 'semantic';

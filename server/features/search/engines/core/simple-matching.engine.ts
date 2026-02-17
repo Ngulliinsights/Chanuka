@@ -4,10 +4,10 @@
 // Enhanced PostgreSQL full-text search with trigram indexes and caching
 // Replaces basic LIKE queries with proper full-text search capabilities
 
-import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { database } from '@server/infrastructure/database';
-import { bills, comments,sponsors } from '@server/infrastructure/schema';
-import { desc,ilike, or, sql } from 'drizzle-orm';
+import { SearchQuery, SearchResult } from '../types/search.types';
+import { db as database } from '../../../../infrastructure/database/pool';
+import { bills } from '@server/infrastructure/schema';
+import { desc, ilike, or } from 'drizzle-orm';
 // Simple logger for search engine
 const logger = {
   debug: (message: string, meta?: unknown) => console.log(`[DEBUG] ${message}`, meta || ''),
@@ -64,13 +64,17 @@ export class SimpleMatchingEngine {
    * Generate cache key from search query parameters
    */
   private generateCacheKey(query: SearchQuery): string {
+    const page = query.pagination?.page || 1;
+    const limit = query.pagination?.limit || 50;
+    const offset = (page - 1) * limit;
+    
     const keyParts = [
       query.query.toLowerCase().trim(),
       query.filters?.status?.join(',') || '',
       query.filters?.chamber?.join(',') || '',
       query.filters?.county?.join(',') || '',
-      query.pagination?.limit || 50,
-      query.pagination?.offset || 0
+      limit,
+      offset
     ];
     
     return keyParts.join('|');
@@ -137,8 +141,11 @@ export class SimpleMatchingEngine {
 
     // Remove the least used 25% of entries
     const entriesToRemove = Math.floor(entries.length * 0.25);
-    for (let i = 0; i < entriesToRemove; i++) {
-      this.searchCache.delete(entries[i][0]);
+    for (let i = 0; i < entriesToRemove && i < entries.length; i++) {
+      const key = entries[i]?.[0];
+      if (key !== undefined) {
+        this.searchCache.delete(key);
+      }
     }
   }
 
@@ -170,7 +177,8 @@ export class SimpleMatchingEngine {
   private async performDirectSearch(query: SearchQuery): Promise<SearchResult[]> {
     const searchTerm = `%${query.query}%`;
     const limit = query.pagination?.limit || 50;
-    const offset = query.pagination?.offset || 0;
+    const page = query.pagination?.page || 1;
+    const offset = (page - 1) * limit;
 
     // Search bills using ILIKE for simple matching
     const billResults = await database

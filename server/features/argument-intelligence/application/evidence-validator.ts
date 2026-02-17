@@ -3,7 +3,7 @@
 // ============================================================================
 // Validates evidence claims and assesses their credibility
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface EvidenceValidationResult {
   evidenceId: string;

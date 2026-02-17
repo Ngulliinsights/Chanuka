@@ -6,7 +6,7 @@
  */
 
 import Redis, { RedisOptions } from 'ioredis';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { promisify } from 'util';
 import { gunzip,gzip } from 'zlib';

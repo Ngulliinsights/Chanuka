@@ -1,9 +1,9 @@
-import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels.ts';
-import { notificationService } from '@server/infrastructure/notifications/notification-service.ts';
-import { smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
-import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth.js';
-import { logger   } from '@shared/core';
+import { userPreferencesService } from '@server/features/users/domain/user-preferences';
+import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
+import { notificationService } from '@server/infrastructure/notifications/notification-service';
+import { smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
+import { logger } from '@server/infrastructure/observability';
 import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
 import { Request, Response,Router } from 'express';
 import { z } from 'zod';

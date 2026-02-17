@@ -9,7 +9,7 @@
  * - Integration with Zod schemas
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 
 export interface ValidationResult {

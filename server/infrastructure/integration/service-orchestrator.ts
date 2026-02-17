@@ -3,14 +3,14 @@
 // ============================================================================
 // Coordinates interactions between different services and ensures data consistency
 
-import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service.ts';
-import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor.ts';
-import { ConstitutionalAnalyzer } from '@server/features/constitutional-analysis/application/constitutional-analyzer.ts';
-import { governmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service.ts';
-import { RecommendationService } from '@server/features/recommendation/application/RecommendationService.ts';
-import { searchService } from '@server/features/search/application/search-service.ts';
-import { logger } from '@shared/core';
-import { databaseService } from '@server/infrastructure/database/database-service.js';
+import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service';
+import { StructureExtractorService } from '@server/features/argument-intelligence/application/structure-extractor';
+import { ConstitutionalAnalyzer } from '@server/features/constitutional-analysis/application/constitutional-analyzer';
+import { governmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
+import { RecommendationService } from '@server/features/recommendation/application/RecommendationService';
+import { searchBills } from '@server/features/search/application/SearchService';
+import { logger } from '@server/infrastructure/observability';
+import { databaseService } from '@server/infrastructure/database/database-service';
 
 export interface ServiceHealth {
   serviceName: string;
@@ -477,7 +477,7 @@ export class ServiceOrchestrator {
           await databaseService.healthCheck();
           break;
         case 'search':
-          await searchService.search({ query: 'health-check', pagination: { page: 1, limit: 1 } });
+          await searchBills({ text: 'health-check', pagination: { page: 1, limit: 1 } });
           break;
         case 'government-data':
           await governmentDataIntegrationService.getIntegrationStatus();

@@ -1,6 +1,6 @@
-import { encryptionService } from '@server/features/security/encryption-service.ts';
-import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { logger  } from '@shared/core';
+import { encryptionService } from '@server/features/security/encryption-service';
+import { securityAuditService } from '@server/features/security/security-audit-service';
+import { logger } from '@server/infrastructure/observability';
 import { getLegacyDatabase } from '@server/infrastructure/database';
 import { sessions, users } from '@server/infrastructure/schema';
 import crypto from 'crypto';

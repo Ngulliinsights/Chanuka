@@ -1,8 +1,8 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { randomUUID } from 'crypto';
 import { NextFunction,Request, Response } from 'express';
 
-import { errorTracker } from '@/core/errors/error-tracker.js';
+import { errorTracker } from '@/core/errors/error-tracker';
 
 import { AuthenticatedRequest } from '../../../../AuthAlert';
 

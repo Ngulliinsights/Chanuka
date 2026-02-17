@@ -7,7 +7,7 @@
 
 import { performance } from 'perf_hooks';
 
-import { unifiedErrorHandler } from '@shared/core/src/observability/error-management/middleware/express-error-middleware.ts';
+import { unifiedErrorHandler } from '@shared/core/src/observability/error-management/middleware/express-error-middleware';
 import { Request, Response, NextFunction, Application } from 'express';
 
 // Import core utilities

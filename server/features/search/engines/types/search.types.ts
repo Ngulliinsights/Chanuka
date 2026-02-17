@@ -76,9 +76,21 @@ export interface SearchQualityScore {
 }
 
 // Suggestion types
+export type SuggestionType = 
+  | 'bill_title' 
+  | 'category' 
+  | 'sponsor' 
+  | 'tag' 
+  | 'popular' 
+  | 'recent'
+  | 'ai_correction'
+  | 'related_term'
+  | 'phonetic_correction'
+  | 'contextual_suggestion';
+
 export interface SearchSuggestion {
   term: string;
-  type: 'bill_title' | 'category' | 'sponsor' | 'tag' | 'popular' | 'recent';
+  type: SuggestionType;
   frequency: number;
   score?: number;
   id?: string;
@@ -87,6 +99,11 @@ export interface SearchSuggestion {
     sponsor_id?: number;
     category?: string;
     description?: string;
+    originalQuery?: string;
+    correctionType?: string;
+    confidence?: number;
+    expansionType?: string;
+    suggestionType?: string;
   };
 }
 
@@ -147,5 +164,3 @@ export interface QueryCondition {
   operator: 'eq' | 'ilike' | 'gt' | 'lt' | 'in';
   value: any;
 }
-
-

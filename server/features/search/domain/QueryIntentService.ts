@@ -52,7 +52,17 @@ export class QueryIntentService {
   private static instance: QueryIntentService;
 
   // Intent detection patterns
-  private static readonly INTENT_PATTERNS = {
+  private static readonly INTENT_PATTERNS: Record<string, {
+    weight: number;
+    questionWords?: string[];
+    patterns?: string[];
+    navigationalTerms?: string[];
+    entityPatterns?: string[];
+    actionVerbs?: string[];
+    transactionalPhrases?: string[];
+    commercialTerms?: string[];
+    locationTerms?: string[];
+  }> = {
     [QueryIntent.INFORMATIONAL]: {
       questionWords: ['what', 'how', 'why', 'when', 'where', 'who', 'which', 'explain', 'describe', 'define'],
       patterns: ['what is', 'how to', 'how do', 'how can', 'why does', 'tell me about', 'explain', 'definition of'],
@@ -96,7 +106,7 @@ export class QueryIntentService {
     if (!QueryIntentService.instance) {
       QueryIntentService.instance = new QueryIntentService();
     }
-    return QueryIntentService.getInstance();
+    return QueryIntentService.instance;
   }
 
   /**
@@ -137,19 +147,19 @@ export class QueryIntentService {
    */
   private extractFeatures(query: string, words: string[]): IntentClassification['features'] {
     const hasQuestionWords = QueryIntentService.INTENT_PATTERNS[QueryIntent.INFORMATIONAL].questionWords
-      .some(word => words.includes(word));
+      ?.some(word => words.includes(word)) ?? false;
 
     const hasNavigationalTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.NAVIGATIONAL].navigationalTerms
-      .some(term => query.includes(term));
+      ?.some(term => query.includes(term)) ?? false;
 
     const hasTransactionalVerbs = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL].actionVerbs
-      .some(verb => words.includes(verb));
+      ?.some(verb => words.includes(verb)) ?? false;
 
     const hasLocationTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.LOCAL].locationTerms
-      .some(term => query.includes(term));
+      ?.some(term => query.includes(term)) ?? false;
 
     // Detect specific entities (bills, ministries, etc.)
-    const hasSpecificEntities = this.detectSpecificEntities(query);
+    const hasSpecificEntities = this.detectSpecificEntities(query) || (QueryIntentService.INTENT_PATTERNS[QueryIntent.NAVIGATIONAL].entityPatterns?.some(p => query.includes(p)) ?? false);
 
     // Determine domain
     const domain = this.detectDomain(query);
@@ -413,7 +423,7 @@ export class QueryIntentService {
    */
   private isTransactionalQuery(query: string): boolean {
     const transactionalTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL].actionVerbs;
-    return transactionalTerms.some(term => query.toLowerCase().includes(term));
+    return transactionalTerms?.some(term => query.toLowerCase().includes(term)) ?? false;
   }
 
   /**

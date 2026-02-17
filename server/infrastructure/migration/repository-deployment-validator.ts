@@ -2,8 +2,8 @@ import { databaseService } from '@server/infrastructure/database/database-servic
 import {
   AsyncServiceResult,
   ResultAdapter,
-  withResultHandling} from '@shared/errors/result-adapter.js';
-import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index.js';
+  withResultHandling} from '@shared/errors/result-adapter';
+import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index';
 import { and, avg, count, desc,eq, sql } from "drizzle-orm";
 
 import { logger } from '@/shared/core';

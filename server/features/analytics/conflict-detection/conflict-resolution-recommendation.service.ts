@@ -5,14 +5,14 @@
  * and improving transparency based on analysis results.
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import {
   ConflictAnalysis,
   FinancialConflict,
   ProfessionalConflict,
   VotingAnomaly
-} from './types.js';
+} from './types';
 
 export class ConflictResolutionRecommendationService {
   private static instance: ConflictResolutionRecommendationService;

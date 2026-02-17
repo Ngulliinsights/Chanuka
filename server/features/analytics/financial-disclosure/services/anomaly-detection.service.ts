@@ -3,9 +3,11 @@
 
 import type {
   CompletenessReport,
-  FinancialDisclosure} from '@server/types/index.js';
+  FinancialDisclosure} from '@server/types/index';
 import { FinancialDisclosureConfig } from '@shared/config';
-import { cache, DatabaseError,logger  } from '@shared/core';
+import { DatabaseError } from '@shared/core';
+import { cache } from '@server/infrastructure/cache';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { and, count,desc, eq, sql } from "drizzle-orm";

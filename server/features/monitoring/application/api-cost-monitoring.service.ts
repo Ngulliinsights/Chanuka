@@ -6,7 +6,7 @@
  * Current location: server/features/monitoring/application/api-cost-monitoring.service.ts
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { EventEmitter } from 'events';
 
 interface CostAlert {

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { GovernmentDataValidationService } from '@server/infrastructure/core/validation/data-validation.ts';
+import { GovernmentDataValidationService } from '@server/infrastructure/core/validation/data-validation';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/services/external-api-error-handler';
 import { ManagedGovernmentDataIntegrationService } from '@server/features/government-data/application/managed-integration.service';
-import { logger   } from '@shared/core';
-import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration.js';
+import { logger } from '@server/infrastructure/observability';
+import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration';
 
 // CLI tool for testing government data integration
 class GovernmentDataIntegrationCLI {

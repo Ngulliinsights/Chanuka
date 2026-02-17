@@ -5,7 +5,8 @@ export enum ErrorDomain {
   BUSINESS = 'business',
   API = 'api',
   DATA = 'data',
-  SECURITY = 'security'
+  SECURITY = 'security',
+  VALIDATION = 'validation'
 }
 
 export interface BaseErrorOptions {
@@ -25,7 +26,7 @@ export class BaseError extends Error {
   public readonly isOperational: boolean;
   public readonly domain: ErrorDomain;
   public readonly severity: ErrorSeverity;
-  public readonly cause?: Error;
+  public override readonly cause?: Error;
 
   constructor(message: string, options: BaseErrorOptions = {}) {
     super(message);
@@ -39,5 +40,27 @@ export class BaseError extends Error {
     this.cause = options.cause;
 
     Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export interface ValidationErrorItem {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+export class ValidationError extends BaseError {
+  public readonly errors: ValidationErrorItem[];
+
+  constructor(message: string, errors: ValidationErrorItem[] = []) {
+    super(message, {
+      statusCode: 422,
+      code: 'VALIDATION_ERROR',
+      domain: ErrorDomain.VALIDATION,
+      severity: ErrorSeverity.MEDIUM,
+      details: { errors },
+    });
+    this.name = 'ValidationError';
+    this.errors = errors;
   }
 }

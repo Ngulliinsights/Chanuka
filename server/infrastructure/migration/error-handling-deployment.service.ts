@@ -10,11 +10,11 @@
  */
 
 import * as Boom from '@hapi/boom';
-import { abTestingService } from '@server/infrastructure/migration/ab-testing.service.ts';
-import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service.ts';
-import { logger  } from '@shared/core';
-import { errorAdapter } from '@shared/errors/error-adapter.js';
-import { errorHandler } from '@shared/errors/error-standardization.js';
+import { abTestingService } from '@server/infrastructure/migration/ab-testing.service';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service';
+import { logger } from '@server/infrastructure/observability';
+import { errorAdapter } from '@shared/errors/error-adapter';
+import { errorHandler } from '@shared/errors/error-standardization';
 import { err,ok, Result } from 'neverthrow';
 
 export interface ErrorHandlingMetrics {

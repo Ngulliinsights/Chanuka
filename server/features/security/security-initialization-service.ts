@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Express } from 'express';
 import fs from 'fs';
 import https from 'https';

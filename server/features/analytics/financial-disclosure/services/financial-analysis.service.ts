@@ -7,9 +7,11 @@ import type {
   FinancialRelationship,
   RelationshipMapping,
   SponsorAffiliation
-} from '@server/types/index.js';
+} from '@server/types/index';
 import { FinancialDisclosureConfig } from '@shared/config';
-import { cache, DatabaseError,logger  } from '@shared/core';
+import { DatabaseError } from '@shared/core';
+import { cache } from '@server/infrastructure/cache';
+import { logger } from '@server/infrastructure/observability';
 
 import { disclosureProcessingService } from './disclosure-processing.service';
 

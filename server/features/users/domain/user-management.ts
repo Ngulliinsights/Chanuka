@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { comments, database as db, notifications,sessions, users } from '@server/infrastructure/database';
 import bcrypt from 'bcrypt';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';

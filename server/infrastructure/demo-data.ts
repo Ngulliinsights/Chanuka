@@ -1,7 +1,7 @@
 // Import analysis types from their respective domain features
-import type { BillAnalysis } from '@server/features/bills/types/analysis.ts';
-import type { SponsorshipAnalysis } from '@server/features/sponsors/types/analysis.ts';
-import { logger   } from '@shared/core';
+import type { BillAnalysis } from '@server/features/bills/types/analysis';
+import type { SponsorshipAnalysis } from '@server/features/sponsors/types/analysis';
+import { logger } from '@server/infrastructure/observability';
 import type { Bill, BillComment, BillEngagement,Sponsor } from '@server/infrastructure/schema';
 
 // Enhanced types for demo data that match API responses

@@ -3,14 +3,14 @@
 // ============================================================================
 // Factory for creating and configuring constitutional analysis services
 
-import { AnalysisConfiguration } from '@server/types/index.ts';
-import { constitutionalAnalysisServiceComplete } from '@shared/application/constitutional-analysis-service-complete.js';
-import { ConstitutionalAnalyzer } from '@shared/application/constitutional-analyzer.js';
-import { ExpertFlaggingService } from '@shared/application/expert-flagging-service.js';
-import { PrecedentFinderService } from '@shared/application/precedent-finder.js';
-import { ProvisionMatcherService } from '@shared/application/provision-matcher.js';
-import { db  } from '@shared/core';
-import { LegalDatabaseClient } from '@shared/infrastructure/external/legal-database-client.js';
+import { AnalysisConfiguration } from '@server/types/index';
+import { constitutionalAnalysisServiceComplete } from '@shared/application/constitutional-analysis-service-complete';
+import { ConstitutionalAnalyzer } from '@shared/application/constitutional-analyzer';
+import { ExpertFlaggingService } from '@shared/application/expert-flagging-service';
+import { PrecedentFinderService } from '@shared/application/precedent-finder';
+import { ProvisionMatcherService } from '@shared/application/provision-matcher';
+import { pool as db } from '@server/infrastructure/database/pool';
+import { LegalDatabaseClient } from '@shared/infrastructure/external/legal-database-client';
 
 /**
  * Default configuration for constitutional analysis

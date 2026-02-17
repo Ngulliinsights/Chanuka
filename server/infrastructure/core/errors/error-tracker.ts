@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Request } from 'express';
 // TODO: Fix imports when shared/core modules are available
 // Stub types for compilation

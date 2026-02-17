@@ -10,10 +10,10 @@ import {
   createAuthenticationError,
   createNotFoundError, 
   createValidationError, 
-  errorAdapter} from './error-adapter.js';
+  errorAdapter} from './error-adapter';
 import { 
   ErrorContext, 
-  errorHandler as legacyHandler} from './error-standardization.js';
+  errorHandler as legacyHandler} from './error-standardization';
 
 // Example service context
 const serviceContext: Partial<ErrorContext> = {

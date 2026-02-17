@@ -10,7 +10,7 @@
  */
 
 import { authService } from '@server/infrastructure/core/auth/auth-service';
-import { errorTracker } from '@server/errors/error-tracker.js';
+import { errorTracker } from '@server/errors/error-tracker';
 import { securityAuditService } from '@server/features/security/security-audit-service';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';

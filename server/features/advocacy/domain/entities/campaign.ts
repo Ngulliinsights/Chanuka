@@ -2,7 +2,7 @@
 // ADVOCACY COORDINATION - Campaign Entity
 // ============================================================================
 
-import { CampaignMetrics,CampaignStrategy } from '@server/types/index.ts';
+import { CampaignMetrics,CampaignStrategy } from '@server/types/index';
 
 export interface Campaign {
   id: string;

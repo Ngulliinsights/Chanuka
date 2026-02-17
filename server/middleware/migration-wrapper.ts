@@ -1,7 +1,7 @@
 // Migration wrapper for server middleware
 // Provides gradual migration from legacy middleware to modern middleware
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { authenticateToken, requireRole } from './auth';
 import { apiRateLimit, authRateLimit, createRateLimit, legacyPasswordResetRateLimit, legacyRegistrationRateLimit,legacySponsorRateLimit, searchRateLimit } from './rate-limiter';

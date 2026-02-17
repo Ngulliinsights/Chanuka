@@ -1,8 +1,8 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import {   ApiError,
   ApiResponseWrapper,
 ApiSuccess,
-  ApiValidationError } from '@shared/core/utils/api-utils.js';
+  ApiValidationError } from '@shared/core/utils/api-utils';
 import { Router } from 'express';
 import { z } from 'zod';
 

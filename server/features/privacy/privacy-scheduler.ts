@@ -1,6 +1,6 @@
-import { privacyService } from '@server/features/privacy/privacy-service.ts';
-import { auditLogger } from '@server/infrastructure/monitoring/index.js';
-import { logger   } from '@shared/core';
+import { privacyService } from '@server/features/privacy/privacy-service';
+import { auditLogger } from '@server/infrastructure/monitoring/index';
+import { logger } from '@server/infrastructure/observability';
 import * as cron from 'node-cron';
 
 class PrivacySchedulerService {

@@ -7,7 +7,7 @@
 
 import { logger } from '@shared/core/observability/logging';
 import { database as db } from '@server/infrastructure/database';
-import { users } from '@server/infrastructure/schema.js';
+import { users } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 import { Server as HttpServer } from 'http';
 import * as jwt from 'jsonwebtoken';

@@ -1,6 +1,6 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { httpUtils   } from '@shared/core';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/external-data/external-api-manager.js';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/external-data/external-api-manager';
 import { NextFunction,Request, Response, Router } from 'express';
 
 // Helper functions using shared utilities

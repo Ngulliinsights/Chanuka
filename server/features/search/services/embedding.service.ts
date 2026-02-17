@@ -4,10 +4,10 @@
 // Handles OpenAI text-embedding-3-small integration with Redis caching
 // Supports batch processing and error handling with fallback mechanisms
 
-import { logger } from '@shared/core';
-import { database } from '@server/infrastructure/database';
-import { cacheService } from '@server/infrastructure/cache';
-import { content_embeddings, ContentType, ProcessingStatus } from '@server/infrastructure/schema/search_system';
+import { logger } from '../../../infrastructure/observability/logger';
+import { db as database } from '../../../infrastructure/database/pool';
+import { cacheService } from '../../../infrastructure/cache';
+import { contentEmbeddings, ContentType } from '../../../infrastructure/schema/search_system';
 import crypto from 'crypto';
 import { and, eq, sql } from 'drizzle-orm';
 import OpenAI from 'openai';
@@ -69,12 +69,12 @@ export class EmbeddingService {
             // Check cache first
             const cached = await cacheService.get<EmbeddingResult>(cacheKey);
             if (cached) {
-                logger.debug('Embedding cache hit', { cacheKey, model });
+                logger.debug({ cacheKey, model }, 'Embedding cache hit');
                 return cached;
             }
 
             // Generate new embedding
-            logger.debug('Generating new embedding', { textLength: text.length, model });
+            logger.debug({ textLength: text.length, model }, 'Generating new embedding');
 
             const response = await this.openai.embeddings.create({
                 model,
@@ -95,22 +95,22 @@ export class EmbeddingService {
             // Cache the result
             await cacheService.set(cacheKey, result, cacheTTL);
 
-            logger.debug('Embedding generated and cached', {
+            logger.debug({
                 cacheKey,
                 model,
                 tokens: result.usage.total_tokens,
-            });
+            }, 'Embedding generated and cached');
 
             return result;
 
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            logger.error('Failed to generate embedding', {
+            logger.error({
                 error: errorMessage,
                 cacheKey,
                 model,
                 textLength: text.length,
-            });
+            }, 'Failed to generate embedding');
             throw error;
         }
     }
@@ -130,11 +130,11 @@ export class EmbeddingService {
 
         if (texts.length === 0) return [];
 
-        logger.debug('Processing batch embeddings', {
+        logger.debug({
             totalTexts: texts.length,
             batchSize,
             model,
-        });
+        }, 'Processing batch embeddings');
 
         const results: EmbeddingResult[] = [];
         const limit = pLimit(batchSize);
@@ -147,10 +147,10 @@ export class EmbeddingService {
                     logger.debug(`Batch embedding ${index + 1}/${texts.length} completed`);
                     return result;
                 } catch (error) {
-                    logger.error(`Failed to generate embedding for text ${index + 1}`, {
+                    logger.error({
                         error: getErrorMessage(error),
                         textLength: text.length,
-                    });
+                    }, `Failed to generate embedding for text ${index + 1}`);
                     throw error;
                 }
             })
@@ -164,24 +164,24 @@ export class EmbeddingService {
                     results.push(result.value);
                 } else {
                     // Handle individual failures - could implement fallback here
-                    logger.error('Batch embedding failed', { error: result.reason });
+                    logger.error({ error: result.reason }, 'Batch embedding failed');
                     throw result.reason;
                 }
             }
 
-            logger.debug('Batch embeddings completed', {
+            logger.debug({
                 totalProcessed: results.length,
                 totalRequested: texts.length,
-            });
+            }, 'Batch embeddings completed');
 
             return results;
 
         } catch (error) {
-            logger.error('Batch embedding processing failed', {
+            logger.error({
                 error: getErrorMessage(error),
                 totalTexts: texts.length,
                 processedCount: results.length,
-            });
+            }, 'Batch embedding processing failed');
             throw error;
         }
     }
@@ -203,98 +203,98 @@ export class EmbeddingService {
             // Check if embedding already exists and is up to date
             const existing = await database
                 .select()
-                .from(content_embeddings)
+                .from(contentEmbeddings)
                 .where(
                     and(
-                        eq(content_embeddings.contentType, contentType),
-                        eq(content_embeddings.contentId, contentId)
+                        eq(contentEmbeddings.content_type, contentType),
+                        eq(contentEmbeddings.content_id, contentId)
                     )
                 )
-                .limit(1);
+                .limit(1) as Array<typeof contentEmbeddings.$inferSelect>;
 
             const contentHash = this.createContentHash(content);
 
-            if (existing.length > 0) {
+            if (existing.length > 0 && existing[0]) {
                 const record = existing[0];
-                if (record.processingStatus === ProcessingStatus.COMPLETED &&
-                    record.contentHash === contentHash) {
-                    logger.debug('Content embedding already up to date', { contentType, contentId });
+                if (record.processing_status === 'completed' &&
+                    record.content_hash === contentHash) {
+                    logger.debug({ contentType, contentId }, 'Content embedding already up to date');
                     return;
                 }
             }
 
             // Update status to processing
             await database
-                .insert(content_embeddings)
+                .insert(contentEmbeddings)
                 .values({
-                    contentType,
-                    contentId,
-                    contentHash,
-                    processingStatus: ProcessingStatus.PROCESSING,
-                    contentTitle: metadata?.title,
-                    contentSummary: metadata?.summary,
-                    contentTags: metadata?.tags,
-                    processingAttempts: existing.length > 0 ? existing[0].processingAttempts + 1 : 1,
-                })
+                    content_type: contentType,
+                    content_id: contentId,
+                    content_hash: contentHash,
+                    processing_status: 'processing',
+                    content_title: metadata?.title,
+                    content_summary: metadata?.summary,
+                    content_tags: metadata?.tags,
+                    processing_attempts: (existing.length > 0 && existing[0]) ? existing[0].processing_attempts + 1 : 1,
+                } as any)
                 .onConflictDoUpdate({
-                    target: [content_embeddings.contentType, content_embeddings.contentId],
+                    target: [contentEmbeddings.content_type, contentEmbeddings.content_id],
                     set: {
-                        processingStatus: ProcessingStatus.PROCESSING,
-                        contentHash,
-                        contentTitle: metadata?.title,
-                        contentSummary: metadata?.summary,
-                        contentTags: metadata?.tags,
-                        processingAttempts: sql`${content_embeddings.processingAttempts} + 1`,
-                        lastAttemptAt: sql`NOW()`,
+                        processing_status: 'processing',
+                        content_hash: contentHash,
+                        content_title: metadata?.title,
+                        content_summary: metadata?.summary,
+                        content_tags: metadata?.tags,
+                        processing_attempts: sql`${contentEmbeddings.processing_attempts} + 1`,
+                        last_attempt_at: sql`NOW()`,
                     },
-                });
+                } as any);
 
             // Generate embedding
             const embeddingResult = await this.generateEmbedding(content);
 
             // Store the embedding
             await database
-                .update(content_embeddings)
+                .update(contentEmbeddings)
                 .set({
-                    embedding: embeddingResult.embedding,
-                    processingStatus: ProcessingStatus.COMPLETED,
-                    modelVersion: embeddingResult.model,
-                    updatedAt: sql`NOW()`,
-                })
+                    embedding: embeddingResult.embedding as any,
+                    processing_status: 'completed',
+                    model_version: embeddingResult.model,
+                    updated_at: sql`NOW()`,
+                } as any)
                 .where(
                     and(
-                        eq(content_embeddings.contentType, contentType),
-                        eq(content_embeddings.contentId, contentId)
+                        eq(contentEmbeddings.content_type, contentType),
+                        eq(contentEmbeddings.content_id, contentId)
                     )
                 );
 
-            logger.debug('Content embedding processed successfully', {
+            logger.debug({
                 contentType,
                 contentId,
                 model: embeddingResult.model,
                 tokens: embeddingResult.usage.total_tokens,
-            });
+            }, 'Content embedding processed successfully');
 
         } catch (error) {
             const errorMessage = getErrorMessage(error);
-            logger.error('Failed to process content embedding', {
+            logger.error({
                 error: errorMessage,
                 contentType,
                 contentId,
-            });
+            }, 'Failed to process content embedding');
 
             // Update status to failed
             await database
-                .update(content_embeddings)
+                .update(contentEmbeddings)
                 .set({
-                    processingStatus: ProcessingStatus.FAILED,
-                    errorMessage,
-                    updatedAt: sql`NOW()`,
-                })
+                    processing_status: 'failed',
+                    error_message: errorMessage,
+                    updated_at: sql`NOW()`,
+                } as any)
                 .where(
                     and(
-                        eq(content_embeddings.contentType, contentType),
-                        eq(content_embeddings.contentId, contentId)
+                        eq(contentEmbeddings.content_type, contentType),
+                        eq(contentEmbeddings.content_id, contentId)
                     )
                 );
 
@@ -311,25 +311,25 @@ export class EmbeddingService {
     ): Promise<number[] | null> {
         try {
             const result = await database
-                .select({ embedding: content_embeddings.embedding })
-                .from(content_embeddings)
+                .select()
+                .from(contentEmbeddings)
                 .where(
                     and(
-                        eq(content_embeddings.contentType, contentType),
-                        eq(content_embeddings.contentId, contentId),
-                        eq(content_embeddings.processingStatus, ProcessingStatus.COMPLETED)
+                        eq(contentEmbeddings.content_type, contentType),
+                        eq(contentEmbeddings.content_id, contentId),
+                        eq(contentEmbeddings.processing_status, 'completed')
                     )
                 )
-                .limit(1);
+                .limit(1) as Array<typeof contentEmbeddings.$inferSelect>;
 
-            return result.length > 0 ? result[0].embedding : null;
+            return result.length > 0 && result[0] ? result[0].embedding as number[] : null;
 
         } catch (error) {
-            logger.error('Failed to get content embedding', {
+            logger.error({
                 error: getErrorMessage(error),
                 contentType,
                 contentId,
-            });
+            }, 'Failed to get content embedding');
             return null;
         }
     }
@@ -363,7 +363,7 @@ export class EmbeddingService {
             await this.generateEmbedding('test', { cacheTTL: 60 }); // Short cache for test
             return true;
         } catch (error) {
-            logger.error('Embedding service health check failed', { error: getErrorMessage(error) });
+            logger.error({ error: getErrorMessage(error) }, 'Embedding service health check failed');
             return false;
         }
     }
@@ -374,7 +374,7 @@ export class EmbeddingService {
     async clearCache(pattern: string = 'embedding:*'): Promise<void> {
         // Note: This would require Redis SCAN and DEL operations
         // Implementation depends on cache service capabilities
-        logger.warn('Cache clearing not implemented', { pattern });
+        logger.warn({ pattern }, 'Cache clearing not implemented');
     }
 }
 

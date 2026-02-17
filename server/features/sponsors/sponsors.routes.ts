@@ -1,7 +1,7 @@
 import { sponsorConflictAnalysisService } from '@shared/application/sponsor-conflict-analysis.service';
 import { SponsorAffiliationInput, sponsorService, SponsorTransparencyInput } from '@shared/application/sponsor-service-direct';
 import { BaseError, ValidationError } from '@shared/core/errors';
-import { ErrorCode, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { ErrorCode, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { logger } from '@shared/core/observability/logging';
 import express, { Response } from 'express';
 import { asyncHandler } from '@shared/middleware/async-handler';

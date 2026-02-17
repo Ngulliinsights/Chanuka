@@ -1,17 +1,17 @@
 // Import individual analysis services and their result types
-import { ConstitutionalAnalysisResult,constitutionalAnalysisService } from '@server/features/analysis/application/constitutional-analysis.service.ts';
-import { publicInterestAnalysisService, PublicInterestScoreResult } from '@server/features/analysis/application/public-interest-analysis.service.ts';
-import { StakeholderAnalysisResult,stakeholderAnalysisService } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
-import { transparencyAnalysisService, TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
-import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
+import { ConstitutionalAnalysisResult,constitutionalAnalysisService } from '@server/features/analysis/application/constitutional-analysis.service';
+import { publicInterestAnalysisService, PublicInterestScoreResult } from '@server/features/analysis/application/public-interest-analysis.service';
+import { StakeholderAnalysisResult,stakeholderAnalysisService } from '@server/features/analysis/application/stakeholder-analysis.service';
+import { transparencyAnalysisService, TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service';
+import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service'; // Updated path
 // Import sponsor conflict analysis service and its necessary types/functions
 // Adjust path based on final location of sponsor conflict analysis
-import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service.ts'; // Updated path
-import { logger  } from '@shared/core';
+import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service'; // Updated path
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { and,eq } from 'drizzle-orm';
 
-import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results
+import { databaseService } from '@/infrastructure/database/database-service'; // For storing results
 import * as schema from '@/shared/schema';
 
 

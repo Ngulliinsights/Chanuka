@@ -1,7 +1,7 @@
 import { cacheService } from '@shared/core/caching';
-import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator.js';
-import { webSocketService } from '@server/infrastructure/websocket.js';
-import { logger  } from '@shared/core';
+import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator';
+import { webSocketService } from '@server/infrastructure/websocket';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { Bill } from '@server/infrastructure/schema';

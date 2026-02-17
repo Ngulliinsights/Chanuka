@@ -3,7 +3,7 @@
 // ============================================================================
 // Extracts named entities and domain-specific entities from text
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface ExtractedEntity {
   text: string;

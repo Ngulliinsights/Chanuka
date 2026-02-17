@@ -1,6 +1,6 @@
 
-import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage.js';
-import { logger   } from '@shared/core';
+import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database/connection';
 import { 
   bills,

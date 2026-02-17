@@ -1,7 +1,7 @@
 import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
 import { z } from 'zod';
 
-import { AuthenticatedRequest } from '@/middleware/auth.js';
+import { AuthenticatedRequest } from '@/middleware/auth';
 
 // Validation schemas for engagement endpoints
 export const getEngagementMetricsSchema = z.object({

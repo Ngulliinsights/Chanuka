@@ -1,11 +1,11 @@
 import { NextFunction,Request, Response, Router } from 'express';
 
-import { VotingPatternAnalysisService } from '@server/features/bills/services/voting-pattern-analysis-service.js';
-import { logger   } from '@shared/core';
+import { VotingPatternAnalysisService } from '@server/features/bills/services/voting-pattern-analysis-service';
+import { logger } from '@server/infrastructure/observability';
 import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
-import { securityAuditService } from '@server/security/security-audit-service.js';
+import { securityAuditService } from '@server/security/security-audit-service';
 
-
+/**
  * Centralized error handler that maps domain errors to appropriate HTTP responses
  * This approach keeps our route handlers clean and maintains consistent error responses
  */

@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Analysis, Bill, BillComment, BillEngagement, BillSectionConflict,BillSponsorship, InsertAnalysis, InsertBill, InsertBillComment, InsertSponsor, InsertUser, InsertUserProfile, Notification, Sponsor, SponsorAffiliation, SponsorTransparency, User, UserProfile } from '@server/infrastructure/schema';
 import { QueryResult, QueryResultRow } from 'pg';
 

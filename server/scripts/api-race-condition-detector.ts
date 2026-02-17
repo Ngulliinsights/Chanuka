@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { createHash } from "crypto";
 import fs from "fs/promises";
 import path from "path";

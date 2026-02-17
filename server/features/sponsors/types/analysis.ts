@@ -11,7 +11,7 @@ import type {
   FinancialBreakdown,
   ImplementationWorkarounds,
   Sponsor,
-  TimelineEvent} from '@server/types/common.js';
+  TimelineEvent} from '@server/types/common';
 
 export interface SponsorshipAnalysis { bill_id: number;
   title: string;

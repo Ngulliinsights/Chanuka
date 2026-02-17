@@ -1,5 +1,5 @@
-import { logger } from '@shared/core';
-import { user_profileservice } from '@shared/domain/user-profile.js';
+import { logger } from '@server/infrastructure/observability';
+import { user_profileservice } from '@shared/domain/user-profile';
 import { Router, Response } from 'express';
 import { z } from 'zod';
 
@@ -9,7 +9,7 @@ import {
 } from '../../../../AuthAlert';
 import { asyncHandler } from '@/middleware/error-management';
 import { BaseError, ValidationError } from '@shared/core/observability/error-management';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
 import { userDomainToApi } from '@shared/utils/transformers';
 

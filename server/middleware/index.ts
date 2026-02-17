@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import compression from 'compression';
 import cors from 'cors';
 import { Express, NextFunction,Request, Response } from 'express';

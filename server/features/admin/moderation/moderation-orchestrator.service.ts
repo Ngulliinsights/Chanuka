@@ -5,11 +5,11 @@
  * This service acts as the primary interface for moderation operations.
  */
 
-import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service.ts';
-import { moderationAnalyticsService } from '@server/features/admin/moderation/moderation-analytics.service.ts';
-import { moderationDecisionService } from '@server/features/admin/moderation/moderation-decision.service.ts';
-import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service.ts';
-import { logger  } from '@shared/core';
+import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service';
+import { moderationAnalyticsService } from '@server/features/admin/moderation/moderation-analytics.service';
+import { moderationDecisionService } from '@server/features/admin/moderation/moderation-decision.service';
+import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service';
+import { logger } from '@server/infrastructure/observability';
 
 import { 
   BulkModerationOperation,
@@ -19,7 +19,7 @@ import {
   ModerationActionRecord,
   ModerationItem, 
   PaginationInfo
-} from './types.js';
+} from './types';
 
 /**
  * Main orchestrator for the content moderation system.

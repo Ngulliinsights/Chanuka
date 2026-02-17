@@ -1,7 +1,7 @@
 // Import result types from other analysis services
-import type { EconomicImpact, SocialImpact,StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service.ts';
-import type { TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service.ts';
-import { logger  } from '@shared/core';
+import type { EconomicImpact, SocialImpact,StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service';
+import type { TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service';
+import { logger } from '@server/infrastructure/observability';
 
 // --- Interface Definitions ---
 export interface PublicInterestScoreResult {

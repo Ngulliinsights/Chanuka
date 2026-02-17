@@ -6,10 +6,10 @@
  * from both existing database systems.
  */
 
-import { createDatabaseConfig } from '@server/infrastructure/database/core/config.ts';
-import type { ConnectionManagerConfig } from '@server/infrastructure/database/core/connection-manager.ts';
-import { createConnectionManager, closeConnectionManager } from '@server/infrastructure/database/core/connection-manager.ts';
-import { createHealthMonitor, stopHealthMonitor } from '@server/infrastructure/database/core/health-monitor.ts';
+import { createDatabaseConfig } from '@server/infrastructure/database/core/config';
+import type { ConnectionManagerConfig } from '@server/infrastructure/database/core/connection-manager';
+import { createConnectionManager, closeConnectionManager } from '@server/infrastructure/database/core/connection-manager';
+import { createHealthMonitor, stopHealthMonitor } from '@server/infrastructure/database/core/health-monitor';
 
 // ============================================================================
 // CONNECTION MANAGEMENT

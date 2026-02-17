@@ -1,8 +1,8 @@
-import { type BillTrackingPreferences as GlobalBillTrackingPreferences,type UserNotificationPreferences, userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { type ChannelDeliveryRequest, type DeliveryResult,notificationChannelService } from '@server/infrastructure/notifications/notification-channels.ts';
-import { type FilterCriteria, type FilterResult,smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter.ts';
-import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
-import { logger   } from '@shared/core';
+import { type BillTrackingPreferences as GlobalBillTrackingPreferences,type UserNotificationPreferences, userPreferencesService } from '@server/features/users/domain/user-preferences';
+import { type ChannelDeliveryRequest, type DeliveryResult,notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
+import { type FilterCriteria, type FilterResult,smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter';
+import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types';
+import { logger } from '@server/infrastructure/observability';
 import { database as db, readDatabase } from '@server/infrastructure/database';
 import { bill_tracking_preferences, bills,notifications, users } from '@server/infrastructure/schema';
 import { and,eq } from 'drizzle-orm';

@@ -1,41 +1,32 @@
-import { logger   } from '@shared/core';
-import { queryIntentService } from '@shared/domain/QueryIntentService';
+import { logger } from '../../../infrastructure/observability/logger';
+import { queryIntentService } from '../domain/QueryIntentService';
 import type {
   PlainBill,
   SearchQuery,
   SearchResponseDto,
   SearchResultDto,
-} from '@shared/domain/search.dto';
-import { SearchAnalytics, SearchMetrics } from '@shared/domain/SearchAnalytics';
-import { SearchValidator } from '@shared/domain/SearchValidator';
-import { typoCorrectionService } from '@shared/domain/TypoCorrectionService';
-import { dualEngineOrchestrator } from '@shared/engines/dual-engine-orchestrator';
-import { suggestionEngineService } from '@shared/engines/suggestion/suggestion-engine.service';
-import { SearchCache } from '@shared/infrastructure/SearchCache';
-import { SearchIndexManager } from '@shared/infrastructure/SearchIndexManager';
+} from '../domain/search.dto';
+import { SearchAnalytics, SearchMetrics } from '../domain/SearchAnalytics';
+import { SearchValidator } from '../domain/SearchValidator';
+import { typoCorrectionService } from '../domain/TypoCorrectionService';
+import { dualEngineOrchestrator } from '../engines/dual-engine-orchestrator';
+import { suggestionEngineService } from '../engines/suggestion/suggestion-engine.service';
+import { SearchCache } from '../infrastructure/SearchCache';
 import type { Request, Response } from 'express';
+import type { SearchSuggestion } from '../engines/types/search.types';
 
 // Define types for better type safety
 interface OrchestratorResult {
   id: string;
   title: string;
   content: string;
-  summary: string;
+  summary?: string;
   relevanceScore: number;
   contentType: string;
   metadata: {
-    status: string;
-    createdAt: string;
+    status?: string;
+    createdAt?: Date | string;
   };
-}
-
-interface SuggestionResult {
-  term: string;
-  frequency: number;
-  score: number;
-  type: string;
-  id: string;
-  metadata?: Record<string, unknown>;
 }
 
 // Repository pattern replaced with direct service
@@ -62,21 +53,21 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
 
   // Phase 3: Query Intent Detection
   const intentClassification = await queryIntentService.classifyIntent(text);
-  logger.debug('Query intent classified', {
+  logger.debug({
     query: text,
     intent: intentClassification.intent,
     confidence: intentClassification.confidence
-  });
+  }, 'Query intent classified');
 
   // Phase 3: Typo Correction and Query Enhancement
   const correctionResult = await typoCorrectionService.correctQuery(text);
   if (correctionResult.correctedQuery !== text && correctionResult.confidence > 0.7) {
     text = correctionResult.correctedQuery;
-    logger.debug('Query corrected', {
+    logger.debug({
       original: correctionResult.originalQuery,
       corrected: correctionResult.correctedQuery,
       confidence: correctionResult.confidence
-    });
+    }, 'Query corrected');
   }
 
   // Phase 3: Query Expansion with Synonyms (for informational queries)
@@ -85,7 +76,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
     if (expansions.length > 1 && expansions[0]) {
       // Use the most relevant expansion (could be enhanced with ML ranking)
       text = expansions[0];
-      logger.debug('Query expanded with synonyms', { original: sanitizedQuery.text, expanded: text });
+      logger.debug({ original: sanitizedQuery.text, expanded: text }, 'Query expanded with synonyms');
     }
   }
   const page = Math.max((pagination as { page?: number }).page ?? DEFAULT_PAGE, 1);
@@ -104,7 +95,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
   /*  2. Phase 2: Use dual-engine orchestrator for intelligent search  */
   const searchOptions = {
     limit,
-    filters,
+    filters: filters as any, // Type compatibility - different SearchFilters definitions
     ...options,
   };
 
@@ -116,7 +107,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
       id: result.id,
       title: result.title,
       content: result.content,
-      summary: result.summary,
+      summary: result.summary || '', // Ensure string
       status: result.metadata.status,
       introduced_date: result.metadata.createdAt,
     } as PlainBill, // Type compatibility
@@ -150,7 +141,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
   if (results.length === 0) {
     // Use consolidated suggestion engine for fallback suggestions
     const fallbackResult = await suggestionsSvc.getAutocompleteSuggestions(text, 5);
-    suggestions = fallbackResult.suggestions.map((s: SuggestionResult) => s.term);
+    suggestions = fallbackResult.suggestions.map((s: SearchSuggestion) => s.term);
   }
 
   /*  6. Build DTO  */
@@ -179,7 +170,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
     await SearchAnalytics.recordSearchEvent(sanitizedQuery, dto);
   } catch (error) {
     // Analytics failure shouldn't break search
-    logger.warn('Failed to record search analytics', { error: String(error) });
+    logger.warn({ error: String(error) }, 'Failed to record search analytics');
   }
 
   return dto;
@@ -196,7 +187,7 @@ export async function getSearchSuggestions(partial: string, limit = 5) {
   const cached = await cache.getSuggestions<string[]>(sanitizedPartial, sanitizedLimit);
   if (cached) return cached;
 
-  const sugs = (await suggestionsSvc.getAutocompleteSuggestions(sanitizedPartial, sanitizedLimit)).suggestions.map((s: SuggestionResult) => s.term);
+  const sugs = (await suggestionsSvc.getAutocompleteSuggestions(sanitizedPartial, sanitizedLimit)).suggestions.map((s: SearchSuggestion) => s.term);
   await cache.setSuggestions(sanitizedPartial, sanitizedLimit, sugs);
 
   // Record analytics for suggestions usage (optional - suggestions are lightweight)
@@ -216,16 +207,19 @@ export async function getPopularSearchTerms(limit = 20) {
   return list.slice(0, limit);
 }
 
-export async function rebuildSearchIndexes(batchSize = 1000): Promise<{ updated: number; errors: number }> {
-  // Validate batch size
-  const validBatchSize = Math.min(Math.max(batchSize, 100), 10000); // Reasonable bounds
+export async function rebuildSearchIndexes(_batchSize = 1000): Promise<{ updated: number; errors: number }> {
+  // Dynamic import to avoid circular dependency
+  const { SearchIndexManager } = await import('../infrastructure/SearchIndexManager');
   const manager = new SearchIndexManager();
-  return manager.rebuildAll(validBatchSize);
+  const result = await manager.rebuildAllIndexes();
+  return { updated: result.billsUpdated, errors: result.errors };
 }
 
 export async function getSearchIndexHealth() {
+  // Dynamic import to avoid circular dependency
+  const { SearchIndexManager } = await import('../infrastructure/SearchIndexManager');
   const manager = new SearchIndexManager();
-  return manager.getHealth();
+  return manager.getIndexHealth();
 }
 
 export async function warmupSearchCache(commonQueries: string[] = []) {
@@ -235,8 +229,18 @@ export async function warmupSearchCache(commonQueries: string[] = []) {
     .map(q => q.trim().substring(0, 200)) // Reasonable length limit
     .slice(0, 50); // Limit to prevent abuse
 
-  const manager = new SearchIndexManager();
-  return manager.warmup(validQueries);
+  // Warmup by executing common queries
+  const results = [];
+  for (const query of validQueries) {
+    try {
+      const result = await searchBills({ text: query, pagination: { page: 1, limit: 10 } });
+      results.push({ query, success: true, count: result.results?.length ?? 0 });
+    } catch (error) {
+      results.push({ query, success: false, error: String(error) });
+    }
+  }
+  
+  return { warmedQueries: results.length, results };
 }
 
 export async function getSearchMetrics() {
@@ -412,7 +416,7 @@ export async function streamSearchBills(query: SearchQuery, res: Response, req?:
     // Execute search with streaming progress
     const searchOptions = {
       limit,
-      filters,
+      filters: filters as any, // Type compatibility - different SearchFilters definitions
       ...options,
       onProgress: (progress: { stage: string; progress: number; message: string }) => {
         res.write(`data: ${JSON.stringify({
@@ -442,7 +446,7 @@ export async function streamSearchBills(query: SearchQuery, res: Response, req?:
         id: result.id,
         title: result.title,
         content: result.content,
-        summary: result.summary,
+        summary: result.summary || '', // Ensure string
         status: result.metadata.status,
         introduced_date: result.metadata.createdAt,
       } as PlainBill,
@@ -475,7 +479,7 @@ export async function streamSearchBills(query: SearchQuery, res: Response, req?:
     let suggestions: string[] | undefined;
     if (results.length === 0) {
       const fallbackResult = await suggestionsSvc.getAutocompleteSuggestions(text, 5);
-      suggestions = fallbackResult.suggestions.map((s: SuggestionResult) => s.term);
+      suggestions = fallbackResult.suggestions.map((s: SearchSuggestion) => s.term);
     }
 
     const dto: SearchResponseDto = {
@@ -529,12 +533,12 @@ export async function streamSearchBills(query: SearchQuery, res: Response, req?:
     try {
       await SearchAnalytics.recordSearchEvent(sanitizedQuery, dto);
     } catch (error) {
-      logger.warn('Failed to record search analytics', { error: String(error) });
+      logger.warn({ error: String(error) }, 'Failed to record search analytics');
     }
 
   } catch (error) {
     if (!controller.signal.aborted) {
-      logger.error('Streaming search failed', { error: String(error), searchId });
+      logger.error({ error: String(error), searchId }, 'Streaming search failed');
 
       res.write(`data: ${JSON.stringify({
         type: 'error',
@@ -561,7 +565,7 @@ export async function cancelSearch(searchId: string): Promise<{ success: boolean
     searchSessionManager.cancelSearch(searchId, 'user_cancelled');
     return { success: true, message: 'Search cancelled successfully' };
   } catch (error) {
-    logger.error('Failed to cancel search', { error: String(error), searchId });
+    logger.error({ error: String(error), searchId }, 'Failed to cancel search');
     return { success: false, message: 'Failed to cancel search' };
   }
 }
@@ -579,7 +583,7 @@ export async function getSearchAnalytics(
   try {
     return await SearchAnalytics.getSearchMetrics(start, end);
   } catch (error) {
-    logger.error('Failed to get search analytics', { error: String(error) });
+    logger.error({ error: String(error) }, 'Failed to get search analytics');
     return { totalSearches: 0, uniqueUsers: 0, averageSearchTime: 0, cacheHitRate: 0, popularQueries: [], noResultQueries: [], timeRange: { start, end } };
   }
 }

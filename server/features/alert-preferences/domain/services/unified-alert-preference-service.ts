@@ -1,4 +1,4 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { and, desc, eq, inArray,sql } from 'drizzle-orm';

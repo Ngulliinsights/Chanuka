@@ -3,8 +3,8 @@
 // ============================================================================
 // Script to populate the database with sample constitutional provisions and precedents
 
-import { db  } from '@shared/core';
-import { logger  } from '@shared/core';
+import { pool as db } from '@server/infrastructure/database/pool';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Sample constitutional provisions from Kenya's 2010 Constitution

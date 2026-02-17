@@ -2,21 +2,21 @@
 // Production-Ready Financial Disclosure Monitoring Service
 // Handles automated monitoring cycles, alert generation, and operational data access
 
-import { FinancialDisclosureConfig } from '@server/features/analytics/financial-disclosure/config.ts';
-import { logger } from '@shared/core/observability/logging/logger.js';
+import { FinancialDisclosureConfig } from '@server/features/analytics/financial-disclosure/config';
+import { logger } from '@shared/core/observability/logging/logger';
 import {
   notifications,
   sponsors,
-  sponsorTransparency} from '@server/infrastructure/schema/schema.js';
+  sponsorTransparency} from '@server/infrastructure/schema/schema';
 import { and, desc, eq, gte, inArray,sql } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
 
-import { CacheService } from '@/infrastructure/cache/cache-service.js';
+import { CacheService } from '@/infrastructure/cache/cache-service';
 import {
   DatabaseError,
   NotFoundError as SponsorNotFoundError,
   ValidationError as InvalidInputError
-} from '@/utils/errors.js';
+} from '@/utils/errors';
 
 import type {
   CompletenessScore,
@@ -25,7 +25,7 @@ import type {
   HealthCheckResult,
   MonitoringStatus,
   SponsorInfo,
-  SystemHealthStatus} from './types.js';
+  SystemHealthStatus} from './types';
 
 // ============================================================================
 // Service Interface & Dependencies

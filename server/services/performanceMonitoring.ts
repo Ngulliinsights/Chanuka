@@ -5,7 +5,7 @@
  * threshold monitoring, alert generation, and reporting.
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface PerformanceMetric {
   name: string;

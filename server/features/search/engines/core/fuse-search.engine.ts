@@ -4,11 +4,11 @@
 // Typo-tolerant search using Fuse.js library for client-side fuzzy matching
 // Replaces PostgreSQL trigram-based fuzzy matching with more flexible scoring
 
-import { SearchEngine,SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { database } from '@server/infrastructure/database';
+import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
+import { db as database } from '../../../../infrastructure/database/pool';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
-import { sql } from 'drizzle-orm';
-import Fuse from 'fuse.js';
+import { sql, and, eq } from 'drizzle-orm';
+import Fuse from 'fuse';
 
 interface FuseSearchOptions {
   threshold?: number;
@@ -120,6 +120,15 @@ export class FuseSearchEngine implements SearchEngine {
    * Search bills using Fuse.js fuzzy matching
    */
   private async searchBills(query: SearchQuery): Promise<SearchResult[]> {
+    // Build where conditions
+    const conditions = [];
+    if (query.filters?.status) {
+      conditions.push(sql`${bills.status} = ANY(${query.filters.status})`);
+    }
+    if (query.filters?.chamber) {
+      conditions.push(sql`${bills.chamber} = ANY(${query.filters.chamber})`);
+    }
+
     const billsData = await database
       .select({
         id: bills.id,
@@ -130,10 +139,9 @@ export class FuseSearchEngine implements SearchEngine {
         created_at: bills.created_at
       })
       .from(bills)
-      .where(query.filters?.status ? sql`${bills.status} = ANY(${query.filters.status})` : undefined)
-      .where(query.filters?.chamber ? sql`${bills.chamber} = ANY(${query.filters.chamber})` : undefined);
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
 
-    const searchableBills: SearchableBill[] = billsData.map((bill: unknown) => ({
+    const searchableBills: SearchableBill[] = billsData.map((bill: any) => ({
       id: bill.id.toString(),
       title: bill.title || '',
       summary: bill.summary || '',
@@ -171,6 +179,15 @@ export class FuseSearchEngine implements SearchEngine {
    * Search sponsors using Fuse.js fuzzy matching
    */
   private async searchSponsors(query: SearchQuery): Promise<SearchResult[]> {
+    // Build where conditions
+    const conditions = [eq(sponsors.is_active, true)];
+    if (query.filters?.chamber) {
+      conditions.push(sql`${sponsors.chamber} = ANY(${query.filters.chamber})`);
+    }
+    if (query.filters?.county) {
+      conditions.push(sql`${sponsors.county} = ANY(${query.filters.county})`);
+    }
+
     const sponsorsData = await database
       .select({
         id: sponsors.id,
@@ -181,11 +198,9 @@ export class FuseSearchEngine implements SearchEngine {
         bio: sponsors.bio
       })
       .from(sponsors)
-      .where(sql`${sponsors.is_active} = true`)
-      .where(query.filters?.chamber ? sql`${sponsors.chamber} = ANY(${query.filters.chamber})` : undefined)
-      .where(query.filters?.county ? sql`${sponsors.county} = ANY(${query.filters.county})` : undefined);
+      .where(and(...conditions));
 
-    const searchableSponsors: SearchableSponsor[] = sponsorsData.map((sponsor: unknown) => ({
+    const searchableSponsors: SearchableSponsor[] = sponsorsData.map((sponsor: any) => ({
       id: sponsor.id.toString(),
       name: sponsor.name || '',
       party: sponsor.party || '',
@@ -223,6 +238,15 @@ export class FuseSearchEngine implements SearchEngine {
    * Search comments using Fuse.js fuzzy matching
    */
   private async searchComments(query: SearchQuery): Promise<SearchResult[]> {
+    // Build where conditions
+    const conditions = [];
+    if (query.filters?.dateRange?.start) {
+      conditions.push(sql`${comments.created_at} >= ${query.filters.dateRange.start}`);
+    }
+    if (query.filters?.dateRange?.end) {
+      conditions.push(sql`${comments.created_at} <= ${query.filters.dateRange.end}`);
+    }
+
     const commentsData = await database
       .select({
         id: comments.id,
@@ -232,11 +256,10 @@ export class FuseSearchEngine implements SearchEngine {
         user_name: users.email
       })
       .from(comments)
-      .innerJoin(users, sql`${comments.user_id} = ${users.id}`)
-      .where(query.filters?.dateRange?.start ? sql`${comments.created_at} >= ${query.filters.dateRange.start}` : undefined)
-      .where(query.filters?.dateRange?.end ? sql`${comments.created_at} <= ${query.filters.dateRange.end}` : undefined);
+      .innerJoin(users, eq(comments.user_id, users.id))
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
 
-    const searchableComments: SearchableComment[] = commentsData.map((comment: unknown) => ({
+    const searchableComments: SearchableComment[] = commentsData.map((comment: any) => ({
       id: comment.id.toString(),
       content: comment.content || '',
       bill_id: comment.bill_id?.toString() || '',

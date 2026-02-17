@@ -3,14 +3,14 @@
 // ============================================================================
 // Main service that orchestrates constitutional analysis of bills
 
-import { ExpertFlaggingService } from '@server/features/constitutional-analysis/application/expert-flagging-service.ts';
-import { PrecedentFinderService } from '@server/features/constitutional-analysis/application/precedent-finder.ts';
-import { ProvisionMatcherService } from '@server/features/constitutional-analysis/application/provision-matcher.ts';
-import { logger  } from '@shared/core';
-import { ConstitutionalAnalysesRepository } from '@shared/infrastructure/repositories/constitutional-analyses-repository.js';
-import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository.js';
-import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository.js';
-import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index.js';
+import { ExpertFlaggingService } from '@server/features/constitutional-analysis/application/expert-flagging-service';
+import { PrecedentFinderService } from '@server/features/constitutional-analysis/application/precedent-finder';
+import { ProvisionMatcherService } from '@server/features/constitutional-analysis/application/provision-matcher';
+import { logger } from '@server/infrastructure/observability';
+import { ConstitutionalAnalysesRepository } from '@shared/infrastructure/repositories/constitutional-analyses-repository';
+import { ConstitutionalProvisionsRepository } from '@shared/infrastructure/repositories/constitutional-provisions-repository';
+import { LegalPrecedentsRepository } from '@shared/infrastructure/repositories/legal-precedents-repository';
+import { ConstitutionalAnalysis,ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index';
 
 export interface AnalysisRequest {
   bill_id: string;

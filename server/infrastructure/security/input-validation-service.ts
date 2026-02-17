@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { ApiValidationError } from '@shared/core/utils/api-utils';
 import { NextFunction,Request, Response } from 'express';
 import { z } from 'zod';

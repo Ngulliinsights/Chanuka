@@ -6,7 +6,7 @@
  */
 
 import { createAdapter } from '@socket.io/redis-adapter';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { Server } from 'http';
 import Redis from 'ioredis';

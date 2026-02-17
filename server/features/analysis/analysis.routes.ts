@@ -1,8 +1,8 @@
-import { billComprehensiveAnalysisService } from '@shared/application/bill-comprehensive-analysis.service.js';
-import { analysisService } from '@shared/application/analysis-service-direct.js';
+import { billComprehensiveAnalysisService } from '@shared/application/bill-comprehensive-analysis.service';
+import { analysisService } from '@shared/application/analysis-service-direct';
 import { BaseError, ValidationError } from '@shared/core/errors';
-import { ErrorCode, ErrorDomain, ErrorSeverity } from '@shared/constants';
-import { logger } from '@shared/core';
+import { ErrorCode, ErrorDomain, ErrorSeverity  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { authenticateToken, requireAuth } from '../../../../AuthAlert';
 import express, { Response } from 'express';
 import { asyncHandler } from '@shared/middleware/async-handler';

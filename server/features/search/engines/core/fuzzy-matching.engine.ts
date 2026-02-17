@@ -3,10 +3,10 @@
 // ============================================================================
 // Typo-tolerant search using PostgreSQL's pg_trgm extension for similarity matching
 
-import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { database } from '@server/infrastructure/database';
+import { SearchQuery, SearchResult } from '../types/search.types';
+import { db as database } from '../../../../infrastructure/database/pool';
 import { bills } from '@server/infrastructure/schema';
-import { desc,sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 export class FuzzyMatchingEngine {
 
@@ -16,7 +16,8 @@ export class FuzzyMatchingEngine {
    */
   async search(query: SearchQuery): Promise<SearchResult[]> {
     const limit = query.pagination?.limit || 50;
-    const offset = query.pagination?.offset || 0;
+    const page = query.pagination?.page || 1;
+    const offset = (page - 1) * limit;
 
     try {
       // Use PostgreSQL similarity function for fuzzy matching

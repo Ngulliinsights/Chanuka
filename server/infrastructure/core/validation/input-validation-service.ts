@@ -1,6 +1,6 @@
-import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics.ts';
-import { logger } from '@shared/core';
-import { ApiValidationError } from '@shared/core/utils/api-utils.js';
+import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { logger } from '@server/infrastructure/observability';
+import { ApiValidationError } from '@shared/core/utils/api-utils';
 import { NextFunction,Request, Response } from 'express';
 import { z } from 'zod';
 
@@ -10,7 +10,7 @@ import {
   sanitizeString,
   validateEmail,
   validatePhone,
-  validateURL} from './validation-utils.js';
+  validateURL} from './validation-utils';
 
 /**
  * Unified Input Validation Service

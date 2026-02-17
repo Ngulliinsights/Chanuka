@@ -2,7 +2,9 @@
 // Main service that orchestrates the decomposed financial disclosure services
 // Maintains backward compatibility with the original API
 
-import { cache, DatabaseError,logger  } from '@shared/core';
+import { DatabaseError } from '@shared/core';
+import { cache } from '@server/infrastructure/cache';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { sponsors } from "@shared/foundation";
 import type {
@@ -10,7 +12,7 @@ import type {
   FinancialDisclosure,
   RelationshipMapping,
   TransparencyDashboard
-} from '@shared/types/index.js';
+} from '@shared/types/index';
 import { desc,eq } from "drizzle-orm";
 
 import { FinancialDisclosureConfig } from './config';

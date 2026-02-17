@@ -7,7 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Validation error detail

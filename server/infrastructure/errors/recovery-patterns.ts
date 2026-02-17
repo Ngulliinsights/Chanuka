@@ -8,7 +8,7 @@
  */
 
 import { TIME_LIMITS } from '@shared/constants';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Retry Options

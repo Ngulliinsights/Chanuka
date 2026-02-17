@@ -9,8 +9,8 @@
 
 import { logger } from '@shared/core/observability/logging';
 import { database as db } from '@server/infrastructure/database';
-import { BatchingService } from '@shared/infrastructure/batching-service.js';
-import { webSocketService } from '@shared/infrastructure/websocket.js';
+import { BatchingService } from '@shared/infrastructure/batching-service';
+import { webSocketService } from '@shared/infrastructure/websocket';
 
 interface ValidationResult {
   phase: string;

@@ -1,4 +1,4 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { EventEmitter } from 'events';
 
 // Error types for external API failures

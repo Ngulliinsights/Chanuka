@@ -9,11 +9,10 @@
 // - Proximity search for phrase matching
 // - Dual-engine integration capabilities
 
-import { SearchQuery, SearchResult } from '@server/types/search.types.ts';
-import { ParsedQuery,searchSyntaxParser } from '@server/utils/search-syntax-parser';
-import { logger } from '@shared/core';
-
-import { databaseService } from '@/infrastructure/database/database-service';
+import { SearchQuery, SearchResult } from '../types/search.types';
+import { ParsedQuery, searchSyntaxParser } from '../../utils/search-syntax-parser';
+import { logger } from '../../../../infrastructure/observability/logger';
+import { pool } from '../../../../infrastructure/database/pool';
 
 interface QueryExpansionOptions {
   enableSynonyms: boolean;
@@ -93,11 +92,11 @@ export class PostgreSQLFullTextEngine {
       return filteredResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
     } catch (error) {
-      logger.error('PostgreSQL full-text search failed', {
+      logger.error({
         error: (error as Error).message,
         query: query.query,
         executionTime: Date.now() - startTime
-      });
+      }, 'PostgreSQL full-text search failed');
 
       // Fallback to empty results on error
       return [];
@@ -131,7 +130,7 @@ export class PostgreSQLFullTextEngine {
 
     const whereClause = whereConditions.join(' AND ');
 
-    const result = await databaseService.executeRawQuery(
+    const result = await pool.query(
       `
       SELECT
         b.id,
@@ -171,13 +170,11 @@ export class PostgreSQLFullTextEngine {
         query.filters?.status?.join(',') || null,
         query.filters?.chamber?.join(',') || null,
         query.pagination?.limit || 50
-      ],
-      [],
-      'searchBillsEnhanced'
+      ]
     );
 
     // TODO: Replace 'any' with proper type definition
-    return result.data.map((bill: unknown) => ({
+    return result.rows.map((bill: any) => ({
       id: bill.id,
       type: 'bill' as const,
       title: bill.title,
@@ -220,7 +217,7 @@ export class PostgreSQLFullTextEngine {
 
     const whereClause = whereConditions.join(' AND ');
 
-    const result = await databaseService.executeRawQuery(
+    const result = await pool.query(
       `
       SELECT
         s.id,
@@ -257,13 +254,11 @@ export class PostgreSQLFullTextEngine {
         query.filters?.chamber?.join(',') || null,
         query.filters?.county?.join(',') || null,
         query.pagination?.limit || 50
-      ],
-      [],
-      'searchSponsorsEnhanced'
+      ]
     );
 
     // TODO: Replace 'any' with proper type definition
-    return result.data.map((sponsor: unknown) => ({
+    return result.rows.map((sponsor: any) => ({
       id: sponsor.id,
       type: 'sponsor' as const,
       title: sponsor.name,
@@ -305,7 +300,7 @@ export class PostgreSQLFullTextEngine {
 
     const whereClause = whereConditions.join(' AND ');
 
-    const result = await databaseService.executeRawQuery(
+    const result = await pool.query(
       `
       SELECT
         c.id,
@@ -336,13 +331,11 @@ export class PostgreSQLFullTextEngine {
         query.filters?.dateRange?.start || null,
         query.filters?.dateRange?.end || null,
         query.pagination?.limit || 50
-      ],
-      [],
-      'searchCommentsEnhanced'
+      ]
     );
 
     // TODO: Replace 'any' with proper type definition
-    return result.data.map((comment: unknown) => ({
+    return result.rows.map((comment: any) => ({
       id: comment.id,
       type: 'comment' as const,
       title: `Comment by ${comment.user_name}`,
@@ -369,25 +362,23 @@ export class PostgreSQLFullTextEngine {
     }
 
     try {
-      const result = await databaseService.executeRawQuery(
+      const result = await pool.query(
         `SELECT expand_query_with_synonyms($1, $2) as expanded_query`,
-        [originalQuery, options.category || null],
-        [],
-        'expandQuery'
+        [originalQuery, options.category || null]
       );
 
       // TODO: Replace 'any' with proper type definition
-      if (result.data.length > 0) {
-        const firstResult = result.data[0] as Record<string, unknown>;
+      if (result.rows.length > 0) {
+        const firstResult = result.rows[0] as Record<string, unknown>;
         if (firstResult?.expanded_query && typeof firstResult.expanded_query === 'string') {
           return firstResult.expanded_query.split(' | ').slice(0, options.maxExpansions);
         }
       }
     } catch (error) {
-      logger.warn('Query expansion failed, using original query', {
+      logger.warn({
         error: (error as Error).message,
         query: originalQuery
-      });
+      }, 'Query expansion failed, using original query');
     }
 
     return [];
@@ -422,17 +413,15 @@ export class PostgreSQLFullTextEngine {
     executionTime: number
   ): Promise<void> {
     try {
-      await databaseService.executeRawQuery(
+      await pool.query(
         `SELECT log_search_performance($1, $2, $3, $4)`,
-        [query, searchType, resultsCount, executionTime],
-        [],
-        'logSearchPerformance'
+        [query, searchType, resultsCount, executionTime]
       );
     } catch (error) {
       // Don't fail search if logging fails
-      logger.warn('Failed to log search performance', {
+      logger.warn({
         error: (error as Error).message
-      });
+      }, 'Failed to log search performance');
     }
   }
 
@@ -654,14 +643,12 @@ export class PostgreSQLFullTextEngine {
    */
   // TODO: Replace 'any' with proper type definition
   async getPerformanceStats(hoursBack: number = 24): Promise<unknown[]> {
-    const result = await databaseService.executeRawQuery(
+    const result = await pool.query(
       `SELECT * FROM get_search_performance_stats($1)`,
-      [hoursBack],
-      [],
-      'getPerformanceStats'
+      [hoursBack]
     );
 
-    return result.data;
+    return result.rows;
   }
 }
 

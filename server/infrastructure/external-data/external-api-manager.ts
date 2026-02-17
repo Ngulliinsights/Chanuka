@@ -14,7 +14,7 @@
 import { APICostMonitoringService, apiCostMonitoringService } from '@server/features/monitoring/application/api-cost-monitoring.service';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
 import { ErrorSeverity, ExternalAPIErrorHandler } from '@server/services/external-api-error-handler';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { EventEmitter } from 'events';
 
 // ============================================================================

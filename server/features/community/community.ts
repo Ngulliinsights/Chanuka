@@ -1,14 +1,14 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 
-import { commentService } from '@server/features/community/comment-voting.ts';
-import { commentVotingService } from '@server/features/community/comment-voting.ts';
-import { authenticateToken as requireAuth } from '@server/middleware/auth.js';
-import { contentModerationService } from '@shared/admin/content-moderation.js';
-import { logger } from '@shared/core';
+import { commentService } from '@server/features/community/comment-voting';
+import { commentVotingService } from '@server/features/community/comment-voting';
+import { authenticateToken as requireAuth } from '@server/middleware/auth';
+import { contentModerationService } from '@shared/admin/content-moderation';
+import { logger } from '@server/infrastructure/observability';
 import { asyncHandler } from '@/middleware/error-management';
 import { BaseError, ValidationError } from '@shared/core/observability/error-management';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
+import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { createErrorContext } from '@shared/core/observability/distributed-tracing';
 
 export const router = Router();

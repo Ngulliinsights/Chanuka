@@ -6,12 +6,12 @@
  */
 
 import * as Boom from '@hapi/boom';
-import { BillNotFoundError, billService, CommentNotFoundError, ValidationError } from '@shared/application/bills.js';
-import { logger  } from '@shared/core';
+import { BillNotFoundError, billService, CommentNotFoundError, ValidationError } from '@shared/application/bills';
+import { logger } from '@server/infrastructure/observability';
 import type { Bill, BillComment } from '@server/infrastructure/schema';
 import { NextFunction,Request, Response, Router } from 'express';
 
-import { errorAdapter } from '@/infrastructure/errors/error-adapter.js';
+import { errorAdapter } from '@/infrastructure/errors/error-adapter';
 
 import type { AuthenticatedRequest } from '../../../../AuthAlert';
 import { authenticateToken } from '../../../../AuthAlert';

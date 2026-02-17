@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Database helper utilities for standardized date calculations and result formatting.

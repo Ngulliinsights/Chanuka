@@ -2,7 +2,7 @@
 // Production-grade email service with enhanced security, type safety, and performance
 
 // ---------- Enhanced Types ----------
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { config } from '../../../config.d';
 

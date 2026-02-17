@@ -1,6 +1,6 @@
 // Import the status monitor service if it exists at this path
-import { billStatusMonitorService } from '@shared/bill-status-monitor.js'; // Adjust path if needed
-import { logger  } from '@shared/core';
+import { billStatusMonitorService } from '@shared/bill-status-monitor'; // Adjust path if needed
+import { logger } from '@server/infrastructure/observability';
 import { databaseService } from '@server/infrastructure/database';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
@@ -9,7 +9,7 @@ import { and, asc, count, desc, eq, inArray, or,sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { cacheService } from '@/infrastructure/cache';
-import { notificationService } from '@/infrastructure/notifications/notification-service.js';
+import { notificationService } from '@/infrastructure/notifications/notification-service';
 
 // --- Type Definitions (Ensure these match shared types if defined there) ---
 // Define allowed enum values explicitly for validation and clarity

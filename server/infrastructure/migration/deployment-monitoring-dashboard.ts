@@ -1,9 +1,9 @@
-import { DeploymentOrchestrator,DeploymentStatus } from '@server/infrastructure/migration/deployment-orchestrator.ts';
-import { CrossPhaseValidationResult,StatisticalAnalysisResult, ValidationResult } from '@server/infrastructure/migration/repository-deployment-validator.ts';
+import { DeploymentOrchestrator,DeploymentStatus } from '@server/infrastructure/migration/deployment-orchestrator';
+import { CrossPhaseValidationResult,StatisticalAnalysisResult, ValidationResult } from '@server/infrastructure/migration/repository-deployment-validator';
 import {
   AsyncServiceResult,
   withResultHandling
-} from '@shared/errors/result-adapter.js';
+} from '@shared/errors/result-adapter';
 
 import { logger } from '@/shared/core';
 

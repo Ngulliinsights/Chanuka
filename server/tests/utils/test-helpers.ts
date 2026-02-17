@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import database from '@server/infrastructure/database';
 import { bills, sponsors,users } from '@server/infrastructure/schema';
 import { bill_engagement,comments, notifications } from '@server/infrastructure/schema';

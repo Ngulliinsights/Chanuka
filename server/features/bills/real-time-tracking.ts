@@ -1,6 +1,6 @@
-import type { AuthenticatedRequest } from '@server/middleware/auth.js';
-import { authenticateToken } from '@server/middleware/auth.js';
-import { logger } from '@shared/core';
+import type { AuthenticatedRequest } from '@server/middleware/auth';
+import { authenticateToken } from '@server/middleware/auth';
+import { logger } from '@server/infrastructure/observability';
 import { 
   ApiError, 
   ApiNotFound, 

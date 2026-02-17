@@ -1,6 +1,6 @@
 import { and, eq, gte, lte, or, sql } from 'drizzle-orm';
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import {
   readDatabase,
   withTransaction,

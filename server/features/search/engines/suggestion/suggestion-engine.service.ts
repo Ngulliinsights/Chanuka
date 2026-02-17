@@ -1,12 +1,10 @@
 // Query builder service removed - using direct Drizzle queries
-import { parallelQueryExecutor, QueryTask } from "@server/utils/parallel-query-executor";
-import { logger  } from '@shared/core';
-import { readDatabase } from '@server/infrastructure/database';
+import { logger } from '../../../../infrastructure/observability/logger';
+import { db } from '../../../../infrastructure/database/pool';
 import * as schema from '@server/infrastructure/schema';
-import { and, count, desc, eq, gte,like, or, sql } from "drizzle-orm";
+import { and, count, desc, gte, like, or, sql } from "drizzle-orm";
 
-import { cacheService } from '@/infrastructure/cache/cache-service.js';
-import { databaseService } from '@/infrastructure/database/database-service.js';
+import { cacheService } from '../../../../infrastructure/cache';
 
 import { type RankingContext,suggestionRankingService } from "./suggestion-ranking.service";
 import {
@@ -14,7 +12,7 @@ import {
   AutocompleteResult,
   SearchAnalytics,
   SearchContext,
-  SearchSuggestion} from "./types/search.types";
+  SearchSuggestion} from "../types/search.types";
 
 /**
  * Internal type for tracking search history entries
@@ -112,10 +110,8 @@ const CONFIG = {
  * - Graceful degradation when queries fail
  */
 export class SuggestionEngineService {
-  private get db() {
-    return readDatabase;
-  }
-
+  private readonly db = db;
+  
   // In-memory caches with LRU eviction support
   // These maintain user search patterns and popular terms
   private searchHistory: Map<string, HistoryEntry> = new Map();
@@ -144,74 +140,41 @@ export class SuggestionEngineService {
     }
 
     // Check cache first to avoid unnecessary database queries
-    // Using our local cache key generator instead of the imported one
     const cacheKey = generateCacheKey(sanitizedQuery);
     const cachedResult = await cacheService.get<AutocompleteResult>(cacheKey);
     if (cachedResult) {
-      logger.debug('Cache hit for search query', { query: sanitizedQuery });
+      logger.debug({ query: sanitizedQuery }, 'Cache hit for search query');
       return cachedResult;
     }
 
-    // Execute queries with fallback handling for resilience
-    // Build a concrete fallback value (with correct typing) to pass to the
-    // database service. The database service's withFallback returns a
-    // DatabaseResult<T>, so we extract `.data` below when returning.
-    const fallbackValue: AutocompleteResult = this.getEmptyAutocompleteResult();
+    try {
+      // Execute queries sequentially with error handling
+      const suggestions = await this.generateSuggestions(sanitizedQuery, limit).catch(err => {
+        logger.warn({ error: err, query: sanitizedQuery }, 'Failed to generate suggestions');
+        return [];
+      });
+      
+      const facets = await this.generateAutocompleteFacets(sanitizedQuery).catch(err => {
+        logger.warn({ error: err, query: sanitizedQuery }, 'Failed to generate facets');
+        return this.getEmptyFacets();
+      });
 
-    const dbResult = await databaseService.withFallback(
-      async () => {
-        // Define parallel query tasks for concurrent execution
-        // This allows us to fetch suggestions and facets simultaneously
-        const tasks: QueryTask[] = [
-          {
-            name: 'suggestions',
-            query: () => this.generateSuggestions(sanitizedQuery, limit),
-            fallback: []
-          },
-          {
-            name: 'facets',
-            query: () => this.generateAutocompleteFacets(sanitizedQuery),
-            fallback: this.getEmptyFacets()
-          }
-        ];
+      // Construct the result
+      const autocompleteResult: AutocompleteResult = {
+        suggestions,
+        facets,
+        query: sanitizedQuery,
+        totalSuggestions: suggestions.length,
+        metadata: includeMetadata ? await this.getSearchMetadata(sanitizedQuery).catch(() => undefined) : undefined
+      };
 
-        const results = await parallelQueryExecutor.executeParallel(tasks);
-
-        // Log any failed queries for monitoring and debugging
-        if (results.suggestions === undefined || results.facets === undefined) {
-          logger.warn('Some parallel queries failed', {
-            query: sanitizedQuery,
-            hasSuggestions: results.suggestions !== undefined,
-            hasFacets: results.facets !== undefined
-          });
-        }
-
-        // The parallel executor returns QueryResult objects, but we need the actual data
-        // We use type assertions through 'unknown' as a safe intermediate step
-        const suggestionsList = (results.suggestions as unknown as SearchSuggestion[]) || [];
-        const facetsData = (results.facets as unknown as AutocompleteFacets) || this.getEmptyFacets();
-
-        // Construct the properly typed result
-        const autocompleteResult: AutocompleteResult = {
-          suggestions: suggestionsList,
-          facets: facetsData,
-          query: sanitizedQuery,
-          totalSuggestions: suggestionsList.length,
-          metadata: includeMetadata ? await this.getSearchMetadata(sanitizedQuery) : undefined
-        };
-
-        // Cache the result with TTL for future requests
-        await cacheService.set(cacheKey, autocompleteResult, CONFIG.CACHE_TTL_SECONDS);
-        return autocompleteResult;
-      },
-      // Pass a concrete fallback value (not a function) to match the
-      // DatabaseService.withFallback signature
-      fallbackValue,
-      'autocomplete-suggestions'
-    );
-
-    // Extract and return the actual autocomplete data from the DatabaseResult
-    return dbResult.data;
+      // Cache the result with TTL for future requests
+      await cacheService.set(cacheKey, autocompleteResult, CONFIG.CACHE_TTL_SECONDS);
+      return autocompleteResult;
+    } catch (error) {
+      logger.error({ error, query: sanitizedQuery }, 'Failed to get autocomplete suggestions');
+      return this.getEmptyAutocompleteResult();
+    }
   }
 
   /**
@@ -249,55 +212,37 @@ export class SuggestionEngineService {
     if (billSuggestions.status === 'fulfilled') {
       suggestions.push(...billSuggestions.value);
     } else {
-      logger.error('Failed to fetch bill suggestions', {
-        error: billSuggestions.reason,
-        query
-      });
+      logger.error({ error: billSuggestions.reason, query }, 'Failed to fetch bill suggestions');
     }
 
     if (categorySuggestions.status === 'fulfilled') {
       suggestions.push(...categorySuggestions.value);
     } else {
-      logger.error('Failed to fetch category suggestions', {
-        error: categorySuggestions.reason,
-        query
-      });
+      logger.error({ error: categorySuggestions.reason, query }, 'Failed to fetch category suggestions');
     }
 
     if (sponsorSuggestions.status === 'fulfilled') {
       suggestions.push(...sponsorSuggestions.value);
     } else {
-      logger.error('Failed to fetch sponsor suggestions', {
-        error: sponsorSuggestions.reason,
-        query
-      });
+      logger.error({ error: sponsorSuggestions.reason, query }, 'Failed to fetch sponsor suggestions');
     }
 
     if (tagSuggestions.status === 'fulfilled') {
       suggestions.push(...tagSuggestions.value);
     } else {
-      logger.error('Failed to fetch tag suggestions', {
-        error: tagSuggestions.reason,
-        query
-      });
+      logger.error({ error: tagSuggestions.reason, query }, 'Failed to fetch tag suggestions');
     }
 
     if (aiCorrections.status === 'fulfilled') {
       suggestions.push(...aiCorrections.value);
     } else {
-      logger.error('Failed to fetch AI corrections', {
-        error: aiCorrections.reason,
-        query
-      });
+      logger.error({ error: aiCorrections.reason, query }, 'Failed to fetch AI corrections');
     }
 
     if (relatedTerms.status === 'fulfilled') {
       suggestions.push(...relatedTerms.value);
     } else {
-      logger.error('Failed to fetch related terms', {
-        error: relatedTerms.reason,
-        query
-      });
+      logger.error({ error: relatedTerms.reason, query }, 'Failed to fetch related terms');
     }
 
     // Create ranking context with user behavior data for personalization
@@ -311,13 +256,13 @@ export class SuggestionEngineService {
     // the internal searchContext's popularTerms array into a Map to match
     // the RankingContext shape used by the ranking algorithms.
     const popularTermsMap = new Map<string, number>(
-      (context.searchContext.popularTerms || []).map((pt: unknown) => [pt.term, pt.frequency])
+      (context.searchContext.popularTerms || []).map((pt: any) => [pt.term, pt.frequency])
     );
 
     const rankingContext: RankingContext = {
       query: context.query,
       searchContext: context.searchContext,
-      userHistory: (context.searchContext.userHistory || []).map((h: unknown) => h.query),
+      userHistory: (context.searchContext.userHistory || []).map((h: any) => h.query),
       popularTerms: popularTermsMap
     };
 
@@ -463,10 +408,7 @@ export class SuggestionEngineService {
         }
       }));
     } catch (error) {
-      logger.error('Tag suggestion query failed - check schema structure', {
-        error,
-        query
-      });
+      logger.error({ error, query }, 'Tag suggestion query failed - check schema structure');
       return [];
     }
   }
@@ -552,7 +494,7 @@ export class SuggestionEngineService {
         dateRanges: await this.getDateRangeFacets(searchPattern)
       };
     } catch (error) {
-      logger.error('Failed to generate facets', { error, query });
+      logger.error({ error, query }, 'Failed to generate facets');
       return this.getEmptyFacets();
     }
   }
@@ -581,7 +523,7 @@ export class SuggestionEngineService {
         label: result.tag.trim()
       }));
     } catch (error) {
-      logger.error('Failed to get tag facets', { error });
+      logger.error({ error }, 'Failed to get tag facets');
       return [];
     }
   }
@@ -698,17 +640,6 @@ export class SuggestionEngineService {
    * Get phonetic corrections using simplified Soundex algorithm
    */
   private async getPhoneticCorrections(query: string, limit: number): Promise<SearchSuggestion[]> {
-    // Simplified phonetic matching - in production, use proper phonetic algorithms
-    const phoneticMap: Record<string, string> = {
-      'a': '0', 'e': '0', 'i': '0', 'o': '0', 'u': '0', 'y': '0',
-      'b': '1', 'f': '1', 'p': '1', 'v': '1',
-      'c': '2', 'g': '2', 'j': '2', 'k': '2', 'q': '2', 's': '2', 'x': '2', 'z': '2',
-      'd': '3', 't': '3',
-      'l': '4',
-      'm': '5', 'n': '5',
-      'r': '6'
-    };
-
     const corrections: SearchSuggestion[] = [];
     const queryPhonetic = this.generatePhoneticCode(query);
 
@@ -758,7 +689,8 @@ export class SuggestionEngineService {
     let prevCode = '';
 
     for (let i = 1; i < cleaned.length && code.length < 4; i++) {
-      const charCode = phoneticMap[cleaned[i]] || '';
+      const char = cleaned[i];
+      const charCode = char ? (phoneticMap[char] || '') : '';
       if (charCode && charCode !== '0' && charCode !== prevCode) {
         code += charCode;
         prevCode = charCode;
@@ -852,7 +784,7 @@ export class SuggestionEngineService {
       // Calculate counts for each date range in parallel
       const countPromises = ranges.map(async (range) => {
         const start_date = new Date(now);
-        startDate.setDate(start_date.getDate() - range.days);
+        start_date.setDate(start_date.getDate() - range.days);
 
         const result = await this.db
           .select({ count: count() })
@@ -895,7 +827,7 @@ export class SuggestionEngineService {
 
       return rangeCounts;
     } catch (error) {
-      logger.error('Failed to calculate date range facets', { error });
+      logger.error({ error }, 'Failed to calculate date range facets');
       // Return zero counts as fallback
       return [
         ...ranges.map(r => ({ value: r.value, label: r.label, count: 0 })),
@@ -955,25 +887,32 @@ export class SuggestionEngineService {
       matrix[i] = [i];
     }
     for (let j = 0; j <= len2; j++) {
-      matrix[0][j] = j;
+      if (matrix[0]) {
+        matrix[0][j] = j;
+      }
     }
 
     // Fill in the rest of the matrix using dynamic programming
     for (let i = 1; i <= len1; i++) {
       for (let j = 1; j <= len2; j++) {
+        const prevRow = matrix[i - 1];
+        const currentRow = matrix[i];
+        
+        if (!prevRow || !currentRow) continue;
+        
         if (str1[i - 1] === str2[j - 1]) {
-          matrix[i][j] = matrix[i - 1][j - 1];
+          currentRow[j] = prevRow[j - 1] ?? 0;
         } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1, // substitution
-            matrix[i][j - 1] + 1,     // insertion
-            matrix[i - 1][j] + 1      // deletion
+          currentRow[j] = Math.min(
+            (prevRow[j - 1] ?? 0) + 1, // substitution
+            (currentRow[j - 1] ?? 0) + 1,     // insertion
+            (prevRow[j] ?? 0) + 1      // deletion
           );
         }
       }
     }
 
-    return matrix[len1][len2];
+    return matrix[len1]?.[len2] ?? 0;
   }
 
   /**
@@ -1000,7 +939,7 @@ export class SuggestionEngineService {
         query: query
       };
     } catch (error) {
-      logger.error('Failed to get search metadata', { error, query });
+      logger.error({ error, query }, 'Failed to get search metadata');
       return {
         totalResults: 0,
         searchTime: Date.now(),
@@ -1123,9 +1062,7 @@ export class SuggestionEngineService {
         });
       }
 
-      logger.info('Search history cleanup performed', {
-        remainingEntries: this.searchHistory.size
-      });
+      logger.info({ remainingEntries: this.searchHistory.size }, 'Search history cleanup performed');
     }
 
     // Clean popular terms cache
@@ -1150,9 +1087,7 @@ export class SuggestionEngineService {
         });
       }
 
-      logger.info('Popular terms cleanup performed', {
-        remainingTerms: this.popularTerms.size
-      });
+      logger.info({ remainingTerms: this.popularTerms.size }, 'Popular terms cleanup performed');
     }
   }
 
@@ -1189,7 +1124,7 @@ export class SuggestionEngineService {
 
       return analyticsRecords;
     } catch (error) {
-      logger.error('Failed to generate search analytics', { error });
+      logger.error({ error }, 'Failed to generate search analytics');
       return [];
     }
   }
@@ -1236,7 +1171,7 @@ export class SuggestionEngineService {
         generatedAt: new Date()
       };
     } catch (error) {
-      logger.error('Failed to generate aggregated analytics', { error });
+      logger.error({ error }, 'Failed to generate aggregated analytics');
       return {
         totalSearches: 0,
         uniqueQueries: 0,
@@ -1328,7 +1263,7 @@ export class SuggestionEngineService {
     });
 
     // Estimate popular terms size
-    this.popularTerms.forEach((data, term) => {
+    this.popularTerms.forEach((_data, term) => {
       totalBytes += term.length * 2;
       totalBytes += 16; // count and lastUpdated (8 bytes each)
     });
@@ -1372,7 +1307,7 @@ export class SuggestionEngineService {
    * @param data - The data object from exportSearchData()
    * @param merge - If true, merge with existing data; if false, replace
    */
-  importSearchData(data: unknown, merge: boolean = false): void {
+  importSearchData(data: any, merge: boolean = false): void {
     try {
       if (!merge) {
         this.searchHistory.clear();
@@ -1381,7 +1316,7 @@ export class SuggestionEngineService {
 
       // Import search history
       if (data.searchHistory && Array.isArray(data.searchHistory)) {
-        data.searchHistory.forEach((item: unknown) => {
+        data.searchHistory.forEach((item: any) => {
           const entry: HistoryEntry = {
             query: item.query,
             timestamp: typeof item.timestamp === 'number' ? item.timestamp : new Date(item.timestamp).getTime(),
@@ -1394,7 +1329,7 @@ export class SuggestionEngineService {
 
       // Import popular terms
       if (data.popularTerms && Array.isArray(data.popularTerms)) {
-        data.popularTerms.forEach((item: unknown) => {
+        data.popularTerms.forEach((item: any) => {
           this.popularTerms.set(item.term, {
             count: item.count,
             lastUpdated: typeof item.lastUpdated === 'number' ? item.lastUpdated : new Date(item.lastUpdated).getTime()
@@ -1402,13 +1337,13 @@ export class SuggestionEngineService {
         });
       }
 
-      logger.info('Search data imported successfully', {
+      logger.info({
         historyEntries: this.searchHistory.size,
         popularTerms: this.popularTerms.size,
         mergeMode: merge
-      });
+      }, 'Search data imported successfully');
     } catch (error) {
-      logger.error('Failed to import search data', { error });
+      logger.error({ error }, 'Failed to import search data');
       throw new Error('Search data import failed');
     }
   }

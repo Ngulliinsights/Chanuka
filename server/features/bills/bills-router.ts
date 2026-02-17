@@ -14,7 +14,7 @@ import { NextFunction, Response, Router } from 'express';
 import type { AuthenticatedRequest } from '../../../../AuthAlert';
 import { authenticateToken } from '../../../../AuthAlert';
 import { securityAuditService } from '../../../../security-audit-service';
-import { billService } from '@shared/application/bills.js';
+import { billService } from '@shared/application/bills';
 import { ERROR_CODES } from '@shared/constants';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
 import { createErrorContext } from '@server/infrastructure/error-handling';

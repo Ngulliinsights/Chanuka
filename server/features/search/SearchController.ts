@@ -8,14 +8,16 @@ import {
   rebuildSearchIndexes,
   searchBills,
   streamSearchBills,
-} from '@shared/application/SearchService';
-import { logger } from '@shared/core';
-import { Router, Response } from 'express';
+} from './application/SearchService';
+import { logger } from '../../infrastructure/observability/logger';
+import { Router, Request, Response } from 'express';
+import { searchRepository } from './infrastructure/SearchRepository';
 
-import { asyncHandler } from '@/middleware/error-management';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity } from '@shared/constants';
-import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { asyncHandler } from '../../middleware/error-management';
+import { BaseError, ValidationError, ErrorDomain } from '../../infrastructure/errors/base-error';
+import { ErrorSeverity } from '../../infrastructure/errors/error-standardization';
+import { ERROR_CODES } from '@shared/constants';
+import { createErrorContext } from '../../infrastructure/errors/error-configuration';
 
 // Type guards for query parameters
 function isSortBy(value: unknown): value is 'relevance' | 'date' | 'title' | 'engagement' {
@@ -30,7 +32,7 @@ function isSearchType(value: unknown): value is 'simple' | 'phrase' | 'boolean' 
   return typeof value === 'string' && ['simple', 'phrase', 'boolean'].includes(value);
 }
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /search - Search bills with advanced filtering and pagination
@@ -46,7 +48,7 @@ const router = Router();
  * - minScore: minimum relevance score
  * - searchType: 'simple' or advanced (default: simple)
  */
-router.get('/', asyncHandler(async (req, res: Response) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search');
 
   try {
@@ -90,7 +92,7 @@ router.get('/', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Search controller error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Search controller error');
 
     throw new BaseError('Search failed', {
       statusCode: 500,
@@ -108,7 +110,7 @@ router.get('/', asyncHandler(async (req, res: Response) => {
  * - q: partial query (minimum 2 characters)
  * - limit: max suggestions to return (default: 5, max: 20)
  */
-router.get('/suggestions', asyncHandler(async (req, res: Response) => {
+router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/suggestions');
 
   try {
@@ -124,7 +126,7 @@ router.get('/suggestions', asyncHandler(async (req, res: Response) => {
     const suggestions = await getSearchSuggestions(q, limit);
     res.json({ query: q, suggestions });
   } catch (error) {
-    logger.error('Search suggestions error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Search suggestions error');
 
     throw new BaseError('Failed to fetch search suggestions', {
       statusCode: 500,
@@ -141,7 +143,7 @@ router.get('/suggestions', asyncHandler(async (req, res: Response) => {
  * Query parameters:
  * - limit: number of popular terms (default: 20, max: 50)
  */
-router.get('/popular', asyncHandler(async (req, res: Response) => {
+router.get('/popular', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/popular');
 
   try {
@@ -150,7 +152,7 @@ router.get('/popular', asyncHandler(async (req, res: Response) => {
 
     res.json({ terms });
   } catch (error) {
-    logger.error('Popular search terms error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Popular search terms error');
 
     throw new BaseError('Failed to fetch popular search terms', {
       statusCode: 500,
@@ -169,7 +171,7 @@ router.get('/popular', asyncHandler(async (req, res: Response) => {
  *
  * Note: This route requires admin authentication
  */
-router.post('/admin/rebuild-index', asyncHandler(async (req, res: Response) => {
+router.post('/admin/rebuild-index', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'POST /api/search/admin/rebuild-index');
 
   try {
@@ -189,7 +191,7 @@ router.post('/admin/rebuild-index', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Rebuild search index error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Rebuild search index error');
 
     throw new BaseError('Failed to rebuild search indexes', {
       statusCode: 500,
@@ -207,14 +209,14 @@ router.post('/admin/rebuild-index', asyncHandler(async (req, res: Response) => {
  *
  * Note: This route requires admin authentication
  */
-router.get('/admin/index-health', asyncHandler(async (req, res: Response) => {
+router.get('/admin/index-health', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/admin/index-health');
 
   try {
     const health = await getSearchIndexHealth();
     res.json(health);
   } catch (error) {
-    logger.error('Get index health error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Get index health error');
 
     throw new BaseError('Failed to fetch index health', {
       statusCode: 500,
@@ -235,7 +237,7 @@ router.get('/admin/index-health', asyncHandler(async (req, res: Response) => {
  * Query parameters: Same as GET / (main search endpoint)
  * Streams results in chunks as they become available
  */
-router.get('/stream', asyncHandler(async (req, res: Response) => {
+router.get('/stream', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/stream');
 
   try {
@@ -281,7 +283,7 @@ router.get('/stream', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Streaming search error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Streaming search error');
 
     throw new BaseError('Streaming search failed', {
       statusCode: 500,
@@ -298,7 +300,7 @@ router.get('/stream', asyncHandler(async (req, res: Response) => {
  * Path parameters:
  * - searchId: unique identifier of the search to cancel
  */
-router.delete('/cancel/:searchId', asyncHandler(async (req, res: Response) => {
+router.delete('/cancel/:searchId', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'DELETE /api/search/cancel/:searchId');
 
   try {
@@ -318,7 +320,7 @@ router.delete('/cancel/:searchId', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Cancel search error', { component: 'search-routes', context, searchId: req.params.searchId }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, searchId: req.params.searchId, error }, 'Cancel search error');
 
     throw new BaseError('Failed to cancel search', {
       statusCode: 500,
@@ -336,7 +338,7 @@ router.delete('/cancel/:searchId', asyncHandler(async (req, res: Response) => {
  * - startDate: start of analytics period (ISO date string)
  * - endDate: end of analytics period (ISO date string)
  */
-router.get('/analytics', asyncHandler(async (req, res: Response) => {
+router.get('/analytics', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/analytics');
 
   try {
@@ -346,7 +348,7 @@ router.get('/analytics', asyncHandler(async (req, res: Response) => {
     const analytics = await getSearchAnalytics(startDate, endDate);
     res.json(analytics);
   } catch (error) {
-    logger.error('Search analytics error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Search analytics error');
 
     throw new BaseError('Failed to fetch search analytics', {
       statusCode: 500,
@@ -362,16 +364,367 @@ router.get('/analytics', asyncHandler(async (req, res: Response) => {
  * GET /search/analytics/metrics - Get current search metrics
  * Returns real-time metrics about search performance and usage
  */
-router.get('/analytics/metrics', asyncHandler(async (req, res: Response) => {
+router.get('/analytics/metrics', asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/analytics/metrics');
 
   try {
     const metrics = await getSearchMetrics();
     res.json(metrics);
   } catch (error) {
-    logger.error('Search metrics error', { component: 'search-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'search-routes', context, error }, 'Search metrics error');
 
     throw new BaseError('Failed to fetch search metrics', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes' }
+    });
+  }
+}));
+
+// ============================================================================
+// DATABASE-BACKED ENDPOINTS via SearchRepository
+// ============================================================================
+
+// ============================================================================
+// MISSING ENDPOINTS - Stub implementations for client integration
+// ============================================================================
+
+/**
+ * GET /search/postgresql - PostgreSQL full-text search
+ * Aliases to main search endpoint since PostgreSQL is the default engine
+ */
+router.get('/postgresql', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/search/postgresql');
+
+  try {
+    const query: Parameters<typeof searchBills>[0] = {
+      text: (req.query.q as string) ?? '',
+      filters: {
+        category: req.query.category ? String(req.query.category).split(',') : undefined,
+        status: req.query.status ? String(req.query.status).split(',') : undefined,
+      },
+      pagination: {
+        page: req.query.page ? Number(req.query.page) : 1,
+        limit: req.query.limit ? Number(req.query.limit) : 10,
+        sortBy: isSortBy(req.query.sortBy) ? req.query.sortBy : 'relevance',
+        sortOrder: isSortOrder(req.query.sortOrder) ? req.query.sortOrder : 'desc',
+      },
+      options: {
+        searchType: 'simple',
+      },
+    };
+
+    if (!query.text.trim()) {
+      throw new ValidationError('Search query is required', [
+        { field: 'q', message: 'Query parameter "q" is required and cannot be empty', code: 'REQUIRED_FIELD' }
+      ]);
+    }
+
+    const dto = await searchBills(query);
+
+    // Record in history via repository
+    searchRepository.recordSearch(query.text, dto.results?.length ?? 0).catch(() => {});
+
+    res.json(dto);
+  } catch (error) {
+    if (error instanceof ValidationError) throw error;
+
+    logger.error({ component: 'search-routes', context, error }, 'PostgreSQL search error');
+    throw new BaseError('PostgreSQL search failed', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes', query: req.query.q }
+    });
+  }
+}));
+
+/**
+ * GET /search/data - Return search data for client-side fuzzy matching
+ * Query parameters:
+ * - type: content type filter (default: 'bills')
+ */
+router.get('/data', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/search/data');
+
+  try {
+    // Return a basic search with empty query to get all available bills
+    const dto = await searchBills({
+      text: '',
+      pagination: { page: 1, limit: 100 },
+      options: { searchType: 'simple' },
+    });
+
+    // Transform to simplified format for fuzzy matching
+    const data = (dto.results || []).map((r: any) => ({
+      id: r.id || r.bill_id,
+      type: 'bill',
+      title: r.title || '',
+      description: r.summary || r.snippet || '',
+      relevanceScore: r.relevanceScore || 0,
+      metadata: r.metadata || {},
+    }));
+
+    res.json(data);
+  } catch (error) {
+    logger.error({ component: 'search-routes', context, error }, 'Search data error');
+    throw new BaseError('Failed to fetch search data', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes' }
+    });
+  }
+}));
+
+/**
+ * GET /search/live - Live search / typeahead
+ * Aliases to suggestions endpoint with slightly different formatting
+ */
+router.get('/live', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/search/live');
+
+  try {
+    const q = (req.query.q as string) ?? '';
+    const limit = Math.min(Number(req.query.limit) || 10, 20);
+
+    if (q.length < 1) {
+      res.json([]);
+      return;
+    }
+
+    const suggestions = await getSearchSuggestions(q, limit);
+    // Format as SearchSuggestion[]
+    const formatted = (suggestions || []).map((s: any) => ({
+      text: typeof s === 'string' ? s : s.term || s.text || '',
+      term: typeof s === 'string' ? s : s.term || s.text || '',
+      type: s.type || 'completion',
+      score: s.frequency || s.score || 0,
+      frequency: s.frequency || 0,
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    logger.error({ component: 'search-routes', context, error }, 'Live search error');
+    throw new BaseError('Live search failed', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes' }
+    });
+  }
+}));
+
+/**
+ * GET /search/recent - Get recent searches
+ */
+router.get('/recent', asyncHandler(async (req: Request, res: Response) => {
+  const limit = Math.min(Number(req.query.limit) || 5, 20);
+  const userId = (req as any).user?.id;
+  const results = await searchRepository.getRecentSearches(limit, userId);
+  res.json(results);
+}));
+
+/**
+ * GET /search/history - Get search history
+ */
+router.get('/history', asyncHandler(async (req: Request, res: Response) => {
+  const limit = Math.min(Number(req.query.limit) || 20, 100);
+  const userId = (req as any).user?.id;
+  const results = await searchRepository.getHistory(userId, limit);
+  res.json(results);
+}));
+
+/**
+ * DELETE /search/history - Clear search history
+ */
+router.delete('/history', asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  await searchRepository.clearHistory(userId);
+  res.json({ success: true });
+}));
+
+/**
+ * POST /search/saved - Save a search
+ */
+router.post('/saved', asyncHandler(async (req: Request, res: Response) => {
+  const { name, query, description, is_public, tags } = req.body;
+  const userId = (req as any).user?.id;
+
+  const saved = await searchRepository.saveSearch({
+    userId,
+    name: name || 'Untitled Search',
+    query: query || {},
+    description,
+    is_public: is_public ?? false,
+    tags: tags || [],
+  });
+
+  res.status(201).json(saved);
+}));
+
+/**
+ * GET /search/saved - Get saved searches
+ */
+router.get('/saved', asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  const results = await searchRepository.getSavedSearches(userId);
+  res.json(results);
+}));
+
+/**
+ * DELETE /search/saved/:id - Delete a saved search
+ */
+router.delete('/saved/:id', asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ValidationError('Search ID is required');
+  }
+  const userId = (req as any).user?.id;
+  const deleted = await searchRepository.deleteSavedSearch(id, userId ?? 'anonymous');
+  res.json({ success: deleted });
+}));
+
+/**
+ * POST /search/saved/:id/execute - Execute a saved search
+ */
+router.post('/saved/:id/execute', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'POST /api/search/saved/:id/execute');
+  const { id } = req.params;
+  if (!id) {
+    throw new ValidationError('Search ID is required');
+  }
+  const userId = (req as any).user?.id;
+
+  const query = await searchRepository.getAndUpdateSavedSearch(id, userId ?? 'anonymous');
+
+  if (!query) {
+    throw new ValidationError('Saved search not found', [
+      { field: 'id', message: `Saved search '${id}' not found`, code: 'NOT_FOUND' }
+    ]);
+  }
+
+  try {
+    const q = query as Record<string, unknown>;
+    const dto = await searchBills({
+      text: (q.q as string) || (q.text as string) || '',
+      filters: (q.filters as Record<string, unknown>) || {},
+      pagination: (q.pagination as { page: number; limit: number }) || { page: 1, limit: 10 },
+      options: (q.options as Record<string, unknown>) || { searchType: 'simple' },
+    });
+
+    res.json(dto);
+  } catch (error) {
+    logger.error({ component: 'search-routes', context, error }, 'Execute saved search error');
+    throw new BaseError('Failed to execute saved search', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes', savedSearchId: id }
+    });
+  }
+}));
+
+/**
+ * GET /search/metadata - Return available filter options and metadata
+ */
+router.get('/metadata', asyncHandler(async (_req: Request, res: Response) => {
+  const metadata = await searchRepository.getMetadata();
+  res.json(metadata);
+}));
+
+/**
+ * GET /search/related - Get related searches
+ */
+router.get('/related', asyncHandler(async (req: Request, res: Response) => {
+  const q = (req.query.q as string) ?? '';
+  const limit = Math.min(Number(req.query.limit) || 5, 20);
+
+  if (q.length < 2) {
+    res.json([]);
+    return;
+  }
+
+  try {
+    const related = await searchRepository.getRelatedSearches(q, limit);
+    res.json(related);
+  } catch {
+    // Fallback: return empty
+    res.json([]);
+  }
+}));
+
+/**
+ * GET /search/result/:type/:id - Get a single search result detail
+ */
+router.get('/result/:type/:id', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'GET /api/search/result/:type/:id');
+
+  try {
+    const { type, id } = req.params;
+    const result = await searchRepository.getSearchResultById(type ?? '', id ?? '');
+
+    if (!result) {
+      throw new ValidationError('Search result not found', [
+        { field: 'id', message: `${type} '${id}' not found`, code: 'NOT_FOUND' }
+      ]);
+    }
+
+    res.json(result);
+  } catch (error) {
+    if (error instanceof ValidationError) throw error;
+    logger.error({ component: 'search-routes', context, error }, 'Search result detail error');
+    throw new BaseError('Failed to fetch search result', {
+      statusCode: 500,
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      details: { component: 'search-routes' }
+    });
+  }
+}));
+
+/**
+ * POST /search/export - Export search results
+ */
+router.post('/export', asyncHandler(async (req: Request, res: Response) => {
+  const context = createErrorContext(req, 'POST /api/search/export');
+
+  try {
+    const format = (req.query.format as string) || 'json';
+    const q = req.body.q || (req.query.q as string) || '';
+
+    if (!q.trim()) {
+      throw new ValidationError('Search query is required for export', [
+        { field: 'q', message: 'Query parameter "q" is required', code: 'REQUIRED_FIELD' }
+      ]);
+    }
+
+    // Perform the search
+    const dto = await searchBills({
+      text: q,
+      pagination: { page: 1, limit: 500 },
+      options: { searchType: 'simple' },
+    });
+
+    // Return export response (stub — no actual file download)
+    res.json({
+      downloadUrl: `/api/search/export/download/${Date.now()}`,
+      format,
+      expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      totalRecords: dto.results?.length ?? 0,
+    });
+  } catch (error) {
+    if (error instanceof ValidationError) throw error;
+
+    logger.error({ component: 'search-routes', context, error }, 'Search export error');
+    throw new BaseError('Search export failed', {
       statusCode: 500,
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
       domain: ErrorDomain.SYSTEM,

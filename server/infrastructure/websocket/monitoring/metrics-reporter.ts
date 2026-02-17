@@ -4,7 +4,7 @@
  */
 
 import { IConnectionManager, IHealthChecker, IMetricsReporter, IOperationQueueManager,IStatisticsCollector, MetricsReport } from '../types';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 
 /**

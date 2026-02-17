@@ -10,7 +10,7 @@
  * - Session hijacking prevention
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { randomBytes, createHash } from 'crypto';
 
 export interface Session {

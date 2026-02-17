@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Simple in-memory cache service for application-level caching

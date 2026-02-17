@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { createCipheriv, createDecipheriv,randomBytes, scrypt, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 

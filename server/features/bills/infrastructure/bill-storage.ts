@@ -1,5 +1,5 @@
-import { BaseStorage, type StorageConfig } from '@server/infrastructure/database/base/BaseStorage.ts';
-import { logger  } from '@shared/core';
+import { BaseStorage, type StorageConfig } from '@server/infrastructure/database/base/BaseStorage';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import {
   type Bill,

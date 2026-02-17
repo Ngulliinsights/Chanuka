@@ -1,7 +1,7 @@
 import { type AnomalyEventContext, cibDetectionService } from '@server/features/safeguards/application/cib-detection-service';
 import { type ModerationContext, moderationService } from '@server/features/safeguards/application/moderation-service';
 import { type RateLimitContext, rateLimitService } from '@server/features/safeguards/application/rate-limit-service';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { NextFunction, Request, Response } from 'express';
 
 /**

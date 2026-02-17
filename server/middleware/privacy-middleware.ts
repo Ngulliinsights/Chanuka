@@ -1,5 +1,5 @@
 import { privacyService } from '@server/features/privacy/privacy-service';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { auditLogger } from '@shared/infrastructure/monitoring/audit-log';
 import { AuthenticatedRequest, PrivacyRequest } from '@server/middleware/auth-types';
 import { NextFunction,Request, Response } from 'express';

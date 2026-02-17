@@ -1,8 +1,8 @@
 import { Notification } from '@server/features/notifications/domain/entities/notification';
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { notifications, user_profiles,users } from '@server/infrastructure/schema';
-import { webSocketService } from '@shared/websocket.js';
+import { webSocketService } from '@shared/websocket';
 import { eq } from 'drizzle-orm';
 
 import { getEmailService } from './email-service';

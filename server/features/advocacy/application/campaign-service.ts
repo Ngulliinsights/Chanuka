@@ -2,12 +2,12 @@
 // ADVOCACY COORDINATION - Campaign Application Service
 // ============================================================================
 
-import { CampaignFilters, CampaignMetrics,PaginationOptions } from '@server/types/index.ts';
-import { logger  } from '@shared/core';
-import { Campaign, NewCampaign } from '@shared/domain/entities/campaign.js';
-import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
+import { CampaignFilters, CampaignMetrics,PaginationOptions } from '@server/types/index';
+import { logger } from '@server/infrastructure/observability';
+import { Campaign, NewCampaign } from '@shared/domain/entities/campaign';
+import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors';
 // Repository interface removed - using direct service calls
-import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service.js';
+import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service';
 
 export class CampaignService {
   constructor(

@@ -8,8 +8,7 @@
 import { EventEmitter } from 'events';
 
 import type { AppConfig } from './schema';
-
-import { configManager, getConfig } from './index';
+import { ConfigurationManager } from './manager';
 
 export type AssetsConfig = AppConfig['utilities']['assets'] & {
   getConfigForType: (type: 'critical' | 'script' | 'style' | 'image' | 'font') => any;

@@ -1,8 +1,8 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
 // Security Services
-import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
-import { logger   } from '@shared/core';
+import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service';
+import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { bills } from '@server/infrastructure/schema';
 import { argumentTable } from '@server/infrastructure/schema/argument_intelligence';

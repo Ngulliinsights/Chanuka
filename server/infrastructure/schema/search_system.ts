@@ -26,6 +26,7 @@ import {
   date,
   pgEnum,
   check,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 import { primaryKeyUuid } from "./base-types";
@@ -386,6 +387,45 @@ export const searchAnalytics = pgTable(
 );
 
 // ============================================================================
+// SAVED SEARCHES - User-bookmarked search queries for re-execution
+// ============================================================================
+
+export const savedSearches = pgTable(
+  "saved_searches",
+  {
+    id: primaryKeyUuid(),
+    user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    query: jsonb("query").notNull().default(sql`'{}'::jsonb`),
+    filters: jsonb("filters").notNull().default(sql`'{}'::jsonb`),
+    is_public: boolean("is_public").notNull().default(false),
+    tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
+
+    use_count: integer("use_count").notNull().default(0),
+    last_executed_at: timestamp("last_executed_at", { withTimezone: true }),
+
+    email_alerts_enabled: boolean("email_alerts_enabled").notNull().default(false),
+    email_alerts_frequency: varchar("email_alerts_frequency", { length: 20 }),
+    email_alerts_threshold: integer("email_alerts_threshold").notNull().default(0),
+
+    created_at: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updated_at: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    userIdx: index("idx_ss_user").on(table.user_id),
+    publicIdx: index("idx_ss_public").on(table.is_public),
+    createdAtIdx: index("idx_ss_created_at").on(table.created_at),
+    userCreatedIdx: index("idx_ss_user_created").on(table.user_id, table.created_at),
+  })
+);
+
+// ============================================================================
 // RELATIONSHIPS
 // ============================================================================
 
@@ -405,6 +445,13 @@ export const searchAnalyticsRelations = relations(searchAnalytics, () => ({
   // Analytics table is primarily for reporting, no outbound relations
 }));
 
+export const savedSearchesRelations = relations(savedSearches, ({ one }) => ({
+  user: one(users, {
+    fields: [savedSearches.user_id],
+    references: [users.id],
+  }),
+}));
+
 // ============================================================================
 // TYPE EXPORTS
 // ============================================================================
@@ -417,6 +464,9 @@ export type NewSearchQuery = typeof searchQueries.$inferInsert;
 
 export type SearchAnalytics = typeof searchAnalytics.$inferSelect;
 export type NewSearchAnalytics = typeof searchAnalytics.$inferInsert;
+
+export type SavedSearch = typeof savedSearches.$inferSelect;
+export type NewSavedSearch = typeof savedSearches.$inferInsert;
 
 // Enum type exports
 export type ContentType = (typeof contentTypeEnum.enumValues)[number];

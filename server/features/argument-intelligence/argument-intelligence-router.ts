@@ -3,20 +3,20 @@
 // ============================================================================
 // Complete REST API for argument intelligence operations
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Router } from 'express';
 
-import { argumentIntelligenceService } from './application/argument-intelligence-service.js';
-import { ArgumentProcessor } from './application/argument-processor.js';
-import { BriefGeneratorService } from './application/brief-generator.js';
-import { ClusteringService } from './application/clustering-service.js';
-import { CoalitionFinderService } from './application/coalition-finder.js';
-import { EvidenceValidatorService } from './application/evidence-validator.js';
-import { PowerBalancerService } from './application/power-balancer.js';
-import { StructureExtractorService } from './application/structure-extractor.js';
-import { EntityExtractor } from './infrastructure/nlp/entity-extractor.js';
-import { SentenceClassifier } from './infrastructure/nlp/sentence-classifier.js';
-import { SimilarityCalculator } from './infrastructure/nlp/similarity-calculator.js';
+import { argumentIntelligenceService } from './application/argument-intelligence-service';
+import { ArgumentProcessor } from './application/argument-processor';
+import { BriefGeneratorService } from './application/brief-generator';
+import { ClusteringService } from './application/clustering-service';
+import { CoalitionFinderService } from './application/coalition-finder';
+import { EvidenceValidatorService } from './application/evidence-validator';
+import { PowerBalancerService } from './application/power-balancer';
+import { StructureExtractorService } from './application/structure-extractor';
+import { EntityExtractor } from './infrastructure/nlp/entity-extractor';
+import { SentenceClassifier } from './infrastructure/nlp/sentence-classifier';
+import { SimilarityCalculator } from './infrastructure/nlp/similarity-calculator';
 
 export const router: Router = Router();
 

@@ -1,5 +1,5 @@
-import { auditLogger } from '@server/infrastructure/monitoring/index.js';
-import { logger   } from '@shared/core';
+import { auditLogger } from '@server/infrastructure/monitoring/index';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import {
   bill_engagement,

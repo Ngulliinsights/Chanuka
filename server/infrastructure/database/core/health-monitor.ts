@@ -7,7 +7,7 @@
  * - scripts/database/health-check.ts
  */
 
-import { UnifiedConnectionManager } from '@server/infrastructure/database/core/connection-manager.ts';
+import { UnifiedConnectionManager } from '@server/infrastructure/database/core/connection-manager';
 
 import { logger } from '@shared/core/observability';
 

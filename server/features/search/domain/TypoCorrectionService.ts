@@ -4,7 +4,7 @@
 // Advanced fuzzy matching, synonym recognition, and multilingual support
 // for intelligent query correction and expansion
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface CorrectionResult {
   originalQuery: string;

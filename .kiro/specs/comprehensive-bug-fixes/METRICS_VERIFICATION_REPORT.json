@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-02-17T04:27:33.700Z",
+  "timestamp": "2026-02-17T05:21:05.849Z",
   "overallPass": false,
   "metrics": [
     {
       "name": "Type Safety Violations",
-      "current": 580,
+      "current": 570,
       "target": 0,
       "baseline": 788,
       "met": false,
-      "details": "Found 252 'as any' and 328 'as unknown' in production code"
+      "details": "Found 242 'as any' and 328 'as unknown' in production code"
     },
     {
       "name": "TODO/FIXME Comments (bugs)",
@@ -28,19 +28,17 @@
     },
     {
       "name": "Commented Imports",
-      "current": 3,
+      "current": 0,
       "target": 0,
       "baseline": 33,
-      "met": false,
-      "details": "Found 3 commented import statements"
+      "met": true
     },
     {
       "name": "TypeScript Suppressions",
-      "current": 4,
+      "current": 0,
       "target": 0,
       "baseline": 3,
-      "met": false,
-      "details": "Found 4 TypeScript suppression directives"
+      "met": true
     },
     {
       "name": "Syntax Errors",
@@ -60,7 +58,7 @@
   ],
   "summary": {
     "totalMetrics": 7,
-    "metricsMet": 1,
-    "metricsFailed": 6
+    "metricsMet": 3,
+    "metricsFailed": 4
   }
 }

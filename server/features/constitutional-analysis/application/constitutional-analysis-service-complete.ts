@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/observability/logging';
-import { db } from '@server/infrastructure/database/pool.js';
+import { db } from '@server/infrastructure/database/pool';
 import {
   analysis_audit_trail,
   constitutional_analyses,

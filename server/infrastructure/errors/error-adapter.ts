@@ -5,7 +5,7 @@
 // and existing error response format
 
 import Boom from '@hapi/boom';
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { err,ok, Result } from 'neverthrow';
 
 import { 
@@ -14,7 +14,7 @@ import {
   ErrorResponse,
   ErrorSeverity, 
   StandardizedError 
-} from './error-standardization.js';
+} from './error-standardization';
 
 /**
  * Error Adapter that bridges Boom errors with existing error response format

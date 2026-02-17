@@ -8,7 +8,7 @@
  * @deprecated Use moderationOrchestratorService from './moderation/index.js' instead
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { 
   BulkModerationOperation,
@@ -17,7 +17,7 @@ import {
   ContentModerationFilters,
   ModerationActionRecord,
   ModerationItem,
-  moderationOrchestratorService} from './moderation/index.js';
+  moderationOrchestratorService} from './moderation/index';
 
 // Re-export types for backward compatibility
 export type {

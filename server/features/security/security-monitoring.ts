@@ -1,4 +1,4 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { bills, user_interests,users } from '@server/infrastructure/schema'; // Fixed: Added user_interests import
 import { eq } from 'drizzle-orm';

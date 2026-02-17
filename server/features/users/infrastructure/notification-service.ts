@@ -1,6 +1,6 @@
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
-import { NotificationData,notificationService } from '@/infrastructure/notifications/notification-service.js';
+import { NotificationData,notificationService } from '@/infrastructure/notifications/notification-service';
 
 export interface UserNotificationData extends Omit<NotificationData, 'user_id'> { user_id: string;
  }

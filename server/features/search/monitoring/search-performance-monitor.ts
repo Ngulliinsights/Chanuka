@@ -5,8 +5,21 @@
  * relevance measurement, and automated alerting for search system validation.
  */
 
-import { searchService } from '@shared/application/search-service.js';
-import { logger  } from '@shared/core';
+import { searchBills } from '../application/SearchService';
+
+const searchService = {
+  async search(opts: { query: string; pagination: { page: number; limit: number } }) {
+    const dto = await searchBills({ text: opts.query, pagination: opts.pagination });
+    return { 
+      results: (dto.results ?? []).map((r) => ({ 
+        ...r, 
+        relevanceScore: (r as any).relevanceScore ?? 0 
+      })), 
+      totalCount: dto.pagination?.total ?? 0 
+    };
+  }
+};
+import { logger } from '../../../infrastructure/observability/logger';
 
 export interface SearchMetrics {
   timestamp: Date;
@@ -208,13 +221,13 @@ export class SearchPerformanceMonitor {
       const aggregated = this.calculateAggregatedMetrics(component, windowMetrics);
       this.aggregatedMetrics.set(component, aggregated);
 
-      logger.info(`📊 Aggregated metrics for ${component}:`, {
+      logger.info({
         totalQueries: aggregated.totalQueries,
         errorRate: aggregated.errorRate,
         p95ResponseTime: aggregated.responseTime.p95,
         p99ResponseTime: aggregated.responseTime.p99,
         meanRelevance: aggregated.relevance.mean
-      });
+      }, `📊 Aggregated metrics for ${component}:`);
     }
   }
 
@@ -233,8 +246,8 @@ export class SearchPerformanceMonitor {
       .sort((a, b) => a - b);
 
     const responseTimeStats = {
-      min: responseTimes.length > 0 ? responseTimes[0] : 0,
-      max: responseTimes.length > 0 ? responseTimes[responseTimes.length - 1] : 0,
+      min: responseTimes.length > 0 ? (responseTimes[0] ?? 0) : 0,
+      max: responseTimes.length > 0 ? (responseTimes[responseTimes.length - 1] ?? 0) : 0,
       mean: responseTimes.length > 0 ? responseTimes.reduce((sum, rt) => sum + rt, 0) / responseTimes.length : 0,
       median: this.calculatePercentile(responseTimes, 50),
       p95: this.calculatePercentile(responseTimes, 95),
@@ -300,11 +313,13 @@ export class SearchPerformanceMonitor {
     const upper = Math.ceil(index);
     
     if (lower === upper) {
-      return sortedArray[lower];
+      return sortedArray[lower] ?? 0;
     }
     
     const weight = index - lower;
-    return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+    const lowerVal = sortedArray[lower] ?? 0;
+    const upperVal = sortedArray[upper] ?? 0;
+    return lowerVal * (1 - weight) + upperVal * weight;
   }
 
   /**
@@ -346,11 +361,11 @@ export class SearchPerformanceMonitor {
     // Store alerts
     for (const alert of alerts) {
       this.activeAlerts.set(alert.id, alert);
-      logger.warn(`🚨 Performance alert: ${alert.message}`, {
+      logger.warn({
         component: alert.component,
         severity: alert.severity,
         metric: alert.metric
-      });
+      }, `🚨 Performance alert: ${alert.message}`);
     }
   }
 
@@ -433,7 +448,7 @@ export class SearchPerformanceMonitor {
 
     this.activeAlerts.set(alertId, alert);
     
-    logger.warn(`🚨 Performance alert created:`, alert);
+    logger.warn(alert, `🚨 Performance alert created:`);
   }
 
   /**
@@ -476,7 +491,7 @@ export class SearchPerformanceMonitor {
 
         logger.debug(`Relevance test "${testCase.query}": ${relevanceScore.toFixed(3)}`);
       } catch (error) {
-        logger.error(`Relevance test failed for "${testCase.query}":`, error);
+        logger.error(error as any, `Relevance test failed for "${testCase.query}":`);
         
         // Record error metrics
         await this.recordSearchMetrics(
@@ -509,8 +524,9 @@ export class SearchPerformanceMonitor {
     const maxScore = expectedTerms.length;
 
     for (const result of results.slice(0, 5)) { // Check top 5 results
-      const title = result.title.toLowerCase();
-      const summary = (result.summary || '').toLowerCase();
+      const resultObj = result as { title?: string; summary?: string };
+      const title = (resultObj.title ?? '').toLowerCase();
+      const summary = (resultObj.summary ?? '').toLowerCase();
       const content = `${title} ${summary}`;
 
       let termMatches = 0;
@@ -533,11 +549,11 @@ export class SearchPerformanceMonitor {
    */
   setBaseline(component: string, baseline: AggregatedMetrics): void {
     this.baselines.set(component, baseline);
-    logger.info(`📊 Baseline set for ${component}:`, {
+    logger.info({
       responseTimeP95: baseline.responseTime.p95,
       errorRate: baseline.errorRate,
       relevanceMean: baseline.relevance.mean
-    });
+    }, `📊 Baseline set for ${component}:`);
   }
 
   /**
@@ -618,7 +634,8 @@ export class SearchPerformanceMonitor {
     }
 
     // Check for components meeting targets
-    for (const [component, data] of Object.entries(summary) as [string, any][]) {
+    const summaryObj = summary as Record<string, any>;
+    for (const [component, data] of Object.entries(summaryObj)) {
       if (data.improvements) {
         if (data.improvements.relevance >= 20) {
           recommendations.push(`${component} has achieved 20%+ relevance improvement target`);
@@ -635,7 +652,7 @@ export class SearchPerformanceMonitor {
   /**
    * Calculate overall health score
    */
-  private calculateOverallHealth(summary: unknown, alerts: PerformanceAlert[]): 'healthy' | 'warning' | 'critical' {
+  private calculateOverallHealth(_summary: unknown, alerts: PerformanceAlert[]): 'healthy' | 'warning' | 'critical' {
     const criticalAlerts = alerts.filter(a => a.severity === 'critical').length;
     const highAlerts = alerts.filter(a => a.severity === 'high').length;
 

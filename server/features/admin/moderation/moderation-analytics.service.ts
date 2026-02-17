@@ -4,8 +4,8 @@
  * Handles analytics, statistics, and reporting for the moderation system.
  */
 
-import { ContentAnalytics } from '@server/features/admin/moderation/types.ts';
-import { logger  } from '@shared/core';
+import { ContentAnalytics } from '@server/features/admin/moderation/types';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { bill, 
   comments, 

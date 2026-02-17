@@ -8,10 +8,10 @@
  */
 
 // bill-status-monitor exports the singleton instance as `billStatusMonitorService`
-import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor.ts';
-import { userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
-import { logger   } from '@shared/core';
-import { webSocketService } from '@shared/infrastructure/websocket.js';
+import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor';
+import { userPreferencesService } from '@server/features/users/domain/user-preferences';
+import { logger } from '@server/infrastructure/observability';
+import { webSocketService } from '@shared/infrastructure/websocket';
 import express from 'express';
 import { createServer } from 'http';
 

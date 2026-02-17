@@ -3,7 +3,7 @@
 // ============================================================================
 // Generates structured legislative briefs from synthesized citizen arguments
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface BriefGenerationRequest {
   bill_id: string;

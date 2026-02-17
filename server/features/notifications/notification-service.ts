@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { notifications } from '@server/infrastructure/schema';
 import { alert_preferences, user_contact_methods } from '@server/infrastructure/schema';

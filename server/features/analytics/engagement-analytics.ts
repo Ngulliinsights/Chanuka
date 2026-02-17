@@ -1,8 +1,8 @@
 // Security Services
-import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service.js';
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service.js';
+import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service';
+import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
 import { bill_engagement,comments as comments_cp } from '@shared/citizen_participation';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache  } from '@shared/core/caching';
 import { cacheKeys  } from '@shared/core/caching/key-generator';
 import { AuthenticatedRequest  } from '@shared/core/types/auth.types';

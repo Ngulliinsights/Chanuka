@@ -3,8 +3,8 @@
 // ============================================================================
 // Comprehensive performance monitoring, optimization, and alerting
 
-import { logger } from '@shared/core';
-import { cache } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
+import { cache } from '@server/infrastructure/cache';
 
 export interface PerformanceMetric {
   id: string;

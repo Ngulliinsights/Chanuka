@@ -5,8 +5,8 @@
  * including financial, professional, and voting pattern conflicts.
  */
 
-import { logger  } from '@shared/core';
-import { getDefaultCache } from '@shared/core/caching/index.js';
+import { logger } from '@server/infrastructure/observability';
+import { getDefaultCache } from '@shared/core/caching/index';
 import { database as db } from '@server/infrastructure/database';
 import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
@@ -21,7 +21,7 @@ import {
   isValidVote,
   ProfessionalConflict,
   ValidatedVote,
-  VotingAnomaly} from './types.js';
+  VotingAnomaly} from './types';
 
 export class ConflictDetectionEngineService {
   private static instance: ConflictDetectionEngineService;

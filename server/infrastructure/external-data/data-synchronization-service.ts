@@ -5,9 +5,9 @@
  * conflict resolution, and comprehensive monitoring and error reporting.
  */
 
-import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service.ts';
-import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service.ts';
-import { logger   } from '@shared/core';
+import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service';
+import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service';
+import { logger } from '@server/infrastructure/observability';
 // Import the database instance properly - adjust path as needed
 import { database as db } from '@server/infrastructure/database/connection';
 import { bill_cosponsors, bills, data_sources,sponsors, sync_jobs } from '@server/infrastructure/schema';
@@ -22,7 +22,7 @@ import {
   DataSource,
   SponsorData,
   SyncError,
-  SyncJob} from './types.js';
+  SyncJob} from './types';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;

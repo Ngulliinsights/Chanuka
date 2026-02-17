@@ -2,9 +2,9 @@
 
 import { 
   createDeploymentMonitoringDashboard 
-} from '../infrastructure/migration/deployment-monitoring-dashboard.js';
+} from '../infrastructure/migration/deployment-monitoring-dashboard';
 import { 
   createDeploymentOrchestrator, 
   DeploymentPhase, 
-  DeploymentPlan} from '../infrastructure/migration/deployment-orchestrator.js';
+  DeploymentPlan} from '../infrastructure/migration/deployment-orchestrator';
 impo

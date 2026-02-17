@@ -34,7 +34,7 @@ import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
 import { webSocketService } from '@server/utils/missing-modules-fallback';
 import { setupVite } from '@server/vite';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { pool } from '@server/infrastructure/database';
 import crypto from 'crypto';
 import express, { Express, NextFunction, Request, Response } from 'express';

@@ -8,11 +8,11 @@
  * - Integration with A/B testing framework
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { 
   AsyncServiceResult, 
   withResultHandling 
-} from '@shared/errors/result-adapter.js';
+} from '@shared/errors/result-adapter';
 
 // Types for feature flags
 export interface FeatureFlag {

@@ -4,10 +4,10 @@ import { cacheService } from '@shared/core/caching';
 import { bills, comment_votes,comments, user_profiles, users } from '@shared/citizen_participation';
 import { bill_engagement } from '@shared/citizen_participation';
 // FIXED: Import cacheKeys from the correct location
-import { cache, cacheKeys   } from '@shared/core';
+import { cache, cacheKeys } from '@server/infrastructure/cache';
 import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse   } from '@shared/core';
-import { logger   } from '@shared/core';
-import { ApiResponseWrapper  } from '@shared/core/utils/api-utils.js';
+import { logger } from '@server/infrastructure/observability';
+import { ApiResponseWrapper  } from '@shared/core/utils/api-utils';
 import { database as db } from '@server/infrastructure/database';
 import type {
   BillEngagementMetrics,
@@ -18,7 +18,7 @@ import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';
 
-import { errorTracker } from '@/core/errors/error-tracker.js';
+import { errorTracker } from '@/core/errors/error-tracker';
 import { databaseService } from '@/infrastructure/database/database-service';
 import { buildTimeThreshold } from '@/utils/db-helpers';
 

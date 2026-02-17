@@ -1,5 +1,5 @@
 import { authService } from '@server/infrastructure/core/auth/auth-service';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { NextFunction,Request, Response } from 'express';
 
 // Extend Express User type to match our auth service

@@ -1,6 +1,6 @@
 // Import the *combined* preference type, NOT the global one directly
-import type { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types.ts';
-import { logger   } from '@shared/core';
+import type { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types';
+import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache  } from '@shared/core/caching';
 import { database as db, readDatabase } from '@server/infrastructure/database';
 import { bill_cosponsors,bill_engagement, bills, comments, sponsors, user_interests, users } from '@server/infrastructure/schema';

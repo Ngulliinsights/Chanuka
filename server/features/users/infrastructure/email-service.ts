@@ -1,7 +1,7 @@
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
-import { config } from '@/config/index.js';
-import { EmailResult,getEmailService, sendTemplatedEmail } from '@/infrastructure/notifications/email-service.js';
+import { config } from '@/config/index';
+import { EmailResult,getEmailService, sendTemplatedEmail } from '@/infrastructure/notifications/email-service';
 
 export interface UserEmailData { user_id: string;
   email: string;

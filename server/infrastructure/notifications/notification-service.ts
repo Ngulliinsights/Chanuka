@@ -1,5 +1,5 @@
 import { PublishCommand,SNSClient } from '@aws-sdk/client-sns';
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import * as admin from 'firebase-admin';
 
 import { 

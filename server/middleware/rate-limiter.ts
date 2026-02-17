@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 

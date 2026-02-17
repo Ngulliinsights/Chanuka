@@ -1,56 +1,92 @@
 // ============================================================================
 // SEMANTIC SEARCH ENGINE - AI-Powered Vector Similarity Search
 // ============================================================================
-// Performs vector similarity search using cosine similarity with hybrid ranking
-// Combines semantic search with traditional search for optimal results
+// Performs vector similarity search using cosine similarity with hybrid ranking.
+// Combines semantic search with PostgreSQL full-text search for optimal results.
+//
+// NOTE ON QUERY STRATEGY
+// ──────────────────────
+// Drizzle's query builder collapses to `unknown` when SQL<unknown> expressions
+// (e.g. cosine similarity via pgvector's <=> operator) are mixed with .where()
+// chains. To preserve full TypeScript type safety without any unsafe casts, all
+// primary queries use `database.execute<RowType>(sql`...`)` — raw parameterised
+// SQL with an explicit generic row shape. This is idiomatic for vector workloads.
 
-import { logger } from '@shared/core';
-import { database } from '@server/infrastructure/database';
-import { bills, sponsors } from '@server/infrastructure/schema';
-import { comments } from '@server/infrastructure/schema';
-import { content_embeddings, QueryType,search_queries, SearchQuery } from '@server/infrastructure/schema/search_system';
-import { desc,eq, or, sql } from 'drizzle-orm';
+import { logger } from '../../../infrastructure/observability/logger';
+import { db as database } from '../../../infrastructure/database/pool';
+import {
+  searchQueries,
+  ContentType,
+  QueryType,
+} from '../../../infrastructure/schema/search_system';
+import { sql } from 'drizzle-orm';
+import { embeddingService } from '../services/embedding.service';
 
-import { embeddingService } from './embedding-service';
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const DEFAULT_LIMIT = 20;
+const DEFAULT_SIMILARITY_THRESHOLD = 0.5;
+const DEFAULT_SEMANTIC_WEIGHT = 0.7;
+const DEFAULT_TRADITIONAL_WEIGHT = 0.3;
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface SearchFilters {
+  contentType?: ContentType[];
+  dateRange?: {
+    start?: Date;
+    end?: Date;
+  };
+  language?: string;
+  /** Minimum cosine similarity score [0, 1]. Defaults to 0.5. */
+  minSimilarity?: number;
+}
 
 export interface SearchOptions {
   limit?: number;
   offset?: number;
-  filters?: {
-    contentType?: ('bill' | 'sponsor' | 'comment')[];
-    status?: string[];
-    dateRange?: {
-      start?: Date;
-      end?: Date;
-    };
-    county?: string;
-    constituency?: string;
-  };
-  hybrid?: boolean; // Enable hybrid search (semantic + traditional)
-  semanticWeight?: number; // Weight for semantic score (0-1)
-  traditionalWeight?: number; // Weight for traditional score (0-1)
+  filters?: SearchFilters;
+  /**
+   * When true, blends semantic score with PostgreSQL full-text ranking.
+   * Weights are controlled by `semanticWeight` / `traditionalWeight`.
+   */
+  hybrid?: boolean;
+  /** Weight for semantic score in hybrid mode. Default: 0.7 */
+  semanticWeight?: number;
+  /** Weight for full-text score in hybrid mode. Default: 0.3 */
+  traditionalWeight?: number;
+  /** Boost results by engagement/quality signals from the embedding record. */
+  boostByEngagement?: boolean;
+  /** Logged to search_queries for analytics when provided. */
+  userId?: string;
+  sessionId?: string;
 }
 
 export interface SearchResult {
   id: string;
-  contentType: 'bill' | 'sponsor' | 'comment';
+  contentType: ContentType;
   title: string;
-  summary?: string;
+  summary: string;
   content: string;
   relevanceScore: number;
-  semanticScore?: number;
+  semanticScore: number;
   traditionalScore?: number;
   metadata: {
-    status?: string;
-    county?: string;
-    constituency?: string;
+    tags?: string[];
+    language: string;
+    qualityScore?: number;
     createdAt: Date;
-    updatedAt?: Date;
+    updatedAt: Date;
   };
 }
 
 export interface SearchResponse {
   results: SearchResult[];
+  /** Approximate total matching rows (without limit/offset). */
   totalCount: number;
   query: string;
   searchType: QueryType;
@@ -58,561 +94,310 @@ export interface SearchResponse {
   hasMore: boolean;
 }
 
+// ============================================================================
+// INTERNAL ROW SHAPES  (only used to type database.execute<T> generics)
+// ============================================================================
+
+interface SearchRow {
+  id: string;
+  content_type: string;
+  title: string | null;
+  summary: string | null;
+  content: string | null;
+  semantic_score: string;        // Postgres returns numerics as strings
+  traditional_score: string | null;
+  relevance_score: string;
+  tags: string[] | null;
+  language: string;
+  quality_score: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface CountRow {
+  total: string;
+}
+
+interface AnalyticsRow {
+  total_queries: string;
+  avg_processing_ms: string | null;
+  total_results: string | null;
+  cache_hits: string | null;
+}
+
+// ============================================================================
+// ENGINE
+// ============================================================================
+
 export class SemanticSearchEngine {
-  private readonly defaultLimit = 20;
-  private readonly maxLimit = 100;
-
   /**
-   * Calculate cosine similarity between two vectors
-   */
-  private cosineSimilarity(vecA: number[], vecB: number[]): number {
-    if (vecA.length !== vecB.length) {
-      throw new Error('Vectors must have the same length');
-    }
-
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < vecA.length; i++) {
-      dotProduct += vecA[i] * vecB[i];
-      normA += vecA[i] * vecA[i];
-      normB += vecB[i] * vecB[i];
-    }
-
-    if (normA === 0 || normB === 0) {
-      return 0;
-    }
-
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
-
-  /**
-   * Perform semantic search with optional hybrid ranking
+   * Execute a semantic (or hybrid) search and return ranked results.
    */
   async search(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
     const startTime = Date.now();
     const {
-      limit = this.defaultLimit,
+      limit = DEFAULT_LIMIT,
       offset = 0,
       filters = {},
-      hybrid = true,
-      semanticWeight = 0.7,
-      traditionalWeight = 0.3,
+      hybrid = false,
+      semanticWeight = DEFAULT_SEMANTIC_WEIGHT,
+      traditionalWeight = DEFAULT_TRADITIONAL_WEIGHT,
+      boostByEngagement = false,
+      userId,
+      sessionId,
     } = options;
 
+    const minSimilarity = filters.minSimilarity ?? DEFAULT_SIMILARITY_THRESHOLD;
+    const searchType: QueryType = hybrid ? 'hybrid' : 'semantic';
+
     try {
-      logger.debug('Starting semantic search', {
-        query,
-        limit,
-        offset,
-        hybrid,
-        filters: Object.keys(filters),
-      });
+      logger.debug({ query, options }, 'Starting semantic search');
 
-      // Generate query embedding
-      const queryEmbedding = await embeddingService.generateEmbedding(query);
+      // 1. Generate embedding for the query.
+      const { embedding } = await embeddingService.generateEmbedding(query);
+      const vectorLiteral = `[${embedding.join(',')}]`;
 
-      // Log the search query
-      const searchQueryRecord = await this.logSearchQuery({
-        queryText: query,
-        queryType: hybrid ? QueryType.HYBRID : QueryType.SEMANTIC,
-        searchFilters: filters,
-        embedding: queryEmbedding.embedding,
-        processingTimeMs: 0, // Will update after search completes
-      });
+      // 2. Build optional filter fragments.
+      //    These are composed into the raw SQL templates as AND clauses.
+      const contentTypeClause =
+        filters.contentType && filters.contentType.length > 0
+          ? sql`AND content_type = ANY(ARRAY[${sql.join(
+              filters.contentType.map((t) => sql`${t}`),
+              sql`, `,
+            )}]::content_type[])`
+          : sql``;
 
-      let results: SearchResult[] = [];
-      let totalCount = 0;
+      const languageClause = filters.language
+        ? sql`AND content_language = ${filters.language}`
+        : sql``;
 
-      if (hybrid) {
-        // Perform hybrid search
-        const hybridResults = await this.performHybridSearch(
-          query,
-          queryEmbedding.embedding,
-          { ...options, semanticWeight, traditionalWeight }
-        );
-        results = hybridResults.results;
-        totalCount = hybridResults.totalCount;
-      } else {
-        // Perform pure semantic search
-        const semanticResults = await this.performSemanticSearch(
-          queryEmbedding.embedding,
-          options
-        );
-        results = semanticResults.results;
-        totalCount = semanticResults.totalCount;
+      const dateStartClause = filters.dateRange?.start
+        ? sql`AND created_at >= ${filters.dateRange.start}`
+        : sql``;
+
+      const dateEndClause = filters.dateRange?.end
+        ? sql`AND created_at <= ${filters.dateRange.end}`
+        : sql``;
+
+      // 3. Score expressions.
+      //    Cosine similarity via pgvector: 1 - (embedding <=> query_vector).
+      const semanticExpr = sql`1 - (embedding <=> ${vectorLiteral}::vector)`;
+
+      const traditionalExpr = sql`ts_rank(
+        to_tsvector('english',
+          coalesce(content_title, '') || ' ' || coalesce(content_text, '')
+        ),
+        plainto_tsquery('english', ${query})
+      )`;
+
+      const blendedExpr = hybrid
+        ? sql`(${semanticWeight}::float * (${semanticExpr})) + (${traditionalWeight}::float * (${traditionalExpr}))`
+        : semanticExpr;
+
+      const finalExpr = boostByEngagement
+        ? sql`(${blendedExpr}) * (
+              1
+              + 0.1  * coalesce(quality_score::float, 0.5)
+              + 0.05 * least(coalesce(engagement_score::float, 0) / 100.0, 1)
+            )`
+        : blendedExpr;
+
+      // 4. Main results query — typed via the SearchRow generic.
+      //    Using database.execute bypasses drizzle's builder inference, which
+      //    collapses to `unknown` when pgvector SQL expressions enter .where().
+      const rowsResult = await database.execute(sql`
+        SELECT
+          content_id                            AS id,
+          content_type,
+          content_title                         AS title,
+          content_summary                       AS summary,
+          content_text                          AS content,
+          (${semanticExpr})                     AS semantic_score,
+          ${hybrid ? sql`(${traditionalExpr})` : sql`NULL`}
+                                                AS traditional_score,
+          (${finalExpr})                        AS relevance_score,
+          content_tags                          AS tags,
+          content_language                      AS language,
+          quality_score,
+          created_at,
+          updated_at
+        FROM content_embeddings
+        WHERE (${semanticExpr}) > ${minSimilarity}
+          ${contentTypeClause}
+          ${languageClause}
+          ${dateStartClause}
+          ${dateEndClause}
+          AND processing_status = 'completed'
+        ORDER BY relevance_score DESC
+        LIMIT  ${limit}
+        OFFSET ${offset}
+      `);
+      const rows = rowsResult.rows as unknown as SearchRow[];
+
+      // 5. Separate count query for accurate pagination.
+      const countResult = await database.execute(sql`
+        SELECT count(*)::text AS total
+        FROM content_embeddings
+        WHERE (${semanticExpr}) > ${minSimilarity}
+          ${contentTypeClause}
+          ${languageClause}
+          ${dateStartClause}
+          ${dateEndClause}
+          AND processing_status = 'completed'
+      `);
+      
+      const countRows = countResult.rows as unknown as CountRow[];
+      const countRow = countRows[0];
+      if (!countRow) {
+        throw new Error('Count query returned no results');
       }
+
+      const totalCount = parseInt(countRow.total, 10);
+
+      // 6. Map raw DB rows to SearchResult.
+      const results: SearchResult[] = rows.map((r: SearchRow) => ({
+        id: r.id,
+        contentType: r.content_type as ContentType,
+        title: r.title ?? 'Untitled',
+        summary: r.summary ?? '',
+        content: r.content ?? '',
+        relevanceScore: parseFloat(r.relevance_score),
+        semanticScore: parseFloat(r.semantic_score),
+        traditionalScore:
+          r.traditional_score != null ? parseFloat(r.traditional_score) : undefined,
+        metadata: {
+          tags: r.tags ?? undefined,
+          language: r.language,
+          qualityScore: r.quality_score != null ? parseFloat(r.quality_score) : undefined,
+          createdAt: new Date(r.created_at),
+          updatedAt: new Date(r.updated_at),
+        },
+      }));
 
       const processingTimeMs = Date.now() - startTime;
 
-      // Update search query with processing time
-      await database
-        .update(search_queries)
-        .set({
-          processingTimeMs,
-          totalResults: totalCount,
-          relevantResults: results.length,
-        })
-        .where(eq(search_queries.id, searchQueryRecord.id));
+      // 7. Fire-and-forget analytics logging.
+      this.logSearchQuery({
+        query,
+        searchType,
+        userId,
+        sessionId,
+        filters,
+        processingTimeMs,
+        totalResults: totalCount,
+        resultsDisplayed: results.length,
+        embedding,
+      }).catch((err) => logger.warn({ err }, 'Failed to log search query'));
 
-      const response: SearchResponse = {
+      logger.debug(
+        { query, searchType, totalCount, processingTimeMs },
+        'Semantic search completed',
+      );
+
+      return {
         results,
         totalCount,
         query,
-        searchType: hybrid ? QueryType.HYBRID : QueryType.SEMANTIC,
+        searchType,
         processingTimeMs,
-        hasMore: (offset + limit) < totalCount,
+        hasMore: offset + results.length < totalCount,
       };
-
-      logger.debug('Semantic search completed', {
-        query,
-        resultCount: results.length,
-        totalCount,
-        processingTimeMs,
-        searchType: response.searchType,
-      });
-
-      return response;
-
     } catch (error) {
-      const processingTimeMs = Date.now() - startTime;
-      logger.error('Semantic search failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        query,
-        processingTimeMs,
-      });
-      throw error;
+      logger.error({ query, error }, 'Semantic search failed');
+      throw new Error(
+        `Semantic search failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   /**
-   * Perform pure semantic search using vector similarity
+   * Retrieve aggregated analytics for a given date.
    */
-  private async performSemanticSearch(
-    queryEmbedding: number[],
-    options: SearchOptions
-  ): Promise<{ results: SearchResult[]; totalCount: number }> {
-    const { limit = this.defaultLimit, offset = 0, filters = {} } = options;
+  async getSearchAnalytics(date: Date): Promise<Record<string, unknown>> {
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
 
-    // For now, use a simplified approach - get all embeddings and calculate similarity in JS
-    // In production, you'd want to use PostgreSQL's vector extension for better performance
-    let embeddingsQuery = database
-      .select({
-        id: content_embeddings.contentId,
-        contentType: content_embeddings.contentType,
-        title: content_embeddings.contentTitle,
-        summary: content_embeddings.contentSummary,
-        embedding: content_embeddings.embedding,
-        createdAt: content_embeddings.createdAt,
-        updatedAt: content_embeddings.updatedAt,
-      })
-      .from(content_embeddings)
-      .where(eq(content_embeddings.processingStatus, 'completed'));
-
-    // Apply content type filters
-    if (filters.contentType?.length) {
-      embeddingsQuery = embeddingsQuery.where(sql`${content_embeddings.contentType} = ANY(${filters.contentType})`);
-    }
-
-    const embeddings = await embeddingsQuery;
-
-    // Calculate cosine similarity for each embedding
-    const resultsWithScores = embeddings.map(emb => ({
-      ...emb,
-      semanticScore: this.cosineSimilarity(queryEmbedding, emb.embedding),
-    }));
-
-    // Sort by similarity score (descending)
-    resultsWithScores.sort((a, b) => b.semanticScore - a.semanticScore);
-
-    // Apply pagination
-    const paginatedResults = resultsWithScores.slice(offset, offset + limit);
-
-    // Enrich results with additional metadata
-    const results = await this.enrichSearchResults(paginatedResults, filters);
-
-    return { results, totalCount: resultsWithScores.length };
-  }
-
-  /**
-   * Perform hybrid search combining semantic and traditional search
-   */
-  private async performHybridSearch(
-    query: string,
-    queryEmbedding: number[],
-    options: SearchOptions & { semanticWeight: number; traditionalWeight: number }
-  ): Promise<{ results: SearchResult[]; totalCount: number }> {
-    const { limit = this.defaultLimit, offset = 0, filters = {}, semanticWeight, traditionalWeight } = options;
-
-    // Get semantic results
-    const semanticResults = await this.performSemanticSearch(queryEmbedding, { ...options, limit: limit * 2 });
-
-    // Get traditional search results
-    const traditionalResults = await this.performTraditionalSearch(query, { ...options, limit: limit * 2 });
-
-    // Combine and rank results using hybrid scoring
-    const combinedResults = this.combineHybridResults(
-      semanticResults.results,
-      traditionalResults.results,
-      semanticWeight,
-      traditionalWeight
-    );
-
-    // Apply final filtering, sorting, and pagination
-    const filteredResults = this.applyFilters(combinedResults, filters);
-    const sortedResults = filteredResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
-    const paginatedResults = sortedResults.slice(offset, offset + limit);
-
-    return {
-      results: paginatedResults,
-      totalCount: filteredResults.length,
-    };
-  }
-
-  /**
-   * Perform traditional text search (fallback/hybrid component)
-   */
-  private async performTraditionalSearch(
-    query: string,
-    options: SearchOptions
-  ): Promise<{ results: SearchResult[]; totalCount: number }> {
-    const { limit = this.defaultLimit, filters = {} } = options;
-
-    // Simple text search implementation
-    // In production, this could use PostgreSQL full-text search or Elasticsearch
-    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
-
-    if (searchTerms.length === 0) {
-      return { results: [], totalCount: 0 };
-    }
-
-    const results: SearchResult[] = [];
-
-    // Search bills
-    if (!filters.contentType || filters.contentType.includes('bill')) {
-      const billResults = await database
-        .select({
-          id: bills.id,
-          title: bills.title,
-          summary: bills.summary,
-          content: sql<string>`concat(${bills.title}, ' ', ${bills.summary}, ' ', ${bills.full_text})`,
-          status: bills.status,
-          county: bills.affected_counties,
-          createdAt: bills.created_at,
-        })
-        .from(bills)
-        .where(
-          or(
-            ...searchTerms.map(term => sql`${bills.title} ILIKE ${`%${term}%`}`),
-            ...searchTerms.map(term => sql`${bills.summary} ILIKE ${`%${term}%`}`),
-            ...searchTerms.map(term => sql`${bills.full_text} ILIKE ${`%${term}%`}`)
-          )
-        )
-        .limit(limit);
-
-      results.push(...billResults.map(bill => ({
-        id: bill.id,
-        contentType: 'bill' as const,
-        title: bill.title || '',
-        summary: bill.summary || undefined,
-        content: bill.content,
-        relevanceScore: 0, // Will be calculated in hybrid scoring
-        traditionalScore: this.calculateTraditionalScore(query, bill.content),
-        metadata: {
-          status: bill.status,
-          county: bill.county?.[0],
-          createdAt: bill.createdAt,
-        },
-      })));
-    }
-
-    // Search sponsors
-    if (!filters.contentType || filters.contentType.includes('sponsor')) {
-      const sponsorResults = await database
-        .select({
-          id: sponsors.id,
-          name: sponsors.name,
-          bio: sponsors.bio,
-          content: sql<string>`concat(${sponsors.name}, ' ', ${sponsors.bio})`,
-          county: sponsors.county,
-          createdAt: sponsors.created_at,
-        })
-        .from(sponsors)
-        .where(
-          or(
-            ...searchTerms.map(term => sql`${sponsors.name} ILIKE ${`%${term}%`}`),
-            ...searchTerms.map(term => sql`${sponsors.bio} ILIKE ${`%${term}%`}`)
-          )
-        )
-        .limit(limit);
-
-      results.push(...sponsorResults.map(sponsor => ({
-        id: sponsor.id,
-        contentType: 'sponsor' as const,
-        title: sponsor.name,
-        summary: sponsor.bio || undefined,
-        content: sponsor.content,
-        relevanceScore: 0,
-        traditionalScore: this.calculateTraditionalScore(query, sponsor.content),
-        metadata: {
-          county: sponsor.county,
-          createdAt: sponsor.createdAt,
-        },
-      })));
-    }
-
-    // Search comments
-    if (!filters.contentType || filters.contentType.includes('comment')) {
-      const commentResults = await database
-        .select({
-          id: comments.id,
-          content: comments.comment_text,
-          userCounty: comments.user_county,
-          createdAt: comments.created_at,
-        })
-        .from(comments)
-        .where(
-          or(
-            ...searchTerms.map(term => sql`${comments.comment_text} ILIKE ${`%${term}%`}`)
-          )
-        )
-        .limit(limit);
-
-      results.push(...commentResults.map(comment => ({
-        id: comment.id,
-        contentType: 'comment' as const,
-        title: 'Comment',
-        content: comment.content,
-        relevanceScore: 0,
-        traditionalScore: this.calculateTraditionalScore(query, comment.content),
-        metadata: {
-          county: comment.userCounty,
-          createdAt: comment.createdAt,
-        },
-      })));
-    }
-
-    return { results, totalCount: results.length };
-  }
-
-  /**
-   * Combine semantic and traditional search results with weighted scoring
-   */
-  private combineHybridResults(
-    semanticResults: SearchResult[],
-    traditionalResults: SearchResult[],
-    semanticWeight: number,
-    traditionalWeight: number
-  ): SearchResult[] {
-    const resultMap = new Map<string, SearchResult>();
-
-    // Add semantic results
-    semanticResults.forEach(result => {
-      const key = `${result.contentType}:${result.id}`;
-      resultMap.set(key, {
-        ...result,
-        relevanceScore: (result.semanticScore || 0) * semanticWeight,
-      });
-    });
-
-    // Add/merge traditional results
-    traditionalResults.forEach(result => {
-      const key = `${result.contentType}:${result.id}`;
-      const existing = resultMap.get(key);
-
-      if (existing) {
-        // Merge results
-        existing.relevanceScore += (result.traditionalScore || 0) * traditionalWeight;
-        existing.traditionalScore = result.traditionalScore;
-      } else {
-        // Add new result
-        resultMap.set(key, {
-          ...result,
-          relevanceScore: (result.traditionalScore || 0) * traditionalWeight,
-        });
-      }
-    });
-
-    return Array.from(resultMap.values());
-  }
-
-  /**
-   * Calculate traditional text matching score
-   */
-  private calculateTraditionalScore(query: string, text: string): number {
-    if (!text) return 0;
-
-    const queryTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
-    const textLower = text.toLowerCase();
-
-    let score = 0;
-    for (const term of queryTerms) {
-      // Exact matches get higher score
-      const exactMatches = (textLower.match(new RegExp(`\\b${term}\\b`, 'g')) || []).length;
-      score += exactMatches * 0.5;
-
-      // Partial matches get lower score
-      const partialMatches = (textLower.match(new RegExp(term, 'g')) || []).length;
-      score += (partialMatches - exactMatches) * 0.2;
-    }
-
-    // Normalize score
-    return Math.min(score / queryTerms.length, 1);
-  }
-
-  /**
-   * Apply filters to search results
-   */
-  private applyFilters(results: SearchResult[], filters: SearchOptions['filters']): SearchResult[] {
-    return results.filter(result => {
-      // Content type filter
-      if (filters?.contentType && !filters.contentType.includes(result.contentType)) {
-        return false;
+    try {
+      // Using execute avoids drizzle builder collapse on and(gte(...), lte(...)).
+      const statsResult = await database.execute(sql`
+        SELECT
+          count(*)::text                 AS total_queries,
+          avg(processing_time_ms)::text  AS avg_processing_ms,
+          sum(total_results)::text       AS total_results,
+          sum(cache_hit)::text           AS cache_hits
+        FROM search_queries
+        WHERE created_at >= ${dayStart}
+          AND created_at <= ${dayEnd}
+      `);
+      
+      const statsRows = statsResult.rows as unknown as AnalyticsRow[];
+      const stats = statsRows[0];
+      if (!stats) {
+        return {
+          totalQueries: 0,
+          avgProcessingMs: 0,
+          totalResults: 0,
+          cacheHitRate: 0,
+        };
       }
 
-      // Status filter
-      if (filters?.status && result.metadata.status && !filters.status.includes(result.metadata.status)) {
-        return false;
-      }
+      // TypeScript now knows stats is defined
+      const totalQueries = parseInt(stats.total_queries, 10);
+      const cacheHits    = parseInt(stats.cache_hits ?? '0', 10);
 
-      // Date range filter
-      if (filters?.dateRange) {
-        const createdAt = result.metadata.createdAt;
-        if (filters.dateRange.start && createdAt < filters.dateRange.start) return false;
-        if (filters.dateRange.end && createdAt > filters.dateRange.end) return false;
-      }
-
-      // Geographic filters
-      if (filters?.county && result.metadata.county !== filters.county) return false;
-      if (filters?.constituency && result.metadata.constituency !== filters.constituency) return false;
-
-      return true;
-    });
-  }
-
-  /**
-   * Enrich search results with additional metadata
-   */
-  private async enrichSearchResults(
-    semanticResults: unknown[],
-    filters: SearchOptions['filters']
-  ): Promise<SearchResult[]> {
-    // This is a simplified version. In production, you might want to batch these queries
-    const enrichedResults: SearchResult[] = [];
-
-    for (const result of semanticResults) {
-      let metadata: SearchResult['metadata'];
-
-      switch (result.contentType) {
-        case 'bill':
-          const bill = await database
-            .select({
-              status: bills.status,
-              county: sql<string>`${bills.affected_counties}[1]`,
-              createdAt: bills.created_at,
-              updatedAt: bills.updated_at,
-            })
-            .from(bills)
-            .where(eq(bills.id, result.id))
-            .limit(1);
-          metadata = bill[0] ? {
-            status: bill[0].status,
-            county: bill[0].county,
-            createdAt: bill[0].createdAt,
-            updatedAt: bill[0].updatedAt,
-          } : {
-            createdAt: result.createdAt,
-          };
-          break;
-
-        case 'sponsor':
-          const sponsor = await database
-            .select({
-              county: sponsors.county,
-              createdAt: sponsors.created_at,
-              updatedAt: sponsors.updated_at,
-            })
-            .from(sponsors)
-            .where(eq(sponsors.id, result.id))
-            .limit(1);
-          metadata = sponsor[0] ? {
-            county: sponsor[0].county,
-            createdAt: sponsor[0].createdAt,
-            updatedAt: sponsor[0].updatedAt,
-          } : {
-            createdAt: result.createdAt,
-          };
-          break;
-
-        case 'comment':
-          const comment = await database
-            .select({
-              userCounty: comments.user_county,
-              createdAt: comments.created_at,
-              updatedAt: comments.updated_at,
-            })
-            .from(comments)
-            .where(eq(comments.id, result.id))
-            .limit(1);
-          metadata = comment[0] ? {
-            county: comment[0].userCounty,
-            createdAt: comment[0].createdAt,
-            updatedAt: comment[0].updatedAt,
-          } : {
-            createdAt: result.createdAt,
-          };
-          break;
-
-        default:
-          metadata = { createdAt: result.createdAt };
-      }
-
-      enrichedResults.push({
-        id: result.id,
-        contentType: result.contentType,
-        title: result.title || '',
-        summary: result.summary,
-        content: '', // Not needed for display
-        relevanceScore: result.semanticScore || 0,
-        semanticScore: result.semanticScore,
-        metadata,
-      });
+      return {
+        date:            date.toISOString().split('T')[0],
+        totalQueries,
+        avgProcessingMs: parseFloat(stats.avg_processing_ms ?? '0'),
+        totalResults:    parseInt(stats.total_results ?? '0', 10),
+        cacheHits,
+        cacheHitRate:    totalQueries > 0 ? cacheHits / totalQueries : 0,
+      };
+    } catch (error) {
+      logger.error({ error, date }, 'Failed to fetch search analytics');
+      return {};
     }
-
-    return enrichedResults;
   }
 
+  // ============================================================================
+  // PRIVATE HELPERS
+  // ============================================================================
+
   /**
-   * Log search query for analytics
+   * Persist a record of the executed search for analytics.
+   * Called fire-and-forget — never awaited by the caller.
    */
-  private async logSearchQuery(data: {
-    queryText: string;
-    queryType: QueryType;
-    searchFilters: any;
-    embedding: number[];
+  private async logSearchQuery(params: {
+    query: string;
+    searchType: QueryType;
+    userId?: string;
+    sessionId?: string;
+    filters: SearchFilters;
     processingTimeMs: number;
-  }): Promise<SearchQuery> {
-    const [query] = await database
-      .insert(search_queries)
-      .values(data)
-      .returning();
+    totalResults: number;
+    resultsDisplayed: number;
+    embedding: number[];
+  }): Promise<void> {
+    // JSON round-trip converts SearchFilters interface → plain Record<string, unknown>,
+    // which satisfies drizzle's jsonb column typing without an unsafe cast.
+    const filtersJson = JSON.parse(JSON.stringify(params.filters)) as Record<string, unknown>;
 
-    return query;
-  }
-
-  /**
-   * Get search analytics
-   */
-  async getSearchAnalytics(date: Date): Promise<any> {
-    // Implementation for search analytics aggregation
-    // This would typically be run as a scheduled job
-    logger.warn('Search analytics aggregation not implemented');
-    return {};
+    await database.insert(searchQueries).values({
+      query_text:         params.query,
+      query_type:         params.searchType,
+      user_id:            params.userId    ?? null,
+      session_id:         params.sessionId ?? null,
+      search_filters:     filtersJson,
+      processing_time_ms: params.processingTimeMs,
+      total_results:      params.totalResults,
+      results_displayed:  params.resultsDisplayed,
+      embedding:          params.embedding,
+      cache_hit:          0, // Embedding-level cache hits tracked inside embeddingService
+    });
   }
 }
 
 // Export singleton instance
 export const semanticSearchEngine = new SemanticSearchEngine();
-
-

@@ -5,7 +5,7 @@
  * with environment-aware defaults and validation.
  */
 
-import { ConnectionManagerConfig } from '@server/infrastructure/database/core/connection-manager.ts';
+import { ConnectionManagerConfig } from '@server/infrastructure/database/core/connection-manager';
 
 /**
  * Environment-specific database configuration.

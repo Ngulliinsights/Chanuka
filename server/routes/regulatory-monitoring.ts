@@ -1,7 +1,7 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker.ts';
-import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring.ts';
+import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring';
 import { ApiResponseWrapper   } from '@shared/core';
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { NextFunction,Request, Response, Router } from 'express';
 import { z } from 'zod'; // For runtime validation
 

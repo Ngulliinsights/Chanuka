@@ -3,10 +3,10 @@
 // ============================================================================
 
 // Repository interfaces removed - using direct service calls
-import { ActionFilters, ActionTemplate,PaginationOptions } from '@server/types/index.ts';
-import { logger  } from '@shared/core';
-import { ActionItem, ActionItemEntity,NewActionItem } from '@shared/domain/entities/action-item.js';
-import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors.js';
+import { ActionFilters, ActionTemplate,PaginationOptions } from '@server/types/index';
+import { logger } from '@server/infrastructure/observability';
+import { ActionItem, ActionItemEntity,NewActionItem } from '@shared/domain/entities/action-item';
+import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors';
 
 export class ActionCoordinator {
   constructor(

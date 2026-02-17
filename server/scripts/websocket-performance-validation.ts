@@ -9,8 +9,8 @@
  */
 
 import { logger } from '@shared/core/observability/logging';
-import { BatchingService } from '@shared/infrastructure/batching-service.js';
-import { webSocketService } from '@shared/infrastructure/websocket.js';
+import { BatchingService } from '@shared/infrastructure/batching-service';
+import { webSocketService } from '@shared/infrastructure/websocket';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';

@@ -1,7 +1,7 @@
 import {
   AsyncServiceResult,
   ResultAdapter,
-  withResultHandling} from '@shared/errors/result-adapter.js';
+  withResultHandling} from '@shared/errors/result-adapter';
 
 import { logger } from '@/shared/core';
 

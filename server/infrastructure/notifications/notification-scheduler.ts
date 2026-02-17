@@ -1,4 +1,4 @@
-import { type BillTrackingPreferences,userPreferencesService } from '@server/features/users/domain/user-preferences.ts';
+import { type BillTrackingPreferences,userPreferencesService } from '@server/features/users/domain/user-preferences';
 import { database as db } from '@server/infrastructure/database';
 import { bill_engagement,bills, notifications, users } from '@server/infrastructure/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
@@ -12,7 +12,7 @@ const enhancedNotificationService = {
 };
 
 type EnhancedNotificationData = any;
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface ScheduledDigest { user_id: string;
   frequency: 'daily' | 'weekly' | 'monthly';

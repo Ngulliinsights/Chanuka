@@ -4,9 +4,9 @@
  * Configuration for enabling gradual rollout of the real ML service.
  */
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
 
 /**
  * Initialize ML service feature flag with default settings

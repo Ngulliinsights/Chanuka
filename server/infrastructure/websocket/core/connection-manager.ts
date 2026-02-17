@@ -7,7 +7,7 @@
  */
 
 import { verify } from 'jsonwebtoken';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 
 import { BASE_CONFIG } from '../config/base-config';

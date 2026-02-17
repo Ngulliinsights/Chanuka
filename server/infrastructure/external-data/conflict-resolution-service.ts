@@ -5,7 +5,7 @@
  * resolution strategies based on source priority and confidence levels.
  */
 
-import { logger   } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { data_sources } from '@server/infrastructure/schema';
 import { and,eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ import {
   ConflictSource, 
   DataSource,
   SponsorData 
-} from './types.js';
+} from './types';
 
 export class ConflictResolutionService {
   private autoResolveThreshold = 0.8; // 80% confidence threshold for auto-resolution

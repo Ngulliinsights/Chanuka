@@ -11,7 +11,7 @@
  * - Notification retry logic
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface Notification {
   id: string;

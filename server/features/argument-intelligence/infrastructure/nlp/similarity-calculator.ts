@@ -3,7 +3,7 @@
 // ============================================================================
 // Calculates semantic similarity between texts using various methods
 
-import { logger  } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface SimilarityResult {
   similarity: number;

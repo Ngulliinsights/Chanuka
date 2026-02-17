@@ -12,7 +12,7 @@
  * - Tag-based cache invalidation
  */
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { createHash } from 'crypto';
 
 export interface CacheOptions {

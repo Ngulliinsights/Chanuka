@@ -11,7 +11,7 @@ import {
   CircuitBreaker,
   ErrorContext,
 } from '@shared/core/observability/error-management';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { ERROR_CODES, ERROR_STATUS_CODES, ERROR_MESSAGES } from '@shared/constants';
 
 /**

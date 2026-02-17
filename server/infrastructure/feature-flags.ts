@@ -5,7 +5,7 @@
  * for the WebSocket to Socket.IO migration.
  */
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability/logger';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -125,7 +125,7 @@ export class FeatureFlagService {
   /**
    * Check if a feature is enabled for a specific user
    */
-  isEnabled(flagName: string, user_id?: string, context?: unknown): boolean {
+  isEnabled(flagName: string, user_id?: string, _context?: unknown): boolean {
     const flag = this.flags.get(flagName);
     if (!flag) {
       logger.warn(`Feature flag not found: ${flagName}`, {
@@ -185,7 +185,7 @@ export class FeatureFlagService {
     // Simple hash function for consistent user bucketing
     let hash = 0;
     for (let i = 0; i < user_id.length; i++) {
-      const char = userId.charCodeAt(i);
+      const char = user_id.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
     }

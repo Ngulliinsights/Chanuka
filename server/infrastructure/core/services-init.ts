@@ -12,9 +12,9 @@
  */
 
 // Import initialization modules
-import { initializeValidationServices, type ValidationServicesContainer } from '@server/infrastructure/core/validation/validation-services-init.ts';
-import { logger } from '@shared/core';
-import { getDbInstance } from '@shared/infrastructure/database/index.js';
+import { initializeValidationServices, type ValidationServicesContainer } from '@server/infrastructure/core/validation/validation-services-init';
+import { logger } from '@server/infrastructure/observability';
+import { getDbInstance } from '@shared/infrastructure/database/index';
 import type { Pool as PoolType } from 'pg';
 
 /**

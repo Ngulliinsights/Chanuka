@@ -1,5 +1,5 @@
-import { securityAuditService } from '@server/features/security/security-audit-service.ts';
-import { logger  } from '@shared/core';
+import { securityAuditService } from '@server/features/security/security-audit-service';
+import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 
 /**

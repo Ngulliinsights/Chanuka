@@ -6,8 +6,8 @@
 // responses, and maintain contact history.
 // ============================================================================
 
-import { RepresentativeContact } from '@server/types/index.ts';
-import { logger  } from '@shared/core';
+import { RepresentativeContact } from '@server/types/index';
+import { logger } from '@server/infrastructure/observability';
 
 // ============================================================================
 // Configuration Types
