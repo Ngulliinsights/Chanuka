@@ -1,29 +1,28 @@
-import { CoverageAnalyzer } from '@server/services/coverage-analyzer';
-import { logger } from '@shared/core';
+import { Router, type Request, type Response } from 'express';
+import type { Router as RouterType } from 'express';
+import { logger } from '../../infrastructure/observability/logger';
 
-import { Router } from 'express';
-
-const router = Router();
+const router: RouterType = Router();
 
 /**
  * GET /api/coverage/report
  * Generate comprehensive coverage report
  */
-router.get('/report', async (req, res) => {
+router.get('/report', async (_req: Request, res: Response) => {
   try {
   // Create analyzer lazily to respect test mocks and avoid early module-side instantiation
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const report = await coverageAnalyzer.generateCoverageReport();
     // Ensure any Date objects are converted to ISO strings so JSON responses
     // and mocked objects remain consistent during tests
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -39,14 +38,7 @@ router.get('/report', async (req, res) => {
       data: report
     });
     } catch (error) {
-    // Lazy-load logger to avoid initializing config during module import
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error generating coverage report:', { error });
-    } catch (e) {
-      // Fallback
-      logger.error('Error generating coverage report:', error);
-    }
+    logger.error({ error }, 'Error generating coverage report');
     res.status(500).json({
       success: false,
       error: 'Failed to generate coverage report',
@@ -59,20 +51,20 @@ router.get('/report', async (req, res) => {
  * GET /api/coverage/server
  * Get server-side coverage analysis
  */
-router.get('/server', async (req, res) => {
+router.get('/server', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeServerCoverage();
     // Normalize any Date instances
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -88,12 +80,7 @@ router.get('/server', async (req, res) => {
       data: coverage
     });
     } catch (error) {
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error analyzing server coverage:', { error });
-    } catch (e) {
-      logger.error('Error analyzing server coverage:', error);
-    }
+    logger.error({ error }, 'Error analyzing server coverage');
     res.status(500).json({
       success: false,
       error: 'Failed to analyze server coverage',
@@ -106,19 +93,19 @@ router.get('/server', async (req, res) => {
  * GET /api/coverage/client
  * Get client-side coverage analysis
  */
-router.get('/client', async (req, res) => {
+router.get('/client', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeClientCoverage();
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -134,12 +121,7 @@ router.get('/client', async (req, res) => {
       data: coverage
     });
     } catch (error) {
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error analyzing client coverage:', { error });
-    } catch (e) {
-      logger.error('Error analyzing client coverage:', error);
-    }
+    logger.error({ error }, 'Error analyzing client coverage');
     res.status(500).json({
       success: false,
       error: 'Failed to analyze client coverage',
@@ -152,19 +134,19 @@ router.get('/client', async (req, res) => {
  * GET /api/coverage/integration
  * Get integration test coverage analysis
  */
-router.get('/integration', async (req, res) => {
+router.get('/integration', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeIntegrationCoverage();
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -180,12 +162,7 @@ router.get('/integration', async (req, res) => {
       data: coverage
     });
     } catch (error) {
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error analyzing integration coverage:', { error });
-    } catch (e) {
-      logger.error('Error analyzing integration coverage:', error);
-    }
+    logger.error({ error }, 'Error analyzing integration coverage');
     res.status(500).json({
       success: false,
       error: 'Failed to analyze integration coverage',
@@ -198,10 +175,9 @@ router.get('/integration', async (req, res) => {
  * GET /api/coverage/gaps
  * Get coverage gaps analysis
  */
-router.get('/gaps', async (req, res) => {
+router.get('/gaps', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
   const coverageAnalyzer = new Analyzer();
   const serverCoverage = await coverageAnalyzer.analyzeServerCoverage();
@@ -215,12 +191,13 @@ router.get('/gaps', async (req, res) => {
     ]);
     
     // Normalize Dates in the gaps and summary objects if present
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -248,12 +225,7 @@ router.get('/gaps', async (req, res) => {
       }
     });
   } catch (error) {
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error analyzing coverage gaps:', { error });
-    } catch (e) {
-      logger.error('Error analyzing coverage gaps:', error);
-    }
+    logger.error({ error }, 'Error analyzing coverage gaps');
     res.status(500).json({
       success: false,
       error: 'Failed to analyze coverage gaps',
@@ -266,13 +238,12 @@ router.get('/gaps', async (req, res) => {
  * POST /api/coverage/analyze
  * Trigger fresh coverage analysis
  */
-router.post('/analyze', async (req, res) => {
+router.post('/analyze', async (req: Request, res: Response) => {
   try {
     const { type } = req.body;
     
     let result;
     // Lazily instantiate analyzer to ensure tests that mock the class are used
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
     const coverageAnalyzer = new Analyzer();
     switch (type) {
@@ -292,12 +263,13 @@ router.post('/analyze', async (req, res) => {
     }
     
     // Ensure date normalization for returned result
-    const serializeDates = (obj: unknown) => {
+    const serializeDates = (obj: unknown): unknown => {
       if (!obj || typeof obj !== 'object') return obj;
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
+      const record = obj as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        const val = record[key];
         if (val instanceof Date) {
-          obj[key] = val.toISOString();
+          record[key] = val.toISOString();
         } else if (Array.isArray(val)) {
           val.forEach(item => serializeDates(item));
         } else if (val && typeof val === 'object') {
@@ -315,12 +287,7 @@ router.post('/analyze', async (req, res) => {
       message: `Coverage analysis completed for ${type || 'all'} tests`
     });
   } catch (error) {
-    try {
-      import { logger } from '../../utils/logger';
-      logger.error('Error running coverage analysis:', { error });
-    } catch (e) {
-      logger.error('Error running coverage analysis:', error);
-    }
+    logger.error({ error }, 'Error running coverage analysis');
     res.status(500).json({
       success: false,
       error: 'Failed to run coverage analysis',
