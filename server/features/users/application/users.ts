@@ -82,15 +82,11 @@ export class UserDomainService {
    * Register a new user with validation and profile creation
    */
   async registerUser(registrationData: UserRegistrationData): AsyncServiceResult<UserAggregate> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Validate input
       if (!registrationData.email || !registrationData.name || !registrationData.password_hash) {
-        const validationResult = ResultAdapter.validationError([
-          { field: 'email', message: 'Email is required' },
-          { field: 'name', message: 'Name is required' },
-          { field: 'password_hash', message: 'Password is required' }
-        ], { service: 'UserDomainService', operation: 'registerUser' });
-        throw ResultAdapter.toBoom(validationResult._unsafeUnwrapErr());
+        const validationResult = err(createValidationError('Validation failed', { service: 'UserDomainService', operation: 'registerUser' }));
+        throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
       // Check for existing user - findByEmail returns User | null directly
@@ -98,12 +94,8 @@ export class UserDomainService {
       
       // If a user with this email already exists, reject the registration
       if (existingUser) {
-        const businessLogicResult = ResultAdapter.businessLogicError(
-          'unique_email',
-          'User with this email already exists',
-          { service: 'UserDomainService', operation: 'registerUser' }
-        );
-        throw ResultAdapter.toBoom(businessLogicResult._unsafeUnwrapErr());
+        const businessLogicResult = err(createBusinessLogicError('User with this email already exists', { ...{ service: 'UserDomainService', operation: 'registerUser' }, code: 'unique_email' }));
+        throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
       // Execute transaction and unwrap DatabaseResult
@@ -149,38 +141,30 @@ export class UserDomainService {
    * Update user profile with business rule validation
    */
   async updateUserProfile(user_id: string, updateData: ProfileUpdateData): AsyncServiceResult<UserAggregate> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Get current aggregate
       const aggregateResult = await this.userService.findUserAggregateById(user_id);
       
       // Check if the result is an error or null
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
+        const notFoundResult = err(createNotFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'updateUserProfile'
-        });
-        throw ResultAdapter.toBoom(notFoundResult._unsafeUnwrapErr());
+        }));
+        throw boomFromStandardized(notFoundResult._unsafeUnwrapErr());
       }
 
       const aggregate = aggregateResult;
 
       // Validate business rules
       if (updateData.is_public && aggregate.reputation_score < 10) {
-        const businessLogicResult = ResultAdapter.businessLogicError(
-          'minimum_reputation',
-          'Users must have at least 10 reputation points to make their profile public',
-          { service: 'UserDomainService', operation: 'updateUserProfile' }
-        );
-        throw ResultAdapter.toBoom(businessLogicResult._unsafeUnwrapErr());
+        const businessLogicResult = err(createBusinessLogicError('Users must have at least 10 reputation points to make their profile public', { ...{ service: 'UserDomainService', operation: 'updateUserProfile' }, code: 'minimum_reputation' }));
+        throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
       if (updateData.is_public && aggregate.profileCompleteness < 50) {
-        const businessLogicResult = ResultAdapter.businessLogicError(
-          'profile_completeness',
-          'Profile must be at least 50% complete to be made public',
-          { service: 'UserDomainService', operation: 'updateUserProfile' }
-        );
-        throw ResultAdapter.toBoom(businessLogicResult._unsafeUnwrapErr());
+        const businessLogicResult = err(createBusinessLogicError('Profile must be at least 50% complete to be made public', { ...{ service: 'UserDomainService', operation: 'updateUserProfile' }, code: 'profile_completeness' }));
+        throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
       const txResult = await databaseService.withTransaction(async (_tx) => {
@@ -250,31 +234,27 @@ export class UserDomainService {
    * Update user interests with validation
    */
   async updateUserInterests(user_id: string, interests: string[]): AsyncServiceResult<UserAggregate> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Get current aggregate
       const aggregateResult = await this.userService.findUserAggregateById(user_id);
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
+        const notFoundResult = err(createNotFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'updateUserInterests'
-        });
-        throw ResultAdapter.toBoom(notFoundResult._unsafeUnwrapErr());
+        }));
+        throw boomFromStandardized(notFoundResult._unsafeUnwrapErr());
       }
       const aggregate = aggregateResult;
 
       // Validate interests
       if (interests.length > 20) {
-        const validationResult = ResultAdapter.validationError([
-          { field: 'interests', message: 'Maximum 20 interests allowed', value: interests.length }
-        ], { service: 'UserDomainService', operation: 'updateUserInterests' });
-        throw ResultAdapter.toBoom(validationResult._unsafeUnwrapErr());
+        const validationResult = err(createValidationError('Validation failed', { service: 'UserDomainService', operation: 'updateUserInterests' }));
+        throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
       if (new Set(interests).size !== interests.length) {
-        const validationResult = ResultAdapter.validationError([
-          { field: 'interests', message: 'Duplicate interests are not allowed' }
-        ], { service: 'UserDomainService', operation: 'updateUserInterests' });
-        throw ResultAdapter.toBoom(validationResult._unsafeUnwrapErr());
+        const validationResult = err(createValidationError('Validation failed', { service: 'UserDomainService', operation: 'updateUserInterests' }));
+        throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
       const txResult = await databaseService.withTransaction(async (_tx) => {
@@ -313,45 +293,35 @@ export class UserDomainService {
    * Submit citizen verification with eligibility checks
    */
   async submitVerification(user_id: string, verificationData: VerificationSubmissionData): AsyncServiceResult<CitizenVerification> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Get user aggregate for eligibility check
       const aggregateResult = await this.userService.findUserAggregateById(user_id);
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
+        const notFoundResult = err(createNotFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'submitVerification'
-        });
-        throw ResultAdapter.toBoom(notFoundResult._unsafeUnwrapErr());
+        }));
+        throw boomFromStandardized(notFoundResult._unsafeUnwrapErr());
       }
       const aggregate = aggregateResult;
 
       // Check verification eligibility
       if (!aggregate.user.isEligibleForVerification()) {
-        const businessLogicResult = ResultAdapter.businessLogicError(
-          'verification_eligibility',
-          'User is not eligible for verification',
-          { service: 'UserDomainService', operation: 'submitVerification' }
-        );
-        throw ResultAdapter.toBoom(businessLogicResult._unsafeUnwrapErr());
+        const businessLogicResult = err(createBusinessLogicError('User is not eligible for verification', { ...{ service: 'UserDomainService', operation: 'submitVerification' }, code: 'verification_eligibility' }));
+        throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
       // Check if user already verified this bill
       const existingVerification = aggregate.verifications.find(v => v.bill_id === verificationData.bill_id);
       if (existingVerification) {
-        const businessLogicResult = ResultAdapter.businessLogicError(
-          'duplicate_verification',
-          'User has already verified this bill',
-          { service: 'UserDomainService', operation: 'submitVerification' }
-        );
-        throw ResultAdapter.toBoom(businessLogicResult._unsafeUnwrapErr());
+        const businessLogicResult = err(createBusinessLogicError('User has already verified this bill', { ...{ service: 'UserDomainService', operation: 'submitVerification' }, code: 'duplicate_verification' }));
+        throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
       // Validate evidence
       if (verificationData.evidence.length === 0) {
-        const validationResult = ResultAdapter.validationError([
-          { field: 'evidence', message: 'At least one piece of evidence is required' }
-        ], { service: 'UserDomainService', operation: 'submitVerification' });
-        throw ResultAdapter.toBoom(validationResult._unsafeUnwrapErr());
+        const validationResult = err(createValidationError('Validation failed', { service: 'UserDomainService', operation: 'submitVerification' }));
+        throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
       const txResult = await databaseService.withTransaction(async (_tx) => {

@@ -8,7 +8,11 @@
 
 import { BillFilters, BillStats,BillWithEngagement, CachedBillService, PaginatedBills, PaginationOptions } from '@server/features/bills/application/bill-service-adapter';
 
-import { toServiceResult, toBoomResult } from '@server/infrastructure/error-handling';
+import {
+  boomFromStandardized,
+  toBoomResult,
+  toServiceResult
+} from '@server/infrastructure/error-handling';
 
 export class BillServiceAdapter {
   private billService: CachedBillService;
@@ -27,7 +31,7 @@ export class BillServiceAdapter {
     const result = await this.billService.getAllBills(filters, pagination);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -41,7 +45,7 @@ export class BillServiceAdapter {
     const result = await this.billService.getBillById(id);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -55,7 +59,7 @@ export class BillServiceAdapter {
     const result = await this.billService.createBill(billData);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -69,7 +73,7 @@ export class BillServiceAdapter {
     const result = await this.billService.updateBill(id, updates);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -83,7 +87,7 @@ export class BillServiceAdapter {
     const result = await this.billService.updateBillStatus(id, newStatus, user_id);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -97,7 +101,7 @@ export class BillServiceAdapter {
     const result = await this.billService.getBillStats();
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     
@@ -115,7 +119,7 @@ export class BillServiceAdapter {
     const result = await this.billService.recordEngagement(bill_id, user_id, engagement_type);
     
     if (result.isErr()) {
-      const boomError = ResultAdapter.toBoom(result.error);
+      const boomError = boomFromStandardized(result.error);
       throw boomError;
     }
     

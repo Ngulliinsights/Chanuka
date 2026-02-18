@@ -1,11 +1,13 @@
 // cSpell:ignore upvotes downvotes
-import { logger } from '@shared/core/observability';
+import { logger } from '../../../infrastructure/observability';
 import { Bill, bills, sponsors, BillStatus, isValidEnum } from '@server/infrastructure/schema';
 import { bill_engagement, comments } from '@server/infrastructure/schema';
 import { and, count, desc, eq, inArray,or, sql } from "drizzle-orm";
 
 import type { AsyncServiceResult } from '@server/infrastructure/error-handling';
-import { safeAsync } from '@server/infrastructure/error-handling';
+import {
+  safeAsync
+} from '@server/infrastructure/error-handling';
 import { serverCache, CACHE_TTL as CACHE_TTL_CONSTANTS } from '@server/infrastructure/cache';
 import { databaseService } from '@server/infrastructure/database/database-service';
 
@@ -189,7 +191,7 @@ export class CachedBillService {
    * Retrieves a bill by ID with multi-layer caching.
    */
   async getBillById(id: string): Promise<AsyncServiceResult<BillWithEngagement | null>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       try {
         const [bill] = await this.db
           .select({
@@ -240,7 +242,7 @@ export class CachedBillService {
    * Creates a new bill and invalidates relevant caches.
    */
   async createBill(billData: InsertBill): Promise<AsyncServiceResult<Bill>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       if (!billData.title) {
         throw new Error('Title is required for bill creation');
       }
@@ -271,7 +273,7 @@ export class CachedBillService {
    * Updates an existing bill and invalidates caches.
    */
   async updateBill(id: string, updates: Partial<InsertBill>): Promise<AsyncServiceResult<Bill | null>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       const [updatedBill] = await this.db
         .update(bills)
         .set({
@@ -293,7 +295,7 @@ export class CachedBillService {
    * Updates bill status with cache invalidation.
    */
   async updateBillStatus(id: string, newStatus: string, user_id?: string): Promise<AsyncServiceResult<void>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       await databaseService.withTransaction(
         async (tx) => {
           await tx
@@ -324,7 +326,7 @@ export class CachedBillService {
    * Deletes a bill and cleans up all related caches.
    */
   async deleteBill(id: string): Promise<AsyncServiceResult<boolean>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       const result = await databaseService.withTransaction(
         async (tx) => {
           await tx.delete(bill_engagement).where(eq(bill_engagement.bill_id, id));
@@ -355,7 +357,7 @@ export class CachedBillService {
   async searchBills(query: string, filters: BillFilters = {}): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SEARCH}:${query}:${JSON.stringify(filters)}`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<Bill[]>(cacheKey);
       if (cached) return cached;
@@ -394,7 +396,7 @@ export class CachedBillService {
   async getBillsByStatus(status: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.STATUS}:${status}`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<Bill[]>(cacheKey);
       if (cached) return cached;
@@ -419,7 +421,7 @@ export class CachedBillService {
   async getBillsByCategory(category: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.CATEGORY}:${category}`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<Bill[]>(cacheKey);
       if (cached) return cached;
@@ -444,7 +446,7 @@ export class CachedBillService {
   async getBillsBySponsor(sponsor_id: string): Promise<AsyncServiceResult<Bill[]>> {
     const cacheKey = `${CACHE_KEYS.SPONSOR}:${sponsor_id}`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<Bill[]>(cacheKey);
       if (cached) return cached;
@@ -467,7 +469,7 @@ export class CachedBillService {
    * Gets bills by IDs (batch query).
    */
   async getBillsByIds(ids: string[]): Promise<AsyncServiceResult<Bill[]>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       if (ids.length === 0) return [];
 
       return await this.db
@@ -487,7 +489,7 @@ export class CachedBillService {
   ): Promise<AsyncServiceResult<PaginatedBills>> {
     const cacheKey = `${CACHE_KEYS.BILLS}:${JSON.stringify(filters)}:${pagination.page}:${pagination.limit}`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<PaginatedBills>(cacheKey);
       if (cached) return cached;
@@ -577,7 +579,7 @@ export class CachedBillService {
   async getBillStats(): Promise<AsyncServiceResult<BillStats>> {
     const cacheKey = `${CACHE_KEYS.STATS}:all`;
     
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       // Try cache first
       const cached = await cacheService.get<BillStats>(cacheKey);
       if (cached) return cached;
@@ -620,7 +622,7 @@ export class CachedBillService {
    * Counts bills with filters.
    */
   async countBills(filters: BillFilters = {}): Promise<AsyncServiceResult<number>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       const conditions = [];
 
           if (filters.status) conditions.push(eq(bills.status, filters.status as BillStatus));
@@ -658,7 +660,7 @@ export class CachedBillService {
     user_id: string,
     engagement_type: 'view' | 'comment' | 'share'
   ): Promise<AsyncServiceResult<void>> {
-    return withResultHandling(async () => {
+    return safeAsync(async () => {
       await databaseService.withTransaction(
         async (tx) => {
           const [existing] = await tx

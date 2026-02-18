@@ -41,6 +41,7 @@ const stats: MigrationStats = {
 const migrations = {
   // Import path updates
   imports: [
+    // Error handling imports
     {
       pattern: /from ['"]@\/infrastructure\/errors\/result-adapter['"]/g,
       replacement: "from '@server/infrastructure/error-handling'",
@@ -57,10 +58,51 @@ const migrations = {
       pattern: /from ['"]\.\.\/\.\.\/\.\.\/infrastructure\/errors['"]/g,
       replacement: "from '@server/infrastructure/error-handling'",
     },
+    // Database service imports
+    {
+      pattern: /from ['"]@\/infrastructure\/database\/database-service['"]/g,
+      replacement: "from '@server/infrastructure/database'",
+    },
+    {
+      pattern: /from ['"]\.\.\/\.\.\/\.\.\/infrastructure\/database\/database-service['"]/g,
+      replacement: "from '@server/infrastructure/database'",
+    },
+    {
+      pattern: /from ['"]@server\/infrastructure\/database\/database-service['"]/g,
+      replacement: "from '@server/infrastructure/database'",
+    },
   ],
 
   // API call replacements
   apiCalls: [
+    // Database service calls
+    {
+      pattern: /databaseService\.db\b/g,
+      replacement: 'db',
+      description: 'databaseService.db → db',
+    },
+    {
+      pattern: /databaseService\.readDb\b/g,
+      replacement: 'readDb',
+      description: 'databaseService.readDb → readDb',
+    },
+    {
+      pattern: /databaseService\.writeDb\b/g,
+      replacement: 'writeDb',
+      description: 'databaseService.writeDb → writeDb',
+    },
+    {
+      pattern: /databaseService\.withTransaction\(/g,
+      replacement: 'withTransaction(',
+      description: 'databaseService.withTransaction → withTransaction',
+    },
+    {
+      pattern: /databaseService\.withReadConnection\(/g,
+      replacement: 'withReadConnection(',
+      description: 'databaseService.withReadConnection → withReadConnection',
+    },
+    
+    // Error handling calls
     // withResultHandling → safeAsync
     {
       pattern: /withResultHandling\s*\(/g,
@@ -118,9 +160,10 @@ const migrations = {
       'ResultAdapter',
       'wrapAsync',
       'wrapSync',
+      'databaseService',
     ],
-    // Add new imports
-    add: [
+    // Add new imports for error handling
+    addErrorHandling: [
       'safeAsync',
       'safe',
       'err',
@@ -132,6 +175,14 @@ const migrations = {
       'createAuthorizationError',
       'boomFromStandardized',
       'standardizedFromBoom',
+    ],
+    // Add new imports for database
+    addDatabase: [
+      'db',
+      'readDb',
+      'writeDb',
+      'withTransaction',
+      'withReadConnection',
     ],
   },
 };
