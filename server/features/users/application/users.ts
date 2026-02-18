@@ -1,10 +1,9 @@
-import { databaseService } from '../../../infrastructure/database/database-service';
+import { databaseService } from '@server/infrastructure/database/database-service';
 import {
   AsyncServiceResult,
-  toServiceResult,
-  toBoomResult,
-  safeAsync
-} from '../../../infrastructure/error-handling';
+  withResultHandling,
+  ResultAdapter,
+} from '@server/infrastructure/errors';
 
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
