@@ -75,6 +75,7 @@ export {
   monitorOperation,
 } from './monitoring/performance-monitor';
 export { logAggregator, LogAggregator } from './monitoring/log-aggregator';
+export { errorTracker } from './monitoring/error-tracker';
 
 // ─── Express middleware factories ─────────────────────────────────────────────
 import type { NextFunction, Request, Response } from 'express';

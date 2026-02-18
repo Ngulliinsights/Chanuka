@@ -8,7 +8,7 @@
 
 import { BillFilters, BillStats,BillWithEngagement, CachedBillService, PaginatedBills, PaginationOptions } from '@server/features/bills/application/bill-service-adapter';
 
-import { toServiceResult, toBoomResult } from '@/infrastructure/error-handling';
+import { toServiceResult, toBoomResult } from '@server/infrastructure/error-handling';
 
 export class BillServiceAdapter {
   private billService: CachedBillService;

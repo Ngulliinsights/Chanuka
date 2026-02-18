@@ -11,7 +11,7 @@ import { logger } from '@server/infrastructure/observability';
 import type { Bill, BillComment } from '@server/infrastructure/schema';
 import { NextFunction,Request, Response, Router } from 'express';
 
-import { standardizedFromBoom, boomFromStandardized } from '@/infrastructure/error-handling';
+import { standardizedFromBoom, boomFromStandardized } from '@server/infrastructure/error-handling';
 
 import type { AuthenticatedRequest } from '../../../../AuthAlert';
 import { authenticateToken } from '../../../../AuthAlert';
