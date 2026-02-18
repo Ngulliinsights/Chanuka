@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { performanceMonitor   } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';
 import { Router } from 'express';

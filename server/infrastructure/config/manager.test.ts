@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ConfigurationManager, ConfigurationError, ConfigurationValidationError, ConfigurationEncryptionError } from './index';
-import { ObservabilityStack } from '../observability/types';
+import { ObservabilityStack } from '../observability/core/types';
 import * as path from 'path';
 import * as fs from 'fs';
 

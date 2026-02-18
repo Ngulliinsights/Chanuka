@@ -9,15 +9,13 @@ import {
   searchBills,
   streamSearchBills,
 } from './application/SearchService';
-import { logger } from '../../infrastructure/observability/logger';
+import { logger } from '../../infrastructure/observability/core/logger';
 import { Router, Request, Response } from 'express';
 import { searchRepository } from './infrastructure/SearchRepository';
 
 import { asyncHandler } from '../../middleware/error-management';
-import { BaseError, ValidationError, ErrorDomain } from '../../infrastructure/errors/base-error';
-import { ErrorSeverity } from '../../infrastructure/errors/error-standardization';
+import { createValidationError, createError, ErrorCategory, ErrorSeverity } from '../../infrastructure/error-handling';
 import { ERROR_CODES } from '@shared/constants';
-import { createErrorContext } from '../../infrastructure/errors/error-configuration';
 
 // Type guards for query parameters
 function isSortBy(value: unknown): value is 'relevance' | 'date' | 'title' | 'engagement' {

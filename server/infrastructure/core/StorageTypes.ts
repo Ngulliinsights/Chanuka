@@ -1,4 +1,4 @@
-import { InsertUser, InsertUserProgress,User, UserProgress } from '@server/types';
+import { InsertUser, InsertUserProgress, User, UserProgress } from './types.js';
 import { QueryResult, QueryResultRow } from 'pg';
 
 export interface TransactionClient {

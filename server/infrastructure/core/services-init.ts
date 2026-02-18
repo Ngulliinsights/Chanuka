@@ -12,9 +12,9 @@
  */
 
 // Import initialization modules
-import { initializeValidationServices, type ValidationServicesContainer } from '@server/infrastructure/core/validation/validation-services-init';
-import { logger } from '@server/infrastructure/observability';
-import { getDbInstance } from '@shared/infrastructure/database/index';
+import { initializeValidationServices, type ValidationServicesContainer } from './validation/validation-services-init.js';
+import { logger } from '../observability/index.js';
+import { getDatabaseOrchestrator } from '../database/index.js';
 import type { Pool as PoolType } from 'pg';
 
 /**
@@ -54,7 +54,7 @@ export async function initializeServerServices(options?: {
     let database;
     if (!options?.skipDatabase) {
       logger.debug('Initializing database connection...');
-      database = options?.dbPool || await getDbInstance();
+      database = options?.dbPool || await getDatabaseOrchestrator().getConnectionManager().getDatabase();
     } else {
       logger.debug('Skipping database initialization');
       database = null;
@@ -94,7 +94,7 @@ export async function initializeServerServices(options?: {
     return serverServicesContainer;
 
   } catch (error) {
-    logger.error('Failed to initialize server services:', error);
+    logger.error({ error }, 'Failed to initialize server services');
     
     // Reset container on failure
     serverServicesContainer = null;
@@ -153,7 +153,7 @@ export async function shutdownServerServices(): Promise<void> {
     // Shutdown services in reverse order
     
     // Shutdown validation services
-    const { shutdownValidationServices } = await import('@server/core/validation/validation-services-init.ts');
+    const { shutdownValidationServices } = await import('./validation/validation-services-init.js');
     await shutdownValidationServices();
 
     // Shutdown database connections if needed
@@ -166,7 +166,7 @@ export async function shutdownServerServices(): Promise<void> {
     
     logger.info('Server services shutdown completed');
   } catch (error) {
-    logger.error('Error during server services shutdown:', error);
+    logger.error({ error }, 'Error during server services shutdown');
     throw error;
   }
 }

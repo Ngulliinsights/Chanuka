@@ -7,8 +7,8 @@
 
 import * as Boom from '@hapi/boom';
 import { logger } from '@server/infrastructure/observability';
-import { errorAdapter } from '@shared/infrastructure/errors/error-adapter';
-import { ErrorResponse } from '@shared/infrastructure/errors/error-standardization';
+import { standardizedFromBoom, toErrorResponse } from '@server/infrastructure/error-handling';
+import type { ErrorResponse } from '@server/infrastructure/error-handling';
 import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 import { NextFunction,Request, Response } from 'express';
 import { ZodError } from 'zod';

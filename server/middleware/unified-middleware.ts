@@ -14,7 +14,7 @@ import { Request, Response, NextFunction, Application } from 'express';
  // Unused import
 
 import { getDefaultCache } from '../cache';
-import { setupGlobalErrorHandlers } from '../observability/error-management';
+// import { setupGlobalErrorHandlers } from '../observability/error-management'; // TODO: Module not found
 // Removed - module deleted by design during development
 import { logger } from '@shared/core/observability';
 import { ValidationService } from '../validation';
@@ -276,7 +276,7 @@ export class UnifiedMiddleware {
     if (this.config.errorHandling?.enabled) {
       // Setup global error handlers
       if (this.config.errorHandling.enableGlobalHandlers) {
-        setupGlobalErrorHandlers();
+        // setupGlobalErrorHandlers(); // TODO: Function not found
       }
 
       // Add unified error handler middleware (should be last)

@@ -5,7 +5,8 @@
 import { 
   ApiErrorResponse as ErrorResponse,
   ApiResponse,
-  ApiSuccessResponse as sendApiResponse
+  ApiSuccessResponse as sendApiResponse,
+  ApiValidationErrorResponse
  } from './shared-core-fallback';
 
 // For backward compatibility
@@ -17,14 +18,14 @@ console.warn(
 );
 
 export const ApiResponseWrapper = UnifiedApiResponse;
-export const ApiSuccess = (res: unknown, data: unknown, metadata?: unknown, statusCode?: number) =>
-  sendApiResponse(res, UnifiedApiResponse.success(data, undefined, metadata), statusCode);
-export const ApiError = (res: unknown, message: string, statusCode = 500) =>
-  sendApiResponse(res, UnifiedApiResponse.error(message), statusCode);
-export const ApiNotFound = (res: unknown, message = 'Resource not found') =>
-  sendApiResponse(res, UnifiedApiResponse.error(message, 'NOT_FOUND'), 404);
-export const ApiValidationError = (res: unknown, errors: unknown[]) =>
-  sendApiResponse(res, UnifiedApiResponse.validation(errors), 400);
+export const ApiSuccess = (res: unknown, data: unknown, metadata?: unknown) =>
+  sendApiResponse(res, data, metadata);
+export const ApiError = (res: unknown, message: string, statusCode = 500, metadata?: unknown) =>
+  ErrorResponse(res, message, statusCode, metadata);
+export const ApiNotFound = (res: unknown, message = 'Resource not found', metadata?: unknown) =>
+  ErrorResponse(res, message, 404, metadata);
+export const ApiValidationError = (res: unknown, errors: unknown, metadata?: unknown) =>
+  ApiValidationErrorResponse(res, errors, metadata);
 
 export type { ApiResponse, ErrorResponse };
 

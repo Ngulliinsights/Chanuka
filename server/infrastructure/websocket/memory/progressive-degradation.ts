@@ -5,7 +5,7 @@
  * Provides graceful degradation of service quality to maintain system stability under stress.
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
   DegradationLevel,

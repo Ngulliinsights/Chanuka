@@ -4,7 +4,7 @@
 // Handles OpenAI text-embedding-3-small integration with Redis caching
 // Supports batch processing and error handling with fallback mechanisms
 
-import { logger } from '../../../infrastructure/observability/logger';
+import { logger } from '../../../infrastructure/observability/core/logger';
 import { db as database } from '../../../infrastructure/database/pool';
 import { cacheService } from '../../../infrastructure/cache';
 import { contentEmbeddings, ContentType } from '../../../infrastructure/schema/search_system';

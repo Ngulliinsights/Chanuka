@@ -5,7 +5,7 @@
  * for search system components during deployment validation failures.
  */
 
-import { logger } from '@server/infrastructure/observability/logger';
+import { logger } from '@server/infrastructure/observability';
 import { searchPerformanceMonitor } from '@server/features/search/monitoring/search-performance-monitor';
 
 import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';

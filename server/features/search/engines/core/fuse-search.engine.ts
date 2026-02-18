@@ -8,7 +8,7 @@ import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
 import { db as database } from '../../../../infrastructure/database/pool';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
 import { sql, and, eq } from 'drizzle-orm';
-import Fuse from 'fuse';
+import Fuse from 'fuse.js';
 
 interface FuseSearchOptions {
   threshold?: number;
@@ -160,7 +160,7 @@ export class FuseSearchEngine implements SearchEngine {
 
     const fuseResults = fuse.search(query.query);
 
-    return fuseResults.map(result => ({
+    return fuseResults.map((result: Fuse.FuseResult<SearchableBill>) => ({
       id: result.item.id,
       title: result.item.title,
       summary: result.item.summary,
@@ -219,7 +219,7 @@ export class FuseSearchEngine implements SearchEngine {
 
     const fuseResults = fuse.search(query.query);
 
-    return fuseResults.map(result => ({
+    return fuseResults.map((result: Fuse.FuseResult<SearchableSponsor>) => ({
       id: result.item.id,
       title: result.item.name,
       summary: result.item.bio,
@@ -276,7 +276,7 @@ export class FuseSearchEngine implements SearchEngine {
 
     const fuseResults = fuse.search(query.query);
 
-    return fuseResults.map(result => ({
+    return fuseResults.map((result: Fuse.FuseResult<SearchableComment>) => ({
       id: result.item.id,
       title: `Comment by ${result.item.user_name}`,
       summary: this.truncateText(result.item.content, 200),

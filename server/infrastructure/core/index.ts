@@ -1,32 +1,52 @@
 // Core Domain
 // Centralized exports for core functionality
 
-// Authentication
+// Authentication - Export from auth modules (server-specific implementations)
 export * from './auth/index.js';
 
-// Validation
-export * from './validation/index.js';
+// Validation - Export from validation modules
+// Note: Explicitly avoid re-exporting AuthResult and SessionValidationResult from shared/core
+// as they're already exported from ./auth/index.js
+export {
+  DataCompletenessService,
+  DataIntegrityValidationService,
+  InputValidationService,
+  SchemaValidationService,
+  ValidationMetricsCollector,
+  initializeValidationServices,
+  getValidationServices,
+  getValidationService,
+  areValidationServicesInitialized,
+  resetValidationServices,
+  shutdownValidationServices,
+  validationMetricsCollector,
+  inputValidationService,
+  schemaValidationService,
+  dataIntegrityValidationService,
+  dataCompletenessService
+} from './validation/index.js';
+
+export type {
+  ValidationResultFromService,
+  ValidationResultFromSchema,
+  ValidationMetric,
+  ValidationMetricsSummary,
+  ValidationHealthStatus,
+  ValidationServicesContainer
+} from './validation/index.js';
 
 // Error Handling
-export { errorTracker } from './errors/error-tracker.js';
+export { errorTracker } from '../observability/monitoring/error-tracker.js';
 
 // Types
-// Avoid re-exporting SocialProfile to prevent conflicts
 export type {
   User,
   Bill,
   BillComment,
   SocialShare,
   Stakeholder
-} from './types/index.js';
+} from './types.js';
 export * from './StorageTypes.js';
-
-// API Response Types
-// TODO: Fix import when shared/core modules are available
-// export { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api';
-
-// Avoid re-exporting SocialProfile to prevent conflicts
-// export * from './types/index.js'; // SocialProfile already exported elsewhere
 
 
 

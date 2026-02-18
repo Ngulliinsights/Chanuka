@@ -13,7 +13,7 @@ const searchService = {
     return { results: (dto.results ?? []).map((r: Record<string, unknown>) => ({ ...r, relevanceScore: (r as { relevanceScore?: number }).relevanceScore ?? 0 })), totalCount: dto.totalResults ?? 0 };
   }
 };
-import { logger } from '@server/infrastructure/observability/logger';
+import { logger } from '@server/infrastructure/observability';
 
 
 import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';

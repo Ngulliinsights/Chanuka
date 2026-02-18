@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 17, 2026 at 05:46 PM
+**Generated:** February 18, 2026 at 04:52 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,951
+**Total Items:** 3,984
 
 ```
 .
@@ -2825,7 +2825,6 @@
 │   │   │   │   └── search-syntax-parser.ts
 │   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
-│   │   │   ├── search-index-manager.ts
 │   │   │   └── SearchController.ts
 │   │   ├── security/
 │   │   │   ├── encryption-service.ts
@@ -2995,11 +2994,6 @@
 │   │   │   │   ├── passwordReset.ts
 │   │   │   │   ├── secure-session-service.ts
 │   │   │   │   └── session-cleanup.ts
-│   │   │   ├── errors/
-│   │   │   │   ├── error-tracker.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── types/
-│   │   │   │   └── index.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── data-completeness.ts
 │   │   │   │   ├── data-validation-service.ts
@@ -3102,16 +3096,13 @@
 │   │   │   ├── init.ts
 │   │   │   ├── monitoring.ts
 │   │   │   └── pool.ts
-│   │   ├── errors/
-│   │   │   ├── base-error.ts
-│   │   │   ├── error-adapter.ts
-│   │   │   ├── error-configuration.ts
-│   │   │   ├── error-standardization.ts
+│   │   ├── error-handling/
+│   │   │   ├── error-factory.ts
+│   │   │   ├── http-error-handler.ts
 │   │   │   ├── index.ts
-│   │   │   ├── migration-example.ts
-│   │   │   ├── recovery-patterns.ts
-│   │   │   ├── result-adapter.ts
-│   │   │   └── result-integration-summary.md
+│   │   │   ├── resilience.ts
+│   │   │   ├── result-types.ts
+│   │   │   └── types.ts
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
@@ -3160,16 +3151,27 @@
 │   │   │   ├── smart-notification-filter.ts
 │   │   │   └── types.ts
 │   │   ├── observability/
-│   │   │   ├── audit-log.ts
-│   │   │   ├── database-logger.ts
-│   │   │   ├── external-api-management.ts
-│   │   │   ├── index.ts
-│   │   │   ├── log-aggregator.ts
-│   │   │   ├── logger.ts
-│   │   │   ├── logging-config.ts
-│   │   │   ├── monitoring-scheduler.ts
-│   │   │   ├── performance-monitor.ts
-│   │   │   └── types.ts
+│   │   │   ├── config/
+│   │   │   │   └── logging-config.ts
+│   │   │   ├── core/
+│   │   │   │   ├── log-buffer.ts
+│   │   │   │   ├── logger.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── database/
+│   │   │   │   └── database-logger.ts
+│   │   │   ├── http/
+│   │   │   │   ├── audit-middleware.ts
+│   │   │   │   └── response-wrapper.ts
+│   │   │   ├── monitoring/
+│   │   │   │   ├── error-tracker.ts
+│   │   │   │   ├── log-aggregator.ts
+│   │   │   │   ├── monitoring-policy.ts
+│   │   │   │   ├── monitoring-scheduler.ts
+│   │   │   │   └── performance-monitor.ts
+│   │   │   ├── security/
+│   │   │   │   ├── security-event-logger.ts
+│   │   │   │   └── security-policy.ts
+│   │   │   └── index.ts
 │   │   ├── performance/
 │   │   │   └── performance-monitor.ts
 │   │   ├── primitives/
@@ -3190,6 +3192,7 @@
 │   │   │   ├── analysis.ts
 │   │   │   ├── argument_intelligence.ts
 │   │   │   ├── base-types.ts
+│   │   │   ├── CIRCULAR_DEPENDENCIES.md
 │   │   │   ├── citizen_participation.ts
 │   │   │   ├── constitutional_intelligence.ts
 │   │   │   ├── enum-validator.ts
@@ -3214,6 +3217,7 @@
 │   │   │   ├── safeguards.ts
 │   │   │   ├── schema-generators.ts
 │   │   │   ├── search_system.ts
+│   │   │   ├── shared-relations.ts
 │   │   │   ├── sync-triggers.ts
 │   │   │   ├── transparency_analysis.ts
 │   │   │   ├── transparency_intelligence.ts
@@ -3323,12 +3327,17 @@
 │   ├── routes/
 │   │   └── regulatory-monitoring.ts
 │   ├── scripts/
+│   │   ├── analyze-module-errors.ts
 │   │   ├── api-race-condition-detector.ts
 │   │   ├── deploy-repository-migration.ts
 │   │   ├── deploy-websocket-migration.ts
+│   │   ├── error-analysis.ts
 │   │   ├── execute-websocket-migration.ts
 │   │   ├── final-migration-validation.ts
+│   │   ├── fix-constants-imports.ts
+│   │   ├── fix-module-resolution.ts
 │   │   ├── fix-return-statements.js
+│   │   ├── fix-shared-core-imports.ts
 │   │   ├── fix-shared-imports.js
 │   │   ├── legacy-websocket-cleanup.ts
 │   │   ├── migration-runner.ts
@@ -3369,10 +3378,14 @@
 │   │   │   ├── infrastructure/
 │   │   │   │   └── websocket/
 │   │   │   │       └── connection-manager.test.ts
-│   │   │   └── mocks/
-│   │   │       └── mock-data.ts
+│   │   │   ├── mocks/
+│   │   │   │   └── mock-data.ts
+│   │   │   └── compilation-infrastructure.test.ts
 │   │   ├── utils/
+│   │   │   ├── compilation-test.helpers.ts
+│   │   │   ├── compilation-test.utils.ts
 │   │   │   ├── logger.ts
+│   │   │   ├── README.md
 │   │   │   └── test-helpers.ts
 │   │   └── setup.ts
 │   ├── types/
@@ -3407,10 +3420,25 @@
 │   │   ├── response-helpers.ts
 │   │   ├── shared-core-fallback.ts
 │   │   └── validation.ts
+│   ├── CIRCULAR_DEPENDENCIES_RESOLUTION.md
+│   ├── error-baseline-report.md
 │   ├── index.ts
 │   ├── MIGRATION_EXAMPLES.ts
+│   ├── module-resolution-analysis-detailed.md
+│   ├── module-resolution-analysis.json
+│   ├── module-resolution-analysis.md
+│   ├── module-resolution-categorization.md
+│   ├── module-resolution-fix-report.md
+│   ├── module-resolution-progress-report.md
 │   ├── package.json
+│   ├── PHASE1_COMPLETION_SUMMARY.md
+│   ├── PHASE1_FINAL_REPORT.md
 │   ├── project.json
+│   ├── tsc-output-after-fix1.txt
+│   ├── tsc-output-after-fix2.txt
+│   ├── tsc-output-final.txt
+│   ├── tsc-output-fresh.txt
+│   ├── tsc-output.txt
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   └── vite.ts
@@ -3896,6 +3924,7 @@
 ├── drizzle.config.ts
 ├── enum-alignment-report.json
 ├── EXECUTIVE_SUMMARY.md
+├── FINAL_FIX_INSTRUCTIONS.md
 ├── FINAL_SESSION_REPORT.md
 ├── FIXES_APPLIED.md
 ├── generate-structure.mjs
@@ -3907,11 +3936,14 @@
 ├── IMPORT_RESOLUTION_FIXES_APPLIED.md
 ├── knip.config.ts
 ├── knip.json
+├── LOGGER_USAGE_GUIDE.md
 ├── METRICS_FIX_PLAN.md
 ├── METRICS_FIX_PROGRESS.md
 ├── migration-verification-report.json
 ├── nginx.conf
 ├── nx.json
+├── OBSERVABILITY_FIX_SUMMARY.md
+├── OBSERVABILITY_REORGANIZATION_COMPLETE.md
 ├── package.json
 ├── performance-baselines.json
 ├── playwright.config.ts
@@ -3951,6 +3983,7 @@
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
 ├── type-check-output.txt
+├── TYPESCRIPT_MODULE_RESOLUTION_FIX.md
 ├── VALIDATION_SCHEMA_ALIGNMENT_COMPLETE.md
 ├── VERIFICATION_SUMMARY.md
 ├── verify-graph-implementation.sh

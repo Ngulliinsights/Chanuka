@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { logger } from '@server/infrastructure/observability';
 import { createObservabilityStack  } from '@shared/core/observability';
 import { apmService } from '@shared/monitoring';

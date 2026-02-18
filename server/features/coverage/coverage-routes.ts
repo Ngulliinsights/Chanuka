@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import type { Router as RouterType } from 'express';
-import { logger } from '../../infrastructure/observability/logger';
+import { logger } from '../../infrastructure/observability/core/logger';
 
 const router: RouterType = Router();
 

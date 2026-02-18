@@ -1,4 +1,4 @@
-import { logger } from '../../../infrastructure/observability/logger';
+import { logger } from '../../../infrastructure/observability/core/logger';
 import { queryIntentService } from '../domain/QueryIntentService';
 import type {
   PlainBill,

@@ -12,7 +12,7 @@
 // primary queries use `database.execute<RowType>(sql`...`)` — raw parameterised
 // SQL with an explicit generic row shape. This is idiomatic for vector workloads.
 
-import { logger } from '../../../infrastructure/observability/logger';
+import { logger } from '../../../infrastructure/observability/core/logger';
 import { db as database } from '../../../infrastructure/database/pool';
 import {
   searchQueries,

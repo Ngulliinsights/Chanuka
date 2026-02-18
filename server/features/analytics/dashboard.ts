@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 // Security Services
 import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service';
 import { inputValidationService } from '@server/infrastructure/security/input-validation-service';

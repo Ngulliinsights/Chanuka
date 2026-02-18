@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { regulatoryChangeMonitoringService } from '@server/features/analytics/regulatory-change-monitoring';
 import { ApiResponseWrapper   } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';

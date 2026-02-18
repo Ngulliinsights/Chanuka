@@ -1,12 +1,12 @@
 import { Response } from 'express';
 
-import { ErrorDomain } from '../observability/error-management';
+import { ErrorCategory } from '@server/infrastructure/error-handling';
 
 interface ErrorResponse {
   statusCode: number;
   message: string;
   code?: string;
-  domain?: ErrorDomain;
+  domain?: ErrorCategory;
   details?: any;
 }
 
@@ -24,7 +24,7 @@ export class ResponseHelper {
       error: {
         message: error.message,
         code: error.code || 'UNKNOWN_ERROR',
-        domain: error.domain || ErrorDomain.SYSTEM,
+        domain: error.domain || ErrorCategory.SYSTEM,
         details: error.details
       }
     });

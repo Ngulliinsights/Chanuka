@@ -19,7 +19,7 @@ const searchService = {
     };
   }
 };
-import { logger } from '../../../infrastructure/observability/logger';
+import { logger } from '../../../infrastructure/observability/core/logger';
 
 export interface SearchMetrics {
   timestamp: Date;

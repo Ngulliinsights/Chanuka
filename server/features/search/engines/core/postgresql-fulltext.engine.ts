@@ -11,7 +11,7 @@
 
 import { SearchQuery, SearchResult } from '../types/search.types';
 import { ParsedQuery, searchSyntaxParser } from '../../utils/search-syntax-parser';
-import { logger } from '../../../../infrastructure/observability/logger';
+import { logger } from '../../../../infrastructure/observability/core/logger';
 import { pool } from '../../../../infrastructure/database/pool';
 
 interface QueryExpansionOptions {

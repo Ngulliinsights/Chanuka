@@ -5,7 +5,7 @@
 
 import { Response } from 'express';
 
-import { logger } from '@shared/core/observability';
+import { logger } from '../infrastructure/observability';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -188,10 +188,10 @@ export function sendApiResponse<T>(
 
   // Log the response for monitoring
   if (!response.success) {
-    logger.error('API Error Response', {
+    logger.error({
       error: response.error,
       statusCode: status
-    });
+    }, 'API Error Response');
   }
 
   res.status(status).json(response);

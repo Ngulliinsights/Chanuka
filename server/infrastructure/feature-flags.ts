@@ -5,7 +5,7 @@
  * for the WebSocket to Socket.IO migration.
  */
 
-import { logger } from '@server/infrastructure/observability/logger';
+import { logger } from '@server/infrastructure/observability';
 
 // ============================================================================
 // TYPE DEFINITIONS

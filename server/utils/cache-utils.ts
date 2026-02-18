@@ -1,14 +1,16 @@
 /**
  * Unified Cache Utilities
- * 
- * Consolidates all caching functionality from '@shared/core/caching'.ts
- * into the shared core system.
+ *
+ * Consolidates all caching functionality into the shared core system.
  */
 
-import { MemoryAdapter } from '../caching/adapters/memory-adapter';
-import { logger } from '@shared/core/observability';
+import { MemoryAdapter } from '../infrastructure/cache/adapters/memory-adapter';
+import { logger } from '../infrastructure/observability';
 
-// Cache metrics for monitoring
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 export interface CacheMetrics {
   hits: number;
   misses: number;
@@ -26,35 +28,52 @@ export type CacheDecorator = (
   descriptor: TypedPropertyDescriptor<any>,
 ) => TypedPropertyDescriptor<any>;
 
-// Default cache adapter
+// ---------------------------------------------------------------------------
+// Internals
+// ---------------------------------------------------------------------------
+
 const defaultAdapter = new MemoryAdapter({
   maxSize: 1000,
-  defaultTtlSec: 3600
+  defaultTtlSec: 3600,
 });
 
 const cacheMetrics: CacheMetrics = {
   hits: 0,
   misses: 0,
   errors: 0,
-  sets: 0
+  sets: 0,
 };
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function toErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+// ---------------------------------------------------------------------------
+// Cache
+// ---------------------------------------------------------------------------
+
 /**
- * Enhanced cache utility with error handling and metrics tracking.
- * Provides a standardized interface for caching expensive operations.
+ * Decorator-compatible cache utility with error handling and metrics tracking.
+ * Usage:
+ *   @cache({ ttl: 60 })
+ *   async expensiveMethod(arg: string) { ... }
  */
 export const cache = Object.assign(
-  (options: Partial<CacheOptions> = {}) => {
-    return (
+  (options: Partial<CacheOptions> = {}) =>
+    (
       _target: any,
       propertyKey: string | symbol,
       descriptor: TypedPropertyDescriptor<any>,
-    ) => {
+    ): TypedPropertyDescriptor<any> => {
       const originalMethod = descriptor.value;
 
       descriptor.value = async function (...args: unknown[]) {
         const key = `${String(propertyKey)}:${JSON.stringify(args)}`;
-        
+
         try {
           const cached = await defaultAdapter.get(key);
           if (cached !== null) {
@@ -63,88 +82,80 @@ export const cache = Object.assign(
           }
         } catch (error) {
           cacheMetrics.errors++;
-          logger.warn('Cache get failed, proceeding with computation', {
-            component: 'cache',
-            key,
-            error: error instanceof Error ? error.message : String(error)
-          });
+          logger.warn(
+            { component: 'cache', key, error: toErrorMessage(error) },
+            'Cache get failed, proceeding with computation',
+          );
         }
 
         cacheMetrics.misses++;
         const result = await originalMethod.apply(this, args);
-        
+
         try {
-          await defaultAdapter.set(key, result, options.ttl || 3600);
+          await defaultAdapter.set(key, result, options.ttl ?? 3600);
           cacheMetrics.sets++;
         } catch (error) {
           cacheMetrics.errors++;
-          logger.warn('Cache set failed, returning computed value', {
-            component: 'cache',
-            key,
-            error: error instanceof Error ? error.message : String(error)
-          });
+          logger.warn(
+            { component: 'cache', key, error: toErrorMessage(error) },
+            'Cache set failed, returning computed value',
+          );
         }
 
         return result;
       };
 
       return descriptor;
-    };
-  },
+    },
+
   {
     /**
-     * Get or set cache with enhanced error handling and metrics.
+     * Get or compute-and-set a cached value.
      */
     getOrSetCache: async <T>(
       key: string,
       ttlSeconds: number,
-      fn: () => Promise<T>
+      fn: () => Promise<T>,
     ): Promise<T> => {
       try {
         const cached = await defaultAdapter.get<T>(key);
         if (cached !== null) {
           cacheMetrics.hits++;
-          logger.debug('Cache hit', { component: 'cache', key });
+          logger.debug({ component: 'cache', key }, 'Cache hit');
           return cached;
         }
       } catch (error) {
         cacheMetrics.errors++;
-        logger.warn('Cache get failed, proceeding with computation', {
-          component: 'cache',
-          key,
-          error: error instanceof Error ? error.message : String(error)
-        });
+        logger.warn(
+          { component: 'cache', key, error: toErrorMessage(error) },
+          'Cache get failed, proceeding with computation',
+        );
       }
 
       cacheMetrics.misses++;
-      logger.debug('Cache miss', { component: 'cache', key });
+      logger.debug({ component: 'cache', key }, 'Cache miss');
 
       const result = await fn();
 
       try {
         await defaultAdapter.set(key, result, ttlSeconds);
         cacheMetrics.sets++;
-        logger.debug('Cache set successful', { component: 'cache', key, ttlSeconds });
+        logger.debug({ component: 'cache', key, ttlSeconds }, 'Cache set successful');
       } catch (error) {
         cacheMetrics.errors++;
-        logger.warn('Cache set failed, returning computed value', {
-          component: 'cache',
-          key,
-          error: error instanceof Error ? error.message : String(error)
-        });
+        logger.warn(
+          { component: 'cache', key, error: toErrorMessage(error) },
+          'Cache set failed, returning computed value',
+        );
       }
 
       return result;
     },
 
-    /**
-     * Get cache metrics for monitoring
-     */
+    /** Returns a snapshot of current cache metrics. */
     getMetrics: (): CacheMetrics => ({ ...cacheMetrics }),
 
-    /**
-     * Reset cache metrics (useful for testing)
-     */
+    /** Resets cache metrics — useful for testing. */
     resetMetrics: (): void => {
       cacheMetrics.hits = 0;
       cacheMetrics.misses = 0;
@@ -152,38 +163,32 @@ export const cache = Object.assign(
       cacheMetrics.sets = 0;
     },
 
-    /**
-     * Invalidate cache entry
-     */
-    invalidate: async (key: string) => {
+    /** Removes a single entry from the cache. */
+    invalidate: async (key: string): Promise<boolean> => {
       try {
         await defaultAdapter.delete(key);
-        logger.info('Cache invalidated', { component: 'cache', key });
+        logger.info({ component: 'cache', key }, 'Cache invalidated');
         return true;
       } catch (error) {
-        logger.warn('Cache invalidation failed', { component: 'cache', key, error });
+        logger.warn({ component: 'cache', key, error }, 'Cache invalidation failed');
         return false;
       }
     },
 
-    /**
-     * Clear all cache entries
-     */
-    clear: async () => {
+    /** Removes all entries from the cache. */
+    clear: async (): Promise<boolean> => {
       try {
         await defaultAdapter.clear();
-        logger.info('Cache cleared', { component: 'cache' });
+        logger.info({ component: 'cache' }, 'Cache cleared');
         return true;
       } catch (error) {
-        logger.warn('Cache clear failed', { component: 'cache', error });
+        logger.warn({ component: 'cache', error }, 'Cache clear failed');
         return false;
       }
     },
 
-    /**
-     * Get a value from cache
-     */
-    get: async (key: string) => {
+    /** Reads a single value from the cache. Returns null on miss or error. */
+    get: async (key: string): Promise<unknown> => {
       try {
         const result = await defaultAdapter.get(key);
         if (result !== null) {
@@ -194,27 +199,21 @@ export const cache = Object.assign(
         return result;
       } catch (error) {
         cacheMetrics.errors++;
-        logger.warn('Cache get failed', { key, error });
+        logger.warn({ key, error }, 'Cache get failed');
         return null;
       }
     },
 
-    /**
-     * Set a value in cache
-     */
-    set: async (key: string, value: unknown, ttlSeconds: number = 3600) => {
+    /** Writes a single value to the cache. */
+    set: async (key: string, value: unknown, ttlSeconds = 3600): Promise<void> => {
       try {
         await defaultAdapter.set(key, value, ttlSeconds);
         cacheMetrics.sets++;
-        logger.debug('Cache set', { key, ttlSeconds });
+        logger.debug({ key, ttlSeconds }, 'Cache set');
       } catch (error) {
         cacheMetrics.errors++;
-        logger.warn('Cache set failed', { key, error });
+        logger.warn({ key, error }, 'Cache set failed');
       }
-    }
+    },
   },
 );
-
-
-
-

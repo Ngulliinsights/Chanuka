@@ -4,8 +4,8 @@ import { Bill, bills, sponsors, BillStatus, isValidEnum } from '@server/infrastr
 import { bill_engagement, comments } from '@server/infrastructure/schema';
 import { and, count, desc, eq, inArray,or, sql } from "drizzle-orm";
 
-import type { AsyncServiceResult } from '@server/infrastructure/errors/result-adapter';
-import { withResultHandling } from '@server/infrastructure/errors/result-adapter';
+import type { AsyncServiceResult } from '@server/infrastructure/error-handling';
+import { safeAsync } from '@server/infrastructure/error-handling';
 import { serverCache, CACHE_TTL as CACHE_TTL_CONSTANTS } from '@server/infrastructure/cache';
 import { databaseService } from '@server/infrastructure/database/database-service';
 

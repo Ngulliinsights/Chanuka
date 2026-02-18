@@ -14,7 +14,7 @@ import * as dotenvExpand from 'dotenv-expand';
 
 import { BaseError, ErrorDomain } from '../errors/base-error';
 import { ErrorSeverity } from '../errors/error-standardization';
-import { ObservabilityStack } from '../observability/types';
+import { ObservabilityStack } from '../observability/core/types';
 import { Result, err, ok } from '../primitives/types/result';
 
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';

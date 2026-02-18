@@ -10,7 +10,7 @@
 
 import { Server } from 'http';
 
-import { logger } from '../observability/logger';
+import { logger } from '../observability/core/logger';
 import { RedisAdapter, SocketIOAdapter } from './adapters';
 // Import consolidated components
 import { BASE_CONFIG } from './config/base-config';

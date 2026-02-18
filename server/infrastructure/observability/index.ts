@@ -1,73 +1,124 @@
 /**
- * Server-Specific Observability Utilities
- * Minimal wrappers for Express middleware and server-specific features
- * 
- * This module provides only server-specific observability utilities:
- * - Express middleware for request/error logging
- * - Server initialization
- * - Server logger instance
- * 
- * For database logging, log aggregation, and performance monitoring,
- * import directly from their respective modules:
- * - './database-logger' for database operation logging
- * - './log-aggregator' for log aggregation and analysis
- * - './performance-monitor' for performance monitoring
+ * Observability — Public Barrel
+ *
+ * This file is the ONLY entry point for:
+ *   import { logger } from '@server/infrastructure/observability'
+ *
+ * Previously this file did not exist, which made every import of the above
+ * path fail silently. All server modules (error-tracker, schema-validation-service,
+ * admin-router, external-api-dashboard, etc.) depend on this barrel resolving.
+ *
+ * Sub-module paths are implementation details — always import from this file.
  */
 
-// Server-specific Express middleware
-import type { Request, Response, NextFunction } from 'express';
-import { logger } from './logger';
+// ─── Configuration ────────────────────────────────────────────────────────────
+export {
+  loggingConfig,
+  getLoggingConfig,
+  validateLoggingConfig,
+} from './config/logging-config';
+export type { LoggingConfig } from './config/logging-config';
 
-// Export server-specific logger (widely used across the server)
-export { logger } from './logger';
+// ─── Core logger (most-imported export in the codebase) ──────────────────────
+export { logger, logBuffer } from './core/logger';
+export type { Logger } from './core/logger';
 
-/**
- * Express request logging middleware
- * Logs HTTP requests with method, path, status code, duration, and user agent
- */
+// ─── Types ────────────────────────────────────────────────────────────────────
+export type {
+  ObservabilityStack,
+  MetricsProvider,
+  RiskLevel,
+  Severity,
+  SecurityEvent,
+  SecurityEventType,
+  AuditLogEntry,
+  DatabaseOperationContext,
+  DatabaseOperationResult,
+  AuditOperation,
+  PerformanceMetric,
+  OperationMetrics,
+  ServicePerformanceReport,
+  SystemHealthMetrics,
+  LogAggregationResult,
+  AlertRule,
+  AlertCondition,
+} from './core/types';
+
+// ─── HTTP middleware ──────────────────────────────────────────────────────────
+export { auditMiddleware, logSensitiveOperation } from './http/audit-middleware';
+export * from './http/response-wrapper';
+
+// ─── Security ─────────────────────────────────────────────────────────────────
+export {
+  isSensitiveEndpoint,
+  classifyRisk,
+  classifySecurityEventType,
+} from './security/security-policy';
+export {
+  emitSecurityEvent,
+  emitSensitiveOperationAudit,
+} from './security/security-event-logger';
+
+// ─── Database ─────────────────────────────────────────────────────────────────
+export {
+  databaseLogger,
+  DatabaseLogger,
+  DatabaseOperationContextBuilder,
+} from './database/database-logger';
+
+// ─── Monitoring ───────────────────────────────────────────────────────────────
+export * from './monitoring/monitoring-policy';
+export { monitoringScheduler, MonitoringScheduler } from './monitoring/monitoring-scheduler';
+export {
+  performanceMonitor,
+  PerformanceMonitor,
+  monitorOperation,
+} from './monitoring/performance-monitor';
+export { logAggregator, LogAggregator } from './monitoring/log-aggregator';
+
+// ─── Express middleware factories ─────────────────────────────────────────────
+import type { NextFunction, Request, Response } from 'express';
+import { logger as _logger } from './core/logger';
+
+/** Attach request-finish logging to every Express route. */
 export function requestLoggingMiddleware() {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const start = Date.now();
-    
     res.on('finish', () => {
-      const duration = Date.now() - start;
-      logger.info('HTTP Request', {
+      _logger.info({
+        message: 'HTTP Request',
         method: req.method,
         path: req.path,
         statusCode: res.statusCode,
-        duration,
-        userAgent: req.get('user-agent')
+        duration: Date.now() - start,
+        userAgent: req.get('user-agent'),
       });
     });
-    
     next();
   };
 }
 
-/**
- * Express error logging middleware
- * Logs HTTP errors with method, path, error message, and stack trace
- */
+/** Log errors that reach the Express error pipeline. */
 export function errorLoggingMiddleware() {
-  return (err: Error, req: Request, res: Response, next: NextFunction) => {
-    logger.error('HTTP Error', {
+  return (err: Error, req: Request, _res: Response, next: NextFunction): void => {
+    _logger.error({
+      message: 'HTTP Error',
       method: req.method,
       path: req.path,
       error: err.message,
-      stack: err.stack
+      stack: err.stack,
     });
-    
     next(err);
   };
 }
 
-/**
- * Server-specific observability initialization
- * Logs initialization with service name and environment
- */
+/** Emit a startup log entry. */
 export function initializeServerObservability(config: {
   serviceName: string;
   environment: string;
-}) {
-  logger.info('Server observability initialized', config);
+}): void {
+  _logger.info({
+    message: 'Server observability initialized',
+    ...config,
+  });
 }

@@ -1,5 +1,5 @@
 // Query builder service removed - using direct Drizzle queries
-import { logger } from '../../../../infrastructure/observability/logger';
+import { logger } from '../../../../infrastructure/observability/core/logger';
 import { db } from '../../../../infrastructure/database/pool';
 import * as schema from '@server/infrastructure/schema';
 import { and, count, desc, gte, like, or, sql } from "drizzle-orm";

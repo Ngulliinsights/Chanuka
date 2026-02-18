@@ -7,7 +7,7 @@
  */
 
 import { logger } from '../../observability';
-import type { Logger } from '../../observability/logger';
+import type { Logger } from '../../observability/core/logger';
 import { DatabaseOrchestrator } from '@server/infrastructure/core/database-orchestrator';
 import { DatabaseConfigManager } from '@server/infrastructure/core/unified-config';
 

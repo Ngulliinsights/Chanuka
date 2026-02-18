@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { cacheService } from '@shared/core/caching';
 import { financialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
 import { logger } from '@server/infrastructure/observability';

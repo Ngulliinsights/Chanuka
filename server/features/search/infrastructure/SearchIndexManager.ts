@@ -1,6 +1,6 @@
 import { cacheService } from '../../../infrastructure/cache';
 import { demoDataService } from '../../../infrastructure/demo-data';
-import { logger } from '../../../infrastructure/observability/logger';
+import { logger } from '../../../infrastructure/observability/core/logger';
 import { readDatabase } from '../../../infrastructure/database';
 import { sql } from 'drizzle-orm';
 

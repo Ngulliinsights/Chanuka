@@ -4,7 +4,7 @@
  * Provides graceful connection handover between different WebSocket services
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 
 export class ConnectionMigrator {
   // Placeholder implementation

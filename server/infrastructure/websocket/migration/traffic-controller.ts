@@ -4,7 +4,7 @@
  * Manages gradual traffic shifting with health validation
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 import { HealthValidator } from './health-validator';
 import { HealthMetrics, MigrationConfig } from './types';
 

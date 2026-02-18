@@ -5,7 +5,7 @@
  * based on leak severity. Integrates with the existing MemoryLeakDetector system.
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 import { logger } from '@server/infrastructure/observability';
 
 import type { 

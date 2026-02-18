@@ -1,6 +1,5 @@
 import { QueryResult, QueryResultRow } from 'pg';
-import { InsertUser, InsertUserProgress, User, UserProgress } from '@server/infrastructure/schema';
-import { logger } from '@shared/core';
+import { InsertUser, InsertUserProgress, User, UserProgress } from './types';
 export interface TransactionClient {
     query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
     release(): void;

@@ -1,4 +1,4 @@
-import { errorTracker } from '@server/infrastructure/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { cacheService } from '@shared/core/caching';
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database/connection';

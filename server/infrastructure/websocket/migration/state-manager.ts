@@ -4,7 +4,7 @@
  * Manages connection state capture, restoration, and backup
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 import { ConnectionState } from './types';
 
 export class StateManager {

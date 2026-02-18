@@ -5,7 +5,7 @@
  * and memory leak detection. Handles cleanup scheduling and memory pressure handling.
  */
 
-import { logger } from '../../observability/logger';
+import { logger } from '../../observability/core/logger';
 import { BASE_CONFIG } from '../config/base-config';
 import { RuntimeConfig } from '../config/runtime-config';
 import type {
