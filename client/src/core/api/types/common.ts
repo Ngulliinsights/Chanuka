@@ -5,6 +5,7 @@
  */
 
 import { ZodSchema } from 'zod';
+import type { RequestInterceptor, ResponseInterceptor } from './interceptors';
 
 // ============================================================================
 // Common Enums and Types
@@ -165,14 +166,6 @@ export interface ValidationOptions {
 }
 
 export type RequestPriority = 'low' | 'normal' | 'high' | 'critical';
-
-// Interceptor types
-export type RequestInterceptor = (
-  request: BaseApiRequest
-) => BaseApiRequest | Promise<BaseApiRequest>;
-export type ResponseInterceptor = (
-  response: BaseApiResponse
-) => BaseApiResponse | Promise<BaseApiResponse>;
 
 export interface UnifiedApiClient extends ApiClient {
   request<T>(request: ApiRequest): Promise<ApiResponse<T>>;

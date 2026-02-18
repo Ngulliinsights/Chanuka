@@ -7,8 +7,13 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { BaseApiClient, BaseClientRequest, BaseClientResponse, RequestBody } from './base-client';
-import { ApiError } from './base-client';
+import { BaseApiClient } from './base-client';
+import {
+  BaseClientRequest,
+  BaseClientResponse,
+  RequestBody,
+  ApiError,
+} from './types/interceptors';
 
 /**
  * Result type for safe API operations

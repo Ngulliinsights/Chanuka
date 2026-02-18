@@ -17,10 +17,10 @@ export {
   coreNotificationService,
   type NotificationData,
   type NotificationHistory
-} from './notification-service.js';
+} from './notification-service';
 
 // Consolidated API routes
-export { router as notificationRoutes } from './notification-routes.js';
+export { router as notificationRoutes } from './notification-routes';
 
 // ===== ADVANCED SERVICES (Multi-channel & Smart Features) =====
 
@@ -32,7 +32,7 @@ export {
   type NotificationBatch,
   type NotificationResult,
   type BulkNotificationResult
-} from './notification-orchestrator.js';
+} from './notification-orchestrator';
 
 // ===== SPECIALIZED SERVICES (Domain-specific Features) =====
 
@@ -42,14 +42,14 @@ export {
   type AlertRule,
   type AlertAction,
   type Alert
-} from './alerting-service.js';
+} from './alerting-service';
 
 // Notification scheduler service for digest notifications
 export {
   notificationSchedulerService,
   type ScheduledDigest,
   type DigestContent
-} from './notification-scheduler.js';
+} from './notification-scheduler';
 
 // Smart notification filtering with AI/ML-based decisions
 export {
@@ -57,10 +57,10 @@ export {
   type FilterCriteria,
   type UserEngagementProfile,
   type FilterResult
-} from './smart-notification-filter.js';
+} from './smart-notification-filter';
 
 // Notification channel management
-export { notificationChannelService } from './notification-channels.js';
+export { notificationChannelService } from './notification-channels';
 
 // ===== MIGRATION GUIDE =====
 
@@ -86,7 +86,7 @@ export { notificationChannelService } from './notification-channels.js';
 // ===== DEFAULT EXPORTS FOR BACKWARD COMPATIBILITY =====
 
 // Export the core service as default for simple use cases
-export { notificationService as default } from './notification-service.js';
+export { notificationService as default } from './notification-service';
 
 import { logger } from '@server/infrastructure/observability';
 

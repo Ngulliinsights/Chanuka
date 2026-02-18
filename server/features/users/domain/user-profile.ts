@@ -6,7 +6,7 @@ import { bill_engagement, bills, comments, notifications, user_profiles, user_ve
 import { and, count,desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { databaseService } from '@/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 
 // Data validation schemas
 const user_profilesDataSchema = z.object({
@@ -550,7 +550,7 @@ export class UserProfileService {
 
     const result = await databaseService.withFallback(
       async () => {
-        await databaseService.withTransaction(async (tx) => {
+        await withTransaction(async (tx) => {
           // Store verification record in user_verification table (JSONB for domain data)
           await tx
             .insert(user_verification)
@@ -791,7 +791,7 @@ export class UserProfileService {
 
     const result = await databaseService.withFallback(
       async () => {
-        await databaseService.withTransaction(async (tx) => {
+        await withTransaction(async (tx) => {
           // Check if engagement record exists
           const [existingEngagement] = await tx
             .select()

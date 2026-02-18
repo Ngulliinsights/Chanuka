@@ -9,7 +9,7 @@ import { logger } from '@client/lib/utils/logger';
 
 import { tokenManager } from '../auth';
 
-import { ApiError, BaseClientRequest } from './base-client';
+import { ApiError, BaseClientRequest } from './types/interceptors';
 
 /**
  * Authentication configuration for API clients

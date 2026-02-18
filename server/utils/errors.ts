@@ -1,100 +1,158 @@
-import { logger } from '@server/infrastructure/observability';
-import { 
-  BaseError,
-  CacheError,
-  ConflictError,
-  DatabaseError,
-  ErrorDomain,
-  ErrorSeverity,
-  ExternalServiceError,
-  ForbiddenError,
-  NetworkError,
-  NotFoundError,
-  ServiceUnavailableError,
-  TooManyRequestsError,
-  UnauthorizedError,
-  ValidationError} from '@shared/core';
-import { NextFunction, Request, Response } from 'express';
+/**
+ * Server Error Utilities
+ * 
+ * @deprecated This file contains legacy error classes.
+ * New code should use @server/infrastructure/error-handling
+ * 
+ * Migration guide:
+ * - Use createError() from @server/infrastructure/error-handling/error-factory
+ * - Use ErrorCategory enum for error types
+ * - Use StandardizedError interface for error handling
+ */
 
-// Re-export the unified error classes from shared/core
+import type { NextFunction, Request, Response } from 'express';
+
+// Re-export shared error types for backward compatibility
 export { 
-  BaseError,
-  ErrorDomain,
-  ErrorSeverity,
   ValidationError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  ConflictError,
-  DatabaseError,
-  ExternalServiceError,
+  TransformationError,
   NetworkError,
-  CacheError,
-  TooManyRequestsError,
-  ServiceUnavailableError
-};
+} from '@shared/utils/errors/types';
+
+// Re-export error context utilities
+export type { ErrorContext } from '@shared/utils/errors/context';
+export { ErrorContextBuilder } from '@shared/utils/errors/context';
 
 /**
- * Authentication error - extends UnauthorizedError using shared BaseError system
+ * Base error class for application errors
+ * @deprecated Use createError() from error-factory instead
  */
-export class AuthError extends UnauthorizedError {
+export class BaseError extends Error {
+  public readonly statusCode: number;
+  public readonly isOperational: boolean;
+
   constructor(
     message: string,
-    details?: Record<string, unknown>
+    statusCode = 500,
+    isOperational = true
   ) {
-    super(message, details);
-    this.name = 'AuthError';
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+    Object.setPrototypeOf(this, BaseError.prototype);
+  }
+}
+
+/**
+ * Authentication error
+ * @deprecated Use ErrorCategory.AUTHENTICATION with createError()
+ */
+export class AuthError extends BaseError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(message, 401);
+    Object.setPrototypeOf(this, AuthError.prototype);
   }
 }
 
 /**
  * Error for invalid credentials during login
+ * @deprecated Use ErrorCategory.AUTHENTICATION with createError()
  */
 export class InvalidCredentialsError extends AuthError {
   constructor(message = 'Invalid credentials') {
-    super(message, { code: 'AUTH_INVALID' });
-    this.name = 'InvalidCredentialsError';
+    super(message);
+    Object.setPrototypeOf(this, InvalidCredentialsError.prototype);
+  }
+}
+
+/**
+ * Unauthorized error
+ * @deprecated Use ErrorCategory.AUTHENTICATION with createError()
+ */
+export class UnauthorizedError extends BaseError {
+  constructor(message = 'Unauthorized', details?: Record<string, unknown>) {
+    super(message, 401);
+    Object.setPrototypeOf(this, UnauthorizedError.prototype);
+  }
+}
+
+/**
+ * Forbidden error
+ * @deprecated Use ErrorCategory.AUTHORIZATION with createError()
+ */
+export class ForbiddenError extends BaseError {
+  constructor(message = 'Forbidden', details?: Record<string, unknown>) {
+    super(message, 403);
+    Object.setPrototypeOf(this, ForbiddenError.prototype);
+  }
+}
+
+/**
+ * Not found error
+ * @deprecated Use ErrorCategory.NOT_FOUND with createError()
+ */
+export class NotFoundError extends BaseError {
+  constructor(resource: string, id?: string, details?: Record<string, unknown>) {
+    const message = id ? `${resource} with id ${id} not found` : `${resource} not found`;
+    super(message, 404);
+    Object.setPrototypeOf(this, NotFoundError.prototype);
+  }
+}
+
+/**
+ * Conflict error
+ * @deprecated Use ErrorCategory.CONFLICT with createError()
+ */
+export class ConflictError extends BaseError {
+  constructor(message: string, resource?: string, details?: Record<string, unknown>) {
+    super(message, 409);
+    Object.setPrototypeOf(this, ConflictError.prototype);
   }
 }
 
 /**
  * Error when user already exists during registration
+ * @deprecated Use ErrorCategory.CONFLICT with createError()
  */
 export class UserExistsError extends ConflictError {
   constructor(message = 'User already exists') {
-    super(message, 'user', { code: 'ALREADY_EXISTS' });
-    this.name = 'UserExistsError';
+    super(message, 'user');
+    Object.setPrototypeOf(this, UserExistsError.prototype);
   }
 }
 
 /**
  * OAuth specific error class
+ * @deprecated Use ErrorCategory.AUTHENTICATION with createError()
  */
 export class OAuthError extends AuthError {
   constructor(message: string, statusCode = 401) {
-    super(message, { 
-      code: 'AUTH_OAUTH_ERROR',
-      statusCode 
-    });
-    this.name = 'OAuthError';
+    super(message);
+    Object.setPrototypeOf(this, OAuthError.prototype);
   }
 }
 
 /**
  * Error for when a sponsor is not found in the database
+ * @deprecated Use ErrorCategory.NOT_FOUND with createError()
  */
 export class SponsorNotFoundError extends NotFoundError {
   constructor(message = 'Sponsor not found') {
-    super('sponsor', undefined, { 
-      code: 'SPONSOR_NOT_FOUND',
-      message 
-    });
-    this.name = 'SponsorNotFoundError';
+    super('sponsor', undefined);
+    Object.setPrototypeOf(this, SponsorNotFoundError.prototype);
   }
 }
 
 /**
  * Async handler wrapper for Express routes to catch errors
+ * 
+ * @example
+ * ```typescript
+ * router.get('/users', asyncHandler(async (req, res) => {
+ *   const users = await getUsers();
+ *   res.json(users);
+ * }));
+ * ```
  */
 export function asyncHandler(fn: Function) {
   return (req: Request, res: Response, next: NextFunction) => {

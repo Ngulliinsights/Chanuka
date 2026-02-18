@@ -9,8 +9,8 @@ import { createServer, type Server } from 'http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
 
-import { RuntimeConfig } from '../../infrastructure/websocket/config/runtime-config.js';
-import { WebSocketService, type WebSocketServiceOptions } from '../../infrastructure/websocket/core/websocket-service.js';
+import { RuntimeConfig } from '../../infrastructure/websocket/config/runtime-config';
+import { WebSocketService, type WebSocketServiceOptions } from '../../infrastructure/websocket/core/websocket-service';
 import type {
   AuthenticatedWebSocket,
   ConnectionStats,
@@ -23,7 +23,7 @@ import type {
   MemoryLeakData,
   MemoryPressureData,
   WebSocketMessage,
-} from '../../infrastructure/websocket/types.js';
+} from '../../infrastructure/websocket/types';
 
 
 // Mock implementations for all dependencies

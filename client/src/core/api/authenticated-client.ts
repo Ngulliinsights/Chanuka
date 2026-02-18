@@ -14,7 +14,8 @@ import {
   DEFAULT_AUTH_CONFIG,
   AuthConfig,
 } from './authentication';
-import { BaseApiClient, ApiClientConfig, BaseClientRequest, RequestBody } from './base-client';
+import { BaseApiClient, ApiClientConfig } from './base-client';
+import { BaseClientRequest, RequestBody } from './types/interceptors';
 
 /**
  * Configuration for authenticated API client

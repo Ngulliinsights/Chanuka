@@ -2,10 +2,10 @@
 // Centralized exports for analytics and reporting functionality
 
 // Routes
-export { router as analyticsRouter } from './analytics.js';
-export { default as engagementAnalyticsRouter } from './engagement-analytics.js';
-export { simpleTransparencyDashboardService as transparencyDashboardRouter } from './transparency-dashboard.js';
-export { createFinancialDisclosureRouter as financialDisclosureRouter } from './financial-disclosure/index.js';
+export { router as analyticsRouter } from './analytics';
+export { default as engagementAnalyticsRouter } from './engagement-analytics';
+export { simpleTransparencyDashboardService as transparencyDashboardRouter } from './transparency-dashboard';
+export { createFinancialDisclosureRouter as financialDisclosureRouter } from './financial-disclosure/index';
 
 // Services - Organized exports from services/ folder
 export {
@@ -15,18 +15,18 @@ export {
   mlAnalysisService,
   FinancialDisclosureAnalyticsService,
   financialDisclosureAnalyticsService
-} from './services/index.js';
+} from './services/index';
 
 // Legacy services (keeping for backward compatibility)
-export { SimpleTransparencyDashboardService } from './transparency-dashboard.js';
-export { simpleTransparencyDashboardService } from './transparency-dashboard.js';
-export { DashboardService } from './dashboard.js';
-export { LegalAnalysisService } from './legal-analysis.js';
-export { conflictDetectionService as ConflictDetectionService } from './conflict-detection.js';
-export { FinancialDisclosureMonitoringService } from './financial-disclosure/monitoring.js';
+export { SimpleTransparencyDashboardService } from './transparency-dashboard';
+export { simpleTransparencyDashboardService } from './transparency-dashboard';
+export { DashboardService } from './dashboard';
+export { LegalAnalysisService } from './legal-analysis';
+export { conflictDetectionService as ConflictDetectionService } from './conflict-detection';
+export { FinancialDisclosureMonitoringService } from './financial-disclosure/monitoring';
 
 // Storage - Organized exports from storage/ folder
-export { ProgressStorage } from './storage/index.js';
+export { ProgressStorage } from './storage/index';
 
 
 

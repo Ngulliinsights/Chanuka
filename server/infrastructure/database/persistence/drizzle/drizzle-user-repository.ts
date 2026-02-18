@@ -7,7 +7,7 @@
 
 import type { IUserRepository } from '@server/domain/interfaces/user-repository.interface';
 import { queryCache } from '@server/infrastructure/caching/query-cache';
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import { databaseLogger } from '@server/infrastructure/logging/database-logger';
 import { performanceMonitor } from '@server/infrastructure/performance/performance-monitor';
 import {
@@ -155,7 +155,7 @@ export class DrizzleUserRepository implements IUserRepository {
           .operation('create')
           .build(),
         async () => {
-          const newUser = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+          const newUser = await withTransaction(async (tx: PgDatabase<any>) => {
             const [dbUser] = await tx
               .insert(users)
               .values(validation.data)
@@ -294,7 +294,7 @@ export class DrizzleUserRepository implements IUserRepository {
           .entityId(id)
           .build(),
         async () => {
-          const updatedDbUser = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+          const updatedDbUser = await withTransaction(async (tx: PgDatabase<any>) => {
             const [dbUser] = await tx
               .update(users)
               .set({
@@ -366,7 +366,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(profileValidation.error);
       }
 
-      const dbProfile = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      const dbProfile = await withTransaction(async (tx: PgDatabase<any>) => {
         const [updatedProfile] = await tx
           .update(user_profiles)
           .set({
@@ -428,7 +428,7 @@ export class DrizzleUserRepository implements IUserRepository {
           .entityId(id)
           .build(),
         async () => {
-          await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: PgDatabase<any>) => {
             const updateResult = await tx
               .update(users)
               .set({
@@ -503,7 +503,7 @@ export class DrizzleUserRepository implements IUserRepository {
           .entityId(id)
           .build(),
         async () => {
-          await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: PgDatabase<any>) => {
             const updateResult = await tx
               .update(users)
               .set({
@@ -570,7 +570,7 @@ export class DrizzleUserRepository implements IUserRepository {
           .entityId(id)
           .build(),
         async () => {
-          await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: PgDatabase<any>) => {
             // Delete profile first due to foreign key constraint
             await tx
               .delete(user_profiles)
@@ -666,7 +666,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} users`));
       }
 
-      const dbUsers = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      const dbUsers = await withTransaction(async (tx: PgDatabase<any>) => {
         const newUsers = await tx
           .insert(users)
           .values(validations.map(v => v.data))
@@ -707,7 +707,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} updates`));
       }
 
-      const dbUsers = await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      const dbUsers = await withTransaction(async (tx: PgDatabase<any>) => {
         const updatedUsers: typeof users.$inferSelect[] = [];
 
         // Process updates individually to handle potential conflicts
@@ -755,7 +755,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} user IDs`));
       }
 
-      await databaseService.withTransaction(async (tx: PgDatabase<any>) => {
+      await withTransaction(async (tx: PgDatabase<any>) => {
         // Delete profiles first due to foreign key constraint
         await tx
           .delete(user_profiles)

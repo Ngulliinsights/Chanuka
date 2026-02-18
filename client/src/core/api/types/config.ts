@@ -133,12 +133,6 @@ export interface ClientConfig {
 }
 
 export interface ClientInterceptors {
-  readonly request?: ReadonlyArray<RequestInterceptor>;
-  readonly response?: ReadonlyArray<ResponseInterceptor>;
+  readonly request?: ReadonlyArray<import('./interceptors').RequestInterceptor>;
+  readonly response?: ReadonlyArray<import('./interceptors').ResponseInterceptor>;
 }
-
-export type RequestInterceptor = (
-  config: RequestInit & { url: string }
-) => (RequestInit & { url: string }) | Promise<RequestInit & { url: string }>;
-
-export type ResponseInterceptor = (response: Response) => Response | Promise<Response>;

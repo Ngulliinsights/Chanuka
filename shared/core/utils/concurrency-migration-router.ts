@@ -15,7 +15,7 @@ import {
   cacheMutex as legacyCacheMutex,
   apiSemaphore as legacyApiSemaphore,
   fileSemaphore as legacyFileSemaphore
-} from './race-condition-prevention.js';
+} from './race-condition-prevention';
 
 export interface MigrationMetrics {
   startTime: number;

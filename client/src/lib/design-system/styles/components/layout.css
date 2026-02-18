@@ -1,0 +1,24 @@
+/**
+ * Layout Component Styles
+ * Part of Chanuka Design System
+ */
+
+/* Base layout styles are in layout/ components */
+/* This file provides additional layout utilities */
+
+.container {
+  width: 100%;
+  max-width: var(--max-width, 1280px);
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+.grid {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.flex {
+  display: flex;
+  gap: var(--spacing-3);
+}

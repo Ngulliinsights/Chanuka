@@ -47,10 +47,10 @@ export * from './utils/security-utils';
 export * from './utils/regex-patterns';
 export * from './utils/formatting';
 
-// NOTE: The following utilities have been moved to server layer:
-// - correlation-id -> server/utils/correlation-id.ts
-// - api-utils -> server/utils/api-utils.ts
-// - response-helpers -> server/utils/response-helpers.ts
+// NOTE: The following utilities have been moved:
+// - correlation-id -> @shared/utils/correlation-id (isomorphic, works in client & server)
+// - api-utils -> server/utils/api-utils.ts (server-only)
+// - response-helpers -> server/utils/response-helpers.ts (server-only)
 // - cache-utils -> server/utils/cache-utils.ts
 // - anonymity-service -> server/utils/anonymity-service.ts
 

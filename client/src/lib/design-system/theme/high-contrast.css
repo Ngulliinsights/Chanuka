@@ -1,0 +1,71 @@
+/**
+ * High Contrast Theme CSS Variables
+ * Chanuka Design System - Accessibility High Contrast Theme
+ * WCAG AAA compliant color ratios
+ */
+
+[data-theme="high-contrast"] {
+  /* Background & Foreground - Maximum contrast */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  
+  /* Card */
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  
+  /* Popover */
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+  
+  /* Primary: High contrast blue */
+  --primary: 210 100% 70%;
+  --primary-foreground: 0 0% 0%;
+  
+  /* Secondary: High contrast teal */
+  --secondary: 180 100% 70%;
+  --secondary-foreground: 0 0% 0%;
+  
+  /* Muted */
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 90%;
+  
+  /* Accent: High contrast orange */
+  --accent: 30 100% 70%;
+  --accent-foreground: 0 0% 0%;
+  
+  /* Destructive/Error */
+  --destructive: 0 100% 70%;
+  --destructive-foreground: 0 0% 0%;
+  
+  /* Border & Input - Visible borders */
+  --border: 0 0% 100%;
+  --input: 0 0% 100%;
+  --ring: 30 100% 70%;
+  
+  /* Semantic Colors (high contrast) */
+  --success: 120 100% 70%;
+  --warning: 45 100% 70%;
+  --danger: 0 100% 70%;
+  --info: 210 100% 70%;
+  
+  /* Governance Colors (high contrast) */
+  --governance-perspective1: 220 100% 70%;
+  --governance-perspective2: 270 100% 70%;
+  --governance-neutral: 120 100% 70%;
+  --governance-amendment: 40 100% 70%;
+  --governance-constitutional: 290 100% 70%;
+  
+  /* Enhanced focus indicators */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+}
+
+/* High contrast specific overrides */
+[data-theme="high-contrast"] * {
+  border-width: 2px;
+}
+
+[data-theme="high-contrast"] :focus-visible {
+  outline: var(--focus-ring-width) solid hsl(var(--ring));
+  outline-offset: var(--focus-ring-offset);
+}

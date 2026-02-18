@@ -1,0 +1,60 @@
+/**
+ * Light Theme CSS Variables
+ * Chanuka Design System - Default Light Theme
+ */
+
+:root,
+[data-theme="light"] {
+  /* Background & Foreground */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  
+  /* Card */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  
+  /* Primary: Deep Blue #0d3b66 (Chanuka brand - institutional authority) */
+  --primary: 206 81% 26%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary: Teal #084c61 (transparency and clarity) */
+  --secondary: 198 77% 20%;
+  --secondary-foreground: 0 0% 100%;
+  
+  /* Muted: Neutral grays */
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  
+  /* Accent: Orange #f38a1f (energy and participation) */
+  --accent: 32 93% 50%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Destructive/Error */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Border & Input */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 32 93% 50%;
+  
+  /* Semantic Colors */
+  --success: 142 71% 45%;
+  --warning: 43 96% 56%;
+  --danger: 0 84% 60%;
+  --info: 206 81% 26%;
+  
+  /* Governance Colors (Political Neutrality) */
+  --governance-perspective1: 219 79% 46%;
+  --governance-perspective2: 261 80% 50%;
+  --governance-neutral: 142 71% 45%;
+  --governance-amendment: 38 92% 50%;
+  --governance-constitutional: 292 65% 47%;
+  
+  /* Radius */
+  --radius: 0.5rem;
+}

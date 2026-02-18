@@ -9,7 +9,7 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
 **Steps**:
 
-- [ ] 1.1.1: Confirm zero usages of dead clients
+- [x] 1.1.1: Confirm zero usages of dead clients
   ```bash
   grep -r "SafeApiClient" client/src/ --include='*.ts' --include='*.tsx'
   grep -r "AuthenticatedApiClient" client/src/ --include='*.ts' --include='*.tsx'
@@ -18,7 +18,7 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
   ```
   Expected: 0 results for each
 
-- [ ] 1.1.2: Investigate shared type usage
+- [x] 1.1.2: Investigate shared type usage
   ```bash
   # Check if these types are used by globalApiClient or other code
   grep -r "RequestInterceptor" client/src/ --include='*.ts' --include='*.tsx' | grep -v "base-client.ts" | grep -v "index.ts"
@@ -29,7 +29,7 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
   ```
   Document findings: If types are used elsewhere, they need extraction
 
-- [ ] 1.1.3: Investigate authentication.ts dependencies
+- [x] 1.1.3: Investigate authentication.ts dependencies
   ```bash
   # Check if authentication.ts is used by globalApiClient or other code
   grep -r "AuthenticationInterceptor\|TokenRefreshInterceptor\|createAuthInterceptors" client/src/ --include='*.ts' --include='*.tsx' | grep -v "authenticated-client.ts" | grep -v "authentication.ts" | grep -v "index.ts"
@@ -38,7 +38,7 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
   - If used by globalApiClient or other code: KEEP authentication.ts
   - If only used by AuthenticatedApiClient: DELETE authentication.ts
 
-- [ ] 1.1.4: Investigate retry-handler.ts (legacy)
+- [x] 1.1.4: Investigate retry-handler.ts (legacy)
   ```bash
   # Check if LegacyRetryHandler is used anywhere
   grep -r "LegacyRetryHandler\|createRetryHandler\|retryHandlers" client/src/ --include='*.ts' --include='*.tsx' | grep -v "retry-handler.ts" | grep -v "index.ts"
@@ -47,7 +47,7 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
   - If 0 usages: ADD retry-handler.ts to deletion list
   - If used: KEEP retry-handler.ts and document why
 
-- [ ] 1.1.5: Extract shared types if needed (based on 1.1.2 findings)
+- [x] 1.1.5: Extract shared types if needed (based on 1.1.2 findings)
   - If types are used by globalApiClient or other code:
     - Create `client/src/core/api/types/interceptors.ts`
     - Move `RequestInterceptor`, `ResponseInterceptor`, `ErrorInterceptor` types

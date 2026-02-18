@@ -8,8 +8,8 @@ import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
 import { bills } from '@server/infrastructure/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
-import { DatabaseService } from '@/infrastructure/database/database-service';
-import { databaseService } from '@/infrastructure/database/database-service';
+import { from '@/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
 
 import type { IBillRepository } from '../../../../bill-repository.interface';
@@ -25,8 +25,7 @@ export class BillsApplicationService {
     private readonly userService: UserService,
     private readonly notificationChannelService: NotificationChannelService,
     private readonly domainEventPublisher: DomainEventPublisher,
-    private readonly databaseService: DatabaseService,
-    private readonly billRepository?: IBillRepository
+    private readonly databaseService: private readonly billRepository?: IBillRepository
   ) { }
 
   private get db() {
@@ -65,7 +64,7 @@ export class BillsApplicationService {
 
       // Execute business logic within transaction
       // The transaction returns a DatabaseResult, so we need to await it and extract the value
-      const databaseResult = await this.databaseService.withTransaction(async () => {
+      const databaseResult = await this.withTransaction(async () => {
         // Build the params object conditionally to satisfy exactOptionalPropertyTypes
         const createParams: {
           billNumber: BillNumber;
@@ -123,7 +122,7 @@ export class BillsApplicationService {
 
       // Execute the domain operation within a transaction
       // The result needs to be unwrapped from DatabaseResult to Bill
-      const databaseResult = await this.databaseService.withTransaction(async () => {
+      const databaseResult = await this.withTransaction(async () => {
         return await domainService.updateBillStatus(bill_id, newStatus, updatedBy);
       });
 
@@ -154,7 +153,7 @@ export class BillsApplicationService {
       );
 
       // Execute the vote recording within a transaction
-      const databaseResult = await this.databaseService.withTransaction(async () => {
+      const databaseResult = await this.withTransaction(async () => {
         return await domainService.recordVote(bill_id, user_id, voteType);
       });
 
@@ -209,7 +208,7 @@ export class BillsApplicationService {
       );
 
       // Execute content update within transaction
-      const databaseResult = await this.databaseService.withTransaction(async () => {
+      const databaseResult = await this.withTransaction(async () => {
         return await domainService.updateBillContent(bill_id, updateParams, updatedBy);
       });
 

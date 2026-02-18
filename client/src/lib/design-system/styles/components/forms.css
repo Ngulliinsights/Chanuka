@@ -1,0 +1,20 @@
+/**
+ * Form Component Styles
+ * Part of Chanuka Design System
+ */
+
+/* Base form styles are in interactive/Input.tsx and form.tsx */
+/* This file provides additional form-specific utilities */
+
+.form-group {
+  margin-bottom: var(--spacing-4);
+}
+
+.form-row {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.form-row > * {
+  flex: 1;
+}

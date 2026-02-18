@@ -318,7 +318,7 @@ export {
   adaptiveAnalyzeBeneficiaries,
   MLServiceAdapter,
   mlServiceAdapter
-} from './ml-adapter.service.js';
+} from './ml-adapter.service';
 
 export async function detectImplementationWorkarounds(bill_id: string): Promise<ImplementationWorkaroundDetection[]> { try {
     // Enhanced input validation

@@ -12,7 +12,7 @@ import * as WebSocket from 'ws';
 import {
   type BackwardCompatibleWebSocketService,
   createWebSocketService,
-} from '../../infrastructure/websocket/index.js';
+} from '../../infrastructure/websocket/index';
 
 describe('WebSocket Service Backward Compatibility', () => {
   let service: BackwardCompatibleWebSocketService;

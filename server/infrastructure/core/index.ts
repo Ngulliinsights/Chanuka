@@ -2,7 +2,7 @@
 // Centralized exports for core functionality
 
 // Authentication - Export from auth modules (server-specific implementations)
-export * from './auth/index.js';
+export * from './auth/index';
 
 // Validation - Export from validation modules
 // Note: Explicitly avoid re-exporting AuthResult and SessionValidationResult from shared/core
@@ -24,7 +24,7 @@ export {
   schemaValidationService,
   dataIntegrityValidationService,
   dataCompletenessService
-} from './validation/index.js';
+} from './validation/index';
 
 export type {
   ValidationResultFromService,
@@ -33,10 +33,10 @@ export type {
   ValidationMetricsSummary,
   ValidationHealthStatus,
   ValidationServicesContainer
-} from './validation/index.js';
+} from './validation/index';
 
 // Error Handling
-export { errorTracker } from '../observability/monitoring/error-tracker.js';
+export { errorTracker } from '../observability/monitoring/error-tracker';
 
 // Types
 export type {
@@ -45,8 +45,8 @@ export type {
   BillComment,
   SocialShare,
   Stakeholder
-} from './types.js';
-export * from './StorageTypes.js';
+} from './types';
+export * from './StorageTypes';
 
 
 

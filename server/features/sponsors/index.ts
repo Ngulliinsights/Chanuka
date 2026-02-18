@@ -1,10 +1,10 @@
 // Barrel export for sponsors feature
-export { sponsorService } from './application/sponsor-service-direct.js';
-export { sponsorConflictAnalysisService } from './application/sponsor-conflict-analysis.service.js';
-export { router } from './presentation/sponsors.routes.js';
+export { sponsorService } from './application/sponsor-service-direct';
+export { sponsorConflictAnalysisService } from './application/sponsor-conflict-analysis.service';
+export { router } from './presentation/sponsors.routes';
 
 // Export analysis types
-export type { SponsorshipAnalysis } from './types/analysis.js';
+export type { SponsorshipAnalysis } from './types/analysis';
 
 
 

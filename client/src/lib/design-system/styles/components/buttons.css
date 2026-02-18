@@ -1,0 +1,20 @@
+/**
+ * Button Component Styles
+ * Part of Chanuka Design System
+ */
+
+/* Base button styles are in interactive/Button.tsx */
+/* This file provides additional button-specific utilities */
+
+.btn-group {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.btn-group--vertical {
+  flex-direction: column;
+}
+
+.btn-group--horizontal {
+  flex-direction: row;
+}

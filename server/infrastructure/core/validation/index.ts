@@ -2,16 +2,16 @@
 export * from '@shared/core';
 
 // Re-export server-specific validation services with explicit naming to avoid conflicts
-export { DataCompletenessService } from './data-completeness.js';
-export { DataIntegrityValidationService } from './data-validation-service.js';
-export type { ValidationResult as ValidationResultFromService } from './data-validation-service.js';
-export type { ValidationResult as ValidationResultFromSchema } from './schema-validation-service.js';
-export { InputValidationService } from './input-validation-service.js';
-export { SchemaValidationService } from './schema-validation-service.js';
+export { DataCompletenessService } from './data-completeness';
+export { DataIntegrityValidationService } from './data-validation-service';
+export type { ValidationResult as ValidationResultFromService } from './data-validation-service';
+export type { ValidationResult as ValidationResultFromSchema } from './schema-validation-service';
+export { InputValidationService } from './input-validation-service';
+export { SchemaValidationService } from './schema-validation-service';
 
 // Validation metrics and monitoring
-export { ValidationMetricsCollector } from './validation-metrics.js';
-export type { ValidationMetric, ValidationMetricsSummary, ValidationHealthStatus } from './validation-metrics.js';
+export { ValidationMetricsCollector } from './validation-metrics';
+export type { ValidationMetric, ValidationMetricsSummary, ValidationHealthStatus } from './validation-metrics';
 
 // Validation services initialization and management
 export {
@@ -26,8 +26,8 @@ export {
   schemaValidationService,
   dataIntegrityValidationService,
   dataCompletenessService
-} from './validation-services-init.js';
-export type { ValidationServicesContainer } from './validation-services-init.js';
+} from './validation-services-init';
+export type { ValidationServicesContainer } from './validation-services-init';
 
 
 

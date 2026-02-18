@@ -7,7 +7,7 @@ import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
 
-import { databaseService } from '@/infrastructure/database/database-service';
+import { db } from '@server/infrastructure/database';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository

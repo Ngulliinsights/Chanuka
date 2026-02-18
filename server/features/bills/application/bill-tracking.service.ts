@@ -107,7 +107,7 @@ export class BillTrackingService {
     try { const bill = await this.validateBillExists(bill_id);
       if (!bill) throw new Error(`Bill with ID ${bill_id } not found`);
 
-      const result = await databaseService.withTransaction(async (tx) => {
+      const result = await withTransaction(async (tx) => {
         const defaultPrefs = {
           tracking_types: preferences?.tracking_types ?? ['status_changes', 'new_comments'],
           alert_frequency: preferences?.alert_frequency ?? 'immediate',

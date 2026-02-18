@@ -1,7 +1,7 @@
 // Test environment configuration
 // This file contains test-specific configuration values
 
-import { AppConfig } from '../../4-personas-implementation-guide';
+import { AppConfig } from './index';
 
 export const testConfig: AppConfig = {
   server: {

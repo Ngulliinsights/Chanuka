@@ -1,7 +1,7 @@
 // Domain Layer - Bills Domain
 // This layer contains domain entities, value objects, and business rules
 
-export * from './LegislativeStorageTypes.js';
+export * from './LegislativeStorageTypes';
 
 
 

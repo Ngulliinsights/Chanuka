@@ -10,7 +10,12 @@ import globalErrorHandler from '../error';
 import { globalCache, CacheKeyGenerator } from './cache-manager';
 import { globalConfig } from './config';
 import { ApiRequest, ApiResponse, RequestOptions, ClientConfig, UnifiedApiClient } from './types';
-import type { RequestInterceptor, ResponseInterceptor, BaseApiRequest, BaseApiResponse } from './types/common';
+import type {
+  RequestInterceptor,
+  ResponseInterceptor,
+  BaseClientRequest,
+  BaseClientResponse,
+} from './types/interceptors';
 
 // Circuit Breaker State
 enum CircuitState {
@@ -310,11 +315,11 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
   // Convert ApiRequest to FetchConfig and apply interceptors
   private async applyRequestInterceptors(request: ApiRequest): Promise<FetchConfig> {
-    // Convert to BaseApiRequest for interceptors
-    let baseRequest: BaseApiRequest = {
+    // Convert to BaseClientRequest for interceptors
+    let baseRequest: BaseClientRequest = {
       method: request.method,
       url: request.url,
-      data: request.body,
+      body: request.body,
       headers: request.headers,
     };
 
@@ -328,7 +333,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       url: baseRequest.url,
       method: baseRequest.method as string,
       headers: baseRequest.headers || request.headers,
-      body: baseRequest.data ? JSON.stringify(baseRequest.data) : undefined,
+      body: baseRequest.body ? JSON.stringify(baseRequest.body) : undefined,
     };
   }
 
@@ -377,8 +382,8 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       }
     }
 
-    // Convert to BaseApiResponse for interceptors
-    let baseResponse: BaseApiResponse<T> = {
+    // Convert to BaseClientResponse for interceptors
+    let baseResponse: BaseClientResponse<T> = {
       data: response.data,
       status: response.status,
       statusText: response.statusText || 'OK',
@@ -918,7 +923,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
 // Helper function to create request interceptor
 export const createAuthRequestInterceptor = (getToken: () => string | null): RequestInterceptor => {
-  return async (request: BaseApiRequest): Promise<BaseApiRequest> => {
+  return async (request: BaseClientRequest): Promise<BaseClientRequest> => {
     const token = getToken();
     if (token) {
       return {
@@ -935,7 +940,7 @@ export const createAuthRequestInterceptor = (getToken: () => string | null): Req
 
 // Helper function to create logging response interceptor
 export const createLoggingResponseInterceptor = (): ResponseInterceptor => {
-  return async (response: BaseApiResponse): Promise<BaseApiResponse> => {
+  return async (response: BaseClientResponse): Promise<BaseClientResponse> => {
     const logLevel = response.status >= 400 ? 'warn' : 'debug';
     logger[logLevel]('API Response received', {
       component: 'ApiClient',

@@ -3,7 +3,7 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
 import { cache } from '@server/infrastructure/cache';
 import { bills, sponsors } from '@server/infrastructure/schema';
@@ -387,7 +387,7 @@ export class GovernmentDataIntegrationService {
     try {
       // Query crowdsourced submissions from verified users
       const submissions = await databaseService.withFallback(async () => {
-        return await databaseService.db
+        return await db
           .select({
             billNumber: sql<string>`cs.bill_number`,
             title: sql<string>`cs.title`,
@@ -430,7 +430,7 @@ export class GovernmentDataIntegrationService {
   private async getManuallyEnteredBills(options: IntegrationOptions): Promise<BillData[]> {
     try {
       const manualBills = await databaseService.withFallback(async () => {
-        return await databaseService.db
+        return await db
           .select()
           .from(bills)
           .where(and(
@@ -557,9 +557,9 @@ export class GovernmentDataIntegrationService {
    * Upsert bill data into database
    */
   private async upsertBill(billData: BillData): Promise<{ created: boolean }> {
-    return await databaseService.withTransaction(async () => {
+    return await withTransaction(async () => {
       // Check if bill exists
-      const existingBill = await databaseService.db
+      const existingBill = await db
         .select()
         .from(bills)
         .where(eq(bills.bill_number, billData.billNumber))
@@ -574,7 +574,7 @@ export class GovernmentDataIntegrationService {
 
       if (existingBill.length > 0) {
         // Update existing bill
-        await databaseService.db
+        await db
           .update(bills)
           .set({
             title: billData.title,
@@ -592,7 +592,7 @@ export class GovernmentDataIntegrationService {
         return { created: false };
       } else {
         // Create new bill
-        await databaseService.db
+        await db
           .insert(bills)
           .values({
             bill_number: billData.billNumber,
@@ -752,7 +752,7 @@ export class GovernmentDataIntegrationService {
   }
 
   private async findExistingBill(billNumber: string): Promise<boolean> {
-    const result = await databaseService.db
+    const result = await db
       .select()
       .from(bills)
       .where(eq(bills.bill_number, billNumber))
@@ -762,7 +762,7 @@ export class GovernmentDataIntegrationService {
   }
 
   private async createPlaceholderBill(billNumber: string): Promise<void> {
-    await databaseService.db
+    await db
       .insert(bills)
       .values({
         bill_number: billNumber,

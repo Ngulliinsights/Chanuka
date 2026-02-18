@@ -12,9 +12,9 @@
  */
 
 // Import initialization modules
-import { initializeValidationServices, type ValidationServicesContainer } from './validation/validation-services-init.js';
-import { logger } from '../observability/index.js';
-import { getDatabaseOrchestrator } from '../database/index.js';
+import { initializeValidationServices, type ValidationServicesContainer } from './validation/validation-services-init';
+import { logger } from '../observability/index';
+import { getDatabaseOrchestrator } from '../database/index';
 import type { Pool as PoolType } from 'pg';
 
 /**

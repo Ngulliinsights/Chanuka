@@ -30,7 +30,7 @@ export { applyMiddleware } from './middleware-registry';
 // Re-export specific middleware - rate limiting is in server, not shared
 // export { rateLimitMiddleware } from '../rate-limiting';
 // TODO: Fix import path - observability is in server/infrastructure, not shared/core
-// export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
+// export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware';
 // export { createHealthEndpoints } from '../observability/health/health-checker'; // TODO: Fix missing export
 
 // Convenience functions for common middleware setups

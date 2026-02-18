@@ -2,10 +2,10 @@
  * Notifications Router Export
  *
  * This file provides backward compatibility for imports expecting
- * the notifications router from 'notifications.js'
+ * the notifications router from 'notifications'
  */
 
-export { router } from './notification-routes.js';
+export { router } from './notification-routes';
 
 
 

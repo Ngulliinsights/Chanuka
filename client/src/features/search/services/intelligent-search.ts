@@ -12,7 +12,7 @@
  * - Memory-efficient Fuse instance management
  */
 
-import Fuse, { type IFuseOptions } from 'fuse.js';
+import Fuse, { type IFuseOptions } from 'fuse';
 
 import { searchApiClient } from '@client/core/api/search';
 import { logger } from '@client/lib/utils/logger';

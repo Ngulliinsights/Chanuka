@@ -1,0 +1,56 @@
+/**
+ * Dark Theme CSS Variables
+ * Chanuka Design System - Dark Theme
+ */
+
+[data-theme="dark"] {
+  /* Background & Foreground */
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  
+  /* Card */
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  
+  /* Popover */
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  
+  /* Primary: Lighter Blue for dark mode */
+  --primary: 206 81% 45%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary: Lighter Teal */
+  --secondary: 198 77% 35%;
+  --secondary-foreground: 0 0% 100%;
+  
+  /* Muted */
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  
+  /* Accent: Brighter Orange for dark mode */
+  --accent: 32 93% 60%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Destructive/Error */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Border & Input */
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 32 93% 60%;
+  
+  /* Semantic Colors (adjusted for dark mode) */
+  --success: 142 71% 50%;
+  --warning: 43 96% 60%;
+  --danger: 0 84% 65%;
+  --info: 206 81% 50%;
+  
+  /* Governance Colors (adjusted for dark mode) */
+  --governance-perspective1: 219 79% 55%;
+  --governance-perspective2: 261 80% 60%;
+  --governance-neutral: 142 71% 50%;
+  --governance-amendment: 38 92% 60%;
+  --governance-constitutional: 292 65% 55%;
+}

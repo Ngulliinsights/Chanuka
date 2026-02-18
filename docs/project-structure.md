@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 18, 2026 at 04:52 AM
+**Generated:** February 18, 2026 at 12:30 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,984
+**Total Items:** 4,003
 
 ```
 .
@@ -2361,6 +2361,8 @@
 │   ├── migrate-codebase-utilities.ts
 │   ├── migrate-console-logs.ts
 │   ├── migrate-consolidated-imports.cjs
+│   ├── migrate-database-imports.ts
+│   ├── migrate-error-handling-api.ts
 │   ├── migrate-error-handling.ts
 │   ├── migrate-imports.js
 │   ├── migrate-logging.js
@@ -3103,6 +3105,7 @@
 │   │   │   ├── resilience.ts
 │   │   │   ├── result-types.ts
 │   │   │   └── types.ts
+│   │   ├── errors/
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
@@ -3908,22 +3911,32 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
+├── ALIAS_AND_API_ISSUES_SUMMARY.md
+├── ALIAS_RESOLUTION_ANALYSIS.md
+├── API_CLIENTS_UNINTEGRATED_ROOT_CAUSE_ANALYSIS.md
 ├── ARCHITECTURE.md
 ├── archive-docs.sh
 ├── CHANGELOG.md
 ├── clear-sw.html
+├── CLIENT_API_ARCHITECTURE_ANALYSIS.md
+├── COMMIT_SUMMARY.md
 ├── COMPLETION_STRATEGY.ts
 ├── COMPREHENSIVE_FINAL_SUMMARY.md
 ├── CONTRIBUTING.md
 ├── CRITICAL_ACTIONS_REQUIRED.md
 ├── cspell.config.yaml
+├── DATABASE_SERVICE_EXPLANATION.md
+├── DATABASE_SERVICE_MISSING_ISSUE.md
+├── DEAD_VS_UNINTEGRATED_CODE_ANALYSIS.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
 ├── drizzle.config.ts
+├── DUPLICATION_ANALYSIS.md
 ├── enum-alignment-report.json
 ├── EXECUTIVE_SUMMARY.md
+├── FEATURE_STRUCTURE_ANALYSIS.md
 ├── FINAL_FIX_INSTRUCTIONS.md
 ├── FINAL_SESSION_REPORT.md
 ├── FIXES_APPLIED.md
@@ -3934,11 +3947,14 @@
 ├── IMPORT_RESOLUTION_FINAL_REPORT.md
 ├── IMPORT_RESOLUTION_FIX_PLAN.md
 ├── IMPORT_RESOLUTION_FIXES_APPLIED.md
+├── INCOMPLETE_MIGRATION_ANALYSIS.md
 ├── knip.config.ts
 ├── knip.json
 ├── LOGGER_USAGE_GUIDE.md
 ├── METRICS_FIX_PLAN.md
 ├── METRICS_FIX_PROGRESS.md
+├── MIGRATION_PLAN.md
+├── migration-and-structure-report.md
 ├── migration-verification-report.json
 ├── nginx.conf
 ├── nx.json
@@ -3952,6 +3968,7 @@
 ├── postcss.config.js
 ├── POSTGRES_CLAIMS_VALIDATION.md
 ├── postgresql_merged.md
+├── PRE_COMMIT_ANALYSIS.md
 ├── PROGRESS_UPDATE_SESSION_2.md
 ├── PROGRESS_UPDATE.md
 ├── QUICK_REFERENCE.md
@@ -3968,6 +3985,7 @@
 ├── SEARCH_ROUTES_ANALYSIS.md
 ├── SEARCH_SYSTEM_FIX_COMPLETE.md
 ├── SEARCH_SYSTEM_FIX_PLAN.md
+├── SECURITY_CSP_DUPLICATION_ANALYSIS.md
 ├── SESSION_2_COMPLETION_SUMMARY.ts
 ├── SESSION_2_FINAL_SUMMARY.md
 ├── SESSION_SUMMARY.md
@@ -3984,6 +4002,7 @@
 ├── tsconfig.tsbuildinfo
 ├── type-check-output.txt
 ├── TYPESCRIPT_MODULE_RESOLUTION_FIX.md
+├── VALIDATION_ARCHITECTURE_ANALYSIS.md
 ├── VALIDATION_SCHEMA_ALIGNMENT_COMPLETE.md
 ├── VERIFICATION_SUMMARY.md
 ├── verify-graph-implementation.sh

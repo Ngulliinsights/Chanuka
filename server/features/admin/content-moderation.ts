@@ -5,7 +5,7 @@
  * decomposed moderation services. New code should use the services from
  * the ./moderation/ directory directly.
  * 
- * @deprecated Use moderationOrchestratorService from './moderation/index.js' instead
+ * @deprecated Use moderationOrchestratorService from './moderation/index' instead
  */
 
 import { logger } from '@server/infrastructure/observability';
@@ -27,7 +27,7 @@ export type {
   ContentAnalytics,
   BulkModerationOperation,
   ContentAnalysisResult
-} from './moderation/index.js';
+} from './moderation/index';
 
 /**
  * Legacy ContentModerationService wrapper
@@ -199,7 +199,7 @@ export class ContentModerationService {
 
 /**
  * Singleton instance of the content moderation service.
- * @deprecated Use moderationOrchestratorService from './moderation/index.js' instead
+ * @deprecated Use moderationOrchestratorService from './moderation/index' instead
  */
 export const contentModerationService = ContentModerationService.getInstance();
 

@@ -5,16 +5,16 @@
  */
 
 // Types
-export * from './types.js';
+export * from './types';
 
 // Services
-export { contentAnalysisService } from './content-analysis.service.js';
-export { moderationQueueService } from './moderation-queue.service.js';
-export { moderationDecisionService } from './moderation-decision.service.js';
-export { moderationAnalyticsService } from './moderation-analytics.service.js';
-export { moderationOrchestratorService } from './moderation-orchestrator.service.js';
+export { contentAnalysisService } from './content-analysis.service';
+export { moderationQueueService } from './moderation-queue.service';
+export { moderationDecisionService } from './moderation-decision.service';
+export { moderationAnalyticsService } from './moderation-analytics.service';
+export { moderationOrchestratorService } from './moderation-orchestrator.service';
 
 // Main service for backward compatibility
-export { moderationOrchestratorService as contentModerationService } from './moderation-orchestrator.service.js';
+export { moderationOrchestratorService as contentModerationService } from './moderation-orchestrator.service';
 
 

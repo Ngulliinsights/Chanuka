@@ -1,0 +1,24 @@
+/**
+ * Progressive Disclosure Styles
+ * Part of Chanuka Design System
+ */
+
+.progressive-disclosure {
+  transition: all 0.3s ease;
+}
+
+.progressive-disclosure--collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.progressive-disclosure--expanded {
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.progressive-disclosure__trigger {
+  cursor: pointer;
+  user-select: none;
+}

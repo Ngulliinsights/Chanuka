@@ -6,15 +6,15 @@ import { verify } from 'jsonwebtoken';
 import { afterEach, beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest';
 import { WebSocket } from 'ws';
 
-import { RuntimeConfig } from '../../../../infrastructure/websocket/config/runtime-config.js';
+import { RuntimeConfig } from '../../../../infrastructure/websocket/config/runtime-config';
 import {
   AuthenticationError,
   ConnectionError,
   ConnectionLimitError,
   ConnectionManager,
   createConnectionManager,
-} from '../../../../infrastructure/websocket/core/connection-manager.js';
-import type { AuthenticatedWebSocket } from '../../../../infrastructure/websocket/types.js';
+} from '../../../../infrastructure/websocket/core/connection-manager';
+import type { AuthenticatedWebSocket } from '../../../../infrastructure/websocket/types';
 
 // Mock jsonwebtoken
 vi.mock('jsonwebtoken', () => ({

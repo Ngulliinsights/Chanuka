@@ -30,6 +30,17 @@ export type {
   ValidationOptions,
 } from './common';
 
+// Interceptor types (core interceptor definitions)
+export type {
+  RequestInterceptor,
+  ResponseInterceptor,
+  ErrorInterceptor,
+  BaseClientRequest,
+  BaseClientResponse,
+  ApiError,
+  RequestBody,
+} from './interceptors';
+
 // Configuration types
 export type {
   ServiceConfig,
@@ -42,8 +53,6 @@ export type {
   ConfigObserver,
   ClientConfig,
   ClientInterceptors,
-  RequestInterceptor,
-  ResponseInterceptor,
 } from './config';
 
 // Error response types (prefer error-response module for ErrorContext)

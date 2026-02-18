@@ -32,7 +32,7 @@ interface NotificationChannelService {
 }
 
 import { cacheService } from '@/infrastructure/cache';
-import { databaseService } from '@/infrastructure/database/database-service';
+import { db } from '@server/infrastructure/database';
 import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
 import { user_profileservice } from '@/users/domain/user-profile';
 

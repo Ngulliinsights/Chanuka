@@ -6,7 +6,7 @@ import { bill_engagement, bills, sponsors, users } from '@server/infrastructure/
 import { bill_trackers,bill_votes } from '@server/infrastructure/schema';
 import { and, count, desc,eq, sql } from 'drizzle-orm';
 
-import { databaseService } from '@/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import { NotificationService } from '@/notifications/domain/services/notification-service';
 // Repository pattern removed - using direct service calls
 import { UserService } from '@/users/application/user-service-direct';
@@ -37,7 +37,7 @@ export class BillDomainService {
     tags?: string[];
     affectedCounties?: string[];
   }): Promise<Bill> {
-    return databaseService.withTransaction(async (tx) => {
+    return withTransaction(async (tx) => {
       // Business Rule: Validate sponsor exists and is authorized
       const sponsor = await this.userService.findById(params.sponsor_id);
       if (!sponsor) {
@@ -96,7 +96,7 @@ export class BillDomainService {
    * Updates bill status with business rule validation and transaction coordination
    */
   async updateBillStatus(bill_id: string, newStatus: BillStatus, updatedBy: string): Promise<any> {
-    return databaseService.withTransaction(async (tx) => {
+    return withTransaction(async (tx) => {
       // Get bill using direct Drizzle query
       const [bill] = await this.db
         .select()

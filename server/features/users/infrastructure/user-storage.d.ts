@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
-import { UserProfile, OAuthProvider, SocialProfile } from '@shared/core/types/auth.types.js';
+import { UserProfile, OAuthProvider, SocialProfile } from '@shared/core/types/auth.types';
 import { BaseStorage } from '../../../../BaseStorage.d';
 import type { StorageOptions } from '../../../../StorageTypes.d';
 import { logger } from '@shared/core';

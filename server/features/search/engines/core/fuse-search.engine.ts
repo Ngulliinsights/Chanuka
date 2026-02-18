@@ -8,7 +8,7 @@ import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
 import { db as database } from '../../../../infrastructure/database/pool';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
 import { sql, and, eq } from 'drizzle-orm';
-import Fuse from 'fuse.js';
+import Fuse from 'fuse';
 
 interface FuseSearchOptions {
   threshold?: number;

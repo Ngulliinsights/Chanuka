@@ -33,7 +33,12 @@ function serializeDomainModel(obj: Record<string, unknown>): Record<string, unkn
   return result;
 }
 
-import type { BaseClientRequest, BaseClientResponse, RequestInterceptor, ResponseInterceptor } from './base-client';
+import type {
+  BaseClientRequest,
+  BaseClientResponse,
+  RequestInterceptor,
+  ResponseInterceptor,
+} from './types/interceptors';
 
 /**
  * Request interceptor that serializes request bodies

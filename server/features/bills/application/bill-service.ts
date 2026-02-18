@@ -9,7 +9,7 @@ import {
   safeAsync
 } from '@server/infrastructure/error-handling';
 import { serverCache, CACHE_TTL as CACHE_TTL_CONSTANTS } from '@server/infrastructure/cache';
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 
 // ============================================================================
 // Type Definitions
@@ -247,7 +247,7 @@ export class CachedBillService {
         throw new Error('Title is required for bill creation');
       }
 
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           const [newBill] = await tx
             .insert(bills)
@@ -296,7 +296,7 @@ export class CachedBillService {
    */
   async updateBillStatus(id: string, newStatus: string, user_id?: string): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
-      await databaseService.withTransaction(
+      await withTransaction(
         async (tx) => {
           await tx
             .update(bills)
@@ -327,7 +327,7 @@ export class CachedBillService {
    */
   async deleteBill(id: string): Promise<AsyncServiceResult<boolean>> {
     return safeAsync(async () => {
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           await tx.delete(bill_engagement).where(eq(bill_engagement.bill_id, id));
           const [deletedBill] = await tx
@@ -661,7 +661,7 @@ export class CachedBillService {
     engagement_type: 'view' | 'comment' | 'share'
   ): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
-      await databaseService.withTransaction(
+      await withTransaction(
         async (tx) => {
           const [existing] = await tx
             .select()

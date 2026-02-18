@@ -6,7 +6,7 @@
  */
 
 import type { ISponsorRepository } from '@server/domain/interfaces/sponsor-repository.interface';
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import {
   newSponsorSchema,
   sponsorSearchOptionsSchema,
@@ -133,7 +133,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(validation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: unknown) => {
         const [newSponsor] = await tx
           .insert(sponsors)
           .values(validation.data)
@@ -277,7 +277,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(updateValidation.error);
       }
 
-      const result = await databaseService.withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: unknown) => {
         const [updatedSponsor] = await tx
           .update(sponsors)
           .set({
@@ -309,7 +309,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      await databaseService.withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: unknown) => {
         await tx
           .update(sponsors)
           .set({
@@ -327,7 +327,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
 
   async delete(id: string): Promise<Result<void, Error>> {
     try {
-      await databaseService.withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: unknown) => {
         await tx
           .delete(sponsors)
           .where(eq(sponsors.id, id));

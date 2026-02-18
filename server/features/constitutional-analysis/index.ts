@@ -4,27 +4,27 @@
 // Main entry point for the constitutional analysis feature
 
 // Application Services
-export { ConstitutionalAnalyzer } from './application/constitutional-analyzer.js';
-export { ProvisionMatcherService } from './application/provision-matcher.js';
-export { PrecedentFinderService } from './application/precedent-finder.js';
-export { ExpertFlaggingService } from './application/expert-flagging-service.js';
+export { ConstitutionalAnalyzer } from './application/constitutional-analyzer';
+export { ProvisionMatcherService } from './application/provision-matcher';
+export { PrecedentFinderService } from './application/precedent-finder';
+export { ExpertFlaggingService } from './application/expert-flagging-service';
 
 // Infrastructure
-export { ConstitutionalProvisionsRepository } from './infrastructure/repositories/constitutional-provisions-repository.js';
-export { LegalPrecedentsRepository } from './infrastructure/repositories/legal-precedents-repository.js';
-export { ConstitutionalAnalysesRepository } from './infrastructure/repositories/constitutional-analyses-repository.js';
-export { ExpertReviewQueueRepository } from './infrastructure/repositories/expert-review-queue-repository.js';
-export { LegalDatabaseClient } from './infrastructure/external/legal-database-client.js';
+export { ConstitutionalProvisionsRepository } from './infrastructure/repositories/constitutional-provisions-repository';
+export { LegalPrecedentsRepository } from './infrastructure/repositories/legal-precedents-repository';
+export { ConstitutionalAnalysesRepository } from './infrastructure/repositories/constitutional-analyses-repository';
+export { ExpertReviewQueueRepository } from './infrastructure/repositories/expert-review-queue-repository';
+export { LegalDatabaseClient } from './infrastructure/external/legal-database-client';
 
 // Services
 export { 
   ConstitutionalAnalysisFactory,
   createConstitutionalAnalyzer,
   createAnalysisServices
-} from './services/constitutional-analysis-factory.js';
+} from './services/constitutional-analysis-factory';
 
 // Presentation
-export { constitutionalAnalysisRouter } from './presentation/constitutional-analysis-router.js';
+export { constitutionalAnalysisRouter } from './presentation/constitutional-analysis-router';
 
 // Configuration
 export { 
@@ -33,7 +33,7 @@ export {
   PRODUCTION_CONFIG,
   DEVELOPMENT_CONFIG,
   TEST_CONFIG
-} from './config/analysis-config.js';
+} from './config/analysis-config';
 
 // Utilities
 export {
@@ -42,7 +42,7 @@ export {
   PrecedentAnalysisUtils,
   ValidationUtils,
   PerformanceUtils
-} from './utils/analysis-utils.js';
+} from './utils/analysis-utils';
 
 // Types
 export type {
@@ -58,6 +58,6 @@ export type {
   ProvisionMatchingError,
   PrecedentAnalysisError,
   ExpertReviewError
-} from './types/index.js';
+} from './types/index';
 
 

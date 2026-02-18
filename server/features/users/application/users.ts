@@ -1,4 +1,4 @@
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 import {
   AsyncServiceResult,
   withResultHandling,
@@ -99,7 +99,7 @@ export class UserDomainService {
       }
 
       // Execute transaction and unwrap DatabaseResult
-      const txResult = await databaseService.withTransaction(async (_tx) => {
+      const txResult = await withTransaction(async (_tx) => {
         // Create user entity
         const user = User.create({
           id: crypto.randomUUID(),
@@ -167,7 +167,7 @@ export class UserDomainService {
         throw boomFromStandardized(businessLogicResult._unsafeUnwrapErr());
       }
 
-      const txResult = await databaseService.withTransaction(async (_tx) => {
+      const txResult = await withTransaction(async (_tx) => {
         let profile = aggregate.profile;
 
         // Create profile if it doesn't exist
@@ -257,7 +257,7 @@ export class UserDomainService {
         throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
-      const txResult = await databaseService.withTransaction(async (_tx) => {
+      const txResult = await withTransaction(async (_tx) => {
         // Clear existing interests
         await this.userService.deleteAllInterests(user_id);
 
@@ -324,7 +324,7 @@ export class UserDomainService {
         throw boomFromStandardized(validationResult._unsafeUnwrapErr());
       }
 
-      const txResult = await databaseService.withTransaction(async (_tx) => {
+      const txResult = await withTransaction(async (_tx) => {
         // Create verification entity
         const verification = CitizenVerification.create({
           id: crypto.randomUUID(),

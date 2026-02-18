@@ -10,7 +10,7 @@ import { governmentDataIntegrationService } from '@server/features/government-da
 import { RecommendationService } from '@server/features/recommendation/application/RecommendationService';
 import { searchBills } from '@server/features/search/application/SearchService';
 import { logger } from '@server/infrastructure/observability';
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { withTransaction } from '@server/infrastructure/database';
 
 export interface ServiceHealth {
   serviceName: string;
@@ -87,7 +87,7 @@ export class ServiceOrchestrator {
       });
 
       // Step 1: Create bill in database
-      const bill = await databaseService.withTransaction(async () => {
+      const bill = await withTransaction(async () => {
         // Bill creation logic would go here
         // For now, simulate bill creation
         return {
@@ -305,7 +305,7 @@ export class ServiceOrchestrator {
       });
 
       // Step 1: Create comment
-      const comment = await databaseService.withTransaction(async () => {
+      const comment = await withTransaction(async () => {
         // Comment creation logic
         return {
           id: this.generateId(),

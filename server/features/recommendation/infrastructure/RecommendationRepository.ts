@@ -10,7 +10,7 @@ import {
 } from '@server/infrastructure/schema';
 import { and, count,desc, eq, gt, inArray, or, SQL, sql } from 'drizzle-orm';
 
- import { databaseService } from '@/services/database-service';
+ import { db } from '@server/infrastructure/database';
 
 export class RecommendationRepository {
   private get db() {

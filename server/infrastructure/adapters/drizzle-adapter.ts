@@ -14,7 +14,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
-import { databaseService } from '@server/infrastructure/database/database-service';
+import { db, withTransaction } from '@server/infrastructure/database';
 import { and, asc, count, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
 
 // Type helper to ensure timestamp fields exist
@@ -145,7 +145,7 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           const insertData = this.entityMapping.fromEntity(entity) as WithTimestamps<Partial<TRow>>;
           
@@ -183,7 +183,7 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           const updateData = this.entityMapping.fromEntity(updates as TEntity) as WithTimestamps<Partial<TRow>>;
           
@@ -216,7 +216,7 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           const deleteResult = await tx
             .delete(this.table)
@@ -275,7 +275,7 @@ export class DrizzleAdapter<TEntity, TRow> {
     try {
       if (entities.length === 0) return [];
       
-      const result = await databaseService.withTransaction(
+      const result = await withTransaction(
         async (tx) => {
           const insertData = entities.map(entity => {
             const data = this.entityMapping.fromEntity(entity) as WithTimestamps<Partial<TRow>>;

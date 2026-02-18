@@ -5,7 +5,7 @@
  * decomposed conflict detection services. New code should use the services from
  * the ./conflict-detection/ directory directly.
  * 
- * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index.js' instead
+ * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index' instead
  */
 
 import { logger } from '@server/infrastructure/observability';
@@ -28,9 +28,9 @@ export type {
   VotingAnomaly,
   ConflictDetectionConfig,
   Stakeholder
-} from './conflict-detection/index.js';
+} from './conflict-detection/index';
 
-export { ConflictDetectionError } from './conflict-detection/index.js';
+export { ConflictDetectionError } from './conflict-detection/index';
 
 /**
  * Legacy EnhancedConflictDetectionService wrapper
@@ -96,7 +96,7 @@ export class EnhancedConflictDetectionService {
 
 /**
  * Singleton instance of the enhanced conflict detection service.
- * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index.js' instead
+ * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index' instead
  */
 export const enhancedConflictDetectionService = EnhancedConflictDetectionService.getInstance();
 

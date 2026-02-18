@@ -18,7 +18,7 @@ export type {
   TransparencyDashboard,
   SponsorInfo,
   SponsorAffiliation
-} from '../types/index.js';
+} from '../types/index';
 
 
 
