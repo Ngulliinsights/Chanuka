@@ -1,4 +1,4 @@
-import { ErrorDomain, ErrorSeverity } from '../../index';
+import { ErrorDomain, ErrorSeverity } from '../../errors/error-types';
 
 // Define BaseError locally since it's not exported from shared/core
 class BaseError extends Error {
