@@ -11,8 +11,7 @@ import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { and,eq } from 'drizzle-orm';
 
-import { databaseService } from '@/infrastructure/database/database-service'; // For storing results
-import * as schema from '@/shared/schema';
+import * as schema from '@shared/schema';
 
 
 // --- Define ConflictSummary type based on sponsor conflict service output ---

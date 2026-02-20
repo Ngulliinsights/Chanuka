@@ -19,8 +19,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 
 import { errorTracker } from '@/core/errors/error-tracker';
-import { databaseService } from '@/infrastructure/database/database-service';
-import { buildTimeThreshold } from '@/utils/db-helpers';
+import { buildTimeThreshold } from '@server/utils/db-helpers';
 
 import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert';
 
@@ -34,8 +33,7 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
    * Get comprehensive user engagement metrics
    */
   async getUserEngagementMetrics(user_id: string, timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserEngagementMetrics> {
-    const result = await databaseService.withFallback(
-      async () => {
+    try {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
         const cacheKey = `${cacheKeys.USER_PROFILE(user_id) }:engagement:${timeframe}`;
 
@@ -132,8 +130,14 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
             return metrics;
           }
         );
-      },
-      { user_id,
+      
+    } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'ServiceName',
+        operation: 'getUserEngagementMetrics:${ user_id }:${timeframe}'
+      });
+      return { user_id,
         userName: 'Unknown User',
         totalComments: 0,
         totalVotes: 0,
@@ -143,18 +147,14 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
         topCommentVotes: 0,
         participationDays: 0,
         expertiseAreas: []
-       },
-      `getUserEngagementMetrics:${ user_id }:${timeframe}`
-    );
-
-    return result.data;
+       };
+    }
   }
 
   /**
    * Get comprehensive bill engagement metrics
    */
-  async getBillEngagementMetrics(bill_id: number): Promise<BillEngagementMetrics> { const result = await databaseService.withFallback(
-      async () => {
+  async getBillEngagementMetrics(bill_id: number): Promise<BillEngagementMetrics> { try {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
         const cacheKey = `${cacheKeys.BILL_DETAILS(bill_id) }:engagement:metrics`;
 
@@ -240,8 +240,14 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
             return metrics;
           }
         );
-      },
-      { bill_id,
+      
+    } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'ServiceName',
+        operation: 'getBillEngagementMetrics:${ bill_id }'
+      });
+      return { bill_id,
         billTitle: 'Unknown Bill',
         totalComments: 0,
         totalVotes: 0,
@@ -251,18 +257,14 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
         expertParticipation: 0,
         timeToFirstComment: 0,
         peakEngagementHour: 12
-       },
-      `getBillEngagementMetrics:${ bill_id }`
-    );
-
-    return result.data;
+       };
+    }
   }
 
   /**
    * Get engagement trends over time
    */
-  async getEngagementTrends(bill_id: number, period: 'hourly' | 'daily' | 'weekly' = 'daily'): Promise<CommentEngagementTrends[typeof period]> { const result = await databaseService.withFallback(
-      async () => {
+  async getEngagementTrends(bill_id: number, period: 'hourly' | 'daily' | 'weekly' = 'daily'): Promise<CommentEngagementTrends[typeof period]> { try {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
         const cacheKey = `${cacheKeys.BILL_DETAILS(bill_id) }:engagement:trends:${period}`;
 
@@ -311,20 +313,22 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
             return formattedTrends as unknown;
           }
         );
-      },
-      [],
-      `getEngagementTrends:${ bill_id }:${period}`
-    );
-
-    return result.data;
+      
+    } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'ServiceName',
+        operation: 'getEngagementTrends:${ bill_id }:${period}'
+      });
+      return [];
+    }
   }
 
   /**
    * Get engagement leaderboard
    */
   async getEngagementLeaderboard(timeframe: '7d' | '30d' | '90d' = '30d', limit: number = 10): Promise<EngagementLeaderboard> {
-    const result = await databaseService.withFallback(
-      async () => {
+    try {
         const cacheKey = `engagement:leaderboard:${timeframe}:${limit}`;
 
         return await cache.getOrSetCache(
@@ -412,16 +416,19 @@ export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL =
             return leaderboard;
           }
         );
-      },
-      {
+      
+    } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'ServiceName',
+        operation: 'getEngagementLeaderboard:${timeframe}'
+      });
+      return {
         topCommenters: [],
         topVoters: [],
         mostEngagedBills: []
-      },
-      `getEngagementLeaderboard:${timeframe}`
-    );
-
-    return result.data;
+      };
+    }
   }
 
   /**

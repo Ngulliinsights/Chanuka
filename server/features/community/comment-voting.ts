@@ -1,10 +1,26 @@
-import { cacheService } from '@shared/core/caching';
-import { databaseService } from '@server/infrastructure/database/database-service';
-import { CACHE_KEYS } from '@shared/core/index';
+import { cacheService } from '@server/infrastructure/cache';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives';
-import { db } from '@server/infrastructure/schema';
-import { comment_votes,comments } from '@server/infrastructure/schema';
-import { and, desc,eq, sql } from 'drizzle-orm';
+import { logger } from '@server/infrastructure/observability';
+import { database as db } from '@server/infrastructure/database';
+import { bills, comment_votes, comments } from '@server/infrastructure/schema';
+import { and, desc, eq, sql } from 'drizzle-orm';
+
+// ---------------------------------------------------------------------------
+// Cache key helpers (scoped to this module)
+// ---------------------------------------------------------------------------
+
+const COMMENT_CACHE = {
+  votingStats: (ids: string[]) => `comment_votes:stats:${ids.join(',')}`,
+  trending: (bill_id: string, timeframe: string, limit: number) =>
+    `comment_votes:trending:${bill_id}:${timeframe}:${limit}`,
+  voteSummary: (bill_id: string) => `comment_votes:summary:${bill_id}`,
+  trendingPattern: (bill_id: string) => `comment_votes:trending:${bill_id}:*`,
+  billCommentsPattern: (bill_id: string) => `bill_comments:${bill_id}:*`,
+};
+
+// ---------------------------------------------------------------------------
+// Public interfaces
+// ---------------------------------------------------------------------------
 
 export interface VoteResult {
   success: boolean;
@@ -23,377 +39,331 @@ export interface CommentEngagementStats {
   popularityRank: number;
 }
 
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
 /**
  * Comment Voting and Engagement Service
- * Handles upvotes, downvotes, and engagement analytics
+ * Handles upvotes, downvotes, and engagement analytics.
  */
 export class CommentVotingService {
   private readonly VOTE_CACHE_TTL = CACHE_TTL_SHORT;
 
+  // -------------------------------------------------------------------------
+  // Public: voting
+  // -------------------------------------------------------------------------
+
   /**
-    * Vote on a comment (upvote or downvote)
-    */
-  async voteOnComment(comment_id: string, user_id: string, vote_type: 'up' | 'down'): Promise<VoteResult> {
-    const result = await databaseService.withFallback(
-      async () => {
-        // Check if comment exists
-        const [comment] = await db
-          .select()
-          .from(comments)
-          .where(eq(comments.id, comment_id))
-          .limit(1);
+   * Vote on a comment (upvote or downvote). Toggling the same vote removes it.
+   */
+  async voteOnComment(
+    comment_id: string,
+    user_id: string,
+    vote_type: 'up' | 'down',
+  ): Promise<VoteResult> {
+    try {
+      const [comment] = await db
+        .select()
+        .from(comments)
+        .where(eq(comments.id, comment_id))
+        .limit(1);
 
-        if (!comment) {
-          throw new Error('Comment not found');
-        }
+      if (!comment) throw new Error('Comment not found');
 
-        // Check if user has already voted on this comment
-        const [existingVote] = await db
-          .select()
-          .from(comment_votes)
-          .where(and(
+      const [existingVote] = await db
+        .select()
+        .from(comment_votes)
+        .where(
+          and(
             eq(comment_votes.comment_id, comment_id),
-            eq(comment_votes.user_id, user_id)
-          ))
-          .limit(1);
+            eq(comment_votes.user_id, user_id),
+          ),
+        )
+        .limit(1);
 
-        let upvoteChange = 0;
-        let downvoteChange = 0;
-        let finalVoteType: 'up' | 'down' | null = vote_type;
+      let upvoteChange = 0;
+      let downvoteChange = 0;
+      let finalVoteType: 'up' | 'down' | null = vote_type;
 
-        if (existingVote) {
-          // User has already voted
-          if (existingVote.vote_type === vote_type) {
-            // Same vote type - remove the vote (toggle off)
-            await db
-              .delete(comment_votes)
-              .where(eq(comment_votes.id, existingVote.id));
-
-            if (vote_type === 'up') {
-              upvoteChange = -1;
-            } else {
-              downvoteChange = -1;
-            }
-            finalVoteType = null;
-          } else {
-            // Different vote type - change the vote
-            await db
-              .update(comment_votes)
-              .set({
-                vote_type,
-                updated_at: new Date()
-              })
-              .where(eq(comment_votes.id, existingVote.id));
-
-            if (vote_type === 'up') {
-              upvoteChange = 1;
-              downvoteChange = -1;
-            } else {
-              upvoteChange = -1;
-              downvoteChange = 1;
-            }
-          }
-        } else { // New vote
+      if (existingVote) {
+        if (existingVote.vote_type === vote_type) {
+          // Same vote — toggle off
+          await db.delete(comment_votes).where(eq(comment_votes.id, existingVote.id));
+          upvoteChange = vote_type === 'up' ? -1 : 0;
+          downvoteChange = vote_type === 'down' ? -1 : 0;
+          finalVoteType = null;
+        } else {
+          // Different vote — flip
           await db
-            .insert(comment_votes)
-            .values({
-              comment_id,
-              user_id,
-              vote_type
-            });
-
-          if (vote_type === 'up') {
-            upvoteChange = 1;
-          } else {
-            downvoteChange = 1;
-          }
+            .update(comment_votes)
+            .set({ vote_type, updated_at: new Date() })
+            .where(eq(comment_votes.id, existingVote.id));
+          upvoteChange = vote_type === 'up' ? 1 : -1;
+          downvoteChange = vote_type === 'down' ? 1 : -1;
         }
+      } else {
+        // New vote
+        await db.insert(comment_votes).values({ comment_id, user_id, vote_type });
+        upvoteChange = vote_type === 'up' ? 1 : 0;
+        downvoteChange = vote_type === 'down' ? 1 : 0;
+      }
 
-        // Update comment vote counts in database
-        const [updatedComment] = await db
-          .update(comments)
-          .set({
-            upvotes: sql`${comments.upvotes} + ${upvoteChange}`,
-            downvotes: sql`${comments.downvotes} + ${downvoteChange}`,
-            updated_at: new Date()
-          })
-          .where(eq(comments.id, comment_id))
-          .returning();
+      const [updatedComment] = await db
+        .update(comments)
+        .set({
+          upvotes: sql`${comments.upvotes} + ${upvoteChange}`,
+          downvotes: sql`${comments.downvotes} + ${downvoteChange}`,
+          updated_at: new Date(),
+        })
+        .where(eq(comments.id, comment_id))
+        .returning();
 
-        // Clear related caches
-        await this.clearVotingCaches(comment_id, comment.bill_id);
+      await this.clearVotingCaches(comment_id, comment.bill_id);
 
-        return {
-          success: true,
-          newUpvotes: updatedComment.upvotes,
-          newDownvotes: updatedComment.downvotes,
-          netVotes: updatedComment.upvotes - updatedComment.downvotes,
-          userVote: finalVoteType
-        };
-      },
-      {
-        success: false,
-        newUpvotes: 0,
-        newDownvotes: 0,
-        netVotes: 0,
-        userVote: null
-      },
-      `voteOnComment:${comment_id}:${user_id}`
-    );
-    return result.data;
+      return {
+        success: true,
+        newUpvotes: updatedComment.upvotes,
+        newDownvotes: updatedComment.downvotes,
+        netVotes: updatedComment.upvotes - updatedComment.downvotes,
+        userVote: finalVoteType,
+      };
+    } catch (error) {
+      logger.error('Failed to vote on comment', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'voteOnComment',
+        context: { comment_id, user_id },
+      });
+      return { success: false, newUpvotes: 0, newDownvotes: 0, netVotes: 0, userVote: null };
+    }
   }
 
   /**
-    * Get user's vote on a specific comment
-    */
+   * Get the current user's vote on a specific comment.
+   */
   async getUserVote(comment_id: string, user_id: string): Promise<'up' | 'down' | null> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const [vote] = await db
-          .select({ vote_type: comment_votes.vote_type })
-          .from(comment_votes)
-          .where(and(
+    try {
+      const [vote] = await db
+        .select({ vote_type: comment_votes.vote_type })
+        .from(comment_votes)
+        .where(
+          and(
             eq(comment_votes.comment_id, comment_id),
-            eq(comment_votes.user_id, user_id)
-          ))
-          .limit(1);
+            eq(comment_votes.user_id, user_id),
+          ),
+        )
+        .limit(1);
 
-        return vote ? vote.vote_type as 'up' | 'down' : null;
-      },
-      null,
-      `getUserVote:${comment_id}:${user_id}`
-    );
-    return result.data;
+      return vote ? (vote.vote_type as 'up' | 'down') : null;
+    } catch (error) {
+      logger.error('Failed to get user vote', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'getUserVote',
+        context: { comment_id, user_id },
+      });
+      return null;
+    }
   }
 
+  // -------------------------------------------------------------------------
+  // Public: stats
+  // -------------------------------------------------------------------------
+
   /**
-    * Get voting statistics for multiple comments
-    */
-  async getCommentVotingStats(comment_ids: string[]): Promise<Map<string, CommentEngagementStats>> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:stats:${comment_ids.join(',')}`;
-        const cached = await cacheService.get(cacheKey);
-        if (cached) {
-          return new Map(cached as [string, CommentEngagementStats][]);
-        }
+   * Get voting statistics for a batch of comments.
+   */
+  async getCommentVotingStats(
+    comment_ids: string[],
+  ): Promise<Map<string, CommentEngagementStats>> {
+    try {
+      const cacheKey = COMMENT_CACHE.votingStats(comment_ids);
+      const cached = await cacheService.get(cacheKey);
+      if (cached) return new Map(cached as [string, CommentEngagementStats][]);
 
-        const commentRecords = await db
-          .select({
-            id: comments.id,
-            upvotes: comments.upvotes,
-            downvotes: comments.downvotes
-          })
-          .from(comments)
-          .where(sql`${comments.id} = ANY(${comment_ids})`);
+      const commentRecords = await db
+        .select({
+          id: comments.id,
+          upvotes: comments.upvotes,
+          downvotes: comments.downvotes,
+        })
+        .from(comments)
+        .where(sql`${comments.id} = ANY(${comment_ids})`);
 
-        const statsMap = new Map<string, CommentEngagementStats>();
+      const statsMap = new Map<string, CommentEngagementStats>();
 
-        commentRecords.forEach((comment: { id: string; upvotes: number; downvotes: number }, index: number) => {
-          const netVotes = comment.upvotes - comment.downvotes;
-          const totalVotes = comment.upvotes + comment.downvotes;
+      commentRecords.forEach((comment, index) => {
+        const netVotes = comment.upvotes - comment.downvotes;
+        const totalVotes = comment.upvotes + comment.downvotes;
+        const engagement_score = this.calculateEngagementScore(
+          comment.upvotes,
+          comment.downvotes,
+          totalVotes,
+        );
 
-          // Calculate engagement score (weighted by recency and vote ratio)
-          const engagement_score = this.calculateEngagementScore(
-            comment.upvotes,
-            comment.downvotes,
-            totalVotes
-          );
-
-          statsMap.set(comment.id, {
-            commentId: comment.id.toString(),
-            upvotes: comment.upvotes,
-            downvotes: comment.downvotes,
-            netVotes,
-            engagement_score,
-            popularityRank: index + 1 // This would be calculated based on sorting
-          });
+        statsMap.set(comment.id, {
+          commentId: comment.id.toString(),
+          upvotes: comment.upvotes,
+          downvotes: comment.downvotes,
+          netVotes,
+          engagement_score,
+          popularityRank: index + 1,
         });
+      });
 
-        // Cache the results
-        await cacheService.set(cacheKey, Array.from(statsMap.entries()), this.VOTE_CACHE_TTL);
-
-        return statsMap;
-      },
-      new Map(),
-      `getCommentVotingStats:${comment_ids.join(',')}`
-    );
-    return result.data;
+      await cacheService.set(cacheKey, Array.from(statsMap.entries()), this.VOTE_CACHE_TTL);
+      return statsMap;
+    } catch (error) {
+      logger.error('Failed to get comment voting stats', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'getCommentVotingStats',
+        context: { comment_count: comment_ids.length },
+      });
+      return new Map();
+    }
   }
 
   /**
-    * Get trending comments based on voting patterns
-    */
-  async getTrendingComments(bill_id: string, timeframe: '1h' | '24h' | '7d' = '24h', limit: number = 10): Promise<{
-    commentId: string;
-    netVotes: number;
-    engagement_score: number;
-    trendingScore: number;
-  }[]> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:trending:${bill_id}:${timeframe}:${limit}`;
-        const cached = await cacheService.get(cacheKey);
-        if (cached) {
-          return cached;
-        }
+   * Get trending comments for a bill within a given timeframe.
+   */
+  async getTrendingComments(
+    bill_id: string,
+    timeframe: '1h' | '24h' | '7d' = '24h',
+    limit = 10,
+  ): Promise<
+    {
+      commentId: string;
+      netVotes: number;
+      engagement_score: number;
+      trendingScore: number;
+    }[]
+  > {
+    try {
+      const cacheKey = COMMENT_CACHE.trending(bill_id, timeframe, limit);
+      const cached = await cacheService.get(cacheKey);
+      if (cached) return cached as typeof trendingComments;
 
-        // Calculate time threshold
-        const timeThreshold = new Date();
-        switch (timeframe) {
-          case '1h':
-            timeThreshold.setHours(timeThreshold.getHours() - 1);
-            break;
-          case '24h':
-            timeThreshold.setDate(timeThreshold.getDate() - 1);
-            break;
-          case '7d':
-            timeThreshold.setDate(timeThreshold.getDate() - 7);
-            break;
-        }
+      const timeThreshold = new Date();
+      switch (timeframe) {
+        case '1h':
+          timeThreshold.setHours(timeThreshold.getHours() - 1);
+          break;
+        case '24h':
+          timeThreshold.setDate(timeThreshold.getDate() - 1);
+          break;
+        case '7d':
+          timeThreshold.setDate(timeThreshold.getDate() - 7);
+          break;
+      }
 
-        const commentRecords = await db
-          .select({
-            id: comments.id,
-            upvotes: comments.upvotes,
-            downvotes: comments.downvotes,
-            created_at: comments.created_at,
-            updated_at: comments.updated_at
-          })
-          .from(comments)
-          .where(and(
+      const commentRecords = await db
+        .select({
+          id: comments.id,
+          upvotes: comments.upvotes,
+          downvotes: comments.downvotes,
+          created_at: comments.created_at,
+          updated_at: comments.updated_at,
+        })
+        .from(comments)
+        .where(
+          and(
             eq(comments.bill_id, bill_id),
-            sql`${comments.updated_at} >= ${timeThreshold}`
-          ))
-          .orderBy(sql`${comments.upvotes} - ${comments.downvotes} DESC`)
-          .limit(limit);
+            sql`${comments.updated_at} >= ${timeThreshold}`,
+          ),
+        )
+        .orderBy(sql`${comments.upvotes} - ${comments.downvotes} DESC`)
+        .limit(limit);
 
-        const trendingComments = commentRecords.map((comment: { 
-          id: string; 
-          upvotes: number; 
-          downvotes: number; 
-          created_at: Date; 
-          updated_at: Date 
-        }) => {
+      const trendingComments = commentRecords
+        .map((comment) => {
           const netVotes = comment.upvotes - comment.downvotes;
           const totalVotes = comment.upvotes + comment.downvotes;
           const engagement_score = this.calculateEngagementScore(
             comment.upvotes,
             comment.downvotes,
-            totalVotes
+            totalVotes,
           );
-
-          // Calculate trending score based on recency and engagement
-          const ageInHours = (Date.now() - comment.updated_at.getTime()) / (1000 * 60 * 60);
-          const recencyMultiplier = Math.max(0.1, 1 - (ageInHours / 24)); // Decay over 24 hours
+          const ageInHours =
+            (Date.now() - (comment.updated_at ?? new Date()).getTime()) / (1000 * 60 * 60);
+          const recencyMultiplier = Math.max(0.1, 1 - ageInHours / 24);
           const trendingScore = engagement_score * recencyMultiplier;
 
           return {
             commentId: comment.id.toString(),
             netVotes,
             engagement_score,
-            trendingScore
+            trendingScore,
           };
-        }).sort((a: { trendingScore: number }, b: { trendingScore: number }) => b.trendingScore - a.trendingScore);
+        })
+        .sort((a, b) => b.trendingScore - a.trendingScore);
 
-        await cacheService.set(cacheKey, trendingComments, this.VOTE_CACHE_TTL);
-        return trendingComments;
-      },
-      [],
-      `getTrendingComments:${bill_id}:${timeframe}`
-    );
-    return result.data;
-  }
-
-  /**
-    * Get user's voting history for comments
-    */
-  async getUserVotingHistory(user_id: string, limit: number = 50): Promise<{
-    comment_id: string;
-    vote_type: 'up' | 'down';
-    votedAt: Date;
-    bill_id: string;
-    billTitle: string;
-  }[]> {
-    const result = await databaseService.withFallback(
-      async () => {
-        // Get user's votes from database with comment and bill information
-        const userVotes = await db
-          .select({
-            comment_id: comment_votes.comment_id,
-            vote_type: comment_votes.vote_type,
-            votedAt: comment_votes.updated_at,
-            bill_id: comments.bill_id,
-            billTitle: sql<string>`(SELECT title FROM bills WHERE id = ${comments.bill_id})`
-          })
-          .from(comment_votes)
-          .innerJoin(comments, eq(comment_votes.comment_id, comments.id))
-          .where(eq(comment_votes.user_id, user_id))
-          .orderBy(desc(comment_votes.updated_at))
-          .limit(limit);
-
-        return userVotes.map((vote: {
-          comment_id: string;
-          vote_type: 'up' | 'down';
-          votedAt: Date;
-          bill_id: string;
-          billTitle: string;
-        }) => ({
-          comment_id: vote.comment_id,
-          vote_type: vote.vote_type,
-          votedAt: vote.votedAt,
-          bill_id: vote.bill_id,
-          billTitle: vote.billTitle || 'Unknown Bill'
-        }));
-      },
-      [],
-      `getUserVotingHistory:${user_id}`
-    );
-    return result.data;
-  }
-
-  /**
-   * Calculate engagement score for a comment
-   */
-  private calculateEngagementScore(upvotes: number, downvotes: number, totalVotes: number): number {
-    if (totalVotes === 0) return 0;
-
-    const netVotes = upvotes - downvotes;
-    const voteRatio = upvotes / totalVotes;
-
-    // Wilson score confidence interval for better ranking
-    const z = 1.96; // 95% confidence
-    const phat = voteRatio;
-    const n = totalVotes;
-
-    if (n === 0) return 0;
-
-    const wilson = (phat + z * z / (2 * n) - z * Math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n)) / (1 + z * z / n);
-
-    // Combine Wilson score with absolute vote count
-    const engagement_score = wilson * Math.log(totalVotes + 1) + netVotes * 0.1;
-
-    return Math.max(0, engagement_score);
-  }
-
-  /**
-    * Clear voting-related caches
-    */
-  private async clearVotingCaches(comment_id: string, bill_id: string): Promise<void> {
-    const patterns = [
-      `${CACHE_KEYS.COMMENT_VOTES}:stats:*`,
-      `${CACHE_KEYS.COMMENT_VOTES}:trending:${bill_id}:*`,
-      `${CACHE_KEYS.BILL_COMMENTS}:${bill_id}:*`
-    ];
-
-    for (const pattern of patterns) {
-      await cacheService.deletePattern(pattern);
+      await cacheService.set(cacheKey, trendingComments, this.VOTE_CACHE_TTL);
+      return trendingComments;
+    } catch (error) {
+      logger.error('Failed to get trending comments', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'getTrendingComments',
+        context: { bill_id, timeframe },
+      });
+      return [];
     }
   }
 
   /**
-    * Get vote summary for a bill's comments
-    */
+   * Get a user's full voting history with bill context.
+   */
+  async getUserVotingHistory(
+    user_id: string,
+    limit = 50,
+  ): Promise<
+    {
+      comment_id: string;
+      vote_type: 'up' | 'down';
+      votedAt: Date;
+      bill_id: string;
+      billTitle: string;
+    }[]
+  > {
+    try {
+      const userVotes = await db
+        .select({
+          comment_id: comment_votes.comment_id,
+          vote_type: comment_votes.vote_type,
+          votedAt: comment_votes.updated_at,
+          bill_id: comments.bill_id,
+          billTitle: bills.title,
+        })
+        .from(comment_votes)
+        .innerJoin(comments, eq(comment_votes.comment_id, comments.id))
+        .innerJoin(bills, eq(comments.bill_id, bills.id))
+        .where(eq(comment_votes.user_id, user_id))
+        .orderBy(desc(comment_votes.updated_at))
+        .limit(limit);
+
+      return userVotes.map((vote) => ({
+        comment_id: vote.comment_id,
+        vote_type: vote.vote_type as 'up' | 'down',
+        votedAt: vote.votedAt ?? new Date(),
+        bill_id: vote.bill_id,
+        billTitle: vote.billTitle ?? 'Unknown Bill',
+      }));
+    } catch (error) {
+      logger.error('Failed to get user voting history', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'getUserVotingHistory',
+        context: { user_id },
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Get aggregated vote summary for all comments on a bill.
+   */
   async getBillCommentVoteSummary(bill_id: string): Promise<{
     totalVotes: number;
     totalUpvotes: number;
@@ -402,134 +372,117 @@ export class CommentVotingService {
     mostUpvotedCommentId: string | null;
     mostControversialCommentId: string | null;
   }> {
-    const result = await databaseService.withFallback<{
-      totalVotes: number;
-      totalUpvotes: number;
-      totalDownvotes: number;
-      averageEngagement: number;
-      mostUpvotedCommentId: string | null;
-      mostControversialCommentId: string | null;
-    }>(
-      async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:summary:${bill_id}`;
-        const cached = await cacheService.get(cacheKey) as {
-          totalVotes: number;
-          totalUpvotes: number;
-          totalDownvotes: number;
-          averageEngagement: number;
-          mostUpvotedCommentId: string | null;
-          mostControversialCommentId: string | null;
-        } | null;
-        if (cached) {
-          return cached;
-        }
+    const emptyResult = {
+      totalVotes: 0,
+      totalUpvotes: 0,
+      totalDownvotes: 0,
+      averageEngagement: 0,
+      mostUpvotedCommentId: null,
+      mostControversialCommentId: null,
+    };
 
-        const [summary] = await db
-          .select({
-            totalUpvotes: sql<number>`SUM(${comments.upvotes})`,
-            totalDownvotes: sql<number>`SUM(${comments.downvotes})`,
-            comment_count: sql<number>`COUNT(*)`,
-            maxUpvotes: sql<number>`MAX(${comments.upvotes})`,
-            maxControversy: sql<number>`MAX(${comments.upvotes} + ${comments.downvotes})`
-          })
-          .from(comments)
-          .where(eq(comments.bill_id, bill_id));
+    try {
+      const cacheKey = COMMENT_CACHE.voteSummary(bill_id);
+      const cached = await cacheService.get(cacheKey) as typeof emptyResult | null;
+      if (cached) return cached;
 
-        // Get most upvoted comment
-        const [mostUpvoted] = await db
-          .select({ id: comments.id })
-          .from(comments)
-          .where(and(
-            eq(comments.bill_id, bill_id),
-            eq(comments.upvotes, summary.maxUpvotes)
-          ))
-          .limit(1);
+      const [summary] = await db
+        .select({
+          totalUpvotes: sql<number>`COALESCE(SUM(${comments.upvotes}), 0)`,
+          totalDownvotes: sql<number>`COALESCE(SUM(${comments.downvotes}), 0)`,
+          comment_count: sql<number>`COUNT(*)`,
+          maxUpvotes: sql<number>`COALESCE(MAX(${comments.upvotes}), 0)`,
+        })
+        .from(comments)
+        .where(eq(comments.bill_id, bill_id));
 
-        // Get most controversial comment (highest total votes)
-        const [mostControversial] = await db
-          .select({
-            id: comments.id,
-            totalVotes: sql<number>`${comments.upvotes} + ${comments.downvotes}`
-          })
-          .from(comments)
-          .where(eq(comments.bill_id, bill_id))
-          .orderBy(sql`${comments.upvotes} + ${comments.downvotes} DESC`)
-          .limit(1);
+      const [mostUpvoted] = await db
+        .select({ id: comments.id })
+        .from(comments)
+        .where(
+          and(eq(comments.bill_id, bill_id), eq(comments.upvotes, summary.maxUpvotes)),
+        )
+        .limit(1);
 
-        const summaryResult = {
-          totalVotes: Number(summary.totalUpvotes) + Number(summary.totalDownvotes),
-          totalUpvotes: Number(summary.totalUpvotes),
-          totalDownvotes: Number(summary.totalDownvotes),
-          averageEngagement: Number(summary.comment_count) > 0 ?
-            (Number(summary.totalUpvotes) + Number(summary.totalDownvotes)) / Number(summary.comment_count) : 0,
-          mostUpvotedCommentId: mostUpvoted?.id?.toString() || null,
-          mostControversialCommentId: mostControversial?.id?.toString() || null
-        };
+      const [mostControversial] = await db
+        .select({ id: comments.id })
+        .from(comments)
+        .where(eq(comments.bill_id, bill_id))
+        .orderBy(sql`${comments.upvotes} + ${comments.downvotes} DESC`)
+        .limit(1);
 
-        await cacheService.set(cacheKey, summaryResult, this.VOTE_CACHE_TTL);
-        return summaryResult;
-      },
-      {
-        totalVotes: 0,
-        totalUpvotes: 0,
-        totalDownvotes: 0,
-        averageEngagement: 0,
-        mostUpvotedCommentId: null as string | null,
-        mostControversialCommentId: null as string | null
-      },
-      `getBillCommentVoteSummary:${bill_id}`
+      const totalUpvotes = Number(summary.totalUpvotes);
+      const totalDownvotes = Number(summary.totalDownvotes);
+      const commentCount = Number(summary.comment_count);
+
+      const summaryResult = {
+        totalVotes: totalUpvotes + totalDownvotes,
+        totalUpvotes,
+        totalDownvotes,
+        averageEngagement:
+          commentCount > 0 ? (totalUpvotes + totalDownvotes) / commentCount : 0,
+        mostUpvotedCommentId: mostUpvoted?.id?.toString() ?? null,
+        mostControversialCommentId: mostControversial?.id?.toString() ?? null,
+      };
+
+      await cacheService.set(cacheKey, summaryResult, this.VOTE_CACHE_TTL);
+      return summaryResult;
+    } catch (error) {
+      logger.error('Failed to get bill comment vote summary', {
+        error,
+        component: 'CommentVotingService',
+        operation: 'getBillCommentVoteSummary',
+        context: { bill_id },
+      });
+      return emptyResult;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
+
+  /**
+   * Wilson score lower-bound engagement ranking, blended with absolute vote weight.
+   */
+  private calculateEngagementScore(
+    upvotes: number,
+    downvotes: number,
+    totalVotes: number,
+  ): number {
+    if (totalVotes === 0) return 0;
+
+    const netVotes = upvotes - downvotes;
+    const phat = upvotes / totalVotes;
+    const z = 1.96; // 95% confidence
+    const n = totalVotes;
+
+    const wilson =
+      (phat + (z * z) / (2 * n) -
+        z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
+      (1 + (z * z) / n);
+
+    return Math.max(0, wilson * Math.log(totalVotes + 1) + netVotes * 0.1);
+  }
+
+  /**
+   * Invalidate all caches related to a comment and its parent bill.
+   */
+  private async clearVotingCaches(comment_id: string, bill_id: string): Promise<void> {
+    const patterns = [
+      `comment_votes:stats:*`,
+      COMMENT_CACHE.trendingPattern(bill_id),
+      COMMENT_CACHE.billCommentsPattern(bill_id),
+    ];
+
+    await Promise.allSettled(
+      patterns.map((pattern) => cacheService.deletePattern(pattern)),
     );
-    return result.data;
+
+    // Also clear the specific stats key that may include this comment_id
+    await cacheService.delete(COMMENT_CACHE.voteSummary(bill_id)).catch(() => void 0);
+    void comment_id; // referenced via pattern above
   }
 }
 
 export const commentVotingService = new CommentVotingService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

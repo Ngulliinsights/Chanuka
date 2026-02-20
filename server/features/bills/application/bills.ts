@@ -8,11 +8,10 @@ import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
 import { bills } from '@server/infrastructure/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
-import { from '@/infrastructure/database/database-service';
 import { withTransaction } from '@server/infrastructure/database';
 import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
 
-import type { IBillRepository } from '../../../../bill-repository.interface';
+import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
 import { UserService } from '../../users/application/user-service-direct';
 
 /**
@@ -25,7 +24,8 @@ export class BillsApplicationService {
     private readonly userService: UserService,
     private readonly notificationChannelService: NotificationChannelService,
     private readonly domainEventPublisher: DomainEventPublisher,
-    private readonly databaseService: private readonly billRepository?: IBillRepository
+    private readonly databaseService: DatabaseService,
+    private readonly billRepository?: IBillRepository
   ) { }
 
   private get db() {

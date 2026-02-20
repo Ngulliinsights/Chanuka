@@ -1,16 +1,24 @@
-
-import { cacheService } from '@shared/core/caching';
-import { databaseService } from '@server/infrastructure/database/database-service';
-import { cacheKeys } from '@shared/core/caching/key-generator';
+import { cacheService } from '@server/infrastructure/cache';
+import { CACHE_TTL_SHORT } from '@shared/core/primitives';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
-import { comments } from '@server/infrastructure/schema';
-import { user_profiles,users } from '@server/infrastructure/schema';
-import { bills } from '@server/infrastructure/schema';
-import { and, asc, count, desc, eq, inArray,isNull, or, sql } from 'drizzle-orm';
+import { bills, comments, user_profiles, users } from '@server/infrastructure/schema';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  or,
+  sql,
+} from 'drizzle-orm';
 
-import { logger } from '@/shared/core';
+// ---------------------------------------------------------------------------
+// Public interfaces
+// ---------------------------------------------------------------------------
 
-// Types for comment operations
 export interface CommentWithUser {
   id: string;
   bill_id: number;
@@ -33,7 +41,7 @@ export interface CommentWithUser {
     expertise: string[] | null;
     organization: string | null;
     reputation_score: number;
-  };
+  } | null;
   replies?: CommentWithUser[];
   replyCount: number;
   netVotes: number;
@@ -61,12 +69,6 @@ export interface CommentFilters {
   offset?: number;
 }
 
-export interface CommentVote {
-  commentId: string;
-  user_id: string;
-  vote_type: 'up' | 'down';
-}
-
 export interface CommentStats {
   totalComments: number;
   expertComments: number;
@@ -80,103 +82,424 @@ export interface CommentStats {
   }>;
 }
 
+// ---------------------------------------------------------------------------
+// Drizzle select shape (reused across several methods)
+// ---------------------------------------------------------------------------
+
+const COMMENT_SELECT = {
+  comment: {
+    id: comments.id,
+    bill_id: comments.bill_id,
+    user_id: comments.user_id,
+    content: comments.content,
+    commentType: comments.commentType,
+    is_verified: comments.is_verified,
+    parent_id: comments.parent_id,
+    upvotes: comments.upvotes,
+    downvotes: comments.downvotes,
+    created_at: comments.created_at,
+    updated_at: comments.updated_at,
+  },
+  user: {
+    id: users.id,
+    name: users.name,
+    role: users.role,
+    verification_status: users.verification_status,
+  },
+  user_profiles: {
+    expertise: user_profiles.expertise,
+    organization: user_profiles.organization,
+    reputation_score: user_profiles.reputation_score,
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
 /**
  * Comprehensive Comment Service
- * Handles threaded comments, voting, moderation, and expert verification
- * 
- * Optimizations include:
- * - Batch reply count queries to reduce database round trips
- * - Improved cache key generation for better invalidation
+ * Handles threaded comments, voting, moderation, and expert verification.
+ *
+ * Optimisations:
+ * - Batch reply-count queries to reduce database round trips
  * - Parallel data fetching where possible
- * - Better error handling and logging
- * - SQL injection prevention through parameterized queries
+ * - Stable, deterministic cache key generation
+ * - Full SQL injection prevention via parameterised Drizzle queries
  */
 export class CommentService {
   private readonly COMMENT_CACHE_TTL = 1800; // 30 minutes
-  private readonly MAX_REPLY_DEPTH = 3; // Prevent infinite nesting
-  private readonly DEFAULT_LIMIT = 20;
   private readonly MAX_LIMIT = 100;
+  private readonly DEFAULT_LIMIT = 20;
+
+  // -------------------------------------------------------------------------
+  // Public: read
+  // -------------------------------------------------------------------------
 
   /**
-   * Get comments for a bill with threading support
-   * Optimized to batch reply count queries and load replies efficiently
+   * Get paginated, threaded comments for a bill.
    */
-  async getBillComments(bill_id: number, filters: CommentFilters = {}): Promise<{
-    comments: CommentWithUser[];
-    totalCount: number;
-    hasMore: boolean;
-  }> {
-    // Generate a stable cache key that properly serializes filters
+  async getBillComments(
+    bill_id: number,
+    filters: CommentFilters = {},
+  ): Promise<{ comments: CommentWithUser[]; totalCount: number; hasMore: boolean }> {
     const cacheKey = this.generateCacheKey('bill_comments', bill_id, filters);
 
-    // Check cache first
     const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (cached) return cached as Awaited<ReturnType<typeof this.getBillComments>>;
+
+    try {
+      const {
+        sort = 'recent',
+        commentType,
+        expertOnly = false,
+        parent_id,
+        limit = this.DEFAULT_LIMIT,
+        offset = 0,
+      } = filters;
+
+      const safeLimit = Math.min(limit, this.MAX_LIMIT);
+      const conditions = this.buildQueryConditions(bill_id, { commentType, expertOnly, parent_id });
+      const baseQuery = this.buildCommentQuery(conditions, sort);
+
+      const [rawResults, totalCount] = await Promise.all([
+        baseQuery.limit(safeLimit + 1).offset(offset),
+        this.getTotalCount(conditions),
+      ]);
+
+      const hasMore = rawResults.length > safeLimit;
+      const pageRows = rawResults.slice(0, safeLimit);
+      const transformedComments = await this.transformCommentsWithReplies(pageRows, parent_id);
+
+      const result = { comments: transformedComments, totalCount, hasMore };
+      await this.safeCacheSet(cacheKey, result, this.COMMENT_CACHE_TTL);
+      return result;
+    } catch (error) {
+      logger.error('Failed to get bill comments', {
+        error,
+        component: 'CommentService',
+        operation: 'getBillComments',
+        context: { bill_id },
+      });
+      return { comments: [], totalCount: 0, hasMore: false };
     }
-
-    // Direct Drizzle usage instead of repository
-    const result = await databaseService.withFallback(
-      async () => {
-        const {
-          sort = 'recent',
-          commentType,
-          expertOnly = false,
-          parent_id,
-          limit = 20,
-          offset = 0
-        } = filters;
-
-        const safeLimit = Math.min(limit, 100);
-        const conditions = this.buildQueryConditions(bill_id, { commentType, expertOnly, parent_id });
-
-        const query = this.buildCommentQuery(conditions, sort);
-        const results = await query.limit(safeLimit + 1).offset(offset);
-
-        const hasMore = results.length > safeLimit;
-        const comments = results.slice(0, safeLimit);
-
-        const totalCount = await this.getTotalCount(bill_id, conditions);
-        const transformedComments = await this.transformCommentsWithReplies(comments, parent_id);
-
-        return {
-          comments: transformedComments,
-          totalCount,
-          hasMore
-        };
-      },
-      { comments: [], totalCount: 0, hasMore: false },
-      `findCommentsByBillId:${bill_id}`
-    );
-
-    // Cache the result with error handling
-    await this.safeCacheSet(cacheKey, result.data, this.COMMENT_CACHE_TTL);
-
-    return result.data;
   }
 
   /**
-   * Build query conditions with proper type safety
+   * Get replies for a specific comment.
    */
+  async getCommentReplies(
+    parent_id: number,
+    filters: CommentFilters = {},
+  ): Promise<CommentWithUser[]> {
+    try {
+      const { sort = 'recent', limit = 10, offset = 0 } = filters;
+      const safeLimit = Math.min(limit, this.MAX_LIMIT);
+
+      const results = await db
+        .select(COMMENT_SELECT)
+        .from(comments)
+        .innerJoin(users, eq(comments.user_id, users.id))
+        .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
+        .where(eq(comments.parent_id, parent_id))
+        .orderBy(
+          sort === 'popular'
+            ? desc(sql`${comments.upvotes} - ${comments.downvotes}`)
+            : asc(comments.created_at),
+        )
+        .limit(safeLimit)
+        .offset(offset);
+
+      const comment_ids = results.map((r) => r.comment.id as number);
+      const replyCounts = await this.getBatchReplyCounts(comment_ids);
+
+      return results.map((row) => ({
+        ...row.comment,
+        user: row.user,
+        user_profiles: row.user_profiles,
+        replies: [],
+        replyCount: replyCounts.get(row.comment.id as number) ?? 0,
+        netVotes: row.comment.upvotes - row.comment.downvotes,
+      }));
+    } catch (error) {
+      logger.error('Failed to get comment replies', {
+        error,
+        component: 'CommentService',
+        operation: 'getCommentReplies',
+        context: { parent_id },
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Find a single comment by ID, with reply count.
+   */
+  async findCommentById(id: number): Promise<CommentWithUser | null> {
+    try {
+      const [row] = await db
+        .select(COMMENT_SELECT)
+        .from(comments)
+        .innerJoin(users, eq(comments.user_id, users.id))
+        .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
+        .where(eq(comments.id, id))
+        .limit(1);
+
+      if (!row) return null;
+
+      const replyCount = await this.getReplyCount(id);
+
+      return {
+        ...row.comment,
+        user: row.user,
+        user_profiles: row.user_profiles,
+        replies: [],
+        replyCount,
+        netVotes: row.comment.upvotes - row.comment.downvotes,
+      };
+    } catch (error) {
+      logger.error('Failed to find comment by ID', {
+        error,
+        component: 'CommentService',
+        operation: 'findCommentById',
+        context: { id },
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Get aggregate statistics for a bill's comments.
+   */
+  async getCommentStats(bill_id: number): Promise<CommentStats> {
+    const cacheKey = `bill_comments:stats:${bill_id}`;
+
+    const cached = await cacheService.get(cacheKey);
+    if (cached) return cached as CommentStats;
+
+    const empty: CommentStats = {
+      totalComments: 0,
+      expertComments: 0,
+      verifiedComments: 0,
+      averageEngagement: 0,
+      topContributors: [],
+    };
+
+    try {
+      const [[totalRow], [expertRow], [verifiedRow], topContributors] = await Promise.all([
+        db
+          .select({ count: count() })
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id)),
+        db
+          .select({ count: count() })
+          .from(comments)
+          .innerJoin(users, eq(comments.user_id, users.id))
+          .where(and(eq(comments.bill_id, bill_id), eq(users.role, 'expert'))),
+        db
+          .select({ count: count() })
+          .from(comments)
+          .where(and(eq(comments.bill_id, bill_id), eq(comments.is_verified, true))),
+        db
+          .select({
+            user_id: users.id,
+            userName: users.name,
+            comment_count: count(comments.id),
+            totalVotes: sql<number>`COALESCE(SUM(${comments.upvotes} - ${comments.downvotes}), 0)`,
+          })
+          .from(comments)
+          .innerJoin(users, eq(comments.user_id, users.id))
+          .where(eq(comments.bill_id, bill_id))
+          .groupBy(users.id, users.name)
+          .orderBy(desc(count(comments.id)))
+          .limit(5),
+      ]);
+
+      const totalComments = Number(totalRow.count);
+      const contributors = topContributors.map((c) => ({
+        user_id: c.user_id,
+        userName: c.userName,
+        comment_count: Number(c.comment_count),
+        totalVotes: Number(c.totalVotes),
+      }));
+
+      const stats: CommentStats = {
+        totalComments,
+        expertComments: Number(expertRow.count),
+        verifiedComments: Number(verifiedRow.count),
+        averageEngagement: this.calculateAverageEngagement(totalComments, contributors),
+        topContributors: contributors,
+      };
+
+      await this.safeCacheSet(cacheKey, stats, this.COMMENT_CACHE_TTL);
+      return stats;
+    } catch (error) {
+      logger.error('Failed to get comment stats', {
+        error,
+        component: 'CommentService',
+        operation: 'getCommentStats',
+        context: { bill_id },
+      });
+      await this.safeCacheSet(cacheKey, empty, this.COMMENT_CACHE_TTL);
+      return empty;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Public: write
+  // -------------------------------------------------------------------------
+
+  /**
+   * Create a new comment, with input validation and optional parent validation.
+   */
+  async createComment(data: CreateCommentData): Promise<CommentWithUser> {
+    this.validateCommentData(data);
+
+    if (data.parent_id) {
+      await this.validateParentComment(data.parent_id, data.bill_id);
+    }
+
+    try {
+      const [newComment] = await db
+        .insert(comments)
+        .values({
+          bill_id: data.bill_id,
+          user_id: data.user_id,
+          content: data.content.trim(),
+          commentType: data.commentType ?? 'general',
+          parent_id: data.parent_id ?? null,
+          upvotes: 0,
+          downvotes: 0,
+          is_verified: false,
+        })
+        .returning();
+
+      const userInfo = await this.getUserInfo(data.user_id);
+
+      this.clearCommentCaches(data.bill_id).catch((error) =>
+        logger.error('Error clearing comment caches after create', {
+          error,
+          context: { bill_id: data.bill_id },
+        }),
+      );
+
+      return {
+        ...newComment,
+        user: userInfo.user,
+        user_profiles: userInfo.user_profiles,
+        replies: [],
+        replyCount: 0,
+        netVotes: 0,
+      };
+    } catch (error) {
+      logger.error('Failed to create comment', {
+        error,
+        component: 'CommentService',
+        operation: 'createComment',
+        context: { bill_id: data.bill_id },
+      });
+      return this.createFallbackComment(data);
+    }
+  }
+
+  /**
+   * Update an existing comment owned by the given user.
+   */
+  async updateComment(
+    comment_id: number,
+    user_id: string,
+    data: UpdateCommentData,
+  ): Promise<CommentWithUser | null> {
+    if (data.content !== undefined) {
+      const trimmed = data.content.trim();
+      if (trimmed.length === 0) throw new Error('Comment content cannot be empty');
+      if (trimmed.length > 5000) throw new Error('Comment content exceeds maximum length');
+      data.content = trimmed;
+    }
+
+    try {
+      const [updatedComment] = await db
+        .update(comments)
+        .set({ ...data, updated_at: new Date() })
+        .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)))
+        .returning();
+
+      if (!updatedComment) throw new Error('Comment not found or access denied');
+
+      const [userInfo, replyCount] = await Promise.all([
+        this.getUserInfo(user_id),
+        this.getReplyCount(comment_id),
+      ]);
+
+      this.clearCommentCaches(updatedComment.bill_id).catch((error) =>
+        logger.error('Error clearing comment caches after update', { error }),
+      );
+
+      return {
+        ...updatedComment,
+        user: userInfo.user,
+        user_profiles: userInfo.user_profiles,
+        replies: [],
+        replyCount,
+        netVotes: updatedComment.upvotes - updatedComment.downvotes,
+      };
+    } catch (error) {
+      logger.error('Failed to update comment', {
+        error,
+        component: 'CommentService',
+        operation: 'updateComment',
+        context: { comment_id },
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Hard-delete a comment owned by the given user.
+   */
+  async deleteComment(comment_id: number, user_id: string): Promise<boolean> {
+    const comment = await this.findCommentById(comment_id);
+    if (!comment) return false;
+
+    try {
+      const result = await db
+        .delete(comments)
+        .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)));
+
+      const deleted = (result.rowCount ?? 0) > 0;
+
+      if (deleted) {
+        this.clearCommentCaches(comment.bill_id).catch((error) =>
+          logger.error('Error clearing comment caches after delete', { error }),
+        );
+      }
+
+      return deleted;
+    } catch (error) {
+      logger.error('Failed to delete comment', {
+        error,
+        component: 'CommentService',
+        operation: 'deleteComment',
+        context: { comment_id },
+      });
+      return false;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Private: query builders
+  // -------------------------------------------------------------------------
+
   private buildQueryConditions(
     bill_id: number,
-    options: {
-      commentType?: string;
-      expertOnly?: boolean;
-      parent_id?: number;
-    }
+    options: { commentType?: string; expertOnly?: boolean; parent_id?: number },
   ) {
     const conditions = [eq(comments.bill_id, bill_id)];
 
-    // Handle parent comment filtering
+    // Filter by parent / top-level
     if (options.parent_id !== undefined) {
-      if (options.parent_id === null) {
-        conditions.push(isNull(comments.parent_id));
-      } else {
-        conditions.push(eq(comments.parent_id, options.parent_id));
-      }
+      conditions.push(eq(comments.parent_id, options.parent_id));
     } else {
-      // Default to top-level comments only
       conditions.push(isNull(comments.parent_id));
     }
 
@@ -185,319 +508,162 @@ export class CommentService {
     }
 
     if (options.expertOnly) {
-      conditions.push(
-        or(
-          eq(users.role, 'expert'),
-          eq(comments.is_verified, true)
-        )
-      );
+      conditions.push(or(eq(users.role, 'expert'), eq(comments.is_verified, true))!);
     }
 
     return conditions;
   }
 
-  /**
-   * Build optimized comment query with proper sorting
-   */
-  private buildCommentQuery(conditions: unknown[], sort: string) {
-    const query = db
-      .select({
-        comment: {
-          id: comments.id,
-          bill_id: comments.bill_id,
-          user_id: comments.user_id,
-          content: comments.content,
-          commentType: comments.commentType,
-          is_verified: comments.is_verified,
-          parent_id: comments.parent_id,
-          upvotes: comments.upvotes,
-          downvotes: comments.downvotes,
-          created_at: comments.created_at,
-          updated_at: comments.updated_at
-        },
-        user: {
-          id: users.id,
-          name: users.name,
-          role: users.role,
-          verification_status: users.verification_status
-        },
-        user_profiles: {
-          expertise: user_profiles.expertise,
-          organization: user_profiles.organization,
-          reputation_score: user_profiles.reputation_score
-        }
-      })
+  private buildCommentQuery(conditions: ReturnType<typeof this.buildQueryConditions>, sort: string) {
+    const base = db
+      .select(COMMENT_SELECT)
       .from(comments)
       .innerJoin(users, eq(comments.user_id, users.id))
       .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
       .where(and(...conditions));
 
-    // Apply sorting strategy based on filter
-    return this.applySorting(query, sort);
+    return this.applySorting(base, sort);
   }
 
-  /**
-   * Apply sorting with optimized SQL expressions
-   */
-  private applySorting(query: unknown, sort: string) {
+  private applySorting(query: any, sort: string) {
     switch (sort) {
       case 'popular':
         return query.orderBy(
           desc(sql`${comments.upvotes} - ${comments.downvotes}`),
-          desc(comments.created_at)
+          desc(comments.created_at),
         );
       case 'verified':
         return query.orderBy(
           desc(comments.is_verified),
           desc(sql`${comments.upvotes} - ${comments.downvotes}`),
-          desc(comments.created_at)
+          desc(comments.created_at),
         );
       case 'oldest':
         return query.orderBy(asc(comments.created_at));
-      default: // recent
+      default:
         return query.orderBy(desc(comments.created_at));
     }
   }
 
-  /**
-   * Get total count efficiently
-   */
-  private async getTotalCount(bill_id: number, conditions: unknown[]): Promise<number> {
+  private async getTotalCount(
+    conditions: ReturnType<typeof this.buildQueryConditions>,
+  ): Promise<number> {
     try {
-      const [{ count: totalCount }] = await db
+      const [{ count: total }] = await db
         .select({ count: count() })
         .from(comments)
+        .innerJoin(users, eq(comments.user_id, users.id))
         .where(and(...conditions));
-
-      return Number(totalCount);
+      return Number(total);
     } catch (error) {
-      logger.error('Error getting total count', { bill_id, error });
+      logger.error('Error getting total comment count', { error });
       return 0;
     }
   }
 
-  /**
-   * Transform comments with replies using batch processing
-   * This reduces N+1 queries by fetching all reply counts at once
-   */
-  private async transformCommentsWithReplies(
-    comments: unknown[],
-    parent_id?: number
-  ): Promise<CommentWithUser[]> {
-    if (comments.length === 0) {
-      return [];
-    }
+  // -------------------------------------------------------------------------
+  // Private: comment transformation
+  // -------------------------------------------------------------------------
 
-    // Batch fetch all reply counts in a single query
-    const comment_ids = comments.map(c => c.comment.id);
+  private async transformCommentsWithReplies(
+    rows: Awaited<ReturnType<typeof this.buildCommentQuery>>,
+    parent_id?: number,
+  ): Promise<CommentWithUser[]> {
+    if (rows.length === 0) return [];
+
+    const comment_ids = rows.map((r) => r.comment.id as number);
     const replyCounts = await this.getBatchReplyCounts(comment_ids);
 
-    // Transform comments with their reply counts
-    const transformedComments: CommentWithUser[] = comments.map(row => ({
+    const transformed: CommentWithUser[] = rows.map((row) => ({
       ...row.comment,
       user: row.user,
       user_profiles: row.user_profiles,
       replies: [],
-      replyCount: replyCounts.get(row.comment.id) || 0,
-      netVotes: row.comment.upvotes - row.comment.downvotes
+      replyCount: replyCounts.get(row.comment.id as number) ?? 0,
+      netVotes: row.comment.upvotes - row.comment.downvotes,
     }));
 
-    // Load replies for top-level comments only (avoid loading for nested)
+    // Only hydrate replies at the top level to prevent infinite nesting
     if (parent_id === undefined) {
-      await this.loadRepliesForComments(transformedComments);
+      await this.loadRepliesForComments(transformed);
     }
 
-    return transformedComments;
+    return transformed;
   }
 
   /**
-   * Batch fetch reply counts for multiple comments
-   * This replaces individual queries with a single grouped query
+   * Batch-fetch reply counts for multiple parent comments in a single query.
    */
   private async getBatchReplyCounts(comment_ids: number[]): Promise<Map<number, number>> {
-    if (comment_ids.length === 0) {
-      return new Map();
-    }
+    if (comment_ids.length === 0) return new Map();
 
     try {
       const results = await db
-        .select({
-          parent_id: comments.parent_id,
-          count: count()
-        })
+        .select({ parent_id: comments.parent_id, count: count() })
         .from(comments)
         .where(inArray(comments.parent_id, comment_ids))
         .groupBy(comments.parent_id);
 
-      return new Map(
-        results.map(r => [Number(r.parent_id), Number(r.count)])
-      );
+      return new Map(results.map((r) => [Number(r.parent_id), Number(r.count)]));
     } catch (error) {
-      logger.error('Error fetching batch reply counts', { comment_ids, error });
+      logger.error('Error fetching batch reply counts', { error, comment_ids });
       return new Map();
     }
   }
 
   /**
-   * Load replies for multiple comments efficiently
+   * Load a shallow first page of replies for each top-level comment.
    */
-  private async loadRepliesForComments(comment: CommentWithUser[]): Promise<void> {
-    const loadPromises = comments.map(comment =>
-      this.getCommentReplies(comment.id, { limit: 5 })
-        .then(replies => {
-          comment.replies = replies;
-        })
-        .catch(error => {
-          logger.error('Error loading replies', { comment_id: comment.id, error });
-          comment.replies = [];
-        })
-    );
-
-    await Promise.all(loadPromises);
-  }
-
-  /**
-   * Get replies for a specific comment with improved error handling
-   */
-  async getCommentReplies(parent_id: number, filters: CommentFilters = {}): Promise<CommentWithUser[]> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const { sort = 'recent', limit = 10, offset = 0 } = filters;
-        const safeLimit = Math.min(limit, this.MAX_LIMIT);
-
-        const query = db
-          .select({
-            comment: {
-              id: comments.id,
-              bill_id: comments.bill_id,
-              user_id: comments.user_id,
-              content: comments.content,
-              commentType: comments.commentType,
-              is_verified: comments.is_verified,
-              parent_id: comments.parent_id,
-              upvotes: comments.upvotes,
-              downvotes: comments.downvotes,
-              created_at: comments.created_at,
-              updated_at: comments.updated_at
-            },
-            user: {
-              id: users.id,
-              name: users.name,
-              role: users.role,
-              verification_status: users.verification_status
-            },
-            user_profiles: {
-              expertise: user_profiles.expertise,
-              organization: user_profiles.organization,
-              reputation_score: user_profiles.reputation_score
-            }
+  private async loadRepliesForComments(commentList: CommentWithUser[]): Promise<void> {
+    await Promise.all(
+      commentList.map((comment) =>
+        this.getCommentReplies(Number(comment.id), { limit: 5 })
+          .then((replies) => {
+            comment.replies = replies;
           })
-          .from(comments)
-          .innerJoin(users, eq(comments.user_id, users.id))
-          .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-          .where(eq(comments.parent_id, parent_id))
-          .orderBy(
-            sort === 'popular'
-              ? desc(sql`${comments.upvotes} - ${comments.downvotes}`)
-              : asc(comments.created_at)
-          )
-          .limit(safeLimit)
-          .offset(offset);
-
-        const results = await query;
-
-        // Batch fetch reply counts for all replies
-        const comment_ids = results.map(r => r.comment.id);
-        const replyCounts = await this.getBatchReplyCounts(comment_ids);
-
-        return results.map(row => ({
-          ...row.comment,
-          user: row.user,
-          user_profiles: row.user_profiles,
-          replies: [], // Nested replies not loaded to prevent deep nesting
-          replyCount: replyCounts.get(row.comment.id) || 0,
-          netVotes: row.comment.upvotes - row.comment.downvotes
-        }));
-      },
-      [],
-      `getCommentReplies:${parent_id}`
+          .catch((error) => {
+            logger.error('Error loading replies for comment', {
+              error,
+              context: { comment_id: comment.id },
+            });
+            comment.replies = [];
+          }),
+      ),
     );
-
-    return result.data;
   }
 
-  /**
-   * Create a new comment with comprehensive validation
-   */
-  async createComment(data: CreateCommentData): Promise<CommentWithUser> {
-    // Validate input data
-    this.validateCommentData(data);
-
-    // Validate parent comment if specified
-    if (data.parent_id) {
-      await this.validateParentComment(data.parent_id, data.bill_id);
+  private async getReplyCount(comment_id: number): Promise<number> {
+    try {
+      const [{ count: replyCount }] = await db
+        .select({ count: count() })
+        .from(comments)
+        .where(eq(comments.parent_id, comment_id));
+      return Number(replyCount);
+    } catch (error) {
+      logger.error('Error getting reply count', {
+        error,
+        context: { comment_id },
+      });
+      return 0;
     }
-
-    // Direct Drizzle usage instead of repository
-    const comment = await databaseService.withFallback(
-      async () => {
-        const [newComment] = await db
-          .insert(comments)
-          .values({
-            bill_id: data.bill_id,
-            user_id: data.user_id,
-            content: data.content.trim(),
-            commentType: data.commentType || 'general',
-            parent_id: data.parent_id || null,
-            upvotes: 0,
-            downvotes: 0,
-            is_verified: false
-          })
-          .returning();
-
-        const userInfo = await this.getUserInfo(data.user_id);
-
-        return {
-          ...newComment,
-          user: userInfo.user,
-          user_profiles: userInfo.user_profiles,
-          replies: [],
-          replyCount: 0,
-          netVotes: 0
-        };
-      },
-      this.createFallbackComment(data),
-      `createComment:${data.bill_id}`
-    );
-
-    // Clear related caches asynchronously
-    this.clearCommentCaches(data.bill_id).catch(error =>
-      logger.error('Error clearing caches', { bill_id: data.bill_id, error })
-    );
-
-    return comment.data;
   }
 
-  /**
-   * Validate comment data before insertion
-   */
+  // -------------------------------------------------------------------------
+  // Private: validation and user info
+  // -------------------------------------------------------------------------
+
   private validateCommentData(data: CreateCommentData): void {
     if (!data.content || data.content.trim().length === 0) {
       throw new Error('Comment content cannot be empty');
     }
-
     if (data.content.length > 5000) {
       throw new Error('Comment content exceeds maximum length of 5000 characters');
     }
-
     if (!data.bill_id || !data.user_id) {
       throw new Error('Bill ID and User ID are required');
     }
   }
 
-  /**
-   * Validate parent comment exists and belongs to same bill
-   */
   private async validateParentComment(parent_id: number, bill_id: number): Promise<void> {
     const [parentComment] = await db
       .select({ bill_id: comments.bill_id })
@@ -505,18 +671,12 @@ export class CommentService {
       .where(eq(comments.id, parent_id))
       .limit(1);
 
-    if (!parentComment) {
-      throw new Error('Parent comment not found');
-    }
-
+    if (!parentComment) throw new Error('Parent comment not found');
     if (parentComment.bill_id !== bill_id) {
-      throw new Error('Parent comment belongs to different bill');
+      throw new Error('Parent comment belongs to a different bill');
     }
   }
 
-  /**
-   * Get user information efficiently
-   */
   private async getUserInfo(user_id: string) {
     const [userInfo] = await db
       .select({
@@ -524,447 +684,87 @@ export class CommentService {
           id: users.id,
           name: users.name,
           role: users.role,
-          verification_status: users.verification_status
+          verification_status: users.verification_status,
         },
         user_profiles: {
           expertise: user_profiles.expertise,
           organization: user_profiles.organization,
-          reputation_score: user_profiles.reputation_score
-        }
+          reputation_score: user_profiles.reputation_score,
+        },
       })
       .from(users)
       .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-      .where(eq(users.id, user_id));
+      .where(eq(users.id, user_id))
+      .limit(1);
 
-    if (!userInfo) {
-      throw new Error('User not found');
-    }
-
+    if (!userInfo) throw new Error('User not found');
     return userInfo;
   }
 
-  /**
-   * Update an existing comment with validation
-   */
-  async updateComment(comment_id: number, user_id: string, data: UpdateCommentData): Promise<CommentWithUser> {
-    // Validate update data
-    if (data.content !== undefined) {
-      const trimmedContent = data.content.trim();
-      if (trimmedContent.length === 0) {
-        throw new Error('Comment content cannot be empty');
-      }
-      if (trimmedContent.length > 5000) {
-        throw new Error('Comment content exceeds maximum length');
-      }
-      data.content = trimmedContent;
-    }
+  // -------------------------------------------------------------------------
+  // Private: cache helpers
+  // -------------------------------------------------------------------------
 
-    // Direct Drizzle usage instead of repository
-    const updatedComment = await databaseService.withFallback(
-      async () => {
-        if (data.content !== undefined) {
-          data.content = data.content.trim();
-        }
-
-        const [updatedComment] = await db
-          .update(comments)
-          .set({
-            ...data,
-            updated_at: new Date()
-          })
-          .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)))
-          .returning();
-
-        if (!updatedComment) {
-          throw new Error('Comment not found or access denied');
-        }
-
-        const userInfo = await this.getUserInfo(user_id);
-        const replyCount = await this.getReplyCount(comment_id);
-
-        return {
-          ...updatedComment,
-          user: userInfo.user,
-          user_profiles: userInfo.user_profiles,
-          replies: [],
-          replyCount,
-          netVotes: updatedComment.upvotes - updatedComment.downvotes
-        };
-      },
-      null as unknown,
-      `updateComment:${comment_id}`
-    );
-
-    // Clear caches asynchronously
-    this.clearCommentCaches(updatedComment.data.bill_id).catch(error =>
-      logger.error('Error clearing caches', { error })
-    );
-
-    return updatedComment.data;
-  }
-
-  /**
-   * Verify comment ownership
-   */
-  private async verifyCommentOwnership(comment_id: number, user_id: string) {
-    const [existingComment] = await db
-      .select()
-      .from(comments)
-      .where(and(
-        eq(comments.id, comment_id),
-        eq(comments.user_id, user_id)
-      ))
-      .limit(1);
-
-    if (!existingComment) {
-      throw new Error('Comment not found or access denied');
-    }
-
-    return existingComment;
-  }
-
-  /**
-   * Delete a comment (soft delete)
-   */
-  async deleteComment(comment_id: number, user_id: string): Promise<boolean> {
-    // Get comment first to know which bill to clear cache for
-    const comment = await this.findCommentById(comment_id);
-    if (!comment) return false;
-
-    // Direct Drizzle usage instead of repository
-    const deleted = await databaseService.withFallback(
-      async () => {
-        const result = await db
-          .delete(comments)
-          .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)));
-
-        return result.rowCount > 0;
-      },
-      false,
-      `deleteComment:${comment_id}`
-    );
-
-    if (deleted.data) {
-      // Clear caches asynchronously
-      this.clearCommentCaches(comment.bill_id).catch(error =>
-        logger.error('Error clearing caches', { error })
-      );
-    }
-
-    return deleted.data;
-  }
-
-  /**
-   * Find comment by ID
-   */
-  async findCommentById(id: number): Promise<CommentWithUser | null> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const [comment] = await db
-          .select({
-            comment: {
-              id: comments.id,
-              bill_id: comments.bill_id,
-              user_id: comments.user_id,
-              content: comments.content,
-              commentType: comments.commentType,
-              is_verified: comments.is_verified,
-              parent_id: comments.parent_id,
-              upvotes: comments.upvotes,
-              downvotes: comments.downvotes,
-              created_at: comments.created_at,
-              updated_at: comments.updated_at
-            },
-            user: {
-              id: users.id,
-              name: users.name,
-              role: users.role,
-              verification_status: users.verification_status
-            },
-            user_profiles: {
-              expertise: user_profiles.expertise,
-              organization: user_profiles.organization,
-              reputation_score: user_profiles.reputation_score
-            }
-          })
-          .from(comments)
-          .innerJoin(users, eq(comments.user_id, users.id))
-          .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-          .where(eq(comments.id, id));
-
-        if (!comment) return null;
-
-        const replyCount = await this.getReplyCount(id);
-
-        return {
-          ...comment.comment,
-          user: comment.user,
-          user_profiles: comment.user_profiles,
-          replies: [],
-          replyCount,
-          netVotes: comment.comment.upvotes - comment.comment.downvotes
-        };
-      },
-      null,
-      `findCommentById:${id}`
-    );
-    return result.data;
-  }
-
-  /**
-   * Get reply count for a single comment
-   */
-  private async getReplyCount(comment_id: number): Promise<number> {
-    const result = await databaseService.withFallback(
-      async () => {
-        const [{ count: replyCount }] = await db
-          .select({ count: count() })
-          .from(comments)
-          .where(eq(comments.parent_id, comment_id));
-
-        return Number(replyCount);
-      },
-      0,
-      `getReplyCount:${comment_id}`
-    );
-    return result.data;
-  }
-
-  /**
-   * Get comprehensive comment statistics for a bill
-   */
-  async getCommentStats(bill_id: number): Promise<CommentStats> {
-    const cacheKey = `bill_comments:stats:${bill_id}`;
-    const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    // Direct Drizzle usage instead of repository
-    const stats = await databaseService.withFallback(
-      async () => {
-        const [totalCommentsResult] = await db
-          .select({ count: count() })
-          .from(comments)
-          .where(eq(comments.bill_id, bill_id));
-
-        const [expertCommentsResult] = await db
-          .select({ count: count() })
-          .from(comments)
-          .innerJoin(users, eq(comments.user_id, users.id))
-          .where(and(
-            eq(comments.bill_id, bill_id),
-            eq(users.role, 'expert')
-          ));
-
-        const [verifiedCommentsResult] = await db
-          .select({ count: count() })
-          .from(comments)
-          .where(and(
-            eq(comments.bill_id, bill_id),
-            eq(comments.is_verified, true)
-          ));
-
-        const topContributors = await db
-          .select({
-            user_id: users.id,
-            userName: users.name,
-            comment_count: count(comments.id),
-            totalVotes: sql<number>`SUM(${comments.upvotes} - ${comments.downvotes})`
-          })
-          .from(comments)
-          .innerJoin(users, eq(comments.user_id, users.id))
-          .where(eq(comments.bill_id, bill_id))
-          .groupBy(users.id, users.name)
-          .orderBy(desc(count(comments.id)))
-          .limit(5);
-
-        const totalComments = Number(totalCommentsResult.count);
-        const contributors = topContributors.map(c => ({
-          user_id: c.user_id,
-          userName: c.userName,
-          comment_count: Number(c.comment_count),
-          totalVotes: Number(c.totalVotes)
-        }));
-
-        return {
-          totalComments,
-          expertComments: Number(expertCommentsResult.count),
-          verifiedComments: Number(verifiedCommentsResult.count),
-          averageEngagement: totalComments > 0 ? contributors.reduce((sum, c) => sum + c.totalVotes, 0) / totalComments : 0,
-          topContributors: contributors
-        };
-      },
-      {
-        totalComments: 0,
-        expertComments: 0,
-        verifiedComments: 0,
-        averageEngagement: 0,
-        topContributors: []
-      },
-      `getCommentStats:${bill_id}`
-    );
-
-    await this.safeCacheSet(cacheKey, stats.data, this.COMMENT_CACHE_TTL);
-    return stats.data;
-  }
-
-  /**
-   * Get total comments count
-   */
-  private async getTotalCommentsCount(bill_id: number): Promise<number> {
-    const [{ count: totalComments }] = await db
-      .select({ count: count() })
-      .from(comments)
-      .where(eq(comments.bill_id, bill_id));
-
-    return Number(totalComments);
-  }
-
-  /**
-   * Get expert comments count
-   */
-  private async getExpertCommentsCount(bill_id: number): Promise<number> {
-    const [{ count: expertComments }] = await db
-      .select({ count: count() })
-      .from(comments)
-      .innerJoin(users, eq(comments.user_id, users.id))
-      .where(and(
-        eq(comments.bill_id, bill_id),
-        eq(users.role, 'expert')
-      ));
-
-    return Number(expertComments);
-  }
-
-  /**
-   * Get verified comments count
-   */
-  private async getVerifiedCommentsCount(bill_id: number): Promise<number> {
-    const [{ count: verifiedComments }] = await db
-      .select({ count: count() })
-      .from(comments)
-      .where(and(
-        eq(comments.bill_id, bill_id),
-        eq(comments.is_verified, true)
-      ));
-
-    return Number(verifiedComments);
-  }
-
-  /**
-   * Get top contributors
-   */
-  private async getTopContributors(bill_id: number) {
-    const topContributors = await db
-      .select({
-        user_id: users.id,
-        userName: users.name,
-        comment_count: count(comments.id),
-        totalVotes: sql<number>`SUM(${comments.upvotes} - ${comments.downvotes})`
-      })
-      .from(comments)
-      .innerJoin(users, eq(comments.user_id, users.id))
-      .where(eq(comments.bill_id, bill_id))
-      .groupBy(users.id, users.name)
-      .orderBy(desc(count(comments.id)))
-      .limit(5);
-
-    return topContributors.map(c => ({
-      user_id: c.user_id,
-      userName: c.userName,
-      comment_count: Number(c.comment_count),
-      totalVotes: Number(c.totalVotes)
-    }));
-  }
-
-  /**
-   * Calculate average engagement
-   */
-  private calculateAverageEngagement(
-    totalComments: number,
-    contributors: Array<{ totalVotes: number }>
-  ): number {
-    if (totalComments === 0) {
-      return 0;
-    }
-
-    const totalVotes = contributors.reduce((sum, c) => sum + c.totalVotes, 0);
-    return totalVotes / totalComments;
-  }
-
-  /**
-   * Generate stable cache key
-   */
-  private generateCacheKey(prefix: string, bill_id: number, filters: unknown): string {
+  private generateCacheKey(prefix: string, bill_id: number, filters: Record<string, unknown>): string {
     const filterString = Object.keys(filters)
       .sort()
-      .map(key => `${key}:${filters[key]}`)
+      .map((key) => `${key}:${filters[key]}`)
       .join('|');
-
     return `${prefix}:${bill_id}:${filterString}`;
   }
 
-  /**
-   * Safe cache set with error handling
-   */
   private async safeCacheSet(key: string, value: unknown, ttl: number): Promise<void> {
     try {
       await cacheService.set(key, value, ttl);
     } catch (error) {
-      logger.error('Cache set failed', { key, error });
+      logger.error('Cache set failed', { error, context: { key } });
     }
   }
 
-  /**
-   * Clear comment-related caches with improved pattern matching
-   */
   private async clearCommentCaches(bill_id: number): Promise<void> {
-    const patterns = [
-      `bill_comments:${bill_id}:*`,
-      `bill_comments:stats:${bill_id}`
-    ];
-
-    for (const pattern of patterns) {
-      try {
-        await cacheService.deletePattern?.(pattern);
-      } catch (error) {
-        logger.error('Cache deletion failed', { pattern, error });
-      }
-    }
+    const patterns = [`bill_comments:${bill_id}:*`, `bill_comments:stats:${bill_id}`];
+    await Promise.allSettled(
+      patterns.map((pattern) =>
+        cacheService.deletePattern?.(pattern) ??
+        cacheService.delete(pattern),
+      ),
+    );
   }
 
-  /**
-   * Create fallback comment for offline mode
-   */
+  // -------------------------------------------------------------------------
+  // Private: fallback / sample data
+  // -------------------------------------------------------------------------
+
+  private calculateAverageEngagement(
+    totalComments: number,
+    contributors: Array<{ totalVotes: number }>,
+  ): number {
+    if (totalComments === 0) return 0;
+    return contributors.reduce((sum, c) => sum + c.totalVotes, 0) / totalComments;
+  }
+
   private createFallbackComment(data: CreateCommentData): CommentWithUser {
     return {
       id: Date.now().toString(),
       bill_id: data.bill_id,
       user_id: data.user_id,
       content: data.content,
-      commentType: data.commentType || 'general',
+      commentType: data.commentType ?? 'general',
       is_verified: false,
-      parent_id: data.parent_id || null,
+      parent_id: data.parent_id ?? null,
       upvotes: 0,
       downvotes: 0,
       created_at: new Date(),
       updated_at: new Date(),
-      user: {
-        id: data.user_id,
-        name: 'Sample User',
-        role: 'citizen',
-        verification_status: 'pending'
-      },
+      user: { id: data.user_id, name: 'Sample User', role: 'citizen', verification_status: 'pending' },
+      user_profiles: null,
       replies: [],
       replyCount: 0,
-      netVotes: 0
+      netVotes: 0,
     };
   }
 
-  /**
-   * Sample comments for fallback mode
-   */
+  /** Offline / demo sample comments. */
   private getSampleComments(bill_id: number): CommentWithUser[] {
     return [
       {
@@ -979,20 +779,11 @@ export class CommentService {
         downvotes: 2,
         created_at: new Date('2024-01-18T10:30:00Z'),
         updated_at: new Date('2024-01-18T10:30:00Z'),
-        user: {
-          id: 'user1',
-          name: 'Dr. Amina Hassan',
-          role: 'expert',
-          verification_status: 'verified'
-        },
-        user_profiles: {
-          expertise: ['Constitutional Law'],
-          organization: 'University Law School',
-          reputation_score: 95
-        },
+        user: { id: 'user1', name: 'Dr. Amina Hassan', role: 'expert', verification_status: 'verified' },
+        user_profiles: { expertise: ['Constitutional Law'], organization: 'University Law School', reputation_score: 95 },
         replies: [],
         replyCount: 0,
-        netVotes: 21
+        netVotes: 21,
       },
       {
         id: '2',
@@ -1006,26 +797,14 @@ export class CommentService {
         downvotes: 1,
         created_at: new Date('2024-01-19T14:15:00Z'),
         updated_at: new Date('2024-01-19T14:15:00Z'),
-        user: {
-          id: 'user2',
-          name: 'James Kiprotich',
-          role: 'advocate',
-          verification_status: 'verified'
-        },
-        user_profiles: {
-          expertise: ['Digital Rights'],
-          organization: 'Digital Rights Foundation',
-          reputation_score: 78
-        },
+        user: { id: 'user2', name: 'James Kiprotich', role: 'advocate', verification_status: 'verified' },
+        user_profiles: { expertise: ['Digital Rights'], organization: 'Digital Rights Foundation', reputation_score: 78 },
         replies: [],
         replyCount: 0,
-        netVotes: 17
-      }
+        netVotes: 17,
+      },
     ];
   }
 }
 
 export const commentService = new CommentService();
-
-
-

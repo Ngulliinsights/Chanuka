@@ -1,4 +1,4 @@
-// UserRepository interface removed - using direct service calls
+// Using repository pattern with Drizzle-based implementation for decoupling
 import { UserProfile } from '../../domain/entities/user-profile';
 import { ProfileCompletenessScore,ProfileDomainService, ProfileValidationResult } from '../../domain/services/profile-domain-service';
 import { ProfileUpdateResult,UserManagementDomainService } from '../../domain/services/user-management-domain-service';

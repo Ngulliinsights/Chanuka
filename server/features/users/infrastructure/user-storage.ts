@@ -13,8 +13,8 @@ import {
   writeDatabase} from '@shared/shared/database/connection';
 import { and, eq, or, sql } from 'drizzle-orm';
 
-import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage';
-import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';
+import type { StorageConfig } from '@server/infrastructure/database/base/BaseStorage';
+import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

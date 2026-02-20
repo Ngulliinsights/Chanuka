@@ -1,4 +1,4 @@
-// Repository interfaces removed - using direct Drizzle queries
+// Using repository pattern with Drizzle-based implementation for decoupling
 import { UserAggregate } from '@shared/aggregates/user-aggregate';
 import { database as db } from '@server/infrastructure/database';
 import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';

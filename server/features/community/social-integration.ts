@@ -1,7 +1,7 @@
 import { database as db } from '@server/infrastructure/database';
 import type { User } from '@server/infrastructure/schema';
 
-import { logger } from '@/shared/core';
+import { logger } from '@shared/core';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {

@@ -32,9 +32,9 @@ interface NotificationChannelService {
   }): Promise<void>;
 }
 
-import { cacheService } from '@/infrastructure/cache';
+import { cacheService } from '@server/infrastructure/cache';
 import { db } from '@server/infrastructure/database';
-import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
+import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
 import { user_profileservice } from '@/users/domain/user-profile';
 
 // ============================================================================

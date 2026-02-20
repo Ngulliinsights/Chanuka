@@ -7,7 +7,7 @@ import { and, count,desc, eq, gte, lte } from "drizzle-orm";
 
 import { 
 sponsorAffiliations,
-  sponsors, sponsorTransparency} from '@/shared/schema';
+  sponsors, sponsorTransparency} from '@shared/schema';
 
 export interface TransparencyScoreResult {
   overallScore: number;

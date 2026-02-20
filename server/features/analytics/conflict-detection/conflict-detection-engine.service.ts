@@ -12,7 +12,7 @@ import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-o
 
 import {
 type Bill,
-bill_sponsorships,   bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors, type SponsorTransparency, sponsorTransparency} from '@/shared/schema';
+bill_sponsorships,   bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors, type SponsorTransparency, sponsorTransparency} from '@shared/schema';
 
 import {
   ConflictDetectionConfig,

@@ -26,7 +26,7 @@ import {
   identityVerification,
   reputationSourceEnum,
   type ReputationScore,
-} from '@/shared/schema/safeguards';
+} from '@shared/schema/safeguards';
 import { database, writeDatabase, readDatabase, withTransaction, type DatabaseTransaction } from '@/server/db';
 import { logger } from '@/server/utils/logger';
 import { eq, lt, gt, and, sql, inArray, lte, gte } from 'drizzle-orm';

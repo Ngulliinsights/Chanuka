@@ -6,7 +6,7 @@ import { and, count, desc, eq, gt, gte, lte,or, sql } from "drizzle-orm";
 
 import {
   type Sponsor,
-  sponsors} from '@/shared/schema';
+  sponsors} from '@shared/schema';
 
 // Extended cache keys for monitoring features
 const MONITORING_CACHE_KEYS = {

@@ -4,23 +4,6 @@ import { logger } from '../../../infrastructure/observability/core/logger';
 import { readDatabase } from '../../../infrastructure/database';
 import { sql } from 'drizzle-orm';
 
-// Simple fallback wrapper to replace databaseService.withFallback
-async function withFallback<T>(
-  operation: () => Promise<T>,
-  fallbackValue: T,
-  _operationName?: string
-): Promise<{ data: T }> {
-  try {
-    const data = await operation();
-    return { data };
-  } catch (error) {
-    logger.error({ error }, 'Database operation failed, using fallback');
-    return { data: fallbackValue };
-  }
-}
-
-const databaseService = { withFallback };
-
 // Search index health status
 export interface SearchIndexHealth {
   status: 'healthy' | 'degraded' | 'critical' | 'offline';
@@ -155,40 +138,29 @@ export class SearchIndexManager {
     }
 
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          const countRows = await this.db.execute(
-            sql`SELECT COUNT(*) as count FROM bills` as unknown as string
-          ) as unknown as { count: string }[];
+      const countRows = await this.db.execute(
+        sql`SELECT COUNT(*) as count FROM bills` as unknown as string
+      ) as unknown as { count: string }[];
 
-          billsProcessed = parseInt(countRows[0]?.count ?? '0', 10);
+      billsProcessed = parseInt(countRows[0]?.count ?? '0', 10);
 
-          const updateResult = await this.db.execute(sql`
-            UPDATE bills
-            SET search_vector =
-              setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-              setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
-              setweight(to_tsvector('english', coalesce(description, '')), 'C') ||
-              setweight(to_tsvector('english', coalesce(content, '')), 'D'),
-              updated_at = NOW()
-            WHERE search_vector IS NULL
-               OR search_vector = ''::tsvector
-               OR updated_at < (SELECT MAX(created_at) FROM bills WHERE search_vector IS NOT NULL)
-          ` as unknown as string) as unknown as { rowCount?: number };
+      const updateResult = await this.db.execute(sql`
+        UPDATE bills
+        SET search_vector =
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(description, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(content, '')), 'D'),
+          updated_at = NOW()
+        WHERE search_vector IS NULL
+           OR search_vector = ''::tsvector
+           OR updated_at < (SELECT MAX(created_at) FROM bills WHERE search_vector IS NOT NULL)
+      ` as unknown as string) as unknown as { rowCount?: number };
 
-          billsUpdated = updateResult.rowCount ?? 0;
+      billsUpdated = updateResult.rowCount ?? 0;
 
-          await this.db.execute(sql`ANALYZE bills` as unknown as string);
-          await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_search_vector` as unknown as string);
-
-          return { billsProcessed, billsUpdated };
-        },
-        { billsProcessed: 0, billsUpdated: 0 },
-        'rebuildAllIndexes'
-      );
-
-      billsProcessed = result.data.billsProcessed;
-      billsUpdated = result.data.billsUpdated;
+      await this.db.execute(sql`ANALYZE bills` as unknown as string);
+      await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_search_vector` as unknown as string);
 
       await this.clearSearchCaches();
 
@@ -200,6 +172,11 @@ export class SearchIndexManager {
 
       return { success: true, billsProcessed, billsUpdated, errors, duration };
     } catch (error) {
+      logger.error('Failed to rebuild search indexes', {
+        error,
+        component: 'SearchIndexManager',
+        operation: 'rebuildAllIndexes'
+      });
       errors = 1;
       errorDetails.push(error instanceof Error ? error.message : String(error));
       logger.error({ component: 'SearchIndexManager', error }, '❌ Search index rebuild failed');
@@ -233,87 +210,83 @@ export class SearchIndexManager {
     }
 
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          logger.info({ component: 'SearchIndexManager' }, '🔍 Executing search index health query...');
+      logger.info({ component: 'SearchIndexManager' }, '🔍 Executing search index health query...');
 
-          const executeResult = await this.db.execute(sql`
-            SELECT
-              COUNT(*) as total_bills,
-              COUNT(search_vector) as indexed_bills,
-              COUNT(*) - COUNT(search_vector) as missing_indexes,
-              MAX(updated_at) as last_update
-            FROM bills
-          ` as unknown as string) as unknown as Record<string, unknown>[];
+      const executeResult = await this.db.execute(sql`
+        SELECT
+          COUNT(*) as total_bills,
+          COUNT(search_vector) as indexed_bills,
+          COUNT(*) - COUNT(search_vector) as missing_indexes,
+          MAX(updated_at) as last_update
+        FROM bills
+      ` as unknown as string) as unknown as Record<string, unknown>[];
 
-          logger.info(
-            { component: 'SearchIndexManager', resultType: typeof executeResult, isArray: Array.isArray(executeResult) },
-            '🔍 Execute result metadata'
-          );
-
-          if (!Array.isArray(executeResult) || executeResult.length === 0) {
-            logger.warn({ component: 'SearchIndexManager' }, '⚠️ Health query returned no rows – reporting offline');
-            return this.offlineHealth('Database query returned no results');
-          }
-
-          const indexStats = executeResult[0];
-          if (!indexStats) {
-            logger.warn({ component: 'SearchIndexManager' }, '⚠️ Health query returned an empty first row – reporting offline');
-            return this.offlineHealth('Database query returned no results');
-          }
-          logger.info({ component: 'SearchIndexManager', indexStats }, '🔍 Index stats');
-
-          const totalBills = parseInt(indexStats.total_bills as string, 10);
-          const indexedBills = parseInt(indexStats.indexed_bills as string, 10);
-          const missingIndexes = parseInt(indexStats.missing_indexes as string, 10);
-          const lastIndexUpdate = indexStats.last_update ? new Date(indexStats.last_update as string) : null;
-          const indexCoverage = totalBills > 0 ? (indexedBills / totalBills) * 100 : 0;
-
-          const sizeResult = await this.db.execute(sql`
-            SELECT
-              pg_size_pretty(pg_total_relation_size('idx_bills_search_vector')) as index_size,
-              pg_total_relation_size('idx_bills_search_vector') as index_size_bytes
-          ` as unknown as string) as unknown as Record<string, unknown>[];
-
-          const [indexSizeRow] = sizeResult;
-          const indexSize = parseInt(indexSizeRow?.index_size_bytes as string, 10) || 0;
-
-          const recentMetrics = this.performanceHistory.slice(-100);
-          const averageSearchTime =
-            recentMetrics.length > 0
-              ? recentMetrics.reduce((sum, m) => sum + m.searchTime, 0) / recentMetrics.length
-              : 0;
-
-          let status: SearchIndexHealth['status'];
-          if (indexCoverage >= 95) status = 'healthy';
-          else if (indexCoverage >= 80) status = 'degraded';
-          else if (indexCoverage >= 50) status = 'critical';
-          else status = 'offline';
-
-          const recommendations: string[] = [];
-          if (missingIndexes > 0) recommendations.push(`${missingIndexes} bills need search index updates`);
-          if (averageSearchTime > 500) recommendations.push('Search performance is slow – consider index optimisation');
-          if (indexCoverage < 90) recommendations.push('Run full index rebuild to improve search coverage');
-
-          return {
-            status,
-            totalBills,
-            indexedBills,
-            missingIndexes,
-            indexCoverage,
-            lastIndexUpdate,
-            performanceMetrics: { averageSearchTime, indexSize, fragmentationLevel: 0 },
-            recommendations,
-          };
-        },
-        this.offlineHealth('Database connection unavailable'),
-        'getIndexHealth'
+      logger.info(
+        { component: 'SearchIndexManager', resultType: typeof executeResult, isArray: Array.isArray(executeResult) },
+        '🔍 Execute result metadata'
       );
 
-      return result.data;
+      if (!Array.isArray(executeResult) || executeResult.length === 0) {
+        logger.warn({ component: 'SearchIndexManager' }, '⚠️ Health query returned no rows – reporting offline');
+        return this.offlineHealth('Database query returned no results');
+      }
+
+      const indexStats = executeResult[0];
+      if (!indexStats) {
+        logger.warn({ component: 'SearchIndexManager' }, '⚠️ Health query returned an empty first row – reporting offline');
+        return this.offlineHealth('Database query returned no results');
+      }
+      logger.info({ component: 'SearchIndexManager', indexStats }, '🔍 Index stats');
+
+      const totalBills = parseInt(indexStats.total_bills as string, 10);
+      const indexedBills = parseInt(indexStats.indexed_bills as string, 10);
+      const missingIndexes = parseInt(indexStats.missing_indexes as string, 10);
+      const lastIndexUpdate = indexStats.last_update ? new Date(indexStats.last_update as string) : null;
+      const indexCoverage = totalBills > 0 ? (indexedBills / totalBills) * 100 : 0;
+
+      const sizeResult = await this.db.execute(sql`
+        SELECT
+          pg_size_pretty(pg_total_relation_size('idx_bills_search_vector')) as index_size,
+          pg_total_relation_size('idx_bills_search_vector') as index_size_bytes
+      ` as unknown as string) as unknown as Record<string, unknown>[];
+
+      const [indexSizeRow] = sizeResult;
+      const indexSize = parseInt(indexSizeRow?.index_size_bytes as string, 10) || 0;
+
+      const recentMetrics = this.performanceHistory.slice(-100);
+      const averageSearchTime =
+        recentMetrics.length > 0
+          ? recentMetrics.reduce((sum, m) => sum + m.searchTime, 0) / recentMetrics.length
+          : 0;
+
+      let status: SearchIndexHealth['status'];
+      if (indexCoverage >= 95) status = 'healthy';
+      else if (indexCoverage >= 80) status = 'degraded';
+      else if (indexCoverage >= 50) status = 'critical';
+      else status = 'offline';
+
+      const recommendations: string[] = [];
+      if (missingIndexes > 0) recommendations.push(`${missingIndexes} bills need search index updates`);
+      if (averageSearchTime > 500) recommendations.push('Search performance is slow – consider index optimisation');
+      if (indexCoverage < 90) recommendations.push('Run full index rebuild to improve search coverage');
+
+      return {
+        status,
+        totalBills,
+        indexedBills,
+        missingIndexes,
+        indexCoverage,
+        lastIndexUpdate,
+        performanceMetrics: { averageSearchTime, indexSize, fragmentationLevel: 0 },
+        recommendations,
+      };
     } catch (error) {
-      logger.error({ component: 'SearchIndexManager', error }, 'Error getting search index health');
-      return this.offlineHealth('Error retrieving index health information');
+      logger.error('Failed to get index health', {
+        error,
+        component: 'SearchIndexManager',
+        operation: 'getIndexHealth'
+      });
+      return this.offlineHealth('Database connection unavailable');
     }
   }
 
@@ -344,33 +317,30 @@ export class SearchIndexManager {
     }
 
     try {
-      await databaseService.withFallback(
-        async () => {
-          await this.db.execute(sql`ANALYZE bills` as unknown as string);
-          operations.push('Analysed bills table');
+      await this.db.execute(sql`ANALYZE bills` as unknown as string);
+      operations.push('Analysed bills table');
 
-          await this.db.execute(sql`VACUUM ANALYZE bills` as unknown as string);
-          operations.push('Updated table statistics');
+      await this.db.execute(sql`VACUUM ANALYZE bills` as unknown as string);
+      operations.push('Updated table statistics');
 
-          await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_search_vector` as unknown as string);
-          operations.push('Reindexed search vector');
+      await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_search_vector` as unknown as string);
+      operations.push('Reindexed search vector');
 
-          await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_status_date` as unknown as string);
-          operations.push('Reindexed status-date index');
+      await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_status_date` as unknown as string);
+      operations.push('Reindexed status-date index');
 
-          await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_category_date` as unknown as string);
-          operations.push('Reindexed category-date index');
-
-          return true;
-        },
-        false,
-        'optimizeIndexes'
-      );
+      await this.db.execute(sql`REINDEX INDEX CONCURRENTLY idx_bills_category_date` as unknown as string);
+      operations.push('Reindexed category-date index');
 
       const duration = Date.now() - startTime;
       logger.info({ component: 'SearchIndexManager', duration }, `✅ Search index optimisation completed in ${duration}ms`);
       return { success: true, operations, duration };
     } catch (error) {
+      logger.error('Failed to optimize indexes', {
+        error,
+        component: 'SearchIndexManager',
+        operation: 'optimizeIndexes'
+      });
       logger.error({ component: 'SearchIndexManager', error }, '❌ Search index optimisation failed');
       return {
         success: false,
@@ -415,41 +385,38 @@ export class SearchIndexManager {
     };
 
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          const statsResult = await this.db.execute(sql`
-            SELECT
-              pg_size_pretty(pg_total_relation_size('idx_bills_search_vector')) as index_size,
-              pg_total_relation_size('idx_bills_search_vector') as index_size_bytes,
-              (SELECT COUNT(*) FROM bills) as total_rows,
-              (SELECT COUNT(*) FROM bills WHERE search_vector IS NOT NULL) as indexed_rows,
-              (SELECT last_vacuum FROM pg_stat_user_tables WHERE relname = 'bills') as last_vacuum,
-              (SELECT last_analyze FROM pg_stat_user_tables WHERE relname = 'bills') as last_analyze
-          ` as unknown as string) as unknown as Record<string, unknown>[];
+      const statsResult = await this.db.execute(sql`
+        SELECT
+          pg_size_pretty(pg_total_relation_size('idx_bills_search_vector')) as index_size,
+          pg_total_relation_size('idx_bills_search_vector') as index_size_bytes,
+          (SELECT COUNT(*) FROM bills) as total_rows,
+          (SELECT COUNT(*) FROM bills WHERE search_vector IS NOT NULL) as indexed_rows,
+          (SELECT last_vacuum FROM pg_stat_user_tables WHERE relname = 'bills') as last_vacuum,
+          (SELECT last_analyze FROM pg_stat_user_tables WHERE relname = 'bills') as last_analyze
+      ` as unknown as string) as unknown as Record<string, unknown>[];
 
-          const stats = statsResult[0];
-          if (!stats) {
-            throw new Error('Index statistics query returned no rows');
-          }
-          const totalRows = parseInt(stats.total_rows as string, 10);
-          const indexedRows = parseInt(stats.indexed_rows as string, 10);
+      const stats = statsResult[0];
+      if (!stats) {
+        throw new Error('Index statistics query returned no rows');
+      }
+      const totalRows = parseInt(stats.total_rows as string, 10);
+      const indexedRows = parseInt(stats.indexed_rows as string, 10);
 
-          return {
-            indexSize: stats.index_size as string,
-            indexSizeBytes: parseInt(stats.index_size_bytes as string, 10),
-            totalRows,
-            indexedRows,
-            indexEfficiency: totalRows > 0 ? (indexedRows / totalRows) * 100 : 0,
-            lastVacuum: stats.last_vacuum ? new Date(stats.last_vacuum as string) : null,
-            lastAnalyze: stats.last_analyze ? new Date(stats.last_analyze as string) : null,
-          };
-        },
-        fallback,
-        'getIndexStatistics'
-      );
-
-      return result.data;
+      return {
+        indexSize: stats.index_size as string,
+        indexSizeBytes: parseInt(stats.index_size_bytes as string, 10),
+        totalRows,
+        indexedRows,
+        indexEfficiency: totalRows > 0 ? (indexedRows / totalRows) * 100 : 0,
+        lastVacuum: stats.last_vacuum ? new Date(stats.last_vacuum as string) : null,
+        lastAnalyze: stats.last_analyze ? new Date(stats.last_analyze as string) : null,
+      };
     } catch (error) {
+      logger.error('Failed to get index statistics', {
+        error,
+        component: 'SearchIndexManager',
+        operation: 'getIndexStatistics'
+      });
       logger.error({ component: 'SearchIndexManager', error }, 'Error getting index statistics');
       return { ...fallback, indexSize: 'Error' };
     }

@@ -11,7 +11,7 @@ const router: RouterType = Router();
 router.get('/report', async (_req: Request, res: Response) => {
   try {
   // Create analyzer lazily to respect test mocks and avoid early module-side instantiation
-  const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+  const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
   const coverageAnalyzer = new Analyzer();
   const report = await coverageAnalyzer.generateCoverageReport();
     // Ensure any Date objects are converted to ISO strings so JSON responses
@@ -54,7 +54,7 @@ router.get('/report', async (_req: Request, res: Response) => {
 router.get('/server', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+  const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeServerCoverage();
     // Normalize any Date instances
@@ -96,7 +96,7 @@ router.get('/server', async (_req: Request, res: Response) => {
 router.get('/client', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+  const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeClientCoverage();
     const serializeDates = (obj: unknown): unknown => {
@@ -137,7 +137,7 @@ router.get('/client', async (_req: Request, res: Response) => {
 router.get('/integration', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+  const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
   const coverageAnalyzer = new Analyzer();
   const coverage = await coverageAnalyzer.analyzeIntegrationCoverage();
     const serializeDates = (obj: unknown): unknown => {
@@ -178,7 +178,7 @@ router.get('/integration', async (_req: Request, res: Response) => {
 router.get('/gaps', async (_req: Request, res: Response) => {
   try {
   // Lazily instantiate analyzer to ensure tests that mock the class are used
-  const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+  const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
   const coverageAnalyzer = new Analyzer();
   const serverCoverage = await coverageAnalyzer.analyzeServerCoverage();
   const clientCoverage = await coverageAnalyzer.analyzeClientCoverage();
@@ -244,7 +244,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
     
     let result;
     // Lazily instantiate analyzer to ensure tests that mock the class are used
-    const { CoverageAnalyzer: Analyzer } = await import('../../services/coverage-analyzer');
+    const { CoverageAnalyzer: Analyzer } = await import('./application/coverage-analyzer.service');
     const coverageAnalyzer = new Analyzer();
     switch (type) {
       case 'server':

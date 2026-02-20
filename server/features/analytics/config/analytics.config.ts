@@ -1,7 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 
-import { errorTracker } from '@/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/error-handling/error-tracker';
 
 /**
  * Analytics Configuration Interface

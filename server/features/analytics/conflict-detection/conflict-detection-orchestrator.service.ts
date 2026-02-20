@@ -17,7 +17,7 @@ import { eq } from 'drizzle-orm';
 import {
 type Bill,
 bills,
-  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@/shared/schema';
+  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@shared/schema';
 
 import {
   ConflictAnalysis,

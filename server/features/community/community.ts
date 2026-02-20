@@ -1,15 +1,27 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { z } from 'zod';
 
-import { commentService } from '@server/features/community/comment-voting';
-import { commentVotingService } from '@server/features/community/comment-voting';
+import { commentService } from './comment';
+import { commentVotingService } from './comment-voting';
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
-import { contentModerationService } from '@shared/admin/content-moderation';
 import { logger } from '@server/infrastructure/observability';
-import { asyncHandler } from '@/middleware/error-management';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
-import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { asyncHandler } from '@server/middleware/error-management';
+import { 
+  createValidationError, 
+  createNotFoundError, 
+  createAuthenticationError,
+  createSystemError 
+} from '@server/infrastructure/error-handling';
+import { ERROR_CODES } from '@shared/constants/error-codes';
+
+// Extend Express Request type to include user
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
 
 export const router = Router();
 
@@ -56,9 +68,7 @@ const pollVoteSchema = z.object({
 /**
  * GET /comments/:bill_id - Retrieve all comments for a bill with filtering
  */
-router.get('/comments/:bill_id', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/comments/:bill_id');
-
+router.get('/comments/:bill_id', asyncHandler(async (req: Request, res: Response) => {
   try {
     const bill_id = parseInt(req.params.bill_id);
     const sort = (req.query.sort as string) || 'recent';
@@ -69,14 +79,15 @@ router.get('/comments/:bill_id', asyncHandler(async (req, res: Response) => {
 
     // Validate bill ID parameter
     if (isNaN(bill_id)) {
-      throw new ValidationError('Invalid bill ID', [
-        { field: 'bill_id', message: 'Bill ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'bill_id', message: 'Bill ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     // Fetch comments with applied filters
     const result = await commentService.getBillComments(bill_id, {
-      sort: sort as unknown,
+      sort: sort as 'recent' | 'popular' | 'oldest',
       expertOnly,
       commentType,
       limit,
@@ -85,51 +96,34 @@ router.get('/comments/:bill_id', asyncHandler(async (req, res: Response) => {
 
     res.json(result);
   } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to fetch comments', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch comments', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', billId: req.params.bill_id }
-    });
+    logger.error('Failed to fetch comments', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
 
 /**
  * POST /comments - Create a new comment on a bill (requires authentication)
  */
-router.post('/comments', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/comments');
-
+router.post('/comments', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const data = req.body;
-    const user_id = (req as any).user?.id;
+    const user_id = req.user?.id;
 
     // Verify user authentication
     if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'community-routes' }
-      });
+      throw createAuthenticationError('missing_token', { component: 'community-routes' });
     }
 
     // Validate input against schema
     const result = createCommentSchema.safeParse(data);
     if (!result.success) {
-      throw new ValidationError('Invalid comment data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
+      throw createValidationError(
+        result.error.errors.map(e => ({
+          field: e.path.join('.'),
+          message: e.message
+        })),
+        { component: 'community-routes' }
+      );
     }
 
     // Create the comment
@@ -141,41 +135,17 @@ router.post('/comments', requireAuth, asyncHandler(async (req, res: Response) =>
       parent_id: result.data.parent_id
     });
 
-    // Analyze content for moderation (async, don't block response)
-    if (comment && typeof comment === 'object' && 'id' in comment) {
-      contentModerationService.flagContent(
-        'comment',
-        comment.id as number,
-        'spam',
-        'Automated content analysis',
-        user_id
-      ).catch(err => logger.error('Content moderation failed:', { component: 'community-routes' }, err));
-    }
-
     res.status(201).json(comment);
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) {
-      throw error;
-    }
-
-    logger.error('Failed to create comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to create comment', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', userId: (req as any).user?.id }
-    });
+    logger.error('Failed to create comment', { component: 'community-routes', userId: req.user?.id }, error as Error);
+    throw error;
   }
 }));
 
 /**
  * GET /comments/:id/replies - Retrieve all replies to a specific comment
  */
-router.get('/comments/:id/replies', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/comments/:id/replies');
-
+router.get('/comments/:id/replies', asyncHandler(async (req: Request, res: Response) => {
   try {
     const parent_id = parseInt(req.params.id);
     const sort = (req.query.sort as string) || 'recent';
@@ -183,70 +153,55 @@ router.get('/comments/:id/replies', asyncHandler(async (req, res: Response) => {
     const offset = parseInt(req.query.offset as string) || 0;
 
     if (isNaN(parent_id)) {
-      throw new ValidationError('Invalid comment ID', [
-        { field: 'id', message: 'Comment ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'id', message: 'Comment ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     const replies = await commentService.getCommentReplies(parent_id, {
-      sort: sort as unknown,
+      sort: sort as 'recent' | 'popular' | 'oldest',
       limit,
       offset
     });
 
     res.json(replies);
   } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to fetch replies', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch replies', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', commentId: req.params.id }
-    });
+    logger.error('Failed to fetch replies', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
 
 /**
  * PUT /comments/:id - Update an existing comment (requires authentication and ownership)
  */
-router.put('/comments/:id', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'PUT /api/community/comments/:id');
-
+router.put('/comments/:id', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const comment_id = parseInt(req.params.id);
     const data = req.body;
-    const user_id = (req as any).user?.id;
+    const user_id = req.user?.id;
 
     if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'community-routes' }
-      });
+      throw createAuthenticationError('missing_token', { component: 'community-routes' });
     }
 
     if (isNaN(comment_id)) {
-      throw new ValidationError('Invalid comment ID', [
-        { field: 'id', message: 'Comment ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'id', message: 'Comment ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     // Validate update data
     const result = updateCommentSchema.safeParse(data);
     if (!result.success) {
-      throw new ValidationError('Invalid comment data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
+      throw createValidationError(
+        result.error.errors.map(e => ({
+          field: e.path.join('.'),
+          message: e.message
+        })),
+        { component: 'community-routes' }
+      );
     }
 
     // Update the comment
@@ -254,137 +209,84 @@ router.put('/comments/:id', requireAuth, asyncHandler(async (req, res: Response)
 
     res.json(updatedComment);
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) {
-      throw error;
-    }
-
-    logger.error('Failed to update comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to update comment', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', commentId: req.params.id }
-    });
+    logger.error('Failed to update comment', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    throw error;
   }
 }));
 
 /**
  * DELETE /comments/:id - Delete a comment (requires authentication and ownership)
  */
-router.delete('/comments/:id', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'DELETE /api/community/comments/:id');
-
+router.delete('/comments/:id', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const comment_id = parseInt(req.params.id);
-    const user_id = (req as any).user?.id;
+    const user_id = req.user?.id;
 
     if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'community-routes' }
-      });
+      throw createAuthenticationError('missing_token', { component: 'community-routes' });
     }
 
     if (isNaN(comment_id)) {
-      throw new ValidationError('Invalid comment ID', [
-        { field: 'id', message: 'Comment ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'id', message: 'Comment ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     const success = await commentService.deleteComment(comment_id, user_id);
 
     res.json({ success });
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) {
-      throw error;
-    }
-
-    logger.error('Failed to delete comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to delete comment', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', commentId: req.params.id }
-    });
+    logger.error('Failed to delete comment', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    throw error;
   }
 }));
 
 /**
  * GET /comments/:bill_id/stats - Retrieve comment statistics for a bill
  */
-router.get('/comments/:bill_id/stats', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/comments/:bill_id/stats');
-
+router.get('/comments/:bill_id/stats', asyncHandler(async (req: Request, res: Response) => {
   try {
     const bill_id = parseInt(req.params.bill_id);
 
     if (isNaN(bill_id)) {
-      throw new ValidationError('Invalid bill ID', [
-        { field: 'bill_id', message: 'Bill ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'bill_id', message: 'Bill ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     const stats = await commentService.getCommentStats(bill_id);
 
     res.json(stats);
   } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to fetch comment statistics', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch comment statistics', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', billId: req.params.bill_id }
-    });
+    logger.error('Failed to fetch comment statistics', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
 
 /**
  * GET /comments/:bill_id/trending - Retrieve trending comments for a bill
  */
-router.get('/comments/:bill_id/trending', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/comments/:bill_id/trending');
-
+router.get('/comments/:bill_id/trending', asyncHandler(async (req: Request, res: Response) => {
   try {
     const bill_id = parseInt(req.params.bill_id);
     const timeframe = (req.query.timeframe as '1h' | '24h' | '7d') || '24h';
     const limit = parseInt(req.query.limit as string) || 10;
 
     if (isNaN(bill_id)) {
-      throw new ValidationError('Invalid bill ID', [
-        { field: 'bill_id', message: 'Bill ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'bill_id', message: 'Bill ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     const trendingComments = await commentVotingService.getTrendingComments(bill_id, timeframe, limit);
 
     res.json(trendingComments);
   } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to fetch trending comments', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch trending comments', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', billId: req.params.bill_id }
-    });
+    logger.error('Failed to fetch trending comments', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
 
@@ -395,38 +297,33 @@ router.get('/comments/:bill_id/trending', asyncHandler(async (req, res: Response
 /**
  * POST /comments/:id/vote - Cast a vote (upvote or downvote) on a comment
  */
-router.post('/comments/:id/vote', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/comments/:id/vote');
-
+router.post('/comments/:id/vote', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   try {
     const comment_id = parseInt(req.params.id);
     const data = req.body;
-    const user_id = (req as any).user?.id;
+    const user_id = req.user?.id;
 
     if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'community-routes' }
-      });
+      throw createAuthenticationError('missing_token', { component: 'community-routes' });
     }
 
     if (isNaN(comment_id)) {
-      throw new ValidationError('Invalid comment ID', [
-        { field: 'id', message: 'Comment ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
+      throw createValidationError(
+        [{ field: 'id', message: 'Comment ID must be a valid number' }],
+        { component: 'community-routes' }
+      );
     }
 
     // Validate vote type
     const result = voteSchema.safeParse(data);
     if (!result.success) {
-      throw new ValidationError('Invalid vote data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
+      throw createValidationError(
+        result.error.errors.map(e => ({
+          field: e.path.join('.'),
+          message: e.message
+        })),
+        { component: 'community-routes' }
+      );
     }
 
     // Record the vote
@@ -434,193 +331,8 @@ router.post('/comments/:id/vote', requireAuth, asyncHandler(async (req, res: Res
 
     res.json(voteResult);
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) {
-      throw error;
-    }
-
-    logger.error('Failed to vote', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to vote', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', commentId: req.params.id }
-    });
-  }
-}));
-
-// ============================================================================
-// MODERATION ENDPOINTS
-// ============================================================================
-
-/**
- * POST /comments/:id/flag - Flag a comment for moderation review
- */
-router.post('/comments/:id/flag', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/comments/:id/flag');
-
-  try {
-    const comment_id = parseInt(req.params.id);
-    const data = req.body;
-    const user_id = (req as any).user?.id;
-
-    if (!user_id) {
-      throw new BaseError('Authentication required', {
-        statusCode: 401,
-        code: ERROR_CODES.NOT_AUTHENTICATED,
-        domain: ErrorDomain.AUTHENTICATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { component: 'community-routes' }
-      });
-    }
-
-    if (isNaN(comment_id)) {
-      throw new ValidationError('Invalid comment ID', [
-        { field: 'id', message: 'Comment ID must be a valid number', code: 'INVALID_FORMAT' }
-      ]);
-    }
-
-    // Validate flag data
-    const result = flagContentSchema.safeParse(data);
-    if (!result.success) {
-      throw new ValidationError('Invalid flag data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
-    }
-
-    // Submit the flag
-    const flag = await contentModerationService.flagContent(
-      'comment',
-      comment_id,
-      result.data.flagType,
-      result.data.reason,
-      user_id
-    );
-
-    const flagId = flag && typeof flag === 'object' && 'id' in flag ? flag.id : undefined;
-
-    res.json({ success: true, flagId });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) {
-      throw error;
-    }
-
-    logger.error('Failed to flag comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to flag comment', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', commentId: req.params.id }
-    });
-  }
-}));
-
-/**
- * POST /comments/:id/highlight - Highlight a comment (for moderator/admin use)
- */
-router.post('/comments/:id/highlight', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/comments/:id/highlight');
-
-  try {
-    // TODO: Implement actual highlight functionality
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('Failed to highlight comment', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to highlight comment', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes' }
-    });
-  }
-}));
-
-// ============================================================================
-// POLL ENDPOINTS
-// ============================================================================
-
-/**
- * POST /polls - Create a new community poll for a bill
- */
-router.post('/polls', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/polls');
-
-  try {
-    const data = req.body;
-
-    // Validate poll data
-    const result = createPollSchema.safeParse(data);
-    if (!result.success) {
-      throw new ValidationError('Invalid poll data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
-    }
-
-    // TODO: Implement actual poll creation in database
-    const pollId = Date.now().toString();
-
-    res.status(201).json({ success: true, id: pollId });
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to create poll', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to create poll', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes', userId: (req as any).user?.id }
-    });
-  }
-}));
-
-/**
- * POST /comments/:id/poll-vote - Cast a vote on a poll option
- */
-router.post('/comments/:id/poll-vote', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /api/community/comments/:id/poll-vote');
-
-  try {
-    const data = req.body;
-
-    // Validate vote data
-    const result = pollVoteSchema.safeParse(data);
-    if (!result.success) {
-      throw new ValidationError('Invalid poll vote data', result.error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message,
-        code: 'VALIDATION_ERROR'
-      })));
-    }
-
-    // TODO: Implement actual poll voting
-    res.json({ success: true });
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    logger.error('Failed to vote on poll', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to vote on poll', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes' }
-    });
+    logger.error('Failed to vote', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    throw error;
   }
 }));
 
@@ -631,9 +343,7 @@ router.post('/comments/:id/poll-vote', requireAuth, asyncHandler(async (req, res
 /**
  * GET /participation/stats - Retrieve participation statistics
  */
-router.get('/participation/stats', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/participation/stats');
-
+router.get('/participation/stats', asyncHandler(async (req: Request, res: Response) => {
   try {
     const bill_id = req.query.bill_id ? parseInt(req.query.bill_id as string) : undefined;
 
@@ -666,24 +376,15 @@ router.get('/participation/stats', asyncHandler(async (req, res: Response) => {
       res.json(stats);
     }
   } catch (error) {
-    logger.error('Failed to fetch participation stats', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch participation statistics', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes' }
-    });
+    logger.error('Failed to fetch participation stats', { component: 'community-routes' }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
 
 /**
  * GET /engagement/recent - Retrieve recent community engagement activity
  */
-router.get('/engagement/recent', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/community/engagement/recent');
-
+router.get('/engagement/recent', asyncHandler(async (req: Request, res: Response) => {
   try {
     // TODO: Replace with actual database queries
     const recentActivity = [
@@ -707,14 +408,7 @@ router.get('/engagement/recent', asyncHandler(async (req, res: Response) => {
 
     res.json(recentActivity);
   } catch (error) {
-    logger.error('Failed to fetch engagement data', { component: 'community-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch engagement data', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'community-routes' }
-    });
+    logger.error('Failed to fetch engagement data', { component: 'community-routes' }, error as Error);
+    throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));

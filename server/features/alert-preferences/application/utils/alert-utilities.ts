@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
 
-import { cacheService } from '@/infrastructure/cache';
+import { cacheService } from '@server/infrastructure/cache';
 
 import { AlertPreference, AlertType, Priority,unifiedAlertPreferenceService } from '../../domain/services/unified-alert-preference-service';
 

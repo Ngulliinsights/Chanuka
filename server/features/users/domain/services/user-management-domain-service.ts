@@ -1,7 +1,7 @@
 import { UserService } from '../../application/user-service-direct';
 import { User } from '../entities/user';
 import { UserInterest,UserProfile } from '../entities/user-profile';
-// UserRepository interface removed - using direct service calls
+// Using repository pattern with Drizzle-based implementation for decoupling
 import { ProfileDomainService } from './profile-domain-service';
 
 export interface UserCreationResult {
