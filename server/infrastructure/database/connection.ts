@@ -1,6 +1,6 @@
 import type { Pool } from 'pg';
 
-import { logger } from '@server/infrastructure/core/index';
+import { logger } from '@server/infrastructure/observability/core/logger';
 
 // ============================================================================
 // TYPE DEFINITIONS
