@@ -1,4 +1,4 @@
-import { logger } from '../';
+import { logger } from '../core/logger';
 import { Request } from 'express';
 // TODO: Fix imports when shared/core modules are available
 // Stub types for compilation
