@@ -7,6 +7,21 @@
 
 import { ERROR_CODES, type ErrorCode } from '@shared/constants';
 
+// Re-export commonly used error types from other modules
+export { ValidationError, TransformationError, NetworkError } from '../../utils/errors/types';
+export type { Result, Ok, Err } from '../../core/primitives/types/result';
+export { ok, err, isOk, isErr } from '../../core/primitives/types/result';
+
+/**
+ * Error Severity Levels
+ */
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+
 /**
  * Error Classification
  * Categorizes errors by their nature for consistent handling
@@ -119,4 +134,53 @@ export function getClassificationFromErrorCode(code: ErrorCode): ErrorClassifica
 
   // Default to server error
   return ErrorClassification.Server;
+}
+
+/**
+ * AppError - Base application error class
+ * Provides a standardized error with classification and context
+ */
+export class AppError extends Error {
+  public readonly code: ErrorCode;
+  public readonly classification: ErrorClassification;
+  public readonly severity: ErrorSeverity;
+  public readonly correlationId: string;
+  public readonly timestamp: Date;
+  public readonly details?: Record<string, unknown>;
+
+  constructor(
+    message: string,
+    code: ErrorCode,
+    severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+    details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'AppError';
+    this.code = code;
+    this.classification = getClassificationFromErrorCode(code);
+    this.severity = severity;
+    this.correlationId = crypto.randomUUID();
+    this.timestamp = new Date();
+    this.details = details;
+
+    // Maintains proper stack trace
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AppError);
+    }
+  }
+
+  /**
+   * Convert to StandardError format
+   */
+  toStandardError(): StandardError {
+    return {
+      code: this.code,
+      message: this.message,
+      classification: this.classification,
+      correlationId: this.correlationId,
+      timestamp: this.timestamp,
+      details: this.details,
+      stack: this.stack,
+    };
+  }
 }

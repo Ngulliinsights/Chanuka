@@ -51,7 +51,6 @@
     "db:seed:legislative": "tsx scripts/seeds/legislative-seed.ts",
     "// --- API CONTRACT VERIFICATION ---": "",
     "api:verify-contracts": "tsx scripts/verify-api-contract-coverage.ts",
-    "db:seed:legislative": "tsx scripts/seeds/legislative-seed.ts",
     "// --- GRAPH DATABASE (NEO4J) ---": "",
     "graph:init": "tsx scripts/database/graph/initialize-graph.ts",
     "graph:sync": "tsx scripts/database/graph/sync-demo.ts",

@@ -104,30 +104,53 @@ export interface ApiErrorContext {
  * Base API Error
  * Foundation for all API-related errors
  */
-export abstract class ApiError extends AppError {
+export abstract class ApiError extends Error {
   /**
    * Error code
    */
-  abstract override readonly code: ApiErrorCode;
+  abstract readonly code: ApiErrorCode;
 
   /**
    * Error severity
    */
-  abstract override readonly severity: ErrorSeverity;
+  abstract readonly severity: ErrorSeverity;
 
   /**
    * API-specific context
    */
   readonly apiContext: ApiErrorContext;
 
+  /**
+   * Additional context
+   */
+  readonly context?: Readonly<Record<string, unknown>>;
+
+  /**
+   * Correlation ID for tracing
+   */
+  readonly correlationId: string;
+
+  /**
+   * Timestamp when error occurred
+   */
+  readonly timestamp: Date;
+
   constructor(
     message: string,
     apiContext: ApiErrorContext,
     context?: Readonly<Record<string, unknown>>
   ) {
-    super(message, context);
+    super(message);
     this.apiContext = apiContext;
+    this.context = context;
+    this.correlationId = crypto.randomUUID();
+    this.timestamp = new Date();
     this.name = this.constructor.name;
+
+    // Maintains proper stack trace
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ApiError);
+    }
   }
 
   /**
@@ -162,6 +185,8 @@ export abstract class ApiError extends AppError {
       severity: this.severity,
       apiContext: this.apiContext,
       context: this.context,
+      correlationId: this.correlationId,
+      timestamp: this.timestamp,
       stack: this.stack,
     };
   }
@@ -173,7 +198,7 @@ export abstract class ApiError extends AppError {
  */
 export class ApiBadRequestError extends ApiError {
   readonly code = 'API_BAD_REQUEST' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -190,7 +215,7 @@ export class ApiBadRequestError extends ApiError {
  */
 export class ApiUnauthorizedError extends ApiError {
   readonly code = 'API_UNAUTHORIZED' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -207,7 +232,7 @@ export class ApiUnauthorizedError extends ApiError {
  */
 export class ApiForbiddenError extends ApiError {
   readonly code = 'API_FORBIDDEN' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -224,7 +249,7 @@ export class ApiForbiddenError extends ApiError {
  */
 export class ApiNotFoundError extends ApiError {
   readonly code = 'API_NOT_FOUND' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -241,7 +266,7 @@ export class ApiNotFoundError extends ApiError {
  */
 export class ApiMethodNotAllowedError extends ApiError {
   readonly code = 'API_METHOD_NOT_ALLOWED' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -258,7 +283,7 @@ export class ApiMethodNotAllowedError extends ApiError {
  */
 export class ApiRequestTimeoutError extends ApiError {
   readonly code = 'API_REQUEST_TIMEOUT' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -275,7 +300,7 @@ export class ApiRequestTimeoutError extends ApiError {
  */
 export class ApiConflictError extends ApiError {
   readonly code = 'API_CONFLICT' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -292,7 +317,7 @@ export class ApiConflictError extends ApiError {
  */
 export class ApiTooManyRequestsError extends ApiError {
   readonly code = 'API_TOO_MANY_REQUESTS' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -309,7 +334,7 @@ export class ApiTooManyRequestsError extends ApiError {
  */
 export class ApiInternalServerError extends ApiError {
   readonly code = 'API_INTERNAL_SERVER_ERROR' as const;
-  readonly severity = 'critical' as const;
+  readonly severity = ErrorSeverity.CRITICAL;
 
   constructor(
     message: string,
@@ -326,7 +351,7 @@ export class ApiInternalServerError extends ApiError {
  */
 export class ApiServiceUnavailableError extends ApiError {
   readonly code = 'API_SERVICE_UNAVAILABLE' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -343,7 +368,7 @@ export class ApiServiceUnavailableError extends ApiError {
  */
 export class ApiGatewayTimeoutError extends ApiError {
   readonly code = 'API_GATEWAY_TIMEOUT' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -360,7 +385,7 @@ export class ApiGatewayTimeoutError extends ApiError {
  */
 export class ApiValidationError extends ApiError {
   readonly code = 'API_VALIDATION_ERROR' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -382,7 +407,7 @@ export class ApiValidationError extends ApiError {
  */
 export class ApiAuthenticationError extends ApiError {
   readonly code = 'API_AUTHENTICATION_ERROR' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -400,7 +425,7 @@ export class ApiAuthenticationError extends ApiError {
  */
 export class ApiPermissionError extends ApiError {
   readonly code = 'API_PERMISSION_ERROR' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -419,7 +444,7 @@ export class ApiPermissionError extends ApiError {
  */
 export class ApiRateLimitError extends ApiError {
   readonly code = 'API_RATE_LIMIT_ERROR' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -439,7 +464,7 @@ export class ApiRateLimitError extends ApiError {
  */
 export class ApiSerializationError extends ApiError {
   readonly code = 'API_SERIALIZATION_ERROR' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -457,7 +482,7 @@ export class ApiSerializationError extends ApiError {
  */
 export class ApiDeserializationError extends ApiError {
   readonly code = 'API_DESERIALIZATION_ERROR' as const;
-  readonly severity = 'medium' as const;
+  readonly severity = ErrorSeverity.MEDIUM;
 
   constructor(
     message: string,
@@ -475,7 +500,7 @@ export class ApiDeserializationError extends ApiError {
  */
 export class ApiUnknownError extends ApiError {
   readonly code = 'API_UNKNOWN_ERROR' as const;
-  readonly severity = 'high' as const;
+  readonly severity = ErrorSeverity.HIGH;
 
   constructor(
     message: string,
@@ -500,7 +525,7 @@ export class ApiErrorFactory {
     message: string,
     apiContext: ApiErrorContext
   ): ApiError {
-    const statusCodeMap: Record<number, new (message: string, apiContext: ApiErrorContext) => ApiError> = {
+    const statusCodeMap: Record<number, typeof ApiError> = {
       400: ApiBadRequestError,
       401: ApiUnauthorizedError,
       403: ApiForbiddenError,
@@ -515,7 +540,7 @@ export class ApiErrorFactory {
     };
 
     const ErrorConstructor = statusCodeMap[httpStatus] ?? ApiUnknownError;
-    return new ErrorConstructor(message, apiContext);
+    return new (ErrorConstructor as any)(message, apiContext);
   }
 
   /**
@@ -526,7 +551,7 @@ export class ApiErrorFactory {
     message: string,
     apiContext: ApiErrorContext
   ): ApiError {
-    const errorCodeMap: Partial<Record<ApiErrorCode, new (message: string, apiContext: ApiErrorContext, ...args: unknown[]) => ApiError>> = {
+    const errorCodeMap: Partial<Record<ApiErrorCode, typeof ApiError>> = {
       API_BAD_REQUEST: ApiBadRequestError,
       API_UNAUTHORIZED: ApiUnauthorizedError,
       API_FORBIDDEN: ApiForbiddenError,
@@ -548,7 +573,7 @@ export class ApiErrorFactory {
     };
 
     const ErrorConstructor = errorCodeMap[errorCode] ?? ApiUnknownError;
-    return new ErrorConstructor(message, apiContext);
+    return new (ErrorConstructor as any)(message, apiContext);
   }
 
   /**
