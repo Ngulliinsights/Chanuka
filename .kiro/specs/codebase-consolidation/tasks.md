@@ -544,11 +544,11 @@ _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
   ```
 
 **Acceptance**:
-- [~] No flat duplicates remain at graph/ root
-- [~] All files organized into subdirectories
-- [~] All imports point to structured paths
-- [~] Integration tests pass
-- [~] Directory structure is clean (only subdirectories + index.ts at root)
+- [ ] No flat duplicates remain at graph/ root
+- [ ] All files organized into subdirectories
+- [ ] All imports point to structured paths
+- [ ] Integration tests pass
+- [ ] Directory structure is clean (only subdirectories + index.ts at root)
 
 ---
 

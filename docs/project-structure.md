@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 20, 2026 at 01:38 AM
+**Generated:** February 20, 2026 at 04:01 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,971
+**Total Items:** 4,025
 
 ```
 .
@@ -481,6 +481,9 @@
 │   │   │   │   │   ├── admin-dashboard.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── advocacy/
+│   │   │   │   ├── ElectoralPressure.tsx
+│   │   │   │   └── index.tsx
 │   │   │   ├── analysis/
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── hooks/
@@ -558,6 +561,9 @@
 │   │   │   │   │   ├── pagination.ts
 │   │   │   │   │   └── tracking.ts
 │   │   │   │   ├── ui/
+│   │   │   │   │   ├── action-prompts/
+│   │   │   │   │   │   ├── ActionPromptCard.tsx
+│   │   │   │   │   │   └── index.tsx
 │   │   │   │   │   ├── analysis/
 │   │   │   │   │   │   ├── conflict-of-interest/
 │   │   │   │   │   │   │   ├── ConflictNetworkVisualization.tsx
@@ -588,11 +594,21 @@
 │   │   │   │   │   │   └── BillTimelineTab.tsx
 │   │   │   │   │   ├── education/
 │   │   │   │   │   │   └── README.md
+│   │   │   │   │   ├── impact/
+│   │   │   │   │   │   ├── ImpactCalculator.tsx
+│   │   │   │   │   │   └── index.tsx
 │   │   │   │   │   ├── implementation/
+│   │   │   │   │   ├── legislative-brief/
+│   │   │   │   │   │   ├── ArgumentMap.tsx
+│   │   │   │   │   │   ├── BriefViewer.tsx
+│   │   │   │   │   │   └── index.tsx
 │   │   │   │   │   ├── list/
 │   │   │   │   │   │   └── BillCard.tsx
 │   │   │   │   │   ├── tracking/
 │   │   │   │   │   │   └── real-time-tracker.tsx
+│   │   │   │   │   ├── translation/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── PlainLanguageView.tsx
 │   │   │   │   │   ├── transparency/
 │   │   │   │   │   │   └── ConflictAnalysisDashboard.tsx
 │   │   │   │   │   ├── ArgumentsTab.tsx
@@ -1687,6 +1703,8 @@
 │   │   ├── ADR-006-validation-single-source.md
 │   │   ├── ADR-007-utils-consolidation.md
 │   │   ├── ADR-008-incomplete-migrations.md
+│   │   ├── ADR-009-graph-module-refactoring.md
+│   │   ├── ADR-010-government-data-consolidation.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -1700,6 +1718,8 @@
 │   │   │   ├── unified-code-analysis-v2.md
 │   │   │   ├── unified-code-analysis.md
 │   │   │   └── unified-coding.md
+│   │   ├── CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
+│   │   ├── CLIENT_OVERLAP_ANALYSIS.md
 │   │   └── data-flow-pipelines.md
 │   ├── archive/
 │   │   ├── legacy_migrations/
@@ -2327,6 +2347,7 @@
 │   ├── fix-client-issues.sh
 │   ├── fix-commented-imports.ts
 │   ├── fix-config.json
+│   ├── fix-database-service-calls.cjs
 │   ├── fix-design-system.ts
 │   ├── fix-display-names.ts
 │   ├── fix-error-components.sh
@@ -2383,6 +2404,7 @@
 │   ├── migrate-console-logs.ts
 │   ├── migrate-consolidated-imports.cjs
 │   ├── migrate-database-imports.ts
+│   ├── migrate-database-service-calls.ts
 │   ├── migrate-error-handling-api.ts
 │   ├── migrate-error-handling.ts
 │   ├── migrate-imports.js
@@ -2697,9 +2719,15 @@
 │   │   │   ├── repositories/
 │   │   │   │   └── sponsorship-repository.ts
 │   │   │   ├── services/
+│   │   │   │   ├── mocks/
+│   │   │   │   │   ├── impact-mock-data.ts
+│   │   │   │   │   └── translation-mock-data.ts
+│   │   │   │   ├── impact-calculator.ts
+│   │   │   │   ├── translation-service.ts
 │   │   │   │   └── voting-pattern-analysis-service.ts
 │   │   │   ├── types/
 │   │   │   │   └── analysis.ts
+│   │   │   ├── action-prompts-routes.ts
 │   │   │   ├── bill-status-monitor.ts
 │   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── bill.js
@@ -2711,6 +2739,7 @@
 │   │   │   ├── MIGRATION_SUMMARY.md
 │   │   │   ├── real-time-tracking.ts
 │   │   │   ├── sponsorship.routes.ts
+│   │   │   ├── translation-routes.ts
 │   │   │   ├── voting-pattern-analysis-router.ts
 │   │   │   └── voting-pattern-analysis.ts
 │   │   ├── community/
@@ -2753,9 +2782,11 @@
 │   │   ├── constitutional-intelligence/
 │   │   │   ├── application/
 │   │   │   │   └── constitutional-analysis.service.ts
-│   │   │   └── domain/
-│   │   │       └── entities/
-│   │   │           └── constitutional-provision.ts
+│   │   │   ├── domain/
+│   │   │   │   └── entities/
+│   │   │   │       └── constitutional-provision.ts
+│   │   │   ├── index.ts
+│   │   │   └── README.md
 │   │   ├── government-data/
 │   │   │   ├── application/
 │   │   │   │   └── managed-integration.service.ts
@@ -2777,6 +2808,7 @@
 │   │   │   ├── domain/
 │   │   │   │   └── entities/
 │   │   │   │       └── notification.ts
+│   │   │   ├── action-prompt-generator.ts
 │   │   │   ├── index.ts
 │   │   │   ├── notification-router.ts
 │   │   │   └── notification-service.ts
@@ -2931,7 +2963,7 @@
 │   │   │   ├── index.ts
 │   │   │   └── MIGRATION_SUMMARY.md
 │   │   ├── index.ts
-│   │   ├── repository-cleanup.ts
+│   │   ├── README.md
 │   │   └── search-suggestions.ts
 │   ├── infrastructure/
 │   │   ├── adapters/
@@ -2974,6 +3006,7 @@
 │   │   │   │   └── cache-warmer.ts
 │   │   │   ├── ADAPTER_VERIFICATION_REPORT.md
 │   │   │   ├── adapters-factory-integration.test.ts
+│   │   │   ├── advanced-caching.service.ts
 │   │   │   ├── ai-cache.ts
 │   │   │   ├── cache-factory.ts
 │   │   │   ├── cache-wrappers.test.ts
@@ -3019,6 +3052,7 @@
 │   │   │   │   ├── jwt-types.ts
 │   │   │   │   ├── passwordReset.ts
 │   │   │   │   ├── secure-session-service.ts
+│   │   │   │   ├── secure-session.service.ts
 │   │   │   │   └── session-cleanup.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── data-completeness.ts
@@ -3026,6 +3060,7 @@
 │   │   │   │   ├── data-validation.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── input-validation-service.ts
+│   │   │   │   ├── input-validation.service.ts
 │   │   │   │   ├── schema-validation-service.ts
 │   │   │   │   ├── security-schemas.ts
 │   │   │   │   ├── validation-metrics.ts
@@ -3117,6 +3152,7 @@
 │   │   │   └── pool.ts
 │   │   ├── error-handling/
 │   │   │   ├── error-factory.ts
+│   │   │   ├── external-api-error-handler.ts
 │   │   │   ├── http-error-handler.ts
 │   │   │   ├── index.ts
 │   │   │   ├── resilience.ts
@@ -3157,6 +3193,7 @@
 │   │   ├── notifications/
 │   │   │   ├── alerting-service.ts
 │   │   │   ├── email-service.ts
+│   │   │   ├── enhanced-notification.service.ts
 │   │   │   ├── index.ts
 │   │   │   ├── notification_integration_guide.md
 │   │   │   ├── notification-channels.ts
@@ -3185,7 +3222,8 @@
 │   │   │   │   ├── log-aggregator.ts
 │   │   │   │   ├── monitoring-policy.ts
 │   │   │   │   ├── monitoring-scheduler.ts
-│   │   │   │   └── performance-monitor.ts
+│   │   │   │   ├── performance-monitor.ts
+│   │   │   │   └── performance-monitoring.service.ts
 │   │   │   ├── security/
 │   │   │   │   ├── security-event-logger.ts
 │   │   │   │   └── security-policy.ts
@@ -3369,17 +3407,7 @@
 │   │   ├── verify-external-api-management.ts
 │   │   └── websocket-performance-validation.ts
 │   ├── services/
-│   │   ├── advancedCachingService.ts
-│   │   ├── api-cost-monitoring.ts
-│   │   ├── coverage-analyzer.ts
-│   │   ├── enhancedNotificationService.ts
-│   │   ├── external-api-error-handler.ts
-│   │   ├── inputValidationService.ts
-│   │   ├── managed-government-data-integration.ts
-│   │   ├── performanceMonitoring.ts
-│   │   ├── README-schema-validation.md
-│   │   ├── schema-validation-demo.ts
-│   │   └── secureSessionService.ts
+│   │   └── README-schema-validation.md
 │   ├── storage/
 │   │   ├── base.ts
 │   │   ├── bill-storage-with-transformers.example.ts
@@ -3438,8 +3466,11 @@
 │   │   ├── shared-core-fallback.ts
 │   │   └── validation.ts
 │   ├── CIRCULAR_DEPENDENCIES_RESOLUTION.md
+│   ├── DDD_STRUCTURE_ANALYSIS.md
 │   ├── error-baseline-report.md
+│   ├── files-with-10plus-errors.md
 │   ├── index.ts
+│   ├── MANUAL_FIX_GUIDE.md
 │   ├── MIGRATION_EXAMPLES.ts
 │   ├── module-resolution-analysis-detailed.md
 │   ├── module-resolution-analysis.json
@@ -3448,8 +3479,15 @@
 │   ├── module-resolution-fix-report.md
 │   ├── module-resolution-progress-report.md
 │   ├── package.json
+│   ├── PHASE1_ARCHITECTURAL_DECISIONS.md
+│   ├── PHASE1_BREAKTHROUGH.md
+│   ├── PHASE1_COMPLETE.md
 │   ├── PHASE1_COMPLETION_SUMMARY.md
 │   ├── PHASE1_FINAL_REPORT.md
+│   ├── PHASE1_FINAL_STATUS.md
+│   ├── PHASE1_PROGRESS_UPDATE.md
+│   ├── phase1-checkpoint-report.md
+│   ├── phase1-continuation-plan.md
 │   ├── project.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
@@ -3608,6 +3646,9 @@
 │   │   │   ├── request-types.ts
 │   │   │   ├── response-types.ts
 │   │   │   └── serialization.ts
+│   │   ├── bills/
+│   │   │   ├── action-prompts.types.ts
+│   │   │   └── translation.types.ts
 │   │   ├── core/
 │   │   │   ├── base.ts
 │   │   │   ├── branded.ts
@@ -3935,12 +3976,19 @@
 │   └── top-orphans-loc.json
 ├── ARCHITECTURE.md
 ├── archive-docs.sh
+├── baseline_analysis.md
 ├── CHANGELOG.md
+├── CIRCULAR_DEPENDENCY_FIX.md
 ├── clear-sw.html
+├── CODEBASE_CONSOLIDATION_COMPLETE.md
+├── COMPLETE_MIGRATION_NOW.md
 ├── CONSOLIDATION_PROGRESS_REPORT.md
 ├── CONSOLIDATION_SESSION_SUMMARY.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
+├── DATABASE_SERVICE_MIGRATION_GUIDE.md
+├── DATABASE_SERVICE_MIGRATION_SUMMARY.md
+├── dependency-graph.json
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
@@ -3948,12 +3996,17 @@
 ├── DOCUMENTATION_AUDIT_REPORT.md
 ├── drizzle.config.ts
 ├── enum-alignment-report.json
+├── FINAL_MIGRATION_STATUS.md
 ├── flat-imports.txt
 ├── generate-structure.mjs
 ├── gov-data-imports.txt
 ├── IMPORT_EXPORT_AUDIT.json
 ├── knip.config.ts
 ├── knip.json
+├── MIGRATION_CHECKLIST.md
+├── MIGRATION_COMPLETE_SUMMARY.md
+├── MIGRATION_PROGRESS.md
+├── MIGRATION_STATUS_REPORT.md
 ├── migration-verification-report.json
 ├── nginx.conf
 ├── nul
@@ -3974,6 +4027,7 @@
 ├── tsconfig.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
+├── VALIDATION_CONSOLIDATION_COMPLETE.md
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
 └── vitest.workspace.ts
