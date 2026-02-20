@@ -11,7 +11,7 @@
  * - ✅ Stack trace capture
  */
 
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 export enum GraphErrorCode {
   // Connection errors

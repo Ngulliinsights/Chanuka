@@ -11,7 +11,7 @@
  * - ✅ Comprehensive logging
  */
 
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 export interface RetryConfig {
   maxRetries: number;

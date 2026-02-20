@@ -4,7 +4,7 @@
  */
 import { Driver } from 'neo4j-driver';
 import { detectVotingPatterns, findInfluentialNodes } from './pattern-discovery';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 export async function discoverAllPatterns(driver: Driver, billId: string): Promise<any> {
   logger.info('Discovering patterns', { billId });

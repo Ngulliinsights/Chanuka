@@ -2,7 +2,7 @@
  * Operation Guard (REFACTORED)
  * IMPROVEMENTS: Rate limiting, circuit breaker pattern
  */
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 export class OperationGuard {
   private operations: Map<string, number> = new Map();

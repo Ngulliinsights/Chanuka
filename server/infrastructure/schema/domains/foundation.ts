@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Foundation Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { users, bills } from '@/shared/schema/domains/foundation'
+// Usage: import { users, bills } from '@shared/schema/domains/foundation'
 //
 // Foundation schema exports include core entities:
 // - users: User accounts with authentication and security

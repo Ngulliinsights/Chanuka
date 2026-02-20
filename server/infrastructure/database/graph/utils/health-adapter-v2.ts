@@ -4,7 +4,7 @@
  */
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from './utils/session-manager';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 export interface HealthStatus {
   healthy: boolean;

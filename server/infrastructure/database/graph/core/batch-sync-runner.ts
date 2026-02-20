@@ -5,7 +5,7 @@
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
 import { SYNC_CONFIG } from '../config/graph-config';
 
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 const errorHandler = new GraphErrorHandler();
 let schedulerInterval: NodeJS.Timeout | null = null;

@@ -12,7 +12,7 @@
  */
 
 import { Record as Neo4jRecord, Integer, Node, Relationship, Path } from 'neo4j-driver';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 /**
  * Safely extract value from Neo4j record.

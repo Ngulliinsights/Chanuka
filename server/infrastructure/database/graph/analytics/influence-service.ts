@@ -6,7 +6,7 @@ import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 const errorHandler = new GraphErrorHandler();
 

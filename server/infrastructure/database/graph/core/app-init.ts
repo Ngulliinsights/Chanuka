@@ -7,7 +7,7 @@ import { Driver, driver as neo4jDriver } from 'neo4j-driver';
 import { initializeSyncService, shutdownSyncService } from './core/sync-executor';
 import { initializeGraphSchema } from './core/schema';
 import { NEO4J_CONFIG, SYNC_CONFIG, validateConfig } from '../config/graph-config';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 let appDriver: Driver | null = null;
 

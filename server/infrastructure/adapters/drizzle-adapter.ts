@@ -13,9 +13,8 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
-import { db, withTransaction } from '@server/infrastructure/database';
-import { and, asc, count, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
+import { database as db, withTransaction } from '@server/infrastructure/database';
+import { and, asc, count, desc, eq, inArray, or, SQL, sql } from 'drizzle-orm';
 
 // Type helper to ensure timestamp fields exist
 type WithTimestamps<T> = T & {
@@ -58,25 +57,24 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          const [row] = await db
-            .select()
-            .from(this.table)
-            .where(eq(this.table.id, id))
-            .limit(1);
+      const [row] = await db
+        .select()
+        .from(this.table)
+        .where(eq(this.table.id, id))
+        .limit(1);
 
-          return row ? this.entityMapping.toEntity(row as TRow) : null;
-        },
-        null,
-        `DrizzleAdapter:findById:${this.tableName}:${id}`
-      );
-
-      this.logPerformance('findById', startTime, { id, found: !!result.data });
-      return result.data;
+      const result = row ? this.entityMapping.toEntity(row as TRow) : null;
+      this.logPerformance('findById', startTime, { id, found: !!result });
+      return result;
     } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'DrizzleAdapter',
+        operation: `findById:${this.tableName}:${id}`,
+        context: { id }
+      });
       this.logError('findById', error, { id });
-      throw error;
+      return null;
     }
   }
 
@@ -90,51 +88,51 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          let query = db.select().from(this.table);
+      let query = db.select().from(this.table);
 
-          // Apply filters
-          if (filters.length > 0) {
-            const conditions = this.buildConditions(filters);
-            query = query.where(and(...conditions));
-          }
+      // Apply filters
+      if (filters.length > 0) {
+        const conditions = this.buildConditions(filters);
+        query = query.where(and(...conditions));
+      }
 
-          // Apply ordering
-          if (options.orderBy) {
-            const orderColumn = this.table[options.orderBy];
-            if (orderColumn) {
-              query = options.orderDirection === 'asc' 
-                ? query.orderBy(asc(orderColumn))
-                : query.orderBy(desc(orderColumn));
-            }
-          }
+      // Apply ordering
+      if (options.orderBy) {
+        const orderColumn = this.table[options.orderBy];
+        if (orderColumn) {
+          query = options.orderDirection === 'asc' 
+            ? query.orderBy(asc(orderColumn))
+            : query.orderBy(desc(orderColumn));
+        }
+      }
 
-          // Apply pagination
-          if (options.limit) {
-            query = query.limit(Math.min(options.limit, 1000)); // Safety limit
-          }
-          if (options.offset) {
-            query = query.offset(options.offset);
-          }
+      // Apply pagination
+      if (options.limit) {
+        query = query.limit(Math.min(options.limit, 1000)); // Safety limit
+      }
+      if (options.offset) {
+        query = query.offset(options.offset);
+      }
 
-          const rows = await query;
-          return rows.map((row: TRow) => this.entityMapping.toEntity(row));
-        },
-        [],
-        `DrizzleAdapter:findMany:${this.tableName}`
-      );
+      const rows = await query;
+      const result = rows.map((row: TRow) => this.entityMapping.toEntity(row));
 
       this.logPerformance('findMany', startTime, { 
         filterCount: filters.length, 
-        resultCount: result.data.length,
+        resultCount: result.length,
         options 
       });
       
-      return result.data;
+      return result;
     } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'DrizzleAdapter',
+        operation: `findMany:${this.tableName}`,
+        context: { filters, options }
+      });
       this.logError('findMany', error, { filters, options });
-      throw error;
+      return [];
     }
   }
 
@@ -242,27 +240,27 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          let query = db.select({ count: count() }).from(this.table);
+      let query = db.select({ count: count() }).from(this.table);
 
-          if (filters.length > 0) {
-            const conditions = this.buildConditions(filters);
-            query = query.where(and(...conditions));
-          }
+      if (filters.length > 0) {
+        const conditions = this.buildConditions(filters);
+        query = query.where(and(...conditions));
+      }
 
-          const [{ count: totalCount }] = await query;
-          return Number(totalCount);
-        },
-        0,
-        `DrizzleAdapter:count:${this.tableName}`
-      );
+      const [{ count: totalCount }] = await query;
+      const result = Number(totalCount);
 
-      this.logPerformance('count', startTime, { filterCount: filters.length, count: result.data });
-      return result.data;
+      this.logPerformance('count', startTime, { filterCount: filters.length, count: result });
+      return result;
     } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'DrizzleAdapter',
+        operation: `count:${this.tableName}`,
+        context: { filters }
+      });
       this.logError('count', error, { filters });
-      throw error;
+      return 0;
     }
   }
 
@@ -314,60 +312,60 @@ export class DrizzleAdapter<TEntity, TRow> {
     const startTime = Date.now();
     
     try {
-      const result = await databaseService.withFallback(
-        async () => {
-          const searchTerm = `%${query.toLowerCase()}%`;
-          const searchConditions = searchFields
-            .map(field => {
-              const column = this.table[field];
-              return column ? sql`LOWER(${column}) LIKE ${searchTerm}` : undefined;
-            })
-            .filter((condition): condition is SQL<unknown> => condition !== undefined);
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const searchConditions = searchFields
+        .map(field => {
+          const column = this.table[field];
+          return column ? sql`LOWER(${column}) LIKE ${searchTerm}` : undefined;
+        })
+        .filter((condition): condition is SQL<unknown> => condition !== undefined);
 
-          if (searchConditions.length === 0) {
-            return [];
-          }
+      if (searchConditions.length === 0) {
+        return [];
+      }
 
-          let dbQuery = db
-            .select()
-            .from(this.table)
-            .where(or(...searchConditions));
+      let dbQuery = db
+        .select()
+        .from(this.table)
+        .where(or(...searchConditions));
 
-          // Apply ordering
-          if (options.orderBy) {
-            const orderColumn = this.table[options.orderBy];
-            if (orderColumn) {
-              dbQuery = options.orderDirection === 'asc' 
-                ? dbQuery.orderBy(asc(orderColumn))
-                : dbQuery.orderBy(desc(orderColumn));
-            }
-          }
+      // Apply ordering
+      if (options.orderBy) {
+        const orderColumn = this.table[options.orderBy];
+        if (orderColumn) {
+          dbQuery = options.orderDirection === 'asc' 
+            ? dbQuery.orderBy(asc(orderColumn))
+            : dbQuery.orderBy(desc(orderColumn));
+        }
+      }
 
-          // Apply pagination with safety limits
-          const limit = Math.min(options.limit || 50, 1000);
-          dbQuery = dbQuery.limit(limit);
-          
-          if (options.offset) {
-            dbQuery = dbQuery.offset(options.offset);
-          }
+      // Apply pagination with safety limits
+      const limit = Math.min(options.limit || 50, 1000);
+      dbQuery = dbQuery.limit(limit);
+      
+      if (options.offset) {
+        dbQuery = dbQuery.offset(options.offset);
+      }
 
-          const rows = await dbQuery;
-          return rows.map((row: TRow) => this.entityMapping.toEntity(row));
-        },
-        [],
-        `DrizzleAdapter:search:${this.tableName}`
-      );
+      const rows = await dbQuery;
+      const result = rows.map((row: TRow) => this.entityMapping.toEntity(row));
 
       this.logPerformance('search', startTime, { 
         query, 
         searchFields, 
-        resultCount: result.data.length 
+        resultCount: result.length 
       });
       
-      return result.data;
+      return result;
     } catch (error) {
+      logger.error('Operation failed', {
+        error,
+        component: 'DrizzleAdapter',
+        operation: `search:${this.tableName}`,
+        context: { query, searchFields, options }
+      });
       this.logError('search', error, { query, searchFields, options });
-      throw error;
+      return [];
     }
   }
 

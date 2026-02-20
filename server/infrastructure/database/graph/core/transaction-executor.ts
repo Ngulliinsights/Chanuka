@@ -8,7 +8,7 @@ import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-ad
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { withTransaction } from '../utils/session-manager';
 
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 const errorHandler = new GraphErrorHandler();
 

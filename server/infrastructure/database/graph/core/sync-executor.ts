@@ -27,7 +27,7 @@ import { withSession } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { NEO4J_CONFIG, SYNC_CONFIG } from '../config/graph-config';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 const errorHandler = new GraphErrorHandler();
 

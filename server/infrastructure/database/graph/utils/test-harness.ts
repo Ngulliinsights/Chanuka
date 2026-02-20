@@ -4,7 +4,7 @@
  */
 import { Driver, driver as neo4jDriver } from 'neo4j-driver';
 import { withSession } from './utils/session-manager';
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 let testDriver: Driver | null = null;
 

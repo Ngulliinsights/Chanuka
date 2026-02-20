@@ -2,7 +2,7 @@
  * Cache Adapter V2 (REFACTORED)
  * IMPROVEMENTS: Type safety, error handling, TTL support
  */
-import { logger } from '@/core/observability';
+import { logger } from '@server/infrastructure/observability';
 import { CACHE_CONFIG } from './config/graph-config';
 
 export interface CacheEntry<T> {
