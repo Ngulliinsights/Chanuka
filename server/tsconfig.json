@@ -5,6 +5,8 @@
     "rootDir": ".",
     "composite": true,
     "ignoreDeprecations": "5.0",
+    "esModuleInterop": true,
+    "downlevelIteration": true,
     "paths": {
       "@/*": ["./*"],
       "@server": ["."],
@@ -12,12 +14,16 @@
       "@server/middleware/*": ["./middleware/*"],
       "@server/utils/*": ["./utils/*"],
       "@server/infrastructure/*": ["./infrastructure/*"],
+      "@server/infrastructure/cache": ["./infrastructure/cache/index.ts"],
+      "@server/infrastructure/cache/*": ["./infrastructure/cache/*"],
+      "@server/infrastructure/database": ["./infrastructure/database/index.ts"],
+      "@server/infrastructure/database/*": ["./infrastructure/database/*"],
       "@server/infrastructure/error-handling": ["./infrastructure/error-handling/index.ts"],
       "@server/infrastructure/error-handling/*": ["./infrastructure/error-handling/*"],
       "@server/infrastructure/observability": ["./infrastructure/observability/index.ts"],
       "@server/infrastructure/observability/*": ["./infrastructure/observability/*"],
+      "@server/infrastructure/schema": ["./infrastructure/schema/index.ts"],
       "@server/infrastructure/schema/*": ["./infrastructure/schema/*"],
-      "@server/infrastructure/database/*": ["./infrastructure/database/*"],
       "@server/infrastructure/core/*": ["./infrastructure/core/*"],
       "@server/features/*": ["./features/*"],
       "@shared": ["../shared"],
@@ -29,7 +35,9 @@
       "@shared/constants": ["../shared/constants"],
       "@shared/constants/*": ["../shared/constants/*"],
       "@shared/utils": ["../shared/utils"],
-      "@shared/utils/*": ["../shared/utils/*"]
+      "@shared/utils/*": ["../shared/utils/*"],
+      "@shared/core": ["../shared/core"],
+      "@shared/core/*": ["../shared/core/*"]
     }
   },
   "references": [
