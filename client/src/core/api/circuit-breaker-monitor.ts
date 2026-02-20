@@ -8,55 +8,11 @@
 import { logger } from '@client/lib/utils/logger';
 
 import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+import { getCircuitBreakerStats } from './circuit-breaker/core';
+import type { CircuitBreakerState, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation } from './circuit-breaker/types';
 
-import { getCircuitBreakerStats } from './interceptors';
-
-export interface CircuitBreakerState {
-  state: 'open' | 'closed' | 'half-open';
-  failures: number;
-  successes: number;
-  rejected: number;
-  failureRate: number;
-  averageResponseTime: number;
-  lastFailureTime?: number;
-  lastSuccessTime?: number;
-}
-
-export interface CircuitBreakerEvent {
-  serviceName: string;
-  state: 'open' | 'closed' | 'half-open';
-  timestamp: Date;
-  metrics: {
-    failures: number;
-    successes: number;
-    rejected: number;
-    failureRate: number;
-    averageResponseTime: number;
-  };
-  correlationId?: string;
-}
-
-export interface ServiceHealthStatus {
-  serviceName: string;
-  healthy: boolean;
-  state: 'open' | 'closed' | 'half-open';
-  lastFailure?: Date;
-  lastSuccess?: Date;
-  failureRate: number;
-  averageResponseTime: number;
-  totalRequests: number;
-  reason?: string;
-}
-
-export interface ErrorCorrelation {
-  correlationId: string;
-  errors: BaseError[];
-  services: string[];
-  startTime: Date;
-  endTime?: Date;
-  resolved: boolean;
-  recoveryAttempts: number;
-}
+// Re-export types for convenience
+export type { CircuitBreakerState, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation };
 
 /**
  * Circuit breaker monitoring and error correlation manager

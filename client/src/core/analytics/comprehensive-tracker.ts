@@ -21,29 +21,6 @@ import { logger } from '@client/lib/utils/logger';
 import { UserRole } from '@shared/types/core/enums';
 
 /**
- * Extended analytics event with additional tracking properties
- * This extends beyond the base schema to support comprehensive tracking
- */
-export interface AnalyticsEvent {
-  id: string;
-  type: string; // More flexible than the base schema
-  category: string;
-  action: string;
-  label?: string;
-  value?: number;
-  timestamp: string | Date; // Support both formats
-  sessionId: string;
-  userId?: string;
-  userRole: UserRole | string;
-  page: string;
-  section?: NavigationSection;
-  anonymized: boolean;
-  consentGiven: boolean;
-  data?: Record<string, unknown>;
-  metadata?: Record<string, unknown>;
-}
-
-/**
  * Persona-specific analytics configuration
  */
 interface PersonaAnalyticsConfig {

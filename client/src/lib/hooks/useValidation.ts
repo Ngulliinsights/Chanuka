@@ -19,15 +19,6 @@ export interface ValidationError {
 }
 
 /**
- * Validation result
- */
-export interface ValidationResult<T> {
-  success: boolean;
-  data?: T;
-  errors?: ValidationError[];
-}
-
-/**
  * Transform Zod errors to validation errors
  */
 function transformZodErrors(zodError: ZodError): ValidationError[] {

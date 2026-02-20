@@ -3,6 +3,7 @@ import { database as db } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { and, desc, eq, inArray,sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { emailSchema } from '@shared/validation';
 
 // Type augmentation for schema.users.preferences
 interface UserPreferencesData {
@@ -157,7 +158,7 @@ const alertChannelSchema = z.object({
   type: z.enum(['in_app', 'email', 'push', 'sms', 'webhook']),
   enabled: z.boolean(),
   config: z.object({
-    email: z.string().email().optional(),
+    email: emailSchema.optional(),
     pushToken: z.string().optional(),
     phone_number: z.string().optional(),
     webhookUrl: z.string().url().optional(),

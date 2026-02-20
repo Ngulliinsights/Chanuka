@@ -1,0 +1,1 @@
+export { PlainLanguageView } from './PlainLanguageView';

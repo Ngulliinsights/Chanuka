@@ -3,21 +3,75 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
-import { withTransaction } from '@server/infrastructure/database';
+import { withTransaction, database as db } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
 import { cache } from '@server/infrastructure/cache';
-import { bills, sponsors } from '@server/infrastructure/schema';
-import { and, desc, eq, isNull,sql } from 'drizzle-orm';
+import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@server/infrastructure/schema';
+import { and, desc, eq, isNull, sql, or } from 'drizzle-orm';
 import { 
   billStatusConverter, 
   chamberConverter, 
   kenyanCountyConverter 
 } from '@shared/core/utils/type-guards';
+import { z } from 'zod';
+
+// ============================================================================
+// VALIDATION SCHEMAS
+// ============================================================================
+
+const GovernmentBillSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  content: z.string().optional(),
+  summary: z.string().optional(),
+  status: z.string(),
+  bill_number: z.string(),
+  introduced_date: z.string().optional(),
+  last_action_date: z.string().optional(),
+  sponsors: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    role: z.string(),
+    party: z.string().optional(),
+    sponsorshipType: z.string()
+  })).optional(),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  source: z.string(),
+  sourceUrl: z.string().optional(),
+  lastUpdated: z.string()
+});
+
+const GovernmentSponsorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  role: z.string(),
+  party: z.string().optional(),
+  constituency: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  bio: z.string().optional(),
+  photo_url: z.string().optional(),
+  affiliations: z.array(z.object({
+    organization: z.string(),
+    role: z.string().optional(),
+    type: z.string(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
+  })).optional(),
+  source: z.string(),
+  sourceUrl: z.string().optional(),
+  lastUpdated: z.string()
+});
+
+type GovernmentBill = z.infer<typeof GovernmentBillSchema>;
+type GovernmentSponsor = z.infer<typeof GovernmentSponsorSchema>;
 
 export interface DataSource {
   name: string;
   type: 'api' | 'scraper' | 'manual' | 'crowdsourced';
-  priority: number;
+  priority: number; // Higher number = higher priority for conflict resolution
   is_active: boolean;
   baseUrl?: string;
   apiKey?: string;
@@ -25,6 +79,8 @@ export interface DataSource {
     requestsPerMinute: number;
     requestsPerHour: number;
   };
+  timeout: number;
+  retryAttempts: number;
   reliability: {
     successRate: number;
     lastSuccessful: Date | null;
@@ -48,13 +104,23 @@ export interface IntegrationResult {
   recordsProcessed: number;
   recordsCreated: number;
   recordsUpdated: number;
+  recordsSkipped: number;
   errors: string[];
   warnings: string[];
+  dataQuality: DataQualityMetrics; // Top-level quality metrics
   metadata: {
     timestamp: Date;
     duration: number;
-    dataQuality: number; // 0-100 score
   };
+}
+
+// Data quality metrics for comprehensive quality assessment
+export interface DataQualityMetrics {
+  completeness: number; // 0-1 scale: percentage of records with all required fields
+  accuracy: number; // 0-1 scale: estimated accuracy based on validation
+  timeliness: number; // 0-1 scale: how recent the data is
+  consistency: number; // 0-1 scale: consistency across sources
+  overall: number; // 0-1 scale: weighted average of all metrics
 }
 
 export interface BillData {
@@ -80,7 +146,66 @@ export interface SponsorData {
   mpNumber?: string;
   email?: string;
   phone?: string;
+  bio?: string;
+  photo_url?: string;
+  affiliations?: Array<{
+    organization: string;
+    role?: string;
+    type: string;
+    start_date?: string;
+    end_date?: string;
+  }>;
 }
+
+// Zod schemas for runtime validation
+const GovernmentBillSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  content: z.string().optional(),
+  summary: z.string().optional(),
+  status: z.string(),
+  bill_number: z.string(),
+  introduced_date: z.string().optional(),
+  last_action_date: z.string().optional(),
+  sponsors: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    role: z.string(),
+    party: z.string().optional(),
+    sponsorshipType: z.string()
+  })).optional(),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  source: z.string(),
+  sourceUrl: z.string().optional(),
+  lastUpdated: z.string()
+});
+
+const GovernmentSponsorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  role: z.string(),
+  party: z.string().optional(),
+  constituency: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  bio: z.string().optional(),
+  photo_url: z.string().optional(),
+  affiliations: z.array(z.object({
+    organization: z.string(),
+    role: z.string().optional(),
+    type: z.string(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
+  })).optional(),
+  source: z.string(),
+  sourceUrl: z.string().optional(),
+  lastUpdated: z.string()
+});
+
+type GovernmentBill = z.infer<typeof GovernmentBillSchema>;
+type GovernmentSponsor = z.infer<typeof GovernmentSponsorSchema>;
 
 /**
  * Robust Government Data Integration Service
@@ -94,6 +219,7 @@ export interface SponsorData {
  */
 export class GovernmentDataIntegrationService {
   private dataSources: Map<string, DataSource> = new Map();
+  private rateLimiters: Map<string, { requests: number; resetTime: number }> = new Map();
   private readonly CACHE_TTL = {
     bills: 3600, // 1 hour
     sponsors: 7200, // 2 hours
@@ -112,10 +238,12 @@ export class GovernmentDataIntegrationService {
     this.dataSources.set('parliament-api', {
       name: 'Parliament of Kenya API',
       type: 'api',
-      priority: 1,
+      priority: 10, // Highest priority for conflict resolution
       is_active: true,
       baseUrl: process.env.PARLIAMENT_API_URL || 'https://parliament.go.ke/api',
-      rateLimit: { requestsPerMinute: 30, requestsPerHour: 1000 },
+      timeout: 30000,
+      retryAttempts: 3,
+      rateLimit: { requestsPerMinute: 60, requestsPerHour: 1000 },
       reliability: { successRate: 0.3, lastSuccessful: null, consecutiveFailures: 0 }
     });
 
@@ -123,9 +251,11 @@ export class GovernmentDataIntegrationService {
     this.dataSources.set('kenya-law', {
       name: 'Kenya Law Reports',
       type: 'scraper',
-      priority: 2,
+      priority: 8,
       is_active: true,
       baseUrl: 'http://kenyalaw.org',
+      timeout: 30000,
+      retryAttempts: 3,
       rateLimit: { requestsPerMinute: 10, requestsPerHour: 200 },
       reliability: { successRate: 0.7, lastSuccessful: null, consecutiveFailures: 0 }
     });
@@ -134,11 +264,39 @@ export class GovernmentDataIntegrationService {
     this.dataSources.set('hansard-scraper', {
       name: 'Hansard Scraper',
       type: 'scraper',
-      priority: 3,
+      priority: 7,
       is_active: true,
       baseUrl: 'https://hansard.parliament.go.ke',
+      timeout: 30000,
+      retryAttempts: 3,
       rateLimit: { requestsPerMinute: 5, requestsPerHour: 100 },
       reliability: { successRate: 0.5, lastSuccessful: null, consecutiveFailures: 0 }
+    });
+
+    // Senate of Kenya API
+    this.dataSources.set('senate-ke', {
+      name: 'Senate of Kenya',
+      type: 'api',
+      priority: 8,
+      is_active: true,
+      baseUrl: 'https://www.parliament.go.ke/senate/api/bills',
+      timeout: 30000,
+      retryAttempts: 3,
+      rateLimit: { requestsPerMinute: 30, requestsPerHour: 500 },
+      reliability: { successRate: 0.3, lastSuccessful: null, consecutiveFailures: 0 }
+    });
+
+    // County Assemblies API
+    this.dataSources.set('county-assemblies', {
+      name: 'County Assemblies',
+      type: 'api',
+      priority: 7,
+      is_active: true,
+      baseUrl: 'https://cog.go.ke/api/assemblies',
+      timeout: 30000,
+      retryAttempts: 3,
+      rateLimit: { requestsPerMinute: 100, requestsPerHour: 2000 },
+      reliability: { successRate: 0.3, lastSuccessful: null, consecutiveFailures: 0 }
     });
 
     // Fallback: Crowdsourced data from verified users
@@ -147,6 +305,8 @@ export class GovernmentDataIntegrationService {
       type: 'crowdsourced',
       priority: 4,
       is_active: true,
+      timeout: 10000,
+      retryAttempts: 2,
       rateLimit: { requestsPerMinute: 100, requestsPerHour: 5000 },
       reliability: { successRate: 0.8, lastSuccessful: new Date(), consecutiveFailures: 0 }
     });
@@ -157,6 +317,8 @@ export class GovernmentDataIntegrationService {
       type: 'manual',
       priority: 5,
       is_active: true,
+      timeout: 5000,
+      retryAttempts: 1,
       rateLimit: { requestsPerMinute: 1000, requestsPerHour: 10000 },
       reliability: { successRate: 0.95, lastSuccessful: new Date(), consecutiveFailures: 0 }
     });
@@ -270,7 +432,7 @@ export class GovernmentDataIntegrationService {
       }
 
       const duration = Date.now() - startTime;
-      const dataQuality = this.calculateDataQuality(billsData, errors, warnings);
+      const dataQuality = this.calculateDataQualityMetrics(billsData);
 
       return {
         source: source.name,
@@ -278,6 +440,7 @@ export class GovernmentDataIntegrationService {
         recordsProcessed,
         recordsCreated,
         recordsUpdated,
+        recordsSkipped: billsData.length - recordsProcessed,
         errors,
         warnings,
         metadata: { timestamp: new Date(), duration, dataQuality }
@@ -291,9 +454,14 @@ export class GovernmentDataIntegrationService {
         recordsProcessed: 0,
         recordsCreated: 0,
         recordsUpdated: 0,
+        recordsSkipped: 0,
         errors: [error instanceof Error ? error.message : 'Unknown error'],
         warnings,
-        metadata: { timestamp: new Date(), duration, dataQuality: 0 }
+        metadata: { 
+          timestamp: new Date(), 
+          duration, 
+          dataQuality: { completeness: 0, accuracy: 0, timeliness: 0, consistency: 0, overall: 0 } 
+        }
       };
     }
   }
@@ -386,7 +554,7 @@ export class GovernmentDataIntegrationService {
   private async getCrowdsourcedBills(options: IntegrationOptions): Promise<BillData[]> {
     try {
       // Query crowdsourced submissions from verified users
-      const submissions = await databaseService.withFallback(async () => {
+      const submissions = await withTransaction(async () => {
         return await db
           .select({
             billNumber: sql<string>`cs.bill_number`,
@@ -429,7 +597,7 @@ export class GovernmentDataIntegrationService {
    */
   private async getManuallyEnteredBills(options: IntegrationOptions): Promise<BillData[]> {
     try {
-      const manualBills = await databaseService.withFallback(async () => {
+      const manualBills = await withTransaction(async () => {
         return await db
           .select()
           .from(bills)
@@ -497,12 +665,19 @@ export class GovernmentDataIntegrationService {
         recordsProcessed,
         recordsCreated: recordsProcessed,
         recordsUpdated: 0,
+        recordsSkipped: 0,
         errors,
         warnings,
         metadata: {
           timestamp: new Date(),
           duration: Date.now() - startTime,
-          dataQuality: 30 // Low quality fallback data
+          dataQuality: { 
+            completeness: 0.3, 
+            accuracy: 0.3, 
+            timeliness: 0.2, 
+            consistency: 0.4, 
+            overall: 0.3 
+          } // Low quality fallback data
         }
       };
 
@@ -514,12 +689,13 @@ export class GovernmentDataIntegrationService {
         recordsProcessed: 0,
         recordsCreated: 0,
         recordsUpdated: 0,
+        recordsSkipped: 0,
         errors,
         warnings,
         metadata: {
           timestamp: new Date(),
           duration: Date.now() - startTime,
-          dataQuality: 0
+          dataQuality: { completeness: 0, accuracy: 0, timeliness: 0, consistency: 0, overall: 0 }
         }
       };
     }
@@ -547,6 +723,17 @@ export class GovernmentDataIntegrationService {
       errors.push('Bill status is required');
     }
 
+    // Additional validation using Zod schema if data comes from external source
+    try {
+      if ('source' in billData && 'lastUpdated' in billData) {
+        GovernmentBillSchema.parse(billData);
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        errors.push(...error.errors.map(e => `${e.path.join('.')}: ${e.message}`));
+      }
+    }
+
     return {
       isValid: errors.length === 0,
       errors
@@ -565,8 +752,9 @@ export class GovernmentDataIntegrationService {
         .where(eq(bills.bill_number, billData.billNumber))
         .limit(1);
 
-      // Convert enum values using type-safe converters
-      const status = billStatusConverter.toEnum(billData.status);
+      // Convert enum values using type-safe converters and normalize status
+      const normalizedStatus = this.normalizeBillStatus(billData.status);
+      const status = billStatusConverter.toEnum(normalizedStatus);
       const chamber = chamberConverter.toEnum(billData.chamber);
       const affectedCounties = billData.affectedCounties?.map(county => 
         kenyanCountyConverter.toEnum(county)
@@ -614,11 +802,63 @@ export class GovernmentDataIntegrationService {
     });
   }
 
+  /**
+   * Process bill sponsors and create sponsorship records (from government data)
+   */
+  private async processBillSponsors(bill_id: number, billSponsors: GovernmentBill['sponsors']): Promise<void> {
+    if (!billSponsors || billSponsors.length === 0) return;
+
+    for (const sponsorInfo of billSponsors) {
+      if (!sponsorInfo.name) continue; // Skip if name is missing
+
+      try {
+        // Find or create sponsor
+        let sponsor = await db.select()
+          .from(sponsors)
+          .where(eq(sponsors.name, sponsorInfo.name))
+          .limit(1);
+
+        if (sponsor.length === 0) {
+          // Create sponsor if doesn't exist
+          const [newSponsor] = await db.insert(sponsors).values({
+            name: sponsorInfo.name,
+            role: sponsorInfo.role || 'Unknown',
+            party: sponsorInfo.party || null,
+            is_active: true,
+            created_at: new Date()
+          }).returning();
+          sponsor = [newSponsor];
+        }
+
+        // Create or update sponsorship record
+        const existingSponsorship = await db.select()
+          .from(bill_cosponsors)
+          .where(and(
+            eq(bill_cosponsors.bill_id, bill_id),
+            eq(bill_cosponsors.sponsor_id, sponsor[0].id)
+          ))
+          .limit(1);
+
+        if (existingSponsorship.length === 0) {
+          await db.insert(bill_cosponsors).values({
+            bill_id,
+            sponsor_id: sponsor[0].id,
+            sponsorshipType: sponsorInfo.sponsorshipType || 'primary',
+            sponsorshipDate: new Date(),
+            is_active: true
+          });
+        }
+      } catch (error) {
+        logger.warn(`Failed to process sponsor ${sponsorInfo.name} for bill ${bill_id}`, error);
+      }
+    }
+  }
+
   // Helper methods for robustness
   private getActiveSources(requestedSources?: string[]): DataSource[] {
     const sources = Array.from(this.dataSources.values())
       .filter(s => s.is_active)
-      .sort((a, b) => a.priority - b.priority);
+      .sort((a, b) => b.priority - a.priority); // Sort by priority descending (higher priority first)
 
     if (requestedSources && requestedSources.length > 0) {
       return sources.filter(s => requestedSources.includes(s.name));
@@ -627,35 +867,111 @@ export class GovernmentDataIntegrationService {
     return sources;
   }
 
-  private async respectRateLimit(source: DataSource): Promise<void> {
-    // Implement rate limiting logic
+  /**
+   * Check rate limiting for a data source
+   */
+  private async checkRateLimit(sourceName: string): Promise<void> {
+    const source = this.dataSources.get(sourceName);
+    if (!source) return;
+
+    const limiter = this.rateLimiters.get(sourceName);
     const now = Date.now();
-    const rateLimitKey = `ratelimit:${source.name}`;
-    
-    // Simple rate limiting implementation
-    await this.delay(60000 / source.rateLimit.requestsPerMinute);
+
+    if (!limiter || now > limiter.resetTime) {
+      // Reset rate limiter
+      this.rateLimiters.set(sourceName, {
+        requests: 0,
+        resetTime: now + (60 * 1000) // Reset every minute
+      });
+      return;
+    }
+
+    if (limiter.requests >= source.rateLimit.requestsPerMinute) {
+      const waitTime = limiter.resetTime - now;
+      logger.info(`Rate limit reached for ${sourceName}, waiting ${waitTime}ms`);
+      await this.delay(waitTime);
+      
+      // Reset after waiting
+      this.rateLimiters.set(sourceName, {
+        requests: 0,
+        resetTime: now + waitTime + (60 * 1000)
+      });
+    }
+  }
+
+  /**
+   * Update rate limiter after successful request
+   */
+  private updateRateLimit(sourceName: string): void {
+    const limiter = this.rateLimiters.get(sourceName);
+    if (limiter) {
+      limiter.requests++;
+    }
+  }
+
+  private async respectRateLimit(source: DataSource): Promise<void> {
+    await this.checkRateLimit(source.name);
   }
 
   private async makeAPIRequest(source: DataSource, endpoint: string, params: unknown): Promise<any> {
-    // Simulate API request with realistic failure rates
-    const failureRate = 1 - source.reliability.successRate;
-    
-    if (Math.random() < failureRate) {
-      throw new Error(`API request failed (simulated failure)`);
+    let lastError: Error;
+
+    for (let attempt = 1; attempt <= source.retryAttempts; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), source.timeout);
+
+        const headers: Record<string, string> = {
+          'Accept': 'application/json',
+          'User-Agent': 'Chanuka-Legislative-Platform/1.0'
+        };
+
+        if (source.apiKey) {
+          headers['Authorization'] = `Bearer ${source.apiKey}`;
+        }
+
+        const url = `${source.baseUrl}${endpoint}`;
+        
+        // Try to use circuit breaker if available
+        let response: Response;
+        try {
+          const { circuitBreakerFetch } = await import('@server/middleware/circuit-breaker-middleware');
+          response = await circuitBreakerFetch(url, {
+            headers,
+            signal: controller.signal
+          }, 'government-data');
+        } catch (importError) {
+          // Fallback to regular fetch if circuit breaker not available
+          response = await fetch(url, {
+            headers,
+            signal: controller.signal
+          });
+        }
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Update rate limiter
+        this.updateRateLimit(source.name);
+
+        return response;
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        lastError = err;
+        logger.warn(`Attempt ${attempt}/${source.retryAttempts} failed for ${source.name}:`, err.message);
+
+        if (attempt < source.retryAttempts) {
+          // Exponential backoff
+          const delay = Math.pow(2, attempt) * 1000;
+          await this.delay(delay);
+        }
+      }
     }
 
-    // Return mock data for demonstration
-    return {
-      data: [
-        {
-          id: '1',
-          bill_number: 'Bill No. 1 of 2024',
-          title: 'The Public Finance Management (Amendment) Bill, 2024',
-          status: 'First Reading',
-          chamber: 'National Assembly'
-        }
-      ]
-    };
+    throw lastError!;
   }
 
   private transformAPIBillData(apiData: unknown[]): BillData[] {
@@ -692,18 +1008,118 @@ export class GovernmentDataIntegrationService {
     }));
   }
 
-  private calculateDataQuality(data: BillData[], errors: string[], warnings: string[]): number {
-    if (data.length === 0) return 0;
+  /**
+   * Calculate comprehensive data quality metrics
+   */
+  private calculateDataQuality(data: BillData[], errors: string[], warnings: string[]): DataQualityMetrics {
+    if (data.length === 0) {
+      return { completeness: 0, accuracy: 0, timeliness: 0, consistency: 0, overall: 0 };
+    }
     
+    // Calculate completeness (percentage of records with all required fields)
+    const completeRecords = data.filter(record => {
+      return record.billNumber && record.title && record.status;
+    });
+    const completeness = completeRecords.length / data.length;
+
+    // Calculate accuracy based on error rate
     const errorRate = errors.length / data.length;
     const warningRate = warnings.length / data.length;
-    
-    // Calculate quality score (0-100)
-    let quality = 100;
-    quality -= errorRate * 50; // Errors heavily penalize quality
-    quality -= warningRate * 20; // Warnings moderately penalize quality
-    
-    return Math.max(0, Math.min(100, quality));
+    const accuracy = Math.max(0, 1 - (errorRate * 0.5) - (warningRate * 0.2));
+
+    // Calculate timeliness (based on how recent the data is)
+    // Assuming data is recent if no specific timestamp issues
+    const timeliness = 0.85; // Default reasonable value
+
+    // Calculate consistency (based on validation success)
+    const consistency = Math.max(0, 1 - errorRate);
+
+    // Calculate overall quality (weighted average)
+    const overall = (completeness * 0.3 + accuracy * 0.3 + timeliness * 0.2 + consistency * 0.2);
+
+    return {
+      completeness,
+      accuracy,
+      timeliness,
+      consistency,
+      overall
+    };
+  }
+
+  /**
+   * Calculate comprehensive data quality metrics
+   */
+  private calculateDataQualityMetrics(data: (BillData | SponsorData | GovernmentBill | GovernmentSponsor)[]): DataQualityMetrics {
+    if (data.length === 0) {
+      return { completeness: 0, accuracy: 0, timeliness: 0, consistency: 0, overall: 0 };
+    }
+
+    // Calculate completeness (percentage of records with all required fields)
+    const completeRecords = data.filter(record => {
+      if ('billNumber' in record) {
+        return record.title && record.billNumber && record.status;
+      } else if ('bill_number' in record) {
+        return record.title && record.bill_number && record.status;
+      } else {
+        return record.name && ('role' in record ? record.role : true);
+      }
+    });
+    const completeness = completeRecords.length / data.length;
+
+    // Calculate timeliness (based on lastUpdated timestamps if available)
+    const now = new Date();
+    const recentRecords = data.filter(record => {
+      if ('lastUpdated' in record) {
+        const lastUpdated = new Date(record.lastUpdated);
+        const daysSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24);
+        return daysSinceUpdate <= 7; // Consider recent if updated within 7 days
+      }
+      return true; // If no timestamp, assume recent
+    });
+    const timeliness = recentRecords.length / data.length;
+
+    // For now, set accuracy and consistency to reasonable defaults
+    // These would be calculated based on cross-source validation in a real implementation
+    const accuracy = 0.85;
+    const consistency = 0.80;
+
+    const overall = (completeness + accuracy + timeliness + consistency) / 4;
+
+    return {
+      completeness,
+      accuracy,
+      timeliness,
+      consistency,
+      overall
+    };
+  }
+
+  /**
+   * Normalize bill status from different sources to standard format
+   */
+  private normalizeBillStatus(status: string): string {
+    const statusMap: Record<string, string> = {
+      'introduced': 'introduced',
+      'first_reading': 'introduced',
+      'first reading': 'introduced',
+      'second_reading': 'committee',
+      'second reading': 'committee',
+      'committee': 'committee',
+      'committee stage': 'committee',
+      'third_reading': 'passed',
+      'third reading': 'passed',
+      'passed': 'passed',
+      'royal_assent': 'signed',
+      'royal assent': 'signed',
+      'signed': 'signed',
+      'assented': 'signed',
+      'failed': 'failed',
+      'withdrawn': 'failed',
+      'defeated': 'failed',
+      'rejected': 'failed'
+    };
+
+    return statusMap[status.toLowerCase()] || status;
   }
 
   private async updateSourceReliability(sourceName: string, success: boolean): Promise<void> {
@@ -732,13 +1148,145 @@ export class GovernmentDataIntegrationService {
     // Store integration metrics for monitoring
     const totalRecords = results.reduce((sum, r) => sum + r.recordsProcessed, 0);
     const successfulSources = results.filter(r => r.success).length;
+    const avgQuality = results.length > 0 
+      ? results.reduce((sum, r) => sum + r.metadata.dataQuality.overall, 0) / results.length 
+      : 0;
     
     logger.info(`📊 Integration complete: ${type}`, {
       totalRecords,
       successfulSources,
       totalSources: results.length,
-      averageQuality: results.reduce((sum, r) => sum + r.metadata.dataQuality, 0) / results.length
+      averageQuality: avgQuality
     });
+  }
+
+  /**
+   * Get integration status and health metrics for all data sources
+   */
+  async getIntegrationStatus(): Promise<{
+    sources: Array<{
+      name: string;
+      status: 'healthy' | 'degraded' | 'down';
+      lastSync: Date | null;
+      errorCount: number;
+      dataQuality: DataQualityMetrics;
+    }>;
+    overallHealth: 'healthy' | 'degraded' | 'down';
+  }> {
+    const sourceStatuses: Array<{
+      name: string;
+      status: 'healthy' | 'degraded' | 'down';
+      lastSync: Date | null;
+      errorCount: number;
+      dataQuality: DataQualityMetrics;
+    }> = [];
+    
+    for (const [sourceName, config] of this.dataSources) {
+      try {
+        // Try to make a simple health check request
+        if (config.type === 'api' && config.baseUrl) {
+          const healthUrl = `${config.baseUrl}/health`;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(healthUrl, { 
+            method: 'HEAD',
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+          
+          sourceStatuses.push({
+            name: config.name,
+            status: response.ok ? 'healthy' : 'degraded',
+            lastSync: config.reliability.lastSuccessful,
+            errorCount: config.reliability.consecutiveFailures,
+            dataQuality: { 
+              completeness: 0.9, 
+              accuracy: config.reliability.successRate, 
+              timeliness: 0.8, 
+              consistency: 0.82, 
+              overall: (0.9 + config.reliability.successRate + 0.8 + 0.82) / 4 
+            }
+          });
+        } else {
+          // For non-API sources, use reliability metrics
+          sourceStatuses.push({
+            name: config.name,
+            status: config.is_active && config.reliability.consecutiveFailures < 3 ? 'healthy' : 'degraded',
+            lastSync: config.reliability.lastSuccessful,
+            errorCount: config.reliability.consecutiveFailures,
+            dataQuality: { 
+              completeness: 0.85, 
+              accuracy: config.reliability.successRate, 
+              timeliness: 0.75, 
+              consistency: 0.80, 
+              overall: (0.85 + config.reliability.successRate + 0.75 + 0.80) / 4 
+            }
+          });
+        }
+      } catch (error) {
+        sourceStatuses.push({
+          name: config.name,
+          status: 'down',
+          lastSync: config.reliability.lastSuccessful,
+          errorCount: config.reliability.consecutiveFailures,
+          dataQuality: { completeness: 0, accuracy: 0, timeliness: 0, consistency: 0, overall: 0 }
+        });
+      }
+    }
+
+    const healthySources = sourceStatuses.filter(s => s.status === 'healthy').length;
+    const totalSources = sourceStatuses.length;
+    
+    let overallHealth: 'healthy' | 'degraded' | 'down';
+    if (healthySources === totalSources) {
+      overallHealth = 'healthy';
+    } else if (healthySources > 0) {
+      overallHealth = 'degraded';
+    } else {
+      overallHealth = 'down';
+    }
+
+    return {
+      sources: sourceStatuses,
+      overallHealth
+    };
+  }
+
+  /**
+   * Process sponsor affiliations from government data
+   */
+  private async processSponsorAffiliations(sponsor_id: number, affiliations: SponsorData['affiliations']): Promise<void> {
+    if (!affiliations || affiliations.length === 0) return;
+
+    for (const affiliation of affiliations) {
+      try {
+        const existingAffiliation = await db.select()
+          .from(sponsorAffiliations)
+          .where(and(
+            eq(sponsorAffiliations.sponsor_id, sponsor_id),
+            eq(sponsorAffiliations.organization, affiliation.organization),
+            eq(sponsorAffiliations.type, affiliation.type)
+          ))
+          .limit(1);
+
+        if (existingAffiliation.length === 0) {
+          await db.insert(sponsorAffiliations).values({
+            sponsor_id,
+            organization: affiliation.organization,
+            role: affiliation.role || null,
+            type: affiliation.type,
+            start_date: affiliation.start_date ? new Date(affiliation.start_date) : null,
+            end_date: affiliation.end_date ? new Date(affiliation.end_date) : null,
+            is_active: !affiliation.end_date,
+            created_at: new Date()
+          });
+        }
+      } catch (error) {
+        logger.warn(`Failed to process affiliation for sponsor ${sponsor_id}`, error);
+      }
+    }
   }
 
   private async getExpiredCacheData(type: string): Promise<unknown[]> {
@@ -780,8 +1328,195 @@ export class GovernmentDataIntegrationService {
     logger.error(`Data gaps detected for ${type}`, { errors });
   }
 
+  /**
+   * Process bill sponsors and create sponsorship records
+   * Ported from infrastructure version for comprehensive sponsor handling
+   */
+  private async processBillSponsors(bill_id: number, billSponsors: GovernmentBill['sponsors']): Promise<void> {
+    if (!billSponsors) return;
+
+    for (const sponsorInfo of billSponsors) {
+      if (!sponsorInfo.name) continue; // Skip if name is missing
+
+      // Find or create sponsor
+      let sponsor = await db.select()
+        .from(sponsors)
+        .where(eq(sponsors.name, sponsorInfo.name))
+        .limit(1);
+
+      if (sponsor.length === 0) {
+        // Create sponsor if doesn't exist
+        const [newSponsor] = await db.insert(sponsors).values({
+          name: sponsorInfo.name,
+          role: sponsorInfo.role || 'Unknown',
+          party: sponsorInfo.party || null,
+          is_active: true,
+          created_at: new Date()
+        }).returning();
+        sponsor = [newSponsor];
+      }
+
+      // Create or update sponsorship record
+      const existingSponsorship = await db.select()
+        .from(bill_cosponsors)
+        .where(and(
+          eq(bill_cosponsors.bill_id, bill_id),
+          eq(bill_cosponsors.sponsor_id, sponsor[0].id)
+        ))
+        .limit(1);
+
+      if (existingSponsorship.length === 0) {
+        await db.insert(bill_cosponsors).values({
+          bill_id,
+          sponsor_id: sponsor[0].id,
+          sponsorshipType: sponsorInfo.sponsorshipType || 'primary',
+          sponsorshipDate: new Date(),
+          is_active: true
+        });
+      }
+    }
+  }
+
+  /**
+   * Process sponsor affiliations
+   * Ported from infrastructure version for comprehensive affiliation tracking
+   */
+  private async processSponsorAffiliations(sponsor_id: number, affiliations: GovernmentSponsor['affiliations']): Promise<void> {
+    if (!affiliations) return;
+
+    for (const affiliation of affiliations) {
+      const existingAffiliation = await db.select()
+        .from(sponsorAffiliations)
+        .where(and(
+          eq(sponsorAffiliations.sponsor_id, sponsor_id),
+          eq(sponsorAffiliations.organization, affiliation.organization),
+          eq(sponsorAffiliations.type, affiliation.type)
+        ))
+        .limit(1);
+
+      if (existingAffiliation.length === 0) {
+        await db.insert(sponsorAffiliations).values({
+          sponsor_id,
+          organization: affiliation.organization,
+          role: affiliation.role || null,
+          type: affiliation.type,
+          start_date: affiliation.start_date ? new Date(affiliation.start_date) : null,
+          end_date: affiliation.end_date ? new Date(affiliation.end_date) : null,
+          is_active: !affiliation.end_date,
+          created_at: new Date()
+        });
+      }
+    }
+  }
+
+  /**
+   * Normalize bill status from different sources
+   * Ported from infrastructure version for comprehensive status mapping
+   */
+  private normalizeBillStatus(status: string): string {
+    const statusMap: Record<string, string> = {
+      'introduced': 'introduced',
+      'first_reading': 'introduced',
+      'second_reading': 'committee',
+      'committee': 'committee',
+      'third_reading': 'passed',
+      'passed': 'passed',
+      'royal_assent': 'signed',
+      'signed': 'signed',
+      'failed': 'failed',
+      'withdrawn': 'failed',
+      'defeated': 'failed'
+    };
+
+    return statusMap[status.toLowerCase()] || status;
+  }
+
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Get integration status and health metrics
+   * Ported from infrastructure version for comprehensive monitoring
+   */
+  async getIntegrationStatus(): Promise<{
+    sources: Array<{
+      name: string;
+      status: 'healthy' | 'degraded' | 'down';
+      lastSync: Date | null;
+      errorCount: number;
+      dataQuality: DataQualityMetrics;
+    }>;
+    overallHealth: 'healthy' | 'degraded' | 'down';
+  }> {
+    const sourceStatuses: Array<{
+      name: string;
+      status: 'healthy' | 'degraded' | 'down';
+      lastSync: Date | null;
+      errorCount: number;
+      dataQuality: DataQualityMetrics;
+    }> = [];
+    
+    for (const [sourceName, config] of this.dataSources) {
+      try {
+        // Try to make a simple health check request
+        const healthUrl = `${config.baseUrl}/health`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(healthUrl, { 
+          method: 'HEAD',
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        sourceStatuses.push({
+          name: config.name,
+          status: response.ok ? 'healthy' as const : 'degraded' as const,
+          lastSync: config.reliability.lastSuccessful,
+          errorCount: config.reliability.consecutiveFailures,
+          dataQuality: { 
+            completeness: 0.9, 
+            accuracy: 0.85, 
+            timeliness: 0.8, 
+            consistency: 0.82, 
+            overall: 0.84 
+          }
+        });
+      } catch (error) {
+        sourceStatuses.push({
+          name: config.name,
+          status: 'down' as const,
+          lastSync: config.reliability.lastSuccessful,
+          errorCount: config.reliability.consecutiveFailures,
+          dataQuality: { 
+            completeness: 0, 
+            accuracy: 0, 
+            timeliness: 0, 
+            consistency: 0, 
+            overall: 0 
+          }
+        });
+      }
+    }
+
+    const healthySources = sourceStatuses.filter(s => s.status === 'healthy').length;
+    const totalSources = sourceStatuses.length;
+    
+    let overallHealth: 'healthy' | 'degraded' | 'down';
+    if (healthySources === totalSources) {
+      overallHealth = 'healthy';
+    } else if (healthySources > 0) {
+      overallHealth = 'degraded';
+    } else {
+      overallHealth = 'down';
+    }
+
+    return {
+      sources: sourceStatuses,
+      overallHealth
+    };
   }
 }
 

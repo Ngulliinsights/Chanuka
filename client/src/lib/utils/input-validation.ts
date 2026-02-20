@@ -12,12 +12,6 @@ export interface ValidationRule {
   message: string;
 }
 
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  sanitizedValue?: string;
-}
-
 // Common validation patterns
 export const VALIDATION_PATTERNS = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,

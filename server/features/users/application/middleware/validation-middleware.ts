@@ -1,6 +1,7 @@
 import { NextFunction,Request, Response } from 'express';
 import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
 import { z } from 'zod';
+import { userRoleSchema } from '@shared/validation';
 // Simple validation middleware without external dependencies
 // This provides basic validation functionality
 
@@ -10,7 +11,7 @@ export const registerUserSchema = z.object({
     email: z.string().email('Invalid email format'),
     name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than 100 characters'),
     password_hash: z.string().min(60, 'Invalid password hash'),
-    role: z.enum(['citizen', 'expert', 'admin']).optional().default('citizen')
+    role: userRoleSchema.optional().default('citizen')
   })
 });
 

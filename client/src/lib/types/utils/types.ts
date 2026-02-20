@@ -1,11 +1,3 @@
-/**
- * Core utility types
- * Essential type utilities that are used across the application
- */
-
-// Basic utility types
-export type Nullable<T> = T | null;
-export type Optional<T> = T | undefined;
 export type Maybe<T> = T | null | undefined;
 
 // Object manipulation utilities
@@ -58,6 +50,3 @@ export type PathValue<T, P extends string> = P extends keyof T
       ? PathValue<T[K], Rest>
       : never
     : never;
-
-// Re-export from common types
-export type * from './common';

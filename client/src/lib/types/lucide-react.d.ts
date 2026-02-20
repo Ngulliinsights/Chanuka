@@ -150,16 +150,3 @@ declare module 'lucide-react' {
   const _default: Record<string, LucideIcon>;
   export default _default;
 }
-
-// Specific module declarations for commonly used icons
-declare module 'lucide-react/Sparkles' {
-  import type { LucideIcon } from 'lucide-react';
-  const Sparkles: LucideIcon;
-  export default Sparkles;
-}
-
-declare module 'lucide-react/BookOpen' {
-  import type { LucideIcon } from 'lucide-react';
-  const BookOpen: LucideIcon;
-  export default BookOpen;
-}

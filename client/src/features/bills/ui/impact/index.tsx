@@ -1,0 +1,1 @@
+export { ImpactCalculator } from './ImpactCalculator';

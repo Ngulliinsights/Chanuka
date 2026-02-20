@@ -1,21 +1,24 @@
 /**
  * Common Types
- *
- * Shared types and utilities used across multiple modules
+ * Shared types and utilities used across multiple modules.
  */
 
-import { ZodSchema } from 'zod';
+import type { ZodSchema } from 'zod';
 import type { RequestInterceptor, ResponseInterceptor } from './interceptors';
 
 // ============================================================================
-// Common Enums and Types
+// Primitives
 // ============================================================================
+
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type SortOrder = 'asc' | 'desc';
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
+export type RequestPriority = 'low' | 'normal' | 'high' | 'critical';
+export type CacheInvalidationTrigger = 'mutation' | 'time' | 'manual' | 'dependency';
+export type VoteType = 'up' | 'down';
 
 // ============================================================================
-// Pagination Types
+// Pagination
 // ============================================================================
 
 export interface PaginationParams {
@@ -39,98 +42,25 @@ export interface PaginatedResponse<T> {
 }
 
 // ============================================================================
-// API Client Types
+// Request & Response
 // ============================================================================
 
-// Base types for backward compatibility
-export interface BaseApiConfig {
-  baseURL: string;
-  timeout: number;
-  retries: number;
-}
-
-export interface BaseApiRequest {
-  method: HttpMethod;
-  url: string;
-  data?: any;
-  headers?: Record<string, string>;
-}
-
-export interface BaseApiResponse<T = any> {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: Record<string, string>;
-}
-
-export interface ApiResponse<T = any> {
-  data: T;
-  status: number;
-  statusText?: string;
-  headers: Headers | Record<string, string>;
-  correlationId?: string;
-  id?: string;
-  requestId?: string;
-  timestamp?: string;
-  duration?: number;
-  cached?: boolean;
-  fromFallback?: boolean;
-  message?: string;
-}
-
 export interface ApiRequest {
-  method: HttpMethod;
-  url: string;
-  data?: any;
-  body?: any;
-  headers?: Record<string, string>;
-  params?: Record<string, string | number | boolean>;
-  timeout?: number;
-  id?: string;
-  timestamp?: string;
+  readonly method: HttpMethod;
+  readonly url: string;
+  readonly data?: unknown;
+  readonly headers?: Record<string, string>;
+  readonly params?: Record<string, string | number | boolean>;
 }
 
-export interface BaseWebSocketMessage<T = any> {
-  type: string;
-  data: T;
-  timestamp: number;
+export interface ApiResponse<T = unknown> {
+  readonly data: T;
+  readonly status: number;
+  readonly statusText: string;
+  readonly headers: Record<string, string>;
+  readonly timestamp: number;
 }
 
-export interface BaseBillData {
-  id: string;
-  title: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ApiClient {
-  get<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;
-  post<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
-  put<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
-  patch<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
-  delete<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;
-}
-
-export interface RequestOptions {
-  readonly timeout?: number;
-  readonly retry?: RetryConfig;
-  readonly cache?: CacheOptions;
-  readonly validate?: ValidationOptions;
-  readonly headers?: Readonly<Record<string, string>>;
-  readonly params?: Readonly<Record<string, string | number | boolean>>;
-  readonly fallbackData?: unknown;
-  readonly skipCache?: boolean;
-  readonly cacheTTL?: number;
-  readonly responseSchema?: ZodSchema;
-  readonly signal?: AbortSignal;
-  readonly priority?: RequestPriority;
-  readonly retries?: number; // Legacy support
-}
-
-/**
- * Retry configuration with exponential backoff support.
- */
 export interface RetryConfig {
   readonly maxRetries: number;
   readonly baseDelay: number;
@@ -140,24 +70,16 @@ export interface RetryConfig {
   readonly retryableErrors?: ReadonlyArray<string>;
 }
 
-/**
- * Cache configuration for request/response caching.
- */
 export interface CacheOptions {
   readonly ttl?: number;
+  readonly key?: string;
+  readonly tags?: ReadonlyArray<string>;
   readonly persist?: boolean;
   readonly compress?: boolean;
   readonly encrypt?: boolean;
-  readonly key?: string;
-  readonly tags?: ReadonlyArray<string>;
   readonly invalidateOn?: ReadonlyArray<CacheInvalidationTrigger>;
 }
 
-export type CacheInvalidationTrigger = 'mutation' | 'time' | 'manual' | 'dependency';
-
-/**
- * Validation options for request/response data.
- */
 export interface ValidationOptions {
   readonly schema?: ZodSchema;
   readonly strict?: boolean;
@@ -165,10 +87,38 @@ export interface ValidationOptions {
   readonly coerceTypes?: boolean;
 }
 
-export type RequestPriority = 'low' | 'normal' | 'high' | 'critical';
+export interface RequestOptions {
+  readonly method?: HttpMethod;
+  readonly headers?: Readonly<Record<string, string>>;
+  readonly params?: Readonly<Record<string, string | number | boolean>>;
+  readonly timeout?: number;
+  readonly signal?: AbortSignal;
+  readonly priority?: RequestPriority;
+  readonly retry?: RetryConfig;
+  readonly cache?: CacheOptions;
+  readonly validate?: ValidationOptions;
+  readonly responseSchema?: ZodSchema;
+  readonly fallbackData?: unknown;
+  /** @deprecated Use `cache` with `ttl` instead */
+  readonly cacheTTL?: number;
+  /** @deprecated Use `retry.maxRetries` instead */
+  readonly retries?: number;
+}
+
+// ============================================================================
+// Client Interfaces
+// ============================================================================
+
+export interface ApiClient {
+  get<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;
+  post<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
+  put<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
+  patch<T>(url: string, data?: unknown, options?: RequestOptions): Promise<ApiResponse<T>>;
+  delete<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>>;
+}
 
 export interface UnifiedApiClient extends ApiClient {
-  request<T>(request: ApiRequest): Promise<ApiResponse<T>>;
+  request<T>(request: ApiRequest, options?: RequestOptions): Promise<ApiResponse<T>>;
   setBaseUrl(url: string): void;
   setTimeout(timeout: number): void;
   addRequestInterceptor(interceptor: RequestInterceptor): void;
@@ -176,13 +126,53 @@ export interface UnifiedApiClient extends ApiClient {
 }
 
 // ============================================================================
-// Rating and Review Types
+// Domain Models
 // ============================================================================
 
-export type VoteType = 'up' | 'down';
+export interface BaseBillData {
+  readonly id: string;
+  readonly title: string;
+  readonly status: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
 
 // ============================================================================
-// Error Types (re-export from core/error)
+// Legacy (kept for backward compatibility — schedule removal)
+// ============================================================================
+
+/** @deprecated Use `ApiRequest` instead */
+export interface BaseApiRequest {
+  method: HttpMethod;
+  url: string;
+  data?: unknown;
+  headers?: Record<string, string>;
+}
+
+/** @deprecated Use `ApiResponse` instead */
+export interface BaseApiResponse<T = unknown> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+}
+
+/** @deprecated Inline this config at the call site */
+export interface BaseApiConfig {
+  baseURL: string;
+  timeout: number;
+  retries: number;
+}
+
+/** @deprecated Use typed event messages instead */
+export interface BaseWebSocketMessage<T = unknown> {
+  type: string;
+  data: T;
+  timestamp: number;
+}
+
+// ============================================================================
+// Re-exports
 // ============================================================================
 
 export {

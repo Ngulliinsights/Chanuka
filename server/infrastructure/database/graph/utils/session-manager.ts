@@ -9,8 +9,8 @@
 
 import { Driver, Session, Transaction, Result } from 'neo4j-driver';
 
-import { GraphErrorHandler } from '../error-adapter-v2';
-import { retryWithBackoff, RetryConfig, RETRY_PRESETS } from '../retry-utils';
+import { GraphErrorHandler } from './error-adapter-v2';
+import { retryWithBackoff, RetryConfig, RETRY_PRESETS } from './retry-utils';
 
 const errorHandler = GraphErrorHandler ? new GraphErrorHandler() : null;
 

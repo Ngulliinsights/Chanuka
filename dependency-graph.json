@@ -1,0 +1,648 @@
+{
+  "graph": {
+    "nodes": {
+      "error-remediation": {
+        "name": "error-remediation",
+        "type": "lib",
+        "data": {
+          "root": "scripts/error-remediation",
+          "targets": {
+            "test": {
+              "options": {
+                "cwd": "scripts/error-remediation",
+                "command": "vitest run"
+              },
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production",
+                {
+                  "externalDependencies": [
+                    "vitest"
+                  ]
+                }
+              ],
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {}
+            }
+          },
+          "name": "error-remediation",
+          "implicitDependencies": [],
+          "tags": []
+        }
+      },
+      "codebase-health-remediation": {
+        "name": "codebase-health-remediation",
+        "type": "lib",
+        "data": {
+          "root": "tools/codebase-health",
+          "targets": {
+            "test": {
+              "options": {
+                "cwd": "tools/codebase-health",
+                "command": "vitest run"
+              },
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production",
+                {
+                  "externalDependencies": [
+                    "vitest"
+                  ]
+                }
+              ],
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {}
+            }
+          },
+          "name": "codebase-health-remediation",
+          "implicitDependencies": [],
+          "tags": []
+        }
+      },
+      "client": {
+        "name": "client",
+        "type": "app",
+        "data": {
+          "root": "client",
+          "name": "client",
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "cache": false,
+              "options": {
+                "script": "dev"
+              },
+              "configurations": {}
+            },
+            "prebuild": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "prebuild"
+              },
+              "configurations": {}
+            },
+            "build": {
+              "executor": "@nx/vite:build",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/client"
+              },
+              "configurations": {}
+            },
+            "build:development": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build:development"
+              },
+              "configurations": {}
+            },
+            "build:staging": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build:staging"
+              },
+              "configurations": {}
+            },
+            "build:pre-production": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build:pre-production"
+              },
+              "configurations": {}
+            },
+            "build:production": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build:production"
+              },
+              "configurations": {}
+            },
+            "build:analyze": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build:analyze"
+              },
+              "configurations": {}
+            },
+            "typecheck": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "typecheck"
+              },
+              "configurations": {}
+            },
+            "type-check": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "type-check"
+              },
+              "configurations": {}
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "client/src/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "configurations": {}
+            },
+            "format:check": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "format:check"
+              },
+              "configurations": {}
+            },
+            "format": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "format"
+              },
+              "configurations": {}
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{options.reportsDirectory}"
+              ],
+              "options": {
+                "configFile": "vitest.config.ts",
+                "passWithNoTests": true,
+                "reportsDirectory": "../coverage/client"
+              },
+              "configurations": {}
+            },
+            "test:coverage": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:coverage"
+              },
+              "configurations": {}
+            },
+            "test:a11y": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:a11y"
+              },
+              "configurations": {}
+            },
+            "test:unit": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:unit"
+              },
+              "configurations": {}
+            },
+            "test:integration": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:integration"
+              },
+              "configurations": {}
+            },
+            "test:e2e": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:e2e"
+              },
+              "configurations": {}
+            },
+            "test:e2e:ui": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:e2e:ui"
+              },
+              "configurations": {}
+            },
+            "test:performance": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:performance"
+              },
+              "configurations": {}
+            },
+            "test:performance-budget": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:performance-budget"
+              },
+              "configurations": {}
+            },
+            "test:visual": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:visual"
+              },
+              "configurations": {}
+            },
+            "test:comprehensive": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:comprehensive"
+              },
+              "configurations": {}
+            },
+            "test:all": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:all"
+              },
+              "configurations": {}
+            },
+            "test:ci": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:ci"
+              },
+              "configurations": {}
+            },
+            "audit:design-system": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "audit:design-system"
+              },
+              "configurations": {}
+            },
+            "analyze:bundle": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "analyze:bundle"
+              },
+              "configurations": {}
+            },
+            "analyze:bundle-ci": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "analyze:bundle-ci"
+              },
+              "configurations": {}
+            },
+            "analyze:bundle:advanced": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "analyze:bundle:advanced"
+              },
+              "configurations": {}
+            },
+            "analyze:radix": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "analyze:radix"
+              },
+              "configurations": {}
+            },
+            "check:performance-budget": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "check:performance-budget"
+              },
+              "configurations": {}
+            },
+            "optimize:assets": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "optimize:assets"
+              },
+              "configurations": {}
+            },
+            "preview": {
+              "executor": "@nx/vite:preview-server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "client:build"
+              },
+              "configurations": {}
+            },
+            "storybook": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "storybook"
+              },
+              "configurations": {}
+            },
+            "build-storybook": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build-storybook"
+              },
+              "configurations": {}
+            },
+            "cleanup": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "cleanup"
+              },
+              "configurations": {}
+            },
+            "deploy:staging": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "deploy:staging"
+              },
+              "configurations": {}
+            },
+            "deploy:pre-production": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "deploy:pre-production"
+              },
+              "configurations": {}
+            },
+            "deploy:production": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "deploy:production"
+              },
+              "configurations": {}
+            },
+            "deploy:production:dry-run": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "deploy:production:dry-run"
+              },
+              "configurations": {}
+            },
+            "deploy:integration": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "deploy:integration"
+              },
+              "configurations": {}
+            },
+            "monitoring:setup": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "monitoring:setup"
+              },
+              "configurations": {}
+            },
+            "cdn:deploy": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "cdn:deploy"
+              },
+              "configurations": {}
+            },
+            "serve": {
+              "executor": "@nx/vite:dev-server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "client:build"
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "client:build:development",
+                  "hmr": true
+                },
+                "production": {
+                  "buildTarget": "client:build:production",
+                  "hmr": false
+                }
+              }
+            },
+            "serve-static": {
+              "executor": "@nx/web:file-server",
+              "options": {
+                "buildTarget": "build",
+                "spa": true
+              },
+              "configurations": {}
+            }
+          },
+          "sourceRoot": "client/src",
+          "projectType": "application",
+          "$schema": "../node_modules/nx/schemas/project-schema.json",
+          "tags": [
+            "scope:client",
+            "type:app"
+          ],
+          "implicitDependencies": []
+        }
+      },
+      "server": {
+        "name": "server",
+        "type": "app",
+        "data": {
+          "root": "server",
+          "name": "server",
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "cache": false,
+              "options": {
+                "script": "dev"
+              },
+              "configurations": {}
+            },
+            "dev:full": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev:full"
+              },
+              "configurations": {}
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/server",
+                "main": "server/index.ts",
+                "tsConfig": "server/tsconfig.json"
+              },
+              "configurations": {}
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "configurations": {}
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{options.reportsDirectory}"
+              ],
+              "options": {
+                "configFile": "../../vitest.workspace.ts",
+                "passWithNoTests": true,
+                "reportsDirectory": "../coverage/server"
+              },
+              "configurations": {}
+            },
+            "test:watch": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:watch"
+              },
+              "configurations": {}
+            },
+            "type-check": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "type-check"
+              },
+              "configurations": {}
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true,
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "server/**/*.{ts,js}"
+                ]
+              },
+              "configurations": {}
+            },
+            "serve": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsx server/index.ts"
+              },
+              "configurations": {}
+            }
+          },
+          "sourceRoot": "server",
+          "projectType": "application",
+          "$schema": "../node_modules/nx/schemas/project-schema.json",
+          "tags": [
+            "scope:server",
+            "type:app"
+          ],
+          "implicitDependencies": []
+        }
+      },
+      "shared": {
+        "name": "shared",
+        "type": "lib",
+        "data": {
+          "root": "shared",
+          "name": "shared",
+          "targets": {
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/shared",
+                "main": "shared/index.ts",
+                "tsConfig": "shared/tsconfig.json"
+              },
+              "configurations": {}
+            },
+            "type-check": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "type-check"
+              },
+              "configurations": {}
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "shared/**/*.{ts,js}"
+                ]
+              },
+              "configurations": {}
+            },
+            "lint:check": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "lint:check"
+              },
+              "configurations": {}
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{options.reportsDirectory}"
+              ],
+              "options": {
+                "configFile": "../../vitest.workspace.ts",
+                "passWithNoTests": true,
+                "reportsDirectory": "../coverage/shared"
+              },
+              "configurations": {}
+            },
+            "test:watch": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:watch"
+              },
+              "configurations": {}
+            },
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "configurations": {}
+            }
+          },
+          "sourceRoot": "shared",
+          "projectType": "library",
+          "$schema": "../node_modules/nx/schemas/project-schema.json",
+          "tags": [
+            "scope:shared",
+            "type:lib"
+          ],
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "error-remediation": [],
+      "codebase-health-remediation": [],
+      "client": [
+        {
+          "source": "client",
+          "target": "shared",
+          "type": "static"
+        }
+      ],
+      "server": [
+        {
+          "source": "server",
+          "target": "shared",
+          "type": "static"
+        },
+        {
+          "source": "server",
+          "target": "client",
+          "type": "dynamic"
+        }
+      ],
+      "shared": []
+    }
+  },
+  "affectedProjects": [],
+  "criticalPath": []
+}

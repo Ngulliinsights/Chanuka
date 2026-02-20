@@ -786,58 +786,83 @@ npm run check:circular
 
 ## Documentation Updates
 
-### ADR-006: API Client Consolidation
+### Update Existing ADRs
+
+The following ADRs already exist and should be updated with implementation status:
+
+**ADR-001: API Client Consolidation** (docs/adr/ADR-001-api-client-consolidation.md)
+- Status: Update with Task 1.1 completion status
+- Add implementation timeline
+- Document final decision and rationale
+
+**ADR-005: CSP Manager Consolidation** (docs/adr/ADR-005-csp-manager-consolidation.md)
+- Status: Update with Task 1.3 completion status
+- Document migration completion
+- Remove "in-progress" language
+
+**ADR-006: Validation Single Source** (docs/adr/ADR-006-validation-single-source.md)
+- Status: Update with Phase 3 completion status
+- Document three-layer architecture implementation
+- Add migration completion metrics
+
+### Create New ADRs
+
+**ADR-009: Graph Module Refactoring**
 ```markdown
-# ADR-006: Consolidate to Single API Client Implementation
+# ADR-009: Graph Module Structured Layout
 
 **Status**: Accepted
 
-**Date**: 2026-02-18
+**Date**: 2026-02-19
 
 **Context**: 
-The codebase had six API client implementations with overlapping functionality. BaseApiClient, AuthenticatedApiClient, and SafeApiClient were complete but unused. UnifiedApiClientImpl (globalApiClient) had 100+ production usages.
+Graph module had flat file structure with all files at root level, making it difficult to navigate and understand organization.
 
 **Decision**: 
-Remove unused clients and standardize on globalApiClient as the canonical implementation. Keep contractApiClient as type-safe wrapper.
+Organize graph module into structured subdirectories:
+- core/ - Core functionality (neo4j-client, batch-sync-runner, etc.)
+- query/ - Query builders (engagement-queries, network-queries, etc.)
+- utils/ - Utilities (query-builder, session-manager)
+- analytics/ - Analytics features
+- sync/ - Sync operations
 
 **Consequences**:
-- Positive: Single, clear API client pattern
-- Positive: Reduced cognitive load
-- Positive: Smaller bundle size
-- Negative: Lost modular architecture option
-- Negative: Lost Result type pattern (SafeApiClient)
+- Positive: Improved discoverability
+- Positive: Clear separation of concerns
+- Positive: Easier to maintain
+- Negative: Import path updates required
+- Negative: One-time migration effort
 
-**Alternatives Considered**:
-- Migrate to BaseApiClient family: Rejected due to 100+ usages of globalApiClient
-- Keep both: Rejected due to confusion and maintenance burden
+**Implementation**: Task 2.2 in codebase-consolidation spec
 ```
 
-### ADR-007: Validation Single Source of Truth
+**ADR-010: Government Data Service Consolidation**
 ```markdown
-# ADR-007: Establish shared/validation/ as Single Source of Truth
+# ADR-010: Single Canonical Government Data Service
 
 **Status**: Accepted
 
-**Date**: 2026-02-18
+**Date**: 2026-02-19
 
 **Context**:
-Validation schemas were duplicated across client and server. Email validation had 4+ independent implementations. User role enum had inconsistent definitions.
+Government data integration existed in two locations:
+- infrastructure/external-data/ (infrastructure layer)
+- features/government-data/ (feature layer)
 
 **Decision**:
-Establish three-layer validation architecture:
-- Layer 1: shared/validation/ (cross-cutting primitives)
-- Layer 2: server/infrastructure/core/validation/ (server runtime)
-- Layer 3: client/[feature]/validation.ts (UI-specific)
+Consolidate to single canonical service in features/government-data/services/
+
+**Rationale**:
+- Feature-layer service is more complete
+- Infrastructure layer should not contain feature-specific logic
+- Single source of truth reduces maintenance burden
 
 **Consequences**:
-- Positive: Single source of truth for validation rules
-- Positive: Consistent validation across client/server
-- Positive: Easier to maintain and update rules
-- Negative: Requires careful management of circular dependencies
-- Negative: Migration effort across entire codebase
+- Positive: Clear ownership
+- Positive: Reduced duplication
+- Negative: Import updates required
 
-**Enforcement**:
-ESLint rules prevent shared/ from importing server/ or client/
+**Implementation**: Task 2.3 in codebase-consolidation spec
 ```
 
 ### Feature Architecture Convention

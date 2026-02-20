@@ -7,7 +7,8 @@
 
 import { z } from 'zod';
 import { createValidatedType, createZodTypeGuard } from '../../core/validation';
-import {
+// Import types directly to avoid circular dependency with index.ts
+import type {
   SliceState,
   PaginatedSliceState,
   SliceStateWithOperations,
@@ -16,7 +17,8 @@ import {
   PaginatedThunkResult,
   ThunkOperationState,
   ThunkExecutionContext
-} from './index';
+} from './slice-state';
+import type { ThunkResult as ThunkResultType } from './thunk-result';
 
 // ============================================================================
 // Comprehensive Type Guards

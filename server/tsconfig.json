@@ -20,15 +20,16 @@
       "@server/infrastructure/database/*": ["./infrastructure/database/*"],
       "@server/infrastructure/core/*": ["./infrastructure/core/*"],
       "@server/features/*": ["./features/*"],
-      "@client": ["../client/src"],
-      "@client/*": ["../client/src/*"],
-      "@tests": ["../tests"],
-      "@tests/*": ["../tests/*"],
+      "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
+      "@shared/types": ["../shared/types"],
+      "@shared/types/*": ["../shared/types/*"],
+      "@shared/validation": ["../shared/validation"],
+      "@shared/validation/*": ["../shared/validation/*"],
       "@shared/constants": ["../shared/constants"],
       "@shared/constants/*": ["../shared/constants/*"],
-      "@shared/core": ["./infrastructure/core"],
-      "@shared/core/*": ["./infrastructure/core/*"]
+      "@shared/utils": ["../shared/utils"],
+      "@shared/utils/*": ["../shared/utils/*"]
     }
   },
   "references": [

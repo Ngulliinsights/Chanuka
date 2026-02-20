@@ -6,6 +6,7 @@ import { database as db } from '@server/infrastructure/database';
 import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@server/infrastructure/schema';
 import { inputValidationService } from '@shared/validation/input-validation-service';
 import { verifyJwtToken, verifyRefreshToken, JwtPayload, RefreshTokenPayload } from './jwt-types';
+import { userRoleSchema } from '@shared/validation';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import { and, desc, eq, gt, isNotNull, lt, ne } from 'drizzle-orm';
@@ -24,7 +25,7 @@ export const registerSchema = z.object({
       'Password must contain uppercase, lowercase, number, and special character'),
   first_name: z.string().min(1, 'First name is required').max(50),
   last_name: z.string().min(1, 'Last name is required').max(50),
-  role: z.enum(['citizen', 'expert', 'journalist', 'advocate']).default('citizen'),
+  role: userRoleSchema.default('citizen'),
   expertise: z.array(z.string()).optional(),
   organization: z.string().optional()
 });

@@ -1,0 +1,78 @@
+              npx tsx scripts/database/rollback-from-backup.ts
+              npx tsx scripts/database/rollback-transaction.ts
+              npx tsx scripts/database/setup-production-like-data.ts --scale=large
+              npx tsx scripts/database/setup-production-like-data.ts --scale=medium
+              npx tsx scripts/database/setup-production-like-data.ts --scale=small
+            npx tsx scripts/database/run-migrations.ts
+            npx tsx scripts/database/run-migrations.ts --dry-run
+            scripts/database/
+          node scripts/advanced-bundle-analyzer.js
+          npx tsx scripts/database/${{ matrix.script }}
+          npx tsx scripts/database/create-rollback-point.ts
+          npx tsx scripts/database/data-integrity-check.ts --baseline
+          npx tsx scripts/database/data-integrity-check.ts --compare
+          npx tsx scripts/database/health-check.ts --output=post-migration-health.json
+          npx tsx scripts/database/health-check.ts --output=pre-migration-health.json
+          npx tsx scripts/database/health-check.ts --output=rollback-health.json
+          npx tsx scripts/database/schema-drift-detection.ts
+          npx tsx scripts/database/verify-migration-success.ts
+      - 'scripts/check-architecture.js'
+      run: node scripts/check-architecture.js
+      run: node scripts/performance-budget-enforcer.cjs
+      run: node scripts/performance-regression-detector.js
+      run: node scripts/web-vitals-checker.js
+    "analyze:architecture": "tsx scripts/modern-project-analyzer.ts",
+    "analyze:modern": "tsx scripts/modern-project-analyzer.ts",
+    "api:verify-contracts": "tsx scripts/verify-api-contract-coverage.ts",
+    "cleanup:memory": "node --expose-gc scripts/immediate-memory-cleanup.cjs",
+    "db:align-enums": "tsx scripts/database/align-enums.ts",
+    "db:generate": "tsx scripts/database/generate-migration.ts",
+    "db:generate-types": "tsx scripts/database/generate-types-simple.ts && tsx scripts/database/post-generate-transform.ts",
+    "db:generate-with-types": "tsx scripts/database/generate-migration-with-types.ts",
+    "db:health": "tsx scripts/database/health-check.ts --detailed",
+    "db:health:watch": "tsx scripts/database/health-check.ts --detailed --watch",
+    "db:init": "tsx scripts/database/initialize-database-integration.ts",
+    "db:migrate": "tsx scripts/database/migrate.ts",
+    "db:migrate:dry-run": "tsx scripts/database/migrate.ts --dry-run",
+    "db:migrate:validate": "tsx scripts/database/migrate.ts --validate",
+    "db:migrate-verified": "tsx scripts/database/migrate-with-verification.ts",
+    "db:reset": "tsx scripts/database/reset.ts",
+    "db:reset:force": "tsx scripts/database/reset.ts --force --migrate --seed --validate",
+    "db:reset:safe": "tsx scripts/database/reset.ts --migrate --validate",
+    "db:rollback-test": "tsx scripts/database/rollback-with-verification.ts --test",
+    "db:rollback-verified": "tsx scripts/database/rollback-with-verification.ts",
+    "db:schema:check": "tsx scripts/database/check-schema.ts",
+    "db:schema:drift": "tsx scripts/database/schema-drift-detection.ts",
+    "db:seed": "tsx scripts/seeds/seed.ts",
+    "db:seed:legislative": "tsx scripts/seeds/legislative-seed.ts",
+    "db:validate-migration": "tsx scripts/database/validate-migration.ts",
+    "db:verify-alignment": "tsx scripts/database/verify-schema-type-alignment-v2.ts",
+    "db:verify-migration": "tsx scripts/database/migration-verification-framework.ts",
+    "db:verify-schema-alignment": "tsx scripts/database/verify-schema-type-alignment.ts",
+    "deploy:production": "node scripts/deploy-production.js --environment production",
+    "deploy:staging": "node scripts/deploy-production.js --environment staging",
+    "fix:api-responses": "tsx scripts/fix-templates.ts --template=api-responses",
+    "fix:api-responses:dry-run": "tsx scripts/fix-templates.ts --template=api-responses --dry-run",
+    "fix:database-operations": "tsx scripts/fix-templates.ts --template=database-operations",
+    "fix:database-operations:dry-run": "tsx scripts/fix-templates.ts --template=database-operations --dry-run",
+    "fix:dynamic-properties": "tsx scripts/fix-templates.ts --template=dynamic-properties",
+    "fix:dynamic-properties:dry-run": "tsx scripts/fix-templates.ts --template=dynamic-properties --dry-run",
+    "fix:enum-conversions": "tsx scripts/fix-templates.ts --template=enum-conversions",
+    "fix:enum-conversions:dry-run": "tsx scripts/fix-templates.ts --template=enum-conversions --dry-run",
+    "fix:eslint-suppressions": "tsx scripts/fix-eslint-suppressions.ts",
+    "fix:type-assertions": "tsx scripts/fix-templates.ts --template=type-assertions",
+    "fix:type-assertions:dry-run": "tsx scripts/fix-templates.ts --template=type-assertions --dry-run",
+    "graph:analyze-influence": "tsx scripts/database/graph/analyze-influence.ts",
+    "graph:discover-networks": "tsx scripts/database/graph/discover-networks.ts",
+    "graph:discover-patterns": "tsx scripts/database/graph/discover-patterns.ts",
+    "graph:init": "tsx scripts/database/graph/initialize-graph.ts",
+    "graph:sync": "tsx scripts/database/graph/sync-demo.ts",
+    "graph:sync-advanced": "tsx scripts/database/graph/sync-advanced-relationships.ts",
+    "graph:sync-networks": "tsx scripts/database/graph/sync-networks.ts",
+    "scan:client-types": "tsx scripts/scan-client-type-violations.ts",
+    "scan:eslint-suppressions": "tsx scripts/scan-eslint-suppressions.ts",
+    "scan:todos": "tsx scripts/scan-todos.ts",
+    "scan:type-violations": "tsx scripts/scan-type-violations.ts",
+    "test:strategic": "node scripts/run-strategic-tests.cjs",
+    "track:progress": "tsx scripts/track-progress.ts",
+    "verify:metrics": "tsx scripts/verify-metrics.ts",

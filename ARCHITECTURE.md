@@ -395,6 +395,14 @@ If you're working on features:
 
 ## Related Documentation
 
+- [Architecture Decision Records (ADRs)](docs/adr/README.md) - Documented architectural decisions
+  - [ADR-001: API Client Consolidation](docs/adr/ADR-001-api-client-consolidation.md)
+  - [ADR-005: CSP Manager Consolidation](docs/adr/ADR-005-csp-manager-consolidation.md)
+  - [ADR-006: Validation Single Source](docs/adr/ADR-006-validation-single-source.md)
+  - [ADR-009: Graph Module Refactoring](docs/adr/ADR-009-graph-module-refactoring.md)
+  - [ADR-010: Government Data Consolidation](docs/adr/ADR-010-government-data-consolidation.md)
+- [Feature Structure Convention](server/features/README.md) - Guidelines for organizing features
+- [Constitutional Intelligence](server/features/constitutional-intelligence/README.md) - Incomplete DDD structure documentation
 - [TYPE_SYSTEM_RESTRUCTURE_PLAN.md](TYPE_SYSTEM_RESTRUCTURE_PLAN.md) - Type system organization
 - [PROJECT_STATUS.md](PROJECT_STATUS.md) - Current project status
 - [README.md](README.md) - Project overview

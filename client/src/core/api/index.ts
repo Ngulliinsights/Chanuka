@@ -10,22 +10,8 @@
  */
 
 // Core API clients
-export {
-  BaseApiClient,
-  DEFAULT_API_CONFIG,
-  type BaseClientRequest,
-  type BaseClientResponse,
-  type ApiClientConfig,
-  type RequestInterceptor,
-  type ResponseInterceptor,
-  type ErrorInterceptor,
-  type ApiError,
-  type RequestBody,
-} from './base-client';
 
-export { AuthenticatedApiClient, type AuthenticatedApiClientConfig } from './authenticated-client';
 
-export { SafeApiClient, type SafeApiResult } from './safe-client';
 
 // Authentication
 export {
@@ -64,20 +50,7 @@ export {
   type InvalidationOptions,
 } from './cache-manager';
 
-// Legacy circuit breaker exports (for backward compatibility)
-export {
-  CircuitBreakerClient,
-  createCircuitBreakerClient,
-  apiClients,
-  type CircuitBreakerClientConfig,
-  type RequestConfig,
-} from './circuit-breaker-client';
 
-export {
-  RetryHandler as LegacyRetryHandler,
-  createRetryHandler,
-  retryHandlers,
-} from './retry-handler';
 
 export {
   CircuitBreakerMonitor,
@@ -108,6 +81,7 @@ export { AnalyticsApiService, createAnalyticsApiService, analyticsApiService } f
 
 // Global clients
 export { globalApiClient } from './client';
+export { contractApiClient } from './contract-client';
 
 // Types
 export * from './types';

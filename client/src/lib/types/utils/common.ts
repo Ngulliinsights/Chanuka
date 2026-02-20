@@ -120,17 +120,6 @@ export type AsyncResult<T> = Promise<{
 }>;
 
 /**
- * Generic validation result
- * Standardized validation interface
- */
-export interface ValidationResult {
-  isValid: boolean;
-  errors: Record<string, string[]>;
-  warnings: Record<string, string[]>;
-  message?: string;
-}
-
-/**
  * Generic form field validation
  * Standardized form validation
  */

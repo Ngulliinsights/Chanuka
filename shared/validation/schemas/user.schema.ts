@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { nonEmptyString, optionalNonEmptyString, optionalNullableNonEmptyString } from './common';
+import { nonEmptyString, optionalNonEmptyString, optionalNullableNonEmptyString, emailSchema, uuidSchema, userRoleSchema } from './common';
 
 /**
  * User Validation Rules
@@ -34,13 +34,11 @@ export const USER_VALIDATION_RULES = {
  * (first_name, last_name, bio, phone), use UserProfileSchema.
  */
 export const UserSchema = z.object({
-  id: z.string().uuid().optional(),
-  email: nonEmptyString('email')
-    .email('Invalid email address')
-    .regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid'),
+  id: uuidSchema.optional(),
+  email: emailSchema,
   username: nonEmptyString('username')
     .regex(USER_VALIDATION_RULES.USERNAME_PATTERN, 'Username must be 3-20 characters (alphanumeric, dash, underscore)'),
-  role: z.enum(['citizen', 'representative', 'admin']).default('citizen'),
+  role: userRoleSchema.default('citizen'),
   is_active: z.boolean().default(true),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -56,8 +54,8 @@ export const UserSchema = z.object({
  * - phone_number: max 20 chars (DB allows varchar(20))
  */
 export const UserProfileSchema = z.object({
-  id: z.string().uuid().optional(),
-  user_id: z.string().uuid(),
+  id: uuidSchema.optional(),
+  user_id: uuidSchema,
   first_name: optionalNonEmptyString('first name', USER_VALIDATION_RULES.FIRST_NAME_MIN_LENGTH, 100),
   last_name: optionalNonEmptyString('last name', USER_VALIDATION_RULES.LAST_NAME_MIN_LENGTH, 100),
   display_name: optionalNonEmptyString('display name', 1, 150),

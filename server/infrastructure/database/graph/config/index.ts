@@ -34,4 +34,4 @@ export {
   CONSISTENCY_CONFIG,
   RECOMMENDATION_CONFIG,
   getConfigSummary,
-} from '../graph-config';
+} from './graph-config';

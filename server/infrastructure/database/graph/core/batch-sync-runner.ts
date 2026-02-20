@@ -2,7 +2,7 @@
  * Batch Sync Runner (REFACTORED)
  * IMPROVEMENTS: Fixed session leaks, added retry logic, proper error handling
  */
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
 import { SYNC_CONFIG } from '../config/graph-config';
 
 import { logger } from '@/core/observability';

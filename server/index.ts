@@ -14,6 +14,8 @@ import { argumentIntelligenceRouter } from '@server/features/argument-intelligen
 import { billTrackingRouter } from '@server/features/bills/bill-tracking.routes';
 import { router as billsRouter } from '@server/features/bills/bills-router';
 import { router as sponsorshipRouter } from '@server/features/bills/sponsorship.routes';
+import { translationRouter } from '@server/features/bills/translation-routes';
+import { actionPromptsRouter } from '@server/features/bills/action-prompts-routes';
 import { router as communityRouter } from '@server/features/community/community';
 import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/constitutional-analysis-router';
 import coverageRouter from '@server/features/coverage/coverage-routes';
@@ -331,6 +333,8 @@ app.use('/api/verification', migratedApiRateLimit({
 // API Routes registration
 app.use('/api/system', systemRouter);
 app.use('/api/bills', billsRouter);
+app.use('/api/bills', translationRouter); // Translation and impact calculator routes
+app.use('/api/bills', actionPromptsRouter); // Action prompts routes
 app.use('/api/sponsorship', sponsorshipRouter);
 app.use('/api/analysis', analysisRouter);
 app.use('/api/bill-tracking', billTrackingRouter);

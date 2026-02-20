@@ -137,6 +137,13 @@ module.exports = {
             message:
               "Shared modules cannot import client or server files. Keep shared modules pure.",
           },
+          // Validation Single Source of Truth - Prevent local redefinitions
+          {
+            group: ["zod"],
+            importNames: ["z"],
+            message:
+              "Use validation primitives from @shared/validation instead of defining local schemas. Import emailSchema, uuidSchema, userRoleSchema, etc.",
+          },
         ],
       },
     ],

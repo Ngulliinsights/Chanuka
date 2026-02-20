@@ -6,7 +6,7 @@
  */
 
 import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service';
-import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service';
+import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
 import { logger } from '@server/infrastructure/observability';
 // Import the database instance properly - adjust path as needed
 import { database as db } from '@server/infrastructure/database/connection';
@@ -25,7 +25,7 @@ import {
   SyncJob} from './types';
 
 export class DataSynchronizationService extends EventEmitter {
-  private governmentDataService: GovernmentDataService;
+  private governmentDataService: GovernmentDataIntegrationService;
   private conflictResolutionService: ConflictResolutionService;
   private activeSyncJobs: Map<string, SyncJob> = new Map();
   private scheduledJobs: Map<string, cron.ScheduledTask> = new Map();
@@ -33,7 +33,7 @@ export class DataSynchronizationService extends EventEmitter {
 
   constructor() {
     super();
-    this.governmentDataService = new GovernmentDataService();
+    this.governmentDataService = new GovernmentDataIntegrationService();
     this.conflictResolutionService = new ConflictResolutionService();
     this.setupEventHandlers();
   }

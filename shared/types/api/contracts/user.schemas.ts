@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { emailSchema, userRoleSchema, uuidSchema } from '@shared/validation';
 import { USER_VALIDATION_RULES } from '@shared/validation/schemas/user.schema';
 
 // ============================================================================
@@ -14,10 +15,7 @@ import { USER_VALIDATION_RULES } from '@shared/validation/schemas/user.schema';
  * Create User Request Schema
  */
 export const CreateUserRequestSchema = z.object({
-  email: z
-    .string()
-    .email('Invalid email address')
-    .regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid'),
+  email: emailSchema.regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid'),
   username: z
     .string()
     .regex(
@@ -31,18 +29,14 @@ export const CreateUserRequestSchema = z.object({
       USER_VALIDATION_RULES.PASSWORD_PATTERN,
       'Password must contain uppercase, lowercase, number, and special character'
     ),
-  role: z.enum(['citizen', 'representative', 'admin']).optional(),
+  role: userRoleSchema.optional(),
 });
 
 /**
  * Update User Request Schema
  */
 export const UpdateUserRequestSchema = z.object({
-  email: z
-    .string()
-    .email('Invalid email address')
-    .regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid')
-    .optional(),
+  email: emailSchema.regex(USER_VALIDATION_RULES.EMAIL_PATTERN, 'Email format is invalid').optional(),
   username: z
     .string()
     .regex(
@@ -50,7 +44,7 @@ export const UpdateUserRequestSchema = z.object({
       'Username must be 3-20 characters (alphanumeric, dash, underscore)'
     )
     .optional(),
-  role: z.enum(['citizen', 'representative', 'admin']).optional(),
+  role: userRoleSchema.optional(),
   status: z.enum(['active', 'inactive', 'suspended']).optional(),
   profile: z
     .object({
@@ -75,7 +69,7 @@ export const UpdateUserRequestSchema = z.object({
  * Get User Request Schema (path params)
  */
 export const GetUserParamsSchema = z.object({
-  id: z.string().uuid('Invalid user ID format'),
+  id: uuidSchema,
 });
 
 /**
@@ -84,7 +78,7 @@ export const GetUserParamsSchema = z.object({
 export const ListUsersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  role: z.enum(['citizen', 'representative', 'admin']).optional(),
+  role: userRoleSchema.optional(),
   status: z.enum(['active', 'inactive', 'suspended']).optional(),
   search: z.string().optional(),
 });
@@ -93,7 +87,7 @@ export const ListUsersQuerySchema = z.object({
  * Delete User Request Schema (path params)
  */
 export const DeleteUserParamsSchema = z.object({
-  id: z.string().uuid('Invalid user ID format'),
+  id: uuidSchema,
 });
 
 // ============================================================================
@@ -104,10 +98,10 @@ export const DeleteUserParamsSchema = z.object({
  * User Schema (for responses)
  */
 export const UserResponseSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
+  id: uuidSchema,
+  email: emailSchema,
   username: z.string(),
-  role: z.enum(['citizen', 'representative', 'admin']),
+  role: userRoleSchema,
   status: z.enum(['active', 'inactive', 'suspended']).optional(),
   profile: z
     .object({

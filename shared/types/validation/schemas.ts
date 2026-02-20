@@ -9,15 +9,6 @@
 import { z } from 'zod';
 
 /**
- * Generic validation result type
- */
-export interface ValidationResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  errors?: ValidationError[];
-}
-
-/**
  * Validation error structure
  */
 export interface ValidationError {

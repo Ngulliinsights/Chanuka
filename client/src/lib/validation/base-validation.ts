@@ -237,13 +237,6 @@ export function validateBatch<T>(
 }
 
 // Validation result type
-export interface ValidationResult<T> {
-  success: boolean;
-  data?: T;
-  error?: BaseValidationError;
-  warnings?: string[];
-}
-
 // Enhanced validation with warnings
 export function validateWithWarnings<T>(
   schema: z.ZodSchema<T>,

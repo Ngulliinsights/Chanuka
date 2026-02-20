@@ -43,15 +43,11 @@ export {
   RECOMMENDED_CSP_CONFIGS
 };
 
-// Migration utilities
-import { SecurityMigrationUtils } from '../migration/migration-utils';
-
 // System (Class, Config, Helpers)
 import {
   DEFAULT_UNIFIED_CONFIG,
   UnifiedSecuritySystem,
   initializeUnifiedSecurity,
-  isUnifiedSecurityEnabled,
   getSecurityStatus,
   securityUtils
 } from './system';
@@ -67,8 +63,7 @@ export {
   SecurityOperationError,
   SecurityErrorMiddleware,
   createSecurityErrorMiddleware,
-  UnifiedRateLimiter,
-  SecurityMigrationUtils
+  UnifiedRateLimiter
 };
 
 // Default export for backward compatibility
@@ -77,12 +72,10 @@ const unifiedSystem = {
   UnifiedInputSanitizer,
   SecurityErrorHandler,
   SecurityErrorMiddleware,
-  SecurityMigrationUtils,
   STANDARD_CSP_CONFIG,
   DEFAULT_UNIFIED_CONFIG,
   UnifiedSecuritySystem,
   initializeUnifiedSecurity,
-  isUnifiedSecurityEnabled,
   getSecurityStatus,
   securityUtils,
 };

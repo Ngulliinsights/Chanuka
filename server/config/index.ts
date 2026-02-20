@@ -2,6 +2,7 @@
 // Comprehensive, type-safe configuration for all server services
 
 import { z } from 'zod';
+import { emailSchema } from '@shared/validation';
 
 // Configuration utilities (defined early to avoid initialization issues)
 export const isDev = (): boolean => {
@@ -137,7 +138,7 @@ const emailConfigSchema = z.object({
   smtpUser: z.string().optional(),
   smtpPass: z.string().optional(),
   smtpSecure: z.boolean().default(false),
-  fromEmail: z.string().email().default('noreply@chanuka.app'),
+  fromEmail: emailSchema.default('noreply@chanuka.app'),
   fromName: z.string().default('Chanuka Platform'),
   enableEmailVerification: z.boolean().default(true),
   enableNotifications: z.boolean().default(true),

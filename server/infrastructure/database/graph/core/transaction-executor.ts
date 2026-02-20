@@ -4,8 +4,8 @@
  */
 import { Driver, Transaction } from 'neo4j-driver';
 
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
-import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { withTransaction } from '../utils/session-manager';
 
 import { logger } from '@/core/observability';

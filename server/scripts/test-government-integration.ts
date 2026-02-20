@@ -4,7 +4,7 @@ import { GovernmentDataValidationService } from '@server/infrastructure/core/val
 import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/services/external-api-error-handler';
 import { ManagedGovernmentDataIntegrationService } from '@server/features/government-data/application/managed-integration.service';
 import { logger } from '@server/infrastructure/observability';
-import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration';
+import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
 
 // CLI tool for testing government data integration
 class GovernmentDataIntegrationCLI {

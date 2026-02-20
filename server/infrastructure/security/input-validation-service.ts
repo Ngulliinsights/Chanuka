@@ -2,6 +2,7 @@ import { logger } from '@server/infrastructure/observability';
 import { ApiValidationError } from '@shared/core/utils/api-utils';
 import { NextFunction,Request, Response } from 'express';
 import { z } from 'zod';
+import { emailSchema, userRoleSchema } from '@shared/validation';
 
 /**
  * Centralized Input Validation Service
@@ -225,7 +226,6 @@ export class InputValidationService {
    * Validate email format
    */
   public validateEmail(email: string): ValidationResult {
-    const emailSchema = z.string().email();
     return this.validateApiInput(emailSchema, email);
   }
 
@@ -332,7 +332,7 @@ export class InputValidationService {
 // Common validation schemas
 export const commonSchemas = {
   // User role validation
-  user_role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']),
+  user_role: userRoleSchema,
   
   // Pagination validation
   pagination: z.object({
@@ -348,10 +348,10 @@ export const commonSchemas = {
   
   // User update validation
   userUpdate: z.object({
-    role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']).optional(),
+    role: userRoleSchema.optional(),
     is_active: z.boolean().optional(),
     name: z.string().min(1).max(255).optional(),
-    email: z.string().email().optional()
+    email: emailSchema.optional()
   }),
   
   // Bill comment validation

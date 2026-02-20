@@ -5,6 +5,7 @@
 // Connects Drizzle ORM schemas with Zod validation and runtime type checking
 
 import { z } from "zod";
+import { emailSchema, uuidSchema, userRoleSchema } from '@shared/validation';
 import { createValidatedType, ValidatedType, validateWithSchema } from "../types/core/validation";
 import { ValidationError, Result } from "../types/core/errors";
 import { isBrandedId } from "../types/core/common";
@@ -195,9 +196,9 @@ export function validateBrandedIds<T extends string>(
 export const DatabaseConstraintSchemas = {
   // User constraints
   UserConstraints: z.object({
-    email: z.string().email(),
+    email: emailSchema,
     password_hash: z.string().min(60).max(255), // BCrypt hash length
-    role: z.enum(['citizen', 'verified_citizen', 'ambassador', 'expert_verifier', 'mp_staff', 'clerk', 'admin', 'auditor', 'journalist']),
+    role: userRoleSchema,
     failed_login_attempts: z.number().int().min(0).max(10),
     is_active: z.boolean(),
   }),

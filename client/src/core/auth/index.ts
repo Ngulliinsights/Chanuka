@@ -262,33 +262,11 @@ export {
 // ============================================================================
 // Migration and Setup Scripts
 // ============================================================================
-
-export {
-  // Migration helpers
-  generateMigrationPlan,
-  generateMigrationChecklist,
-  runMigrationHelper,
-  IMPORT_MAPPINGS,
-  CODE_PATTERNS,
-  FILES_TO_REMOVE,
-} from './scripts/migration-helper';
-
-export {
-  // Cleanup utilities
-  generateCleanupReport,
-  logCleanupStatus,
-  validateConsolidatedAuth,
-  runAuthCleanup,
-} from './scripts/cleanup-old-auth';
-
-export {
-  // Initialization helpers
-  initAuthSystem,
-  setupAuthForReact,
-  setupAuthForTesting,
-  validateAuthSetup,
-  USAGE_EXAMPLES,
-} from './scripts/init-auth-system';
+// Note: These are exported for backward compatibility but should be imported
+// directly from their respective files to avoid circular dependencies:
+// - import { runAuthCleanup } from '@client/core/auth/scripts/cleanup-old-auth'
+// - import { initAuthSystem } from '@client/core/auth/scripts/init-auth-system'
+// - import { runMigrationHelper } from '@client/core/auth/scripts/migration-helper'
 
 // ============================================================================
 // Default Export (Main Auth Module)

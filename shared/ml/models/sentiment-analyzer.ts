@@ -4,6 +4,7 @@
 // Analyzes public sentiment towards bills, comments, and political content
 
 import { z } from 'zod';
+import { userRoleSchema } from '@shared/validation';
 
 import { TextProcessor, Statistics, Cache } from './shared_utils';
 

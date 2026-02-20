@@ -1,7 +1,8 @@
 import { logger } from '@server/infrastructure/observability';
 
-import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service';
-import { ApiResponse, BillData, DataSource, SponsorData } from '@/infrastructure/external-data/types';
+import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
+import { BillData, DataSource, SponsorData } from '@server/features/government-data/services/government-data-integration.service';
+import { ApiResponse } from '@server/infrastructure/external-data/types';
 
 export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';
@@ -29,11 +30,11 @@ export interface UserGovernmentDataResult {
  * - Privacy-compliant data access
  */
 export class UserGovernmentDataService {
-  private governmentDataService: GovernmentDataService;
+  private governmentDataService: GovernmentDataIntegrationService;
   private userQueryCache: Map<string, { result: UserGovernmentDataResult; expires: Date }> = new Map();
 
   constructor() {
-    this.governmentDataService = new GovernmentDataService();
+    this.governmentDataService = new GovernmentDataIntegrationService();
     logger.info('✅ User Government Data Service initialized');
   }
 

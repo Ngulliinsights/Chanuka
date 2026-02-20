@@ -7,6 +7,7 @@
 
 import { validationService } from '@shared/core/validation';
 import { z } from 'zod';
+import { emailSchema, uuidSchema, userRoleSchema, paginationSchema } from '@shared/validation';
 
 // ============================================================================
 // COMMON VALIDATION SCHEMAS
@@ -298,17 +299,13 @@ export const billSearchOptionsSchema = z.object({
  * New user creation validation
  */
 export const newUserSchema = z.object({
-  email: z.string()
-    .email('Invalid email format')
-    .max(320, 'Email is too long'),
+  email: emailSchema.max(320, 'Email is too long'),
 
   password_hash: z.string()
     .min(1, 'Password hash is required')
     .max(255, 'Password hash is too long'),
 
-  role: z.enum(['citizen', 'admin', 'moderator', 'analyst'], {
-    errorMap: () => ({ message: 'Invalid user role' })
-  }).default('citizen'),
+  role: userRoleSchema.default('citizen'),
 
   county: z.string().max(50).optional(),
   constituency: z.string().max(100).optional(),
@@ -395,7 +392,7 @@ export const userProfileSchema = z.object({
 export const userSearchOptionsSchema = z.object({
   limit: z.number().int().min(1).max(100).optional().default(50),
   offset: z.number().int().min(0).optional().default(0),
-  role: z.enum(['citizen', 'admin', 'moderator', 'analyst']).optional(),
+  role: userRoleSchema.optional(),
   is_active: z.boolean().optional(),
 });
 

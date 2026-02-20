@@ -1,0 +1,70 @@
+# Architecture Decision Records (ADRs)
+
+This directory contains Architecture Decision Records documenting significant architectural decisions made during the Chanuka platform development.
+
+## Index
+
+### ADR-001: API Client Consolidation
+**File:** [ADR-001-api-client-consolidation.md](./ADR-001-api-client-consolidation.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Analysis of why BaseApiClient, AuthenticatedApiClient, and SafeApiClient remain unintegrated. Decision to consolidate on globalApiClient (UnifiedApiClientImpl) as the canonical implementation.
+
+### ADR-002: Client API Architecture
+**File:** [ADR-002-client-api-architecture.md](./ADR-002-client-api-architecture.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Comprehensive analysis of client-side API architecture, including the relationship between different API client implementations and their usage patterns.
+
+### ADR-003: Dead vs Unintegrated Code
+**File:** [ADR-003-dead-vs-unintegrated-code.md](./ADR-003-dead-vs-unintegrated-code.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Framework for distinguishing between dead code (should be deleted) and unintegrated code (needs integration decision). Establishes criteria for code cleanup decisions.
+
+### ADR-004: Feature Structure Convention
+**File:** [ADR-004-feature-structure-convention.md](./ADR-004-feature-structure-convention.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Guidelines for when to use full DDD structure (application/domain/infrastructure) vs flat structure for features. Provides decision criteria and examples.
+
+### ADR-005: CSP Manager Consolidation
+**File:** [ADR-005-csp-manager-consolidation.md](./ADR-005-csp-manager-consolidation.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Analysis of Content Security Policy (CSP) manager duplication. Decision to consolidate on UnifiedCSPManager and remove legacy implementation.
+
+### ADR-006: Validation Single Source of Truth
+**File:** [ADR-006-validation-single-source.md](./ADR-006-validation-single-source.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Establishes shared/validation/ as the single source of truth for validation schemas. Defines three-layer validation architecture (shared primitives, server runtime, client UI-specific).
+
+### ADR-007: Utils Consolidation
+**File:** [ADR-007-utils-consolidation.md](./ADR-007-utils-consolidation.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Analysis of utils folder duplication across client, server, and shared. Decision on consolidation strategy and placement of utility functions.
+
+### ADR-008: Incomplete Migrations
+**File:** [ADR-008-incomplete-migrations.md](./ADR-008-incomplete-migrations.md)  
+**Status:** Accepted  
+**Date:** February 18, 2026  
+**Summary:** Systemic analysis of incomplete migrations in the codebase. Identifies root causes and establishes process for completing or rolling back migrations.
+
+## ADR Format
+
+Each ADR should follow this structure:
+
+1. **Title**: Short, descriptive name
+2. **Status**: Proposed | Accepted | Deprecated | Superseded
+3. **Date**: When the decision was made
+4. **Context**: What is the issue we're seeing that is motivating this decision?
+5. **Decision**: What is the change we're proposing and/or doing?
+6. **Consequences**: What becomes easier or more difficult to do because of this change?
+7. **Alternatives Considered**: What other options were evaluated?
+
+## References
+
+- [Architecture Documentation](../ARCHITECTURE.md)
+- [Codebase Consolidation Spec](.kiro/specs/codebase-consolidation/)

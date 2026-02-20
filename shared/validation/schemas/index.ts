@@ -69,4 +69,16 @@ export {
   optionalNonEmptyString,
   nullableNonEmptyString,
   optionalNullableNonEmptyString,
+  // Primitive schemas - Single Source of Truth
+  emailSchema,
+  uuidSchema,
+  phoneSchema,
+  urlSchema,
+  userRoleSchema,
+  paginationSchema,
+  searchQuerySchema,
+  dateRangeSchema,
+  billIdSchema,
+  userIdSchema,
+  commentIdSchema,
 } from './common';

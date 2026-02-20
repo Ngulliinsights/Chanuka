@@ -23,12 +23,6 @@ export function getErrorDisplayMessage(error: LoadingError): string {
   return error.message || 'Loading error occurred';
 }
 
-interface ValidationResult {
-  success: boolean;
-  data: LoadingProgress;
-  error?: LoadingError;
-}
-
 export function safeValidateLoadingProgress(progress: LoadingProgress): ValidationResult {
   try {
     if (typeof progress.loaded !== 'number' || typeof progress.total !== 'number') {

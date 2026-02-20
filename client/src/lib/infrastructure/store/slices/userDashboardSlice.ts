@@ -21,7 +21,9 @@ import type {
   UserDashboardPreferences,
 } from '@client/lib/types/user-dashboard';
 
-import type { RootState } from '../index';
+// Import RootState type directly to avoid circular dependency
+// The actual store is not needed at module level
+type RootState = any; // Will be properly typed when used in selectors
 
 interface UserDashboardState {
   // Core data

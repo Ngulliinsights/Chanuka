@@ -1,92 +1,150 @@
-export type UserProfileId = string & { readonly __brand: 'UserProfileId' };
-export type SessionId = string & { readonly __brand: 'SessionId' };
-export type UserSessionId = string & { readonly __brand: 'UserSessionId' };
-export type OAuthTokenId = string & { readonly __brand: 'OAuthTokenId' };
-export type OAuthProviderId = string & { readonly __brand: 'OAuthProviderId' };
+/**
+ * Branded ID Types
+ *
+ * Nominal typing for entity identifiers, preventing accidental ID misuse
+ * across domain boundaries. All IDs are strings at runtime.
+ *
+ * @example
+ * const userId = createBrandedId<'UserProfileId'>('abc-123');
+ * function getUser(id: UserProfileId) { ... }
+ * getUser(userId); // ✓
+ * getUser('abc-123'); // ✗ Type error
+ */
 
+// ============================================================================
+// Brand Primitive
+// ============================================================================
+
+/** Base brand type. Prefer domain-specific aliases below over using this directly. */
+export type Brand<T, B extends string> = T & { readonly __brand: B };
+
+// ============================================================================
+// Identity & Auth
+// ============================================================================
+
+export type UserProfileId      = Brand<string, 'UserProfileId'>;
+export type UserSessionId      = Brand<string, 'UserSessionId'>;
+export type OAuthTokenId       = Brand<string, 'OAuthTokenId'>;
+export type OAuthProviderId    = Brand<string, 'OAuthProviderId'>;
+
+// ============================================================================
 // Legislative Entities
-export type BillId = string & { readonly __brand: 'BillId' };
-export type SponsorId = string & { readonly __brand: 'SponsorId' };
-export type LegislatorId = string & { readonly __brand: 'LegislatorId' };
-export type CommitteeId = string & { readonly __brand: 'CommitteeId' };
-export type CommitteeMemberId = string & { readonly __brand: 'CommitteeMemberId' };
-export type GovernorId = string & { readonly __brand: 'GovernorId' };
-export type AmendmentId = string & { readonly __brand: 'AmendmentId' };
-export type ParliamentarySessionId = string & { readonly __brand: 'ParliamentarySessionId' };
-export type ParliamentarySittingId = string & { readonly __brand: 'ParliamentarySittingId' };
+// ============================================================================
 
+export type CommitteeMemberId        = Brand<string, 'CommitteeMemberId'>;
+export type GovernorId               = Brand<string, 'GovernorId'>;
+export type ParliamentarySessionId   = Brand<string, 'ParliamentarySessionId'>;
+export type ParliamentarySittingId   = Brand<string, 'ParliamentarySittingId'>;
+export type ConferenceId             = Brand<string, 'ConferenceId'>;
+
+// ============================================================================
 // Participation & Engagement
-export type CommentId = string & { readonly __brand: 'CommentId' };
-export type CommentVoteId = string & { readonly __brand: 'CommentVoteId' };
-export type BillVoteId = string & { readonly __brand: 'BillVoteId' };
-export type BillEngagementId = string & { readonly __brand: 'BillEngagementId' };
-export type NotificationId = string & { readonly __brand: 'NotificationId' };
-export type UserInterestId = string & { readonly __brand: 'UserInterestId' };
+// ============================================================================
 
+export type CommentVoteId     = Brand<string, 'CommentVoteId'>;
+export type BillVoteId        = Brand<string, 'BillVoteId'>;
+export type BillEngagementId  = Brand<string, 'BillEngagementId'>;
+export type UserInterestId    = Brand<string, 'UserInterestId'>;
+
+// ============================================================================
 // Moderation & Safety
-export type ModerationId = string & { readonly __brand: 'ModerationId' };
-export type ModerationQueueId = string & { readonly __brand: 'ModerationQueueId' };
-export type ModerationActionId = string & { readonly __brand: 'ModerationActionId' };
+// ============================================================================
 
+export type ModerationId        = Brand<string, 'ModerationId'>;
+export type ModerationQueueId   = Brand<string, 'ModerationQueueId'>;
+export type ModerationActionId  = Brand<string, 'ModerationActionId'>;
+
+// ============================================================================
 // Advocacy & Campaigns
-export type CampaignId = string & { readonly __brand: 'CampaignId' };
-export type ActionItemId = string & { readonly __brand: 'ActionItemId' };
-export type CampaignParticipantId = string & { readonly __brand: 'CampaignParticipantId' };
-export type ActionCompletionId = string & { readonly __brand: 'ActionCompletionId' };
+// ============================================================================
 
+export type CampaignId             = Brand<string, 'CampaignId'>;
+export type ActionItemId           = Brand<string, 'ActionItemId'>;
+export type CampaignParticipantId  = Brand<string, 'CampaignParticipantId'>;
+export type ActionCompletionId     = Brand<string, 'ActionCompletionId'>;
+
+// ============================================================================
 // Intelligence & Analysis
-export type ConstitutionalAnalysisId = string & { readonly __brand: 'ConstitutionalAnalysisId' };
-export type ConstitutionalProvisionId = string & { readonly __brand: 'ConstitutionalProvisionId' };
-export type LegalPrecedentId = string & { readonly __brand: 'LegalPrecedentId' };
-export type ArgumentId = string & { readonly __brand: 'ArgumentId' };
-export type ClaimId = string & { readonly __brand: 'ClaimId' };
-export type EvidenceId = string & { readonly __brand: 'EvidenceId' };
+// ============================================================================
 
+export type ConstitutionalAnalysisId  = Brand<string, 'ConstitutionalAnalysisId'>;
+export type ConstitutionalProvisionId = Brand<string, 'ConstitutionalProvisionId'>;
+export type LegalPrecedentId          = Brand<string, 'LegalPrecedentId'>;
+export type ClaimId                   = Brand<string, 'ClaimId'>;
+export type EvidenceId                = Brand<string, 'EvidenceId'>;
+
+// ============================================================================
 // Discovery & Search
-export type SearchQueryId = string & { readonly __brand: 'SearchQueryId' };
-export type DiscoveryPatternId = string & { readonly __brand: 'DiscoveryPatternId' };
-export type TrendingTopicId = string & { readonly __brand: 'TrendingTopicId' };
-export type UserRecommendationId = string & { readonly __brand: 'UserRecommendationId' };
+// ============================================================================
 
+export type SearchQueryId          = Brand<string, 'SearchQueryId'>;
+export type DiscoveryPatternId     = Brand<string, 'DiscoveryPatternId'>;
+export type TrendingTopicId        = Brand<string, 'TrendingTopicId'>;
+export type UserRecommendationId   = Brand<string, 'UserRecommendationId'>;
+
+// ============================================================================
 // Impact & Measurement
-export type LegislativeOutcomeId = string & { readonly __brand: 'LegislativeOutcomeId' };
-export type BillImplementationId = string & { readonly __brand: 'BillImplementationId' };
-export type AttributionAssessmentId = string & { readonly __brand: 'AttributionAssessmentId' };
+// ============================================================================
 
+export type LegislativeOutcomeId    = Brand<string, 'LegislativeOutcomeId'>;
+export type BillImplementationId    = Brand<string, 'BillImplementationId'>;
+export type AttributionAssessmentId = Brand<string, 'AttributionAssessmentId'>;
+
+// ============================================================================
 // Graph & Sync
-export type GraphSyncStatusId = string & { readonly __brand: 'GraphSyncStatusId' };
-export type GraphSyncErrorId = string & { readonly __brand: 'GraphSyncErrorId' };
+// ============================================================================
 
+export type GraphSyncStatusId = Brand<string, 'GraphSyncStatusId'>;
+export type GraphSyncErrorId  = Brand<string, 'GraphSyncErrorId'>;
+
+// ============================================================================
 // API & System
-export type ApiRequestId = string & { readonly __brand: 'ApiRequestId' };
-export type ConferenceId = string & { readonly __brand: 'ConferenceId' };
+// ============================================================================
+
+export type ApiRequestId = Brand<string, 'ApiRequestId'>;
+
+// ============================================================================
+// Branded ID Utilities
+// ============================================================================
 
 /**
- * Utility to create branded types
+ * Cast a raw string to a branded ID.
+ * Use at system boundaries (e.g. API responses, DB reads) where the
+ * string's identity has been externally validated.
+ *
+ * @example
+ * const id = brandId<UserProfileId>('abc-123');
  */
-export function createBrandedId<T extends string>(
-  value: string
-): string & { readonly __brand: T } {
-  return value as string & { readonly __brand: T };
+export function brandId<T extends Brand<string, string>>(value: string): T {
+  if (!value || typeof value !== 'string') {
+    throw new TypeError(`Invalid branded ID: expected a non-empty string, got ${JSON.stringify(value)}`);
+  }
+  return value as T;
 }
 
 /**
- * Type guard for branded IDs
+ * Type guard — narrows `unknown` to a branded ID type.
+ * Note: only validates that the value is a non-empty string;
+ * it cannot verify domain correctness at runtime.
  */
-export function isBrandedId<T extends string>(
+export function isBrandedId<T extends Brand<string, string>>(
   value: unknown
-): value is string & { readonly __brand: T } {
+): value is T {
   return typeof value === 'string' && value.length > 0;
 }
 
-/**
- * Common utility types
- */
-export type Nullable<T> = T | null;
-export type Optional<T> = T | undefined;
+// ============================================================================
+// General Utility Types
+// ============================================================================
+
+export type Nullable<T>    = T | null;
+export type Optional<T>    = T | undefined;
+export type Maybe<T>       = T | null | undefined;
+
 export type DeepReadonly<T> = {
-  readonly [K in keyof T]: DeepReadonly<T[K]>;
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
 };
+
 export type DeepPartial<T> = {
-  [K in keyof T]?: DeepPartial<T[K]>;
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };

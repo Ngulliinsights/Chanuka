@@ -3,15 +3,10 @@
  */
 
 import { z } from 'zod';
+import { emailSchema, userRoleSchema } from '@shared/validation';
 
-export interface ValidationResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-// Common validation schemas
-export const emailSchema = z.string().email('Invalid email address');
+// Common validation schemas - re-export from shared
+export { emailSchema, userRoleSchema } from '@shared/validation';
 
 export const passwordSchema = z
   .string()
@@ -39,7 +34,7 @@ export const userSchema = z.object({
   id: z.string(),
   email: emailSchema,
   username: usernameSchema,
-  role: z.enum(['admin', 'user', 'moderator']),
+  role: userRoleSchema,
   isActive: z.boolean(),
 });
 
@@ -87,8 +82,7 @@ export function validateNavigationPath(path: string) {
 }
 
 export function validateUserRole(role: string) {
-  const roleSchema = z.enum(['admin', 'user', 'moderator', 'citizen', 'expert', 'official']);
-  return roleSchema.safeParse(role);
+  return userRoleSchema.safeParse(role);
 }
 
 export function validateRelatedPage(page: unknown) {
@@ -116,7 +110,7 @@ export function validateUseRelatedPagesOptions(options: unknown) {
 export function validate<T>(
   schema: z.ZodSchema<T>,
   data: unknown
-): ValidationResult<T> {
+): { success: true; data: T } | { success: false; error: string } {
   const result = schema.safeParse(data);
 
   if (result.success) {

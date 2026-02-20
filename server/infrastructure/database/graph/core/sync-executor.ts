@@ -24,8 +24,8 @@ import { eq, and, desc } from 'drizzle-orm';
 import { runBatchSync, startSyncScheduler, stopSyncScheduler } from './batch-sync-runner';
 import * as neo4jSchema from './schema';
 import { withSession } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../error-adapter-v2';
-import { retryWithBackoff, RETRY_PRESETS } from '../retry-utils';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { NEO4J_CONFIG, SYNC_CONFIG } from '../config/graph-config';
 import { logger } from '@/core/observability';
 

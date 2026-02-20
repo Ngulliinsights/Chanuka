@@ -147,20 +147,11 @@ export async function initializeUnifiedSecurity(config?: Partial<UnifiedSecurity
 }
 
 /**
- * Check if unified security is enabled
- */
-export function isUnifiedSecurityEnabled(): boolean {
-  return process.env.USE_UNIFIED_SECURITY === 'true' ||
-         process.env.NODE_ENV === 'production';
-}
-
-/**
  * Get current security status across all components
  */
 export function getSecurityStatus() {
   // This would aggregate status from all security components
   return {
-    unified: isUnifiedSecurityEnabled(),
     components: {
       csp: { enabled: true, status: 'healthy' },
       sanitization: { enabled: true, status: 'healthy' },

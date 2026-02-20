@@ -24,14 +24,12 @@ import {
   ActivitySummary
 } from '@client/lib/services/interfaces';
 
-// Import services from index to avoid circular dependencies
-import {
-  authService,
-  userProfileService,
-  dashboardService,
-  engagementService,
-  achievementService
-} from './index';
+// Import services directly from their source files to avoid circular dependencies
+import { authService } from './auth-service';
+import { userProfileService } from './profile-service';
+import { dashboardService } from './dashboard-service';
+import { engagementService } from './engagement-service';
+import { achievementService } from './achievements-service';
 
 // ============================================================================
 // LEGACY USER SERVICE API

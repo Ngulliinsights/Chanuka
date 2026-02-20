@@ -71,12 +71,6 @@ export interface AggregateResult {
   summary?: Record<string, unknown>;
 }
 
-export interface ValidationResult {
-  valid: boolean;
-  errors?: string[];
-  timestamp: number;
-}
-
 export interface ExportResult {
   exported: boolean;
   format: string;

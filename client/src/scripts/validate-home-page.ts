@@ -7,12 +7,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-interface ValidationResult {
-  passed: boolean;
-  message: string;
-  details?: string[];
-}
-
 class HomePageValidator {
   private homePagePath = join(process.cwd(), 'src/pages/StrategicHomePage.tsx');
 

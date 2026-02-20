@@ -8,12 +8,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface ValidationResult {
-  success: boolean;
-  message: string;
-  details?: string[];
-}
-
 class WebSocketConsolidationValidator {
   private errors: string[] = [];
   private warnings: string[] = [];

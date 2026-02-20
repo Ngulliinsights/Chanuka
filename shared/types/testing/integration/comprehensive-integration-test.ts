@@ -8,18 +8,21 @@
 import { z } from 'zod';
 import { createValidatedType } from '../../core/validation';
 import { Result, ValidationError } from '../../core/errors';
-import {
+// Import types directly to avoid circular dependency with index.ts
+import type {
   TypeCompatibilityTestSuite,
+  ValidationMiddlewareTestSuite,
+  BackwardCompatibilityTest,
+  CompleteIntegrationTestSuite
+} from './comprehensive-type-tests';
+import {
   runTypeCompatibilityTestSuite,
   validateDomainTypePatterns,
   BUILTIN_DOMAIN_TYPE_PATTERN_RULES,
-  ValidationMiddlewareTestSuite,
   runValidationMiddlewareTestSuite,
-  BackwardCompatibilityTest,
   runBackwardCompatibilityTest,
-  CompleteIntegrationTestSuite,
   runCompleteIntegrationTestSuite
-} from './index';
+} from './integration-test-runner';
 
 // ============================================================================
 // Sample Validated Types for Testing

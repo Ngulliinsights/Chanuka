@@ -219,12 +219,6 @@ export interface UnifiedErrorSystem {
 // UNIFIED FORM AND VALIDATION INTERFACES
 // ============================================================================
 
-export interface ValidationResult {
-  success: boolean;
-  errors: ValidationError[];
-  data?: any;
-}
-
 export interface ValidationErrorDetail {
   field: string;
   message: string;

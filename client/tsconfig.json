@@ -44,10 +44,6 @@
     //       This prevents ambiguity between workspace /shared and client @lib
     // ========================================================
     "paths": {
-      // ===== ROOT ALIASES =====
-      "@": ["./src"],
-      "@/*": ["./src/*"],
-      
       // ===== CLIENT FRAMEWORK =====
       "@client": ["./src"],
       "@client/*": ["./src/*"],
@@ -62,8 +58,6 @@
       // ===== SHARED MODULES (root-level shared/) =====
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
-      "@workspace": ["../shared"],
-      "@workspace/*": ["../shared/*"],
       "@core/*": ["./src/core/*"],
       "@lib": ["./src/lib"],
       "@lib/*": ["./src/lib/*"],
@@ -98,19 +92,7 @@
       "@utils": ["./src/lib/utils"],
       "@utils/*": ["./src/lib/utils/*"],
       
-      // ===== WORKSPACE-LEVEL MODULES (all in ../../shared) =====
-      // Use @workspace prefix for clarity - these are NOT client modules
 
-      "@workspace/types": ["../shared/types"],
-      "@workspace/types/*": ["../shared/types/*"],
-      "@workspace/core": ["../shared/core"],
-      "@workspace/core/*": ["../shared/core/*"],
-      "@workspace/validation": ["../shared/validation"],
-      "@workspace/validation/*": ["../shared/validation/*"],
-      "@workspace/constants": ["../shared/constants"],
-      "@workspace/constants/*": ["../shared/constants/*"],
-      "@workspace/utils": ["../shared/utils"],
-      "@workspace/utils/*": ["../shared/utils/*"],
       
       // ===== STUBS FOR SERVER-ONLY MODULES =====
       "@server-stub/database": ["./src/stubs/database-stub.ts"],

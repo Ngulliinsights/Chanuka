@@ -10,18 +10,6 @@ import path from 'path';
 
 import { glob } from 'glob';
 
-interface ValidationResult {
-  passed: boolean;
-  issues: string[];
-  warnings: string[];
-  summary: {
-    filesChecked: number;
-    unifiedComponentsUsed: number;
-    designTokensUsed: number;
-    legacyPatternsFound: number;
-  };
-}
-
 class MigrationValidator {
   private issues: string[] = [];
   private warnings: string[] = [];

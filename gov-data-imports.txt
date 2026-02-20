@@ -1,0 +1,3 @@
+server/scripts/test-government-integration.ts:7:import { GovernmentDataIntegrationService } from '@shared/infrastructure/external-data/government-data-integration';
+server/infrastructure/external-data/data-synchronization-service.ts:9:import { GovernmentDataService } from '@server/infrastructure/external-data/government-data-service';
+server/features/users/infrastructure/government-data-service.ts:3:import { GovernmentDataService } from '@/infrastructure/external-data/government-data-service';

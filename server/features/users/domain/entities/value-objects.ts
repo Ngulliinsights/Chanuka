@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { emailSchema } from '@shared/validation';
 
 // Value Objects for User Domain
 
@@ -6,8 +7,7 @@ export class Email {
   private constructor(private readonly _value: string) {}
 
   static create(email: string): Email {
-    const schema = z.string().email().min(1).max(254);
-    const validated = schema.parse(email.toLowerCase().trim());
+    const validated = emailSchema.parse(email.toLowerCase().trim());
     return new Email(validated);
   }
 

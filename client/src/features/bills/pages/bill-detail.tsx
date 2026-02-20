@@ -11,8 +11,14 @@ import BillFullTextTab from '@client/features/bills/ui/detail/BillFullTextTab';
 import BillOverviewTab from '@client/features/bills/ui/detail/BillOverviewTab';
 import BillSponsorsTab from '@client/features/bills/ui/detail/BillSponsorsTab';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/components/ImplementationWorkarounds';
+import { BriefViewer } from '@client/features/bills/ui/legislative-brief';
+import { ActionPromptCard } from '@client/features/bills/ui/action-prompts';
+import { PlainLanguageView } from '@client/features/bills/ui/translation';
+import { ImpactCalculator } from '@client/features/bills/ui/impact';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@client/services/apiService';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +37,16 @@ export default function BillDetail() {
 
   // ✅ Use the React Query Hook (The Brain)
   const { data: bill, isLoading, isError, error } = useBill(id);
+
+  // Fetch action prompts for this bill
+  const { data: actionPrompts } = useQuery({
+    queryKey: ['action-prompts', id],
+    queryFn: async () => {
+      const response = await api.get(`/api/bills/${id}/action-prompts`);
+      return response.data;
+    },
+    enabled: !!id,
+  });
 
   // 1. Loading State
   if (isLoading) {
@@ -75,9 +91,21 @@ export default function BillDetail() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10 h-auto">
           <TabsTrigger value="overview" className="py-3">
             Overview
+          </TabsTrigger>
+          <TabsTrigger value="plain-language" className="py-3">
+            📖 Plain Language
+          </TabsTrigger>
+          <TabsTrigger value="impact" className="py-3">
+            💰 My Impact
+          </TabsTrigger>
+          <TabsTrigger value="actions" className="py-3">
+            🎯 Actions
+          </TabsTrigger>
+          <TabsTrigger value="brief" className="py-3">
+            📄 Brief
           </TabsTrigger>
           <TabsTrigger value="text" className="py-3">
             Full Text
@@ -98,6 +126,36 @@ export default function BillDetail() {
 
         <TabsContent value="overview" className="space-y-6">
           <BillOverviewTab bill={bill} />
+        </TabsContent>
+
+        <TabsContent value="plain-language" className="space-y-4">
+          <PlainLanguageView billId={bill.id} />
+        </TabsContent>
+
+        <TabsContent value="impact" className="space-y-4">
+          <ImpactCalculator billId={bill.id} />
+        </TabsContent>
+
+        <TabsContent value="actions" className="space-y-4">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Take Action</h2>
+            <p className="text-gray-600 mb-6">
+              Here are the actions you can take right now to engage with this bill.
+            </p>
+            {actionPrompts && actionPrompts.length > 0 ? (
+              <div className="space-y-4">
+                {actionPrompts.map((prompt: any, idx: number) => (
+                  <ActionPromptCard key={idx} prompt={prompt} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No actions available at this time.</p>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="brief" className="space-y-4">
+          <BriefViewer billId={bill.id} />
         </TabsContent>
 
         <TabsContent value="text">

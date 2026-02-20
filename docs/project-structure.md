@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 18, 2026 at 12:30 PM
+**Generated:** February 20, 2026 at 01:38 AM
 **Max Depth:** 7 levels
-**Total Items:** 4,003
+**Total Items:** 3,971
 
 ```
 .
@@ -105,8 +105,10 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── service.ts
 │   │   │   ├── api/
+│   │   │   │   ├── circuit-breaker/
+│   │   │   │   │   ├── core.ts
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── examples/
-│   │   │   │   │   └── circuit-breaker-usage.ts
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── use-api-with-fallback.ts
@@ -129,6 +131,7 @@
 │   │   │   │   │   ├── engagement.ts
 │   │   │   │   │   ├── error-response.ts
 │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── interceptors.ts
 │   │   │   │   │   ├── performance.ts
 │   │   │   │   │   ├── preferences.ts
 │   │   │   │   │   ├── request.ts
@@ -137,12 +140,9 @@
 │   │   │   │   │   └── sponsor.ts
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── auth.ts
-│   │   │   │   ├── authenticated-client.ts
 │   │   │   │   ├── authentication.ts
-│   │   │   │   ├── base-client.ts
 │   │   │   │   ├── bills.ts
 │   │   │   │   ├── cache-manager.ts
-│   │   │   │   ├── circuit-breaker-client.ts
 │   │   │   │   ├── circuit-breaker-monitor.ts
 │   │   │   │   ├── client.ts
 │   │   │   │   ├── community.ts
@@ -155,9 +155,7 @@
 │   │   │   │   ├── performance.ts
 │   │   │   │   ├── privacy.ts
 │   │   │   │   ├── registry.ts
-│   │   │   │   ├── retry-handler.ts
 │   │   │   │   ├── retry.ts
-│   │   │   │   ├── safe-client.ts
 │   │   │   │   ├── search.ts
 │   │   │   │   ├── serialization-interceptors.ts
 │   │   │   │   ├── system.ts
@@ -406,9 +404,6 @@
 │   │   │   │   │   └── security-config.ts
 │   │   │   │   ├── headers/
 │   │   │   │   │   └── SecurityHeaders.ts
-│   │   │   │   ├── migration/
-│   │   │   │   │   ├── compatibility-layer.ts
-│   │   │   │   │   └── migration-utils.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── dashboard/
 │   │   │   │   │   │   ├── SecureForm.tsx
@@ -434,7 +429,6 @@
 │   │   │   │   │   ├── rate-limiter.ts
 │   │   │   │   │   ├── security-interface.ts
 │   │   │   │   │   └── system.ts
-│   │   │   │   ├── csp-manager.ts
 │   │   │   │   ├── csp-nonce.ts
 │   │   │   │   ├── csrf-protection.ts
 │   │   │   │   ├── index.ts
@@ -1001,6 +995,12 @@
 │   │   │   │   │   ├── base/
 │   │   │   │   │   │   ├── base.css
 │   │   │   │   │   │   └── variables.css
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── buttons.css
+│   │   │   │   │   │   ├── forms.css
+│   │   │   │   │   │   ├── layout.css
+│   │   │   │   │   │   ├── progressive-disclosure.css
+│   │   │   │   │   │   └── ui.css
 │   │   │   │   │   ├── responsive/
 │   │   │   │   │   │   ├── desktop.css
 │   │   │   │   │   │   ├── mobile.css
@@ -1018,6 +1018,10 @@
 │   │   │   │   │   ├── globals.css
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── STYLE_GUIDE.md
+│   │   │   │   ├── theme/
+│   │   │   │   │   ├── dark.css
+│   │   │   │   │   ├── high-contrast.css
+│   │   │   │   │   └── light.css
 │   │   │   │   ├── themes/
 │   │   │   │   │   ├── dark.ts
 │   │   │   │   │   ├── high-contrast.ts
@@ -1231,8 +1235,6 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── community/
 │   │   │   │   │   ├── community-base.ts
-│   │   │   │   │   ├── community-base.ts.orig
-│   │   │   │   │   ├── community-base.ts.rej
 │   │   │   │   │   ├── community-hooks.ts
 │   │   │   │   │   ├── community-services.ts
 │   │   │   │   │   └── index.ts
@@ -1676,6 +1678,16 @@
 │   ├── pipeline-config.yml
 │   └── README.md
 ├── docs/
+│   ├── adr/
+│   │   ├── ADR-001-api-client-consolidation.md
+│   │   ├── ADR-002-client-api-architecture.md
+│   │   ├── ADR-003-dead-vs-unintegrated-code.md
+│   │   ├── ADR-004-feature-structure-convention.md
+│   │   ├── ADR-005-csp-manager-consolidation.md
+│   │   ├── ADR-006-validation-single-source.md
+│   │   ├── ADR-007-utils-consolidation.md
+│   │   ├── ADR-008-incomplete-migrations.md
+│   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
 │   │   │   ├── design.md
@@ -1805,6 +1817,8 @@
 │   │   ├── sponsorbyreal.html
 │   │   ├── strategic_additions_poems.md
 │   │   └── strategy_template_flow.mermaid
+│   ├── development/
+│   │   └── CIRCULAR_DEPENDENCY_PREVENTION.md
 │   ├── guides/
 │   │   ├── templates/
 │   │   │   ├── new-api-endpoint-template.md
@@ -1895,6 +1909,7 @@
 │   │   ├── race-condition-analysis.md
 │   │   └── schema-domain-relationships.md
 │   ├── technical,/
+│   ├── api-client-guide.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
 │   ├── BUG_FIX_REPORT.md
 │   ├── CLIENT_HEALTH_CHECK.md
@@ -2076,10 +2091,6 @@
 │   │   │   ├── TASK10_IMPLEMENTATION_SUMMARY.md
 │   │   │   └── TASK10.1_SUMMARY.md
 │   │   ├── scripts/
-│   │   │   ├── error-remediation/
-│   │   │   │   ├── reports/
-│   │   │   │   │   └── backups/
-│   │   │   │   └── tests/
 │   │   │   ├── phase1-module-discovery.ts
 │   │   │   ├── phase2-generate-fixes.ts
 │   │   │   └── phase2-import-updates.ts
@@ -2146,6 +2157,14 @@
 │   │   │   │   │   ├── backup-1771266598469/
 │   │   │   │   │   ├── backup-1771282234723/
 │   │   │   │   │   ├── backup-1771282246610/
+│   │   │   │   │   ├── backup-1771413595262/
+│   │   │   │   │   ├── backup-1771413613080/
+│   │   │   │   │   ├── backup-1771427590389/
+│   │   │   │   │   ├── backup-1771427605079/
+│   │   │   │   │   ├── backup-1771428483064/
+│   │   │   │   │   ├── backup-1771428493700/
+│   │   │   │   │   ├── backup-1771488240065/
+│   │   │   │   │   ├── backup-1771488256065/
 │   │   │   │   │   ├── server/
 │   │   │   │   │   │   └── infrastructure/
 │   │   │   │   │   │       └── schema/
@@ -2262,6 +2281,7 @@
 │   ├── architecture_fixer.ts
 │   ├── audit-codebase-utilities.ts
 │   ├── audit-error-handling-sprawl.ts
+│   ├── audit-imports-exports.ts
 │   ├── audit-middleware-sprawl.ts
 │   ├── bulk-migrate-types.sh
 │   ├── bundle-analysis-plugin.js
@@ -2271,6 +2291,7 @@
 │   ├── check-tables.ts
 │   ├── check-thresholds.js
 │   ├── check-type-compatibility.ts
+│   ├── CLASSIFICATION.md
 │   ├── clean-shared-core-imports.ts
 │   ├── cleanup-deprecated-folders.ts
 │   ├── cleanup-legacy-adapters.js
@@ -2296,8 +2317,6 @@
 │   ├── domain-type-migration-plan.md
 │   ├── drop-schema.ts
 │   ├── dynamic-path-updater.js
-│   ├── emergency-build-fix.ts
-│   ├── emergency-design-system-consolidation.ts
 │   ├── enum-alignment-audit.md
 │   ├── execute-comprehensive-migration.ts
 │   ├── final-client-cleanup.sh
@@ -2317,9 +2336,11 @@
 │   ├── fix-eslint-suppressions.ts
 │   ├── fix-features-integration.ts
 │   ├── fix-frontend-imports.js
+│   ├── fix-graph-imports.ts
 │   ├── fix-import-paths.ts
 │   ├── fix-import-resolution.ts
 │   ├── fix-infrastructure-issues.ts
+│   ├── fix-js-extensions.ts
 │   ├── fix-lucide-imports.ts
 │   ├── fix-missing-exports.ts
 │   ├── fix-plural-singular-consistency.ts
@@ -2370,6 +2391,7 @@
 │   ├── migrate-to-unified-websocket.ts
 │   ├── migrate-types.js
 │   ├── migrate-types.ts
+│   ├── migrate-utils-consolidation.ts
 │   ├── ml-service-demo.ts
 │   ├── modern-project-analyzer.ts
 │   ├── nuanced-verification.ts
@@ -2401,6 +2423,7 @@
 │   ├── strategic-contrast-migration.js
 │   ├── test-consolidated-design-system.ts
 │   ├── test-design-system-architecture.ts
+│   ├── test-neo4j-integration.ts
 │   ├── track-progress.ts
 │   ├── update-core-imports.js
 │   ├── update-core-references.js
@@ -2425,6 +2448,7 @@
 │   ├── verify-and-fix-project-structure.ts
 │   ├── verify-api-contract-coverage.ts
 │   ├── verify-cleanup.ts
+│   ├── verify-graph-refactoring.ts
 │   ├── verify-metrics.ts
 │   ├── verify-project-structure.ts
 │   ├── verify-security-patches.ts
@@ -3021,11 +3045,22 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-config.ts
 │   │   │   ├── graph/
+│   │   │   │   ├── analytics/
+│   │   │   │   │   ├── advanced-analytics.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── influence-service.ts
+│   │   │   │   │   ├── network-discovery.ts
+│   │   │   │   │   ├── pattern-discovery-service.ts
+│   │   │   │   │   ├── pattern-discovery.ts
+│   │   │   │   │   └── recommendation-engine.ts
 │   │   │   │   ├── config/
 │   │   │   │   │   ├── graph-config.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── core/
+│   │   │   │   │   ├── app-init.ts
 │   │   │   │   │   ├── batch-sync-runner.ts
+│   │   │   │   │   ├── graphql-api.ts
+│   │   │   │   │   ├── idempotency-ledger.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── neo4j-client.ts
 │   │   │   │   │   ├── schema.ts
@@ -3036,52 +3071,34 @@
 │   │   │   │   │   ├── engagement-queries.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── network-queries.ts
-│   │   │   │   ├── utils/
+│   │   │   │   ├── sync/
+│   │   │   │   │   ├── advanced-relationships.ts
+│   │   │   │   │   ├── advanced-sync.ts
+│   │   │   │   │   ├── array-field-sync.ts
+│   │   │   │   │   ├── conflict-resolver.ts
+│   │   │   │   │   ├── engagement-networks.ts
+│   │   │   │   │   ├── engagement-sync.ts
 │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── institutional-networks.ts
+│   │   │   │   │   ├── network-sync.ts
+│   │   │   │   │   ├── parliamentary-networks.ts
+│   │   │   │   │   ├── relationships.ts
+│   │   │   │   │   ├── safeguards-networks.ts
+│   │   │   │   │   └── sync-monitoring.ts
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── cache-adapter-v2.ts
+│   │   │   │   │   ├── error-adapter-v2.ts
+│   │   │   │   │   ├── error-classifier.ts
+│   │   │   │   │   ├── health-adapter-v2.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── operation-guard.ts
 │   │   │   │   │   ├── query-builder.ts
-│   │   │   │   │   └── session-manager.ts
-│   │   │   │   ├── advanced-analytics.ts
-│   │   │   │   ├── advanced-queries.ts
-│   │   │   │   ├── advanced-relationships.ts
-│   │   │   │   ├── advanced-sync.ts
-│   │   │   │   ├── app-init.ts
-│   │   │   │   ├── array-field-sync.ts
-│   │   │   │   ├── batch-sync-runner.ts
-│   │   │   │   ├── cache-adapter-v2.ts
-│   │   │   │   ├── conflict-resolver.ts
-│   │   │   │   ├── engagement-networks.ts
-│   │   │   │   ├── engagement-queries.ts
-│   │   │   │   ├── engagement-sync.ts
-│   │   │   │   ├── error-adapter-v2.ts
-│   │   │   │   ├── error-classifier.ts
-│   │   │   │   ├── graph-config.ts
-│   │   │   │   ├── graphql-api.ts
-│   │   │   │   ├── health-adapter-v2.ts
-│   │   │   │   ├── idempotency-ledger.ts
+│   │   │   │   │   ├── result-normalizer.ts
+│   │   │   │   │   ├── retry-utils.ts
+│   │   │   │   │   ├── session-manager.ts
+│   │   │   │   │   └── test-harness.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── influence-service.ts
-│   │   │   │   ├── institutional-networks.ts
-│   │   │   │   ├── neo4j-client.ts
-│   │   │   │   ├── network-discovery.ts
-│   │   │   │   ├── network-queries.ts
-│   │   │   │   ├── network-sync.ts
-│   │   │   │   ├── operation-guard.ts
-│   │   │   │   ├── parliamentary-networks.ts
-│   │   │   │   ├── pattern-discovery-service.ts
-│   │   │   │   ├── pattern-discovery.ts
-│   │   │   │   ├── query-builder.ts
-│   │   │   │   ├── recommendation-engine.ts
-│   │   │   │   ├── REFACTORING_SUMMARY.md
-│   │   │   │   ├── relationships.ts
-│   │   │   │   ├── result-normalizer.ts
-│   │   │   │   ├── retry-utils.ts
-│   │   │   │   ├── safeguards-networks.ts
-│   │   │   │   ├── schema.ts
-│   │   │   │   ├── session-manager.ts
-│   │   │   │   ├── sync-executor.ts
-│   │   │   │   ├── sync-monitoring.ts
-│   │   │   │   ├── test-harness.ts
-│   │   │   │   └── transaction-executor.ts
+│   │   │   │   └── REFACTORING_SUMMARY.md
 │   │   │   ├── persistence/
 │   │   │   │   ├── drizzle/
 │   │   │   │   │   ├── drizzle-bill-repository.ts
@@ -3110,8 +3127,6 @@
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
 │   │   │   ├── external-api-manager.ts
-│   │   │   ├── government-data-integration.ts
-│   │   │   ├── government-data-service.ts
 │   │   │   ├── index.ts
 │   │   │   └── types.ts
 │   │   ├── integration/
@@ -3411,7 +3426,6 @@
 │   │   ├── api-response.ts
 │   │   ├── api-utils.ts
 │   │   ├── cache-utils.ts
-│   │   ├── correlation-id.ts
 │   │   ├── crypto.ts
 │   │   ├── db-helpers.ts
 │   │   ├── db-init.ts
@@ -3437,14 +3451,11 @@
 │   ├── PHASE1_COMPLETION_SUMMARY.md
 │   ├── PHASE1_FINAL_REPORT.md
 │   ├── project.json
-│   ├── tsc-output-after-fix1.txt
-│   ├── tsc-output-after-fix2.txt
-│   ├── tsc-output-final.txt
-│   ├── tsc-output-fresh.txt
-│   ├── tsc-output.txt
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   └── vite.ts
+├── serverinfrastructuredatabasegraphanalytics/
+├── serverinfrastructuredatabasegraphsync/
 ├── shared/
 │   ├── constants/
 │   │   ├── error-codes.ts
@@ -3693,9 +3704,13 @@
 │   │   ├── README.md
 │   │   └── verify-dependencies.ts
 │   ├── utils/
+│   │   ├── correlation-id/
+│   │   │   ├── context.ts
+│   │   │   ├── generator.ts
+│   │   │   ├── index.ts
+│   │   │   └── middleware.ts
 │   │   ├── errors/
 │   │   │   ├── context.ts
-│   │   │   ├── correlation-id.ts
 │   │   │   ├── index.ts
 │   │   │   ├── logger.ts
 │   │   │   ├── transform.test.ts
@@ -3728,8 +3743,14 @@
 │   │   │   ├── index.ts
 │   │   │   ├── user.schema.ts
 │   │   │   └── validation-schemas.test.ts
+│   │   ├── validators/
+│   │   │   ├── bill-number.ts
+│   │   │   ├── email.ts
+│   │   │   ├── index.ts
+│   │   │   └── password.ts
 │   │   ├── errors.ts
 │   │   ├── index.ts
+│   │   ├── middleware.ts
 │   │   ├── SCHEMA_ALIGNMENT_GUIDE.md
 │   │   └── test-schemas.ts
 │   ├── fix-unused.ts
@@ -3765,6 +3786,7 @@
 │   │   │   ├── comment-flow.integration.test.ts
 │   │   │   ├── data-retrieval-flow.integration.test.ts
 │   │   │   ├── error-scenarios.integration.test.ts
+│   │   │   ├── graph-module.integration.test.ts
 │   │   │   ├── transformation-pipeline.integration.test.ts
 │   │   │   └── user-flow.integration.test.ts
 │   │   ├── index.ts
@@ -3911,104 +3933,50 @@
 │   ├── orphans-metadata.json
 │   ├── TIER_1_INTEGRATION_STATUS.md
 │   └── top-orphans-loc.json
-├── ALIAS_AND_API_ISSUES_SUMMARY.md
-├── ALIAS_RESOLUTION_ANALYSIS.md
-├── API_CLIENTS_UNINTEGRATED_ROOT_CAUSE_ANALYSIS.md
 ├── ARCHITECTURE.md
 ├── archive-docs.sh
 ├── CHANGELOG.md
 ├── clear-sw.html
-├── CLIENT_API_ARCHITECTURE_ANALYSIS.md
-├── COMMIT_SUMMARY.md
-├── COMPLETION_STRATEGY.ts
-├── COMPREHENSIVE_FINAL_SUMMARY.md
+├── CONSOLIDATION_PROGRESS_REPORT.md
+├── CONSOLIDATION_SESSION_SUMMARY.md
 ├── CONTRIBUTING.md
-├── CRITICAL_ACTIONS_REQUIRED.md
 ├── cspell.config.yaml
-├── DATABASE_SERVICE_EXPLANATION.md
-├── DATABASE_SERVICE_MISSING_ISSUE.md
-├── DEAD_VS_UNINTEGRATED_CODE_ANALYSIS.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
+├── DOCUMENTATION_AUDIT_REPORT.md
 ├── drizzle.config.ts
-├── DUPLICATION_ANALYSIS.md
 ├── enum-alignment-report.json
-├── EXECUTIVE_SUMMARY.md
-├── FEATURE_STRUCTURE_ANALYSIS.md
-├── FINAL_FIX_INSTRUCTIONS.md
-├── FINAL_SESSION_REPORT.md
-├── FIXES_APPLIED.md
+├── flat-imports.txt
 ├── generate-structure.mjs
-├── IMMEDIATE_ACTION_PLAN.md
-├── IMPORT_FIXES_COMPLETE.md
-├── IMPORT_RESOLUTION_COMPLETE_SUMMARY.md
-├── IMPORT_RESOLUTION_FINAL_REPORT.md
-├── IMPORT_RESOLUTION_FIX_PLAN.md
-├── IMPORT_RESOLUTION_FIXES_APPLIED.md
-├── INCOMPLETE_MIGRATION_ANALYSIS.md
+├── gov-data-imports.txt
+├── IMPORT_EXPORT_AUDIT.json
 ├── knip.config.ts
 ├── knip.json
-├── LOGGER_USAGE_GUIDE.md
-├── METRICS_FIX_PLAN.md
-├── METRICS_FIX_PROGRESS.md
-├── MIGRATION_PLAN.md
-├── migration-and-structure-report.md
 ├── migration-verification-report.json
 ├── nginx.conf
+├── nul
 ├── nx.json
-├── OBSERVABILITY_FIX_SUMMARY.md
-├── OBSERVABILITY_REORGANIZATION_COMPLETE.md
 ├── package.json
 ├── performance-baselines.json
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
-├── POSTGRES_CLAIMS_VALIDATION.md
-├── postgresql_merged.md
-├── PRE_COMMIT_ANALYSIS.md
-├── PROGRESS_UPDATE_SESSION_2.md
-├── PROGRESS_UPDATE.md
-├── QUICK_REFERENCE.md
-├── QUICK_START_FOR_NEXT_SESSION.ts
 ├── README.md
+├── referenced-scripts.txt
 ├── run_codebase_stats.bat
 ├── schema-type-alignment-report.json
-├── SEARCH_ALL_FIXES_COMPLETE.md
-├── SEARCH_ERROR_FIX_STRATEGY.md
-├── SEARCH_FINAL_FIX_EXECUTION.md
-├── SEARCH_FIX_COMPLETION_REPORT.md
-├── SEARCH_FIX_FINAL_SUMMARY.md
-├── SEARCH_FIX_SUMMARY.md
-├── SEARCH_ROUTES_ANALYSIS.md
-├── SEARCH_SYSTEM_FIX_COMPLETE.md
-├── SEARCH_SYSTEM_FIX_PLAN.md
-├── SECURITY_CSP_DUPLICATION_ANALYSIS.md
-├── SESSION_2_COMPLETION_SUMMARY.ts
-├── SESSION_2_FINAL_SUMMARY.md
-├── SESSION_SUMMARY.md
-├── START_HERE.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── test_api_integration.js
-├── tsc_output.txt
-├── tsc-errors.txt
-├── TSCONFIG_FIX_COMPLETE.md
 ├── tsconfig.json
-├── tsconfig.server.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo
-├── type-check-output.txt
-├── TYPESCRIPT_MODULE_RESOLUTION_FIX.md
-├── VALIDATION_ARCHITECTURE_ANALYSIS.md
-├── VALIDATION_SCHEMA_ALIGNMENT_COMPLETE.md
-├── VERIFICATION_SUMMARY.md
 ├── verify-graph-implementation.sh
 ├── vitest.setup.ts
-├── vitest.workspace.ts
-└── WORK_COMPLETED_SUMMARY.md
+└── vitest.workspace.ts
 ```
 
 ## Configuration

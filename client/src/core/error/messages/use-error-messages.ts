@@ -9,14 +9,18 @@ import { useCallback, useMemo } from 'react';
 
 import { AppError } from '../types';
 
-import {
-  formatErrorMessage,
-  getRecoverySuggestions,
-  createEnhancedErrorMessage,
-  getLocalizedMessage,
-  formatErrorForDisplay,
-  formatErrorForHTML
-} from './index';
+// Import directly from source files to avoid circular dependency with index.ts
+import { formatErrorMessage, formatErrorForDisplay, formatErrorForHTML } from './error-message-formatter';
+import { getRecoverySuggestions } from './error-recovery-suggestions';
+import { getLocalizedMessage } from './error-message-templates';
+import type { FormatOptions } from './error-message-formatter';
+
+// Import createEnhancedErrorMessage type inline to avoid circular dependency
+interface EnhancedErrorMessage {
+  formattedMessage: ReturnType<typeof formatErrorMessage>;
+  template: any;
+  recoverySuggestions: ReturnType<typeof getRecoverySuggestions>;
+}
 
 // ============================================================================
 // Main Error Messages Hook
@@ -40,11 +44,33 @@ export function useErrorMessages() {
   }, []);
 
   // Create enhanced error message
-  const createEnhancedMessage = useCallback((error: AppError | Error, options = {}) => {
-    return createEnhancedErrorMessage(error, {
-      locale: currentLocale,
-      ...options
-    });
+  const createEnhancedMessage = useCallback((error: AppError | Error, options: FormatOptions & { maxSuggestions?: number } = {}): EnhancedErrorMessage => {
+    const { maxSuggestions = 3, ...formatOptions } = options;
+    
+    // Import getBestMatchTemplate dynamically to avoid circular dependency
+    const { getBestMatchTemplate } = require('./error-message-templates');
+    const { ErrorDomain, ErrorSeverity } = require('../constants');
+    
+    const template = getBestMatchTemplate(
+      error instanceof AppError ? error.type : ErrorDomain.SYSTEM,
+      error instanceof AppError ? error.severity : ErrorSeverity.MEDIUM,
+      error instanceof AppError ? error.code : undefined
+    );
+
+    return {
+      formattedMessage: formatErrorMessage(error, { locale: currentLocale, ...formatOptions }),
+      template,
+      recoverySuggestions: getRecoverySuggestions(
+        error instanceof AppError ? error : new AppError(
+          error.message || 'Unknown error',
+          error.name || 'UNKNOWN_ERROR',
+          ErrorDomain.SYSTEM,
+          ErrorSeverity.MEDIUM
+        ),
+        {},
+        maxSuggestions
+      ),
+    };
   }, [currentLocale]);
 
   // Get localized message by template ID

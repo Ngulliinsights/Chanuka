@@ -128,3 +128,37 @@ playwright/.cache/client/src/components/Sidebar.tsx
 # Strategic/Business documents (don't commit)
 docs/strategy/
 client/logs/
+
+# Development artifacts and session files
+*.orig
+*.rej
+backup-*/
+**/reports/backups/
+SESSION_*.md
+PROGRESS_*.md
+*_COMPLETION_*.md
+tsc-errors.txt
+tsc_output*.txt
+type-check-output.txt
+performance-baselines.json
+
+# Analysis and summary documents (should be in .archive/ or docs/)
+*_ANALYSIS.md
+*_SUMMARY.md
+*_REPORT.md
+*_FIX_*.md
+*_COMPLETE.md
+*_PLAN.md
+*_AUDIT.md
+*_ISSUES.md
+*_STRATEGY.md
+*_RESOLUTION.md
+
+# Exception: Keep intentional documentation
+!ARCHITECTURE.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!README.md
+!DOCUMENTATION_AUDIT_REPORT.md
+!CONSOLIDATION_SESSION_SUMMARY.md
+nul

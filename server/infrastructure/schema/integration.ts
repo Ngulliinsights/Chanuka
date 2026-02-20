@@ -11,6 +11,8 @@ import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
   index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
+import { z } from 'zod';
+import { emailSchema, uuidSchema, userRoleSchema } from '@shared/validation';
 
 import {
   primaryKeyUuid,
@@ -155,9 +157,9 @@ export function createSessionId(id: string): SessionId {
  * Integrates with database schema for runtime validation
  */
 export const UserSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  role: z.enum(['citizen', 'verified_citizen', 'ambassador', 'expert_verifier', 'mp_staff', 'clerk', 'admin', 'auditor', 'journalist']),
+  id: uuidSchema,
+  email: emailSchema,
+  role: userRoleSchema,
   is_verified: z.boolean(),
   is_active: z.boolean(),
   created_at: z.date(),

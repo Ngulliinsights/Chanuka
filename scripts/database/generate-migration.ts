@@ -1,3 +1,30 @@
+#!/usr/bin/env tsx
+/**
+ * Database Migration Generator
+ * 
+ * Generates new migration files from schema changes using Drizzle ORM.
+ * Compares current schema with database state and creates timestamped migration files.
+ * 
+ * Usage:
+ *   npm run db:generate
+ *   tsx scripts/database/generate-migration.ts
+ * 
+ * What it does:
+ *   - Compares Drizzle schema with current database state
+ *   - Generates SQL migration statements
+ *   - Creates timestamped migration file in drizzle/ directory
+ *   - Validates generated migration syntax
+ * 
+ * When to run:
+ *   - After modifying Drizzle schema files
+ *   - Before committing schema changes
+ *   - As part of development workflow
+ * 
+ * Output:
+ *   - Migration file: drizzle/<timestamp>_<name>.sql
+ *   - Migration metadata: drizzle/meta/<timestamp>_snapshot.json
+ */
+
 // File: generate-migrations.ts
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/node-postgres';
