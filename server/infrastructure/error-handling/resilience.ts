@@ -25,7 +25,7 @@
  * Dependency rule: resilience.ts → types.ts (RetryOptions, CircuitBreakerOptions, CircuitState), logger
  */
 
-import { logger } from '../observability';
+import { logger } from '../observability/core/logger';
 import {
   CircuitBreakerOptions,
   CircuitBreakerStats,

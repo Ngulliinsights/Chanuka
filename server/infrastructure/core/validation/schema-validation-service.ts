@@ -7,7 +7,7 @@ import {
   complianceChecks,
   securityAuditLogs,
   threatIntelligence
-} from '@/shared/schema';
+} from '@shared/schema';
 
 export interface ValidationResult {
   tableName: string;
