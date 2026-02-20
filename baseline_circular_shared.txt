@@ -1,0 +1,8 @@
+$ npx madge --circular --extensions ts,tsx shared/
+Processed 983 files (24.8s) (121 warnings)
+
+✖ Found 3 circular dependencies!
+
+1) dist/core/observability/interfaces.d.ts > dist/core/observability/telemetry.d.ts
+2) dist/core/src/observability/interfaces.d.ts > dist/core/observability/telemetry.d.ts
+3) dist/schema/domains/foundation.d.ts

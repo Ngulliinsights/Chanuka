@@ -1,0 +1,259 @@
+=== Baseline Error Analysis ===
+
+File: baseline_tsc_root.txt
+---
+TS2307 (Cannot find module): 0
+0
+TS2305 (Module has no exported member): 0
+0
+TS2614 (Module not found or not a module): 0
+0
+TS2724 (Module has no default export): 0
+0
+TS7006 (Parameter implicitly has 'any'): 0
+0
+TS18046 (Possibly undefined): 0
+0
+TS6133 (Variable declared but never used): 0
+0
+
+All error codes in this file:
+
+Total error lines: 0
+0
+
+========================================
+
+File: baseline_tsc_client.txt
+---
+TS2307 (Cannot find module): 16
+TS2305 (Module has no exported member): 79
+TS2614 (Module not found or not a module): 1
+TS2724 (Module has no default export): 19
+TS7006 (Parameter implicitly has 'any'): 14
+TS18046 (Possibly undefined): 390
+TS6133 (Variable declared but never used): 639
+
+All error codes in this file:
+    639 TS6133
+    390 TS2339
+    390 TS18046
+    146 TS2304
+    124 TS2353
+    106 TS18048
+    102 TS2322
+     83 TS2345
+     79 TS2532
+     79 TS2305
+     71 TS6196
+     71 TS4114
+     43 TS2551
+     34 TS7030
+     23 TS2352
+     19 TS2724
+     18 TS2416
+     17 TS2571
+     16 TS2307
+     15 TS2769
+     14 TS7006
+     12 TS7053
+     12 TS2554
+     11 TS6192
+      8 TS2538
+      5 TS2540
+      5 TS2308
+      4 TS6198
+      4 TS2698
+      3 TS2612
+      3 TS2552
+      3 TS2370
+      3 TS2344
+      3 TS1205
+      2 TS6138
+      2 TS2488
+      2 TS2459
+      2 TS2365
+      2 TS2341
+      1 TS7024
+      1 TS7022
+      1 TS2722
+      1 TS2614
+      1 TS2407
+      1 TS18047
+
+Total error lines: 2571
+
+========================================
+
+File: baseline_tsc_server.txt
+---
+TS2307 (Cannot find module): 1004
+TS2305 (Module has no exported member): 115
+TS2614 (Module not found or not a module): 96
+TS2724 (Module has no default export): 51
+TS7006 (Parameter implicitly has 'any'): 492
+TS18046 (Possibly undefined): 793
+TS6133 (Variable declared but never used): 810
+
+All error codes in this file:
+   1004 TS2307
+    810 TS6133
+    793 TS18046
+    492 TS7006
+    453 TS2304
+    305 TS2339
+    142 TS2345
+    125 TS18048
+    115 TS2305
+    112 TS2322
+     96 TS2614
+     74 TS2532
+     67 TS2769
+     56 TS2300
+     51 TS2724
+     48 TS2323
+     35 TS7030
+     34 TS1210
+     29 TS2484
+     27 TS2551
+     26 TS2393
+     23 TS6192
+     20 TS6196
+     18 TS2698
+     16 TS1205
+     13 TS7053
+     13 TS2308
+     12 TS1272
+     11 TS2694
+      9 TS4115
+      9 TS2454
+      9 TS2353
+      8 TS2448
+      7 TS2554
+      7 TS2540
+      6 TS6138
+      5 TS7031
+      5 TS7022
+      5 TS2561
+      5 TS2365
+      4 TS2552
+      4 TS2451
+      4 TS2354
+      4 TS2344
+      3 TS7027
+      3 TS4114
+      3 TS2683
+      3 TS2663
+      3 TS2538
+      3 TS2459
+      3 TS2352
+      3 TS2348
+      2 TS7034
+      2 TS7016
+      2 TS7005
+      2 TS2731
+      2 TS2556
+      2 TS2407
+      2 TS2362
+      2 TS2349
+      2 TS18047
+      2 TS18004
+      2 TS1361
+      1 TS6198
+      1 TS2722
+      1 TS2719
+      1 TS2571
+      1 TS2488
+      1 TS2440
+      1 TS2312
+      1 TS1448
+      1 TS1225
+      1 TS1215
+
+Total error lines: 5167
+
+========================================
+
+File: baseline_tsc_shared.txt
+---
+TS2307 (Cannot find module): 33
+TS2305 (Module has no exported member): 18
+TS2614 (Module not found or not a module): 0
+0
+TS2724 (Module has no default export): 4
+TS7006 (Parameter implicitly has 'any'): 3
+TS18046 (Possibly undefined): 381
+TS6133 (Variable declared but never used): 121
+
+All error codes in this file:
+    381 TS18046
+    121 TS6133
+     81 TS2339
+     52 TS2353
+     49 TS2322
+     47 TS2345
+     33 TS2307
+     28 TS6196
+     24 TS2416
+     23 TS2308
+     21 TS4114
+     20 TS2352
+     18 TS2305
+     16 TS7053
+     14 TS2554
+     14 TS2540
+     13 TS18048
+     12 TS2741
+     12 TS2304
+      9 TS2769
+      9 TS2484
+      9 TS18047
+      6 TS6192
+      6 TS2693
+      5 TS2739
+      4 TS2724
+      4 TS2532
+      3 TS7006
+      3 TS2552
+      3 TS2538
+      2 TS7034
+      2 TS7005
+      2 TS6138
+      2 TS2365
+      2 TS2344
+      2 TS2300
+      2 TS1202
+      1 TS7024
+      1 TS7022
+      1 TS2783
+      1 TS2545
+      1 TS2430
+
+Total error lines: 1059
+
+========================================
+
+File: baseline_vitest.txt
+---
+TS2307 (Cannot find module): 0
+0
+TS2305 (Module has no exported member): 0
+0
+TS2614 (Module not found or not a module): 0
+0
+TS2724 (Module has no default export): 0
+0
+TS7006 (Parameter implicitly has 'any'): 0
+0
+TS18046 (Possibly undefined): 0
+0
+TS6133 (Variable declared but never used): 0
+0
+
+All error codes in this file:
+
+Total error lines: 0
+0
+
+========================================
+

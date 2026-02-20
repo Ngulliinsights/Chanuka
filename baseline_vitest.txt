@@ -1,0 +1,200 @@
+[1m[43m DEPRECATED [49m[22m [33mThe workspace file is deprecated and will be removed in the next major. Please, use the `test.projects` field in the root config file instead.[39m
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+✅ Environment variables validated successfully
+✅ Environment variables validated successfully
+✅ Environment variables validated successfully
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Access Granted/Downloads/projects/SimpleTool[39m
+
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mconstructor[2m > [22mshould create a cache with the specified max size[32m 4[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mconstructor[2m > [22mshould throw error for invalid max size[32m 3[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mset and get[2m > [22mshould set and get values correctly[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mset and get[2m > [22mshould return undefined for non-existent keys[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mset and get[2m > [22mshould update existing values[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mset and get[2m > [22mshould move accessed items to front[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22meviction[2m > [22mshould evict least recently used item when full[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22meviction[2m > [22mshould evict correctly after access pattern[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22meviction[2m > [22mshould handle complex access patterns[32m 4[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mhas[2m > [22mshould check existence without affecting order[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mdelete[2m > [22mshould delete existing keys[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mdelete[2m > [22mshould return false for non-existent keys[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mdelete[2m > [22mshould handle deleting head node[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mdelete[2m > [22mshould handle deleting tail node[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mclear[2m > [22mshould remove all items[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22msize and capacity[2m > [22mshould track size correctly[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mkeys, values, and entries[2m > [22mshould return keys in MRU to LRU order[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mkeys, values, and entries[2m > [22mshould return values in MRU to LRU order[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mkeys, values, and entries[2m > [22mshould return entries in MRU to LRU order[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mkeys, values, and entries[2m > [22mshould return empty arrays when cache is empty[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mpeek operations[2m > [22mshould peek at MRU and LRU items[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mpeek operations[2m > [22mshould return undefined when cache is empty[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mpeek operations[2m > [22mshould not affect order when peeking[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mstatistics[2m > [22mshould provide accurate statistics[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mstatistics[2m > [22mshould handle empty cache statistics[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22medge cases[2m > [22mshould handle single item cache[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22medge cases[2m > [22mshould handle updating values in full cache[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22medge cases[2m > [22mshould handle rapid set/get operations[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22medge cases[2m > [22mshould maintain consistency after many operations[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/websocket/utils/lru-cache.test.ts[2m > [22mLRUCache[2m > [22mtype safety[2m > [22mshould work with different key and value types[32m 1[2mms[22m[39m
+[90mstderr[2m | server/infrastructure/cache/cache-wrappers.test.ts
+[22m[39m[DEPRECATION WARNING] simple-factory.ts is deprecated and will be removed in v2.0.0. Please use createSimpleCacheService from ./factory instead. See migration guide: https://docs.example.com/cache-migration
+
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/cache-wrappers.test.ts[2m > [22mCacheWarmingService[2m > [22mwarmCache[2m > [22mshould warm cache with factory functions[32m 7[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/cache-wrappers.test.ts[2m > [22mCacheWarmingService[2m > [22mwarmCache[2m > [22mshould skip existing keys during warm up[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/cache-wrappers.test.ts[2m > [22mCacheWarmingService[2m > [22mwarmCache[2m > [22mshould handle factory errors gracefully[32m 5[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/cache-wrappers.test.ts[2m > [22mCacheWarmingService[2m > [22mwarmCache[2m > [22mshould warm cache with different data types[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/cache-wrappers.test.ts[2m > [22mCacheWarmingService[2m > [22mwarmCache[2m > [22mshould handle empty entries array[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBasic Operations[2m > [22mshould set and get a value[32m 7[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBasic Operations[2m > [22mshould return null for non-existent key[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBasic Operations[2m > [22mshould delete a value[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBasic Operations[2m > [22mshould check if key exists[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBasic Operations[2m > [22mshould clear all entries[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBatch Operations[2m > [22mshould get multiple values[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBatch Operations[2m > [22mshould set multiple values[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mBatch Operations[2m > [22mshould delete multiple values[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mgetOrSet[2m > [22mshould return cached value if exists[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mgetOrSet[2m > [22mshould call factory and cache result if not exists[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/caching-service.test.ts[2m > [22mCachingService[2m > [22mgetOrSet[2m > [22mshould handle factory errors[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/adapters-factory-integration.test.ts[2m > [22mAdapter-Factory Integration[2m > [22mMemoryAdapter with Factory[2m > [22mshould create MemoryAdapter through factory[32m 5[2mms[22m[39m
+ [32m✓[39m [30m[45m 3 [49m[39m server/infrastructure/cache/adapters-factory-integration.test.ts[2m > [22mAdapter-Factory Integration[2m > [22mMemoryAdapter with Factory[2m > [22mshould perform basic cache operations[32m 3[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasConsecutiveChars[2m > [22mshould detect consecutive characters[32m 4[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasConsecutiveChars[2m > [22mshould return false for non-consecutive characters[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasConsecutiveChars[2m > [22mshould handle empty strings[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasConsecutiveChars[2m > [22mshould handle special regex characters[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsIgnoreCase[2m > [22mshould find substring case-insensitively[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsIgnoreCase[2m > [22mshould return false when substring not found[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsIgnoreCase[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mequalsIgnoreCase[2m > [22mshould compare strings case-insensitively[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mequalsIgnoreCase[2m > [22mshould return false for different strings[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mequalsIgnoreCase[2m > [22mshould handle exact matches[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mequalsIgnoreCase[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasContent[2m > [22mshould return true for strings with content[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasContent[2m > [22mshould return false for empty or whitespace strings[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasValidLength[2m > [22mshould validate string length within bounds[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasValidLength[2m > [22mshould return false for strings outside bounds[32m 0[2mms[22m[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mhasValidLength[2m > [22mshould handle edge cases[32m 22[2mms[22m[39m
+[31m   → expected false to be true // Object.is equality[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsAnyChar[2m > [22mshould detect if string contains any specified characters[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsAnyChar[2m > [22mshould return false when no characters found[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mcontainsAnyChar[2m > [22mshould handle empty arrays[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould convert to uppercase[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould convert to lowercase[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould convert to title case[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould add prefix and suffix[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould truncate long strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mformat[2m > [22mshould apply multiple transformations[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoTitleCase[2m > [22mshould convert to title case[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoTitleCase[2m > [22mshould handle single word[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoCamelCase[2m > [22mshould convert to camelCase[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoCamelCase[2m > [22mshould handle single word[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoPascalCase[2m > [22mshould convert to PascalCase[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoPascalCase[2m > [22mshould handle single word[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoSnakeCase[2m > [22mshould convert to snake_case[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoSnakeCase[2m > [22mshould handle camelCase input[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoKebabCase[2m > [22mshould convert to kebab-case[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Formatting[2m > [22mtoKebabCase[2m > [22mshould handle camelCase input[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mnormalize[2m > [22mshould trim and lowercase[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mnormalize[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mtrim[2m > [22mshould trim whitespace[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mtrim[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mcountOccurrences[2m > [22mshould count string occurrences[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mcountOccurrences[2m > [22mshould count regex pattern occurrences[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mcountOccurrences[2m > [22mshould return 0 for no matches[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mremoveChars[2m > [22mshould remove specified characters[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mremoveChars[2m > [22mshould remove regex pattern[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mremoveChars[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mextractBeforePattern[2m > [22mshould extract substring before pattern[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mextractBeforePattern[2m > [22mshould return null if pattern not found[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mjoinWithOxfordComma[2m > [22mshould join two items with "and"[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mjoinWithOxfordComma[2m > [22mshould join three items with Oxford comma[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Manipulation[2m > [22mjoinWithOxfordComma[2m > [22mshould handle single item[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mlevenshteinDistance[2m > [22mshould calculate edit distance[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mlevenshteinDistance[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22msimilarity[2m > [22mshould calculate similarity score[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22msimilarity[2m > [22mshould return 1 for empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mextractWords[2m > [22mshould extract words from string[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mextractWords[2m > [22mshould handle punctuation[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mextractWords[2m > [22mshould return empty array for no words[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mcountWords[2m > [22mshould count words[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Analysis[2m > [22mcountWords[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould validate with minLength[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould fail validation for too short strings[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould validate with maxLength[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould fail validation for too long strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould validate empty strings when allowed[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22mvalidate[2m > [22mshould fail validation for empty strings when not allowed[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misValidEmail[2m > [22mshould validate correct email addresses[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misValidEmail[2m > [22mshould reject invalid email addresses[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misValidUrl[2m > [22mshould validate correct URLs[32m 0[2mms[22m[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misValidUrl[2m > [22mshould reject invalid URLs[32m 1[2mms[22m[39m
+[31m   → expected true to be false // Object.is equality[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misAlphanumeric[2m > [22mshould validate alphanumeric strings[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misAlphanumeric[2m > [22mshould reject non-alphanumeric strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misNumeric[2m > [22mshould validate numeric strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/string-utils.test.ts[2m > [22mString Manipulation Utilities[2m > [22mString Validation[2m > [22misNumeric[2m > [22mshould reject non-numeric strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould format Date object correctly[32m 41[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould format string date correctly[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould format timestamp number correctly[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould handle edge case: January 1st[32m 4[2mms[22m[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould handle edge case: December 31st[32m 18[2mms[22m[39m
+[31m   → expected 'January 1, 2025' to be 'December 31, 2024' // Object.is equality[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatDate[2m > [22mshould handle leap year date[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatTimestamp[2m > [22mshould format Date object with time[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatTimestamp[2m > [22mshould format timestamp number with time[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatTimestamp[2m > [22mshould include AM/PM indicator[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatTimestamp[2m > [22mshould handle midnight[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatTimestamp[2m > [22mshould handle noon[32m 1[2mms[22m[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return "just now" for very recent times[32m 2[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return "just now" for times within 60 seconds[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return minutes for times within an hour[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return minutes for 30 minutes ago[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return hours for times within a day[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return hours for 12 hours ago[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould return formatted date for times over a day ago[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould handle string date input[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould handle timestamp number input[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould handle edge case: exactly 1 hour ago[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/formatting/date-time.test.ts[2m > [22mDate and Time Formatting Utilities[2m > [22mformatRelativeTime[2m > [22mshould handle edge case: exactly 24 hours ago[32m 1[2mms[22m[39m
+[31m   → jest is not defined[39m
+[31m   → jest is not defined[39m
+ [31m×[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould remove all HTML tags by default[32m 20[2mms[22m[39m
+[31m   → expected 'alert("xss")Hello' to be 'Hello' // Object.is equality[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould remove dangerous script tags[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould remove event handlers[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould remove javascript: protocol[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould trim whitespace[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould limit length when maxLength specified[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeHtml[2m > [22mshould handle non-string input[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould escape single quotes[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould remove semicolons[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould remove SQL comments[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould remove block comments[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould trim whitespace[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeSql[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould remove dangerous characters[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould remove leading dots[32m 1[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould replace multiple dots with single dot[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould trim whitespace[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould limit length to 255 characters[32m 0[2mms[22m[39m
+ [32m✓[39m [30m[46m 5 [49m[39m shared/core/utils/security-utils.test.ts[2m > [22mSecurity and Validation Utilities[2m > [22mInput Sanitization[2m > [22msanitizeFilename[2m > [22mshould handle valid filenames[32m 0[2mms[22m[39m
