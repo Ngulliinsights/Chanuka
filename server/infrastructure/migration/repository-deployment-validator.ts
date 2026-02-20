@@ -1,4 +1,3 @@
-import { databaseService } from '@server/infrastructure/database/database-service';
 import {
   AsyncServiceResult,
   ResultAdapter,
@@ -6,7 +5,7 @@ import {
 import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index';
 import { and, avg, count, desc,eq, sql } from "drizzle-orm";
 
-import { logger } from '@/shared/core';
+import { logger } from '@shared/core';
 
 // Types for deployment validation
 export interface DeploymentValidationConfig {

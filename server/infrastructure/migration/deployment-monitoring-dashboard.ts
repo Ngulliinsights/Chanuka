@@ -5,7 +5,7 @@ import {
   withResultHandling
 } from '@shared/errors/result-adapter';
 
-import { logger } from '@/shared/core';
+import { logger } from '@shared/core';
 
 export interface DashboardMetrics {
   deployment: {

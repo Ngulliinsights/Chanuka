@@ -6,7 +6,7 @@
  * connection management across the platform.
  */
 
-import { logger } from '../../observability';
+import { logger } from '../../observability/core/logger';
 import type { Logger } from '../../observability/core/logger';
 import { DatabaseOrchestrator } from '@server/infrastructure/core/database-orchestrator';
 import { DatabaseConfigManager } from '@server/infrastructure/core/unified-config';
