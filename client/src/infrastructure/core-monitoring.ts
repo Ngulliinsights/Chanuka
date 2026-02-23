@@ -15,7 +15,6 @@ import {
   ErrorAnalytics,
   SystemHealth,
   AppError,
-  ErrorDomain,
   ErrorSeverity
 } from '@client/infrastructure/monitoring/unified-error-monitoring-interface';
 
@@ -237,7 +236,9 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     });
 
     const totalErrors = errors.length;
-    const errorRate = period === 'hour' ? totalErrors : totalErrors / (periodMs[period] / (60 * 60 * 1000));
+    // errorRate is always expressed as errors-per-hour
+    const hoursInPeriod = periodMs[period] / (60 * 60 * 1000);
+    const errorRate = totalErrors / hoursInPeriod;
 
     // Top errors
     const errorCounts: Map<string, number> = new Map();
@@ -262,7 +263,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     };
   }
 
-  private trackCoreError(operationName: string, error: AppError): void {
+  private trackCoreError(operationName: string, _error: AppError): void {
     const stats = this.coreOperationStats.get(operationName) || {
       totalCalls: 0,
       errors: 0,
@@ -274,7 +275,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     this.coreOperationStats.set(operationName, stats);
   }
 
-  private updateCoreStats(operationName: string, duration: number, success: boolean): void {
+  private updateCoreStats(operationName: string, duration: number, _success: boolean): void {
     const stats = this.coreOperationStats.get(operationName) || {
       totalCalls: 0,
       errors: 0,
@@ -297,7 +298,10 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     if (operationStats.length === 0) return 100;
 
     const avgExecutionTime = operationStats.reduce((sum, stat) => sum + stat.avgExecutionTime, 0) / operationStats.length;
-    const errorRate = operationStats.reduce((sum, stat) => sum + (stat.errors / stat.totalCalls), 0) / operationStats.length;
+    const errorRate = operationStats.reduce(
+      (sum, stat) => sum + (stat.totalCalls > 0 ? stat.errors / stat.totalCalls : 0),
+      0
+    ) / operationStats.length;
 
     // Performance score based on execution time and error rate
     const timeScore = Math.max(0, 100 - (avgExecutionTime / 5)); // Penalize slow core operations
@@ -370,7 +374,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
   }
 
   private calculateErrorImpact(error: AppError): number {
-    const severityMultiplier = {
+    const severityMultiplier: Record<string, number> = {
       [ErrorSeverity.LOW]: 1,
       [ErrorSeverity.MEDIUM]: 2,
       [ErrorSeverity.HIGH]: 3,
@@ -378,7 +382,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       [ErrorSeverity.BLOCKER]: 5
     };
 
-    return severityMultiplier[error.severity] || 1;
+    return severityMultiplier[error.severity as string] || 1;
   }
 
   private calculateTrend(current: number, previous: number): 'increasing' | 'decreasing' | 'stable' {
@@ -559,8 +563,8 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
   }
 
   private isOperationEnabled(operation: string): boolean {
-    const monitoring = ServiceArchitectureMonitoring.getInstance() as unknown;
-    return monitoring.enabledOperations.has('*') || monitoring.enabledOperations.has(operation);
+    const monitoring = ServiceArchitectureMonitoring.getInstance();
+    return (monitoring as any).enabledOperations.has('*') || (monitoring as any).enabledOperations.has(operation);
   }
 }
 

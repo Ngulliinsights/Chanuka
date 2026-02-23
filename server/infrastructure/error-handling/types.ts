@@ -31,15 +31,11 @@ export enum ErrorCategory {
 }
 
 /**
- * Operational severity, used to route to the correct log level and
- * decide whether to fire alerts. Maps to log levels in error-factory.ts.
+ * Operational severity — imported from the shared single source of truth.
+ * Re-exported here so downstream server modules can keep importing from this file.
  */
-export enum ErrorSeverity {
-  LOW      = 'low',
-  MEDIUM   = 'medium',
-  HIGH     = 'high',
-  CRITICAL = 'critical',
-}
+import { ErrorSeverity } from '@shared/core';
+export { ErrorSeverity };
 
 /**
  * Circuit breaker operating states (see resilience.ts).

@@ -57,14 +57,8 @@ export type { ValidationError as ValidationTypesAlias } from './validation-types
 
 
 
-// Middleware types (excluding conflicting ones already aliased above)
-export type {
-  RegularMiddleware,
-  ErrorMiddleware,
-  AnyMiddleware,
-  PerformanceMetrics,
-  MiddlewareProvider
-} from '../middleware/types';
+// Middleware types moved to server/middleware/shared-core/
+// Import directly from '@server/middleware/shared-core/types' if needed
 
 
 

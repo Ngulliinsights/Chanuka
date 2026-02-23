@@ -1,4 +1,4 @@
-import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
 import type { Pool as PoolType } from 'pg';
 
 export interface ValidationRule {

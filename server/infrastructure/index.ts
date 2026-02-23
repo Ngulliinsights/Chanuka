@@ -5,20 +5,46 @@
 export * from './database';
 
 // Observability (monitoring, logging, performance)
+// NOTE: exports AlertRule, AlertAction from error-handling/types via observability chain
 export * from './observability';
 
 // Notifications (server-specific, using shared primitives)
-export * from './notifications';
+// Use named exports to avoid duplicate AlertRule/AlertAction conflict with observability
+export {
+  NotificationService,
+  CoreNotificationService,
+  notificationService,
+  coreNotificationService,
+  type NotificationData,
+  type NotificationHistory,
+  notificationRoutes,
+  NotificationOrchestratorService,
+  notificationOrchestratorService,
+  type NotificationRequest,
+  type NotificationBatch,
+  type NotificationResult,
+  type BulkNotificationResult,
+  alertingService,
+  type Alert,
+  notificationSchedulerService,
+  type ScheduledDigest,
+  type DigestContent,
+  SmartNotificationFilterService,
+  type FilterCriteria,
+  type UserEngagementProfile,
+  type FilterResult,
+  notificationChannelService,
+} from './notifications';
 
 // External Data (server-specific, using shared utilities)
 export * from './external-data';
 
 // WebSocket (server-specific - consolidated)
-export { 
-  WebSocketService, 
-  createWebSocketService, 
+export {
+  WebSocketService,
+  createWebSocketService,
   createUnifiedWebSocketService,
-  BackwardCompatibleWebSocketService 
+  UnifiedWebSocketService,
 } from './websocket';
 
 // Demo Data (server-specific)
@@ -32,48 +58,3 @@ export {
   withTransaction,
   withReadConnection
 } from '@server/infrastructure/database/connection';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

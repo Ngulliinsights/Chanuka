@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
 import { config } from '@server/config/index';
-import { router as authRouter } from '@server/infrastructure/core/auth/auth';
-import { sessionCleanupService } from '@server/infrastructure/core/auth/session-cleanup';
-import { schemaValidationService } from '@server/infrastructure/core/validation/schema-validation-service';
+import { router as authRouter } from '@server/infrastructure/auth/auth';
+import { sessionCleanupService } from '@server/infrastructure/auth/session-cleanup';
+import { schemaValidationService } from '@server/infrastructure/validation/schema-validation-service';
 import { router as adminRouter } from '@server/features/admin/admin';
 import { router as externalApiDashboardRouter } from '@server/features/admin/external-api-dashboard';
 import { router as externalApiManagementRouter } from '@server/features/admin/external-api-dashboard';
@@ -32,7 +32,7 @@ import { monitoringScheduler } from '@server/infrastructure/monitoring/monitorin
 import { notificationSchedulerService } from '@server/infrastructure/notifications/notification-scheduler';
 import { router as notificationsRouter } from '@server/infrastructure/notifications/notifications';
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
-import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
+import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
 import { webSocketService } from '@server/utils/missing-modules-fallback';
 import { setupVite } from '@server/vite';
@@ -312,23 +312,11 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
 });
 
 // Security-sensitive endpoints with additional rate limiting
-app.use('/api/auth', migratedApiRateLimit({
-  windowMs: 15 * 60 * 1000,
-  maxRequests: 5,
-  skipSuccessfulRequests: true
-}), authRouter);
+app.use('/api/auth', standardRateLimits.auth, authRouter);
 
-app.use('/api/admin', migratedApiRateLimit({
-  windowMs: 5 * 60 * 1000,
-  maxRequests: 10,
-  skipSuccessfulRequests: false
-}), adminRouter);
+app.use('/api/admin', standardRateLimits.api, adminRouter);
 
-app.use('/api/verification', migratedApiRateLimit({
-  windowMs: 10 * 60 * 1000,
-  maxRequests: 3,
-  skipSuccessfulRequests: true
-}), verificationRouter);
+app.use('/api/verification', standardRateLimits.auth, verificationRouter);
 
 // API Routes registration
 app.use('/api/system', systemRouter);

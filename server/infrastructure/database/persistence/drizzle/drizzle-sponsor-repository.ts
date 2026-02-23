@@ -14,7 +14,7 @@ import {
   uuidParamSchema,
   validateRepositoryInput,
   validateSearchParams
-} from '@server/infrastructure/validation/repository-validation';
+} from '@server/infrastructure/database/repository-validation';
 import type { Maybe,Result } from '@shared/core';
 import { Err, none,Ok, some } from '@shared/core';
 import type { NewSponsor,Sponsor } from '@server/infrastructure/schema';

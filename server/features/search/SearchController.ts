@@ -14,6 +14,7 @@ import { Router, Request, Response } from 'express';
 import { searchRepository } from './infrastructure/SearchRepository';
 
 import { asyncHandler } from '../../middleware/error-management';
+import { authenticateToken, requireRole } from '../../middleware/auth';
 import { createValidationError, createError, ErrorCategory, ErrorSeverity } from '../../infrastructure/error-handling';
 import { ERROR_CODES } from '@shared/constants';
 
@@ -169,7 +170,7 @@ router.get('/popular', asyncHandler(async (req: Request, res: Response) => {
  *
  * Note: This route requires admin authentication
  */
-router.post('/admin/rebuild-index', asyncHandler(async (req: Request, res: Response) => {
+router.post('/admin/rebuild-index', authenticateToken, requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'POST /api/search/admin/rebuild-index');
 
   try {
@@ -207,7 +208,7 @@ router.post('/admin/rebuild-index', asyncHandler(async (req: Request, res: Respo
  *
  * Note: This route requires admin authentication
  */
-router.get('/admin/index-health', asyncHandler(async (req: Request, res: Response) => {
+router.get('/admin/index-health', authenticateToken, requireRole(['admin']), asyncHandler(async (req: Request, res: Response) => {
   const context = createErrorContext(req, 'GET /api/search/admin/index-health');
 
   try {

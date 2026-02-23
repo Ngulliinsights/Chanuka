@@ -16,8 +16,8 @@ export {
   loggingConfig,
   getLoggingConfig,
   validateLoggingConfig,
-} from './config/logging-config';
-export type { LoggingConfig } from './config/logging-config';
+} from './logging-config';
+export type { LoggingConfig } from './logging-config';
 
 // ─── Core logger (most-imported export in the codebase) ──────────────────────
 export { logger, logBuffer } from './core';
@@ -64,7 +64,7 @@ export {
   databaseLogger,
   DatabaseLogger,
   DatabaseOperationContextBuilder,
-} from './database/database-logger';
+} from './database-logger';
 
 // ─── Monitoring ───────────────────────────────────────────────────────────────
 export * from './monitoring';

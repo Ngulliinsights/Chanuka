@@ -353,14 +353,16 @@ export function useVoteOnComment() {
     mutationFn: ({
       commentId,
       voteType,
+      billId,
     }: {
       commentId: string | number;
       voteType: 'up' | 'down';
+      billId: string;
     }) => billsApiService.voteOnComment(commentId, voteType),
 
-    onSuccess: () => {
-      // Invalidate all bill queries to refresh comment counts
-      queryClient.invalidateQueries({ queryKey: billsKeys.all });
+    onSuccess: (_data, variables) => {
+      // Invalidate only the affected bill's comments, not all bill queries
+      queryClient.invalidateQueries({ queryKey: billsKeys.comments(variables.billId) });
     },
 
     onError: (error: Error) => {
@@ -382,10 +384,11 @@ export function useEndorseComment() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (commentId: string | number) => billsApiService.endorseComment(commentId),
+    mutationFn: ({ commentId, billId }: { commentId: string | number; billId: string }) =>
+      billsApiService.endorseComment(commentId),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billsKeys.all });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: billsKeys.comments(variables.billId) });
 
       toast({
         title: 'Comment endorsed',

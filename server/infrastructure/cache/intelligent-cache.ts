@@ -4,6 +4,10 @@
  * Builds caching recommendations from actual usage patterns.
  * Only caches what metrics show is worth caching.
  *
+ * @deprecated This module uses Node.js-specific APIs (`fs`, `path`) and
+ * should NOT reside in `shared/`. Move to `server/infrastructure/cache/`
+ * so client bundles are not polluted with Node.js imports.
+ *
  * Strategy:
  * - Measure cache hit rates
  * - Calculate actual time savings
@@ -13,20 +17,53 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { CacheMetrics, CacheAggregate, PerformanceRecommendation } from '@shared/types/performance';
+
+// Types defined locally since @shared/types/performance does not exist
+// and this module is deprecated (should move to server/).
+interface CacheMetrics {
+  cacheKey: string;
+  hitCount: number;
+  missCount: number;
+  hitRate: number;
+  avgHitTimeMs: number;
+  avgMissTimeMs: number;
+  totalSizeBytes: number;
+  estimatedSavingsMs: number;
+  recommendedTTL: number;
+}
+
+interface CacheAggregate {
+  totalHits: number;
+  totalMisses: number;
+  overallHitRate: number;
+  totalSizeBytes: number;
+  estimatedSavingsMs: number;
+  hotSpots: CacheMetrics[];
+}
+
+interface PerformanceRecommendation {
+  priority: 'high' | 'medium' | 'low';
+  category: string;
+  title: string;
+  description: string;
+  estimatedSavingsMs: number;
+  effort: string;
+  evidenceMetrics: string[];
+  implementationSteps: string[];
+}
 
 /**
  * Tracks cache performance for analysis
  */
 interface CacheEntry {
-  readonly key: string;
-  readonly accessCount: number;
-  readonly hitCount: number;
-  readonly missCount: number;
-  readonly lastAccessTime: number;
-  readonly lastSetTime: number;
-  readonly size: number;
-  readonly operationTimeMs: number; // time to generate if miss
+  key: string;
+  accessCount: number;
+  hitCount: number;
+  missCount: number;
+  lastAccessTime: number;
+  lastSetTime: number;
+  size: number;
+  operationTimeMs: number; // time to generate if miss
 }
 
 /**
@@ -284,10 +321,9 @@ export class IntelligentCache {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = path.join(this.outputPath, `cache-analysis-${sessionName}-${timestamp}.json`);
 
-    const allMetrics = Array.from(this.metrics.entries()).map(([key, metrics]) => ({
-      key,
+    const allMetrics = Array.from(this.metrics.entries()).map(([_key, metrics]) => ({
       ...metrics,
-      hitRate: this.getHitRate(key),
+      hitRate: this.getHitRate(metrics.key),
     }));
 
     const report = {

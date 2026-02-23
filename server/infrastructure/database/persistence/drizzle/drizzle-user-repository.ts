@@ -9,7 +9,7 @@ import type { IUserRepository } from '@server/domain/interfaces/user-repository.
 import { queryCache } from '@server/infrastructure/caching/query-cache';
 import { withTransaction } from '@server/infrastructure/database';
 import { databaseLogger } from '@server/infrastructure/logging/database-logger';
-import { performanceMonitor } from '@server/infrastructure/performance/performance-monitor';
+import { performanceMonitor } from '@server/infrastructure/observability/monitoring/performance-monitor';
 import {
   newUserSchema,
   userProfileSchema,
@@ -17,7 +17,7 @@ import {
   uuidParamSchema,
   validateRepositoryInput,
   validateSearchParams
-} from '@server/infrastructure/validation/repository-validation';
+} from '@server/infrastructure/database/repository-validation';
 import type { Maybe,Result } from '@shared/core';
 import { Err, none,Ok, some } from '@shared/core';
 import type { NewUser, NewUserProfile,User, UserProfile } from '@server/infrastructure/schema';

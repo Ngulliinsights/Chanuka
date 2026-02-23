@@ -3,15 +3,8 @@
  * This provides temporary implementations to fix compilation errors
  */
 
-// Fallback for missing @shared/middleware/auth.js
-export interface AuthenticatedRequest {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-  [key: string]: any;
-}
+// Re-export canonical AuthenticatedRequest from shared
+export type { AuthenticatedRequest } from '@shared/core/types/auth.types';
 
 // Fallback for missing @shared/features/bills/types/analysis.js
 export interface BillAnalysis {

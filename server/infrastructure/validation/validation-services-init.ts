@@ -12,12 +12,12 @@
  * 5. Data Completeness Service (depends on database and metrics)
  */
 
-import { DataCompletenessService } from '@server/infrastructure/core/validation/data-completeness';
-import { DataIntegrityValidationService } from '@server/infrastructure/core/validation/data-validation-service';
-import { InputValidationService } from '@server/infrastructure/core/validation/input-validation-service';
-import { SchemaValidationService } from '@server/infrastructure/core/validation/schema-validation-service';
+import { DataCompletenessService } from '@server/infrastructure/validation/data-completeness';
+import { DataIntegrityValidationService } from '@server/infrastructure/validation/data-validation-service';
+import { InputValidationService } from '@server/infrastructure/validation/input-validation-service';
+import { SchemaValidationService } from '@server/infrastructure/validation/schema-validation-service';
 // Import service classes
-import { ValidationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { ValidationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
 import { getDbInstance } from '@server/infrastructure/database/index';
 import { logger } from '@server/infrastructure/observability';
 import type { Pool as PoolType } from 'pg';

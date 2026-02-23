@@ -1,4 +1,4 @@
-import { validationMetricsCollector } from '@server/infrastructure/core/validation/validation-metrics';
+import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
 import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 

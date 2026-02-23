@@ -1,33 +1,16 @@
 /**
  * Authentication Type Definitions
  * 
- * Type-safe interfaces for authenticated requests and user data
+ * Re-exports canonical types from shared and provides middleware-specific extensions.
+ * All base auth types come from @shared/core/types/auth.types.
  */
 
 import { Request } from 'express';
+import type { AuthenticatedRequest } from '@shared/core/types/auth.types';
 
-/**
- * User data attached to authenticated requests
- */
-export interface AuthenticatedUser {
-  readonly id: string;
-  readonly email: string;
-  readonly role: string;
-  readonly first_name?: string | null;
-  readonly last_name?: string | null;
-  readonly name?: string;
-  readonly verification_status?: string;
-  readonly is_active?: boolean | null;
-}
-
-/**
- * Extended Request interface with authenticated user
- */
-export interface AuthenticatedRequest extends Request {
-  user?: AuthenticatedUser;
-  requestId?: string;
-  startTime?: number;
-}
+// Re-export canonical types for backward compatibility
+export type { AuthenticatedRequest, AuthenticatedUser } from '@shared/core/types/auth.types';
+export { isAuthenticated, hasRole, getUserId } from '@shared/core/types/auth.types';
 
 /**
  * Extended Request interface with data retention preferences
@@ -43,30 +26,8 @@ export interface PrivacyRequest extends AuthenticatedRequest {
 
 /**
  * Type guard to check if a request has an authenticated user
+ * @deprecated Use isAuthenticated from @shared/core/types/auth.types instead
  */
 export function isAuthenticatedRequest(req: Request): req is AuthenticatedRequest {
   return 'user' in req && req.user !== undefined;
-}
-
-/**
- * Type guard to check if a request has a user with a specific role
- */
-export function hasRole(req: Request, role: string): boolean {
-  if (!isAuthenticatedRequest(req)) {
-    return false;
-  }
-  
-  return req.user?.role === role;
-}
-
-/**
- * Get user ID from authenticated request
- * Returns null if request is not authenticated
- */
-export function getUserId(req: Request): string | null {
-  if (!isAuthenticatedRequest(req)) {
-    return null;
-  }
-  
-  return req.user?.id || null;
 }

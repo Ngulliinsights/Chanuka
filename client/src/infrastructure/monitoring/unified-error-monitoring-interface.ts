@@ -4,42 +4,18 @@
  */
 
 // Import from single source of truth
-import { ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '../../../infrastructure/error/constants';
+import { ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '@client/infrastructure/error/constants';
 
-// Re-export types for compatibility
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
-export type ErrorDomain = 
-  | 'authentication'
-  | 'authorization'
-  | 'permission'
-  | 'validation'
-  | 'network'
-  | 'database'
-  | 'external_service'
-  | 'cache'
-  | 'business_logic'
-  | 'security'
-  | 'session'
-  | 'system'
-  | 'resource'
-  | 'rate_limiting'
-  | 'ui'
-  | 'hooks'
-  | 'library_services'
-  | 'service_architecture'
-  | 'cross_system'
-  | 'user_input'
-  | 'configuration'
-  | 'integration'
-  | 'performance'
-  | 'file_system'
-  | 'unknown';
-
-export type ClientSystem = 'web' | 'mobile' | 'desktop' | 'service_architecture' | 'security' | 'library_services' | 'hooks';
+// Re-export the canonical enum types (not string unions) so downstream
+// consumers use the same nominal type as @shared/core.
+export type ErrorSeverity = CoreErrorSeverity;
+export type ErrorDomain = CoreErrorDomain;
 
 // Const objects for runtime enum values - use core enums
 export const ErrorSeverity = CoreErrorSeverity;
 export const ErrorDomain = CoreErrorDomain;
+
+export type ClientSystem = 'web' | 'mobile' | 'desktop' | 'service_architecture' | 'security' | 'library_services' | 'hooks';
 
 export const ClientSystem = {
   WEB: 'web' as const,

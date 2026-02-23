@@ -1,51 +1,15 @@
 /**
  * Error Constants and Enums
  *
- * Shared constants used across the error handling system.
+ * Client-specific error constants; ErrorDomain and ErrorSeverity are
+ * imported from @shared/core (single source of truth).
  * Separated to avoid circular dependencies.
  */
 
-/**
- * Categories for error classification, enabling better error routing and handling.
- */
-export enum ErrorDomain {
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  PERMISSION = 'permission',
-  VALIDATION = 'validation',
-  NETWORK = 'network',
-  DATABASE = 'database',
-  EXTERNAL_SERVICE = 'external_service',
-  CACHE = 'cache',
-  BUSINESS_LOGIC = 'business_logic',
-  SECURITY = 'security',
-  SESSION = 'session',
-  SYSTEM = 'system',
-  RESOURCE = 'resource',
-  RATE_LIMITING = 'rate_limiting',
-  UI = 'ui',
-  HOOKS = 'hooks',
-  LIBRARY_SERVICES = 'library_services',
-  SERVICE_ARCHITECTURE = 'service_architecture',
-  CROSS_SYSTEM = 'cross_system',
-  USER_INPUT = 'user_input',
-  CONFIGURATION = 'configuration',
-  INTEGRATION = 'integration',
-  PERFORMANCE = 'performance',
-  FILE_SYSTEM = 'file_system',
-  UNKNOWN = 'unknown',
-}
-
-/**
- * Severity levels for error prioritization and alerting.
- */
-export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical',
-  BLOCKER = 'blocker',
-}
+// ============================================================================
+// Error Domain & Severity — re-exported from shared single source of truth
+// ============================================================================
+export { ErrorDomain, ErrorSeverity } from '@shared/core';
 
 /**
  * Recovery action types

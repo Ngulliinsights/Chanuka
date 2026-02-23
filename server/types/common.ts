@@ -43,40 +43,19 @@ export interface ErrorResponse {
   timestamp: string;
 }
 
-// ===== USER TYPES =====
+// ===== USER TYPES (re-exported from canonical source) =====
 
-export interface User {
-  id: number;
-  email: string;
-  username?: string | null;
-  first_name?: string | null;
-  last_name?: string | null;
-  display_name?: string | null;
-  role: UserRole;
-  avatar_url?: string | null;
-  expertise?: string[] | null;
-  is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
-  last_login_at?: Date | null;
-}
-
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
-
-export interface UserProfile extends User {
-  bio?: string | null;
-  interests?: string[] | null;
-  verification_status?: 'pending' | 'verified' | 'rejected';
-  reputation_score?: number;
-  preferences?: UserPreferences;
-}
-
-export interface UserPreferences {
-  emailNotifications?: boolean;
-  theme?: 'light' | 'dark' | 'auto';
-  language?: string;
-  timezone?: string;
-}
+export type {
+  User,
+  UserRole,
+  UserProfile,
+  UserPreferences,
+  AuthenticatedRequest,
+  AuthenticatedUser,
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+} from '@shared/core/types/auth.types';
 
 // ===== BILL TYPES =====
 
@@ -338,26 +317,7 @@ export interface BillEngagementStats {
 }
 
 // ===== AUTHENTICATION TYPES =====
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  role?: UserRole;
-}
-
-export interface AuthResponse {
-  token: string;
-  refresh_token?: string;
-  user: UserProfile;
-  expiresIn: number;
-}
+// LoginRequest, RegisterRequest, AuthResponse re-exported from @shared/core/types/auth.types above
 
 // ===== SYSTEM HEALTH TYPES =====
 
@@ -382,6 +342,5 @@ export type DeepPartial<T> = {
 // ===== LEGACY TYPE ALIASES (for backward compatibility) =====
 
 export type ApiResponseType<T> = ApiResponse<T>;
-export type UserType = User;
 export type BillType = Bill;
 export type ExpertType = Expert;

@@ -6,8 +6,8 @@ import https from 'https';
 import { encryptionService } from './encryption-service';
 import { securityAuditService } from './security-audit-service';
 import { tlsConfigService } from './tls-config-service';
-import { inputValidationService } from '@server/infrastructure/core/validation/input-validation-service';
-import { secureSessionService } from '@server/infrastructure/core/auth/secure-session-service';
+import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
+import { secureSessionService } from '@server/infrastructure/auth/secure-session-service';
 import { securityMiddleware } from './security-middleware';
 
 /**

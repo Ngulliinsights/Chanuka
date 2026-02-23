@@ -32,12 +32,9 @@ export { validateUser, validateUserRegistration } from './schemas/user.schema';
 export { validateBill } from './schemas/bill.schema';
 export { validateComment } from './schemas/comment.schema';
 
-// Export middleware (server-only, but safe to import)
-export { 
-  validateSchema, 
-  validateQuery, 
-  validateParams 
-} from './middleware';
+// NOTE: Express middleware (validateSchema, validateQuery, validateParams)
+// is server-only. Import directly from '@shared/validation/middleware'
+// in server code. NOT re-exported here to avoid Express types in client bundles.
 
 // Export transformer validation utilities
 export {

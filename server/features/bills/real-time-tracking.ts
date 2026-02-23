@@ -494,7 +494,9 @@ function formatWebSocketStats(stats: WebSocketApiStats): Record<string, unknown>
     connectedUsers: stats.uniqueUsers,
     totalSubscriptions: stats.totalSubscriptions,
     uptime: stats.uptime,
-    messageSuccessRate: `${((stats.messagesSent / (stats.messagesSent + 1)) * 100).toFixed(2)}%`,
+    messageSuccessRate: stats.messagesSent + stats.messagesReceived > 0
+      ? `${((stats.messagesSent / (stats.messagesSent + stats.messagesReceived)) * 100).toFixed(2)}%`
+      : '0.00%',
     performance: {
       messagesSent: stats.messagesSent,
       messagesReceived: stats.messagesReceived,

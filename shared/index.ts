@@ -15,24 +15,39 @@ export * from './types/index';
 // ============================================================================
 // CORE INFRASTRUCTURE
 // ============================================================================
+// NOTE: We do NOT `export * from './core/index'` here because ./types/index
+// already re-exports many of the same names (Brand, ErrorSeverity, etc.),
+// which causes TS "ambiguous re-export" errors. Instead we selectively
+// export only the items from ./core that are NOT already covered by ./types.
 
-// Core utilities and services
-export * from './core/index';
+// Error enums — canonical definitions live in shared/core/index.ts
+export { ErrorDomain, ErrorSeverity } from './core/index';
 
-// Database infrastructure
-export * from './database/index';
+// Core utility functions & types not covered by ./types
+// NOTE: security-utils, data-utils, and type-guards are intentionally
+// omitted because they export names (validateEmail, ValidationResult, etc.)
+// that collide with ./types/index or ./validation/index. Import them
+// directly from '@shared/core/utils/...' when needed.
+export * from './core/utils/string-utils';
+export * from './core/utils/number-utils';
+export * from './core/utils/regex-patterns';
+export * from './core/utils/formatting';
 
-// Schema definitions and types
-export * from './schema/index';
-
-// Platform-specific implementations
-export * from './platform/index';
+// Platform-specific implementations (selective to avoid AnonymityLevel clash)
+export { Kenya } from './platform/index';
+export type {
+  DisplayIdentity,
+  DataRetentionPolicy,
+  AnonymityService
+} from './platform/index';
 
 // ============================================================================
 // VALIDATION
 // ============================================================================
-
-export * from './validation/index';
+// NOTE: We do NOT `export * from './validation/index'` here because it
+// re-exports names (validateWithSchema, validateData) that collide with
+// ./types/index. Import validation utilities directly:
+//   import { ... } from '@shared/validation';
 
 // ============================================================================
 // INTERNATIONALIZATION
@@ -61,8 +76,6 @@ export type {
   CommentId,
   
   // Domain types
-  User,
-  UserProfile,
   Bill,
   Committee,
   Comment,
@@ -81,14 +94,6 @@ export type {
   ErrorClassification,
 } from './types/index';
 
-export type {
-  // Core types
-  Result,
-  Maybe,
-  BaseError,
-  ApiResponse
-} from './core/index';
-
 // ============================================================================
 // UTILITY COLLECTIONS
 // ============================================================================
@@ -96,7 +101,6 @@ export type {
 // Export utility collections for easy access
 import { utils } from './core/utils/common-utils';
 export { utils };
-export { validation, formatting, strings, arrays, functions, objects, civic } from './core/utils/common-utils';
 
 // ============================================================================
 // CONFIGURATION HELPERS
@@ -123,15 +127,22 @@ export const createSharedConfig = (environment: 'development' | 'test' | 'stagin
   };
 };
 
-// ============================================================================
-// HEALTH CHECK UTILITIES
-// ============================================================================
+export interface HealthCheckResult {
+  status: 'healthy' | 'unhealthy';
+  timestamp: string;
+  version: string;
+  components?: Record<string, 'healthy' | 'unhealthy'>;
+  details?: Record<string, unknown>;
+  error?: string;
+}
 
-export const healthCheck = async (): Promise<void> => {
+export const healthCheck = async (): Promise<HealthCheckResult> => {
   try {
-    // Import database health check
-    const { getDatabaseHealth } = await import('./database/index');
-    const dbHealth = await getDatabaseHealth();
+    // NOTE: shared/database/ does not exist yet.
+    // When it is created, uncomment the dynamic import below.
+    // const { getDatabaseHealth } = await import('./database/index');
+    // const dbHealth = await getDatabaseHealth();
+    const dbHealth = { healthy: true };
     
     return {
       status: 'healthy',

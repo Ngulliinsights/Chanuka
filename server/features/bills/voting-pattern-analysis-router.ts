@@ -182,14 +182,14 @@ router.get('/correlations', asyncHandler(async (req, res) => {
     if (!sponsor_idResult.valid) {
       return res.status(400).json(UnifiedApiResponse.validation([{ field: 'sponsor_id', message: sponsor_idResult.error }]));
     }
-    targetSponsorId = sponsor_idResult.value;
+    target_sponsor_id = sponsor_idResult.value;
   } else {
     // If no specific sponsor, use the first active sponsor as example
     const allAnalysis = await votingPatternAnalysisService.analyzeVotingPatterns();
     if (allAnalysis.length === 0) {
       return res.status(404).json(UnifiedApiResponse.notFound('Sponsors', 'No sponsors available for correlation analysis'));
     }
-    targetSponsorId = allAnalysis[0].sponsor_id;
+    target_sponsor_id = allAnalysis[0].sponsor_id;
   }
 
   // Parse comparison sponsors if provided

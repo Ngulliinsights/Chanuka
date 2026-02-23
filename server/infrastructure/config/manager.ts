@@ -12,8 +12,7 @@ import { resolve } from 'path';
 import * as chokidar from 'chokidar';
 import * as dotenvExpand from 'dotenv-expand';
 
-import { BaseError, ErrorDomain } from '../errors/base-error';
-import { ErrorSeverity } from '../errors/error-standardization';
+import { ErrorSeverity } from '../error-handling/types';
 import { ObservabilityStack } from '../observability/core/types';
 import { Result, err, ok } from '../primitives/types/result';
 
@@ -31,29 +30,38 @@ import type {
 } from './types';
 
 // Configuration Manager Error Classes
-export class ConfigurationError extends BaseError {
+// Uses ErrorSeverity from the canonical error-handling/types module.
+// Extends native Error rather than duplicating a BaseError abstraction.
+export class ConfigurationError extends Error {
+  public readonly statusCode: number;
+  public readonly code: string;
+  public readonly severity: ErrorSeverity;
+  public readonly isOperational: boolean;
+  public readonly details?: Record<string, unknown>;
+
   constructor(message: string, cause?: Error, metadata?: Record<string, unknown>) {
-    super(message, {
-      statusCode: 500,
-      code: 'CONFIGURATION_ERROR',
-      ...(cause ? { cause } : {}),
-      ...(metadata ? { details: metadata } : {}),
-      isOperational: true,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-    });
+    super(message, cause ? { cause } : undefined);
+    this.name        = 'ConfigurationError';
+    this.statusCode  = 500;
+    this.code        = 'CONFIGURATION_ERROR';
+    this.severity    = ErrorSeverity.HIGH;
+    this.isOperational = true;
+    this.details     = metadata;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
 export class ConfigurationValidationError extends ConfigurationError {
   constructor(message: string, validationErrors: unknown[]) {
     super(message, undefined, { validationErrors });
+    this.name = 'ConfigurationValidationError';
   }
 }
 
 export class ConfigurationEncryptionError extends ConfigurationError {
   constructor(message: string, cause?: Error) {
     super(message, cause);
+    this.name = 'ConfigurationEncryptionError';
   }
 }
 
@@ -116,7 +124,7 @@ export class ConfigurationManager extends EventEmitter {
       // Validate configuration with Result types
       const validationResult = this.validateConfiguration(rawConfig);
       if (validationResult.isErr()) {
-        const error = validationResult.unwrap();
+        const error = validationResult.error;
         this.emit('config:error', error);
         this.observability?.getMetrics()?.counter('config.validation.failed', 1);
         return err(error);
@@ -160,7 +168,7 @@ export class ConfigurationManager extends EventEmitter {
         if (dependencyResult.isErr()) {
           // Log warning but don't fail loading
           this.observability?.getLogger()?.warn({
-            error: (dependencyResult.unwrap() as ConfigurationError).message
+            error: dependencyResult.error.message
           }, 'Dependency validation failed');
         }
       }
@@ -330,9 +338,9 @@ export class ConfigurationManager extends EventEmitter {
    */
   setEncryptionKey(key: string): Result<void, ConfigurationEncryptionError> {
     try {
-      // Validate key strength (basic check)
-      if (key.length < 32) {
-        return err(new ConfigurationEncryptionError('Encryption key must be at least 32 characters long'));
+      // Validate key strength — AES-256 requires exactly 32 bytes
+      if (Buffer.byteLength(key, 'utf8') < 32) {
+        return err(new ConfigurationEncryptionError('Encryption key must be at least 32 bytes long'));
       }
 
       this.encryptionKey = key;
@@ -397,7 +405,7 @@ export class ConfigurationManager extends EventEmitter {
          // Assuming new format ENC:iv:content
          return err(new ConfigurationEncryptionError('Invalid encrypted value format'));
       }
-      const [ivHex, contentHex] = parts;
+      const [ivHex, contentHex] = parts as [string, string];
       const iv = Buffer.from(ivHex, 'hex');
       
       const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.encryptionKey!), iv);
@@ -438,11 +446,10 @@ export class ConfigurationManager extends EventEmitter {
     destroy(): Result<void, ConfigurationError> {
       try {
         this.removeAllListeners();
-        this._state.watchingFiles = [];
         this.hotReloadConfig.enabled = false;
         this.encryptedValues.clear();
 
-        // Clean up chokidar watchers
+        // Clean up chokidar watchers BEFORE clearing the list
         for (const file of this._state.watchingFiles) {
           const watcher = (this as any)[`_watcher_${file}`];
           if (watcher && typeof watcher.close === 'function') {
@@ -450,6 +457,7 @@ export class ConfigurationManager extends EventEmitter {
             delete (this as any)[`_watcher_${file}`];
           }
         }
+        this._state.watchingFiles = [];
 
         this.observability?.getLogger()?.info('Configuration manager destroyed');
         return ok(undefined);
@@ -650,7 +658,7 @@ export class ConfigurationManager extends EventEmitter {
       if (!(key in current) || typeof current[key] !== 'object') {
         current[key] = {};
       }
-      current = current[key];
+      current = current[key] as Record<string, unknown>;
     }
 
     const lastKey = keys[keys.length - 1];
@@ -665,15 +673,15 @@ export class ConfigurationManager extends EventEmitter {
 
     // Validate Redis connection if using Redis
     if (config.cache.provider === 'redis' || config.rateLimit.provider === 'redis') {
-      validations.push(this.validateRedisConnection(config.cache.redisUrl));
+      validations.push(this.validateRedisUrlFormat(config.cache.redisUrl));
     }
 
     // Validate database connection
-    validations.push(this.validateDatabaseConnection(config.database.url));
+    validations.push(this.validateDatabaseUrlFormat(config.database.url));
 
     // Validate Sentry DSN if configured
     if (config.errors.reportToSentry && config.errors.sentryDsn) {
-      validations.push(this.validateSentryDsn(config.errors.sentryDsn));
+      validations.push(this.validateSentryDsnFormat(config.errors.sentryDsn));
     }
 
     try {
@@ -701,7 +709,7 @@ export class ConfigurationManager extends EventEmitter {
     }
   }
 
-  private async validateRedisConnection(redisUrl: string): Promise<DependencyValidationResult> {
+  private async validateRedisUrlFormat(redisUrl: string): Promise<DependencyValidationResult> {
     try {
       new URL(redisUrl);
       return {
@@ -719,7 +727,7 @@ export class ConfigurationManager extends EventEmitter {
     }
   }
 
-  private async validateDatabaseConnection(databaseUrl: string): Promise<DependencyValidationResult> {
+  private async validateDatabaseUrlFormat(databaseUrl: string): Promise<DependencyValidationResult> {
     try {
       new URL(databaseUrl);
       return {
@@ -737,7 +745,7 @@ export class ConfigurationManager extends EventEmitter {
     }
   }
 
-  private async validateSentryDsn(sentryDsn: string): Promise<DependencyValidationResult> {
+  private async validateSentryDsnFormat(sentryDsn: string): Promise<DependencyValidationResult> {
     try {
       new URL(sentryDsn);
       return {
@@ -836,7 +844,7 @@ export class ConfigurationManager extends EventEmitter {
   private detectChanges(previous: AppConfig, current: AppConfig): ConfigChange[] {
     const changes: ConfigChange[] = [];
 
-    const compareObjects = (prev: unknown, curr: unknown, path: string = '') => {
+    const compareObjects = (prev: Record<string, unknown>, curr: Record<string, unknown>, path: string = '') => {
       const allKeys = new Set([...Object.keys(prev || {}), ...Object.keys(curr || {})]);
 
       for (const key of Array.from(allKeys)) {
@@ -859,7 +867,7 @@ export class ConfigurationManager extends EventEmitter {
             type: 'removed',
           });
         } else if (typeof prevValue === 'object' && typeof currValue === 'object') {
-          compareObjects(prevValue, currValue, currentPath);
+          compareObjects(prevValue as Record<string, unknown>, currValue as Record<string, unknown>, currentPath);
         } else if (prevValue !== currValue) {
           changes.push({
             path: currentPath,
@@ -926,12 +934,12 @@ export class ConfigurationManager extends EventEmitter {
     return Math.abs(hash);
   }
 
-  private deepMerge(target: unknown, source: unknown): unknown {
-    const result = { ...target };
+  private deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = { ...target };
 
     for (const key in source) {
       if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = this.deepMerge(target[key] || {}, source[key]);
+        result[key] = this.deepMerge((target[key] || {}) as Record<string, unknown>, source[key] as Record<string, unknown>);
       } else {
         result[key] = source[key];
       }

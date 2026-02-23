@@ -1,6 +1,10 @@
 import { authService } from '@server/infrastructure/auth/auth-service';
 import { logger } from '@server/infrastructure/observability';
-import { NextFunction,Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
+import type { AuthenticatedRequest } from '@shared/core/types/auth.types';
+
+// Re-export AuthenticatedRequest for consumers that import from this file
+export type { AuthenticatedRequest } from '@shared/core/types/auth.types';
 
 // Extend Express User type to match our auth service
 declare global {
@@ -16,10 +20,6 @@ declare global {
       is_active: boolean | null;
     }
   }
-}
-
-export interface AuthenticatedRequest extends Request {
-  user?: Express.User;
 }
 
 export const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

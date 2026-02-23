@@ -18,15 +18,7 @@ import { billService } from '@shared/application/bills';
 import { ERROR_CODES } from '@shared/constants';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { createErrorContext } from '@server/infrastructure/error-handling';
-
-const logger = {
-  error: (message: string, context?: Record<string, unknown>, error?: Error) => {
-    console.error(`[ERROR] ${message}`, context || '', error || '');
-  },
-  info: (message: string, context?: Record<string, unknown>, meta?: Record<string, unknown>) => {
-    console.info(`[INFO] ${message}`, context || '', meta || '');
-  }
-};
+import { logger } from '@server/infrastructure/observability/core/logger';
 
 const router: Router = Router();
 

@@ -66,12 +66,17 @@ export * from './utils/formatting';
 // Compatibility exports removed. Import directly from server layer.
 // See SHARED_LAYER_AUDIT.md for migration details.
 
-// Error severity and domain enums
+// ============================================================================
+// ERROR ENUMS — SINGLE SOURCE OF TRUTH
+// ============================================================================
+// Both server and client re-export these; do NOT redefine elsewhere.
+
 export enum ErrorDomain {
   SYSTEM = 'system',
   VALIDATION = 'validation',
   AUTHENTICATION = 'authentication',
   AUTHORIZATION = 'authorization',
+  PERMISSION = 'permission',
   DATABASE = 'database',
   CACHE = 'cache',
   NETWORK = 'network',
@@ -79,13 +84,27 @@ export enum ErrorDomain {
   BUSINESS_LOGIC = 'business_logic',
   INFRASTRUCTURE = 'infrastructure',
   SECURITY = 'security',
+  SESSION = 'session',
   DATA = 'data',
-  INTEGRATION = 'integration'
+  INTEGRATION = 'integration',
+  RESOURCE = 'resource',
+  RATE_LIMITING = 'rate_limiting',
+  UI = 'ui',
+  HOOKS = 'hooks',
+  LIBRARY_SERVICES = 'library_services',
+  SERVICE_ARCHITECTURE = 'service_architecture',
+  CROSS_SYSTEM = 'cross_system',
+  USER_INPUT = 'user_input',
+  CONFIGURATION = 'configuration',
+  PERFORMANCE = 'performance',
+  FILE_SYSTEM = 'file_system',
+  UNKNOWN = 'unknown',
 }
 
 export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
+  BLOCKER = 'blocker',
 }
